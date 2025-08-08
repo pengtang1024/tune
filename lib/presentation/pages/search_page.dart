@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/core/utils/localization_delegate.dart';
+import 'package:tune/core/routes/app_router.dart';
+import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/domain/usecases/search_songs.dart';
 import 'package:tune/presentation/widgets/song_list.dart';
 import 'package:tune/core/di/dependency_injection.dart';
 import 'package:tune/domain/entities/song.dart';
 import 'package:tune/presentation/bloc/player/player_bloc.dart';
 import 'package:tune/presentation/bloc/player/player_event.dart';
+import 'package:auto_route/auto_route.dart';
 
+@RoutePage()
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -19,7 +22,6 @@ class _SearchPageState extends State<SearchPage> {
   late SearchSongs _searchSongs;
   List<Song> _songs = [];
   bool _isLoading = false;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,10 +29,11 @@ class _SearchPageState extends State<SearchPage> {
     _searchSongs = DependencyInjection.get<SearchSongs>();
   }
 
-  Future<void> _performSearch(String query) async {
+  Future<void> _searchSongsByQuery(String query) async {
     if (query.isEmpty) {
       setState(() {
         _songs = [];
+        _isLoading = false;
       });
       return;
     }
@@ -51,58 +54,45 @@ class _SearchPageState extends State<SearchPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed: $e')),
+          SnackBar(content: Text('Failed to search songs: $e')),
         );
       }
     }
   }
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.searchTitle),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+        title: Text(localizations.search_title),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search songs...',
+                hintText: localizations.search_hint_text, // 修复本地化字符串引用
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onChanged: _performSearch,
+              onChanged: _searchSongsByQuery,
             ),
           ),
-          _isLoading
-              ? const Expanded(child: Center(child: CircularProgressIndicator()))
-              : Expanded(
-                  child: SongList(
-                    songs: _songs,
-                    onSongTap: (song) {
-                      context.read<PlayerBloc>().add(PlaySongEvent(song.id));
-                    },
-                  ),
-                ),
-        ],
+        ),
       ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SongList(
+              songs: _songs,
+              onSongTap: (song) {
+                context.read<PlayerBloc>().add(PlaySongEvent(song.id));
+                context.pushRoute(PlayerRoute());
+              },
+            ),
     );
   }
 }

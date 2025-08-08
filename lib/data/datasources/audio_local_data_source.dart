@@ -1,4 +1,6 @@
-import 'package:on_audio_query/on_audio_query.dart' as on_audio;
+// 移除on_audio_query导入
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/models/song_model.dart';
 
 abstract class AudioLocalDataSource {
@@ -9,42 +11,88 @@ abstract class AudioLocalDataSource {
 }
 
 class AudioLocalDataSourceImpl implements AudioLocalDataSource {
-  final on_audio.OnAudioQuery onAudioQuery;
+  // 移除onAudioQuery依赖
 
-  AudioLocalDataSourceImpl(this.onAudioQuery);
+  AudioLocalDataSourceImpl(); // 移除构造函数参数
 
   @override
   Future<List<SongModel>> getAllSongs() async {
-    final songs = await onAudioQuery.querySongs(
-      sortType: on_audio.SongSortType.DATE_ADDED,
-      orderType: on_audio.OrderType.DESC_OR_GREATER,
-      uriType: on_audio.UriType.EXTERNAL,
-    );
-    
-    return songs.map((song) => SongModel.fromAudioQuerySong(song)).toList();
+    // 实现基本的本地音乐文件查询功能
+    try {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final List<FileSystemEntity> files = directory.listSync(recursive: true);
+      
+      final List<SongModel> songs = [];
+      int id = 1;
+      
+      for (final FileSystemEntity file in files) {
+        if (file is File && _isAudioFile(file.path)) {
+          final String fileName = file.uri.pathSegments.last;
+          final String title = fileName.replaceAll(RegExp(r'\.[^.]*$'), ''); // 移除扩展名
+          final FileStat stat = await file.stat();
+          
+          songs.add(
+            SongModel(
+              id: id++,
+              title: title,
+              artist: 'Unknown Artist',
+              album: 'Unknown Album',
+              genre: 'Unknown Genre',
+              duration: 0, // 无法获取实际时长
+              uri: file.path,
+              albumArtUri: null,
+              dateAdded: stat.changed.millisecondsSinceEpoch,
+              isFavorite: false,
+            ),
+          );
+        }
+      }
+      
+      return songs;
+    } catch (e) {
+      // 如果出现错误，返回空列表
+      return [];
+    }
   }
 
   @override
   Future<List<SongModel>> searchSongs(String query) async {
-    final songs = await onAudioQuery.querySongs(
-      // 移除了不存在的sortBy参数
-      sortType: on_audio.SongSortType.TITLE,
-      orderType: on_audio.OrderType.ASC_OR_SMALLER,
-      uriType: on_audio.UriType.EXTERNAL,
-    );
+    final List<SongModel> allSongs = await getAllSongs();
+    if (query.isEmpty) {
+      return allSongs;
+    }
     
-    return songs.map((song) => SongModel.fromAudioQuerySong(song)).toList();
+    return allSongs.where((song) {
+      return song.title.toLowerCase().contains(query.toLowerCase()) ||
+          song.artist.toLowerCase().contains(query.toLowerCase()) ||
+          song.album.toLowerCase().contains(query.toLowerCase());
+    }).toList();
   }
 
   @override
   Future<void> toggleFavorite(int songId) async {
     // 实现收藏逻辑
-    // 在实际应用中，可能需要使用数据库存储收藏状态
+    // 在实际应用中，应该将收藏状态保存到本地存储
   }
 
   @override
   Future<List<SongModel>> getFavoriteSongs() async {
-    // 返回收藏的歌曲列表
+    // 实现获取收藏歌曲逻辑
     return [];
+  }
+
+  /// 检查文件是否为音频文件
+  bool _isAudioFile(String path) {
+    final List<String> audioExtensions = [
+      '.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.wma'
+    ];
+    
+    for (final String extension in audioExtensions) {
+      if (path.toLowerCase().endsWith(extension)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 }

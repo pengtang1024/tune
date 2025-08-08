@@ -2,14 +2,14 @@
 
 Tune 是一款专注于提供简洁直观界面的跨平台音乐播放器应用，旨在帮助用户管理和播放本地音乐库。
 
-## 功能特性
+## 🎵 功能特性
 
-- 本地音乐库管理
-- 自定义播放列表（按风格、心情或场景）
-- 流畅的音频播放体验
-- 音效调节（Equalizer）
-- 极简界面设计
-- 支持多平台（Android、iOS、Windows、macOS、Linux 和 Web）
+- **音乐播放模块**: 集成 just_audio 实现高质量音频播放，支持多种音频格式（MP3、FLAC、WAV等），提供播放控制（播放/暂停/停止/上一首/下一首）、音量控制、播放进度控制等功能；
+- **音乐库模块**: 通过自定义实现获取本地音乐，支持在线流媒体资源；
+- **主题系统**: 支持多种预设主题（Trendy Electro、Midnight Purple、Sunrise Orange），可跟随系统主题或手动切换；
+- **多语言支持**: 支持中英文切换，可扩展更多语言；
+- **响应式设计**: 适配不同屏幕尺寸，支持移动端和桌面端；
+- **后台播放**: 支持后台播放音乐，提供通知栏控制；
 
 ## 技术架构
 
@@ -48,17 +48,15 @@ Tune 是一款专注于提供简洁直观界面的跨平台音乐播放器应用
 - **用户模块**: 支持第三方登录，用 shared_preferences 存储用户会话
 - **UI/UX 模块**: 响应式设计，支持自定义主题和暗色模式
 
-## 技术栈
+## 📦 主要技术栈
 
-- 音频播放: [just_audio](https://pub.dev/packages/just_audio)
 - 状态管理: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
-- 本地存储: [hive](https://pub.dev/packages/hive) + [shared_preferences](https://pub.dev/packages/shared_preferences)
-- 网络请求: [dio](https://pub.dev/packages/dio)
 - 路由管理: [auto_route](https://pub.dev/packages/auto_route)
-- 本地音乐获取: [on_audio_query](https://pub.dev/packages/on_audio_query)
+- 音频播放: [just_audio](https://pub.dev/packages/just_audio)
+- 本地音乐获取: 自定义实现；
 - 权限管理: [permission_handler](https://pub.dev/packages/permission_handler)
-- 后台任务: [workmanager](https://pub.dev/packages/workmanager) (Android) + [background_fetch](https://pub.dev/packages/background_fetch) (iOS)
-- UI 组件: [flutter_screenutil](https://pub.dev/packages/flutter_screenutil)
+- 依赖注入: [get_it](https://pub.dev/packages/get_it)
+- 国际化: [flutter_localizations](https://pub.dev/packages/flutter_localizations)
 
 ## 跨平台适配
 

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tune/config/app_config.dart';
 import 'package:tune/config/theme/app_theme.dart';
 import 'package:tune/core/di/dependency_injection.dart';
-import 'package:tune/core/routes/app_router.dart';
-import 'package:tune/core/utils/localization_service.dart';
-import 'package:tune/core/utils/localization_delegate.dart';
+import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/presentation/bloc/localization/localization_bloc.dart';
+import 'package:tune/presentation/bloc/localization/localization_state.dart';
 import 'package:tune/presentation/bloc/theme/theme_bloc.dart';
 import 'package:tune/presentation/bloc/theme/theme_state.dart';
-import 'package:tune/presentation/bloc/user/user_bloc.dart';
+import 'package:tune/presentation/bloc/player/player_bloc.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:tune/core/routes/app_router.dart';
+import 'dart:developer';
 
-Future<void> main() async {
+void main() async {
+  // 确保WidgetsBinding初始化完成
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 初始化Hive
-  await Hive.initFlutter();
   
   // 初始化依赖注入
   await DependencyInjection.init();
@@ -24,70 +23,92 @@ Future<void> main() async {
   // 初始化应用配置
   await AppConfig.init();
   
-  // 初始化本地化服务
-  await LocalizationService().init();
-  
+  FlutterError.onError = (details) {
+    // 自定义错误处理（如上报到日志服务）
+    log('生产环境错误: ${details.exception}');
+  };
+
+  // 运行应用
   runApp(const MyApp());
 }
 
+/// 应用程序主类
+/// 
+/// 这是应用程序的入口点，负责初始化和配置整个应用程序。
+/// 它使用MultiBlocProvider来管理应用程序的状态，
+/// 并根据用户的主题和语言偏好来配置应用程序的外观和本地化设置。
 class MyApp extends StatelessWidget {
+  /// 创建应用程序实例
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appRouter = AppRouter();
+    
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => ThemeBloc(),
+        // 提供主题Bloc
+        BlocProvider<ThemeBloc>(
+          create: (context) => ThemeBloc(),
         ),
-        BlocProvider(
-          create: (_) => UserBloc(),
+        // 提供本地化Bloc
+        BlocProvider<LocalizationBloc>(
+          create: (context) => LocalizationBloc(),
         ),
-        BlocProvider(
-          create: (_) => DependencyInjection().getPlayerBloc(),
+        // 提供PlayerBloc
+        BlocProvider<PlayerBloc>(
+          create: (context) => DependencyInjection.get<PlayerBloc>(),
         ),
       ],
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) {
-          // 根据主题状态选择主题
-          ThemeData? selectedTheme;
-          if (state is ThemeChangedState) {
-            switch (state.themeName) {
-              case 'vibrant':
-                selectedTheme = AppTheme.vibrantTheme;
-                break;
-              case 'vinyl':
-                selectedTheme = AppTheme.vinylTheme;
-                break;
-              case 'tech':
-                selectedTheme = AppTheme.techTheme;
-                break;
-              default:
-                // 使用默认主题
-                break;
-            }
-          }
-          
-          return MaterialApp.router(
-            title: 'Tune',
-            theme: selectedTheme ?? AppTheme.lightTheme,
-            darkTheme: selectedTheme ?? AppTheme.darkTheme,
-            themeMode: state is ThemeChangedState ? state.themeMode : ThemeMode.system,
-            routerConfig: AppRouter().config(),
-            debugShowCheckedModeBanner: false,
-            
-            // 本地化配置
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: LocalizationService()
-                .getSupportedLocales()
-                .map((code) => Locale(code))
-                .toList(),
-            locale: Locale(LocalizationService().getCurrentLocale()),
+      child: Builder(
+        builder: (context) {
+          return BlocBuilder<ThemeBloc, ThemeState>(
+            builder: (context, themeState) {
+              return BlocBuilder<LocalizationBloc, LocalizationState>(
+                builder: (context, localizationState) {
+                  // 确定当前的主题模式
+                  ThemeMode themeMode = ThemeMode.system;
+                  String? themeName;
+                  
+                  // 如果主题状态是已更改状态，则使用新主题
+                  if (themeState is ThemeChangedState) {
+                    themeMode = themeState.themeMode;
+                    themeName = themeState.themeName;
+                  }
+                  
+                  // 确定当前的语言代码
+                  String locale = 'en'; // 默认语言为英语
+                  
+                  // 如果本地化状态是已更改状态，则使用新语言
+                  if (localizationState is LocalizationChangedState) {
+                    locale = localizationState.locale;
+                  }
+                  
+                  // 构建应用程序
+                  return MaterialApp.router(
+                    // 设置标题
+                    title: 'Tune',
+                    
+                    // 设置主题
+                    theme: AppTheme.getTheme(themeName ?? 'trendyElectro').themeData,
+                    
+                    // 设置暗黑主题
+                    darkTheme: AppTheme.getTheme(themeName ?? 'trendyElectro').darkThemeData,
+                    
+                    // 设置主题模式
+                    themeMode: themeMode,
+                    
+                    // 设置本地化相关属性
+                    localizationsDelegates: AppLocalizations.localizationsDelegates,
+                    supportedLocales: AppLocalizations.supportedLocales,
+                    locale: Locale(locale),
+                    
+                    // 设置路由
+                    routerConfig: appRouter.config(),
+                  );
+                },
+              );
+            },
           );
         },
       ),

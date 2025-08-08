@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalizationService {
@@ -11,20 +10,14 @@ class LocalizationService {
   LocalizationService._internal();
 
   late SharedPreferences _prefs;
-  late Box<Map> _languagePacksBox;
-
   final Map<String, Map<String, String>> _loadedLanguagePacks = {};
   String? _currentLocale;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
-    _languagePacksBox = await Hive.openBox<Map>('language_packs');
     
     // 加载内置语言包
     await _loadBuiltInLanguagePacks();
-    
-    // 加载自定义语言包
-    await _loadCustomLanguagePacks();
     
     // 获取当前选择的语言
     _currentLocale = _prefs.getString(_selectedLocaleKey);
@@ -57,6 +50,22 @@ class LocalizationService {
         'theme_light': 'Light',
         'theme_dark': 'Dark',
         'theme_system': 'System',
+        'bottom_player_bar_now_playing': 'Now Playing',
+        'bottom_player_bar_no_song': 'No song selected',
+        'song_list_title': 'Songs',
+        'song_list_no_songs': 'No songs found',
+        'player_page_duration': 'Duration',
+        'player_page_artist': 'Artist',
+        'player_page_album': 'Album',
+        'search_page_hint': 'Search songs...',
+        'search_page_empty': 'Enter a search term to find songs',
+        'search_page_no_results': 'No songs found matching your search',
+        'settings_page_language': 'Language',
+        'settings_page_theme': 'Theme',
+        'settings_page_about': 'About',
+        'library_page_artists': 'Artists',
+        'library_page_albums': 'Albums',
+        'library_page_genres': 'Genres'
       };
 
       _loadedLanguagePacks['zh'] = {
@@ -73,25 +82,30 @@ class LocalizationService {
         'theme_light': '浅色',
         'theme_dark': '深色',
         'theme_system': '系统',
+        'bottom_player_bar_now_playing': '正在播放',
+        'bottom_player_bar_no_song': '未选择歌曲',
+        'song_list_title': '歌曲列表',
+        'song_list_no_songs': '未找到歌曲',
+        'player_page_duration': '时长',
+        'player_page_artist': '艺术家',
+        'player_page_album': '专辑',
+        'search_page_hint': '搜索歌曲...',
+        'search_page_empty': '输入搜索词来查找歌曲',
+        'search_page_no_results': '未找到匹配的歌曲',
+        'settings_page_language': '语言',
+        'settings_page_theme': '主题',
+        'settings_page_about': '关于',
+        'library_page_artists': '艺术家',
+        'library_page_albums': '专辑',
+        'library_page_genres': '流派'
       };
-    }
-  }
-
-  Future<void> _loadCustomLanguagePacks() async {
-    // 从Hive加载自定义语言包
-    for (var key in _languagePacksBox.keys) {
-      final pack = _languagePacksBox.get(key);
-      if (pack != null) {
-        _loadedLanguagePacks[key.toString()] = 
-            Map<String, String>.from(pack);
-      }
     }
   }
 
   String? translate(String key) {
     if (_currentLocale == null) return null;
     
-    final pack = _loadedLanguagePacks[_currentLocale];
+    final pack = _loadedLanguagePacks[_currentLocale!];
     if (pack == null) return null;
     
     return pack[key];
@@ -108,33 +122,5 @@ class LocalizationService {
   Future<void> setLocale(String locale) async {
     _currentLocale = locale;
     await _prefs.setString(_selectedLocaleKey, locale);
-  }
-
-  Future<void> addLanguagePack(String locale, Map<String, String> translations) async {
-    // 保存到Hive
-    await _languagePacksBox.put(locale, translations);
-    
-    // 更新内存中的语言包
-    _loadedLanguagePacks[locale] = translations;
-  }
-
-  Future<void> removeLanguagePack(String locale) async {
-    // 不能删除内置语言包
-    if (locale == 'en' || locale == 'zh') return;
-    
-    // 从Hive删除
-    await _languagePacksBox.delete(locale);
-    
-    // 从内存中删除
-    _loadedLanguagePacks.remove(locale);
-    
-    // 如果删除的是当前语言，则切换回默认语言
-    if (_currentLocale == locale) {
-      await setLocale('en');
-    }
-  }
-
-  Future<void> updateLanguagePack(String locale, Map<String, String> translations) async {
-    await addLanguagePack(locale, translations);
   }
 }

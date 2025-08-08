@@ -4,29 +4,23 @@ import 'package:tune/config/app_config.dart';
 import 'package:tune/presentation/bloc/theme/theme_event.dart';
 import 'package:tune/presentation/bloc/theme/theme_state.dart';
 
+/// 主题Bloc类
+///
+/// 负责管理应用程序的主题状态，处理主题更改事件，
+/// 并将主题设置持久化到本地存储中。
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeInitial()) {
-    on<ThemeChangedEvent>(_onThemeChanged);
-  }
+  /// 创建主题Bloc实例
+  ///
+  /// 初始化Bloc，设置初始状态为ThemeInitial，并注册事件处理器。
+  ThemeBloc() : super(ThemeChangedState(ThemeMode.system)) {
+    on<ThemeChangedEvent>((event, emit) async {
+      // 保存主题设置到本地存储
+      if (event.themeName != null) {
+        await AppConfig.setTheme(event.themeName!);
+      }
 
-  void _onThemeChanged(ThemeChangedEvent event, Emitter<ThemeState> emit) async {
-    // 保存主题模式到共享偏好设置
-    String themeModeString;
-    switch (event.themeMode) {
-      case ThemeMode.light:
-        themeModeString = 'light';
-        break;
-      case ThemeMode.dark:
-        themeModeString = 'dark';
-        break;
-      case ThemeMode.system:
-        themeModeString = 'system';
-        break;
-    }
-    
-    await AppConfig.setThemeMode(themeModeString);
-    
-    // 发出新的主题状态
-    emit(ThemeChangedState(event.themeMode, themeName: event.themeName));
+      // 发出新的主题状态
+      emit(ThemeChangedState(event.themeMode, themeName: event.themeName));
+    });
   }
 }

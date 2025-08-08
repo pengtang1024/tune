@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:tune/data/datasources/audio_local_data_source.dart';
 import 'package:tune/data/datasources/audio_remote_data_source.dart';
 import 'package:tune/data/repositories/audio_repository_impl.dart';
@@ -18,12 +17,9 @@ class DependencyInjection {
     // 注册AudioPlayer
     getIt.registerLazySingleton<AudioPlayer>(() => AudioPlayer());
     
-    // 注册OnAudioQuery
-    getIt.registerLazySingleton<OnAudioQuery>(() => OnAudioQuery());
-    
     // 注册数据源
     getIt.registerLazySingleton<AudioLocalDataSource>(
-      () => AudioLocalDataSourceImpl(getIt<OnAudioQuery>()),
+      () => AudioLocalDataSourceImpl(),
     );
     
     getIt.registerLazySingleton<AudioRemoteDataSource>(
@@ -53,11 +49,11 @@ class DependencyInjection {
     
     // 注册服务
     getIt.registerLazySingleton<AudioService>(
-      () => AudioService(),
+      () => AudioService(getIt<PlayAudio>()),
     );
     
-    // Player Bloc
-    getIt.registerFactory(
+    // 注册Bloc
+    getIt.registerFactory<PlayerBloc>(
       () => PlayerBloc(
         audioService: getIt<AudioService>(),
         getAllSongs: getIt<GetAllSongs>(),
@@ -71,9 +67,4 @@ class DependencyInjection {
   // 获取AudioPlayer实例
   AudioPlayer get audioPlayer => getIt<AudioPlayer>();
   
-  // 获取PlayerBloc实例
-  PlayerBloc getPlayerBloc() => PlayerBloc(
-        audioService: getIt<AudioService>(),
-        getAllSongs: getIt<GetAllSongs>(),
-      );
 }

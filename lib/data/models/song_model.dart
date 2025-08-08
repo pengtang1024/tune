@@ -1,4 +1,3 @@
-import 'package:on_audio_query/on_audio_query.dart' as on_audio;
 import 'package:tune/domain/entities/song.dart';
 
 class SongModel extends Song {
@@ -26,13 +25,54 @@ class SongModel extends Song {
       uri: map['uri'] as String,
       albumArtUri: map['albumArtUri'] as String?,
       dateAdded: map['dateAdded'] as int,
-      isFavorite: map['isFavorite'] as bool? ?? false,
+      isFavorite: map['isFavorite'] as bool,
     );
   }
 
   factory SongModel.fromJson(Map<String, dynamic> json) {
-    // 复用fromMap方法以避免重复代码
-    return SongModel.fromMap(json);
+    return SongModel(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      artist: json['artist'] as String,
+      album: json['album'] as String,
+      genre: json['genre'] as String,
+      duration: json['duration'] as int,
+      uri: json['uri'] as String,
+      albumArtUri: json['albumArtUri'] as String?,
+      dateAdded: json['dateAdded'] as int,
+      isFavorite: json['isFavorite'] as bool,
+    );
+  }
+
+  /// 转换为实体对象
+  Song toEntity() {
+    return Song(
+      id: id,
+      title: title,
+      artist: artist,
+      album: album,
+      genre: genre,
+      duration: duration,
+      uri: uri,
+      albumArtUri: albumArtUri,
+      dateAdded: dateAdded,
+      isFavorite: isFavorite,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'artist': artist,
+      'album': album,
+      'genre': genre,
+      'duration': duration,
+      'uri': uri,
+      'albumArtUri': albumArtUri,
+      'dateAdded': dateAdded,
+      'isFavorite': isFavorite,
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -50,34 +90,29 @@ class SongModel extends Song {
     };
   }
 
-  Song toEntity() {
-    return Song(
-      id: id,
-      title: title,
-      artist: artist,
-      album: album,
-      genre: genre,
-      duration: duration,
-      uri: uri,
-      albumArtUri: albumArtUri,
-      dateAdded: dateAdded,
-      isFavorite: isFavorite,
-    );
-  }
-
-  /// 从on_audio_query的SongModel创建SongModel
-  factory SongModel.fromAudioQuerySong(on_audio.SongModel song) {
+  SongModel copyWith({
+    int? id,
+    String? title,
+    String? artist,
+    String? album,
+    String? genre,
+    int? duration,
+    String? uri,
+    String? albumArtUri,
+    int? dateAdded,
+    bool? isFavorite,
+  }) {
     return SongModel(
-      id: song.id,
-      title: song.title,
-      artist: song.artist ?? 'Unknown Artist',
-      album: song.album ?? 'Unknown Album',
-      genre: song.genre ?? 'Unknown Genre',
-      duration: song.duration ?? 0,
-      uri: song.uri ?? '',
-      albumArtUri: null,
-      dateAdded: 0,
-      isFavorite: false,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      artist: artist ?? this.artist,
+      album: album ?? this.album,
+      genre: genre ?? this.genre,
+      duration: duration ?? this.duration,
+      uri: uri ?? this.uri,
+      albumArtUri: albumArtUri ?? this.albumArtUri,
+      dateAdded: dateAdded ?? this.dateAdded,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

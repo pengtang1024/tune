@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:tune/core/utils/localization_delegate.dart';
 import 'package:tune/domain/entities/song.dart';
+import 'package:tune/l10n/app_localizations.dart'; // 使用生成的本地化文件
 
 class SongList extends StatelessWidget {
   final List<Song> songs;
-  final Function(Song)? onSongTap;
+  /// 歌曲项点击回调
+  final Function(Song song) onSongTap;
 
-  const SongList({super.key, required this.songs, this.onSongTap});
+  /// 创建歌曲列表组件实例
+  /// 
+  /// [songs] 要显示的歌曲列表
+  /// [onSongTap] 歌曲项点击回调函数
+  const SongList({super.key, required this.songs, required this.onSongTap});
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    // 使用Flutter官方生成的本地化机制
+    final localizations = AppLocalizations.of(context)!;
     
+    // 如果歌曲列表为空，则显示提示信息
     if (songs.isEmpty) {
       return Center(
-        child: Text(localizations.songListNoSongs),
+        child: Text(localizations.song_list_no_songs),
       );
     }
 
@@ -33,12 +40,10 @@ class SongList extends StatelessWidget {
             child: const Icon(Icons.music_note),
           ),
           title: Text(song.title),
-          subtitle: Text(song.artist),
-          trailing: Text(
-            _formatDuration(Duration(milliseconds: song.duration)),
-            style: const TextStyle(fontSize: 12),
-          ),
-          onTap: onSongTap != null ? () => onSongTap!(song) : null,
+          // 歌手和专辑信息
+          subtitle: Text('${song.artist} - ${song.album}'),
+          // 点击事件处理
+          onTap: () => onSongTap(song),
         );
       },
     );

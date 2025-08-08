@@ -1,11 +1,20 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/core/utils/localization_delegate.dart';
-import 'package:tune/core/utils/localization_service.dart';
+import 'package:tune/config/app_config.dart';
+import 'package:tune/l10n/app_localizations.dart'; // 使用生成的本地化文件
 import 'package:tune/presentation/bloc/theme/theme_bloc.dart';
 import 'package:tune/presentation/bloc/theme/theme_event.dart';
+import 'package:tune/presentation/bloc/localization/localization_bloc.dart';
+import 'package:tune/presentation/bloc/localization/localization_event.dart';
 
+/// 设置页面
+/// 
+/// 该页面允许用户配置应用程序的各种设置，包括语言和主题。
+/// 用户可以在此页面切换应用程序的语言和主题样式。
+@RoutePage()
 class SettingsPage extends StatefulWidget {
+  /// 创建设置页面实例
   const SettingsPage({super.key});
 
   @override
@@ -13,176 +22,122 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String? _selectedLocale;
-  String? _selectedThemeName;
-  ThemeMode? _selectedThemeMode;
+  // 保存当前选中的语言代码
+  late String _selectedLanguage;
+  
+  // 保存当前选中的主题名称
+  late String _selectedTheme;
 
   @override
   void initState() {
     super.initState();
-    _selectedLocale = LocalizationService().getCurrentLocale();
-    _selectedThemeMode = ThemeMode.system; // 默认系统主题模式
+    
+    // 初始化语言和主题设置
+    _selectedLanguage = AppConfig.locale;
+    _selectedTheme = AppConfig.theme;
+  }
+
+  /// 构建语言选择下拉菜单
+  /// 
+  /// 该方法创建一个下拉按钮，允许用户从支持的语言列表中选择一种语言。
+  /// 当用户选择新语言时，会更新应用程序的语言设置并保存到本地存储。
+  Widget _buildLanguageSelector(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    return ListTile(
+      title: Text(localizations.settings_page_language),
+      trailing: DropdownButton<String>(
+        value: _selectedLanguage,
+        items: [
+          DropdownMenuItem(
+            value: 'en',
+            child: const Text('English'),
+          ),
+          DropdownMenuItem(
+            value: 'zh',
+            child: const Text('中文'),
+          ),
+        ],
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedLanguage = newValue;
+            });
+            
+            // 更新语言设置
+            context.read<LocalizationBloc>().add(
+                  LanguageChangedEvent(newValue),
+                );
+            
+            // 保存语言设置到本地存储
+            AppConfig.setLocale(newValue);
+          }
+        },
+      ),
+    );
+  }
+
+  /// 构建主题选择下拉菜单
+  /// 
+  /// 该方法创建一个下拉按钮，允许用户从可用的主题列表中选择一个主题。
+  /// 当用户选择新主题时，会更新应用程序的主题设置并保存到本地存储。
+  Widget _buildThemeSelector(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    return ListTile(
+      title: Text(localizations.settings_page_theme),
+      trailing: DropdownButton<String>(
+        value: _selectedTheme,
+        items: [
+          DropdownMenuItem(
+            value: 'trendyElectro',
+            child: Text(localizations.theme_name_trendy_electro),
+          ),
+          DropdownMenuItem(
+            value: 'midnightPurple',
+            child: Text(localizations.theme_name_midnight_purple),
+          ),
+          DropdownMenuItem(
+            value: 'sunriseOrange',
+            child: Text(localizations.theme_name_sunrise_orange),
+          ),
+        ],
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedTheme = newValue;
+            });
+            
+            // 更新主题设置
+            context.read<ThemeBloc>().add(
+                  ThemeChangedEvent(ThemeMode.system, themeName: newValue),
+                );
+            
+            // 保存主题设置到本地存储
+            AppConfig.setTheme(newValue);
+          }
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
-    final supportedLocales = LocalizationService().getSupportedLocales();
+    final localizations = AppLocalizations.of(context)!;
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.settingsTitle),
+        title: Text(localizations.settings_title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '语言', // 暂时使用硬编码文本
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            DropdownButton<String>(
-              value: _selectedLocale,
-              items: supportedLocales.map((locale) {
-                String localeName;
-                switch (locale) {
-                  case 'en':
-                    localeName = 'English';
-                    break;
-                  case 'zh':
-                    localeName = '中文';
-                    break;
-                  default:
-                    localeName = locale;
-                }
-                
-                return DropdownMenuItem(
-                  value: locale,
-                  child: Text(localeName),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedLocale = newValue;
-                  });
-                  
-                  // 保存语言选择
-                  LocalizationService().setLocale(newValue);
-                  
-                  // 重启应用以应用语言更改
-                  // 在实际应用中，你可能需要使用状态管理来更新整个应用的语言
-                }
-              },
-            ),
-            const SizedBox(height: 32),
-            Text(
-              '主题', // 暂时使用硬编码文本
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            // 主题模式选择
-            ListTile(
-              title: Text('浅色'),
-              trailing: Radio<ThemeMode>(
-                value: ThemeMode.light,
-                groupValue: _selectedThemeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedThemeMode = value;
-                    });
-                    context.read<ThemeBloc>().add(ThemeChangedEvent(value, themeName: _selectedThemeName));
-                  }
-                },
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedThemeMode = ThemeMode.light;
-                });
-                context.read<ThemeBloc>().add(ThemeChangedEvent(ThemeMode.light, themeName: _selectedThemeName));
-              },
-            ),
-            ListTile(
-              title: Text('深色'),
-              trailing: Radio<ThemeMode>(
-                value: ThemeMode.dark,
-                groupValue: _selectedThemeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedThemeMode = value;
-                    });
-                    context.read<ThemeBloc>().add(ThemeChangedEvent(value, themeName: _selectedThemeName));
-                  }
-                },
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedThemeMode = ThemeMode.dark;
-                });
-                context.read<ThemeBloc>().add(ThemeChangedEvent(ThemeMode.dark, themeName: _selectedThemeName));
-              },
-            ),
-            ListTile(
-              title: Text('系统'),
-              trailing: Radio<ThemeMode>(
-                value: ThemeMode.system,
-                groupValue: _selectedThemeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedThemeMode = value;
-                    });
-                    context.read<ThemeBloc>().add(ThemeChangedEvent(value, themeName: _selectedThemeName));
-                  }
-                },
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedThemeMode = ThemeMode.system;
-                });
-                context.read<ThemeBloc>().add(ThemeChangedEvent(ThemeMode.system, themeName: _selectedThemeName));
-              },
-            ),
-            const SizedBox(height: 16),
-            // 主题样式选择
-            Text(
-              '主题样式',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _buildThemeChip('默认', null),
-                _buildThemeChip('活力律动', 'vibrant'),
-                _buildThemeChip('沉浸黑胶', 'vinyl'),
-                _buildThemeChip('科技流光', 'tech'),
-              ],
-            ),
-          ],
-        ),
+      body: ListView(
+        children: [
+          // 语言设置部分
+          _buildLanguageSelector(context),
+          
+          // 主题设置部分
+          _buildThemeSelector(context),
+        ],
       ),
-    );
-  }
-  
-  Widget _buildThemeChip(String label, String? themeName) {
-    final isSelected = _selectedThemeName == themeName;
-    
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        setState(() {
-          _selectedThemeName = selected ? themeName : null;
-        });
-        // 应用主题更改
-        context.read<ThemeBloc>().add(ThemeChangedEvent(_selectedThemeMode ?? ThemeMode.system, themeName: _selectedThemeName));
-      },
     );
   }
 }
