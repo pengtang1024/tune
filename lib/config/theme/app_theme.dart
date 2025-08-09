@@ -26,6 +26,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFFAFAFC), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -33,6 +37,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -79,6 +87,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF1E1B4B), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -86,6 +98,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -132,6 +148,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFF9FAFB), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -139,6 +159,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -185,6 +209,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF1F2937), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -192,6 +220,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -238,6 +270,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFF0FDF4), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -245,6 +281,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -291,6 +331,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF132F10), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -298,6 +342,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -344,6 +392,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFF1F5F9), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -351,6 +403,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -397,6 +453,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF0F172A), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -404,6 +464,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -450,6 +514,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFFFFAF0), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -457,6 +525,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
@@ -503,6 +575,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF1F2937), // 页面底色
     textTheme: const TextTheme(
+      bodySmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      ),
       bodyMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
@@ -510,6 +586,10 @@ class AppTheme {
       bodyLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.normal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         fontSize: 20,
