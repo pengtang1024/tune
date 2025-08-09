@@ -98,253 +98,253 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
-  /// No description provided for @app_name.
+  /// this is the name of the app
   ///
   /// In en, this message translates to:
   /// **'Tune'**
   String get app_name;
 
-  /// No description provided for @home_title.
+  /// this is the title of the home page
   ///
   /// In en, this message translates to:
   /// **'Home'**
   String get home_title;
 
-  /// No description provided for @library_title.
+  /// this is the title of the library page
   ///
   /// In en, this message translates to:
   /// **'Library'**
   String get library_title;
 
-  /// No description provided for @search_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get search_title;
-
-  /// No description provided for @search_hint_text.
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search...'**
   String get search_hint_text;
 
-  /// No description provided for @artist_title.
+  /// this is the title of the artist page
   ///
   /// In en, this message translates to:
   /// **'Artist'**
   String get artist_title;
 
-  /// No description provided for @search_hint.
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search songs...'**
   String get search_hint;
 
-  /// No description provided for @artist_hint.
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search artists...'**
   String get artist_hint;
 
-  /// No description provided for @album_hint.
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search albums...'**
   String get album_hint;
 
-  /// No description provided for @settings_title.
+  /// this is the title of the settings page
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings_title;
 
-  /// No description provided for @play_button.
+  /// this is the text for the play button
   ///
   /// In en, this message translates to:
   /// **'Play'**
   String get play_button;
 
-  /// No description provided for @pause_button.
+  /// this is the text for the pause button
   ///
   /// In en, this message translates to:
   /// **'Pause'**
   String get pause_button;
 
-  /// No description provided for @next_button.
+  /// this is the text for the next button
   ///
   /// In en, this message translates to:
   /// **'Next'**
   String get next_button;
 
-  /// No description provided for @previous_button.
+  /// this is the text for the previous button
   ///
   /// In en, this message translates to:
   /// **'Previous'**
   String get previous_button;
 
-  /// No description provided for @favorite_button.
+  /// this is the text for the favorite button
   ///
   /// In en, this message translates to:
   /// **'Favorite'**
   String get favorite_button;
 
-  /// No description provided for @theme_light.
+  /// this is the text for the light theme
   ///
   /// In en, this message translates to:
   /// **'Light'**
   String get theme_light;
 
-  /// No description provided for @theme_dark.
+  /// this is the text for the dark theme
   ///
   /// In en, this message translates to:
   /// **'Dark'**
   String get theme_dark;
 
-  /// No description provided for @theme_system.
+  /// this is the text for the system theme
   ///
   /// In en, this message translates to:
   /// **'System'**
   String get theme_system;
 
-  /// No description provided for @bottom_player_bar_now_playing.
+  /// this is the text for the now playing indicator
   ///
   /// In en, this message translates to:
   /// **'Now Playing'**
   String get bottom_player_bar_now_playing;
 
-  /// No description provided for @bottom_player_bar_no_song.
+  /// this is the text for the no song selected indicator
   ///
   /// In en, this message translates to:
   /// **'No song selected'**
   String get bottom_player_bar_no_song;
 
-  /// No description provided for @song_list_title.
+  /// this is the title for the song list
   ///
   /// In en, this message translates to:
   /// **'Songs'**
   String get song_list_title;
 
-  /// No description provided for @song_list_no_songs.
+  /// this is the text for the no songs found indicator
   ///
   /// In en, this message translates to:
   /// **'No songs found'**
   String get song_list_no_songs;
 
-  /// No description provided for @player_page_duration.
+  /// this is the text for the duration indicator
   ///
   /// In en, this message translates to:
   /// **'Duration'**
   String get player_page_duration;
 
-  /// No description provided for @player_page_artist.
+  /// this is the text for the artist indicator
   ///
   /// In en, this message translates to:
   /// **'Artist'**
   String get player_page_artist;
 
-  /// No description provided for @player_page_album.
+  /// this is the text for the album indicator
   ///
   /// In en, this message translates to:
   /// **'Album'**
   String get player_page_album;
 
-  /// No description provided for @search_page_hint.
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search songs...'**
   String get search_page_hint;
 
-  /// No description provided for @search_page_empty.
+  /// this is the text for the empty search indicator
   ///
   /// In en, this message translates to:
   /// **'Enter a search term to find songs'**
   String get search_page_empty;
 
-  /// No description provided for @search_page_no_results.
+  /// this is the text for the no results indicator
   ///
   /// In en, this message translates to:
   /// **'No songs found matching your search'**
   String get search_page_no_results;
 
-  /// No description provided for @settings_page_language.
+  /// this is the text for the language indicator
   ///
   /// In en, this message translates to:
   /// **'Language'**
   String get settings_page_language;
 
-  /// No description provided for @settings_page_theme.
+  /// this is the text for the theme indicator
   ///
   /// In en, this message translates to:
   /// **'Theme'**
   String get settings_page_theme;
 
-  /// No description provided for @theme_name_trendy_electro.
+  /// this is the text for the font indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Font'**
+  String get settings_page_font;
+
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Trendy Electro'**
   String get theme_name_trendy_electro;
 
-  /// No description provided for @theme_name_minimal_gray.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Minimal Gray'**
   String get theme_name_minimal_gray;
 
-  /// No description provided for @theme_name_nature_forest.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Nature Forest'**
   String get theme_name_nature_forest;
 
-  /// No description provided for @theme_name_cyber_neon.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Cyber Neon'**
   String get theme_name_cyber_neon;
 
-  /// No description provided for @theme_name_warm_healing.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Warm Healing'**
   String get theme_name_warm_healing;
 
-  /// No description provided for @theme_name_dark_mode.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Dark Mode'**
   String get theme_name_dark_mode;
 
-  /// No description provided for @theme_name_light_mode.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Light Mode'**
   String get theme_name_light_mode;
 
-  /// No description provided for @theme_name_system_theme.
+  /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'System Theme'**
   String get theme_name_system_theme;
 
-  /// No description provided for @settings_page_about.
+  /// this is the text for the about indicator
   ///
   /// In en, this message translates to:
   /// **'About'**
   String get settings_page_about;
 
-  /// No description provided for @library_page_artists.
+  /// this is the text for the artists indicator
   ///
   /// In en, this message translates to:
   /// **'Artists'**
   String get library_page_artists;
 
-  /// No description provided for @library_page_albums.
+  /// this is the text for the albums indicator
   ///
   /// In en, this message translates to:
   /// **'Albums'**
   String get library_page_albums;
 
-  /// No description provided for @library_page_genres.
+  /// this is the text for the genres indicator
   ///
   /// In en, this message translates to:
   /// **'Genres'**

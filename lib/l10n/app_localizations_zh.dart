@@ -18,9 +18,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get library_title => '库';
 
   @override
-  String get search_title => '搜索';
-
-  @override
   String get search_hint_text => '搜索...';
 
   @override
@@ -97,6 +94,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_page_theme => '主题';
+
+  @override
+  String get settings_page_font => '字体';
 
   @override
   String get theme_name_trendy_electro => '趋势电子';

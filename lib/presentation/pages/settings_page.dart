@@ -30,6 +30,9 @@ class _SettingsPageState extends State<SettingsPage> {
   
   // 保存当前选中的主题模式
   late ThemeMode _selectedThemeMode;
+  
+  // 保存当前选中的字体
+  late String _selectedFontFamily;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _selectedLanguage = AppConfig.locale;
     _selectedTheme = _getValidThemeName(AppConfig.theme);
     _selectedThemeMode = AppConfig.themeMode; // 从配置中读取主题模式
+    _selectedFontFamily = AppConfig.fontFamily; // 从配置中读取字体
   }
 
   /// 获取有效的主题名称
@@ -62,15 +66,6 @@ class _SettingsPageState extends State<SettingsPage> {
     // 否则返回默认主题
     return 'trendyElectro';
   }
-  
-  /// 从配置中获取主题模式
-  /// 
-  /// 根据AppConfig中的设置返回对应的主题模式
-  ThemeMode _getThemeModeFromConfig() {
-    // 这里应该从持久化存储中读取主题模式设置
-    // 目前我们先返回默认值
-    return ThemeMode.system;
-  }
 
   /// 构建语言选择下拉菜单
   /// 
@@ -91,14 +86,14 @@ class _SettingsPageState extends State<SettingsPage> {
             value: 'en',
             child: Text(
               'English',
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: 'zh',
             child: Text(
               '中文',
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
         ],
@@ -140,35 +135,35 @@ class _SettingsPageState extends State<SettingsPage> {
             value: 'trendyElectro',
             child: Text(
               localizations.theme_name_trendy_electro,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: 'minimalGray',
             child: Text(
               localizations.theme_name_minimal_gray,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: 'natureForest',
             child: Text(
               localizations.theme_name_nature_forest,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: 'cyberNeon',
             child: Text(
               localizations.theme_name_cyber_neon,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: 'warmHealing',
             child: Text(
               localizations.theme_name_warm_healing,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
         ],
@@ -209,21 +204,21 @@ class _SettingsPageState extends State<SettingsPage> {
             value: ThemeMode.light,
             child: Text(
               localizations.theme_name_light_mode,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: ThemeMode.dark,
             child: Text(
               localizations.theme_name_dark_mode,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
           DropdownMenuItem(
             value: ThemeMode.system,
             child: Text(
               localizations.theme_name_system_theme,
-              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+              style: const TextStyle(fontWeight: FontWeight.normal),
             ),
           ),
         ],
@@ -245,6 +240,63 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+  
+  /// 构建字体选择下拉菜单
+  ///
+  /// 该方法创建一个下拉按钮，允许用户从可用的字体列表中选择一个字体。
+  /// 当用户选择新字体时，会更新应用程序的字体设置并保存到本地存储。
+  Widget _buildFontSelector(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    // 定义可用的字体列表
+    const fontOptions = [
+      'Default',
+      'Roboto',
+      'Open Sans',
+      'Lato',
+      'Montserrat',
+    ];
+    
+    // 定义字体显示名称映射
+    final Map<String, String> fontFamilyNames = {
+      'Default': 'Default',
+      'Roboto': 'Roboto',
+      'Open Sans': 'Open Sans',
+      'Lato': 'Lato',
+      'Montserrat': 'Montserrat',
+    };
+    
+    return ListTile(
+      title: Text(
+        localizations.settings_page_font,
+        style: Theme.of(context).textTheme.titleMedium, // 统一使用titleMedium样式
+      ),
+      trailing: DropdownButton<String>(
+        value: _selectedFontFamily,
+        items: fontOptions.map((font) {
+          return DropdownMenuItem(
+            value: font,
+            child: Text(
+              fontFamilyNames[font]!,
+              style: const TextStyle(fontWeight: FontWeight.normal),
+            ),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedFontFamily = newValue;
+            });
+            
+            // 更新字体设置
+            context.read<ThemeBloc>().add(
+              FontFamilyChangedEvent(newValue),
+            );
+          }
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,6 +310,9 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           // 语言设置部分
           _buildLanguageSelector(context),
+          
+          // 字体设置部分
+          _buildFontSelector(context),
           
           // 主题设置部分
           _buildThemeSelector(context),

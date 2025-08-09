@@ -18,9 +18,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get library_title => 'Library';
 
   @override
-  String get search_title => 'Search';
-
-  @override
   String get search_hint_text => 'Search...';
 
   @override
@@ -97,6 +94,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_page_theme => 'Theme';
+
+  @override
+  String get settings_page_font => 'Font';
 
   @override
   String get theme_name_trendy_electro => 'Trendy Electro';

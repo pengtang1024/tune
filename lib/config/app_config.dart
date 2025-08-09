@@ -18,6 +18,9 @@ class AppConfig {
   /// 语言配置键名
   static const String _keyLocale = 'locale';
   
+  /// 字体配置键名
+  static const String _keyFontFamily = 'font_family';
+  
   /// 用户ID配置键名
   static const String _keyUserId = 'user_id';
   
@@ -32,6 +35,9 @@ class AppConfig {
   
   /// 当前主题模式
   static ThemeMode themeMode = ThemeMode.system;
+  
+  /// 当前字体
+  static String fontFamily = 'Default';
 
   /// 初始化配置管理器
   /// 
@@ -42,6 +48,7 @@ class AppConfig {
     locale = _prefs.getString(_keyLocale) ?? 'en';
     theme = _getValidThemeName(_prefs.getString(_keyTheme));
     themeMode = _getThemeModeFromString(_prefs.getString(_keyThemeMode));
+    fontFamily = _prefs.getString(_keyFontFamily) ?? 'Default';
   }
 
   /// 获取有效的主题名称
@@ -118,6 +125,13 @@ class AppConfig {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyThemeMode, _themeModeToString(value));
   }
+  
+  /// 设置字体
+  static Future<void> setFontFamily(String value) async {
+    fontFamily = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyFontFamily, value);
+  }
 
   // 用户会话管理
   
@@ -176,5 +190,6 @@ class AppConfig {
     // 重置默认值
     locale = 'en';
     theme = 'trendyElectro';
+    fontFamily = 'Default';
   }
 }

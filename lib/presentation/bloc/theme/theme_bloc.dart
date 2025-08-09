@@ -23,6 +23,18 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       // 发出新的主题状态
       emit(ThemeChangedState(event.themeMode, themeName: validThemeName));
     });
+    
+    // 处理字体更改事件
+    on<FontFamilyChangedEvent>((event, emit) async {
+      // 保存字体设置到本地存储
+      await AppConfig.setFontFamily(event.fontFamily);
+      
+      // 重新发出当前主题状态以触发UI重建
+      if (state is ThemeChangedState) {
+        final currentState = state as ThemeChangedState;
+        emit(ThemeChangedState(currentState.themeMode, themeName: currentState.themeName));
+      }
+    });
   }
   
   /// 验证并返回有效的主题名称

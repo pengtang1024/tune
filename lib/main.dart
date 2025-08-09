@@ -64,6 +64,7 @@ class MyApp extends StatelessWidget {
                   // 确定当前的主题模式
                   ThemeMode themeMode = ThemeMode.system;
                   String? themeName;
+                  String fontFamily = AppConfig.fontFamily; // 获取字体设置
 
                   // 如果主题状态是已更改状态，则使用新主题
                   if (themeState is ThemeChangedState) {
@@ -87,11 +88,13 @@ class MyApp extends StatelessWidget {
                     // 设置主题
                     theme: AppTheme.getTheme(
                       themeName ?? AppConfig.theme,
+                      fontFamily,
                     ).themeData,
 
                     // 设置暗黑主题
                     darkTheme: AppTheme.getTheme(
                       themeName ?? AppConfig.theme,
+                      fontFamily,
                     ).darkThemeData,
 
                     // 设置主题模式
@@ -102,7 +105,7 @@ class MyApp extends StatelessWidget {
                     supportedLocales: AppLocalizations.supportedLocales,
                     locale: Locale(locale),
 
-                    // 设置路由
+                    // 配置路由
                     routerConfig: appRouter.config(),
                   );
                 },

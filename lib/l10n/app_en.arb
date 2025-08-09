@@ -1,44 +1,212 @@
 {
   "app_name": "Tune",
+  "@app_name": {
+    "description": "this is the name of the app",
+    "type": "string"
+  },
   "home_title": "Home",
+  "@home_title": {
+    "description": "this is the title of the home page",
+    "type": "string"
+  },
   "library_title": "Library",
-  "search_title": "Search",
+  "@library_title": {
+    "description": "this is the title of the library page",
+    "type": "string"
+  },
   "search_hint_text": "Search...",
+  "@search_hint_text": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
   "artist_title": "Artist",
+  "@artist_title": {
+    "description": "this is the title of the artist page",
+    "type": "string"
+  },
   "search_hint": "Search songs...",
+  "@search_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
   "artist_hint": "Search artists...",
+  "@artist_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
   "album_hint": "Search albums...",
+  "@album_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
   "settings_title": "Settings",
+  "@settings_title": {
+    "description": "this is the title of the settings page",
+    "type": "string"
+  },
   "play_button": "Play",
+  "@play_button": {
+    "description": "this is the text for the play button",
+    "type": "string"
+  },
   "pause_button": "Pause",
+  "@pause_button": {
+    "description": "this is the text for the pause button",
+    "type": "string"
+  },
   "next_button": "Next",
+  "@next_button": {
+    "description": "this is the text for the next button",
+    "type": "string"
+  },
   "previous_button": "Previous",
+  "@previous_button": {
+    "description": "this is the text for the previous button",
+    "type": "string"
+  },
   "favorite_button": "Favorite",
+  "@favorite_button": {
+    "description": "this is the text for the favorite button",
+    "type": "string"
+  },
   "theme_light": "Light",
+  "@theme_light": {
+    "description": "this is the text for the light theme",
+    "type": "string"
+  },
   "theme_dark": "Dark",
+  "@theme_dark": {
+    "description": "this is the text for the dark theme",
+    "type": "string"
+  },
   "theme_system": "System",
+  "@theme_system": {
+    "description": "this is the text for the system theme",
+    "type": "string"
+  },
   "bottom_player_bar_now_playing": "Now Playing",
+  "@bottom_player_bar_now_playing": {
+    "description": "this is the text for the now playing indicator",
+    "type": "string"
+  },
   "bottom_player_bar_no_song": "No song selected",
+  "@bottom_player_bar_no_song": {
+    "description": "this is the text for the no song selected indicator",
+    "type": "string"
+  },
   "song_list_title": "Songs",
+  "@song_list_title": {
+    "description": "this is the title for the song list",
+    "type": "string"
+  },
   "song_list_no_songs": "No songs found",
+  "@song_list_no_songs": {
+    "description": "this is the text for the no songs found indicator",
+    "type": "string"
+  },
   "player_page_duration": "Duration",
+  "@player_page_duration": {
+    "description": "this is the text for the duration indicator",
+    "type": "string"
+  },
   "player_page_artist": "Artist",
+  "@player_page_artist": {
+    "description": "this is the text for the artist indicator",
+    "type": "string"
+  },
   "player_page_album": "Album",
+  "@player_page_album": {
+    "description": "this is the text for the album indicator",
+    "type": "string"
+  },
   "search_page_hint": "Search songs...",
+  "@search_page_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
   "search_page_empty": "Enter a search term to find songs",
+  "@search_page_empty": {
+    "description": "this is the text for the empty search indicator",
+    "type": "string"
+  },
   "search_page_no_results": "No songs found matching your search",
+  "@search_page_no_results": {
+    "description": "this is the text for the no results indicator",
+    "type": "string"
+  },
   "settings_page_language": "Language",
+  "@settings_page_language": {
+    "description": "this is the text for the language indicator",
+    "type": "string"
+  },
   "settings_page_theme": "Theme",
+  "@settings_page_theme": {
+    "description": "this is the text for the theme indicator",
+    "type": "string"
+  },
+  "settings_page_font": "Font",
+  "@settings_page_font": {
+    "description": "this is the text for the font indicator",
+    "type": "string"
+  },
   "theme_name_trendy_electro": "Trendy Electro",
+  "@theme_name_trendy_electro": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_minimal_gray": "Minimal Gray",
+  "@theme_name_minimal_gray": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_nature_forest": "Nature Forest",
+  "@theme_name_nature_forest": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_cyber_neon": "Cyber Neon",
+  "@theme_name_cyber_neon": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_warm_healing": "Warm Healing",
+  "@theme_name_warm_healing": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_dark_mode": "Dark Mode",
+  "@theme_name_dark_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_light_mode": "Light Mode",
+  "@theme_name_light_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "theme_name_system_theme": "System Theme",
+  "@theme_name_system_theme": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
   "settings_page_about": "About",
+  "@settings_page_about": {
+    "description": "this is the text for the about indicator",
+    "type": "string"
+  },
   "library_page_artists": "Artists",
+  "@library_page_artists": {
+    "description": "this is the text for the artists indicator",
+    "type": "string"
+  },
   "library_page_albums": "Albums",
-  "library_page_genres": "Genres"
+  "@library_page_albums": {
+    "description": "this is the text for the albums indicator",
+    "type": "string"
+  },
+  "library_page_genres": "Genres",
+  "@library_page_genres": {
+    "description": "this is the text for the genres indicator",
+    "type": "string"
+  }
 }

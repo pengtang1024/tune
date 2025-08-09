@@ -1,12 +1,14 @@
 # Tune - 音乐播放器
 
+[English](README_en.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [한국어](README_ko.md) | [Русский](README_ru.md)
+
 Tune 是一款专注于提供简洁直观界面的跨平台音乐播放器应用，旨在帮助用户管理和播放本地音乐库。
 
 ## 🎵 功能特性
 
 - **音乐播放模块**: 集成 just_audio 实现高质量音频播放，支持多种音频格式（MP3、FLAC、WAV等），提供播放控制（播放/暂停/停止/上一首/下一首）、音量控制、播放进度控制等功能；
 - **音乐库模块**: 通过自定义实现获取本地音乐，支持在线流媒体资源；
-- **主题系统**: 支持多种预设主题（Trendy Electro、Midnight Purple、Sunrise Orange），可跟随系统主题或手动切换；
+- **主题系统**: 支持多种预设主题（Trendy Electro、Minimal Gray、Nature Forest、Cyber Neon、Warm Healing），可跟随系统主题或手动切换；
 - **多语言支持**: 支持中英文切换，可扩展更多语言；
 - **响应式设计**: 适配不同屏幕尺寸，支持移动端和桌面端；
 - **后台播放**: 支持后台播放音乐，提供通知栏控制；
@@ -43,7 +45,7 @@ Tune 是一款专注于提供简洁直观界面的跨平台音乐播放器应用
 ### 核心模块
 
 - **音频播放核心模块**: 使用 just_audio 实现播放、暂停、切换、进度控制等功能
-- **音乐库模块**: 通过 on_audio_query 获取本地音乐，支持在线流媒体资源
+- **音乐库模块**: 通过自定义实现获取本地音乐，支持在线流媒体资源
 - **播放列表模块**: 使用 Hive 或 SQLite 存储播放列表
 - **用户模块**: 支持第三方登录，用 shared_preferences 存储用户会话
 - **UI/UX 模块**: 响应式设计，支持自定义主题和暗色模式
@@ -53,7 +55,7 @@ Tune 是一款专注于提供简洁直观界面的跨平台音乐播放器应用
 - 状态管理: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
 - 路由管理: [auto_route](https://pub.dev/packages/auto_route)
 - 音频播放: [just_audio](https://pub.dev/packages/just_audio)
-- 本地音乐获取: 自定义实现；
+- 本地音乐获取: 自定义实现
 - 权限管理: [permission_handler](https://pub.dev/packages/permission_handler)
 - 依赖注入: [get_it](https://pub.dev/packages/get_it)
 - 国际化: [flutter_localizations](https://pub.dev/packages/flutter_localizations)
@@ -105,6 +107,41 @@ lib/
     ├── pages/              # 页面
     ├── widgets/            # 通用组件
     └── components/         # 业务组件
+```
+
+## 常用命令
+
+### 国际化
+
+手动生成本地化文件:
+```
+flutter gen-l10n
+```
+
+### 图标
+
+使用 flutter_launcher_icons 自动生成图标:
+```
+flutter pub run flutter_launcher_icons:main
+```
+
+### 代码生成
+
+运行 build_runner 进行代码生成:
+```
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+### 测试
+
+运行所有测试:
+```
+flutter test
+```
+
+运行带覆盖率的测试:
+```
+flutter test --coverage
 ```
 
 ## 测试策略
