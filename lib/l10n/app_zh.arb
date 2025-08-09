@@ -30,8 +30,10 @@
   "settings_page_language": "语言",
   "settings_page_theme": "主题",
   "theme_name_trendy_electro": "趋势电子",
-  "theme_name_midnight_purple": "午夜紫色",
-  "theme_name_sunrise_orange": "日出橙色",
+  "theme_name_minimal_gray": "极简灰调",
+  "theme_name_nature_forest": "自然森系",
+  "theme_name_cyber_neon": "赛博霓虹",
+  "theme_name_warm_healing": "暖调治愈",
   "theme_name_dark_mode": "深色模式",
   "theme_name_light_mode": "浅色模式",
   "theme_name_system_theme": "系统主题",
@@ -39,4 +41,4 @@
   "library_page_artists": "艺术家",
   "library_page_albums": "专辑",
   "library_page_genres": "流派"
-}
+}

@@ -32,7 +32,7 @@ class PlayerView extends StatelessWidget {
         } else if (state is PlayerPlaying || state is PlayerPaused) {
           final song = state is PlayerPlaying ? state.song : (state as PlayerPaused).song;
           final isPlaying = state is PlayerPlaying;
-          
+
           return Column(
             children: [
               // 专辑封面区域
@@ -63,7 +63,7 @@ class PlayerView extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      song.album ?? '',
+                      song.album ?? 'Unknown Album',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),

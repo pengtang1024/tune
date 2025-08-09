@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : SongList(
               songs: _songs,
-              onSongTap: (song) {
+              onSongSelected: (song) {
                 context.read<PlayerBloc>().add(PlaySongEvent(song.id));
                 context.pushRoute(const PlayerRoute());
               },

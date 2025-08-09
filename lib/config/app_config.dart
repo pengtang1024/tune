@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 应用程序配置管理类
@@ -8,11 +9,11 @@ class AppConfig {
   /// SharedPreferences实例，用于本地数据存储
   static late SharedPreferences _prefs;
 
+  /// 主题名称配置键名
+  static const String _keyTheme = 'theme';
+  
   /// 主题模式配置键名
   static const String _keyThemeMode = 'theme_mode';
-  
-  /// 主题名称配置键名
-  static const String _keyThemeName = 'theme_name';
   
   /// 语言配置键名
   static const String _keyLocale = 'locale';
@@ -22,45 +23,100 @@ class AppConfig {
   
   /// 用户令牌配置键名
   static const String _keyUserToken = 'user_token';
+  
+  /// 当前语言
+  static String locale = 'en';
+  
+  /// 当前主题
+  static String theme = 'trendyElectro';
+  
+  /// 当前主题模式
+  static ThemeMode themeMode = ThemeMode.system;
 
   /// 初始化配置管理器
   /// 
   /// 获取SharedPreferences实例，必须在应用程序启动时调用。
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+    
+    locale = _prefs.getString(_keyLocale) ?? 'en';
+    theme = _getValidThemeName(_prefs.getString(_keyTheme));
+    themeMode = _getThemeModeFromString(_prefs.getString(_keyThemeMode));
+  }
+
+  /// 获取有效的主题名称
+  /// 
+  /// 验证并返回有效的主题名称，如果存储的主题名称无效则返回默认主题
+  static String _getValidThemeName(String? storedTheme) {
+    // 有效的主题列表
+    const validThemes = [
+      'trendyElectro',
+      'minimalGray', 
+      'natureForest',
+      'cyberNeon',
+      'warmHealing'
+    ];
+    
+    // 如果存储的主题名称有效，直接返回
+    if (storedTheme != null && validThemes.contains(storedTheme)) {
+      return storedTheme;
+    }
+    
+    // 否则返回默认主题
+    return 'trendyElectro';
+  }
+  
+  /// 将字符串转换为ThemeMode
+  /// 
+  /// 根据存储的字符串值返回对应的ThemeMode枚举值
+  static ThemeMode _getThemeModeFromString(String? themeModeString) {
+    switch (themeModeString) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+  
+  /// 将ThemeMode转换为字符串
+  /// 
+  /// 将ThemeMode枚举值转换为可存储的字符串值
+  static String _themeModeToString(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.dark:
+        return 'dark';
+      case ThemeMode.system:
+      default:
+        return 'system';
+    }
   }
 
   // 主题偏好设置
   
-  /// 获取当前主题模式
-  /// 
-  /// 从本地存储中读取主题模式设置，如果未设置则返回默认值'system'。
-  /// 
-  /// 返回值:
-  /// - 'light': 浅色模式
-  /// - 'dark': 深色模式
-  /// - 'system': 跟随系统设置
-  static String get theme {
-    return _prefs.getString(_keyThemeName) ?? 'trendyElectro';
+  /// 设置语言
+  static Future<void> setLocale(String value) async {
+    locale = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLocale, value);
   }
 
+  /// 设置主题
+  static Future<void> setTheme(String value) async {
+    theme = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyTheme, value);
+  }
+  
   /// 设置主题模式
-  /// 
-  /// 将主题模式设置保存到本地存储中。
-  /// 
-  /// [themeMode] 要保存的主题模式字符串
-  static Future<void> setTheme(String themeName) async {
-    await _prefs.setString(_keyThemeName, themeName);
-  }
-  
-  /// 获取当前语言
-  static String get locale {
-    return _prefs.getString(_keyLocale) ?? 'en';
-  }
-  
-  /// 设置语言
-  static Future<void> setLocale(String locale) async {
-    await _prefs.setString(_keyLocale, locale);
+  static Future<void> setThemeMode(ThemeMode value) async {
+    themeMode = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyThemeMode, _themeModeToString(value));
   }
 
   // 用户会话管理
@@ -116,5 +172,9 @@ class AppConfig {
   /// 清除所有本地存储的配置信息，用于用户登出或重置应用设置。
   static Future<void> clearAll() async {
     await _prefs.clear();
+    
+    // 重置默认值
+    locale = 'en';
+    theme = 'trendyElectro';
   }
 }

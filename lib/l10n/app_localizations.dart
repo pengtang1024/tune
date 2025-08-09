@@ -284,17 +284,29 @@ abstract class AppLocalizations {
   /// **'Trendy Electro'**
   String get theme_name_trendy_electro;
 
-  /// No description provided for @theme_name_midnight_purple.
+  /// No description provided for @theme_name_minimal_gray.
   ///
   /// In en, this message translates to:
-  /// **'Midnight Purple'**
-  String get theme_name_midnight_purple;
+  /// **'Minimal Gray'**
+  String get theme_name_minimal_gray;
 
-  /// No description provided for @theme_name_sunrise_orange.
+  /// No description provided for @theme_name_nature_forest.
   ///
   /// In en, this message translates to:
-  /// **'Sunrise Orange'**
-  String get theme_name_sunrise_orange;
+  /// **'Nature Forest'**
+  String get theme_name_nature_forest;
+
+  /// No description provided for @theme_name_cyber_neon.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyber Neon'**
+  String get theme_name_cyber_neon;
+
+  /// No description provided for @theme_name_warm_healing.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm Healing'**
+  String get theme_name_warm_healing;
 
   /// No description provided for @theme_name_dark_mode.
   ///

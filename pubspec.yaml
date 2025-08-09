@@ -21,6 +21,17 @@ version: 1.0.0+1
 environment:
   sdk: ^3.8.1
 
+flutter_icons:  # 与插件名称保持一致，消除警告
+  android: "launcher_icon"
+  ios: true               # 启用 iOS 图标生成
+  image_path: "assets/icons/app_icon.png"  # 原图路径
+  min_sdk_android: 21       # Android 最低支持版本（可选）
+  web:
+    generate: true          # 启用 Web 图标生成
+  windows:
+    generate: true          # 启用 Windows 图标生成
+  macos:
+    generate: true          # 启用 macOS 图标生成
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -68,7 +79,6 @@ dependencies:
   path_provider: ^2.1.1
 
   # Audio metadata
-  audiotags: ^1.4.0
 
   # Equatable for value equality
   equatable: ^2.0.5
@@ -82,11 +92,13 @@ dependencies:
   # Localization
   flutter_localizations:
     sdk: flutter
+  intl: any
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_launcher_icons: ^0.14.4
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -110,6 +122,41 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   generate: true
+  fonts:
+    - family:  JetBrainsMono
+      fonts:
+        - asset: assets/fonts/ttf/JetBrainsMono-Bold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-BoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-ExtraBold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-ExtraBoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-ExtraLight.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-ExtraLightItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-Italic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-Light.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-LightItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-Medium.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-MediumItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-Regular.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-SemiBold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-SemiBoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-Thin.ttf
+        - asset: assets/fonts/ttf/JetBrainsMono-ThinItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Bold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-BoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraBold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraLight.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Italic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Light.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-LightItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Medium.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-MediumItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Regular.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-SemiBold.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-Thin.ttf
+        - asset: assets/fonts/ttf/JetBrainsMonoNL-ThinItalic.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -12,20 +12,49 @@ class AppTheme {
   static final ThemeData trendyElectroTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6200EE), // 电光紫作为主色调
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFF6200EE), // 电光紫
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF03DAC6), // 青色作为辅助色
-      onSecondary: Colors.black,
-      surface: Colors.white, // 使用surface替代background
-      onSurface: Colors.black, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFFC7D2FE), // 雾蓝紫
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFC7D2FE), // 雾蓝紫
+      onPrimary: Color(0xFF1E293B), // 深灰蓝
+      secondary: Color(0xFFFBCFE8), // 柔粉作为辅助色
+      onSecondary: Color(0xFF1E293B), // 深灰蓝
+      tertiary: Color(0xFFBFDBFE), // 浅蓝作为辅助色2
+      onTertiary: Color(0xFF1E293B), // 深灰蓝
+      surface: Color(0xFFFAFAFC), // 极浅灰背景色
+      onSurface: Color(0xFF1E293B), // 深灰蓝文本主色
+      onSurfaceVariant: Color(0xFF64748B), // 灰蓝文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFFFAFAFC), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF6200EE),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFFC7D2FE),
+      foregroundColor: Color(0xFF1E293B),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF1E293B),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFFFFFFFF), // 白色卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -36,20 +65,49 @@ class AppTheme {
   static final ThemeData trendyElectroDarkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFBB86FC), // 淡紫色作为主色调
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFFBB86FC), // 淡紫色作为主色
-      onPrimary: Colors.black,
-      secondary: const Color(0xFF03DAC6), // 青色作为辅助色
-      onSecondary: Colors.black,
-      surface: const Color(0xFF121212), // 深灰色背景，使用surface替代background
-      onSurface: Colors.white, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFF5B21B6), // 暗紫蓝
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF5B21B6), // 暗紫蓝
+      onPrimary: Color(0xFFF8FAFC), // 浅灰
+      secondary: Color(0xFFEC4899), // 粉紫作为辅助色
+      onSecondary: Color(0xFFF8FAFC), // 浅灰
+      tertiary: Color(0xFF2563EB), // 中蓝作为辅助色2
+      onTertiary: Color(0xFFF8FAFC), // 浅灰
+      surface: Color(0xFF1E1B4B), // 深紫黑背景色
+      onSurface: Color(0xFFF8FAFC), // 浅灰文本主色
+      onSurfaceVariant: Color(0xFF94A3B8), // 中灰蓝文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFF1E1B4B), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF121212),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF5B21B6),
+      foregroundColor: Color(0xFFF8FAFC),
+      titleTextStyle: TextStyle(
+        color: Color(0xFFF8FAFC),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFF312E81), // 暗紫灰卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -60,20 +118,49 @@ class AppTheme {
   static final ThemeData minimalGrayTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF9E9E9E), // 灰色作为主色调
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFF9E9E9E), // 灰色作为主色
-      onPrimary: Colors.black,
-      secondary: const Color(0xFF616161), // 深灰色作为辅助色
-      onSecondary: Colors.white,
-      surface: Colors.white, // 使用surface替代background
-      onSurface: Colors.black, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFF9CA3AF), // 中灰
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFF9CA3AF), // 中灰
+      onPrimary: Color(0xFF111827), // 近黑
+      secondary: Color(0xFFD1D5DB), // 浅灰作为辅助色
+      onSecondary: Color(0xFF111827), // 近黑
+      tertiary: Color(0xFF93C5FD), // 雾蓝作为辅助色2
+      onTertiary: Color(0xFF111827), // 近黑
+      surface: Color(0xFFF9FAFB), // 极浅灰背景色
+      onSurface: Color(0xFF111827), // 近黑文本主色
+      onSurfaceVariant: Color(0xFF6B7280), // 中灰文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFFF9FAFB), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF9E9E9E),
-      foregroundColor: Colors.black,
+      backgroundColor: Color(0xFF9CA3AF),
+      foregroundColor: Color(0xFF111827),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF111827),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Colors.white, // 白色卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -84,20 +171,49 @@ class AppTheme {
   static final ThemeData minimalGrayDarkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF757575), // 中灰色作为主色调
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFF757575), // 中灰色作为主色
-      onPrimary: Colors.white,
-      secondary: const Color(0xFFBDBDBD), // 浅灰色作为辅助色
-      onSecondary: Colors.black,
-      surface: const Color(0xFF212121), // 深黑色背景，使用surface替代background
-      onSurface: Colors.white, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFF4B5563), // 深灰
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF4B5563), // 深灰
+      onPrimary: Color(0xFFF9FAFB), // 近白
+      secondary: Color(0xFF6B7280), // 中灰作为辅助色
+      onSecondary: Color(0xFFF9FAFB), // 近白
+      tertiary: Color(0xFF60A5FA), // 柔蓝作为辅助色2
+      onTertiary: Color(0xFFF9FAFB), // 近白
+      surface: Color(0xFF1F2937), // 深灰黑背景色
+      onSurface: Color(0xFFF9FAFB), // 近白文本主色
+      onSurfaceVariant: Color(0xFFD1D5DB), // 浅灰文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFF1F2937), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF212121),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF4B5563),
+      foregroundColor: Color(0xFFF9FAFB),
+      titleTextStyle: TextStyle(
+        color: Color(0xFFF9FAFB),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFF374151), // 暗灰卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -108,20 +224,49 @@ class AppTheme {
   static final ThemeData natureForestTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF4CAF50), // 绿色作为主色调
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFF4CAF50), // 绿色作为主色
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF8BC34A), // 浅绿色作为辅助色
-      onSecondary: Colors.black,
-      surface: Colors.white, // 使用surface替代background
-      onSurface: Colors.black, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFFA7F3D0), // 浅青绿
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFA7F3D0), // 浅青绿
+      onPrimary: Color(0xFF1E293B), // 深灰
+      secondary: Color(0xFFDCFCE7), // 芽绿白作为辅助色
+      onSecondary: Color(0xFF1E293B), // 深灰
+      tertiary: Color(0xFFEFEBE9), // 木色灰作为辅助色2
+      onTertiary: Color(0xFF1E293B), // 深灰
+      surface: Color(0xFFF0FDF4), // 浅绿白背景色
+      onSurface: Color(0xFF1E293B), // 深灰文本主色
+      onSurfaceVariant: Color(0xFF64748B), // 灰蓝文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFFF0FDF4), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF4CAF50),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFFA7F3D0),
+      foregroundColor: Color(0xFF1E293B),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF1E293B),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Colors.white, // 白色卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -132,20 +277,49 @@ class AppTheme {
   static final ThemeData natureForestDarkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF388E3C), // 深绿色作为主色调
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFF388E3C), // 深绿色作为主色
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF66BB6A), // 中绿色作为辅助色
-      onSecondary: Colors.black,
-      surface: const Color(0xFF1B5E20), // 深绿色背景，使用surface替代background
-      onSurface: Colors.white, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFF4D7C0F), // 橄榄绿
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF4D7C0F), // 橄榄绿
+      onPrimary: Color(0xFFF0FDF4), // 浅绿白
+      secondary: Color(0xFF10B981), // 青绿作为辅助色
+      onSecondary: Color(0xFFF0FDF4), // 浅绿白
+      tertiary: Color(0xFFA8A29E), // 暖灰棕作为辅助色2
+      onTertiary: Color(0xFFF0FDF4), // 浅绿白
+      surface: Color(0xFF132F10), // 深绿黑背景色
+      onSurface: Color(0xFFF0FDF4), // 浅绿白文本主色
+      onSurfaceVariant: Color(0xFFA7F3D0), // 浅青绿文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFF132F10), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1B5E20),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF4D7C0F),
+      foregroundColor: Color(0xFFF0FDF4),
+      titleTextStyle: TextStyle(
+        color: Color(0xFFF0FDF4),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFF1F3A18), // 暗绿灰卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -156,20 +330,49 @@ class AppTheme {
   static final ThemeData cyberNeonTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFFF4081), // 霓虹粉作为主色调
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFFFF4081), // 霓虹粉作为主色
-      onPrimary: Colors.white,
-      secondary: const Color(0xFF6200EE), // 电光紫作为辅助色
-      onSecondary: Colors.white,
-      surface: Colors.white, // 使用surface替代background
-      onSurface: Colors.black, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFFBFDBFE), // 浅蓝
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFBFDBFE), // 浅蓝
+      onPrimary: Color(0xFF1E293B), // 深灰蓝
+      secondary: Color(0xFFEDE9FE), // 紫白作为辅助色
+      onSecondary: Color(0xFF1E293B), // 深灰蓝
+      tertiary: Color(0xFFCCFBF1), // 青白作为辅助色2
+      onTertiary: Color(0xFF1E293B), // 深灰蓝
+      surface: Color(0xFFF1F5F9), // 浅灰背景色
+      onSurface: Color(0xFF1E293B), // 深灰蓝文本主色
+      onSurfaceVariant: Color(0xFF64748B), // 灰蓝文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFFF1F5F9), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFFF4081),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFFBFDBFE),
+      foregroundColor: Color(0xFF1E293B),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF1E293B),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Colors.white, // 白色卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -180,20 +383,49 @@ class AppTheme {
   static final ThemeData cyberNeonDarkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFF50057), // 深霓虹粉作为主色调
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFFF50057), // 深霓虹粉作为主色
-      onPrimary: Colors.white,
-      secondary: const Color(0xFFBB86FC), // 淡紫色作为辅助色
-      onSecondary: Colors.black,
-      surface: const Color(0xFF0A0A0A), // 几乎纯黑的背景，使用surface替代background
-      onSurface: Colors.white, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFF1E40AF), // 暗蓝
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF1E40AF), // 暗蓝
+      onPrimary: Color(0xFFF1F5F9), // 浅灰
+      secondary: Color(0xFF7C3AED), // 深紫作为辅助色
+      onSecondary: Color(0xFFF1F5F9), // 浅灰
+      tertiary: Color(0xFF06B6D4), // 青蓝作为辅助色2
+      onTertiary: Color(0xFFF1F5F9), // 浅灰
+      surface: Color(0xFF0F172A), // 靛蓝黑背景色
+      onSurface: Color(0xFFF1F5F9), // 浅灰文本主色
+      onSurfaceVariant: Color(0xFF94A3B8), // 中灰蓝文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFF0F172A), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF0A0A0A),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF1E40AF),
+      foregroundColor: Color(0xFFF1F5F9),
+      titleTextStyle: TextStyle(
+        color: Color(0xFFF1F5F9),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFF334155), // 深蓝灰卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -204,20 +436,49 @@ class AppTheme {
   static final ThemeData warmHealingTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFFF9800), // 橙色作为主色调
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: const Color(0xFFFF9800), // 橙色作为主色
-      onPrimary: Colors.black,
-      secondary: const Color(0xFFF8BBD0), // 浅粉色作为辅助色
-      onSecondary: Colors.black,
-      surface: Colors.white, // 使用surface替代background
-      onSurface: Colors.black, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFFFDE68A), // 柔黄
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFFDE68A), // 柔黄
+      onPrimary: Color(0xFF374151), // 深棕
+      secondary: Color(0xFFFEF3C7), // 米黄作为辅助色
+      onSecondary: Color(0xFF374151), // 深棕
+      tertiary: Color(0xFFFBCFE8), // 柔粉作为辅助色2
+      onTertiary: Color(0xFF374151), // 深棕
+      surface: Color(0xFFFFFAF0), // 浅橙白背景色
+      onSurface: Color(0xFF374151), // 深棕文本主色
+      onSurfaceVariant: Color(0xFF9CA3AF), // 中灰文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFFFFFAF0), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFFF9800),
-      foregroundColor: Colors.black,
+      backgroundColor: Color(0xFFFDE68A),
+      foregroundColor: Color(0xFF374151),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF374151),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Colors.white, // 白色卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
@@ -228,20 +489,49 @@ class AppTheme {
   static final ThemeData warmHealingDarkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFFF9800), // 橙色作为主色调
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFFFFB74D), // 浅橙色作为主色
-      onPrimary: Colors.black,
-      secondary: const Color(0xFFF8BBD0), // 浅粉色作为辅助色
-      onSecondary: Colors.black,
-      surface: const Color(0xFF3E2723), // 深棕色背景，使用surface替代background
-      onSurface: Colors.white, // 使用onSurface替代onBackground
+    primaryColor: const Color(0xFFB45309), // 深棕
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFFB45309), // 深棕
+      onPrimary: Color(0xFFFEF3C7), // 米黄
+      secondary: Color(0xFFF59E0B), // 暖橙作为辅助色
+      onSecondary: Color(0xFFFEF3C7), // 米黄
+      tertiary: Color(0xFFEC4899), // 粉棕作为辅助色2
+      onTertiary: Color(0xFFFEF3C7), // 米黄
+      surface: Color(0xFF1F2937), // 深棕黑背景色
+      onSurface: Color(0xFFFEF3C7), // 米黄文本主色
+      onSurfaceVariant: Color(0xFFD1D5DB), // 浅灰文本次色
+    ),
+    scaffoldBackgroundColor: const Color(0xFF1F2937), // 页面底色
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF3E2723),
-      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFFB45309),
+      foregroundColor: Color(0xFFFEF3C7),
+      titleTextStyle: TextStyle(
+        color: Color(0xFFFEF3C7),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      color: Color(0xFF374151), // 深棕灰卡片
+      surfaceTintColor: Colors.transparent,
     ),
   );
   

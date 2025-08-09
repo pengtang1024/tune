@@ -90,6 +90,7 @@ class SongModel extends Song {
     };
   }
 
+  @override
   SongModel copyWith({
     int? id,
     String? title,

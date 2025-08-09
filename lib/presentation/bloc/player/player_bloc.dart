@@ -24,6 +24,18 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     _init();
   }
 
+  /// 获取所有歌曲的公共方法
+  Future<List<Song>> getAllSongs() async {
+    try {
+      final songs = await _getAllSongs();
+      _songs = songs;
+      return songs;
+    } catch (e) {
+      // 如果获取歌曲失败，返回空列表
+      return [];
+    }
+  }
+
   Future<void> _init() async {
     on<PlaySongEvent>(_onPlaySong);
     on<TogglePlayPauseEvent>(_onTogglePlayPause);
@@ -39,9 +51,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
     // 监听播放位置变化
     _positionSubscription = _audioService.positionStream.listen((position) {
-      if (state is PlayerPlaying || state is PlayerPaused) {
-        add(UpdateProgressEvent(position));
-      }
+      add(UpdateProgressEvent(position));
     });
   }
 

@@ -27,6 +27,9 @@ class _SettingsPageState extends State<SettingsPage> {
   
   // 保存当前选中的主题名称
   late String _selectedTheme;
+  
+  // 保存当前选中的主题模式
+  late ThemeMode _selectedThemeMode;
 
   @override
   void initState() {
@@ -34,7 +37,39 @@ class _SettingsPageState extends State<SettingsPage> {
     
     // 初始化语言和主题设置
     _selectedLanguage = AppConfig.locale;
-    _selectedTheme = AppConfig.theme;
+    _selectedTheme = _getValidThemeName(AppConfig.theme);
+    _selectedThemeMode = AppConfig.themeMode; // 从配置中读取主题模式
+  }
+
+  /// 获取有效的主题名称
+  /// 
+  /// 验证并返回有效的主题名称，如果提供的主题名称无效则返回默认主题
+  String _getValidThemeName(String? themeName) {
+    // 有效的主题列表
+    const validThemes = [
+      'trendyElectro',
+      'minimalGray', 
+      'natureForest',
+      'cyberNeon',
+      'warmHealing'
+    ];
+    
+    // 如果主题名称有效，直接返回
+    if (themeName != null && validThemes.contains(themeName)) {
+      return themeName;
+    }
+    
+    // 否则返回默认主题
+    return 'trendyElectro';
+  }
+  
+  /// 从配置中获取主题模式
+  /// 
+  /// 根据AppConfig中的设置返回对应的主题模式
+  ThemeMode _getThemeModeFromConfig() {
+    // 这里应该从持久化存储中读取主题模式设置
+    // 目前我们先返回默认值
+    return ThemeMode.system;
   }
 
   /// 构建语言选择下拉菜单
@@ -45,17 +80,26 @@ class _SettingsPageState extends State<SettingsPage> {
     final localizations = AppLocalizations.of(context)!;
     
     return ListTile(
-      title: Text(localizations.settings_page_language),
+      title: Text(
+        localizations.settings_page_language,
+        style: Theme.of(context).textTheme.titleMedium, // 统一使用titleMedium样式
+      ),
       trailing: DropdownButton<String>(
         value: _selectedLanguage,
         items: [
           DropdownMenuItem(
             value: 'en',
-            child: const Text('English'),
+            child: Text(
+              'English',
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
           ),
           DropdownMenuItem(
             value: 'zh',
-            child: const Text('中文'),
+            child: Text(
+              '中文',
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
           ),
         ],
         onChanged: (String? newValue) {
@@ -85,21 +129,47 @@ class _SettingsPageState extends State<SettingsPage> {
     final localizations = AppLocalizations.of(context)!;
     
     return ListTile(
-      title: Text(localizations.settings_page_theme),
+      title: Text(
+        localizations.settings_page_theme,
+        style: Theme.of(context).textTheme.titleMedium, // 统一使用titleMedium样式
+      ),
       trailing: DropdownButton<String>(
         value: _selectedTheme,
         items: [
           DropdownMenuItem(
             value: 'trendyElectro',
-            child: Text(localizations.theme_name_trendy_electro),
+            child: Text(
+              localizations.theme_name_trendy_electro,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
           ),
           DropdownMenuItem(
-            value: 'midnightPurple',
-            child: Text(localizations.theme_name_midnight_purple),
+            value: 'minimalGray',
+            child: Text(
+              localizations.theme_name_minimal_gray,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
           ),
           DropdownMenuItem(
-            value: 'sunriseOrange',
-            child: Text(localizations.theme_name_sunrise_orange),
+            value: 'natureForest',
+            child: Text(
+              localizations.theme_name_nature_forest,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
+          ),
+          DropdownMenuItem(
+            value: 'cyberNeon',
+            child: Text(
+              localizations.theme_name_cyber_neon,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
+          ),
+          DropdownMenuItem(
+            value: 'warmHealing',
+            child: Text(
+              localizations.theme_name_warm_healing,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
           ),
         ],
         onChanged: (String? newValue) {
@@ -107,14 +177,69 @@ class _SettingsPageState extends State<SettingsPage> {
             setState(() {
               _selectedTheme = newValue;
             });
-            
+
             // 更新主题设置
             context.read<ThemeBloc>().add(
-                  ThemeChangedEvent(ThemeMode.system, themeName: newValue),
+                  ThemeChangedEvent(_selectedThemeMode, themeName: newValue),
                 );
-            
-            // 保存主题设置到本地存储
-            AppConfig.setTheme(newValue);
+
+            // 注意：不再直接调用AppConfig.setTheme，让ThemeBloc处理
+          }
+        },
+      ),
+    );
+  }
+  
+  /// 构建主题模式选择下拉菜单
+  /// 
+  /// 该方法创建一个下拉按钮，允许用户选择主题模式（浅色、深色或系统默认）。
+  /// 当用户选择新模式时，会更新应用程序的主题模式设置并保存到本地存储。
+  Widget _buildThemeModeSelector(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    
+    return ListTile(
+      title: Text(
+        localizations.theme_name_system_theme,
+        style: Theme.of(context).textTheme.titleMedium, // 统一使用titleMedium样式
+      ),
+      trailing: DropdownButton<ThemeMode>(
+        value: _selectedThemeMode,
+        items: [
+          DropdownMenuItem(
+            value: ThemeMode.light,
+            child: Text(
+              localizations.theme_name_light_mode,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
+          ),
+          DropdownMenuItem(
+            value: ThemeMode.dark,
+            child: Text(
+              localizations.theme_name_dark_mode,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
+          ),
+          DropdownMenuItem(
+            value: ThemeMode.system,
+            child: Text(
+              localizations.theme_name_system_theme,
+              style: Theme.of(context).textTheme.bodyMedium, // 统一使用bodyMedium样式
+            ),
+          ),
+        ],
+        onChanged: (ThemeMode? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedThemeMode = newValue;
+            });
+
+            // 更新主题模式设置
+            context.read<ThemeBloc>().add(
+                  ThemeChangedEvent(newValue, themeName: _selectedTheme),
+                );
+                
+            // 保存主题模式设置到本地存储
+            AppConfig.setThemeMode(newValue);
           }
         },
       ),
@@ -124,7 +249,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.settings_title),
@@ -136,6 +261,9 @@ class _SettingsPageState extends State<SettingsPage> {
           
           // 主题设置部分
           _buildThemeSelector(context),
+          
+          // 主题模式设置部分
+          _buildThemeModeSelector(context),
         ],
       ),
     );
