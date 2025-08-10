@@ -50,24 +50,8 @@ class BottomPlayerBar extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          song.title,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          song.artist,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        _SongTitle(title: song.title),
+                        _SongArtist(artist: song.artist),
                       ],
                     ),
                   ),
@@ -97,5 +81,42 @@ class BottomPlayerBar extends StatelessWidget {
       },
     );
   }
+}
 
+class _SongTitle extends StatelessWidget {
+  final String title;
+
+  const _SongTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _SongArtist extends StatelessWidget {
+  final String artist;
+
+  const _SongArtist({required this.artist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      artist,
+      style: TextStyle(
+        fontSize: 12,
+        color: Theme.of(context).textTheme.bodySmall?.color,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
 }
