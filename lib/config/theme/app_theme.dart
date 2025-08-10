@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tune/config/app_config.dart';
 
 /// 应用主题配置类
 /// 

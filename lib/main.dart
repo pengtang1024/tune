@@ -62,11 +62,15 @@ class MyApp extends StatelessWidget {
               return BlocBuilder<LocalizationBloc, LocalizationState>(
                 builder: (context, localizationState) {
                   // 使用AppTheme类中的方法处理主题
-                  final appTheme = AppTheme.getTheme(
-                    (themeState is ThemeChangedState)
-                      ? themeState.themeName ?? AppConfig.theme
-                      : AppConfig.theme
-                  );
+                  final themeName = (themeState is ThemeChangedState)
+                    ? themeState.themeName ?? AppConfig.theme
+                    : AppConfig.theme;
+                  
+                  final fontFamily = (themeState is ThemeChangedState)
+                    ? themeState.fontFamily ?? AppConfig.fontFamily
+                    : AppConfig.fontFamily;
+                  
+                  final appTheme = AppTheme.getTheme(themeName, fontFamily);
 
                   // 确定当前的主题模式
                   final themeMode = (themeState is ThemeChangedState)

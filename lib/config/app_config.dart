@@ -83,6 +83,7 @@ class AppConfig {
       case 'dark':
         return ThemeMode.dark;
       case 'system':
+        return ThemeMode.system;
       default:
         return ThemeMode.system;
     }
@@ -98,7 +99,6 @@ class AppConfig {
       case ThemeMode.dark:
         return 'dark';
       case ThemeMode.system:
-      default:
         return 'system';
     }
   }

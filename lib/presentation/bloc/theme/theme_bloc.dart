@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tune/config/app_config.dart';
 import 'package:tune/presentation/bloc/theme/theme_event.dart';
@@ -12,7 +11,11 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   /// 创建主题Bloc实例
   ///
   /// 初始化Bloc，设置初始状态为ThemeInitial，并注册事件处理器。
-  ThemeBloc() : super(ThemeChangedState(AppConfig.themeMode, themeName: _getValidThemeName(AppConfig.theme))) {
+  ThemeBloc() : super(ThemeChangedState(
+    AppConfig.themeMode, 
+    themeName: _getValidThemeName(AppConfig.theme),
+    fontFamily: AppConfig.fontFamily,
+  )) {
     on<ThemeChangedEvent>((event, emit) async {
       final validThemeName = _getValidThemeName(event.themeName);
       
@@ -21,7 +24,11 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       await AppConfig.setThemeMode(event.themeMode);
 
       // 发出新的主题状态
-      emit(ThemeChangedState(event.themeMode, themeName: validThemeName));
+      emit(ThemeChangedState(
+        event.themeMode, 
+        themeName: validThemeName,
+        fontFamily: (state is ThemeChangedState) ? (state as ThemeChangedState).fontFamily : AppConfig.fontFamily,
+      ));
     });
     
     // 处理字体更改事件
@@ -32,7 +39,11 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       // 重新发出当前主题状态以触发UI重建
       if (state is ThemeChangedState) {
         final currentState = state as ThemeChangedState;
-        emit(ThemeChangedState(currentState.themeMode, themeName: currentState.themeName));
+        emit(ThemeChangedState(
+          currentState.themeMode, 
+          themeName: currentState.themeName,
+          fontFamily: event.fontFamily,
+        ));
       }
     });
   }

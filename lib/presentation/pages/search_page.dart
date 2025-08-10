@@ -28,6 +28,19 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     _searchSongs = DependencyInjection.get<SearchSongs>();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.trim();
+    _performSearch(query);
   }
 
   Future<void> _performSearch(String query) async {
@@ -103,12 +116,6 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }
 

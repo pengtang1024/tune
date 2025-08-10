@@ -50,9 +50,8 @@ class AudioService {
             ))
         .toList();
 
-    await _audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(children: audioSources),
-      initialIndex: 0,
+    await _audioPlayer.setAudioSources(
+      audioSources,
       preload: false,
     );
   }

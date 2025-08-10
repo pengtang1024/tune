@@ -239,8 +239,8 @@ class _SongArtist extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       artist,
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).textTheme.bodySmall?.color,
+      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: Theme.of(context).textTheme.bodySmall!.color,
           ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

@@ -113,7 +113,7 @@ class _SongArtist extends StatelessWidget {
       artist,
       style: TextStyle(
         fontSize: 12,
-        color: Theme.of(context).textTheme.bodySmall?.color,
+        color: Theme.of(context).textTheme.bodySmall!.color,
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

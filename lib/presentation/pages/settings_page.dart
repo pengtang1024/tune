@@ -5,8 +5,10 @@ import 'package:tune/config/app_config.dart';
 import 'package:tune/l10n/app_localizations.dart'; // 使用生成的本地化文件
 import 'package:tune/presentation/bloc/theme/theme_bloc.dart';
 import 'package:tune/presentation/bloc/theme/theme_event.dart';
+import 'package:tune/presentation/bloc/theme/theme_state.dart';
 import 'package:tune/presentation/bloc/localization/localization_bloc.dart';
 import 'package:tune/presentation/bloc/localization/localization_event.dart';
+import 'package:tune/presentation/bloc/localization/localization_state.dart';
 
 /// 设置页面
 /// 
@@ -65,6 +67,58 @@ class _SettingsPageState extends State<SettingsPage> {
     
     // 否则返回默认主题
     return 'trendyElectro';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LocalizationBloc, LocalizationState>(
+      builder: (context, localizationState) {
+        return BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, themeState) {
+            // 更新语言设置
+            if (localizationState is LocalizationChangedState) {
+              _selectedLanguage = localizationState.locale;
+            } else {
+              _selectedLanguage = AppConfig.locale;
+            }
+            
+            // 更新主题设置
+            if (themeState is ThemeChangedState) {
+              _selectedTheme = _getValidThemeName(themeState.themeName);
+              _selectedThemeMode = themeState.themeMode;
+              _selectedFontFamily = themeState.fontFamily ?? AppConfig.fontFamily;
+            } else {
+              _selectedTheme = _getValidThemeName(AppConfig.theme);
+              _selectedThemeMode = AppConfig.themeMode;
+              _selectedFontFamily = AppConfig.fontFamily;
+            }
+            
+            final localizations = AppLocalizations.of(context)!;
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(localizations.settings_title),
+              ),
+              body: ListView(
+                children: [
+                  // 语言设置部分
+                  _buildLanguageSelector(context),
+                  
+                  // 字体设置部分
+                  _buildFontSelector(context),
+                  
+                  // 主题设置部分
+                  _buildThemeSelector(context),
+                  
+                  // 主题模式设置部分
+                  _buildThemeModeSelector(context),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   /// 构建语言选择下拉菜单
@@ -294,32 +348,6 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           }
         },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations.settings_title),
-      ),
-      body: ListView(
-        children: [
-          // 语言设置部分
-          _buildLanguageSelector(context),
-          
-          // 字体设置部分
-          _buildFontSelector(context),
-          
-          // 主题设置部分
-          _buildThemeSelector(context),
-          
-          // 主题模式设置部分
-          _buildThemeModeSelector(context),
-        ],
       ),
     );
   }

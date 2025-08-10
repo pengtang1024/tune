@@ -30,15 +30,19 @@ class ThemeChangedState extends ThemeState {
   /// 当前的主题名称（标识具体的主题样式）
   final String? themeName;
 
+  /// 当前的字体家族
+  final String? fontFamily;
+
   /// 创建主题已更改状态实例
   /// 
   /// [themeMode] 当前的主题模式
   /// [themeName] 当前的主题名称，可选参数
-  ThemeChangedState(this.themeMode, {this.themeName});
+  /// [fontFamily] 当前的字体家族，可选参数
+  ThemeChangedState(this.themeMode, {this.themeName, this.fontFamily});
 
   /// 定义状态的相等性比较属性
   /// 
-  /// 包含themeMode和themeName，用于比较两个ThemeChangedState是否相等。
+  /// 包含themeMode、themeName和fontFamily，用于比较两个ThemeChangedState是否相等。
   @override
-  List<Object?> get props => [themeMode, themeName];
+  List<Object?> get props => [themeMode, themeName, fontFamily];
 }

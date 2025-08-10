@@ -57,15 +57,15 @@ class PlayerView extends StatelessWidget {
                     ),
                     Text(
                       song.artist,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       song.album ?? 'Unknown Album',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                     ),
                   ],

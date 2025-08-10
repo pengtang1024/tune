@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:tune/config/app_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/core/routes/app_router.dart';
 
