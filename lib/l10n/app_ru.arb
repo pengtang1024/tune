@@ -1,0 +1,263 @@
+{
+  "@@locale": "ru",
+  "app_name": "Tune",
+  "@app_name": {
+    "description": "this is the name of the app",
+    "type": "string"
+  },
+  "home_title": "Главная",
+  "@home_title": {
+    "description": "this is the title of the home page",
+    "type": "string"
+  },
+  "library_title": "Библиотека",
+  "@library_title": {
+    "description": "this is the title of the library page",
+    "type": "string"
+  },
+  "search_title": "Поиск",
+  "@search_title": {
+    "description": "this is the title of the search page",
+    "type": "string"
+  },
+  "settings_title": "Настройки",
+  "@settings_title": {
+    "description": "this is the title of the settings page",
+    "type": "string"
+  },
+  "player_title": "Проигрыватель",
+  "@player_title": {
+    "description": "this is the title of the player page",
+    "type": "string"
+  },
+  "profile_title": "Профиль",
+  "@profile_title": {
+    "description": "this is the title of the profile page",
+    "type": "string"
+  },
+  "profile_default_username": "Пользователь",
+  "@profile_default_username": {
+    "description": "this is the default username",
+    "type": "string"
+  },
+  "profile_default_user_email": "user@example.com",
+  "@profile_default_user_email": {
+    "description": "this is the default user email",
+    "type": "string"
+  },
+  "search_hint_text": "Поиск...",
+  "@search_hint_text": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "artist_title": "Исполнитель",
+  "@artist_title": {
+    "description": "this is the title of the artist page",
+    "type": "string"
+  },
+  "search_hint": "Поиск песен...",
+  "@search_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "artist_hint": "Поиск исполнителей...",
+  "@artist_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "album_hint": "Поиск альбомов...",
+  "@album_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "play_button": "Воспроизвести",
+  "@play_button": {
+    "description": "this is the text for the play button",
+    "type": "string"
+  },
+  "pause_button": "Пауза",
+  "@pause_button": {
+    "description": "this is the text for the pause button",
+    "type": "string"
+  },
+  "next_button": "Следующая",
+  "@next_button": {
+    "description": "this is the text for the next button",
+    "type": "string"
+  },
+  "previous_button": "Предыдущая",
+  "@previous_button": {
+    "description": "this is the text for the previous button",
+    "type": "string"
+  },
+  "favorite_button": "Избранное",
+  "@favorite_button": {
+    "description": "this is the text for the favorite button",
+    "type": "string"
+  },
+  "theme_light": "Светлая",
+  "@theme_light": {
+    "description": "this is the text for the light theme",
+    "type": "string"
+  },
+  "theme_dark": "Темная",
+  "@theme_dark": {
+    "description": "this is the text for the dark theme",
+    "type": "string"
+  },
+  "theme_system": "Системная",
+  "@theme_system": {
+    "description": "this is the text for the system theme",
+    "type": "string"
+  },
+  "bottom_player_bar_now_playing": "Сейчас играет",
+  "@bottom_player_bar_now_playing": {
+    "description": "this is the text for the now playing indicator",
+    "type": "string"
+  },
+  "bottom_player_bar_no_song": "Песня не выбрана",
+  "@bottom_player_bar_no_song": {
+    "description": "this is the text for the no song selected indicator",
+    "type": "string"
+  },
+  "song_list_title": "Песни",
+  "@song_list_title": {
+    "description": "this is the title for the song list",
+    "type": "string"
+  },
+  "song_list_no_songs": "Песны не найдены",
+  "@song_list_no_songs": {
+    "description": "this is the text for the no songs found indicator",
+    "type": "string"
+  },
+  "player_page_duration": "Длительность",
+  "@player_page_duration": {
+    "description": "this is the text for the duration indicator",
+    "type": "string"
+  },
+  "player_page_artist": "Исполнитель",
+  "@player_page_artist": {
+    "description": "this is the text for the artist indicator",
+    "type": "string"
+  },
+  "player_page_album": "Альбом",
+  "@player_page_album": {
+    "description": "this is the text for the album indicator",
+    "type": "string"
+  },
+  "search_page_hint": "Поиск песен...",
+  "@search_page_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "search_page_empty": "Введите поисковый запрос для поиска песен",
+  "@search_page_empty": {
+    "description": "this is the text for the empty search indicator",
+    "type": "string"
+  },
+  "search_page_no_results": "Не найдено песен, соответствующих вашему запросу",
+  "@search_page_no_results": {
+    "description": "this is the text for the no results indicator",
+    "type": "string"
+  },
+  "settings_page_language": "Язык",
+  "@settings_page_language": {
+    "description": "this is the text for the language indicator",
+    "type": "string"
+  },
+  "settings_page_theme": "Тема",
+  "@settings_page_theme": {
+    "description": "this is the text for the theme indicator",
+    "type": "string"
+  },
+  "settings_page_font": "Шрифт",
+  "@settings_page_font": {
+    "description": "this is the text for the font indicator",
+    "type": "string"
+  },
+  "settings_page_about": "О приложении",
+  "@settings_page_about": {
+    "description": "this is the text for the about indicator",
+    "type": "string"
+  },
+  "library_page_artists": "Исполнители",
+  "@library_page_artists": {
+    "description": "this is the text for the artists indicator",
+    "type": "string"
+  },
+  "library_page_albums": "Альбомы",
+  "@library_page_albums": {
+    "description": "this is the text for the albums indicator",
+    "type": "string"
+  },
+  "library_page_genres": "Жанры",
+  "@library_page_genres": {
+    "description": "this is the text for the genres indicator",
+    "type": "string"
+  },
+  "language_name_en": "Английский",
+  "@language_name_en": {
+    "description": "this is the name of the English language",
+    "type": "string"
+  },
+  "language_name_zh": "Китайский",
+  "@language_name_zh": {
+    "description": "this is the name of the Chinese language",
+    "type": "string"
+  },
+  "language_name_ja": "Японский",
+  "@language_name_ja": {
+    "description": "this is the name of the Japanese language",
+    "type": "string"
+  },
+  "language_name_ko": "Корейский",
+  "@language_name_ko": {
+    "description": "this is the name of the Korean language",
+    "type": "string"
+  },
+  "language_name_ru": "Русский",
+  "@language_name_ru": {
+    "description": "this is the name of the Russian language",
+    "type": "string"
+  },
+  "theme_name_trendy_electro": "Модный Электро",
+  "@theme_name_trendy_electro": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_minimal_gray": "Минималистичный Серый",
+  "@theme_name_minimal_gray": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_nature_forest": "Лес Природы",
+  "@theme_name_nature_forest": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_cyber_neon": "Кибер Нeon",
+  "@theme_name_cyber_neon": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_warm_healing": "Теплое Исцеление",
+  "@theme_name_warm_healing": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_light_mode": "Светлый Режим",
+  "@theme_name_light_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_dark_mode": "Темный Режим",
+  "@theme_name_dark_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_system_theme": "Системная Тема",
+  "@theme_name_system_theme": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  }
+}

@@ -133,4 +133,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get library_page_genres => 'Genres';
+
+  @override
+  String get player_title => 'Player';
+
+  @override
+  String get profile_title => 'Profile';
+
+  @override
+  String get profile_default_username => 'User';
+
+  @override
+  String get profile_default_user_email => 'user@example.com';
+
+  @override
+  String get language_name_en => 'English';
+
+  @override
+  String get language_name_zh => 'Chinese';
 }

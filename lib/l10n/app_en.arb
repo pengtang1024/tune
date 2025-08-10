@@ -208,5 +208,35 @@
   "@library_page_genres": {
     "description": "this is the text for the genres indicator",
     "type": "string"
+  },
+  "player_title": "Player",
+  "@player_title": {
+    "description": "this is the title of the player page",
+    "type": "string"
+  },
+  "profile_title": "Profile",
+  "@profile_title": {
+    "description": "this is the title of the profile page",
+    "type": "string"
+  },
+  "profile_default_username": "User",
+  "@profile_default_username": {
+    "description": "this is the default username",
+    "type": "string"
+  },
+  "profile_default_user_email": "user@example.com",
+  "@profile_default_user_email": {
+    "description": "this is the default user email",
+    "type": "string"
+  },
+  "language_name_en": "English",
+  "@language_name_en": {
+    "description": "this is the name of the English language",
+    "type": "string"
+  },
+  "language_name_zh": "Chinese",
+  "@language_name_zh": {
+    "description": "this is the name of the Chinese language",
+    "type": "string"
   }
 }

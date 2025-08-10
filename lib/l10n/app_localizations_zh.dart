@@ -15,7 +15,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get home_title => '首页';
 
   @override
-  String get library_title => '库';
+  String get library_title => '音乐库';
 
   @override
   String get search_hint_text => '搜索...';
@@ -99,7 +99,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_page_font => '字体';
 
   @override
-  String get theme_name_trendy_electro => '趋势电子';
+  String get theme_name_trendy_electro => '潮流轻电';
 
   @override
   String get theme_name_minimal_gray => '极简灰调';
@@ -133,4 +133,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get library_page_genres => '流派';
+
+  @override
+  String get player_title => '播放器';
+
+  @override
+  String get profile_title => '我的';
+
+  @override
+  String get profile_default_username => '用户';
+
+  @override
+  String get profile_default_user_email => 'user@example.com';
+
+  @override
+  String get language_name_en => '英语';
+
+  @override
+  String get language_name_zh => '中文';
 }

@@ -4,6 +4,7 @@ import 'package:tune/presentation/pages/player_page.dart';
 import 'package:tune/presentation/pages/library_page.dart';
 import 'package:tune/presentation/pages/search_page.dart';
 import 'package:tune/presentation/pages/settings_page.dart';
+import 'package:tune/presentation/pages/profile_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -16,5 +17,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: LibraryRoute.page),
     AutoRoute(page: SearchRoute.page),
     AutoRoute(page: SettingsRoute.page),
+    AutoRoute(page: ProfileRoute.page),
   ];
 }

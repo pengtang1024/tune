@@ -1,0 +1,263 @@
+{
+  "@@locale": "ja",
+  "app_name": "Tune",
+  "@app_name": {
+    "description": "this is the name of the app",
+    "type": "string"
+  },
+  "home_title": "ホーム",
+  "@home_title": {
+    "description": "this is the title of the home page",
+    "type": "string"
+  },
+  "library_title": "ライブラリ",
+  "@library_title": {
+    "description": "this is the title of the library page",
+    "type": "string"
+  },
+  "search_title": "検索",
+  "@search_title": {
+    "description": "this is the title of the search page",
+    "type": "string"
+  },
+  "settings_title": "設定",
+  "@settings_title": {
+    "description": "this is the title of the settings page",
+    "type": "string"
+  },
+  "player_title": "プレーヤー",
+  "@player_title": {
+    "description": "this is the title of the player page",
+    "type": "string"
+  },
+  "profile_title": "プロフィール",
+  "@profile_title": {
+    "description": "this is the title of the profile page",
+    "type": "string"
+  },
+  "profile_default_username": "ユーザー",
+  "@profile_default_username": {
+    "description": "this is the default username",
+    "type": "string"
+  },
+  "profile_default_user_email": "user@example.com",
+  "@profile_default_user_email": {
+    "description": "this is the default user email",
+    "type": "string"
+  },
+  "search_hint_text": "検索...",
+  "@search_hint_text": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "artist_title": "アーティスト",
+  "@artist_title": {
+    "description": "this is the title of the artist page",
+    "type": "string"
+  },
+  "search_hint": "曲を検索...",
+  "@search_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "artist_hint": "アーティストを検索...",
+  "@artist_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "album_hint": "アルバムを検索...",
+  "@album_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "play_button": "再生",
+  "@play_button": {
+    "description": "this is the text for the play button",
+    "type": "string"
+  },
+  "pause_button": "一時停止",
+  "@pause_button": {
+    "description": "this is the text for the pause button",
+    "type": "string"
+  },
+  "next_button": "次へ",
+  "@next_button": {
+    "description": "this is the text for the next button",
+    "type": "string"
+  },
+  "previous_button": "前へ",
+  "@previous_button": {
+    "description": "this is the text for the previous button",
+    "type": "string"
+  },
+  "favorite_button": "お気に入り",
+  "@favorite_button": {
+    "description": "this is the text for the favorite button",
+    "type": "string"
+  },
+  "theme_light": "ライト",
+  "@theme_light": {
+    "description": "this is the text for the light theme",
+    "type": "string"
+  },
+  "theme_dark": "ダーク",
+  "@theme_dark": {
+    "description": "this is the text for the dark theme",
+    "type": "string"
+  },
+  "theme_system": "システム",
+  "@theme_system": {
+    "description": "this is the text for the system theme",
+    "type": "string"
+  },
+  "bottom_player_bar_now_playing": "再生中",
+  "@bottom_player_bar_now_playing": {
+    "description": "this is the text for the now playing indicator",
+    "type": "string"
+  },
+  "bottom_player_bar_no_song": "曲が選択されていません",
+  "@bottom_player_bar_no_song": {
+    "description": "this is the text for the no song selected indicator",
+    "type": "string"
+  },
+  "song_list_title": "曲",
+  "@song_list_title": {
+    "description": "this is the title for the song list",
+    "type": "string"
+  },
+  "song_list_no_songs": "曲が見つかりません",
+  "@song_list_no_songs": {
+    "description": "this is the text for the no songs found indicator",
+    "type": "string"
+  },
+  "player_page_duration": "長さ",
+  "@player_page_duration": {
+    "description": "this is the text for the duration indicator",
+    "type": "string"
+  },
+  "player_page_artist": "アーティスト",
+  "@player_page_artist": {
+    "description": "this is the text for the artist indicator",
+    "type": "string"
+  },
+  "player_page_album": "アルバム",
+  "@player_page_album": {
+    "description": "this is the text for the album indicator",
+    "type": "string"
+  },
+  "search_page_hint": "曲を検索...",
+  "@search_page_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "search_page_empty": "検索語を入力して曲を検索",
+  "@search_page_empty": {
+    "description": "this is the text for the empty search indicator",
+    "type": "string"
+  },
+  "search_page_no_results": "検索に一致する曲が見つかりません",
+  "@search_page_no_results": {
+    "description": "this is the text for the no results indicator",
+    "type": "string"
+  },
+  "settings_page_language": "言語",
+  "@settings_page_language": {
+    "description": "this is the text for the language indicator",
+    "type": "string"
+  },
+  "settings_page_theme": "テーマ",
+  "@settings_page_theme": {
+    "description": "this is the text for the theme indicator",
+    "type": "string"
+  },
+  "settings_page_font": "フォント",
+  "@settings_page_font": {
+    "description": "this is the text for the font indicator",
+    "type": "string"
+  },
+  "settings_page_about": "アプリについて",
+  "@settings_page_about": {
+    "description": "this is the text for the about indicator",
+    "type": "string"
+  },
+  "library_page_artists": "アーティスト",
+  "@library_page_artists": {
+    "description": "this is the text for the artists indicator",
+    "type": "string"
+  },
+  "library_page_albums": "アルバム",
+  "@library_page_albums": {
+    "description": "this is the text for the albums indicator",
+    "type": "string"
+  },
+  "library_page_genres": "ジャンル",
+  "@library_page_genres": {
+    "description": "this is the text for the genres indicator",
+    "type": "string"
+  },
+  "language_name_en": "英語",
+  "@language_name_en": {
+    "description": "this is the name of the English language",
+    "type": "string"
+  },
+  "language_name_zh": "中国語",
+  "@language_name_zh": {
+    "description": "this is the name of the Chinese language",
+    "type": "string"
+  },
+  "language_name_ja": "日本語",
+  "@language_name_ja": {
+    "description": "this is the name of the Japanese language",
+    "type": "string"
+  },
+  "language_name_ko": "韓国語",
+  "@language_name_ko": {
+    "description": "this is the name of the Korean language",
+    "type": "string"
+  },
+  "language_name_ru": "ロシア語",
+  "@language_name_ru": {
+    "description": "this is the name of the Russian language",
+    "type": "string"
+  },
+  "theme_name_trendy_electro": "トレンディ・エレクトロ",
+  "@theme_name_trendy_electro": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_minimal_gray": "ミニマル・グレー",
+  "@theme_name_minimal_gray": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_nature_forest": "自然の森",
+  "@theme_name_nature_forest": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_cyber_neon": "サイバー・ネオン",
+  "@theme_name_cyber_neon": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_warm_healing": "暖かい癒し",
+  "@theme_name_warm_healing": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_light_mode": "ライトモード",
+  "@theme_name_light_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_dark_mode": "ダークモード",
+  "@theme_name_dark_mode": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  },
+  "theme_name_system_theme": "システムテーマ",
+  "@theme_name_system_theme": {
+    "description": "this is the name of the theme",
+    "type": "string"
+  }
+}

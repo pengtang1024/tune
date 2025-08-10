@@ -6,6 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +98,9 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('ru'),
     Locale('zh'),
   ];
 
@@ -349,6 +355,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Genres'**
   String get library_page_genres;
+
+  /// this is the title of the player page
+  ///
+  /// In en, this message translates to:
+  /// **'Player'**
+  String get player_title;
+
+  /// this is the title of the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile_title;
+
+  /// this is the default username
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get profile_default_username;
+
+  /// this is the default user email
+  ///
+  /// In en, this message translates to:
+  /// **'user@example.com'**
+  String get profile_default_user_email;
+
+  /// this is the name of the English language
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get language_name_en;
+
+  /// this is the name of the Chinese language
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese'**
+  String get language_name_zh;
 }
 
 class _AppLocalizationsDelegate
@@ -362,7 +404,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+      <String>['en', 'ja', 'ko', 'ru', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -373,6 +415,12 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'ja':
+      return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
+    case 'ru':
+      return AppLocalizationsRu();
     case 'zh':
       return AppLocalizationsZh();
   }

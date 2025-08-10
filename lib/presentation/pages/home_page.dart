@@ -66,12 +66,6 @@ class _HomePageState extends State<HomePage> {
               context.pushRoute(const SearchRoute());
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.pushRoute(const SettingsRoute());
-            },
-          ),
         ],
       ),
       body: _isLoading

@@ -1,4 +1,5 @@
 {
+  "@@locale": "zh",
   "app_name": "Tune",
   "@app_name": {
     "description": "APP名字",
@@ -9,14 +10,39 @@
     "description": "首页标题",
     "type": "string"
   },
-  "library_title": "库",
+  "library_title": "音乐库",
   "@library_title": {
-    "description": "库标题",
+    "description": "音乐库标题",
     "type": "string"
   },
   "search_title": "搜索",
   "@search_title": {
     "description": "搜索标题",
+    "type": "string"
+  },
+  "settings_title": "设置",
+  "@settings_title": {
+    "description": "设置标题",
+    "type": "string"
+  },
+  "player_title": "播放器",
+  "@player_title": {
+    "description": "播放器标题",
+    "type": "string"
+  },
+  "profile_title": "我的",
+  "@profile_title": {
+    "description": "个人资料标题",
+    "type": "string"
+  },
+  "profile_default_username": "用户",
+  "@profile_default_username": {
+    "description": "默认用户名",
+    "type": "string"
+  },
+  "profile_default_user_email": "user@example.com",
+  "@profile_default_user_email": {
+    "description": "默认用户邮箱",
     "type": "string"
   },
   "search_hint_text": "搜索...",
@@ -42,11 +68,6 @@
   "album_hint": "搜索专辑...",
   "@album_hint": {
     "description": "搜索专辑提示",
-    "type": "string"
-  },
-  "settings_title": "设置",
-  "@settings_title": {
-    "description": "设置标题",
     "type": "string"
   },
   "play_button": "播放",
@@ -154,46 +175,6 @@
     "description": "字体",
     "type": "string"
   },
-  "theme_name_trendy_electro": "趋势电子",
-  "@theme_name_trendy_electro": {
-    "description": "趋势电子",
-    "type": "string"
-  },
-  "theme_name_minimal_gray": "极简灰调",
-  "@theme_name_minimal_gray": {
-    "description": "极简灰调",
-    "type": "string"
-  },
-  "theme_name_nature_forest": "自然森系",
-  "@theme_name_nature_forest": {
-    "description": "自然森系",
-    "type": "string"
-  },
-  "theme_name_cyber_neon": "赛博霓虹",
-  "@theme_name_cyber_neon": {
-    "description": "赛博霓虹",
-    "type": "string"
-  },
-  "theme_name_warm_healing": "暖调治愈",
-  "@theme_name_warm_healing": {
-    "description": "暖调治愈",
-    "type": "string"
-  },
-  "theme_name_dark_mode": "深色模式",
-  "@theme_name_dark_mode": {
-    "description": "深色模式",
-    "type": "string"
-  },
-  "theme_name_light_mode": "浅色模式",
-  "@theme_name_light_mode": {
-    "description": "浅色模式",
-    "type": "string"
-  },
-  "theme_name_system_theme": "系统主题",
-  "@theme_name_system_theme": {
-    "description": "系统主题",
-    "type": "string"
-  },
   "settings_page_about": "关于",
   "@settings_page_about": {
     "description": "关于",
@@ -212,6 +193,56 @@
   "library_page_genres": "流派",
   "@library_page_genres": {
     "description": "流派",
+    "type": "string"
+  },
+  "language_name_en": "英语",
+  "@language_name_en": {
+    "description": "语言名称 - 英语",
+    "type": "string"
+  },
+  "language_name_zh": "中文",
+  "@language_name_zh": {
+    "description": "语言名称 - 中文",
+    "type": "string"
+  },
+  "theme_name_trendy_electro": "潮流轻电",
+  "@theme_name_trendy_electro": {
+    "description": "主题名称 - 潮流轻电",
+    "type": "string"
+  },
+  "theme_name_minimal_gray": "极简灰调",
+  "@theme_name_minimal_gray": {
+    "description": "主题名称 - 极简灰调",
+    "type": "string"
+  },
+  "theme_name_nature_forest": "自然森系",
+  "@theme_name_nature_forest": {
+    "description": "主题名称 - 自然森系",
+    "type": "string"
+  },
+  "theme_name_cyber_neon": "赛博霓虹",
+  "@theme_name_cyber_neon": {
+    "description": "主题名称 - 赛博霓虹",
+    "type": "string"
+  },
+  "theme_name_warm_healing": "暖调治愈",
+  "@theme_name_warm_healing": {
+    "description": "主题名称 - 暖调治愈",
+    "type": "string"
+  },
+  "theme_name_light_mode": "浅色模式",
+  "@theme_name_light_mode": {
+    "description": "主题名称 - 浅色模式",
+    "type": "string"
+  },
+  "theme_name_dark_mode": "深色模式",
+  "@theme_name_dark_mode": {
+    "description": "主题名称 - 深色模式",
+    "type": "string"
+  },
+  "theme_name_system_theme": "系统主题",
+  "@theme_name_system_theme": {
+    "description": "主题名称 - 系统主题",
     "type": "string"
   }
 }
