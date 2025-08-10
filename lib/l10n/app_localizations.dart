@@ -397,6 +397,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get search_title;
+
+  /// this is the message shown when there is no song playing
+  ///
+  /// In en, this message translates to:
+  /// **'No song is playing'**
+  String get no_song_playing;
 }
 
 class _AppLocalizationsDelegate

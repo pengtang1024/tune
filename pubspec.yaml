@@ -63,6 +63,9 @@ dependencies:
   # Routing
   auto_route: ^9.3.0+1
 
+  # Network connectivity
+  connectivity_plus: ^6.0.3
+
   # Local music query
 
   # Permissions

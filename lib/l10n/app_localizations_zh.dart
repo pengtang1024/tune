@@ -154,4 +154,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get search_title => '搜索';
+
+  @override
+  String get no_song_playing => 'No song is playing';
 }

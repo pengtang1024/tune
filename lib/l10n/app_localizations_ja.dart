@@ -154,4 +154,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get search_title => '検索';
+
+  @override
+  String get no_song_playing => '再生中の曲がありません';
 }

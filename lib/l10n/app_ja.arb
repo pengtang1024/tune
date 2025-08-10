@@ -259,5 +259,10 @@
   "@theme_name_system_theme": {
     "description": "this is the name of the theme",
     "type": "string"
+  },
+  "no_song_playing": "再生中の曲がありません",
+  "@no_song_playing": {
+    "description": "this is the name of the theme",
+    "type": "string"
   }
 }

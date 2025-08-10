@@ -155,4 +155,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get search_title => 'Поиск';
+
+  @override
+  String get no_song_playing => 'No song is playing';
 }

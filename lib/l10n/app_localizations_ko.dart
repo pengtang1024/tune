@@ -154,4 +154,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get search_title => '검색';
+
+  @override
+  String get no_song_playing => 'No song is playing';
 }

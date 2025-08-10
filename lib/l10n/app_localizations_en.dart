@@ -154,4 +154,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search_title => 'Search';
+
+  @override
+  String get no_song_playing => 'No song is playing';
 }

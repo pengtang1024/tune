@@ -243,5 +243,10 @@
   "@search_title": {
     "description": "this is the title of the search page",
     "type": "string"
+  },
+  "no_song_playing": "No song is playing",
+  "@no_song_playing": {
+    "description": "this is the message shown when there is no song playing",
+    "type": "string"
   }
 }

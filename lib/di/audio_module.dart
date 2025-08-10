@@ -1,0 +1,60 @@
+import 'package:get_it/get_it.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:tune/data/datasources/audio_local_data_source.dart';
+import 'package:tune/data/datasources/audio_remote_data_source.dart';
+import 'package:tune/data/repositories/audio_repository_impl.dart';
+import 'package:tune/domain/repositories/audio_repository.dart';
+import 'package:tune/domain/usecases/get_all_songs.dart';
+import 'package:tune/domain/usecases/play_audio.dart';
+import 'package:tune/domain/usecases/search_songs.dart';
+import 'package:tune/features/home/presentation/bloc/player/player_bloc.dart';
+import 'package:tune/platform/services/media/audio_service.dart';
+
+/// 音频模块注册
+class AudioModule {
+  /// 初始化音频模块
+  static Future<void> init(GetIt getIt) async {
+    // 注册AudioPlayer
+    getIt.registerLazySingleton<AudioPlayer>(() => AudioPlayer());
+
+    // 注册数据源
+    getIt.registerLazySingleton<AudioLocalDataSource>(
+      () => AudioLocalDataSourceImpl(),
+    );
+    getIt.registerLazySingleton<AudioRemoteDataSource>(
+      () => AudioRemoteDataSourceImpl(),
+    );
+
+    // 注册仓库
+    getIt.registerLazySingleton<AudioRepository>(
+      () => AudioRepositoryImpl(
+        getIt<AudioLocalDataSource>(),
+        getIt<AudioRemoteDataSource>(),
+      ),
+    );
+
+    // 注册用例
+    getIt.registerLazySingleton<GetAllSongs>(
+      () => GetAllSongs(getIt<AudioRepository>()),
+    );
+    getIt.registerLazySingleton<PlayAudio>(
+      () => PlayAudio(getIt<AudioRepository>()),
+    );
+    getIt.registerLazySingleton<SearchSongs>(
+      () => SearchSongs(getIt<AudioRepository>()),
+    );
+
+    // 注册服务
+    getIt.registerLazySingleton<AudioService>(
+      () => AudioService(getIt<PlayAudio>()),
+    );
+
+    // 注册Bloc
+    getIt.registerFactory<PlayerBloc>(
+      () => PlayerBloc(
+        audioService: getIt<AudioService>(),
+        getAllSongs: getIt<GetAllSongs>(),
+      ),
+    );
+  }
+}
