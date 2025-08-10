@@ -9,6 +9,8 @@ import 'package:tune/core/di/dependency_injection.dart';
 import 'package:tune/presentation/bloc/player/player_bloc.dart';
 import 'package:tune/presentation/bloc/player/player_event.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:tune/core/utils/platform_detector.dart';
+import 'package:tune/presentation/widgets/section_title.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
@@ -53,6 +55,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final useMobileLayout = PlatformDetector.shouldUseMobileLayout(context);
+    final isDesktop = PlatformDetector.isDesktop;
+    final isWeb = PlatformDetector.isWeb;
     
     return Scaffold(
       appBar: AppBar(
@@ -64,6 +69,7 @@ class _HomePageState extends State<HomePage> {
               context.pushRoute(const SearchRoute());
             },
           ),
+          // 在移动端布局下显示设置按钮，Web和PC端也保留设置按钮
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -78,8 +84,8 @@ class _HomePageState extends State<HomePage> {
           // 添加一个欢迎标题
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              localizations.home_title,
+            child: SectionTitle(
+              title: localizations.home_title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -88,11 +94,8 @@ class _HomePageState extends State<HomePage> {
           // 最近播放和推荐部分标题
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              localizations.song_list_title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: SectionTitle(
+              title: localizations.song_list_title,
             ),
           ),
           const SizedBox(height: 8),
@@ -108,16 +111,17 @@ class _HomePageState extends State<HomePage> {
                         ),
                       )
                     : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: PlatformDetector.getGridSpacing(context),
+                        ),
                         child: GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 4 / 5,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: PlatformDetector.getGridCrossAxisCount(context),
+                            crossAxisSpacing: PlatformDetector.getGridSpacing(context),
+                            mainAxisSpacing: PlatformDetector.getGridSpacing(context),
+                            childAspectRatio: PlatformDetector.getCardAspectRatio(context),
                           ),
-                          itemCount: _songs.length > 4 ? 4 : _songs.length,
+                          itemCount: _songs.length,
                           itemBuilder: (context, index) {
                             final song = _songs[index];
                             return _SongCard(
@@ -133,8 +137,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
           ),
-          // 查看全部歌曲按钮
-          if (_songs.isNotEmpty)
+          // 查看全部歌曲按钮 (仅在移动端布局下显示)
+          if (useMobileLayout && _songs.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
@@ -154,7 +158,9 @@ class _HomePageState extends State<HomePage> {
             ),
         ],
       ),
-      bottomNavigationBar: const BottomPlayerBar(),
+      bottomNavigationBar: useMobileLayout
+          ? const BottomPlayerBar() 
+          : null, // 在桌面端布局下不显示底部播放栏
     );
   }
 }
@@ -170,8 +176,10 @@ class _SongCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useMobileLayout = PlatformDetector.shouldUseMobileLayout(context);
+    
     return Card(
-      elevation: 2,
+      elevation: useMobileLayout ? 2 : 4, // 根据布局调整阴影
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -205,9 +213,9 @@ class _SongCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SongTitle(title: song.title),
+                  SongTitle(title: song.title),
                   const SizedBox(height: 4),
-                  _SongArtist(artist: song.artist),
+                  SongArtist(artist: song.artist),
                 ],
               ),
             ),
@@ -236,18 +244,48 @@ class _SongTitle extends StatelessWidget {
   }
 }
 
-class _SongArtist extends StatelessWidget {
+class HeadlineTitle extends StatelessWidget {
+  final String title;
+
+  const HeadlineTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class SongTitle extends StatelessWidget {
+  final String title;
+
+  const SongTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class SongArtist extends StatelessWidget {
   final String artist;
 
-  const _SongArtist({required this.artist});
+  const SongArtist({required this.artist});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       artist,
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).textTheme.bodySmall?.color,
-          ),
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
