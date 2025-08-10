@@ -9,6 +9,8 @@ import 'package:tune/presentation/widgets/song_list.dart';
 import 'package:tune/core/di/dependency_injection.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:tune/core/routes/app_router.dart';
+import 'package:tune/core/utils/platform_detector.dart';
+import 'package:tune/presentation/widgets/section_title.dart';
 
 @RoutePage()
 class SearchPage extends StatefulWidget {
@@ -77,6 +79,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final useMobileLayout = PlatformDetector.shouldUseMobileLayout(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -88,6 +91,7 @@ class _SearchPageState extends State<SearchPage> {
             hintStyle: _SearchHintStyle(context: context),
           ),
           style: _SearchTextStyle(context: context),
+          onSubmitted: _performSearch,
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -108,13 +112,126 @@ class _SearchPageState extends State<SearchPage> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 )
-              : SongList(
-                  songs: _songs,
-                  onSongSelected: (song) {
+              : useMobileLayout
+                  ? _buildMobileLayout(localizations) // 移动端布局
+                  : _buildDesktopLayout(localizations), // 桌面端布局
+    );
+  }
+
+  Widget _buildMobileLayout(AppLocalizations localizations) {
+    return SongList(
+      songs: _songs,
+      onSongSelected: (song) {
+        context.read<PlayerBloc>().add(PlaySongEvent(song.id));
+        context.pushRoute(const PlayerRoute());
+      },
+    );
+  }
+
+  Widget _buildDesktopLayout(AppLocalizations localizations) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionTitle(title: localizations.search_title),
+          const SizedBox(height: 16),
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: PlatformDetector.getGridCrossAxisCount(context),
+                crossAxisSpacing: PlatformDetector.getGridSpacing(context),
+                mainAxisSpacing: PlatformDetector.getGridSpacing(context),
+                childAspectRatio: PlatformDetector.getCardAspectRatio(context),
+              ),
+              itemCount: _songs.length,
+              itemBuilder: (context, index) {
+                final song = _songs[index];
+                return _SearchResultCard(
+                  song: song,
+                  onTap: () {
                     context.read<PlayerBloc>().add(PlaySongEvent(song.id));
                     context.pushRoute(const PlayerRoute());
                   },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchResultCard extends StatelessWidget {
+  final Song song;
+  final VoidCallback onTap;
+
+  const _SearchResultCard({
+    required this.song,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 专辑封面占位符
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
                 ),
+                child: const Center(
+                  child: Icon(
+                    Icons.music_note,
+                    size: 40,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            // 歌曲信息
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    song.title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    song.artist,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
