@@ -61,41 +61,33 @@ class MyApp extends StatelessWidget {
             builder: (context, themeState) {
               return BlocBuilder<LocalizationBloc, LocalizationState>(
                 builder: (context, localizationState) {
-                  // 确定当前的主题模式
-                  ThemeMode themeMode = ThemeMode.system;
-                  String? themeName;
-                  String fontFamily = AppConfig.fontFamily; // 获取字体设置
+                  // 使用AppTheme类中的方法处理主题
+                  final appTheme = AppTheme.getTheme(
+                    (themeState is ThemeChangedState)
+                      ? themeState.themeName ?? AppConfig.theme
+                      : AppConfig.theme
+                  );
 
-                  // 如果主题状态是已更改状态，则使用新主题
-                  if (themeState is ThemeChangedState) {
-                    themeMode = themeState.themeMode;
-                    themeName = themeState.themeName;
-                  }
+                  // 确定当前的主题模式
+                  final themeMode = (themeState is ThemeChangedState)
+                    ? themeState.themeMode
+                    : ThemeMode.system;
 
                   // 确定当前的语言代码
-                  String locale = 'en'; // 默认语言为英语
-
-                  // 如果本地化状态是已更改状态，则使用新语言
-                  if (localizationState is LocalizationChangedState) {
-                    locale = localizationState.locale;
-                  }
+                  final locale = (localizationState is LocalizationChangedState)
+                    ? localizationState.locale
+                    : AppConfig.locale;
 
                   // 构建应用程序
                   return MaterialApp.router(
                     // 设置标题
-                    title: 'Tune',
+                    title: AppLocalizations.of(context)?.app_name ?? 'Tune',
 
                     // 设置主题
-                    theme: AppTheme.getTheme(
-                      themeName ?? AppConfig.theme,
-                      fontFamily,
-                    ).themeData,
+                    theme: appTheme.themeData,
 
                     // 设置暗黑主题
-                    darkTheme: AppTheme.getTheme(
-                      themeName ?? AppConfig.theme,
-                      fontFamily,
-                    ).darkThemeData,
+                    darkTheme: appTheme.darkThemeData,
 
                     // 设置主题模式
                     themeMode: themeMode,
@@ -105,7 +97,7 @@ class MyApp extends StatelessWidget {
                     supportedLocales: AppLocalizations.supportedLocales,
                     locale: Locale(locale),
 
-                    // 配置路由
+                    // 设置路由
                     routerConfig: appRouter.config(),
                   );
                 },

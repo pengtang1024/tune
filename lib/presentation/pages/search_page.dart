@@ -1,12 +1,14 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/core/routes/app_router.dart';
 import 'package:tune/domain/entities/song.dart';
+import 'package:tune/domain/usecases/search_songs.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/presentation/bloc/player/player_bloc.dart';
 import 'package:tune/presentation/bloc/player/player_event.dart';
 import 'package:tune/presentation/widgets/song_list.dart';
+import 'package:tune/core/di/dependency_injection.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:tune/core/routes/app_router.dart';
 
 @RoutePage()
 class SearchPage extends StatefulWidget {
@@ -17,18 +19,22 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  late SearchSongs _searchSongs;
   List<Song> _songs = [];
   bool _isLoading = false;
   final TextEditingController _searchController = TextEditingController();
 
-  /// 搜索歌曲
-  ///
-  /// 根据输入的查询字符串搜索歌曲。
-  /// 如果查询为空，则清空结果列表。
-  Future<void> _searchSongs(String query) async {
+  @override
+  void initState() {
+    super.initState();
+    _searchSongs = DependencyInjection.get<SearchSongs>();
+  }
+
+  Future<void> _performSearch(String query) async {
     if (query.isEmpty) {
       setState(() {
         _songs = [];
+        _isLoading = false;
       });
       return;
     }
@@ -38,48 +44,21 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     try {
-      // 这里应该调用实际的搜索功能
-      // 暂时使用简单的过滤方式
-      final allSongs = await context.read<PlayerBloc>().getAllSongs();
-      final filteredSongs = allSongs.where((song) {
-        return song.title.toLowerCase().contains(query.toLowerCase()) ||
-            song.artist.toLowerCase().contains(query.toLowerCase()) ||
-            song.album.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-
-      if (mounted) {
-        setState(() {
-          _songs = filteredSongs;
-          _isLoading = false;
-        });
-      }
+      final songs = await _searchSongs(query);
+      setState(() {
+        _songs = songs;
+        _isLoading = false;
+      });
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        // 显示错误提示
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(AppLocalizations.of(context)!
-                  .search_page_no_results)),
+          SnackBar(content: Text('Failed to search songs: $e')),
         );
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(() {
-      _searchSongs(_searchController.text);
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 
   @override
@@ -93,34 +72,64 @@ class _SearchPageState extends State<SearchPage> {
           decoration: InputDecoration(
             hintText: localizations.search_page_hint,
             border: InputBorder.none,
-            hintStyle: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.color
-                    ?.withOpacity(0.7)),
+            hintStyle: _SearchHintStyle(context: context),
           ),
-          style: TextStyle(
-              color:
-                  Theme.of(context).textTheme.bodyLarge?.color),
+          style: _SearchTextStyle(context: context),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // context.router.pop();
             _searchController.clear();
+            Navigator.of(context).pop();
           },
         ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SongList(
-              songs: _songs,
-              onSongSelected: (song) {
-                context.read<PlayerBloc>().add(PlaySongEvent(song.id));
-                context.pushRoute(const PlayerRoute());
-              },
-            ),
+          : _songs.isEmpty
+              ? Center(
+                  child: Text(
+                    _searchController.text.isEmpty
+                        ? localizations.search_page_empty
+                        : localizations.search_page_no_results,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                )
+              : SongList(
+                  songs: _songs,
+                  onSongSelected: (song) {
+                    context.read<PlayerBloc>().add(PlaySongEvent(song.id));
+                    context.pushRoute(const PlayerRoute());
+                  },
+                ),
     );
   }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+}
+
+class _SearchHintStyle extends TextStyle {
+  final BuildContext context;
+
+  _SearchHintStyle({required this.context})
+      : super(
+          color: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.color
+              ?.withValues(alpha: 0.7),
+        );
+}
+
+class _SearchTextStyle extends TextStyle {
+  final BuildContext context;
+
+  _SearchTextStyle({required this.context})
+      : super(
+          color: Theme.of(context).textTheme.bodyLarge?.color,
+        );
 }
