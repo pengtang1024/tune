@@ -151,4 +151,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get language_name_zh => '中国語';
+
+  @override
+  String get search_title => '検索';
 }

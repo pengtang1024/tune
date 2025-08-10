@@ -151,4 +151,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language_name_zh => 'Chinese';
+
+  @override
+  String get search_title => 'Search';
 }

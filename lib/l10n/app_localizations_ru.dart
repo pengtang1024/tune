@@ -152,4 +152,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get language_name_zh => 'Китайский';
+
+  @override
+  String get search_title => 'Поиск';
 }

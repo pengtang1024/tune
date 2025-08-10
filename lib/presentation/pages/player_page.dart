@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tune/domain/entities/song.dart';
+import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/presentation/bloc/player/player_bloc.dart';
+import 'package:tune/presentation/bloc/player/player_state.dart';
+import 'package:tune/presentation/bloc/player/player_event.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:tune/core/utils/platform_detector.dart';
+import 'package:tune/presentation/widgets/section_title.dart';
 
 class SongArtist extends StatelessWidget {
   final String artist;
@@ -16,7 +25,6 @@ class SongArtist extends StatelessWidget {
     );
   }
 }
-import 'package:flutter/material.dart';
 
 class HeadlineTitle extends StatelessWidget {
   final String title;
@@ -32,18 +40,6 @@ class HeadlineTitle extends StatelessWidget {
     );
   }
 }
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/domain/entities/song.dart';
-import 'package:tune/l10n/app_localizations.dart';
-import 'package:tune/presentation/bloc/player/player_bloc.dart';
-import 'package:tune/presentation/bloc/player/player_state.dart';
-import 'package:tune/presentation/bloc/player/player_event.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:tune/core/utils/platform_detector.dart';
-import 'package:tune/presentation/widgets/section_title.dart';
-import 'package:tune/presentation/widgets/headline_title.dart';
-import 'package:tune/presentation/widgets/song_artist.dart';
 
 @RoutePage()
 class PlayerPage extends StatelessWidget {

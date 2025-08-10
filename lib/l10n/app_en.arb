@@ -238,5 +238,10 @@
   "@language_name_zh": {
     "description": "this is the name of the Chinese language",
     "type": "string"
+  },
+  "search_title": "Search",
+  "@search_title": {
+    "description": "this is the title of the search page",
+    "type": "string"
   }
 }

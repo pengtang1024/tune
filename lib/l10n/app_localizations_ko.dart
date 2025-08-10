@@ -151,4 +151,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get language_name_zh => '중국어';
+
+  @override
+  String get search_title => '검색';
 }

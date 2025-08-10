@@ -391,6 +391,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chinese'**
   String get language_name_zh;
+
+  /// this is the title of the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search_title;
 }
 
 class _AppLocalizationsDelegate
