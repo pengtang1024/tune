@@ -8,12 +8,14 @@ class NetworkInfoMobile implements NetworkInfo {
   @override
   Future<bool> get isConnected async {
     final result = await _connectivity.checkConnectivity();
-    return result != ConnectivityResult.none;
+    // 修复：处理 List<ConnectivityResult> 类型
+    return result.any((r) => r != ConnectivityResult.none);
   }
 
   @override
   Future<bool> get isWiFi async {
     final result = await _connectivity.checkConnectivity();
-    return result == ConnectivityResult.wifi;
+    // 修复：处理 List<ConnectivityResult> 类型
+    return result.any((r) => r == ConnectivityResult.wifi);
   }
 }

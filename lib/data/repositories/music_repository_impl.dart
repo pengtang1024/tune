@@ -1,7 +1,7 @@
 import 'package:tune/data/datasources/local/music_local_datasource.dart';
 import 'package:tune/data/datasources/remote/music_remote_datasource.dart';
-import 'package:tune/domain/entities/song.dart';
 import 'package:tune/domain/entities/playlist.dart';
+import 'package:tune/domain/entities/song.dart';
 import 'package:tune/domain/repositories/music_repository.dart';
 
 /// 音乐仓库实现

@@ -1,11 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tune/domain/entities/song.dart';
-import 'package:auto_route/auto_route.dart';
-import 'package:tune/core/utils/platform_detector.dart';
-import 'package:tune/features/home/presentation/bloc/player/player_bloc.dart';
-import 'package:tune/features/home/presentation/bloc/player/player_state.dart';
-import 'package:tune/features/home/presentation/bloc/player/player_event.dart';
+import 'package:tune/features/audio/presentation/bloc/player/player_bloc.dart';
+import 'package:tune/features/audio/presentation/bloc/player/player_event.dart';
+import 'package:tune/features/audio/presentation/bloc/player/player_state.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 class SongArtist extends StatelessWidget {
@@ -16,12 +15,7 @@ class SongArtist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      artist,
-      style: style ?? Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).textTheme.bodySmall?.color,
-          ),
-    );
+    return Text(artist, style: style ?? Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color));
   }
 }
 
@@ -33,10 +27,7 @@ class HeadlineTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: style ?? Theme.of(context).textTheme.headlineSmall,
-    );
+    return Text(title, style: style ?? Theme.of(context).textTheme.headlineSmall);
   }
 }
 
@@ -53,11 +44,7 @@ class MusicPlayerPage extends StatelessWidget {
     return BlocBuilder<PlayerBloc, PlayerState>(
       builder: (context, state) {
         if (state is PlayerInitial || state is PlayerLoading) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         if (state is PlayerError) {
@@ -80,11 +67,7 @@ class MusicPlayerPage extends StatelessWidget {
         }
 
         if (state is PlayerStopped) {
-          return Scaffold(
-            body: Center(
-              child: Text(localizations.no_song_playing),
-            ),
-          );
+          return Scaffold(body: Center(child: Text(localizations.no_song_playing)));
         }
 
         Song? currentSong;
@@ -105,11 +88,7 @@ class MusicPlayerPage extends StatelessWidget {
         }
 
         if (currentSong == null) {
-          return const Scaffold(
-            body: Center(
-              child: Text('No song playing'),
-            ),
-          );
+          return const Scaffold(body: Center(child: Text('No song playing')));
         }
 
         return Scaffold(
@@ -122,18 +101,8 @@ class MusicPlayerPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (useMobileLayout)
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                        )
-                      else
-                        const Spacer(),
-                      Text(
-                        localizations.bottom_player_bar_now_playing,
-                        style: (Theme.of(context).textTheme.titleLarge ?? const TextStyle())
-                            .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                      if (useMobileLayout) IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.of(context).pop()) else const Spacer(),
+                      Text(localizations.now_playing, style: (Theme.of(context).textTheme.titleLarge ?? const TextStyle()).copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
                       const Spacer(),
                     ],
                   ),
@@ -144,15 +113,8 @@ class MusicPlayerPage extends StatelessWidget {
                     child: Container(
                       width: 300,
                       height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.music_note,
-                        size: 120,
-                        color: Colors.grey[600],
-                      ),
+                      decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(16)),
+                      child: Icon(Icons.music_note, size: 120, color: Colors.grey[600]),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -209,10 +171,7 @@ class MusicPlayerPage extends StatelessWidget {
                         onPressed: () {
                           context.read<PlayerBloc>().add(TogglePlayPauseEvent());
                         },
-                        child: Icon(
-                          isPlaying ? Icons.pause : Icons.play_arrow,
-                          size: 48,
-                        ),
+                        child: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 48),
                       ),
                       IconButton(
                         icon: const Icon(Icons.skip_next),

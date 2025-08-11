@@ -12,13 +12,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get app_name => 'Tune';
 
   @override
-  String get home_title => '首页';
+  String get home_title => '主页';
+
+  @override
+  String get font_family => '字体系列';
+
+  @override
+  String get theme_mode => '主题模式';
+
+  @override
+  String get light_mode => '浅色模式';
+
+  @override
+  String get dark_mode => '深色模式';
+
+  @override
+  String get system_mode => '系统模式';
 
   @override
   String get library_title => '音乐库';
-
-  @override
-  String get search_hint_text => '搜索...';
 
   @override
   String get artist_title => '艺术家';
@@ -51,110 +63,113 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favorite_button => '收藏';
 
   @override
-  String get theme_light => '浅色';
+  String get now_playing => '正在播放';
 
   @override
-  String get theme_dark => '深色';
+  String get no_things_players => '没有播放器';
 
   @override
-  String get theme_system => '系统';
-
-  @override
-  String get bottom_player_bar_now_playing => '正在播放';
-
-  @override
-  String get bottom_player_bar_no_song => '没有选择歌曲';
+  String get no_selected_song => '未选择歌曲';
 
   @override
   String get song_list_title => '歌曲';
 
   @override
-  String get song_list_no_songs => '没有找到歌曲';
+  String get no_songs_found => '未找到歌曲';
 
   @override
-  String get player_page_duration => '时长';
+  String get player_duration => '时长';
 
   @override
-  String get player_page_artist => '艺术家';
+  String get player_artist => '艺术家';
 
   @override
-  String get player_page_album => '专辑';
+  String get player_album => '专辑';
 
   @override
-  String get search_page_hint => '搜索歌曲...';
+  String get search_empty => '输入搜索词来查找歌曲';
 
   @override
-  String get search_page_empty => '输入搜索关键词查找歌曲';
+  String get search_no_results => '未找到匹配的歌曲';
 
   @override
-  String get search_page_no_results => '没有找到匹配您搜索的歌曲';
+  String get language => '语言';
 
   @override
-  String get settings_page_language => '语言';
+  String get theme => '主题';
 
   @override
-  String get settings_page_theme => '主题';
+  String get font => '字体';
 
   @override
-  String get settings_page_font => '字体';
+  String get theme_trendy_electro => '时尚电子';
 
   @override
-  String get theme_name_trendy_electro => '潮流轻电';
+  String get theme_minimal_gray => '极简灰';
 
   @override
-  String get theme_name_minimal_gray => '极简灰调';
+  String get theme_nature_forest => '自然森林';
 
   @override
-  String get theme_name_nature_forest => '自然森系';
+  String get theme_cyber_neon => '赛博霓虹';
 
   @override
-  String get theme_name_cyber_neon => '赛博霓虹';
+  String get theme_warm_healing => '温暖治愈';
 
   @override
-  String get theme_name_warm_healing => '暖调治愈';
+  String get about => '关于';
 
   @override
-  String get theme_name_dark_mode => '深色模式';
+  String get library_artists => '艺术家';
 
   @override
-  String get theme_name_light_mode => '浅色模式';
+  String get library_albums => '专辑';
 
   @override
-  String get theme_name_system_theme => '系统主题';
-
-  @override
-  String get settings_page_about => '关于';
-
-  @override
-  String get library_page_artists => '艺术家';
-
-  @override
-  String get library_page_albums => '专辑';
-
-  @override
-  String get library_page_genres => '流派';
+  String get library_genres => '流派';
 
   @override
   String get player_title => '播放器';
 
   @override
-  String get profile_title => '我的';
+  String get profile_title => '个人资料';
 
   @override
-  String get profile_default_username => '用户';
+  String get username_default => '用户';
 
   @override
-  String get profile_default_user_email => 'user@example.com';
+  String get user_email_default => 'user@example.com';
 
   @override
-  String get language_name_en => '英语';
-
-  @override
-  String get language_name_zh => '中文';
+  String get locale => '中文';
 
   @override
   String get search_title => '搜索';
 
   @override
-  String get no_song_playing => 'No song is playing';
+  String get no_song_playing => '当前无歌曲播放';
+
+  @override
+  String get quick_actions => '快速操作';
+
+  @override
+  String get favorites => '收藏';
+
+  @override
+  String get playlists => '播放列表';
+
+  @override
+  String get recently_played => '最近播放';
+
+  @override
+  String get recommendations => '推荐';
+
+  @override
+  String get no_recent_songs => '无最近播放歌曲';
+
+  @override
+  String get no_recommendations => '无推荐内容';
+
+  @override
+  String get failed_to_load_songs => '加载歌曲失败';
 }

@@ -7,10 +7,10 @@ class PlatformException extends AppException {
 
   /// 构造函数
   PlatformException({
-    required String message,
+    required super.message,
     required this.platform,
-    String code = 'platform_error',
-  }) : super(message: message, code: code);
+    super.code = 'platform_error',
+  });
 
   @override
   String toString() {

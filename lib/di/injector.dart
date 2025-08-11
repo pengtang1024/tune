@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
+import 'package:tune/di/audio_module.dart';
+import 'package:tune/di/business_module.dart';
 import 'package:tune/di/core_module.dart';
 import 'package:tune/di/data_module.dart';
 import 'package:tune/di/platform_module.dart';
-import 'package:tune/di/audio_module.dart';
-import 'package:tune/di/business_module.dart';
 
 /// 注入器入口（初始化所有模块）
 class Injector {

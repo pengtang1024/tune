@@ -3,12 +3,13 @@ import 'package:just_audio/just_audio.dart';
 import 'package:tune/data/datasources/audio_local_data_source.dart';
 import 'package:tune/data/datasources/audio_remote_data_source.dart';
 import 'package:tune/data/repositories/audio_repository_impl.dart';
+import 'package:tune/data/services/media/audio_service.dart';
+import 'package:tune/data/services/media/i_audio_service.dart';
 import 'package:tune/domain/repositories/audio_repository.dart';
 import 'package:tune/domain/usecases/get_all_songs.dart';
 import 'package:tune/domain/usecases/play_audio.dart';
 import 'package:tune/domain/usecases/search_songs.dart';
-import 'package:tune/features/home/presentation/bloc/player/player_bloc.dart';
-import 'package:tune/platform/services/media/audio_service.dart';
+import 'package:tune/features/audio/presentation/bloc/player/player_bloc.dart';
 
 /// 音频模块注册
 class AudioModule {
@@ -45,14 +46,16 @@ class AudioModule {
     );
 
     // 注册服务
-    getIt.registerLazySingleton<AudioService>(
-      () => AudioService(getIt<PlayAudio>()),
+    getIt.registerLazySingleton<IAudioService>(
+      () => AudioService(
+        audioPlayer: getIt<AudioPlayer>(),
+      ),
     );
 
     // 注册Bloc
     getIt.registerFactory<PlayerBloc>(
       () => PlayerBloc(
-        audioService: getIt<AudioService>(),
+        audioService: getIt<IAudioService>(),
         getAllSongs: getIt<GetAllSongs>(),
       ),
     );

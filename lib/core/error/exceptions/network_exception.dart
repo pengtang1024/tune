@@ -7,10 +7,10 @@ class NetworkException extends AppException {
 
   /// 构造函数
   NetworkException({
-    required String message,
+    required super.message,
     this.statusCode,
-    String code = 'network_error',
-  }) : super(message: message, code: code);
+    super.code = 'network_error',
+  });
 
   @override
   String toString() {

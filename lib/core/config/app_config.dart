@@ -1,89 +1,142 @@
 import 'package:flutter/material.dart';
-import 'package:tune/core/config/localization_config.dart';
-import 'package:tune/core/config/theme_config.dart';
-import 'package:tune/core/config/user_session_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tune/core/config/font_constants.dart';
+import 'package:tune/core/storage/local/local_storage_impl.dart';
+import 'package:tune/core/storage/secure/secure_storage_impl.dart';
 
-/// 应用程序配置管理类
-/// 
-/// 负责统一管理应用程序的所有配置信息。
-/// 将不同类型的配置分散到专门的配置类中，提高代码的模块化和可维护性。
+
+
+/// 应用程序配置常量类
+///
+/// 负责定义应用程序的各种配置常量信息
 class AppConfig {
-  /// 初始化所有配置管理器
-  /// 
-  /// 必须在应用程序启动时调用，用于初始化所有配置管理器。
+  /// SharedPreferences实例，用于本地数据存储
+  static late SharedPreferences _prefs;
+
+  /// 本地存储实例
+  static late LocalStorageImpl localStorage;
+
+  /// 安全存储实例
+  static late SecureStorageImpl secureStorage;
+
+  /// 主题名称配置键名
+  static const String keyTheme = 'theme';
+
+  /// 主题模式配置键名
+  static const String keyThemeMode = 'theme_mode';
+
+  /// 语言配置键名
+  static const String keyLocale = 'locale';
+
+  /// 字体配置键名
+  static const String keyFontFamily = 'font_family';
+
+  /// 默认语言
+  static const String defaultLocale = 'en';
+
+  /// 默认主题
+  static const String defaultTheme = 'trendyElectro';
+
+  /// 有效的主题列表
+  static const List<String> validThemes = [
+    'trendyElectro',
+    'minimalGray',
+    'natureForest',
+    'cyberNeon',
+    'warmHealing'
+  ];
+
+  /// 当前语言
+  static String locale = 'en';
+
+  /// 当前主题
+  static String theme = 'trendyElectro';
+
+  /// 当前主题模式
+  static ThemeMode themeMode = ThemeMode.system;
+
+  /// 当前字体
+  static FontFamily fontFamily = FontFamily.defaultFont;
+
+  /// 初始化配置管理器
+  ///
+  /// 获取SharedPreferences实例，必须在应用程序启动时调用。
   static Future<void> init() async {
-    await Future.wait([
-      LocalizationConfig.init(),
-      ThemeConfig.init(),
-      UserSessionConfig.init(),
-    ]);
+    _prefs = await SharedPreferences.getInstance();
+    localStorage = LocalStorageImpl()..init();
+    secureStorage = SecureStorageImpl()..init();
+
+    locale = _prefs.getString(keyLocale) ?? 'en';
+    theme = _prefs.getString(keyTheme) ?? 'trendyElectro';
+    themeMode = _getThemeModeFromString(_prefs.getString(keyThemeMode));
+    final storedFont = _prefs.getString(keyFontFamily);
+    fontFamily = FontFamily.fromValue(storedFont);
   }
 
-  // 本地化配置相关静态getter和setter方法
-  
-  /// 获取当前语言
-  static String get locale => LocalizationConfig.locale;
-  
-  /// 设置语言
-  static Future<void> setLocale(String value) => LocalizationConfig.setLocale(value);
-
-  // 主题配置相关静态getter和setter方法
-  
-  /// 获取当前主题
-  static String get theme => ThemeConfig.theme;
-  
-  /// 设置主题
-  static Future<void> setTheme(String value) => ThemeConfig.setTheme(value);
-  
-  /// 获取当前主题模式
-  static ThemeMode get themeMode => ThemeConfig.themeMode;
-  
-  /// 设置主题模式
-  static Future<void> setThemeMode(ThemeMode value) => ThemeConfig.setThemeMode(value);
-  
-  /// 获取当前字体
-  static AppFontFamily get fontFamily => ThemeConfig.fontFamily;
-  
-  /// 设置字体
-  static Future<void> setFontFamily(AppFontFamily value) => ThemeConfig.setFontFamily(value);
-  
   /// 获取有效的主题名称
-  static String getValidThemeName(String? storedTheme) => ThemeConfig.getValidThemeName(storedTheme);
+  ///
+  /// 验证并返回有效的主题名称，如果存储的主题名称无效则返回默认主题
+  static String getValidThemeName(String? storedTheme) {
+    // 如果存储的主题名称有效，直接返回
+    if (storedTheme != null && validThemes.contains(storedTheme)) {
+      return storedTheme;
+    }
 
-  // 用户会话配置相关静态getter和setter方法
-  
-  /// 获取用户ID
-  static String? getUserId() => UserSessionConfig.getUserId();
-  
-  /// 设置用户ID
-  static Future<void> setUserId(String userId) => UserSessionConfig.setUserId(userId);
-  
-  /// 清除用户ID
-  static Future<void> clearUserId() => UserSessionConfig.clearUserId();
-  
-  /// 获取用户令牌
-  static String? getUserToken() => UserSessionConfig.getUserToken();
-  
-  /// 设置用户令牌
-  static Future<void> setUserToken(String token) => UserSessionConfig.setUserToken(token);
-  
-  /// 清除用户令牌
-  static Future<void> clearUserToken() => UserSessionConfig.clearUserToken();
-  
-  /// 清除所有用户会话配置
-  static Future<void> clearUserSession() => UserSessionConfig.clearAll();
-  
-  /// 清除所有配置
-  /// 
-  /// 清除所有本地存储的配置信息，用于用户登出或重置应用设置。
-  static Future<void> clearAll() async {
-    await Future.wait([
-      UserSessionConfig.clearAll(),
-    ]);
-    
-    // 重置为默认配置
-    LocalizationConfig.locale = 'en';
-    ThemeConfig.theme = 'trendyElectro';
-    ThemeConfig.fontFamily = AppFontFamily.defaultFont;
+    // 否则返回默认主题
+    return 'trendyElectro';
+  }
+
+  /// 获取主题模式枚举值
+  ///
+  /// 将字符串转换为ThemeMode枚举值。
+  static ThemeMode _getThemeModeFromString(String? value) {
+    switch (value) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+        return ThemeMode.system;
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  /// 获取主题模式字符串值
+  ///
+  /// 将ThemeMode枚举值转换为字符串。
+  static String _getThemeModeString(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.dark:
+        return 'dark';
+      case ThemeMode.system:
+        return 'system';
+    }
+  }
+
+  /// 设置主题
+  static Future<void> setTheme(String themeName) async {
+    theme = themeName;
+    await _prefs.setString(keyTheme, themeName);
+  }
+
+  /// 设置主题模式
+  static Future<void> setThemeMode(ThemeMode mode) async {
+    themeMode = mode;
+    await _prefs.setString(keyThemeMode, _getThemeModeString(mode));
+  }
+
+  /// 设置字体
+  static Future<void> setFontFamily(FontFamily fontFamily) async {
+    AppConfig.fontFamily = fontFamily;
+    await _prefs.setString(keyFontFamily, fontFamily.value);
+  }
+
+  /// 设置语言
+  static Future<void> setLocale(String value) async {
+    locale = value;
+    await _prefs.setString(keyLocale, value);
   }
 }

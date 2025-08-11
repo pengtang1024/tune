@@ -1,175 +1,154 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:tune/app/theme/web_theme.dart';
+import 'package:tune/core/config/font_constants.dart';
+
 import 'base_theme.dart';
+import 'cupertino_theme.dart';
+import 'material_theme.dart';
 
-/// 最小化灰色主题
+/// 极简灰调主题
 ///
-/// 以灰色调为主，提供简洁、专业和现代感的界面
+/// 以简洁的灰色调为主，营造极简、干净的视觉体验
 class MinimalGrayTheme extends BaseTheme {
+  @override
+  late String fontFamily;
+
+  @override
+  late ThemeMode themeMode;
+
   /// 构造函数
-  MinimalGrayTheme({String fontFamily = 'Default'}) : super(fontFamily: fontFamily);
+  MinimalGrayTheme({String? fontFamily, ThemeMode? themeMode}) : super(fontFamily: fontFamily ?? FontFamily.defaultFont.value, themeMode: themeMode ?? ThemeMode.system);
 
   @override
-  ThemeData createLightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      primaryColor: const Color(0xFF6B7280), // 中灰
-      colorScheme: const ColorScheme.light(
-        primary: Color(0xFF6B7280), // 中灰
-        onPrimary: Colors.white, // 白色
-        secondary: Color(0xFF9CA3AF), // 浅灰作为辅助色
-        onSecondary: Colors.white, // 白色
-        tertiary: Color(0xFF374151), // 深灰作为辅助色2
-        onTertiary: Colors.white, // 白色
-        surface: Color(0xFFF9FAFB), // 极浅灰背景色
-        onSurface: Color(0xFF1F2937), // 深灰文本主色
-        onSurfaceVariant: Color(0xFF6B7280), // 中灰文本次色
-      ),
-      scaffoldBackgroundColor: const Color(0xFFF9FAFB), // 页面底色
-      textTheme: TextTheme(
-        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-        labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-        labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w900),
-        displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w900),
-        displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w900),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4B5563), // 灰蓝
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: const Color(0xFF4B5563),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFF4B5563),
-            width: 2,
-          ),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-    );
-  }
+  String get themeName => 'minimalGray';
 
   @override
-  ThemeData createDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: const Color(0xFF9CA3AF), // 浅灰
-      colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF9CA3AF), // 浅灰
-        onPrimary: Color(0xFF1F2937), // 深灰
-        secondary: Color(0xFFD1D5DB), // 极浅灰作为辅助色
-        onSecondary: Color(0xFF1F2937), // 深灰
-        tertiary: Color(0xFF6B7280), // 中灰作为辅助色2
-        onTertiary: Color(0xFF1F2937), // 深灰
-        surface: Color(0xFF111827), // 极深灰背景色
-        onSurface: Color(0xFFF9FAFB), // 极浅灰文本主色
-        onSurfaceVariant: Color(0xFF9CA3AF), // 浅灰文本次色
-      ),
-      scaffoldBackgroundColor: const Color(0xFF111827), // 页面底色
-      textTheme: TextTheme(
-        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-        labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-        labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        displaySmall: TextStyle(fontSize: 36, fontWeight: FontWeight.w900),
-        displayMedium: TextStyle(fontSize: 45, fontWeight: FontWeight.w900),
-        displayLarge: TextStyle(fontSize: 57, fontWeight: FontWeight.w900),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF6B7280), // 中灰
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: const Color(0xFF9CA3AF),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFF9CA3AF),
-            width: 2,
-          ),
-        ),
-        filled: true,
-        fillColor: const Color(0xFF1F2937),
-      ),
-    );
+  ThemeData createMaterialTheme() {
+    return MaterialTheme.fromTheme(buildThemeData(fontFamily, themeMode));
   }
 
   @override
   CupertinoThemeData createCupertinoTheme() {
-    return CupertinoThemeData(
-      primaryColor: const Color(0xFF6B7280),
-      scaffoldBackgroundColor: const Color(0xFFF9FAFB),
-      textTheme: CupertinoTextThemeData(
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-        navTitleTextStyle: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
+    return CupertinoThemeConfig.fromTheme(buildThemeData(fontFamily, themeMode));
+  }
+
+  @override
+  ThemeData createWebTheme() {
+    return WebTheme.fromTheme(buildThemeData(fontFamily, themeMode));
+  }
+
+  @override
+  ThemeData buildThemeData(String? fontFamily, ThemeMode? themeMode) {
+    // 浅色模式的详细配色方案
+    final isLight = themeMode == ThemeMode.light;
+    final primaryColor = isLight ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+    final onPrimary = isLight ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
+    final secondary = isLight ? const Color(0xFFD1D5DB) : const Color(0xFF6B7280);
+    final onSecondary = isLight ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
+    final tertiary = isLight ? const Color(0xFF93C5FD) : const Color(0xFF60A5FA);
+    final onTertiary = isLight ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
+    final surface = isLight ? const Color(0xFFF9FAFB) : const Color(0xFF1F2937);
+    final onSurface = isLight ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
+    final onSurfaceVariant = isLight ? const Color(0xFF6B7280) : const Color(0xFFD1D5DB);
+
+    final colorScheme = ColorScheme(
+      brightness: isLight ? Brightness.light : Brightness.dark,
+      primary: primaryColor,
+      onPrimary: onPrimary,
+      secondary: secondary,
+      onSecondary: onSecondary,
+      tertiary: tertiary,
+      onTertiary: onTertiary,
+      surface: surface,
+      onSurface: onSurface,
+      onSurfaceVariant: onSurfaceVariant,
+      error: isLight ? const Color(0xFFB91C1C) : const Color(0xFFFECACA),
+      onError: isLight ? Colors.white : const Color(0xFF450A0A),
+      surfaceVariant: isLight ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563),
+      outline: isLight ? const Color(0xFF9CA3AF) : const Color(0xFF94A3B8),
+      outlineVariant: isLight ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+      shadow: Colors.black,
+      scrim: Colors.black,
+      inverseSurface: isLight ? const Color(0xFF374151) : const Color(0xFFF9FAFB),
+      onInverseSurface: isLight ? Colors.white : const Color(0xFF1F2937),
+      inversePrimary: isLight ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF),
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: colorScheme.brightness,
+      primaryColor: colorScheme.primary,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      textTheme: TextTheme(
+        bodySmall: TextStyle(fontSize: TextStyles.bodySmallFontSize, fontWeight: FontWeight.normal, fontFamily: fontFamily, color: colorScheme.onSurfaceVariant),
+        bodyMedium: TextStyle(fontSize: TextStyles.bodyMediumFontSize, fontWeight: FontWeight.normal, fontFamily: fontFamily, color: colorScheme.onSurface),
+        bodyLarge: TextStyle(fontSize: TextStyles.bodyLargeFontSize, fontWeight: FontWeight.normal, fontFamily: fontFamily, color: colorScheme.onSurface),
+        titleSmall: TextStyle(fontSize: TextStyles.titleSmallFontSize, fontWeight: FontWeight.bold, fontFamily: fontFamily, color: colorScheme.onSurface),
+        titleMedium: TextStyle(fontSize: TextStyles.titleMediumFontSize, fontWeight: FontWeight.bold, fontFamily: fontFamily, color: colorScheme.onSurface),
+        titleLarge: TextStyle(fontSize: TextStyles.titleLargeFontSize, fontWeight: FontWeight.bold, fontFamily: fontFamily, color: colorScheme.onSurface),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        titleTextStyle: TextStyle(fontSize: TextStyles.appBarTitleFontSize, fontWeight: FontWeight.bold, fontFamily: fontFamily, color: colorScheme.onPrimary),
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+      ),
+      cardTheme: CardThemeData(
+        color: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      iconTheme: IconThemeData(color: colorScheme.onSurface),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          textStyle: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
-        navLargeTitleTextStyle: const TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          textStyle: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.bold),
         ),
-        actionTextStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
+        selectedLabelStyle: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(fontFamily: fontFamily),
+      ),
+      tabBarTheme: TabBarThemeData(
+        indicator: UnderlineTabIndicator(borderSide: BorderSide(color: colorScheme.primary, width: 3)),
+        labelColor: colorScheme.primary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
+        labelStyle: TextStyle(fontFamily: fontFamily, fontWeight: FontWeight.bold),
+      ),
+      sliderTheme: SliderThemeData(activeTrackColor: colorScheme.primary, inactiveTrackColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3), thumbColor: colorScheme.primary, overlayColor: colorScheme.primary.withValues(alpha: 0.12)),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return null;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary.withValues(alpha: 0.5);
+          }
+          return null;
+        }),
+      ),
+      listTileTheme: ListTileThemeData(
+        iconColor: colorScheme.onSurfaceVariant,
+        textColor: colorScheme.onSurface,
+        titleTextStyle: TextStyle(fontFamily: fontFamily, color: colorScheme.onSurface, fontSize: 16),
+        subtitleTextStyle: TextStyle(fontFamily: fontFamily, color: colorScheme.onSurfaceVariant, fontSize: 14),
       ),
     );
   }

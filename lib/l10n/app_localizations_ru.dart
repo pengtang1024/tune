@@ -15,10 +15,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get home_title => 'Главная';
 
   @override
-  String get library_title => 'Библиотека';
+  String get font_family => 'Семейство шрифтов';
 
   @override
-  String get search_hint_text => 'Поиск...';
+  String get theme_mode => 'Режим темы';
+
+  @override
+  String get light_mode => 'Светлый режим';
+
+  @override
+  String get dark_mode => 'Темный режим';
+
+  @override
+  String get system_mode => 'Системный режим';
+
+  @override
+  String get library_title => 'Библиотека';
 
   @override
   String get artist_title => 'Исполнитель';
@@ -51,111 +63,113 @@ class AppLocalizationsRu extends AppLocalizations {
   String get favorite_button => 'Избранное';
 
   @override
-  String get theme_light => 'Светлая';
+  String get now_playing => 'Сейчас играет';
 
   @override
-  String get theme_dark => 'Темная';
+  String get no_things_players => 'Нет плееров';
 
   @override
-  String get theme_system => 'Системная';
-
-  @override
-  String get bottom_player_bar_now_playing => 'Сейчас играет';
-
-  @override
-  String get bottom_player_bar_no_song => 'Песня не выбрана';
+  String get no_selected_song => 'Песня не выбрана';
 
   @override
   String get song_list_title => 'Песни';
 
   @override
-  String get song_list_no_songs => 'Песны не найдены';
+  String get no_songs_found => 'Песны не найдены';
 
   @override
-  String get player_page_duration => 'Длительность';
+  String get player_duration => 'Длительность';
 
   @override
-  String get player_page_artist => 'Исполнитель';
+  String get player_artist => 'Исполнитель';
 
   @override
-  String get player_page_album => 'Альбом';
+  String get player_album => 'Альбом';
 
   @override
-  String get search_page_hint => 'Поиск песен...';
+  String get search_empty => 'Введите поисковый запрос для поиска песен';
 
   @override
-  String get search_page_empty => 'Введите поисковый запрос для поиска песен';
+  String get search_no_results => 'Песны не найдены по вашему запросу';
 
   @override
-  String get search_page_no_results =>
-      'Не найдено песен, соответствующих вашему запросу';
+  String get language => 'Язык';
 
   @override
-  String get settings_page_language => 'Язык';
+  String get theme => 'Тема';
 
   @override
-  String get settings_page_theme => 'Тема';
+  String get font => 'Шрифт';
 
   @override
-  String get settings_page_font => 'Шрифт';
+  String get theme_trendy_electro => 'Модный Электро';
 
   @override
-  String get theme_name_trendy_electro => 'Модный Электро';
+  String get theme_minimal_gray => 'Минималистичный Серый';
 
   @override
-  String get theme_name_minimal_gray => 'Минималистичный Серый';
+  String get theme_nature_forest => 'Лес Природы';
 
   @override
-  String get theme_name_nature_forest => 'Лес Природы';
+  String get theme_cyber_neon => 'Кибер Нeon';
 
   @override
-  String get theme_name_cyber_neon => 'Кибер Нeon';
+  String get theme_warm_healing => 'Теплое Исцеление';
 
   @override
-  String get theme_name_warm_healing => 'Теплое Исцеление';
+  String get about => 'О приложении';
 
   @override
-  String get theme_name_dark_mode => 'Темный Режим';
+  String get library_artists => 'Исполнители';
 
   @override
-  String get theme_name_light_mode => 'Светлый Режим';
+  String get library_albums => 'Альбомы';
 
   @override
-  String get theme_name_system_theme => 'Системная Тема';
+  String get library_genres => 'Жанры';
 
   @override
-  String get settings_page_about => 'О приложении';
-
-  @override
-  String get library_page_artists => 'Исполнители';
-
-  @override
-  String get library_page_albums => 'Альбомы';
-
-  @override
-  String get library_page_genres => 'Жанры';
-
-  @override
-  String get player_title => 'Проигрыватель';
+  String get player_title => 'Плеер';
 
   @override
   String get profile_title => 'Профиль';
 
   @override
-  String get profile_default_username => 'Пользователь';
+  String get username_default => 'Пользователь';
 
   @override
-  String get profile_default_user_email => 'user@example.com';
+  String get user_email_default => 'user@example.com';
 
   @override
-  String get language_name_en => 'Английский';
-
-  @override
-  String get language_name_zh => 'Китайский';
+  String get locale => 'Русский';
 
   @override
   String get search_title => 'Поиск';
 
   @override
-  String get no_song_playing => 'No song is playing';
+  String get no_song_playing => 'Нет воспроизводимой песни';
+
+  @override
+  String get quick_actions => 'Быстрые действия';
+
+  @override
+  String get favorites => 'Избранное';
+
+  @override
+  String get playlists => 'Плейлисты';
+
+  @override
+  String get recently_played => 'Недавно воспроизведенные';
+
+  @override
+  String get recommendations => 'Рекомендации';
+
+  @override
+  String get no_recent_songs => 'Нет недавних песен';
+
+  @override
+  String get no_recommendations => 'Нет рекомендаций';
+
+  @override
+  String get failed_to_load_songs => 'Не удалось загрузить песни';
 }

@@ -5,7 +5,7 @@
     必须使用中文注释
     注释必须在代码之前
 3.尽量使用Bloc模式编写代码
-4.框架
+4.框架：Clean Architecture架构
 lib/
 ├── app/                          # 应用入口与全局配置
 │   ├── app.dart                  # 根Widget（根据平台选择Material/Cupertino）
@@ -162,3 +162,4 @@ lib/
 ├── core_module.dart          # 核心服务注册（无平台依赖）
 ├── data_module.dart          # 数据层服务注册
 └── platform_module.dart      # 平台服务注册（根据运行时平台动态选择）
+5.本地化支持中英日韩俄

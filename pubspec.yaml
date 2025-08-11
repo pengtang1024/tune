@@ -128,38 +128,19 @@ flutter:
   fonts:
     - family:  JetBrainsMono
       fonts:
-        - asset: assets/fonts/ttf/JetBrainsMono-Bold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-BoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-ExtraBold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-ExtraBoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-ExtraLight.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-ExtraLightItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-Italic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-Light.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-LightItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-Medium.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-MediumItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-Regular.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-SemiBold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-SemiBoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-Thin.ttf
-        - asset: assets/fonts/ttf/JetBrainsMono-ThinItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Bold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-BoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraBold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraLight.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Italic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Light.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-LightItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Medium.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-MediumItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Regular.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-SemiBold.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-Thin.ttf
-        - asset: assets/fonts/ttf/JetBrainsMonoNL-ThinItalic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Bold.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Italic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-BoldItalic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-ExtraBold.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-ExtraBoldItalic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-ExtraLight.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-ExtraLightItalic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Italic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Light.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-LightItalic.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Medium.ttf
+        - asset: assets/fonts/JetBrainsMono/JetBrainsMono-MediumItalic.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

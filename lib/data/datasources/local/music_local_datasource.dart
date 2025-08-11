@@ -1,5 +1,5 @@
-import 'package:tune/domain/entities/song.dart';
 import 'package:tune/domain/entities/playlist.dart';
+import 'package:tune/domain/entities/song.dart';
 
 /// 音乐本地数据源
 abstract class MusicLocalDataSource {

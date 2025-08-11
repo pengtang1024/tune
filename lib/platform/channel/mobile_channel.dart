@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 
 /// 移动端MethodChannel（调用原生API）
@@ -14,7 +16,7 @@ class MobileChannel {
       return await _channel.invokeMethod(method, arguments);
     } on PlatformException catch (e) {
       // 处理平台异常
-      print('Platform exception: ${e.message}');
+      log('Platform exception: ${e.message}');
       rethrow;
     }
   }

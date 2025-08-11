@@ -116,17 +116,41 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home_title;
 
+  /// this is the font family
+  ///
+  /// In en, this message translates to:
+  /// **'Font Family'**
+  String get font_family;
+
+  /// this is the theme mode
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Mode'**
+  String get theme_mode;
+
+  /// this is the light mode
+  ///
+  /// In en, this message translates to:
+  /// **'Light Mode'**
+  String get light_mode;
+
+  /// this is the dark mode
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get dark_mode;
+
+  /// this is the system mode
+  ///
+  /// In en, this message translates to:
+  /// **'System Mode'**
+  String get system_mode;
+
   /// this is the title of the library page
   ///
   /// In en, this message translates to:
   /// **'Library'**
   String get library_title;
-
-  /// this is the hint text for the search bar
-  ///
-  /// In en, this message translates to:
-  /// **'Search...'**
-  String get search_hint_text;
 
   /// this is the title of the artist page
   ///
@@ -188,35 +212,23 @@ abstract class AppLocalizations {
   /// **'Favorite'**
   String get favorite_button;
 
-  /// this is the text for the light theme
-  ///
-  /// In en, this message translates to:
-  /// **'Light'**
-  String get theme_light;
-
-  /// this is the text for the dark theme
-  ///
-  /// In en, this message translates to:
-  /// **'Dark'**
-  String get theme_dark;
-
-  /// this is the text for the system theme
-  ///
-  /// In en, this message translates to:
-  /// **'System'**
-  String get theme_system;
-
   /// this is the text for the now playing indicator
   ///
   /// In en, this message translates to:
   /// **'Now Playing'**
-  String get bottom_player_bar_now_playing;
+  String get now_playing;
+
+  /// this is the text for the no things players indicator
+  ///
+  /// In en, this message translates to:
+  /// **'No things players'**
+  String get no_things_players;
 
   /// this is the text for the no song selected indicator
   ///
   /// In en, this message translates to:
   /// **'No song selected'**
-  String get bottom_player_bar_no_song;
+  String get no_selected_song;
 
   /// this is the title for the song list
   ///
@@ -228,133 +240,109 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'No songs found'**
-  String get song_list_no_songs;
+  String get no_songs_found;
 
   /// this is the text for the duration indicator
   ///
   /// In en, this message translates to:
   /// **'Duration'**
-  String get player_page_duration;
+  String get player_duration;
 
   /// this is the text for the artist indicator
   ///
   /// In en, this message translates to:
   /// **'Artist'**
-  String get player_page_artist;
+  String get player_artist;
 
   /// this is the text for the album indicator
   ///
   /// In en, this message translates to:
   /// **'Album'**
-  String get player_page_album;
-
-  /// this is the hint text for the search bar
-  ///
-  /// In en, this message translates to:
-  /// **'Search songs...'**
-  String get search_page_hint;
+  String get player_album;
 
   /// this is the text for the empty search indicator
   ///
   /// In en, this message translates to:
   /// **'Enter a search term to find songs'**
-  String get search_page_empty;
+  String get search_empty;
 
   /// this is the text for the no results indicator
   ///
   /// In en, this message translates to:
   /// **'No songs found matching your search'**
-  String get search_page_no_results;
+  String get search_no_results;
 
   /// this is the text for the language indicator
   ///
   /// In en, this message translates to:
   /// **'Language'**
-  String get settings_page_language;
+  String get language;
 
   /// this is the text for the theme indicator
   ///
   /// In en, this message translates to:
   /// **'Theme'**
-  String get settings_page_theme;
+  String get theme;
 
   /// this is the text for the font indicator
   ///
   /// In en, this message translates to:
   /// **'Font'**
-  String get settings_page_font;
+  String get font;
 
   /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Trendy Electro'**
-  String get theme_name_trendy_electro;
+  String get theme_trendy_electro;
 
   /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Minimal Gray'**
-  String get theme_name_minimal_gray;
+  String get theme_minimal_gray;
 
   /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Nature Forest'**
-  String get theme_name_nature_forest;
+  String get theme_nature_forest;
 
   /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Cyber Neon'**
-  String get theme_name_cyber_neon;
+  String get theme_cyber_neon;
 
   /// this is the name of the theme
   ///
   /// In en, this message translates to:
   /// **'Warm Healing'**
-  String get theme_name_warm_healing;
-
-  /// this is the name of the theme
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get theme_name_dark_mode;
-
-  /// this is the name of the theme
-  ///
-  /// In en, this message translates to:
-  /// **'Light Mode'**
-  String get theme_name_light_mode;
-
-  /// this is the name of the theme
-  ///
-  /// In en, this message translates to:
-  /// **'System Theme'**
-  String get theme_name_system_theme;
+  String get theme_warm_healing;
 
   /// this is the text for the about indicator
   ///
   /// In en, this message translates to:
   /// **'About'**
-  String get settings_page_about;
+  String get about;
 
   /// this is the text for the artists indicator
   ///
   /// In en, this message translates to:
   /// **'Artists'**
-  String get library_page_artists;
+  String get library_artists;
 
   /// this is the text for the albums indicator
   ///
   /// In en, this message translates to:
   /// **'Albums'**
-  String get library_page_albums;
+  String get library_albums;
 
   /// this is the text for the genres indicator
   ///
   /// In en, this message translates to:
   /// **'Genres'**
-  String get library_page_genres;
+  String get library_genres;
 
   /// this is the title of the player page
   ///
@@ -372,25 +360,19 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'User'**
-  String get profile_default_username;
+  String get username_default;
 
   /// this is the default user email
   ///
   /// In en, this message translates to:
   /// **'user@example.com'**
-  String get profile_default_user_email;
+  String get user_email_default;
 
   /// this is the name of the English language
   ///
   /// In en, this message translates to:
   /// **'English'**
-  String get language_name_en;
-
-  /// this is the name of the Chinese language
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese'**
-  String get language_name_zh;
+  String get locale;
 
   /// this is the title of the search page
   ///
@@ -403,6 +385,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No song is playing'**
   String get no_song_playing;
+
+  /// this is the title for the quick actions section
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quick_actions;
+
+  /// this is the title for the favorites section
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// this is the title for the playlists section
+  ///
+  /// In en, this message translates to:
+  /// **'Playlists'**
+  String get playlists;
+
+  /// this is the title for the recently played section
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Played'**
+  String get recently_played;
+
+  /// this is the title for the recommendations section
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get recommendations;
+
+  /// this is the text for the no recent songs indicator
+  ///
+  /// In en, this message translates to:
+  /// **'No recent songs'**
+  String get no_recent_songs;
+
+  /// this is the text for the no recommendations indicator
+  ///
+  /// In en, this message translates to:
+  /// **'No recommendations'**
+  String get no_recommendations;
+
+  /// this is the text for the failed to load songs error
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load songs'**
+  String get failed_to_load_songs;
 }
 
 class _AppLocalizationsDelegate

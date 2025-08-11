@@ -15,10 +15,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_title => '홈';
 
   @override
-  String get library_title => '라이브러리';
+  String get font_family => '폰트 패밀리';
 
   @override
-  String get search_hint_text => '검색...';
+  String get theme_mode => '테마 모드';
+
+  @override
+  String get light_mode => '라이트 모드';
+
+  @override
+  String get dark_mode => '다크 모드';
+
+  @override
+  String get system_mode => '시스템 모드';
+
+  @override
+  String get library_title => '라이브러리';
 
   @override
   String get artist_title => '아티스트';
@@ -51,88 +63,70 @@ class AppLocalizationsKo extends AppLocalizations {
   String get favorite_button => '즐겨찾기';
 
   @override
-  String get theme_light => '밝은';
+  String get now_playing => '지금 재생 중';
 
   @override
-  String get theme_dark => '어두운';
+  String get no_things_players => '플레이어 없음';
 
   @override
-  String get theme_system => '시스템';
-
-  @override
-  String get bottom_player_bar_now_playing => '지금 재생 중';
-
-  @override
-  String get bottom_player_bar_no_song => '선택된 노래 없음';
+  String get no_selected_song => '선택된 노래 없음';
 
   @override
   String get song_list_title => '노래';
 
   @override
-  String get song_list_no_songs => '노래를 찾을 수 없음';
+  String get no_songs_found => '노래를 찾을 수 없음';
 
   @override
-  String get player_page_duration => '재생 시간';
+  String get player_duration => '길이';
 
   @override
-  String get player_page_artist => '아티스트';
+  String get player_artist => '아티스트';
 
   @override
-  String get player_page_album => '앨범';
+  String get player_album => '앨범';
 
   @override
-  String get search_page_hint => '노래 검색...';
+  String get search_empty => '노래를 찾기 위해 검색어를 입력하세요';
 
   @override
-  String get search_page_empty => '검색어를 입력하여 노래 찾기';
+  String get search_no_results => '검색 결과가 없습니다';
 
   @override
-  String get search_page_no_results => '검색과 일치하는 노래를 찾을 수 없음';
+  String get language => '언어';
 
   @override
-  String get settings_page_language => '언어';
+  String get theme => '테마';
 
   @override
-  String get settings_page_theme => '테마';
+  String get font => '폰트';
 
   @override
-  String get settings_page_font => '폰트';
+  String get theme_trendy_electro => '트렌디 일렉트로';
 
   @override
-  String get theme_name_trendy_electro => '트렌디 일렉트로';
+  String get theme_minimal_gray => '미니멀 그레이';
 
   @override
-  String get theme_name_minimal_gray => '미니멀 그레이';
+  String get theme_nature_forest => '자연 숲';
 
   @override
-  String get theme_name_nature_forest => '자연의 숲';
+  String get theme_cyber_neon => '사이버 네온';
 
   @override
-  String get theme_name_cyber_neon => '사이버 네온';
+  String get theme_warm_healing => '따뜻한 힐링';
 
   @override
-  String get theme_name_warm_healing => '따뜻한 치유';
+  String get about => '앱 정보';
 
   @override
-  String get theme_name_dark_mode => '어두운 모드';
+  String get library_artists => '아티스트';
 
   @override
-  String get theme_name_light_mode => '밝은 모드';
+  String get library_albums => '앨범';
 
   @override
-  String get theme_name_system_theme => '시스템 테마';
-
-  @override
-  String get settings_page_about => '앱 정보';
-
-  @override
-  String get library_page_artists => '아티스트';
-
-  @override
-  String get library_page_albums => '앨범';
-
-  @override
-  String get library_page_genres => '장르';
+  String get library_genres => '장르';
 
   @override
   String get player_title => '플레이어';
@@ -141,20 +135,41 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profile_title => '프로필';
 
   @override
-  String get profile_default_username => '사용자';
+  String get username_default => '사용자';
 
   @override
-  String get profile_default_user_email => 'user@example.com';
+  String get user_email_default => 'user@example.com';
 
   @override
-  String get language_name_en => '영어';
-
-  @override
-  String get language_name_zh => '중국어';
+  String get locale => '한국어';
 
   @override
   String get search_title => '검색';
 
   @override
-  String get no_song_playing => 'No song is playing';
+  String get no_song_playing => '재생 중인 노래가 없습니다';
+
+  @override
+  String get quick_actions => '빠른 작업';
+
+  @override
+  String get favorites => '즐겨찾기';
+
+  @override
+  String get playlists => '재생목록';
+
+  @override
+  String get recently_played => '최근 재생';
+
+  @override
+  String get recommendations => '추천';
+
+  @override
+  String get no_recent_songs => '최근 재생한 노래가 없습니다';
+
+  @override
+  String get no_recommendations => '추천 항목이 없습니다';
+
+  @override
+  String get failed_to_load_songs => '노래 로드 실패';
 }

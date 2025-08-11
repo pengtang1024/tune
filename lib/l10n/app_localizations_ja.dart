@@ -15,10 +15,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_title => 'ホーム';
 
   @override
-  String get library_title => 'ライブラリ';
+  String get font_family => 'フォントファミリー';
 
   @override
-  String get search_hint_text => '検索...';
+  String get theme_mode => 'テーマモード';
+
+  @override
+  String get light_mode => 'ライトモード';
+
+  @override
+  String get dark_mode => 'ダークモード';
+
+  @override
+  String get system_mode => 'システムモード';
+
+  @override
+  String get library_title => 'ライブラリ';
 
   @override
   String get artist_title => 'アーティスト';
@@ -51,110 +63,113 @@ class AppLocalizationsJa extends AppLocalizations {
   String get favorite_button => 'お気に入り';
 
   @override
-  String get theme_light => 'ライト';
+  String get now_playing => '再生中';
 
   @override
-  String get theme_dark => 'ダーク';
+  String get no_things_players => 'プレーヤーがありません';
 
   @override
-  String get theme_system => 'システム';
-
-  @override
-  String get bottom_player_bar_now_playing => '再生中';
-
-  @override
-  String get bottom_player_bar_no_song => '曲が選択されていません';
+  String get no_selected_song => '曲が選択されていません';
 
   @override
   String get song_list_title => '曲';
 
   @override
-  String get song_list_no_songs => '曲が見つかりません';
+  String get no_songs_found => '曲が見つかりません';
 
   @override
-  String get player_page_duration => '長さ';
+  String get player_duration => '長さ';
 
   @override
-  String get player_page_artist => 'アーティスト';
+  String get player_artist => 'アーティスト';
 
   @override
-  String get player_page_album => 'アルバム';
+  String get player_album => 'アルバム';
 
   @override
-  String get search_page_hint => '曲を検索...';
+  String get search_empty => '検索ワードを入力してください';
 
   @override
-  String get search_page_empty => '検索語を入力して曲を検索';
+  String get search_no_results => '検索結果がありません';
 
   @override
-  String get search_page_no_results => '検索に一致する曲が見つかりません';
+  String get language => '言語';
 
   @override
-  String get settings_page_language => '言語';
+  String get theme => 'テーマ';
 
   @override
-  String get settings_page_theme => 'テーマ';
+  String get font => 'フォント';
 
   @override
-  String get settings_page_font => 'フォント';
+  String get theme_trendy_electro => 'トレンディ・エレクトロ';
 
   @override
-  String get theme_name_trendy_electro => 'トレンディ・エレクトロ';
+  String get theme_minimal_gray => 'ミニマル・グレー';
 
   @override
-  String get theme_name_minimal_gray => 'ミニマル・グレー';
+  String get theme_nature_forest => 'ナチュラル・フォレスト';
 
   @override
-  String get theme_name_nature_forest => '自然の森';
+  String get theme_cyber_neon => 'サイバー・ネオン';
 
   @override
-  String get theme_name_cyber_neon => 'サイバー・ネオン';
+  String get theme_warm_healing => 'ウォーム・ヒーリング';
 
   @override
-  String get theme_name_warm_healing => '暖かい癒し';
+  String get about => 'アプリについて';
 
   @override
-  String get theme_name_dark_mode => 'ダークモード';
+  String get library_artists => 'アーティスト';
 
   @override
-  String get theme_name_light_mode => 'ライトモード';
+  String get library_albums => 'アルバム';
 
   @override
-  String get theme_name_system_theme => 'システムテーマ';
+  String get library_genres => 'ジャンル';
 
   @override
-  String get settings_page_about => 'アプリについて';
-
-  @override
-  String get library_page_artists => 'アーティスト';
-
-  @override
-  String get library_page_albums => 'アルバム';
-
-  @override
-  String get library_page_genres => 'ジャンル';
-
-  @override
-  String get player_title => 'プレーヤー';
+  String get player_title => 'プレイヤー';
 
   @override
   String get profile_title => 'プロフィール';
 
   @override
-  String get profile_default_username => 'ユーザー';
+  String get username_default => 'ユーザー';
 
   @override
-  String get profile_default_user_email => 'user@example.com';
+  String get user_email_default => 'user@example.com';
 
   @override
-  String get language_name_en => '英語';
-
-  @override
-  String get language_name_zh => '中国語';
+  String get locale => '日本語';
 
   @override
   String get search_title => '検索';
 
   @override
-  String get no_song_playing => '再生中の曲がありません';
+  String get no_song_playing => '再生中の曲はありません';
+
+  @override
+  String get quick_actions => 'クイックアクション';
+
+  @override
+  String get favorites => 'お気に入り';
+
+  @override
+  String get playlists => 'プレイリスト';
+
+  @override
+  String get recently_played => '最近再生した曲';
+
+  @override
+  String get recommendations => 'おすすめ';
+
+  @override
+  String get no_recent_songs => '最近再生した曲はありません';
+
+  @override
+  String get no_recommendations => 'おすすめはありません';
+
+  @override
+  String get failed_to_load_songs => '曲の読み込みに失敗しました';
 }

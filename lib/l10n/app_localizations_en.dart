@@ -15,10 +15,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_title => 'Home';
 
   @override
-  String get library_title => 'Library';
+  String get font_family => 'Font Family';
 
   @override
-  String get search_hint_text => 'Search...';
+  String get theme_mode => 'Theme Mode';
+
+  @override
+  String get light_mode => 'Light Mode';
+
+  @override
+  String get dark_mode => 'Dark Mode';
+
+  @override
+  String get system_mode => 'System Mode';
+
+  @override
+  String get library_title => 'Library';
 
   @override
   String get artist_title => 'Artist';
@@ -51,88 +63,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favorite_button => 'Favorite';
 
   @override
-  String get theme_light => 'Light';
+  String get now_playing => 'Now Playing';
 
   @override
-  String get theme_dark => 'Dark';
+  String get no_things_players => 'No things players';
 
   @override
-  String get theme_system => 'System';
-
-  @override
-  String get bottom_player_bar_now_playing => 'Now Playing';
-
-  @override
-  String get bottom_player_bar_no_song => 'No song selected';
+  String get no_selected_song => 'No song selected';
 
   @override
   String get song_list_title => 'Songs';
 
   @override
-  String get song_list_no_songs => 'No songs found';
+  String get no_songs_found => 'No songs found';
 
   @override
-  String get player_page_duration => 'Duration';
+  String get player_duration => 'Duration';
 
   @override
-  String get player_page_artist => 'Artist';
+  String get player_artist => 'Artist';
 
   @override
-  String get player_page_album => 'Album';
+  String get player_album => 'Album';
 
   @override
-  String get search_page_hint => 'Search songs...';
+  String get search_empty => 'Enter a search term to find songs';
 
   @override
-  String get search_page_empty => 'Enter a search term to find songs';
+  String get search_no_results => 'No songs found matching your search';
 
   @override
-  String get search_page_no_results => 'No songs found matching your search';
+  String get language => 'Language';
 
   @override
-  String get settings_page_language => 'Language';
+  String get theme => 'Theme';
 
   @override
-  String get settings_page_theme => 'Theme';
+  String get font => 'Font';
 
   @override
-  String get settings_page_font => 'Font';
+  String get theme_trendy_electro => 'Trendy Electro';
 
   @override
-  String get theme_name_trendy_electro => 'Trendy Electro';
+  String get theme_minimal_gray => 'Minimal Gray';
 
   @override
-  String get theme_name_minimal_gray => 'Minimal Gray';
+  String get theme_nature_forest => 'Nature Forest';
 
   @override
-  String get theme_name_nature_forest => 'Nature Forest';
+  String get theme_cyber_neon => 'Cyber Neon';
 
   @override
-  String get theme_name_cyber_neon => 'Cyber Neon';
+  String get theme_warm_healing => 'Warm Healing';
 
   @override
-  String get theme_name_warm_healing => 'Warm Healing';
+  String get about => 'About';
 
   @override
-  String get theme_name_dark_mode => 'Dark Mode';
+  String get library_artists => 'Artists';
 
   @override
-  String get theme_name_light_mode => 'Light Mode';
+  String get library_albums => 'Albums';
 
   @override
-  String get theme_name_system_theme => 'System Theme';
-
-  @override
-  String get settings_page_about => 'About';
-
-  @override
-  String get library_page_artists => 'Artists';
-
-  @override
-  String get library_page_albums => 'Albums';
-
-  @override
-  String get library_page_genres => 'Genres';
+  String get library_genres => 'Genres';
 
   @override
   String get player_title => 'Player';
@@ -141,20 +135,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile_title => 'Profile';
 
   @override
-  String get profile_default_username => 'User';
+  String get username_default => 'User';
 
   @override
-  String get profile_default_user_email => 'user@example.com';
+  String get user_email_default => 'user@example.com';
 
   @override
-  String get language_name_en => 'English';
-
-  @override
-  String get language_name_zh => 'Chinese';
+  String get locale => 'English';
 
   @override
   String get search_title => 'Search';
 
   @override
   String get no_song_playing => 'No song is playing';
+
+  @override
+  String get quick_actions => 'Quick Actions';
+
+  @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get playlists => 'Playlists';
+
+  @override
+  String get recently_played => 'Recently Played';
+
+  @override
+  String get recommendations => 'Recommendations';
+
+  @override
+  String get no_recent_songs => 'No recent songs';
+
+  @override
+  String get no_recommendations => 'No recommendations';
+
+  @override
+  String get failed_to_load_songs => 'Failed to load songs';
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:tune/core/network/client/api_client.dart';
 
@@ -28,6 +30,7 @@ class DioClient implements ApiClient {
       return response.data;
     } on DioException catch (e) {
       // TODO: 处理Dio异常
+      log("DioClient get error: $e");
       rethrow;
     }
   }
@@ -47,6 +50,7 @@ class DioClient implements ApiClient {
       return response.data;
     } on DioException catch (e) {
       // TODO: 处理Dio异常
+      log("DioClient post error: $e");
       rethrow;
     }
   }
@@ -66,6 +70,7 @@ class DioClient implements ApiClient {
       return response.data;
     } on DioException catch (e) {
       // TODO: 处理Dio异常
+      log("DioClient put error: $e");
       rethrow;
     }
   }
@@ -83,6 +88,7 @@ class DioClient implements ApiClient {
       return response.data;
     } on DioException catch (e) {
       // TODO: 处理Dio异常
+      log("DioClient delete error: $e");
       rethrow;
     }
   }

@@ -1,248 +1,277 @@
 {
-  "@@locale": "zh",
   "app_name": "Tune",
   "@app_name": {
-    "description": "APP名字",
+    "description": "这是应用程序的名称",
     "type": "string"
   },
-  "home_title": "首页",
+  "home_title": "主页",
   "@home_title": {
-    "description": "首页标题",
+    "description": "这是主页的标题",
+    "type": "string"
+  },
+  "font_family": "字体系列",
+  "@font_family": {
+    "description": "这是字体系列",
+    "type": "string"
+  },
+  "theme_mode": "主题模式",
+  "@theme_mode": {
+    "description": "这是主题模式",
+    "type": "string"
+  },
+  "light_mode": "浅色模式",
+  "@light_mode": {
+    "description": "这是浅色模式",
+    "type": "string"
+  },
+  "dark_mode": "深色模式",
+  "@dark_mode": {
+    "description": "这是深色模式",
+    "type": "string"
+  },
+  "system_mode": "系统模式",
+  "@system_mode": {
+    "description": "这是系统模式",
     "type": "string"
   },
   "library_title": "音乐库",
   "@library_title": {
-    "description": "音乐库标题",
-    "type": "string"
-  },
-  "search_title": "搜索",
-  "@search_title": {
-    "description": "搜索标题",
-    "type": "string"
-  },
-  "settings_title": "设置",
-  "@settings_title": {
-    "description": "设置标题",
-    "type": "string"
-  },
-  "player_title": "播放器",
-  "@player_title": {
-    "description": "播放器标题",
-    "type": "string"
-  },
-  "profile_title": "我的",
-  "@profile_title": {
-    "description": "个人资料标题",
-    "type": "string"
-  },
-  "profile_default_username": "用户",
-  "@profile_default_username": {
-    "description": "默认用户名",
-    "type": "string"
-  },
-  "profile_default_user_email": "user@example.com",
-  "@profile_default_user_email": {
-    "description": "默认用户邮箱",
-    "type": "string"
-  },
-  "search_hint_text": "搜索...",
-  "@search_hint_text": {
-    "description": "搜索提示",
+    "description": "这是音乐库页面的标题",
     "type": "string"
   },
   "artist_title": "艺术家",
   "@artist_title": {
-    "description": "艺术家标题",
+    "description": "这是艺术家页面的标题",
     "type": "string"
   },
   "search_hint": "搜索歌曲...",
   "@search_hint": {
-    "description": "搜索歌曲提示",
+    "description": "这是搜索栏的提示文本",
     "type": "string"
   },
   "artist_hint": "搜索艺术家...",
   "@artist_hint": {
-    "description": "搜索艺术家提示",
+    "description": "这是搜索栏的提示文本",
     "type": "string"
   },
   "album_hint": "搜索专辑...",
   "@album_hint": {
-    "description": "搜索专辑提示",
+    "description": "这是搜索栏的提示文本",
+    "type": "string"
+  },
+  "settings_title": "设置",
+  "@settings_title": {
+    "description": "这是设置页面的标题",
     "type": "string"
   },
   "play_button": "播放",
   "@play_button": {
-    "description": "播放按钮",
+    "description": "这是播放按钮的文本",
     "type": "string"
   },
   "pause_button": "暂停",
   "@pause_button": {
-    "description": "暂停按钮",
+    "description": "这是暂停按钮的文本",
     "type": "string"
   },
   "next_button": "下一首",
   "@next_button": {
-    "description": "下一首按钮",
+    "description": "这是下一首按钮的文本",
     "type": "string"
   },
   "previous_button": "上一首",
   "@previous_button": {
-    "description": "上一首按钮",
+    "description": "这是上一首按钮的文本",
     "type": "string"
   },
   "favorite_button": "收藏",
   "@favorite_button": {
-    "description": "收藏按钮",
+    "description": "这是收藏按钮的文本",
     "type": "string"
   },
-  "theme_light": "浅色",
-  "@theme_light": {
-    "description": "浅色主题",
+  "now_playing": "正在播放",
+  "@now_playing": {
+    "description": "这是正在播放指示器的文本",
     "type": "string"
   },
-  "theme_dark": "深色",
-  "@theme_dark": {
-    "description": "深色主题",
+  "no_things_players": "没有播放器",
+  "@no_things_players": {
+    "description": "这是没有播放器指示器的文本",
     "type": "string"
   },
-  "theme_system": "系统",
-  "@theme_system": {
-    "description": "系统主题",
-    "type": "string"
-  },
-  "bottom_player_bar_now_playing": "正在播放",
-  "@bottom_player_bar_now_playing": {
-    "description": "正在播放",
-    "type": "string"
-  },
-  "bottom_player_bar_no_song": "没有选择歌曲",
-  "@bottom_player_bar_no_song": {
-    "description": "没有选择歌曲",
+  "no_selected_song": "未选择歌曲",
+  "@no_selected_song": {
+    "description": "这是未选择歌曲指示器的文本",
     "type": "string"
   },
   "song_list_title": "歌曲",
   "@song_list_title": {
-    "description": "歌曲列表标题",
+    "description": "这是歌曲列表的标题",
     "type": "string"
   },
-  "song_list_no_songs": "没有找到歌曲",
-  "@song_list_no_songs": {
-    "description": "没有找到歌曲",
+  "no_songs_found": "未找到歌曲",
+  "@no_songs_found": {
+    "description": "这是未找到歌曲指示器的文本",
     "type": "string"
   },
-  "player_page_duration": "时长",
-  "@player_page_duration": {
-    "description": "时长",
+  "player_duration": "时长",
+  "@player_duration": {
+    "description": "这是时长指示器的文本",
     "type": "string"
   },
-  "player_page_artist": "艺术家",
-  "@player_page_artist": {
-    "description": "艺术家",
+  "player_artist": "艺术家",
+  "@player_artist": {
+    "description": "这是艺术家指示器的文本",
     "type": "string"
   },
-  "player_page_album": "专辑",
-  "@player_page_album": {
-    "description": "专辑",
+  "player_album": "专辑",
+  "@player_album": {
+    "description": "这是专辑指示器的文本",
     "type": "string"
   },
-  "search_page_hint": "搜索歌曲...",
-  "@search_page_hint": {
-    "description": "搜索歌曲提示",
+  "search_empty": "输入搜索词来查找歌曲",
+  "@search_empty": {
+    "description": "这是空搜索指示器的文本",
     "type": "string"
   },
-  "search_page_empty": "输入搜索关键词查找歌曲",
-  "@search_page_empty": {
-    "description": "搜索歌曲提示",
+  "search_no_results": "未找到匹配的歌曲",
+  "@search_no_results": {
+    "description": "这是无结果指示器的文本",
     "type": "string"
   },
-  "search_page_no_results": "没有找到匹配您搜索的歌曲",
-  "@search_page_no_results": {
-    "description": "没有找到匹配您搜索的歌曲",
+  "language": "语言",
+  "@language": {
+    "description": "这是语言指示器的文本",
     "type": "string"
   },
-  "settings_page_language": "语言",
-  "@settings_page_language": {
-    "description": "语言",
+  "theme": "主题",
+  "@theme": {
+    "description": "这是主题指示器的文本",
     "type": "string"
   },
-  "settings_page_theme": "主题",
-  "@settings_page_theme": {
-    "description": "主题",
+  "font": "字体",
+  "@font": {
+    "description": "这是字体指示器的文本",
     "type": "string"
   },
-  "settings_page_font": "字体",
-  "@settings_page_font": {
-    "description": "字体",
+  "theme_trendy_electro": "时尚电子",
+  "@theme_trendy_electro": {
+    "description": "这是主题的名称",
     "type": "string"
   },
-  "settings_page_about": "关于",
-  "@settings_page_about": {
-    "description": "关于",
+  "theme_minimal_gray": "极简灰",
+  "@theme_minimal_gray": {
+    "description": "这是主题的名称",
     "type": "string"
   },
-  "library_page_artists": "艺术家",
-  "@library_page_artists": {
-    "description": "艺术家",
+  "theme_nature_forest": "自然森林",
+  "@theme_nature_forest": {
+    "description": "这是主题的名称",
     "type": "string"
   },
-  "library_page_albums": "专辑",
-  "@library_page_albums": {
-    "description": "专辑",
+  "theme_cyber_neon": "赛博霓虹",
+  "@theme_cyber_neon": {
+    "description": "这是主题的名称",
     "type": "string"
   },
-  "library_page_genres": "流派",
-  "@library_page_genres": {
-    "description": "流派",
+  "theme_warm_healing": "温暖治愈",
+  "@theme_warm_healing": {
+    "description": "这是主题的名称",
     "type": "string"
   },
-  "language_name_en": "英语",
-  "@language_name_en": {
-    "description": "语言名称 - 英语",
+  "about": "关于",
+  "@about": {
+    "description": "这是关于指示器的文本",
     "type": "string"
   },
-  "language_name_zh": "中文",
-  "@language_name_zh": {
-    "description": "语言名称 - 中文",
+  "library_artists": "艺术家",
+  "@library_artists": {
+    "description": "这是艺术家指示器的文本",
     "type": "string"
   },
-  "theme_name_trendy_electro": "潮流轻电",
-  "@theme_name_trendy_electro": {
-    "description": "主题名称 - 潮流轻电",
+  "library_albums": "专辑",
+  "@library_albums": {
+    "description": "这是专辑指示器的文本",
     "type": "string"
   },
-  "theme_name_minimal_gray": "极简灰调",
-  "@theme_name_minimal_gray": {
-    "description": "主题名称 - 极简灰调",
+  "library_genres": "流派",
+  "@library_genres": {
+    "description": "这是流派指示器的文本",
     "type": "string"
   },
-  "theme_name_nature_forest": "自然森系",
-  "@theme_name_nature_forest": {
-    "description": "主题名称 - 自然森系",
+  "player_title": "播放器",
+  "@player_title": {
+    "description": "这是播放器页面的标题",
     "type": "string"
   },
-  "theme_name_cyber_neon": "赛博霓虹",
-  "@theme_name_cyber_neon": {
-    "description": "主题名称 - 赛博霓虹",
+  "profile_title": "个人资料",
+  "@profile_title": {
+    "description": "这是个人资料页面的标题",
     "type": "string"
   },
-  "theme_name_warm_healing": "暖调治愈",
-  "@theme_name_warm_healing": {
-    "description": "主题名称 - 暖调治愈",
+  "username_default": "用户",
+  "@username_default": {
+    "description": "这是默认用户名",
     "type": "string"
   },
-  "theme_name_light_mode": "浅色模式",
-  "@theme_name_light_mode": {
-    "description": "主题名称 - 浅色模式",
+  "user_email_default": "user@example.com",
+  "@user_email_default": {
+    "description": "这是默认用户邮箱",
     "type": "string"
   },
-  "theme_name_dark_mode": "深色模式",
-  "@theme_name_dark_mode": {
-    "description": "主题名称 - 深色模式",
+  "locale": "中文",
+  "@locale": {
+    "description": "这是中文语言的名称",
     "type": "string"
   },
-  "theme_name_system_theme": "系统主题",
-  "@theme_name_system_theme": {
-    "description": "主题名称 - 系统主题",
+  "search_title": "搜索",
+  "@search_title": {
+    "description": "这是搜索页面的标题",
+    "type": "string"
+  },
+  "no_song_playing": "当前无歌曲播放",
+  "@no_song_playing": {
+    "description": "这是没有歌曲播放时显示的消息",
+    "type": "string"
+  },
+  "quick_actions": "快速操作",
+  "@quick_actions": {
+    "description": "这是快速操作部分的标题",
+    "type": "string"
+  },
+  "favorites": "收藏",
+  "@favorites": {
+    "description": "这是收藏部分的标题",
+    "type": "string"
+  },
+  "playlists": "播放列表",
+  "@playlists": {
+    "description": "这是播放列表部分的标题",
+    "type": "string"
+  },
+  "recently_played": "最近播放",
+  "@recently_played": {
+    "description": "这是最近播放部分的标题",
+    "type": "string"
+  },
+  "recommendations": "推荐",
+  "@recommendations": {
+    "description": "这是推荐部分的标题",
+    "type": "string"
+  },
+  "no_recent_songs": "无最近播放歌曲",
+  "@no_recent_songs": {
+    "description": "这是无最近歌曲指示器的文本",
+    "type": "string"
+  },
+  "no_recommendations": "无推荐内容",
+  "@no_recommendations": {
+    "description": "这是无推荐指示器的文本",
+    "type": "string"
+  },
+  "failed_to_load_songs": "加载歌曲失败",
+  "@failed_to_load_songs": {
+    "description": "这是加载歌曲失败错误的文本",
     "type": "string"
   }
 }

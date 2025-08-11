@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/widgets.dart';
 
 /// 路由监听器
@@ -8,27 +10,27 @@ class RouterObserver extends NavigatorObserver {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     // 页面推入栈
     // TODO: 实现页面访问统计逻辑
-    print('Route pushed: ${route.settings.name}');
+    log('Route pushed: ${route.settings.name}');
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     // 页面弹出栈
     // TODO: 实现页面访问统计逻辑
-    print('Route popped: ${route.settings.name}');
+    log('Route popped: ${route.settings.name}');
   }
 
   @override
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
     // 页面被移除
     // TODO: 实现页面访问统计逻辑
-    print('Route removed: ${route.settings.name}');
+    log('Route removed: ${route.settings.name}');
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     // 页面被替换
     // TODO: 实现页面访问统计逻辑
-    print('Route replaced: ${oldRoute?.settings.name} -> ${newRoute?.settings.name}');
+    log('Route replaced: ${oldRoute?.settings.name} -> ${newRoute?.settings.name}');
   }
 }

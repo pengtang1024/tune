@@ -1,5 +1,6 @@
 // 移除on_audio_query导入
 import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/models/song_model.dart';
 
@@ -21,16 +22,16 @@ class AudioLocalDataSourceImpl implements AudioLocalDataSource {
     try {
       final Directory directory = await getApplicationDocumentsDirectory();
       final List<FileSystemEntity> files = directory.listSync(recursive: true);
-      
+
       final List<SongModel> songs = [];
       int id = 1;
-      
+
       for (final FileSystemEntity file in files) {
         if (file is File && _isAudioFile(file.path)) {
           final String fileName = file.uri.pathSegments.last;
           final String title = fileName.replaceAll(RegExp(r'\.[^.]*$'), ''); // 移除扩展名
           final FileStat stat = await file.stat();
-          
+
           songs.add(
             SongModel(
               id: id++,
@@ -47,7 +48,7 @@ class AudioLocalDataSourceImpl implements AudioLocalDataSource {
           );
         }
       }
-      
+
       return songs;
     } catch (e) {
       // 如果出现错误，返回空列表
@@ -61,7 +62,7 @@ class AudioLocalDataSourceImpl implements AudioLocalDataSource {
     if (query.isEmpty) {
       return allSongs;
     }
-    
+
     return allSongs.where((song) {
       return song.title.toLowerCase().contains(query.toLowerCase()) ||
           song.artist.toLowerCase().contains(query.toLowerCase()) ||
@@ -86,13 +87,13 @@ class AudioLocalDataSourceImpl implements AudioLocalDataSource {
     final List<String> audioExtensions = [
       '.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.wma'
     ];
-    
+
     for (final String extension in audioExtensions) {
       if (path.toLowerCase().endsWith(extension)) {
         return true;
       }
     }
-    
+
     return false;
   }
 }

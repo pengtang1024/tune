@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:tune/features/home/presentation/pages/home/home_page.dart';
-import 'package:tune/features/home/presentation/pages/library_page.dart';
-import 'package:tune/features/home/presentation/pages/player/music_player_page.dart';
-import 'package:tune/features/home/presentation/pages/search_page.dart';
-import 'package:tune/features/home/presentation/pages/settings_page.dart';
-import 'package:tune/features/home/presentation/pages/profile_page.dart';
-import 'package:tune/features/home/presentation/pages/login_page.dart';
+// 更新导入路径到 audio 模块
+import 'package:tune/features/audio/presentation/pages/player/music_player_page.dart';
+import 'package:tune/features/auth/presentation/pages/login_page.dart';
+import 'package:tune/features/home/presentation/pages/home_page.dart';
+import 'package:tune/features/playlist/presentation/pages/library_page.dart';
+import 'package:tune/features/profile/presentation/pages/profile_page.dart';
+import 'package:tune/features/search/presentation/pages/search_page.dart';
+import 'package:tune/features/settings/presentation/pages/settings_page.dart';
 
 part 'app_router.gr.dart';
 

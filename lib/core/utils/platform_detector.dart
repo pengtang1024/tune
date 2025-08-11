@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// 平台检测工具类
-/// 
+///
 /// 用于检测当前运行的平台环境，包括Web、桌面端和移动端
 class PlatformDetector {
   /// 检测是否为Web平台
@@ -11,24 +11,26 @@ class PlatformDetector {
   /// 检测是否为桌面平台（Windows、macOS、Linux）
   static bool get isDesktop {
     if (kIsWeb) return false;
-    return [
-      TargetPlatform.windows,
-      TargetPlatform.macOS,
-      TargetPlatform.linux,
-    ].contains(defaultTargetPlatform);
+    return [TargetPlatform.windows, TargetPlatform.macOS, TargetPlatform.linux].contains(defaultTargetPlatform);
   }
 
   /// 检测是否为移动平台（Android、iOS）
   static bool get isMobile {
     if (kIsWeb) return false;
-    return [
-      TargetPlatform.android,
-      TargetPlatform.iOS,
-    ].contains(defaultTargetPlatform);
+    return [TargetPlatform.android, TargetPlatform.iOS].contains(defaultTargetPlatform);
+  }
+
+  static bool get isCupertino {
+    if (kIsWeb) return false;
+    return [TargetPlatform.iOS, TargetPlatform.macOS].contains(defaultTargetPlatform);
+  }
+  static bool get isMaterial {
+    if (kIsWeb) return false;
+    return [TargetPlatform.android, TargetPlatform.linux, TargetPlatform.windows].contains(defaultTargetPlatform);
   }
 
   /// 检查是否应该使用移动端布局
-  /// 
+  ///
   /// 当屏幕宽度小于指定阈值时，使用移动端布局
   /// 这适用于Web和桌面端窗口缩小的情况
   static bool shouldUseMobileLayout(BuildContext context, {double threshold = 768}) {
@@ -37,7 +39,7 @@ class PlatformDetector {
   }
 
   /// 根据屏幕尺寸和平台类型返回相应的列数
-  /// 
+  ///
   /// Web和桌面端根据屏幕宽度动态计算列数
   /// 移动端或小屏幕设备固定显示较少列数
   static int getGridCrossAxisCount(BuildContext context) {

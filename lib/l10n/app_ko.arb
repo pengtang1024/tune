@@ -1,263 +1,277 @@
 {
-  "@@locale": "ko",
   "app_name": "Tune",
   "@app_name": {
-    "description": "this is the name of the app",
+    "description": "이것은 앱의 이름입니다",
     "type": "string"
   },
   "home_title": "홈",
   "@home_title": {
-    "description": "this is the title of the home page",
+    "description": "이것은 홈 페이지의 제목입니다",
+    "type": "string"
+  },
+  "font_family": "폰트 패밀리",
+  "@font_family": {
+    "description": "이것은 폰트 패밀리입니다",
+    "type": "string"
+  },
+  "theme_mode": "테마 모드",
+  "@theme_mode": {
+    "description": "이것은 테마 모드입니다",
+    "type": "string"
+  },
+  "light_mode": "라이트 모드",
+  "@light_mode": {
+    "description": "이것은 라이트 모드입니다",
+    "type": "string"
+  },
+  "dark_mode": "다크 모드",
+  "@dark_mode": {
+    "description": "이것은 다크 모드입니다",
+    "type": "string"
+  },
+  "system_mode": "시스템 모드",
+  "@system_mode": {
+    "description": "이것은 시스템 모드입니다",
     "type": "string"
   },
   "library_title": "라이브러리",
   "@library_title": {
-    "description": "this is the title of the library page",
-    "type": "string"
-  },
-  "search_title": "검색",
-  "@search_title": {
-    "description": "this is the title of the search page",
-    "type": "string"
-  },
-  "settings_title": "설정",
-  "@settings_title": {
-    "description": "this is the title of the settings page",
-    "type": "string"
-  },
-  "player_title": "플레이어",
-  "@player_title": {
-    "description": "this is the title of the player page",
-    "type": "string"
-  },
-  "profile_title": "프로필",
-  "@profile_title": {
-    "description": "this is the title of the profile page",
-    "type": "string"
-  },
-  "profile_default_username": "사용자",
-  "@profile_default_username": {
-    "description": "this is the default username",
-    "type": "string"
-  },
-  "profile_default_user_email": "user@example.com",
-  "@profile_default_user_email": {
-    "description": "this is the default user email",
-    "type": "string"
-  },
-  "search_hint_text": "검색...",
-  "@search_hint_text": {
-    "description": "this is the hint text for the search bar",
+    "description": "이것은 라이브러리 페이지의 제목입니다",
     "type": "string"
   },
   "artist_title": "아티스트",
   "@artist_title": {
-    "description": "this is the title of the artist page",
+    "description": "이것은 아티스트 페이지의 제목입니다",
     "type": "string"
   },
   "search_hint": "노래 검색...",
   "@search_hint": {
-    "description": "this is the hint text for the search bar",
+    "description": "이것은 검색 바의 힌트 텍스트입니다",
     "type": "string"
   },
   "artist_hint": "아티스트 검색...",
   "@artist_hint": {
-    "description": "this is the hint text for the search bar",
+    "description": "이것은 검색 바의 힌트 텍스트입니다",
     "type": "string"
   },
   "album_hint": "앨범 검색...",
   "@album_hint": {
-    "description": "this is the hint text for the search bar",
+    "description": "이것은 검색 바의 힌트 텍스트입니다",
+    "type": "string"
+  },
+  "settings_title": "설정",
+  "@settings_title": {
+    "description": "이것은 설정 페이지의 제목입니다",
     "type": "string"
   },
   "play_button": "재생",
   "@play_button": {
-    "description": "this is the text for the play button",
+    "description": "이것은 재생 버튼의 텍스트입니다",
     "type": "string"
   },
   "pause_button": "일시정지",
   "@pause_button": {
-    "description": "this is the text for the pause button",
+    "description": "이것은 일시정지 버튼의 텍스트입니다",
     "type": "string"
   },
   "next_button": "다음",
   "@next_button": {
-    "description": "this is the text for the next button",
+    "description": "이것은 다음 버튼의 텍스트입니다",
     "type": "string"
   },
   "previous_button": "이전",
   "@previous_button": {
-    "description": "this is the text for the previous button",
+    "description": "이것은 이전 버튼의 텍스트입니다",
     "type": "string"
   },
   "favorite_button": "즐겨찾기",
   "@favorite_button": {
-    "description": "this is the text for the favorite button",
+    "description": "이것은 즐겨찾기 버튼의 텍스트입니다",
     "type": "string"
   },
-  "theme_light": "밝은",
-  "@theme_light": {
-    "description": "this is the text for the light theme",
+  "now_playing": "지금 재생 중",
+  "@now_playing": {
+    "description": "이것은 지금 재생 중 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "theme_dark": "어두운",
-  "@theme_dark": {
-    "description": "this is the text for the dark theme",
+  "no_things_players": "플레이어 없음",
+  "@no_things_players": {
+    "description": "이것은 플레이어가 없음을 나타내는 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "theme_system": "시스템",
-  "@theme_system": {
-    "description": "this is the text for the system theme",
-    "type": "string"
-  },
-  "bottom_player_bar_now_playing": "지금 재생 중",
-  "@bottom_player_bar_now_playing": {
-    "description": "this is the text for the now playing indicator",
-    "type": "string"
-  },
-  "bottom_player_bar_no_song": "선택된 노래 없음",
-  "@bottom_player_bar_no_song": {
-    "description": "this is the text for the no song selected indicator",
+  "no_selected_song": "선택된 노래 없음",
+  "@no_selected_song": {
+    "description": "이것은 노래가 선택되지 않았다는 인디케이터의 텍스트입니다",
     "type": "string"
   },
   "song_list_title": "노래",
   "@song_list_title": {
-    "description": "this is the title for the song list",
+    "description": "이것은 노래 목록의 제목입니다",
     "type": "string"
   },
-  "song_list_no_songs": "노래를 찾을 수 없음",
-  "@song_list_no_songs": {
-    "description": "this is the text for the no songs found indicator",
+  "no_songs_found": "노래를 찾을 수 없음",
+  "@no_songs_found": {
+    "description": "이것은 노래를 찾을 수 없다는 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "player_page_duration": "재생 시간",
-  "@player_page_duration": {
-    "description": "this is the text for the duration indicator",
+  "player_duration": "길이",
+  "@player_duration": {
+    "description": "이것은 길이 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "player_page_artist": "아티스트",
-  "@player_page_artist": {
-    "description": "this is the text for the artist indicator",
+  "player_artist": "아티스트",
+  "@player_artist": {
+    "description": "이것은 아티스트 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "player_page_album": "앨범",
-  "@player_page_album": {
-    "description": "this is the text for the album indicator",
+  "player_album": "앨범",
+  "@player_album": {
+    "description": "이것은 앨범 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "search_page_hint": "노래 검색...",
-  "@search_page_hint": {
-    "description": "this is the hint text for the search bar",
+  "search_empty": "노래를 찾기 위해 검색어를 입력하세요",
+  "@search_empty": {
+    "description": "이것은 빈 검색 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "search_page_empty": "검색어를 입력하여 노래 찾기",
-  "@search_page_empty": {
-    "description": "this is the text for the empty search indicator",
+  "search_no_results": "검색 결과가 없습니다",
+  "@search_no_results": {
+    "description": "이것은 결과가 없다는 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "search_page_no_results": "검색과 일치하는 노래를 찾을 수 없음",
-  "@search_page_no_results": {
-    "description": "this is the text for the no results indicator",
+  "language": "언어",
+  "@language": {
+    "description": "이것은 언어 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "settings_page_language": "언어",
-  "@settings_page_language": {
-    "description": "this is the text for the language indicator",
+  "theme": "테마",
+  "@theme": {
+    "description": "이것은 테마 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "settings_page_theme": "테마",
-  "@settings_page_theme": {
-    "description": "this is the text for the theme indicator",
+  "font": "폰트",
+  "@font": {
+    "description": "이것은 폰트 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "settings_page_font": "폰트",
-  "@settings_page_font": {
-    "description": "this is the text for the font indicator",
+  "theme_trendy_electro": "트렌디 일렉트로",
+  "@theme_trendy_electro": {
+    "description": "이것은 테마의 이름입니다",
     "type": "string"
   },
-  "settings_page_about": "앱 정보",
-  "@settings_page_about": {
-    "description": "this is the text for the about indicator",
+  "theme_minimal_gray": "미니멀 그레이",
+  "@theme_minimal_gray": {
+    "description": "이것은 테마의 이름입니다",
     "type": "string"
   },
-  "library_page_artists": "아티스트",
-  "@library_page_artists": {
-    "description": "this is the text for the artists indicator",
+  "theme_nature_forest": "자연 숲",
+  "@theme_nature_forest": {
+    "description": "이것은 테마의 이름입니다",
     "type": "string"
   },
-  "library_page_albums": "앨범",
-  "@library_page_albums": {
-    "description": "this is the text for the albums indicator",
+  "theme_cyber_neon": "사이버 네온",
+  "@theme_cyber_neon": {
+    "description": "이것은 테마의 이름입니다",
     "type": "string"
   },
-  "library_page_genres": "장르",
-  "@library_page_genres": {
-    "description": "this is the text for the genres indicator",
+  "theme_warm_healing": "따뜻한 힐링",
+  "@theme_warm_healing": {
+    "description": "이것은 테마의 이름입니다",
     "type": "string"
   },
-  "language_name_en": "영어",
-  "@language_name_en": {
-    "description": "this is the name of the English language",
+  "about": "앱 정보",
+  "@about": {
+    "description": "이것은 앱 정보 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "language_name_zh": "중국어",
-  "@language_name_zh": {
-    "description": "this is the name of the Chinese language",
+  "library_artists": "아티스트",
+  "@library_artists": {
+    "description": "이것은 아티스트 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "language_name_ja": "일본어",
-  "@language_name_ja": {
-    "description": "this is the name of the Japanese language",
+  "library_albums": "앨범",
+  "@library_albums": {
+    "description": "이것은 앨범 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "language_name_ko": "한국어",
-  "@language_name_ko": {
-    "description": "this is the name of the Korean language",
+  "library_genres": "장르",
+  "@library_genres": {
+    "description": "이것은 장르 인디케이터의 텍스트입니다",
     "type": "string"
   },
-  "language_name_ru": "러시아어",
-  "@language_name_ru": {
-    "description": "this is the name of the Russian language",
+  "player_title": "플레이어",
+  "@player_title": {
+    "description": "이것은 플레이어 페이지의 제목입니다",
     "type": "string"
   },
-  "theme_name_trendy_electro": "트렌디 일렉트로",
-  "@theme_name_trendy_electro": {
-    "description": "this is the name of the theme",
+  "profile_title": "프로필",
+  "@profile_title": {
+    "description": "이것은 프로필 페이지의 제목입니다",
     "type": "string"
   },
-  "theme_name_minimal_gray": "미니멀 그레이",
-  "@theme_name_minimal_gray": {
-    "description": "this is the name of the theme",
+  "username_default": "사용자",
+  "@username_default": {
+    "description": "이것은 기본 사용자 이름입니다",
     "type": "string"
   },
-  "theme_name_nature_forest": "자연의 숲",
-  "@theme_name_nature_forest": {
-    "description": "this is the name of the theme",
+  "user_email_default": "user@example.com",
+  "@user_email_default": {
+    "description": "이것은 기본 사용자 이메일입니다",
     "type": "string"
   },
-  "theme_name_cyber_neon": "사이버 네온",
-  "@theme_name_cyber_neon": {
-    "description": "this is the name of the theme",
+  "locale": "한국어",
+  "@locale": {
+    "description": "이것은 한국어 언어의 이름입니다",
     "type": "string"
   },
-  "theme_name_warm_healing": "따뜻한 치유",
-  "@theme_name_warm_healing": {
-    "description": "this is the name of the theme",
+  "search_title": "검색",
+  "@search_title": {
+    "description": "이것은 검색 페이지의 제목입니다",
     "type": "string"
   },
-  "theme_name_light_mode": "밝은 모드",
-  "@theme_name_light_mode": {
-    "description": "this is the name of the theme",
+  "no_song_playing": "재생 중인 노래가 없습니다",
+  "@no_song_playing": {
+    "description": "이것은 노래가 재생되지 않을 때 표시되는 메시지입니다",
     "type": "string"
   },
-  "theme_name_dark_mode": "어두운 모드",
-  "@theme_name_dark_mode": {
-    "description": "this is the name of the theme",
+  "quick_actions": "빠른 작업",
+  "@quick_actions": {
+    "description": "이것은 빠른 작업 섹션의 제목입니다",
     "type": "string"
   },
-  "theme_name_system_theme": "시스템 테마",
-  "@theme_name_system_theme": {
-    "description": "this is the name of the theme",
+  "favorites": "즐겨찾기",
+  "@favorites": {
+    "description": "이것은 즐겨찾기 섹션의 제목입니다",
+    "type": "string"
+  },
+  "playlists": "재생목록",
+  "@playlists": {
+    "description": "이것은 재생목록 섹션의 제목입니다",
+    "type": "string"
+  },
+  "recently_played": "최근 재생",
+  "@recently_played": {
+    "description": "이것은 최근 재생 섹션의 제목입니다",
+    "type": "string"
+  },
+  "recommendations": "추천",
+  "@recommendations": {
+    "description": "이것은 추천 섹션의 제목입니다",
+    "type": "string"
+  },
+  "no_recent_songs": "최근 재생한 노래가 없습니다",
+  "@no_recent_songs": {
+    "description": "이것은 최근 노래가 없다는 인디케이터의 텍스트입니다",
+    "type": "string"
+  },
+  "no_recommendations": "추천 항목이 없습니다",
+  "@no_recommendations": {
+    "description": "이것은 추천이 없다는 인디케이터의 텍스트입니다",
+    "type": "string"
+  },
+  "failed_to_load_songs": "노래 로드 실패",
+  "@failed_to_load_songs": {
+    "description": "이것은 노래 로드 실패 오류의 텍스트입니다",
     "type": "string"
   }
 }
