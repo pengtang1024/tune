@@ -1,117 +1,132 @@
-# Tune - Your Personal Melody Box 🎵
+# Tune - Cross-Platform Music Player
 
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="Tune Logo" width="120" />
+  <img src="assets/icons/app_icon.png" width="200" alt="Tune Logo" />
 </p>
 
 <p align="center">
-  <a href="README_zh.md">中文</a> | 
-  <a href="README_en.md">English</a> | 
-  <a href="README_ja.md">日本語</a> | 
-  <a href="README_ko.md">한국어</a> | 
+  Let every melody find its home
+</p>
+
+<p align="center">
+  <a href="README.md">中文</a> •
+  <a href="README_en.md">English</a> •
+  <a href="README_ja.md">日本語</a> •
+  <a href="README_ko.md">한국어</a> •
   <a href="README_ru.md">Русский</a>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Web-blue" alt="Supported Platforms" />
-  <img src="https://img.shields.io/badge/Flutter-%5E3.0-green" alt="Flutter Version" />
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" />
-</p>
+## 🎵 About Tune
 
-Tune is more than just a music player; it's your personal "melody storage box." Here, you can easily organize your local music library, customize playlists by style, mood, or scene, ensuring each song waits for you in the most suitable place. With smooth playback experience paired with delicate sound adjustment, every note in your headphones becomes clear and full, as if you were at the scene. The simple yet refined interface design hides a pure love for music, without any unnecessary distractions — just you and your music alone.
+In the hustle and bustle of daily life, there are always some melodies that quietly find their way into your heart - perhaps the cheerful rhythm that wakes you up in the morning, the gentle folk song that accompanies you late at night, or the surprise single you encounter on a journey.
 
-Whether it's a classic favorite treasured for years or a newly discovered niche masterpiece, Tune can妥善安放 them all, making every opening a beautiful auditory reunion.
+Tune is more than just a music player; it's your personal "melody organizer." Here, you can easily organize your local music library, customize playlists by style, mood, or scene, ensuring each song is in its perfect place waiting for you. With smooth playback experience paired with delicate audio adjustments, every note in your headphones sounds clear and full, as if you were at the live performance. The simple yet sophisticated interface design embodies pure love for music, free from distractions, offering only you and your music alone.
+
+Whether it's classic songs treasured for years or newly discovered niche gems, Tune can妥善 store them all, making every opening a beautiful auditory reunion.
 
 With Tune, let music return to its essence, and let every moment be accompanied by melodies.
 
-## 🎵 Key Features
+## 🌟 Features
 
-🎵 **Local Music Library Management** - Easily organize your local music files with a clean and intuitive interface
+- 🎧 **High-quality Audio Playback** - Supports multiple audio formats including MP3, FLAC, WAV
+- 📚 **Local Music Management** - Automatically scans and organizes local music library with metadata parsing
+- 🎨 **Multi-theme Support** - 8 beautiful themes (Trendy Electro, Minimal Gray, Nature Forest, Cyber Neon, Warm Healing, etc.) with automatic dark/light mode switching
+- 🌍 **Multi-language Support** - Supports Chinese, English, Japanese, Korean, Russian
+- 📱 **Cross-platform Compatibility** - Full support for Android, iOS, Windows, macOS, Linux, Web
+- ⚡ **Smooth Experience** - Background playback, notification controls, quick search
+- 🎛️ **Personalization** - Rich customization options for fonts, themes, languages
+- 🎯 **Smart Recommendations** - Personalized music recommendations based on playback history
+- 📥 **Offline Caching** - Supports caching online music for offline enjoyment
+- 📋 **Playlists** - Supports creating and managing custom playlists
+- 🔄 **Multiple Play Modes** - List loop, single loop, shuffle play
+- ⏩ **Playback Control** - Supports playback progress dragging, volume adjustment, playback speed adjustment (0.5x-2.0x)
+- 🎵 **Lyrics Synchronization** - Supports real-time display of LRC format lyrics
+- 🔍 **Smart Search** - Supports searching by song name, artist, album
 
-📋 **Custom Playlists** - Create playlists based on genres, moods, or scenes for the perfect listening experience
+## 🎨 Theme Preview
 
-🔊 **High-Quality Audio Playback** - Integrated with just_audio for high-quality audio playback supporting multiple formats (MP3, FLAC, WAV, etc.)
+Tune offers multiple beautiful themes for you to choose from:
 
-🎚️ **Equalizer & Sound Control** - Fine-tune audio with customizable sound settings and volume control
+1. **Trendy Electro** - Purple-toned modern electronic style
+2. **Minimal Gray** - Clean gray-scale design
+3. **Nature Forest** - Fresh green natural style
+4. **Cyber Neon** - Futuristic neon colors
+5. **Warm Healing** - Warm orange healing style
+6. **Warm Orange Gradient** - Gradient orange warm style
+7. **Monochrome** - Minimalist design with unified colors
+8. **Vibrant Red** - Passionate red theme
 
-🎨 **Multiple Themes** - Choose from 5 beautiful preset themes (Trendy Electro, Minimal Gray, Nature Forest, Cyber Neon, Warm Healing) with light/dark mode support
+All themes follow the design concept of "bright and transparent in light mode, delicate and refined in dark mode" with low-saturation color matching to create a sense of sophistication
 
-🌍 **Multi-language Support** - Full support for 5 languages (English, Chinese, Japanese, Korean, Russian) with easy switching
+## 🛠 Technical Architecture
 
-📱 **Cross-Platform** - Beautifully designed for mobile, desktop, and web with responsive layouts
-
-⏯️ **Background Playback** - Continue listening while using other apps with notification controls
-
-## 🏗️ Technical Architecture
-
-This project adopts a layered architecture of Clean Architecture + BLoC pattern to ensure cross-platform consistency and maintainability.
-
-### Architecture Layers
+Tune is built using Clean Architecture + BLoC pattern to ensure code maintainability and scalability:
 
 ```
 lib/
-├── config/                 # Configuration files
-│   └── theme/              # Theme configuration
+├── app/                    # Application core configuration
+│   ├── router/             # Routing management
+│   └── theme/              # Theme system
 ├── core/                   # Core layer
-│   ├── di/                 # Dependency injection
-│   ├── routes/             # Route management
+│   ├── bloc/               # Global state management
+│   ├── config/             # Application configuration
+│   ├── error/              # Error handling
+│   ├── network/            # Network related
 │   ├── services/           # Core services
-│   └── utils/              # Utility classes
-├── data/                   # Data layer
-│   ├── datasources/        # Data sources
-│   ├── models/             # Data models
-│   └── repositories/       # Repository implementations
-├── domain/                 # Domain layer
-│   ├── entities/           # Entities
-│   ├── repositories/       # Repository interfaces
-│   └── usecases/           # Use cases
-└── presentation/           # Presentation layer
-    ├── bloc/               # State management
-    ├── pages/              # Pages
-    ├── widgets/            # Generic components
-    └── components/         # Business components
+│   ├── storage/            # Data storage
+│   ├── utils/              # Utility classes
+│   └── widgets/            # Core components
+├── features/               # Feature modules
+│   ├── audio/              # Audio playback functionality
+│   ├── home/               # Home module
+│   ├── library/            # Music library module
+│   ├── player/             # Player module
+│   ├── profile/            # Profile module
+│   ├── search/             # Search module
+│   └── settings/           # Settings module
+├── l10n/                   # Internationalization resources
+└── di/                     # Dependency injection
 ```
 
-### Core Modules
+## 🚀 Quick Start
 
-- **Audio Playback Core Module** - Implements play, pause, skip, and progress control using just_audio
-- **Music Library Module** - Custom implementation for local music retrieval with online streaming support
-- **Playlist Module** - Uses Hive for playlist storage
-- **User Module** - Third-party login support with shared_preferences for user sessions
-- **UI/UX Module** - Responsive design with customizable themes and dark mode
+### Requirements
 
-## 📦 Main Technology Stack
+- Flutter SDK 3.8.1 or higher
+- Dart SDK 3.8.1 or higher
+- Supported IDE (Android Studio / VS Code)
 
-- **State Management**: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
-- **Route Management**: [auto_route](https://pub.dev/packages/auto_route)
+### Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### Run the Application
+
+```bash
+# Run in development mode
+flutter run
+
+# Build for specific platforms
+flutter build apk      # Android
+flutter build ios      # iOS
+flutter build web      # Web
+flutter build windows  # Windows
+flutter build macos    # macOS
+flutter build linux    # Linux
+```
+
+## 🔧 Main Dependencies
+
 - **Audio Playback**: [just_audio](https://pub.dev/packages/just_audio)
-- **Local Music Retrieval**: Custom implementation
-- **Permission Management**: [permission_handler](https://pub.dev/packages/permission_handler)
+- **State Management**: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
+- **Routing**: [auto_route](https://pub.dev/packages/auto_route)
+- **Local Storage**: [hive](https://pub.dev/packages/hive), [shared_preferences](https://pub.dev/packages/shared_preferences)
+- **Network Requests**: [dio](https://pub.dev/packages/dio)
 - **Dependency Injection**: [get_it](https://pub.dev/packages/get_it)
-- **Internationalization**: [flutter_localizations](https://pub.dev/packages/flutter_localizations)
+- **Internationalization**: [flutter_localizations](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
 
-## 🚀 Getting Started
-
-1. Clone the project:
-   ```bash
-   git clone <repository-url>
-   ```
-
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
-
-3. Run the application:
-   ```bash
-   flutter run
-   ```
-
-## 🎯 Platform Adaptation
-
-- **Mobile**: Follows platform design guidelines with background playback, lock screen controls, and notification player controls
-- **Desktop**: Windowed layout design with system tray integration, keyboard shortcuts, and multi-window support
-- **Web**: Responsive web design handling browser audio restrictions with PWA support
 
 ## 🛠️ Useful Commands
 

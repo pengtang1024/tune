@@ -1,167 +1,165 @@
-# Tune - 당신의 개인 멜로디 상자 🎵
+# Tune - 크로스 플랫폼 음악 플레이어
 
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="Tune Logo" width="120" />
+  <img src="app.png" width="200" alt="Tune Logo" />
 </p>
 
 <p align="center">
-  <a href="README_zh.md">中文</a> | 
-  <a href="README_en.md">English</a> | 
-  <a href="README_ja.md">日本語</a> | 
-  <a href="README_ko.md">한국어</a> | 
+  모든 멜로디에게 돌아갈 곳을
+</p>
+
+<p align="center">
+  <a href="README.md">中文</a> •
+  <a href="README_en.md">English</a> •
+  <a href="README_ja.md">日本語</a> •
+  <a href="README_ko.md">한국어</a> •
   <a href="README_ru.md">Русский</a>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/플랫폼-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Web-blue" alt="지원되는 플랫폼" />
-  <img src="https://img.shields.io/badge/Flutter-%5E3.0-green" alt="Flutter 버전" />
-  <img src="https://img.shields.io/badge/라이선스-MIT-blue.svg" alt="라이선스" />
-</p>
+## 🎵 Tune에 대해
 
-Tune은 단순한 음악 플레이어가 아니라 당신의 개인적인 "멜로디 보관함"입니다. 여기서 로컬 음악 라이브러리를 쉽게 정리하고, 스타일, 분위기, 상황별로 재생목록을 사용자 정의하여 각 곡이 가장 적합한 위치에서 당신을 기다리도록 할 수 있습니다. 매끄러운 재생 경험과 섬세한 음향 조절을 통해 헤드폰의 모든 음표가 선명하고 풍부해지며, 마치 현장에 있는 것처럼 느껴집니다. 심플하면서도 세련된 인터페이스 디자인은 음악에 대한 순수한 사랑을 숨기고, 불필요한 산만함 없이 당신과 음악만의 고요한 시간을 제공합니다.
+바쁜 일상 속에서 마음속에 살며시 머무는 멜로디가 있습니다 — 아침에 당신을 깨우는 밝은 리듬, 심야에 함께해주는 부드러운 민요, 여행 중 우연히 만나는 서프라이즈 싱글 곡일 수도 있습니다.
 
-수년간 간직한 클래식한 명곡이든, 최근 발견한 니치한 걸작이든, Tune은 모두를 적절히 보관하여 매번 열 때마다 아름다운 청각적 재회가 되도록 합니다.
+Tune은 음악 플레이어 이상으로 당신의 개인적인 「멜로디 수납함」입니다. 여기서 로컬 음악 라이브러리를 쉽게 정리하고, 스타일, 기분, 장면별로 플레이리스트를 커스터마이즈할 수 있습니다. 각 곡이 가장 적합한 위치에서 당신을 기다립니다. 원활한 재생 경험과 섬세한 음향 조정을 통해 헤드폰의 각 음符가 선명하고 풍부하게 울려 퍼져 라이브 공연장에 있는 것처럼 느껴집니다. 심플하면서도 세련된 인터페이스 디자인에는 음악에 대한 순수한 사랑이 담겨 있으며, 불필요한 방해 없이 당신과 음악만의 여유로운 시간을 제공합니다.
 
-Tune과 함께 음악을 본질로 되돌리고, 모든 순간을 멜로디와 함께 보내세요.
+수년간 소중히 간직한 클래식 곡이든, 새로 발견한 마이너 명작이든, Tune이 꼼꼼히 보관해주어 매번의 재생이 아름다운 청각의 재회가 됩니다.
 
-## 🎵 주요 기능
+Tune으로 음악을 본래의 모습으로 되돌리고, 모든 시간에 멜로디를 함께하세요.
 
-🎵 **로컬 음악 라이브러리 관리** - 로컬 음악 파일을 쉽게 정리할 수 있는 깨끗하고 직관적인 인터페이스
+## 🌟 특징
 
-📋 **사용자 정의 재생목록** - 장르, 분위기, 상황별로 재생목록을 만들어 완벽한 청취 경험 제공
+- 🎧 **고품질 오디오 재생** - MP3, FLAC, WAV 등 다양한 오디오 포맷 지원
+- 📚 **로컬 음악 관리** - 로컬 음악 라이브러리 자동 스캔 및 정리, 메타데이터 파싱 지원
+- 🎨 **멀티 테마 지원** - 8가지 아름다운 테마(트렌디 일렉트로, 미니멀 그레이, 내츄럴 포레스트, 사이버 네온, 웜 힐링 등), 다크/라이트 모드 자동 전환
+- 🌍 **다국어 지원** - 중국어, 영어, 일본어, 한국어, 러시아어 지원
+- 📱 **크로스 플랫폼 호환성** - Android, iOS, Windows, macOS, Linux, Web 전 플랫폼 지원
+- ⚡ **원활한 경험** - 백그라운드 재생, 알림 컨트롤, 빠른 검색
+- 🎛️ **개인화** - 폰트, 테마, 언어 등 풍부한 커스터마이즈 옵션
+- 🎯 **스마트 추천** - 재생 기록 기반 개인화된 음악 추천
+- 📥 **오프라인 캐시** - 온라인 음악 캐시 지원으로 언제든지 음악을 즐길 수 있음
+- 📋 **플레이리스트** - 맞춤 플레이리스트 생성 및 관리 지원
+- 🔄 **다중 재생 모드** - 리스트 루프, 싱글 루프, 셔플 재생
+- ⏩ **재생 컨트롤** - 재생 진행 드래그, 볼륨 조절, 재생 속도 조절(0.5x-2.0x) 지원
+- 🎵 **가사 동기화** - LRC 포맷 가사 실시간 표시 지원
+- 🔍 **스마트 검색** - 곡명, 아티스트, 앨범별 검색 지원
 
-🔊 **고품질 오디오 재생** - just_audio를 통합하여 MP3, FLAC, WAV 등 여러 형식을 지원하는 고품질 오디오 재생
+## 🎨 테마 미리보기
 
-🎚️ **이퀄라이저 및 사운드 제어** - 사용자 정의 가능한 사운드 설정과 볼륨 조절로 오디오 미세 조정
+Tune은 선택 가능한 여러 아름다운 테마를 제공합니다:
 
-🎨 **다양한 테마** - Trendy Electro, Minimal Gray, Nature Forest, Cyber Neon, Warm Healing 등 5가지 아름다운 프리셋 테마와 라이트/다크 모드 지원
+1. **트렌디 일렉트로** - 보라색을 기반으로 한 현대적인 전자 스타일
+2. **미니멀 그레이** - 깔끔한 회색 톤 디자인
+3. **내츄럴 포레스트** - 신선한 녹색 자연 스타일
+4. **사이버 네온** - 미래지향적인 네온 컬러
+5. **웜 힐링** - 따뜻한 오렌지 힐링 스타일
+6. **웜 오렌지 그라데이션** - 그라데이션 오렌지 따뜻한 스타일
+7. **모노크롬** - 통일된 컬러의 미니멀 디자인
+8. **비비드 레드** - 열정적인 빨간 테마
 
-🌍 **다국어 지원** - 영어, 중국어, 일본어, 한국어, 러시아어 등 5개 언어의 완전한 지원과 쉬운 전환
+모든 테마는 「라이트 모드에서는 밝고 투명하게, 다크 모드에서는 섬세하고 세련되게」라는 디자인 철학을 따르며, 저채도 컬러 매칭으로 고급스러움을 연출합니다.
 
-📱 **크로스 플랫폼** - 모바일, 데스크톱, 웹을 위한 아름답게 설계된 반응형 레이아웃
+## 🛠 기술 아키텍처
 
-⏯️ **백그라운드 재생** - 알림 제어를 통해 다른 앱을 사용하는 동안에도 계속 듣기
-
-## 🏗️ 기술 아키텍처
-
-이 프로젝트는 Clean Architecture + BLoC 패턴의 계층화 아키텍처를 채택하여 크로스 플랫폼 일관성과 유지보수성을 보장합니다.
-
-### 아키텍처 계층
+Tune은 Clean Architecture + BLoC 패턴을 채택하여 코드의 유지보수성과 확장성을 보장합니다:
 
 ```
 lib/
-├── config/                 # 설정 파일
-│   └── theme/              # 테마 설정
+├── app/                    # 애플리케이션 코어 설정
+│   ├── router/             # 라우팅 관리
+│   └── theme/              # 테마 시스템
 ├── core/                   # 코어 계층
-│   ├── di/                 # 의존성 주입
-│   ├── routes/             # 라우트 관리
+│   ├── bloc/               # 글로벌 상태 관리
+│   ├── config/             # 애플리케이션 설정
+│   ├── error/              # 에러 핸들링
+│   ├── network/            # 네트워크 관련
 │   ├── services/           # 코어 서비스
-│   └── utils/              # 유틸리티 클래스
-├── data/                   # 데이터 계층
-│   ├── datasources/        # 데이터 소스
-│   ├── models/             # 데이터 모델
-│   └── repositories/       # 리포지토리 구현
-├── domain/                 # 도메인 계층
-│   ├── entities/           # 엔티티
-│   ├── repositories/       # 리포지토리 인터페이스
-│   └── usecases/           # 유스케이스
-└── presentation/           # 표현 계층
-    ├── bloc/               # 상태 관리
-    ├── pages/              # 페이지
-    ├── widgets/            # 일반 컴포넌트
-    └── components/         # 비즈니스 컴포넌트
+│   ├── storage/            # 데이터 저장소
+│   ├── utils/              # 유틸리티 클래스
+│   └── widgets/            # 코어 컴포넌트
+├── features/               # 기능 모듈
+│   ├── audio/              # 오디오 재생 기능
+│   ├── home/               # 홈 모듈
+│   ├── library/            # 음악 라이브러리 모듈
+│   ├── player/             # 플레이어 모듈
+│   ├── profile/            # 프로필 모듈
+│   ├── search/             # 검색 모듈
+│   └── settings/           # 설정 모듈
+├── l10n/                   # 국제화 리소스
+└── di/                     # 의존성 주입
 ```
-
-### 핵심 모듈
-
-- **오디오 재생 코어 모듈** - just_audio를 사용하여 재생, 일시정지, 건너뛰기 및 진행 상황 제어 구현
-- **음악 라이브러리 모듈** - 온라인 스트리밍 지원이 포함된 로컬 음악 검색을 위한 사용자 정의 구현
-- **재생목록 모듈** - 재생목록 저장을 위해 Hive 사용
-- **사용자 모듈** - 사용자 세션에 shared_preferences를 사용한 타사 로그인 지원
-- **UI/UX 모듈** - 사용자 정의 가능한 테마와 다크 모드를 갖춘 반응형 디자인
-
-## 📦 주요 기술 스택
-
-- **상태 관리**: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
-- **라우트 관리**: [auto_route](https://pub.dev/packages/auto_route)
-- **오디오 재생**: [just_audio](https://pub.dev/packages/just_audio)
-- **로컬 음악 검색**: 사용자 정의 구현
-- **권한 관리**: [permission_handler](https://pub.dev/packages/permission_handler)
-- **의존성 주입**: [get_it](https://pub.dev/packages/get_it)
-- **국제화**: [flutter_localizations](https://pub.dev/packages/flutter_localizations)
 
 ## 🚀 빠른 시작
 
-1. 프로젝트 클론:
-   ```bash
-   git clone <repository-url>
-   ```
+### 환경 요구사항
 
-2. 의존성 설치:
-   ```bash
-   flutter pub get
-   ```
+- Flutter SDK 3.8.1 이상
+- Dart SDK 3.8.1 이상
+- 지원 IDE (Android Studio / VS Code)
 
-3. 애플리케이션 실행:
-   ```bash
-   flutter run
-   ```
+### 의존성 설치
 
-## 🎯 플랫폼 적응
-
-- **모바일**: 백그라운드 재생, 잠금 화면 제어, 알림 플레이어 제어가 포함된 플랫폼 디자인 지침 준수
-- **데스크톱**: 시스템 트레이 통합, 키보드 단축키, 다중 창 지원이 포함된 창 레이아웃 디자인
-- **Web**: PWA 지원이 포함된 브라우저 오디오 제한을 처리하는 반응형 웹 디자인
-
-## 🛠️ 유용한 명령어
-
-### 국제화
-
-수동으로 로컬라이제이션 파일 생성:
 ```bash
-flutter gen-l10n
+flutter pub get
 ```
 
-### 아이콘
+### 애플리케이션 실행
 
-flutter_launcher_icons를 사용하여 앱 아이콘 자동 생성:
 ```bash
-flutter pub run flutter_launcher_icons:main
+# 개발 모드로 실행
+flutter run
+
+# 특정 플랫폼용으로 빌드
+flutter build apk      # Android
+flutter build ios      # iOS
+flutter build web      # Web
+flutter build windows  # Windows
+flutter build macos    # macOS
+flutter build linux    # Linux
 ```
 
-### 코드 생성
+## 🔧 주요 의존성
 
-build_runner 실행하여 코드 생성:
-```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-```
+- **오디오 재생**: [just_audio](https://pub.dev/packages/just_audio)
+- **상태 관리**: [flutter_bloc](https://pub.dev/packages/flutter_bloc)
+- **라우팅**: [auto_route](https://pub.dev/packages/auto_route)
+- **로컬 저장소**: [hive](https://pub.dev/packages/hive), [shared_preferences](https://pub.dev/packages/shared_preferences)
+- **네트워크 요청**: [dio](https://pub.dev/packages/dio)
+- **의존성 주입**: [get_it](https://pub.dev/packages/get_it)
+- **국제화**: [flutter_localizations](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
 
-### 테스트
+## 📱 플랫폼 지원
 
-모든 테스트 실행:
-```bash
-flutter test
-```
+| 플랫폼   | 상태     | 비고 |
+|----------|----------|------|
+| Android  | ✅ 지원   | API 21+ |
+| iOS      | ✅ 지원   | iOS 11+ |
+| Windows  | ✅ 지원   | Windows 10+ |
+| macOS    | ✅ 지원   | macOS 10.15+ |
+| Linux    | ✅ 지원   | Ubuntu 20.04+ |
+| Web      | ✅ 지원   | 현대 브라우저 |
 
-커버리지와 함께 테스트 실행:
-```bash
-flutter test --coverage
-```
+## 🤝 기여
 
-## 🧪 테스트 전략
+모든 형태의 기여를 환영합니다! Tune에 기여하고 싶으시다면 다음 단계를 따르세요:
 
-- **단위 테스트**: 유스케이스 및 리포지토리 로직 테스트
-- **통합 테스트**: 데이터 소스 및 네트워크 요청 테스트
-- **위젯 테스트**: UI 컴포넌트 테스트
-- **엔드투엔드 테스트**: 사용자 흐름 테스트
-
-## 📈 확장성 고려사항
-
-- 플러그인 기반 아키텍처
-- API 버전 제어 지원
-- 구성 가능한 테마
-- 안정성 보장을 위한 모듈식 테스트
+1. 저장소 포크
+2. 기능 브랜치 생성 (`git checkout -b feature/AmazingFeature`)
+3. 변경 사항 커밋 (`git commit -m 'Add some AmazingFeature'`)
+4. 브랜치에 푸시 (`git push origin feature/AmazingFeature`)
+5. 풀 리퀘스트 생성
 
 ## 📄 라이선스
 
-이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다 - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스 하에 라이선스됩니다 - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+
+## 🙏 감사의 말
+
+- 오픈소스 커뮤니티에 기여하는 모든 개발자에게 감사
+- 우수한 프레임워크를 제공하는 Flutter 팀에게 감사
+- 개발 도구 지원을 제공하는 JetBrains에게 감사
+
+---
+
+<p align="center">
+  Tune으로 음악을 본래의 모습으로 되돌리고, 모든 시간에 멜로디를 함께하세요.
+</p>
