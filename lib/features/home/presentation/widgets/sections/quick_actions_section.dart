@@ -10,15 +10,11 @@ class QuickActionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth > 1200
-            ? 4
-            : constraints.maxWidth > 800
-                ? 3
-                : 2;
-                
+        final crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 3 : 2;
+
         // 在桌面端使用水平滚动布局，在移动端使用网格布局
         if (crossAxisCount > 2) {
           // 桌面端 - 使用水平滚动布局以节省垂直空间
@@ -66,6 +62,16 @@ class QuickActionsSection extends StatelessWidget {
                   },
                   isDesktop: true,
                 ),
+                const SizedBox(width: 8),
+                QuickActionCard(
+                  icon: Icons.find_in_page,
+                  title: localizations.scan_local_music,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  onTap: () {
+                    context.pushRoute(const MusicScanRoute());
+                  },
+                  isDesktop: true,
+                ),
                 const SizedBox(width: 8), // 添加末尾间距
               ],
             ),
@@ -110,6 +116,14 @@ class QuickActionsSection extends StatelessWidget {
                   color: Theme.of(context).colorScheme.tertiaryContainer,
                   onTap: () {
                     // TODO: 导航到最近播放页面
+                  },
+                ),
+                QuickActionCard(
+                  icon: Icons.find_in_page,
+                  title: localizations.scan_local_music,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  onTap: () {
+                    context.pushRoute(const MusicScanRoute());
                   },
                 ),
               ],

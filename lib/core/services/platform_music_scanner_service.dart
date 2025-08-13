@@ -151,36 +151,39 @@ class DesktopMusicScannerService implements PlatformMusicScannerService {
       }
       
       if (musicDir == null) {
-        final errorMsg = 'musicDir为null，未找到任何音乐目录';
-        print(errorMsg);
-        yield music_scanner_service.ScanProgress(
-          status: music_scanner_service.ScanStatus.error,
-          progress: 0,
-          message: '未找到音乐目录',
-          songs: <Song>[],
-        );
-        return;
+        // 尝试使用常见路径
+        print('musicDir为null，尝试使用常见音乐路径...');
+        for (int i = 0; i < _commonMusicPaths.length; i++) {
+          final musicPath = _commonMusicPaths[i];
+          print('检查路径 [$i]: $musicPath');
+          final dir = Directory(musicPath);
+          if (await dir.exists()) {
+            print('找到存在的音乐目录: $musicPath');
+            musicDir = dir;
+            break;
+          } else {
+            print('路径不存在: $musicPath');
+          }
+        }
       }
       
-      final dirExists = await musicDir.exists();
-      if (!dirExists) {
-        final errorMsg = '音乐目录不存在: ${musicDir.path}';
-        print(errorMsg);
-        yield music_scanner_service.ScanProgress(
-          status: music_scanner_service.ScanStatus.error,
-          progress: 0,
-          message: errorMsg,
-          songs: <Song>[],
-        );
-        return;
+      // 如果仍然没有找到音乐目录，则使用应用程序文档目录
+      if (musicDir == null) {
+        print('未找到音乐目录，使用应用程序文档目录');
+        musicDir = await getApplicationDocumentsDirectory();
       }
-
-      final dirPath = musicDir.path;
-      print('准备扫描目录: $dirPath');
+      
+      // 确保目录存在，如果不存在则创建它
+      if (!(await musicDir.exists())) {
+        print('目录不存在，正在创建: ${musicDir.path}');
+        await musicDir.create(recursive: true);
+      }
+      
+      print('准备扫描目录: ${musicDir.path}');
       yield music_scanner_service.ScanProgress(
         status: music_scanner_service.ScanStatus.scanning,
         progress: 10,
-        message: '正在扫描目录: $dirPath',
+        message: '正在扫描目录: ${musicDir.path}',
         songs: <Song>[],
       );
       
@@ -293,11 +296,92 @@ class DesktopMusicScannerService implements PlatformMusicScannerService {
     print('=== 文件夹扫描过程结束 ===');
   }
 
+  /// 扫描指定的多个目录
+  Stream<music_scanner_service.ScanProgress> scanMusicInFolders(List<String> folderPaths) async* {
+    _isCancelled = false;
+    
+    print('=== 开始扫描指定的多个文件夹 ===');
+    for (var path in folderPaths) {
+      print('  扫描路径: $path');
+    }
+    
+    yield music_scanner_service.ScanProgress(
+      status: music_scanner_service.ScanStatus.scanning,
+      progress: 0,
+      message: '开始扫描 ${folderPaths.length} 个文件夹',
+      songs: <Song>[],
+    );
+
+    try {
+      final allSongs = <Song>[];
+      
+      for (int i = 0; i < folderPaths.length; i++) {
+        if (_isCancelled) break;
+        
+        final folderPath = folderPaths[i];
+        final progress = ((i / folderPaths.length) * 100).toInt();
+        yield music_scanner_service.ScanProgress(
+          status: music_scanner_service.ScanStatus.scanning,
+          progress: progress,
+          message: '正在扫描文件夹 ($i/${folderPaths.length}): $folderPath',
+          songs: allSongs,
+        );
+        
+        final folder = Directory(folderPath);
+        print('检查文件夹是否存在...');
+        final folderExists = await folder.exists();
+        print('文件夹存在状态: $folderExists');
+        
+        if (!folderExists) {
+          print('指定的文件夹不存在: $folderPath');
+          continue;
+        }
+        
+        print('准备扫描文件夹中的音乐文件...');
+        // 扫描音乐文件
+        final songs = await _scanDirectory(folder);
+        allSongs.addAll(songs);
+        print('文件夹扫描完成，找到 ${songs.length} 首歌曲');
+      }
+      
+      if (_isCancelled) {
+        print('扫描已被取消');
+        yield music_scanner_service.ScanProgress(
+          status: music_scanner_service.ScanStatus.cancelled,
+          progress: 0,
+          message: '扫描已取消',
+          songs: <Song>[],
+        );
+        return;
+      }
+      
+      final successMsg = '扫描成功完成，共扫描 ${folderPaths.length} 个文件夹，找到 ${allSongs.length} 首歌曲';
+      print(successMsg);
+      yield music_scanner_service.ScanProgress(
+        status: music_scanner_service.ScanStatus.completed,
+        progress: 100,
+        message: successMsg,
+        songs: allSongs,
+        totalSongs: allSongs.length,
+      );
+    } catch (e, stackTrace) {
+      print('扫描文件夹过程中出现未捕获的错误: $e');
+      print('错误堆栈: $stackTrace');
+      yield music_scanner_service.ScanProgress(
+        status: music_scanner_service.ScanStatus.error,
+        progress: 0,
+        message: '扫描过程中出现错误: $e\n\n详细信息: $stackTrace',
+        songs: <Song>[],
+      );
+    }
+    
+    print('=== 多文件夹扫描过程结束 ===');
+  }
+
   /// 获取音频文件扩展名列表
   Set<String> _getAudioExtensions() {
     return {
-      '.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.wma', '.aiff', '.aif', '.ape', '.wv',
-      '.mp4', '.m4b', '.m4p', '.m4r', '.3gp', '.3g2', '.opus', '.oga', '.spx', '.asf', '.amr'
+      '.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.wma', '.aiff', '.aif', '.ape', '.wv'
     };
   }
   
@@ -349,7 +433,6 @@ class DesktopMusicScannerService implements PlatformMusicScannerService {
         print('处理文件 ($processed): $filePath');
       }
       
-      // 检查文件扩展名是否为音频格式
       if (audioExtensions.contains(fileExtension)) {
         print('发现音频文件: $filePath');
         matchedFiles++;
@@ -358,34 +441,58 @@ class DesktopMusicScannerService implements PlatformMusicScannerService {
           final fileName = path.basenameWithoutExtension(filePath);
           final stat = await file.stat();
           
-          // 使用audio_metadata_reader获取音频时长
+          // 使用audio_metadata_reader获取音频元数据
           int duration = 0;
+          String title = fileName;
+          String artist = '未知艺术家';
+          String album = '未知专辑';
+          String genre = '未知流派';
+          
           try {
             final file = File(filePath);
             final metadata = audio_metadata_reader.readMetadata(file);
+            
+            // 获取音频时长
             if (metadata.duration != null) {
               duration = metadata.duration!.inMilliseconds;
               print('音频文件时长: ${duration}ms');
             } else {
               print('无法获取音频时长');
             }
+            
+            // 获取标题
+            if (metadata.title != null && metadata.title!.isNotEmpty) {
+              title = metadata.title!;
+            }
+            
+            // 获取艺术家
+            if (metadata.artist != null && metadata.artist!.isNotEmpty) {
+              artist = metadata.artist!;
+            }
+            
+            // 获取专辑
+            if (metadata.album != null && metadata.album!.isNotEmpty) {
+              album = metadata.album!;
+            }
+            
+            
+            print('音频文件元数据: 标题=$title, 艺术家=$artist, 专辑=$album');
           } catch (e) {
-            print('获取音频时长失败: $e');
+            print('获取音频元数据失败: $e');
           }
           
           // 过滤时长少于5秒的音频文件
           if (duration < 5000) { // 5秒 = 5000毫秒
             print('跳过时长少于5秒的文件: $filePath (时长: ${duration}ms)');
-            processed++;
             continue; // 跳过当前文件
           }
           
           final song = Song(
             id: songs.length + 1,
-            title: fileName,
-            artist: '未知艺术家',
-            album: '未知专辑',
-            genre: '未知流派',
+            title: title,
+            artist: artist,
+            album: album,
+            genre: genre,
             duration: duration, // 使用实际获取的时长
             uri: filePath,
             albumArtUri: null,
