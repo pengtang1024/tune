@@ -117,10 +117,23 @@ class MusicPlayerPage extends StatelessWidget {
         // 控制按钮
         _buildControlButtons(context, isPlaying),
 
+        // 播放模式和播放速度控制
+        _buildPlaybackControls(context, localizations),
+
         const Spacer(),
 
         // 音量控制
-        _buildVolumeControl(context),
+        BlocBuilder<PlayerBloc, PlayerState>(
+          builder: (context, state) {
+            double volume = 0.5; // 默认音量
+            if (state is PlayerPlaying) {
+              volume = state.volume;
+            } else if (state is PlayerPaused) {
+              volume = state.volume;
+            }
+            return _buildVolumeControl(context, volume);
+          },
+        ),
       ],
     );
   }
@@ -209,7 +222,26 @@ class MusicPlayerPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVolumeControl(BuildContext context) {
+  Widget _buildPlaybackControls(BuildContext context, AppLocalizations localizations) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // 播放模式按钮
+          _buildPlayModeButton(context),
+          
+          // 播放速度显示
+          _buildSpeedIndicator(context, localizations),
+          
+          // 播放速度调节按钮
+          _buildSpeedControlButton(context, localizations),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVolumeControl(BuildContext context, double volume) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -217,15 +249,125 @@ class MusicPlayerPage extends StatelessWidget {
           const Icon(Icons.volume_down),
           Expanded(
             child: Slider(
-              value: 0.5, // 简化实现，实际应该从 bloc 状态获取
+              value: volume,
               onChanged: (value) {
                 context.read<PlayerBloc>().add(SetVolumeEvent(value));
               },
             ),
           ),
           const Icon(Icons.volume_up),
+          const SizedBox(width: 8),
+          Text(
+            '${(volume * 100).toInt()}%', 
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPlayModeButton(BuildContext context) {
+    return BlocBuilder<PlayerBloc, PlayerState>(
+      builder: (context, state) {
+        PlayMode playMode = PlayMode.repeatAll;
+        if (state is PlayerPlaying) {
+          // 从bloc获取当前播放模式
+          playMode = state.playMode;
+        } else if (state is PlayerPaused) {
+          // 从bloc获取当前播放模式
+          playMode = state.playMode;
+        }
+
+        return IconButton(
+          icon: _getPlayModeIcon(playMode),
+          onPressed: () {
+            // 循环切换播放模式
+            PlayMode nextMode;
+            switch (playMode) {
+              case PlayMode.repeatAll:
+                nextMode = PlayMode.repeatOne;
+                break;
+              case PlayMode.repeatOne:
+                nextMode = PlayMode.shuffle;
+                break;
+              case PlayMode.shuffle:
+                nextMode = PlayMode.repeatAll;
+                break;
+            }
+            context.read<PlayerBloc>().add(SetPlayModeEvent(nextMode));
+          },
+        );
+      },
+    );
+  }
+
+  Icon _getPlayModeIcon(PlayMode playMode) {
+    switch (playMode) {
+      case PlayMode.repeatAll:
+        return const Icon(Icons.repeat);
+      case PlayMode.repeatOne:
+        return const Icon(Icons.repeat_one);
+      case PlayMode.shuffle:
+        return const Icon(Icons.shuffle);
+    }
+  }
+
+  Widget _buildSpeedIndicator(BuildContext context, AppLocalizations localizations) {
+    return BlocBuilder<PlayerBloc, PlayerState>(
+      builder: (context, state) {
+        double speed = 1.0;
+        if (state is PlayerPlaying) {
+          speed = state.speed;
+        } else if (state is PlayerPaused) {
+          speed = state.speed;
+        }
+
+        return Text(
+          '${speed.toStringAsFixed(1)}x',
+          style: Theme.of(context).textTheme.bodyMedium,
+        );
+      },
+    );
+  }
+
+  Widget _buildSpeedControlButton(BuildContext context, AppLocalizations localizations) {
+    return PopupMenuButton<double>(
+      icon: const Icon(Icons.speed),
+      onSelected: (double speed) {
+        context.read<PlayerBloc>().add(SetPlaybackSpeedEvent(speed));
+      },
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<double>(
+            value: 0.5,
+            child: Text('0.5x'),
+          ),
+          PopupMenuItem<double>(
+            value: 0.75,
+            child: Text('0.75x'),
+          ),
+          PopupMenuItem<double>(
+            value: 1.0,
+            child: Text('1.0x'),
+          ),
+          PopupMenuItem<double>(
+            value: 1.25,
+            child: Text('1.25x'),
+          ),
+          PopupMenuItem<double>(
+            value: 1.5,
+            child: Text('1.5x'),
+          ),
+          PopupMenuItem<double>(
+            value: 1.75,
+            child: Text('1.75x'),
+          ),
+          PopupMenuItem<double>(
+            value: 2.0,
+            child: Text('2.0x'),
+          ),
+        ];
+      },
     );
   }
 
