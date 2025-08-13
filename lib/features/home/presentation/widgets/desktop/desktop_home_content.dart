@@ -1,7 +1,5 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/app/router/app_router.dart';
 import 'package:tune/features/home/presentation/bloc/home_bloc.dart';
 import 'package:tune/features/home/presentation/bloc/home_state.dart';
 import 'package:tune/features/home/presentation/widgets/sections/quick_actions_section.dart';
@@ -19,6 +17,7 @@ class DesktopHomeContent extends StatefulWidget {
 
 class _DesktopHomeContentState extends State<DesktopHomeContent> {
   bool _isSidebarExpanded = true;
+  int _selectedMenuItemIndex = 0; // 0: 首页, 1: 音乐库, 2: 收藏, 3: 播放列表, 4: 最近播放
 
   @override
   Widget build(BuildContext context) {
@@ -83,44 +82,61 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
                       context,
                       icon: Icons.home,
                       title: localizations.home_title,
-                      isSelected: true,
+                      isSelected: _selectedMenuItemIndex == 0,
                       isExpanded: _isSidebarExpanded,
+                      onTap: () {
+                        setState(() {
+                          _selectedMenuItemIndex = 0;
+                        });
+                      },
                     ),
                     _buildNavigationItem(
                       context,
                       icon: Icons.music_note,
                       title: localizations.library_title,
-                      onTap: () {
-                        context.pushRoute(const LibraryRoute());
-                      },
+                      isSelected: _selectedMenuItemIndex == 1,
                       isExpanded: _isSidebarExpanded,
+                      onTap: () {
+                        setState(() {
+                          _selectedMenuItemIndex = 1;
+                        });
+                      },
                     ),
                     _buildNavigationItem(
                       context,
                       icon: Icons.favorite,
                       title: localizations.favorites,
-                      onTap: () {
-                        // TODO: 导航到收藏页面
-                      },
+                      isSelected: _selectedMenuItemIndex == 2,
                       isExpanded: _isSidebarExpanded,
+                      onTap: () {
+                        setState(() {
+                          _selectedMenuItemIndex = 2;
+                        });
+                      },
                     ),
                     _buildNavigationItem(
                       context,
                       icon: Icons.playlist_play,
                       title: localizations.playlists,
-                      onTap: () {
-                        // TODO: 导航到播放列表页面
-                      },
+                      isSelected: _selectedMenuItemIndex == 3,
                       isExpanded: _isSidebarExpanded,
+                      onTap: () {
+                        setState(() {
+                          _selectedMenuItemIndex = 3;
+                        });
+                      },
                     ),
                     _buildNavigationItem(
                       context,
                       icon: Icons.history,
                       title: localizations.recently_played,
-                      onTap: () {
-                        // TODO: 导航到最近播放页面
-                      },
+                      isSelected: _selectedMenuItemIndex == 4,
                       isExpanded: _isSidebarExpanded,
+                      onTap: () {
+                        setState(() {
+                          _selectedMenuItemIndex = 4;
+                        });
+                      },
                     ),
                     
                     // 展开/收起按钮
@@ -161,79 +177,8 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 欢迎信息
-                      Text(
-                        localizations.home_title,
-                        style:
-                            Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // 快捷功能
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            localizations.quick_actions,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              // TODO: 实现扫描本地歌曲功能
-                            },
-                            icon: const Icon(Icons.add, size: 16),
-                            label: Text(localizations.library_title),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // 快捷操作网格
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: QuickActionsSection(),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 本地音乐列表
-                      const SongsSection(),
-
-                      const SizedBox(height: 20),
-
-                      // 最近播放
-                      Text(
-                        localizations.recently_played,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                      ),
-                      const SizedBox(height: 12),
-                      RecentlyPlayedSection(homeState: homeState, localizations: localizations),
-
-                      const SizedBox(height: 20),
-
-                      // 推荐内容
-                      Text(
-                        localizations.recommendations,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                      ),
-                      const SizedBox(height: 12),
-                      RecommendationsSection(homeState: homeState, localizations: localizations),
-                      const SizedBox(height: 20), // 添加底部间距
+                      // 根据选中的菜单项显示不同的内容
+                      _buildContentByIndex(_selectedMenuItemIndex, context, localizations, homeState),
                     ],
                   ),
                 ),
@@ -243,6 +188,157 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
         ),
       ],
     );
+  }
+
+  Widget _buildContentByIndex(int index, BuildContext context, AppLocalizations localizations, HomeState homeState) {
+    switch (index) {
+      case 0: // 首页
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 欢迎信息
+            Text(
+              localizations.home_title,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+
+            // 快捷功能
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  localizations.quick_actions,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: 实现扫描本地歌曲功能
+                  },
+                  icon: const Icon(Icons.add, size: 16),
+                  label: Text(localizations.library_title),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // 快捷操作网格
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: QuickActionsSection(),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 本地音乐列表
+            const SongsSection(),
+
+            const SizedBox(height: 20),
+
+            // 最近播放
+            Text(
+              localizations.recently_played,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            RecentlyPlayedSection(homeState: homeState, localizations: localizations),
+
+            const SizedBox(height: 20),
+
+            // 推荐内容
+            Text(
+              localizations.recommendations,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            RecommendationsSection(homeState: homeState, localizations: localizations),
+            const SizedBox(height: 20), // 添加底部间距
+          ],
+        );
+      case 1: // 音乐库
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              localizations.library_title,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            // TODO: 实现音乐库内容
+            const Center(
+              child: Text('音乐库内容'),
+            ),
+          ],
+        );
+      case 2: // 收藏
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              localizations.favorites,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            // TODO: 实现收藏内容
+            const Center(
+              child: Text('收藏内容'),
+            ),
+          ],
+        );
+      case 3: // 播放列表
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              localizations.playlists,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            // TODO: 实现播放列表内容
+            const Center(
+              child: Text('播放列表内容'),
+            ),
+          ],
+        );
+      case 4: // 最近播放
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              localizations.recently_played,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            // TODO: 实现最近播放内容
+            const Center(
+              child: Text('最近播放内容'),
+            ),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   Widget _buildNavigationItem(
