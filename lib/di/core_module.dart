@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/core/bloc/localization/localization_bloc.dart';
 import 'package:tune/core/bloc/theme/theme_bloc.dart';
+import 'package:tune/core/services/music_scanner_service.dart';
 
 /// 核心服务注册（无平台依赖）
 class CoreModule {
@@ -17,5 +18,8 @@ class CoreModule {
 
     // 注册本地存储模块
     getIt.registerCachedFactory(() => SharedPreferences.getInstance());
+
+    // 注册音乐扫描服务
+    getIt.registerSingleton(MusicScannerService());
   }
 }

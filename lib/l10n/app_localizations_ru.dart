@@ -172,4 +172,36 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get failed_to_load_songs => 'Не удалось загрузить песни';
+
+  @override
+  String get scan_local_music => 'Scan Local Music';
+
+  @override
+  String get no_scan_performed => 'No scan performed';
+
+  @override
+  String get scanning => 'Scanning';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get scan_completed => 'Scan Completed';
+
+  @override
+  String get scan_again => 'Scan Again';
+
+  @override
+  String found_songs(Object count) {
+    return 'Found $count songs';
+  }
+
+  @override
+  String get scan_failed => 'Scan Failed';
+
+  @override
+  String get try_again => 'Try Again';
+
+  @override
+  String get scan_cancelled => 'Scan Cancelled';
 }

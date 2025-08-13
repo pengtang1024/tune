@@ -172,4 +172,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failed_to_load_songs => '加载歌曲失败';
+
+  @override
+  String get scan_local_music => '扫描本地音乐';
+
+  @override
+  String get no_scan_performed => '没有执行扫描';
+
+  @override
+  String get scanning => '扫描中';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get scan_completed => '扫描完成';
+
+  @override
+  String get scan_again => '再次扫描';
+
+  @override
+  String found_songs(Object count) {
+    return '找到了$count首歌曲';
+  }
+
+  @override
+  String get scan_failed => '扫描失败';
+
+  @override
+  String get try_again => '再试一次';
+
+  @override
+  String get scan_cancelled => '扫描已取消';
 }

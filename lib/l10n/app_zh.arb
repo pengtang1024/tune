@@ -1,4 +1,5 @@
 {
+  "@@locale": "zh",
   "app_name": "Tune",
   "@app_name": {
     "description": "这是应用程序的名称",
@@ -273,5 +274,15 @@
   "@failed_to_load_songs": {
     "description": "这是加载歌曲失败错误的文本",
     "type": "string"
-  }
+  },
+  "scan_local_music": "扫描本地音乐",
+  "no_scan_performed": "没有执行扫描",
+  "scanning": "扫描中",
+  "cancel": "取消",
+  "scan_completed": "扫描完成",
+  "scan_again": "再次扫描",
+  "found_songs": "找到了{count}首歌曲",
+  "scan_failed": "扫描失败",
+  "try_again": "再试一次",
+  "scan_cancelled": "扫描已取消"
 }
