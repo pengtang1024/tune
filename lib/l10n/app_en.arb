@@ -1,4 +1,5 @@
 {
+  "@@locale": "en",
   "app_name": "Tune",
   "@app_name": {
     "description": "this is the name of the app",
@@ -273,5 +274,15 @@
   "@failed_to_load_songs": {
     "description": "this is the text for the failed to load songs error",
     "type": "string"
-  }
+  },
+  "scan_local_music": "Scan Local Music",
+  "no_scan_performed": "No scan performed",
+  "scanning": "Scanning",
+  "cancel": "Cancel",
+  "scan_completed": "Scan Completed",
+  "scan_again": "Scan Again",
+  "found_songs": "Found {count} songs",
+  "scan_failed": "Scan Failed",
+  "try_again": "Try Again",
+  "scan_cancelled": "Scan Cancelled"
 }

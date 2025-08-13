@@ -130,6 +130,14 @@ class _HomePageState extends State<HomePage> {
                       // TODO: 导航到最近播放页面
                     },
                   ),
+                  _buildQuickActionCard(
+                    context,
+                    icon: Icons.find_in_page,
+                    title: localizations.scan_local_music,
+                    onTap: () {
+                      context.pushRoute(const MusicScanRoute());
+                    },
+                  ),
                 ],
               ),
 
