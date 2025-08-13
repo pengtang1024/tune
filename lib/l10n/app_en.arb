@@ -65,6 +65,26 @@
     "description": "this is the title of the settings page",
     "type": "string"
   },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action",
+    "type": "string"
+  },
+  "search_suggestions": "Search Suggestions",
+  "@search_suggestions": {
+    "description": "Search suggestions title",
+    "type": "string"
+  },
+  "search_history": "Search History",
+  "@search_history": {
+    "description": "Search history title",
+    "type": "string"
+  },
+  "clear_history": "Clear History",
+  "@clear_history": {
+    "description": "Clear history action",
+    "type": "string"
+  },
   "play_button": "Play",
   "@play_button": {
     "description": "this is the text for the play button",
@@ -92,112 +112,112 @@
   },
   "now_playing": "Now Playing",
   "@now_playing": {
-    "description": "this is the text for the now playing indicator",
+    "description": "this is the text for the now playing",
     "type": "string"
   },
   "no_things_players": "No things players",
   "@no_things_players": {
-    "description": "this is the text for the no things players indicator",
+    "description": "this is the text for the no things players",
     "type": "string"
   },
   "no_selected_song": "No song selected",
   "@no_selected_song": {
-    "description": "this is the text for the no song selected indicator",
+    "description": "this is the text for the no selected song",
     "type": "string"
   },
   "song_list_title": "Songs",
   "@song_list_title": {
-    "description": "this is the title for the song list",
+    "description": "this is the title of the song list",
     "type": "string"
   },
   "no_songs_found": "No songs found",
   "@no_songs_found": {
-    "description": "this is the text for the no songs found indicator",
+    "description": "this is the text for the no songs found",
     "type": "string"
   },
   "player_duration": "Duration",
   "@player_duration": {
-    "description": "this is the text for the duration indicator",
+    "description": "this is the duration of the player",
     "type": "string"
   },
   "player_artist": "Artist",
   "@player_artist": {
-    "description": "this is the text for the artist indicator",
+    "description": "this is the artist of the player",
     "type": "string"
   },
   "player_album": "Album",
   "@player_album": {
-    "description": "this is the text for the album indicator",
+    "description": "this is the album of the player",
     "type": "string"
   },
   "search_empty": "Enter a search term to find songs",
   "@search_empty": {
-    "description": "this is the text for the empty search indicator",
+    "description": "this is the text for the search empty",
     "type": "string"
   },
   "search_no_results": "No songs found matching your search",
   "@search_no_results": {
-    "description": "this is the text for the no results indicator",
+    "description": "this is the text for the search no results",
     "type": "string"
   },
   "language": "Language",
   "@language": {
-    "description": "this is the text for the language indicator",
+    "description": "this is the language",
     "type": "string"
   },
   "theme": "Theme",
   "@theme": {
-    "description": "this is the text for the theme indicator",
+    "description": "this is the theme",
     "type": "string"
   },
   "font": "Font",
   "@font": {
-    "description": "this is the text for the font indicator",
+    "description": "this is the font",
     "type": "string"
   },
   "theme_trendy_electro": "Trendy Electro",
   "@theme_trendy_electro": {
-    "description": "this is the name of the theme",
+    "description": "this is the trendy electro theme",
     "type": "string"
   },
   "theme_minimal_gray": "Minimal Gray",
   "@theme_minimal_gray": {
-    "description": "this is the name of the theme",
+    "description": "this is the minimal gray theme",
     "type": "string"
   },
   "theme_nature_forest": "Nature Forest",
   "@theme_nature_forest": {
-    "description": "this is the name of the theme",
+    "description": "this is the nature forest theme",
     "type": "string"
   },
   "theme_cyber_neon": "Cyber Neon",
   "@theme_cyber_neon": {
-    "description": "this is the name of the theme",
+    "description": "this is the cyber neon theme",
     "type": "string"
   },
   "theme_warm_healing": "Warm Healing",
   "@theme_warm_healing": {
-    "description": "this is the name of the theme",
+    "description": "this is the warm healing theme",
     "type": "string"
   },
   "about": "About",
   "@about": {
-    "description": "this is the text for the about indicator",
+    "description": "this is the about",
     "type": "string"
   },
   "library_artists": "Artists",
   "@library_artists": {
-    "description": "this is the text for the artists indicator",
+    "description": "this is the library artists",
     "type": "string"
   },
   "library_albums": "Albums",
   "@library_albums": {
-    "description": "this is the text for the albums indicator",
+    "description": "this is the library albums",
     "type": "string"
   },
   "library_genres": "Genres",
   "@library_genres": {
-    "description": "this is the text for the genres indicator",
+    "description": "this is the library genres",
     "type": "string"
   },
   "player_title": "Player",
@@ -220,69 +240,84 @@
     "description": "this is the default user email",
     "type": "string"
   },
-  "locale": "English",
-  "@locale": {
-    "description": "this is the name of the English language",
+  "failed_to_load_songs": "Failed to load songs",
+  "@failed_to_load_songs": {
+    "description": "Error message when failing to load songs",
     "type": "string"
   },
-  "search_title": "Search",
-  "@search_title": {
-    "description": "this is the title of the search page",
+  "found_songs": "Found Songs",
+  "@found_songs": {
+    "description": "Title for the found songs section",
     "type": "string"
   },
-  "no_song_playing": "No song is playing",
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel action text",
+    "type": "string"
+  },
+  "no_song_playing": "No song playing",
   "@no_song_playing": {
-    "description": "this is the message shown when there is no song playing",
+    "description": "Text displayed when no song is playing",
     "type": "string"
   },
   "quick_actions": "Quick Actions",
   "@quick_actions": {
-    "description": "this is the title for the quick actions section",
+    "description": "Title for quick actions section",
     "type": "string"
   },
   "favorites": "Favorites",
   "@favorites": {
-    "description": "this is the title for the favorites section",
+    "description": "Title for favorites section",
     "type": "string"
   },
   "playlists": "Playlists",
   "@playlists": {
-    "description": "this is the title for the playlists section",
+    "description": "Title for playlists section",
     "type": "string"
   },
   "recently_played": "Recently Played",
   "@recently_played": {
-    "description": "this is the title for the recently played section",
+    "description": "Title for recently played section",
+    "type": "string"
+  },
+  "scan_local_music": "Scan Local Music",
+  "@scan_local_music": {
+    "description": "Action to scan local music",
     "type": "string"
   },
   "recommendations": "Recommendations",
   "@recommendations": {
-    "description": "this is the title for the recommendations section",
+    "description": "Title for recommendations section",
     "type": "string"
   },
-  "no_recent_songs": "No recent songs",
-  "@no_recent_songs": {
-    "description": "this is the text for the no recent songs indicator",
+  "scanning": "Scanning...",
+  "@scanning": {
+    "description": "Text displayed during scanning process",
     "type": "string"
   },
-  "no_recommendations": "No recommendations",
-  "@no_recommendations": {
-    "description": "this is the text for the no recommendations indicator",
-    "type": "string"
-  },
-  "failed_to_load_songs": "Failed to load songs",
-  "@failed_to_load_songs": {
-    "description": "this is the text for the failed to load songs error",
-    "type": "string"
-  },
-  "scan_local_music": "Scan Local Music",
-  "no_scan_performed": "No scan performed",
-  "scanning": "Scanning",
-  "cancel": "Cancel",
   "scan_completed": "Scan Completed",
+  "@scan_completed": {
+    "description": "Text displayed when scan is completed",
+    "type": "string"
+  },
   "scan_again": "Scan Again",
-  "found_songs": "Found {count} songs",
+  "@scan_again": {
+    "description": "Action to scan again",
+    "type": "string"
+  },
   "scan_failed": "Scan Failed",
+  "@scan_failed": {
+    "description": "Text displayed when scan fails",
+    "type": "string"
+  },
   "try_again": "Try Again",
-  "scan_cancelled": "Scan Cancelled"
+  "@try_again": {
+    "description": "Action to try again",
+    "type": "string"
+  },
+  "scan_cancelled": "Scan Cancelled",
+  "@scan_cancelled": {
+    "description": "Text displayed when scan is cancelled",
+    "type": "string"
+  }
 }

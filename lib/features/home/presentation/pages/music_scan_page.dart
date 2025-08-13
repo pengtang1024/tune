@@ -32,7 +32,7 @@ class _MusicScanPageState extends State<MusicScanPage> {
     setState(() {
       _isLoadingPaths = true;
     });
-    
+
     final prefs = await SharedPreferences.getInstance();
     final paths = prefs.getStringList('custom_scan_paths') ?? [];
     setState(() {
@@ -78,7 +78,7 @@ class _MusicScanPageState extends State<MusicScanPage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.scan_local_music),
@@ -104,7 +104,7 @@ class _MusicScanPageState extends State<MusicScanPage> {
           } else if (state is MusicScanCancelled) {
             return _buildCancelledView(localizations);
           }
-          
+
           return Container();
         },
       ),
@@ -147,9 +147,9 @@ class _MusicScanPageState extends State<MusicScanPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 自定义扫描路径部分
             Card(
               child: Padding(
@@ -176,7 +176,7 @@ class _MusicScanPageState extends State<MusicScanPage> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     if (_isLoadingPaths)
                       const Center(child: CircularProgressIndicator())
                     else if (_customScanPaths.isEmpty)
@@ -228,9 +228,9 @@ class _MusicScanPageState extends State<MusicScanPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // 说明文本
             Text(
               '点击下方按钮开始扫描设备上的音乐文件。\n确保您的设备上存在音乐文件，并且文件格式受支持（如MP3、FLAC等）。',
@@ -247,12 +247,12 @@ class _MusicScanPageState extends State<MusicScanPage> {
   Widget _buildScanningView(MusicScanState state, AppLocalizations localizations) {
     int progress = 0;
     String message = localizations.scanning;
-    
+
     if (state is MusicScanInProgress) {
       progress = state.progress;
       message = state.message;
     }
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -326,7 +326,7 @@ class _MusicScanPageState extends State<MusicScanPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            localizations.found_songs(state.songs.length),
+             '${localizations.found_songs}: ${state.songs.length}',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),

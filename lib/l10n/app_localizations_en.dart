@@ -48,6 +48,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_title => 'Settings';
 
   @override
+  String get retry => 'Retry';
+
+  @override
+  String get search_suggestions => 'Search Suggestions';
+
+  @override
+  String get search_history => 'Search History';
+
+  @override
+  String get clear_history => 'Clear History';
+
+  @override
   String get play_button => 'Play';
 
   @override
@@ -141,13 +153,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get user_email_default => 'user@example.com';
 
   @override
-  String get locale => 'English';
+  String get failed_to_load_songs => 'Failed to load songs';
 
   @override
-  String get search_title => 'Search';
+  String get found_songs => 'Found Songs';
 
   @override
-  String get no_song_playing => 'No song is playing';
+  String get cancel => 'Cancel';
+
+  @override
+  String get no_song_playing => 'No song playing';
 
   @override
   String get quick_actions => 'Quick Actions';
@@ -162,39 +177,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recently_played => 'Recently Played';
 
   @override
-  String get recommendations => 'Recommendations';
-
-  @override
-  String get no_recent_songs => 'No recent songs';
-
-  @override
-  String get no_recommendations => 'No recommendations';
-
-  @override
-  String get failed_to_load_songs => 'Failed to load songs';
-
-  @override
   String get scan_local_music => 'Scan Local Music';
 
   @override
-  String get no_scan_performed => 'No scan performed';
+  String get recommendations => 'Recommendations';
 
   @override
-  String get scanning => 'Scanning';
-
-  @override
-  String get cancel => 'Cancel';
+  String get scanning => 'Scanning...';
 
   @override
   String get scan_completed => 'Scan Completed';
 
   @override
   String get scan_again => 'Scan Again';
-
-  @override
-  String found_songs(Object count) {
-    return 'Found $count songs';
-  }
 
   @override
   String get scan_failed => 'Scan Failed';

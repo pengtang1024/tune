@@ -11,4 +11,8 @@ class AppConstants {
 
   /// 最大重试次数
   static const int maxRetryCount = 3;
+
+  // 搜索历史相关常量
+  static const String searchHistoryKey = 'search_history';
+  static const int maxSearchHistoryCount = 20;
 }

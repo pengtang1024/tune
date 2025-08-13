@@ -1,6 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:tune/core/bloc/localization/localization_bloc.dart';
-import 'package:tune/core/bloc/theme/theme_bloc.dart';
 import 'package:tune/features/home/data/datasources/home_local_data_source.dart';
 import 'package:tune/features/home/data/datasources/home_local_data_source_impl.dart';
 import 'package:tune/features/home/data/repositories/home_repository_impl.dart';
@@ -33,9 +31,6 @@ class HomeModule {
     );
 
     // 注册 BLoCs
-    getIt.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
-    getIt.registerLazySingleton<LocalizationBloc>(() => LocalizationBloc());
-    
     getIt.registerFactory<HomeBloc>(
       () => HomeBloc(
         getRecentlyPlayedSongs: getIt<GetRecentlyPlayedSongs>(),

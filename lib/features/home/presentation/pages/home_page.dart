@@ -301,6 +301,12 @@ class _HomePageState extends State<HomePage> {
         title: Text(localizations.home_title),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              context.pushRoute(const SearchRoute());
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               context.pushRoute(const SettingsRoute());
