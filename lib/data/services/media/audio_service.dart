@@ -1,5 +1,5 @@
 import 'package:just_audio/just_audio.dart' hide LoopMode;
-import 'package:just_audio/just_audio.dart' show LoopMode;
+import 'package:just_audio/just_audio.dart' show LoopMode, ProcessingState;
 import 'package:rxdart/rxdart.dart';
 import 'package:tune/data/services/media/i_audio_service.dart';
 import 'package:tune/domain/entities/song.dart';
@@ -35,7 +35,7 @@ class AudioService implements IAudioService {
       position: position,
       duration: duration,
     ),
-  );
+  ).asBroadcastStream();
 
   @override
   Future<void> setPlaylist(List<Song> songs) async {
@@ -58,7 +58,12 @@ class AudioService implements IAudioService {
 
   @override
   Future<void> play() async {
-    await _audioPlayer.play();
+    try {
+      await _audioPlayer.play();
+    } catch (e) {
+      // 处理播放错误
+      rethrow;
+    }
   }
 
   @override
@@ -104,12 +109,22 @@ class AudioService implements IAudioService {
 
   @override
   Future<void> skipToNext() async {
-    await _audioPlayer.seekToNext();
+    try {
+      await _audioPlayer.seekToNext();
+    } catch (e) {
+      // 如果跳转下一首失败，可能是播放列表结束
+      rethrow;
+    }
   }
 
   @override
   Future<void> skipToPrevious() async {
-    await _audioPlayer.seekToPrevious();
+    try {
+      await _audioPlayer.seekToPrevious();
+    } catch (e) {
+      // 如果跳转上一首失败，可能是播放列表开始
+      rethrow;
+    }
   }
 
   @override

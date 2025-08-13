@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
@@ -13,8 +14,11 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   final GetAllSongs _getAllSongs;
   List<Song> _songs = [];
   StreamSubscription? _positionSubscription;
+  StreamSubscription? _playerStateSubscription;
   PlayMode _playMode = PlayMode.repeatAll;
   double _playbackSpeed = 1.0;
+  int? _currentSongIndex;
+  Set<int> _playedIndicesInShuffle = {};
 
   PlayerBloc({
     required IAudioService audioService,
@@ -48,11 +52,25 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     on<SetPlayModeEvent>(_onSetPlayMode);
     on<SetPlaybackSpeedEvent>(_onSetPlaybackSpeed);
     on<SeekToEvent>(_onSeekTo);
+    on<PlayErrorEvent>(_onPlayError);
 
-    // 监听播放状态变化
+    // 监听播放位置变化
     _positionSubscription = _audioService.positionStream.listen((position) {
-      if (state is PlayerPlaying) {
+      if (state is PlayerPlaying || state is PlayerPaused) {
         add(UpdateProgressEvent(position));
+      }
+    });
+
+    // 监听播放器状态变化
+    _playerStateSubscription = _audioService.playerStateStream.listen((playerState) {
+      // 处理播放完成事件
+      if (playerState.processingState == just_audio.ProcessingState.completed) {
+        _handlePlaybackCompleted();
+      }
+      // 处理播放错误
+      else if (playerState.processingState == just_audio.ProcessingState.idle && playerState.playing) {
+        // 某些错误状态下可能会进入idle状态，这里作为错误处理
+        _handlePlaybackError('播放失败，请检查文件');
       }
     });
 
@@ -69,12 +87,73 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
+  /// 处理播放完成事件
+  void _handlePlaybackCompleted() {
+    try {
+      if (_playMode == PlayMode.repeatOne) {
+        // 单曲循环，重新播放当前歌曲
+        if (_currentSongIndex != null && _currentSongIndex! < _songs.length) {
+          add(PlaySongEvent(_songs[_currentSongIndex!].id));
+        }
+      } else if (_playMode == PlayMode.shuffle && _songs.isNotEmpty) {
+        // 随机播放模式
+        final availableIndices = List.generate(_songs.length, (index) => index)
+            .where((index) => !_playedIndicesInShuffle.contains(index))
+            .toList();
+        
+        if (availableIndices.isEmpty) {
+          // 如果所有歌曲都播放过了，重置列表
+          _playedIndicesInShuffle.clear();
+          availableIndices.addAll(List.generate(_songs.length, (index) => index));
+        }
+        
+        // 使用更可靠的随机数生成方式
+        final random = Random();
+        final randomIndex = availableIndices[random.nextInt(availableIndices.length)];
+        _playedIndicesInShuffle.add(randomIndex);
+        _currentSongIndex = randomIndex;
+        add(PlaySongEvent(_songs[randomIndex].id));
+      } else {
+        // 列表循环模式
+        if (_songs.isNotEmpty) {
+          add(SkipToNextEvent());
+        } else {
+          // 没有歌曲时进入停止状态
+          add(StopEvent());
+        }
+      }
+    } catch (e) {
+      // 添加错误处理
+      add(PlayErrorEvent("播放完成处理失败: $e"));
+    }
+  }
+
+  /// 处理播放错误事件
+  void _handlePlaybackError(String message) {
+    add(PlayErrorEvent(message));
+  }
+
   /// 处理播放歌曲事件
   Future<void> _onPlaySong(PlaySongEvent event, Emitter<PlayerState> emit) async {
     emit(PlayerLoading());
     try {
-      final song = _songs.firstWhere((s) => s.id == event.songId);
+      final songIndex = _songs.indexWhere((s) => s.id == event.songId);
+      if (songIndex == -1) {
+        throw Exception('歌曲未找到');
+      }
+      
+      _currentSongIndex = songIndex;
+      
+      final song = _songs[songIndex];
       await _audioService.playSong(song, _songs); // 传递歌曲和播放列表参数
+      
+      // 只有在随机播放模式下才需要管理已播放索引
+      if (_playMode == PlayMode.shuffle) {
+        // 如果是随机播放模式且当前歌曲不在已播放列表中，则添加
+        if (!_playedIndicesInShuffle.contains(songIndex)) {
+          _playedIndicesInShuffle.add(songIndex);
+        }
+      }
 
       // 获取歌曲时长
       final durationStream = _audioService.durationStream;
@@ -92,9 +171,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         position: Duration.zero,
         duration: duration ?? Duration.zero,
         volume: 1.0,
+        speed: _playbackSpeed,
+        playMode: _playMode,
       ));
     } catch (e) {
       emit(PlayerError(message: e.toString()));
+      // 出错时尝试播放下一首
+      add(SkipToNextEvent());
     }
   }
 
@@ -108,6 +191,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         position: currentState.position,
         duration: currentState.duration,
         volume: currentState.volume,
+        speed: currentState.speed,
+        playMode: currentState.playMode,
       ));
     } else if (state is PlayerPaused) {
       _audioService.play(); // 恢复播放
@@ -117,6 +202,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         position: currentState.position,
         duration: currentState.duration,
         volume: currentState.volume,
+        speed: currentState.speed,
+        playMode: currentState.playMode,
       ));
     }
   }
@@ -129,7 +216,34 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   /// 处理跳到下一首事件
   void _onSkipToNext(SkipToNextEvent event, Emitter<PlayerState> emit) {
-    _audioService.skipToNext();
+    if (_playMode == PlayMode.shuffle && _songs.isNotEmpty) {
+      // 随机播放模式
+      final availableIndices = List.generate(_songs.length, (index) => index)
+          .where((index) => !_playedIndicesInShuffle.contains(index))
+          .toList();
+      
+      if (availableIndices.isEmpty) {
+        // 如果所有歌曲都播放过了，重置列表
+        _playedIndicesInShuffle.clear();
+        availableIndices.addAll(List.generate(_songs.length, (index) => index));
+      }
+      
+      // 使用更可靠的随机数生成方式
+      final random = Random(DateTime.now().millisecondsSinceEpoch);
+      final randomIndex = availableIndices[random.nextInt(availableIndices.length)];
+      _currentSongIndex = randomIndex;
+      add(PlaySongEvent(_songs[randomIndex].id));
+    } else {
+      // 其他播放模式，让音频服务处理
+      _audioService.skipToNext().catchError((error) {
+        // 如果skipToNext失败，尝试播放列表中的下一首
+        if (_currentSongIndex != null && _songs.isNotEmpty) {
+          final nextIndex = (_currentSongIndex! + 1) % _songs.length;
+          _currentSongIndex = nextIndex;
+          add(PlaySongEvent(_songs[nextIndex].id));
+        }
+      });
+    }
   }
 
   /// 处理跳到上一首事件
@@ -141,10 +255,18 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   void _onUpdateProgress(UpdateProgressEvent event, Emitter<PlayerState> emit) {
     if (state is PlayerPlaying) {
       final currentState = state as PlayerPlaying;
-      emit(currentState.copyWith(position: event.position));
+      emit(currentState.copyWith(
+        position: event.position,
+        speed: currentState.speed, // 显式传递播放速度信息
+        playMode: currentState.playMode, // 显式传递播放模式信息
+      ));
     } else if (state is PlayerPaused) {
       final currentState = state as PlayerPaused;
-      emit(currentState.copyWith(position: event.position));
+      emit(currentState.copyWith(
+        position: event.position,
+        speed: currentState.speed, // 显式传递播放速度信息
+        playMode: currentState.playMode, // 显式传递播放模式信息
+      ));
     }
   }
 
@@ -159,13 +281,30 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     switch (event.playMode) {
       case PlayMode.repeatAll:
         _audioService.setLoopMode(just_audio.LoopMode.all);
+        _audioService.setShuffleMode(false);
         break;
       case PlayMode.repeatOne:
         _audioService.setLoopMode(just_audio.LoopMode.one);
+        _audioService.setShuffleMode(false);
         break;
       case PlayMode.shuffle:
+        _audioService.setLoopMode(just_audio.LoopMode.all);
         _audioService.setShuffleMode(true);
+        _playedIndicesInShuffle.clear();
+        // 如果当前有正在播放的歌曲，将其添加到已播放列表中
+        if (_currentSongIndex != null) {
+          _playedIndicesInShuffle.add(_currentSongIndex!);
+        }
         break;
+    }
+    
+    // 更新当前状态中的播放模式
+    if (state is PlayerPlaying) {
+      final currentState = state as PlayerPlaying;
+      emit(currentState.copyWith(playMode: event.playMode));
+    } else if (state is PlayerPaused) {
+      final currentState = state as PlayerPaused;
+      emit(currentState.copyWith(playMode: event.playMode));
     }
   }
 
@@ -180,9 +319,17 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     _audioService.seek(event.position);
   }
 
+  /// 处理播放错误事件
+  void _onPlayError(PlayErrorEvent event, Emitter<PlayerState> emit) {
+    emit(PlayerError(message: event.message));
+    // 尝试自动跳到下一首
+    add(SkipToNextEvent());
+  }
+
   @override
   Future<void> close() {
     _positionSubscription?.cancel();
+    _playerStateSubscription?.cancel();
     _audioService.dispose();
     return super.close();
   }
