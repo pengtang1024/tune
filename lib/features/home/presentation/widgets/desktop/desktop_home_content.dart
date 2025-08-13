@@ -15,9 +15,45 @@ class DesktopHomeContent extends StatefulWidget {
   State<DesktopHomeContent> createState() => _DesktopHomeContentState();
 }
 
-class _DesktopHomeContentState extends State<DesktopHomeContent> {
+class _DesktopHomeContentState extends State<DesktopHomeContent>
+    with SingleTickerProviderStateMixin {
   bool _isSidebarExpanded = true;
   int _selectedMenuItemIndex = 0; // 0: 首页, 1: 音乐库, 2: 收藏, 3: 播放列表, 4: 最近播放
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    if (_isSidebarExpanded) {
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarExpanded = !_isSidebarExpanded;
+      if (_isSidebarExpanded) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +64,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
         // 侧边栏导航
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           width: _isSidebarExpanded ? 250 : 70,
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
@@ -72,7 +109,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
                 ),
               ),
               
-              // 导航菜单项 - 移除外部的Expanded和ListView，直接使用列表
+              // 导航菜单项
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Column(
@@ -141,24 +178,22 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
                     
                     // 展开/收起按钮
                     ListTile(
-                      leading: Icon(
-                        _isSidebarExpanded 
-                          ? Icons.arrow_back_ios_new 
-                          : Icons.arrow_forward_ios,
-                        size: 16.0,
+                      leading: RotationTransition(
+                        turns: _animation,
+                        child: const Icon(
+                          Icons.chevron_left,
+                          size: 20.0,
+                        ),
                       ),
                       title: _isSidebarExpanded
-                        ? const Text('Toggle Sidebar')
+                        ? Text(localizations.toggle_sidebar)
                         : null,
-                      onTap: () {
-                        setState(() {
-                          _isSidebarExpanded = !_isSidebarExpanded;
-                        });
-                      },
+                      onTap: _toggleSidebar,
                       contentPadding: EdgeInsets.symmetric(
-                        horizontal: _isSidebarExpanded ? 16.0 : 22.0, // 调整收起时的内边距使图标居中
+                        horizontal: _isSidebarExpanded ? 16.0 : 20.0,
                         vertical: 8.0,
                       ),
+                      horizontalTitleGap: 16.0,
                     ),
                   ],
                 ),
@@ -363,7 +398,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent> {
         borderRadius: BorderRadius.circular(0), // 移除圆角
       ),
       contentPadding: EdgeInsets.symmetric(
-        horizontal: isExpanded ? 16.0 : 22.0, // 调整收起时的内边距使图标居中
+        horizontal: isExpanded ? 16.0 : 20.0, // 调整收起时的内边距使图标居中
         vertical: 8.0,
       ),
       horizontalTitleGap: 16.0, // 设置图标和文字之间的间距

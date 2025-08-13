@@ -52,12 +52,12 @@
   },
   "artist_hint": "Search artists...",
   "@artist_hint": {
-    "description": "this is the hint text for the search bar",
+    "description": "this is the hint text for the artist search bar",
     "type": "string"
   },
   "album_hint": "Search albums...",
   "@album_hint": {
-    "description": "this is the hint text for the search bar",
+    "description": "this is the hint text for the album search bar",
     "type": "string"
   },
   "settings_title": "Settings",
@@ -67,137 +67,27 @@
   },
   "play_button": "Play",
   "@play_button": {
-    "description": "this is the text for the play button",
+    "description": "this is the play button text",
     "type": "string"
   },
   "pause_button": "Pause",
   "@pause_button": {
-    "description": "this is the text for the pause button",
-    "type": "string"
-  },
-  "next_button": "Next",
-  "@next_button": {
-    "description": "this is the text for the next button",
+    "description": "this is the pause button text",
     "type": "string"
   },
   "previous_button": "Previous",
   "@previous_button": {
-    "description": "this is the text for the previous button",
+    "description": "this is the previous button text",
     "type": "string"
   },
-  "favorite_button": "Favorite",
-  "@favorite_button": {
-    "description": "this is the text for the favorite button",
+  "next_button": "Next",
+  "@next_button": {
+    "description": "this is the next button text",
     "type": "string"
   },
-  "now_playing": "Now Playing",
-  "@now_playing": {
-    "description": "this is the text for the now playing indicator",
-    "type": "string"
-  },
-  "no_things_players": "No things players",
-  "@no_things_players": {
-    "description": "this is the text for the no things players indicator",
-    "type": "string"
-  },
-  "no_selected_song": "No song selected",
-  "@no_selected_song": {
-    "description": "this is the text for the no song selected indicator",
-    "type": "string"
-  },
-  "song_list_title": "Songs",
-  "@song_list_title": {
-    "description": "this is the title for the song list",
-    "type": "string"
-  },
-  "no_songs_found": "No songs found",
-  "@no_songs_found": {
-    "description": "this is the text for the no songs found indicator",
-    "type": "string"
-  },
-  "player_duration": "Duration",
-  "@player_duration": {
-    "description": "this is the text for the duration indicator",
-    "type": "string"
-  },
-  "player_artist": "Artist",
-  "@player_artist": {
-    "description": "this is the text for the artist indicator",
-    "type": "string"
-  },
-  "player_album": "Album",
-  "@player_album": {
-    "description": "this is the text for the album indicator",
-    "type": "string"
-  },
-  "search_empty": "Enter a search term to find songs",
-  "@search_empty": {
-    "description": "this is the text for the empty search indicator",
-    "type": "string"
-  },
-  "search_no_results": "No songs found matching your search",
-  "@search_no_results": {
-    "description": "this is the text for the no results indicator",
-    "type": "string"
-  },
-  "language": "Language",
-  "@language": {
-    "description": "this is the text for the language indicator",
-    "type": "string"
-  },
-  "theme": "Theme",
-  "@theme": {
-    "description": "this is the text for the theme indicator",
-    "type": "string"
-  },
-  "font": "Font",
-  "@font": {
-    "description": "this is the text for the font indicator",
-    "type": "string"
-  },
-  "theme_trendy_electro": "Trendy Electro",
-  "@theme_trendy_electro": {
-    "description": "this is the name of the theme",
-    "type": "string"
-  },
-  "theme_minimal_gray": "Minimal Gray",
-  "@theme_minimal_gray": {
-    "description": "this is the name of the theme",
-    "type": "string"
-  },
-  "theme_nature_forest": "Nature Forest",
-  "@theme_nature_forest": {
-    "description": "this is the name of the theme",
-    "type": "string"
-  },
-  "theme_cyber_neon": "Cyber Neon",
-  "@theme_cyber_neon": {
-    "description": "this is the name of the theme",
-    "type": "string"
-  },
-  "theme_warm_healing": "Warm Healing",
-  "@theme_warm_healing": {
-    "description": "this is the name of the theme",
-    "type": "string"
-  },
-  "about": "About",
-  "@about": {
-    "description": "this is the text for the about indicator",
-    "type": "string"
-  },
-  "library_artists": "Artists",
-  "@library_artists": {
-    "description": "this is the text for the artists indicator",
-    "type": "string"
-  },
-  "library_albums": "Albums",
-  "@library_albums": {
-    "description": "this is the text for the albums indicator",
-    "type": "string"
-  },
-  "library_genres": "Genres",
-  "@library_genres": {
-    "description": "this is the text for the genres indicator",
+  "stop_button": "Stop",
+  "@stop_button": {
+    "description": "this is the stop button text",
     "type": "string"
   },
   "player_title": "Player",
@@ -205,24 +95,19 @@
     "description": "this is the title of the player page",
     "type": "string"
   },
-  "profile_title": "Profile",
-  "@profile_title": {
-    "description": "this is the title of the profile page",
+  "now_playing": "Now Playing",
+  "@now_playing": {
+    "description": "this is the now playing text",
     "type": "string"
   },
-  "username_default": "User",
-  "@username_default": {
-    "description": "this is the default username",
+  "no_song_playing": "No song playing",
+  "@no_song_playing": {
+    "description": "this is the text for the no song playing indicator",
     "type": "string"
   },
-  "user_email_default": "user@example.com",
-  "@user_email_default": {
-    "description": "this is the default user email",
-    "type": "string"
-  },
-  "locale": "English",
-  "@locale": {
-    "description": "this is the name of the English language",
+  "no_songs_found": "No songs found",
+  "@no_songs_found": {
+    "description": "this is the text for the no songs found indicator",
     "type": "string"
   },
   "search_title": "Search",
@@ -230,9 +115,9 @@
     "description": "this is the title of the search page",
     "type": "string"
   },
-  "no_song_playing": "No song is playing",
-  "@no_song_playing": {
-    "description": "this is the message shown when there is no song playing",
+  "search_no_results": "No results found",
+  "@search_no_results": {
+    "description": "this is the text for the no search results indicator",
     "type": "string"
   },
   "quick_actions": "Quick Actions",
@@ -284,5 +169,45 @@
   "found_songs": "Found {count} songs",
   "scan_failed": "Scan Failed",
   "try_again": "Try Again",
-  "scan_cancelled": "Scan Cancelled"
+  "scan_cancelled": "Scan Cancelled",
+  "toggle_sidebar": "Toggle Sidebar",
+  "@toggle_sidebar": {
+    "description": "this is the text for the toggle sidebar button",
+    "type": "string"
+  },
+  "no_things_players": "No songs in the player",
+  "@no_things_players": {
+    "description": "this is the text for the no songs in player indicator",
+    "type": "string"
+  },
+  "song_list_title": "Song List",
+  "@song_list_title": {
+    "description": "this is the title for the song list section",
+    "type": "string"
+  },
+  "profile_title": "Profile",
+  "@profile_title": {
+    "description": "this is the title for the profile page",
+    "type": "string"
+  },
+  "username_default": "User",
+  "@username_default": {
+    "description": "this is the default username",
+    "type": "string"
+  },
+  "user_email_default": "user@example.com",
+  "@user_email_default": {
+    "description": "this is the default user email",
+    "type": "string"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "this is the language setting",
+    "type": "string"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "this is the theme setting",
+    "type": "string"
+  }
 }
