@@ -146,6 +146,14 @@ class _HomePageState extends State<HomePage> {
                     onPressed: _scanLocalSongs,
                     child: Text(localizations.library_title),
                   ),
+                  _buildQuickActionCard(
+                    context,
+                    icon: Icons.find_in_page,
+                    title: localizations.scan_local_music,
+                    onTap: () {
+                      context.pushRoute(const MusicScanRoute());
+                    },
+                  ),
                 ],
               ),
               const SizedBox(height: 10),

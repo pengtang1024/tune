@@ -86,6 +86,25 @@ class MusicPlayerRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [MusicScanPage]
+class MusicScanRoute extends PageRouteInfo<void> {
+  const MusicScanRoute({List<PageRouteInfo>? children})
+      : super(
+          MusicScanRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MusicScanRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MusicScanPage();
+    },
+  );
+}
+
+/// generated route for
 /// [ProfilePage]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})

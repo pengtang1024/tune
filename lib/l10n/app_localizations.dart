@@ -433,6 +433,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load songs'**
   String get failed_to_load_songs;
+
+  /// No description provided for @scan_local_music.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Local Music'**
+  String get scan_local_music;
+
+  /// No description provided for @no_scan_performed.
+  ///
+  /// In en, this message translates to:
+  /// **'No scan performed'**
+  String get no_scan_performed;
+
+  /// No description provided for @scanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning'**
+  String get scanning;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @scan_completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Completed'**
+  String get scan_completed;
+
+  /// No description provided for @scan_again.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Again'**
+  String get scan_again;
+
+  /// No description provided for @found_songs.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {count} songs'**
+  String found_songs(Object count);
+
+  /// No description provided for @scan_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Failed'**
+  String get scan_failed;
+
+  /// No description provided for @try_again.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get try_again;
+
+  /// No description provided for @scan_cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Cancelled'**
+  String get scan_cancelled;
 }
 
 class _AppLocalizationsDelegate
