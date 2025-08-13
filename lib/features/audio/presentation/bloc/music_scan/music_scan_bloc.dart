@@ -16,6 +16,7 @@ class MusicScanBloc extends Bloc<MusicScanEvent, MusicScanState> {
     on<StartScanEvent>(_onStartScan);
     on<StartScanFoldersEvent>(_onStartScanFolders);
     on<CancelScanEvent>(_onCancelScan);
+    on<ResetScanEvent>(_onResetScan);
     on<_ScanProgressEvent>(_onScanProgress);
     on<_ScanErrorEvent>(_onScanError);
   }
@@ -117,6 +118,13 @@ class MusicScanBloc extends Bloc<MusicScanEvent, MusicScanState> {
       CancelScanEvent event, Emitter<MusicScanState> emit) async {
     _musicScannerService.cancelScan();
     emit(MusicScanCancelled());
+  }
+
+  /// 处理重置扫描事件
+  Future<void> _onResetScan(
+      ResetScanEvent event, Emitter<MusicScanState> emit) async {
+    _scanSubscription?.cancel();
+    emit(MusicScanInitial());
   }
 
   @override
