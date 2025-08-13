@@ -81,7 +81,7 @@ dependencies:
   # Path provider
   path_provider: ^2.1.1
 
-  # Audio metadata
+  audio_metadata_reader: ^1.4.2
 
   # Equatable for value equality
   equatable: ^2.0.5
@@ -96,7 +96,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
-  audio_metadata_reader: ^1.4.2
+
   file_picker: ^10.3.1
 
 dev_dependencies:
