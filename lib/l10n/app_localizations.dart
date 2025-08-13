@@ -62,7 +62,8 @@ import 'app_localizations_zh.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('zh')
+    Locale('zh'),
+    Locale('zh', 'CN'),
   ];
 
   /// this is the name of the app
@@ -155,13 +159,13 @@ abstract class AppLocalizations {
   /// **'Search songs...'**
   String get search_hint;
 
-  /// this is the hint text for the artist search bar
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search artists...'**
   String get artist_hint;
 
-  /// this is the hint text for the album search bar
+  /// this is the hint text for the search bar
   ///
   /// In en, this message translates to:
   /// **'Search albums...'**
@@ -173,35 +177,191 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings_title;
 
-  /// this is the play button text
+  /// Retry action
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Search suggestions title
+  ///
+  /// In en, this message translates to:
+  /// **'Search Suggestions'**
+  String get search_suggestions;
+
+  /// Search history title
+  ///
+  /// In en, this message translates to:
+  /// **'Search History'**
+  String get search_history;
+
+  /// Clear history action
+  ///
+  /// In en, this message translates to:
+  /// **'Clear History'**
+  String get clear_history;
+
+  /// this is the text for the play button
   ///
   /// In en, this message translates to:
   /// **'Play'**
   String get play_button;
 
-  /// this is the pause button text
+  /// this is the text for the pause button
   ///
   /// In en, this message translates to:
   /// **'Pause'**
   String get pause_button;
 
-  /// this is the previous button text
-  ///
-  /// In en, this message translates to:
-  /// **'Previous'**
-  String get previous_button;
-
-  /// this is the next button text
+  /// this is the text for the next button
   ///
   /// In en, this message translates to:
   /// **'Next'**
   String get next_button;
 
-  /// this is the stop button text
+  /// this is the text for the previous button
   ///
   /// In en, this message translates to:
-  /// **'Stop'**
-  String get stop_button;
+  /// **'Previous'**
+  String get previous_button;
+
+  /// this is the text for the favorite button
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get favorite_button;
+
+  /// this is the text for the now playing
+  ///
+  /// In en, this message translates to:
+  /// **'Now Playing'**
+  String get now_playing;
+
+  /// this is the text for the no things players
+  ///
+  /// In en, this message translates to:
+  /// **'No things players'**
+  String get no_things_players;
+
+  /// this is the text for the no selected song
+  ///
+  /// In en, this message translates to:
+  /// **'No song selected'**
+  String get no_selected_song;
+
+  /// this is the title of the song list
+  ///
+  /// In en, this message translates to:
+  /// **'Songs'**
+  String get song_list_title;
+
+  /// this is the text for the no songs found
+  ///
+  /// In en, this message translates to:
+  /// **'No songs found'**
+  String get no_songs_found;
+
+  /// this is the duration of the player
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get player_duration;
+
+  /// this is the artist of the player
+  ///
+  /// In en, this message translates to:
+  /// **'Artist'**
+  String get player_artist;
+
+  /// this is the album of the player
+  ///
+  /// In en, this message translates to:
+  /// **'Album'**
+  String get player_album;
+
+  /// this is the text for the search empty
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a search term to find songs'**
+  String get search_empty;
+
+  /// this is the text for the search no results
+  ///
+  /// In en, this message translates to:
+  /// **'No songs found matching your search'**
+  String get search_no_results;
+
+  /// this is the language
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// this is the theme
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// this is the font
+  ///
+  /// In en, this message translates to:
+  /// **'Font'**
+  String get font;
+
+  /// this is the trendy electro theme
+  ///
+  /// In en, this message translates to:
+  /// **'Trendy Electro'**
+  String get theme_trendy_electro;
+
+  /// this is the minimal gray theme
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal Gray'**
+  String get theme_minimal_gray;
+
+  /// this is the nature forest theme
+  ///
+  /// In en, this message translates to:
+  /// **'Nature Forest'**
+  String get theme_nature_forest;
+
+  /// this is the cyber neon theme
+  ///
+  /// In en, this message translates to:
+  /// **'Cyber Neon'**
+  String get theme_cyber_neon;
+
+  /// this is the warm healing theme
+  ///
+  /// In en, this message translates to:
+  /// **'Warm Healing'**
+  String get theme_warm_healing;
+
+  /// this is the about
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// this is the library artists
+  ///
+  /// In en, this message translates to:
+  /// **'Artists'**
+  String get library_artists;
+
+  /// this is the library albums
+  ///
+  /// In en, this message translates to:
+  /// **'Albums'**
+  String get library_albums;
+
+  /// this is the library genres
+  ///
+  /// In en, this message translates to:
+  /// **'Genres'**
+  String get library_genres;
 
   /// this is the title of the player page
   ///
@@ -209,163 +369,7 @@ abstract class AppLocalizations {
   /// **'Player'**
   String get player_title;
 
-  /// this is the now playing text
-  ///
-  /// In en, this message translates to:
-  /// **'Now Playing'**
-  String get now_playing;
-
-  /// this is the text for the no song playing indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No song playing'**
-  String get no_song_playing;
-
-  /// this is the text for the no songs found indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No songs found'**
-  String get no_songs_found;
-
-  /// this is the title of the search page
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get search_title;
-
-  /// this is the text for the no search results indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No results found'**
-  String get search_no_results;
-
-  /// this is the title for the quick actions section
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Actions'**
-  String get quick_actions;
-
-  /// this is the title for the favorites section
-  ///
-  /// In en, this message translates to:
-  /// **'Favorites'**
-  String get favorites;
-
-  /// this is the title for the playlists section
-  ///
-  /// In en, this message translates to:
-  /// **'Playlists'**
-  String get playlists;
-
-  /// this is the title for the recently played section
-  ///
-  /// In en, this message translates to:
-  /// **'Recently Played'**
-  String get recently_played;
-
-  /// this is the title for the recommendations section
-  ///
-  /// In en, this message translates to:
-  /// **'Recommendations'**
-  String get recommendations;
-
-  /// this is the text for the no recent songs indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No recent songs'**
-  String get no_recent_songs;
-
-  /// this is the text for the no recommendations indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No recommendations'**
-  String get no_recommendations;
-
-  /// this is the text for the failed to load songs error
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load songs'**
-  String get failed_to_load_songs;
-
-  /// No description provided for @scan_local_music.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Local Music'**
-  String get scan_local_music;
-
-  /// No description provided for @no_scan_performed.
-  ///
-  /// In en, this message translates to:
-  /// **'No scan performed'**
-  String get no_scan_performed;
-
-  /// No description provided for @scanning.
-  ///
-  /// In en, this message translates to:
-  /// **'Scanning'**
-  String get scanning;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
-
-  /// No description provided for @scan_completed.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Completed'**
-  String get scan_completed;
-
-  /// No description provided for @scan_again.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Again'**
-  String get scan_again;
-
-  /// No description provided for @found_songs.
-  ///
-  /// In en, this message translates to:
-  /// **'Found {count} songs'**
-  String found_songs(Object count);
-
-  /// No description provided for @scan_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Failed'**
-  String get scan_failed;
-
-  /// No description provided for @try_again.
-  ///
-  /// In en, this message translates to:
-  /// **'Try Again'**
-  String get try_again;
-
-  /// No description provided for @scan_cancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Cancelled'**
-  String get scan_cancelled;
-
-  /// this is the text for the toggle sidebar button
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle Sidebar'**
-  String get toggle_sidebar;
-
-  /// this is the text for the no songs in player indicator
-  ///
-  /// In en, this message translates to:
-  /// **'No songs in the player'**
-  String get no_things_players;
-
-  /// this is the title for the song list section
-  ///
-  /// In en, this message translates to:
-  /// **'Song List'**
-  String get song_list_title;
-
-  /// this is the title for the profile page
+  /// this is the title of the profile page
   ///
   /// In en, this message translates to:
   /// **'Profile'**
@@ -383,20 +387,105 @@ abstract class AppLocalizations {
   /// **'user@example.com'**
   String get user_email_default;
 
-  /// this is the language setting
+  /// Error message when failing to load songs
   ///
   /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
+  /// **'Failed to load songs'**
+  String get failed_to_load_songs;
 
-  /// this is the theme setting
+  /// Title for the found songs section
   ///
   /// In en, this message translates to:
-  /// **'Theme'**
-  String get theme;
+  /// **'Found Songs'**
+  String get found_songs;
+
+  /// Cancel action text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Text displayed when no song is playing
+  ///
+  /// In en, this message translates to:
+  /// **'No song playing'**
+  String get no_song_playing;
+
+  /// Title for quick actions section
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quick_actions;
+
+  /// Title for favorites section
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// Title for playlists section
+  ///
+  /// In en, this message translates to:
+  /// **'Playlists'**
+  String get playlists;
+
+  /// Title for recently played section
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Played'**
+  String get recently_played;
+
+  /// Action to scan local music
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Local Music'**
+  String get scan_local_music;
+
+  /// Title for recommendations section
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get recommendations;
+
+  /// Text displayed during scanning process
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning...'**
+  String get scanning;
+
+  /// Text displayed when scan is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Completed'**
+  String get scan_completed;
+
+  /// Action to scan again
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Again'**
+  String get scan_again;
+
+  /// Text displayed when scan fails
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Failed'**
+  String get scan_failed;
+
+  /// Action to try again
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get try_again;
+
+  /// Text displayed when scan is cancelled
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Cancelled'**
+  String get scan_cancelled;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -405,25 +494,38 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'zh':
+      {
+        switch (locale.countryCode) {
+          case 'CN':
+            return AppLocalizationsZhCn();
+        }
+        break;
+      }
+  }
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'zh': return AppLocalizationsZh();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

@@ -1,0 +1,323 @@
+{
+  "@@locale": "zh_CN",
+  "app_name": "Tune",
+  "@app_name": {
+    "description": "this is the name of the app",
+    "type": "string"
+  },
+  "home_title": "首页",
+  "@home_title": {
+    "description": "this is the title of the home page",
+    "type": "string"
+  },
+  "font_family": "字体家族",
+  "@font_family": {
+    "description": "this is the font family",
+    "type": "string"
+  },
+  "theme_mode": "主题模式",
+  "@theme_mode": {
+    "description": "this is the theme mode",
+    "type": "string"
+  },
+  "light_mode": "浅色模式",
+  "@light_mode": {
+    "description": "this is the light mode",
+    "type": "string"
+  },
+  "dark_mode": "深色模式",
+  "@dark_mode": {
+    "description": "this is the dark mode",
+    "type": "string"
+  },
+  "system_mode": "系统模式",
+  "@system_mode": {
+    "description": "this is the system mode",
+    "type": "string"
+  },
+  "library_title": "音乐库",
+  "@library_title": {
+    "description": "this is the title of the library page",
+    "type": "string"
+  },
+  "artist_title": "艺术家",
+  "@artist_title": {
+    "description": "this is the title of the artist page",
+    "type": "string"
+  },
+  "search_hint": "搜索歌曲...",
+  "@search_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "artist_hint": "搜索艺术家...",
+  "@artist_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "album_hint": "搜索专辑...",
+  "@album_hint": {
+    "description": "this is the hint text for the search bar",
+    "type": "string"
+  },
+  "settings_title": "设置",
+  "@settings_title": {
+    "description": "this is the title of the settings page",
+    "type": "string"
+  },
+  "retry": "重试",
+  "@retry": {
+    "description": "Retry action",
+    "type": "string"
+  },
+  "search_suggestions": "搜索建议",
+  "@search_suggestions": {
+    "description": "Search suggestions title",
+    "type": "string"
+  },
+  "search_history": "搜索历史",
+  "@search_history": {
+    "description": "Search history title",
+    "type": "string"
+  },
+  "clear_history": "清除历史",
+  "@clear_history": {
+    "description": "Clear history action",
+    "type": "string"
+  },
+  "play_button": "播放",
+  "@play_button": {
+    "description": "this is the text for the play button",
+    "type": "string"
+  },
+  "pause_button": "暂停",
+  "@pause_button": {
+    "description": "this is the text for the pause button",
+    "type": "string"
+  },
+  "next_button": "下一首",
+  "@next_button": {
+    "description": "this is the text for the next button",
+    "type": "string"
+  },
+  "previous_button": "上一首",
+  "@previous_button": {
+    "description": "this is the text for the previous button",
+    "type": "string"
+  },
+  "favorite_button": "收藏",
+  "@favorite_button": {
+    "description": "this is the text for the favorite button",
+    "type": "string"
+  },
+  "now_playing": "正在播放",
+  "@now_playing": {
+    "description": "this is the text for the now playing",
+    "type": "string"
+  },
+  "no_things_players": "没有播放器",
+  "@no_things_players": {
+    "description": "this is the text for the no things players",
+    "type": "string"
+  },
+  "no_selected_song": "未选择歌曲",
+  "@no_selected_song": {
+    "description": "this is the text for the no selected song",
+    "type": "string"
+  },
+  "song_list_title": "歌曲",
+  "@song_list_title": {
+    "description": "this is the title of the song list",
+    "type": "string"
+  },
+  "no_songs_found": "未找到歌曲",
+  "@no_songs_found": {
+    "description": "this is the text for the no songs found",
+    "type": "string"
+  },
+  "player_duration": "时长",
+  "@player_duration": {
+    "description": "this is the duration of the player",
+    "type": "string"
+  },
+  "player_artist": "艺术家",
+  "@player_artist": {
+    "description": "this is the artist of the player",
+    "type": "string"
+  },
+  "player_album": "专辑",
+  "@player_album": {
+    "description": "this is the album of the player",
+    "type": "string"
+  },
+  "search_empty": "输入搜索词来查找歌曲",
+  "@search_empty": {
+    "description": "this is the text for the search empty",
+    "type": "string"
+  },
+  "search_no_results": "未找到匹配您搜索的歌曲",
+  "@search_no_results": {
+    "description": "this is the text for the search no results",
+    "type": "string"
+  },
+  "language": "语言",
+  "@language": {
+    "description": "this is the language",
+    "type": "string"
+  },
+  "theme": "主题",
+  "@theme": {
+    "description": "this is the theme",
+    "type": "string"
+  },
+  "font": "字体",
+  "@font": {
+    "description": "this is the font",
+    "type": "string"
+  },
+  "theme_trendy_electro": "时尚电子",
+  "@theme_trendy_electro": {
+    "description": "this is the trendy electro theme",
+    "type": "string"
+  },
+  "theme_minimal_gray": "简约灰",
+  "@theme_minimal_gray": {
+    "description": "this is the minimal gray theme",
+    "type": "string"
+  },
+  "theme_nature_forest": "自然森林",
+  "@theme_nature_forest": {
+    "description": "this is the nature forest theme",
+    "type": "string"
+  },
+  "theme_cyber_neon": "赛博霓虹",
+  "@theme_cyber_neon": {
+    "description": "this is the cyber neon theme",
+    "type": "string"
+  },
+  "theme_warm_healing": "温暖治愈",
+  "@theme_warm_healing": {
+    "description": "this is the warm healing theme",
+    "type": "string"
+  },
+  "about": "关于",
+  "@about": {
+    "description": "this is the about",
+    "type": "string"
+  },
+  "library_artists": "艺术家",
+  "@library_artists": {
+    "description": "this is the library artists",
+    "type": "string"
+  },
+  "library_albums": "专辑",
+  "@library_albums": {
+    "description": "this is the library albums",
+    "type": "string"
+  },
+  "library_genres": "流派",
+  "@library_genres": {
+    "description": "this is the library genres",
+    "type": "string"
+  },
+  "player_title": "播放器",
+  "@player_title": {
+    "description": "this is the title of the player page",
+    "type": "string"
+  },
+  "profile_title": "个人资料",
+  "@profile_title": {
+    "description": "this is the title of the profile page",
+    "type": "string"
+  },
+  "username_default": "用户",
+  "@username_default": {
+    "description": "this is the default username",
+    "type": "string"
+  },
+  "user_email_default": "user@example.com",
+  "@user_email_default": {
+    "description": "this is the default user email",
+    "type": "string"
+  },
+  "failed_to_load_songs": "加载歌曲失败",
+  "@failed_to_load_songs": {
+    "description": "Error message when failing to load songs",
+    "type": "string"
+  },
+  "found_songs": "找到的歌曲",
+  "@found_songs": {
+    "description": "Title for the found songs section",
+    "type": "string"
+  },
+  "cancel": "取消",
+  "@cancel": {
+    "description": "Cancel action text",
+    "type": "string"
+  },
+  "no_song_playing": "没有正在播放的歌曲",
+  "@no_song_playing": {
+    "description": "Text displayed when no song is playing",
+    "type": "string"
+  },
+  "quick_actions": "快速操作",
+  "@quick_actions": {
+    "description": "Title for quick actions section",
+    "type": "string"
+  },
+  "favorites": "收藏夹",
+  "@favorites": {
+    "description": "Title for favorites section",
+    "type": "string"
+  },
+  "playlists": "播放列表",
+  "@playlists": {
+    "description": "Title for playlists section",
+    "type": "string"
+  },
+  "recently_played": "最近播放",
+  "@recently_played": {
+    "description": "Title for recently played section",
+    "type": "string"
+  },
+  "scan_local_music": "扫描本地音乐",
+  "@scan_local_music": {
+    "description": "Action to scan local music",
+    "type": "string"
+  },
+  "recommendations": "推荐",
+  "@recommendations": {
+    "description": "Title for recommendations section",
+    "type": "string"
+  },
+  "scanning": "扫描中...",
+  "@scanning": {
+    "description": "Text displayed during scanning process",
+    "type": "string"
+  },
+  "scan_completed": "扫描完成",
+  "@scan_completed": {
+    "description": "Text displayed when scan is completed",
+    "type": "string"
+  },
+  "scan_again": "重新扫描",
+  "@scan_again": {
+    "description": "Action to scan again",
+    "type": "string"
+  },
+  "scan_failed": "扫描失败",
+  "@scan_failed": {
+    "description": "Text displayed when scan fails",
+    "type": "string"
+  },
+  "try_again": "重试",
+  "@try_again": {
+    "description": "Action to try again",
+    "type": "string"
+  },
+  "scan_cancelled": "扫描已取消",
+  "@scan_cancelled": {
+    "description": "Text displayed when scan is cancelled",
+    "type": "string"
+  }
+}

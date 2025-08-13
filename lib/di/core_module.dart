@@ -1,26 +1,27 @@
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/core/bloc/localization/localization_bloc.dart';
 import 'package:tune/core/bloc/theme/theme_bloc.dart';
-import 'package:tune/core/services/music_scanner_service.dart';
+import 'package:tune/core/services/search_history_service.dart';
+import 'package:tune/core/storage/local/local_storage_impl.dart';
+import 'package:tune/core/storage/storage.dart' as storage;
 
-/// 核心服务注册（无平台依赖）
+/// 核心模块注册
 class CoreModule {
-  /// 初始化核心模块
+  /// 注册核心服务
   static Future<void> init(GetIt getIt) async {
-    // 注册本地化模块
-    getIt.registerFactory(() => LocalizationBloc());
+    // 注册本地存储服务
+    final localStorage = LocalStorageImpl();
+    getIt.registerSingleton<storage.Storage>(localStorage);
+    getIt.registerSingleton<LocalStorageImpl>(localStorage);
 
-    // 注册主题模块
-    getIt.registerFactory(() => ThemeBloc());
+    // 初始化本地存储
+    localStorage.init();
 
-    // 注册字体模块
-
-    // 注册本地存储模块
-    final sharedPreferences = await SharedPreferences.getInstance();
-    getIt.registerSingleton<SharedPreferences>(sharedPreferences);
-
-    // 注册音乐扫描服务
-    getIt.registerSingleton(MusicScannerService());
+    // 注册搜索历史服务
+    getIt.registerSingleton(SearchHistoryService(localStorage));
+    
+    // 注册核心 BLoCs
+    getIt.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
+    getIt.registerLazySingleton<LocalizationBloc>(() => LocalizationBloc());
   }
 }
