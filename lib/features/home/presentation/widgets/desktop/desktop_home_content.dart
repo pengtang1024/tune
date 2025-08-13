@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:tune/app/router/app_router.dart';
 import 'package:tune/features/home/presentation/bloc/home_bloc.dart';
 import 'package:tune/features/home/presentation/bloc/home_state.dart';
 import 'package:tune/features/home/presentation/widgets/sections/quick_actions_section.dart';
@@ -62,146 +64,43 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
     return Row(
       children: [
         // 侧边栏导航
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          width: _isSidebarExpanded ? 250 : 70,
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(2, 0),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // 顶部应用Logo区域
-              Container(
-                height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                child: Row(
-                  mainAxisAlignment: _isSidebarExpanded 
-                    ? MainAxisAlignment.start 
-                    : MainAxisAlignment.center, // 收起时图标居中
-                  children: [
-                    if (_isSidebarExpanded) ...[
-                      Text(
-                        localizations.app_name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ] else ...[
-                      const Icon(
-                        Icons.music_note,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              
-              // 导航菜单项
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildNavigationItem(
-                      context,
-                      icon: Icons.home,
-                      title: localizations.home_title,
-                      isSelected: _selectedMenuItemIndex == 0,
-                      isExpanded: _isSidebarExpanded,
-                      onTap: () {
-                        setState(() {
-                          _selectedMenuItemIndex = 0;
-                        });
-                      },
-                    ),
-                    _buildNavigationItem(
-                      context,
-                      icon: Icons.music_note,
-                      title: localizations.library_title,
-                      isSelected: _selectedMenuItemIndex == 1,
-                      isExpanded: _isSidebarExpanded,
-                      onTap: () {
-                        setState(() {
-                          _selectedMenuItemIndex = 1;
-                        });
-                      },
-                    ),
-                    _buildNavigationItem(
-                      context,
-                      icon: Icons.favorite,
-                      title: localizations.favorites,
-                      isSelected: _selectedMenuItemIndex == 2,
-                      isExpanded: _isSidebarExpanded,
-                      onTap: () {
-                        setState(() {
-                          _selectedMenuItemIndex = 2;
-                        });
-                      },
-                    ),
-                    _buildNavigationItem(
-                      context,
-                      icon: Icons.playlist_play,
-                      title: localizations.playlists,
-                      isSelected: _selectedMenuItemIndex == 3,
-                      isExpanded: _isSidebarExpanded,
-                      onTap: () {
-                        setState(() {
-                          _selectedMenuItemIndex = 3;
-                        });
-                      },
-                    ),
-                    _buildNavigationItem(
-                      context,
-                      icon: Icons.history,
-                      title: localizations.recently_played,
-                      isSelected: _selectedMenuItemIndex == 4,
-                      isExpanded: _isSidebarExpanded,
-                      onTap: () {
-                        setState(() {
-                          _selectedMenuItemIndex = 4;
-                        });
-                      },
-                    ),
-                    
-                    // 展开/收起按钮
-                    ListTile(
-                      leading: RotationTransition(
-                        turns: _animation,
-                        child: const Icon(
-                          Icons.chevron_left,
-                          size: 20.0,
-                        ),
-                      ),
-                      title: _isSidebarExpanded
-                        ? Text(localizations.toggle_sidebar)
-                        : null,
-                      onTap: _toggleSidebar,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: _isSidebarExpanded ? 16.0 : 20.0,
-                        vertical: 8.0,
-                      ),
-                      horizontalTitleGap: 16.0,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        NavigationRail(
+          extended: _isSidebarExpanded,
+          selectedIndex: _selectedMenuItemIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedMenuItemIndex = index;
+            });
+            if (index == 1) {
+              context.router.push(MusicLibraryRoute());
+            }
+          },
+          labelType: _isSidebarExpanded
+              ? NavigationRailLabelType.none
+              : NavigationRailLabelType.all,
+          destinations: [
+            NavigationRailDestination(
+              icon: const Icon(Icons.home),
+              label: Text(localizations.home_title),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.music_note),
+              label: Text(localizations.library_title),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.favorite),
+              label: Text(localizations.favorites),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.playlist_play),
+              label: Text(localizations.playlists),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.history),
+              label: Text(localizations.recently_played),
+            ),
+          ],
         ),
-        
         // 主内容区域
         Expanded(
           child: BlocBuilder<HomeBloc, HomeState>(

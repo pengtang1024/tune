@@ -28,7 +28,7 @@ class QuickActionsSection extends StatelessWidget {
                   title: localizations.library_title,
                   color: Theme.of(context).colorScheme.primaryContainer,
                   onTap: () {
-                    context.pushRoute(const LibraryRoute());
+                    context.pushRoute(const MusicLibraryRoute());
                   },
                   isDesktop: true,
                 ),
@@ -91,7 +91,7 @@ class QuickActionsSection extends StatelessWidget {
                   title: localizations.library_title,
                   color: Theme.of(context).colorScheme.primaryContainer,
                   onTap: () {
-                    context.pushRoute(const LibraryRoute());
+                    context.pushRoute(const MusicLibraryRoute());
                   },
                 ),
                 QuickActionCard(

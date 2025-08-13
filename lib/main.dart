@@ -9,6 +9,11 @@ import 'package:tune/core/bloc/theme/theme_bloc.dart';
 import 'package:tune/features/audio/presentation/bloc/music_scan/music_scan_bloc.dart';
 import 'package:tune/features/audio/presentation/bloc/player/player_bloc.dart';
 import 'package:tune/features/home/presentation/bloc/home_bloc.dart';
+import 'package:tune/features/home/presentation/bloc/music_library/music_library_bloc.dart';
+
+// 导入用例
+import 'package:tune/domain/usecases/get_all_songs.dart';
+import 'package:tune/domain/usecases/search_songs.dart';
 
 import 'app/app.dart';
 import 'app/app_initializer.dart';
@@ -39,6 +44,13 @@ void main() async {
         BlocProvider<HomeBloc>(create: (context) => Injector.get<HomeBloc>()),
         // 提供音乐扫描Bloc
         BlocProvider<MusicScanBloc>(create: (context) => Injector.get<MusicScanBloc>()),
+        // 提供音乐库Bloc
+        BlocProvider<MusicLibraryBloc>(
+          create: (context) => MusicLibraryBloc(
+            getAllSongs: Injector.get<GetAllSongs>(),
+            searchSongs: Injector.get<SearchSongs>(),
+          ),
+        ),
       ],
       child: App(appRouter: appRouter),
     ),

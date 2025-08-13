@@ -1,9 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:tune/core/bloc/localization/localization_bloc.dart';
+import 'package:tune/core/bloc/navigation/navigation_bloc.dart';
+import 'package:tune/core/bloc/search/search_bloc.dart';
 import 'package:tune/core/bloc/theme/theme_bloc.dart';
 import 'package:tune/core/services/search_history_service.dart';
 import 'package:tune/core/storage/local/local_storage_impl.dart';
 import 'package:tune/core/storage/storage.dart' as storage;
+import 'package:tune/domain/usecases/search_songs.dart';
 
 /// 核心模块注册
 class CoreModule {
@@ -23,5 +26,7 @@ class CoreModule {
     // 注册核心 BLoCs
     getIt.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
     getIt.registerLazySingleton<LocalizationBloc>(() => LocalizationBloc());
+    getIt.registerLazySingleton<NavigationBloc>(() => NavigationBloc());
+    getIt.registerLazySingleton<SearchBloc>(() => SearchBloc(searchSongs: getIt<SearchSongs>()));
   }
 }

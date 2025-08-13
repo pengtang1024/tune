@@ -29,25 +29,6 @@ class HomeRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [LibraryPage]
-class LibraryRoute extends PageRouteInfo<void> {
-  const LibraryRoute({List<PageRouteInfo>? children})
-      : super(
-          LibraryRoute.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'LibraryRoute';
-
-  static PageInfo page = PageInfo(
-    name,
-    builder: (data) {
-      return const LibraryPage();
-    },
-  );
-}
-
-/// generated route for
 /// [LoginPage]
 class LoginRoute extends PageRouteInfo<void> {
   const LoginRoute({List<PageRouteInfo>? children})
@@ -62,6 +43,25 @@ class LoginRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const LoginPage();
+    },
+  );
+}
+
+/// generated route for
+/// [MusicLibraryPage]
+class MusicLibraryRoute extends PageRouteInfo<void> {
+  const MusicLibraryRoute({List<PageRouteInfo>? children})
+      : super(
+          MusicLibraryRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MusicLibraryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MusicLibraryPage();
     },
   );
 }

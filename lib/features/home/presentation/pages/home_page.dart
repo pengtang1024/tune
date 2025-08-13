@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                           title: localizations.library_title,
                           color: Theme.of(context).colorScheme.primaryContainer,
                           onTap: () {
-                            context.pushRoute(const LibraryRoute());
+                            context.pushRoute(const MusicLibraryRoute());
                           },
                         ),
                         _buildModernQuickActionCard(
