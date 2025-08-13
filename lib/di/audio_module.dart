@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:tune/core/services/platform_music_scanner_service.dart';
 import 'package:tune/data/datasources/audio_local_data_source.dart';
 import 'package:tune/data/datasources/audio_remote_data_source.dart';
 import 'package:tune/data/repositories/audio_repository_impl.dart';
@@ -9,6 +10,7 @@ import 'package:tune/domain/repositories/audio_repository.dart';
 import 'package:tune/domain/usecases/get_all_songs.dart';
 import 'package:tune/domain/usecases/play_audio.dart';
 import 'package:tune/domain/usecases/search_songs.dart';
+import 'package:tune/features/audio/presentation/bloc/music_scan/music_scan_bloc.dart';
 import 'package:tune/features/audio/presentation/bloc/player/player_bloc.dart';
 
 /// 音频模块注册
@@ -57,6 +59,13 @@ class AudioModule {
       () => PlayerBloc(
         audioService: getIt<IAudioService>(),
         getAllSongs: getIt<GetAllSongs>(),
+      ),
+    );
+    
+    // 注册音乐扫描Bloc
+    getIt.registerFactory<MusicScanBloc>(
+      () => MusicScanBloc(
+        musicScannerService: getIt<PlatformMusicScannerService>(),
       ),
     );
   }

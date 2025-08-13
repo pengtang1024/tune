@@ -50,8 +50,8 @@ class AudioService implements IAudioService {
     ))
         .toList();
 
-    await _audioPlayer.setAudioSources(
-      audioSources,
+    await _audioPlayer.setAudioSource(
+      ConcatenatingAudioSource(children: audioSources),
       preload: false,
     );
   }

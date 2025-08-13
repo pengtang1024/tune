@@ -14,6 +14,7 @@ class MusicScanBloc extends Bloc<MusicScanEvent, MusicScanState> {
       : _musicScannerService = musicScannerService,
         super(MusicScanInitial()) {
     on<StartScanEvent>(_onStartScan);
+    on<StartScanFoldersEvent>(_onStartScanFolders);
     on<CancelScanEvent>(_onCancelScan);
     on<_ScanProgressEvent>(_onScanProgress);
     on<_ScanErrorEvent>(_onScanError);
@@ -35,6 +36,41 @@ class MusicScanBloc extends Bloc<MusicScanEvent, MusicScanState> {
           add(_ScanErrorEvent(error.toString()));
         },
       );
+    } catch (e) {
+      emit(MusicScanError(message: '扫描启动失败: $e'));
+    }
+  }
+
+  /// 处理开始扫描特定目录事件
+  Future<void> _onStartScanFolders(
+      StartScanFoldersEvent event, Emitter<MusicScanState> emit) async {
+    emit(MusicScanLoading());
+    
+    try {
+      // 订阅扫描进度流
+      _scanSubscription?.cancel();
+      // 检查服务是否支持扫描特定目录
+      if (_musicScannerService is DesktopMusicScannerService) {
+        final desktopService = _musicScannerService as DesktopMusicScannerService;
+        _scanSubscription = desktopService.scanMusicInFolders(event.folderPaths).listen(
+          (progress) {
+            add(_ScanProgressEvent(progress));
+          },
+          onError: (error) {
+            add(_ScanErrorEvent(error.toString()));
+          },
+        );
+      } else {
+        // 对于不支持特定目录扫描的平台，使用全盘扫描
+        _scanSubscription = _musicScannerService.scanAllMusic().listen(
+          (progress) {
+            add(_ScanProgressEvent(progress));
+          },
+          onError: (error) {
+            add(_ScanErrorEvent(error.toString()));
+          },
+        );
+      }
     } catch (e) {
       emit(MusicScanError(message: '扫描启动失败: $e'));
     }

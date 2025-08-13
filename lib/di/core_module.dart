@@ -9,15 +9,16 @@ class CoreModule {
   /// 初始化核心模块
   static Future<void> init(GetIt getIt) async {
     // 注册本地化模块
-    getIt.registerCachedFactory(() => LocalizationBloc());
+    getIt.registerFactory(() => LocalizationBloc());
 
     // 注册主题模块
-    getIt.registerCachedFactory(() => ThemeBloc());
+    getIt.registerFactory(() => ThemeBloc());
 
     // 注册字体模块
 
     // 注册本地存储模块
-    getIt.registerCachedFactory(() => SharedPreferences.getInstance());
+    final sharedPreferences = await SharedPreferences.getInstance();
+    getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
     // 注册音乐扫描服务
     getIt.registerSingleton(MusicScannerService());

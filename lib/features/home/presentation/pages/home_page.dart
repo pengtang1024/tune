@@ -146,14 +146,6 @@ class _HomePageState extends State<HomePage> {
                     onPressed: _scanLocalSongs,
                     child: Text(localizations.library_title),
                   ),
-                  _buildQuickActionCard(
-                    context,
-                    icon: Icons.find_in_page,
-                    title: localizations.scan_local_music,
-                    onTap: () {
-                      context.pushRoute(const MusicScanRoute());
-                    },
-                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -204,6 +196,15 @@ class _HomePageState extends State<HomePage> {
                           color: Theme.of(context).colorScheme.tertiaryContainer,
                           onTap: () {
                             // TODO: 导航到最近播放页面
+                          },
+                        ),
+                        _buildModernQuickActionCard(
+                          context,
+                          icon: Icons.find_in_page,
+                          title: localizations.scan_local_music,
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          onTap: () {
+                            context.pushRoute(const MusicScanRoute());
                           },
                         ),
                       ],
@@ -308,6 +309,32 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: const DesktopHomeContent(),
+    );
+  }
+
+  Widget _buildQuickActionCard(BuildContext context,
+      {required IconData icon, required String title, required VoidCallback onTap}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 36, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
