@@ -54,100 +54,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pause_button => '暂停';
 
   @override
-  String get next_button => '下一首';
-
-  @override
   String get previous_button => '上一首';
 
   @override
-  String get favorite_button => '收藏';
+  String get next_button => '下一首';
 
   @override
-  String get now_playing => '正在播放';
-
-  @override
-  String get no_things_players => '没有播放器';
-
-  @override
-  String get no_selected_song => '未选择歌曲';
-
-  @override
-  String get song_list_title => '歌曲';
-
-  @override
-  String get no_songs_found => '未找到歌曲';
-
-  @override
-  String get player_duration => '时长';
-
-  @override
-  String get player_artist => '艺术家';
-
-  @override
-  String get player_album => '专辑';
-
-  @override
-  String get search_empty => '输入搜索词来查找歌曲';
-
-  @override
-  String get search_no_results => '未找到匹配的歌曲';
-
-  @override
-  String get language => '语言';
-
-  @override
-  String get theme => '主题';
-
-  @override
-  String get font => '字体';
-
-  @override
-  String get theme_trendy_electro => '时尚电子';
-
-  @override
-  String get theme_minimal_gray => '极简灰';
-
-  @override
-  String get theme_nature_forest => '自然森林';
-
-  @override
-  String get theme_cyber_neon => '赛博霓虹';
-
-  @override
-  String get theme_warm_healing => '温暖治愈';
-
-  @override
-  String get about => '关于';
-
-  @override
-  String get library_artists => '艺术家';
-
-  @override
-  String get library_albums => '专辑';
-
-  @override
-  String get library_genres => '流派';
+  String get stop_button => '停止';
 
   @override
   String get player_title => '播放器';
 
   @override
-  String get profile_title => '个人资料';
+  String get now_playing => '正在播放';
 
   @override
-  String get username_default => '用户';
+  String get no_song_playing => '没有正在播放的歌曲';
 
   @override
-  String get user_email_default => 'user@example.com';
-
-  @override
-  String get locale => '中文';
+  String get no_songs_found => '未找到歌曲';
 
   @override
   String get search_title => '搜索';
 
   @override
-  String get no_song_playing => '当前无歌曲播放';
+  String get search_no_results => '未找到结果';
 
   @override
   String get quick_actions => '快速操作';
@@ -204,4 +135,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get scan_cancelled => '扫描已取消';
+
+  @override
+  String get toggle_sidebar => '切换侧边栏';
+
+  @override
+  String get no_things_players => '播放器中没有歌曲';
+
+  @override
+  String get song_list_title => '歌曲列表';
+
+  @override
+  String get profile_title => '个人资料';
+
+  @override
+  String get username_default => '用户';
+
+  @override
+  String get user_email_default => 'user@example.com';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get theme => '主题';
 }

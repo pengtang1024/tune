@@ -2,7 +2,7 @@
   "@@locale": "zh",
   "app_name": "Tune",
   "@app_name": {
-    "description": "这是应用程序的名称",
+    "description": "这是应用的名称",
     "type": "string"
   },
   "home_title": "主页",
@@ -52,12 +52,12 @@
   },
   "artist_hint": "搜索艺术家...",
   "@artist_hint": {
-    "description": "这是搜索栏的提示文本",
+    "description": "这是艺术家搜索栏的提示文本",
     "type": "string"
   },
   "album_hint": "搜索专辑...",
   "@album_hint": {
-    "description": "这是搜索栏的提示文本",
+    "description": "这是专辑搜索栏的提示文本",
     "type": "string"
   },
   "settings_title": "设置",
@@ -67,137 +67,27 @@
   },
   "play_button": "播放",
   "@play_button": {
-    "description": "这是播放按钮的文本",
+    "description": "这是播放按钮文本",
     "type": "string"
   },
   "pause_button": "暂停",
   "@pause_button": {
-    "description": "这是暂停按钮的文本",
-    "type": "string"
-  },
-  "next_button": "下一首",
-  "@next_button": {
-    "description": "这是下一首按钮的文本",
+    "description": "这是暂停按钮文本",
     "type": "string"
   },
   "previous_button": "上一首",
   "@previous_button": {
-    "description": "这是上一首按钮的文本",
+    "description": "这是上一首按钮文本",
     "type": "string"
   },
-  "favorite_button": "收藏",
-  "@favorite_button": {
-    "description": "这是收藏按钮的文本",
+  "next_button": "下一首",
+  "@next_button": {
+    "description": "这是下一首按钮文本",
     "type": "string"
   },
-  "now_playing": "正在播放",
-  "@now_playing": {
-    "description": "这是正在播放指示器的文本",
-    "type": "string"
-  },
-  "no_things_players": "没有播放器",
-  "@no_things_players": {
-    "description": "这是没有播放器指示器的文本",
-    "type": "string"
-  },
-  "no_selected_song": "未选择歌曲",
-  "@no_selected_song": {
-    "description": "这是未选择歌曲指示器的文本",
-    "type": "string"
-  },
-  "song_list_title": "歌曲",
-  "@song_list_title": {
-    "description": "这是歌曲列表的标题",
-    "type": "string"
-  },
-  "no_songs_found": "未找到歌曲",
-  "@no_songs_found": {
-    "description": "这是未找到歌曲指示器的文本",
-    "type": "string"
-  },
-  "player_duration": "时长",
-  "@player_duration": {
-    "description": "这是时长指示器的文本",
-    "type": "string"
-  },
-  "player_artist": "艺术家",
-  "@player_artist": {
-    "description": "这是艺术家指示器的文本",
-    "type": "string"
-  },
-  "player_album": "专辑",
-  "@player_album": {
-    "description": "这是专辑指示器的文本",
-    "type": "string"
-  },
-  "search_empty": "输入搜索词来查找歌曲",
-  "@search_empty": {
-    "description": "这是空搜索指示器的文本",
-    "type": "string"
-  },
-  "search_no_results": "未找到匹配的歌曲",
-  "@search_no_results": {
-    "description": "这是无结果指示器的文本",
-    "type": "string"
-  },
-  "language": "语言",
-  "@language": {
-    "description": "这是语言指示器的文本",
-    "type": "string"
-  },
-  "theme": "主题",
-  "@theme": {
-    "description": "这是主题指示器的文本",
-    "type": "string"
-  },
-  "font": "字体",
-  "@font": {
-    "description": "这是字体指示器的文本",
-    "type": "string"
-  },
-  "theme_trendy_electro": "时尚电子",
-  "@theme_trendy_electro": {
-    "description": "这是主题的名称",
-    "type": "string"
-  },
-  "theme_minimal_gray": "极简灰",
-  "@theme_minimal_gray": {
-    "description": "这是主题的名称",
-    "type": "string"
-  },
-  "theme_nature_forest": "自然森林",
-  "@theme_nature_forest": {
-    "description": "这是主题的名称",
-    "type": "string"
-  },
-  "theme_cyber_neon": "赛博霓虹",
-  "@theme_cyber_neon": {
-    "description": "这是主题的名称",
-    "type": "string"
-  },
-  "theme_warm_healing": "温暖治愈",
-  "@theme_warm_healing": {
-    "description": "这是主题的名称",
-    "type": "string"
-  },
-  "about": "关于",
-  "@about": {
-    "description": "这是关于指示器的文本",
-    "type": "string"
-  },
-  "library_artists": "艺术家",
-  "@library_artists": {
-    "description": "这是艺术家指示器的文本",
-    "type": "string"
-  },
-  "library_albums": "专辑",
-  "@library_albums": {
-    "description": "这是专辑指示器的文本",
-    "type": "string"
-  },
-  "library_genres": "流派",
-  "@library_genres": {
-    "description": "这是流派指示器的文本",
+  "stop_button": "停止",
+  "@stop_button": {
+    "description": "这是停止按钮文本",
     "type": "string"
   },
   "player_title": "播放器",
@@ -205,24 +95,19 @@
     "description": "这是播放器页面的标题",
     "type": "string"
   },
-  "profile_title": "个人资料",
-  "@profile_title": {
-    "description": "这是个人资料页面的标题",
+  "now_playing": "正在播放",
+  "@now_playing": {
+    "description": "这是正在播放文本",
     "type": "string"
   },
-  "username_default": "用户",
-  "@username_default": {
-    "description": "这是默认用户名",
+  "no_song_playing": "没有正在播放的歌曲",
+  "@no_song_playing": {
+    "description": "这是没有歌曲播放指示器的文本",
     "type": "string"
   },
-  "user_email_default": "user@example.com",
-  "@user_email_default": {
-    "description": "这是默认用户邮箱",
-    "type": "string"
-  },
-  "locale": "中文",
-  "@locale": {
-    "description": "这是中文语言的名称",
+  "no_songs_found": "未找到歌曲",
+  "@no_songs_found": {
+    "description": "这是未找到歌曲指示器的文本",
     "type": "string"
   },
   "search_title": "搜索",
@@ -230,9 +115,9 @@
     "description": "这是搜索页面的标题",
     "type": "string"
   },
-  "no_song_playing": "当前无歌曲播放",
-  "@no_song_playing": {
-    "description": "这是没有歌曲播放时显示的消息",
+  "search_no_results": "未找到结果",
+  "@search_no_results": {
+    "description": "这是未找到搜索结果指示器的文本",
     "type": "string"
   },
   "quick_actions": "快速操作",
@@ -262,12 +147,12 @@
   },
   "no_recent_songs": "无最近播放歌曲",
   "@no_recent_songs": {
-    "description": "这是无最近歌曲指示器的文本",
+    "description": "这是无最近播放歌曲指示器的文本",
     "type": "string"
   },
   "no_recommendations": "无推荐内容",
   "@no_recommendations": {
-    "description": "这是无推荐指示器的文本",
+    "description": "这是无推荐内容指示器的文本",
     "type": "string"
   },
   "failed_to_load_songs": "加载歌曲失败",
@@ -284,5 +169,45 @@
   "found_songs": "找到了{count}首歌曲",
   "scan_failed": "扫描失败",
   "try_again": "再试一次",
-  "scan_cancelled": "扫描已取消"
+  "scan_cancelled": "扫描已取消",
+  "toggle_sidebar": "切换侧边栏",
+  "@toggle_sidebar": {
+    "description": "这是切换侧边栏按钮的文本",
+    "type": "string"
+  },
+  "no_things_players": "播放器中没有歌曲",
+  "@no_things_players": {
+    "description": "这是播放器中没有歌曲指示器的文本",
+    "type": "string"
+  },
+  "song_list_title": "歌曲列表",
+  "@song_list_title": {
+    "description": "这是歌曲列表部分的标题",
+    "type": "string"
+  },
+  "profile_title": "个人资料",
+  "@profile_title": {
+    "description": "这是个人资料页面的标题",
+    "type": "string"
+  },
+  "username_default": "用户",
+  "@username_default": {
+    "description": "这是默认用户名",
+    "type": "string"
+  },
+  "user_email_default": "user@example.com",
+  "@user_email_default": {
+    "description": "这是默认用户邮箱",
+    "type": "string"
+  },
+  "language": "语言",
+  "@language": {
+    "description": "这是语言设置",
+    "type": "string"
+  },
+  "theme": "主题",
+  "@theme": {
+    "description": "这是主题设置",
+    "type": "string"
+  }
 }
