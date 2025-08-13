@@ -9,6 +9,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get locale => 'English';
+
+  @override
   String get app_name => 'Tune';
 
   @override
@@ -199,4 +202,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_cancelled => 'Scan Cancelled';
+
+  @override
+  String get toggle_sidebar => 'Toggle Sidebar';
+
+  @override
+  String get sort_by_title => 'Sort by Title';
+
+  @override
+  String get sort_by_artist => 'Sort by Artist';
+
+  @override
+  String get sort_by_album => 'Sort by Album';
+
+  @override
+  String get sort_by_date_added => 'Sort by Date Added';
+
+  @override
+  String get sort_by_duration => 'Sort by Duration';
+
+  @override
+  String get group_by_none => 'Group by None';
+
+  @override
+  String get search_songs => 'Search songs';
 }

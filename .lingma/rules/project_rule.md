@@ -163,3 +163,4 @@ lib/
 ├── data_module.dart          # 数据层服务注册
 └── platform_module.dart      # 平台服务注册（根据运行时平台动态选择）
 5.本地化支持中英日韩俄
+6.使用flutter analyze查看缺失key,在app_en添加缺失的key,并且根据完善好的en生成其他语言的arb,然后执行i10n-gen
