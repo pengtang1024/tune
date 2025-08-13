@@ -18,7 +18,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   PlayMode _playMode = PlayMode.repeatAll;
   double _playbackSpeed = 1.0;
   int? _currentSongIndex;
-  Set<int> _playedIndicesInShuffle = {};
+  Set<int> _playedIndicesInShuffle = <int>{};
 
   PlayerBloc({
     required IAudioService audioService,
@@ -67,8 +67,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (playerState.processingState == just_audio.ProcessingState.completed) {
         _handlePlaybackCompleted();
       }
-      // 处理播放错误
-      else if (playerState.processingState == just_audio.ProcessingState.idle && playerState.playing) {
+      // 处理播放错误 - 修复枚举常量错误
+      else if (playerState.processingState == just_audio.ProcessingState.idle) {
         // 某些错误状态下可能会进入idle状态，这里作为错误处理
         _handlePlaybackError('播放失败，请检查文件');
       }
@@ -108,7 +108,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         }
         
         // 使用更可靠的随机数生成方式
-        final random = Random();
+        final random = Random(DateTime.now().millisecondsSinceEpoch);
         final randomIndex = availableIndices[random.nextInt(availableIndices.length)];
         _playedIndicesInShuffle.add(randomIndex);
         _currentSongIndex = randomIndex;
@@ -231,6 +231,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       // 使用更可靠的随机数生成方式
       final random = Random(DateTime.now().millisecondsSinceEpoch);
       final randomIndex = availableIndices[random.nextInt(availableIndices.length)];
+      _playedIndicesInShuffle.add(randomIndex);
       _currentSongIndex = randomIndex;
       add(PlaySongEvent(_songs[randomIndex].id));
     } else {

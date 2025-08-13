@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:path/path.dart' as path;
 import 'package:tune/domain/entities/song.dart';
 
 /// 音乐库服务
@@ -37,12 +38,30 @@ class MusicLibraryService {
         // 直接使用本地数据源的专辑艺术Uri
         String? albumArtUri;
         if (song.albumId != null) {
-          albumArtUri = (await _audioQuery.queryArtwork(
-            song.albumId!,
-            ArtworkType.ALBUM,
-            format: ArtworkFormat.JPEG,
-            size: 200,
-          )) as String?;
+          try {
+            final artwork = await _audioQuery.queryArtwork(
+              song.albumId!,
+              ArtworkType.ALBUM,
+              format: ArtworkFormat.JPEG,
+              size: 200,
+            );
+
+            // 处理不同类型的专辑艺术数据
+            if (artwork != null) {
+              if (artwork is Uint8List) {
+                // 将Uint8List转换为文件路径
+                final tempDir = Directory.systemTemp;
+                final tempFile = File(path.join(tempDir.path, 'album_art_${song.id}.jpg'));
+                await tempFile.writeAsBytes(artwork);
+                albumArtUri = tempFile.path;
+              } else {
+                albumArtUri = artwork.toString();
+              }
+            }
+          } catch (e) {
+            // 如果无法获取专辑艺术，保持为null
+            albumArtUri = null;
+          }
         }
 
         songList.add(
@@ -81,18 +100,24 @@ class MusicLibraryService {
         orderType: OrderType.ASC_OR_SMALLER,
         uriType: UriType.EXTERNAL,
         ignoreCase: true,
-        searchBy: [
-          SearchType.TITLE,
-          SearchType.ARTIST,
-          SearchType.ALBUM,
-        ],
-        searchValue: query,
+        // 移除不支持的参数
       );
+
+      // 手动过滤结果
+      final filteredSongs = songs.where((song) {
+        final title = song.title.toLowerCase();
+        final artist = song.artist?.toLowerCase() ?? '';
+        final album = song.album?.toLowerCase() ?? '';
+        final lowerQuery = query.toLowerCase();
+        return title.contains(lowerQuery) ||
+               artist.contains(lowerQuery) ||
+               album.contains(lowerQuery);
+      }).toList();
 
       final List<Song> songList = [];
 
-      for (var i = 0; i < songs.length; i++) {
-        final song = songs[i];
+      for (var i = 0; i < filteredSongs.length; i++) {
+        final song = filteredSongs[i];
 
         // 获取专辑艺术
         String? albumArtUri;
@@ -105,13 +130,16 @@ class MusicLibraryService {
               size: 200,
             );
             // 将Uint8List转换为文件路径
-            if (artwork != null && artwork is Uint8List) {
-              // 创建临时文件保存专辑艺术
-              final tempFile = await File.createTemp('album_art');
-              await tempFile.writeAsBytes(artwork);
-              albumArtUri = tempFile.path;
-            } else if (artwork != null && artwork is String) {
-              albumArtUri = artwork;
+            if (artwork != null) {
+              if (artwork is Uint8List) {
+                // 创建临时文件保存专辑艺术
+                final tempDir = Directory.systemTemp;
+                final tempFile = File(path.join(tempDir.path, 'album_art_${song.id}_search.jpg'));
+                await tempFile.writeAsBytes(artwork);
+                albumArtUri = tempFile.path;
+              } else {
+                albumArtUri = artwork.toString();
+              }
             }
           } catch (e) {
             // 如果无法获取专辑艺术，保持为null
@@ -148,7 +176,7 @@ class MusicLibraryService {
     final Map<String, List<Song>> songsByArtist = {};
 
     for (final song in songs) {
-      final artist = song.artist;
+      final artist = song.artist ?? '';
       if (songsByArtist.containsKey(artist)) {
         songsByArtist[artist]!.add(song);
       } else {
@@ -165,7 +193,7 @@ class MusicLibraryService {
     final Map<String, List<Song>> songsByAlbum = {};
 
     for (final song in songs) {
-      final album = song.album;
+      final album = song.album ?? '';
       if (songsByAlbum.containsKey(album)) {
         songsByAlbum[album]!.add(song);
       } else {
@@ -182,7 +210,7 @@ class MusicLibraryService {
     final Map<String, List<Song>> songsByGenre = {};
 
     for (final song in songs) {
-      final genre = song.genre;
+      final genre = song.genre ?? '';
       if (songsByGenre.containsKey(genre)) {
         songsByGenre[genre]!.add(song);
       } else {
@@ -221,11 +249,11 @@ class MusicLibraryService {
     final songs = await getAllSongs();
     final artists = <String>{};
     for (final song in songs) {
-      if (song.artist.isNotEmpty) {
-        artists.add(song.artist);
+      if ((song.artist ?? '').isNotEmpty) {
+        artists.add(song.artist!);
       }
     }
-    return artists.toList();
+    return artists.toList()..sort();
   }
 
   /// 获取专辑列表
@@ -233,11 +261,11 @@ class MusicLibraryService {
     final songs = await getAllSongs();
     final albums = <String>{};
     for (final song in songs) {
-      if (song.album.isNotEmpty) {
-        albums.add(song.album);
+      if ((song.album ?? '').isNotEmpty) {
+        albums.add(song.album!);
       }
     }
-    return albums.toList();
+    return albums.toList()..sort();
   }
 
   /// 获取流派列表
@@ -245,11 +273,11 @@ class MusicLibraryService {
     final songs = await getAllSongs();
     final genres = <String>{};
     for (final song in songs) {
-      if (song.genre.isNotEmpty) {
-        genres.add(song.genre);
+      if ((song.genre ?? '').isNotEmpty) {
+        genres.add(song.genre!);
       }
     }
-    return genres.toList();
+    return genres.toList()..sort();
   }
 
   /// 获取收藏歌曲
@@ -269,8 +297,8 @@ class MusicLibraryService {
   /// 按时长排序（从短到长）
   Future<List<Song>> getSongsSortedByDuration({bool ascending = true}) async {
     final songs = await getAllSongs();
-    songs.sort((a, b) => ascending 
-        ? a.duration.compareTo(b.duration) 
+    songs.sort((a, b) => ascending
+        ? a.duration.compareTo(b.duration)
         : b.duration.compareTo(a.duration));
     return songs;
   }
@@ -278,19 +306,19 @@ class MusicLibraryService {
   /// 获取指定艺术家的歌曲
   Future<List<Song>> getSongsByArtistName(String artistName) async {
     final songs = await getAllSongs();
-    return songs.where((song) => song.artist == artistName).toList();
+    return songs.where((song) => (song.artist ?? '') == artistName).toList();
   }
 
   /// 获取指定专辑的歌曲
   Future<List<Song>> getSongsByAlbumName(String albumName) async {
     final songs = await getAllSongs();
-    return songs.where((song) => song.album == albumName).toList();
+    return songs.where((song) => (song.album ?? '') == albumName).toList();
   }
 
   /// 获取指定流派的歌曲
   Future<List<Song>> getSongsByGenreName(String genreName) async {
     final songs = await getAllSongs();
-    return songs.where((song) => song.genre == genreName).toList();
+    return songs.where((song) => (song.genre ?? '') == genreName).toList();
   }
 
   /// 获取歌曲总数
@@ -302,6 +330,11 @@ class MusicLibraryService {
   /// 获取所有歌曲的总时长
   Future<int> getTotalDuration() async {
     final songs = await getAllSongs();
-    return songs.fold(0, (sum, song) => sum + song.duration);
+    // 修复类型错误
+    int totalDuration = 0;
+    for (final song in songs) {
+      totalDuration += song.duration;
+    }
+    return totalDuration;
   }
 }

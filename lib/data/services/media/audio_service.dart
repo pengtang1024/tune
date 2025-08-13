@@ -1,5 +1,5 @@
 import 'package:just_audio/just_audio.dart' hide LoopMode;
-import 'package:just_audio/just_audio.dart' show LoopMode, ProcessingState;
+import 'package:just_audio/just_audio.dart' show LoopMode;
 import 'package:rxdart/rxdart.dart';
 import 'package:tune/data/services/media/i_audio_service.dart';
 import 'package:tune/domain/entities/song.dart';
@@ -35,7 +35,7 @@ class AudioService implements IAudioService {
       position: position,
       duration: duration,
     ),
-  ).asBroadcastStream();
+  );
 
   @override
   Future<void> setPlaylist(List<Song> songs) async {
@@ -50,20 +50,13 @@ class AudioService implements IAudioService {
     ))
         .toList();
 
-    await _audioPlayer.setAudioSource(
-      ConcatenatingAudioSource(children: audioSources),
-      preload: false,
-    );
+    // 使用新的API替换已废弃的ConcatenatingAudioSource
+    await _audioPlayer.setAudioSources(audioSources, preload: false);
   }
 
   @override
   Future<void> play() async {
-    try {
-      await _audioPlayer.play();
-    } catch (e) {
-      // 处理播放错误
-      rethrow;
-    }
+    await _audioPlayer.play();
   }
 
   @override
@@ -109,22 +102,12 @@ class AudioService implements IAudioService {
 
   @override
   Future<void> skipToNext() async {
-    try {
-      await _audioPlayer.seekToNext();
-    } catch (e) {
-      // 如果跳转下一首失败，可能是播放列表结束
-      rethrow;
-    }
+    await _audioPlayer.seekToNext();
   }
 
   @override
   Future<void> skipToPrevious() async {
-    try {
-      await _audioPlayer.seekToPrevious();
-    } catch (e) {
-      // 如果跳转上一首失败，可能是播放列表开始
-      rethrow;
-    }
+    await _audioPlayer.seekToPrevious();
   }
 
   @override
@@ -139,7 +122,12 @@ class AudioService implements IAudioService {
 
   @override
   Future<void> setShuffleMode(bool shuffle) async {
-    await _audioPlayer.setShuffleModeEnabled(shuffle);
+    // 修复：使用正确的API设置随机播放模式
+    if (shuffle) {
+      await _audioPlayer.shuffle();
+    } else {
+      await _audioPlayer.setShuffleModeEnabled(false);
+    }
   }
 
   @override
