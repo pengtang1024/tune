@@ -1,58 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tune/core/bloc/localization/localization_bloc.dart';
-import 'package:tune/core/bloc/navigation/navigation_bloc.dart';
-import 'package:tune/core/bloc/search/search_bloc.dart';
-import 'package:tune/core/bloc/theme/theme_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/config/app_initializer.dart';
+import 'package:tune/providers/theme_providers.dart';
+import 'package:tune/providers/localization_providers.dart'; // 添加本地化提供者
+import 'package:tune/routing/app_router.dart';
+import 'package:tune/ui/core/themes/app_theme.dart';
 
-// 更新导入路径到 audio 模块
-import 'package:tune/features/audio/presentation/bloc/music_scan/music_scan_bloc.dart';
-import 'package:tune/features/audio/presentation/bloc/player/player_bloc.dart';
-import 'package:tune/features/home/presentation/bloc/home_bloc.dart';
-import 'package:tune/features/home/presentation/bloc/music_library/music_library_bloc.dart';
-
-// 导入用例
-import 'package:tune/domain/usecases/get_all_songs.dart';
-import 'package:tune/domain/usecases/search_songs.dart';
-
-import 'app/app.dart';
-import 'app/app_initializer.dart';
-import 'app/router/app_router.dart';
-import 'di/injector.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
-  // 初始化应用
-  await AppInitializer.init();
+  // 确保WidgetsFlutterBinding初始化
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const ProviderScope(child: TuneApp()));
+}
 
-  // 创建路由实例
-  final appRouter = AppRouter();
+class TuneApp extends ConsumerWidget {
+  const TuneApp({super.key});
 
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        // 提供主题Bloc
-        BlocProvider<ThemeBloc>(create: (context) => Injector.get<ThemeBloc>()),
-        // 提供本地化Bloc
-        BlocProvider<LocalizationBloc>(create: (context) => Injector.get<LocalizationBloc>()),
-        // 提供导航Bloc
-        BlocProvider<NavigationBloc>(create: (context) => Injector.get<NavigationBloc>()),
-        // 提供搜索Bloc
-        BlocProvider<SearchBloc>(create: (context) => Injector.get<SearchBloc>()),
-        // 提供播放器Bloc
-        BlocProvider<PlayerBloc>(create: (context) => Injector.get<PlayerBloc>()),
-        // 提供首页Bloc
-        BlocProvider<HomeBloc>(create: (context) => Injector.get<HomeBloc>()),
-        // 提供音乐扫描Bloc
-        BlocProvider<MusicScanBloc>(create: (context) => Injector.get<MusicScanBloc>()),
-        // 提供音乐库Bloc
-        BlocProvider<MusicLibraryBloc>(
-          create: (context) => MusicLibraryBloc(
-            getAllSongs: Injector.get<GetAllSongs>(),
-            searchSongs: Injector.get<SearchSongs>(),
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 初始化应用（只在首次构建时调用）
+    final initFuture = ref.watch(_initProvider);
+
+    return initFuture.when(
+      data: (_) {
+        // 监听主题模式变化
+        final themeMode = ref.watch(themeModeProvider);
+        // 监听语言环境变化
+        final locale = ref.watch(localeProvider);
+
+        return MaterialApp.router(
+          title: 'Tune',
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
+          routerConfig: appRouter,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: locale, // 设置当前语言环境
+        );
+      },
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (error, stack) => MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('Error: $error'),
           ),
         ),
-      ],
-      child: App(appRouter: appRouter),
-    ),
-  );
+      ),
+    );
+  }
 }
+
+// 初始化提供者
+final _initProvider = FutureProvider<void>((ref) async {
+  await AppInitializer.init(ref);
+});
