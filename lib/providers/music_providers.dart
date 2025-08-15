@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/repositories/music_repository.dart';
 import 'package:tune/data/services/impl/platform_music_service.dart';
+import 'package:tune/data/services/cross_platform_music_scanner.dart';
 
 // 服务提供者
 final platformMusicServiceProvider = Provider((ref) {
@@ -11,4 +12,10 @@ final platformMusicServiceProvider = Provider((ref) {
 final musicRepositoryProvider = Provider((ref) {
   final service = ref.watch(platformMusicServiceProvider);
   return MusicRepository(musicService: service);
+});
+
+// 跨平台音乐扫描服务提供者
+final crossPlatformMusicScannerProvider = Provider((ref) {
+  final musicService = ref.watch(platformMusicServiceProvider);
+  return CrossPlatformMusicScannerImpl(musicService);
 });

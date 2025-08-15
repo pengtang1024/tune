@@ -152,6 +152,30 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'音乐库'**
   String get library;
+
+  /// No description provided for @search.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索'**
+  String get search;
+
+  /// No description provided for @player.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放器'**
+  String get player;
+
+  /// No description provided for @playlist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表'**
+  String get playlist;
+
+  /// No description provided for @about.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关于'**
+  String get about;
 }
 
 class _AppLocalizationsDelegate

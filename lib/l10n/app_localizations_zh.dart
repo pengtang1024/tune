@@ -34,6 +34,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get library => '音乐库';
+
+  @override
+  String get search => '搜索';
+
+  @override
+  String get player => '播放器';
+
+  @override
+  String get playlist => '播放列表';
+
+  @override
+  String get about => '关于';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -66,4 +78,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get library => '音乐库';
+
+  @override
+  String get search => '搜索';
+
+  @override
+  String get player => '播放器';
+
+  @override
+  String get playlist => '播放列表';
+
+  @override
+  String get about => '关于';
 }

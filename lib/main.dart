@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_initializer.dart';
 import 'package:tune/providers/theme_providers.dart';
 import 'package:tune/providers/localization_providers.dart'; // 添加本地化提供者
-import 'package:tune/routing/app_router.dart';
+import 'package:tune/providers/router_providers.dart';
 import 'package:tune/ui/core/themes/app_theme.dart';
 
 import 'l10n/app_localizations.dart';
 
+
 void main() async {
-  // 确保WidgetsFlutterBinding初始化
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: TuneApp()));
+  runApp(
+    ProviderScope(
+      child: const TuneApp(),
+    ),
+  );
 }
 
 class TuneApp extends ConsumerWidget {
@@ -32,18 +35,14 @@ class TuneApp extends ConsumerWidget {
 
         return MaterialApp.router(
           title: 'Tune',
+          themeMode: themeMode,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          themeMode: themeMode,
-          routerConfig: appRouter,
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          locale: locale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: locale, // 设置当前语言环境
+          routerConfig: ref.watch(goRouterProvider),
+          debugShowCheckedModeBanner: false,
         );
       },
       loading: () => const MaterialApp(

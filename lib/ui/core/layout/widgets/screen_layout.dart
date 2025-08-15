@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/extension/router_extension.dart';
 import 'package:tune/providers/theme_providers.dart';
 import 'package:tune/providers/localization_providers.dart';
 import 'package:tune/providers/router_providers.dart'; // 添加路由提供者
 import 'package:tune/ui/home/providers/home_providers.dart';
-import 'package:tune/ui/home/widgets/desktop_home_layout.dart';
-import 'package:tune/ui/home/widgets/mobile_home_layout.dart';
-import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/ui/core/layout/widgets/desktop_layout.dart';
+import 'package:tune/ui/core/layout/widgets/mobile_layout.dart';
+import 'package:tune/utils/logger.dart';
+import 'package:tune/ui/home/widgets/home_page.dart';
+import 'package:tune/ui/recommend/widgets/recommend_page.dart';
+import 'package:tune/ui/featured/widgets/featured_page.dart';
+import 'package:tune/ui/library/widgets/library_page.dart';
+import 'package:tune/ui/core/settings/widgets/settings_page.dart';
 
-class HomeScreen extends ConsumerWidget {
+class ScreenLayout extends ConsumerWidget {
   final Widget child;
-  
-  const HomeScreen({super.key, required this.child});
+
+  const ScreenLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,14 +29,14 @@ class HomeScreen extends ConsumerWidget {
       viewModel.loadSongs();
     });
 
-    return HomeScreenContent(child: child);
+    return ScreenContentLayout(child: child);
   }
 }
 
-class HomeScreenContent extends ConsumerWidget {
+class ScreenContentLayout extends ConsumerWidget {
   final Widget child;
-  
-  const HomeScreenContent({super.key, required this.child});
+
+  const ScreenContentLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,38 +45,13 @@ class HomeScreenContent extends ConsumerWidget {
     final currentThemeMode = ref.watch(themeModeProvider);
     // 监听当前语言环境
     final currentLocale = ref.watch(localeProvider);
-    // 监听路由状态
-    final routerState = ref.watch(routerProvider);
 
     // 根据屏幕宽度判断是手机还是桌面布局
     final isDesktop = MediaQuery.of(context).size.width > 600;
 
-    // 根据路由名称和本地化文件确定标题
-    final currentRoute = GoRouterState.of(context).uri.toString();
-    final localizations = AppLocalizations.of(context);
-    
-    // 更新路由状态
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (routerState.selectedMenuItem != currentRoute) {
-        ref.read(routerProvider.notifier).updateSelectedMenuItem(currentRoute);
-      }
-    });
-    
-    String appBarTitle = localizations?.app_name ?? 'Tune'; // 默认标题
-    
-    // 根据路由名称确定标题
-    if (currentRoute == '/') {
-      appBarTitle = localizations?.home ?? 'Home';
-    } else if (currentRoute.contains('recommend')) {
-      appBarTitle = localizations?.recommend ?? 'Recommend';
-    } else if (currentRoute.contains('featured')) {
-      appBarTitle = localizations?.featured ?? 'Featured';
-    } else if (currentRoute.contains('library')) {
-      appBarTitle = localizations?.library ?? 'Library';
-    } else if (currentRoute.contains('settings')) {
-      appBarTitle = localizations?.settings ?? 'Settings';
-    }
-    // 对于其他路由，可以添加更多条件或保持默认标题
+    // 根据路由路径设置标题
+    final currentRoutePath = GoRouterState.of(context).uri.toString();
+    String appBarTitle = _getAppBarTitle(context, currentRoutePath);
 
     final content = Scaffold(
       appBar: AppBar(
@@ -91,9 +73,9 @@ class HomeScreenContent extends ConsumerWidget {
             icon: const Icon(Icons.settings),
             onPressed: () {
               // 导航到设置页面
-              context.push('/settings');
-              ref.read(routerProvider.notifier).updateSelectedMenuItem('/settings');
+              context.go('/settings');
             },
+            tooltip: '设置',
           ),
         ],
       ),
@@ -105,9 +87,35 @@ class HomeScreenContent extends ConsumerWidget {
 
     // 根据设备类型返回不同的布局
     if (isDesktop) {
-      return DesktopHomeLayout(child: content);
+      return DesktopLayout(child: content);
     } else {
-      return MobileHomeLayout(child: content);
+      return MobileLayout(child: content);
+    }
+  }
+
+  String _getAppBarTitle(BuildContext context, String routePath) {
+    // 根据路由路径设置标题
+    switch (routePath) {
+      case '/':
+        return context.loc.home;
+      case '/settings':
+        return context.loc.settings;
+      case '/about':
+        return context.loc.about;
+      case '/recommend':
+        return context.loc.recommend;
+      case '/search':
+        return context.loc.search;
+      case '/library':
+        return context.loc.library;
+      case '/featured':
+        return context.loc.featured;
+      case '/player':
+        return context.loc.player;
+      case '/playlist':
+        return context.loc.playlist;
+      default:
+        return context.loc.app_name;
     }
   }
 
@@ -138,7 +146,7 @@ class HomeScreenContent extends ConsumerWidget {
   /// 切换主题模式
   void _switchThemeMode(WidgetRef ref, ThemeMode currentThemeMode) {
     final themeNotifier = ref.read(themeModeProvider.notifier);
-    
+
     // 循环切换主题模式: system -> light -> dark -> system
     switch (currentThemeMode) {
       case ThemeMode.system:
@@ -152,11 +160,11 @@ class HomeScreenContent extends ConsumerWidget {
         break;
     }
   }
-  
+
   /// 显示语言选择对话框
   void _showLanguageSelector(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.read(localeProvider).languageCode;
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -170,7 +178,7 @@ class HomeScreenContent extends ConsumerWidget {
       },
     );
   }
-  
+
   /// 构建语言选项
   Widget _buildLanguageOption(BuildContext context, WidgetRef ref, String name, String code, String currentCode) {
     return SimpleDialogOption(

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 /// 欢迎页面组件
 /// 显示应用的欢迎信息和标语
-class WelcomePage extends StatelessWidget {
-  const WelcomePage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -34,4 +34,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get library => 'Library';
+
+  @override
+  String get search => '搜索';
+
+  @override
+  String get player => '播放器';
+
+  @override
+  String get playlist => '播放列表';
+
+  @override
+  String get about => '关于';
 }

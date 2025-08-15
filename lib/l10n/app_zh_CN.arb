@@ -8,5 +8,9 @@
   "home": "主页",
   "recommend": "推荐",
   "featured": "精选",
-  "library": "音乐库"
+  "library": "音乐库",
+  "search": "搜索",
+  "player": "播放器",
+  "playlist": "播放列表",
+  "about": "关于"
 }

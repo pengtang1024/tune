@@ -1,6 +1,9 @@
 import 'package:logger/logger.dart';
+
 class Log {
-  static final Logger _logger = Logger();
+  static final Logger _logger = Logger(
+    printer: PrettyPrinter(), // 格式化输出，默认样式
+  );
   static void debug(String message) {
     // In a real app, you might want to use a proper logging package
     if (const bool.fromEnvironment('DEBUG')) {

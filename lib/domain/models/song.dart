@@ -7,6 +7,18 @@ class Song extends SongModel {
   @override
   int get duration => super.duration ?? 0;
 
+  // 确保title不为空
+  @override
+  String get title => super.title ?? '未知歌曲';
+
+  // 确保artist不为空
+  @override
+  String? get artist => super.artist;
+
+  // 确保album不为空
+  @override
+  String? get album => super.album;
+
   // 添加fromJson方法
   factory Song.fromJson(Map<String, dynamic> json) {
     // 使用on_audio_query的fromMap构造函数
