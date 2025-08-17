@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class NoteCollisionStackAnimation extends ThemedAnimationBase {
@@ -62,11 +64,11 @@ class _NoteCollisionStackPainter extends CustomPainter {
     for (int i = 0; i < noteCount; i++) {
       // 音符下落进度
       final fallProgress = ((progress * noteCount + i) % noteCount) / noteCount;
-      
+
       // 音符水平位置随机
       final random = Random(i);
       final x = 20 + random.nextDouble() * 40;
-      
+
       // 音符垂直位置（下落+堆叠）
       double y;
       if (fallProgress < 0.7) {
@@ -76,7 +78,7 @@ class _NoteCollisionStackPainter extends CustomPainter {
         // 堆叠阶段（在地面上）
         y = center.dy - 20 - i * 15;
       }
-      
+
       // 碰撞时带轻微形变
       double scaleX = 1.0;
       double scaleY = 1.0;
@@ -84,13 +86,13 @@ class _NoteCollisionStackPainter extends CustomPainter {
         // 碰撞瞬间宽度增加10%
         scaleX = 1.1;
       }
-      
+
       // 弹跳效果
       double bounce = 0;
       if (fallProgress > 0.7 && fallProgress < 0.8) {
         bounce = 5 * sin((fallProgress - 0.7) * 10 * pi);
       }
-      
+
       // 使用主题色
       final colors = [
         theme.colorScheme.primary,
@@ -98,11 +100,11 @@ class _NoteCollisionStackPainter extends CustomPainter {
         theme.colorScheme.tertiary,
       ];
       paint.color = colors[i % colors.length];
-      
+
       canvas.save();
       canvas.translate(x, y + bounce);
       canvas.scale(scaleX, scaleY);
-      
+
       // 绘制音符
       canvas.drawCircle(Offset(0, 0), 8, paint);
       canvas.restore();

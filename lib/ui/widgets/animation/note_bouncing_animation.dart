@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class NoteBouncingAnimation extends ThemedAnimationBase {
@@ -53,22 +55,22 @@ class _NoteBouncingPainter extends CustomPainter {
       // 音符位置基于时间进度和随机偏移
       final timeOffset = (progress * noteCount + i) % noteCount / noteCount;
       final x = 10 + i * 15.0;
-      
+
       // 弹跳轨迹为衰减正弦波
       final bounceHeight = 30 * sin(timeOffset * 4 * pi) * exp(-timeOffset * 2);
-      
+
       // 音符颜色随主题变化
-      paint.color = i % 2 == 0 
-        ? theme.colorScheme.primary 
+      paint.color = i % 2 == 0
+        ? theme.colorScheme.primary
         : theme.colorScheme.secondary;
-      
+
       final notePath = Path();
       notePath.moveTo(x, size.height - 10 - bounceHeight);
       notePath.lineTo(x - 5, size.height - 15 - bounceHeight);
       notePath.lineTo(x, size.height - 25 - bounceHeight);
       notePath.lineTo(x + 5, size.height - 15 - bounceHeight);
       notePath.close();
-      
+
       canvas.drawPath(notePath, paint);
     }
   }

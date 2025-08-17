@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LyricsGradientAnimation extends ThemedAnimationBase {
@@ -52,16 +54,16 @@ class _LyricsGradientPainter extends CustomPainter {
       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       fontSize: 14,
     );
-    
+
     final normalTextPainter = TextPainter(
       text: TextSpan(text: text, style: normalStyle),
       textDirection: TextDirection.ltr,
     );
     normalTextPainter.layout();
-    
+
     // 绘制非当前行（灰色）
     normalTextPainter.paint(canvas, const Offset(0, 10));
-    
+
     // 创建渐变色遮罩
     final gradientRect = Rect.fromLTWH(0, 0, size.width * progress, size.height);
     final gradient = ui.Gradient.linear(
@@ -72,27 +74,27 @@ class _LyricsGradientPainter extends CustomPainter {
         theme.colorScheme.primary,
       ],
     );
-    
+
     final paint = Paint()
       ..shader = gradient
       ..blendMode = BlendMode.srcIn;
-    
+
     // 使用遮罩绘制当前行
     canvas.saveLayer(Offset.zero & size, paint);
-    
+
     final highlightStyle = TextStyle(
       color: theme.colorScheme.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.bold,
     );
-    
+
     final highlightTextPainter = TextPainter(
       text: TextSpan(text: text, style: highlightStyle),
       textDirection: TextDirection.ltr,
     );
     highlightTextPainter.layout();
     highlightTextPainter.paint(canvas, const Offset(0, 10));
-    
+
     canvas.restore();
   }
 

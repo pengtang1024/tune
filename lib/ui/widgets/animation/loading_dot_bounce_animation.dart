@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LoadingDotBounceAnimation extends ThemedAnimationBase {
@@ -53,15 +54,15 @@ class _LoadingDotBouncePainter extends CustomPainter {
     final dotCount = 3;
     final dotRadius = 5.0;
     final dotSpacing = 20.0;
-    
+
     for (int i = 0; i < dotCount; i++) {
       // 跳动高度随机（5-10px）
       final maxHeight = 5 + i * 2.5;
-      
+
       // 计算跳动进度
       final dotProgress = (progress * dotCount + i) % dotCount / dotCount;
       final jumpProgress = (dotProgress * 3) % 1.0;
-      
+
       // 跳动曲线（上升和下降）
       double bounce;
       if (jumpProgress < 0.5) {
@@ -71,14 +72,14 @@ class _LoadingDotBouncePainter extends CustomPainter {
         // 下降阶段
         bounce = maxHeight * (1 - (jumpProgress - 0.5) * 2);
       }
-      
+
       // 圆点位置
       final x = center.dx + (i - 1) * dotSpacing;
       final y = center.dy - bounce;
-      
+
       // 圆点颜色
       paint.color = theme.colorScheme.primary.withValues(alpha: 0.7 + 0.3 * (1 - bounce / maxHeight));
-      
+
       // 绘制圆点
       canvas.drawCircle(Offset(x, y), dotRadius, paint);
     }

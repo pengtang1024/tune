@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class FavoriteButtonExplosionAnimation extends ThemedAnimationBase {
@@ -56,7 +58,7 @@ class _FavoriteButtonExplosionPainter extends CustomPainter {
       // 心形路径
       final heartPath = Path();
       heartPath.moveTo(center.dx, center.dy + 5);
-      
+
       // 创建心形的上半部分
       for (double i = 0; i <= 2 * pi; i += 0.1) {
         final x = 16 * pow(sin(i), 3);
@@ -66,9 +68,9 @@ class _FavoriteButtonExplosionPainter extends CustomPainter {
           center.dy + y * (1 - buttonProgress),
         );
       }
-      
+
       heartPath.close();
-      
+
       // 绘制心形
       paint.color = theme.colorScheme.primary.withValues(alpha: 1.0 - buttonProgress * 0.5);
       canvas.drawPath(heartPath, paint);
@@ -91,12 +93,12 @@ class _FavoriteButtonExplosionPainter extends CustomPainter {
 
         // 粒子颜色与主题色一致
         paint.color = theme.colorScheme.primary.withValues(alpha: 1.0 - explosionProgress);
-        
+
         // 绘制星形粒子
         canvas.save();
         canvas.translate(position.dx, position.dy);
         canvas.rotate(angle);
-        
+
         // 简化星形为菱形
         final path = Path();
         path.moveTo(0, -particleSize);
@@ -104,7 +106,7 @@ class _FavoriteButtonExplosionPainter extends CustomPainter {
         path.lineTo(0, particleSize);
         path.lineTo(-particleSize / 2, 0);
         path.close();
-        
+
         canvas.drawPath(path, paint);
         canvas.restore();
       }

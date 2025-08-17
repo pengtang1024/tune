@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/repositories/music_repository.dart';
-import 'package:tune/data/services/impl/platform_music_service.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/impl/platform_music_service.dart';
 
 // 服务提供者
 final platformMusicServiceProvider = Provider((ref) {

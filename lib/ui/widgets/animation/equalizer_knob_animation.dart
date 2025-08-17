@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class EqualizerKnobAnimation extends ThemedAnimationBase {
@@ -76,26 +78,26 @@ class _EqualizerKnobPainter extends CustomPainter {
       final angle = (i * 12 - 90) * pi / 180; // 从顶部开始，每12°一条
       final startRadius = i % 3 == 0 ? 15 : 18; // 主刻度更靠近中心
       final endRadius = i % 3 == 0 ? 20 : 23; // 主刻度更长
-      
+
       final startX = center.dx + startRadius * cos(angle);
       final startY = center.dy + startRadius * sin(angle);
       final endX = center.dx + endRadius * cos(angle);
       final endY = center.dy + endRadius * sin(angle);
-      
+
       canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
     }
 
     // 计算回弹角度（±2°）
     final reboundAngle = 0.0349 * sin(reboundProgress * 2 * pi); // 2° in radians
-    
+
     // 绘制旋钮指针
     paint.style = PaintingStyle.fill;
     paint.color = theme.colorScheme.primary;
-    
+
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotationAngle + reboundAngle);
-    
+
     // 绘制指针形状
     final path = Path();
     path.moveTo(0, -15); // 指针尖端
@@ -103,15 +105,15 @@ class _EqualizerKnobPainter extends CustomPainter {
     path.lineTo(0, 3);
     path.lineTo(3, 0);
     path.close();
-    
+
     canvas.drawPath(path, paint);
-    
+
     canvas.restore();
-    
+
     // 绘制旋钮中心点
     paint.color = theme.colorScheme.onPrimaryContainer;
     canvas.drawCircle(center, 4, paint);
-    
+
     paint.color = theme.colorScheme.primary;
     canvas.drawCircle(center, 2, paint);
   }

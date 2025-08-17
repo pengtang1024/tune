@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+
 import 'themed_animation_base.dart';
 
 class PlayButtonBreathingAnimation extends ThemedAnimationBase {

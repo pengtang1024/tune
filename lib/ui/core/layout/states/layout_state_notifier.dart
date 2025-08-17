@@ -6,7 +6,7 @@ class LayoutStateNotifier extends StateNotifier<LayoutState> {
   LayoutStateNotifier() : super(LayoutState.initial());
 
   /// 切换侧边栏展开状态
-  void toggleSidebar() {
-    state = state.copyWith(isSidebarExpanded: !state.isSidebarExpanded);
+  void toggleExpanded() {
+    state = state.copyWith(isExpanded: !state.isExpanded);
   }
 }

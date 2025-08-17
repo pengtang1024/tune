@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ProgressBarSegmentedLoadingAnimation extends ThemedAnimationBase {
@@ -59,14 +61,14 @@ class _ProgressBarSegmentedLoadingPainter extends CustomPainter {
     // 模拟分段加载（最多显示10段）
     final segmentCount = 10;
     final segmentWidth = size.width / segmentCount;
-    
+
     for (int i = 0; i < segmentCount; i++) {
       // 计算每个段落的状态
       final segmentProgress = (progress * segmentCount + i) % segmentCount / segmentCount;
-      
+
       // 段落位置
       final x = i * segmentWidth;
-      
+
       // 根据状态设置颜色
       if (segmentProgress < 0.5) {
         // 已缓存段显示实体色

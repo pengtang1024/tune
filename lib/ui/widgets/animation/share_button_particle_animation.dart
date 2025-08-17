@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ShareButtonParticleAnimation extends ThemedAnimationBase {
@@ -91,22 +93,22 @@ class _ShareButtonParticlePainter extends CustomPainter {
         final angle = (i * 2 * pi / particleCount);
         final baseDistance = particleProgress * 30;
         final distance = baseDistance * (0.8 + 0.4 * (i % 3) / 3);
-        
+
         // 粒子大小逐渐缩小至消失
         final particleSize = 3.0 * (1 - particleProgress);
-        
+
         final x = center.dx + distance * cos(angle);
         final y = center.dy + distance * sin(angle);
-        
+
         paint.style = PaintingStyle.fill;
-        
+
         // 使用主题色的多种变体
         final colors = [
           theme.colorScheme.primary,
           theme.colorScheme.secondary,
           theme.colorScheme.tertiary,
         ];
-        
+
         paint.color = colors[i % colors.length].withValues(alpha: 1.0 - particleProgress);
         canvas.drawCircle(Offset(x, y), particleSize, paint);
       }

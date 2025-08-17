@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class SpectrumFlashAnimation extends ThemedAnimationBase {
@@ -60,7 +62,7 @@ class _SpectrumFlashPainter extends CustomPainter {
 
       // 计算闪烁亮度（80%-100%）
       final flashIntensity = 0.8 + 0.2 * sin(progress * 4 * pi + i);
-      
+
       // 仅强度>50%的柱体参与闪烁
       final effectiveFlash = heightFactor > 0.5 ? flashIntensity : 1.0;
 
@@ -82,9 +84,9 @@ class _SpectrumFlashPainter extends CustomPainter {
 
       canvas.drawRect(
         Rect.fromLTWH(
-          i * barWidth, 
-          size.height - barHeight, 
-          barWidth - 1, 
+          i * barWidth,
+          size.height - barHeight,
+          barWidth - 1,
           barHeight
         ),
         paint,

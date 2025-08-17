@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/providers/router_providers.dart';
-import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/extension/theme_extension.dart';
-import 'package:tune/ui/core/layout/widgets/app_bar.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
+import 'package:tune/domain/models/menu_item.dart';
+import 'package:tune/providers/menu_provider.dart';
+import 'package:tune/ui/core/layout/widgets/custom_app_bar.dart';
 
 class MobileLayout extends ConsumerWidget {
   final Widget child;
@@ -13,44 +12,24 @@ class MobileLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 获取路由状态提供者
-    final routerState = ref.watch(routerProvider);
 
+    final menuState = ref.watch(menuStateProvider);
+    final menuNotifier = ref.read(menuStateProvider.notifier);
+    final noSelected = context.theme.primaryColor.withValues(alpha: 0.6);
+    final selected = context.theme.primaryColor;
     return Scaffold(
       appBar: const CustomAppBar(), // 全局唯一的标题栏
       body: child, // 内容展示区
       bottomNavigationBar: NavigationBar(
-        selectedIndex: routerState.getSelectedIndex(),
-        onDestinationSelected: (int index) {
-          _navigateTo(context, ref, index);
-        },
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined, color: context.theme.primaryColor.withValues(alpha: 0.6)),
-            selectedIcon: Icon(Icons.home, color: context.theme.primaryColor),
-            label: '', // 移除label，使用tooltip替代
-            tooltip: context.loc.home,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.explore_outlined, color: context.theme.primaryColor.withValues(alpha: 0.6)),
-            selectedIcon: Icon(Icons.explore, color: context.theme.primaryColor),
-            label: '',
-            tooltip: '发现', // TODO: 使用本地化
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.library_music_outlined, color: context.theme.primaryColor.withValues(alpha: 0.6)),
-            selectedIcon: Icon(Icons.library_music, color: context.theme.primaryColor),
-            label: '',
-            tooltip: context.loc.library,
-          ),
-        ],
+        selectedIndex: DeviceMenuItem.mobile().firstWhere((item) => item.path == menuState.path).index,
+        onDestinationSelected: (index) => menuNotifier.selectMenu(DeviceMenuItem.mobile()[index].path, false),
+        destinations: DeviceMenuItem.mobile().map((item)=> NavigationDestination(
+          icon: Icon(item.icon, color: noSelected),
+          selectedIcon: Icon(item.icon, color: selected),
+          label: item.label,
+          tooltip: item.label,
+        )).toList(),
       ),
     );
-  }
-
-  /// 导航到指定索引的页面
-  void _navigateTo(BuildContext context, WidgetRef ref, int index) {
-    final router = ref.read(routerProvider.notifier);
-    router.goToIndex(index);
   }
 }

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LoadingNoteRotationAnimation extends ThemedAnimationBase {
@@ -67,13 +69,13 @@ class _LoadingNotePainter extends CustomPainter {
     for (int i = 0; i < 3; i++) {
       final angle = rotation + (i * 2 * pi / 3);
       final distance = 20.0;
-      
+
       final noteX = center.dx + distance * cos(angle);
       final noteY = center.dy + distance * sin(angle);
-      
+
       // 音符大小随位置变化（近大远小，但这里简化处理）
       final noteScale = scale * (0.8 + 0.2 * sin(angle));
-      
+
       // 使用主题色
       final colors = [
         theme.colorScheme.primary,
@@ -81,16 +83,16 @@ class _LoadingNotePainter extends CustomPainter {
         theme.colorScheme.tertiary,
       ];
       paint.color = colors[i % colors.length];
-      
+
       canvas.save();
       canvas.translate(noteX, noteY);
       canvas.scale(noteScale);
-      
+
       // 绘制音符
       canvas.drawCircle(Offset(0, 0), 6, paint);
       canvas.restore();
     }
-    
+
     // 绘制中心点
     paint.color = theme.colorScheme.primary;
     canvas.drawCircle(center, 5, paint);
@@ -98,8 +100,8 @@ class _LoadingNotePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LoadingNotePainter oldDelegate) {
-    return oldDelegate.rotation != rotation || 
-           oldDelegate.scale != scale || 
+    return oldDelegate.rotation != rotation ||
+           oldDelegate.scale != scale ||
            oldDelegate.theme != theme;
   }
 }

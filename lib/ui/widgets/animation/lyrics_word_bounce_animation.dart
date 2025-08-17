@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LyricsWordBounceAnimation extends ThemedAnimationBase {
@@ -89,7 +91,7 @@ class _LyricsWordBouncePainter extends CustomPainter {
     // 逐字绘制并添加弹跳效果
     final wordCount = text.characters.length;
     double currentX = textOffset.dx;
-    
+
     for (int i = 0; i < wordCount; i++) {
       final word = text.characters.elementAt(i);
       final wordSpan = TextSpan(text: word, style: style);
@@ -98,16 +100,16 @@ class _LyricsWordBouncePainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       );
       wordPainter.layout();
-      
+
       // 弹跳曲线为衰减正弦波
       final wordProgress = (progress * wordCount + i) % wordCount / wordCount;
       final bounceHeight = 10.0 * sin(wordProgress * 4 * pi) * exp(-wordProgress * 3);
-      
+
       final wordOffset = Offset(
         currentX,
         textOffset.dy - bounceHeight,
       );
-      
+
       wordPainter.paint(canvas, wordOffset);
       currentX += wordPainter.width;
     }

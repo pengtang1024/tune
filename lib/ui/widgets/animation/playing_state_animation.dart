@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 /// 播放状态动画组件
@@ -25,7 +26,7 @@ class _PlayingStateAnimationState
   void initState() {
     super.initState();
     initAnimationController(widget.duration);
-    
+
     if (widget.isPlaying) {
       repeatAnimation();
     }
@@ -38,7 +39,7 @@ class _PlayingStateAnimationState
   @override
   void didUpdateWidget(covariant PlayingStateAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // 当播放状态改变时，更新动画状态
     if (oldWidget.isPlaying != widget.isPlaying) {
       if (widget.isPlaying) {

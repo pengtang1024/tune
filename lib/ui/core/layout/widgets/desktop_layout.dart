@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:tune/providers/router_providers.dart';
-import 'package:tune/ui/core/layout/widgets/sidebar_menu.dart';
-import 'package:tune/ui/core/layout/widgets/app_bar.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
-import 'package:tune/ui/core/layout/providers/layout_providers.dart';
+import 'package:tune/core/extension/theme_extension.dart';
+import 'package:tune/domain/models/menu_item.dart';
+import 'package:tune/providers/layout_providers.dart';
+import 'package:tune/providers/menu_provider.dart';
+import 'package:tune/ui/core/layout/widgets/custom_app_bar.dart';
+import 'package:tune/ui/core/layout/widgets/desktop_menu/logo_section_widget.dart';
+import 'package:tune/ui/core/layout/widgets/desktop_menu/menu_item_widget.dart';
+import 'package:tune/ui/widgets/user_info_widget.dart';
+
+import 'desktop_menu/expand_button_widget.dart';
 
 class DesktopLayout extends ConsumerWidget {
   final Widget child;
@@ -14,28 +18,48 @@ class DesktopLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 获取当前路由路径，用于确定菜单选中状态
-    final currentRoute = GoRouterState.of(context).uri.toString();
-    // 移除查询参数和锚点，只保留路径部分
-    final cleanRoute = currentRoute.split('?')[0].split('#')[0];
-    
-    // 监听布局状态以响应侧边栏展开/收起变化
-    final layoutState = ref.watch(layoutStateNotifierProvider);
-
+    final menuState = ref.watch(menuStateProvider);
+    final menuNotifier = ref.read(menuStateProvider.notifier);
+    final isExpanded = ref.watch(layoutStateNotifierProvider).isExpanded;
     return Row(
       children: [
-        // 左侧菜单区域（根据展开状态调整宽度）
-        SidebarMenu(
-          onMenuItemSelected: (item) {
-            context.go(item.route);
-            
-            // 更新路由状态
-            final routerNotifier = ref.read(routerProvider.notifier);
-            routerNotifier.updateSelectedMenuItem(item.route);
-          },
-          currentRoute: cleanRoute,
+        // 侧边栏菜单
+        Container(
+          width: isExpanded ? 250 : 80,
+          color: context.theme.colorScheme.surfaceContainerHighest,
+          child: Column(
+            children: [
+              // 顶部Logo区域
+              LogoSectionWidget(isExpanded: isExpanded),
+
+              // 菜单项
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: DeviceMenuItem.desktop()
+                      .map(
+                        (item) => MenuItemWidget(
+                          item: item,
+                          isExpanded: isExpanded,
+                          isSelected: menuState.path == item.path,
+                          onTap: () => {
+                            menuNotifier.selectMenu(item.path, true),
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+
+              // 用户信息区域
+              if (isExpanded) ...[const Divider(), const UserInfoWidget()],
+
+              // 底部展开/收起按钮
+              ExpandButtonWidget(isExpanded: isExpanded),
+            ],
+          ),
         ),
-        // 右侧区域（标题栏+内容区）
+        // 内容区
         Expanded(
           child: Column(
             children: [

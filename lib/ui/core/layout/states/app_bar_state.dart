@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -7,43 +6,43 @@ import 'package:flutter/material.dart';
 class AppBarState {
   /// 标题文本
   final String title;
-  
+
   /// 返回按钮显示状态
   final bool showBackButton;
-  
+
   /// 动态按钮列表（按添加顺序存储）
   final List<Widget> dynamicActions;
-  
+
   /// 当前主题模式
   final ThemeMode themeMode;
-  
+
   /// 当前语言代码
   final Locale locale;
-  
+
   /// "我的"下拉框显示状态
   final bool showMyDropdown;
-  
+
   /// 本地化语言选择框显示状态
   final bool showLanguageDropdown;
-  
+
   /// 当前路由路径
   final String currentRoute;
-  
+
   /// 用户头像URL
   final String? userAvatarUrl;
-  
+
   /// 用户名
   final String? username;
-  
+
   /// 用户等级
   final int? userLevel;
-  
+
   /// 用户标签列表
   final List<String> userTags;
-  
+
   /// 支持的语言列表
   final List<Locale> supportedLocales;
-  
+
   /// 播放按钮悬停状态
   final bool isPlayButtonHovered;
 

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LoadingSoundWaveAnimation extends ThemedAnimationBase {
@@ -51,23 +53,23 @@ class _LoadingSoundWavePainter extends CustomPainter {
 
     // 动态调整线条数量（高端5条，低端3条，这里简化为3-5条）
     final lineCount = 3 + (2 * progress).toInt();
-    
+
     for (int i = 0; i < lineCount; i++) {
       final path = Path();
-      
+
       // 线条间距
       final lineSpacing = size.width / (lineCount + 1);
       final x = (i + 1) * lineSpacing;
-      
+
       // 波动幅度随加载进度增加
       final amplitude = 5 + 10 * progress;
-      
+
       // 每条线频率不同
       final frequency = 0.05 + i * 0.02;
-      
+
       // 移动到起始点
       path.moveTo(x, size.height);
-      
+
       // 绘制上下波动的声波线
       final pointCount = 20;
       for (int j = 1; j <= pointCount; j++) {
@@ -75,7 +77,7 @@ class _LoadingSoundWavePainter extends CustomPainter {
         final offsetX = amplitude * sin(frequency * y + progress * 2 * pi);
         path.lineTo(x + offsetX, y);
       }
-      
+
       // 线条颜色使用主题色
       final colors = [
         theme.colorScheme.primary,

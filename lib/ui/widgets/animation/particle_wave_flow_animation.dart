@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ParticleWaveFlowAnimation extends ThemedAnimationBase {
@@ -52,7 +54,7 @@ class _ParticleWaveFlowPainter extends CustomPainter {
     // 先绘制波形路径
     final path = Path();
     path.moveTo(0, size.height / 2);
-    
+
     final pointCount = 20;
     for (int i = 1; i <= pointCount; i++) {
       final x = i * size.width / pointCount;
@@ -60,7 +62,7 @@ class _ParticleWaveFlowPainter extends CustomPainter {
       final y = size.height / 2 + 10 * sin((i / pointCount) * 4 * pi + progress * 2 * pi);
       path.lineTo(x, y);
     }
-    
+
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 2;
     paint.color = theme.colorScheme.primary;
@@ -72,34 +74,34 @@ class _ParticleWaveFlowPainter extends CustomPainter {
       // 粒子在路径上的位置
       final particleProgress = (progress + i * 0.1) % 1.0;
       final x = particleProgress * size.width;
-      
+
       // 根据波形计算y坐标
       final y = size.height / 2 + 10 * sin(particleProgress * 4 * pi + progress * 2 * pi);
-      
+
       // 粒子经过波峰时轻微上浮，波谷时轻微下沉
       final waveOffset = 2 * sin(particleProgress * 4 * pi + progress * 2 * pi);
-      
+
       // 使用主题色
       final colors = [
         theme.colorScheme.primary,
         theme.colorScheme.secondary,
         theme.colorScheme.tertiary,
       ];
-      
+
       // 粒子颜色
       paint.style = PaintingStyle.fill;
       paint.color = colors[i % colors.length].withValues(alpha: 0.7);
-      
+
       // 绘制粒子
       canvas.drawCircle(Offset(x, y + waveOffset), 2, paint);
-      
+
       // 绘制半透明尾迹（前几个位置）
       for (int j = 1; j <= 3; j++) {
         final trailProgress = (particleProgress - j * 0.02) % 1.0;
         final trailX = trailProgress * size.width;
         final trailY = size.height / 2 + 10 * sin(trailProgress * 4 * pi + progress * 2 * pi);
         final trailOffset = 2 * sin(trailProgress * 4 * pi + progress * 2 * pi);
-        
+
         paint.color = colors[i % colors.length].withValues(alpha: 0.7 - j * 0.2);
         canvas.drawCircle(Offset(trailX, trailY + trailOffset), 1.5 - j * 0.3, paint);
       }

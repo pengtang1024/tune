@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ProgressTimeScrollAnimation extends ThemedAnimationBase {
@@ -52,10 +53,10 @@ class _TimeScrollPainter extends CustomPainter {
     // 模拟时间数字"1:23"的滚动效果
     final minutes = 1;
     final seconds = (23 + (progress * 60)).toInt() % 60;
-    
+
     // 构造时间字符串
     final timeString = "$minutes:${seconds.toString().padLeft(2, '0')}";
-    
+
     // 绘制时间文本
     final textPainter = TextPainter(
       text: TextSpan(
@@ -76,7 +77,7 @@ class _TimeScrollPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();
-    
+
     // 居中绘制
     textPainter.paint(
       canvas,

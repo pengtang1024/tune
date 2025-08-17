@@ -24,7 +24,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retry => '重试';
 
   @override
-  String get home => '主页';
+  String get home => '首页';
 
   @override
   String get recommend => '推荐';
@@ -68,7 +68,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get retry => '重试';
 
   @override
-  String get home => '主页';
+  String get home => '首页';
 
   @override
   String get recommend => '推荐';

@@ -1,7 +1,8 @@
 import 'dart:io' show Platform, Directory, File;
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:file_picker/file_picker.dart';
+
 import 'package:audio_metadata_reader/audio_metadata_reader.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:tune/data/services/music_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';

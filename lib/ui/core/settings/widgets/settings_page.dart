@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
-import 'package:tune/ui/core/settings/providers/settings_providers.dart';
+import 'package:tune/ui/core/settings/widgets/tabs/about_tab.dart';
+import 'package:tune/ui/core/settings/widgets/tabs/account_tab.dart';
+import 'package:tune/ui/core/settings/widgets/tabs/animations_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/general_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/music_library_tab.dart';
-import 'package:tune/ui/core/settings/widgets/tabs/account_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/playback_tab.dart';
-import 'package:tune/ui/core/settings/widgets/tabs/about_tab.dart';
-import 'package:tune/ui/core/settings/widgets/tabs/animations_tab.dart';
 
 /// 设置页面组件
 /// 提供应用设置功能，包括常规设置和音乐库设置
@@ -73,7 +71,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
 // 保留原有的TabView实现
 class SettingsTabView extends ConsumerWidget {
   final int selectedTabIndex;
-  
+
   const SettingsTabView({super.key, this.selectedTabIndex = 0});
 
   @override

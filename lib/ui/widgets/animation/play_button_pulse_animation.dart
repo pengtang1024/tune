@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 /// 播放按钮脉冲动画组件
@@ -64,14 +65,14 @@ class _PlayButtonPulsePainter extends CustomPainter {
     for (int i = 0; i < pulseCount; i++) {
       // 计算当前脉冲的进度
       final ringProgress = (pulseProgress * pulseCount + i) % pulseCount / pulseCount;
-      
+
       // 计算半径和透明度
       final radius = baseRadius + ringProgress * (size.width / 2 - baseRadius);
       final opacity = 1.0 - ringProgress;
 
       // 设置画笔颜色
       paint.color = theme.colorScheme.primary.withValues(alpha: opacity * 0.4);
-      
+
       // 绘制圆环
       canvas.drawCircle(center, radius, paint);
     }

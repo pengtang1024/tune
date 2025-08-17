@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/layout/states/app_bar_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/providers/theme_providers.dart';
+import 'package:tune/ui/core/layout/states/app_bar_state.dart';
 
 /// AppBar模块状态管理器
 /// 负责全局标题栏状态的管理与更新
 class AppBarStateNotifier extends StateNotifier<AppBarState> {
-  AppBarStateNotifier() : super(AppBarState.initial()) {
+  final Ref ref;
+
+  AppBarStateNotifier(this.ref) : super(AppBarState.initial()) {
     _loadPreferences();
     _initSupportedLocales();
     _initUserInfo();
@@ -32,41 +35,42 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
 
   /// 加载用户偏好设置
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    
+    final sharedPrefs = ref.read(sharedPreferencesServiceProvider);
+
     // 加载主题模式
-    final themeModeIndex = prefs.getInt('theme_mode');
+    final themeModeIndex = sharedPrefs.getInt('theme_mode');
     final themeMode = themeModeIndex != null && themeModeIndex >= 0 && themeModeIndex < ThemeMode.values.length
         ? ThemeMode.values[themeModeIndex]
         : ThemeMode.system;
-    
+
     // 加载语言设置
-    final languageCode = prefs.getString('language_code') ?? 'zh';
-    final countryCode = prefs.getString('country_code');
-    final locale = countryCode != null 
-        ? Locale(languageCode, countryCode) 
+    final languageCode = sharedPrefs.getString('language_code') ?? 'zh';
+    final countryCode = sharedPrefs.getString('country_code');
+    final locale = countryCode != null
+        ? Locale(languageCode, countryCode)
         : Locale(languageCode);
-    
+
     state = state.copyWith(
       themeMode: themeMode,
       locale: locale,
     );
   }
-  
+
   /// 保存主题模式
   Future<void> _saveThemeMode(ThemeMode themeMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('theme_mode', themeMode.index);
+    final sharedPrefs = ref.read(sharedPreferencesServiceProvider);
+    ref.read(themeModeProvider.notifier).updateThemeMode(themeMode);
+    await sharedPrefs.setInt('theme_mode', themeMode.index);
   }
-  
+
   /// 保存语言设置
   Future<void> _saveLanguage(Locale locale) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language_code', locale.languageCode);
+    final sharedPrefs= ref.read(sharedPreferencesServiceProvider);
+    await sharedPrefs.setString('language_code', locale.languageCode);
     if (locale.countryCode != null) {
-      await prefs.setString('country_code', locale.countryCode!);
+      await sharedPrefs.setString('country_code', locale.countryCode!);
     } else {
-      await prefs.remove('country_code');
+      await sharedPrefs.remove('country_code');
     }
   }
 
@@ -108,9 +112,10 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       state = state.copyWith(dynamicActions: const []);
     }
   }
-  
+
   /// 循环切换主题模式（浅色->深色->随系统->浅色）
   void toggleThemeMode() {
+
     ThemeMode newThemeMode;
     switch (state.themeMode) {
       case ThemeMode.light:
@@ -123,19 +128,24 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
         newThemeMode = ThemeMode.light;
         break;
     }
-    
     state = state.copyWith(themeMode: newThemeMode);
     _saveThemeMode(newThemeMode);
   }
-  
+
   /// 设置主题模式（支持浅色、深色、自动三种模式）
+/// 设置主题模式的方法
+///
+/// @param themeMode 要设置的主题模式，包括亮色、暗色等选项
   void setThemeMode(ThemeMode themeMode) {
+    // 检查当前主题模式是否与要设置的主题模式不同
     if (state.themeMode != themeMode) {
+      // 更新状态，使用 copyWith 方法创建新的状态实例，只改变 themeMode 属性
       state = state.copyWith(themeMode: themeMode);
+      // 保存设置的主题模式到本地存储
       _saveThemeMode(themeMode);
     }
   }
-  
+
   /// 切换语言
   void switchLanguage(Locale locale) {
     if (state.locale != locale) {
@@ -143,38 +153,38 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       _saveLanguage(locale);
     }
   }
-  
+
   /// 切换"我的"下拉框显示状态
   void toggleMyDropdown() {
     state = state.copyWith(showMyDropdown: !state.showMyDropdown);
   }
-  
+
   /// 设置"我的"下拉框显示状态
   void setShowMyDropdown(bool show) {
     if (state.showMyDropdown != show) {
       state = state.copyWith(showMyDropdown: show);
     }
   }
-  
+
   /// 切换语言选择框显示状态
   void toggleLanguageDropdown() {
     state = state.copyWith(showLanguageDropdown: !state.showLanguageDropdown);
   }
-  
+
   /// 设置语言选择框显示状态
   void setShowLanguageDropdown(bool show) {
     if (state.showLanguageDropdown != show) {
       state = state.copyWith(showLanguageDropdown: show);
     }
   }
-  
+
   /// 处理路由变化
   void handleRouteChange(String route, {String? title, bool? showBackButton}) {
     // 检查路由是否发生变化
     if (state.currentRoute != route) {
       state = state.copyWith(currentRoute: route);
     }
-    
+
     // 如果提供了标题或返回按钮状态，则更新它们
     if (title != null || showBackButton != null) {
       state = state.copyWith(
@@ -183,7 +193,7 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       );
     }
   }
-  
+
   /// 更新用户信息
   void updateUserInfo({
     String? avatarUrl,
@@ -198,19 +208,19 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       userTags: tags,
     );
   }
-  
+
   /// 设置播放按钮悬停状态
   void setPlayButtonHover(bool isHovered) {
     if (state.isPlayButtonHovered != isHovered) {
       state = state.copyWith(isPlayButtonHovered: isHovered);
     }
   }
-  
+
   /// 加载用户信息（模拟方法，实际项目中应从网络或本地存储加载）
   Future<void> loadUserInfo() async {
     // 模拟异步加载用户信息
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     // 设置默认用户信息
     state = state.copyWith(
       username: 'Tune User',

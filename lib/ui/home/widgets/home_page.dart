@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 
 /// 欢迎页面组件
 /// 显示应用的欢迎信息和标语
@@ -10,13 +9,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // 使用addPostFrameCallback避免在构建过程中修改状态
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appBarState = ref.read(appBarStateNotifierProvider);
-      if (appBarState.title != '主页') {
-        final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-        appBarNotifier.updateAppBar('主页', false);
-      }
-    });
+
 
     return Scaffold(
       body: const Center(

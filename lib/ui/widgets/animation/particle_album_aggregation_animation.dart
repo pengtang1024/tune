@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ParticleAlbumAggregationAnimation extends ThemedAnimationBase {
@@ -66,10 +68,10 @@ class _ParticleAlbumAggregationPainter extends CustomPainter {
       // 当前位置 - 基于进度的插值
       final currentX = initialX + (targetX - initialX) * progress;
       final currentY = initialY + (targetY - initialY) * progress;
-      
+
       // 粒子大小随进度变化
       final particleSize = 2.0 + progress * 2.0;
-      
+
       // 粒子颜色 - 使用主题色
       final colors = [
         theme.colorScheme.primary,
@@ -77,24 +79,24 @@ class _ParticleAlbumAggregationPainter extends CustomPainter {
         theme.colorScheme.tertiary,
         theme.colorScheme.error,
       ];
-      
+
       paint.color = colors[i % colors.length].withOpacity(0.7 + progress * 0.3);
-      
+
       canvas.drawCircle(Offset(currentX, currentY), particleSize, paint);
     }
-    
+
     // 当聚合完成时，绘制中心的专辑封面轮廓
     if (progress > 0.7) {
       final scale = (progress - 0.7) / 0.3;
       paint.color = theme.colorScheme.onSurface.withOpacity(scale * 0.5);
       canvas.drawCircle(center, 20 * scale, paint);
-      
+
       // 绘制专辑封面内的音乐符号
       if (scale > 0.5) {
         final iconPaint = Paint()
           ..color = theme.colorScheme.onSurface.withOpacity(scale)
           ..style = PaintingStyle.fill;
-          
+
         // 简化的音乐符号
         canvas.drawCircle(
             Offset(center.dx - 5, center.dy - 5), 3 * scale, iconPaint);

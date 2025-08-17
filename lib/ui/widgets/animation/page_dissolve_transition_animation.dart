@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class PageDissolveTransitionAnimation extends ThemedAnimationBase {
@@ -52,12 +54,12 @@ class _PageDissolveTransitionPainter extends CustomPainter {
     // 模拟页面溶解过渡效果
     // 使用噪声纹理实现溶解效果（简化版）
     final random = Random(12345); // 固定种子确保一致性
-    
+
     // 绘制网格点来模拟噪声效果
     final gridSize = 10;
     final cellWidth = size.width / gridSize;
     final cellHeight = size.height / gridSize;
-    
+
     for (int i = 0; i < gridSize; i++) {
       for (int j = 0; j < gridSize; j++) {
         // 根据噪声值和进度决定是否绘制点
@@ -68,7 +70,7 @@ class _PageDissolveTransitionPainter extends CustomPainter {
           paint.color = HSLColor.fromColor(theme.colorScheme.primary)
               .withLightness(colorIntensity)
               .toColor();
-          
+
           canvas.drawRect(
             Rect.fromLTWH(
               i * cellWidth,
@@ -81,13 +83,13 @@ class _PageDissolveTransitionPainter extends CustomPainter {
         }
       }
     }
-    
+
     // 添加边缘模糊效果（简化）
     final blurPaint = Paint()
       ..color = theme.colorScheme.onSurface.withValues(alpha: 0.3 * (1 - progress))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-      
+
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
       blurPaint,

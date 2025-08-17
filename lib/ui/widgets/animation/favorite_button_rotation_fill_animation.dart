@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class FavoriteButtonRotationFillAnimation extends ThemedAnimationBase {
@@ -67,48 +69,48 @@ class _FavoriteButtonRotationFillPainter extends CustomPainter {
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotation);
-    
+
     // 绘制空心圆（未收藏状态）
     if (fillProgress < 1.0) {
       paint.color = theme.colorScheme.onSurface;
       canvas.drawCircle(Offset(0, 0), 25, paint);
-      
+
       // 绘制空心部分
       paint.color = theme.colorScheme.surface;
       canvas.drawCircle(Offset(0, 0), 20, paint);
     }
-    
+
     // 绘制填充效果（收藏状态）
     if (fillProgress > 0) {
       paint.color = theme.colorScheme.primary.withValues(alpha: fillProgress);
       canvas.drawCircle(Offset(0, 0), 25 * fillProgress, paint);
     }
-    
+
     canvas.restore();
-    
+
     // 绘制轻微抖动效果（完成时）
     if (fillProgress >= 1.0) {
       final shake = 0.1 * sin(rotation * 10);
       canvas.save();
       canvas.translate(center.dx + shake, center.dy + shake);
-      
+
       paint.color = theme.colorScheme.primary;
       canvas.drawCircle(Offset(0, 0), 25, paint);
-      
+
       canvas.restore();
     }
-    
+
     // 绘制心形图标
     final iconPaint = Paint()
-      ..color = fillProgress >= 1.0 
-          ? theme.colorScheme.onPrimary 
+      ..color = fillProgress >= 1.0
+          ? theme.colorScheme.onPrimary
           : theme.colorScheme.onSurface
       ..style = PaintingStyle.fill;
-      
+
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotation / 2);
-    
+
     // 简化的心形形状
     final path = Path();
     path.moveTo(0, -10);
@@ -121,14 +123,14 @@ class _FavoriteButtonRotationFillPainter extends CustomPainter {
     path.lineTo(8, -16);
     path.close();
     canvas.drawPath(path, iconPaint);
-    
+
     canvas.restore();
   }
 
   @override
   bool shouldRepaint(covariant _FavoriteButtonRotationFillPainter oldDelegate) {
-    return oldDelegate.rotation != rotation || 
-           oldDelegate.fillProgress != fillProgress || 
+    return oldDelegate.rotation != rotation ||
+           oldDelegate.fillProgress != fillProgress ||
            oldDelegate.theme != theme;
   }
 }

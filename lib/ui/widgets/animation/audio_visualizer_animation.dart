@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 /// 音频可视化动画组件
@@ -92,7 +92,7 @@ class _AudioVisualizerPainter extends CustomPainter {
     for (int i = 0; i < barCount; i++) {
       final barHeight = maxHeight * barAnimations[i].value;
       final opacity = opacityAnimations[i].value;
-      
+
       // 计算柱子的位置
       final left = i * barWidth + 1;
       final top = (maxHeight - barHeight) / 2;

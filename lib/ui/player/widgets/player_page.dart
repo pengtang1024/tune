@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
-import 'package:tune/ui/player/widgets/player_volume.dart';
 
-/// 播放器主页面
+/// 播放器首页面
 class PlayerPage extends ConsumerWidget {
   const PlayerPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
-    final appBarState = ref.watch(appBarStateNotifierProvider);
 
-    // 更新AppBar状态
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-      appBarNotifier.updateAppBar('播放器', false);
-    });
+
 
     if (playerState.errorMessage.isNotEmpty) {
       return Center(
@@ -38,9 +31,6 @@ class PlayerPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(appBarState.title),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -61,7 +51,7 @@ class PlayerPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             // 歌曲信息
             Text(
               playerState.currentSong!.title,
@@ -77,15 +67,15 @@ class PlayerPage extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            
+
             // 播放进度
             const PlayerProgress(),
             const SizedBox(height: 32),
-            
+
             // 播放控制
             const PlayerControls(),
             const SizedBox(height: 32),
-            
+
             // 音量控制
             const PlayerVolume(),
           ],

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class AlbumFloatingAnimation extends ThemedAnimationBase {
@@ -61,7 +63,7 @@ class _AlbumFloatingPainter extends CustomPainter {
 
     // 绘制专辑封面
     final paint = Paint()..style = PaintingStyle.fill;
-    
+
     // 专辑封面背景
     paint.color = theme.colorScheme.primaryContainer;
     canvas.drawCircle(Offset(center.dx, center.dy + floatOffset), 25, paint);
@@ -75,18 +77,18 @@ class _AlbumFloatingPainter extends CustomPainter {
     // 绘制专辑封面内容（音乐符号）
     paint.style = PaintingStyle.fill;
     paint.color = theme.colorScheme.onPrimaryContainer;
-    
+
     canvas.save();
     canvas.translate(center.dx, center.dy + floatOffset);
     canvas.rotate(rotateAnimation);
-    
+
     // 绘制音乐符号
     canvas.drawCircle(Offset(-6, -3), 3, paint);
     canvas.drawCircle(Offset(6, -3), 3, paint);
     canvas.drawCircle(Offset(0, 6), 3, paint);
-    
+
     canvas.restore();
-    
+
     // 绘制投影（增强悬浮感）
     final shadowPaint = Paint()
       ..color = theme.colorScheme.shadow.withValues(alpha: 0.3 - 0.1 * sin(floatAnimation).abs())

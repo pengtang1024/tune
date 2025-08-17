@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 /// 音符粒子动画组件
@@ -92,11 +94,11 @@ class _NoteParticlePainter extends CustomPainter {
       // 计算粒子位置
       final x = particle.startX + particle.speedX * progress * size.width;
       final y = particle.startY + particle.speedY * progress * size.height;
-      
+
       // 循环处理边界
       final wrappedX = x % (size.width + particle.size) - particle.size;
       final wrappedY = y % (size.height + particle.size) - particle.size;
-      
+
       // 更新旋转角度
       final rotation = particle.rotation + particle.rotationSpeed * progress * 100;
 
@@ -108,22 +110,22 @@ class _NoteParticlePainter extends CustomPainter {
       canvas.save();
       canvas.translate(wrappedX, wrappedY);
       canvas.rotate(rotation);
-      
+
       // 绘制音符图标
       final path = Path();
       final noteSize = particle.size / 2;
-      
+
       // 音符椭圆部分
       path.addOval(Rect.fromLTWH(-noteSize * 0.8, -noteSize * 0.5, noteSize * 1.6, noteSize));
-      
+
       // 音符线部分
       path.moveTo(noteSize * 0.8, -noteSize * 0.3);
       path.lineTo(noteSize * 0.8, -noteSize * 1.5);
       path.moveTo(noteSize * 1.0, -noteSize * 0.3);
       path.lineTo(noteSize * 1.0, -noteSize * 1.3);
-      
+
       canvas.drawPath(path, paint);
-      
+
       // 恢复画布状态
       canvas.restore();
     }

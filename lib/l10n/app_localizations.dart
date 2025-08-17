@@ -132,7 +132,7 @@ abstract class AppLocalizations {
   /// No description provided for @home.
   ///
   /// In zh_CN, this message translates to:
-  /// **'主页'**
+  /// **'首页'**
   String get home;
 
   /// No description provided for @recommend.

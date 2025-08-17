@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class NoteRainAnimation extends ThemedAnimationBase {
@@ -54,15 +56,15 @@ class _NoteRainPainter extends CustomPainter {
       final random = Random(i * 100);
       // 音符的水平位置随机
       final x = random.nextDouble() * size.width;
-      
+
       // 音符的垂直位置基于时间和初始位置
       final startY = (random.nextDouble() * -size.height).toInt().toDouble();
       final endY = size.height;
       final y = startY + (endY - startY) * ((progress + i * 0.2) % 1.0);
-      
+
       // 音符旋转角度
       final rotation = (progress * 2 * pi + i) % (2 * pi);
-      
+
       // 使用主题色
       final colors = [
         theme.colorScheme.primary,
@@ -72,11 +74,11 @@ class _NoteRainPainter extends CustomPainter {
         theme.colorScheme.surfaceTint,
       ];
       paint.color = colors[i % colors.length];
-      
+
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(rotation);
-      
+
       // 绘制音符
       canvas.drawCircle(Offset(0, 0), 4, paint);
       canvas.restore();

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class NoteSpiralAnimation extends ThemedAnimationBase {
@@ -54,24 +56,24 @@ class _SpiralNotePainter extends CustomPainter {
     for (int i = 0; i < noteCount; i++) {
       // 螺旋线螺距固定（50px/圈）
       final pitch = 50.0;
-      
+
       // 时间偏移，使音符间隔均匀
       final timeOffset = i / noteCount;
       final currentProgress = (progress + timeOffset) % 1.0;
-      
+
       // 计算螺旋参数
       final angle = currentProgress * 4 * 2 * pi; // 4圈
       final radius = currentProgress * 30; // 半径逐渐增大
       final height = currentProgress * size.height; // 上升高度
-      
+
       // 计算音符位置
       final x = center.dx + radius * cos(angle);
       final y = center.dy - height;
-      
+
       // 使用主题色并根据高度变化调整透明度
       final colorIntensity = 0.5 + 0.5 * currentProgress;
       paint.color = theme.colorScheme.primary.withValues(alpha: colorIntensity);
-      
+
       // 绘制音符
       canvas.drawCircle(Offset(x, y), 5, paint);
     }

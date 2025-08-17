@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class CircularSpectrumAnimation extends ThemedAnimationBase {
@@ -69,21 +71,21 @@ class _CircularSpectrumPainter extends CustomPainter {
         final angle = (j * 2 * pi / barCount) + animationValue * pi;
         final heightFactor = (0.5 + 0.5 * sin(animationValue * 2 * pi + j * 0.3))
             .clamp(0.2, 1.0);
-        
+
         final startPoint = Offset(
           center.dx +
               (currentRadius - barHeight * heightFactor / 2) * cos(angle),
           center.dy +
               (currentRadius - barHeight * heightFactor / 2) * sin(angle),
         );
-        
+
         final endPoint = Offset(
           center.dx +
               (currentRadius + barHeight * heightFactor / 2) * cos(angle),
           center.dy +
               (currentRadius + barHeight * heightFactor / 2) * sin(angle),
         );
-        
+
         paint.strokeWidth = 3.0;
         paint.style = PaintingStyle.stroke;
         canvas.drawLine(startPoint, endPoint, paint);

@@ -487,7 +487,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
 
   Future<void> _scanCustomPaths() async {
     if (_isScanning || _customScanPaths.isEmpty) return;
-    
+
     await _startScan();
   }
 
@@ -548,7 +548,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     } catch (e) {
       Log.info('MusicScanPage: Scan failed with error: $e');
       String errorMessage = '扫描失败';
-      
+
       // 检查是否为MissingPluginException
       if (e.toString().contains('MissingPluginException')) {
         errorMessage = '当前平台不支持音乐扫描功能。此功能仅在Android和iOS设备上可用。';
@@ -578,23 +578,8 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
   @override
   Widget build(BuildContext context) {
     ref.watch(libraryStateNotifierProvider);
-    final appBarState = ref.watch(appBarStateNotifierProvider);
-
-    // 更新AppBar状态
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-      appBarNotifier.updateAppBar('扫描音乐', true);
-    });
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: appBarState.title,
-        showBackButton: appBarState.showBackButton,
-        onBackButtonPressed: () {
-          // 返回上一页
-          Navigator.of(context).pop();
-        },
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class AudioPeakBlastAnimation extends ThemedAnimationBase {
@@ -53,7 +55,7 @@ class _AudioPeakBlastPainter extends CustomPainter {
     // 绘制中心圆形
     final baseRadius = 15.0;
     final currentRadius = baseRadius * (1 + progress * 2);
-    
+
     // 中心圆使用主题主色
     paint.color = theme.colorScheme.primary.withValues(alpha: 1.0 - progress * 0.7);
     canvas.drawCircle(center, baseRadius * (1 - progress), paint);
@@ -65,14 +67,14 @@ class _AudioPeakBlastPainter extends CustomPainter {
       paint.style = PaintingStyle.stroke;
       paint.color = theme.colorScheme.secondary.withValues(alpha: 0.8 - progress * 0.7);
       canvas.drawCircle(center, waveRadius, paint);
-      
+
       // 绘制向外扩散的粒子
       for (int i = 0; i < 8; i++) {
         final angle = i * pi / 4;
         final blastRadius = currentRadius * 0.7;
         final x = center.dx + blastRadius * cos(angle);
         final y = center.dy + blastRadius * sin(angle);
-        
+
         paint.style = PaintingStyle.fill;
         paint.color = theme.colorScheme.tertiary.withValues(alpha: 0.7 - progress);
         canvas.drawCircle(Offset(x, y), 3 * (1 - progress), paint);

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_initializer.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
-import 'package:tune/providers/router_providers.dart';
 import 'package:tune/config/app_theme.dart';
+import 'package:tune/core/router/app_router.dart';
+import 'package:tune/providers/localization_providers.dart';
+import 'package:tune/providers/theme_providers.dart';
+import 'package:tune/utils/logger.dart';
 
 import 'l10n/app_localizations.dart';
 
@@ -29,8 +31,10 @@ class TuneApp extends ConsumerWidget {
       data: (_) {
         // 监听主题模式变化
         final themeMode = ref.watch(themeModeProvider);
+        Log.info("当前主题模式: $themeMode");
         // 监听语言环境变化
-        final locale = ref.watch(localeProvider);
+        final locale = ref.watch(localeStateProvider);
+        final router = ref.watch(routerProvider);
 
         return MaterialApp.router(
           title: 'Tune',
@@ -40,7 +44,7 @@ class TuneApp extends ConsumerWidget {
           locale: locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: ref.watch(goRouterProvider),
+          routerConfig: router,
           debugShowCheckedModeBanner: false,
         );
       },

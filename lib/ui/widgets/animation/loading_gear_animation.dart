@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class LoadingGearAnimation extends ThemedAnimationBase {
@@ -54,42 +56,42 @@ class _LoadingGearPainter extends CustomPainter {
     canvas.save();
     canvas.translate(center.dx - 20, center.dy);
     canvas.rotate(rotation / 2); // 大齿轮慢
-    
+
     paint.color = theme.colorScheme.primaryContainer;
     _drawGear(canvas, paint, 15, 8, theme); // 半径15，8个齿
-    
+
     canvas.restore();
 
     // 小齿轮
     canvas.save();
     canvas.translate(center.dx + 20, center.dy);
     canvas.rotate(-rotation); // 小齿轮快，反向旋转
-    
+
     paint.color = theme.colorScheme.secondaryContainer;
     _drawGear(canvas, paint, 10, 6, theme); // 半径10，6个齿
-    
+
     canvas.restore();
   }
 
   // 绘制齿轮辅助方法
   void _drawGear(Canvas canvas, Paint paint, double radius, int toothCount, ThemeData theme) {
     final center = Offset(0, 0);
-    
+
     // 绘制齿轮主体
     canvas.drawCircle(center, radius, paint);
-    
+
     // 绘制齿状凸起
     paint.color = theme.colorScheme.onSurface.withValues(alpha: 0.8);
-    
+
     for (int i = 0; i < toothCount; i++) {
       final angle = i * 2 * pi / toothCount;
       final toothRadius = radius + 4;
       final toothX = toothRadius * cos(angle);
       final toothY = toothRadius * sin(angle);
-      
+
       canvas.drawCircle(Offset(toothX, toothY), 2, paint);
     }
-    
+
     // 绘制齿轮中心
     paint.color = theme.colorScheme.surface;
     canvas.drawCircle(center, radius / 2, paint);

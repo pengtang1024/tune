@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class VolumeRippleBarsAnimation extends ThemedAnimationBase {
@@ -54,27 +55,27 @@ class _VolumeRippleBarsPainter extends CustomPainter {
     // 绘制音量涟漪柱状图
     for (int i = 0; i < barCount; i++) {
       // 柱状条高度基于音量模拟值
-      final barHeightFactor = (0.5 + 0.5 * 
+      final barHeightFactor = (0.5 + 0.5 *
         (((progress * barCount + i) % barCount) / barCount));
-      
+
       // 柱状条颜色（使用主题色）
       // 创建渐变效果，从主题主色到次色
       HSLColor primaryHsl = HSLColor.fromColor(theme.colorScheme.primary);
       HSLColor secondaryHsl = HSLColor.fromColor(theme.colorScheme.secondary);
-      
+
       // 根据位置插值颜色
-      final lightness = primaryHsl.lightness + 
+      final lightness = primaryHsl.lightness +
           (secondaryHsl.lightness - primaryHsl.lightness) * (i / barCount);
-      final saturation = primaryHsl.saturation + 
+      final saturation = primaryHsl.saturation +
           (secondaryHsl.saturation - primaryHsl.saturation) * (i / barCount);
-      
+
       paint.color = HSLColor.fromAHSL(
         1.0,
         primaryHsl.hue,
         saturation,
         lightness * barHeightFactor,
       ).toColor();
-      
+
       // 绘制柱状条
       canvas.drawRect(
         Rect.fromLTWH(

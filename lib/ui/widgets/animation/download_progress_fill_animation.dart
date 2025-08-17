@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class DownloadProgressFillAnimation extends ThemedAnimationBase {
@@ -58,7 +60,7 @@ class _DownloadProgressFillPainter extends CustomPainter {
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 2.0;
     paint.color = theme.colorScheme.onSurface.withValues(alpha: 0.5);
-    
+
     // 外圆
     canvas.drawCircle(center, 25, paint);
 

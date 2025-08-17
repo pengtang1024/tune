@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ProgressPulseAnimation extends ThemedAnimationBase {
@@ -64,19 +65,19 @@ class _ProgressPulsePainter extends CustomPainter {
     // 绘制末端滑块
     final sliderX = size.width * 0.7;
     final sliderY = size.height / 2;
-    
+
     // 脉冲效果通过缩放实现
     canvas.save();
     canvas.translate(sliderX, sliderY);
     canvas.scale(pulseScale);
-    
+
     paint.color = theme.colorScheme.primary;
     canvas.drawCircle(Offset(0, 0), 8, paint);
-    
+
     // 滑块内圈
     paint.color = theme.colorScheme.onPrimary;
     canvas.drawCircle(Offset(0, 0), 4, paint);
-    
+
     canvas.restore();
   }
 

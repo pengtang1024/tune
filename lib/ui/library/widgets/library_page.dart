@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tune/core/extension/theme_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
-import 'package:tune/ui/widgets/music_card_widget.dart';
 import 'package:tune/utils/device_utils.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
@@ -175,7 +172,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   Widget _buildSongList() {
     final songsAsync = ref.watch(songsProvider);
-    
+
     return songsAsync.when(
       data: (songs) {
         if (songs.isEmpty) {

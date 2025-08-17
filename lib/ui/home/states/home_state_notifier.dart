@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/home/states/home_state.dart';
 import 'package:tune/ui/home/controllers/home_controller.dart';
+import 'package:tune/ui/home/states/home_state.dart';
 
 class HomeStateNotifier extends StateNotifier<HomeState> {
   final HomeController _homeController;

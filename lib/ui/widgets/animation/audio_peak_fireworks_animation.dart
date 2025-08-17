@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class AudioPeakFireworksAnimation extends ThemedAnimationBase {
@@ -54,12 +56,12 @@ class _FireworksPainter extends CustomPainter {
     // 绘制多个爆发点（随机分布）
     final explosionCount = 3;
     final random = Random(123); // 固定种子确保一致性
-    
+
     for (int i = 0; i < explosionCount; i++) {
       // 随机爆发点位置
       final explosionX = center.dx + (random.nextDouble() - 0.5) * size.width * 0.2;
       final explosionY = center.dy + (random.nextDouble() - 0.5) * size.height * 0.2;
-      
+
       // 绘制粒子（类似烟花）
       final particleCount = 20;
       for (int j = 0; j < particleCount; j++) {

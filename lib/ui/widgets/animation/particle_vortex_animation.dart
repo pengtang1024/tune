@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class ParticleVortexAnimation extends ThemedAnimationBase {
@@ -52,31 +54,31 @@ class _ParticleVortexPainter extends CustomPainter {
 
     // 绘制50个粒子形成旋涡状旋转流动
     final particleCount = 50;
-    
+
     for (int i = 0; i < particleCount; i++) {
       // 粒子初始角度
       final initialAngle = (i * 2 * pi / particleCount);
-      
+
       // 粒子距中心的距离
       final distance = 5 + (i % 10) * 3;
-      
+
       // 转速随音量升高而加快（通过progress模拟）
       final rotationSpeed = 1 + progress;
-      
+
       // 计算当前角度
       final angle = initialAngle + progress * 2 * pi * rotationSpeed;
-      
+
       // 粒子位置
       final x = center.dx + distance * cos(angle);
       final y = center.dy + distance * sin(angle);
-      
+
       // 粒子距中心越近转速越快，颜色也越深
       final speedFactor = 1 - (distance / 35);
       final colorIntensity = 0.3 + 0.7 * speedFactor;
-      
+
       // 使用主题色并根据距离调整透明度
       paint.color = theme.colorScheme.primary.withValues(alpha: colorIntensity);
-      
+
       // 绘制粒子
       canvas.drawCircle(Offset(x, y), 2, paint);
     }

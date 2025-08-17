@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class AlbumSwingAnimation extends ThemedAnimationBase {
@@ -17,7 +19,7 @@ class _AlbumSwingAnimationState extends ThemedAnimationStateBase<AlbumSwingAnima
     super.initState();
     initAnimationController(const Duration(seconds: 3));
     repeatAnimation();
-    
+
     _animation = Tween<double>(begin: -pi/6, end: pi/6).animate(
       CurvedAnimation(parent: controller, curve: Curves.easeInOut),
     );

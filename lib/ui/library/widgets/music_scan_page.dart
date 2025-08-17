@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_description_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_header_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_scan_button_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/custom_path_list_item_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/empty_state_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/error_state_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/widgets/scan_button_widget.dart';
@@ -37,14 +35,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 使用addPostFrameCallback避免在构建过程中修改状态
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appBarState = ref.read(appBarStateNotifierProvider);
-      if (appBarState.title != '扫描音乐') {
-        final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-        appBarNotifier.updateAppBar('扫描音乐', true);
-      }
-    });
+
 
     final state = ref.watch(libraryStateNotifierProvider);
 
@@ -57,7 +48,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
             const ScanHeaderWidget(),
             const SizedBox(height: 16),
             ScanStatusWidget(
-              statusMessage: state.statusMessage, 
+              statusMessage: state.statusMessage,
               errorMessage: state.errorMessage ?? '',
             ),
             const SizedBox(height: 16),
@@ -78,7 +69,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
             const SizedBox(height: 16),
             if (state.errorMessage != null) ...[
               ErrorStateWidget(
-                errorMessage: state.errorMessage!, 
+                errorMessage: state.errorMessage!,
                 onRetry: () {
                   ref.read(libraryStateNotifierProvider.notifier).resetScan();
                   ref.read(libraryStateNotifierProvider.notifier).scanMusic();
@@ -135,7 +126,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       ),
     );
   }
-  
+
   String _formatDuration(int durationInMilliseconds) {
     final duration = Duration(milliseconds: durationInMilliseconds);
     final minutes = duration.inMinutes;

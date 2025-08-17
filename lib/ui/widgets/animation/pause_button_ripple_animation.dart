@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class PauseButtonRippleAnimation extends ThemedAnimationBase {
@@ -56,9 +57,9 @@ class _PauseRipplePainter extends CustomPainter {
 
       // 第一圈100%，第二圈80%，第三圈60%振幅
       final amplitudeFactor = [1.0, 0.8, 0.6][i];
-      
+
       paint.color = theme.colorScheme.primary.withValues(alpha: opacity * amplitudeFactor);
-      
+
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.scale(scale);
@@ -70,12 +71,12 @@ class _PauseRipplePainter extends CustomPainter {
     paint.style = PaintingStyle.fill;
     paint.color = theme.colorScheme.primary;
     canvas.drawCircle(center, 10, paint);
-    
+
     // 绘制暂停图标
     final iconPaint = Paint()
       ..color = theme.colorScheme.onPrimary
       ..style = PaintingStyle.fill;
-      
+
     // 绘制两个竖条表示暂停
     final rectWidth = 3.0;
     final rectHeight = 8.0;
@@ -87,7 +88,7 @@ class _PauseRipplePainter extends CustomPainter {
       ),
       iconPaint,
     );
-    
+
     canvas.drawRect(
       Rect.fromCenter(
         center: Offset(center.dx + rectWidth/2 + 1, center.dy),

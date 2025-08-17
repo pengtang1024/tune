@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class VolumeBubbleAnimation extends ThemedAnimationBase {
@@ -54,21 +56,21 @@ class _VolumeBubblePainter extends CustomPainter {
     for (int i = 0; i < bubbleCount; i++) {
       // 气泡位置基于时间进度
       final bubbleProgress = (progress * bubbleCount + i) % bubbleCount / bubbleCount;
-      
+
       // 气泡位置
       final x = 20 + (i % 4) * 15.0;
       final y = size.height - 10 - bubbleProgress * (size.height - 20);
-      
+
       // 气泡大小和透明度
       final radius = 3 + 5 * sin(bubbleProgress * pi);
       final opacity = (1 - bubbleProgress) * 0.8;
-      
+
       // 气泡颜色
       paint.color = theme.colorScheme.primary.withOpacity(opacity);
-      
+
       // 绘制气泡
       canvas.drawCircle(Offset(x, y), radius, paint);
-      
+
       // 绘制高光
       paint.color = theme.colorScheme.onPrimary.withOpacity(opacity * 0.5);
       canvas.drawCircle(

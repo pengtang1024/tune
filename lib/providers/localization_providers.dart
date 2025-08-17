@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/persistence_service.dart';
-import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/providers/persistence_providers.dart';
 
 /// 本地化服务提供者
 final localizationServiceProvider = Provider<LocalizationService>((ref) {
@@ -11,7 +11,7 @@ final localizationServiceProvider = Provider<LocalizationService>((ref) {
 });
 
 /// 当前语言环境状态提供者
-final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
+final localeStateProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
   final localizationService = ref.watch(localizationServiceProvider);
   return LocaleNotifier(localizationService);
 });
@@ -40,7 +40,7 @@ class LocalizationService {
         }
       }
     }
-    
+
     // 返回默认语言环境
     return const Locale('en');
   }
@@ -58,8 +58,9 @@ class LocaleNotifier extends StateNotifier<Locale> {
   /// 更新语言环境
   Future<void> updateLocale(Locale? locale) async {
     if (locale == null) return;
-    
+
     state = locale;
+
     await _localizationService.saveLocale(locale);
   }
 }

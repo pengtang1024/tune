@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class AudioWaveElasticAnimation extends ThemedAnimationBase {
@@ -59,28 +61,28 @@ class _AudioWaveElasticPainter extends CustomPainter {
 
     // 移动到起始点
     path.moveTo(0, size.height / 2);
-    
+
     // 绘制波形线
     for (int i = 1; i <= pointCount; i++) {
       final x = i * size.width / pointCount;
       // 波形公式: y = A * sin(B * x + C)
       final y = size.height / 2 +
           amplitude * sin((i / pointCount) * 2 * pi + animation);
-      
+
       path.lineTo(x, y);
     }
-    
+
     canvas.drawPath(path, paint);
-    
+
     // 绘制波峰高光点
     final highlightPaint = Paint()
       ..color = theme.colorScheme.onPrimary
       ..style = PaintingStyle.fill;
-      
+
     final highlightX = size.width / 2;
     final highlightY = size.height / 2 +
         amplitude * sin(0.5 * 2 * pi + animation);
-        
+
     canvas.drawCircle(Offset(highlightX, highlightY), 3, highlightPaint);
   }
 

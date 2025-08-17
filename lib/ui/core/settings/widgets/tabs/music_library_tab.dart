@@ -1,6 +1,6 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 class MusicLibraryTab extends ConsumerStatefulWidget {
@@ -27,7 +27,7 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
 
     // 使用全局的sharedPreferencesServiceProvider
     final persistenceService = ref.read(sharedPreferencesServiceProvider);
-    
+
     setState(() {
       _customScanPaths = persistenceService.getStringList('custom_scan_paths') ?? [];
       _isLoading = false;
@@ -37,7 +37,7 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
   Future<void> _saveSetting(String key, dynamic value) async {
     // 使用全局的sharedPreferencesServiceProvider
     final persistenceService = ref.read(sharedPreferencesServiceProvider);
-    
+
     if (value is List<String>) {
       await persistenceService.setStringList(key, value);
     }
@@ -78,7 +78,7 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          
+
           // 添加自定义扫描目录
           Card(
             child: Padding(
@@ -105,7 +105,7 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   if (_customScanPaths.isEmpty)
                     const Center(
                       child: Text(
@@ -140,7 +140,7 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                         );
                       },
                     ),
-                  
+
                   const SizedBox(height: 16),
                   const Text(
                     '注意：请通过侧边栏的"音乐扫描"功能进行全平台扫描',
@@ -150,9 +150,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 音乐库信息
           Card(
             child: Padding(
@@ -183,9 +183,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 扫描说明
           Card(
             child: Padding(
@@ -246,9 +246,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 常见问题
           Card(
             child: Padding(

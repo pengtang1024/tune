@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'themed_animation_base.dart';
 
 class SectorSpectrumAnimation extends ThemedAnimationBase {
@@ -52,22 +54,22 @@ class _SectorSpectrumPainter extends CustomPainter {
 
     // 音量模拟值（0-100%）
     final volume = (50 + 50 * sin(progress * 2 * pi)).clamp(0.0, 100.0);
-    
+
     // 扇形角度 = 音量 × 3.6°
     final sectorAngle = volume * 3.6 * pi / 180;
-    
+
     // 绘制3条平行线，随角度同步展开
     final lineCount = 3;
     for (int i = 0; i < lineCount; i++) {
       // 线条距离中心的距离
       final radius = 20.0 + i * 10.0;
-      
+
       // 线条颜色与音量关联（高音量偏亮）
       final brightness = 0.5 + 0.5 * (volume / 100);
       paint.color = HSLColor.fromColor(theme.colorScheme.primary)
           .withLightness(brightness)
           .toColor();
-      
+
       // 绘制扇形弧线
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
