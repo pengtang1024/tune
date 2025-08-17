@@ -238,7 +238,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   Wrap(
                     spacing: 5,
                     runSpacing: 3,
-                    children: state.userTags.map((tag) {
+                    children: state.userTags.map<Widget>((tag) {
                       Color tagColor = Colors.grey;
                       if (tag == 'vip') {
                         tagColor = Colors.red;

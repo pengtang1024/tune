@@ -4,6 +4,7 @@ import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
+import 'package:tune/ui/player/widgets/player_volume.dart';
 
 /// 播放器主页面
 class PlayerPage extends ConsumerWidget {
@@ -86,7 +87,7 @@ class PlayerPage extends ConsumerWidget {
             const SizedBox(height: 32),
             
             // 音量控制
-            const VolumeControl(),
+            const PlayerVolume(),
           ],
         ),
       ),
@@ -95,8 +96,8 @@ class PlayerPage extends ConsumerWidget {
 }
 
 /// 音量控制组件
-class VolumeControl extends ConsumerWidget {
-  const VolumeControl({super.key});
+class PlayerVolume extends ConsumerWidget {
+  const PlayerVolume({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
