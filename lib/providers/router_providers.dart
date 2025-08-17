@@ -8,6 +8,7 @@ import 'package:tune/ui/featured/widgets/featured_page.dart';
 import 'package:tune/ui/library/widgets/library_page.dart';
 import 'package:tune/ui/library/widgets/music_scan_page.dart';
 import 'package:tune/ui/core/settings/widgets/settings_page.dart';
+import 'package:tune/providers/router_observer.dart';
 
 /// 路由状态
 class RouterState {
@@ -46,10 +47,40 @@ class RouterState {
 
 /// 路由状态管理器
 class RouterNotifier extends StateNotifier<RouterState> {
-  RouterNotifier() : super(RouterState(selectedMenuItem: '/'));
+  GoRouter? _router;
+
+  RouterNotifier() : super(RouterState(selectedMenuItem: '/')) {
+    // 初始化时注册路由观察者
+  }
+
+  void setRouter(GoRouter router) {
+    _router = router;
+  }
 
   void updateSelectedMenuItem(String path) {
     state = state.copyWith(selectedMenuItem: path);
+  }
+
+  /// 根据索引导航到对应页面
+  void goToIndex(int index) {
+    if (_router == null) return;
+
+    switch (index) {
+      case 0:
+        _router!.go('/');
+        break;
+      case 1:
+        _router!.go('/recommend');
+        break;
+      case 2:
+        _router!.go('/featured');
+        break;
+      case 3:
+        _router!.go('/library');
+        break;
+      default:
+        _router!.go('/');
+    }
   }
 }
 
@@ -58,9 +89,16 @@ final routerProvider = StateNotifierProvider<RouterNotifier, RouterState>((ref) 
   return RouterNotifier();
 });
 
+
 /// GoRouter提供者，用于在整个应用中提供路由实例
 final goRouterProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
+  final routerNotifier = ref.read(routerProvider.notifier);
+  
+  // 创建一个GlobalKey用于Navigator
+  final navigatorKey = GlobalKey<NavigatorState>();
+  
+  final router = GoRouter(
+    navigatorKey: navigatorKey,
     routes: [
       ShellRoute(
         builder: (BuildContext context, GoRouterState state, Widget child) {
@@ -73,6 +111,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const HomePage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
           GoRoute(
             path: '/recommend',
@@ -80,6 +121,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const RecommendPage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
           GoRoute(
             path: '/featured',
@@ -87,6 +131,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const FeaturedPage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
           GoRoute(
             path: '/library',
@@ -94,6 +141,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const LibraryPage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
           GoRoute(
             path: '/music-scan',
@@ -101,6 +151,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const MusicScanPage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
           GoRoute(
             path: '/settings',
@@ -108,9 +161,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) {
               return const SettingsPage();
             },
+            routes: [
+              // 添加子路由示例
+            ],
           ),
         ],
       ),
     ],
   );
+  
+  // 设置路由器实例
+  routerNotifier.setRouter(router);
+  
+  return router;
 });

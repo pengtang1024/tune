@@ -1,19 +1,190 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 
-class FeaturedPage extends StatelessWidget {
-// 这是一个名为FeaturedPage的常量构造函数
-// 使用const关键字声明这是一个编译时常量
-// 接收一个可选的key参数，这是Flutter中Widget的标准做法
-// super.key表示将key参数传递给父类构造函数
+/// 精选页面组件
+/// 显示精选的音乐内容
+class FeaturedPage extends ConsumerWidget {
   const FeaturedPage({super.key});
 
   @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 使用addPostFrameCallback避免在构建过程中修改状态
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appBarState = ref.read(appBarStateNotifierProvider);
+      if (appBarState.title != '精选') {
+        final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
+        appBarNotifier.updateAppBar('精选', false);
+      }
+    });
+
+    return Scaffold(
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.featured_play_list,
+              size: 64,
+              color: Colors.blue,
+            ),
+            SizedBox(height: 16),
+            Text(
+              '精选页面',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              '这里将显示精选的音乐内容',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  const _Section({
+    required this.title,
+    required this.children,
+  });
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        '精选页面\n这里将显示精选的音乐内容',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 24),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...children,
+      ],
+    );
+  }
+}
+
+class _ArtistItem extends StatelessWidget {
+  final String name;
+  final String genre;
+
+  const _ArtistItem({
+    required this.name,
+    required this.genre,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Icon(
+              Icons.person,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          title: Text(name),
+          subtitle: Text(genre),
+          trailing: const Icon(Icons.arrow_forward_ios),
+        ),
+      ),
+    );
+  }
+}
+
+class _AlbumItem extends StatelessWidget {
+  final String title;
+  final String artist;
+
+  const _AlbumItem({
+    required this.title,
+    required this.artist,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.album,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          title: Text(title),
+          subtitle: Text(artist),
+          trailing: const Icon(Icons.arrow_forward_ios),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlaylistItem extends StatelessWidget {
+  final String title;
+  final int songCount;
+
+  const _PlaylistItem({
+    required this.title,
+    required this.songCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.queue_music,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          title: Text(title),
+          subtitle: Text('$songCount 首歌曲'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+        ),
       ),
     );
   }

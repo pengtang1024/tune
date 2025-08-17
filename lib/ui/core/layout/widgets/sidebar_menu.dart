@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tune/domain/models/menu_item.dart';
-import 'package:tune/ui/core/layout/providers/sidebar_providers.dart';
+import 'package:tune/ui/core/layout/providers/layout_providers.dart';
 import 'package:tune/core/extension/theme_extension.dart';
+import 'package:tune/ui/core/layout/widgets/sidebar_menu/widgets/expand_button_widget.dart';
+import 'package:tune/ui/core/layout/widgets/sidebar_menu/widgets/logo_section_widget.dart';
+import 'package:tune/ui/core/layout/widgets/sidebar_menu/widgets/menu_item_widget.dart';
 
 class SidebarMenu extends ConsumerWidget {
   final Function(MenuItem) onMenuItemSelected;
@@ -17,8 +19,8 @@ class SidebarMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sidebarState = ref.watch(sidebarMenuProvider);
-    final isExpanded = sidebarState.isExpanded;
+    final layoutState = ref.watch(layoutStateNotifierProvider);
+    final isExpanded = layoutState.isSidebarExpanded;
 
     final menuItems = [
       MenuItem(
@@ -33,7 +35,7 @@ class SidebarMenu extends ConsumerWidget {
       ),
       MenuItem(
         title: '精选',
-        icon: Icons.star_outline,
+        icon: Icons.featured_play_list_outlined,
         route: '/featured',
       ),
       MenuItem(
@@ -41,76 +43,42 @@ class SidebarMenu extends ConsumerWidget {
         icon: Icons.library_music_outlined,
         route: '/library',
       ),
+      MenuItem(
+        title: '设置',
+        icon: Icons.settings_outlined,
+        route: '/settings',
+      ),
     ];
 
-    return Material(
-      // 添加Material组件以支持ListTile
-      child: Container(
-        width: isExpanded ? 250 : 80,
-        decoration: BoxDecoration(
-          color: context.theme.cardColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(2, 0),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // 应用标题栏
-            _buildAppHeader(context, isExpanded),
-            // 菜单项目列表
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: menuItems.map((item) => _buildMenuItem(context, ref, item, currentRoute)).toList(),
-              ),
-            ),
-            // 用户信息区域
-            _buildUserSection(context, isExpanded),
-            // 菜单展开/收缩按钮移到底部
-            _buildExpandButton(context, ref, isExpanded),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 构建应用头部组件
-  ///
-  /// @param context 上下文
-  /// @param isExpanded 是否展开
-  Widget _buildAppHeader(BuildContext context, bool isExpanded) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
+      width: isExpanded ? 250 : 80,
+      color: context.theme.colorScheme.surfaceContainerHighest,
+      child: Column(
         children: [
-          // 应用图标
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: context.theme.primaryColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.music_note,
-              color: context.theme.colorScheme.onPrimary,
+          // 顶部Logo区域
+          LogoSectionWidget(isExpanded: isExpanded),
+
+          // 菜单项
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: menuItems.map((item) => MenuItemWidget(
+                item: item,
+                isExpanded: isExpanded,
+                isSelected: currentRoute == item.route,
+                onTap: () => onMenuItemSelected(item),
+              )).toList(),
             ),
           ),
-          // 应用名称 (仅在展开时显示)
+
+          // 用户信息区域
           if (isExpanded) ...[
-            const SizedBox(width: 12),
-            Text(
-              'Tune',
-              style: context.theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.theme.primaryColor,
-              ),
-            ),
+            const Divider(),
+            const _UserInfoWidget(),
           ],
+
+          // 底部展开/收起按钮
+          _buildExpandButton(context, ref, isExpanded),
         ],
       ),
     );
@@ -119,154 +87,85 @@ class SidebarMenu extends ConsumerWidget {
   /// 构建展开/收缩按钮
   ///
   /// @param context 上下文
-  /// @param ref Provider引用
+  /// @param ref WidgetRef
   /// @param isExpanded 是否展开
   Widget _buildExpandButton(BuildContext context, WidgetRef ref, bool isExpanded) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: isExpanded ? MainAxisAlignment.end : MainAxisAlignment.center,
-        children: [
-          IconButton(
-            onPressed: () => ref.read(sidebarMenuProvider.notifier).toggleExpanded(),
-            icon: Icon(
-              isExpanded ? Icons.chevron_left : Icons.chevron_right,
-              color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-            tooltip: isExpanded ? '收起菜单' : '展开菜单',
+    final layoutNotifier = ref.read(layoutStateNotifierProvider.notifier);
+
+    return Material(
+      color: Colors.transparent,
+      child: SizedBox(
+        height: 48.0, // 固定高度确保一致性
+        child: InkWell(
+          onTap: () {
+            layoutNotifier.toggleSidebar();
+          },
+          child: Row(
+            children: [
+              // 固定宽度的图标区域，确保展开和收起时宽度一致
+              SizedBox(
+                width: 80.0,
+                child: Center(
+                  child: Icon(
+                    isExpanded ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
+                    size: 24.0,
+                  ),
+                ),
+              ),
+              // 文字区域，收起时隐藏
+              if (isExpanded)
+                Expanded(
+                  child: Text(
+                    '收起侧边栏',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+}
 
-  /// 构建菜单项
-  ///
-  /// @param context 上下文
-  /// @param ref Provider引用
-  /// @param item 菜单项数据
-  /// @param currentRoute 当前路由
-  Widget _buildMenuItem(BuildContext context, WidgetRef ref, MenuItem item, String currentRoute) {
-    final isExpanded = ref.watch(sidebarMenuProvider).isExpanded;
-    // 修复路由匹配逻辑，确保正确识别当前选中项
-    final isSelected = _isRouteSelected(currentRoute, item.route);
+/// 用户信息组件
+class _UserInfoWidget extends StatelessWidget {
+  const _UserInfoWidget();
 
-    // 桌面端：展开时图标和标题之间应有适当间距，收起时只显示图标，鼠标悬停或长按时显示提示信息
-    if (isExpanded) {
-      return ListTile(
-        leading: Icon(
-          item.icon,
-          color: isSelected 
-            ? context.theme.primaryColor
-            : context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
-        ),
-        title: Text(
-          item.title,
-          style: TextStyle(
-            color: isSelected 
-              ? context.theme.primaryColor
-              : context.theme.colorScheme.onSurface,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 20,
+            child: Icon(Icons.person, size: 20),
           ),
-        ),
-        selected: isSelected,
-        onTap: () => onMenuItemSelected(item),
-        horizontalTitleGap: 16.0, // 增加图标和标题之间的间距
-      );
-    } else {
-      // 收起时只显示图标，使用InkWell和Tooltip显示提示信息
-      return Tooltip(
-        message: item.title,
-        child: InkWell(
-          onTap: () => onMenuItemSelected(item),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            child: Icon(
-              item.icon,
-              color: isSelected 
-                ? context.theme.primaryColor
-                : context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '用户名',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'user@example.com',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      );
-    }
-  }
-
-  /// 判断路由是否被选中
-  ///
-  /// @param currentRoute 当前路由
-  /// @param itemRoute 菜单项路由
-  bool _isRouteSelected(String currentRoute, String itemRoute) {
-    // 处理根路径的特殊情况
-    if (itemRoute == '/') {
-      return currentRoute == '/' || currentRoute.isEmpty;
-    }
-    
-    // 对于其他路径，检查是否以该路径开头（处理带参数的路由）
-    return currentRoute == itemRoute;
-  }
-
-  /// 构建用户信息区域
-  ///
-  /// @param context 上下文
-  /// @param isExpanded 是否展开
-  Widget _buildUserSection(BuildContext context, bool isExpanded) {
-    // 使用Flexible包装用户信息区域，防止布局溢出
-    return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // 限制高度为最小必要尺寸
-          children: [
-            const Divider(),
-            isExpanded
-                ? ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: context.theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        color: context.theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                    title: Text(
-                      '用户名',
-                      style: context.theme.textTheme.titleMedium,
-                    ),
-                    subtitle: Text(
-                      'user@example.com',
-                      style: context.theme.textTheme.bodySmall?.copyWith(
-                        color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    onTap: () {
-                      // TODO: 导航到用户个人资料页面
-                    },
-                  )
-                : InkWell(
-                    onTap: () {
-                      // TODO: 导航到用户个人资料页面
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: context.theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        color: context.theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-          ],
-        ),
+        ],
       ),
     );
   }

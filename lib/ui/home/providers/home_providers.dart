@@ -1,12 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/repositories/music_repository.dart';
 import 'package:tune/data/services/impl/platform_music_service.dart';
-import 'package:tune/ui/home/view_model/home_view_model.dart';
+import 'package:tune/ui/home/states/home_state_notifier.dart';
+import 'package:tune/ui/home/states/home_state.dart';
+import 'package:tune/ui/home/controllers/home_controller.dart';
 
-/// 主页视图模型提供者
-final homeViewModelProvider = StateNotifierProvider<HomeViewModel, HomeViewState>((ref) {
-  // 重新创建依赖项而不是从其他providers文件中导入
+/// HomeController提供者
+final homeControllerProvider = Provider<HomeController>((ref) {
   final service = PlatformMusicService();
   final repository = MusicRepository(musicService: service);
-  return HomeViewModel(musicRepository: repository);
+  return HomeController(musicRepository: repository);
+});
+
+/// HomeStateNotifier提供者
+final homeStateNotifierProvider =
+    StateNotifierProvider<HomeStateNotifier, HomeState>((ref) {
+  final controller = ref.watch(homeControllerProvider);
+  return HomeStateNotifier(homeController: controller);
 });

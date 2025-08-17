@@ -120,18 +120,21 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                       itemCount: _customScanPaths.length,
                       itemBuilder: (context, index) {
                         final path = _customScanPaths[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: ListTile(
-                            title: Text(
-                              path,
-                              style: const TextStyle(
-                                fontSize: 12,
+                        return Material(
+                          color: Colors.transparent,
+                          child: Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              title: Text(
+                                path,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => _removeCustomScanPath(index),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _removeCustomScanPath(index),
+                              ),
                             ),
                           ),
                         );

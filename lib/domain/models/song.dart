@@ -9,7 +9,7 @@ class Song extends SongModel {
 
   // 确保title不为空
   @override
-  String get title => super.title ?? '未知歌曲';
+  String get title => super.title;
 
   // 确保artist不为空
   @override

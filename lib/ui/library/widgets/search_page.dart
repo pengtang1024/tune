@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
-import 'package:tune/ui/library/view_model/search_view_model.dart';
+import 'package:tune/ui/library/states/search_state.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final String? query;
@@ -38,14 +38,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _performSearch(String query) {
-    final searchViewModel = ref.read(searchViewModelProvider.notifier);
-    searchViewModel.searchSongs(query);
+    final searchNotifier = ref.read(searchStateNotifierProvider.notifier);
+    searchNotifier.searchSongs(query);
   }
 
   @override
   Widget build(BuildContext context) {
-    final searchState = ref.watch(searchViewModelProvider);
-    final searchViewModel = ref.read(searchViewModelProvider.notifier);
+    final searchState = ref.watch(searchStateNotifierProvider);
+    final searchNotifier = ref.read(searchStateNotifierProvider.notifier);
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -70,7 +70,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                             icon: const Icon(Icons.clear),
                             onPressed: () {
                               _searchController.clear();
-                              searchViewModel.updateQuery('');
+                              searchNotifier.updateQuery('');
                             },
                           )
                         : null,
@@ -79,13 +79,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                   onChanged: (value) {
-                    searchViewModel.updateQuery(value);
+                    searchNotifier.updateQuery(value);
                   },
                   onSubmitted: (value) {
-                    searchViewModel.searchSongs(value);
+                    searchNotifier.searchSongs(value);
                   },
                 ),
               ),
@@ -109,7 +109,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildSearchResults(dynamic state) {
+  Widget _buildSearchResults(SearchState state) {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -139,27 +139,30 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _buildSongItem(Song song) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(8),
+    return Material(
+      color: Colors.transparent,
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.music_note,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-          child: Icon(
-            Icons.music_note,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+          title: Text(song.title),
+          subtitle: Text('${song.artist ?? '未知艺术家'} · ${song.album ?? '未知专辑'}'),
+          trailing: Text(_formatDuration(song.duration)),
+          onTap: () {
+            // TODO: 实现播放功能
+          },
         ),
-        title: Text(song.title),
-        subtitle: Text('${song.artist ?? '未知艺术家'} · ${song.album ?? '未知专辑'}'),
-        trailing: Text(_formatDuration(song.duration)),
-        onTap: () {
-          // TODO: 实现播放功能
-        },
       ),
     );
   }

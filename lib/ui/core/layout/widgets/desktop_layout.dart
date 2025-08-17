@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/providers/router_providers.dart';
 import 'package:tune/ui/core/layout/widgets/sidebar_menu.dart';
+import 'package:tune/ui/core/layout/widgets/app_bar.dart';
+import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
+import 'package:tune/ui/core/layout/providers/layout_providers.dart';
 
 class DesktopLayout extends ConsumerWidget {
   final Widget child;
@@ -15,10 +18,13 @@ class DesktopLayout extends ConsumerWidget {
     final currentRoute = GoRouterState.of(context).uri.toString();
     // 移除查询参数和锚点，只保留路径部分
     final cleanRoute = currentRoute.split('?')[0].split('#')[0];
+    
+    // 监听布局状态以响应侧边栏展开/收起变化
+    final layoutState = ref.watch(layoutStateNotifierProvider);
 
     return Row(
       children: [
-        // 使用SidebarMenu组件替换NavigationRail
+        // 左侧菜单区域（根据展开状态调整宽度）
         SidebarMenu(
           onMenuItemSelected: (item) {
             context.go(item.route);
@@ -29,8 +35,19 @@ class DesktopLayout extends ConsumerWidget {
           },
           currentRoute: cleanRoute,
         ),
-        // 主内容区域
-        Expanded(child: child),
+        // 右侧区域（标题栏+内容区）
+        Expanded(
+          child: Column(
+            children: [
+              // 全局唯一的标题栏（固定高度）
+              const CustomAppBar(),
+              // 内容展示区（占右侧剩余空间）
+              Expanded(
+                child: child, // 仅在此区域进行页面切换更新
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

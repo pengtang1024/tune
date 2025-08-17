@@ -1,39 +1,33 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/music_providers.dart';
-import 'package:tune/ui/library/view_model/library_view_model.dart';
-import 'package:tune/ui/library/view_model/search_view_model.dart';
+import 'package:tune/ui/library/states/library_state_notifier.dart';
+import 'package:tune/ui/library/states/library_state.dart';
+import 'package:tune/ui/library/states/search_state_notifier.dart';
+import 'package:tune/ui/library/states/search_state.dart';
+import 'package:tune/ui/library/controllers/library_controller.dart';
 
-final libraryProvider = StateNotifierProvider<LibraryNotifier, LibraryState>((ref) {
-  return LibraryNotifier();
+// Library状态管理器提供者
+final libraryStateNotifierProvider =
+    StateNotifierProvider<LibraryStateNotifier, LibraryState>((ref) {
+  return LibraryStateNotifier();
 });
 
-final songsProvider = FutureProvider<List<Song>>((ref) async {
-  try {
-    final repository = ref.watch(musicRepositoryProvider);
-    return await repository.getAllSongs();
-  } catch (e) {
-    // 返回空列表而不是抛出错误，确保UI可以正常显示
-    return [];
-  }
-});
-
-final searchSongsProvider = FutureProvider.family<List<Song>, String>((ref, query) async {
-  try {
-    if (query.trim().isEmpty) {
-      return [];
-    }
-    
-    final repository = ref.watch(musicRepositoryProvider);
-    return await repository.searchSongs(query);
-  } catch (e) {
-    // 返回空列表而不是抛出错误，确保UI可以正常显示
-    return [];
-  }
-});
-
-// 搜索视图模型提供者
-final searchViewModelProvider = StateNotifierProvider<SearchViewModel, SearchState>((ref) {
+// Library控制器提供者
+final libraryControllerProvider = Provider<LibraryController>((ref) {
   final repository = ref.watch(musicRepositoryProvider);
-  return SearchViewModel(musicRepository: repository);
+  return LibraryController(musicRepository: repository);
+});
+
+// 所有歌曲提供者
+final songsProvider = FutureProvider<List<Song>>((ref) async {
+  final controller = ref.watch(libraryControllerProvider);
+  return await controller.getAllSongs();
+});
+
+// 搜索状态管理器提供者
+final searchStateNotifierProvider =
+    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
+  final repository = ref.watch(musicRepositoryProvider);
+  return SearchStateNotifier(musicRepository: repository);
 });

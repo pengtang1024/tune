@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/ui/core/settings/view_model/settings_view_model.dart';
+import 'package:tune/ui/core/settings/states/settings_state_notifier.dart';
+import 'package:tune/ui/core/settings/states/settings_state.dart';
 
-final settingsViewModelProvider = StateNotifierProvider<SettingsViewModel, SettingsState>((ref) {
-  return SettingsViewModel();
+final settingsStateNotifierProvider =
+    StateNotifierProvider<SettingsStateNotifier, SettingsState>((ref) {
+  return SettingsStateNotifier();
 });

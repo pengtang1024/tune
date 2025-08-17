@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/data/services/persistence_service.dart';
 
 class GeneralTab extends ConsumerStatefulWidget {
   const GeneralTab({super.key});

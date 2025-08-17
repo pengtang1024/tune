@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_initializer.dart';
-import 'package:tune/providers/theme_providers.dart';
-import 'package:tune/providers/localization_providers.dart'; // 添加本地化提供者
+import 'package:tune/ui/core/layout/providers/app_bar_providers.dart';
 import 'package:tune/providers/router_providers.dart';
-import 'package:tune/ui/core/themes/app_theme.dart';
+import 'package:tune/config/app_theme.dart';
 
 import 'l10n/app_localizations.dart';
 
