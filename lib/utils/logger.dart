@@ -1,9 +1,13 @@
 import 'package:logger/logger.dart';
+import 'package:tune/utils/logger_config.dart';
 
 class Log {
   static final Logger _logger = Logger(
-    printer: PrettyPrinter(), // 格式化输出，默认样式
+    printer: SingleLinePrinter(),
+    // 可选：控制日志输出级别（如只输出 info 及以上级别）
+    level: Level.info,
   );
+
   static void debug(String message) {
     // In a real app, you might want to use a proper logging package
     if (const bool.fromEnvironment('DEBUG')) {
