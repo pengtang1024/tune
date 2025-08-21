@@ -168,14 +168,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        final crossAxisCount = (screenWidth / 180).floor().clamp(1, 10);
+        final crossAxisCount = (screenWidth / 250).floor().clamp(1, 10); // 增加最小宽度以适应新布局
 
         return GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 0.8, // 控制网格项的宽高比
+            childAspectRatio: 2.5, // 调整宽高比以适应新的更大卡片
           ),
           itemCount: filteredSongs.length,
           itemBuilder: (context, index) {
@@ -209,19 +209,20 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           notifier.playSong(song);
         },
         borderRadius: BorderRadius.circular(8),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 专辑封面占位符
+            // 专辑封面占位符 (更大的封面，占用更多垂直空间)
             Container(
-              height: 120,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
               ),
               child: Icon(
                 Icons.music_note,
-                size: 48,
+                size: 32,
                 color: Colors.grey[600],
               ),
             ),
@@ -233,37 +234,89 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // 歌曲标题
-                    Text(
-                      song.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // 歌曲标题和时长 (在同一行)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            song.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // 时长
+                        Text(
+                          _formatDuration(song.duration),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
-                    // 艺术家
-                    Text(
-                      song.artist,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // 艺术家和专辑 (在同一行)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${song.artist} · ${song.album}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    // 专辑
-                    Text(
-                      song.album,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    // 标签行 (显示歌曲的其他元信息标签)
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 2,
+                      children: [
+                        // 年份标签
+                        if (song.year != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              song.year.toString(),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        // 流派标签
+                        if (song.genre != null && song.genre!.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.purple.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              song.genre!,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.purple,
+                              ),
+                            ),
+                          ),
+                        // 其他可能的标签可以在这里添加
+                      ],
                     ),
                   ],
                 ),
@@ -273,5 +326,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ),
       ),
     );
+  }
+
+  /// 格式化歌曲时长
+  String _formatDuration(int milliseconds) {
+    final duration = Duration(milliseconds: milliseconds);
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds.remainder(60);
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 }
