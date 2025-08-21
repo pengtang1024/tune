@@ -206,152 +206,156 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           notifier.playSong(song);
         },
         borderRadius: BorderRadius.circular(8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 专辑封面占位符 (正方形，根据内容自适应高度)
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
-              ),
-              child: Icon(
-                Icons.music_note,
-                size: 32,
-                color: Colors.grey[600],
-              ),
-            ),
-            // 歌曲信息
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // 歌曲标题和时长 (在同一行)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            song.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // 时长
-                        Text(
-                          _formatDuration(song.duration),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    // 艺术家和专辑 (在同一行)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${song.artist} · ${song.album}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    // 标签行 (显示歌曲的其他元信息标签)
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 2,
-                      children: [
-                        // 年份标签
-                        if (song.year != null && song.year != 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              song.year.toString()!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                        // 流派标签
-                        if (song.genre != null && song.genre!.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.purple.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              song.genre!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.purple,
-                              ),
-                            ),
-                          ),
-                        // 比特率标签
-                        if (song.bitrate != null && song.bitrate != 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${song.bitrate}kbps',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                        // 采样率标签
-                        if (song.sampleRate != null && song.sampleRate != 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${song.sampleRate}Hz',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8), // 在标签下方添加间距
-                  ],
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 专辑封面占位符 (正方形，与卡片等高)
+              Container(
+                width: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                ),
+                child: Icon(
+                  Icons.music_note,
+                  size: 32,
+                  color: Colors.grey[600],
                 ),
               ),
-            ),
-          ],
+              // 歌曲信息
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 歌曲标题和时长 (在同一行)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              song.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // 时长
+                          Text(
+                            _formatDuration(song.duration),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // 艺术家和专辑 (在同一行)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${song.artist} · ${song.album}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // 标签行 (显示歌曲的其他元信息标签)
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 2,
+                        children: [
+                          // 年份标签
+                          if (song.year != null && song.year != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                song.year.toString()!,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                          // 流派标签
+                          if (song.genre != null && song.genre!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.purple.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                song.genre!,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.purple,
+                                ),
+                              ),
+                            ),
+                          // 比特率标签
+                          if (song.bitrate != null && song.bitrate != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${song.bitrate}kbps',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          // 采样率标签
+                          if (song.sampleRate != null && song.sampleRate != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${song.sampleRate}Hz',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8), // 在标签下方添加间距
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

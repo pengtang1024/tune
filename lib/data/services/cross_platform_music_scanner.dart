@@ -231,6 +231,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'genre': metadata.genres.join(','),
         'bitrate': metadata.bitrate,
         'sampleRate': metadata.sampleRate,
+        'size': file.lengthSync(),
+        'type': 'audio', // 添加类型字段以区分音频和视频
+        'isFavorite': false,
       };
 
       return Song(songData);
