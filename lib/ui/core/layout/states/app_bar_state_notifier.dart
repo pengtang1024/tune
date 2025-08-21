@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/providers/theme_providers.dart';
 import 'package:tune/ui/core/layout/states/app_bar_state.dart';
 
 /// AppBar模块状态管理器
@@ -44,11 +43,20 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
         : ThemeMode.system;
 
     // 加载语言设置
-    final languageCode = sharedPrefs.getString('language_code') ?? 'zh';
+    final languageCode = sharedPrefs.getString('language_code') ?? 'en';
     final countryCode = sharedPrefs.getString('country_code');
-    final locale = countryCode != null
-        ? Locale(languageCode, countryCode)
-        : Locale(languageCode);
+
+    // 确保locale是支持的locale之一
+    Locale locale;
+    try {
+      locale = AppLocalizations.supportedLocales.firstWhere(
+        (supportedLocale) => supportedLocale.languageCode == languageCode &&
+                            (countryCode == null || supportedLocale.countryCode == countryCode),
+      );
+    } catch (e) {
+      // 如果找不到匹配的语言环境，则使用默认语言环境
+      locale = AppLocalizations.supportedLocales.first;
+    }
 
     state = state.copyWith(
       themeMode: themeMode,
@@ -59,7 +67,6 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
   /// 保存主题模式
   Future<void> _saveThemeMode(ThemeMode themeMode) async {
     final sharedPrefs = ref.read(sharedPreferencesServiceProvider);
-    ref.read(themeModeProvider.notifier).updateThemeMode(themeMode);
     await sharedPrefs.setInt('theme_mode', themeMode.index);
   }
 
@@ -115,7 +122,6 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
 
   /// 循环切换主题模式（浅色->深色->随系统->浅色）
   void toggleThemeMode() {
-
     ThemeMode newThemeMode;
     switch (state.themeMode) {
       case ThemeMode.light:
@@ -133,9 +139,8 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
   }
 
   /// 设置主题模式（支持浅色、深色、自动三种模式）
-/// 设置主题模式的方法
-///
-/// @param themeMode 要设置的主题模式，包括亮色、暗色等选项
+  ///
+  /// @param themeMode 要设置的主题模式，包括亮色、暗色等选项
   void setThemeMode(ThemeMode themeMode) {
     // 检查当前主题模式是否与要设置的主题模式不同
     if (state.themeMode != themeMode) {
@@ -227,5 +232,21 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       userLevel: 5,
       userTags: const ['vip', '听众', '精英'],
     );
+  }
+
+  /// 更新语言环境
+  void updateLocale(Locale locale) {
+    if (state.locale != locale) {
+      state = state.copyWith(locale: locale);
+      _saveLanguage(locale);
+    }
+  }
+
+  /// 更新主题模式
+  void updateThemeMode(ThemeMode themeMode) {
+    if (state.themeMode != themeMode) {
+      state = state.copyWith(themeMode: themeMode);
+      _saveThemeMode(themeMode);
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/about_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/account_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/animations_tab.dart';
@@ -9,62 +10,12 @@ import 'package:tune/ui/core/settings/widgets/tabs/playback_tab.dart';
 
 /// 设置页面组件
 /// 提供应用设置功能，包括常规设置和音乐库设置
-class SettingsPage extends ConsumerStatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  ConsumerState<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends ConsumerState<SettingsPage>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 6, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabs: const [
-              Tab(text: '常规'),
-              Tab(text: '音乐库'),
-              Tab(text: '账号'),
-              Tab(text: '播放'),
-              Tab(text: '关于'),
-              Tab(text: '动画'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: const [
-                GeneralTab(),
-                MusicLibraryTab(),
-                AccountTab(),
-                PlaybackTab(),
-                AboutTab(),
-                AnimationsTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const SettingsTabView();
   }
 }
 
@@ -76,37 +27,40 @@ class SettingsTabView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return DefaultTabController(
-      initialIndex: selectedTabIndex,
-      length: 6, // 更新标签页数量
-      child: Column(
-        children: [
-          // 标签页标题栏
-          TabBar(
-            isScrollable: true,
-            tabs: const [
-              Tab(text: '常规'),
-              Tab(text: '音乐库'),
-              Tab(text: '账号'),
-              Tab(text: '播放'),
-              Tab(text: '关于'),
-              Tab(text: '动画'),
-            ],
-          ),
-          // 标签页内容区域
-          const Expanded(
-            child: TabBarView(
-              children: [
-                GeneralTab(),
-                MusicLibraryTab(),
-                AccountTab(),
-                PlaybackTab(),
-                AboutTab(),
-                AnimationsTab(),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: DefaultTabController(
+        initialIndex: selectedTabIndex,
+        length: 6, // 更新标签页数量
+        child: Column(
+          children: [
+            // 标签页标题栏
+            TabBar(
+              isScrollable: true,
+              tabs: [
+                Tab(text: context.loc.general_tab),
+                Tab(text: context.loc.library_tab),
+                Tab(text: context.loc.account_tab),
+                Tab(text: context.loc.playback_tab),
+                Tab(text: context.loc.about_tab),
+                Tab(text: context.loc.animations_tab),
               ],
             ),
-          ),
-        ],
+            // 标签页内容区域
+            const Expanded(
+              child: TabBarView(
+                children: [
+                  GeneralTab(),
+                  MusicLibraryTab(),
+                  AccountTab(),
+                  PlaybackTab(),
+                  AboutTab(),
+                  AnimationsTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

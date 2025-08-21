@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/device_constants.dart';
 
 /// 设备类型枚举
 enum DeviceType {
@@ -12,10 +13,10 @@ class DeviceUtils {
   /// 根据屏幕宽度判断设备类型
   static DeviceType getDeviceType(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    
-    if (width < 600) {
+
+    if (width < DeviceConstants.mobileBreakpoint) {
       return DeviceType.mobile;
-    } else if (width < 1024) {
+    } else if (width < DeviceConstants.tabletBreakpoint) {
       return DeviceType.tablet;
     } else {
       return DeviceType.desktop;
@@ -40,63 +41,63 @@ class DeviceUtils {
   /// 获取适合当前设备的侧边栏宽度
   static double getSidebarWidth(BuildContext context, [bool isExpanded = true]) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return isExpanded ? 250.0 : 80.0;
+        return isExpanded ? DeviceConstants.mobileSidebarExpandedWidth : DeviceConstants.mobileSidebarCollapsedWidth;
       case DeviceType.tablet:
-        return isExpanded ? 250.0 : 80.0;
+        return isExpanded ? DeviceConstants.mobileSidebarExpandedWidth : DeviceConstants.mobileSidebarCollapsedWidth;
       case DeviceType.desktop:
         // PC端优化：展开时180px，收起时60px
-        return isExpanded ? 180.0 : 60.0;
+        return isExpanded ? DeviceConstants.desktopSidebarExpandedWidth : DeviceConstants.desktopSidebarCollapsedWidth;
     }
   }
 
   /// 获取适合当前设备的AppBar高度
   static double getAppBarHeight(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
       case DeviceType.tablet:
         return kToolbarHeight; // 使用默认高度
       case DeviceType.desktop:
-        return 60.0; // PC端高度缩减至60px
+        return DeviceConstants.desktopAppBarHeight; // PC端高度缩减至60px
     }
   }
 
   /// 获取适合当前设备的填充大小
   static double getPadding(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return 16.0;
+        return DeviceConstants.mobilePadding;
       case DeviceType.tablet:
-        return 24.0;
+        return DeviceConstants.tabletPadding;
       case DeviceType.desktop:
-        return 12.0; // PC端减小填充，提高信息密度
+        return DeviceConstants.desktopPadding; // PC端减小填充，提高信息密度
     }
   }
 
   /// 获取适合当前设备的图标大小
   static double getIconSize(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return 24.0;
+        return DeviceConstants.mobileIconSize;
       case DeviceType.tablet:
-        return 28.0;
+        return DeviceConstants.tabletIconSize;
       case DeviceType.desktop:
-        return 20.0; // PC端减小图标大小
+        return DeviceConstants.desktopIconSize; // PC端减小图标大小
     }
   }
 
   /// 获取适合当前设备的字体大小
   static double getScaledFontSize(BuildContext context, double baseSize) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
         return baseSize;
@@ -110,68 +111,68 @@ class DeviceUtils {
   /// 获取适合当前设备的间距
   static double getSpacing(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return 16.0;
+        return DeviceConstants.mobilePadding;
       case DeviceType.tablet:
-        return 20.0;
+        return DeviceConstants.tabletPadding;
       case DeviceType.desktop:
-        return 12.0; // PC端减小间距
+        return DeviceConstants.desktopPadding; // PC端减小间距
     }
   }
 
   /// 获取适合当前设备的菜单项高度
   static double getMenuItemHeight(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
       case DeviceType.tablet:
-        return 48.0;
+        return DeviceConstants.mobileMenuItemHeight;
       case DeviceType.desktop:
-        return 40.0; // PC端减小菜单项高度
+        return DeviceConstants.desktopMenuItemHeight; // PC端减小菜单项高度
     }
   }
 
   /// 获取适合当前设备的菜单项间距
   static double getMenuItemSpacing(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
       case DeviceType.tablet:
-        return 8.0;
+        return DeviceConstants.mobileMenuItemSpacing;
       case DeviceType.desktop:
-        return 6.0; // PC端减小间距
+        return DeviceConstants.desktopMenuItemSpacing; // PC端减小间距
     }
   }
 
   /// 获取适合当前设备的列表项高度
   static double getListItemHeight(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return 72.0;
+        return DeviceConstants.mobileListItemHeight;
       case DeviceType.tablet:
-        return 80.0;
+        return DeviceConstants.tabletListItemHeight;
       case DeviceType.desktop:
-        return 60.0; // PC端减小列表项高度
+        return DeviceConstants.desktopListItemHeight; // PC端减小列表项高度
     }
   }
 
   /// 获取适合当前设备的按钮最小尺寸
   static Size getButtonMinSize(BuildContext context) {
     final deviceType = getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return const Size(48.0, 48.0);
+        return Size(DeviceConstants.mobileButtonMinWidth, DeviceConstants.mobileButtonMinHeight);
       case DeviceType.tablet:
-        return const Size(52.0, 52.0);
+        return Size(DeviceConstants.tabletButtonMinWidth, DeviceConstants.tabletButtonMinHeight);
       case DeviceType.desktop:
-        return const Size(40.0, 40.0); // PC端减小按钮尺寸
+        return Size(DeviceConstants.desktopButtonMinWidth, DeviceConstants.desktopButtonMinHeight); // PC端减小按钮尺寸
     }
   }
 
@@ -179,22 +180,22 @@ class DeviceUtils {
   static int getGridColumns(BuildContext context) {
     final deviceType = getDeviceType(context);
     final width = MediaQuery.of(context).size.width;
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
-        return 2;
+        return DeviceConstants.mobileGridColumns;
       case DeviceType.tablet:
-        return 3;
+        return DeviceConstants.tabletGridColumns;
       case DeviceType.desktop:
         // 根据屏幕宽度动态计算列数
-        if (width > 1600) {
-          return 6;
-        } else if (width > 1400) {
-          return 5;
-        } else if (width > 1200) {
-          return 4;
+        if (width > DeviceConstants.desktopGridBreakpointLarge) {
+          return DeviceConstants.desktopGridColumnsExtraLarge;
+        } else if (width > DeviceConstants.desktopGridBreakpointMedium) {
+          return DeviceConstants.desktopGridColumnsLarge;
+        } else if (width > DeviceConstants.desktopGridBreakpointSmall) {
+          return DeviceConstants.desktopGridColumnsMedium;
         } else {
-          return 3;
+          return DeviceConstants.desktopGridColumnsSmall;
         }
     }
   }

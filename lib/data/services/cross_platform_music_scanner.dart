@@ -1,9 +1,8 @@
 import 'dart:io' show Platform, Directory, File;
-
-import 'package:audio_metadata_reader/audio_metadata_reader.dart';
+import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:tune/data/services/music_service.dart';
+import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -17,13 +16,20 @@ abstract class CrossPlatformMusicScanner {
 
   /// 扫描多个目录中的音乐文件
   Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths);
+
+  /// 扫描单个文件
+  Future<Song?> scanMusicFile(String filePath);
+  
+  /// 获取所有歌曲
+  Future<List<Song>> getAllSongs();
+
+  /// 搜索歌曲
+  Future<List<Song>> searchSongs(String query);
 }
 
 /// 跨平台音乐扫描服务实现
 class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
-  final MusicService _musicService;
-
-  CrossPlatformMusicScannerImpl(this._musicService);
+  CrossPlatformMusicScannerImpl();
 
   @override
   Future<List<Song>> scanMusic() async {
@@ -31,22 +37,17 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
     // 检查平台类型
     if (kIsWeb) {
-      // Web平台 - 使用文件选择器
+      // Web平台 - 返回空列表，因为Web平台需要用户手动选择文件
       Log.info('CrossPlatformMusicScanner: Running on Web platform');
-      return await _scanWithFilePicker();
+      return [];
     } else if (Platform.isAndroid || Platform.isIOS) {
-      // 移动平台 - 使用原生音乐查询
+      // 移动平台 - 返回空列表（实际项目中应该使用移动平台特定的API）
       Log.info('CrossPlatformMusicScanner: Running on mobile platform');
-      try {
-        return await _musicService.getAllSongs();
-      } catch (e) {
-        Log.info('CrossPlatformMusicScanner: Failed to use native scanner, falling back to file picker: $e');
-        return await _scanWithFilePicker();
-      }
+      return [];
     } else {
-      // 桌面平台 - 使用文件选择器
+      // 桌面平台 - 返回空列表，避免自动弹出文件选择器
       Log.info('CrossPlatformMusicScanner: Running on desktop platform');
-      return await _scanWithFilePicker();
+      return [];
     }
   }
 
@@ -61,16 +62,43 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories');
     final allSongs = <Song>[];
 
-    for (final path in directoryPaths) {
+    for (final dirPath in directoryPaths) {
       try {
-        final songs = await _scanDirectory(path);
+        final songs = await _scanDirectory(dirPath);
         allSongs.addAll(songs);
       } catch (e) {
-        Log.info('CrossPlatformMusicScanner: Failed to scan directory $path: $e');
+        Log.info('CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e');
       }
     }
 
     return allSongs;
+  }
+
+  @override
+  Future<Song?> scanMusicFile(String filePath) async {
+    Log.info('CrossPlatformMusicScanner: Scanning single file: $filePath');
+    try {
+      final file = File(filePath);
+      if (await file.exists()) {
+        return await _createSongFromFile(file);
+      }
+    } catch (e) {
+      Log.info('CrossPlatformMusicScanner: Failed to scan file $filePath: $e');
+    }
+    return null;
+  }
+
+  /// 获取所有歌曲
+  @override
+  Future<List<Song>> getAllSongs() async {
+    return await scanMusic();
+  }
+
+  /// 搜索歌曲
+  @override
+  Future<List<Song>> searchSongs(String query) async {
+    // 简单实现：返回所有歌曲（实际项目中应该根据查询条件过滤）
+    return await scanMusic();
   }
 
   /// 使用文件选择器扫描音乐
@@ -87,118 +115,85 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       Log.info('CrossPlatformMusicScanner: Selected directory: $result');
       return await _scanDirectory(result);
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to pick directory: $e');
+      Log.info('CrossPlatformMusicScanner: Failed to scan with file picker: $e');
       return [];
     }
   }
 
-  /// 扫描指定目录中的音乐文件
+  /// 扫描目录中的音乐文件
   Future<List<Song>> _scanDirectory(String directoryPath) async {
-    Log.info('CrossPlatformMusicScanner: Scanning directory: $directoryPath');
-
     final songs = <Song>[];
-    final audioExtensions = {'.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.wma'};
+    final directory = Directory(directoryPath);
+
+    if (!await directory.exists()) {
+      Log.info('CrossPlatformMusicScanner: Directory does not exist: $directoryPath');
+      return songs;
+    }
 
     try {
-      final dir = Directory(directoryPath);
-      if (!await dir.exists()) {
-        Log.info('CrossPlatformMusicScanner: Directory does not exist: $directoryPath');
-        return songs;
-      }
-
-      // 递归遍历目录
-      await for (final entity in dir.list(recursive: true)) {
-        if (entity is File) {
-          final file = entity;
-          final path = file.path;
-          final extension = _getFileExtension(path).toLowerCase();
-
-          // 检查是否为音频文件
-          if (audioExtensions.contains(extension)) {
-            try {
-              Log.info('CrossPlatformMusicScanner: Found audio file: $path');
-              final song = await _createSongFromFile(file);
+      await for (final file in directory.list(recursive: true, followLinks: false)) {
+        if (file is File && _isAudioFile(file.path)) {
+          try {
+            final song = await _createSongFromFile(file);
+            if (song != null) {
               songs.add(song);
-            } catch (e) {
-              Log.info('CrossPlatformMusicScanner: Failed to process file $path: $e');
             }
+          } catch (e) {
+            Log.info('CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e');
           }
         }
       }
-
-      Log.info('CrossPlatformMusicScanner: Found ${songs.length} songs in directory: $directoryPath');
-      return songs;
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to scan directory $directoryPath: $e');
-      return songs;
+      Log.info('CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e');
     }
+
+    Log.info('CrossPlatformMusicScanner: Found ${songs.length} songs in directory: $directoryPath');
+    return songs;
+  }
+
+  /// 检查文件是否为音频文件
+  bool _isAudioFile(String filePath) {
+    final ext = path.extension(filePath).toLowerCase();
+    return ext == '.mp3' || ext == '.flac' || ext == '.wav' || ext == '.m4a' || ext == '.aac' || ext == '.ogg';
   }
 
   /// 从文件创建歌曲对象
-  Future<Song> _createSongFromFile(File file) async {
-    final path = file.path;
-    final fileName = _getFileNameWithoutExtension(path);
-    final stat = await file.stat();
-
-    // 默认值
-    var title = fileName;
-    var artist = '未知艺术家';
-    var album = '未知专辑';
-    var duration = 0;
+  Future<Song?> _createSongFromFile(File file) async {
+    final filePath = file.path;
+    final fileName = path.basenameWithoutExtension(filePath);
 
     try {
-      // 尝试读取音频元数据
-      final metadata = readMetadata(file);
+      // 读取音频文件元数据
+      final metadata = audio_meta.readMetadata(file);
 
-      // 提取元数据
-      if (metadata.title != null && metadata.title!.isNotEmpty) {
-        title = metadata.title!;
-      }
+      // 创建歌曲数据映射
+      final songData = <String, dynamic>{
+        'id': filePath.hashCode, // 使用文件路径的哈希值作为ID
+        'title': metadata.title ?? fileName,
+        'artist': metadata.artist ?? 'Unknown Artist',
+        'album': metadata.album ?? 'Unknown Album',
+        'duration': metadata.duration?.inMilliseconds ?? 0,
+        'uri': filePath,
+        'dateAdded': DateTime.now().millisecondsSinceEpoch,
+        'year': metadata.year,
+      };
 
-      if (metadata.artist != null && metadata.artist!.isNotEmpty) {
-        artist = metadata.artist!;
-      }
-
-      if (metadata.album != null && metadata.album!.isNotEmpty) {
-        album = metadata.album!;
-      }
-
-      if (metadata.duration != null) {
-        duration = metadata.duration!.inMilliseconds;
-      }
+      return Song(songData);
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to read metadata for $path: $e');
-    }
+      Log.info('CrossPlatformMusicScanner: Failed to read metadata for $filePath: $e');
+      // 如果无法读取元数据，则创建一个基本的歌曲对象
+      final songData = <String, dynamic>{
+        'id': filePath.hashCode,
+        'title': fileName,
+        'artist': 'Unknown Artist',
+        'album': 'Unknown Album',
+        'duration': 0,
+        'uri': filePath,
+        'dateAdded': DateTime.now().millisecondsSinceEpoch,
+        'year': 0,
+      };
 
-    // 创建歌曲对象
-    return Song({
-      'id': path.hashCode, // 使用路径的哈希值作为ID
-      'title': title,
-      'artist': artist,
-      'album': album,
-      'duration': duration,
-      'uri': path,
-      'dateAdded': stat.changed.millisecondsSinceEpoch,
-    });
-  }
-
-  /// 获取文件扩展名
-  String _getFileExtension(String filePath) {
-    try {
-      return filePath.substring(filePath.lastIndexOf('.'));
-    } catch (e) {
-      return '';
-    }
-  }
-
-  /// 获取不带扩展名的文件名
-  String _getFileNameWithoutExtension(String filePath) {
-    try {
-      final fileName = filePath.split(Platform.pathSeparator).last;
-      final dotIndex = fileName.lastIndexOf('.');
-      return dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
-    } catch (e) {
-      return '未知歌曲';
+      return Song(songData);
     }
   }
 }

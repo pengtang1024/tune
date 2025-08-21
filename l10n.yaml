@@ -4,7 +4,6 @@ output-localization-file: app_localizations.dart
 untranslated-messages-file: untranslated.json
 
 enable-cache: true
-
 languages:
   - zh_CN
   - zh_TW

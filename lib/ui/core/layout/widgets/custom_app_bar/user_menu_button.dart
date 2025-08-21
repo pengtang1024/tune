@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/user_profile.dart';
 
@@ -15,13 +16,11 @@ class UserMenuButton extends ConsumerWidget {
 
     return PopupMenuButton<String>(
       icon: const Icon(Icons.person),
-      tooltip: '我的',
+
       onSelected: (String result) {
-        switch (result) {
-          case 'settings':
-            context.go('/settings');
-            break;
-          // 可以添加更多选项
+        if (result == 'settings') {
+          // 使用GoRouter导航到设置页面
+          context.go('/settings');
         }
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -31,9 +30,9 @@ class UserMenuButton extends ConsumerWidget {
           child: UserProfile(state: appBarState),
         ),
         const PopupMenuDivider(),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'settings',
-          child: Text('设置'),
+          child: Text(context.loc.settings), // 使用本地化字符串
         ),
       ],
     );

@@ -1,25 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/router/app_router.dart';
-import 'package:tune/providers/menu_provider.dart';
-import 'package:tune/providers/music_providers.dart';
+import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 /// 应用初始化器
 class AppInitializer {
-  /// 初始化应用所需的所有服务
-  static Future<void> init(Ref ref) async {
+  /// 初始化应用
+  static Future<void> initialize(Ref ref) async {
     // 初始化持久化服务
-    await ref.read(sharedPreferencesServiceProvider);
-    await ref.read(routerProvider);
+    await ref.read(sharedPreferencesServiceProvider).init();
 
-    // 延迟一小段时间以确保服务正确初始化
-    await Future.delayed(const Duration(milliseconds: 10));
+    // 初始化路由
+    ref.read(routerProvider);
 
-    await ref.read(menuStateProvider);
     // 初始化音乐服务
-    await ref.read(musicRepositoryProvider);
-    await ref.read(platformMusicServiceProvider);
+    ref.read(crossPlatformMusicScannerProvider);
 
-    // 可以在这里初始化其他服务
+    // 初始化音频服务
+    // await ref.read(audioServiceProvider.notifier).init();
   }
 }

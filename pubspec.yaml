@@ -83,7 +83,6 @@ dependencies:
   flutter_screenutil: ^5.9.0
 
   # Path provider
-  path_provider: ^2.1.1
 
   audio_metadata_reader: ^1.4.2
 
@@ -95,6 +94,9 @@ dependencies:
 
   # Dependency injection
   get_it: ^8.2.0
+
+  # JSON serialization
+  json_annotation: ^4.9.0
 
   # Localization
   flutter_localizations:

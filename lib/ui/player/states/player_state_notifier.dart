@@ -11,6 +11,8 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   final Ref _ref;
   late final AudioPlayerService _audioPlayerService;
   StreamSubscription? _positionSubscription;
+  List<Song> _playlist = [];
+  int _currentIndex = -1;
 
   PlayerStateNotifier(this._ref) : super(PlayerState.initial()) {
     _audioPlayerService = _ref.read(audioPlayerServiceProvider);
@@ -29,6 +31,12 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         );
       }
     });
+  }
+
+  /// 设置播放列表
+  void setPlaylist(List<Song> playlist, int initialIndex) {
+    _playlist = playlist;
+    _currentIndex = initialIndex;
   }
 
   /// 播放歌曲
@@ -95,12 +103,52 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
 
   /// 播放下一首
   void skipToNext() {
-    // TODO: 实现播放下一首逻辑
+    if (_playlist.isEmpty || _currentIndex < 0) return;
+    
+    // 计算下一首歌曲的索引
+    int nextIndex;
+    if (state.isShuffleMode) {
+      // 随机播放模式
+      nextIndex = (DateTime.now().millisecondsSinceEpoch % _playlist.length);
+      // 确保不会重复播放当前歌曲
+      if (nextIndex == _currentIndex && _playlist.length > 1) {
+        nextIndex = (nextIndex + 1) % _playlist.length;
+      }
+    } else {
+      // 顺序播放模式
+      nextIndex = (_currentIndex + 1) % _playlist.length;
+    }
+    
+    _currentIndex = nextIndex;
+    playSong(_playlist[_currentIndex]);
   }
 
   /// 播放上一首
   void skipToPrevious() {
-    // TODO: 实现播放上一首逻辑
+    if (_playlist.isEmpty || _currentIndex < 0) return;
+    
+    // 如果当前播放位置超过3秒，则回到开头而不是播放上一首
+    if (state.position.inSeconds > 3) {
+      seekTo(Duration.zero);
+      return;
+    }
+    
+    // 计算上一首歌曲的索引
+    int previousIndex;
+    if (state.isShuffleMode) {
+      // 随机播放模式
+      previousIndex = (DateTime.now().millisecondsSinceEpoch % _playlist.length);
+      // 确保不会重复播放当前歌曲
+      if (previousIndex == _currentIndex && _playlist.length > 1) {
+        previousIndex = (previousIndex + 1) % _playlist.length;
+      }
+    } else {
+      // 顺序播放模式
+      previousIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
+    }
+    
+    _currentIndex = previousIndex;
+    playSong(_playlist[_currentIndex]);
   }
 
   @override

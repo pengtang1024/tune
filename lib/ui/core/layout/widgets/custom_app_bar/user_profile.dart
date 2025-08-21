@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/core/layout/states/app_bar_state.dart';
 
 /// 用户信息组件
@@ -36,7 +37,7 @@ class UserProfile extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      state.username ?? '未知用户',
+                      state.username ?? context.loc.unknown_user,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -71,11 +72,11 @@ class UserProfile extends StatelessWidget {
                     runSpacing: 3,
                     children: state.userTags.map<Widget>((tag) {
                       Color tagColor = Colors.grey;
-                      if (tag == 'vip') {
+                      if (tag == 'vip' || tag == context.loc.tag_vip) {
                         tagColor = Colors.red;
-                      } else if (tag == '歌手') {
+                      } else if (tag == context.loc.tag_singer) {
                         tagColor = Colors.green;
-                      } else if (tag == '精英') {
+                      } else if (tag == context.loc.tag_elite) {
                         tagColor = Colors.purple;
                       }
 

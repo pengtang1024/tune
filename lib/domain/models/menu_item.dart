@@ -44,19 +44,19 @@ class DeviceMenuItem {
 const List<DeviceMenuItem> mobileMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: '首页',
+    label: 'home', // 应该使用 localizations.home
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: '发现',
+    label: 'discover', // 应该使用 localizations.recommend 或添加新的本地化字符串
     icon: Icons.explore,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: '音乐库',
+    label: 'library', // 应该使用 localizations.library
     icon: Icons.library_music,
     index: 2,
   ),
@@ -66,25 +66,25 @@ const List<DeviceMenuItem> mobileMenuItems = [
 const List<DeviceMenuItem> desktopMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: '首页',
+    label: 'home', // 应该使用 localizations.home
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: '推荐',
+    label: 'recommend', // 应该使用 localizations.recommend
     icon: Icons.recommend,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/featured',
-    label: '精选',
+    label: 'featured', // 应该使用 localizations.featured
     icon: Icons.star,
     index: 2,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: '音乐库',
+    label: 'library', // 应该使用 localizations.library
     icon: Icons.library_music,
     index: 3,
   ),

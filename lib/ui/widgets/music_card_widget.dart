@@ -18,7 +18,7 @@ class MusicCardWidget extends StatelessWidget {
       child: Card(
         child: ListTile(
           title: Text(song.title),
-          subtitle: Text('${song.artist} - ${song.album}'),
+          subtitle: Text('${song.artist} - ${song.album}'), // 这里是动态数据，不是硬编码
           trailing: Text(_formatDuration(song.duration)),
           onTap: onTap,
         ),

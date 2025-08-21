@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 class MusicLibraryTab extends ConsumerStatefulWidget {
@@ -73,9 +74,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '音乐库管理',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            context.loc.music_library_management,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
 
@@ -89,9 +90,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        '自定义扫描目录',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Text(
+                        context.loc.custom_scan_paths,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
@@ -100,17 +101,17 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '添加自定义目录进行音乐扫描',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.add_custom_directory,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
 
                   if (_customScanPaths.isEmpty)
-                    const Center(
+                    Center(
                       child: Text(
-                        '暂无自定义扫描路径',
-                        style: TextStyle(color: Colors.grey),
+                        context.loc.no_custom_scan_paths,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     )
                   else
@@ -142,9 +143,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
                     ),
 
                   const SizedBox(height: 16),
-                  const Text(
-                    '注意：请通过侧边栏的"音乐扫描"功能进行全平台扫描',
-                    style: TextStyle(color: Colors.orange, fontSize: 14),
+                  Text(
+                    context.loc.full_platform_scan_note,
+                    style: const TextStyle(color: Colors.orange, fontSize: 14),
                   ),
                 ],
               ),
@@ -160,24 +161,24 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '音乐库信息',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.library_info,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '当前音乐库包含 0 首歌曲',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.songs_count,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    '提示：音乐库信息将在专门的音乐库页面中显示和管理',
-                    style: TextStyle(color: Colors.blue, fontSize: 14),
+                  Text(
+                    context.loc.library_features,
+                    style: const TextStyle(color: Colors.blue, fontSize: 14),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '提示：您可以通过侧边栏访问"音乐库"和"音乐扫描"功能',
-                    style: TextStyle(color: Colors.green, fontSize: 14),
+                  Text(
+                    context.loc.access_library,
+                    style: const TextStyle(color: Colors.green, fontSize: 14),
                   ),
                 ],
               ),
@@ -193,54 +194,54 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '音乐扫描说明',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.scan_instructions,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '• 通过侧边栏的"音乐扫描"功能可以扫描设备上的所有音乐文件',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.auto_extract_metadata,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '• 可以在扫描页面添加自定义扫描路径',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.add_custom_paths,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '• 扫描完成后，音乐将自动显示在音乐库中',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.scan_completion,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '• 音乐库会自动提取歌曲的元数据（标题、艺术家、专辑等）',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.auto_metadata_extraction,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    '如何使用音乐扫描功能：',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.how_to_scan,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    '1. 点击左侧边栏的"音乐扫描"菜单项',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.scan_step1,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '2. 在扫描页面点击"开始扫描"按钮',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.scan_step2,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '3. 等待扫描完成，查看扫描结果',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.scan_step3,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '4. 扫描到的音乐将自动显示在"音乐库"中',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.scan_step4,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
@@ -256,39 +257,39 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '常见问题',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.faq,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Q: 为什么扫描不到音乐文件？',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.faq_scan_issue,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'A: 请确保设备上存在音乐文件，并且应用具有访问存储的权限。',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.faq_scan_issue_answer,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Q: 扫描很慢怎么办？',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.faq_slow_scan,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'A: 首次扫描可能会比较慢，后续扫描会更快。请耐心等待。',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.faq_slow_scan_answer,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Q: 扫描后音乐没有显示在音乐库中？',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    context.loc.faq_not_showing,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'A: 请确保扫描已完成，并尝试刷新音乐库页面。',
-                    style: TextStyle(color: Colors.grey),
+                  Text(
+                    context.loc.faq_not_showing_answer,
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),

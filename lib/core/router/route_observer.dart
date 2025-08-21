@@ -121,21 +121,24 @@ class MenuRouteObserver extends NavigatorObserver {
 
   /// 根据路由路径获取对应的标题
   String _getTitleForPath(String path) {
+    // 注意：这些字符串应该使用本地化，但由于这是在路由观察器中，
+    // 可能无法直接访问BuildContext来获取本地化实例
+    // 在实际应用中，应该通过其他方式传递本地化标题
     switch (path) {
       case '/home':
-        return '首页';
+        return 'home'; // 应该使用 localizations.home
       case '/recommend':
-        return '发现';
+        return 'recommend'; // 应该使用 localizations.recommend
       case '/featured':
-        return '精选';
+        return 'featured'; // 应该使用 localizations.featured
       case '/library':
-        return '音乐库';
+        return 'library'; // 应该使用 localizations.library
       case '/music-scan':
-        return '扫描音乐';
+        return 'music_scan'; // 应该使用自定义本地化字符串
       case '/settings':
-        return '设置';
+        return 'settings'; // 应该使用 localizations.settings
       default:
-        return 'Tune';
+        return 'app_name'; // 应该使用 localizations.app_name
     }
   }
 

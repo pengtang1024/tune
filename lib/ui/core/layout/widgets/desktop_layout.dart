@@ -55,7 +55,7 @@ class DesktopLayout extends ConsumerWidget {
               if (isExpanded) ...[const Divider(), const UserInfoWidget()],
 
               // 底部展开/收起按钮
-              ExpandButtonWidget(isExpanded: isExpanded),
+              ExpandButtonWidget(),
             ],
           ),
         ),

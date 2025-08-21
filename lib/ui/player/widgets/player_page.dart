@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
 
@@ -11,21 +13,19 @@ class PlayerPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
-
-
+    final localizations = context.loc;
 
     if (playerState.errorMessage.isNotEmpty) {
       return Center(
-        child: Text('播放出错: ${playerState.errorMessage}'),
+        child: Text('${localizations.playback_error}: ${playerState.errorMessage}'), // 使用本地化字符串
       );
     }
 
     if (playerState.currentSong == null) {
-      return const Center(
+      return Center(
         child: Text(
-          '暂无播放歌曲\n请选择一首歌曲开始播放',
+          '${localizations.no_song_playing}\n${localizations.select_a_song_to_play}', // 使用本地化字符串
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18),
         ),
       );
     }
@@ -55,12 +55,14 @@ class PlayerPage extends ConsumerWidget {
             // 歌曲信息
             Text(
               playerState.currentSong!.title,
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
-              '${playerState.currentSong!.artist ?? '未知艺术家'} · ${playerState.currentSong!.album ?? '未知专辑'}',
+              '${playerState.currentSong!.artist ?? localizations.unknown_artist} - ${playerState.currentSong!.album ?? localizations.unknown_album}',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
@@ -78,6 +80,9 @@ class PlayerPage extends ConsumerWidget {
 
             // 音量控制
             const PlayerVolume(),
+            
+            // 播放模式控制
+            const PlayerModeControls(),
           ],
         ),
       ),
@@ -104,6 +109,39 @@ class PlayerVolume extends ConsumerWidget {
           ),
         ),
         const Icon(Icons.volume_up),
+      ],
+    );
+  }
+}
+
+/// 播放模式控制组件
+class PlayerModeControls extends ConsumerWidget {
+  const PlayerModeControls({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerState = ref.watch(playerStateNotifierProvider);
+    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // 随机播放按钮
+        IconButton(
+          icon: Icon(
+            playerState.isShuffleMode ? Icons.shuffle : Icons.shuffle_outlined,
+            color: playerState.isShuffleMode ? Theme.of(context).colorScheme.primary : null,
+          ),
+          onPressed: playerNotifier.toggleShuffleMode,
+        ),
+        
+        // 循环播放按钮
+        IconButton(
+          icon: const Icon(Icons.repeat),
+          onPressed: () {
+            // TODO: 实现循环播放模式切换
+          },
+        ),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 
 class ErrorStateWidget extends StatelessWidget {
   final String errorMessage;
@@ -12,21 +13,14 @@ class ErrorStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 48,
-            ),
-            const SizedBox(height: 16),
             Text(
               errorMessage,
-              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.red,
                 fontSize: 16,
@@ -35,7 +29,7 @@ class ErrorStateWidget extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: onRetry,
-              child: const Text('重试'),
+              child: Text(context.loc.retry),
             ),
           ],
         ),

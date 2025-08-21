@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 
 class AboutTab extends ConsumerWidget {
   const AboutTab({super.key});
@@ -65,33 +66,33 @@ class AboutTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 应用名称和版本
-          const Text(
-            'Tune 音乐播放器',
-            style: TextStyle(
-              fontSize: 28, 
+          Text(
+            context.loc.app_name,
+            style: const TextStyle(
+              fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '版本 1.0.0',
-            style: TextStyle(
-              fontSize: 16, 
+          Text(
+            context.loc.version,
+            style: const TextStyle(
+              fontSize: 16,
               color: Colors.grey,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '运行平台: $platform',
+            '${context.loc.platform}: $platform',
             style: const TextStyle(
-              fontSize: 16, 
+              fontSize: 16,
               color: Colors.grey,
             ),
           ),
           const SizedBox(height: 30),
-          
+
           // 简介卡片
           Card(
             elevation: 2,
@@ -101,25 +102,24 @@ class AboutTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '简介',
+                    context.loc.about,
                     style: TextStyle(
-                      fontSize: 20, 
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Tune 是一款简洁、美观的跨平台音乐播放器，专注于为用户提供优质的音乐播放体验。'
-                    '支持多种音频格式，具备丰富的播放功能和个性化设置选项。',
-                    style: TextStyle(fontSize: 15),
+                  Text(
+                    context.loc.about_description,
+                    style: const TextStyle(fontSize: 15),
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 功能特点
           Card(
             elevation: 2,
@@ -129,9 +129,9 @@ class AboutTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '功能特点',
+                    context.loc.features,
                     style: TextStyle(
-                      fontSize: 20, 
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
@@ -139,45 +139,45 @@ class AboutTab extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _FeatureItem(
                     icon: Icons.music_note,
-                    title: '高质量音频播放',
-                    description: '支持 MP3、FLAC、WAV、AAC 等多种音频格式',
+                    title: context.loc.high_quality_audio_playback,
+                    description: context.loc.supports_multiple_audio_formats,
                   ),
                   const SizedBox(height: 12),
                   _FeatureItem(
                     icon: Icons.folder,
-                    title: '本地音乐管理',
-                    description: '自动扫描并整理本地音乐库',
+                    title: context.loc.local_music_management,
+                    description: context.loc.automatically_scans_and_organizes_local_music_library,
                   ),
                   const SizedBox(height: 12),
                   _FeatureItem(
                     icon: Icons.translate,
-                    title: '多语言支持',
-                    description: '支持中文、英文、日文、韩文、俄文等多种语言',
+                    title: context.loc.multi_language_support,
+                    description: context.loc.supports_chinese_english_japanese_korean_russian_and_more,
                   ),
                   const SizedBox(height: 12),
                   _FeatureItem(
                     icon: Icons.color_lens,
-                    title: '多主题支持',
-                    description: '8 种主题配色，支持深色/浅色模式切换',
+                    title: context.loc.multiple_themes,
+                    description: context.loc.eight_theme_colors_with_dark_light_mode_switching,
                   ),
                   const SizedBox(height: 12),
                   _FeatureItem(
                     icon: Icons.sync,
-                    title: '歌词同步',
-                    description: 'LRC 格式歌词实时同步显示',
+                    title: context.loc.lyrics_synchronization,
+                    description: context.loc.lrc_format_lyrics_real_time_synchronization_display,
                   ),
                   const SizedBox(height: 12),
                   _FeatureItem(
                     icon: Icons.search,
-                    title: '智能搜索',
-                    description: '支持按歌曲名、艺术家、专辑等元数据快速搜索',
+                    title: context.loc.smart_search,
+                    description: context.loc.supports_searching_by_song_title_artist_album_and_other_metadata,
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 开源许可
           Card(
             elevation: 2,
@@ -187,24 +187,24 @@ class AboutTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '开源许可',
+                    context.loc.open_source_license,
                     style: TextStyle(
-                      fontSize: 20, 
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    '本项目使用 MIT 许可证开源，源代码可在 GitHub 上获取。',
-                    style: TextStyle(fontSize: 15),
+                  Text(
+                    context.loc.opensource_license_description,
+                    style: const TextStyle(fontSize: 15),
                   ),
                   const SizedBox(height: 12),
                   InkWell(
                     onTap: () => _launchUrl('https://github.com/your-username/tune'),
-                    child: const Text(
-                      'GitHub 项目地址',
-                      style: TextStyle(
+                    child: Text(
+                      context.loc.github_project_address,
+                      style: const TextStyle(
                         fontSize: 15,
                         color: Colors.blue,
                         decoration: TextDecoration.underline,
@@ -216,7 +216,7 @@ class AboutTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 联系我们
           Card(
             elevation: 2,
@@ -226,29 +226,29 @@ class AboutTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '联系我们',
+                    context.loc.contact_us,
                     style: TextStyle(
-                      fontSize: 20, 
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: theme.primaryColor,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    '如有任何问题或建议，请通过以下方式联系我们:',
-                    style: TextStyle(fontSize: 15),
+                  Text(
+                    context.loc.contact_us_description,
+                    style: const TextStyle(fontSize: 15),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    '📧 邮箱: support@tune-music.com',
-                    style: TextStyle(fontSize: 15),
+                  Text(
+                    context.loc.email,
+                    style: const TextStyle(fontSize: 15),
                   ),
                   const SizedBox(height: 8),
                   InkWell(
                     onTap: () => _launchUrl('https://tune-music.com'),
-                    child: const Text(
-                      '🌐 官方网站: https://tune-music.com',
-                      style: TextStyle(
+                    child: Text(
+                      context.loc.official_website,
+                      style: const TextStyle(
                         fontSize: 15,
                         color: Colors.blue,
                         decoration: TextDecoration.underline,

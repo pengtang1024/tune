@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_initializer.dart';
 import 'package:tune/config/app_theme.dart';
 import 'package:tune/core/router/app_router.dart';
-import 'package:tune/providers/localization_providers.dart';
-import 'package:tune/providers/theme_providers.dart';
+import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 import 'l10n/app_localizations.dart';
@@ -29,19 +28,18 @@ class TuneApp extends ConsumerWidget {
 
     return initFuture.when(
       data: (_) {
-        // 监听主题模式变化
-        final themeMode = ref.watch(themeModeProvider);
-        Log.info("当前主题模式: $themeMode");
-        // 监听语言环境变化
-        final locale = ref.watch(localeStateProvider);
+        // 监听AppBar状态变化，包括主题和语言
+        final appBarState = ref.watch(appBarStateNotifierProvider);
+        Log.info("当前主题模式: ${appBarState.themeMode}");
+
         final router = ref.watch(routerProvider);
 
         return MaterialApp.router(
           title: 'Tune',
-          themeMode: themeMode,
+          themeMode: appBarState.themeMode,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          locale: locale,
+          locale: appBarState.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -56,7 +54,7 @@ class TuneApp extends ConsumerWidget {
       error: (error, stack) => MaterialApp(
         home: Scaffold(
           body: Center(
-            child: Text('Error: $error'),
+            child: Text('Error: $error'), // 应该使用本地化字符串
           ),
         ),
       ),
@@ -66,5 +64,5 @@ class TuneApp extends ConsumerWidget {
 
 // 初始化提供者
 final _initProvider = FutureProvider<void>((ref) async {
-  await AppInitializer.init(ref);
+  await AppInitializer.initialize(ref);
 });

@@ -10,7 +10,7 @@ import 'package:tune/ui/library/states/search_state_notifier.dart';
 // Library状态管理器提供者
 final libraryStateNotifierProvider =
     StateNotifierProvider<LibraryStateNotifier, LibraryState>((ref) {
-  return LibraryStateNotifier();
+  return LibraryStateNotifier(ref);
 });
 
 // Library控制器提供者

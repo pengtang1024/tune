@@ -65,4 +65,17 @@ class LibraryState {
       isLoading: false,
     );
   }
+  
+  List<Song> get searchResults {
+    if (searchQuery.isEmpty) {
+      return songs;
+    }
+    
+    final query = searchQuery.toLowerCase();
+    return songs.where((song) {
+      return song.title.toLowerCase().contains(query) ||
+          (song.artist?.toLowerCase().contains(query) ?? false) ||
+          (song.album?.toLowerCase().contains(query) ?? false);
+    }).toList();
+  }
 }

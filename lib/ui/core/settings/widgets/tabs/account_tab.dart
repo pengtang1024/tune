@@ -1,104 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/data/services/persistence_service.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/ui/core/settings/providers/account_settings_provider.dart';
 
-class AccountTab extends ConsumerStatefulWidget {
+class AccountTab extends ConsumerWidget {
   const AccountTab({super.key});
 
   @override
-  ConsumerState<AccountTab> createState() => _AccountTabState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(accountSettingsProvider);
+    final notifier = ref.read(accountSettingsProvider.notifier);
 
-class _AccountTabState extends ConsumerState<AccountTab> {
-  final _usernameController = TextEditingController();
-  bool _autoLogin = false;
-  bool _savePassword = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAccountSettings();
-  }
-
-  Future<void> _loadAccountSettings() async {
-    final persistenceService = ref.read(sharedPreferencesServiceProvider);
-    
-    final username = persistenceService.getString('account_username') ?? '';
-    final autoLogin = persistenceService.getBool('account_auto_login') ?? false;
-    final savePassword = persistenceService.getBool('account_save_password') ?? false;
-    
-    setState(() {
-      _usernameController.text = username;
-      _autoLogin = autoLogin;
-      _savePassword = savePassword;
-    });
-  }
-
-  Future<void> _saveAccountSettings() async {
-    final persistenceService = ref.read(sharedPreferencesServiceProvider);
-    
-    await persistenceService.setString('account_username', _usernameController.text);
-    await persistenceService.setBool('account_auto_login', _autoLogin);
-    await persistenceService.setBool('account_save_password', _savePassword);
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('账号设置已保存')),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '账号设置',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _usernameController,
-            decoration: const InputDecoration(
-              labelText: '用户名',
-              border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.loc.settings),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.loc.account_settings, // 使用本地化字符串
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 16),
-          CheckboxListTile(
-            title: const Text('自动登录'),
-            value: _autoLogin,
-            onChanged: (value) {
-              setState(() {
-                _autoLogin = value ?? false;
-              });
-            },
-          ),
-          CheckboxListTile(
-            title: const Text('保存密码'),
-            value: _savePassword,
-            onChanged: (value) {
-              setState(() {
-                _savePassword = value ?? false;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _saveAccountSettings,
-            child: const Text('保存设置'),
-          ),
-        ],
+            const SizedBox(height: 20),
+            TextField(
+              controller: TextEditingController(text: state.username),
+              decoration: InputDecoration(
+                labelText: context.loc.username,
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (value) => notifier.updateUsername(value),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: TextEditingController(text: state.email),
+              decoration: InputDecoration(
+                labelText: context.loc.email,
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (value) => notifier.updateEmail(value),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Text(
+                  context.loc.auto_login, // 使用本地化字符串
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Spacer(),
+                Switch(
+                  value: state.autoLogin,
+                  onChanged: (bool value) {
+                    notifier.updateAutoLogin(value);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Text(
+                  context.loc.save_password, // 使用本地化字符串
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Spacer(),
+                Switch(
+                  value: state.savePassword,
+                  onChanged: (bool value) {
+                    notifier.updateSavePassword(value);
+                  },
+                ),
+              ],
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  notifier.saveSettings();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(context.loc.account_settings_saved)), // 使用本地化字符串
+                  );
+                },
+                child: Text(context.loc.save), // 使用本地化字符串
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

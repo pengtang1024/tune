@@ -16,6 +16,5 @@ final musicRepositoryProvider = Provider((ref) {
 
 // 跨平台音乐扫描服务提供者
 final crossPlatformMusicScannerProvider = Provider((ref) {
-  final musicService = ref.watch(platformMusicServiceProvider);
-  return CrossPlatformMusicScannerImpl(musicService);
+  return CrossPlatformMusicScannerImpl();
 });

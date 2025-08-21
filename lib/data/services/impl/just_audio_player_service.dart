@@ -12,7 +12,7 @@ class JustAudioPlayerService implements AudioPlayerService {
       await _audioPlayer.setFilePath(song.data);
       await _audioPlayer.play();
     } catch (e) {
-      throw Exception('播放歌曲失败: $e');
+      throw Exception('Failed to play song: $e'); // 应该使用本地化字符串
     }
   }
 

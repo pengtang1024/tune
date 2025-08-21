@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 
 /// 语言切换按钮组件
@@ -11,7 +12,7 @@ class LanguageButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       icon: const Icon(Icons.g_translate),
-      tooltip: '切换语言',
+      tooltip: context.loc.settings,
       onPressed: () {
         _showLanguageSelectionDialog(context, ref);
       },
@@ -28,27 +29,23 @@ class LanguageButton extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('选择语言'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: supportedLocales.map((Locale locale) {
-                return RadioListTile<Locale>(
-                  title: Builder(
-                    builder: (context) {
-                      return Text(_getLocaleDisplayName(locale, context));
-                    }
-                  ),
-                  value: locale,
-                  groupValue: currentLocale,
-                  onChanged: (Locale? value) {
-                    if (value != null) {
-                      appBarNotifier.switchLanguage(value);
-                      Navigator.of(context).pop();
-                    }
+          title: Text(context.loc.select_language),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: supportedLocales.length,
+              itemBuilder: (context, index) {
+                final locale = supportedLocales[index];
+                return ListTile(
+                  title: Text(_getLocaleDisplayName(locale, context)),
+                  selected: locale == currentLocale,
+                  onTap: () {
+                    appBarNotifier.switchLanguage(locale);
+                    Navigator.of(context).pop();
                   },
                 );
-              }).toList(),
+              },
             ),
           ),
           actions: [
@@ -56,7 +53,7 @@ class LanguageButton extends ConsumerWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('取消'),
+              child: Text(context.loc.cancel), // 使用本地化字符串
             ),
           ],
         );
@@ -83,12 +80,18 @@ class LanguageButton extends ConsumerWidget {
           return '한국어';
         case 'ru':
           return 'Русский';
+        case 'de':
+          return 'Deutsch';
+        case 'fr':
+          return 'Français';
+        case 'es':
+          return 'Español';
         default:
-          return locale.toString();
+          return locale.languageCode;
       }
     } catch (e) {
-      // 如果出现异常，返回默认格式
-      return locale.toString();
+      // 如果出现异常，返回语言代码
+      return locale.languageCode;
     }
   }
 }
