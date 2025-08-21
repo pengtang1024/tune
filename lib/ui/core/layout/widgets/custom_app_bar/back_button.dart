@@ -20,17 +20,16 @@ class BackButtonWidget extends ConsumerWidget {
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
         // 使用GoRouter返回上一页
-        // 总是尝试返回，如果无法返回再导航到首页
         final goRouter = GoRouter.of(context);
         if (goRouter.canPop()) {
           goRouter.pop();
         } else {
-          // 检查当前路由是否不是首页，如果不是则返回首页
+          // 如果无法使用GoRouter返回，则导航到首页
+          // 但要避免在首页时仍然尝试导航到首页
           final currentPath = goRouter.routeInformationProvider.value.uri.toString();
-          if (currentPath != '/') {
-            context.go('/');
+          if (currentPath != '/' && currentPath != '/home') {
+            context.go('/home');
           }
-          // 如果当前已经在首页，则不执行任何操作
         }
       },
     );

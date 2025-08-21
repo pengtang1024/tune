@@ -80,7 +80,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         const SizedBox(width: 12),
         ElevatedButton(
           onPressed: () {
-            context.go('/music-scan');
+            // 使用push而不是go，这样可以正确返回到上一个页面
+            context.push('/music-scan');
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(16),

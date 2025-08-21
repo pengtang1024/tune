@@ -126,19 +126,19 @@ class MenuRouteObserver extends NavigatorObserver {
     // 在实际应用中，应该通过其他方式传递本地化标题
     switch (path) {
       case '/home':
-        return 'home'; // 应该使用 localizations.home
+        return '首页'; // 应该使用 localizations.home
       case '/recommend':
-        return 'recommend'; // 应该使用 localizations.recommend
+        return '推荐'; // 应该使用 localizations.recommend
       case '/featured':
-        return 'featured'; // 应该使用 localizations.featured
+        return '精选'; // 应该使用 localizations.featured
       case '/library':
-        return 'library'; // 应该使用 localizations.library
+        return '音乐库'; // 应该使用 localizations.library
       case '/music-scan':
-        return 'music_scan'; // 应该使用自定义本地化字符串
+        return '音乐扫描'; // 应该使用自定义本地化字符串
       case '/settings':
-        return 'settings'; // 应该使用 localizations.settings
+        return '设置'; // 应该使用 localizations.settings
       default:
-        return 'app_name'; // 应该使用 localizations.app_name
+        return 'Tune'; // 应该使用 localizations.app_name
     }
   }
 

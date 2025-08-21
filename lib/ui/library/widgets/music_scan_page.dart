@@ -96,111 +96,88 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     final state = ref.watch(libraryStateNotifierProvider);
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('音乐扫描'), // 应该使用本地化字符串
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadCustomScanPaths,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // 扫描状态显示
-          ScanStatusWidget(
-            statusMessage: state.statusMessage,
-            errorMessage: state.errorMessage ?? '',
-          ),
+    return Column(
+      children: [
+        // 扫描状态显示
+        ScanStatusWidget(
+          statusMessage: state.statusMessage,
+          errorMessage: state.errorMessage ?? '',
+        ),
 
-          // 扫描进度条
-          if (state.scanStatus == ScanStatus.scanning)
-            LinearProgressIndicator(value: state.scanProgress),
+        // 扫描进度条
+        if (state.scanStatus == ScanStatus.scanning)
+          LinearProgressIndicator(value: state.scanProgress),
 
-          // 自定义路径部分
-          CustomPathsHeaderWidget(
-            onAddPath: _addCustomScanPath,
-          ),
+        // 自定义路径部分
+        CustomPathsHeaderWidget(
+          onAddPath: _addCustomScanPath,
+        ),
 
-          if (_customScanPaths.isEmpty)
-            const EmptyStateWidget()
-          else
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _customScanPaths.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      title: Text(
-                        _customScanPaths[index],
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, size: 20),
-                        onPressed: () => _removeCustomScanPath(index),
-                      ),
+        if (_customScanPaths.isEmpty)
+          const EmptyStateWidget()
+        else
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _customScanPaths.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    title: Text(
+                      _customScanPaths[index],
+                      style: const TextStyle(fontSize: 12),
                     ),
-                  );
-                },
-              ),
-            ),
-
-          // 自定义路径描述
-          const CustomPathsDescriptionWidget(),
-
-          const SizedBox(height: 16),
-
-          // 扫描按钮
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: CustomPathsScanButtonWidget(
-              isScanning: state.scanStatus == ScanStatus.scanning,
-              hasCustomPaths: _customScanPaths.isNotEmpty,
-              onPressed: _startScan,
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, size: 20),
+                      onPressed: () => _removeCustomScanPath(index),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
-          const SizedBox(height: 16),
+        // 自定义路径描述
+        const CustomPathsDescriptionWidget(),
 
-          // 扫描结果
-          if (state.foundSongs.isNotEmpty) ...[
-            ScanResultsHeaderWidget(scannedCount: state.foundSongs.length),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: state.foundSongs.length,
-                itemBuilder: (context, index) {
-                  final song = state.foundSongs[index];
-                  final durationText =
-                      Duration(milliseconds: song.duration).toString().split('.').first.padLeft(8, '0');
-                  return SongListItemWidget(
-                    song: song,
-                    durationText: durationText,
-                  );
-                },
-              ),
-            ),
-          ],
-        ],
-      ),
-      floatingActionButton: state.foundSongs.isNotEmpty
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                final notifier = ref.read(libraryStateNotifierProvider.notifier);
-                notifier.addScannedSongsToLibrary();
+        const SizedBox(height: 16),
+
+        // 扫描按钮
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: CustomPathsScanButtonWidget(
+            isScanning: state.scanStatus == ScanStatus.scanning,
+            hasCustomPaths: _customScanPaths.isNotEmpty,
+            onPressed: _startScan,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // 扫描结果
+        if (state.foundSongs.isNotEmpty) ...[
+          ScanResultsHeaderWidget(scannedCount: state.foundSongs.length),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView.builder(
+              itemCount: state.foundSongs.length,
+              itemBuilder: (context, index) {
+                final song = state.foundSongs[index];
+                final durationText =
+                    Duration(milliseconds: song.duration).toString().split('.').first.padLeft(8, '0');
+                return SongListItemWidget(
+                  song: song,
+                  durationText: durationText,
+                );
               },
-              icon: const Icon(Icons.add),
-              label: const Text('添加到音乐库'),
-            )
-          : null,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
