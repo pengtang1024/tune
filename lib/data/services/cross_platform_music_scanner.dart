@@ -227,11 +227,19 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'data': filePath, // 使用data字段存储文件路径
         'uri': filePath, // 同时保留uri字段以保持兼容性
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
-        'year': metadata.year,
-        'genre': metadata.genres.join(','),
+        'year': metadata.year?.year, // 从DateTime中提取年份
+        'genre': metadata.genres?.isNotEmpty == true ? metadata.genres!.first : null,
         'bitrate': metadata.bitrate,
         'sampleRate': metadata.sampleRate,
-        'size': file.lengthSync(),
+        'trackNumber': metadata.trackNumber,
+        'trackTotal': metadata.trackTotal,
+        'discNumber': metadata.discNumber,
+        'totalDisc': metadata.totalDisc,
+        'lyrics': metadata.lyrics,
+        'genres': metadata.genres,
+        'performers': metadata.performers,
+        'language': metadata.language,
+        'size': await file.length(),
         'type': 'audio', // 添加类型字段以区分音频和视频
         'isFavorite': false,
       };
@@ -250,6 +258,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'uri': filePath,
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': 0,
+        'size': await file.length(),
+        'type': 'audio',
+        'isFavorite': false,
       };
 
       return Song(songData);

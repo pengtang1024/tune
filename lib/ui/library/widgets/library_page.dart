@@ -26,7 +26,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    
+
     // 初始化时加载音乐库
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notifier = ref.read(libraryStateNotifierProvider.notifier);
@@ -45,7 +45,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     setState(() {
       _displayedSearchQuery = _searchQuery;
     });
-    
+
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
     notifier.updateSearchQuery(_searchQuery);
   }
@@ -56,7 +56,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
       appBarNotifier.clearDynamicActions(); // 清除之前的动态按钮
-      
+
       final libraryState = ref.read(libraryStateNotifierProvider);
       appBarNotifier.addDynamicAction(
         IconButton(
@@ -70,9 +70,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ),
       );
     });
-    
+
     final state = ref.watch(libraryStateNotifierProvider);
-    
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -194,14 +194,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         onTap: () {
           // 点击歌曲卡片时的处理逻辑
           final notifier = ref.read(playerStateNotifierProvider.notifier);
-          
+
           // 获取当前歌曲列表
           final libraryNotifier = ref.read(libraryStateNotifierProvider.notifier);
           final allSongs = libraryNotifier.state.songs;
-          
+
           // 设置播放列表
           notifier.setPlaylist(allSongs, allSongs.indexWhere((s) => s.id == song.id));
-          
+
           // 播放歌曲
           notifier.playSong(song);
         },
@@ -347,6 +347,70 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                                 ),
                               ),
                             ),
+                          // 音轨号标签
+                          if (song.trackNumber != null && song.trackNumber != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '#${song.trackNumber}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.indigo,
+                                ),
+                              ),
+                            ),
+                          // 光盘号标签
+                          if (song.discNumber != null && song.discNumber != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.pink.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Disc ${song.discNumber}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.pink,
+                                ),
+                              ),
+                            ),
+                          // 文件大小标签
+                          if (song.size != null && song.size != 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.teal.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _formatFileSize(song.size!),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.teal,
+                                ),
+                              ),
+                            ),
+                          // 收藏标签
+                          if (song.isFavorite)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                '♥',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 8), // 在标签下方添加间距
@@ -369,6 +433,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
+  /// 格式化文件大小
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } else {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    }
+  }
+
   /// 构建通用标签组件
   Widget _buildTag({required String text, required Color bgColor, required Color textColor}) {
     return Container(
@@ -386,4 +463,5 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
     );
   }
+
 }
