@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 
 // Music scan widgets
 import 'package:tune/ui/library/widgets/music_scan/widgets/empty_state_widget.dart';
@@ -49,6 +50,11 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       setState(() {
         _isLoading = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.loc.load_stats_failed)),
+        );
+      }
     }
   }
 
@@ -60,7 +66,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       // 错误处理
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save custom path: $e')), // 应该使用本地化字符串
+          SnackBar(content: Text('${context.loc.failed_to_save_custom_path}: $e')),
         );
       }
     }
@@ -89,6 +95,18 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
   void _startScan() {
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
     notifier.scanCustomPaths();
+  }
+
+  // 将扫描结果添加到音乐库
+  void _addToLibrary() {
+    final notifier = ref.read(libraryStateNotifierProvider.notifier);
+    notifier.addScannedSongsToLibrary();
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('已将扫描到的歌曲添加到音乐库')),
+      );
+    }
   }
 
   @override
@@ -160,7 +178,19 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
 
         // 扫描结果
         if (state.foundSongs.isNotEmpty) ...[
-          ScanResultsHeaderWidget(scannedCount: state.foundSongs.length),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ScanResultsHeaderWidget(scannedCount: state.foundSongs.length),
+                ElevatedButton(
+                  onPressed: _addToLibrary,
+                  child: Text('添加到音乐库'),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 8),
           Expanded(
             child: ListView.builder(

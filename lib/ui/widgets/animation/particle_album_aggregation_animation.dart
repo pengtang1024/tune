@@ -80,7 +80,7 @@ class _ParticleAlbumAggregationPainter extends CustomPainter {
         theme.colorScheme.error,
       ];
 
-      paint.color = colors[i % colors.length].withOpacity(0.7 + progress * 0.3);
+      paint.color = colors[i % colors.length].withValues(alpha:0.7 + progress * 0.3);
 
       canvas.drawCircle(Offset(currentX, currentY), particleSize, paint);
     }
@@ -88,13 +88,13 @@ class _ParticleAlbumAggregationPainter extends CustomPainter {
     // 当聚合完成时，绘制中心的专辑封面轮廓
     if (progress > 0.7) {
       final scale = (progress - 0.7) / 0.3;
-      paint.color = theme.colorScheme.onSurface.withOpacity(scale * 0.5);
+      paint.color = theme.colorScheme.onSurface.withValues(alpha:scale * 0.5);
       canvas.drawCircle(center, 20 * scale, paint);
 
       // 绘制专辑封面内的音乐符号
       if (scale > 0.5) {
         final iconPaint = Paint()
-          ..color = theme.colorScheme.onSurface.withOpacity(scale)
+          ..color = theme.colorScheme.onSurface.withValues(alpha:scale)
           ..style = PaintingStyle.fill;
 
         // 简化的音乐符号

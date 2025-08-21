@@ -191,5 +191,10 @@
   "auto_login": "自动登录",
   "save_password": "保存密码",
   "account_settings_saved": "账户设置已保存",
-  "save": "保存"
+  "save": "保存",
+  "search_songs": "搜索音乐...",
+  "artists": "歌手",
+  "albums": "专辑",
+  "load_stats_failed": "加载统计信息失败",
+  "load_songs_failed": "加载歌曲失败"
 }

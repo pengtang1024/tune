@@ -1,6 +1,5 @@
 import 'dart:io' show Platform, Directory, File;
 import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
@@ -62,7 +61,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories');
     final allSongs = <Song>[];
 
-    for (final dirPath in directoryPaths) {
+    for (int i = 0; i < directoryPaths.length; i++) {
+      final dirPath = directoryPaths[i];
       try {
         final songs = await _scanDirectory(dirPath);
         allSongs.addAll(songs);
@@ -101,25 +101,6 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     return await scanMusic();
   }
 
-  /// 使用文件选择器扫描音乐
-  Future<List<Song>> _scanWithFilePicker() async {
-    try {
-      Log.info('CrossPlatformMusicScanner: Opening file picker for directory selection');
-      final result = await FilePicker.platform.getDirectoryPath();
-
-      if (result == null) {
-        Log.info('CrossPlatformMusicScanner: No directory selected');
-        return [];
-      }
-
-      Log.info('CrossPlatformMusicScanner: Selected directory: $result');
-      return await _scanDirectory(result);
-    } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to scan with file picker: $e');
-      return [];
-    }
-  }
-
   /// 扫描目录中的音乐文件
   Future<List<Song>> _scanDirectory(String directoryPath) async {
     final songs = <Song>[];
@@ -131,16 +112,26 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     }
 
     try {
+      // 先获取所有文件列表以计算进度
+      final files = <File>[];
       await for (final file in directory.list(recursive: true, followLinks: false)) {
         if (file is File && _isAudioFile(file.path)) {
-          try {
-            final song = await _createSongFromFile(file);
-            if (song != null) {
-              songs.add(song);
-            }
-          } catch (e) {
-            Log.info('CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e');
+          files.add(file);
+        }
+      }
+
+      Log.info('CrossPlatformMusicScanner: Found ${files.length} audio files in directory: $directoryPath');
+
+      // 处理每个音频文件
+      for (int i = 0; i < files.length; i++) {
+        final file = files[i];
+        try {
+          final song = await _createSongFromFile(file);
+          if (song != null) {
+            songs.add(song);
           }
+        } catch (e) {
+          Log.info('CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e');
         }
       }
     } catch (e) {

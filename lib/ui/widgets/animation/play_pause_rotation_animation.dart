@@ -48,7 +48,7 @@ class _PlayPauseRotationAnimationState
                 gradient: RadialGradient(
                   colors: [
                     theme.colorScheme.primaryContainer,
-                    theme.colorScheme.primary.withOpacity(0.8),
+                    theme.colorScheme.primary.withValues(alpha:0.8),
                   ],
                 ),
                 shape: BoxShape.circle,

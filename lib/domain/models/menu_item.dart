@@ -44,19 +44,19 @@ class DeviceMenuItem {
 const List<DeviceMenuItem> mobileMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: 'home', // 应该使用 localizations.home
+    label: 'home', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: 'discover', // 应该使用 localizations.recommend 或添加新的本地化字符串
+    label: 'recommend', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.explore,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: 'library', // 应该使用 localizations.library
+    label: 'library', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.library_music,
     index: 2,
   ),
@@ -66,25 +66,25 @@ const List<DeviceMenuItem> mobileMenuItems = [
 const List<DeviceMenuItem> desktopMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: 'home', // 应该使用 localizations.home
+    label: 'home', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: 'recommend', // 应该使用 localizations.recommend
+    label: 'recommend', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.recommend,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/featured',
-    label: 'featured', // 应该使用 localizations.featured
+    label: 'featured', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.star,
     index: 2,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: 'library', // 应该使用 localizations.library
+    label: 'library', // 这里应该使用本地化键，而不是直接的字符串
     icon: Icons.library_music,
     index: 3,
   ),

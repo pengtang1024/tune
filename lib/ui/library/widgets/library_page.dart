@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/utils/device_utils.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/ui/player/providers/player_providers.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -61,7 +63,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           child: TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: '搜索音乐...',
+              hintText: context.loc.search_songs, // 使用本地化字符串
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -107,14 +109,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildStatItem('歌曲', totalSongs.toString()),
-            _buildStatItem('歌手', totalArtists.toString()),
-            _buildStatItem('专辑', totalAlbums.toString()),
+            _buildStatItem(context.loc.songs, totalSongs.toString()), // 使用本地化字符串
+            _buildStatItem(context.loc.artists, totalArtists.toString()), // 使用本地化字符串
+            _buildStatItem(context.loc.albums, totalAlbums.toString()), // 使用本地化字符串
           ],
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Text('加载统计信息失败: $error'),
+      error: (error, stack) => Text('${context.loc.load_stats_failed}: $error'), // 使用本地化字符串
     );
   }
 
@@ -149,82 +151,56 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         final filteredSongs = _searchQuery.isEmpty
             ? songs
             : songs.where((song) {
-                final title = song.title ?? '';
-                final artist = song.artist ?? '';
-                final album = song.album ?? '';
-                return title.toLowerCase().contains(_searchQuery) ||
-                    artist.toLowerCase().contains(_searchQuery) ||
-                    album.toLowerCase().contains(_searchQuery);
+                // 搜索匹配：标题、艺术家或专辑
+                return song.title.toLowerCase().contains(_searchQuery) ||
+                    song.artist.toLowerCase().contains(_searchQuery) ||
+                    song.album.toLowerCase().contains(_searchQuery);
               }).toList();
 
         if (filteredSongs.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.music_note,
-                  size: 64,
-                  color: Colors.grey,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  '暂无音乐',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '点击右上角按钮扫描音乐',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+          return Center(
+            child: Text(context.loc.no_songs_found), // 使用本地化字符串
           );
         }
 
-        // 计算网格列数
-        final crossAxisCount = DeviceUtils.isDesktop(context) ? 6 : 3;
+        // 计算列数（根据屏幕宽度动态调整）
+        final screenWidth = MediaQuery.of(context).size.width;
+        final crossAxisCount = (screenWidth / 180).floor().clamp(1, 10);
 
         return GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 0.85,
+            childAspectRatio: 0.8, // 控制网格项的宽高比
           ),
           itemCount: filteredSongs.length,
           itemBuilder: (context, index) {
             final song = filteredSongs[index];
-            return _buildSongItem(song);
+            return _buildSongCard(song);
           },
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Text('加载歌曲失败: $error'),
+      error: (error, stack) => Center(
+        child: Text('${context.loc.load_songs_failed}: $error'), // 使用本地化字符串
+      ),
     );
   }
 
-  Widget _buildSongItem(Song song) {
-    final title = song.title ?? '未知歌曲';
-    final artist = song.artist ?? '未知艺术家';
-    final album = song.album ?? '未知专辑';
-    final duration = song.duration ?? 0;
-
-    return GestureDetector(
-      onTap: () {
-        // TODO: 播放歌曲
-      },
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+  Widget _buildSongCard(Song song) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: InkWell(
+        onTap: () {
+          // 点击歌曲卡片时的处理逻辑
+          final notifier = ref.read(playerStateNotifierProvider.notifier);
+          notifier.playSong(song);
+        },
+        borderRadius: BorderRadius.circular(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -233,59 +209,51 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               height: 120,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
               ),
-              child: const Icon(
-                Icons.album,
-                size: 60,
-                color: Colors.grey,
+              child: Icon(
+                Icons.music_note,
+                size: 48,
+                color: Colors.grey[600],
               ),
             ),
+            // 歌曲信息
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 歌曲标题
                   Text(
-                    title,
+                    song.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                   const SizedBox(height: 4),
+                  // 艺术家
                   Text(
-                    artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    song.artist,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.grey,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        album,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        '${(duration / 1000).floor().toString().padLeft(2, '0')}:${(duration % 1000 ~/ 10).toString().padLeft(2, '0')}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2),
+                  // 专辑
+                  Text(
+                    song.album,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

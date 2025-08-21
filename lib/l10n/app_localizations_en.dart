@@ -186,7 +186,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get desktop_lyrics_description =>
-      'Display lyrics on the desktop in floating window';
+      'Display lyrics in a floating window on the desktop';
 
   @override
   String get small => 'Small';
@@ -205,7 +205,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_description =>
-      'Tune is a modern music player that allows you to manage and play your local music collection with ease. With a clean and intuitive interface, Tune provides a seamless music experience.';
+      'Tune is a modern music player that allows you to easily manage and play your local music collection. With a clean and intuitive interface, Tune provides a seamless music experience.';
 
   @override
   String get features => 'Features';
@@ -215,7 +215,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supports_multiple_audio_formats =>
-      'Supports multiple audio formats including MP3, FLAC, WAV, and more';
+      'Supports multiple audio formats including MP3, FLAC, WAV, etc.';
 
   @override
   String get local_music_management => 'Local music management';
@@ -229,7 +229,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supports_chinese_english_japanese_korean_russian_and_more =>
-      'Supports Chinese, English, Japanese, Korean, Russian, and more languages';
+      'Supports Chinese, English, Japanese, Korean, Russian and more languages';
 
   @override
   String get multiple_themes => 'Multiple themes';
@@ -250,7 +250,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supports_searching_by_song_title_artist_album_and_other_metadata =>
-      'Supports searching by song title, artist, album, and other metadata';
+      'Supports searching by song title, artist, album and other metadata';
 
   @override
   String get open_source_license => 'Open Source License';
@@ -264,7 +264,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contact_us_description =>
-      'If you have any questions, suggestions, or feedback, feel free to contact us through the channels below.';
+      'If you have any questions, suggestions or feedback, please feel free to contact us through the following channels.';
 
   @override
   String get official_website => 'Official Website';
@@ -278,7 +278,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_completion =>
-      '• Can view results in music library after scan completion';
+      '• Results can be viewed in the library after scanning is complete';
 
   @override
   String get auto_metadata_extraction =>
@@ -295,7 +295,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get custom_path_scanning_will_be_implemented =>
-      'Custom path scanning will be implemented in a future version';
+      'Custom path scanning will be implemented in future versions';
 
   @override
   String get error => 'Error';
@@ -310,7 +310,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featured_albums => 'Featured Albums';
 
   @override
-  String get songs => 'songs';
+  String get songs => 'Songs';
 
   @override
   String get music_scan => 'Music Scan';
@@ -319,16 +319,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scan_local_music => 'Scan Local Music';
 
   @override
-  String get search_error => 'Search error';
+  String get search_error => 'Search Error';
 
   @override
   String get no_matching_songs => 'No matching songs found';
 
   @override
-  String get playback_error => 'Playback error';
+  String get playback_error => 'Playback Error';
 
   @override
-  String get no_song_playing => 'No song playing';
+  String get no_song_playing => 'No song is currently playing';
 
   @override
   String get select_a_song_to_play => 'Please select a song to play';
@@ -361,7 +361,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bottom_player_bar_now_playing => 'Now Playing';
 
   @override
-  String get bottom_player_bar_no_song => 'No song selected';
+  String get bottom_player_bar_no_song => 'No Song Selected';
 
   @override
   String get song_list_title => 'Songs';
@@ -424,7 +424,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favorite_button => 'Favorite';
 
   @override
-  String get font_family => 'Font Family';
+  String get font_family => 'Font';
 
   @override
   String get theme_mode => 'Theme Mode';
@@ -454,10 +454,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get now_playing => 'Now Playing';
 
   @override
-  String get no_things_players => 'No things players';
+  String get no_things_players => 'No Players';
 
   @override
-  String get no_selected_song => 'No song selected';
+  String get no_selected_song => 'No Song Selected';
 
   @override
   String get player_duration => 'Duration';
@@ -469,7 +469,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get player_album => 'Album';
 
   @override
-  String get search_empty => 'Enter a search term to find songs';
+  String get search_empty => 'Enter search terms to find songs';
 
   @override
   String get search_no_results => 'No songs found matching your search';
@@ -508,7 +508,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get search_page_hint => 'Search songs...';
 
   @override
-  String get search_page_empty => 'Enter a search term to find songs';
+  String get search_page_empty => 'Enter search terms to find songs';
 
   @override
   String get search_page_no_results => 'No songs found matching your search';
@@ -611,4 +611,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get search_songs => 'Search songs...';
+
+  @override
+  String get artists => 'Artists';
+
+  @override
+  String get albums => 'Albums';
+
+  @override
+  String get load_stats_failed => 'Failed to load statistics';
+
+  @override
+  String get load_songs_failed => 'Failed to load songs';
 }

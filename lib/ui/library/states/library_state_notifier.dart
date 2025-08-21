@@ -43,6 +43,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     );
   }
 
+  /// 更新扫描进度
   void updateScanProgress(double progress) {
     state = state.copyWith(scanProgress: progress);
   }

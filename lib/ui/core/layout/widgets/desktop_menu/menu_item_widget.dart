@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/theme_extension.dart';
 import 'package:tune/domain/models/menu_item.dart';
 import 'package:tune/utils/device_utils.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 
 /// 菜单项组件
 /// 仅负责显示单个菜单项
@@ -49,7 +50,7 @@ class MenuItemWidget extends ConsumerWidget {
               if (isExpanded)
                 Expanded(
                   child: Text(
-                    item.label,
+                    _getLocalizedLabel(context, item.label),
                     style: TextStyle(
                       color: isSelected ? context.theme.primaryColor : context.theme.textTheme.bodyMedium?.color,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -61,5 +62,25 @@ class MenuItemWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _getLocalizedLabel(BuildContext context, String labelKey) {
+    // 根据标签键返回本地化字符串
+    switch (labelKey) {
+      case 'home':
+        return context.loc.home;
+      case 'recommend':
+        return context.loc.recommend;
+      case 'featured':
+        return context.loc.featured;
+      case 'library':
+        return context.loc.library;
+      case 'music_scan':
+        return context.loc.music_scan; // 需要在本地化文件中添加这个键
+      case 'settings':
+        return context.loc.settings;
+      default:
+        return labelKey;
+    }
   }
 }

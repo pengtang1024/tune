@@ -66,13 +66,13 @@ class _VolumeBubblePainter extends CustomPainter {
       final opacity = (1 - bubbleProgress) * 0.8;
 
       // 气泡颜色
-      paint.color = theme.colorScheme.primary.withOpacity(opacity);
+      paint.color = theme.colorScheme.primary.withValues(alpha:opacity);
 
       // 绘制气泡
       canvas.drawCircle(Offset(x, y), radius, paint);
 
       // 绘制高光
-      paint.color = theme.colorScheme.onPrimary.withOpacity(opacity * 0.5);
+      paint.color = theme.colorScheme.onPrimary.withValues(alpha:opacity * 0.5);
       canvas.drawCircle(
         Offset(x - radius/3, y - radius/3),
         radius/3,

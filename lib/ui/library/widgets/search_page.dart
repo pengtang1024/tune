@@ -53,7 +53,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             hintText: localizations.search, // 使用本地化字符串
             border: InputBorder.none,
             hintStyle: TextStyle(
-              color: Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.7),
+              color: Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha:0.7),
             ),
           ),
           style: TextStyle(
@@ -105,7 +105,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             Icon(
               Icons.search_off,
               size: 64,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -145,7 +145,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         ),
         title: Text(song.title),
         subtitle: Text(
-          '${song.artist ?? localizations.unknown_artist} - ${song.album ?? localizations.unknown_album}',
+          '${song.artist} - ${song.album}',
         ),
         trailing: Text(
           Duration(milliseconds: song.duration).toString().split('.').first.padLeft(8, '0'),

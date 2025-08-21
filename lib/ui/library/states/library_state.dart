@@ -10,7 +10,7 @@ class LibraryState {
   final List<Song> songs;
   final bool isLoading;
   final String? errorMessage;
-  
+
   // 音乐扫描相关字段
   final ScanStatus scanStatus;
   final double scanProgress;
@@ -65,17 +65,17 @@ class LibraryState {
       isLoading: false,
     );
   }
-  
+
   List<Song> get searchResults {
     if (searchQuery.isEmpty) {
       return songs;
     }
-    
+
     final query = searchQuery.toLowerCase();
     return songs.where((song) {
       return song.title.toLowerCase().contains(query) ||
-          (song.artist?.toLowerCase().contains(query) ?? false) ||
-          (song.album?.toLowerCase().contains(query) ?? false);
+          (song.artist.toLowerCase().contains(query)) ||
+          (song.album.toLowerCase().contains(query));
     }).toList();
   }
 }

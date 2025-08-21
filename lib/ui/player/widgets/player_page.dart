@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
 
@@ -40,32 +39,21 @@ class PlayerPage extends ConsumerWidget {
             Container(
               width: 200,
               height: 200,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                Icons.music_note,
-                size: 100,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, borderRadius: BorderRadius.circular(16)),
+              child: Icon(Icons.music_note, size: 100, color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
             const SizedBox(height: 32),
 
             // 歌曲信息
             Text(
               playerState.currentSong!.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             Text(
-              '${playerState.currentSong!.artist ?? localizations.unknown_artist} - ${playerState.currentSong!.album ?? localizations.unknown_album}',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).textTheme.bodySmall?.color,
-                  ),
+              '${playerState.currentSong!.artist} - ${playerState.currentSong!.album}',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -80,7 +68,7 @@ class PlayerPage extends ConsumerWidget {
 
             // 音量控制
             const PlayerVolume(),
-            
+
             // 播放模式控制
             const PlayerModeControls(),
           ],
@@ -103,10 +91,7 @@ class PlayerVolume extends ConsumerWidget {
       children: [
         const Icon(Icons.volume_down),
         Expanded(
-          child: Slider(
-            value: playerState.volume,
-            onChanged: playerNotifier.setVolume,
-          ),
+          child: Slider(value: playerState.volume, onChanged: playerNotifier.setVolume),
         ),
         const Icon(Icons.volume_up),
       ],
@@ -128,13 +113,10 @@ class PlayerModeControls extends ConsumerWidget {
       children: [
         // 随机播放按钮
         IconButton(
-          icon: Icon(
-            playerState.isShuffleMode ? Icons.shuffle : Icons.shuffle_outlined,
-            color: playerState.isShuffleMode ? Theme.of(context).colorScheme.primary : null,
-          ),
+          icon: Icon(playerState.isShuffleMode ? Icons.shuffle : Icons.shuffle_outlined, color: playerState.isShuffleMode ? Theme.of(context).colorScheme.primary : null),
           onPressed: playerNotifier.toggleShuffleMode,
         ),
-        
+
         // 循环播放按钮
         IconButton(
           icon: const Icon(Icons.repeat),

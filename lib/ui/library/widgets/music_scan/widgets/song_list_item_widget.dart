@@ -8,11 +8,7 @@ class SongListItemWidget extends StatelessWidget {
   final Song song;
   final String durationText;
 
-  const SongListItemWidget({
-    super.key,
-    required this.song,
-    required this.durationText,
-  });
+  const SongListItemWidget({super.key, required this.song, required this.durationText});
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +20,11 @@ class SongListItemWidget extends StatelessWidget {
           leading: Container(
             width: 50,
             height: 50,
-            decoration: BoxDecoration(
-              color: context.theme.colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.music_note,
-              color: context.theme.colorScheme.onSurfaceVariant,
-            ),
+            decoration: BoxDecoration(color: context.theme.colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8)),
+            child: Icon(Icons.music_note, color: context.theme.colorScheme.onSurfaceVariant),
           ),
           title: Text(song.title),
-          subtitle: Text('${song.artist ?? '未知艺术家'} · ${song.album ?? '未知专辑'}'),
+          subtitle: Text('${song.artist} · ${song.album}'),
           trailing: Text(durationText),
         ),
       ),

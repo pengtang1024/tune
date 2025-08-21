@@ -590,6 +590,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get save => '保存';
+
+  @override
+  String get search_songs => '搜索音乐...';
+
+  @override
+  String get artists => '歌手';
+
+  @override
+  String get albums => '专辑';
+
+  @override
+  String get load_stats_failed => '加载统计信息失败';
+
+  @override
+  String get load_songs_failed => '加载歌曲失败';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1178,4 +1193,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get save => '保存';
+
+  @override
+  String get search_songs => '搜索歌曲...';
+
+  @override
+  String get artists => '艺术家';
+
+  @override
+  String get albums => '专辑';
+
+  @override
+  String get load_stats_failed => '加载统计信息失败';
+
+  @override
+  String get load_songs_failed => '加载歌曲失败';
 }

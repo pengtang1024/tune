@@ -64,12 +64,12 @@ class _ExplosionPainter extends CustomPainter {
         center.dy + distance * sin(angle),
       );
 
-      paint.color = theme.colorScheme.primary.withOpacity(1.0 - progress);
+      paint.color = theme.colorScheme.primary.withValues(alpha:1.0 - progress);
       canvas.drawCircle(position, particleSize, paint);
     }
 
     // 绘制中心闪光
-    paint.color = theme.colorScheme.secondary.withOpacity(1.0 - progress * 2);
+    paint.color = theme.colorScheme.secondary.withValues(alpha:1.0 - progress * 2);
     canvas.drawCircle(center, 5 * (1 - progress), paint);
   }
 

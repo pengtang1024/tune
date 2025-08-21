@@ -70,13 +70,13 @@ class _SpectrumWaterfallPainter extends CustomPainter {
       Color color;
       if (i < barCount / 3) {
         // 低频 - 使用主题主色
-        color = theme.colorScheme.primary.withOpacity(opacity);
+        color = theme.colorScheme.primary.withValues(alpha:opacity);
       } else if (i < 2 * barCount / 3) {
         // 中频 - 使用主题次色
-        color = theme.colorScheme.secondary.withOpacity(opacity);
+        color = theme.colorScheme.secondary.withValues(alpha: opacity);
       } else {
         // 高频 - 使用主题第三色
-        color = theme.colorScheme.tertiary.withOpacity(opacity);
+        color = theme.colorScheme.tertiary.withValues(alpha:opacity);
       }
 
       paint.color = color;

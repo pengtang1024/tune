@@ -1250,6 +1250,36 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'保存'**
   String get save;
+
+  /// No description provided for @search_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索歌曲...'**
+  String get search_songs;
+
+  /// No description provided for @artists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get artists;
+
+  /// No description provided for @albums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get albums;
+
+  /// No description provided for @load_stats_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载统计信息失败'**
+  String get load_stats_failed;
+
+  /// No description provided for @load_songs_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载歌曲失败'**
+  String get load_songs_failed;
 }
 
 class _AppLocalizationsDelegate

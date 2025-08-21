@@ -56,6 +56,9 @@ dependencies:
   riverpod: ^2.6.1
   flutter_riverpod: ^2.6.1
 
+  # Path package for path manipulation
+  path: ^1.9.0
+
   # Local storage
   hive: ^2.2.3
   hive_flutter: ^1.1.0
