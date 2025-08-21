@@ -66,4 +66,32 @@ class Song {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// 将Song对象转换为Map
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'artist': artist,
+      'album': album,
+      'duration': duration,
+      'uri': uri,
+      'dateAdded': dateAdded,
+      'genre': genre,
+      'year': year,
+      'bitrate': bitrate,
+      'sampleRate': sampleRate,
+      'trackNumber': trackNumber,
+      'trackTotal': trackTotal,
+      'discNumber': discNumber,
+      'totalDisc': totalDisc,
+      'lyrics': lyrics,
+      'genres': genres,
+      'performers': performers,
+      'language': language,
+      'size': size,
+      'type': type,
+      'isFavorite': isFavorite,
+    };
+  }
 }

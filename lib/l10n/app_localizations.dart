@@ -1280,6 +1280,72 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'加载歌曲失败'**
   String get load_songs_failed;
+
+  /// No description provided for @clear_library.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空音乐库'**
+  String get clear_library;
+
+  /// No description provided for @confirm_clear_library.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确认清空音乐库'**
+  String get confirm_clear_library;
+
+  /// No description provided for @confirm_clear_library_message.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。'**
+  String get confirm_clear_library_message;
+
+  /// No description provided for @delete_song.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除歌曲'**
+  String get delete_song;
+
+  /// No description provided for @confirm_delete_song.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确认删除歌曲'**
+  String get confirm_delete_song;
+
+  /// No description provided for @confirm_delete_song_message.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。'**
+  String get confirm_delete_song_message;
+
+  /// No description provided for @favorite.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏'**
+  String get favorite;
+
+  /// No description provided for @unfavorite.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消收藏'**
+  String get unfavorite;
+
+  /// No description provided for @select_all.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全选'**
+  String get select_all;
+
+  /// No description provided for @deselect_all.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消全选'**
+  String get deselect_all;
+
+  /// No description provided for @items_selected.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'项已选择'**
+  String get items_selected;
 }
 
 class _AppLocalizationsDelegate

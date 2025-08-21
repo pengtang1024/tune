@@ -179,6 +179,55 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     }
   }
 
+  /// 删除指定的歌曲
+  void removeSong(Song song) {
+    final updatedSongs = List<Song>.from(state.songs)..remove(song);
+    state = state.copyWith(
+      songs: updatedSongs,
+      statusMessage: '已删除歌曲: ${song.title}',
+    );
+    // 保存到持久化存储
+    _saveScannedSongs(updatedSongs);
+  }
+
+  /// 切换歌曲的收藏状态
+  void toggleFavorite(Song song) {
+    final updatedSongs = List<Song>.from(state.songs);
+    final index = updatedSongs.indexWhere((s) => s.id == song.id);
+    if (index != -1) {
+      final updatedSong = Song(song.toJson()..['isFavorite'] = !song.isFavorite);
+      updatedSongs[index] = updatedSong;
+      state = state.copyWith(
+        songs: updatedSongs,
+        statusMessage: '${song.isFavorite ? '取消收藏' : '收藏'}歌曲: ${song.title}',
+      );
+      // 保存到持久化存储
+      _saveScannedSongs(updatedSongs);
+    }
+  }
+
+  /// 删除多首歌曲
+  void removeSongs(List<Song> songsToRemove) {
+    final updatedSongs = List<Song>.from(state.songs)..removeWhere((song) => songsToRemove.contains(song));
+    state = state.copyWith(
+      songs: updatedSongs,
+      statusMessage: '已删除 ${songsToRemove.length} 首歌曲',
+    );
+    // 保存到持久化存储
+    _saveScannedSongs(updatedSongs);
+  }
+
+  /// 清空音乐库
+  void clearLibrary() {
+    final songCount = state.songs.length;
+    state = state.copyWith(
+      songs: [],
+      statusMessage: '已清空音乐库，共删除 $songCount 首歌曲',
+    );
+    // 保存到持久化存储
+    _saveScannedSongs([]);
+  }
+
   void removeCustomPath(String path) {
     // TODO: 实现移除自定义路径的逻辑
   }
@@ -291,5 +340,89 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
     // 播放指定歌曲
     playerNotifier.playSong(song);
+  }
+
+  /// 切换批量选择模式
+  void toggleMultiSelectMode() {
+    state = state.copyWith(
+      isMultiSelectMode: !state.isMultiSelectMode,
+      selectedSongs: state.isMultiSelectMode ? const {} : state.selectedSongs,
+    );
+  }
+
+  /// 选择或取消选择单首歌曲
+  void toggleSongSelection(Song song) {
+    if (!state.isMultiSelectMode) return;
+    
+    final selectedSongs = Set<Song>.from(state.selectedSongs);
+    if (selectedSongs.contains(song)) {
+      selectedSongs.remove(song);
+    } else {
+      selectedSongs.add(song);
+    }
+    
+    state = state.copyWith(selectedSongs: selectedSongs);
+  }
+
+  /// 选择所有歌曲
+  void selectAllSongs() {
+    if (!state.isMultiSelectMode) return;
+    
+    final allSongs = state.searchResults.toSet();
+    state = state.copyWith(selectedSongs: allSongs);
+  }
+
+  /// 取消选择所有歌曲
+  void deselectAllSongs() {
+    if (!state.isMultiSelectMode) return;
+    
+    state = state.copyWith(selectedSongs: const {});
+  }
+
+  /// 批量删除歌曲
+  void removeSelectedSongs() {
+    if (!state.isMultiSelectMode || state.selectedSongs.isEmpty) return;
+    
+    // 将Set转换为List以便使用removeWhere
+    final selectedSongsList = state.selectedSongs.toList();
+    final updatedSongs = List<Song>.from(state.songs)..removeWhere((song) => selectedSongsList.contains(song));
+    
+    state = state.copyWith(
+      songs: updatedSongs,
+      isMultiSelectMode: false,
+      selectedSongs: const {},
+      statusMessage: '已删除 ${state.selectedSongs.length} 首歌曲',
+    );
+    // 保存到持久化存储
+    _saveScannedSongs(updatedSongs);
+  }
+
+  /// 批量切换收藏状态
+  void toggleFavoriteForSelectedSongs() {
+    if (!state.isMultiSelectMode || state.selectedSongs.isEmpty) return;
+    
+    final updatedSongs = List<Song>.from(state.songs);
+    int favoriteCount = 0;
+    int unfavoriteCount = 0;
+    
+    for (int i = 0; i < updatedSongs.length; i++) {
+      final song = updatedSongs[i];
+      if (state.selectedSongs.contains(song)) {
+        final updatedSong = Song(song.toJson()..['isFavorite'] = !song.isFavorite);
+        updatedSongs[i] = updatedSong;
+        if (song.isFavorite) {
+          unfavoriteCount++;
+        } else {
+          favoriteCount++;
+        }
+      }
+    }
+    
+    state = state.copyWith(
+      songs: updatedSongs,
+      statusMessage: '已收藏 $favoriteCount 首歌曲，取消收藏 $unfavoriteCount 首歌曲',
+    );
+    // 保存到持久化存储
+    _saveScannedSongs(updatedSongs);
   }
 }

@@ -101,3 +101,5 @@ _updateAppBarState(ref, context, currentRoutePath);
 在状态更新前进行值对比，新旧值一致时不通知UI刷新
 使用Riverpod精准通知需要更新的UI部分，而不是触发全局刷新
 对于频繁变化的状态（如播放状态），应实现防抖机制避免过度刷新
+
+本地化参数的添加，应该根据l10n.yaml获取模板文件，zh_CN.arb为核心模板，根据模板文件添加参数，然后同等更新其他语言文件，最后通过flutter gen-l10n生成各个语言的AppLocalizations

@@ -63,20 +63,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get custom_scan_paths => 'Custom Scan Paths';
 
   @override
-  String get add_custom_directory => 'Add custom directory for music scanning';
+  String get add_custom_directory => 'Add Custom Music Scan Directory';
 
   @override
   String get no_custom_scan_paths => 'No custom scan paths';
 
   @override
   String get full_platform_scan_note =>
-      'Note: Please use the \"Music Scan\" function in the sidebar for full platform scanning';
+      'Note: For full platform scan, please use the \"Music Scan\" function in the sidebar';
 
   @override
   String get library_info => 'Library Info';
 
   @override
-  String get songs_count => 'Current library contains 0 songs';
+  String get songs_count => 'The current library contains 0 songs';
 
   @override
   String get library_features => 'Library Features';
@@ -102,7 +102,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_step4 =>
-      '4. Scanned music will automatically appear in the \"Library\"';
+      '4. The scanned music will automatically appear in the \"Library\"';
 
   @override
   String get faq => 'FAQ';
@@ -112,22 +112,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faq_scan_issue_answer =>
-      'A: Please ensure music files exist on your device and the app has storage access permissions.';
+      'A: Please make sure music files exist on your device and the app has storage access permissions.';
 
   @override
-  String get faq_slow_scan => 'Q: Why is scanning slow?';
+  String get faq_slow_scan => 'Q: Why is the scan slow?';
 
   @override
   String get faq_slow_scan_answer =>
-      'A: First scan may be slow, subsequent scans will be faster. Please be patient.';
+      'A: The first scan may be slow, subsequent scans will be faster. Please be patient.';
 
   @override
   String get faq_not_showing =>
-      'Q: Why aren\'t scanned songs showing in the library?';
+      'Q: Why aren\'t the scanned songs showing in the library?';
 
   @override
   String get faq_not_showing_answer =>
-      'A: Please ensure scanning is complete and try refreshing the library page.';
+      'A: Please make sure the scan is complete and try refreshing the library page.';
 
   @override
   String get contact_us =>
@@ -165,320 +165,311 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get auto_start_description =>
-      'Automatically start the application on system startup';
+      'Automatically start the application when the system starts';
 
   @override
-  String get window_size => 'Window Size';
+  String get window_size => '窗口大小';
 
   @override
-  String get window_size_description =>
-      'Set the default window size when the application starts';
+  String get window_size_description => '设置应用程序启动时的默认窗口大小';
 
   @override
-  String get default_player => 'Default Player';
+  String get default_player => '默认播放器';
 
   @override
-  String get default_player_description =>
-      'Set this application as the default audio player';
+  String get default_player_description => '将此应用程序设置为默认音频播放器';
 
   @override
-  String get desktop_lyrics => 'Desktop Lyrics';
+  String get desktop_lyrics => '桌面歌词';
 
   @override
-  String get desktop_lyrics_description =>
-      'Display lyrics in a floating window on the desktop';
+  String get desktop_lyrics_description => '在桌面上以浮动窗口形式显示歌词';
 
   @override
-  String get small => 'Small';
+  String get small => '小';
 
   @override
-  String get medium => 'Medium';
+  String get medium => '中';
 
   @override
-  String get large => 'Large';
+  String get large => '大';
 
   @override
-  String get version => 'Version: 1.0.0';
+  String get version => '版本: 1.0.0';
 
   @override
-  String get platform => 'Platform';
+  String get platform => '平台';
 
   @override
   String get about_description =>
-      'Tune is a modern music player that allows you to easily manage and play your local music collection. With a clean and intuitive interface, Tune provides a seamless music experience.';
+      'Tune 是一款现代音乐播放器，让您可以轻松管理和播放本地音乐收藏。凭借简洁直观的界面，Tune 提供了无缝的音乐体验。';
 
   @override
-  String get features => 'Features';
+  String get features => '功能';
 
   @override
-  String get high_quality_audio_playback => 'High-quality audio playback';
+  String get high_quality_audio_playback => '高品质音频播放';
 
   @override
-  String get supports_multiple_audio_formats =>
-      'Supports multiple audio formats including MP3, FLAC, WAV, etc.';
+  String get supports_multiple_audio_formats => '支持多种音频格式，包括 MP3、FLAC、WAV 等';
 
   @override
-  String get local_music_management => 'Local music management';
+  String get local_music_management => '本地音乐管理';
 
   @override
   String get automatically_scans_and_organizes_local_music_library =>
-      'Automatically scans and organizes your local music library';
+      '自动扫描和整理您的本地音乐库';
 
   @override
-  String get multi_language_support => 'Multi-language support';
+  String get multi_language_support => '多语言支持';
 
   @override
   String get supports_chinese_english_japanese_korean_russian_and_more =>
-      'Supports Chinese, English, Japanese, Korean, Russian and more languages';
+      '支持中文、英文、日文、韩文、俄文等多种语言';
 
   @override
-  String get multiple_themes => 'Multiple themes';
+  String get multiple_themes => '多种主题';
 
   @override
   String get eight_theme_colors_with_dark_light_mode_switching =>
-      'Eight theme colors with dark/light mode switching';
+      '八种主题颜色，支持深色/浅色模式切换';
 
   @override
-  String get lyrics_synchronization => 'Lyrics synchronization';
+  String get lyrics_synchronization => '歌词同步';
 
   @override
   String get lrc_format_lyrics_real_time_synchronization_display =>
-      'LRC format lyrics real-time synchronization display';
+      'LRC 格式歌词实时同步显示';
 
   @override
-  String get smart_search => 'Smart search';
+  String get smart_search => '智能搜索';
 
   @override
   String get supports_searching_by_song_title_artist_album_and_other_metadata =>
-      'Supports searching by song title, artist, album and other metadata';
+      '支持按歌曲标题、艺术家、专辑和其他元数据搜索';
 
   @override
-  String get open_source_license => 'Open Source License';
+  String get open_source_license => '开源许可';
 
   @override
   String get opensource_license_description =>
-      'This project is licensed under the MIT License - see the LICENSE file for details.';
+      '该项目根据 MIT 许可证授权 - 有关详细信息，请参阅 LICENSE 文件。';
 
   @override
-  String get github_project_address => 'GitHub Project Address';
+  String get github_project_address => 'GitHub 项目地址';
 
   @override
-  String get contact_us_description =>
-      'If you have any questions, suggestions or feedback, please feel free to contact us through the following channels.';
+  String get contact_us_description => '如果您有任何问题、建议或反馈，请随时通过以下渠道与我们联系。';
 
   @override
-  String get official_website => 'Official Website';
+  String get official_website => '官方网站';
 
   @override
-  String get access_library =>
-      '• Can access and manage music library at any time';
+  String get access_library => '• 可随时访问和管理音乐库';
 
   @override
-  String get add_custom_paths => '• Can add custom scan paths';
+  String get add_custom_paths => '• 可添加自定义扫描路径';
 
   @override
-  String get scan_completion =>
-      '• Results can be viewed in the library after scanning is complete';
+  String get scan_completion => '• 扫描完成后可在音乐库查看结果';
 
   @override
-  String get auto_metadata_extraction =>
-      '• Automatically extract metadata from music files';
+  String get auto_metadata_extraction => '• 自动从音乐文件中提取元数据';
 
   @override
-  String get scan_instructions => 'Scan Instructions';
+  String get scan_instructions => '扫描说明';
 
   @override
-  String get music_library_management => 'Music Library Management';
+  String get music_library_management => '音乐库管理';
 
   @override
-  String get failed_to_save_custom_path => 'Failed to save custom path';
+  String get failed_to_save_custom_path => '保存自定义路径失败';
 
   @override
-  String get custom_path_scanning_will_be_implemented =>
-      'Custom path scanning will be implemented in future versions';
+  String get custom_path_scanning_will_be_implemented => '自定义路径扫描将在未来版本中实现';
 
   @override
-  String get error => 'Error';
+  String get error => '错误';
 
   @override
-  String get featured_playlists => 'Featured Playlists';
+  String get featured_playlists => '精选播放列表';
 
   @override
-  String get featured_artists => 'Featured Artists';
+  String get featured_artists => '精选艺术家';
 
   @override
-  String get featured_albums => 'Featured Albums';
+  String get featured_albums => '精选专辑';
 
   @override
-  String get songs => 'Songs';
+  String get songs => '首歌曲';
 
   @override
-  String get music_scan => 'Music Scan';
+  String get music_scan => '音乐扫描';
 
   @override
-  String get scan_local_music => 'Scan Local Music';
+  String get scan_local_music => '扫描本地音乐';
 
   @override
-  String get search_error => 'Search Error';
+  String get search_error => '搜索错误';
 
   @override
-  String get no_matching_songs => 'No matching songs found';
+  String get no_matching_songs => '未找到匹配的歌曲';
 
   @override
-  String get playback_error => 'Playback Error';
+  String get playback_error => '播放错误';
 
   @override
-  String get no_song_playing => 'No song is currently playing';
+  String get no_song_playing => '当前无歌曲播放';
 
   @override
-  String get select_a_song_to_play => 'Please select a song to play';
+  String get select_a_song_to_play => '请选择一首歌曲进行播放';
 
   @override
-  String get unknown_user => 'Unknown User';
+  String get unknown_user => '未知用户';
 
   @override
-  String get my_account => 'My Account';
+  String get my_account => '我的账户';
 
   @override
-  String get select_language => 'Select Language';
+  String get select_language => '选择语言';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => '取消';
 
   @override
-  String get failed_to_open_github => 'Failed to open GitHub page';
+  String get failed_to_open_github => '无法打开 GitHub 页面';
 
   @override
-  String get theme_light => 'Light';
+  String get theme_light => '浅色';
 
   @override
-  String get theme_dark => 'Dark';
+  String get theme_dark => '深色';
 
   @override
-  String get theme_system => 'System';
+  String get theme_system => '系统';
 
   @override
-  String get bottom_player_bar_now_playing => 'Now Playing';
+  String get bottom_player_bar_now_playing => '正在播放';
 
   @override
-  String get bottom_player_bar_no_song => 'No Song Selected';
+  String get bottom_player_bar_no_song => '未选择歌曲';
 
   @override
-  String get song_list_title => 'Songs';
+  String get song_list_title => '歌曲';
 
   @override
-  String get song_list_no_songs => 'No songs found';
+  String get song_list_no_songs => '未找到歌曲';
 
   @override
-  String get settings_page_language => 'Language';
+  String get settings_page_language => '语言';
 
   @override
-  String get settings_page_theme => 'Theme';
+  String get settings_page_theme => '主题';
 
   @override
-  String get theme_name_trendy_electro => 'Trendy Electro';
+  String get theme_name_trendy_electro => '潮流电音';
 
   @override
-  String get theme_name_minimal_gray => 'Minimal Gray';
+  String get theme_name_minimal_gray => '极简灰';
 
   @override
-  String get theme_name_nature_forest => 'Nature Forest';
+  String get theme_name_nature_forest => '自然森林';
 
   @override
-  String get theme_name_cyber_neon => 'Cyber Neon';
+  String get theme_name_cyber_neon => '赛博霓虹';
 
   @override
-  String get theme_name_warm_healing => 'Warm Healing';
+  String get theme_name_warm_healing => '温暖治愈';
 
   @override
-  String get theme_name_dark_mode => 'Dark Mode';
+  String get theme_name_dark_mode => '深色模式';
 
   @override
-  String get theme_name_light_mode => 'Light Mode';
+  String get theme_name_light_mode => '浅色模式';
 
   @override
-  String get theme_name_system_theme => 'System Theme';
+  String get theme_name_system_theme => '系统主题';
 
   @override
-  String get library_page_artists => 'Artists';
+  String get library_page_artists => '艺术家';
 
   @override
-  String get library_page_albums => 'Albums';
+  String get library_page_albums => '专辑';
 
   @override
-  String get library_page_genres => 'Genres';
+  String get library_page_genres => '流派';
 
   @override
-  String get play_button => 'Play';
+  String get play_button => '播放';
 
   @override
-  String get pause_button => 'Pause';
+  String get pause_button => '暂停';
 
   @override
-  String get next_button => 'Next';
+  String get next_button => '下一首';
 
   @override
-  String get previous_button => 'Previous';
+  String get previous_button => '上一首';
 
   @override
-  String get favorite_button => 'Favorite';
+  String get favorite_button => '收藏';
 
   @override
-  String get font_family => 'Font';
+  String get font_family => '字体';
 
   @override
-  String get theme_mode => 'Theme Mode';
+  String get theme_mode => '主题模式';
 
   @override
-  String get light_mode => 'Light Mode';
+  String get light_mode => '浅色模式';
 
   @override
-  String get dark_mode => 'Dark Mode';
+  String get dark_mode => '深色模式';
 
   @override
-  String get system_mode => 'System Mode';
+  String get system_mode => '系统模式';
 
   @override
-  String get artist_title => 'Artist';
+  String get artist_title => '艺术家';
 
   @override
-  String get search_hint => 'Search songs...';
+  String get search_hint => '搜索歌曲...';
 
   @override
-  String get artist_hint => 'Search artists...';
+  String get artist_hint => '搜索艺术家...';
 
   @override
-  String get album_hint => 'Search albums...';
+  String get album_hint => '搜索专辑...';
 
   @override
-  String get now_playing => 'Now Playing';
+  String get now_playing => '正在播放';
 
   @override
-  String get no_things_players => 'No Players';
+  String get no_things_players => '无播放器';
 
   @override
-  String get no_selected_song => 'No Song Selected';
+  String get no_selected_song => '未选择歌曲';
 
   @override
-  String get player_duration => 'Duration';
+  String get player_duration => '时长';
 
   @override
-  String get player_artist => 'Artist';
+  String get player_artist => '艺术家';
 
   @override
-  String get player_album => 'Album';
+  String get player_album => '专辑';
 
   @override
-  String get search_empty => 'Enter search terms to find songs';
+  String get search_empty => '输入搜索词以查找歌曲';
 
   @override
-  String get search_no_results => 'No songs found matching your search';
+  String get search_no_results => '未找到与您的搜索匹配的歌曲';
 
   @override
-  String get language => 'Language';
+  String get language => '语言';
 
   @override
-  String get theme => 'Theme';
+  String get theme => '主题';
 
   @override
   String get font => 'Font';
@@ -626,4 +617,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get load_songs_failed => 'Failed to load songs';
+
+  @override
+  String get clear_library => 'Clear Library';
+
+  @override
+  String get confirm_clear_library => 'Confirm Clear Library';
+
+  @override
+  String get confirm_clear_library_message =>
+      'Are you sure you want to clear the library? This operation will remove all song records, but will not delete the actual audio files.';
+
+  @override
+  String get delete_song => 'Delete Song';
+
+  @override
+  String get confirm_delete_song => 'Confirm Delete Song';
+
+  @override
+  String get confirm_delete_song_message =>
+      'Are you sure you want to delete this song? This operation only removes the record from the library, it will not delete the actual audio file.';
+
+  @override
+  String get favorite => 'Favorite';
+
+  @override
+  String get unfavorite => 'Unfavorite';
+
+  @override
+  String get select_all => 'Select All';
+
+  @override
+  String get deselect_all => 'Deselect All';
+
+  @override
+  String get items_selected => 'items selected';
 }

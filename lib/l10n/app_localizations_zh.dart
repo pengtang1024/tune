@@ -605,6 +605,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get load_songs_failed => '加载歌曲失败';
+
+  @override
+  String get clear_library => '清空音乐库';
+
+  @override
+  String get confirm_clear_library => '确认清空音乐库';
+
+  @override
+  String get confirm_clear_library_message =>
+      '您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。';
+
+  @override
+  String get delete_song => '删除歌曲';
+
+  @override
+  String get confirm_delete_song => '确认删除歌曲';
+
+  @override
+  String get confirm_delete_song_message =>
+      '您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。';
+
+  @override
+  String get favorite => '收藏';
+
+  @override
+  String get unfavorite => '取消收藏';
+
+  @override
+  String get select_all => '全选';
+
+  @override
+  String get deselect_all => '取消全选';
+
+  @override
+  String get items_selected => '项已选择';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1208,4 +1243,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get load_songs_failed => '加载歌曲失败';
+
+  @override
+  String get clear_library => '清空音乐库';
+
+  @override
+  String get confirm_clear_library => '确认清空音乐库';
+
+  @override
+  String get confirm_clear_library_message =>
+      '您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。';
+
+  @override
+  String get delete_song => '删除歌曲';
+
+  @override
+  String get confirm_delete_song => '确认删除歌曲';
+
+  @override
+  String get confirm_delete_song_message =>
+      '您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。';
+
+  @override
+  String get favorite => '收藏';
+
+  @override
+  String get unfavorite => '取消收藏';
+
+  @override
+  String get select_all => '全选';
+
+  @override
+  String get deselect_all => '取消全选';
+
+  @override
+  String get items_selected => '项已选择';
 }
