@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/ui/player/services/play_mode_service.dart';
 import 'package:tune/ui/player/states/player_state.dart';
+import 'package:tune/ui/player/states/play_mode.dart';
 
 /// 播放器状态管理器
 class PlayerStateNotifier extends StateNotifier<PlayerState> {
@@ -21,8 +23,8 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
 
   /// 初始化播放器
   void _initializePlayer() {
-    // 定期更新播放位置
-    _positionSubscription = Stream.periodic(const Duration(seconds: 1)).listen((_) {
+    // 实时更新播放位置
+    _positionSubscription = Stream.periodic(const Duration(milliseconds: 60)).listen((_) {
       if (state.currentSong != null && _audioPlayerService.isPlaying) {
         state = state.copyWith(
           position: _audioPlayerService.currentPosition,
@@ -53,7 +55,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         song,
         _audioPlayerService.currentPosition,
         _audioPlayerService.duration,
-      );
+      ).copyWith(playMode: state.playMode);
     } catch (e) {
       // 播放出错，更新状态为错误
       state = PlayerState.error('播放歌曲失败: $e');
@@ -96,31 +98,25 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
     state = state.copyWith(volume: volume);
   }
 
-  /// 切换随机播放模式
-  void toggleShuffleMode() {
-    state = state.copyWith(isShuffleMode: !state.isShuffleMode);
+  /// 切换播放模式
+  void togglePlayMode() {
+    final nextMode = PlayModeService.getNextPlayMode(state.playMode);
+    state = state.copyWith(playMode: nextMode);
   }
+
+  /// 获取当前播放模式
+  PlayMode get playMode => state.playMode;
 
   /// 播放下一首
   void skipToNext() {
     if (_playlist.isEmpty || _currentIndex < 0) return;
     
     // 计算下一首歌曲的索引
-    int nextIndex;
-    if (state.isShuffleMode) {
-      // 随机播放模式
-      nextIndex = (DateTime.now().millisecondsSinceEpoch % _playlist.length);
-      // 确保不会重复播放当前歌曲
-      if (nextIndex == _currentIndex && _playlist.length > 1) {
-        nextIndex = (nextIndex + 1) % _playlist.length;
-      }
-    } else {
-      // 顺序播放模式
-      nextIndex = (_currentIndex + 1) % _playlist.length;
+    final nextIndex = PlayModeService.getNextIndex(_currentIndex, _playlist.length, state.playMode);
+    if (nextIndex >= 0) {
+      _currentIndex = nextIndex;
+      playSong(_playlist[_currentIndex]);
     }
-    
-    _currentIndex = nextIndex;
-    playSong(_playlist[_currentIndex]);
   }
 
   /// 播放上一首
@@ -134,21 +130,11 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
     }
     
     // 计算上一首歌曲的索引
-    int previousIndex;
-    if (state.isShuffleMode) {
-      // 随机播放模式
-      previousIndex = (DateTime.now().millisecondsSinceEpoch % _playlist.length);
-      // 确保不会重复播放当前歌曲
-      if (previousIndex == _currentIndex && _playlist.length > 1) {
-        previousIndex = (previousIndex + 1) % _playlist.length;
-      }
-    } else {
-      // 顺序播放模式
-      previousIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
+    final previousIndex = PlayModeService.getPreviousIndex(_currentIndex, _playlist.length, state.playMode);
+    if (previousIndex >= 0) {
+      _currentIndex = previousIndex;
+      playSong(_playlist[_currentIndex]);
     }
-    
-    _currentIndex = previousIndex;
-    playSong(_playlist[_currentIndex]);
   }
 
   @override

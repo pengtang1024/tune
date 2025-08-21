@@ -109,6 +109,12 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     }
   }
 
+  // 重置扫描
+  void _resetScan() {
+    final notifier = ref.read(libraryStateNotifierProvider.notifier);
+    notifier.resetScan();
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(libraryStateNotifierProvider);
@@ -202,8 +208,35 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
                 return SongListItemWidget(
                   song: song,
                   durationText: durationText,
+                  onPlay: () {
+                    final notifier = ref.read(libraryStateNotifierProvider.notifier);
+                    notifier.playSong(song);
+                  },
                 );
               },
+            ),
+          ),
+        ] else if (state.scanStatus == ScanStatus.completed) ...[
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '扫描完成，未找到新歌曲',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _resetScan,
+                  child: const Text('重新扫描'),
+                ),
+              ],
             ),
           ),
         ],

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/player/states/player_state_notifier.dart';
+import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
+import 'package:tune/ui/player/widgets/player_volume.dart';
 
 /// 播放器首页面
 class PlayerPage extends ConsumerWidget {
@@ -12,18 +15,19 @@ class PlayerPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
-    final localizations = context.loc;
+    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+    final loc = context.loc;
 
     if (playerState.errorMessage.isNotEmpty) {
       return Center(
-        child: Text('${localizations.playback_error}: ${playerState.errorMessage}'), // 使用本地化字符串
+        child: Text('${loc.playback_error}: ${playerState.errorMessage}'), // 使用本地化字符串
       );
     }
 
     if (playerState.currentSong == null) {
       return Center(
         child: Text(
-          '${localizations.no_song_playing}\n${localizations.select_a_song_to_play}', // 使用本地化字符串
+          '${loc.no_song_playing}\n${loc.select_a_song_to_play}', // 使用本地化字符串
           textAlign: TextAlign.center,
         ),
       );
@@ -70,7 +74,7 @@ class PlayerPage extends ConsumerWidget {
             const PlayerVolume(),
 
             // 播放模式控制
-            const PlayerModeControls(),
+            PlayerModeControls(playerNotifier: playerNotifier),
           ],
         ),
       ),
@@ -78,51 +82,48 @@ class PlayerPage extends ConsumerWidget {
   }
 }
 
-/// 音量控制组件
-class PlayerVolume extends ConsumerWidget {
-  const PlayerVolume({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerStateNotifierProvider);
-    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
-
-    return Row(
-      children: [
-        const Icon(Icons.volume_down),
-        Expanded(
-          child: Slider(value: playerState.volume, onChanged: playerNotifier.setVolume),
-        ),
-        const Icon(Icons.volume_up),
-      ],
-    );
-  }
-}
-
 /// 播放模式控制组件
 class PlayerModeControls extends ConsumerWidget {
-  const PlayerModeControls({super.key});
+  final PlayerStateNotifier playerNotifier;
+  
+  const PlayerModeControls({super.key, required this.playerNotifier});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
-    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+    final loc = context.loc;
+
+    IconData getModeIcon() {
+      switch (playerState.playMode) {
+        case PlayMode.shuffle:
+          return Icons.shuffle;
+        case PlayMode.repeatOne:
+          return Icons.repeat_one;
+        default:
+          return Icons.repeat;
+      }
+    }
+
+    String getModeTooltip() {
+      switch (playerState.playMode) {
+        case PlayMode.shuffle:
+          return loc.shuffle;
+        case PlayMode.repeatOne:
+          return loc.repeat_one;
+        default:
+          return loc.repeat_all;
+      }
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // 随机播放按钮
+        // 播放模式按钮
         IconButton(
-          icon: Icon(playerState.isShuffleMode ? Icons.shuffle : Icons.shuffle_outlined, color: playerState.isShuffleMode ? Theme.of(context).colorScheme.primary : null),
-          onPressed: playerNotifier.toggleShuffleMode,
-        ),
-
-        // 循环播放按钮
-        IconButton(
-          icon: const Icon(Icons.repeat),
-          onPressed: () {
-            // TODO: 实现循环播放模式切换
-          },
+          icon: Icon(getModeIcon()),
+          color: Theme.of(context).colorScheme.primary,
+          tooltip: getModeTooltip(),
+          onPressed: playerNotifier.togglePlayMode,
         ),
       ],
     );

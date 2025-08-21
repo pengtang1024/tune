@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/ui/player/states/play_mode.dart';
 
 /// 播放器状态数据模型
 class PlayerState {
@@ -7,7 +8,7 @@ class PlayerState {
   final Duration position;
   final Duration duration;
   final double volume;
-  final bool isShuffleMode;
+  final PlayMode playMode;
   final String errorMessage;
 
   PlayerState({
@@ -16,7 +17,7 @@ class PlayerState {
     this.position = Duration.zero,
     this.duration = Duration.zero,
     this.volume = 1.0,
-    this.isShuffleMode = false,
+    this.playMode = PlayMode.sequential,
     this.errorMessage = '',
   });
 
@@ -65,7 +66,7 @@ class PlayerState {
     Duration? position,
     Duration? duration,
     double? volume,
-    bool? isShuffleMode,
+    PlayMode? playMode,
     String? errorMessage,
   }) {
     return PlayerState(
@@ -74,7 +75,7 @@ class PlayerState {
       position: position ?? this.position,
       duration: duration ?? this.duration,
       volume: volume ?? this.volume,
-      isShuffleMode: isShuffleMode ?? this.isShuffleMode,
+      playMode: playMode ?? this.playMode,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -88,7 +89,7 @@ class PlayerState {
         other.position == position &&
         other.duration == duration &&
         other.volume == volume &&
-        other.isShuffleMode == isShuffleMode &&
+        other.playMode == playMode &&
         other.errorMessage == errorMessage;
   }
 
@@ -99,7 +100,7 @@ class PlayerState {
         position,
         duration,
         volume,
-        isShuffleMode,
+        playMode,
         errorMessage,
       );
 }

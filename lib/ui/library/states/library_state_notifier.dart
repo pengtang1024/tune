@@ -1,10 +1,14 @@
+import 'dart:convert';
+import 'dart:io' show Platform, File;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as path;
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/states/player_state_notifier.dart';
+import 'package:path_provider/path_provider.dart';
 
 class LibraryStateNotifier extends StateNotifier<LibraryState> {
   final Ref _ref;
@@ -85,9 +89,19 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
       // 调用真正的音乐扫描服务
       final scanner = _ref.read(crossPlatformMusicScannerProvider);
-      final songs = await scanner.scanMusic();
+
+      // 使用带进度更新的扫描方法
+      final songs = await scanner.scanMusicInDirectoriesWithProgress(
+        scanner.getDefaultMusicPaths(),
+        (progress) {
+          // 在主线程更新UI进度
+          updateScanProgress(progress);
+        },
+      );
 
       completeScanning(songs);
+      // 保存扫描结果到持久化存储
+      await _saveScannedSongs(songs);
     } catch (e) {
       setScanError('扫描失败: $e');
     }
@@ -97,26 +111,34 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   void scanCustomPaths() async {
     try {
       startScanning();
-      
+
       // 获取自定义扫描路径
       final persistenceService = _ref.read(sharedPreferencesServiceProvider);
       final customPaths = persistenceService.getStringList('custom_scan_paths') ?? [];
-      
+
       if (customPaths.isEmpty) {
         setScanError('没有设置自定义扫描路径');
         return;
       }
-      
+
       // 调用真正的音乐扫描服务
       final scanner = _ref.read(crossPlatformMusicScannerProvider);
-      final songs = await scanner.scanMusicInDirectories(customPaths);
-      
+      final songs = await scanner.scanMusicInDirectoriesWithProgress(
+        customPaths,
+        (progress) {
+          // 在主线程更新UI进度
+          updateScanProgress(progress);
+        },
+      );
+
       completeScanning(songs);
+      // 保存扫描结果到持久化存储
+      await _saveScannedSongs(songs);
     } catch (e) {
       setScanError('扫描失败: $e');
     }
   }
-  
+
   /// 将扫描到的歌曲添加到音乐库
   void addScannedSongsToLibrary() {
     if (state.foundSongs.isNotEmpty) {
@@ -125,42 +147,110 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
         songs: updatedSongs,
         foundSongs: const [],
         scanStatus: ScanStatus.idle,
-        statusMessage: '',
+        statusMessage: '已将 ${state.foundSongs.length} 首歌曲添加到音乐库',
       );
+      // 保存到持久化存储
+      _saveScannedSongs(updatedSongs);
     }
   }
 
   void removeCustomPath(String path) {
     // TODO: 实现移除自定义路径的逻辑
   }
-  
-  /// 加载音乐库
-  void loadLibrary() {
-    // 这里应该从持久化存储中加载歌曲
-    // 目前我们只是模拟一下
-    setLoading(true);
-    
-    // 模拟异步加载
-    Future.delayed(const Duration(milliseconds: 500), () {
-      // 实际项目中这里应该从数据库或文件中加载歌曲
-      setSongs(state.songs); // 保持现有歌曲
-      setLoading(false);
-    });
+
+  /// 保存扫描到的歌曲到持久化存储
+  Future<void> _saveScannedSongs(List<Song> songs) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File(path.join(dir.path, 'scanned_songs.json'));
+      
+      // 手动构建歌曲数据映射
+      final List<Map<String, dynamic>> songsData = songs.map((song) {
+        return {
+          'id': song.id,
+          'title': song.title,
+          'artist': song.artist,
+          'album': song.album,
+          'duration': song.duration,
+          'uri': song.uri,
+          'dateAdded': song.dateAdded,
+          'genre': song.genre,
+          'year': song.year,
+        };
+      }).toList();
+      
+      await file.writeAsString(jsonEncode(songsData));
+    } catch (e) {
+      // 错误处理，但不中断主流程
+      print('保存歌曲数据失败: $e');
+    }
   }
-  
+
+  /// 从持久化存储加载歌曲
+  Future<List<Song>> _loadScannedSongs() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File(path.join(dir.path, 'scanned_songs.json'));
+      
+      if (await file.exists()) {
+        final jsonString = await file.readAsString();
+        final List<dynamic> songsData = jsonDecode(jsonString);
+        return songsData.map((data) => Song(data as Map<String, dynamic>)).toList();
+      }
+    } catch (e) {
+      // 错误处理，但不中断主流程
+      print('加载歌曲数据失败: $e');
+    }
+    return [];
+  }
+
+  /// 加载音乐库
+  void loadLibrary() async {
+    setLoading(true);
+
+    try {
+      // 首先尝试从持久化存储加载歌曲
+      List<Song> songs = await _loadScannedSongs();
+      
+      // 如果持久化存储中没有歌曲，则从扫描服务获取
+      if (songs.isEmpty) {
+        final scanner = _ref.read(crossPlatformMusicScannerProvider);
+        songs = await scanner.getAllSongs();
+      }
+
+      setSongs(songs);
+    } catch (e) {
+      setError('加载音乐库失败: $e');
+    }
+  }
+
+  /// 搜索歌曲
+  void searchSongs(String query) async {
+    setLoading(true);
+
+    try {
+      final scanner = _ref.read(crossPlatformMusicScannerProvider);
+      final songs = await scanner.searchSongs(query);
+
+      setSongs(songs);
+    } catch (e) {
+      setError('搜索歌曲失败: $e');
+    }
+  }
+
   /// 播放歌曲并设置播放列表
   void playSong(Song song) {
     final playerNotifier = _ref.read(playerStateNotifierProvider.notifier);
-    
+
     // 获取当前显示的所有歌曲作为播放列表
     final List<Song> allSongs = [...state.songs, ...state.foundSongs];
-    
+
     // 查找歌曲在列表中的索引
     final index = allSongs.indexWhere((s) => s.id == song.id);
-    
+
     // 设置播放列表
     playerNotifier.setPlaylist(allSongs, index);
-    
+
     // 播放指定歌曲
     playerNotifier.playSong(song);
   }

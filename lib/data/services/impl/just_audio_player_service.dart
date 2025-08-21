@@ -9,10 +9,18 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> play(Song song) async {
     try {
-      await _audioPlayer.setFilePath(song.data);
+      // 优先使用uri字段，如果uri为空则使用data字段
+      final String? audioPath = song.uri ?? song.data;
+      
+      // 检查音频路径是否为空
+      if (audioPath == null || audioPath.isEmpty) {
+        throw Exception('音频文件路径为空');
+      }
+      
+      await _audioPlayer.setFilePath(audioPath);
       await _audioPlayer.play();
     } catch (e) {
-      throw Exception('Failed to play song: $e'); // 应该使用本地化字符串
+      throw Exception('播放歌曲失败: $e');
     }
   }
 

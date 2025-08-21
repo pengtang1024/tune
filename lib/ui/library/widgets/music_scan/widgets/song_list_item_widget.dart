@@ -7,8 +7,10 @@ import 'package:tune/domain/models/song.dart';
 class SongListItemWidget extends StatelessWidget {
   final Song song;
   final String durationText;
+  final VoidCallback? onPlay;
 
-  const SongListItemWidget({super.key, required this.song, required this.durationText});
+
+  const SongListItemWidget({super.key, required this.song, required this.durationText, this.onPlay});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +28,9 @@ class SongListItemWidget extends StatelessWidget {
           title: Text(song.title),
           subtitle: Text('${song.artist} · ${song.album}'),
           trailing: Text(durationText),
+          onTap: onPlay,
         ),
       ),
     );
   }
-}
+}

@@ -16,6 +16,10 @@ abstract class CrossPlatformMusicScanner {
   /// 扫描多个目录中的音乐文件
   Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths);
 
+  /// 扫描多个目录中的音乐文件，并提供进度回调
+  Future<List<Song>> scanMusicInDirectoriesWithProgress(
+      List<String> directoryPaths, Function(double) onProgress);
+
   /// 扫描单个文件
   Future<Song?> scanMusicFile(String filePath);
   
@@ -24,6 +28,9 @@ abstract class CrossPlatformMusicScanner {
 
   /// 搜索歌曲
   Future<List<Song>> searchSongs(String query);
+  
+  /// 获取默认音乐路径
+  List<String> getDefaultMusicPaths();
 }
 
 /// 跨平台音乐扫描服务实现
@@ -44,31 +51,45 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       Log.info('CrossPlatformMusicScanner: Running on mobile platform');
       return [];
     } else {
-      // 桌面平台 - 返回空列表，避免自动弹出文件选择器
+      // 桌面平台 - 扫描默认音乐目录
       Log.info('CrossPlatformMusicScanner: Running on desktop platform');
-      return [];
+      final defaultPaths = getDefaultMusicPaths();
+      return await scanMusicInDirectories(defaultPaths);
     }
   }
 
   @override
   Future<List<Song>> scanMusicInDirectory(String directoryPath) async {
     Log.info('CrossPlatformMusicScanner: Scanning directory: $directoryPath');
-    return await _scanDirectory(directoryPath);
+    return await _scanDirectory(directoryPath, (progress) {});
   }
 
   @override
   Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) async {
     Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories');
+    return await scanMusicInDirectoriesWithProgress(directoryPaths, (progress) {});
+  }
+
+  @override
+  Future<List<Song>> scanMusicInDirectoriesWithProgress(
+      List<String> directoryPaths, Function(double) onProgress) async {
+    Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories with progress');
     final allSongs = <Song>[];
 
     for (int i = 0; i < directoryPaths.length; i++) {
       final dirPath = directoryPaths[i];
       try {
-        final songs = await _scanDirectory(dirPath);
+        final songs = await _scanDirectory(dirPath, (progress) {
+          // 计算整体进度
+          final overallProgress = (i + progress) / directoryPaths.length;
+          onProgress(overallProgress);
+        });
         allSongs.addAll(songs);
       } catch (e) {
         Log.info('CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e');
       }
+      // 更新进度
+      onProgress((i + 1) / directoryPaths.length);
     }
 
     return allSongs;
@@ -98,11 +119,48 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   @override
   Future<List<Song>> searchSongs(String query) async {
     // 简单实现：返回所有歌曲（实际项目中应该根据查询条件过滤）
-    return await scanMusic();
+    final allSongs = await scanMusic();
+    if (query.isEmpty) {
+      return allSongs;
+    }
+    
+    return allSongs.where((song) {
+      return song.title.toLowerCase().contains(query.toLowerCase()) ||
+             song.artist.toLowerCase().contains(query.toLowerCase()) ||
+             song.album.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+  }
+  
+  /// 获取默认音乐路径
+  @override
+  List<String> getDefaultMusicPaths() {
+    final paths = <String>[];
+    
+    if (Platform.isWindows) {
+      // Windows音乐目录
+      final userHome = Platform.environment['USERPROFILE'];
+      if (userHome != null) {
+        paths.add(path.join(userHome, 'Music'));
+      }
+    } else if (Platform.isMacOS) {
+      // macOS音乐目录
+      final userHome = Platform.environment['HOME'];
+      if (userHome != null) {
+        paths.add(path.join(userHome, 'Music'));
+      }
+    } else if (Platform.isLinux) {
+      // Linux音乐目录
+      final userHome = Platform.environment['HOME'];
+      if (userHome != null) {
+        paths.add(path.join(userHome, 'Music'));
+      }
+    }
+    
+    return paths;
   }
 
   /// 扫描目录中的音乐文件
-  Future<List<Song>> _scanDirectory(String directoryPath) async {
+  Future<List<Song>> _scanDirectory(String directoryPath, Function(double) onProgress) async {
     final songs = <Song>[];
     final directory = Directory(directoryPath);
 
@@ -133,6 +191,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         } catch (e) {
           Log.info('CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e');
         }
+        // 更新进度
+        onProgress((i + 1) / files.length);
       }
     } catch (e) {
       Log.info('CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e');
@@ -164,7 +224,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'artist': metadata.artist ?? 'Unknown Artist',
         'album': metadata.album ?? 'Unknown Album',
         'duration': metadata.duration?.inMilliseconds ?? 0,
-        'uri': filePath,
+        'data': filePath, // 使用data字段存储文件路径
+        'uri': filePath, // 同时保留uri字段以保持兼容性
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': metadata.year,
       };
@@ -179,6 +240,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'artist': 'Unknown Artist',
         'album': 'Unknown Album',
         'duration': 0,
+        'data': filePath,
         'uri': filePath,
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': 0,
