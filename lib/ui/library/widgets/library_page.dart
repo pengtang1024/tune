@@ -99,14 +99,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       setState(() {
                         _searchQuery = query;
                       });
+                      _performSearch(); // 实时搜索
                     },
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _performSearch,
-                  child: Text(context.loc.search),
-                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -149,13 +146,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   Widget _buildSongGrid(List<Song> songs) {
     // 根据搜索查询过滤歌曲
-    final filteredSongs = _displayedSearchQuery.isEmpty
+    final filteredSongs = _searchQuery.isEmpty
         ? songs
         : songs.where((song) {
             // 搜索匹配：标题、艺术家或专辑
-            return song.title.toLowerCase().contains(_displayedSearchQuery.toLowerCase()) ||
-                song.artist.toLowerCase().contains(_displayedSearchQuery.toLowerCase()) ||
-                song.album.toLowerCase().contains(_displayedSearchQuery.toLowerCase());
+            return song.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                song.artist.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                song.album.toLowerCase().contains(_searchQuery.toLowerCase());
           }).toList();
 
     if (filteredSongs.isEmpty) {
@@ -212,7 +209,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 专辑封面占位符 (更大的封面，占用更多垂直空间)
+            // 专辑封面占位符 (正方形，根据内容自适应高度)
             Container(
               width: 80,
               height: 80,
@@ -229,7 +226,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             // 歌曲信息
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -284,7 +281,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       runSpacing: 2,
                       children: [
                         // 年份标签
-                        if (song.year != null)
+                        if (song.year != null && song.year != 0)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
@@ -292,7 +289,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              song.year.toString(),
+                              song.year.toString()!,
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Colors.green,
@@ -315,9 +312,41 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                               ),
                             ),
                           ),
-                        // 其他可能的标签可以在这里添加
+                        // 比特率标签
+                        if (song.bitrate != null && song.bitrate != 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '${song.bitrate}kbps',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        // 采样率标签
+                        if (song.sampleRate != null && song.sampleRate != 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '${song.sampleRate}Hz',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
+                    const SizedBox(height: 8), // 在标签下方添加间距
                   ],
                 ),
               ),
@@ -334,5 +363,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds.remainder(60);
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// 构建通用标签组件
+  Widget _buildTag({required String text, required Color bgColor, required Color textColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          color: textColor,
+        ),
+      ),
+    );
   }
 }

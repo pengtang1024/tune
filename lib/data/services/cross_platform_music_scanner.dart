@@ -22,13 +22,13 @@ abstract class CrossPlatformMusicScanner {
 
   /// 扫描单个文件
   Future<Song?> scanMusicFile(String filePath);
-  
+
   /// 获取所有歌曲
   Future<List<Song>> getAllSongs();
 
   /// 搜索歌曲
   Future<List<Song>> searchSongs(String query);
-  
+
   /// 获取默认音乐路径
   List<String> getDefaultMusicPaths();
 }
@@ -123,19 +123,19 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     if (query.isEmpty) {
       return allSongs;
     }
-    
+
     return allSongs.where((song) {
       return song.title.toLowerCase().contains(query.toLowerCase()) ||
              song.artist.toLowerCase().contains(query.toLowerCase()) ||
              song.album.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
-  
+
   /// 获取默认音乐路径
   @override
   List<String> getDefaultMusicPaths() {
     final paths = <String>[];
-    
+
     if (Platform.isWindows) {
       // Windows音乐目录
       final userHome = Platform.environment['USERPROFILE'];
@@ -155,7 +155,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         paths.add(path.join(userHome, 'Music'));
       }
     }
-    
+
     return paths;
   }
 
@@ -228,6 +228,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'uri': filePath, // 同时保留uri字段以保持兼容性
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': metadata.year,
+        'genre': metadata.genres.join(','),
+        'bitrate': metadata.bitrate,
+        'sampleRate': metadata.sampleRate,
       };
 
       return Song(songData);

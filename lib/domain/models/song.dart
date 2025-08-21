@@ -13,6 +13,8 @@ class Song {
   final int dateAdded;
   final String? genre;
   final int? year;
+  final int? bitrate; // 比特率 (kbps)
+  final int? sampleRate; // 采样率 (Hz)
 
   Song(Map<String, dynamic> data)
       : id = data['id'] ?? 0,
@@ -23,7 +25,9 @@ class Song {
         uri = data['uri'] ?? '',
         dateAdded = data['dateAdded'] ?? 0,
         genre = data['genre'],
-        year = data['year'];
+        year = data['year'],
+        bitrate = data['bitrate'],
+        sampleRate = data['sampleRate'];
 
   // Getters for compatibility with existing code
   String get displayName => title;
