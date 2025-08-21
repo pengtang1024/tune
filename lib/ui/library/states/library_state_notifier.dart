@@ -142,12 +142,37 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   /// 将扫描到的歌曲添加到音乐库
   void addScannedSongsToLibrary() {
     if (state.foundSongs.isNotEmpty) {
-      final updatedSongs = List<Song>.from(state.songs)..addAll(state.foundSongs);
+      // 创建一个映射，用于快速查找已存在的歌曲
+      final existingSongsMap = <int, Song>{};
+      for (final song in state.songs) {
+        existingSongsMap[song.id] = song;
+      }
+      
+      // 创建更新后的歌曲列表
+      final updatedSongs = List<Song>.from(state.songs);
+      
+      // 处理扫描到的歌曲
+      int updatedCount = 0;
+      int addedCount = 0;
+      
+      for (final newSong in state.foundSongs) {
+        if (existingSongsMap.containsKey(newSong.id)) {
+          // 如果歌曲已存在，则更新它
+          final index = updatedSongs.indexWhere((song) => song.id == newSong.id);
+          updatedSongs[index] = newSong;
+          updatedCount++;
+        } else {
+          // 如果是新歌曲，则添加它
+          updatedSongs.add(newSong);
+          addedCount++;
+        }
+      }
+      
       state = state.copyWith(
         songs: updatedSongs,
         foundSongs: const [],
         scanStatus: ScanStatus.idle,
-        statusMessage: '已将 ${state.foundSongs.length} 首歌曲添加到音乐库',
+        statusMessage: '已更新 $updatedCount 首歌曲，新增 $addedCount 首歌曲',
       );
       // 保存到持久化存储
       _saveScannedSongs(updatedSongs);
@@ -176,6 +201,19 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
           'dateAdded': song.dateAdded,
           'genre': song.genre,
           'year': song.year,
+          'bitrate': song.bitrate,
+          'sampleRate': song.sampleRate,
+          'trackNumber': song.trackNumber,
+          'trackTotal': song.trackTotal,
+          'discNumber': song.discNumber,
+          'totalDisc': song.totalDisc,
+          'lyrics': song.lyrics,
+          'genres': song.genres,
+          'performers': song.performers,
+          'language': song.language,
+          'size': song.size,
+          'type': song.type,
+          'isFavorite': song.isFavorite,
         };
       }).toList();
       

@@ -56,4 +56,14 @@ class Song {
   String get displayName => title;
   int get durationInMillis => duration;
   String get data => uri;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is Song && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }
