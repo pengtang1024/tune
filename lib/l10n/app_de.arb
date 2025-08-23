@@ -1,0 +1,19 @@
+{
+  "@@locale": "de",
+  "app_name": "Tune",
+  "no_songs_found": "Keine Songs gefunden",
+  "settings": "Einstellungen",
+  "retry": "Wiederholen",
+  "home": "Startseite",
+  "library": "Bibliothek",
+  "search": "Suche",
+  "player": "Player",
+  "about": "Über",
+  "songs": "Songs",
+  "music_scan": "Musik-Scan",
+  "scan_local_music": "Lokale Musik scannen",
+  "search_songs": "Songs suchen...",
+  "add_to_library": "Zur Bibliothek hinzufügen",
+  "scan_completed_no_new_songs": "Scan abgeschlossen, keine neuen Songs gefunden",
+  "rescan": "Erneut scannen"
+}

@@ -48,6 +48,12 @@ class PlatformMusicService implements MusicService {
   }
 
   @override
+  Future<List<Song>> loadSongs() async {
+    // 该方法在平台特定实现中被重写
+    return [];
+  }
+
+  @override
   Future<List<Song>> searchSongs(String query) async {
     // 在 Web 平台上返回空列表
     if (kIsWeb) {

@@ -1,9 +1,5 @@
 import 'dart:io' show File;
-import 'package:json_annotation/json_annotation.dart';
 
-part 'song.g.dart';
-
-@JsonSerializable()
 class Song {
   final int id;
   final String title;
@@ -57,17 +53,7 @@ class Song {
   int get durationInMillis => duration;
   String get data => uri;
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    return other is Song && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
-
-  /// 将Song对象转换为Map
+  /// 转换为 JSON 对象
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -94,4 +80,14 @@ class Song {
       'isFavorite': isFavorite,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is Song && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

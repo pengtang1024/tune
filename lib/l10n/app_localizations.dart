@@ -5,7 +5,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -94,9 +100,16 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('ja'),
+    Locale('ko'),
+    Locale('ru'),
     Locale('zh'),
     Locale('zh', 'CN'),
+    Locale('zh', 'TW'),
   ];
 
   /// No description provided for @app_name.
@@ -1281,71 +1294,29 @@ abstract class AppLocalizations {
   /// **'加载歌曲失败'**
   String get load_songs_failed;
 
-  /// No description provided for @clear_library.
+  /// No description provided for @add_to_library.
   ///
   /// In zh_CN, this message translates to:
-  /// **'清空音乐库'**
-  String get clear_library;
+  /// **'添加到音乐库'**
+  String get add_to_library;
 
-  /// No description provided for @confirm_clear_library.
+  /// No description provided for @scan_completed_no_new_songs.
   ///
   /// In zh_CN, this message translates to:
-  /// **'确认清空音乐库'**
-  String get confirm_clear_library;
+  /// **'扫描完成，未找到新歌曲'**
+  String get scan_completed_no_new_songs;
 
-  /// No description provided for @confirm_clear_library_message.
+  /// No description provided for @added_scanned_songs_to_library.
   ///
   /// In zh_CN, this message translates to:
-  /// **'您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。'**
-  String get confirm_clear_library_message;
+  /// **'已将扫描的歌曲添加到音乐库'**
+  String get added_scanned_songs_to_library;
 
-  /// No description provided for @delete_song.
+  /// No description provided for @rescan.
   ///
   /// In zh_CN, this message translates to:
-  /// **'删除歌曲'**
-  String get delete_song;
-
-  /// No description provided for @confirm_delete_song.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'确认删除歌曲'**
-  String get confirm_delete_song;
-
-  /// No description provided for @confirm_delete_song_message.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。'**
-  String get confirm_delete_song_message;
-
-  /// No description provided for @favorite.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'收藏'**
-  String get favorite;
-
-  /// No description provided for @unfavorite.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'取消收藏'**
-  String get unfavorite;
-
-  /// No description provided for @select_all.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'全选'**
-  String get select_all;
-
-  /// No description provided for @deselect_all.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'取消全选'**
-  String get deselect_all;
-
-  /// No description provided for @items_selected.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'项已选择'**
-  String get items_selected;
+  /// **'重新扫描'**
+  String get rescan;
 }
 
 class _AppLocalizationsDelegate
@@ -1358,8 +1329,16 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'ja',
+    'ko',
+    'ru',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1373,6 +1352,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
         switch (locale.countryCode) {
           case 'CN':
             return AppLocalizationsZhCn();
+          case 'TW':
+            return AppLocalizationsZhTw();
         }
         break;
       }
@@ -1380,8 +1361,20 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'ja':
+      return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
+    case 'ru':
+      return AppLocalizationsRu();
     case 'zh':
       return AppLocalizationsZh();
   }

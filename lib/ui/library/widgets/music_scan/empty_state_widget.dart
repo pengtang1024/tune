@@ -12,14 +12,14 @@ class EmptyStateWidget extends StatelessWidget {
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(
+          children: [
+            const Icon(
               Icons.music_off,
               size: 48,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               '未找到音乐文件\n点击"开始扫描"按钮扫描本地音乐',
               textAlign: TextAlign.center,
               style: TextStyle(

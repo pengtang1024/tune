@@ -8,7 +8,7 @@ class ScanResultsHeaderWidget extends StatelessWidget {
 
   const ScanResultsHeaderWidget({
     super.key,
-    required this.scannedCount,
+    this.scannedCount = 0,
   });
 
   @override

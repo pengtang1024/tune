@@ -1,19 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
-import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/core/extension/localizations_extension.dart';
-
-// Music scan widgets
-import 'package:tune/ui/library/widgets/music_scan/widgets/empty_state_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/scan_results_header_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/scan_status_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/song_list_item_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_header_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_description_widget.dart';
-import 'package:tune/ui/library/widgets/music_scan/widgets/custom_paths_scan_button_widget.dart';
+import 'package:tune/ui/library/widgets/music_scan/components/custom_paths_manager.dart';
+import 'package:tune/ui/library/widgets/music_scan/components/scan_control_buttons.dart';
+import 'package:tune/ui/library/widgets/music_scan/components/scan_results_display.dart';
+import 'package:tune/ui/library/widgets/music_scan/components/scan_status_display.dart';
 
 /// 音乐扫描页面
 /// 提供音乐文件扫描功能，包括自定义路径管理和扫描结果显示
@@ -51,9 +47,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.loc.load_stats_failed)),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.loc.load_stats_failed)));
       }
     }
   }
@@ -64,11 +58,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       await persistenceService.setStringList('custom_scan_paths', _customScanPaths);
     } catch (e) {
       // 错误处理
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${context.loc.failed_to_save_custom_path}: $e')),
-        );
-      }
+      _showErrorSnackBar('${context.loc.failed_to_save_custom_path}: $e');
     }
   }
 
@@ -91,6 +81,20 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     });
   }
 
+  // 显示错误提示
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  // 显示成功提示
+  void _showSuccessSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
   // 开始扫描
   void _startScan() {
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
@@ -101,18 +105,20 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
   void _addToLibrary() {
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
     notifier.addScannedSongsToLibrary();
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已将扫描到的歌曲添加到音乐库')),
-      );
-    }
+
+    _showSuccessSnackBar(context.loc.added_scanned_songs_to_library);
   }
 
   // 重置扫描
   void _resetScan() {
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
     notifier.resetScan();
+  }
+
+  // 播放歌曲
+  void _playSong(Song song) {
+    final notifier = ref.read(libraryStateNotifierProvider.notifier);
+    notifier.playSong(song);
   }
 
   @override
@@ -123,124 +129,40 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(
-      children: [
-        // 扫描状态显示
-        ScanStatusWidget(
-          statusMessage: state.statusMessage,
-          errorMessage: state.errorMessage ?? '',
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.loc.scan_local_music),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 扫描状态显示
+            ScanStatusDisplay(state: state),
+
+            // 自定义路径管理
+            CustomPathsManager(
+              customScanPaths: _customScanPaths, 
+              onAddPath: _addCustomScanPath, 
+              onRemovePath: _removeCustomScanPath
+            ),
+
+            // 扫描控制按钮
+            ScanControlButtons(
+              isScanning: state.scanStatus == ScanStatus.scanning, 
+              hasCustomPaths: _customScanPaths.isNotEmpty, 
+              onStartScan: _startScan
+            ),
+
+            // 扫描结果展示
+            ScanResultsDisplay(
+              state: state, 
+              onAddToLibrary: _addToLibrary, 
+              onResetScan: _resetScan, 
+              onPlaySong: _playSong
+            ),
+          ],
         ),
-
-        // 扫描进度条
-        if (state.scanStatus == ScanStatus.scanning)
-          LinearProgressIndicator(value: state.scanProgress),
-
-        // 自定义路径部分
-        CustomPathsHeaderWidget(
-          onAddPath: _addCustomScanPath,
-        ),
-
-        if (_customScanPaths.isEmpty)
-          const EmptyStateWidget()
-        else
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _customScanPaths.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    title: Text(
-                      _customScanPaths[index],
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, size: 20),
-                      onPressed: () => _removeCustomScanPath(index),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-        // 自定义路径描述
-        const CustomPathsDescriptionWidget(),
-
-        const SizedBox(height: 16),
-
-        // 扫描按钮
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: CustomPathsScanButtonWidget(
-            isScanning: state.scanStatus == ScanStatus.scanning,
-            hasCustomPaths: _customScanPaths.isNotEmpty,
-            onPressed: _startScan,
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // 扫描结果
-        if (state.foundSongs.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ScanResultsHeaderWidget(scannedCount: state.foundSongs.length),
-                ElevatedButton(
-                  onPressed: _addToLibrary,
-                  child: Text('添加到音乐库'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: ListView.builder(
-              itemCount: state.foundSongs.length,
-              itemBuilder: (context, index) {
-                final song = state.foundSongs[index];
-                final durationText =
-                    Duration(milliseconds: song.duration).toString().split('.').first.padLeft(8, '0');
-                return SongListItemWidget(
-                  song: song,
-                  durationText: durationText,
-                  onPlay: () {
-                    final notifier = ref.read(libraryStateNotifierProvider.notifier);
-                    notifier.playSong(song);
-                  },
-                );
-              },
-            ),
-          ),
-        ] else if (state.scanStatus == ScanStatus.completed) ...[
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 48,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '扫描完成，未找到新歌曲',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _resetScan,
-                  child: const Text('重新扫描'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 }

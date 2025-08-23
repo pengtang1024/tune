@@ -16,10 +16,6 @@ class LibraryState {
   final double scanProgress;
   final List<Song> foundSongs;
   final String statusMessage;
-  
-  // 批量选择相关字段
-  final bool isMultiSelectMode;
-  final Set<Song> selectedSongs;
 
   LibraryState({
     required this.isGridView,
@@ -32,8 +28,6 @@ class LibraryState {
     this.scanProgress = 0.0,
     this.foundSongs = const [],
     this.statusMessage = '',
-    this.isMultiSelectMode = false,
-    this.selectedSongs = const {},
   });
 
   LibraryState copyWith({
@@ -47,8 +41,6 @@ class LibraryState {
     double? scanProgress,
     List<Song>? foundSongs,
     String? statusMessage,
-    bool? isMultiSelectMode,
-    Set<Song>? selectedSongs,
   }) {
     return LibraryState(
       isGridView: isGridView ?? this.isGridView,
@@ -61,8 +53,6 @@ class LibraryState {
       scanProgress: scanProgress ?? this.scanProgress,
       foundSongs: foundSongs ?? this.foundSongs,
       statusMessage: statusMessage ?? this.statusMessage,
-      isMultiSelectMode: isMultiSelectMode ?? this.isMultiSelectMode,
-      selectedSongs: selectedSongs ?? this.selectedSongs,
     );
   }
 
@@ -73,8 +63,6 @@ class LibraryState {
       selectedMenuItemIndex: 0,
       songs: [],
       isLoading: false,
-      isMultiSelectMode: false,
-      selectedSongs: const {},
     );
   }
 

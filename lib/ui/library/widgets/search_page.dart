@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
+import 'package:tune/ui/library/widgets/library/search_results_widget.dart';
+import 'package:tune/ui/player/providers/player_providers.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final String? initialQuery;
@@ -50,7 +51,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: localizations.search, // 使用本地化字符串
+            hintText: localizations.search,
             border: InputBorder.none,
             hintStyle: TextStyle(
               color: Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha:0.7),
@@ -81,79 +82,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
         ],
       ),
-      body: _buildSearchResults(state, localizations),
-    );
-  }
-
-  Widget _buildSearchResults(LibraryState state, AppLocalizations localizations) {
-    if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state.errorMessage?.isNotEmpty ?? false) {
-      return Center(
-        child: Text('${localizations.search_error}: ${state.errorMessage}'), // 使用本地化字符串
-      );
-    }
-
-    final songs = state.searchResults;
-    if (songs.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              localizations.search_no_results, // 使用本地化字符串
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: songs.length,
-      itemBuilder: (context, index) {
-        final song = songs[index];
-        return _buildSongListItem(song, localizations);
-      },
-    );
-  }
-
-  Widget _buildSongListItem(Song song, AppLocalizations localizations) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: const Icon(Icons.music_note, size: 30),
-        ),
-        title: Text(song.title),
-        subtitle: Text(
-          '${song.artist} - ${song.album}',
-        ),
-        trailing: Text(
-          Duration(milliseconds: song.duration).toString().split('.').first.padLeft(8, '0'),
-        ),
-        onTap: () {
-          // TODO: 播放选中的歌曲
-        },
+      body: SearchResultsWidget(
+        state: state,
+        localizations: localizations,
+        onPlaySong: _playSong,
       ),
     );
+  }
+
+  void _playSong(Song song) {
+    // 播放选中的歌曲
+    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+    final libraryState = ref.read(libraryStateNotifierProvider);
+    
+    // 设置播放列表
+    playerNotifier.setPlaylist(libraryState.songs, libraryState.songs.indexWhere((s) => s.id == song.id));
+    
+    // 播放歌曲
+    playerNotifier.playSong(song);
   }
 }

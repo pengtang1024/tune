@@ -9,7 +9,7 @@ class ScanStatusWidget extends StatelessWidget {
   const ScanStatusWidget({
     super.key,
     required this.statusMessage,
-    required this.errorMessage,
+    this.errorMessage = '',
   });
 
   @override

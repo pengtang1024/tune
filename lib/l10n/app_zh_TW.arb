@@ -1,0 +1,19 @@
+{
+  "@@locale": "zh_TW",
+  "app_name": "Tune",
+  "no_songs_found": "未找到歌曲",
+  "settings": "設定",
+  "retry": "重試",
+  "home": "首頁",
+  "library": "音樂庫",
+  "search": "搜尋",
+  "player": "播放器",
+  "about": "關於",
+  "songs": "首歌曲",
+  "music_scan": "音樂掃描",
+  "scan_local_music": "掃描本地音樂",
+  "search_songs": "搜尋歌曲...",
+  "add_to_library": "添加到音樂庫",
+  "scan_completed_no_new_songs": "掃描完成，未找到新歌曲",
+  "rescan": "重新掃描"
+}

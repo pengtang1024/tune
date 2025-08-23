@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/router/app_router.dart';
+import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
@@ -17,6 +18,6 @@ class AppInitializer {
     ref.read(crossPlatformMusicScannerProvider);
 
     // 初始化音频服务
-    // await ref.read(audioServiceProvider.notifier).init();
+    await ref.read(audioPlayerServiceProvider).init();
   }
 }

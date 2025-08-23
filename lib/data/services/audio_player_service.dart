@@ -2,6 +2,9 @@ import 'package:tune/domain/models/song.dart';
 
 /// 音频播放服务接口
 abstract class AudioPlayerService {
+  /// 初始化服务
+  Future<void> init();
+
   /// 播放歌曲
   Future<void> play(Song song);
 

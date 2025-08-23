@@ -134,29 +134,19 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
         newThemeMode = ThemeMode.light;
         break;
     }
-    state = state.copyWith(themeMode: newThemeMode);
-    _saveThemeMode(newThemeMode);
+    updateThemeMode(newThemeMode);
   }
 
   /// 设置主题模式（支持浅色、深色、自动三种模式）
   ///
   /// @param themeMode 要设置的主题模式，包括亮色、暗色等选项
   void setThemeMode(ThemeMode themeMode) {
-    // 检查当前主题模式是否与要设置的主题模式不同
-    if (state.themeMode != themeMode) {
-      // 更新状态，使用 copyWith 方法创建新的状态实例，只改变 themeMode 属性
-      state = state.copyWith(themeMode: themeMode);
-      // 保存设置的主题模式到本地存储
-      _saveThemeMode(themeMode);
-    }
+    updateThemeMode(themeMode);
   }
 
   /// 切换语言
   void switchLanguage(Locale locale) {
-    if (state.locale != locale) {
-      state = state.copyWith(locale: locale);
-      _saveLanguage(locale);
-    }
+    updateLocale(locale);
   }
 
   /// 切换"我的"下拉框显示状态

@@ -1,9 +1,12 @@
 import 'dart:io' show Platform, Directory, File;
 import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
+
+// 添加debugPrint导入
+import 'package:flutter/material.dart' show debugPrint;
 
 /// 跨平台音乐扫描服务接口
 abstract class CrossPlatformMusicScanner {
@@ -47,9 +50,15 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       Log.info('CrossPlatformMusicScanner: Running on Web platform');
       return [];
     } else if (Platform.isAndroid || Platform.isIOS) {
-      // 移动平台 - 返回空列表（实际项目中应该使用移动平台特定的API）
+      // 移动平台 - 使用平台特定的API扫描音乐文件
       Log.info('CrossPlatformMusicScanner: Running on mobile platform');
-      return [];
+      try {
+        final paths = await _getMobileMusicPaths();
+        return await scanMusicInDirectories(paths);
+      } catch (e) {
+        Log.error('Failed to scan mobile music: $e');
+        return [];
+      }
     } else {
       // 桌面平台 - 扫描默认音乐目录
       Log.info('CrossPlatformMusicScanner: Running on desktop platform');
@@ -154,6 +163,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       if (userHome != null) {
         paths.add(path.join(userHome, 'Music'));
       }
+    } else if (Platform.isAndroid || Platform.isIOS) {
+      // 移动平台音乐目录
+      paths.addAll(_getMobileMusicPaths());
     }
 
     return paths;
@@ -206,6 +218,16 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   bool _isAudioFile(String filePath) {
     final ext = path.extension(filePath).toLowerCase();
     return ext == '.mp3' || ext == '.flac' || ext == '.wav' || ext == '.m4a' || ext == '.aac' || ext == '.ogg';
+  }
+
+  /// 获取移动平台音乐路径
+  List<String> _getMobileMusicPaths() {
+    if (Platform.isAndroid) {
+      return ['/storage/emulated/0/Music'];
+    } else if (Platform.isIOS) {
+      return ['/var/mobile/Media/Music'];
+    }
+    return [];
   }
 
   /// 从文件创建歌曲对象
@@ -265,5 +287,36 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
       return Song(songData);
     }
+  }
+
+  Future<List<Song>> scanCustomPaths(List<String> paths) async {
+    final allSongs = <Song>[];
+    
+    // 定义支持的音频格式
+    final supportedFormats = {'mp3', 'flac', 'wav', 'm4a', 'aac', 'ogg'};
+    
+    for (final path in paths) {
+      final dir = Directory(path);
+      if (await dir.exists()) {
+        await for (final fileEntity in dir.list(recursive: true, followLinks: false)) {
+          if (fileEntity is File) {
+            final file = fileEntity;
+            final extension = file.path.split('.').last.toLowerCase();
+            if (supportedFormats.contains(extension)) {
+              try {
+                final song = await _createSongFromFile(file);
+                if (song != null) {
+                  allSongs.add(song);
+                }
+              } catch (e) {
+                debugPrint('Error scanning file ${file.path}: $e');
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return allSongs;
   }
 }

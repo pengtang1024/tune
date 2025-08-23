@@ -1,0 +1,19 @@
+{
+  "@@locale": "fr",
+  "app_name": "Tune",
+  "no_songs_found": "Aucune chanson trouvée",
+  "settings": "Paramètres",
+  "retry": "Réessayer",
+  "home": "Accueil",
+  "library": "Bibliothèque",
+  "search": "Recherche",
+  "player": "Lecteur",
+  "about": "À propos",
+  "songs": "Chansons",
+  "music_scan": "Analyse musicale",
+  "scan_local_music": "Scanner la musique locale",
+  "search_songs": "Rechercher des chansons...",
+  "add_to_library": "Ajouter à la bibliothèque",
+  "scan_completed_no_new_songs": "Analyse terminée, aucune nouvelle chanson trouvée",
+  "rescan": "Nouvelle analyse"
+}

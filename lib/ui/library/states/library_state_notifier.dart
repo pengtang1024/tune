@@ -1,14 +1,22 @@
 import 'dart:convert';
 import 'dart:io' show Platform, File;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as path;
-import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/music_service.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/providers/music_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/states/player_state_notifier.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as path;
+import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart' as scanner_provider;
 
 class LibraryStateNotifier extends StateNotifier<LibraryState> {
   final Ref _ref;
@@ -83,48 +91,36 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     );
   }
 
+  /// 扫描默认路径中的音乐
   void scanMusic() async {
-    try {
-      startScanning();
-
-      // 调用真正的音乐扫描服务
-      final scanner = _ref.read(crossPlatformMusicScannerProvider);
-
-      // 使用带进度更新的扫描方法
-      final songs = await scanner.scanMusicInDirectoriesWithProgress(
-        scanner.getDefaultMusicPaths(),
-        (progress) {
-          // 在主线程更新UI进度
-          updateScanProgress(progress);
-        },
-      );
-
-      completeScanning(songs);
-      // 保存扫描结果到持久化存储
-      await _saveScannedSongs(songs);
-    } catch (e) {
-      setScanError('扫描失败: $e');
-    }
+    _scanMusicInPaths(() => _ref.read(scanner_provider.crossPlatformMusicScannerProvider).getDefaultMusicPaths());
   }
 
   /// 扫描自定义路径中的音乐
   void scanCustomPaths() async {
+    // 获取自定义扫描路径
+    final persistenceService = _ref.read(sharedPreferencesServiceProvider);
+    final customPaths = persistenceService.getStringList('custom_scan_paths') ?? [];
+    
+    if (customPaths.isEmpty) {
+      setScanError('没有设置自定义扫描路径');
+      return;
+    }
+    
+    _scanMusicInPaths(() => customPaths);
+  }
+
+  /// 通用音乐扫描方法
+  void _scanMusicInPaths(List<String> Function() getPaths) async {
     try {
       startScanning();
 
-      // 获取自定义扫描路径
-      final persistenceService = _ref.read(sharedPreferencesServiceProvider);
-      final customPaths = persistenceService.getStringList('custom_scan_paths') ?? [];
-
-      if (customPaths.isEmpty) {
-        setScanError('没有设置自定义扫描路径');
-        return;
-      }
-
       // 调用真正的音乐扫描服务
-      final scanner = _ref.read(crossPlatformMusicScannerProvider);
+      final scanner = _ref.read(scanner_provider.crossPlatformMusicScannerProvider);
+
+      // 使用带进度更新的扫描方法
       final songs = await scanner.scanMusicInDirectoriesWithProgress(
-        customPaths,
+        getPaths(),
         (progress) {
           // 在主线程更新UI进度
           updateScanProgress(progress);
@@ -177,55 +173,6 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
       // 保存到持久化存储
       _saveScannedSongs(updatedSongs);
     }
-  }
-
-  /// 删除指定的歌曲
-  void removeSong(Song song) {
-    final updatedSongs = List<Song>.from(state.songs)..remove(song);
-    state = state.copyWith(
-      songs: updatedSongs,
-      statusMessage: '已删除歌曲: ${song.title}',
-    );
-    // 保存到持久化存储
-    _saveScannedSongs(updatedSongs);
-  }
-
-  /// 切换歌曲的收藏状态
-  void toggleFavorite(Song song) {
-    final updatedSongs = List<Song>.from(state.songs);
-    final index = updatedSongs.indexWhere((s) => s.id == song.id);
-    if (index != -1) {
-      final updatedSong = Song(song.toJson()..['isFavorite'] = !song.isFavorite);
-      updatedSongs[index] = updatedSong;
-      state = state.copyWith(
-        songs: updatedSongs,
-        statusMessage: '${song.isFavorite ? '取消收藏' : '收藏'}歌曲: ${song.title}',
-      );
-      // 保存到持久化存储
-      _saveScannedSongs(updatedSongs);
-    }
-  }
-
-  /// 删除多首歌曲
-  void removeSongs(List<Song> songsToRemove) {
-    final updatedSongs = List<Song>.from(state.songs)..removeWhere((song) => songsToRemove.contains(song));
-    state = state.copyWith(
-      songs: updatedSongs,
-      statusMessage: '已删除 ${songsToRemove.length} 首歌曲',
-    );
-    // 保存到持久化存储
-    _saveScannedSongs(updatedSongs);
-  }
-
-  /// 清空音乐库
-  void clearLibrary() {
-    final songCount = state.songs.length;
-    state = state.copyWith(
-      songs: [],
-      statusMessage: '已清空音乐库，共删除 $songCount 首歌曲',
-    );
-    // 保存到持久化存储
-    _saveScannedSongs([]);
   }
 
   void removeCustomPath(String path) {
@@ -301,7 +248,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
       
       // 如果持久化存储中没有歌曲，则从扫描服务获取
       if (songs.isEmpty) {
-        final scanner = _ref.read(crossPlatformMusicScannerProvider);
+        final scanner = _ref.read(scanner_provider.crossPlatformMusicScannerProvider);
         songs = await scanner.getAllSongs();
       }
 
@@ -316,7 +263,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     setLoading(true);
 
     try {
-      final scanner = _ref.read(crossPlatformMusicScannerProvider);
+      final scanner = _ref.read(scanner_provider.crossPlatformMusicScannerProvider);
       final songs = await scanner.searchSongs(query);
 
       setSongs(songs);
@@ -340,89 +287,5 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
     // 播放指定歌曲
     playerNotifier.playSong(song);
-  }
-
-  /// 切换批量选择模式
-  void toggleMultiSelectMode() {
-    state = state.copyWith(
-      isMultiSelectMode: !state.isMultiSelectMode,
-      selectedSongs: state.isMultiSelectMode ? const {} : state.selectedSongs,
-    );
-  }
-
-  /// 选择或取消选择单首歌曲
-  void toggleSongSelection(Song song) {
-    if (!state.isMultiSelectMode) return;
-    
-    final selectedSongs = Set<Song>.from(state.selectedSongs);
-    if (selectedSongs.contains(song)) {
-      selectedSongs.remove(song);
-    } else {
-      selectedSongs.add(song);
-    }
-    
-    state = state.copyWith(selectedSongs: selectedSongs);
-  }
-
-  /// 选择所有歌曲
-  void selectAllSongs() {
-    if (!state.isMultiSelectMode) return;
-    
-    final allSongs = state.searchResults.toSet();
-    state = state.copyWith(selectedSongs: allSongs);
-  }
-
-  /// 取消选择所有歌曲
-  void deselectAllSongs() {
-    if (!state.isMultiSelectMode) return;
-    
-    state = state.copyWith(selectedSongs: const {});
-  }
-
-  /// 批量删除歌曲
-  void removeSelectedSongs() {
-    if (!state.isMultiSelectMode || state.selectedSongs.isEmpty) return;
-    
-    // 将Set转换为List以便使用removeWhere
-    final selectedSongsList = state.selectedSongs.toList();
-    final updatedSongs = List<Song>.from(state.songs)..removeWhere((song) => selectedSongsList.contains(song));
-    
-    state = state.copyWith(
-      songs: updatedSongs,
-      isMultiSelectMode: false,
-      selectedSongs: const {},
-      statusMessage: '已删除 ${state.selectedSongs.length} 首歌曲',
-    );
-    // 保存到持久化存储
-    _saveScannedSongs(updatedSongs);
-  }
-
-  /// 批量切换收藏状态
-  void toggleFavoriteForSelectedSongs() {
-    if (!state.isMultiSelectMode || state.selectedSongs.isEmpty) return;
-    
-    final updatedSongs = List<Song>.from(state.songs);
-    int favoriteCount = 0;
-    int unfavoriteCount = 0;
-    
-    for (int i = 0; i < updatedSongs.length; i++) {
-      final song = updatedSongs[i];
-      if (state.selectedSongs.contains(song)) {
-        final updatedSong = Song(song.toJson()..['isFavorite'] = !song.isFavorite);
-        updatedSongs[i] = updatedSong;
-        if (song.isFavorite) {
-          unfavoriteCount++;
-        } else {
-          favoriteCount++;
-        }
-      }
-    }
-    
-    state = state.copyWith(
-      songs: updatedSongs,
-      statusMessage: '已收藏 $favoriteCount 首歌曲，取消收藏 $unfavoriteCount 首歌曲',
-    );
-    // 保存到持久化存储
-    _saveScannedSongs(updatedSongs);
   }
 }

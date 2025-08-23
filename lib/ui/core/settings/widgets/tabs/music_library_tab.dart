@@ -65,6 +65,9 @@ class _MusicLibraryTabState extends ConsumerState<MusicLibraryTab> {
 
   @override
   Widget build(BuildContext context) {
+    // 监听持久化服务的变化，当设置改变时刷新UI
+    ref.watch(sharedPreferencesServiceProvider);
+    
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }

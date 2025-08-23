@@ -1,0 +1,19 @@
+{
+  "@@locale": "ja",
+  "app_name": "Tune",
+  "no_songs_found": "曲が見つかりません",
+  "settings": "設定",
+  "retry": "再試行",
+  "home": "ホーム",
+  "library": "ライブラリ",
+  "search": "検索",
+  "player": "プレーヤー",
+  "about": "アプリについて",
+  "songs": "曲",
+  "music_scan": "音楽スキャン",
+  "scan_local_music": "ローカル音楽をスキャン",
+  "search_songs": "曲を検索...",
+  "add_to_library": "ライブラリに追加",
+  "scan_completed_no_new_songs": "スキャン完了、新しい曲が見つかりません",
+  "rescan": "再スキャン"
+}

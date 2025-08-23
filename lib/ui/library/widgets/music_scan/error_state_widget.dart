@@ -3,12 +3,12 @@ import 'package:tune/core/extension/localizations_extension.dart';
 
 class ErrorStateWidget extends StatelessWidget {
   final String errorMessage;
-  final VoidCallback onRetry;
+  final VoidCallback? onRetry;
 
   const ErrorStateWidget({
     super.key,
     required this.errorMessage,
-    required this.onRetry,
+    this.onRetry,
   });
 
   @override

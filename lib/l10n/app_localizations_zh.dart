@@ -607,39 +607,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get load_songs_failed => '加载歌曲失败';
 
   @override
-  String get clear_library => '清空音乐库';
+  String get add_to_library => '添加到音乐库';
 
   @override
-  String get confirm_clear_library => '确认清空音乐库';
+  String get scan_completed_no_new_songs => '扫描完成，未找到新歌曲';
 
   @override
-  String get confirm_clear_library_message =>
-      '您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。';
+  String get added_scanned_songs_to_library => '已将扫描的歌曲添加到音乐库';
 
   @override
-  String get delete_song => '删除歌曲';
-
-  @override
-  String get confirm_delete_song => '确认删除歌曲';
-
-  @override
-  String get confirm_delete_song_message =>
-      '您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。';
-
-  @override
-  String get favorite => '收藏';
-
-  @override
-  String get unfavorite => '取消收藏';
-
-  @override
-  String get select_all => '全选';
-
-  @override
-  String get deselect_all => '取消全选';
-
-  @override
-  String get items_selected => '项已选择';
+  String get rescan => '重新扫描';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1245,37 +1222,67 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get load_songs_failed => '加载歌曲失败';
 
   @override
-  String get clear_library => '清空音乐库';
+  String get add_to_library => '添加到音乐库';
 
   @override
-  String get confirm_clear_library => '确认清空音乐库';
+  String get scan_completed_no_new_songs => '扫描完成，未找到新歌曲';
 
   @override
-  String get confirm_clear_library_message =>
-      '您确定要清空音乐库吗？此操作将删除所有歌曲记录，但不会删除实际的音频文件。';
+  String get added_scanned_songs_to_library => '已将扫描的歌曲添加到音乐库';
 
   @override
-  String get delete_song => '删除歌曲';
+  String get rescan => '重新扫描';
+}
+
+/// The translations for Chinese, as used in Taiwan (`zh_TW`).
+class AppLocalizationsZhTw extends AppLocalizationsZh {
+  AppLocalizationsZhTw() : super('zh_TW');
 
   @override
-  String get confirm_delete_song => '确认删除歌曲';
+  String get app_name => 'Tune';
 
   @override
-  String get confirm_delete_song_message =>
-      '您确定要删除这首歌曲吗？此操作仅从音乐库中移除记录，不会删除实际的音频文件。';
+  String get no_songs_found => '未找到歌曲';
 
   @override
-  String get favorite => '收藏';
+  String get settings => '設定';
 
   @override
-  String get unfavorite => '取消收藏';
+  String get retry => '重試';
 
   @override
-  String get select_all => '全选';
+  String get home => '首頁';
 
   @override
-  String get deselect_all => '取消全选';
+  String get library => '音樂庫';
 
   @override
-  String get items_selected => '项已选择';
+  String get search => '搜尋';
+
+  @override
+  String get player => '播放器';
+
+  @override
+  String get about => '關於';
+
+  @override
+  String get songs => '首歌曲';
+
+  @override
+  String get music_scan => '音樂掃描';
+
+  @override
+  String get scan_local_music => '掃描本地音樂';
+
+  @override
+  String get search_songs => '搜尋歌曲...';
+
+  @override
+  String get add_to_library => '添加到音樂庫';
+
+  @override
+  String get scan_completed_no_new_songs => '掃描完成，未找到新歌曲';
+
+  @override
+  String get rescan => '重新掃描';
 }

@@ -1,0 +1,19 @@
+{
+  "@@locale": "ko",
+  "app_name": "Tune",
+  "no_songs_found": "노래를 찾을 수 없습니다",
+  "settings": "설정",
+  "retry": "다시 시도",
+  "home": "홈",
+  "library": "라이브러리",
+  "search": "검색",
+  "player": "플레이어",
+  "about": "앱 정보",
+  "songs": "노래",
+  "music_scan": "음악 스캔",
+  "scan_local_music": "로컬 음악 스캔",
+  "search_songs": "노래 검색...",
+  "add_to_library": "라이브러리에 추가",
+  "scan_completed_no_new_songs": "스캔 완료, 새로운 노래를 찾을 수 없습니다",
+  "rescan": "다시 스캔"
+}
