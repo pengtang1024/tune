@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
-import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/library/widgets/library/search_results_widget.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 
@@ -24,9 +23,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void initState() {
     super.initState();
     if (widget.initialQuery != null) {
-      _searchController.text = widget.initialQuery!;
       _searchQuery = widget.initialQuery!;
-      _performSearch();
+      _searchController.text = _searchQuery;
     }
   }
 
@@ -36,69 +34,64 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     super.dispose();
   }
 
-  void _performSearch() {
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+    
+    // 执行搜索
+    if (query.isNotEmpty) {
+      final notifier = ref.read(libraryStateNotifierProvider.notifier);
+      notifier.searchSongs(query);
+    }
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchQuery = '';
+      _searchController.clear();
+    });
+    
+    // 清空搜索结果
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
-    notifier.updateSearchQuery(_searchQuery);
+    notifier.clearSearch();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(libraryStateNotifierProvider);
     final localizations = context.loc;
 
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _searchController,
+          onChanged: _onSearchChanged,
           decoration: InputDecoration(
-            hintText: localizations.search,
+            hintText: localizations.search_songs,
             border: InputBorder.none,
-            hintStyle: TextStyle(
-              color: Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha:0.7),
-            ),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: _clearSearch,
+                  )
+                : null,
           ),
-          style: TextStyle(
-            color: Theme.of(context).appBarTheme.foregroundColor,
-          ),
-          onChanged: (value) {
-            setState(() {
-              _searchQuery = value;
-            });
-            _performSearch();
-          },
-          onSubmitted: (_) => _performSearch(),
         ),
         actions: [
-          if (_searchQuery.isNotEmpty)
+          if (_searchQuery.isEmpty)
             IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.search),
               onPressed: () {
-                _searchController.clear();
-                setState(() {
-                  _searchQuery = '';
-                });
-                _performSearch();
+                if (_searchQuery.isNotEmpty) {
+                  final notifier = ref.read(libraryStateNotifierProvider.notifier);
+                  notifier.searchSongs(_searchQuery);
+                }
               },
             ),
         ],
       ),
-      body: SearchResultsWidget(
-        state: state,
-        localizations: localizations,
-        onPlaySong: _playSong,
-      ),
+      body: const SearchResultsWidget(),
     );
   }
 
-  void _playSong(Song song) {
-    // 播放选中的歌曲
-    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
-    final libraryState = ref.read(libraryStateNotifierProvider);
-    
-    // 设置播放列表
-    playerNotifier.setPlaylist(libraryState.songs, libraryState.songs.indexWhere((s) => s.id == song.id));
-    
-    // 播放歌曲
-    playerNotifier.playSong(song);
-  }
 }

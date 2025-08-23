@@ -136,6 +136,12 @@ abstract class AppLocalizations {
   /// **'设置'**
   String get settings;
 
+  /// No description provided for @settings_saved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置已保存'**
+  String get settings_saved;
+
   /// No description provided for @retry.
   ///
   /// In zh_CN, this message translates to:
@@ -220,250 +226,490 @@ abstract class AppLocalizations {
   /// **'自定义扫描路径'**
   String get custom_scan_paths;
 
-  /// No description provided for @add_custom_directory.
+  /// No description provided for @playback_settings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'添加自定义音乐扫描目录'**
-  String get add_custom_directory;
+  /// **'播放设置'**
+  String get playback_settings;
 
-  /// No description provided for @no_custom_scan_paths.
+  /// No description provided for @account_settings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'暂无自定义扫描路径'**
-  String get no_custom_scan_paths;
-
-  /// No description provided for @full_platform_scan_note.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'注意：如需全平台扫描，请使用侧边栏中的\"音乐扫描\"功能'**
-  String get full_platform_scan_note;
-
-  /// No description provided for @library_info.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库信息'**
-  String get library_info;
-
-  /// No description provided for @songs_count.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'当前音乐库包含 0 首歌曲'**
-  String get songs_count;
-
-  /// No description provided for @library_features.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库功能'**
-  String get library_features;
-
-  /// No description provided for @auto_extract_metadata.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'• 音乐库会自动提取歌曲元数据（标题、艺术家、专辑等）'**
-  String get auto_extract_metadata;
-
-  /// No description provided for @how_to_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'如何使用音乐扫描：'**
-  String get how_to_scan;
-
-  /// No description provided for @scan_step1.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'1. 点击左侧边栏中的\"音乐扫描\"菜单项'**
-  String get scan_step1;
-
-  /// No description provided for @scan_step2.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'2. 在扫描页面点击\"开始扫描\"按钮'**
-  String get scan_step2;
-
-  /// No description provided for @scan_step3.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'3. 等待扫描完成并查看结果'**
-  String get scan_step3;
-
-  /// No description provided for @scan_step4.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'4. 扫描的音乐将自动出现在\"音乐库\"中'**
-  String get scan_step4;
-
-  /// No description provided for @faq.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'常见问题'**
-  String get faq;
-
-  /// No description provided for @faq_scan_issue.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'问：为什么找不到音乐文件？'**
-  String get faq_scan_issue;
-
-  /// No description provided for @faq_scan_issue_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'答：请确保设备上存在音乐文件，并且应用具有存储访问权限。'**
-  String get faq_scan_issue_answer;
-
-  /// No description provided for @faq_slow_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'问：为什么扫描很慢？'**
-  String get faq_slow_scan;
-
-  /// No description provided for @faq_slow_scan_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'答：首次扫描可能会较慢，后续扫描会更快。请耐心等待。'**
-  String get faq_slow_scan_answer;
-
-  /// No description provided for @faq_not_showing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'问：为什么扫描的歌曲没有显示在音乐库中？'**
-  String get faq_not_showing;
-
-  /// No description provided for @faq_not_showing_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'答：请确保扫描已完成，并尝试刷新音乐库页面。'**
-  String get faq_not_showing_answer;
-
-  /// No description provided for @contact_us.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'如果您有任何问题或建议，请联系我们：'**
-  String get contact_us;
-
-  /// No description provided for @email.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'📧 邮箱: support@tune-music.com'**
-  String get email;
-
-  /// No description provided for @website.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'🌐 网站: https://tune-music.com'**
-  String get website;
-
-  /// No description provided for @unknown_artist.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知艺术家'**
-  String get unknown_artist;
-
-  /// No description provided for @unknown_album.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知专辑'**
-  String get unknown_album;
-
-  /// No description provided for @enable_desktop_lyrics.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'启用桌面歌词'**
-  String get enable_desktop_lyrics;
-
-  /// No description provided for @tag_vip.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'VIP'**
-  String get tag_vip;
-
-  /// No description provided for @tag_singer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌手'**
-  String get tag_singer;
-
-  /// No description provided for @tag_elite.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'精英'**
-  String get tag_elite;
+  /// **'账户设置'**
+  String get account_settings;
 
   /// No description provided for @general_settings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'通用设置'**
+  /// **'常规设置'**
   String get general_settings;
 
-  /// No description provided for @auto_start.
+  /// No description provided for @music_library_settings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'开机自启'**
-  String get auto_start;
+  /// **'音乐库设置'**
+  String get music_library_settings;
 
-  /// No description provided for @auto_start_description.
+  /// No description provided for @about_settings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'系统启动时自动启动应用程序'**
-  String get auto_start_description;
+  /// **'关于'**
+  String get about_settings;
 
-  /// No description provided for @window_size.
+  /// No description provided for @play_mode.
   ///
   /// In zh_CN, this message translates to:
-  /// **'窗口大小'**
-  String get window_size;
+  /// **'播放模式'**
+  String get play_mode;
 
-  /// No description provided for @window_size_description.
+  /// No description provided for @sequence_playback.
   ///
   /// In zh_CN, this message translates to:
-  /// **'设置应用程序启动时的默认窗口大小'**
-  String get window_size_description;
+  /// **'顺序播放'**
+  String get sequence_playback;
 
-  /// No description provided for @default_player.
+  /// No description provided for @repeat_one.
   ///
   /// In zh_CN, this message translates to:
-  /// **'默认播放器'**
-  String get default_player;
+  /// **'单曲重复'**
+  String get repeat_one;
 
-  /// No description provided for @default_player_description.
+  /// No description provided for @shuffle_playback.
   ///
   /// In zh_CN, this message translates to:
-  /// **'将此应用程序设置为默认音频播放器'**
-  String get default_player_description;
+  /// **'随机播放'**
+  String get shuffle_playback;
 
-  /// No description provided for @desktop_lyrics.
+  /// No description provided for @audio_quality.
   ///
   /// In zh_CN, this message translates to:
-  /// **'桌面歌词'**
-  String get desktop_lyrics;
+  /// **'音质'**
+  String get audio_quality;
 
-  /// No description provided for @desktop_lyrics_description.
+  /// No description provided for @low_quality.
   ///
   /// In zh_CN, this message translates to:
-  /// **'在桌面上以浮动窗口形式显示歌词'**
-  String get desktop_lyrics_description;
+  /// **'低质量'**
+  String get low_quality;
 
-  /// No description provided for @small.
+  /// No description provided for @medium_quality.
   ///
   /// In zh_CN, this message translates to:
-  /// **'小'**
-  String get small;
+  /// **'中等质量'**
+  String get medium_quality;
 
-  /// No description provided for @medium.
+  /// No description provided for @high_quality.
   ///
   /// In zh_CN, this message translates to:
-  /// **'中'**
-  String get medium;
+  /// **'高质量'**
+  String get high_quality;
 
-  /// No description provided for @large.
+  /// No description provided for @pause_when_headset_disconnected.
   ///
   /// In zh_CN, this message translates to:
-  /// **'大'**
-  String get large;
+  /// **'耳机断开时暂停'**
+  String get pause_when_headset_disconnected;
+
+  /// No description provided for @audio_effects.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频效果'**
+  String get audio_effects;
+
+  /// No description provided for @enable_equalizer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用均衡器'**
+  String get enable_equalizer;
+
+  /// No description provided for @bass_boost.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'低音增强'**
+  String get bass_boost;
+
+  /// No description provided for @spatial_audio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'空间音频'**
+  String get spatial_audio;
+
+  /// No description provided for @username.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用户名'**
+  String get username;
+
+  /// No description provided for @email.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'邮箱'**
+  String get email;
+
+  /// No description provided for @auto_login.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动登录'**
+  String get auto_login;
+
+  /// No description provided for @save_password.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存密码'**
+  String get save_password;
+
+  /// No description provided for @save.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存'**
+  String get save;
+
+  /// No description provided for @cancel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消'**
+  String get cancel;
+
+  /// No description provided for @ok.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确定'**
+  String get ok;
+
+  /// No description provided for @add.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加'**
+  String get add;
+
+  /// No description provided for @remove.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'移除'**
+  String get remove;
+
+  /// No description provided for @edit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'编辑'**
+  String get edit;
+
+  /// No description provided for @delete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除'**
+  String get delete;
+
+  /// No description provided for @add_custom_path.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加自定义路径'**
+  String get add_custom_path;
+
+  /// No description provided for @no_custom_paths.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未设置自定义扫描路径'**
+  String get no_custom_paths;
+
+  /// No description provided for @no_custom_paths_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加自定义文件夹路径以扫描特定位置的音乐文件'**
+  String get no_custom_paths_description;
+
+  /// No description provided for @scan_local_music.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描本地音乐'**
+  String get scan_local_music;
+
+  /// No description provided for @scanning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描中...'**
+  String get scanning;
+
+  /// No description provided for @scan_completed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描完成'**
+  String get scan_completed;
+
+  /// No description provided for @scan_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描失败'**
+  String get scan_failed;
+
+  /// No description provided for @failed_to_load_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载歌曲失败'**
+  String get failed_to_load_songs;
+
+  /// No description provided for @failed_to_load_songs_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法从您的音乐库加载歌曲。请检查您的网络连接或重新扫描音乐库。'**
+  String get failed_to_load_songs_description;
+
+  /// No description provided for @try_again.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重试'**
+  String get try_again;
+
+  /// No description provided for @scan_progress.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描进度'**
+  String get scan_progress;
+
+  /// No description provided for @scanning_path.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在扫描路径:'**
+  String get scanning_path;
+
+  /// No description provided for @no_songs_found_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在您的设备上未找到任何音乐文件。'**
+  String get no_songs_found_description;
+
+  /// No description provided for @scan_again.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重新扫描'**
+  String get scan_again;
+
+  /// No description provided for @scan_local_music_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描您的设备以查找音乐文件'**
+  String get scan_local_music_description;
+
+  /// No description provided for @custom_scan_paths_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加自定义文件夹路径以扫描特定位置的音乐文件'**
+  String get custom_scan_paths_description;
+
+  /// No description provided for @scan_button.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开始扫描'**
+  String get scan_button;
+
+  /// No description provided for @cancel_scan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消扫描'**
+  String get cancel_scan;
+
+  /// No description provided for @failed_to_save_custom_scan_paths.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存自定义扫描路径失败'**
+  String get failed_to_save_custom_scan_paths;
+
+  /// No description provided for @failed_to_add_custom_scan_path.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加自定义扫描路径失败'**
+  String get failed_to_add_custom_scan_path;
+
+  /// No description provided for @failed_to_scan_music.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描音乐失败'**
+  String get failed_to_scan_music;
+
+  /// No description provided for @search_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索歌曲...'**
+  String get search_songs;
+
+  /// No description provided for @artists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get artists;
+
+  /// No description provided for @albums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get albums;
+
+  /// No description provided for @songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌曲'**
+  String get songs;
+
+  /// No description provided for @playlists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表'**
+  String get playlists;
+
+  /// No description provided for @music_library.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库'**
+  String get music_library;
+
+  /// No description provided for @favorites.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏'**
+  String get favorites;
+
+  /// No description provided for @recently_played.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近播放'**
+  String get recently_played;
+
+  /// No description provided for @top_charts.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排行榜'**
+  String get top_charts;
+
+  /// No description provided for @new_releases.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新歌发布'**
+  String get new_releases;
+
+  /// No description provided for @genres.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流派'**
+  String get genres;
+
+  /// No description provided for @now_playing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放'**
+  String get now_playing;
+
+  /// No description provided for @previous.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'上一首'**
+  String get previous;
+
+  /// No description provided for @next.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下一首'**
+  String get next;
+
+  /// No description provided for @play.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放'**
+  String get play;
+
+  /// No description provided for @pause.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'暂停'**
+  String get pause;
+
+  /// No description provided for @sequence.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'顺序播放'**
+  String get sequence;
+
+  /// No description provided for @shuffle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'随机播放'**
+  String get shuffle;
+
+  /// No description provided for @scan_completed_no_new_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描完成，未找到新歌曲'**
+  String get scan_completed_no_new_songs;
+
+  /// No description provided for @added_scanned_songs_to_library.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已将扫描的歌曲添加到音乐库'**
+  String get added_scanned_songs_to_library;
+
+  /// No description provided for @rescan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重新扫描'**
+  String get rescan;
+
+  /// No description provided for @load_stats_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载统计信息失败'**
+  String get load_stats_failed;
+
+  /// No description provided for @load_songs_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载歌曲失败'**
+  String get load_songs_failed;
+
+  /// No description provided for @add_to_library.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加到音乐库'**
+  String get add_to_library;
+
+  /// No description provided for @general_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'常规'**
+  String get general_tab;
+
+  /// No description provided for @library_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库'**
+  String get library_tab;
+
+  /// No description provided for @account_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'账户'**
+  String get account_tab;
+
+  /// No description provided for @playback_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放'**
+  String get playback_tab;
+
+  /// No description provided for @about_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关于'**
+  String get about_tab;
+
+  /// No description provided for @animations_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'动画'**
+  String get animations_tab;
 
   /// No description provided for @version.
   ///
   /// In zh_CN, this message translates to:
-  /// **'版本: 1.0.0'**
+  /// **'版本'**
   String get version;
 
   /// No description provided for @platform.
@@ -475,25 +721,25 @@ abstract class AppLocalizations {
   /// No description provided for @about_description.
   ///
   /// In zh_CN, this message translates to:
-  /// **'Tune 是一款现代音乐播放器，让您可以轻松管理和播放本地音乐收藏。凭借简洁直观的界面，Tune 提供了无缝的音乐体验。'**
+  /// **'Tune 是一款现代化的音乐播放器，专为音乐爱好者设计。它支持多种音频格式，提供高质量的音频播放体验。'**
   String get about_description;
 
   /// No description provided for @features.
   ///
   /// In zh_CN, this message translates to:
-  /// **'功能'**
+  /// **'功能特性'**
   String get features;
 
   /// No description provided for @high_quality_audio_playback.
   ///
   /// In zh_CN, this message translates to:
-  /// **'高品质音频播放'**
+  /// **'高质量音频播放'**
   String get high_quality_audio_playback;
 
   /// No description provided for @supports_multiple_audio_formats.
   ///
   /// In zh_CN, this message translates to:
-  /// **'支持多种音频格式，包括 MP3、FLAC、WAV 等'**
+  /// **'支持多种音频格式（MP3、FLAC、WAV、AAC等）'**
   String get supports_multiple_audio_formats;
 
   /// No description provided for @local_music_management.
@@ -505,7 +751,7 @@ abstract class AppLocalizations {
   /// No description provided for @automatically_scans_and_organizes_local_music_library.
   ///
   /// In zh_CN, this message translates to:
-  /// **'自动扫描和整理您的本地音乐库'**
+  /// **'自动扫描并整理本地音乐库'**
   String get automatically_scans_and_organizes_local_music_library;
 
   /// No description provided for @multi_language_support.
@@ -529,7 +775,7 @@ abstract class AppLocalizations {
   /// No description provided for @eight_theme_colors_with_dark_light_mode_switching.
   ///
   /// In zh_CN, this message translates to:
-  /// **'八种主题颜色，支持深色/浅色模式切换'**
+  /// **'8种主题颜色，支持深色/浅色模式切换'**
   String get eight_theme_colors_with_dark_light_mode_switching;
 
   /// No description provided for @lyrics_synchronization.
@@ -541,7 +787,7 @@ abstract class AppLocalizations {
   /// No description provided for @lrc_format_lyrics_real_time_synchronization_display.
   ///
   /// In zh_CN, this message translates to:
-  /// **'LRC 格式歌词实时同步显示'**
+  /// **'LRC格式歌词实时同步显示'**
   String get lrc_format_lyrics_real_time_synchronization_display;
 
   /// No description provided for @smart_search.
@@ -553,7 +799,7 @@ abstract class AppLocalizations {
   /// No description provided for @supports_searching_by_song_title_artist_album_and_other_metadata.
   ///
   /// In zh_CN, this message translates to:
-  /// **'支持按歌曲标题、艺术家、专辑和其他元数据搜索'**
+  /// **'支持按歌曲名、艺术家、专辑等元数据搜索'**
   String get supports_searching_by_song_title_artist_album_and_other_metadata;
 
   /// No description provided for @open_source_license.
@@ -565,19 +811,25 @@ abstract class AppLocalizations {
   /// No description provided for @opensource_license_description.
   ///
   /// In zh_CN, this message translates to:
-  /// **'该项目根据 MIT 许可证授权 - 有关详细信息，请参阅 LICENSE 文件。'**
+  /// **'本项目使用开源许可证发布，源代码可在GitHub上获取。'**
   String get opensource_license_description;
 
   /// No description provided for @github_project_address.
   ///
   /// In zh_CN, this message translates to:
-  /// **'GitHub 项目地址'**
+  /// **'GitHub项目地址'**
   String get github_project_address;
+
+  /// No description provided for @contact_us.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'联系我们'**
+  String get contact_us;
 
   /// No description provided for @contact_us_description.
   ///
   /// In zh_CN, this message translates to:
-  /// **'如果您有任何问题、建议或反馈，请随时通过以下渠道与我们联系。'**
+  /// **'如有任何问题，请通过以下方式联系我们：\n邮箱：support@tune.com'**
   String get contact_us_description;
 
   /// No description provided for @official_website.
@@ -586,35 +838,71 @@ abstract class AppLocalizations {
   /// **'官方网站'**
   String get official_website;
 
-  /// No description provided for @access_library.
+  /// No description provided for @auto_start.
   ///
   /// In zh_CN, this message translates to:
-  /// **'• 可随时访问和管理音乐库'**
-  String get access_library;
+  /// **'开机自启'**
+  String get auto_start;
 
-  /// No description provided for @add_custom_paths.
+  /// No description provided for @auto_start_description.
   ///
   /// In zh_CN, this message translates to:
-  /// **'• 可添加自定义扫描路径'**
-  String get add_custom_paths;
+  /// **'系统启动时自动运行Tune'**
+  String get auto_start_description;
 
-  /// No description provided for @scan_completion.
+  /// No description provided for @window_size.
   ///
   /// In zh_CN, this message translates to:
-  /// **'• 扫描完成后可在音乐库查看结果'**
-  String get scan_completion;
+  /// **'窗口大小'**
+  String get window_size;
 
-  /// No description provided for @auto_metadata_extraction.
+  /// No description provided for @small.
   ///
   /// In zh_CN, this message translates to:
-  /// **'• 自动从音乐文件中提取元数据'**
-  String get auto_metadata_extraction;
+  /// **'小'**
+  String get small;
 
-  /// No description provided for @scan_instructions.
+  /// No description provided for @medium.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描说明'**
-  String get scan_instructions;
+  /// **'中'**
+  String get medium;
+
+  /// No description provided for @large.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'大'**
+  String get large;
+
+  /// No description provided for @window_size_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置应用窗口的默认大小'**
+  String get window_size_description;
+
+  /// No description provided for @default_player.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认播放器'**
+  String get default_player;
+
+  /// No description provided for @default_player_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'将Tune设置为系统默认音频播放器'**
+  String get default_player_description;
+
+  /// No description provided for @desktop_lyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'桌面歌词'**
+  String get desktop_lyrics;
+
+  /// No description provided for @desktop_lyrics_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在桌面上显示实时歌词'**
+  String get desktop_lyrics_description;
 
   /// No description provided for @music_library_management.
   ///
@@ -622,47 +910,149 @@ abstract class AppLocalizations {
   /// **'音乐库管理'**
   String get music_library_management;
 
-  /// No description provided for @failed_to_save_custom_path.
+  /// No description provided for @add_custom_directory.
   ///
   /// In zh_CN, this message translates to:
-  /// **'保存自定义路径失败'**
-  String get failed_to_save_custom_path;
+  /// **'添加自定义目录'**
+  String get add_custom_directory;
 
-  /// No description provided for @custom_path_scanning_will_be_implemented.
+  /// No description provided for @no_custom_scan_paths.
   ///
   /// In zh_CN, this message translates to:
-  /// **'自定义路径扫描将在未来版本中实现'**
-  String get custom_path_scanning_will_be_implemented;
+  /// **'未设置自定义扫描路径'**
+  String get no_custom_scan_paths;
 
-  /// No description provided for @error.
+  /// No description provided for @full_platform_scan_note.
   ///
   /// In zh_CN, this message translates to:
-  /// **'错误'**
-  String get error;
+  /// **'全平台扫描说明：默认扫描系统音乐目录，可通过添加自定义路径扩展扫描范围。'**
+  String get full_platform_scan_note;
 
-  /// No description provided for @featured_playlists.
+  /// No description provided for @library_info.
   ///
   /// In zh_CN, this message translates to:
-  /// **'精选播放列表'**
-  String get featured_playlists;
+  /// **'音乐库信息'**
+  String get library_info;
 
-  /// No description provided for @featured_artists.
+  /// No description provided for @songs_count.
   ///
   /// In zh_CN, this message translates to:
-  /// **'精选艺术家'**
-  String get featured_artists;
+  /// **'歌曲总数'**
+  String get songs_count;
 
-  /// No description provided for @featured_albums.
+  /// No description provided for @library_features.
   ///
   /// In zh_CN, this message translates to:
-  /// **'精选专辑'**
-  String get featured_albums;
+  /// **'音乐库功能'**
+  String get library_features;
 
-  /// No description provided for @songs.
+  /// No description provided for @access_library.
   ///
   /// In zh_CN, this message translates to:
-  /// **'首歌曲'**
-  String get songs;
+  /// **'访问音乐库'**
+  String get access_library;
+
+  /// No description provided for @scan_instructions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描说明'**
+  String get scan_instructions;
+
+  /// No description provided for @auto_extract_metadata.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动提取元数据'**
+  String get auto_extract_metadata;
+
+  /// No description provided for @add_custom_paths.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加自定义路径'**
+  String get add_custom_paths;
+
+  /// No description provided for @scan_completion.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描完成'**
+  String get scan_completion;
+
+  /// No description provided for @auto_metadata_extraction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动元数据提取'**
+  String get auto_metadata_extraction;
+
+  /// No description provided for @how_to_scan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'如何扫描'**
+  String get how_to_scan;
+
+  /// No description provided for @scan_step1.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'1. 点击扫描按钮开始扫描'**
+  String get scan_step1;
+
+  /// No description provided for @scan_step2.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'2. 系统会自动扫描默认音乐目录'**
+  String get scan_step2;
+
+  /// No description provided for @scan_step3.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'3. 可添加自定义目录扩展扫描范围'**
+  String get scan_step3;
+
+  /// No description provided for @scan_step4.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'4. 扫描完成后歌曲会自动添加到音乐库'**
+  String get scan_step4;
+
+  /// No description provided for @faq.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'常见问题'**
+  String get faq;
+
+  /// No description provided for @faq_scan_issue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描问题'**
+  String get faq_scan_issue;
+
+  /// No description provided for @faq_scan_issue_answer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'如果扫描失败，请检查文件权限和路径是否正确。'**
+  String get faq_scan_issue_answer;
+
+  /// No description provided for @faq_slow_scan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描缓慢'**
+  String get faq_slow_scan;
+
+  /// No description provided for @faq_slow_scan_answer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描速度取决于音乐库大小和硬盘性能，大库扫描可能需要较长时间。'**
+  String get faq_slow_scan_answer;
+
+  /// No description provided for @faq_not_showing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌曲未显示'**
+  String get faq_not_showing;
+
+  /// No description provided for @faq_not_showing_answer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确保音乐文件格式受支持，并检查文件是否损坏。'**
+  String get faq_not_showing_answer;
 
   /// No description provided for @music_scan.
   ///
@@ -670,53 +1060,11 @@ abstract class AppLocalizations {
   /// **'音乐扫描'**
   String get music_scan;
 
-  /// No description provided for @scan_local_music.
+  /// No description provided for @failed_to_open_github.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描本地音乐'**
-  String get scan_local_music;
-
-  /// No description provided for @search_error.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索错误'**
-  String get search_error;
-
-  /// No description provided for @no_matching_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未找到匹配的歌曲'**
-  String get no_matching_songs;
-
-  /// No description provided for @playback_error.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放错误'**
-  String get playback_error;
-
-  /// No description provided for @no_song_playing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'当前无歌曲播放'**
-  String get no_song_playing;
-
-  /// No description provided for @select_a_song_to_play.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'请选择一首歌曲进行播放'**
-  String get select_a_song_to_play;
-
-  /// No description provided for @unknown_user.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知用户'**
-  String get unknown_user;
-
-  /// No description provided for @my_account.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'我的账户'**
-  String get my_account;
+  /// **'无法打开GitHub页面'**
+  String get failed_to_open_github;
 
   /// No description provided for @select_language.
   ///
@@ -724,269 +1072,41 @@ abstract class AppLocalizations {
   /// **'选择语言'**
   String get select_language;
 
-  /// No description provided for @cancel.
+  /// No description provided for @unknown_user.
   ///
   /// In zh_CN, this message translates to:
-  /// **'取消'**
-  String get cancel;
+  /// **'未知用户'**
+  String get unknown_user;
 
-  /// No description provided for @failed_to_open_github.
+  /// No description provided for @tag_vip.
   ///
   /// In zh_CN, this message translates to:
-  /// **'无法打开 GitHub 页面'**
-  String get failed_to_open_github;
+  /// **'VIP'**
+  String get tag_vip;
 
-  /// No description provided for @theme_light.
+  /// No description provided for @tag_singer.
   ///
   /// In zh_CN, this message translates to:
-  /// **'浅色'**
-  String get theme_light;
+  /// **'歌手'**
+  String get tag_singer;
 
-  /// No description provided for @theme_dark.
+  /// No description provided for @tag_elite.
   ///
   /// In zh_CN, this message translates to:
-  /// **'深色'**
-  String get theme_dark;
-
-  /// No description provided for @theme_system.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'系统'**
-  String get theme_system;
-
-  /// No description provided for @bottom_player_bar_now_playing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在播放'**
-  String get bottom_player_bar_now_playing;
-
-  /// No description provided for @bottom_player_bar_no_song.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未选择歌曲'**
-  String get bottom_player_bar_no_song;
-
-  /// No description provided for @song_list_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌曲'**
-  String get song_list_title;
-
-  /// No description provided for @song_list_no_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未找到歌曲'**
-  String get song_list_no_songs;
-
-  /// No description provided for @settings_page_language.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'语言'**
-  String get settings_page_language;
+  /// **'精英'**
+  String get tag_elite;
 
   /// No description provided for @settings_page_theme.
   ///
   /// In zh_CN, this message translates to:
-  /// **'主题'**
+  /// **'主题设置'**
   String get settings_page_theme;
 
-  /// No description provided for @theme_name_trendy_electro.
+  /// No description provided for @settings_page_language.
   ///
   /// In zh_CN, this message translates to:
-  /// **'潮流电音'**
-  String get theme_name_trendy_electro;
-
-  /// No description provided for @theme_name_minimal_gray.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'极简灰'**
-  String get theme_name_minimal_gray;
-
-  /// No description provided for @theme_name_nature_forest.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自然森林'**
-  String get theme_name_nature_forest;
-
-  /// No description provided for @theme_name_cyber_neon.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'赛博霓虹'**
-  String get theme_name_cyber_neon;
-
-  /// No description provided for @theme_name_warm_healing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'温暖治愈'**
-  String get theme_name_warm_healing;
-
-  /// No description provided for @theme_name_dark_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'深色模式'**
-  String get theme_name_dark_mode;
-
-  /// No description provided for @theme_name_light_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'浅色模式'**
-  String get theme_name_light_mode;
-
-  /// No description provided for @theme_name_system_theme.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'系统主题'**
-  String get theme_name_system_theme;
-
-  /// No description provided for @library_page_artists.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get library_page_artists;
-
-  /// No description provided for @library_page_albums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get library_page_albums;
-
-  /// No description provided for @library_page_genres.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'流派'**
-  String get library_page_genres;
-
-  /// No description provided for @play_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放'**
-  String get play_button;
-
-  /// No description provided for @pause_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'暂停'**
-  String get pause_button;
-
-  /// No description provided for @next_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'下一首'**
-  String get next_button;
-
-  /// No description provided for @previous_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'上一首'**
-  String get previous_button;
-
-  /// No description provided for @favorite_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'收藏'**
-  String get favorite_button;
-
-  /// No description provided for @font_family.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'字体'**
-  String get font_family;
-
-  /// No description provided for @theme_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'主题模式'**
-  String get theme_mode;
-
-  /// No description provided for @light_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'浅色模式'**
-  String get light_mode;
-
-  /// No description provided for @dark_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'深色模式'**
-  String get dark_mode;
-
-  /// No description provided for @system_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'系统模式'**
-  String get system_mode;
-
-  /// No description provided for @artist_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get artist_title;
-
-  /// No description provided for @search_hint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索歌曲...'**
-  String get search_hint;
-
-  /// No description provided for @artist_hint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索艺术家...'**
-  String get artist_hint;
-
-  /// No description provided for @album_hint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索专辑...'**
-  String get album_hint;
-
-  /// No description provided for @now_playing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在播放'**
-  String get now_playing;
-
-  /// No description provided for @no_things_players.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'无播放器'**
-  String get no_things_players;
-
-  /// No description provided for @no_selected_song.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未选择歌曲'**
-  String get no_selected_song;
-
-  /// No description provided for @player_duration.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'时长'**
-  String get player_duration;
-
-  /// No description provided for @player_artist.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get player_artist;
-
-  /// No description provided for @player_album.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get player_album;
-
-  /// No description provided for @search_empty.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'输入搜索词以查找歌曲'**
-  String get search_empty;
-
-  /// No description provided for @search_no_results.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未找到与您的搜索匹配的歌曲'**
-  String get search_no_results;
+  /// **'语言设置'**
+  String get settings_page_language;
 
   /// No description provided for @language.
   ///
@@ -1000,89 +1120,23 @@ abstract class AppLocalizations {
   /// **'主题'**
   String get theme;
 
-  /// No description provided for @font.
+  /// No description provided for @system_mode.
   ///
   /// In zh_CN, this message translates to:
-  /// **'字体'**
-  String get font;
+  /// **'跟随系统'**
+  String get system_mode;
 
-  /// No description provided for @library_artists.
+  /// No description provided for @light_mode.
   ///
   /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get library_artists;
+  /// **'浅色模式'**
+  String get light_mode;
 
-  /// No description provided for @library_albums.
+  /// No description provided for @dark_mode.
   ///
   /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get library_albums;
-
-  /// No description provided for @library_genres.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'流派'**
-  String get library_genres;
-
-  /// No description provided for @profile_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'个人资料'**
-  String get profile_title;
-
-  /// No description provided for @username_default.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'用户'**
-  String get username_default;
-
-  /// No description provided for @user_email_default.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'user@example.com'**
-  String get user_email_default;
-
-  /// No description provided for @search_hint_text.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索...'**
-  String get search_hint_text;
-
-  /// No description provided for @search_page_hint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索歌曲...'**
-  String get search_page_hint;
-
-  /// No description provided for @search_page_empty.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'输入搜索词以查找歌曲'**
-  String get search_page_empty;
-
-  /// No description provided for @search_page_no_results.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未找到与您的搜索匹配的歌曲'**
-  String get search_page_no_results;
-
-  /// No description provided for @settings_page_about.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'关于'**
-  String get settings_page_about;
-
-  /// No description provided for @language_name_en.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'英语'**
-  String get language_name_en;
-
-  /// No description provided for @language_name_zh.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'中文'**
-  String get language_name_zh;
+  /// **'深色模式'**
+  String get dark_mode;
 
   /// No description provided for @english.
   ///
@@ -1093,13 +1147,13 @@ abstract class AppLocalizations {
   /// No description provided for @chinese_simplified.
   ///
   /// In zh_CN, this message translates to:
-  /// **'中文 (简体)'**
+  /// **'简体中文'**
   String get chinese_simplified;
 
   /// No description provided for @chinese_traditional.
   ///
   /// In zh_CN, this message translates to:
-  /// **'中文 (繁体)'**
+  /// **'繁体中文'**
   String get chinese_traditional;
 
   /// No description provided for @chinese.
@@ -1144,179 +1198,77 @@ abstract class AppLocalizations {
   /// **'西班牙语'**
   String get spanish;
 
-  /// No description provided for @playback_mode.
+  /// No description provided for @search_error.
   ///
   /// In zh_CN, this message translates to:
-  /// **'播放模式'**
-  String get playback_mode;
+  /// **'搜索错误'**
+  String get search_error;
+
+  /// No description provided for @error.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'错误'**
+  String get error;
+
+  /// No description provided for @network_error.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络错误'**
+  String get network_error;
+
+  /// No description provided for @permission_denied.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'权限被拒绝'**
+  String get permission_denied;
+
+  /// No description provided for @invalid_input.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无效输入'**
+  String get invalid_input;
+
+  /// No description provided for @search_no_results.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未找到搜索结果'**
+  String get search_no_results;
+
+  /// No description provided for @skipToPrevious.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'上一首'**
+  String get skipToPrevious;
+
+  /// No description provided for @skipToNext.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下一首'**
+  String get skipToNext;
+
+  /// No description provided for @playback_error.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放错误'**
+  String get playback_error;
+
+  /// No description provided for @no_song_playing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前无歌曲播放'**
+  String get no_song_playing;
+
+  /// No description provided for @select_a_song_to_play.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请选择一首歌曲播放'**
+  String get select_a_song_to_play;
 
   /// No description provided for @repeat_all.
   ///
   /// In zh_CN, this message translates to:
-  /// **'全部重复'**
+  /// **'全部循环'**
   String get repeat_all;
-
-  /// No description provided for @repeat_one.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'单曲重复'**
-  String get repeat_one;
-
-  /// No description provided for @shuffle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'随机播放'**
-  String get shuffle;
-
-  /// No description provided for @audio_effects.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音频效果'**
-  String get audio_effects;
-
-  /// No description provided for @enable_equalizer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'启用均衡器'**
-  String get enable_equalizer;
-
-  /// No description provided for @bass_boost.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'低音增强'**
-  String get bass_boost;
-
-  /// No description provided for @spatial_audio.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'空间音频'**
-  String get spatial_audio;
-
-  /// No description provided for @account_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'账户设置'**
-  String get account_settings;
-
-  /// No description provided for @general_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'常规'**
-  String get general_tab;
-
-  /// No description provided for @library_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get library_tab;
-
-  /// No description provided for @account_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'账户'**
-  String get account_tab;
-
-  /// No description provided for @playback_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放'**
-  String get playback_tab;
-
-  /// No description provided for @about_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'关于'**
-  String get about_tab;
-
-  /// No description provided for @animations_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'动画'**
-  String get animations_tab;
-
-  /// No description provided for @username.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'用户名'**
-  String get username;
-
-  /// No description provided for @auto_login.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自动登录'**
-  String get auto_login;
-
-  /// No description provided for @save_password.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'保存密码'**
-  String get save_password;
-
-  /// No description provided for @account_settings_saved.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'账户设置已保存'**
-  String get account_settings_saved;
-
-  /// No description provided for @save.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'保存'**
-  String get save;
-
-  /// No description provided for @search_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索歌曲...'**
-  String get search_songs;
-
-  /// No description provided for @artists.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get artists;
-
-  /// No description provided for @albums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get albums;
-
-  /// No description provided for @load_stats_failed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'加载统计信息失败'**
-  String get load_stats_failed;
-
-  /// No description provided for @load_songs_failed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'加载歌曲失败'**
-  String get load_songs_failed;
-
-  /// No description provided for @add_to_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加到音乐库'**
-  String get add_to_library;
-
-  /// No description provided for @scan_completed_no_new_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描完成，未找到新歌曲'**
-  String get scan_completed_no_new_songs;
-
-  /// No description provided for @added_scanned_songs_to_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'已将扫描的歌曲添加到音乐库'**
-  String get added_scanned_songs_to_library;
-
-  /// No description provided for @rescan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重新扫描'**
-  String get rescan;
 }
 
 class _AppLocalizationsDelegate

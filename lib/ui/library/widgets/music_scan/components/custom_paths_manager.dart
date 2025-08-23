@@ -45,6 +45,7 @@ class CustomPathsManager extends StatelessWidget {
           if (customScanPaths.isNotEmpty) ...[
             const Text('自定义扫描路径:'),
             const SizedBox(height: 8),
+            // 移除Expanded包装，直接使用ListView.builder
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

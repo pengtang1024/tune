@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/core/settings/states/playback_settings_state.dart';
 
 /// 播放设置状态管理器
 class PlaybackSettingsStateNotifier extends StateNotifier<PlaybackSettingsState> {
-  PlaybackSettingsStateNotifier() : super(PlaybackSettingsState.initial());
+  final Ref _ref;
+
+  PlaybackSettingsStateNotifier(this._ref) : super(PlaybackSettingsState.initial());
 
   /// 更新播放模式
   void updatePlayMode(String playMode) {
@@ -25,7 +28,7 @@ class PlaybackSettingsStateNotifier extends StateNotifier<PlaybackSettingsState>
     state = state.copyWith(playMode: mode);
   }
 
-  /// 切换均衡器
+  /// 切换启用均衡器
   void toggleEqualizer(bool value) {
     state = state.copyWith(isEqualizerEnabled: value);
   }
@@ -42,6 +45,14 @@ class PlaybackSettingsStateNotifier extends StateNotifier<PlaybackSettingsState>
 
   /// 保存设置
   void saveSettings() {
-    // TODO: 实现保存设置到持久化存储的逻辑
+    try {
+      final persistenceService = _ref.read(sharedPreferencesServiceProvider);
+      persistenceService.setBool('playback_enable_equalizer', state.isEqualizerEnabled);
+      persistenceService.setBool('playback_bass_boost', state.isBassBoostEnabled);
+      persistenceService.setBool('playback_spatial_audio', state.isSpatialAudioEnabled);
+    } catch (e) {
+      // 错误处理，但不中断主流程
+      print('保存播放设置失败: $e');
+    }
   }
 }

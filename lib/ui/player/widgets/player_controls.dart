@@ -1,8 +1,8 @@
+import 'package:tune/ui/player/widgets/play_pause_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 
-/// 播放控制组件
 class PlayerControls extends ConsumerWidget {
   const PlayerControls({super.key});
 
@@ -17,23 +17,15 @@ class PlayerControls extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.skip_previous),
           iconSize: 48.0,
-          onPressed: playerState.currentSong != null ? playerNotifier.skipToPrevious : null,
+          onPressed: playerState.currentSong != null ? playerNotifier.previous : null,
         ),
         const SizedBox(width: 16.0),
-        FloatingActionButton(
-          onPressed: playerState.currentSong != null
-              ? (playerState.isPlaying ? playerNotifier.pause : playerNotifier.play)
-              : null,
-          child: Icon(
-            playerState.isPlaying ? Icons.pause : Icons.play_arrow,
-            size: 48.0,
-          ),
-        ),
+        const PlayPauseButton(),
         const SizedBox(width: 16.0),
         IconButton(
           icon: const Icon(Icons.skip_next),
           iconSize: 48.0,
-          onPressed: playerState.currentSong != null ? playerNotifier.skipToNext : null,
+          onPressed: playerState.currentSong != null ? playerNotifier.next : null,
         ),
       ],
     );

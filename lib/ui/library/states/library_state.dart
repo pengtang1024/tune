@@ -10,6 +10,7 @@ class LibraryState {
   final List<Song> songs;
   final bool isLoading;
   final String? errorMessage;
+  final List<Song> searchResults;
 
   // 音乐扫描相关字段
   final ScanStatus scanStatus;
@@ -24,6 +25,7 @@ class LibraryState {
     required this.songs,
     required this.isLoading,
     this.errorMessage,
+    required this.searchResults,
     this.scanStatus = ScanStatus.idle,
     this.scanProgress = 0.0,
     this.foundSongs = const [],
@@ -37,6 +39,7 @@ class LibraryState {
     List<Song>? songs,
     bool? isLoading,
     String? errorMessage,
+    List<Song>? searchResults,
     ScanStatus? scanStatus,
     double? scanProgress,
     List<Song>? foundSongs,
@@ -49,6 +52,7 @@ class LibraryState {
       songs: songs ?? this.songs,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      searchResults: searchResults ?? this.searchResults,
       scanStatus: scanStatus ?? this.scanStatus,
       scanProgress: scanProgress ?? this.scanProgress,
       foundSongs: foundSongs ?? this.foundSongs,
@@ -61,21 +65,9 @@ class LibraryState {
       isGridView: false,
       searchQuery: '',
       selectedMenuItemIndex: 0,
-      songs: [],
+      songs: const [],
       isLoading: false,
+      searchResults: const [],
     );
-  }
-
-  List<Song> get searchResults {
-    if (searchQuery.isEmpty) {
-      return songs;
-    }
-
-    final query = searchQuery.toLowerCase();
-    return songs.where((song) {
-      return song.title.toLowerCase().contains(query) ||
-          (song.artist.toLowerCase().contains(query)) ||
-          (song.album.toLowerCase().contains(query));
-    }).toList();
   }
 }

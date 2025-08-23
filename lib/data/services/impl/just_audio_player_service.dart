@@ -46,41 +46,73 @@ class JustAudioPlayerService implements AudioPlayerService {
 
   @override
   Future<void> pause() async {
-    if (_audioPlayer != null) {
-      await _audioPlayer!.pause();
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer!.pause();
+      }
+    } catch (e) {
+      Log.error('暂停播放失败: $e');
+      rethrow;
     }
   }
 
   @override
   Future<void> resume() async {
-    if (_audioPlayer != null) {
-      await _audioPlayer!.play();
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer!.play();
+      }
+    } catch (e) {
+      Log.error('恢复播放失败: $e');
+      rethrow;
     }
   }
 
   @override
   Future<void> stop() async {
-    if (_audioPlayer != null) {
-      await _audioPlayer!.stop();
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer!.stop();
+      }
+    } catch (e) {
+      Log.error('停止播放失败: $e');
+      rethrow;
     }
   }
 
   @override
   Future<void> seekTo(Duration position) async {
-    if (_audioPlayer != null) {
-      await _audioPlayer!.seek(position);
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer!.seek(position);
+      }
+    } catch (e) {
+      Log.error('跳转到指定位置失败: $e');
+      rethrow;
     }
   }
 
   @override
   Future<void> setVolume(double volume) async {
-    if (_audioPlayer != null) {
-      await _audioPlayer!.setVolume(volume);
+    try {
+      if (_audioPlayer != null) {
+        await _audioPlayer!.setVolume(volume);
+      }
+    } catch (e) {
+      Log.error('设置音量失败: $e');
+      rethrow;
     }
   }
 
   @override
-  Duration get currentPosition => _audioPlayer?.position ?? Duration.zero;
+  Duration get currentPosition {
+    try {
+      return _audioPlayer?.position ?? Duration.zero;
+    } catch (e) {
+      Log.error('获取当前播放位置失败: $e');
+      return Duration.zero;
+    }
+  }
 
   @override
   Duration get duration {
@@ -105,7 +137,11 @@ class JustAudioPlayerService implements AudioPlayerService {
 
   @override
   void dispose() {
-    _audioPlayer?.dispose();
-    _audioPlayer = null;
+    try {
+      _audioPlayer?.dispose();
+      _audioPlayer = null;
+    } catch (e) {
+      Log.error('释放音频播放器资源失败: $e');
+    }
   }
 }

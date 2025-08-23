@@ -8,8 +8,6 @@ class RecommendPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-
     return Scaffold(
       body: const Center(
         child: Column(
@@ -112,7 +110,13 @@ class _RecommendItem extends StatelessWidget {
           subtitle: Text(subtitle),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
-            // TODO: 实现点击推荐项的逻辑
+            // 点击推荐项的逻辑：显示SnackBar提示
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('点击了推荐项: $title'),
+                duration: const Duration(seconds: 1),
+              ),
+            );
           },
         ),
       ),

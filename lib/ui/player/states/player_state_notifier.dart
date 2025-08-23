@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/ui/player/services/play_mode_service.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
+import 'package:tune/utils/logger.dart';
 
 /// 播放器状态管理器
 class PlayerStateNotifier extends StateNotifier<PlayerState> {
@@ -24,13 +25,26 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   /// 初始化播放器
   void _initializePlayer() {
     // 实时更新播放位置
-    _positionSubscription = Stream.periodic(const Duration(milliseconds: 60)).listen((_) {
-      if (state.currentSong != null && _audioPlayerService.isPlaying) {
-        state = state.copyWith(
-          position: _audioPlayerService.currentPosition,
-          duration: _audioPlayerService.duration,
-          isPlaying: _audioPlayerService.isPlaying,
-        );
+    _positionSubscription = Stream.periodic(const Duration(milliseconds: 100)).listen((_) {
+      try {
+        if (state.currentSong != null) {
+          final isPlaying = _audioPlayerService.isPlaying;
+          final position = _audioPlayerService.currentPosition;
+          final duration = _audioPlayerService.duration;
+          
+          // 只有当状态发生变化时才更新
+          if (state.isPlaying != isPlaying || 
+              state.position != position || 
+              state.duration != duration) {
+            state = state.copyWith(
+              isPlaying: isPlaying,
+              position: position,
+              duration: duration,
+            );
+          }
+        }
+      } catch (e) {
+        Log.error('更新播放位置时出错: $e');
       }
     });
   }
@@ -57,6 +71,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         _audioPlayerService.duration,
       ).copyWith(playMode: state.playMode);
     } catch (e) {
+      Log.error('播放歌曲失败: $e');
       // 播放出错，更新状态为错误
       state = PlayerState.error('播放歌曲失败: $e');
     }
@@ -64,83 +79,107 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
 
   /// 暂停播放
   Future<void> pause() async {
-    if (state.isPlaying && state.currentSong != null) {
-      await _audioPlayerService.pause();
-      state = state.copyWith(isPlaying: false);
+    try {
+      if (state.isPlaying && state.currentSong != null) {
+        await _audioPlayerService.pause();
+        state = state.copyWith(isPlaying: false);
+      }
+    } catch (e) {
+      Log.error('暂停播放失败: $e');
     }
   }
 
   /// 继续播放
   Future<void> play() async {
-    if (!state.isPlaying && state.currentSong != null) {
-      await _audioPlayerService.resume();
-      state = state.copyWith(isPlaying: true);
+    try {
+      if (!state.isPlaying && state.currentSong != null) {
+        await _audioPlayerService.resume();
+        state = state.copyWith(isPlaying: true);
+      }
+    } catch (e) {
+      Log.error('继续播放失败: $e');
     }
   }
 
   /// 停止播放
   Future<void> stop() async {
-    await _audioPlayerService.stop();
-    state = PlayerState.initial();
+    try {
+      await _audioPlayerService.stop();
+      state = PlayerState.initial();
+    } catch (e) {
+      Log.error('停止播放失败: $e');
+    }
   }
 
   /// 跳转到指定位置
   Future<void> seekTo(Duration position) async {
-    if (state.currentSong != null) {
-      await _audioPlayerService.seekTo(position);
-      state = state.copyWith(position: position);
+    try {
+      if (state.currentSong != null) {
+        await _audioPlayerService.seekTo(position);
+        state = state.copyWith(position: position);
+      }
+    } catch (e) {
+      Log.error('跳转到指定位置失败: $e');
     }
   }
 
   /// 设置音量
   Future<void> setVolume(double volume) async {
-    await _audioPlayerService.setVolume(volume);
-    state = state.copyWith(volume: volume);
+    try {
+      await _audioPlayerService.setVolume(volume);
+      state = state.copyWith(volume: volume);
+    } catch (e) {
+      Log.error('设置音量失败: $e');
+    }
   }
 
   /// 切换播放模式
   void togglePlayMode() {
-    final nextMode = PlayModeService.getNextPlayMode(state.playMode);
+    final nextMode = PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
     state = state.copyWith(playMode: nextMode);
   }
 
-  /// 获取当前播放模式
-  PlayMode get playMode => state.playMode;
-
   /// 播放下一首
-  void skipToNext() {
-    if (_playlist.isEmpty || _currentIndex < 0) return;
+  void next() {
+    if (_playlist.isEmpty) return;
     
-    // 计算下一首歌曲的索引
-    final nextIndex = PlayModeService.getNextIndex(_currentIndex, _playlist.length, state.playMode);
-    if (nextIndex >= 0) {
-      _currentIndex = nextIndex;
-      playSong(_playlist[_currentIndex]);
+    switch (state.playMode) {
+      case PlayMode.sequential:
+        _currentIndex = (_currentIndex + 1) % _playlist.length;
+        break;
+      case PlayMode.repeatOne:
+        // 保持当前索引不变
+        break;
+      case PlayMode.shuffle:
+        _currentIndex = Random().nextInt(_playlist.length);
+        break;
     }
+    
+    playSong(_playlist[_currentIndex]);
   }
 
   /// 播放上一首
-  void skipToPrevious() {
-    if (_playlist.isEmpty || _currentIndex < 0) return;
+  void previous() {
+    if (_playlist.isEmpty) return;
     
-    // 如果当前播放位置超过3秒，则回到开头而不是播放上一首
-    if (state.position.inSeconds > 3) {
-      seekTo(Duration.zero);
-      return;
+    switch (state.playMode) {
+      case PlayMode.sequential:
+        _currentIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
+        break;
+      case PlayMode.repeatOne:
+        // 保持当前索引不变
+        break;
+      case PlayMode.shuffle:
+        _currentIndex = Random().nextInt(_playlist.length);
+        break;
     }
     
-    // 计算上一首歌曲的索引
-    final previousIndex = PlayModeService.getPreviousIndex(_currentIndex, _playlist.length, state.playMode);
-    if (previousIndex >= 0) {
-      _currentIndex = previousIndex;
-      playSong(_playlist[_currentIndex]);
-    }
+    playSong(_playlist[_currentIndex]);
   }
 
   @override
   void dispose() {
     _positionSubscription?.cancel();
-    _audioPlayerService.dispose();
     super.dispose();
   }
 }

@@ -34,6 +34,9 @@ abstract class CrossPlatformMusicScanner {
 
   /// 获取默认音乐路径
   List<String> getDefaultMusicPaths();
+  
+  /// 扫描自定义路径
+  Future<List<Song>> scanCustomPaths(List<String> paths);
 }
 
 /// 跨平台音乐扫描服务实现
@@ -289,6 +292,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     }
   }
 
+  @override
   Future<List<Song>> scanCustomPaths(List<String> paths) async {
     final allSongs = <Song>[];
     
