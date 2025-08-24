@@ -22,12 +22,14 @@ class MiniPlayer extends ConsumerWidget {
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           top: BorderSide(
+            // ignore: deprecated_member_use
             color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
             width: 0.5,
           ),
         ),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 2,
             offset: const Offset(0, -1),

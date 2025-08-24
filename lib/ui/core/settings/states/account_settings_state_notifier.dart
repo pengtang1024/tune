@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/core/settings/states/account_settings_state.dart';
+import 'package:tune/utils/logger.dart';
 
 /// 账户设置状态管理器
 class AccountSettingsStateNotifier extends StateNotifier<AccountSettingsState> {
@@ -38,7 +39,7 @@ class AccountSettingsStateNotifier extends StateNotifier<AccountSettingsState> {
       persistenceService.setBool('account_save_password', state.savePassword);
     } catch (e) {
       // 错误处理，但不中断主流程
-      print('保存账户设置失败: $e');
+      Log.error('保存账户设置失败: $e');
     }
   }
 }

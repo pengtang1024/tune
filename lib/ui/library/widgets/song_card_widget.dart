@@ -26,7 +26,7 @@ class SongCardWidget extends ConsumerWidget {
           // 跳转到播放器页面
           context.push('/player');
         },
-        splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
+        splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         highlightColor: Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         child: Padding(

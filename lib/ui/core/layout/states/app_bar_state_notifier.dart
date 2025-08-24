@@ -17,9 +17,7 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
 
   /// 初始化支持的语言列表
   void _initSupportedLocales() {
-    state = state.copyWith(
-      supportedLocales: AppLocalizations.supportedLocales,
-    );
+    state = state.copyWith(supportedLocales: AppLocalizations.supportedLocales);
   }
 
   /// 初始化用户信息
@@ -38,7 +36,10 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
 
     // 加载主题模式
     final themeModeIndex = sharedPrefs.getInt('theme_mode');
-    final themeMode = themeModeIndex != null && themeModeIndex >= 0 && themeModeIndex < ThemeMode.values.length
+    final themeMode =
+        themeModeIndex != null &&
+            themeModeIndex >= 0 &&
+            themeModeIndex < ThemeMode.values.length
         ? ThemeMode.values[themeModeIndex]
         : ThemeMode.system;
 
@@ -50,8 +51,10 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       // 如果有保存的语言设置，则使用保存的设置
       try {
         locale = AppLocalizations.supportedLocales.firstWhere(
-          (supportedLocale) => supportedLocale.languageCode == languageCode &&
-                              (countryCode == null || supportedLocale.countryCode == countryCode),
+          (supportedLocale) =>
+              supportedLocale.languageCode == languageCode &&
+              (countryCode == null ||
+                  supportedLocale.countryCode == countryCode),
         );
       } catch (e) {
         // 如果找不到匹配的语言环境，则使用默认语言环境
@@ -63,8 +66,10 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       try {
         // 尝试匹配系统语言
         locale = AppLocalizations.supportedLocales.firstWhere(
-          (supportedLocale) => supportedLocale.languageCode == systemLocale.languageCode &&
-                              (supportedLocale.countryCode == null || supportedLocale.countryCode == systemLocale.countryCode),
+          (supportedLocale) =>
+              supportedLocale.languageCode == systemLocale.languageCode &&
+              (supportedLocale.countryCode == null ||
+                  supportedLocale.countryCode == systemLocale.countryCode),
         );
       } catch (e) {
         // 如果系统语言不支持，则使用英语作为默认语言
@@ -72,10 +77,7 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
       }
     }
 
-    state = state.copyWith(
-      themeMode: themeMode,
-      locale: locale,
-    );
+    state = state.copyWith(themeMode: themeMode, locale: locale);
   }
 
   /// 保存主题模式
@@ -86,7 +88,7 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
 
   /// 保存语言设置
   Future<void> _saveLanguage(Locale locale) async {
-    final sharedPrefs= ref.read(sharedPreferencesServiceProvider);
+    final sharedPrefs = ref.read(sharedPreferencesServiceProvider);
     await sharedPrefs.setString('language_code', locale.languageCode);
     if (locale.countryCode != null) {
       await sharedPrefs.setString('country_code', locale.countryCode!);
@@ -113,10 +115,7 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
   void updateAppBar(String title, bool showBackButton) {
     // 只有当状态真正改变时才更新
     if (state.title != title || state.showBackButton != showBackButton) {
-      state = state.copyWith(
-        title: title,
-        showBackButton: showBackButton,
-      );
+      state = state.copyWith(title: title, showBackButton: showBackButton);
     }
   }
 
@@ -251,6 +250,27 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
     if (state.themeMode != themeMode) {
       state = state.copyWith(themeMode: themeMode);
       _saveThemeMode(themeMode);
+    }
+  }
+
+  /// 更新未读通知数量
+  void updateUnreadNotificationCount(int count) {
+    if (state.unreadNotificationCount != count) {
+      state = state.copyWith(unreadNotificationCount: count);
+    }
+  }
+
+  /// 增加未读通知数量
+  void incrementUnreadNotificationCount() {
+    state = state.copyWith(
+      unreadNotificationCount: state.unreadNotificationCount + 1,
+    );
+  }
+
+  /// 重置未读通知数量
+  void resetUnreadNotificationCount() {
+    if (state.unreadNotificationCount != 0) {
+      state = state.copyWith(unreadNotificationCount: 0);
     }
   }
 }

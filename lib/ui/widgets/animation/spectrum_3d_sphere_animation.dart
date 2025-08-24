@@ -14,8 +14,6 @@ class Spectrum3DSphereAnimation extends ThemedAnimationBase {
 
 class _Spectrum3DSphereAnimationState
     extends ThemedAnimationStateBase<Spectrum3DSphereAnimation> {
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();

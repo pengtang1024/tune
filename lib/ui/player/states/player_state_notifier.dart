@@ -6,7 +6,6 @@ import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/app_bar_providers.dart';
-import 'package:tune/ui/core/layout/states/app_bar_state_notifier.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/utils/logger.dart';
@@ -91,23 +90,23 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   Future<void> playSong(Song song) async {
     try {
       Log.info('开始播放歌曲: ${song.title}');
-      
+
       // 添加到播放历史记录
       _addToPlayHistory(song);
-      
+
       // 更新状态为加载中
       state = PlayerState.loading(song);
 
       // 播放歌曲
       await _audioPlayerService.play(song);
-      
+
       // 更新应用栏标题为歌曲名称
       final appBarNotifier = _ref.read(appBarStateNotifierProvider.notifier);
       appBarNotifier.updateTitle(song.title);
-      
+
       // 等待一小段时间确保播放器状态稳定
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       // 更新状态为播放中
       state = PlayerState.playing(
         song,
@@ -115,7 +114,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         _audioPlayerService.duration,
         _audioPlayerService.speed,
       ).copyWith(playMode: state.playMode);
-      
+
       Log.info('歌曲播放成功: ${song.title}');
     } catch (e, stackTrace) {
       Log.error('播放歌曲失败: $e\nStack trace: $stackTrace');
@@ -383,6 +382,9 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
     } catch (e, stackTrace) {
       Log.error('释放播放器状态管理器时出错: $e\nStack trace: $stackTrace');
       // 可以考虑添加更多错误处理逻辑
+    } finally {
+      // 确保调用父类的dispose方法
+      super.dispose();
     }
   }
 }

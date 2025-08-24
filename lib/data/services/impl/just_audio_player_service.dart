@@ -2,7 +2,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
-import 'dart:io' show Platform;
 
 /// 基于just_audio的音频播放服务实现
 class JustAudioPlayerService implements AudioPlayerService {
@@ -28,17 +27,17 @@ class JustAudioPlayerService implements AudioPlayerService {
         await init();
       }
 
-      // 优先使用uri字段，如果uri为空则使用data字段
-      final String audioPath = song.uri ?? song.data;
+      // 使用song.uri作为音频路径
+      final String audioPath = song.uri;
 
       // 检查音频路径是否为空
-      if (audioPath == null || audioPath.isEmpty) {
+      if (audioPath.isEmpty) {
         Log.error('音频文件路径为空');
         throw Exception('音频文件路径为空');
       }
 
       Log.info('尝试播放音频文件: $audioPath');
-      
+
       // 使用Uri.file处理路径，以提高兼容性
       await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
       await _audioPlayer!.play();

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/core/settings/states/playback_settings_state.dart';
+import 'package:tune/utils/logger.dart';
 
 /// 播放设置状态管理器
 class PlaybackSettingsStateNotifier extends StateNotifier<PlaybackSettingsState> {
@@ -51,8 +52,8 @@ class PlaybackSettingsStateNotifier extends StateNotifier<PlaybackSettingsState>
       persistenceService.setBool('playback_bass_boost', state.isBassBoostEnabled);
       persistenceService.setBool('playback_spatial_audio', state.isSpatialAudioEnabled);
     } catch (e) {
-      // 错误处理，但不中断主流程
-      print('保存播放设置失败: $e');
-    }
+        // 错误处理，但不中断主流程
+        Log.error('保存播放设置失败: $e');
+      }
   }
 }

@@ -13,8 +13,6 @@ class WaveformGridAnimation extends ThemedAnimationBase {
 
 class _WaveformGridAnimationState
     extends ThemedAnimationStateBase<WaveformGridAnimation> {
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();

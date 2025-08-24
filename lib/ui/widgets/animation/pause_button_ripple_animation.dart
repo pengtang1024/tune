@@ -12,8 +12,6 @@ class PauseButtonRippleAnimation extends ThemedAnimationBase {
 
 class _PauseButtonRippleAnimationState
     extends ThemedAnimationStateBase<PauseButtonRippleAnimation> {
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();

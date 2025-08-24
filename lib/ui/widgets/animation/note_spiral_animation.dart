@@ -54,9 +54,6 @@ class _SpiralNotePainter extends CustomPainter {
     // 绘制3个螺旋上升的音符
     final noteCount = 3;
     for (int i = 0; i < noteCount; i++) {
-      // 螺旋线螺距固定（50px/圈）
-      final pitch = 50.0;
-
       // 时间偏移，使音符间隔均匀
       final timeOffset = i / noteCount;
       final currentProgress = (progress + timeOffset) % 1.0;

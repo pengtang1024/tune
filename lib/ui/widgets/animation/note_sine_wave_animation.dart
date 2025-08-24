@@ -13,8 +13,6 @@ class NoteSineWaveAnimation extends ThemedAnimationBase {
 
 class _NoteSineWaveAnimationState
     extends ThemedAnimationStateBase<NoteSineWaveAnimation> {
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();
@@ -44,10 +42,6 @@ class _SineWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = theme.colorScheme.primary
-      ..style = PaintingStyle.fill;
-
     // 绘制3个沿正弦曲线移动的音符
     for (int i = 0; i < 3; i++) {
       final x = (progress * size.width + i * 30) % (size.width + 60) - 30;

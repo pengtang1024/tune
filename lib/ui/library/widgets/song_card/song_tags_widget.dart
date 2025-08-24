@@ -28,7 +28,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.year != null && song.year != 0) {
       tags.add(_buildTag(
         text: song.year.toString(),
-        bgColor: Colors.green.withOpacity(0.1),
+        bgColor: Colors.green.withValues(alpha: 0.1),
         textColor: Colors.green,
       ));
     }
@@ -37,7 +37,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.genre != null && song.genre!.isNotEmpty) {
       tags.add(_buildTag(
         text: song.genre!,
-        bgColor: Colors.purple.withOpacity(0.1),
+        bgColor: Colors.purple.withValues(alpha: 0.1),
         textColor: Colors.purple,
       ));
     }
@@ -46,7 +46,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.bitrate != null && song.bitrate != 0) {
       tags.add(_buildTag(
         text: '${song.bitrate}kbps',
-        bgColor: Colors.blue.withOpacity(0.1),
+        bgColor: Colors.blue.withValues(alpha: 0.1),
         textColor: Colors.blue,
       ));
     }
@@ -55,7 +55,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.sampleRate != null && song.sampleRate != 0) {
       tags.add(_buildTag(
         text: '${song.sampleRate}Hz',
-        bgColor: Colors.orange.withOpacity(0.1),
+        bgColor: Colors.orange.withValues(alpha: 0.1),
         textColor: Colors.orange,
       ));
     }
@@ -64,7 +64,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.trackNumber != null && song.trackNumber != 0) {
       tags.add(_buildTag(
         text: '#${song.trackNumber}',
-        bgColor: Colors.indigo.withOpacity(0.1),
+        bgColor: Colors.indigo.withValues(alpha: 0.1),
         textColor: Colors.indigo,
       ));
     }
@@ -73,7 +73,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.discNumber != null && song.discNumber != 0) {
       tags.add(_buildTag(
         text: 'Disc ${song.discNumber}',
-        bgColor: Colors.pink.withOpacity(0.1),
+        bgColor: Colors.pink.withValues(alpha: 0.1),
         textColor: Colors.pink,
       ));
     }
@@ -82,7 +82,7 @@ class SongTagsWidget extends StatelessWidget {
     if (song.size != null && song.size != 0) {
       tags.add(_buildTag(
         text: _formatFileSize(song.size!),
-        bgColor: Colors.teal.withOpacity(0.1),
+        bgColor: Colors.teal.withValues(alpha: 0.1),
         textColor: Colors.teal,
       ));
     }
@@ -91,8 +91,8 @@ class SongTagsWidget extends StatelessWidget {
     if (song.isFavorite) {
       tags.add(_buildTag(
         text: '♥',
-        bgColor: Colors.red.withOpacity(0.1),
-        textColor: Colors.red,
+          bgColor: Colors.red.withValues(alpha: 0.1),
+          textColor: Colors.red,
       ));
     }
 

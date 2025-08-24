@@ -6,10 +6,10 @@ import 'package:tune/ui/core/layout/widgets/custom_app_bar/back_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/clear_data_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/github_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/language_button.dart';
+import 'package:tune/ui/core/layout/widgets/custom_app_bar/notification_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/play_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/theme_toggle_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/user_menu_button.dart';
-
 
 /// 自定义AppBar组件
 /// 实现全局唯一的标题栏，所有页面共享同一实例
@@ -32,6 +32,9 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
       actions: [
         // 动态按钮（最右侧，从右到左排列）
         ...appBarState.dynamicActions,
+
+        // 通知按钮
+        const NotificationButton(),
 
         // 清理数据按钮（动态按钮左侧）
         const ClearDataButton(),

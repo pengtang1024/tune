@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/ui/widgets/animation/album_cover_particle_animation.dart';
+import 'package:tune/ui/widgets/animation/album_cover_rotate_animation.dart';
 import 'package:tune/ui/widgets/animation/album_cover_rotation_animation.dart';
 import 'package:tune/ui/widgets/animation/album_floating_animation.dart';
 import 'package:tune/ui/widgets/animation/album_page_flip_animation.dart';
@@ -8,7 +10,12 @@ import 'package:tune/ui/widgets/animation/album_swing_animation.dart';
 import 'package:tune/ui/widgets/animation/audio_peak_blast_animation.dart';
 import 'package:tune/ui/widgets/animation/audio_peak_explosion_animation.dart';
 import 'package:tune/ui/widgets/animation/audio_peak_fireworks_animation.dart';
+import 'package:tune/ui/widgets/animation/audio_ripple_animation.dart';
+import 'package:tune/ui/widgets/animation/audio_spectrum_grid_animation.dart';
 import 'package:tune/ui/widgets/animation/audio_visualizer_animation.dart';
+import 'package:tune/ui/widgets/animation/audio_visualizer_ring_animation.dart';
+import 'package:tune/ui/widgets/animation/audio_wave_cube_animation.dart';
+import 'package:tune/ui/widgets/animation/audio_wave_distortion_animation.dart';
 import 'package:tune/ui/widgets/animation/audio_wave_elastic_animation.dart';
 import 'package:tune/ui/widgets/animation/circular_spectrum_animation.dart';
 import 'package:tune/ui/widgets/animation/cube_spectrum_animation.dart';
@@ -24,15 +31,24 @@ import 'package:tune/ui/widgets/animation/lyrics_gradient_animation.dart';
 import 'package:tune/ui/widgets/animation/lyrics_highlight_animation.dart';
 import 'package:tune/ui/widgets/animation/lyrics_line_scale_animation.dart';
 import 'package:tune/ui/widgets/animation/lyrics_word_bounce_animation.dart';
+import 'package:tune/ui/widgets/animation/music_beat_particle_animation.dart';
+import 'package:tune/ui/widgets/animation/music_particle_connect_animation.dart';
+import 'package:tune/ui/widgets/animation/music_spectrum_cube_animation.dart';
+import 'package:tune/ui/widgets/animation/music_spectrum_particle_animation.dart';
+import 'package:tune/ui/widgets/animation/music_wave_particle_animation.dart';
+import 'package:tune/ui/widgets/animation/note_bounce_animation.dart';
 import 'package:tune/ui/widgets/animation/note_bouncing_animation.dart';
 import 'package:tune/ui/widgets/animation/note_collision_stack_animation.dart';
+import 'package:tune/ui/widgets/animation/note_fall_animation.dart';
 import 'package:tune/ui/widgets/animation/note_particle_animation.dart';
 import 'package:tune/ui/widgets/animation/note_rain_animation.dart';
+import 'package:tune/ui/widgets/animation/note_rotate_animation.dart';
 import 'package:tune/ui/widgets/animation/note_sine_wave_animation.dart';
 import 'package:tune/ui/widgets/animation/note_spiral_animation.dart';
 import 'package:tune/ui/widgets/animation/page_dissolve_transition_animation.dart';
 import 'package:tune/ui/widgets/animation/particle_album_aggregation_animation.dart';
 import 'package:tune/ui/widgets/animation/particle_grid_wave_animation.dart';
+import 'package:tune/ui/widgets/animation/particle_orbit_animation.dart';
 import 'package:tune/ui/widgets/animation/particle_vortex_animation.dart';
 import 'package:tune/ui/widgets/animation/particle_wave_flow_animation.dart';
 import 'package:tune/ui/widgets/animation/pause_button_ripple_animation.dart';
@@ -42,6 +58,7 @@ import 'package:tune/ui/widgets/animation/play_button_pulse_animation.dart';
 import 'package:tune/ui/widgets/animation/play_pause_rotation_animation.dart';
 import 'package:tune/ui/widgets/animation/play_state_pulse_animation.dart';
 import 'package:tune/ui/widgets/animation/playing_state_animation.dart';
+import 'package:tune/ui/widgets/animation/playlist_expand_animation.dart';
 import 'package:tune/ui/widgets/animation/progress_bar_segmented_loading_animation.dart';
 import 'package:tune/ui/widgets/animation/progress_pulse_animation.dart';
 import 'package:tune/ui/widgets/animation/progress_time_scroll_animation.dart';
@@ -69,12 +86,7 @@ class AnimationsTab extends ConsumerStatefulWidget {
 }
 
 class _AnimationsTabState extends ConsumerState<AnimationsTab> {
-  final bool _isFavorite = false;
   final bool _isPlaying = false;
-  final bool _expanded = false;
-  final double _volume = 0.5;
-  final double _progress = 0.3;
-  final int _count = 128;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +197,54 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
       AnimationItem(name: '波形网格', widget: const WaveformGridAnimation()),
       AnimationItem(name: '播放按钮脉冲动画', widget: const PlayButtonPulseAnimation()),
       AnimationItem(name: '音符粒子动画', widget: const NoteParticleAnimation()),
+      // 新增的动画组件
+      AnimationItem(
+        name: '专辑封面粒子动画',
+        widget: const AlbumCoverParticleAnimation(),
+      ),
+      AnimationItem(
+        name: '专辑封面旋转动画',
+        widget: const AlbumCoverRotateAnimation(),
+      ),
+      AnimationItem(name: '音频涟漪动画', widget: const AudioRippleAnimation()),
+      AnimationItem(
+        name: '音频频谱网格动画',
+        widget: const AudioSpectrumGridAnimation(),
+      ),
+      AnimationItem(
+        name: '音频可视化环形动画',
+        widget: const AudioVisualizerRingAnimation(),
+      ),
+      AnimationItem(name: '音频波形立方体动画', widget: const AudioWaveCubeAnimation()),
+      AnimationItem(
+        name: '音频波形失真动画',
+        widget: const AudioWaveDistortionAnimation(),
+      ),
+      AnimationItem(
+        name: '音乐节拍粒子动画',
+        widget: const MusicBeatParticleAnimation(),
+      ),
+      AnimationItem(
+        name: '音乐粒子连接动画',
+        widget: const MusicParticleConnectAnimation(),
+      ),
+      AnimationItem(
+        name: '音乐频谱立方体动画',
+        widget: const MusicSpectrumCubeAnimation(),
+      ),
+      AnimationItem(
+        name: '音乐频谱粒子动画',
+        widget: const MusicSpectrumParticleAnimation(),
+      ),
+      AnimationItem(
+        name: '音乐波形粒子动画',
+        widget: const MusicWaveParticleAnimation(),
+      ),
+      AnimationItem(name: '音符弹跳动画', widget: const NoteBounceAnimation()),
+      AnimationItem(name: '音符下落动画', widget: const NoteFallAnimation()),
+      AnimationItem(name: '音符旋转动画', widget: const NoteRotateAnimation()),
+      AnimationItem(name: '粒子轨道动画', widget: const ParticleOrbitAnimation()),
+      AnimationItem(name: '播放列表展开动画', widget: const PlaylistExpandAnimation()),
     ];
 
     final theme = Theme.of(context);

@@ -1,9 +1,14 @@
+// UTF-8 encoded file
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
+#include <shellapi.h>
 
 #include "flutter_window.h"
 #include "utils.h"
+
+// Define the function type for SetCurrentProcessExplicitAppUserModelID
+typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDFunc)(PCWSTR AppID);
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
@@ -17,11 +22,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
+  // Dynamically load SetCurrentProcessExplicitAppUserModelID function
+  // This approach avoids compilation errors
+  HMODULE shell32 = ::LoadLibrary(L"shell32.dll");
+  if (shell32 != nullptr) {
+    SetCurrentProcessExplicitAppUserModelIDFunc setAppIDFunc = 
+        reinterpret_cast<SetCurrentProcessExplicitAppUserModelIDFunc>(
+            ::GetProcAddress(shell32, "SetCurrentProcessExplicitAppUserModelID"));
+    
+    if (setAppIDFunc != nullptr) {
+      // Set AppUserModelID required for Windows notifications
+      setAppIDFunc(L"dev.dexterx.tune");
+    }
+    
+    ::FreeLibrary(shell32);
+  }
+
   flutter::DartProject project(L"data");
 
-  std::vector<std::string> command_line_arguments =
-      GetCommandLineArguments();
-
+  std::vector<std::string> command_line_arguments = GetCommandLineArguments();
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);

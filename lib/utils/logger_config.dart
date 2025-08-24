@@ -20,12 +20,12 @@ class SingleLinePrinter extends LogPrinter {
   // 将日志级别转换为缩写
   String _levelToAbbr(Level level) {
     switch (level) {
-      case Level.verbose: return 'V';
+      case Level.trace: return 'T';
       case Level.debug: return 'D';
       case Level.info: return 'I';
       case Level.warning: return 'W';
       case Level.error: return 'E';
-      case Level.wtf: return 'WTF';
+      case Level.fatal: return 'FATAL';
       default: return '?';
     }
   }
@@ -35,5 +35,5 @@ class SingleLinePrinter extends LogPrinter {
 final logger = Logger(
   printer: SingleLinePrinter(),
   // 可选：控制日志输出级别（如只输出 info 及以上级别）
-  level: Level.verbose,
+  level: Level.trace,
 );

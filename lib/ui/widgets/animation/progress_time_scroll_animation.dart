@@ -48,7 +48,6 @@ class _TimeScrollPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final paint = Paint()..style = PaintingStyle.fill;
 
     // 模拟时间数字"1:23"的滚动效果
     final minutes = 1;

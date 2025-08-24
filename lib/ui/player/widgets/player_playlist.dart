@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 
 /// 播放列表组件

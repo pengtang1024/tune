@@ -31,7 +31,6 @@ class PlatformMusicService implements MusicService {
   }
 
   /// 扫描音乐
-  @override
   Future<List<Song>> scanMusic() async {
     // 在 Web 平台上返回空列表
     if (kIsWeb) {
@@ -47,7 +46,6 @@ class PlatformMusicService implements MusicService {
     return [];
   }
 
-  @override
   Future<List<Song>> loadSongs() async {
     // 该方法在平台特定实现中被重写
     return [];

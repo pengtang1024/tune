@@ -88,4 +88,10 @@ const List<DeviceMenuItem> desktopMenuItems = [
     icon: Icons.library_music,
     index: 3,
   ),
+  DeviceMenuItem(
+    path: '/notification_test',
+    label: 'notification_test', // 这里应该使用本地化键，而不是直接的字符串
+    icon: Icons.notifications_active,
+    index: 4,
+  ),
 ];

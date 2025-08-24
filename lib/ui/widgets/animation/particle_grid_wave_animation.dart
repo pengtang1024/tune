@@ -14,8 +14,6 @@ class ParticleGridWaveAnimation extends ThemedAnimationBase {
 
 class _ParticleGridWaveAnimationState
     extends ThemedAnimationStateBase<ParticleGridWaveAnimation> {
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();

@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
 
 /// 跨平台音乐扫描服务接口

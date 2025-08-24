@@ -9,7 +9,6 @@ class PlayerHistory extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerStateNotifierProvider);
     final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
 
     // 获取最近播放的歌曲历史（这里简化处理，实际应该从持久化存储中获取）

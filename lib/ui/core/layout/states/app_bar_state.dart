@@ -46,6 +46,9 @@ class AppBarState {
   /// 播放按钮悬停状态
   final bool isPlayButtonHovered;
 
+  /// 未读通知数量
+  final int unreadNotificationCount;
+
   AppBarState({
     required this.title,
     required this.showBackButton,
@@ -61,6 +64,7 @@ class AppBarState {
     this.userTags = const [],
     this.supportedLocales = const [],
     this.isPlayButtonHovered = false,
+    this.unreadNotificationCount = 0,
   });
 
   /// 创建初始状态
@@ -77,6 +81,7 @@ class AppBarState {
       userTags: const [],
       supportedLocales: const [],
       isPlayButtonHovered: false,
+      unreadNotificationCount: 0,
     );
   }
 
@@ -96,6 +101,7 @@ class AppBarState {
     List<String>? userTags,
     List<Locale>? supportedLocales,
     bool? isPlayButtonHovered,
+    int? unreadNotificationCount,
   }) {
     return AppBarState(
       title: title ?? this.title,
@@ -112,6 +118,8 @@ class AppBarState {
       userTags: userTags ?? this.userTags,
       supportedLocales: supportedLocales ?? this.supportedLocales,
       isPlayButtonHovered: isPlayButtonHovered ?? this.isPlayButtonHovered,
+      unreadNotificationCount:
+          unreadNotificationCount ?? this.unreadNotificationCount,
     );
   }
 
@@ -132,24 +140,26 @@ class AppBarState {
         other.userLevel == userLevel &&
         listEquals(other.userTags, userTags) &&
         listEquals(other.supportedLocales, supportedLocales) &&
-        other.isPlayButtonHovered == isPlayButtonHovered;
+        other.isPlayButtonHovered == isPlayButtonHovered &&
+        other.unreadNotificationCount == unreadNotificationCount;
   }
 
   @override
   int get hashCode => Object.hash(
-        title,
-        showBackButton,
-        Object.hashAll(dynamicActions),
-        themeMode,
-        locale,
-        showMyDropdown,
-        showLanguageDropdown,
-        currentRoute,
-        userAvatarUrl,
-        username,
-        userLevel,
-        Object.hashAll(userTags),
-        Object.hashAll(supportedLocales),
-        isPlayButtonHovered,
-      );
+    title,
+    showBackButton,
+    Object.hashAll(dynamicActions),
+    themeMode,
+    locale,
+    showMyDropdown,
+    showLanguageDropdown,
+    currentRoute,
+    userAvatarUrl,
+    username,
+    userLevel,
+    Object.hashAll(userTags),
+    Object.hashAll(supportedLocales),
+    isPlayButtonHovered,
+    unreadNotificationCount,
+  );
 }

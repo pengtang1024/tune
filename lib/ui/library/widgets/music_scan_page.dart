@@ -65,7 +65,10 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       }
     } catch (e) {
       Log.error('添加自定义扫描路径失败: $e');
-      _showErrorSnackBar(context.loc.failed_to_add_custom_scan_path);
+      // 确保在访问context前检查mounted状态
+      if (mounted) {
+        _showErrorSnackBar(context.loc.failed_to_add_custom_scan_path);
+      }
     }
   }
 
@@ -84,7 +87,10 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       await persistenceService.setStringList('custom_scan_paths', _customScanPaths);
     } catch (e) {
       Log.error('保存自定义扫描路径失败: $e');
-      _showErrorSnackBar(context.loc.failed_to_save_custom_scan_paths);
+      // 确保在访问context前检查mounted状态
+      if (mounted) {
+        _showErrorSnackBar(context.loc.failed_to_save_custom_scan_paths);
+      }
     }
   }
 
@@ -119,8 +125,12 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     } catch (e) {
       Log.error('扫描音乐失败: $e');
       final notifier = ref.read(libraryStateNotifierProvider.notifier);
-      notifier.scanError(context.loc.failed_to_scan_music);
-      _showErrorSnackBar(context.loc.failed_to_scan_music);
+      // 确保在访问context前检查mounted状态
+      if (mounted) {
+        final failedMessage = context.loc.failed_to_scan_music;
+        notifier.scanError(failedMessage);
+        _showErrorSnackBar(failedMessage);
+      }
     }
   }
 
