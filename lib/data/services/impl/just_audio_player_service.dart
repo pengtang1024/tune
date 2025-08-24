@@ -27,17 +27,19 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_audioPlayer == null) {
         await init();
       }
-      
+
       // 优先使用uri字段，如果uri为空则使用data字段
-      final String? audioPath = song.uri ?? song.data;
-      
+      final String audioPath = song.uri ?? song.data;
+
       // 检查音频路径是否为空
       if (audioPath == null || audioPath.isEmpty) {
         Log.error('音频文件路径为空');
         throw Exception('音频文件路径为空');
       }
-      
+
       Log.info('尝试播放音频文件: $audioPath');
+      
+      // 使用Uri.file处理路径，以提高兼容性
       await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
       await _audioPlayer!.play();
       Log.info('音频播放成功');

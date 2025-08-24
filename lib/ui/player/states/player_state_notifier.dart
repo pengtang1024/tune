@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/providers/app_bar_providers.dart';
+import 'package:tune/ui/core/layout/states/app_bar_state_notifier.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/utils/logger.dart';
@@ -15,7 +17,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   late final AudioPlayerService _audioPlayerService;
   StreamSubscription? _positionSubscription;
   List<Song> _playlist = [];
-  List<Song> _playHistory = []; // 播放历史记录
+  final List<Song> _playHistory = []; // 播放历史记录
   int _currentIndex = -1;
   static const int _maxHistorySize = 50; // 最大历史记录数量
 
@@ -28,33 +30,47 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   void _initializePlayer() {
     try {
       // 实时更新播放位置
-      _positionSubscription = Stream.periodic(const Duration(milliseconds: 100)).listen((_) {
-        try {
-          if (state.currentSong != null) {
-            final isPlaying = _audioPlayerService.isPlaying;
-            final position = _audioPlayerService.currentPosition;
-            final duration = _audioPlayerService.duration;
-            final speed = _audioPlayerService.speed;
-            
-            // 只有当状态发生变化时才更新
-            if (state.isPlaying != isPlaying || 
-                state.position != position || 
-                state.duration != duration ||
-                state.speed != speed) {
-              state = state.copyWith(
-                isPlaying: isPlaying,
-                position: position,
-                duration: duration,
-                speed: speed,
-              );
-            }
-          }
-        } catch (e, stackTrace) {
-          Log.error('更新播放位置时出错: $e\nStack trace: $stackTrace');
-        }
-      }, onError: (error, stackTrace) {
-        Log.error('播放位置监听流出错: $error\nStack trace: $stackTrace');
-      });
+      _positionSubscription = Stream.periodic(const Duration(milliseconds: 100))
+          .listen(
+            (_) {
+              try {
+                if (state.currentSong != null) {
+                  final isPlaying = _audioPlayerService.isPlaying;
+                  final position = _audioPlayerService.currentPosition;
+                  final duration = _audioPlayerService.duration;
+                  final speed = _audioPlayerService.speed;
+
+                  // 只有当状态发生变化时才更新
+                  if (state.isPlaying != isPlaying ||
+                      state.position != position ||
+                      state.duration != duration ||
+                      state.speed != speed) {
+                    // 如果当前处于加载状态但播放器已经在播放，则更新状态
+                    if (state.isLoading && isPlaying) {
+                      state = PlayerState.playing(
+                        state.currentSong!,
+                        position,
+                        duration,
+                        speed,
+                      ).copyWith(playMode: state.playMode);
+                    } else {
+                      state = state.copyWith(
+                        isPlaying: isPlaying,
+                        position: position,
+                        duration: duration,
+                        speed: speed,
+                      );
+                    }
+                  }
+                }
+              } catch (e, stackTrace) {
+                Log.error('更新播放位置时出错: $e\nStack trace: $stackTrace');
+              }
+            },
+            onError: (error, stackTrace) {
+              Log.error('播放位置监听流出错: $error\nStack trace: $stackTrace');
+            },
+          );
     } catch (e, stackTrace) {
       Log.error('初始化播放器时出错: $e\nStack trace: $stackTrace');
     }
@@ -85,6 +101,13 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       // 播放歌曲
       await _audioPlayerService.play(song);
       
+      // 更新应用栏标题为歌曲名称
+      final appBarNotifier = _ref.read(appBarStateNotifierProvider.notifier);
+      appBarNotifier.updateTitle(song.title);
+      
+      // 等待一小段时间确保播放器状态稳定
+      await Future.delayed(const Duration(milliseconds: 100));
+      
       // 更新状态为播放中
       state = PlayerState.playing(
         song,
@@ -110,15 +133,15 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         // 如果存在，将其移到列表开头
         _playHistory.removeAt(existingIndex);
       }
-      
+
       // 将歌曲添加到历史记录开头
       _playHistory.insert(0, song);
-      
+
       // 保持历史记录大小在限制范围内
       if (_playHistory.length > _maxHistorySize) {
         _playHistory.removeRange(_maxHistorySize, _playHistory.length);
       }
-      
+
       Log.info('添加歌曲到播放历史记录: ${song.title}');
     } catch (e, stackTrace) {
       Log.error('添加歌曲到播放历史记录失败: $e', stackTrace);
@@ -156,6 +179,11 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
     try {
       await _audioPlayerService.stop();
       state = PlayerState.initial();
+
+      // 恢复应用栏标题为默认标题
+      final appBarNotifier = _ref.read(appBarStateNotifierProvider.notifier);
+      appBarNotifier.updateTitle('播放器');
+
       Log.info('停止播放成功');
     } catch (e, stackTrace) {
       Log.error('停止播放失败: $e\nStack trace: $stackTrace');
@@ -200,7 +228,8 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   /// 切换播放模式
   void togglePlayMode() {
     try {
-      final nextMode = PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
+      final nextMode =
+          PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
       state = state.copyWith(playMode: nextMode);
       Log.info('播放模式切换为: ${nextMode.name}');
     } catch (e, stackTrace) {
@@ -215,7 +244,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         Log.info('播放列表为空，无法播放下一首');
         return;
       }
-      
+
       switch (state.playMode) {
         case PlayMode.sequential:
           _currentIndex = (_currentIndex + 1) % _playlist.length;
@@ -227,7 +256,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
           _currentIndex = Random().nextInt(_playlist.length);
           break;
       }
-      
+
       Log.info('播放下一首歌曲，索引: $_currentIndex');
       playSong(_playlist[_currentIndex]);
     } catch (e, stackTrace) {
@@ -242,10 +271,11 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
         Log.info('播放列表为空，无法播放上一首');
         return;
       }
-      
+
       switch (state.playMode) {
         case PlayMode.sequential:
-          _currentIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
+          _currentIndex =
+              (_currentIndex - 1 + _playlist.length) % _playlist.length;
           break;
         case PlayMode.repeatOne:
           // 保持当前索引不变
@@ -254,7 +284,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
           _currentIndex = Random().nextInt(_playlist.length);
           break;
       }
-      
+
       Log.info('播放上一首歌曲，索引: $_currentIndex');
       playSong(_playlist[_currentIndex]);
     } catch (e, stackTrace) {
@@ -293,7 +323,8 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       _playlist.add(song);
       Log.info('添加歌曲到播放列表: ${song.title}');
     } catch (e, stackTrace) {
-      Log.error('添加歌曲到播放列表失败: $e', stackTrace);
+      Log.error('添加歌曲到播放列表失败: $e\nStack trace: $stackTrace');
+      // 可以考虑添加更多错误处理逻辑，如通知用户等
     }
   }
 
@@ -303,28 +334,29 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       if (index >= 0 && index < _playlist.length) {
         final song = _playlist[index];
         _playlist.removeAt(index);
-        
+
         // 如果删除的是当前播放歌曲之前的歌曲，需要调整当前索引
         if (index < _currentIndex) {
           _currentIndex--;
-        } 
+        }
         // 如果删除的是当前播放歌曲，需要处理播放状态
         else if (index == _currentIndex && _playlist.isNotEmpty) {
           // 如果删除的是最后一首歌，播放第一首
           if (_currentIndex >= _playlist.length) {
             _currentIndex = 0;
           }
-        } 
+        }
         // 如果播放列表为空，停止播放
         else if (_playlist.isEmpty) {
           _currentIndex = -1;
           stop();
         }
-        
+
         Log.info('从播放列表移除歌曲: ${song.title}');
       }
     } catch (e, stackTrace) {
-      Log.error('从播放列表移除歌曲失败: $e', stackTrace);
+      Log.error('从播放列表移除歌曲失败: $e\nStack trace: $stackTrace');
+      // 可以考虑添加更多错误处理逻辑，如通知用户等
     }
   }
 
@@ -336,19 +368,21 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       stop();
       Log.info('清空播放列表');
     } catch (e, stackTrace) {
-      Log.error('清空播放列表失败: $e', stackTrace);
+      Log.error('清空播放列表失败: $e\nStack trace: $stackTrace');
+      // 可以考虑添加更多错误处理逻辑，如通知用户等
     }
   }
 
+  /// 释放资源
   @override
   void dispose() {
     try {
       _positionSubscription?.cancel();
       _audioPlayerService.dispose();
-      Log.info('播放器状态管理器释放成功');
-      super.dispose();
+      Log.info('播放器状态管理器资源释放成功');
     } catch (e, stackTrace) {
       Log.error('释放播放器状态管理器时出错: $e\nStack trace: $stackTrace');
+      // 可以考虑添加更多错误处理逻辑
     }
   }
 }

@@ -157,11 +157,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_custom_path => 'Add Custom Path';
 
   @override
-  String get no_custom_paths => 'No custom scan paths';
+  String get no_custom_scan_paths => 'No custom scan paths';
 
   @override
-  String get no_custom_paths_description =>
-      'Add custom folder paths to scan music files in specific locations';
+  String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
   String get scan_local_music => 'Scan Local Music';
@@ -432,9 +431,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_custom_directory => 'Add Custom Directory';
 
   @override
-  String get no_custom_scan_paths => 'No custom scan paths';
-
-  @override
   String get full_platform_scan_note =>
       'Full platform scan note: By default, the system music directory is scanned, and the scan range can be expanded by adding custom paths.';
 
@@ -700,4 +696,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get very_fast => 'Very Fast';
+
+  @override
+  String get no_scan_results => 'No scan results found';
 }

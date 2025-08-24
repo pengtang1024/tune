@@ -86,6 +86,16 @@ class PlayerState {
     );
   }
 
+  /// 检查是否处于加载状态
+  bool get isLoading => currentSong != null && 
+                       errorMessage.isEmpty && 
+                       !isPlaying && 
+                       position == Duration.zero && 
+                       duration == Duration.zero;
+
+  /// 检查是否处于错误状态
+  bool get isError => errorMessage.isNotEmpty;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

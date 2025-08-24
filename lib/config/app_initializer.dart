@@ -1,6 +1,3 @@
-import 'dart:io' show Directory, FileSystemEntityType;
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
@@ -16,10 +13,10 @@ class AppInitializer {
 
       // 初始化持久化服务
       await _initPersistenceService(ref);
-      
+
       // 初始化音频播放服务
       await _initAudioPlayerService(ref);
-      
+
       // 初始化音乐扫描服务
       await _initMusicScannerService(ref);
 

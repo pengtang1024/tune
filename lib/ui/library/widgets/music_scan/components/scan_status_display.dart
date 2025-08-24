@@ -27,7 +27,7 @@ class ScanStatusDisplay extends ConsumerWidget {
             ScanProgressWidget(progress: state.scanProgress),
           ] else if (state.scanStatus == ScanStatus.completed) ...[
             ScanStatusWidget(
-              statusMessage: state.statusMessage,
+              statusMessage: '扫描完成，找到 ${state.foundSongs.length} 首歌曲',
             ),
           ] else if (state.scanStatus == ScanStatus.error) ...[
             const ScanStatusWidget(statusMessage: '扫描出错'),

@@ -11,7 +11,7 @@ class AnimationItemWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Card(
-      color: theme.colorScheme.surfaceVariant,
+      color: theme.colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -24,20 +24,22 @@ class AnimationItemWidget extends ConsumerWidget {
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: ref.watch(animationsEnabledProvider)
-                  ? Builder(
-                      builder: (BuildContext context) {
-                        // 传递主题给动画组件，确保主题适配
-                        // 添加UniqueKey确保组件正确重建，避免黑屏问题
-                        return Theme(
-                          data: Theme.of(context),
-                          child: KeyedSubtree(
-                            key: ValueKey('${animationItem.name}_${ref.watch(animationsEnabledProvider)}'),
-                            child: animationItem.widget,
-                          ),
-                        );
-                      }
-                    )
-                  : const Icon(Icons.animation_outlined, size: 30),
+                    ? Builder(
+                        builder: (BuildContext context) {
+                          // 传递主题给动画组件，确保主题适配
+                          // 添加UniqueKey确保组件正确重建，避免黑屏问题
+                          return Theme(
+                            data: Theme.of(context),
+                            child: KeyedSubtree(
+                              key: ValueKey(
+                                '${animationItem.name}_${ref.watch(animationsEnabledProvider)}',
+                              ),
+                              child: animationItem.widget,
+                            ),
+                          );
+                        },
+                      )
+                    : const Icon(Icons.animation_outlined, size: 30),
               ),
             ),
             const SizedBox(height: 8),

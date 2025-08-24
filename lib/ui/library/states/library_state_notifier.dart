@@ -1,17 +1,15 @@
 import 'dart:convert';
 import 'dart:io' show File;
-import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/player/states/player_state_notifier.dart' show PlayerStateNotifier;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart' as scanner_provider;
+import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart'
+    as scanner_provider;
 import 'package:tune/utils/logger.dart';
 
 class LibraryStateNotifier extends StateNotifier<LibraryState> {
@@ -61,10 +59,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   }
 
   void scanError(String error) {
-    state = state.copyWith(
-      scanStatus: ScanStatus.error,
-      errorMessage: error,
-    );
+    state = state.copyWith(scanStatus: ScanStatus.error, errorMessage: error);
   }
 
   void resetScan() {
@@ -80,16 +75,16 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   Future<void> addScannedSongsToLibrary() async {
     try {
       setLoading(true);
-      
+
       // 获取扫描到的歌曲
       final scannedSongs = state.foundSongs;
-      
+
       // 更新音乐库
       setSongs([...state.songs, ...scannedSongs]);
-      
+
       // 保存到持久化存储
       await _saveScannedSongs(scannedSongs);
-      
+
       // 重置扫描状态
       resetScan();
     } catch (e) {
@@ -103,7 +98,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File(path.join(dir.path, 'scanned_songs.json'));
-      
+
       // 将歌曲转换为可序列化的Map列表
       final songsData = songs.map((song) {
         return {
@@ -134,7 +129,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
           'isFavorite': song.isFavorite,
         };
       }).toList();
-      
+
       await file.writeAsString(jsonEncode(songsData));
     } catch (e) {
       // 错误处理，但不中断主流程
@@ -147,11 +142,13 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final file = File(path.join(dir.path, 'scanned_songs.json'));
-      
+
       if (await file.exists()) {
         final jsonString = await file.readAsString();
         final List<dynamic> songsData = jsonDecode(jsonString);
-        return songsData.map((data) => Song(data as Map<String, dynamic>)).toList();
+        return songsData
+            .map((data) => Song(data as Map<String, dynamic>))
+            .toList();
       }
     } catch (e) {
       // 错误处理，但不中断主流程
@@ -167,10 +164,12 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     try {
       // 首先尝试从持久化存储加载歌曲
       List<Song> songs = await _loadScannedSongs();
-      
+
       // 如果持久化存储中没有歌曲，则从扫描服务获取
       if (songs.isEmpty) {
-        final scanner = _ref.read(scanner_provider.crossPlatformMusicScannerProvider);
+        final scanner = _ref.read(
+          scanner_provider.crossPlatformMusicScannerProvider,
+        );
         songs = await scanner.getAllSongs();
       }
 
@@ -186,7 +185,9 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     setLoading(true);
 
     try {
-      final scanner = _ref.read(scanner_provider.crossPlatformMusicScannerProvider);
+      final scanner = _ref.read(
+        scanner_provider.crossPlatformMusicScannerProvider,
+      );
       final songs = await scanner.searchSongs(query);
 
       setSongs(songs);
@@ -225,11 +226,12 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   void removeCustomPath(String pathToRemove) {
     try {
       final persistenceService = _ref.read(sharedPreferencesServiceProvider);
-      final customPaths = persistenceService.getStringList('custom_scan_paths') ?? [];
-      
+      final customPaths =
+          persistenceService.getStringList('custom_scan_paths') ?? [];
+
       // 从列表中移除指定路径
       final updatedPaths = List<String>.from(customPaths)..remove(pathToRemove);
-      
+
       // 保存更新后的路径列表
       persistenceService.setStringList('custom_scan_paths', updatedPaths);
     } catch (e) {
@@ -245,5 +247,19 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
       isLoading: false,
       errorMessage: null,
     );
+  }
+
+  /// 清理所有应用数据
+  void clearAllData() async {
+    try {
+      // 清理持久化存储
+      final persistenceService = _ref.read(sharedPreferencesServiceProvider);
+      await persistenceService.clear();
+
+      // 重置状态到初始状态
+      state = LibraryState.initial();
+    } catch (e) {
+      Log.error('清理所有数据失败: $e');
+    }
   }
 }

@@ -12,7 +12,7 @@ class PlayerEqualizer extends ConsumerStatefulWidget {
 
 class _PlayerEqualizerState extends ConsumerState<PlayerEqualizer> {
   // 模拟均衡器频段值
-  List<double> _bandValues = List.filled(10, 0.0);
+  final List<double> _bandValues = List.filled(10, 0.0);
   bool _isEnabled = false;
 
   @override
@@ -22,7 +22,7 @@ class _PlayerEqualizerState extends ConsumerState<PlayerEqualizer> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -33,9 +33,9 @@ class _PlayerEqualizerState extends ConsumerState<PlayerEqualizer> {
             children: [
               Text(
                 loc.equalizer,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               Switch(
                 value: _isEnabled,

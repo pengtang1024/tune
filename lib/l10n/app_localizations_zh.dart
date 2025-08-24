@@ -156,10 +156,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get add_custom_path => '添加自定义路径';
 
   @override
-  String get no_custom_paths => '未设置自定义扫描路径';
+  String get no_custom_scan_paths => '暂无自定义扫描路径';
 
   @override
-  String get no_custom_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
+  String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
   String get scan_local_music => '扫描本地音乐';
@@ -419,9 +419,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get add_custom_directory => '添加自定义音乐扫描目录';
 
   @override
-  String get no_custom_scan_paths => '暂无自定义扫描路径';
-
-  @override
   String get full_platform_scan_note => '注意：如需全平台扫描，请使用侧边栏中的\"音乐扫描\"功能';
 
   @override
@@ -678,6 +675,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get very_fast => '非常快';
+
+  @override
+  String get no_scan_results => '未找到扫描结果';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -832,10 +832,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get add_custom_path => '添加自定义路径';
 
   @override
-  String get no_custom_paths => '未设置自定义扫描路径';
+  String get no_custom_scan_paths => '未设置自定义扫描路径';
 
   @override
-  String get no_custom_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
+  String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
   String get scan_local_music => '扫描本地音乐';
@@ -1095,9 +1095,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get add_custom_directory => '添加自定义目录';
 
   @override
-  String get no_custom_scan_paths => '未设置自定义扫描路径';
-
-  @override
   String get full_platform_scan_note => '全平台扫描说明：默认扫描系统音乐目录，可通过添加自定义路径扩展扫描范围。';
 
   @override
@@ -1354,6 +1351,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get very_fast => '非常快';
+
+  @override
+  String get no_scan_results => '未找到扫描结果';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

@@ -32,6 +32,9 @@ class LibraryState {
     this.statusMessage = '',
   });
 
+  /// 检查是否有扫描结果
+  bool get hasScannedResults => foundSongs.isNotEmpty;
+
   LibraryState copyWith({
     bool? isGridView,
     String? searchQuery,

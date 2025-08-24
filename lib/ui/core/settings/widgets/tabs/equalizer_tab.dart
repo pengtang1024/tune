@@ -12,7 +12,7 @@ class EqualizerTab extends ConsumerStatefulWidget {
 
 class _EqualizerTabState extends ConsumerState<EqualizerTab> {
   bool _equalizerEnabled = false;
-  List<double> _bandValues = List.filled(10, 0.0); // 10个频段
+  final List<double> _bandValues = List.filled(10, 0.0); // 10个频段
   String _selectedPreset = 'flat';
   bool _isLoading = true;
 
@@ -30,8 +30,10 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
     final persistenceService = ref.read(sharedPreferencesServiceProvider);
 
     setState(() {
-      _equalizerEnabled = persistenceService.getBool('equalizer_enabled') ?? false;
-      _selectedPreset = persistenceService.getString('equalizer_preset') ?? 'flat';
+      _equalizerEnabled =
+          persistenceService.getBool('equalizer_enabled') ?? false;
+      _selectedPreset =
+          persistenceService.getString('equalizer_preset') ?? 'flat';
       _isLoading = false;
     });
   }
@@ -49,7 +51,7 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
   @override
   Widget build(BuildContext context) {
     ref.watch(sharedPreferencesServiceProvider);
-    
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -74,7 +76,10 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
                 children: [
                   Text(
                     context.loc.enable_equalizer,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Switch(
                     value: _equalizerEnabled,
@@ -101,7 +106,10 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
                   children: [
                     Text(
                       context.loc.presets,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     DropdownButton<String>(
@@ -115,12 +123,30 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
                         }
                       },
                       items: [
-                        DropdownMenuItem(value: 'flat', child: Text(context.loc.flat)),
-                        DropdownMenuItem(value: 'pop', child: Text(context.loc.pop)),
-                        DropdownMenuItem(value: 'rock', child: Text(context.loc.rock)),
-                        DropdownMenuItem(value: 'jazz', child: Text(context.loc.jazz)),
-                        DropdownMenuItem(value: 'classical', child: Text(context.loc.classical)),
-                        DropdownMenuItem(value: 'hip_hop', child: Text(context.loc.hip_hop)),
+                        DropdownMenuItem(
+                          value: 'flat',
+                          child: Text(context.loc.flat),
+                        ),
+                        DropdownMenuItem(
+                          value: 'pop',
+                          child: Text(context.loc.pop),
+                        ),
+                        DropdownMenuItem(
+                          value: 'rock',
+                          child: Text(context.loc.rock),
+                        ),
+                        DropdownMenuItem(
+                          value: 'jazz',
+                          child: Text(context.loc.jazz),
+                        ),
+                        DropdownMenuItem(
+                          value: 'classical',
+                          child: Text(context.loc.classical),
+                        ),
+                        DropdownMenuItem(
+                          value: 'hip_hop',
+                          child: Text(context.loc.hip_hop),
+                        ),
                       ],
                     ),
                   ],
@@ -138,7 +164,10 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
                   children: [
                     Text(
                       context.loc.custom_equalizer,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     // 频段滑块
@@ -160,7 +189,8 @@ class _EqualizerTabState extends ConsumerState<EqualizerTab> {
                                 min: -10.0,
                                 max: 10.0,
                                 divisions: 20,
-                                label: '${_bandValues[i].toStringAsFixed(1)} dB',
+                                label:
+                                    '${_bandValues[i].toStringAsFixed(1)} dB',
                                 onChanged: (value) {
                                   setState(() {
                                     _bandValues[i] = value;

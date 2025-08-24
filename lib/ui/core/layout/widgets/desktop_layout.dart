@@ -24,67 +24,65 @@ class DesktopLayout extends ConsumerWidget {
     final menuNotifier = ref.read(menuStateProvider.notifier);
     final isExpanded = ref.watch(layoutStateNotifierProvider).isExpanded;
     final playerState = ref.watch(playerStateNotifierProvider);
-    
-    return Column(
+
+    return Row(
       children: [
-        // 主要布局区域（占据剩余空间）
-        Expanded(
-          child: Row(
+        // 侧边栏菜单
+        Container(
+          width: isExpanded ? 250 : 80,
+          color: context.theme.colorScheme.surfaceContainerHighest,
+          child: Column(
             children: [
-              // 侧边栏菜单
-              Container(
-                width: isExpanded ? 250 : 80,
-                color: context.theme.colorScheme.surfaceContainerHighest,
-                child: Column(
-                  children: [
-                    // 顶部Logo区域
-                    LogoSectionWidget(isExpanded: isExpanded),
+              // 顶部Logo区域
+              LogoSectionWidget(isExpanded: isExpanded),
 
-                    // 菜单项
-                    Expanded(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: DeviceMenuItem.desktop()
-                            .map(
-                              (item) => MenuItemWidget(
-                                item: item,
-                                isExpanded: isExpanded,
-                                isSelected: menuState.path == item.path,
-                                onTap: () => {
-                                  menuNotifier.selectMenu(item.path, true),
-                                },
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-
-                    // 用户信息区域
-                    if (isExpanded) ...[const Divider(), const UserInfoWidget()],
-
-                    // 底部展开/收起按钮
-                    ExpandButtonWidget(),
-                  ],
+              // 菜单项
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: DeviceMenuItem.desktop()
+                      .map(
+                        (item) => MenuItemWidget(
+                          item: item,
+                          isExpanded: isExpanded,
+                          isSelected: menuState.path == item.path,
+                          onTap: () => {
+                            menuNotifier.selectMenu(item.path, true),
+                          },
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
-              // 内容区
+
+              // 用户信息区域
+              if (isExpanded) ...[const Divider(), const UserInfoWidget()],
+
+              // 底部展开/收起按钮
+              ExpandButtonWidget(),
+            ],
+          ),
+        ),
+        // 内容区
+        Expanded(
+          child: Column(
+            children: [
+              // 全局唯一的标题栏（固定高度）
+              const CustomAppBar(),
+              // 内容展示区（占右侧剩余空间）
               Expanded(
                 child: Column(
                   children: [
-                    // 全局唯一的标题栏（固定高度）
-                    const CustomAppBar(),
-                    // 内容展示区（占右侧剩余空间）
-                    Expanded(
-                      child: child, // 仅在此区域进行页面切换更新
-                    ),
+                    // 主要内容
+                    Expanded(child: child),
+                    // 迷你播放器（如果正在播放歌曲）
+                    if (playerState.currentSong != null) const MiniPlayer(),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        // 迷你播放器（如果正在播放歌曲）
-        if (playerState.currentSong != null) const MiniPlayer(),
       ],
     );
   }

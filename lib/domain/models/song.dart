@@ -1,5 +1,3 @@
-import 'dart:io' show File;
-
 class Song {
   final int id;
   final String title;
@@ -25,28 +23,32 @@ class Song {
   final bool isFavorite; // 是否收藏
 
   Song(Map<String, dynamic> data)
-      : id = data['id'] ?? 0,
-        title = data['title'] ?? '',
-        artist = data['artist'] ?? '',
-        album = data['album'] ?? '',
-        duration = data['duration'] ?? 0,
-        uri = data['uri'] ?? '',
-        dateAdded = data['dateAdded'] ?? 0,
-        genre = data['genre'],
-        year = data['year'],
-        bitrate = data['bitrate'],
-        sampleRate = data['sampleRate'],
-        trackNumber = data['trackNumber'],
-        trackTotal = data['trackTotal'],
-        discNumber = data['discNumber'],
-        totalDisc = data['totalDisc'],
-        lyrics = data['lyrics'],
-        genres = data['genres'] is List ? List<String>.from(data['genres']) : null,
-        performers = data['performers'] is List ? List<String>.from(data['performers']) : null,
-        language = data['language'],
-        size = data['size'],
-        type = data['type'],
-        isFavorite = data['isFavorite'] ?? false;
+    : id = data['id'] ?? 0,
+      title = data['title'] ?? '',
+      artist = data['artist'] ?? '',
+      album = data['album'] ?? '',
+      duration = data['duration'] ?? 0,
+      uri = data['uri'] ?? '',
+      dateAdded = data['dateAdded'] ?? 0,
+      genre = data['genre'],
+      year = data['year'],
+      bitrate = data['bitrate'],
+      sampleRate = data['sampleRate'],
+      trackNumber = data['trackNumber'],
+      trackTotal = data['trackTotal'],
+      discNumber = data['discNumber'],
+      totalDisc = data['totalDisc'],
+      lyrics = data['lyrics'],
+      genres = data['genres'] is List
+          ? List<String>.from(data['genres'])
+          : null,
+      performers = data['performers'] is List
+          ? List<String>.from(data['performers'])
+          : null,
+      language = data['language'],
+      size = data['size'],
+      type = data['type'],
+      isFavorite = data['isFavorite'] ?? false;
 
   // Getters for compatibility with existing code
   String get displayName => title;

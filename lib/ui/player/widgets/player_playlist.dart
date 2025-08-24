@@ -20,7 +20,7 @@ class PlayerPlaylist extends ConsumerWidget {
       height: 200,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -28,9 +28,9 @@ class PlayerPlaylist extends ConsumerWidget {
         children: [
           Text(
             '播放列表',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Expanded(
@@ -39,28 +39,32 @@ class PlayerPlaylist extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final song = playerNotifier.getPlaylist()[index];
                 final isCurrent = song.id == playerState.currentSong?.id;
-                
+
                 return ListTile(
                   title: Text(
                     song.title,
                     style: TextStyle(
-                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                      color: isCurrent 
-                        ? Theme.of(context).colorScheme.primary 
-                        : Theme.of(context).colorScheme.onSurface,
+                      fontWeight: isCurrent
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isCurrent
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   subtitle: Text(
                     '${song.artist} - ${song.album}',
                     style: TextStyle(
-                      color: isCurrent 
-                        ? Theme.of(context).colorScheme.primary 
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: isCurrent
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   onTap: () => playerNotifier.playSongAtIndex(index),
                   selected: isCurrent,
-                  selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
+                  selectedTileColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
                 );
               },
             ),

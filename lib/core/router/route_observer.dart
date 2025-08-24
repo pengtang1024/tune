@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/menu_item.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/providers/menu_provider.dart';
+import 'package:tune/providers/route_observer_provider.dart';
 import 'package:tune/utils/logger.dart';
 
 /// 路由观察者：监听路由变化并同步菜单状态和标题
@@ -29,6 +30,7 @@ class MenuRouteObserver extends NavigatorObserver {
     );
     _syncMenuState(route, isDesktop);
     _syncAppBarTitleAndBackButton(route, previousRoute);
+    _updateRouteObserverState(route);
   }
 
   /// 当路由被弹出导航栈时触发
@@ -45,6 +47,7 @@ class MenuRouteObserver extends NavigatorObserver {
     if (previousRoute != null) {
       _syncMenuState(previousRoute, isDesktop);
       _syncAppBarTitleAndBackButton(previousRoute, route);
+      _updateRouteObserverState(previousRoute);
     }
   }
 
@@ -62,6 +65,7 @@ class MenuRouteObserver extends NavigatorObserver {
     if (newRoute != null) {
       _syncMenuState(newRoute, isDesktop);
       _syncAppBarTitleAndBackButton(newRoute, oldRoute);
+      _updateRouteObserverState(newRoute);
     }
   }
 
@@ -114,6 +118,23 @@ class MenuRouteObserver extends NavigatorObserver {
           }
         } catch (e) {
           Log.error('Error updating app bar title: $e');
+        }
+      });
+    }
+  }
+
+  /// 更新路由观察器状态
+  void _updateRouteObserverState(Route<dynamic> route) {
+    final path = route.settings.name;
+    if (path != null) {
+      Future.microtask(() {
+        try {
+          final routeObserverState = ref.read(routeObserverProvider);
+          if (routeObserverState.route != path) {
+            ref.read(routeObserverProvider.notifier).state = routeObserverState.copyWith(route: path);
+          }
+        } catch (e) {
+          Log.error('Error updating route observer state: $e');
         }
       });
     }

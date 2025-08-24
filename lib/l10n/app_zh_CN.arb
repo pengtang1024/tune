@@ -64,8 +64,8 @@
   "about": "关于",
   "custom_scan_paths": "自定义扫描路径",
   "add_custom_path": "添加自定义路径",
-  "no_custom_paths": "未设置自定义扫描路径",
-  "no_custom_paths_description": "添加自定义文件夹路径以扫描特定位置的音乐文件",
+  "no_custom_scan_paths": "未设置自定义扫描路径",
+  "no_custom_scan_paths_description": "添加自定义文件夹路径以扫描特定位置的音乐文件",
   "scan_local_music": "扫描本地音乐",
   "scanning": "扫描中...",
   "scan_completed": "扫描完成",
@@ -237,5 +237,7 @@
   "slow": "慢",
   "normal": "正常",
   "fast": "快",
-  "very_fast": "非常快"
+  "very_fast": "非常快",
+  "no_scan_results": "未找到扫描结果",
+  "no_custom_scan_paths": "未设置自定义扫描路径"
 }

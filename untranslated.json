@@ -40,8 +40,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -119,7 +119,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -204,7 +203,12 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
+  ],
+
+  "en": [
+    "no_custom_scan_paths_description"
   ],
 
   "es": [
@@ -248,8 +252,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -327,7 +331,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -412,7 +415,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "fr": [
@@ -456,8 +460,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -535,7 +539,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -620,7 +623,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "ja": [
@@ -664,8 +668,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -743,7 +747,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -828,7 +831,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "ko": [
@@ -872,8 +876,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -951,7 +955,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -1036,7 +1039,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "ru": [
@@ -1080,8 +1084,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -1159,7 +1163,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -1244,7 +1247,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "zh": [
@@ -1266,8 +1270,7 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -1333,7 +1336,8 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ],
 
   "zh_TW": [
@@ -1377,8 +1381,8 @@
     "edit",
     "delete",
     "add_custom_path",
-    "no_custom_paths",
-    "no_custom_paths_description",
+    "no_custom_scan_paths",
+    "no_custom_scan_paths_description",
     "scanning",
     "scan_completed",
     "scan_failed",
@@ -1456,7 +1460,6 @@
     "desktop_lyrics_description",
     "music_library_management",
     "add_custom_directory",
-    "no_custom_scan_paths",
     "full_platform_scan_note",
     "library_info",
     "songs_count",
@@ -1541,6 +1544,7 @@
     "slow",
     "normal",
     "fast",
-    "very_fast"
+    "very_fast",
+    "no_scan_results"
   ]
 }

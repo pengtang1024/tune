@@ -235,5 +235,7 @@
   "slow": "Slow",
   "normal": "Normal",
   "fast": "Fast",
-  "very_fast": "Very Fast"
+  "very_fast": "Very Fast",
+  "no_scan_results": "No scan results found",
+  "no_custom_scan_paths": "No custom scan paths"
 }

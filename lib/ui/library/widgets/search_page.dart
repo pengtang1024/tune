@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/widgets/library/search_results_widget.dart';
-import 'package:tune/ui/player/providers/player_providers.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final String? initialQuery;
@@ -38,7 +36,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     setState(() {
       _searchQuery = query;
     });
-    
+
     // 执行搜索
     if (query.isNotEmpty) {
       final notifier = ref.read(libraryStateNotifierProvider.notifier);
@@ -51,7 +49,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       _searchQuery = '';
       _searchController.clear();
     });
-    
+
     // 清空搜索结果
     final notifier = ref.read(libraryStateNotifierProvider.notifier);
     notifier.clearSearch();
@@ -83,7 +81,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               icon: const Icon(Icons.search),
               onPressed: () {
                 if (_searchQuery.isNotEmpty) {
-                  final notifier = ref.read(libraryStateNotifierProvider.notifier);
+                  final notifier = ref.read(
+                    libraryStateNotifierProvider.notifier,
+                  );
                   notifier.searchSongs(_searchQuery);
                 }
               },
@@ -93,5 +93,4 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       body: const SearchResultsWidget(),
     );
   }
-
 }

@@ -13,26 +13,16 @@ class RecommendPage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.recommend,
-              size: 64,
-              color: Colors.blue,
-            ),
+            Icon(Icons.recommend, size: 64, color: Colors.blue),
             SizedBox(height: 16),
             Text(
               '推荐页面',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Text(
               '这里将显示推荐的音乐内容',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ],
         ),
@@ -45,10 +35,7 @@ class _RecommendSection extends StatelessWidget {
   final String title;
   final List<_RecommendItem> items;
 
-  const _RecommendSection({
-    required this.title,
-    required this.items,
-  });
+  const _RecommendSection({required this.title, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +44,7 @@ class _RecommendSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         ...items,
@@ -74,11 +58,7 @@ class _RecommendItem extends StatelessWidget {
   final String subtitle;
   final String? imageUrl;
 
-  const _RecommendItem({
-    required this.title,
-    required this.subtitle,
-    this.imageUrl,
-  });
+  const _RecommendItem({required this.title, required this.subtitle, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +72,9 @@ class _RecommendItem extends StatelessWidget {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(

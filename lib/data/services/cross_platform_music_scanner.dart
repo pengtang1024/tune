@@ -22,7 +22,9 @@ abstract class CrossPlatformMusicScanner {
 
   /// 扫描多个目录中的音乐文件，并提供进度回调
   Future<List<Song>> scanMusicInDirectoriesWithProgress(
-      List<String> directoryPaths, Function(double) onProgress);
+    List<String> directoryPaths,
+    Function(double) onProgress,
+  );
 
   /// 扫描单个文件
   Future<Song?> scanMusicFile(String filePath);
@@ -35,7 +37,7 @@ abstract class CrossPlatformMusicScanner {
 
   /// 获取默认音乐路径
   List<String> getDefaultMusicPaths();
-  
+
   /// 扫描自定义路径
   Future<List<Song>> scanCustomPaths(List<String> paths);
 }
@@ -43,7 +45,7 @@ abstract class CrossPlatformMusicScanner {
 /// 跨平台音乐扫描服务实现
 class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   CrossPlatformMusicScannerImpl();
-  
+
   @override
   Future<void> init() async {
     // 初始化操作（如果需要）
@@ -63,7 +65,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       // 移动平台 - 使用平台特定的API扫描音乐文件
       Log.info('CrossPlatformMusicScanner: Running on mobile platform');
       try {
-        final paths = await _getMobileMusicPaths();
+        final paths = _getMobileMusicPaths();
         return await scanMusicInDirectories(paths);
       } catch (e) {
         Log.error('Failed to scan mobile music: $e');
@@ -85,14 +87,23 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
   @override
   Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) async {
-    Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories');
-    return await scanMusicInDirectoriesWithProgress(directoryPaths, (progress) {});
+    Log.info(
+      'CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories',
+    );
+    return await scanMusicInDirectoriesWithProgress(
+      directoryPaths,
+      (progress) {},
+    );
   }
 
   @override
   Future<List<Song>> scanMusicInDirectoriesWithProgress(
-      List<String> directoryPaths, Function(double) onProgress) async {
-    Log.info('CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories with progress');
+    List<String> directoryPaths,
+    Function(double) onProgress,
+  ) async {
+    Log.info(
+      'CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories with progress',
+    );
     final allSongs = <Song>[];
 
     for (int i = 0; i < directoryPaths.length; i++) {
@@ -105,7 +116,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         });
         allSongs.addAll(songs);
       } catch (e) {
-        Log.info('CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e');
+        Log.info(
+          'CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e',
+        );
       }
       // 更新进度
       onProgress((i + 1) / directoryPaths.length);
@@ -145,8 +158,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
     return allSongs.where((song) {
       return song.title.toLowerCase().contains(query.toLowerCase()) ||
-             song.artist.toLowerCase().contains(query.toLowerCase()) ||
-             song.album.toLowerCase().contains(query.toLowerCase());
+          song.artist.toLowerCase().contains(query.toLowerCase()) ||
+          song.album.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
 
@@ -182,25 +195,35 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   }
 
   /// 扫描目录中的音乐文件
-  Future<List<Song>> _scanDirectory(String directoryPath, Function(double) onProgress) async {
+  Future<List<Song>> _scanDirectory(
+    String directoryPath,
+    Function(double) onProgress,
+  ) async {
     final songs = <Song>[];
     final directory = Directory(directoryPath);
 
     if (!await directory.exists()) {
-      Log.info('CrossPlatformMusicScanner: Directory does not exist: $directoryPath');
+      Log.info(
+        'CrossPlatformMusicScanner: Directory does not exist: $directoryPath',
+      );
       return songs;
     }
 
     try {
       // 先获取所有文件列表以计算进度
       final files = <File>[];
-      await for (final file in directory.list(recursive: true, followLinks: false)) {
+      await for (final file in directory.list(
+        recursive: true,
+        followLinks: false,
+      )) {
         if (file is File && _isAudioFile(file.path)) {
           files.add(file);
         }
       }
 
-      Log.info('CrossPlatformMusicScanner: Found ${files.length} audio files in directory: $directoryPath');
+      Log.info(
+        'CrossPlatformMusicScanner: Found ${files.length} audio files in directory: $directoryPath',
+      );
 
       // 处理每个音频文件
       for (int i = 0; i < files.length; i++) {
@@ -211,23 +234,34 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
             songs.add(song);
           }
         } catch (e) {
-          Log.info('CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e');
+          Log.info(
+            'CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e',
+          );
         }
         // 更新进度
         onProgress((i + 1) / files.length);
       }
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e');
+      Log.info(
+        'CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e',
+      );
     }
 
-    Log.info('CrossPlatformMusicScanner: Found ${songs.length} songs in directory: $directoryPath');
+    Log.info(
+      'CrossPlatformMusicScanner: Found ${songs.length} songs in directory: $directoryPath',
+    );
     return songs;
   }
 
   /// 检查文件是否为音频文件
   bool _isAudioFile(String filePath) {
     final ext = path.extension(filePath).toLowerCase();
-    return ext == '.mp3' || ext == '.flac' || ext == '.wav' || ext == '.m4a' || ext == '.aac' || ext == '.ogg';
+    return ext == '.mp3' ||
+        ext == '.flac' ||
+        ext == '.wav' ||
+        ext == '.m4a' ||
+        ext == '.aac' ||
+        ext == '.ogg';
   }
 
   /// 获取移动平台音乐路径
@@ -260,7 +294,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'uri': filePath, // 同时保留uri字段以保持兼容性
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': metadata.year?.year, // 从DateTime中提取年份
-        'genre': metadata.genres?.isNotEmpty == true ? metadata.genres!.first : null,
+        'genre': metadata.genres.isNotEmpty == true
+            ? metadata.genres.first
+            : null,
         'bitrate': metadata.bitrate,
         'sampleRate': metadata.sampleRate,
         'trackNumber': metadata.trackNumber,
@@ -278,7 +314,9 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
       return Song(songData);
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to read metadata for $filePath: $e');
+      Log.info(
+        'CrossPlatformMusicScanner: Failed to read metadata for $filePath: $e',
+      );
       // 如果无法读取元数据，则创建一个基本的歌曲对象
       final songData = <String, dynamic>{
         'id': filePath.hashCode,
@@ -304,7 +342,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     try {
       Log.info('开始扫描自定义路径: $paths');
       final allSongs = <Song>[];
-      
+
       // 检查路径列表是否为空
       if (paths.isEmpty) {
         Log.info('自定义扫描路径列表为空');
@@ -314,29 +352,32 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       for (final path in paths) {
         try {
           Log.info('扫描路径: $path');
-          
+
           // 检查路径是否为空
           if (path.isEmpty) {
             Log.info('跳过空路径');
             continue;
           }
-          
+
           final dir = Directory(path);
-          
+
           // 检查目录是否存在
           if (!await dir.exists()) {
             Log.info('目录不存在，跳过: $path');
             continue;
           }
-          
+
           // 检查是否为目录
           final stat = await dir.stat();
           if (stat.type != FileSystemEntityType.directory) {
             Log.info('路径不是目录，跳过: $path');
             continue;
           }
-          
-          await for (final file in dir.list(recursive: true, followLinks: false)) {
+
+          await for (final file in dir.list(
+            recursive: true,
+            followLinks: false,
+          )) {
             try {
               if (file is File) {
                 final fileName = file.path.toLowerCase();
@@ -365,7 +406,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
           continue;
         }
       }
-      
+
       Log.info('扫描完成，共找到 ${allSongs.length} 首歌曲');
       return allSongs;
     } catch (e, stackTrace) {

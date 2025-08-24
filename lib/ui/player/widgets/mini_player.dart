@@ -20,11 +20,17 @@ class MiniPlayer extends ConsumerWidget {
       height: 60,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, -1),
           ),
         ],
       ),
@@ -43,7 +49,7 @@ class MiniPlayer extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // 歌曲信息
           Expanded(
             child: Column(
@@ -52,9 +58,9 @@ class MiniPlayer extends ConsumerWidget {
               children: [
                 Text(
                   playerState.currentSong!.title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -68,14 +74,18 @@ class MiniPlayer extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // 控制按钮
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(playerState.isPlaying ? Icons.pause : Icons.play_arrow),
-                onPressed: playerState.isPlaying ? playerNotifier.pause : playerNotifier.play,
+                icon: Icon(
+                  playerState.isPlaying ? Icons.pause : Icons.play_arrow,
+                ),
+                onPressed: playerState.isPlaying
+                    ? playerNotifier.pause
+                    : playerNotifier.play,
               ),
               IconButton(
                 icon: const Icon(Icons.skip_next),

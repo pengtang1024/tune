@@ -69,12 +69,12 @@ class AnimationsTab extends ConsumerStatefulWidget {
 }
 
 class _AnimationsTabState extends ConsumerState<AnimationsTab> {
-  bool _isFavorite = false;
-  bool _isPlaying = false;
-  bool _expanded = false;
-  double _volume = 0.5;
-  double _progress = 0.3;
-  int _count = 128;
+  final bool _isFavorite = false;
+  final bool _isPlaying = false;
+  final bool _expanded = false;
+  final double _volume = 0.5;
+  final double _progress = 0.3;
+  final int _count = 128;
 
   @override
   Widget build(BuildContext context) {
@@ -83,50 +83,23 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
         name: '专辑封面旋转',
         widget: const AlbumCoverRotationAnimation(),
       ),
-      AnimationItem(
-        name: '音频可视化',
-        widget: const AudioVisualizerAnimation(),
-      ),
+      AnimationItem(name: '音频可视化', widget: const AudioVisualizerAnimation()),
       AnimationItem(
         name: '播放状态',
         widget: PlayingStateAnimation(isPlaying: _isPlaying),
       ),
-      AnimationItem(
-        name: '专辑旋转',
-        widget: const AlbumRotationAnimation(),
-      ),
-      AnimationItem(
-        name: '专辑摇摆',
-        widget: const AlbumSwingAnimation(),
-      ),
-      AnimationItem(
-        name: '音符弹跳',
-        widget: const NoteBouncingAnimation(),
-      ),
-      AnimationItem(
-        name: '音量气泡',
-        widget: const VolumeBubbleAnimation(),
-      ),
+      AnimationItem(name: '专辑旋转', widget: const AlbumRotationAnimation()),
+      AnimationItem(name: '专辑摇摆', widget: const AlbumSwingAnimation()),
+      AnimationItem(name: '音符弹跳', widget: const NoteBouncingAnimation()),
+      AnimationItem(name: '音量气泡', widget: const VolumeBubbleAnimation()),
       AnimationItem(
         name: '播放按钮呼吸',
         widget: const PlayButtonBreathingAnimation(),
       ),
-      AnimationItem(
-        name: '播放暂停旋转',
-        widget: const PlayPauseRotationAnimation(),
-      ),
-      AnimationItem(
-        name: '圆形频谱',
-        widget: const CircularSpectrumAnimation(),
-      ),
-      AnimationItem(
-        name: '瀑布频谱',
-        widget: const SpectrumWaterfallAnimation(),
-      ),
-      AnimationItem(
-        name: '音频波弹性',
-        widget: const AudioWaveElasticAnimation(),
-      ),
+      AnimationItem(name: '播放暂停旋转', widget: const PlayPauseRotationAnimation()),
+      AnimationItem(name: '圆形频谱', widget: const CircularSpectrumAnimation()),
+      AnimationItem(name: '瀑布频谱', widget: const SpectrumWaterfallAnimation()),
+      AnimationItem(name: '音频波弹性', widget: const AudioWaveElasticAnimation()),
       AnimationItem(
         name: '粒子专辑聚合',
         widget: const ParticleAlbumAggregationAnimation(),
@@ -143,34 +116,13 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
         name: '收藏按钮爆炸',
         widget: const FavoriteButtonExplosionAnimation(),
       ),
-      AnimationItem(
-        name: '音量涟漪条',
-        widget: const VolumeRippleBarsAnimation(),
-      ),
-      AnimationItem(
-        name: '歌词高亮',
-        widget: const LyricsHighlightAnimation(),
-      ),
-      AnimationItem(
-        name: '音频峰值爆炸',
-        widget: const AudioPeakBlastAnimation(),
-      ),
-      AnimationItem(
-        name: '立方体频谱',
-        widget: const CubeSpectrumAnimation(),
-      ),
-      AnimationItem(
-        name: '均衡器旋钮',
-        widget: const EqualizerKnobAnimation(),
-      ),
-      AnimationItem(
-        name: '专辑悬浮',
-        widget: const AlbumFloatingAnimation(),
-      ),
-      AnimationItem(
-        name: '专辑翻页',
-        widget: const AlbumPageFlipAnimation(),
-      ),
+      AnimationItem(name: '音量涟漪条', widget: const VolumeRippleBarsAnimation()),
+      AnimationItem(name: '歌词高亮', widget: const LyricsHighlightAnimation()),
+      AnimationItem(name: '音频峰值爆炸', widget: const AudioPeakBlastAnimation()),
+      AnimationItem(name: '立方体频谱', widget: const CubeSpectrumAnimation()),
+      AnimationItem(name: '均衡器旋钮', widget: const EqualizerKnobAnimation()),
+      AnimationItem(name: '专辑悬浮', widget: const AlbumFloatingAnimation()),
+      AnimationItem(name: '专辑翻页', widget: const AlbumPageFlipAnimation()),
       AnimationItem(
         name: '音频峰值爆炸',
         widget: const AudioPeakExplosionAnimation(),
@@ -187,118 +139,52 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
         name: '加载状态圆点跳动',
         widget: const LoadingDotBounceAnimation(),
       ),
-      AnimationItem(
-        name: '加载状态齿轮',
-        widget: const LoadingGearAnimation(),
-      ),
+      AnimationItem(name: '加载状态齿轮', widget: const LoadingGearAnimation()),
       AnimationItem(
         name: '加载状态音符旋转',
         widget: const LoadingNoteRotationAnimation(),
       ),
-      AnimationItem(
-        name: '加载状态声波',
-        widget: const LoadingSoundWaveAnimation(),
-      ),
-      AnimationItem(
-        name: '歌词渐变',
-        widget: const LyricsGradientAnimation(),
-      ),
-      AnimationItem(
-        name: '歌词行缩放',
-        widget: const LyricsLineScaleAnimation(),
-      ),
-      AnimationItem(
-        name: '歌词字弹跳',
-        widget: const LyricsWordBounceAnimation(),
-      ),
+      AnimationItem(name: '加载状态声波', widget: const LoadingSoundWaveAnimation()),
+      AnimationItem(name: '歌词渐变', widget: const LyricsGradientAnimation()),
+      AnimationItem(name: '歌词行缩放', widget: const LyricsLineScaleAnimation()),
+      AnimationItem(name: '歌词字弹跳', widget: const LyricsWordBounceAnimation()),
       AnimationItem(
         name: '音符碰撞堆叠',
         widget: const NoteCollisionStackAnimation(),
       ),
-      AnimationItem(
-        name: '音符雨',
-        widget: const NoteRainAnimation(),
-      ),
-      AnimationItem(
-        name: '音符正弦波',
-        widget: const NoteSineWaveAnimation(),
-      ),
-      AnimationItem(
-        name: '音符螺旋',
-        widget: const NoteSpiralAnimation(),
-      ),
+      AnimationItem(name: '音符雨', widget: const NoteRainAnimation()),
+      AnimationItem(name: '音符正弦波', widget: const NoteSineWaveAnimation()),
+      AnimationItem(name: '音符螺旋', widget: const NoteSpiralAnimation()),
       AnimationItem(
         name: '页面溶解过渡',
         widget: const PageDissolveTransitionAnimation(),
       ),
-      AnimationItem(
-        name: '粒子网格波',
-        widget: const ParticleGridWaveAnimation(),
-      ),
-      AnimationItem(
-        name: '粒子旋涡',
-        widget: const ParticleVortexAnimation(),
-      ),
-      AnimationItem(
-        name: '粒子流沿波形',
-        widget: const ParticleWaveFlowAnimation(),
-      ),
-      AnimationItem(
-        name: '暂停按钮波纹',
-        widget: const PauseButtonRippleAnimation(),
-      ),
-      AnimationItem(
-        name: '播放按钮填充',
-        widget: const PlayButtonFillAnimation(),
-      ),
-      AnimationItem(
-        name: '播放状态脉冲',
-        widget: const PlayStatePulseAnimation(),
-      ),
+      AnimationItem(name: '粒子网格波', widget: const ParticleGridWaveAnimation()),
+      AnimationItem(name: '粒子旋涡', widget: const ParticleVortexAnimation()),
+      AnimationItem(name: '粒子流沿波形', widget: const ParticleWaveFlowAnimation()),
+      AnimationItem(name: '暂停按钮波纹', widget: const PauseButtonRippleAnimation()),
+      AnimationItem(name: '播放按钮填充', widget: const PlayButtonFillAnimation()),
+      AnimationItem(name: '播放状态脉冲', widget: const PlayStatePulseAnimation()),
       AnimationItem(
         name: '进度条分段加载',
         widget: const ProgressBarSegmentedLoadingAnimation(),
       ),
-      AnimationItem(
-        name: '进度脉冲',
-        widget: const ProgressPulseAnimation(),
-      ),
+      AnimationItem(name: '进度脉冲', widget: const ProgressPulseAnimation()),
       AnimationItem(
         name: '进度时间滚动',
         widget: const ProgressTimeScrollAnimation(),
       ),
-      AnimationItem(
-        name: '波纹扩散',
-        widget: const RippleDiffusionAnimation(),
-      ),
-      AnimationItem(
-        name: '扇形频谱',
-        widget: const SectorSpectrumAnimation(),
-      ),
-      AnimationItem(
-        name: '3D频谱球',
-        widget: const Spectrum3DSphereAnimation(),
-      ),
-      AnimationItem(
-        name: '频谱闪光',
-        widget: const SpectrumFlashAnimation(),
-      ),
+      AnimationItem(name: '波纹扩散', widget: const RippleDiffusionAnimation()),
+      AnimationItem(name: '扇形频谱', widget: const SectorSpectrumAnimation()),
+      AnimationItem(name: '3D频谱球', widget: const Spectrum3DSphereAnimation()),
+      AnimationItem(name: '频谱闪光', widget: const SpectrumFlashAnimation()),
       AnimationItem(
         name: '音量扇形展开',
         widget: const VolumeSectorExpandAnimation(),
       ),
-      AnimationItem(
-        name: '波形网格',
-        widget: const WaveformGridAnimation(),
-      ),
-      AnimationItem(
-        name: '播放按钮脉冲动画',
-        widget: const PlayButtonPulseAnimation(),
-      ),
-      AnimationItem(
-        name: '音符粒子动画',
-        widget: const NoteParticleAnimation(),
-      ),
+      AnimationItem(name: '波形网格', widget: const WaveformGridAnimation()),
+      AnimationItem(name: '播放按钮脉冲动画', widget: const PlayButtonPulseAnimation()),
+      AnimationItem(name: '音符粒子动画', widget: const NoteParticleAnimation()),
     ];
 
     final theme = Theme.of(context);
@@ -322,7 +208,7 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Card(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -338,7 +224,9 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
                       Text(
                         '开启或关闭所有动画效果',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -351,7 +239,8 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
                         ),
                         value: ref.watch(animationsEnabledProvider),
                         onChanged: (value) {
-                          ref.read(animationsEnabledProvider.notifier).state = value;
+                          ref.read(animationsEnabledProvider.notifier).state =
+                              value;
                         },
                         activeColor: theme.colorScheme.primary,
                       ),
@@ -380,17 +269,13 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
               mainAxisSpacing: 16,
               childAspectRatio: 1.5,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final animationItem = animations[index];
-                return AnimationItemWidget(animationItem: animationItem);
-              },
-              childCount: animations.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final animationItem = animations[index];
+              return AnimationItemWidget(animationItem: animationItem);
+            }, childCount: animations.length),
           ),
         ],
       ),
     );
   }
 }
-

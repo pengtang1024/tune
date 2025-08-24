@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart' as scanner_provider;
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
@@ -10,7 +11,6 @@ import 'package:tune/ui/library/widgets/music_scan/components/custom_paths_manag
 import 'package:tune/ui/library/widgets/music_scan/components/scan_control_buttons.dart';
 import 'package:tune/ui/library/widgets/music_scan/components/scan_results_display.dart';
 import 'package:tune/ui/library/widgets/music_scan/components/scan_status_display.dart';
-import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart' as scanner_provider;
 import 'package:tune/utils/logger.dart';
 
 /// 音乐扫描页面
@@ -107,20 +107,20 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     try {
       final notifier = ref.read(libraryStateNotifierProvider.notifier);
       final scanner = ref.read(scanner_provider.crossPlatformMusicScannerProvider);
-      
+
       // 开始扫描状态
       notifier.startScanning();
-      
+
       // 执行扫描
       final songs = await scanner.scanCustomPaths(_customScanPaths);
-      
+
       // 完成扫描
       notifier.completeScan(songs);
     } catch (e) {
       Log.error('扫描音乐失败: $e');
       final notifier = ref.read(libraryStateNotifierProvider.notifier);
-      notifier.scanError('扫描音乐失败: $e');
-      _showErrorSnackBar('failed_to_scan_music');
+      notifier.scanError(context.loc.failed_to_scan_music);
+      _showErrorSnackBar(context.loc.failed_to_scan_music);
     }
   }
 
@@ -149,13 +149,13 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     final state = ref.watch(libraryStateNotifierProvider);
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc.scan_local_music),
-      ),
+      appBar: AppBar(title: Text(context.loc.scan_local_music)),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -169,6 +169,17 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
               onRemovePath: _removeCustomScanPath
             ),
 
+            // 空状态提示 - 没有自定义路径
+            if (_customScanPaths.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  context.loc.no_custom_scan_paths, 
+                  style: Theme.of(context).textTheme.bodyMedium, 
+                  textAlign: TextAlign.center
+                ),
+              ),
+
             // 扫描控制按钮
             ScanControlButtons(
               isScanning: state.scanStatus == ScanStatus.scanning, 
@@ -176,13 +187,25 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
               onStartScan: _startScan
             ),
 
+            // 空状态提示 - 未扫描或没有结果
+            if (_customScanPaths.isNotEmpty && !state.hasScannedResults && state.scanStatus != ScanStatus.scanning)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  context.loc.no_scan_results, 
+                  style: Theme.of(context).textTheme.bodyMedium, 
+                  textAlign: TextAlign.center
+                ),
+              ),
+
             // 扫描结果展示
-            ScanResultsDisplay(
-              state: state, 
-              onAddToLibrary: _addToLibrary, 
-              onResetScan: _resetScan, 
-              onPlaySong: _playSong
-            ),
+            if (state.hasScannedResults) 
+              ScanResultsDisplay(
+                state: state, 
+                onAddToLibrary: _addToLibrary, 
+                onResetScan: _resetScan, 
+                onPlaySong: _playSong
+              ),
           ],
         ),
       ),

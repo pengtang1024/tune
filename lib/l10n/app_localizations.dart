@@ -406,17 +406,17 @@ abstract class AppLocalizations {
   /// **'添加自定义路径'**
   String get add_custom_path;
 
-  /// No description provided for @no_custom_paths.
+  /// No description provided for @no_custom_scan_paths.
   ///
   /// In zh_CN, this message translates to:
   /// **'未设置自定义扫描路径'**
-  String get no_custom_paths;
+  String get no_custom_scan_paths;
 
-  /// No description provided for @no_custom_paths_description.
+  /// No description provided for @no_custom_scan_paths_description.
   ///
   /// In zh_CN, this message translates to:
   /// **'添加自定义文件夹路径以扫描特定位置的音乐文件'**
-  String get no_custom_paths_description;
+  String get no_custom_scan_paths_description;
 
   /// No description provided for @scan_local_music.
   ///
@@ -915,12 +915,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'添加自定义目录'**
   String get add_custom_directory;
-
-  /// No description provided for @no_custom_scan_paths.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未设置自定义扫描路径'**
-  String get no_custom_scan_paths;
 
   /// No description provided for @full_platform_scan_note.
   ///
@@ -1437,6 +1431,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'非常快'**
   String get very_fast;
+
+  /// No description provided for @no_scan_results.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未找到扫描结果'**
+  String get no_scan_results;
 }
 
 class _AppLocalizationsDelegate

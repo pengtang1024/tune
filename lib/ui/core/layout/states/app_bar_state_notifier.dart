@@ -42,20 +42,34 @@ class AppBarStateNotifier extends StateNotifier<AppBarState> {
         ? ThemeMode.values[themeModeIndex]
         : ThemeMode.system;
 
-    // 加载语言设置
-    final languageCode = sharedPrefs.getString('language_code') ?? 'en';
+    Locale locale;
+    final languageCode = sharedPrefs.getString('language_code');
     final countryCode = sharedPrefs.getString('country_code');
 
-    // 确保locale是支持的locale之一
-    Locale locale;
-    try {
-      locale = AppLocalizations.supportedLocales.firstWhere(
-        (supportedLocale) => supportedLocale.languageCode == languageCode &&
-                            (countryCode == null || supportedLocale.countryCode == countryCode),
-      );
-    } catch (e) {
-      // 如果找不到匹配的语言环境，则使用默认语言环境
-      locale = AppLocalizations.supportedLocales.first;
+    if (languageCode != null) {
+      // 如果有保存的语言设置，则使用保存的设置
+      try {
+        locale = AppLocalizations.supportedLocales.firstWhere(
+          (supportedLocale) => supportedLocale.languageCode == languageCode &&
+                              (countryCode == null || supportedLocale.countryCode == countryCode),
+        );
+      } catch (e) {
+        // 如果找不到匹配的语言环境，则使用默认语言环境
+        locale = AppLocalizations.supportedLocales.first;
+      }
+    } else {
+      // 如果没有保存的语言设置，则根据系统语言设置默认语言
+      final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      try {
+        // 尝试匹配系统语言
+        locale = AppLocalizations.supportedLocales.firstWhere(
+          (supportedLocale) => supportedLocale.languageCode == systemLocale.languageCode &&
+                              (supportedLocale.countryCode == null || supportedLocale.countryCode == systemLocale.countryCode),
+        );
+      } catch (e) {
+        // 如果系统语言不支持，则使用英语作为默认语言
+        locale = const Locale('en');
+      }
     }
 
     state = state.copyWith(

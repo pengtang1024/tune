@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/providers/app_bar_providers.dart';
+import 'package:tune/providers/route_observer_provider.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/library/widgets/library/song_grid_widget.dart';
@@ -38,23 +39,32 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 添加扫描按钮到全局标题
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-      appBarNotifier.clearDynamicActions(); // 清除之前的动态按钮
+    // 监听路由变化，在进入音乐库页面时添加扫描按钮
+    ref.listen<RouteObserverState>(routeObserverProvider, (previous, next) {
+      if (next.route == '/library') {
+        // 延迟执行以确保在widget构建完成后执行
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
+          appBarNotifier.clearDynamicActions(); // 清除之前的动态按钮
 
-      final libraryState = ref.read(libraryStateNotifierProvider);
-      appBarNotifier.addDynamicAction(
-        IconButton(
-          icon: const Icon(Icons.music_note),
-          onPressed: libraryState.scanStatus == ScanStatus.scanning
-              ? null
-              : () {
-                  context.push('/music-scan');
-                },
-          tooltip: context.loc.scan_local_music,
-        ),
-      );
+          final libraryState = ref.read(libraryStateNotifierProvider);
+          appBarNotifier.addDynamicAction(
+            IconButton(
+              icon: const Icon(Icons.music_note),
+              onPressed: libraryState.scanStatus == ScanStatus.scanning
+                  ? null
+                  : () {
+                      context.push('/music-scan');
+                    },
+              tooltip: context.loc.scan_local_music,
+            ),
+          );
+        });
+      } else if (next.route != '/music-scan') {
+        // 当页面被移除时清除动态按钮（除了跳转到音乐扫描页面的情况）
+        final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
+        appBarNotifier.clearDynamicActions();
+      }
     });
 
     final state = ref.watch(libraryStateNotifierProvider);
@@ -73,18 +83,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             _buildScanStatusDisplay(state),
 
             // 歌曲列表标题
-            if (state.songs.isNotEmpty) ...[
-              Text(context.loc.songs, style: Theme.of(context).textTheme.titleLarge), 
-              const SizedBox(height: 8)
-            ],
+            if (state.songs.isNotEmpty) ...[Text(context.loc.songs, style: Theme.of(context).textTheme.titleLarge), const SizedBox(height: 8)],
 
             // 歌曲网格列表
             Expanded(
-              child: SongGridWidget(
-                songs: state.songs, 
-                searchQuery: _searchQuery, 
-                localizedNoSongsFound: context.loc.no_songs_found
-              ),
+              child: SongGridWidget(songs: state.songs, searchQuery: _searchQuery, localizedNoSongsFound: context.loc.no_songs_found),
             ),
           ],
         ),
@@ -110,9 +113,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 },
               )
             : null,
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-        ),
+        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
       ),
       onChanged: (value) {
         setState(() {
@@ -131,30 +132,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return Container(
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.only(bottom: 16.0),
-      decoration: BoxDecoration(
-        color: state.scanStatus == ScanStatus.error 
-            ? Colors.red.withOpacity(0.1) 
-            : Colors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+      decoration: BoxDecoration(color: state.scanStatus == ScanStatus.error ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(8.0)),
       child: Row(
         children: [
-          if (state.scanStatus == ScanStatus.scanning) ...[
-            const CircularProgressIndicator(),
-            const SizedBox(width: 12),
-          ] else if (state.scanStatus == ScanStatus.error) ...[
-            const Icon(Icons.error, color: Colors.red),
-            const SizedBox(width: 12),
-          ],
+          if (state.scanStatus == ScanStatus.scanning) ...[const CircularProgressIndicator(), const SizedBox(width: 12)] else if (state.scanStatus == ScanStatus.error) ...[const Icon(Icons.error, color: Colors.red), const SizedBox(width: 12)],
           Expanded(
-            child: Text(
-              state.statusMessage,
-              style: TextStyle(
-                color: state.scanStatus == ScanStatus.error 
-                    ? Colors.red 
-                    : Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
+            child: Text(state.statusMessage, style: TextStyle(color: state.scanStatus == ScanStatus.error ? Colors.red : Theme.of(context).textTheme.bodyMedium?.color)),
           ),
         ],
       ),
