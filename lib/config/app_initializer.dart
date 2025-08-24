@@ -9,7 +9,8 @@ class AppInitializer {
   /// 初始化应用
   static Future<void> initialize(Ref ref) async {
     // 初始化持久化服务
-    await ref.read(sharedPreferencesServiceProvider).init();
+    final persistenceService = ref.read(sharedPreferencesServiceProvider);
+    await persistenceService.init();
 
     // 初始化路由
     ref.read(routerProvider);

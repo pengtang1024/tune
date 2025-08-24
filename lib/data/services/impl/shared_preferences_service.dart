@@ -4,9 +4,8 @@ import 'package:tune/data/services/persistence_service.dart';
 /// SharedPreferences持久化服务实现
 class SharedPreferencesService implements PersistenceService {
   SharedPreferences? _prefs;
-  SharedPreferencesService(){
-    init();
-  }
+  
+  SharedPreferencesService();
 
   @override
   Future<void> init() async {

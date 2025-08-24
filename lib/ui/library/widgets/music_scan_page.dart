@@ -65,7 +65,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       }
     } catch (e) {
       Log.error('添加自定义扫描路径失败: $e');
-      _showErrorSnackBar('failed_to_add_custom_scan_path');
+      _showErrorSnackBar(context.loc.failed_to_add_custom_scan_path);
     }
   }
 
@@ -84,16 +84,13 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       await persistenceService.setStringList('custom_scan_paths', _customScanPaths);
     } catch (e) {
       Log.error('保存自定义扫描路径失败: $e');
-      _showErrorSnackBar('failed_to_save_custom_scan_paths');
+      _showErrorSnackBar(context.loc.failed_to_save_custom_scan_paths);
     }
   }
 
   // 显示错误提示
-  void _showErrorSnackBar(String messageKey) {
+  void _showErrorSnackBar(String message) {
     if (mounted) {
-      final message = messageKey == 'failed_to_save_custom_scan_paths' 
-          ? context.loc.failed_to_save_custom_scan_paths 
-          : context.loc.failed_to_add_custom_scan_path;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
   }

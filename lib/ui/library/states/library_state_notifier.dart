@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/player/states/player_state_notifier.dart';
+import 'package:tune/ui/player/states/player_state_notifier.dart' show PlayerStateNotifier;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/providers/persistence_providers.dart';
