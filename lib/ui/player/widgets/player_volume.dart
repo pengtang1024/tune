@@ -12,9 +12,11 @@ class PlayerVolume extends ConsumerWidget {
     final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const Icon(Icons.volume_down),
-        Expanded(
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 100),
           child: Slider(
             value: playerState.volume,
             onChanged: playerNotifier.setVolume,

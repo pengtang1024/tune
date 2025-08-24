@@ -1269,6 +1269,174 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'全部循环'**
   String get repeat_all;
+
+  /// No description provided for @playback_speed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放速度'**
+  String get playback_speed;
+
+  /// No description provided for @default_playback_speed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认播放速度'**
+  String get default_playback_speed;
+
+  /// No description provided for @default_playback_speed_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置所有歌曲的默认播放速度'**
+  String get default_playback_speed_description;
+
+  /// No description provided for @crossfade.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'交叉淡入淡出'**
+  String get crossfade;
+
+  /// No description provided for @crossfade_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用歌曲间的交叉淡入淡出'**
+  String get crossfade_description;
+
+  /// No description provided for @crossfade_duration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'交叉淡入淡出时长'**
+  String get crossfade_duration;
+
+  /// No description provided for @gapless_playback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无缝播放'**
+  String get gapless_playback;
+
+  /// No description provided for @gapless_playback_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用无缝播放以实现平滑过渡'**
+  String get gapless_playback_description;
+
+  /// No description provided for @equalizer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡器'**
+  String get equalizer;
+
+  /// No description provided for @equalizer_tab.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡器'**
+  String get equalizer_tab;
+
+  /// No description provided for @presets.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'预设'**
+  String get presets;
+
+  /// No description provided for @flat.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平直'**
+  String get flat;
+
+  /// No description provided for @pop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流行'**
+  String get pop;
+
+  /// No description provided for @rock.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'摇滚'**
+  String get rock;
+
+  /// No description provided for @jazz.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'爵士'**
+  String get jazz;
+
+  /// No description provided for @classical.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'古典'**
+  String get classical;
+
+  /// No description provided for @hip_hop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'嘻哈'**
+  String get hip_hop;
+
+  /// No description provided for @custom_equalizer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义均衡器'**
+  String get custom_equalizer;
+
+  /// No description provided for @animations_settings.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'动画设置'**
+  String get animations_settings;
+
+  /// No description provided for @enable_animations.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用动画'**
+  String get enable_animations;
+
+  /// No description provided for @enable_animations_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用或禁用UI动画'**
+  String get enable_animations_description;
+
+  /// No description provided for @animation_speed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'动画速度'**
+  String get animation_speed;
+
+  /// No description provided for @animation_speed_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置UI动画的速度'**
+  String get animation_speed_description;
+
+  /// No description provided for @very_slow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'非常慢'**
+  String get very_slow;
+
+  /// No description provided for @slow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'慢'**
+  String get slow;
+
+  /// No description provided for @normal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正常'**
+  String get normal;
+
+  /// No description provided for @fast.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'快'**
+  String get fast;
+
+  /// No description provided for @very_fast.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'非常快'**
+  String get very_fast;
 }
 
 class _AppLocalizationsDelegate

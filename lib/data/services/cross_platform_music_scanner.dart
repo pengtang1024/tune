@@ -1,19 +1,20 @@
-import 'dart:io' show Platform, Directory, File;
-import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
+import 'dart:io' show Directory, File, FileSystemEntityType, Platform;
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
-
-// 添加debugPrint导入
-import 'package:flutter/material.dart' show debugPrint;
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
 
 /// 跨平台音乐扫描服务接口
 abstract class CrossPlatformMusicScanner {
+  /// 初始化服务
+  Future<void> init();
+
   /// 扫描音乐文件
   Future<List<Song>> scanMusic();
 
-  /// 在指定目录中扫描音乐文件
+  /// 扫描单个目录中的音乐文件
   Future<List<Song>> scanMusicInDirectory(String directoryPath);
 
   /// 扫描多个目录中的音乐文件
@@ -42,6 +43,12 @@ abstract class CrossPlatformMusicScanner {
 /// 跨平台音乐扫描服务实现
 class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   CrossPlatformMusicScannerImpl();
+  
+  @override
+  Future<void> init() async {
+    // 初始化操作（如果需要）
+    Log.info('CrossPlatformMusicScannerImpl: 初始化完成');
+  }
 
   @override
   Future<List<Song>> scanMusic() async {
@@ -294,33 +301,76 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
   @override
   Future<List<Song>> scanCustomPaths(List<String> paths) async {
-    final allSongs = <Song>[];
-    
-    // 定义支持的音频格式
-    final supportedFormats = {'mp3', 'flac', 'wav', 'm4a', 'aac', 'ogg'};
-    
-    for (final path in paths) {
-      final dir = Directory(path);
-      if (await dir.exists()) {
-        await for (final fileEntity in dir.list(recursive: true, followLinks: false)) {
-          if (fileEntity is File) {
-            final file = fileEntity;
-            final extension = file.path.split('.').last.toLowerCase();
-            if (supportedFormats.contains(extension)) {
-              try {
-                final song = await _createSongFromFile(file);
-                if (song != null) {
-                  allSongs.add(song);
+    try {
+      Log.info('开始扫描自定义路径: $paths');
+      final allSongs = <Song>[];
+      
+      // 检查路径列表是否为空
+      if (paths.isEmpty) {
+        Log.info('自定义扫描路径列表为空');
+        return allSongs;
+      }
+
+      for (final path in paths) {
+        try {
+          Log.info('扫描路径: $path');
+          
+          // 检查路径是否为空
+          if (path.isEmpty) {
+            Log.info('跳过空路径');
+            continue;
+          }
+          
+          final dir = Directory(path);
+          
+          // 检查目录是否存在
+          if (!await dir.exists()) {
+            Log.info('目录不存在，跳过: $path');
+            continue;
+          }
+          
+          // 检查是否为目录
+          final stat = await dir.stat();
+          if (stat.type != FileSystemEntityType.directory) {
+            Log.info('路径不是目录，跳过: $path');
+            continue;
+          }
+          
+          await for (final file in dir.list(recursive: true, followLinks: false)) {
+            try {
+              if (file is File) {
+                final fileName = file.path.toLowerCase();
+                // 支持的音频格式
+                if (fileName.endsWith('.mp3') ||
+                    fileName.endsWith('.flac') ||
+                    fileName.endsWith('.wav') ||
+                    fileName.endsWith('.m4a') ||
+                    fileName.endsWith('.aac') ||
+                    fileName.endsWith('.ogg')) {
+                  final song = await _createSongFromFile(file);
+                  if (song != null) {
+                    allSongs.add(song);
+                  }
                 }
-              } catch (e) {
-                debugPrint('Error scanning file ${file.path}: $e');
               }
+            } catch (e, stackTrace) {
+              Log.error('处理文件时出错: ${file.path}, 错误: $e', stackTrace);
+              // 继续处理其他文件
+              continue;
             }
           }
+        } catch (e, stackTrace) {
+          Log.error('扫描路径时出错: $path, 错误: $e', stackTrace);
+          // 继续扫描其他路径
+          continue;
         }
       }
+      
+      Log.info('扫描完成，共找到 ${allSongs.length} 首歌曲');
+      return allSongs;
+    } catch (e, stackTrace) {
+      Log.error('扫描自定义路径时发生严重错误: $e', stackTrace);
+      rethrow;
     }
-    
-    return allSongs;
   }
 }

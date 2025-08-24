@@ -8,6 +8,7 @@ class PlayerState {
   final Duration position;
   final Duration duration;
   final double volume;
+  final double speed;
   final PlayMode playMode;
   final String errorMessage;
 
@@ -17,6 +18,7 @@ class PlayerState {
     this.position = Duration.zero,
     this.duration = Duration.zero,
     this.volume = 1.0,
+    this.speed = 1.0,
     this.playMode = PlayMode.sequential,
     this.errorMessage = '',
   });
@@ -35,22 +37,24 @@ class PlayerState {
   }
 
   /// 创建播放状态
-  static PlayerState playing(Song song, Duration position, Duration duration) {
+  static PlayerState playing(Song song, Duration position, Duration duration, double speed) {
     return PlayerState(
       currentSong: song,
       isPlaying: true,
       position: position,
       duration: duration,
+      speed: speed,
     );
   }
 
   /// 创建暂停状态
-  static PlayerState paused(Song song, Duration position, Duration duration) {
+  static PlayerState paused(Song song, Duration position, Duration duration, double speed) {
     return PlayerState(
       currentSong: song,
       isPlaying: false,
       position: position,
       duration: duration,
+      speed: speed,
     );
   }
 
@@ -66,6 +70,7 @@ class PlayerState {
     Duration? position,
     Duration? duration,
     double? volume,
+    double? speed,
     PlayMode? playMode,
     String? errorMessage,
   }) {
@@ -75,6 +80,7 @@ class PlayerState {
       position: position ?? this.position,
       duration: duration ?? this.duration,
       volume: volume ?? this.volume,
+      speed: speed ?? this.speed,
       playMode: playMode ?? this.playMode,
       errorMessage: errorMessage ?? this.errorMessage,
     );
@@ -89,6 +95,7 @@ class PlayerState {
         other.position == position &&
         other.duration == duration &&
         other.volume == volume &&
+        other.speed == speed &&
         other.playMode == playMode &&
         other.errorMessage == errorMessage;
   }
@@ -100,6 +107,7 @@ class PlayerState {
         position,
         duration,
         volume,
+        speed,
         playMode,
         errorMessage,
       );

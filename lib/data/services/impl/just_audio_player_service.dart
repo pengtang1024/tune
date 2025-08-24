@@ -14,8 +14,8 @@ class JustAudioPlayerService implements AudioPlayerService {
     try {
       _audioPlayer = AudioPlayer();
       Log.info('音频播放器初始化成功');
-    } catch (e) {
-      Log.error('初始化音频播放器失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('初始化音频播放器失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -33,13 +33,16 @@ class JustAudioPlayerService implements AudioPlayerService {
       
       // 检查音频路径是否为空
       if (audioPath == null || audioPath.isEmpty) {
+        Log.error('音频文件路径为空');
         throw Exception('音频文件路径为空');
       }
       
+      Log.info('尝试播放音频文件: $audioPath');
       await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
       await _audioPlayer!.play();
-    } catch (e) {
-      Log.error('播放音频失败: $e');
+      Log.info('音频播放成功');
+    } catch (e, stackTrace) {
+      Log.error('播放音频失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -50,8 +53,8 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_audioPlayer != null) {
         await _audioPlayer!.pause();
       }
-    } catch (e) {
-      Log.error('暂停播放失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('暂停播放失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -62,8 +65,8 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_audioPlayer != null) {
         await _audioPlayer!.play();
       }
-    } catch (e) {
-      Log.error('恢复播放失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('恢复播放失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -74,8 +77,8 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_audioPlayer != null) {
         await _audioPlayer!.stop();
       }
-    } catch (e) {
-      Log.error('停止播放失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('停止播放失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -86,8 +89,8 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_audioPlayer != null) {
         await _audioPlayer!.seek(position);
       }
-    } catch (e) {
-      Log.error('跳转到指定位置失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('跳转到指定位置失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -96,10 +99,26 @@ class JustAudioPlayerService implements AudioPlayerService {
   Future<void> setVolume(double volume) async {
     try {
       if (_audioPlayer != null) {
-        await _audioPlayer!.setVolume(volume);
+        // 限制音量范围在0.0到1.0之间
+        final clampedVolume = volume.clamp(0.0, 1.0);
+        await _audioPlayer!.setVolume(clampedVolume);
       }
-    } catch (e) {
-      Log.error('设置音量失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('设置音量失败: $e\nStack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> setSpeed(double speed) async {
+    try {
+      if (_audioPlayer != null) {
+        // 限制播放速度范围在0.25到2.0之间
+        final clampedSpeed = speed.clamp(0.25, 2.0);
+        await _audioPlayer!.setSpeed(clampedSpeed);
+      }
+    } catch (e, stackTrace) {
+      Log.error('设置播放速度失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
   }
@@ -108,8 +127,8 @@ class JustAudioPlayerService implements AudioPlayerService {
   Duration get currentPosition {
     try {
       return _audioPlayer?.position ?? Duration.zero;
-    } catch (e) {
-      Log.error('获取当前播放位置失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('获取当前播放位置失败: $e\nStack trace: $stackTrace');
       return Duration.zero;
     }
   }
@@ -118,9 +137,9 @@ class JustAudioPlayerService implements AudioPlayerService {
   Duration get duration {
     try {
       return _audioPlayer?.duration ?? Duration.zero;
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Windows平台有时在获取duration时会抛出异常
-      Log.error('获取音频时长失败: $e');
+      Log.error('获取音频时长失败: $e\nStack trace: $stackTrace');
       return Duration.zero;
     }
   }
@@ -129,9 +148,19 @@ class JustAudioPlayerService implements AudioPlayerService {
   bool get isPlaying {
     try {
       return _audioPlayer?.playing ?? false;
-    } catch (e) {
-      Log.error('获取播放状态失败: $e');
+    } catch (e, stackTrace) {
+      Log.error('获取播放状态失败: $e\nStack trace: $stackTrace');
       return false;
+    }
+  }
+
+  @override
+  double get speed {
+    try {
+      return _audioPlayer?.speed ?? 1.0;
+    } catch (e, stackTrace) {
+      Log.error('获取播放速度失败: $e\nStack trace: $stackTrace');
+      return 1.0;
     }
   }
 
@@ -140,8 +169,9 @@ class JustAudioPlayerService implements AudioPlayerService {
     try {
       _audioPlayer?.dispose();
       _audioPlayer = null;
-    } catch (e) {
-      Log.error('释放音频播放器资源失败: $e');
+      Log.info('音频播放器资源释放成功');
+    } catch (e, stackTrace) {
+      Log.error('释放音频播放器资源失败: $e\nStack trace: $stackTrace');
     }
   }
 }

@@ -1,147 +1,204 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/ui/core/settings/providers/playback_settings_provider.dart';
+import 'package:tune/providers/persistence_providers.dart';
 
-/// 播放设置标签页
-class PlaybackTab extends ConsumerWidget {
+class PlaybackTab extends ConsumerStatefulWidget {
   const PlaybackTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(playbackSettingsProvider);
-    final notifier = ref.read(playbackSettingsProvider.notifier);
+  ConsumerState<PlaybackTab> createState() => _PlaybackTabState();
+}
 
-    return Padding(
+class _PlaybackTabState extends ConsumerState<PlaybackTab> {
+  double _defaultPlaybackSpeed = 1.0;
+  bool _crossfadeEnabled = false;
+  int _crossfadeDuration = 1000; // milliseconds
+  bool _gaplessPlayback = true;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final persistenceService = ref.read(sharedPreferencesServiceProvider);
+
+    setState(() {
+      _defaultPlaybackSpeed = persistenceService.getDouble('default_playback_speed') ?? 1.0;
+      _crossfadeEnabled = persistenceService.getBool('crossfade_enabled') ?? false;
+      _crossfadeDuration = persistenceService.getInt('crossfade_duration') ?? 1000;
+      _gaplessPlayback = persistenceService.getBool('gapless_playback') ?? true;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _saveSetting(String key, dynamic value) async {
+    final persistenceService = ref.read(sharedPreferencesServiceProvider);
+
+    if (value is bool) {
+      await persistenceService.setBool(key, value);
+    } else if (value is double) {
+      await persistenceService.setDouble(key, value);
+    } else if (value is int) {
+      await persistenceService.setInt(key, value);
+    } else if (value is String) {
+      await persistenceService.setString(key, value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(sharedPreferencesServiceProvider);
+    
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             context.loc.playback_settings,
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
-          DropdownButtonFormField<String?>(
-            value: state.playMode,
-            decoration: InputDecoration(
-              labelText: context.loc.play_mode,
-              border: const OutlineInputBorder(),
+          const SizedBox(height: 16),
+
+          // 默认播放速度
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.loc.default_playback_speed,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButton<double>(
+                    value: _defaultPlaybackSpeed,
+                    onChanged: (double? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _defaultPlaybackSpeed = newValue;
+                        });
+                        _saveSetting('default_playback_speed', newValue);
+                      }
+                    },
+                    items: const [
+                      DropdownMenuItem(value: 0.5, child: Text('0.5x')),
+                      DropdownMenuItem(value: 0.75, child: Text('0.75x')),
+                      DropdownMenuItem(value: 1.0, child: Text('1.0x')),
+                      DropdownMenuItem(value: 1.25, child: Text('1.25x')),
+                      DropdownMenuItem(value: 1.5, child: Text('1.5x')),
+                      DropdownMenuItem(value: 2.0, child: Text('2.0x')),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.loc.default_playback_speed_description,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
-            items: [
-              DropdownMenuItem(
-                value: 'sequence',
-                child: Text(context.loc.sequence_playback),
-              ),
-              DropdownMenuItem(
-                value: 'repeat_one',
-                child: Text(context.loc.repeat_one),
-              ),
-              DropdownMenuItem(
-                value: 'shuffle',
-                child: Text(context.loc.shuffle_playback),
-              ),
-            ],
-            onChanged: (String? value) {
-              if (value != null) {
-                notifier.updatePlaybackMode(value);
-              }
-            },
           ),
-          const SizedBox(height: 20),
-          DropdownButtonFormField<String?>(
-            value: state.audioQuality,
-            decoration: InputDecoration(
-              labelText: context.loc.audio_quality,
-              border: const OutlineInputBorder(),
+          const SizedBox(height: 16),
+
+          // 交叉淡入淡出
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        context.loc.crossfade,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Switch(
+                        value: _crossfadeEnabled,
+                        onChanged: (value) {
+                          setState(() {
+                            _crossfadeEnabled = value;
+                          });
+                          _saveSetting('crossfade_enabled', value);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.loc.crossfade_description,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  if (_crossfadeEnabled) ...[
+                    const SizedBox(height: 16),
+                    Text(context.loc.crossfade_duration),
+                    Slider(
+                      value: _crossfadeDuration.toDouble(),
+                      min: 100,
+                      max: 5000,
+                      divisions: 49,
+                      label: '${_crossfadeDuration}ms',
+                      onChanged: (value) {
+                        setState(() {
+                          _crossfadeDuration = value.toInt();
+                        });
+                        _saveSetting('crossfade_duration', _crossfadeDuration);
+                      },
+                    ),
+                  ],
+                ],
+              ),
             ),
-            items: [
-              DropdownMenuItem(
-                value: 'low',
-                child: Text(context.loc.low_quality),
-              ),
-              DropdownMenuItem(
-                value: 'medium',
-                child: Text(context.loc.medium_quality),
-              ),
-              DropdownMenuItem(
-                value: 'high',
-                child: Text(context.loc.high_quality),
-              ),
-            ],
-            onChanged: (String? value) {
-              if (value != null) {
-                notifier.updateAudioQuality(value);
-              }
-            },
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(context.loc.pause_when_headset_disconnected),
-              Switch(
-                value: state.pauseWhenHeadsetDisconnected,
-                onChanged: notifier.updatePauseWhenHeadsetDisconnected,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            context.loc.audio_effects,
-            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(context.loc.enable_equalizer),
-              Switch(
-                value: state.isEqualizerEnabled,
-                onChanged: (bool value) {
-                  notifier.toggleEqualizer(value);
-                },
+
+          // 无缝播放
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        context.loc.gapless_playback,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Switch(
+                        value: _gaplessPlayback,
+                        onChanged: (value) {
+                          setState(() {
+                            _gaplessPlayback = value;
+                          });
+                          _saveSetting('gapless_playback', value);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.loc.gapless_playback_description,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(context.loc.bass_boost),
-              Switch(
-                value: state.isBassBoostEnabled,
-                onChanged: (bool value) {
-                  notifier.toggleBassBoost(value);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(context.loc.spatial_audio),
-              Switch(
-                value: state.isSpatialAudioEnabled,
-                onChanged: (bool value) {
-                  notifier.toggleSpatialAudio(value);
-                },
-              ),
-            ],
-          ),
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                notifier.saveSettings();
-                // 显示保存成功的提示
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(context.loc.settings_saved)),
-                );
-              },
-              child: Text(context.loc.save),
             ),
           ),
         ],

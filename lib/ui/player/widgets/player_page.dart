@@ -6,7 +6,11 @@ import 'package:tune/ui/player/states/player_state_notifier.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
+import 'package:tune/ui/player/widgets/player_speed.dart';
 import 'package:tune/ui/player/widgets/player_volume.dart';
+import 'package:tune/ui/player/widgets/player_playlist.dart';
+import 'package:tune/ui/player/widgets/player_equalizer.dart';
+import 'package:tune/ui/player/widgets/player_history.dart';
 
 /// 播放器首页面
 class PlayerPage extends ConsumerWidget {
@@ -36,46 +40,69 @@ class PlayerPage extends ConsumerWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 专辑封面占位符
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, borderRadius: BorderRadius.circular(16)),
-              child: Icon(Icons.music_note, size: 100, color: Theme.of(context).colorScheme.onPrimaryContainer),
-            ),
-            const SizedBox(height: 32),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 专辑封面占位符
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, borderRadius: BorderRadius.circular(16)),
+                child: Icon(Icons.music_note, size: 100, color: Theme.of(context).colorScheme.onPrimaryContainer),
+              ),
+              const SizedBox(height: 32),
 
-            // 歌曲信息
-            Text(
-              playerState.currentSong!.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              '${playerState.currentSong!.artist} - ${playerState.currentSong!.album}',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
+              // 歌曲信息
+              Text(
+                playerState.currentSong!.title,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${playerState.currentSong!.artist} - ${playerState.currentSong!.album}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
 
-            // 播放进度
-            const PlayerProgress(),
-            const SizedBox(height: 32),
+              // 播放进度
+              const PlayerProgress(),
+              const SizedBox(height: 32),
 
-            // 播放控制
-            const PlayerControls(),
-            const SizedBox(height: 32),
+              // 播放控制
+              const PlayerControls(),
+              const SizedBox(height: 32),
 
-            // 音量控制
-            const PlayerVolume(),
+              // 音量和速度控制
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  PlayerVolume(),
+                  PlayerSpeed(),
+                ],
+              ),
+              const SizedBox(height: 16),
 
-            // 播放模式控制
-            PlayerModeControls(playerNotifier: playerNotifier),
-          ],
+              // 播放模式控制
+              PlayerModeControls(playerNotifier: playerNotifier),
+              const SizedBox(height: 32),
+
+              // 均衡器控制
+              const PlayerEqualizer(),
+              const SizedBox(height: 32),
+
+              // 播放历史记录
+              const PlayerHistory(),
+              const SizedBox(height: 32),
+
+              // 播放列表
+              const PlayerPlaylist(),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

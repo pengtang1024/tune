@@ -594,6 +594,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get repeat_all => '全部重复';
+
+  @override
+  String get playback_speed => '播放速度';
+
+  @override
+  String get default_playback_speed => '默认播放速度';
+
+  @override
+  String get default_playback_speed_description => '设置所有歌曲的默认播放速度';
+
+  @override
+  String get crossfade => '交叉淡入淡出';
+
+  @override
+  String get crossfade_description => '启用歌曲间的交叉淡入淡出';
+
+  @override
+  String get crossfade_duration => '交叉淡入淡出时长';
+
+  @override
+  String get gapless_playback => '无缝播放';
+
+  @override
+  String get gapless_playback_description => '启用无缝播放以实现平滑过渡';
+
+  @override
+  String get equalizer => '均衡器';
+
+  @override
+  String get equalizer_tab => '均衡器';
+
+  @override
+  String get presets => '预设';
+
+  @override
+  String get flat => '平直';
+
+  @override
+  String get pop => '流行';
+
+  @override
+  String get rock => '摇滚';
+
+  @override
+  String get jazz => '爵士';
+
+  @override
+  String get classical => '古典';
+
+  @override
+  String get hip_hop => '嘻哈';
+
+  @override
+  String get custom_equalizer => '自定义均衡器';
+
+  @override
+  String get animations_settings => '动画设置';
+
+  @override
+  String get enable_animations => '启用动画';
+
+  @override
+  String get enable_animations_description => '启用或禁用UI动画';
+
+  @override
+  String get animation_speed => '动画速度';
+
+  @override
+  String get animation_speed_description => '设置UI动画的速度';
+
+  @override
+  String get very_slow => '非常慢';
+
+  @override
+  String get slow => '慢';
+
+  @override
+  String get normal => '正常';
+
+  @override
+  String get fast => '快';
+
+  @override
+  String get very_fast => '非常快';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1186,6 +1270,90 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get repeat_all => '全部循环';
+
+  @override
+  String get playback_speed => '播放速度';
+
+  @override
+  String get default_playback_speed => '默认播放速度';
+
+  @override
+  String get default_playback_speed_description => '设置所有歌曲的默认播放速度';
+
+  @override
+  String get crossfade => '交叉淡入淡出';
+
+  @override
+  String get crossfade_description => '启用歌曲间的交叉淡入淡出';
+
+  @override
+  String get crossfade_duration => '交叉淡入淡出时长';
+
+  @override
+  String get gapless_playback => '无缝播放';
+
+  @override
+  String get gapless_playback_description => '启用无缝播放以实现平滑过渡';
+
+  @override
+  String get equalizer => '均衡器';
+
+  @override
+  String get equalizer_tab => '均衡器';
+
+  @override
+  String get presets => '预设';
+
+  @override
+  String get flat => '平直';
+
+  @override
+  String get pop => '流行';
+
+  @override
+  String get rock => '摇滚';
+
+  @override
+  String get jazz => '爵士';
+
+  @override
+  String get classical => '古典';
+
+  @override
+  String get hip_hop => '嘻哈';
+
+  @override
+  String get custom_equalizer => '自定义均衡器';
+
+  @override
+  String get animations_settings => '动画设置';
+
+  @override
+  String get enable_animations => '启用动画';
+
+  @override
+  String get enable_animations_description => '启用或禁用UI动画';
+
+  @override
+  String get animation_speed => '动画速度';
+
+  @override
+  String get animation_speed_description => '设置UI动画的速度';
+
+  @override
+  String get very_slow => '非常慢';
+
+  @override
+  String get slow => '慢';
+
+  @override
+  String get normal => '正常';
+
+  @override
+  String get fast => '快';
+
+  @override
+  String get very_fast => '非常快';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

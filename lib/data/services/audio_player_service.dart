@@ -23,6 +23,9 @@ abstract class AudioPlayerService {
   /// 设置音量
   Future<void> setVolume(double volume);
 
+  /// 设置播放速度
+  Future<void> setSpeed(double speed);
+
   /// 获取当前播放位置
   Duration get currentPosition;
 
@@ -31,6 +34,9 @@ abstract class AudioPlayerService {
 
   /// 是否正在播放
   bool get isPlaying;
+
+  /// 获取当前播放速度
+  double get speed;
 
   /// 释放资源
   void dispose();

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/app_bar_title.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/back_button.dart';
+import 'package:tune/ui/core/layout/widgets/custom_app_bar/clear_data_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/github_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/language_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/play_button.dart';
@@ -32,7 +33,10 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         // 动态按钮（最右侧，从右到左排列）
         ...appBarState.dynamicActions,
 
-        // GitHub按钮（动态按钮左侧）
+        // 清理数据按钮（动态按钮左侧）
+        const ClearDataButton(),
+
+        // GitHub按钮（清理数据按钮左侧）
         const GitHubButton(),
 
         // 播放按钮（GitHub按钮左侧）

@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome_message => 'Welcome to Tune';
 
   @override
-  String get no_songs_found => 'No Songs Found';
+  String get no_songs_found => 'No songs found';
 
   @override
   String get settings => 'Settings';
@@ -106,7 +106,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pause_when_headset_disconnected =>
-      'Pause When Headset Disconnected';
+      'Pause when headset disconnected';
 
   @override
   String get audio_effects => 'Audio Effects';
@@ -157,7 +157,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_custom_path => 'Add Custom Path';
 
   @override
-  String get no_custom_paths => 'No Custom Scan Paths';
+  String get no_custom_paths => 'No custom scan paths';
 
   @override
   String get no_custom_paths_description =>
@@ -176,7 +176,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scan_failed => 'Scan Failed';
 
   @override
-  String get failed_to_load_songs => 'Failed to Load Songs';
+  String get failed_to_load_songs => 'Failed to load songs';
 
   @override
   String get failed_to_load_songs_description =>
@@ -321,72 +321,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_description =>
-      'Tune is a modern music player designed for music lovers. It supports multiple audio formats and provides a high-quality audio playback experience.';
+      'Tune is a modern music player designed for music lovers. It supports multiple audio formats and provides high-quality audio playback experience.';
 
   @override
   String get features => 'Features';
 
   @override
-  String get high_quality_audio_playback => 'High Quality Audio Playback';
+  String get high_quality_audio_playback => 'High-quality audio playback';
 
   @override
   String get supports_multiple_audio_formats =>
       'Supports multiple audio formats (MP3, FLAC, WAV, AAC, etc.)';
 
   @override
-  String get local_music_management => 'Local Music Management';
+  String get local_music_management => 'Local music management';
 
   @override
   String get automatically_scans_and_organizes_local_music_library =>
       'Automatically scans and organizes local music library';
 
   @override
-  String get multi_language_support => 'Multi-language Support';
+  String get multi_language_support => 'Multi-language support';
 
   @override
   String get supports_chinese_english_japanese_korean_russian_and_more =>
       'Supports Chinese, English, Japanese, Korean, Russian and more languages';
 
   @override
-  String get multiple_themes => 'Multiple Themes';
+  String get multiple_themes => 'Multiple themes';
 
   @override
   String get eight_theme_colors_with_dark_light_mode_switching =>
       '8 theme colors with dark/light mode switching';
 
   @override
-  String get lyrics_synchronization => 'Lyrics Synchronization';
+  String get lyrics_synchronization => 'Lyrics synchronization';
 
   @override
   String get lrc_format_lyrics_real_time_synchronization_display =>
       'LRC format lyrics real-time synchronization display';
 
   @override
-  String get smart_search => 'Smart Search';
+  String get smart_search => 'Smart search';
 
   @override
   String get supports_searching_by_song_title_artist_album_and_other_metadata =>
       'Supports searching by song title, artist, album and other metadata';
 
   @override
-  String get open_source_license => 'Open Source License';
+  String get open_source_license => 'Open source license';
 
   @override
   String get opensource_license_description =>
       'This project is released under an open source license, and the source code is available on GitHub.';
 
   @override
-  String get github_project_address => 'GitHub Project Address';
+  String get github_project_address => 'GitHub project address';
 
   @override
-  String get contact_us => 'Contact Us';
+  String get contact_us => 'Contact us';
 
   @override
   String get contact_us_description =>
-      'If you have any questions, please contact us at:\nEmail: support@tune.com';
+      'If you have any questions, please contact us through the following ways:\nEmail: support@tune.com';
 
   @override
-  String get official_website => 'Official Website';
+  String get official_website => 'Official website';
 
   @override
   String get auto_start => 'Auto Start';
@@ -432,7 +432,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_custom_directory => 'Add Custom Directory';
 
   @override
-  String get no_custom_scan_paths => 'No Custom Scan Paths';
+  String get no_custom_scan_paths => 'No custom scan paths';
 
   @override
   String get full_platform_scan_note =>
@@ -477,11 +477,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_step3 =>
-      '3. You can add custom directories to expand the scan range';
+      '3. Custom directories can be added to expand the scan range';
 
   @override
   String get scan_step4 =>
-      '4. Songs will be automatically added to the music library after scanning is complete';
+      '4. Songs will be automatically added to the music library after scanning is completed';
 
   @override
   String get faq => 'FAQ';
@@ -491,14 +491,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faq_scan_issue_answer =>
-      'If scanning fails, please check file permissions and whether the path is correct.';
+      'If scanning fails, please check if file permissions and paths are correct.';
 
   @override
   String get faq_slow_scan => 'Slow Scan';
 
   @override
   String get faq_slow_scan_answer =>
-      'Scan speed depends on the size of the music library and hard disk performance. Large library scanning may take a long time.';
+      'Scan speed depends on the size of the music library and hard disk performance. Large library scans may take a long time.';
 
   @override
   String get faq_not_showing => 'Songs Not Showing';
@@ -595,7 +595,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalid_input => 'Invalid Input';
 
   @override
-  String get search_no_results => 'No Search Results';
+  String get search_no_results => 'No search results found';
 
   @override
   String get skipToPrevious => 'Skip to Previous';
@@ -607,11 +607,97 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playback_error => 'Playback Error';
 
   @override
-  String get no_song_playing => 'No Song Playing';
+  String get no_song_playing => 'No song playing';
 
   @override
-  String get select_a_song_to_play => 'Select a song to play';
+  String get select_a_song_to_play => 'Please select a song to play';
 
   @override
   String get repeat_all => 'Repeat All';
+
+  @override
+  String get playback_speed => 'Playback Speed';
+
+  @override
+  String get default_playback_speed => 'Default Playback Speed';
+
+  @override
+  String get default_playback_speed_description =>
+      'Set the default playback speed for all songs';
+
+  @override
+  String get crossfade => 'Crossfade';
+
+  @override
+  String get crossfade_description => 'Enable crossfade between songs';
+
+  @override
+  String get crossfade_duration => 'Crossfade Duration';
+
+  @override
+  String get gapless_playback => 'Gapless Playback';
+
+  @override
+  String get gapless_playback_description =>
+      'Enable gapless playback for seamless transitions';
+
+  @override
+  String get equalizer => 'Equalizer';
+
+  @override
+  String get equalizer_tab => 'Equalizer';
+
+  @override
+  String get presets => 'Presets';
+
+  @override
+  String get flat => 'Flat';
+
+  @override
+  String get pop => 'Pop';
+
+  @override
+  String get rock => 'Rock';
+
+  @override
+  String get jazz => 'Jazz';
+
+  @override
+  String get classical => 'Classical';
+
+  @override
+  String get hip_hop => 'Hip Hop';
+
+  @override
+  String get custom_equalizer => 'Custom Equalizer';
+
+  @override
+  String get animations_settings => 'Animations Settings';
+
+  @override
+  String get enable_animations => 'Enable Animations';
+
+  @override
+  String get enable_animations_description => 'Enable or disable UI animations';
+
+  @override
+  String get animation_speed => 'Animation Speed';
+
+  @override
+  String get animation_speed_description => 'Set the speed of UI animations';
+
+  @override
+  String get very_slow => 'Very Slow';
+
+  @override
+  String get slow => 'Slow';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get fast => 'Fast';
+
+  @override
+  String get very_fast => 'Very Fast';
 }

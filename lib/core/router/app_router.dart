@@ -8,6 +8,7 @@ import 'package:tune/ui/featured/widgets/featured_page.dart';
 import 'package:tune/ui/home/widgets/home_page.dart';
 import 'package:tune/ui/library/widgets/library_page.dart';
 import 'package:tune/ui/library/widgets/music_scan_page.dart';
+import 'package:tune/ui/player/widgets/player_page.dart';
 import 'package:tune/ui/recommend/widgets/recommend_page.dart';
 
 /// 路由Provider：提供GoRouter实例
@@ -72,6 +73,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: '/settings',
             builder: (BuildContext context, GoRouterState state) {
               return const SettingsPage();
+            },
+          ),
+          GoRoute(
+            path: '/player',
+            name: '/player',
+            builder: (BuildContext context, GoRouterState state) {
+              return const PlayerPage();
             },
           ),
         ],

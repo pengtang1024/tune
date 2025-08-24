@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/widgets/song_card/album_cover_widget.dart';
@@ -21,6 +22,9 @@ class SongCardWidget extends ConsumerWidget {
           // 点击歌曲卡片时的处理逻辑
           final notifier = ref.read(libraryStateNotifierProvider.notifier);
           notifier.playSong(song);
+          
+          // 跳转到播放器页面
+          context.push('/player');
         },
         splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
         highlightColor: Colors.transparent,

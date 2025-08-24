@@ -199,21 +199,25 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
   /// 播放歌曲并设置播放列表
   void playSong(Song song) {
     try {
+      Log.info('准备播放歌曲: ${song.title}');
       final playerNotifier = _ref.read(playerStateNotifierProvider.notifier);
 
       // 获取当前显示的所有歌曲作为播放列表
       final List<Song> allSongs = [...state.songs, ...state.foundSongs];
+      Log.info('构建播放列表，共${allSongs.length}首歌曲');
 
       // 查找歌曲在列表中的索引
       final index = allSongs.indexWhere((s) => s.id == song.id);
+      Log.info('歌曲索引: $index');
 
       // 设置播放列表
       playerNotifier.setPlaylist(allSongs, index);
 
       // 播放指定歌曲
       playerNotifier.playSong(song);
-    } catch (e) {
-      Log.error('播放歌曲失败: $e');
+      Log.info('歌曲播放请求已发送');
+    } catch (e, stackTrace) {
+      Log.error('播放歌曲失败: $e\nStack trace: $stackTrace');
     }
   }
 
