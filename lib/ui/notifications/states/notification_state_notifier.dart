@@ -46,8 +46,7 @@ class NotificationStateNotifier extends StateNotifier<NotificationState> {
     try {
       Log.info('NotificationStateNotifier: 开始初始化通知状态');
       // 这里可以添加从持久化存储加载通知的逻辑
-      // 目前先添加一些示例通知
-      addSampleNotifications();
+      // 移除了示例通知的添加，避免应用启动时显示测试通知
       Log.info('NotificationStateNotifier: 初始化通知状态完成');
     } catch (e, stackTrace) {
       Log.error('NotificationStateNotifier: 初始化通知状态时出错: $e', stackTrace);

@@ -106,7 +106,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pause_when_headset_disconnected =>
-      'Pause when headset disconnected';
+      'Pause When Headset Disconnected';
 
   @override
   String get audio_effects => 'Audio Effects';
@@ -160,7 +160,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get no_custom_scan_paths => 'No custom scan paths';
 
   @override
-  String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
+  String get change_language => 'Change Language';
+
+  @override
+  String get change_language_confirm =>
+      'Are you sure you want to change the app language? This will restart the app to apply the new settings.';
+
+  @override
+  String get current_language_display => 'Current Language:';
+
+  @override
+  String get theme_preview => 'Theme Preview';
+
+  @override
+  String get system_mode_preview => 'System';
+
+  @override
+  String get light_mode_preview => 'Light';
+
+  @override
+  String get dark_mode_preview => 'Dark';
+
+  @override
+  String get no_custom_scan_paths_description =>
+      'Add custom folder paths to scan music files in specific locations';
 
   @override
   String get scan_local_music => 'Scan Local Music';
@@ -280,13 +303,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Scan completed, no new songs found';
 
   @override
-  String get added_scanned_songs_to_library => 'Added scanned songs to library';
+  String get added_scanned_songs_to_library =>
+      'Added scanned songs to music library';
 
   @override
   String get rescan => 'Rescan';
 
   @override
-  String get load_stats_failed => 'Failed to load statistics';
+  String get load_stats_failed => 'Failed to load stats';
 
   @override
   String get load_songs_failed => 'Failed to load songs';
@@ -368,24 +392,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Supports searching by song title, artist, album and other metadata';
 
   @override
-  String get open_source_license => 'Open source license';
+  String get open_source_license => 'Open Source License';
 
   @override
   String get opensource_license_description =>
-      'This project is released under an open source license, and the source code is available on GitHub.';
+      'This project is released under an open source license. The source code is available on GitHub.';
 
   @override
-  String get github_project_address => 'GitHub project address';
+  String get github_project_address => 'GitHub Project Address';
 
   @override
-  String get contact_us => 'Contact us';
+  String get contact_us => 'Contact Us';
 
   @override
   String get contact_us_description =>
       'If you have any questions, please contact us through the following ways:\nEmail: support@tune.com';
 
   @override
-  String get official_website => 'Official website';
+  String get official_website => 'Official Website';
 
   @override
   String get auto_start => 'Auto Start';
@@ -477,7 +501,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_step4 =>
-      '4. Songs will be automatically added to the music library after scanning is completed';
+      '4. After scanning is complete, songs will be automatically added to the music library';
 
   @override
   String get faq => 'FAQ';
@@ -494,14 +518,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faq_slow_scan_answer =>
-      'Scan speed depends on the size of the music library and hard disk performance. Large library scans may take a long time.';
+      'Scan speed depends on music library size and hard disk performance. Large library scans may take a long time.';
 
   @override
   String get faq_not_showing => 'Songs Not Showing';
 
   @override
   String get faq_not_showing_answer =>
-      'Make sure the music file format is supported and check if the file is corrupted.';
+      'Ensure that the music file format is supported and check if the file is corrupted.';
 
   @override
   String get music_scan => 'Music Scan';
@@ -535,6 +559,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get theme => 'Theme';
+
+  @override
+  String get display_settings => 'Display Settings';
+
+  @override
+  String get language_theme_description =>
+      'Set the language and theme mode of the application';
 
   @override
   String get system_mode => 'System Mode';
@@ -635,7 +666,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gapless_playback_description =>
-      'Enable gapless playback for seamless transitions';
+      'Enable gapless playback for smooth transitions';
 
   @override
   String get equalizer => 'Equalizer';
@@ -699,4 +730,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_scan_results => 'No scan results found';
+
+  @override
+  String get enable_notifications => 'Enable Notifications';
+
+  @override
+  String get enable_notifications_description =>
+      'Enable or disable app notifications';
+
+  @override
+  String get font_size => 'Font Size';
+
+  @override
+  String get font_size_description =>
+      'Adjust the display size of text within the app';
 }

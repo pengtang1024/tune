@@ -28,6 +28,9 @@ class LocalNotificationService implements NotificationService {
   // 跟踪初始化状态
   bool _isInitialized = false;
   
+  // 标记是否处于降级模式
+  bool _isFallbackMode = false;
+  
   // 存储需要重试的通知
   final List<Map<String, dynamic>> _pendingNotifications = [];
   
@@ -58,7 +61,7 @@ class LocalNotificationService implements NotificationService {
       final initializationSettingsWindows = Platform.isWindows
           ? WindowsInitializationSettings(
               appName: 'Tune',
-              guid: '{123e4567-e89b-12d3-a456-426614174000}',
+              guid: '2ec006fd-1260-4eaf-9f67-ffaf1a4b2fdc',
               appUserModelId: 'cn.iouf.tune',
             )
           : null;
@@ -110,41 +113,30 @@ class LocalNotificationService implements NotificationService {
       _isInitialized = true;
       Log.info('LocalNotificationService: Windows平台初始化成功');
     } catch (windowsError) {
-      Log.error('LocalNotificationService: Windows平台初始化失败: $windowsError');
-      // 在Windows平台上，如果第一次初始化失败，尝试使用空配置重新初始化
-      try {
-        const emptySettings = InitializationSettings(
-          windows: WindowsInitializationSettings(
-            appName: 'Tune',
-            guid: '{123e4567-e89b-12d3-a456-426614174000}',
-            appUserModelId: 'cn.iouf.tune',
-          ),
-        );
-        await _notificationsPlugin.initialize(
-          emptySettings,
-          onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-        );
-        _isInitialized = true;
-        Log.info('LocalNotificationService: Windows平台使用空配置初始化成功');
-      } catch (secondError) {
-        Log.error('LocalNotificationService: Windows平台二次初始化失败: $secondError');
-        // 如果两次初始化都失败，尝试一种更简化的方式初始化，至少允许角标功能工作
+        Log.error('LocalNotificationService: Windows平台初始化失败: $windowsError');
+        // Windows平台上，初始化失败后不再尝试重新初始化，直接进入降级模式
+        // 这样可以避免'_plugin has already been initialized'错误
         try {
-          // 不调用_notificationsPlugin.initialize，直接标记为已初始化
-          // 这样至少可以让角标相关功能通过shared_preferences工作
+          // 标记为降级模式初始化
           _isInitialized = true;
+          _isFallbackMode = true;
           Log.info('LocalNotificationService: Windows平台初始化失败，使用降级模式，仅启用基本功能');
         } catch (fallbackError) {
           Log.error('LocalNotificationService: Windows平台降级模式初始化失败: $fallbackError');
         }
       }
-    }
   }
   
   /// 处理待发送的通知
   Future<void> _processPendingNotifications() async {
     final List<Map<String, dynamic>> notificationsCopy = List.from(_pendingNotifications);
     _pendingNotifications.clear();
+    
+    // 如果处于降级模式，清空待处理通知但不实际处理
+    if (_isFallbackMode) {
+      Log.info('LocalNotificationService: 处于降级模式，清空待处理通知但不实际处理');
+      return;
+    }
     
     for (final notification in notificationsCopy) {
       try {
@@ -220,6 +212,14 @@ class LocalNotificationService implements NotificationService {
         return;
       }
       
+      // 检查是否处于降级模式
+      if (_isFallbackMode) {
+        Log.info('LocalNotificationService: 处于降级模式，无法显示通知，仅记录: ID=$id, 标题=$title');
+        // 在降级模式下，我们不尝试显示通知，但可以记录通知信息
+        // 这里可以考虑将通知信息保存到持久化存储
+        return;
+      }
+      
       Log.info('LocalNotificationService: 处理通知请求: ID=$id, 标题=$title');
       Log.info('通知渠道参数: channelId=${channelId ?? 'tune_channel'}, channelName=${channelName ?? 'Tune Notifications'}');
 
@@ -239,17 +239,20 @@ class LocalNotificationService implements NotificationService {
       Log.info('LocalNotificationService: 通知显示成功: ID=$id');
     } catch (e, stackTrace) {
       Log.error('LocalNotificationService: 显示通知时出错: $e', stackTrace);
-      // 尝试重试机制
-      await _retryNotification(
-        type: 'show',
-        id: id,
-        title: title,
-        body: body,
-        payload: payload,
-        channelId: channelId,
-        channelName: channelName,
-        channelDescription: channelDescription,
-      );
+      // 如果是降级模式，不进行重试
+      if (!_isFallbackMode) {
+        // 尝试重试机制
+        await _retryNotification(
+          type: 'show',
+          id: id,
+          title: title,
+          body: body,
+          payload: payload,
+          channelId: channelId,
+          channelName: channelName,
+          channelDescription: channelDescription,
+        );
+      }
     }
   }
   
@@ -330,6 +333,13 @@ class LocalNotificationService implements NotificationService {
         return;
       }
       
+      // 检查是否处于降级模式
+      if (_isFallbackMode) {
+        Log.info('LocalNotificationService: 处于降级模式，无法设置定时通知，仅记录: ID=$id, 标题=$title');
+        // 在降级模式下，不尝试设置定时通知
+        return;
+      }
+      
       // 为各平台创建通知详情
       final notificationDetails = _createNotificationDetails(
         'tune_channel',
@@ -350,7 +360,7 @@ class LocalNotificationService implements NotificationService {
       
       // 使用Future.delayed来实现定时通知
       Future.delayed(delay, () async {
-        if (_isInitialized) {
+        if (_isInitialized && !_isFallbackMode) {
           try {
             await _notificationsPlugin.show(
               id,
@@ -372,29 +382,34 @@ class LocalNotificationService implements NotificationService {
             );
           }
         } else {
-          Log.info('LocalNotificationService: 定时通知显示时服务未初始化: ID=$id');
+          Log.info('LocalNotificationService: 定时通知显示时服务未初始化或处于降级模式: ID=$id');
           // 将通知重新加入待发送队列
-          _pendingNotifications.add({
-            'type': 'show',
-            'id': id,
-            'title': title,
-            'body': body,
-            'payload': payload,
-            'retryCount': 0,
-          });
+          if (!_isFallbackMode) {
+            _pendingNotifications.add({
+              'type': 'show',
+              'id': id,
+              'title': title,
+              'body': body,
+              'payload': payload,
+              'retryCount': 0,
+            });
+          }
         }
       });
     } catch (e, stackTrace) {
       Log.error('LocalNotificationService: 调度通知时出错: $e', stackTrace);
-      // 尝试重试机制
-      await _retryNotification(
-        type: 'schedule',
-        id: id,
-        title: title,
-        body: body,
-        scheduledTime: scheduledTime,
-        payload: payload,
-      );
+      // 如果是降级模式，不进行重试
+      if (!_isFallbackMode) {
+        // 尝试重试机制
+        await _retryNotification(
+          type: 'schedule',
+          id: id,
+          title: title,
+          body: body,
+          scheduledTime: scheduledTime,
+          payload: payload,
+        );
+      }
     }
   }
   
@@ -559,6 +574,11 @@ class LocalNotificationService implements NotificationService {
       
       if (!_isInitialized) {
         Log.info('LocalNotificationService: 服务未初始化，仅保存角标数量到本地存储');
+        return;
+      }
+      
+      if (_isFallbackMode) {
+        Log.info('LocalNotificationService: 处于降级模式，跳过角标更新的通知操作');
         return;
       }
       

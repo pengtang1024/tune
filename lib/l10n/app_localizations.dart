@@ -412,6 +412,48 @@ abstract class AppLocalizations {
   /// **'未设置自定义扫描路径'**
   String get no_custom_scan_paths;
 
+  /// No description provided for @change_language.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更改语言'**
+  String get change_language;
+
+  /// No description provided for @change_language_confirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确定要更改应用语言吗？这将重启应用以应用新设置。'**
+  String get change_language_confirm;
+
+  /// No description provided for @current_language_display.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前语言:'**
+  String get current_language_display;
+
+  /// No description provided for @theme_preview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'主题预览'**
+  String get theme_preview;
+
+  /// No description provided for @system_mode_preview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'系统'**
+  String get system_mode_preview;
+
+  /// No description provided for @light_mode_preview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'浅色'**
+  String get light_mode_preview;
+
+  /// No description provided for @dark_mode_preview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'深色'**
+  String get dark_mode_preview;
+
   /// No description provided for @no_custom_scan_paths_description.
   ///
   /// In zh_CN, this message translates to:
@@ -1114,6 +1156,18 @@ abstract class AppLocalizations {
   /// **'主题'**
   String get theme;
 
+  /// No description provided for @display_settings.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'显示设置'**
+  String get display_settings;
+
+  /// No description provided for @language_theme_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置应用的语言和主题模式'**
+  String get language_theme_description;
+
   /// No description provided for @system_mode.
   ///
   /// In zh_CN, this message translates to:
@@ -1437,6 +1491,30 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'未找到扫描结果'**
   String get no_scan_results;
+
+  /// No description provided for @enable_notifications.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用通知'**
+  String get enable_notifications;
+
+  /// No description provided for @enable_notifications_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用或禁用应用通知'**
+  String get enable_notifications_description;
+
+  /// No description provided for @font_size.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'字体大小'**
+  String get font_size;
+
+  /// No description provided for @font_size_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'调整应用内文字的显示大小'**
+  String get font_size_description;
 }
 
 class _AppLocalizationsDelegate

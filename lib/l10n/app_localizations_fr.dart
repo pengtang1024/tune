@@ -159,6 +159,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get no_custom_scan_paths => '未设置自定义扫描路径';
 
   @override
+  String get change_language => '更改语言';
+
+  @override
+  String get change_language_confirm => '确定要更改应用语言吗？这将重启应用以应用新设置。';
+
+  @override
+  String get current_language_display => '当前语言:';
+
+  @override
+  String get theme_preview => '主题预览';
+
+  @override
+  String get system_mode_preview => '系统';
+
+  @override
+  String get light_mode_preview => '浅色';
+
+  @override
+  String get dark_mode_preview => '深色';
+
+  @override
   String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
@@ -519,6 +540,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get theme => '主题';
 
   @override
+  String get display_settings => '显示设置';
+
+  @override
+  String get language_theme_description => '设置应用的语言和主题模式';
+
+  @override
   String get system_mode => '跟随系统';
 
   @override
@@ -679,4 +706,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get no_scan_results => '未找到扫描结果';
+
+  @override
+  String get enable_notifications => '启用通知';
+
+  @override
+  String get enable_notifications_description => '启用或禁用应用通知';
+
+  @override
+  String get font_size => '字体大小';
+
+  @override
+  String get font_size_description => '调整应用内文字的显示大小';
 }

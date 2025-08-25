@@ -5,10 +5,8 @@ import 'package:tune/ui/core/layout/widgets/custom_app_bar/app_bar_title.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/back_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/clear_data_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/github_button.dart';
-import 'package:tune/ui/core/layout/widgets/custom_app_bar/language_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/notification_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/play_button.dart';
-import 'package:tune/ui/core/layout/widgets/custom_app_bar/theme_toggle_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/user_menu_button.dart';
 
 /// 自定义AppBar组件
@@ -45,11 +43,6 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         // 播放按钮（GitHub按钮左侧）
         const PlayButton(),
 
-        // 本地化按钮（播放按钮左侧）
-        const LanguageButton(),
-
-        // 主题切换按钮（本地化按钮左侧）
-        const ThemeToggleButton(),
 
         // "我的"按钮（最左侧，但显示在最右边）
         const UserMenuButton(),
