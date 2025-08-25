@@ -12,6 +12,18 @@ class WelcomeSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
     final loc = context.loc;
+    
+    // 根据当前时间选择合适的问候语
+    final currentTime = DateTime.now();
+    String greeting;
+    
+    if (currentTime.hour < 12) {
+      greeting = loc.good_morning;
+    } else if (currentTime.hour < 18) {
+      greeting = loc.good_afternoon;
+    } else {
+      greeting = loc.good_evening;
+    }
 
     return Card(
       child: Padding(
@@ -19,7 +31,7 @@ class WelcomeSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${loc.good_day}\n${loc.welcome_to_tune}', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text('$greeting\n${loc.welcome_to_tune}', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             if (playerState.currentSong != null) ...[
               Text(loc.now_playing, style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.primary)),
