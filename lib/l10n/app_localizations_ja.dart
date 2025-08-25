@@ -250,13 +250,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get songs => '曲';
 
   @override
-  String get playlists => '播放列表';
+  String get playlists => 'プレイリスト';
 
   @override
   String get music_library => '音乐库';
 
   @override
-  String get favorites => '收藏';
+  String get favorites => 'お気に入り';
 
   @override
   String get recently_played => '最近播放';
@@ -310,22 +310,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get add_to_library => 'ライブラリに追加';
 
   @override
-  String get general_tab => '常规';
+  String get general_tab => '一般';
 
   @override
-  String get library_tab => '音乐库';
+  String get library_tab => 'ライブラリ';
 
   @override
-  String get account_tab => '账户';
+  String get account_tab => 'アカウント';
 
   @override
-  String get playback_tab => '播放';
+  String get playback_tab => '再生';
 
   @override
   String get about_tab => '关于';
 
   @override
-  String get animations_tab => '动画';
+  String get animations_tab => 'アニメーション';
 
   @override
   String get version => '版本';
@@ -524,7 +524,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tag_singer => '歌手';
 
   @override
-  String get tag_elite => '精英';
+  String get tag_elite => 'エリート';
 
   @override
   String get settings_page_theme => '主题设置';
@@ -647,7 +647,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get equalizer => '均衡器';
 
   @override
-  String get equalizer_tab => '均衡器';
+  String get equalizer_tab => 'イコライザー';
 
   @override
   String get presets => '预设';
@@ -717,4 +717,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get font_size_description => '调整应用内文字的显示大小';
+
+  @override
+  String get good_morning => 'おはようございます';
+
+  @override
+  String get good_afternoon => 'こんにちは';
+
+  @override
+  String get good_evening => 'こんばんは';
+
+  @override
+  String get welcome_to_tune => 'Tuneへようこそ';
+
+  @override
+  String get see_all => 'すべて見る';
+
+  @override
+  String get no_recent_songs => '最近再生した楽曲はありません';
+
+  @override
+  String get quick_actions => 'クイックアクション';
+
+  @override
+  String get my_songs => 'マイソング';
+
+  @override
+  String get radio => 'ラジオ';
 }

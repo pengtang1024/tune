@@ -1,5 +1,17 @@
 {
   "@@locale": "zh_TW",
+  "@@last_modified": "2024-05-21T10:00:00.000Z",
+  "good_morning": "早上好",
+  "good_afternoon": "下午好",
+  "good_evening": "晚上好",
+  "welcome_to_tune": "歡迎使用Tune",
+  "see_all": "查看全部",
+  "no_recent_songs": "暫無最近播放的歌曲",
+  "quick_actions": "快速操作",
+  "my_songs": "我的歌曲",
+  "favorites": "收藏",
+  "playlists": "播放列表",
+  "radio": "電台",
   "app_name": "Tune",
   "no_songs_found": "未找到歌曲",
   "settings": "設定",
@@ -15,5 +27,14 @@
   "search_songs": "搜尋歌曲...",
   "add_to_library": "添加到音樂庫",
   "scan_completed_no_new_songs": "掃描完成，未找到新歌曲",
-  "rescan": "重新掃描"
+  "rescan": "重新掃描",
+  "tag_vip": "VIP",
+  "tag_singer": "歌手",
+  "tag_elite": "精英",
+  "general_tab": "常規",
+  "library_tab": "音樂庫",
+  "account_tab": "帳戶",
+  "playback_tab": "播放",
+  "equalizer_tab": "均衡器",
+  "animations_tab": "動畫"
 }

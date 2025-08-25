@@ -259,5 +259,16 @@
   "enable_notifications": "启用通知",
   "enable_notifications_description": "启用或禁用应用通知",
   "font_size": "字体大小",
-  "font_size_description": "调整应用内文字的显示大小"
+  "font_size_description": "调整应用内文字的显示大小",
+  "good_morning": "早上好",
+  "good_afternoon": "下午好",
+  "good_evening": "晚上好",
+  "welcome_to_tune": "欢迎使用Tune",
+  "see_all": "查看全部",
+  "no_recent_songs": "暂无最近播放的歌曲",
+  "quick_actions": "快速操作",
+  "my_songs": "我的歌曲",
+  "favorites": "收藏",
+  "playlists": "播放列表",
+  "radio": "电台"
 }

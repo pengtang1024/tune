@@ -15,19 +15,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get welcome_message => '欢迎使用 Tune';
 
   @override
-  String get no_songs_found => 'Aucune chanson trouvée';
+  String get no_songs_found => '未找到歌曲';
 
   @override
-  String get settings => 'Paramètres';
+  String get settings => '设置';
 
   @override
   String get settings_saved => '设置已保存';
 
   @override
-  String get retry => 'Réessayer';
+  String get retry => '重试';
 
   @override
-  String get home => 'Accueil';
+  String get home => '首页';
 
   @override
   String get home_title => '首页';
@@ -39,19 +39,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get featured => '精选';
 
   @override
-  String get library => 'Bibliothèque';
+  String get library => '音乐库';
 
   @override
   String get library_title => '音乐库';
 
   @override
-  String get search => 'Recherche';
+  String get search => '搜索';
 
   @override
   String get search_title => '搜索';
 
   @override
-  String get player => 'Lecteur';
+  String get player => '播放器';
 
   @override
   String get player_title => '播放器';
@@ -60,7 +60,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get playlist => '播放列表';
 
   @override
-  String get about => 'À propos';
+  String get about => '关于';
 
   @override
   String get custom_scan_paths => '自定义扫描路径';
@@ -183,7 +183,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
-  String get scan_local_music => 'Scanner la musique locale';
+  String get scan_local_music => '扫描本地音乐';
 
   @override
   String get scanning => '扫描中...';
@@ -238,7 +238,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get failed_to_scan_music => '扫描音乐失败';
 
   @override
-  String get search_songs => 'Rechercher des chansons...';
+  String get search_songs => '搜索歌曲...';
 
   @override
   String get artists => '艺术家';
@@ -247,16 +247,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get albums => '专辑';
 
   @override
-  String get songs => 'Chansons';
+  String get songs => '歌曲';
 
   @override
-  String get playlists => '播放列表';
+  String get playlists => 'Listes de lecture';
 
   @override
   String get music_library => '音乐库';
 
   @override
-  String get favorites => '收藏';
+  String get favorites => 'Favoris';
 
   @override
   String get recently_played => '最近播放';
@@ -292,14 +292,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shuffle => '随机播放';
 
   @override
-  String get scan_completed_no_new_songs =>
-      'Analyse terminée, aucune nouvelle chanson trouvée';
+  String get scan_completed_no_new_songs => '扫描完成，未找到新歌曲';
 
   @override
   String get added_scanned_songs_to_library => '已将扫描的歌曲添加到音乐库';
 
   @override
-  String get rescan => 'Nouvelle analyse';
+  String get rescan => '重新扫描';
 
   @override
   String get load_stats_failed => '加载统计信息失败';
@@ -308,25 +307,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get load_songs_failed => '加载歌曲失败';
 
   @override
-  String get add_to_library => 'Ajouter à la bibliothèque';
+  String get add_to_library => '添加到音乐库';
 
   @override
-  String get general_tab => '常规';
+  String get general_tab => 'Général';
 
   @override
-  String get library_tab => '音乐库';
+  String get library_tab => 'Bibliothèque';
 
   @override
-  String get account_tab => '账户';
+  String get account_tab => 'Compte';
 
   @override
-  String get playback_tab => '播放';
+  String get playback_tab => 'Lecture';
 
   @override
   String get about_tab => '关于';
 
   @override
-  String get animations_tab => '动画';
+  String get animations_tab => 'Animations';
 
   @override
   String get version => '版本';
@@ -507,7 +506,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get faq_not_showing_answer => '确保音乐文件格式受支持，并检查文件是否损坏。';
 
   @override
-  String get music_scan => 'Analyse musicale';
+  String get music_scan => 'Scan musical';
 
   @override
   String get failed_to_open_github => '无法打开GitHub页面';
@@ -522,10 +521,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tag_vip => 'VIP';
 
   @override
-  String get tag_singer => '歌手';
+  String get tag_singer => 'Chanteur';
 
   @override
-  String get tag_elite => '精英';
+  String get tag_elite => 'Élite';
 
   @override
   String get settings_page_theme => '主题设置';
@@ -648,7 +647,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equalizer => '均衡器';
 
   @override
-  String get equalizer_tab => '均衡器';
+  String get equalizer_tab => 'Égaliseur';
 
   @override
   String get presets => '预设';
@@ -718,4 +717,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get font_size_description => '调整应用内文字的显示大小';
+
+  @override
+  String get good_morning => 'Bonjour';
+
+  @override
+  String get good_afternoon => 'Bon après-midi';
+
+  @override
+  String get good_evening => 'Bonsoir';
+
+  @override
+  String get welcome_to_tune => 'Bienvenue dans Tune';
+
+  @override
+  String get see_all => 'Tout voir';
+
+  @override
+  String get no_recent_songs => 'Aucune chanson récemment jouée';
+
+  @override
+  String get quick_actions => 'Actions rapides';
+
+  @override
+  String get my_songs => 'Mes chansons';
+
+  @override
+  String get radio => 'Radio';
 }

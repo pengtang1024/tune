@@ -1,5 +1,17 @@
 {
   "@@locale": "ru",
+  "@@last_modified": "2024-05-21T10:00:00.000Z",
+  "good_morning": "Доброе утро",
+  "good_afternoon": "Добрый день",
+  "good_evening": "Добрый вечер",
+  "welcome_to_tune": "Добро пожаловать в Tune",
+  "see_all": "Посмотреть все",
+  "no_recent_songs": "Нет недавно воспроизводимых песен",
+  "quick_actions": "Быстрые действия",
+  "my_songs": "Мои песни",
+  "favorites": "Избранное",
+  "playlists": "Плейлисты",
+  "radio": "Радио",
   "app_name": "Tune",
   "no_songs_found": "Песни не найдены",
   "settings": "Настройки",
@@ -15,5 +27,14 @@
   "search_songs": "Поиск песен...",
   "add_to_library": "Добавить в библиотеку",
   "scan_completed_no_new_songs": "Сканирование завершено, новые песни не найдены",
-  "rescan": "Пересканировать"
+  "rescan": "Пересканировать",
+  "tag_vip": "VIP",
+  "tag_singer": "Певец",
+  "tag_elite": "Элита",
+  "general_tab": "Общие",
+  "library_tab": "Библиотека",
+  "account_tab": "Аккаунт",
+  "playback_tab": "Воспроизведение",
+  "equalizer_tab": "Эквалайзер",
+  "animations_tab": "Анимации"
 }

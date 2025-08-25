@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome_message => 'Welcome to Tune';
 
   @override
-  String get no_songs_found => 'No songs found';
+  String get no_songs_found => 'No Songs Found';
 
   @override
   String get settings => 'Settings';
@@ -157,7 +157,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add_custom_path => 'Add Custom Path';
 
   @override
-  String get no_custom_scan_paths => 'No custom scan paths';
+  String get no_custom_scan_paths => 'No Custom Scan Paths';
 
   @override
   String get change_language => 'Change Language';
@@ -198,11 +198,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scan_failed => 'Scan Failed';
 
   @override
-  String get failed_to_load_songs => 'Failed to load songs';
+  String get failed_to_load_songs => 'Failed to Load Songs';
 
   @override
   String get failed_to_load_songs_description =>
-      'Unable to load songs from your music library. Please check your network connection or rescan your music library.';
+      'Unable to load songs from your music library. Please check your network connection or rescan the music library.';
 
   @override
   String get try_again => 'Try Again';
@@ -211,7 +211,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scan_progress => 'Scan Progress';
 
   @override
-  String get scanning_path => 'Scanning path:';
+  String get scanning_path => 'Scanning Path:';
 
   @override
   String get no_songs_found_description =>
@@ -236,13 +236,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failed_to_save_custom_scan_paths =>
-      'Failed to save custom scan paths';
+      'Failed to Save Custom Scan Paths';
 
   @override
-  String get failed_to_add_custom_scan_path => 'Failed to add custom scan path';
+  String get failed_to_add_custom_scan_path => 'Failed to Add Custom Scan Path';
 
   @override
-  String get failed_to_scan_music => 'Failed to scan music';
+  String get failed_to_scan_music => 'Failed to Scan Music';
 
   @override
   String get search_songs => 'Search songs...';
@@ -310,10 +310,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rescan => 'Rescan';
 
   @override
-  String get load_stats_failed => 'Failed to load stats';
+  String get load_stats_failed => 'Failed to Load Statistics';
 
   @override
-  String get load_songs_failed => 'Failed to load songs';
+  String get load_songs_failed => 'Failed to Load Songs';
 
   @override
   String get add_to_library => 'Add to Library';
@@ -344,48 +344,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_description =>
-      'Tune is a modern music player designed for music lovers. It supports multiple audio formats and provides high-quality audio playback experience.';
+      'Tune is a modern music player designed for music lovers. It supports multiple audio formats and provides a high-quality audio playback experience.';
 
   @override
   String get features => 'Features';
 
   @override
-  String get high_quality_audio_playback => 'High-quality audio playback';
+  String get high_quality_audio_playback => 'High Quality Audio Playback';
 
   @override
   String get supports_multiple_audio_formats =>
-      'Supports multiple audio formats (MP3, FLAC, WAV, AAC, etc.)';
+      'Supports Multiple Audio Formats (MP3, FLAC, WAV, AAC, etc.)';
 
   @override
-  String get local_music_management => 'Local music management';
+  String get local_music_management => 'Local Music Management';
 
   @override
   String get automatically_scans_and_organizes_local_music_library =>
       'Automatically scans and organizes local music library';
 
   @override
-  String get multi_language_support => 'Multi-language support';
+  String get multi_language_support => 'Multi-language Support';
 
   @override
   String get supports_chinese_english_japanese_korean_russian_and_more =>
-      'Supports Chinese, English, Japanese, Korean, Russian and more languages';
+      'Supports Chinese, English, Japanese, Korean, Russian and more';
 
   @override
-  String get multiple_themes => 'Multiple themes';
+  String get multiple_themes => 'Multiple Themes';
 
   @override
   String get eight_theme_colors_with_dark_light_mode_switching =>
       '8 theme colors with dark/light mode switching';
 
   @override
-  String get lyrics_synchronization => 'Lyrics synchronization';
+  String get lyrics_synchronization => 'Lyrics Synchronization';
 
   @override
   String get lrc_format_lyrics_real_time_synchronization_display =>
       'LRC format lyrics real-time synchronization display';
 
   @override
-  String get smart_search => 'Smart search';
+  String get smart_search => 'Smart Search';
 
   @override
   String get supports_searching_by_song_title_artist_album_and_other_metadata =>
@@ -396,7 +396,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get opensource_license_description =>
-      'This project is released under an open source license. The source code is available on GitHub.';
+      'This project is released under an open source license, and the source code is available on GitHub.';
 
   @override
   String get github_project_address => 'GitHub Project Address';
@@ -456,13 +456,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get full_platform_scan_note =>
-      'Full platform scan note: By default, the system music directory is scanned, and the scan range can be expanded by adding custom paths.';
+      'Full Platform Scan Note: By default, scan the system music directory, and the scan range can be extended by adding custom paths.';
 
   @override
   String get library_info => 'Library Info';
 
   @override
-  String get songs_count => 'Songs Count';
+  String get songs_count => 'Total Songs';
 
   @override
   String get library_features => 'Library Features';
@@ -497,11 +497,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scan_step3 =>
-      '3. Custom directories can be added to expand the scan range';
+      '3. Custom directories can be added to extend the scan range';
 
   @override
   String get scan_step4 =>
-      '4. After scanning is complete, songs will be automatically added to the music library';
+      '4. Songs will be automatically added to the music library after scanning is completed';
 
   @override
   String get faq => 'FAQ';
@@ -525,13 +525,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faq_not_showing_answer =>
-      'Ensure that the music file format is supported and check if the file is corrupted.';
+      'Make sure the music file format is supported and check if the file is corrupted.';
 
   @override
   String get music_scan => 'Music Scan';
 
   @override
-  String get failed_to_open_github => 'Failed to open GitHub page';
+  String get failed_to_open_github => 'Failed to Open GitHub Page';
 
   @override
   String get select_language => 'Select Language';
@@ -580,10 +580,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
-  String get chinese_simplified => 'Chinese Simplified';
+  String get chinese_simplified => 'Simplified Chinese';
 
   @override
-  String get chinese_traditional => 'Chinese Traditional';
+  String get chinese_traditional => 'Traditional Chinese';
 
   @override
   String get chinese => 'Chinese';
@@ -622,13 +622,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalid_input => 'Invalid Input';
 
   @override
-  String get search_no_results => 'No search results found';
+  String get search_no_results => 'No Search Results Found';
 
   @override
-  String get skipToPrevious => 'Skip to Previous';
+  String get skipToPrevious => 'Previous';
 
   @override
-  String get skipToNext => 'Skip to Next';
+  String get skipToNext => 'Next';
 
   @override
   String get playback_error => 'Playback Error';
@@ -729,7 +729,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get very_fast => 'Very Fast';
 
   @override
-  String get no_scan_results => 'No scan results found';
+  String get no_scan_results => 'No Scan Results Found';
 
   @override
   String get enable_notifications => 'Enable Notifications';
@@ -744,4 +744,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get font_size_description =>
       'Adjust the display size of text within the app';
+
+  @override
+  String get good_morning => 'Good morning';
+
+  @override
+  String get good_afternoon => 'Good afternoon';
+
+  @override
+  String get good_evening => 'Good evening';
+
+  @override
+  String get welcome_to_tune => 'Welcome to Tune';
+
+  @override
+  String get see_all => 'See all';
+
+  @override
+  String get no_recent_songs => 'No recently played songs';
+
+  @override
+  String get quick_actions => 'Quick Actions';
+
+  @override
+  String get my_songs => 'My Songs';
+
+  @override
+  String get radio => 'Radio';
 }

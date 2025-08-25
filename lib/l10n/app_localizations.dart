@@ -1515,6 +1515,60 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'调整应用内文字的显示大小'**
   String get font_size_description;
+
+  /// No description provided for @good_morning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'早上好'**
+  String get good_morning;
+
+  /// No description provided for @good_afternoon.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下午好'**
+  String get good_afternoon;
+
+  /// No description provided for @good_evening.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'晚上好'**
+  String get good_evening;
+
+  /// No description provided for @welcome_to_tune.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'欢迎使用Tune'**
+  String get welcome_to_tune;
+
+  /// No description provided for @see_all.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查看全部'**
+  String get see_all;
+
+  /// No description provided for @no_recent_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'暂无最近播放的歌曲'**
+  String get no_recent_songs;
+
+  /// No description provided for @quick_actions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'快速操作'**
+  String get quick_actions;
+
+  /// No description provided for @my_songs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我的歌曲'**
+  String get my_songs;
+
+  /// No description provided for @radio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台'**
+  String get radio;
 }
 
 class _AppLocalizationsDelegate

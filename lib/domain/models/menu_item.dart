@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 /// 菜单项枚举：定义路由与菜单的映射关系
 class DeviceMenuItem {
   final String path;
-  final String label;
+  final String labelKey; // 改为labelKey，表示本地化键
   final IconData icon;
   final int index;
 
   const DeviceMenuItem({
     required this.path,
-    required this.label,
+    required this.labelKey, // 改为labelKey
     required this.icon,
-    required this.index ,
+    required this.index,
   });
 
   /// 根据路由路径获取对应的菜单项
@@ -44,19 +44,19 @@ class DeviceMenuItem {
 const List<DeviceMenuItem> mobileMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: 'home', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'home', // 使用本地化键
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: 'recommend', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'recommend', // 使用本地化键
     icon: Icons.explore,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: 'library', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'library', // 使用本地化键
     icon: Icons.library_music,
     index: 2,
   ),
@@ -66,31 +66,31 @@ const List<DeviceMenuItem> mobileMenuItems = [
 const List<DeviceMenuItem> desktopMenuItems = [
   DeviceMenuItem(
     path: '/home',
-    label: 'home', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'home', // 使用本地化键
     icon: Icons.home,
     index: 0,
   ),
   DeviceMenuItem(
     path: '/recommend',
-    label: 'recommend', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'recommend', // 使用本地化键
     icon: Icons.recommend,
     index: 1,
   ),
   DeviceMenuItem(
     path: '/featured',
-    label: 'featured', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'featured', // 使用本地化键
     icon: Icons.star,
     index: 2,
   ),
   DeviceMenuItem(
     path: '/library',
-    label: 'library', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'library', // 使用本地化键
     icon: Icons.library_music,
     index: 3,
   ),
   DeviceMenuItem(
     path: '/notification_test',
-    label: 'notification_test', // 这里应该使用本地化键，而不是直接的字符串
+    labelKey: 'notification_test', // 使用本地化键
     icon: Icons.notifications_active,
     index: 4,
   ),
