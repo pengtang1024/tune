@@ -60,8 +60,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           );
         });
-      } else if (next.route != '/music-scan') {
-        // 当页面被移除时清除动态按钮（除了跳转到音乐扫描页面的情况）
+      } else {
+        // 当页面被移除时清除动态按钮
         final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
         appBarNotifier.clearDynamicActions();
       }
