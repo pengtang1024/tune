@@ -23,6 +23,19 @@ class MobileLayout extends ConsumerWidget {
     final playerState = ref.watch(playerStateNotifierProvider);
     final loc = context.loc;
     
+    // 安全地获取选中的菜单项索引
+    final mobileMenuItems = DeviceMenuItem.mobile();
+    int selectedIndex = 0;
+    try {
+      selectedIndex = mobileMenuItems.firstWhere(
+        (item) => item.path == menuState.path,
+        orElse: () => mobileMenuItems.first,
+      ).index;
+    } catch (e) {
+      // 如果找不到匹配项，使用默认的第一个菜单项
+      selectedIndex = 0;
+    }
+    
     return Scaffold(
       appBar: const CustomAppBar(), // 全局唯一的标题栏
       body: Column(
@@ -36,9 +49,9 @@ class MobileLayout extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: DeviceMenuItem.mobile().firstWhere((item) => item.path == menuState.path).index,
-        onDestinationSelected: (index) => menuNotifier.selectMenu(DeviceMenuItem.mobile()[index].path, false),
-        destinations: DeviceMenuItem.mobile().map((item)=> NavigationDestination(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) => menuNotifier.selectMenu(mobileMenuItems[index].path, false),
+        destinations: mobileMenuItems.map((item)=> NavigationDestination(
           icon: Icon(item.icon, color: noSelected),
           selectedIcon: Icon(item.icon, color: selected),
           label: _getLocalizedLabel(loc, item.labelKey), // 使用本地化标签

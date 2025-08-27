@@ -29,27 +29,38 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
   @override
   void initState() {
     super.initState();
-    _loadCustomScanPaths();
+    // 使用addPostFrameCallback确保在组件构建完成后再加载数据
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCustomScanPaths();
+    });
   }
 
   /// 加载自定义扫描路径
   Future<void> _loadCustomScanPaths() async {
-    setState(() {
-      _isLoading = true;
-    });
+    // 先显示加载状态
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     try {
       final persistenceService = ref.read(sharedPreferencesServiceProvider);
       final paths = persistenceService.getStringList('custom_scan_paths') ?? [];
-      setState(() {
-        _customScanPaths = paths;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _customScanPaths = paths;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       Log.error('加载自定义扫描路径失败: $e');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorSnackBar(context.loc.load_stats_failed);
+      }
     }
   }
 
@@ -57,7 +68,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
   Future<void> _addCustomScanPath() async {
     try {
       final result = await FilePicker.platform.getDirectoryPath();
-      if (result != null) {
+      if (result != null && mounted) {
         setState(() {
           _customScanPaths = [..._customScanPaths, result];
         });
@@ -74,10 +85,12 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
 
   /// 移除自定义扫描路径
   Future<void> _removeCustomScanPath(int index) async {
-    setState(() {
-      _customScanPaths = List.from(_customScanPaths)..removeAt(index);
-    });
-    await _saveCustomScanPaths();
+    if (mounted) {
+      setState(() {
+        _customScanPaths = List.from(_customScanPaths)..removeAt(index);
+      });
+      await _saveCustomScanPaths();
+    }
   }
 
   /// 保存自定义扫描路径
@@ -128,7 +141,7 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
       // 确保在访问context前检查mounted状态
       if (mounted) {
         final failedMessage = context.loc.failed_to_scan_music;
-        notifier.scanError(failedMessage);
+        notifier.scanError('$failedMessage: ${e.toString()}');
         _showErrorSnackBar(failedMessage);
       }
     }
@@ -159,64 +172,128 @@ class _MusicScanPageState extends ConsumerState<MusicScanPage> {
     final state = ref.watch(libraryStateNotifierProvider);
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.loc.scan_local_music)),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 扫描状态显示
-            ScanStatusDisplay(state: state),
+      body: RefreshIndicator(
+        onRefresh: _loadCustomScanPaths,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 页面说明
+              Text(
+                context.loc.scan_local_music_description,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
+              ),
+              const SizedBox(height: 24),
+              
+              // 扫描状态显示
+              ScanStatusDisplay(state: state),
+              const SizedBox(height: 24),
 
-            // 自定义路径管理
-            CustomPathsManager(
-              customScanPaths: _customScanPaths, 
-              onAddPath: _addCustomScanPath, 
-              onRemovePath: _removeCustomScanPath
-            ),
-
-            // 空状态提示 - 没有自定义路径
-            if (_customScanPaths.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  context.loc.no_custom_scan_paths, 
-                  style: Theme.of(context).textTheme.bodyMedium, 
-                  textAlign: TextAlign.center
+              // 自定义路径管理
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: CustomPathsManager(
+                  customScanPaths: _customScanPaths, 
+                  onAddPath: _addCustomScanPath, 
+                  onRemovePath: _removeCustomScanPath
                 ),
               ),
+              const SizedBox(height: 24),
 
-            // 扫描控制按钮
-            ScanControlButtons(
-              isScanning: state.scanStatus == ScanStatus.scanning, 
-              hasCustomPaths: _customScanPaths.isNotEmpty, 
-              onStartScan: _startScan
-            ),
+              // 扫描控制按钮
+              ScanControlButtons(
+                isScanning: state.scanStatus == ScanStatus.scanning, 
+                hasCustomPaths: _customScanPaths.isNotEmpty, 
+                onStartScan: _startScan
+              ),
+              const SizedBox(height: 24),
 
-            // 空状态提示 - 未扫描或没有结果
-            if (_customScanPaths.isNotEmpty && !state.hasScannedResults && state.scanStatus != ScanStatus.scanning)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  context.loc.no_scan_results, 
-                  style: Theme.of(context).textTheme.bodyMedium, 
-                  textAlign: TextAlign.center
+              // 空状态提示 - 未扫描或没有结果
+              if (_customScanPaths.isNotEmpty && !state.hasScannedResults && state.scanStatus != ScanStatus.scanning)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.music_note,
+                        size: 48,
+                        color: Theme.of(context).disabledColor,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        context.loc.no_scan_results, 
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ), 
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        context.loc.scan_instructions,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).hintColor,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-            // 扫描结果展示
-            if (state.hasScannedResults) 
-              ScanResultsDisplay(
-                state: state, 
-                onAddToLibrary: _addToLibrary, 
-                onResetScan: _resetScan, 
-                onPlaySong: _playSong
-              ),
-          ],
+              // 扫描结果展示
+              if (state.hasScannedResults) 
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ScanResultsDisplay(
+                    state: state, 
+                    onAddToLibrary: _addToLibrary, 
+                    onResetScan: _resetScan, 
+                    onPlaySong: _playSong
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

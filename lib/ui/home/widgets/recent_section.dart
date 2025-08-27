@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/extension/router_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/ui/library/providers/library_providers.dart';
+import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/player/states/player_state_notifier.dart';
 import 'package:tune/ui/widgets/music_card_widget.dart';
 
-/// 最近播放区域组件
+/// 最近播放组件
 /// 展示最近播放的歌曲列表
 class RecentSection extends ConsumerWidget {
   const RecentSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final songs = ref.watch(libraryStateNotifierProvider).songs;
     final loc = context.loc;
+    // 获取播放历史
+    final playerNotifier = ref.watch(playerStateNotifierProvider.notifier);
+    // 从播放器状态中获取最近播放的歌曲
+    final List<Song> songs = playerNotifier.getPlayHistory();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,28 +35,56 @@ class RecentSection extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () {
-                // TODO: 查看全部最近播放
+                // 查看全部最近播放
+                context.router.push('/library'); // 临时导航到音乐库
               },
-              child: Text('See more'), // 使用硬编码字符串替代不存在的本地化字符串
+              child: Text(loc.see_all),
             ),
           ],
         ),
         const SizedBox(height: 12),
         if (songs.isEmpty) ...[
           Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(loc.no_songs_found),
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.history,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    loc.no_recent_songs,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                  ),
+                ],
+              ),
             ),
           ),
         ] else ...[
           Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Column(
               children: songs.take(3).map((song) {
                 return MusicCardWidget(
                   song: song,
                   onTap: () {
-                    // TODO: 播放歌曲
+                    // 播放歌曲
+                    // 设置播放列表并播放选中的歌曲
+                    final index = songs.indexOf(song);
+                    playerNotifier.setPlaylist(songs, index);
+                    playerNotifier.playSong(song);
                   },
                 );
               }).toList(),

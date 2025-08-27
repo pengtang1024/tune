@@ -12,16 +12,17 @@ class ScanButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: onPressed,
-            icon: const Icon(Icons.search),
-            label: const Text('开始扫描'),
-          ),
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        textStyle: Theme.of(context).textTheme.labelLarge,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
-      ],
+      ),
+      icon: const Icon(Icons.search, size: 20),
+      label: const Text('开始扫描'),
     );
   }
 }

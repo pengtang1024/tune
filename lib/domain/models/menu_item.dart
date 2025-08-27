@@ -89,9 +89,15 @@ const List<DeviceMenuItem> desktopMenuItems = [
     index: 3,
   ),
   DeviceMenuItem(
+    path: '/music-scan',
+    labelKey: 'scan_local_music', // 使用本地化键
+    icon: Icons.find_in_page,
+    index: 4,
+  ),
+  DeviceMenuItem(
     path: '/notification_test',
     labelKey: 'notification_test', // 使用本地化键
     icon: Icons.notifications_active,
-    index: 4,
+    index: 5,
   ),
 ];

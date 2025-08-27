@@ -25,6 +25,11 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
     _initializePlayer();
   }
 
+  /// 获取播放历史
+  List<Song> getPlayHistory() {
+    return List.unmodifiable(_playHistory);
+  }
+
   /// 初始化播放器
   void _initializePlayer() {
     try {
@@ -309,11 +314,6 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   /// 获取当前播放列表
   List<Song> getPlaylist() {
     return _playlist;
-  }
-
-  /// 获取播放历史记录
-  List<Song> getPlayHistory() {
-    return List.unmodifiable(_playHistory);
   }
 
   /// 添加歌曲到播放列表

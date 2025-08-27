@@ -14,16 +14,38 @@ class ScanStatusDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            '扫描状态',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          
           // 根据扫描状态显示不同内容
           if (state.scanStatus == ScanStatus.idle) ...[
             const ScanStatusWidget(statusMessage: '等待开始扫描'),
+            const SizedBox(height: 16),
             const EmptyStateWidget(),
           ] else if (state.scanStatus == ScanStatus.scanning) ...[
             const ScanStatusWidget(statusMessage: '正在扫描'),
+            const SizedBox(height: 16),
             ScanProgressWidget(progress: state.scanProgress),
           ] else if (state.scanStatus == ScanStatus.completed) ...[
             ScanStatusWidget(
@@ -31,6 +53,7 @@ class ScanStatusDisplay extends ConsumerWidget {
             ),
           ] else if (state.scanStatus == ScanStatus.error) ...[
             const ScanStatusWidget(statusMessage: '扫描出错'),
+            const SizedBox(height: 16),
             ErrorStateWidget(
               errorMessage: state.errorMessage ?? '未知错误',
             ),

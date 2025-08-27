@@ -293,9 +293,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'uri': filePath, // 同时保留uri字段以保持兼容性
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': metadata.year?.year, // 从DateTime中提取年份
-        'genre': metadata.genres.isNotEmpty == true
-            ? metadata.genres.first
-            : null,
+        'genre': metadata.genres.isNotEmpty ? metadata.genres.first : null,
         'bitrate': metadata.bitrate,
         'sampleRate': metadata.sampleRate,
         'trackNumber': metadata.trackNumber,
@@ -348,7 +346,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         return allSongs;
       }
 
-      for (final path in paths) {
+      for (int i = 0; i < paths.length; i++) {
+        final path = paths[i];
         try {
           Log.info('扫描路径: $path');
 
@@ -373,32 +372,14 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
             continue;
           }
 
-          await for (final file in dir.list(
-            recursive: true,
-            followLinks: false,
-          )) {
-            try {
-              if (file is File) {
-                final fileName = file.path.toLowerCase();
-                // 支持的音频格式
-                if (fileName.endsWith('.mp3') ||
-                    fileName.endsWith('.flac') ||
-                    fileName.endsWith('.wav') ||
-                    fileName.endsWith('.m4a') ||
-                    fileName.endsWith('.aac') ||
-                    fileName.endsWith('.ogg')) {
-                  final song = await _createSongFromFile(file);
-                  if (song != null) {
-                    allSongs.add(song);
-                  }
-                }
-              }
-            } catch (e, stackTrace) {
-              Log.error('处理文件时出错: ${file.path}, 错误: $e', stackTrace);
-              // 继续处理其他文件
-              continue;
-            }
-          }
+          // 扫描目录中的文件
+          final songsInDir = await _scanDirectory(path, (progress) {
+            // 计算整体进度
+            final overallProgress = (i + progress) / paths.length;
+            Log.info('扫描进度: ${(overallProgress * 100).toStringAsFixed(1)}%');
+          });
+          
+          allSongs.addAll(songsInDir);
         } catch (e, stackTrace) {
           Log.error('扫描路径时出错: $path, 错误: $e', stackTrace);
           // 继续扫描其他路径
