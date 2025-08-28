@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/core/extension/router_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/player/states/player_state_notifier.dart';
 import 'package:tune/ui/widgets/music_card_widget.dart';
 
 /// 最近播放组件
@@ -35,8 +32,7 @@ class RecentSection extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () {
-                // 查看全部最近播放
-                context.router.push('/library'); // 临时导航到音乐库
+                // TODO: 查看全部最近播放
               },
               child: Text(loc.see_all),
             ),

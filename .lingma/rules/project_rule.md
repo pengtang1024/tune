@@ -103,3 +103,5 @@ _updateAppBarState(ref, context, currentRoutePath);
 对于频繁变化的状态（如播放状态），应实现防抖机制避免过度刷新
 
 本地化参数的添加，应该根据l10n.yaml获取模板文件，zh_CN.arb为核心模板，根据模板文件添加参数，然后同等更新其他语言文件，最后通过flutter gen-l10n生成各个语言的AppLocalizations
+所有修改完成后必须检查是否有编译错误
+优先使用流式布局，避免使用网格布局，网格布局在一些场景下会导致布局问题

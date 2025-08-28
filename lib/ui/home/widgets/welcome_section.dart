@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/core/extension/router_extension.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/player/states/player_state_notifier.dart';
 
 /// 欢迎区域组件
 /// 展示欢迎信息和当前播放状态
@@ -34,7 +31,7 @@ class WelcomeSection extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -84,21 +81,24 @@ class WelcomeSection extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                trailing: IconButton(
-                  icon: Icon(
-                    playerState.isPlaying ? Icons.pause_circle : Icons.play_circle,
-                    size: 40,
-                    color: Theme.of(context).colorScheme.primary,
+                trailing: SizedBox(
+                  width: 40,
+                  child: IconButton(
+                    icon: Icon(
+                      playerState.isPlaying ? Icons.pause_circle : Icons.play_circle,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: () {
+                      // 切换播放状态
+                      final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+                      if (playerState.isPlaying) {
+                        playerNotifier.pause();
+                      } else {
+                        playerNotifier.play();
+                      }
+                    },
                   ),
-                  onPressed: () {
-                    // 切换播放状态
-                    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
-                    if (playerState.isPlaying) {
-                      playerNotifier.pause();
-                    } else {
-                      playerNotifier.play();
-                    }
-                  },
                 ),
               ),
             ] else ...[
@@ -126,8 +126,8 @@ class WelcomeSection extends ConsumerWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // 导航到音乐扫描页面
-                        context.router.push('/music-scan');
+                        // TODO: 实现音乐扫描功能或添加路由
+                        // context.router.push('/music-scan');
                       },
                       child: Text(loc.scan_local_music),
                     ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/core/extension/router_extension.dart';
 
 /// 快速操作组件
 /// 展示常用功能的快捷入口
@@ -36,32 +34,28 @@ class QuickActionsSection extends StatelessWidget {
                   icon: Icons.music_note_outlined,
                   label: loc.my_songs,
                   onTap: () {
-                    // 导航到我的音乐
-                    context.router.push('/library');
+                    // TODO: 导航到我的音乐
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.favorite_border,
                   label: loc.favorites,
                   onTap: () {
-                    // 导航到收藏
-                    context.router.push('/library'); // 临时使用音乐库路由
+                    // TODO: 导航到收藏
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.playlist_play,
                   label: loc.playlists,
                   onTap: () {
-                    // 导航到播放列表
-                    context.router.push('/library'); // 临时使用音乐库路由
+                    // TODO: 导航到播放列表
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.radio,
                   label: loc.radio,
                   onTap: () {
-                    // 导航到电台
-                    context.router.push('/library'); // 临时使用音乐库路由
+                    // TODO: 导航到电台
                   },
                 ),
               ],
@@ -104,10 +98,7 @@ class _QuickActionButton extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(label),
       ],
     );
   }

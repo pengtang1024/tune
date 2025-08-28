@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/repositories/music_repository.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/music_providers.dart';
 
@@ -14,7 +13,6 @@ class LibraryOverviewSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = context.loc;
     // 实际获取音乐库统计信息
-    final musicRepository = ref.watch(musicRepositoryProvider);
     final AsyncValue<List<Song>> songsAsync = ref.watch(_songsProvider);
 
     return Column(
@@ -63,9 +61,7 @@ class LibraryOverviewSection extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Text('Error: $error'),
-              ),
+              error: (error, stack) => Center(child: Text('Error: $error')),
             ),
           ),
         ),
@@ -108,30 +104,13 @@ class _LibraryStatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Icon(
-            icon,
-            size: 32,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-        ),
+        Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
         const SizedBox(height: 8),
         Text(
           countFormatter(count),
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }

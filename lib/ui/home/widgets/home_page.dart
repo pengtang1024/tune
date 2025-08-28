@@ -5,6 +5,7 @@ import 'package:tune/ui/home/widgets/welcome_section.dart';
 import 'package:tune/ui/home/widgets/quick_actions_section.dart';
 import 'package:tune/ui/home/widgets/recent_section.dart';
 import 'package:tune/ui/home/widgets/library_overview_section.dart';
+import 'package:tune/ui/home/widgets/components/home_app_bar.dart';
 
 /// 现代化的首页组件
 /// 展示欢迎信息、快速操作和最近播放的音乐
@@ -16,12 +17,13 @@ class HomePage extends ConsumerWidget {
     final playerState = ref.watch(playerStateNotifierProvider);
 
     return Scaffold(
+      appBar: const HomeAppBar(),
       body: CustomScrollView(
         slivers: [
           // 内容部分
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -42,6 +44,8 @@ class HomePage extends ConsumerWidget {
                   
                   // 我的音乐库概览
                   const LibraryOverviewSection(),
+
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

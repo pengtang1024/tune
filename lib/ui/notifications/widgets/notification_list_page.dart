@@ -216,9 +216,12 @@ class NotificationListItem extends StatelessWidget {
           ],
         ),
         onTap: onTap,
-        trailing: IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: onDelete,
+        trailing: SizedBox(
+          width: 40,
+          child: IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: onDelete,
+          ),
         ),
       ),
     );
