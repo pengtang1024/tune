@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tune/ui/core/settings/widgets/tabs/general_tab.dart';
 
 /// 语言选项按钮组件
 /// 提供紧凑的语言选择按钮，仅显示图标和简写文本
@@ -11,13 +10,13 @@ class LanguageOptionButton extends StatelessWidget {
   final String label;
 
   const LanguageOptionButton({
-    Key? key,
+    super.key,
     required this.locale,
     required this.currentLocale,
     required this.onSelected,
     required this.displayName,
     this.label = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

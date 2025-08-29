@@ -93,7 +93,6 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^19.4.0
   flutter_timezone: ^4.1.1
-
   # Equatable for value equality
   equatable: ^2.0.5
 
@@ -118,7 +117,6 @@ dependencies:
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.9.0
   just_audio_windows: ^0.2.2
-  flutter_app_badger: ^1.5.0
 
 dev_dependencies:
   flutter_test:
