@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
+import 'package:tune/data/services/play_history_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/app_bar_providers.dart';
@@ -16,18 +17,31 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   late final AudioPlayerService _audioPlayerService;
   StreamSubscription? _positionSubscription;
   List<Song> _playlist = [];
-  final List<Song> _playHistory = []; // 播放历史记录
+  List<Song> _playHistory = []; // 播放历史记录
   int _currentIndex = -1;
   static const int _maxHistorySize = 50; // 最大历史记录数量
+  final PlayHistoryService _playHistoryService = PlayHistoryService();
 
   PlayerStateNotifier(this._ref) : super(PlayerState.initial()) {
     _audioPlayerService = _ref.read(audioPlayerServiceProvider);
     _initializePlayer();
+    _initializePlayHistory();
+    _playHistoryService.init();
   }
 
   /// 获取播放历史
   List<Song> getPlayHistory() {
     return List.unmodifiable(_playHistory);
+  }
+
+  /// 初始化播放历史
+  Future<void> _initializePlayHistory() async {
+    try {
+      _playHistory = await _playHistoryService.getPlayHistory();
+      Log.info('播放历史初始化成功，共${_playHistory.length}条记录');
+    } catch (e, stackTrace) {
+      Log.error('初始化播放历史失败: $e\nStack trace: $stackTrace');
+    }
   }
 
   /// 初始化播放器
@@ -145,6 +159,9 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       if (_playHistory.length > _maxHistorySize) {
         _playHistory.removeRange(_maxHistorySize, _playHistory.length);
       }
+
+      // 保存到持久化存储
+      unawaited(_playHistoryService.addSongToHistory(song));
 
       Log.info('添加歌曲到播放历史记录: ${song.title}');
     } catch (e, stackTrace) {

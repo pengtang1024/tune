@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 
 /// 快速操作组件
@@ -34,28 +35,32 @@ class QuickActionsSection extends StatelessWidget {
                   icon: Icons.music_note_outlined,
                   label: loc.my_songs,
                   onTap: () {
-                    // TODO: 导航到我的音乐
+                    // 导航到我的音乐
+                    context.go('/library/songs');
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.favorite_border,
                   label: loc.favorites,
                   onTap: () {
-                    // TODO: 导航到收藏
+                    // 导航到收藏
+                    context.go('/library/favorites');
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.playlist_play,
                   label: loc.playlists,
                   onTap: () {
-                    // TODO: 导航到播放列表
+                    // 导航到播放列表
+                    context.go('/library/playlists');
                   },
                 ),
                 _QuickActionButton(
                   icon: Icons.radio,
                   label: loc.radio,
                   onTap: () {
-                    // TODO: 导航到电台
+                    // 导航到电台
+                    context.go('/radio');
                   },
                 ),
               ],

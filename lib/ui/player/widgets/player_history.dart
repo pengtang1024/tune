@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 
@@ -10,9 +11,10 @@ class PlayerHistory extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+    final loc = context.loc;
 
-    // 获取最近播放的歌曲历史（这里简化处理，实际应该从持久化存储中获取）
-    final List<Song> history = playerNotifier.getPlaylist().take(5).toList();
+    // 获取最近播放的歌曲历史
+    final List<Song> history = playerNotifier.getPlayHistory().take(5).toList();
 
     if (history.isEmpty) {
       return const SizedBox.shrink();
@@ -29,7 +31,7 @@ class PlayerHistory extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '最近播放',
+            loc.recently_played, // 使用本地化文本
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),

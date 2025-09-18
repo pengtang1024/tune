@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
@@ -32,7 +33,8 @@ class RecentSection extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () {
-                // TODO: 查看全部最近播放
+                // 导航到历史记录页面
+                context.go('/history');
               },
               child: Text(loc.see_all),
             ),

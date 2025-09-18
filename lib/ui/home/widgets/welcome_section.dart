@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
@@ -126,8 +127,8 @@ class WelcomeSection extends ConsumerWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: 实现音乐扫描功能或添加路由
-                        // context.router.push('/music-scan');
+                        // 导航到音乐扫描页面
+                        context.go('/scan');
                       },
                       child: Text(loc.scan_local_music),
                     ),

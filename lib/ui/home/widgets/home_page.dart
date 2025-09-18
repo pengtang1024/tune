@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/home/widgets/welcome_section.dart';
 import 'package:tune/ui/home/widgets/quick_actions_section.dart';

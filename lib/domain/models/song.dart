@@ -86,6 +86,35 @@ class Song {
     };
   }
 
+  /// 从 JSON 对象创建 Song 实例
+  factory Song.fromJson(Map<String, dynamic> json) {
+    return Song({
+      'id': json['id'] as int? ?? 0,
+      'title': json['title'] as String? ?? '',
+      'artist': json['artist'] as String? ?? '',
+      'album': json['album'] as String? ?? '',
+      'duration': json['duration'] as int? ?? 0,
+      'uri': json['uri'] as String? ?? '',
+      'dateAdded': json['dateAdded'] as int? ?? 0,
+      'genre': json['genre'] as String?,
+      'year': json['year'] as int?,
+      'bitrate': json['bitrate'] as int?,
+      'sampleRate': json['sampleRate'] as int?,
+      'trackNumber': json['trackNumber'] as int?,
+      'trackTotal': json['trackTotal'] as int?,
+      'discNumber': json['discNumber'] as int?,
+      'totalDisc': json['totalDisc'] as int?,
+      'lyrics': json['lyrics'] as String?,
+      'genres': json['genres'] as List<String>?,
+      'performers': json['performers'] as List<String>?,
+      'language': json['language'] as String?,
+      'size': json['size'] as int?,
+      'type': json['type'] as String?,
+      'isFavorite': json['isFavorite'] as bool? ?? false,
+      'albumArt': json['albumArt'] as String?,
+    });
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
