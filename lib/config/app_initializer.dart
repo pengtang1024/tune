@@ -120,7 +120,7 @@ class AppInitializer {
       // 初始化通知数据
       final notificationNotifier = ref.read(
           notificationStateNotifierProvider.notifier);
-      await notificationNotifier.init();
+      notificationNotifier.initialize();
 
       Log.info('通知服务初始化成功');
     } catch (e, stackTrace) {

@@ -18,8 +18,10 @@ class PlayHistoryService {
 
   /// 初始化Hive
   Future<void> init() async {
-    // 注册适配器
-    Hive.registerAdapter(SongAdapter());
+    // 检查适配器是否已注册，避免重复注册导致错误
+    if (!Hive.isAdapterRegistered(SongAdapter().typeId)) {
+      Hive.registerAdapter(SongAdapter());
+    }
 
     // 打开播放历史 Box
     _playHistoryBox = await Hive.openBox<Song>('play_history');

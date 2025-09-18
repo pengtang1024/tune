@@ -3,7 +3,7 @@ import 'song.dart';
 
 class SongAdapter extends TypeAdapter<Song> {
   @override
-  final int typeId = 0; // 为这个适配器分配一个唯一的类型ID
+  final int typeId = 1; // 修改为唯一的类型ID，避免与已注册的适配器冲突
 
   @override
   Song read(BinaryReader reader) {
