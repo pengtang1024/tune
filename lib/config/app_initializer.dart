@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
-import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/notifications/providers/notification_providers.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tune/data/services/providers/notification_manager_provider.dart';
 import 'package:tune/data/services/providers/play_history_service_provider.dart';
+import 'package:tune/core/services/window_manager_service.dart';
 import 'dart:io'; // 用于平台检测
 import 'package:hive_flutter/hive_flutter.dart'; // 用于Hive初始化
 import 'package:path_provider/path_provider.dart'; // 用于获取应用文档目录
@@ -30,6 +30,11 @@ class AppInitializer {
 
       // 初始化通知服务
       await _initNotificationService(ref);
+
+      // 初始化窗口管理器
+      Log.info('开始初始化窗口管理器');
+      await WindowManagerService.init();
+      Log.info('窗口管理器初始化完成');
 
       Log.info('应用核心服务初始化完成');
     } catch (e, stackTrace) {
