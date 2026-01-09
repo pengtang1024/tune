@@ -10,13 +10,13 @@ class WindowSizeOptionButton extends StatelessWidget {
   final String description;
 
   const WindowSizeOptionButton({
-    Key? key,
+    super.key,
     required this.size,
     required this.currentSize,
     required this.onSelected,
     this.label = '',
     this.description = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

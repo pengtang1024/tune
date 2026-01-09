@@ -1515,6 +1515,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'调整应用内文字的显示大小'**
   String get font_size_description;
+
+  /// No description provided for @error_occurred.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发生错误'**
+  String get error_occurred;
 }
 
 class _AppLocalizationsDelegate

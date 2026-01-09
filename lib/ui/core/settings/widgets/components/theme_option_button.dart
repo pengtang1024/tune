@@ -10,13 +10,13 @@ class ThemeOptionButton extends StatelessWidget {
   final String label;
 
   const ThemeOptionButton({
-    Key? key,
+    super.key,
     required this.themeMode,
     required this.currentThemeMode,
     required this.onSelected,
     required this.icon,
     this.label = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

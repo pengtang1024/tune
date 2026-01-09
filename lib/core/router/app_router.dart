@@ -11,7 +11,7 @@ import 'package:tune/ui/library/widgets/music_scan_page.dart';
 import 'package:tune/ui/notifications/widgets/grouped_notification_list.dart';
 import 'package:tune/ui/player/widgets/player_page.dart';
 import 'package:tune/ui/recommend/widgets/recommend_page.dart';
-import 'package:tune/ui/notifications/widgets/notification_test_page.dart';
+
 
 /// 路由Provider：提供GoRouter实例
 /// 路由Provider：适配go_router 16.1.0
@@ -91,13 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               return const NotificationListPageWithGrouping();
             },
           ),
-          GoRoute(
-            path: '/notification_test',
-            name: '/notification_test',
-            builder: (BuildContext context, GoRouterState state) {
-              return const NotificationTestPage();
-            },
-          ),
+
         ],
       ),
     ],

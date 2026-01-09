@@ -717,6 +717,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get font_size_description => '调整应用内文字的显示大小';
+
+  @override
+  String get error_occurred => '发生错误';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1432,6 +1435,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get font_size_description => '调整应用内文字的显示大小';
+
+  @override
+  String get error_occurred => '发生错误';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

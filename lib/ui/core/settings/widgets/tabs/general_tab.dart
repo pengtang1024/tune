@@ -205,35 +205,6 @@ class _GeneralTabState extends ConsumerState<GeneralTab> {
         return locale.languageCode;
     }
   }
-  
-  // 获取语言对应的图标
-  Widget _getLanguageFlag(Locale locale) {
-    switch (locale.languageCode) {
-      case 'en':
-        return const Icon(Icons.flag, color: Colors.red);
-      case 'zh':
-        if (locale.countryCode == 'CN') {
-          return const Icon(Icons.flag, color: Colors.red);
-        } else if (locale.countryCode == 'TW') {
-          return const Icon(Icons.flag, color: Colors.blue);
-        }
-        return const Icon(Icons.flag, color: Colors.red);
-      case 'ja':
-        return const Icon(Icons.flag, color: Colors.grey);
-      case 'ko':
-        return const Icon(Icons.flag, color: Colors.blue);
-      case 'ru':
-        return const Icon(Icons.flag, color: Colors.blue);
-      case 'de':
-        return const Icon(Icons.flag, color: Colors.red);
-      case 'fr':
-        return const Icon(Icons.flag, color: Colors.blue);
-      case 'es':
-        return const Icon(Icons.flag, color: Colors.red);
-      default:
-        return const Icon(Icons.language);
-    }
-  }
 
   Future<void> _saveSetting(String key, dynamic value) async {
     // 使用全局的sharedPreferencesServiceProvider

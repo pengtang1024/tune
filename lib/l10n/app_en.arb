@@ -259,5 +259,6 @@
   "enable_notifications": "Enable Notifications",
   "enable_notifications_description": "Enable or disable app notifications",
   "font_size": "Font Size",
-  "font_size_description": "Adjust the display size of text within the app"
+  "font_size_description": "Adjust the display size of text within the app",
+  "error_occurred": "Error occurred"
 }

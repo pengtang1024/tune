@@ -744,4 +744,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get font_size_description =>
       'Adjust the display size of text within the app';
+
+  @override
+  String get error_occurred => 'Error occurred';
 }

@@ -51,13 +51,18 @@ class TuneApp extends ConsumerWidget {
           body: Center(child: CircularProgressIndicator()),
         ),
       ),
-      error: (error, stack) => MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text('Error: $error'), // 应该使用本地化字符串
+      error: (error, stack) {
+        Log.error('应用启动失败: $error', stack);
+        return MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: Text(
+                'Error occurred: $error',
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

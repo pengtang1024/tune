@@ -8,11 +8,11 @@ class CompactWindowSizeButton extends StatelessWidget {
   final Function(String) onSelected;
 
   const CompactWindowSizeButton({
-    Key? key,
+    super.key,
     required this.size,
     required this.currentSize,
     required this.onSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

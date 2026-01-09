@@ -302,7 +302,7 @@ class _AnimationsTabState extends ConsumerState<AnimationsTab> {
                           ref.read(animationsEnabledProvider.notifier).state =
                               value;
                         },
-                        activeColor: theme.colorScheme.primary,
+                        activeTrackColor: theme.colorScheme.primary,
                       ),
                     ],
                   ),

@@ -158,8 +158,7 @@ class MenuRouteObserver extends NavigatorObserver {
         return '音乐扫描'; // 应该使用自定义本地化字符串
       case '/settings':
         return '设置'; // 应该使用 localizations.settings
-      case '/notification_test':
-        return '通知测试'; // 通知测试页面标题
+
       default:
         return 'Tune'; // 应该使用 localizations.app_name
     }

@@ -7,6 +7,8 @@ import 'package:tune/providers/route_observer_provider.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
 import 'package:tune/ui/library/widgets/library/song_grid_widget.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -69,58 +71,149 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     final state = ref.watch(libraryStateNotifierProvider);
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 搜索框
-            _buildSearchBar(),
-            const SizedBox(height: 16),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: isDark 
+              ? AppDesignSystem.backgroundGradientDark
+              : AppDesignSystem.backgroundGradientLight,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 页面标题
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+                      decoration: BoxDecoration(
+                        gradient: AppDesignSystem.primaryGradient,
+                        borderRadius: AppDesignSystem.borderRadius12,
+                      ),
+                      child: Icon(
+                        Icons.library_music_rounded,
+                        color: Colors.white,
+                        size: AppDesignSystem.iconSize24,
+                      ),
+                    ),
+                    const SizedBox(width: AppDesignSystem.spacing12),
+                    Text(
+                      '音乐库',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: AppDesignSystem.fontWeightBold,
+                        color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (state.songs.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDesignSystem.spacing12,
+                          vertical: AppDesignSystem.spacing6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppDesignSystem.primary.withOpacity(0.1),
+                          borderRadius: AppDesignSystem.borderRadius20,
+                        ),
+                        child: Text(
+                          '${state.songs.length} 首歌曲',
+                          style: TextStyle(
+                            color: AppDesignSystem.primary,
+                            fontSize: AppDesignSystem.fontSize12,
+                            fontWeight: AppDesignSystem.fontWeightMedium,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                
+                const SizedBox(height: AppDesignSystem.spacing24),
+                
+                // 搜索框
+                _buildSearchBar(),
+                const SizedBox(height: AppDesignSystem.spacing16),
 
-            // 扫描状态显示
-            _buildScanStatusDisplay(state),
+                // 扫描状态显示
+                _buildScanStatusDisplay(state),
 
-            // 歌曲列表标题
-            if (state.songs.isNotEmpty) ...[Text(context.loc.songs, style: Theme.of(context).textTheme.titleLarge), const SizedBox(height: 8)],
-
-            // 歌曲网格列表
-            Expanded(
-              child: SongGridWidget(songs: state.songs, searchQuery: _searchQuery, localizedNoSongsFound: context.loc.no_songs_found),
+                // 歌曲列表
+                Expanded(
+                  child: SongGridWidget(
+                    songs: state.songs,
+                    searchQuery: _searchQuery,
+                    localizedNoSongsFound: context.loc.no_songs_found,
+                    style: SongGridStyle.list,
+                    onSongTap: (song) {
+                      // TODO: 播放歌曲或显示详情
+                    },
+                    onSongPlay: (song) {
+                      // TODO: 播放歌曲
+                    },
+                    onSongMore: (song) {
+                      // TODO: 显示更多操作
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSearchBar() {
-    return TextField(
-      controller: _searchController,
-      decoration: InputDecoration(
-        hintText: context.loc.search,
-        prefixIcon: const Icon(Icons.search),
-        suffixIcon: _searchQuery.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {
-                    _searchQuery = '';
-                  });
-                  _performSearch();
-                },
-              )
-            : null,
-        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing4),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: context.loc.search,
+          hintStyle: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppDesignSystem.neutral500
+                : AppDesignSystem.neutral400,
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppDesignSystem.neutral500
+                : AppDesignSystem.neutral400,
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear_rounded),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                    _performSearch();
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDesignSystem.spacing16,
+            vertical: AppDesignSystem.spacing12,
+          ),
+        ),
+        style: const TextStyle(
+          fontSize: AppDesignSystem.fontSize16,
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+          _performSearch();
+        },
       ),
-      onChanged: (value) {
-        setState(() {
-          _searchQuery = value;
-        });
-        _performSearch();
-      },
     );
   }
 
@@ -129,15 +222,73 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      margin: const EdgeInsets.only(bottom: 16.0),
-      decoration: BoxDecoration(color: state.scanStatus == ScanStatus.error ? Colors.red.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8.0)),
+    Color statusColor;
+    IconData statusIcon;
+    String statusType;
+
+    switch (state.scanStatus) {
+      case ScanStatus.scanning:
+        statusColor = AppDesignSystem.primary;
+        statusIcon = Icons.refresh_rounded;
+        statusType = '扫描中';
+        break;
+      case ScanStatus.error:
+        statusColor = AppDesignSystem.error;
+        statusIcon = Icons.error_rounded;
+        statusType = '错误';
+        break;
+      default:
+        return const SizedBox.shrink();
+    }
+
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing16),
+      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+      backgroundColor: statusColor.withOpacity(0.1),
+      borderSide: BorderSide(color: statusColor.withOpacity(0.3)),
       child: Row(
         children: [
-          if (state.scanStatus == ScanStatus.scanning) ...[const CircularProgressIndicator(), const SizedBox(width: 12)] else if (state.scanStatus == ScanStatus.error) ...[const Icon(Icons.error, color: Colors.red), const SizedBox(width: 12)],
+          if (state.scanStatus == ScanStatus.scanning) ...[
+            SizedBox(
+              width: AppDesignSystem.iconSize20,
+              height: AppDesignSystem.iconSize20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+              ),
+            ),
+          ] else if (state.scanStatus == ScanStatus.error) ...[
+            Icon(
+              statusIcon,
+              color: statusColor,
+              size: AppDesignSystem.iconSize20,
+            ),
+          ],
+          const SizedBox(width: AppDesignSystem.spacing12),
           Expanded(
-            child: Text(state.statusMessage, style: TextStyle(color: state.scanStatus == ScanStatus.error ? Colors.red : Theme.of(context).textTheme.bodyMedium?.color)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  statusType,
+                  style: TextStyle(
+                    fontWeight: AppDesignSystem.fontWeightMedium,
+                    color: statusColor,
+                    fontSize: AppDesignSystem.fontSize14,
+                  ),
+                ),
+                const SizedBox(height: AppDesignSystem.spacing2),
+                Text(
+                  state.statusMessage,
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppDesignSystem.neutral300
+                        : AppDesignSystem.neutral700,
+                    fontSize: AppDesignSystem.fontSize12,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

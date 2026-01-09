@@ -21,6 +21,7 @@ class Song {
   final int? size; // 文件大小（字节）
   final String? type; // 文件类型
   final bool isFavorite; // 是否收藏
+  final String? albumArtPath; // 专辑封面路径
 
   Song(Map<String, dynamic> data)
     : id = data['id'] ?? 0,
@@ -48,7 +49,8 @@ class Song {
       language = data['language'],
       size = data['size'],
       type = data['type'],
-      isFavorite = data['isFavorite'] ?? false;
+      isFavorite = data['isFavorite'] ?? false,
+      albumArtPath = data['albumArtPath'];
 
   // Getters for compatibility with existing code
   String get displayName => title;
@@ -80,6 +82,7 @@ class Song {
       'size': size,
       'type': type,
       'isFavorite': isFavorite,
+      'albumArtPath': albumArtPath,
     };
   }
 

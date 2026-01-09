@@ -259,5 +259,6 @@
   "enable_notifications": "启用通知",
   "enable_notifications_description": "启用或禁用应用通知",
   "font_size": "字体大小",
-  "font_size_description": "调整应用内文字的显示大小"
+  "font_size_description": "调整应用内文字的显示大小",
+  "error_occurred": "发生错误"
 }
