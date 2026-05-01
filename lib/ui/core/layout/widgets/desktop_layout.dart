@@ -123,8 +123,8 @@ class DesktopLayout extends ConsumerWidget {
                       margin: const EdgeInsets.all(AppDesignSystem.spacing16),
                       decoration: BoxDecoration(
                         color: theme.brightness == Brightness.dark
-                            ? AppDesignSystem.neutral900.withOpacity(0.8)
-                            : AppDesignSystem.neutral50.withOpacity(0.8),
+            ? AppDesignSystem.neutral900.withOpacity(0.9)
+            : AppDesignSystem.neutral50.withOpacity(0.9),
                         borderRadius: AppDesignSystem.borderRadius16,
                         border: Border.all(
                           color: theme.brightness == Brightness.dark

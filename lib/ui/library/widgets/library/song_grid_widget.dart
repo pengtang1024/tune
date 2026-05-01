@@ -119,6 +119,7 @@ class SongGridWidget extends StatelessWidget {
 
         return GridView.builder(
           padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+          cacheExtent: 1000, // 增加缓存范围以提高滚动性能
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             childAspectRatio: childAspectRatio,
@@ -133,7 +134,7 @@ class SongGridWidget extends StatelessWidget {
               onTap: () => onSongTap?.call(song),
               onPlay: () => onSongPlay?.call(song),
               onMore: () => onSongMore?.call(song),
-              isPlaying: song.id == currentlyPlayingId,
+              isPlaying: currentlyPlayingId != null && song.id.toString() == currentlyPlayingId,
             );
           },
         );
@@ -144,6 +145,7 @@ class SongGridWidget extends StatelessWidget {
   Widget _buildListView(List<Song> filteredSongs) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: AppDesignSystem.spacing8),
+      cacheExtent: 1000, // 增加缓存范围以提高滚动性能
       itemCount: filteredSongs.length,
       separatorBuilder: (context, index) => const SizedBox(height: AppDesignSystem.spacing4),
       itemBuilder: (context, index) {
@@ -153,7 +155,7 @@ class SongGridWidget extends StatelessWidget {
           onTap: () => onSongTap?.call(song),
           onPlay: () => onSongPlay?.call(song),
           onMore: () => onSongMore?.call(song),
-          isPlaying: song.id == currentlyPlayingId,
+          isPlaying: currentlyPlayingId != null && song.id == int.tryParse(currentlyPlayingId!),
         );
       },
     );
@@ -162,6 +164,7 @@ class SongGridWidget extends StatelessWidget {
   Widget _buildCompactView(List<Song> filteredSongs) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: AppDesignSystem.spacing4),
+      cacheExtent: 1000, // 增加缓存范围以提高滚动性能
       itemCount: filteredSongs.length,
       separatorBuilder: (context, index) => const SizedBox(height: AppDesignSystem.spacing2),
       itemBuilder: (context, index) {
@@ -170,7 +173,7 @@ class SongGridWidget extends StatelessWidget {
           song: song,
           onTap: () => onSongTap?.call(song),
           onPlay: () => onSongPlay?.call(song),
-          isPlaying: song.id == currentlyPlayingId,
+          isPlaying: currentlyPlayingId != null && song.id == int.tryParse(currentlyPlayingId!),
         );
       },
     );

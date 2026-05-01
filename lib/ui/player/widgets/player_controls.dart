@@ -56,7 +56,7 @@ class PlayerControls extends ConsumerWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppDesignSystem.primary.withOpacity(0.3),
+                color: AppDesignSystem.primary.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -132,7 +132,7 @@ class PlayerControls extends ConsumerWidget {
           height: isLarge ? AppDesignSystem.iconSize56 : AppDesignSystem.iconSize48,
           decoration: BoxDecoration(
             color: isActive 
-                ? AppDesignSystem.primary.withOpacity(0.1)
+                ? AppDesignSystem.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(isLarge ? AppDesignSystem.radius24 : AppDesignSystem.radius20),
             border: isActive 

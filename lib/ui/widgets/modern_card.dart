@@ -45,67 +45,67 @@ class ModernCard extends StatelessWidget {
   /// 创建一个简单的卡片
   factory ModernCard.simple({
     Key? key,
-    required Widget child,
     EdgeInsetsGeometry? padding,
     VoidCallback? onTap,
+    required Widget child,
   }) {
     return ModernCard(
       key: key,
-      child: child,
       padding: padding,
       onTap: onTap,
+      child: child,
     );
   }
 
   /// 创建一个突出的卡片
   factory ModernCard.elevated({
     Key? key,
-    required Widget child,
     EdgeInsetsGeometry? padding,
     VoidCallback? onTap,
+    required Widget child,
   }) {
     return ModernCard(
       key: key,
-      child: child,
       padding: padding,
       onTap: onTap,
       isElevated: true,
+      child: child,
     );
   }
 
   /// 创建一个带边框的卡片
   factory ModernCard.bordered({
     Key? key,
-    required Widget child,
     EdgeInsetsGeometry? padding,
     Color? borderColor,
     VoidCallback? onTap,
+    required Widget child,
   }) {
     return ModernCard(
       key: key,
-      child: child,
       padding: padding,
       onTap: onTap,
       isBordered: true,
       borderSide: borderColor != null ? BorderSide(color: borderColor) : null,
+      child: child,
     );
   }
 
   /// 创建一个渐变卡片
   factory ModernCard.gradient({
     Key? key,
-    required Widget child,
     EdgeInsetsGeometry? padding,
     Gradient? gradient,
     VoidCallback? onTap,
+    required Widget child,
   }) {
     return ModernCard(
       key: key,
-      child: child,
       padding: padding,
       onTap: onTap,
       isGradient: true,
       gradient: gradient,
+      child: child,
     );
   }
 
@@ -162,8 +162,8 @@ class ModernCard extends StatelessWidget {
             onTap: onTap,
             onLongPress: onLongPress,
             borderRadius: cardBorderRadius,
-            splashColor: AppDesignSystem.primary.withOpacity(0.1),
-            highlightColor: AppDesignSystem.primary.withOpacity(0.05),
+            splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
+            highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
             child: cardContent,
           ),
         ),
@@ -220,12 +220,12 @@ class GlassCard extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: isDark 
-              ? Colors.white.withOpacity(opacity)
-              : Colors.black.withOpacity(opacity),
+              ? Colors.white.withValues(alpha: opacity)
+              : Colors.black.withValues(alpha: opacity),
           border: Border.all(
             color: isDark 
-                ? Colors.white.withOpacity(0.2)
-                : Colors.white.withOpacity(0.3),
+                ? Colors.white.withValues(alpha: 0.2)
+                : Colors.white.withValues(alpha: 0.3),
             width: 1,
           ),
         ),

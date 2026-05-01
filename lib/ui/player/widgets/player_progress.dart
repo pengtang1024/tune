@@ -37,7 +37,7 @@ class PlayerProgress extends ConsumerWidget {
                     ? AppDesignSystem.neutral700 
                     : AppDesignSystem.neutral300,
                 thumbColor: AppDesignSystem.primary,
-                overlayColor: AppDesignSystem.primary.withOpacity(0.2),
+                overlayColor: AppDesignSystem.primary.withValues(alpha: 0.2),
                 valueIndicatorColor: AppDesignSystem.primary,
                 valueIndicatorTextStyle: const TextStyle(
                   color: Colors.white,

@@ -146,23 +146,22 @@ class ModernButton extends StatelessWidget {
   /// 创建一个图标按钮
   factory ModernButton.icon({
     Key? key,
-    required Widget icon,
-    required String text,
+    required IconData icon,
     VoidCallback? onPressed,
+    ModernButtonType type = ModernButtonType.primary,
     ModernButtonSize? size,
-    ModernButtonType? type,
     bool isLoading = false,
     bool isFullWidth = false,
   }) {
     return ModernButton(
       key: key,
-      text: text,
-      child: icon,
+      text: '',
       onPressed: onPressed,
-      type: type ?? ModernButtonType.primary,
+      type: type,
       size: size ?? ModernButtonSize.medium,
       isLoading: isLoading,
       isFullWidth: isFullWidth,
+      child: Icon(icon),
     );
   }
 
@@ -338,8 +337,8 @@ class ModernButton extends StatelessWidget {
         return _ButtonColors(
           backgroundColor: backgroundColor ?? AppDesignSystem.primary,
           foregroundColor: foregroundColor ?? Colors.white,
-          splashColor: Colors.white.withOpacity(0.2),
-          highlightColor: Colors.white.withOpacity(0.1),
+          splashColor: Colors.white.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
           border: null,
         );
       case ModernButtonType.secondary:
@@ -348,8 +347,8 @@ class ModernButton extends StatelessWidget {
               (isDark ? AppDesignSystem.neutral800 : AppDesignSystem.neutral100),
           foregroundColor: foregroundColor ?? 
               (isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900),
-          splashColor: AppDesignSystem.primary.withOpacity(0.1),
-          highlightColor: AppDesignSystem.primary.withOpacity(0.05),
+          splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
+          highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
           border: null,
         );
       case ModernButtonType.outline:
@@ -357,8 +356,8 @@ class ModernButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           foregroundColor: foregroundColor ?? 
               (isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900),
-          splashColor: AppDesignSystem.primary.withOpacity(0.1),
-          highlightColor: AppDesignSystem.primary.withOpacity(0.05),
+          splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
+          highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
           border: Border.all(
             color: borderColor ?? AppDesignSystem.primary,
             width: 1,
@@ -368,16 +367,16 @@ class ModernButton extends StatelessWidget {
         return _ButtonColors(
           backgroundColor: Colors.transparent,
           foregroundColor: foregroundColor ?? AppDesignSystem.primary,
-          splashColor: AppDesignSystem.primary.withOpacity(0.1),
-          highlightColor: AppDesignSystem.primary.withOpacity(0.05),
+          splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
+          highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
           border: null,
         );
       case ModernButtonType.gradient:
         return _ButtonColors(
           backgroundColor: Colors.transparent,
           foregroundColor: foregroundColor ?? Colors.white,
-          splashColor: Colors.white.withOpacity(0.2),
-          highlightColor: Colors.white.withOpacity(0.1),
+          splashColor: Colors.white.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
           border: null,
         );
     }

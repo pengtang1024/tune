@@ -74,8 +74,8 @@ class AppAnimations {
       child: InkWell(
         onTap: onTap,
         borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
-        splashColor: rippleColor ?? AppDesignSystem.primary.withOpacity(0.2),
-        highlightColor: (rippleColor ?? AppDesignSystem.primary).withOpacity(0.1),
+        splashColor: rippleColor ?? AppDesignSystem.primary.withValues(alpha: 0.2),
+        highlightColor: (rippleColor ?? AppDesignSystem.primary).withValues(alpha: 0.1),
         child: child,
       ),
     );
@@ -83,27 +83,31 @@ class AppAnimations {
 
   /// 滑入动画
   static Widget slideIn({
-    required Widget child,
     Offset begin = const Offset(0.0, 0.3),
     Duration? duration,
     Duration? delay,
     Curve? curve,
+    required Widget child,
   }) {
     return AnimatedSlideTransition(
-      child: child,
+      begin: begin,
       duration: duration ?? AppDesignSystem.duration300,
+      delay: delay,
+      curve: curve,
+      child: child,
     );
   }
 
   /// 列表项动画
   static Widget animatedListItem({
-    required Widget child,
     int index = 0,
     Duration? duration,
+    required Widget child,
   }) {
     return AnimatedSlideTransition(
-      child: child,
+      begin: const Offset(0.0, 0.3),
       duration: duration ?? AppDesignSystem.duration300,
+      child: child,
     );
   }
 }
@@ -113,11 +117,18 @@ class AnimatedSlideTransition extends StatefulWidget {
   final Widget child;
   final Duration duration;
   final VoidCallback? onComplete;
+  final Offset begin;
+  final Duration? delay;
+  final Curve? curve;
 
   const AnimatedSlideTransition({
-    required this.child,
-    required this.duration,
     this.onComplete,
+    required this.duration,
+    this.begin = const Offset(0.0, 0.3),
+    this.delay,
+    this.curve,
+    super.key,
+    required this.child,
   });
 
   @override
@@ -134,14 +145,22 @@ class _AnimatedSlideTransitionState extends State<AnimatedSlideTransition>
     super.initState();
     _controller = AnimationController(duration: widget.duration, vsync: this);
     _offsetAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.3),
+      begin: widget.begin,
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
+      curve: widget.curve ?? Curves.easeOut,
     ));
 
-    _controller.forward();
+    if (widget.delay != null) {
+      Future.delayed(widget.delay!, () {
+        if (mounted) {
+          _controller.forward();
+        }
+      });
+    } else {
+      _controller.forward();
+    }
   }
 
   @override

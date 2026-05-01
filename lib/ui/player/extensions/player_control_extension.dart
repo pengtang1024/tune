@@ -46,7 +46,7 @@ class PlayerStateInfo {
 extension PlayerControlExtension on AudioPlayerService {
   /// 创建位置监听流
   Stream<Duration> createPositionStream() {
-    return Stream.periodic(const Duration(milliseconds: 100))
+    return Stream.periodic(const Duration(milliseconds: 500)) // 降低更新频率以节省资源
         .map((_) => currentPosition)
         .distinct();
   }

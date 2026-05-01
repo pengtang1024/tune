@@ -348,28 +348,34 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         return allSongs;
       }
 
-      for (final path in paths) {
+      for (final dirPath in paths) {
         try {
-          Log.info('扫描路径: $path');
+          Log.info('扫描路径: $dirPath');
 
           // 检查路径是否为空
-          if (path.isEmpty) {
+          if (dirPath.isEmpty) {
             Log.info('跳过空路径');
             continue;
           }
 
-          final dir = Directory(path);
+          // 验证路径安全性，防止路径遍历攻击
+          if (!_isValidPath(dirPath)) {
+            Log.info('无效路径，跳过: $dirPath');
+            continue;
+          }
+
+          final dir = Directory(dirPath);
 
           // 检查目录是否存在
           if (!await dir.exists()) {
-            Log.info('目录不存在，跳过: $path');
+            Log.info('目录不存在，跳过: $dirPath');
             continue;
           }
 
           // 检查是否为目录
           final stat = await dir.stat();
           if (stat.type != FileSystemEntityType.directory) {
-            Log.info('路径不是目录，跳过: $path');
+            Log.info('路径不是目录，跳过: $dirPath');
             continue;
           }
 
@@ -379,6 +385,12 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
           )) {
             try {
               if (file is File) {
+                // 再次验证文件路径安全性
+                if (!_isValidPath(file.path)) {
+                  Log.info('无效文件路径，跳过: ${file.path}');
+                  continue;
+                }
+                
                 final fileName = file.path.toLowerCase();
                 // 支持的音频格式
                 if (fileName.endsWith('.mp3') ||
@@ -400,7 +412,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
             }
           }
         } catch (e, stackTrace) {
-          Log.error('扫描路径时出错: $path, 错误: $e', stackTrace);
+          Log.error('扫描路径时出错: $dirPath, 错误: $e', stackTrace);
           // 继续扫描其他路径
           continue;
         }
@@ -411,6 +423,25 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     } catch (e, stackTrace) {
       Log.error('扫描自定义路径时发生严重错误: $e', stackTrace);
       rethrow;
+    }
+  }
+
+  /// 验证路径是否安全，防止路径遍历攻击
+  bool _isValidPath(String inputPath) {
+    try {
+      // 使用path包规范化路径
+      final normalizedPath = path.normalize(inputPath);
+
+      // 检查是否包含父目录引用（路径遍历攻击检测）
+      if (normalizedPath.contains('..')) {
+        Log.info('路径包含父目录引用，拒绝访问: $inputPath');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      Log.error('路径验证错误: $e');
+      return false;
     }
   }
 }

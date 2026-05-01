@@ -118,7 +118,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           vertical: AppDesignSystem.spacing6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppDesignSystem.primary.withOpacity(0.1),
+                          color: AppDesignSystem.primary.withValues(alpha: 0.1),
                           borderRadius: AppDesignSystem.borderRadius20,
                         ),
                         child: Text(
@@ -244,8 +244,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return ModernCard(
       margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing16),
       padding: const EdgeInsets.all(AppDesignSystem.spacing16),
-      backgroundColor: statusColor.withOpacity(0.1),
-      borderSide: BorderSide(color: statusColor.withOpacity(0.3)),
+      backgroundColor: statusColor.withValues(alpha: 0.1),
+      borderSide: BorderSide(color: statusColor.withValues(alpha: 0.3)),
       child: Row(
         children: [
           if (state.scanStatus == ScanStatus.scanning) ...[

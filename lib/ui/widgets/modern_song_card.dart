@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
@@ -123,13 +124,13 @@ class ModernSongCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: AppDesignSystem.borderRadius12,
-          splashColor: AppDesignSystem.primary.withOpacity(0.1),
-          highlightColor: AppDesignSystem.primary.withOpacity(0.05),
+          splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
+          highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
           child: AnimatedContainer(
             duration: AppDesignSystem.duration200,
             decoration: BoxDecoration(
               color: isSelected 
-                  ? AppDesignSystem.primary.withOpacity(0.1)
+                  ? AppDesignSystem.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: AppDesignSystem.borderRadius12,
               border: isSelected 
@@ -178,14 +179,16 @@ class ModernSongCard extends StatelessWidget {
             child: song.albumArtPath != null && song.albumArtPath!.isNotEmpty
                 ? ClipRRect(
                     borderRadius: AppDesignSystem.borderRadius8,
-                    child: Image.asset(
-                      song.albumArtPath!,
+                    child: Image.file(
+                      File(song.albumArtPath!),
                       width: double.infinity,
                       height: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return _buildDefaultAlbumArt();
                       },
+                      cacheWidth: 200, // 优化性能，指定缓存宽度
+                      cacheHeight: 200, // 优化性能，指定缓存高度
                     ),
                   )
                 : _buildDefaultAlbumArt(),
@@ -198,7 +201,7 @@ class ModernSongCard extends StatelessWidget {
               height: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: AppDesignSystem.borderRadius8,
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
               ),
               child: Center(
                 child: Icon(
@@ -216,7 +219,7 @@ class ModernSongCard extends StatelessWidget {
   Widget _buildDefaultAlbumArt() {
     return Icon(
       Icons.album_rounded,
-      color: Colors.white.withOpacity(0.8),
+      color: Colors.white.withValues(alpha: 0.8),
       size: AppDesignSystem.iconSize32,
     );
   }
@@ -314,7 +317,7 @@ class ModernSongCard extends StatelessWidget {
                   height: AppDesignSystem.iconSize32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppDesignSystem.primary.withOpacity(0.1),
+                    color: AppDesignSystem.primary.withValues(alpha: 0.1),
                   ),
                   child: Icon(
                     isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
@@ -334,13 +337,13 @@ class ModernSongCard extends StatelessWidget {
             child: InkWell(
               onTap: onMore,
               borderRadius: AppDesignSystem.borderRadius20,
-              child: Container(
+              child: SizedBox(
                 width: AppDesignSystem.iconSize32,
                 height: AppDesignSystem.iconSize32,
                 child: Icon(
                   Icons.more_vert_rounded,
                   size: AppDesignSystem.iconSize20,
-                  color: theme.iconTheme.color?.withOpacity(0.7),
+                  color: theme.iconTheme.color?.withValues(alpha: 0.7),
                 ),
               ),
             ),

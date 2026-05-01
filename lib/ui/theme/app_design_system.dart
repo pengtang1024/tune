@@ -120,7 +120,7 @@ class AppDesignSystem {
   
   static List<BoxShadow> get shadowLight => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.05),
+      color: Colors.black.withValues(alpha: 0.05),
       blurRadius: 4,
       offset: const Offset(0, 1),
     ),
@@ -128,12 +128,12 @@ class AppDesignSystem {
   
   static List<BoxShadow> get shadowMedium => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
       blurRadius: 8,
       offset: const Offset(0, 2),
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.04),
+      color: Colors.black.withValues(alpha: 0.04),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
@@ -141,12 +141,12 @@ class AppDesignSystem {
   
   static List<BoxShadow> get shadowHeavy => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.12),
+      color: Colors.black.withValues(alpha: 0.12),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
       blurRadius: 32,
       offset: const Offset(0, 8),
     ),
@@ -154,7 +154,7 @@ class AppDesignSystem {
   
   static List<BoxShadow> get shadowColored => [
     BoxShadow(
-      color: primary.withOpacity(0.2),
+      color: primary.withValues(alpha: 0.2),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),

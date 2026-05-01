@@ -56,8 +56,8 @@ class PlayerPage extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.all(AppDesignSystem.spacing16),
                   child: ModernCard(
-                    backgroundColor: AppDesignSystem.error.withOpacity(0.1),
-                    borderSide: BorderSide(color: AppDesignSystem.error.withOpacity(0.3)),
+                    backgroundColor: AppDesignSystem.error.withValues(alpha: 0.1),
+                    borderSide: BorderSide(color: AppDesignSystem.error.withValues(alpha: 0.3)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppDesignSystem.spacing16),
                       child: Column(
@@ -162,7 +162,7 @@ class PlayerPage extends ConsumerWidget {
                   Text(
                     '正在播放',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.iconTheme.color?.withOpacity(0.7),
+                      color: theme.iconTheme.color?.withValues(alpha: 0.7),
                       fontSize: AppDesignSystem.fontSize12,
                     ),
                   ),

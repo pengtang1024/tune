@@ -38,9 +38,12 @@ class JustAudioPlayerService implements AudioPlayerService {
 
       Log.info('尝试播放音频文件: $audioPath');
 
-      // 使用Uri.file处理路径，以提高兼容性
-      await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
-      await _audioPlayer!.play();
+      // 释放之前的音频源以节省内存
+      if (_audioPlayer != null) {
+        await _audioPlayer!.stop();
+        await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
+        await _audioPlayer!.play();
+      }
       Log.info('音频播放成功');
     } catch (e, stackTrace) {
       Log.error('播放音频失败: $e\nStack trace: $stackTrace');

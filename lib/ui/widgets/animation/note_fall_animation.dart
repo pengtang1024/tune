@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -64,14 +64,14 @@ class _NoteFallPainter extends CustomPainter {
     // 绘制飘落的音符
     for (int i = 0; i < noteCount; i++) {
       // 计算音符初始位置（随机水平位置）
-      final random = Random(i);
+      final random = math.Random(i);
       final x = random.nextDouble() * size.width;
 
       // 计算音符垂直位置（基于进度和随机偏移）
       final y = (fallProgress * 1.5 - random.nextDouble() * 0.5) * size.height;
 
       // 计算音符旋转角度
-      final rotation = fallProgress * 2 * pi + i;
+      final rotation = fallProgress * 2 * math.pi + i;
 
       // 设置颜色
       Color baseColor;
@@ -83,7 +83,7 @@ class _NoteFallPainter extends CustomPainter {
         baseColor = theme.colorScheme.tertiary;
       }
       // ignore: deprecated_member_use
-      paint.color = baseColor.withOpacity(0.8);
+      paint.color = baseColor.withValues(alpha: 0.8);
 
       // 保存画布状态
       canvas.save();
