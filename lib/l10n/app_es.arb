@@ -1,5 +1,17 @@
 {
   "@@locale": "es",
+  "@@last_modified": "2024-05-21T10:00:00.000Z",
+  "good_morning": "Buenos días",
+  "good_afternoon": "Buenas tardes",
+  "good_evening": "Buenas noches",
+  "welcome_to_tune": "Bienvenido a Tune",
+  "see_all": "Ver todo",
+  "no_recent_songs": "No hay canciones reproducidas recientemente",
+  "quick_actions": "Acciones rápidas",
+  "my_songs": "Mis canciones",
+  "favorites": "Favoritos",
+  "playlists": "Listas de reproducción",
+  "radio": "Radio",
   "app_name": "Tune",
   "no_songs_found": "No se encontraron canciones",
   "settings": "Configuración",
@@ -15,5 +27,14 @@
   "search_songs": "Buscar canciones...",
   "add_to_library": "Agregar a la biblioteca",
   "scan_completed_no_new_songs": "Escaneo completado, no se encontraron nuevas canciones",
-  "rescan": "Volver a escanear"
+  "rescan": "Volver a escanear",
+  "tag_vip": "VIP",
+  "tag_singer": "Cantante",
+  "tag_elite": "Élite",
+  "general_tab": "General",
+  "library_tab": "Biblioteca",
+  "account_tab": "Cuenta",
+  "playback_tab": "Reproducción",
+  "equalizer_tab": "Ecualizador",
+  "animations_tab": "Animaciones"
 }

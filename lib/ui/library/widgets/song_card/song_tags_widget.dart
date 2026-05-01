@@ -15,8 +15,8 @@ class SongTagsWidget extends StatelessWidget {
     }
 
     return Wrap(
-      spacing: 6,
-      runSpacing: 2,
+      spacing: 4,  // 减小水平间距
+      runSpacing: 1, // 减小行间距
       children: tags,
     );
   }
@@ -118,7 +118,7 @@ class SongTagsWidget extends StatelessWidget {
       required Color bgColor,
       required Color textColor}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), // 减小内边距
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(4),
@@ -126,7 +126,7 @@ class SongTagsWidget extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 9, // 减小字体大小
           color: textColor,
         ),
       ),

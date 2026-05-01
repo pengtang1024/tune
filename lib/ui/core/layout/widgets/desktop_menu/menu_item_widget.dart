@@ -50,7 +50,7 @@ class MenuItemWidget extends ConsumerWidget {
               if (isExpanded)
                 Expanded(
                   child: Text(
-                    _getLocalizedLabel(context, item.label),
+                    _getLocalizedLabel(context, item.labelKey), // 使用labelKey字段
                     style: TextStyle(
                       color: isSelected ? context.theme.primaryColor : context.theme.textTheme.bodyMedium?.color,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -79,6 +79,8 @@ class MenuItemWidget extends ConsumerWidget {
         return context.loc.music_scan; // 需要在本地化文件中添加这个键
       case 'settings':
         return context.loc.settings;
+      case 'notification_test':
+        return 'Notifications'; // 这是一个测试菜单项
       default:
         return labelKey;
     }

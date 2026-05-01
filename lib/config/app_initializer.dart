@@ -1,13 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
-import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/notifications/providers/notification_providers.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tune/data/services/providers/notification_manager_provider.dart';
+import 'package:tune/data/services/providers/play_history_service_provider.dart';
+import 'package:tune/core/services/window_manager_service.dart';
 import 'dart:io'; // 用于平台检测
+import 'package:hive_flutter/hive_flutter.dart'; // 用于Hive初始化
+import 'package:path_provider/path_provider.dart'; // 用于获取应用文档目录
 
 /// 应用初始化器
 class AppInitializer {
@@ -28,9 +31,30 @@ class AppInitializer {
       // 初始化通知服务
       await _initNotificationService(ref);
 
+      // 初始化窗口管理器
+      Log.info('开始初始化窗口管理器');
+      await WindowManagerService.init();
+      Log.info('窗口管理器初始化完成');
+
       Log.info('应用核心服务初始化完成');
     } catch (e, stackTrace) {
       Log.error('应用初始化失败: $e', stackTrace);
+      rethrow;
+    }
+  }
+
+  /// 初始化Hive
+  static Future<void> _initHive() async {
+    try {
+      Log.info('初始化Hive');
+
+      // 获取应用文档目录并初始化Hive
+      final directory = await getApplicationDocumentsDirectory();
+      await Hive.initFlutter(directory.path);
+
+      Log.info('Hive初始化成功');
+    } catch (e, stackTrace) {
+      Log.error('初始化Hive失败: $e', stackTrace);
       rethrow;
     }
   }
@@ -39,8 +63,17 @@ class AppInitializer {
   static Future<void> _initPersistenceService(Ref ref) async {
     try {
       Log.info('初始化持久化服务');
+
+      // 初始化Hive
+      await _initHive();
+
       final persistenceService = ref.read(sharedPreferencesServiceProvider);
       await persistenceService.init();
+
+      // 初始化播放历史服务
+      final playHistoryService = ref.read(playHistoryServiceProvider);
+      await playHistoryService.init();
+
       Log.info('持久化服务初始化成功');
     } catch (e, stackTrace) {
       Log.error('初始化持久化服务失败: $e', stackTrace);
@@ -91,23 +124,8 @@ class AppInitializer {
 
       // 初始化通知数据
       final notificationNotifier = ref.read(
-        notificationStateNotifierProvider.notifier,
-      );
-
-      // 设置更新AppBar未读通知数量的回调
-      notificationNotifier.setUpdateAppBarUnreadCountCallback((count) {
-        ref
-            .read(appBarStateNotifierProvider.notifier)
-            .updateUnreadNotificationCount(count);
-      });
-
+          notificationStateNotifierProvider.notifier);
       notificationNotifier.initialize();
-
-      // 获取未读通知数量并更新AppBar
-      final notificationState = ref.read(notificationStateNotifierProvider);
-      ref
-          .read(appBarStateNotifierProvider.notifier)
-          .updateUnreadNotificationCount(notificationState.unreadCount);
 
       Log.info('通知服务初始化成功');
     } catch (e, stackTrace) {
@@ -117,60 +135,16 @@ class AppInitializer {
     }
   }
 
-  /// 请求通知权限（跨平台兼容）
+  /// 请求通知权限
   static Future<void> _requestNotificationPermission() async {
     try {
-      // 根据不同平台处理通知权限
-      if (Platform.isAndroid) {
-        // Android平台需要请求通知权限
-        // 注意：在permission_handler 12.0.1版本中，foregroundService权限可能已更改或移除
-        final notificationPermission = await Permission.notification.request();
-        
-        if (notificationPermission.isGranted) {
-          Log.info('Android: 通知权限已授予');
-          // 尝试请求前台服务权限，如果可用
-          try {
-            // 由于permission_handler 12.0.1版本中foregroundService权限可能不存在
-            // 这里添加try-catch以避免构建错误
-            // 实际应用中可能需要根据具体的permission_handler版本进行适配
-          } catch (e) {
-            Log.info('Android: 前台服务权限请求不可用或已更改');
-          }
-        } else {
-          Log.info('Android: 通知权限被拒绝');
-        }
+      Log.info('请求通知权限');
+      if (Platform.isAndroid || Platform.isIOS) {
+        await [
+          Permission.notification,
+        ].request();
       }
-      else if (Platform.isIOS || Platform.isMacOS) {
-        // iOS和macOS平台
-        final notificationPermission = await Permission.notification.request();
-        
-        if (notificationPermission.isGranted) {
-          Log.info('iOS/macOS: 通知权限已授予');
-        } else {
-          Log.info('iOS/macOS: 通知权限被拒绝');
-        }
-      }
-      else if (Platform.isWindows) {
-        // Windows平台
-        // Windows通常不需要显式请求通知权限，但需要确保应用已注册通知
-        Log.info('Windows: 初始化通知服务，Windows平台通常不需要显式请求权限');
-        // Windows特定的通知初始化逻辑可以在这里添加
-      }
-      else if (Platform.isLinux) {
-        // Linux平台
-        Log.info('Linux: 初始化通知服务');
-        // Linux特定的通知初始化逻辑可以在这里添加
-      }
-      else {
-        // 其他平台
-        final notificationPermission = await Permission.notification.request();
-        
-        if (notificationPermission.isGranted) {
-          Log.info('其他平台: 通知权限已授予');
-        } else {
-          Log.info('其他平台: 通知权限被拒绝');
-        }
-      }
+      Log.info('通知权限请求完成');
     } catch (e, stackTrace) {
       Log.error('请求通知权限失败: $e', stackTrace);
     }

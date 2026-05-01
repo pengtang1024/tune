@@ -43,7 +43,11 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
   // 音乐扫描相关方法
   void startScanning() {
-    state = state.copyWith(scanStatus: ScanStatus.scanning, errorMessage: null);
+    state = state.copyWith(
+      scanStatus: ScanStatus.scanning, 
+      errorMessage: null,
+      statusMessage: '开始扫描...',
+    );
   }
 
   void updateScanProgress(double progress) {
@@ -54,12 +58,18 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     state = state.copyWith(
       scanStatus: ScanStatus.completed,
       foundSongs: songs,
-      scanProgress: songs.length.toDouble(),
+      scanProgress: 1.0,
+      statusMessage: '扫描完成，共找到 ${songs.length} 首歌曲',
     );
   }
 
   void scanError(String error) {
-    state = state.copyWith(scanStatus: ScanStatus.error, errorMessage: error);
+    Log.error('扫描过程中发生错误: $error');
+    state = state.copyWith(
+      scanStatus: ScanStatus.error, 
+      errorMessage: error,
+      statusMessage: '扫描失败: $error',
+    );
   }
 
   void resetScan() {
@@ -68,6 +78,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
       foundSongs: [],
       scanProgress: 0.0,
       errorMessage: null,
+      statusMessage: '',
     );
   }
 
@@ -175,8 +186,10 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
       setSongs(songs);
     } catch (e) {
-      Log.error('加载音乐库失败: $e');
-      setError('加载音乐库失败: $e');
+      final errorMessage = '加载音乐库失败: $e';
+      Log.error(errorMessage);
+      setError(errorMessage);
+      scanError(errorMessage); // 设置扫描状态为错误
     }
   }
 
@@ -192,8 +205,10 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
       setSongs(songs);
     } catch (e) {
-      Log.error('搜索歌曲失败: $e');
-      setError('搜索歌曲失败: $e');
+      final errorMessage = '搜索歌曲失败: $e';
+      Log.error(errorMessage);
+      setError(errorMessage);
+      scanError(errorMessage); // 设置扫描状态为错误
     }
   }
 
@@ -258,8 +273,11 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
 
       // 重置状态到初始状态
       state = LibraryState.initial();
+
+      Log.info('所有数据已成功清理');
     } catch (e) {
       Log.error('清理所有数据失败: $e');
+      setError('清理所有数据失败: $e');
     }
   }
 }

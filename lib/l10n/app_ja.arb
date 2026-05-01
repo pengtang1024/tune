@@ -1,5 +1,6 @@
 {
   "@@locale": "ja",
+  "@@last_modified": "2024-05-21T10:00:00.000Z",
   "app_name": "Tune",
   "no_songs_found": "曲が見つかりません",
   "settings": "設定",
@@ -15,5 +16,25 @@
   "search_songs": "曲を検索...",
   "add_to_library": "ライブラリに追加",
   "scan_completed_no_new_songs": "スキャン完了、新しい曲が見つかりません",
-  "rescan": "再スキャン"
+  "rescan": "再スキャン",
+  "good_morning": "おはようございます",
+  "good_afternoon": "こんにちは",
+  "good_evening": "こんばんは",
+  "welcome_to_tune": "Tuneへようこそ",
+  "see_all": "すべて見る",
+  "no_recent_songs": "最近再生した楽曲はありません",
+  "quick_actions": "クイックアクション",
+  "my_songs": "マイソング",
+  "favorites": "お気に入り",
+  "playlists": "プレイリスト",
+  "radio": "ラジオ",
+  "tag_vip": "VIP",
+  "tag_singer": "歌手",
+  "tag_elite": "エリート",
+  "general_tab": "一般",
+  "library_tab": "ライブラリ",
+  "account_tab": "アカウント",
+  "playback_tab": "再生",
+  "equalizer_tab": "イコライザー",
+  "animations_tab": "アニメーション"
 }

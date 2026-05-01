@@ -1,6 +1,7 @@
 name: tune
 description: "Tune：让每一段旋律都找到归属 在喧嚣的日常里，总有一些旋律会悄悄住进心里 —— 可能是清晨唤醒你的轻快节奏，是深夜陪伴你的温柔民谣，或是旅途中偶然邂逅的惊喜单曲。 Tune 不止是一款音乐播放器，更是你私人的「旋律收纳箱」。在这里，你可以轻松整理本地音乐库，按风格、心情或场景自定义歌单，让每首歌都在最合适的位置等你；流畅的播放体验搭配细腻的音效调节，让耳机里的每一个音符都清晰饱满，仿佛置身现场；简约而不简单的界面设计，藏着对音乐的纯粹热爱，没有多余干扰，只有你与音乐的独处时光。 无论是珍藏多年的经典老歌，还是刚发现的小众佳作，Tune 都能帮你妥帖安放，让每一次点开都成为一场美好的听觉重逢。 用 Tune，让音乐回归本真，让每段时光都有旋律相伴。"
 # The following line prevents the package from being accidentally published to
+# pubspec.yaml:6:11
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -94,7 +95,6 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^19.4.0
   flutter_timezone: ^4.1.1
-
   # Equatable for value equality
   equatable: ^2.0.5
 
@@ -115,11 +115,13 @@ dependencies:
   # FlexColorScheme for advanced theme management
   flex_color_scheme: ^8.2.0
 
+  # Window management for desktop
+  window_manager: ^0.5.0
+
   file_picker: ^10.3.1
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.9.0
   just_audio_windows: ^0.2.2
-  flutter_app_badger: ^1.5.0
 
 dev_dependencies:
   flutter_test:

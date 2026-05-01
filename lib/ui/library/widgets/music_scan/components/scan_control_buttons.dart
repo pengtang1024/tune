@@ -16,12 +16,36 @@ class ScanControlButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ScanButtonWidget(
-            onPressed: hasCustomPaths && !isScanning ? onStartScan : null,
+          Text(
+            '扫描控制',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: SizedBox(
+              width: 200,
+              child: ScanButtonWidget(
+                onPressed: hasCustomPaths && !isScanning ? onStartScan : null,
+              ),
+            ),
           ),
         ],
       ),

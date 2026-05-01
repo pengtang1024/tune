@@ -6,7 +6,7 @@ import 'package:tune/ui/core/layout/widgets/custom_app_bar/back_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/clear_data_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/github_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/notification_button.dart';
-import 'package:tune/ui/core/layout/widgets/custom_app_bar/play_button.dart';
+// 移除了播放按钮的导入
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/user_menu_button.dart';
 
 /// 自定义AppBar组件
@@ -31,6 +31,14 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         // 动态按钮（最右侧，从右到左排列）
         ...appBarState.dynamicActions,
 
+        // 搜索按钮
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            // TODO: 导航到搜索页面
+          },
+        ),
+
         // 通知按钮
         const NotificationButton(),
 
@@ -40,9 +48,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
         // GitHub按钮（清理数据按钮左侧）
         const GitHubButton(),
 
-        // 播放按钮（GitHub按钮左侧）
-        const PlayButton(),
-
+        // 移除了播放按钮
 
         // "我的"按钮（最左侧，但显示在最右边）
         const UserMenuButton(),
