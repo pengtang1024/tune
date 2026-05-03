@@ -59,14 +59,8 @@ class WelcomeSection extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
-                    image: playerState.currentSong?.albumArt != null 
-                      ? DecorationImage(
-                          image: NetworkImage(playerState.currentSong!.albumArt!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
                   ),
-                  child: playerState.currentSong?.albumArt == null
+                  child: playerState.currentSong?.albumArtPath == null
                       ? Icon(
                           Icons.music_note,
                           color: Theme.of(context).colorScheme.onPrimaryContainer,

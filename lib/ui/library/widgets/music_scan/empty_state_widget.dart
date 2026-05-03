@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/ui/widgets/empty_state.dart';
 
 /// 空状态组件
 /// 显示没有找到音乐文件时的提示信息
@@ -7,29 +8,10 @@ class EmptyStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.music_off,
-              size: 48,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              '未找到音乐文件\n点击"开始扫描"按钮扫描本地音乐',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const EmptyState(
+      icon: Icons.music_off,
+      title: '未找到音乐文件',
+      subtitle: '点击"开始扫描"按钮扫描本地音乐',
     );
   }
 }

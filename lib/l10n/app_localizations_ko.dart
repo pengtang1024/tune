@@ -15,19 +15,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get welcome_message => '欢迎使用 Tune';
 
   @override
-  String get no_songs_found => '노래를 찾을 수 없습니다';
+  String get no_songs_found => '未找到歌曲';
 
   @override
-  String get settings => '설정';
+  String get settings => '设置';
 
   @override
   String get settings_saved => '设置已保存';
 
   @override
-  String get retry => '다시 시도';
+  String get retry => '重试';
 
   @override
-  String get home => '홈';
+  String get home => '首页';
 
   @override
   String get home_title => '首页';
@@ -39,19 +39,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get featured => '精选';
 
   @override
-  String get library => '라이브러리';
+  String get library => '音乐库';
 
   @override
   String get library_title => '音乐库';
 
   @override
-  String get search => '검색';
+  String get search => '搜索';
 
   @override
   String get search_title => '搜索';
 
   @override
-  String get player => '플레이어';
+  String get player => '播放器';
 
   @override
   String get player_title => '播放器';
@@ -60,7 +60,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get playlist => '播放列表';
 
   @override
-  String get about => '앱 정보';
+  String get about => '关于';
 
   @override
   String get custom_scan_paths => '自定义扫描路径';
@@ -183,7 +183,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
 
   @override
-  String get scan_local_music => '로컬 음악 스캔';
+  String get scan_local_music => '扫描本地音乐';
 
   @override
   String get scanning => '扫描中...';
@@ -238,7 +238,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get failed_to_scan_music => '扫描音乐失败';
 
   @override
-  String get search_songs => '노래 검색...';
+  String get search_songs => '搜索歌曲...';
 
   @override
   String get artists => '艺术家';
@@ -247,16 +247,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get albums => '专辑';
 
   @override
-  String get songs => '노래';
+  String get songs => '歌曲';
 
   @override
-  String get playlists => '播放列表';
+  String get playlists => '재생목록';
 
   @override
   String get music_library => '音乐库';
 
   @override
-  String get favorites => '收藏';
+  String get favorites => '즐겨찾기';
 
   @override
   String get recently_played => '最近播放';
@@ -292,13 +292,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shuffle => '随机播放';
 
   @override
-  String get scan_completed_no_new_songs => '스캔 완료, 새로운 노래를 찾을 수 없습니다';
+  String get scan_completed_no_new_songs => '扫描完成，未找到新歌曲';
 
   @override
   String get added_scanned_songs_to_library => '已将扫描的歌曲添加到音乐库';
 
   @override
-  String get rescan => '다시 스캔';
+  String get rescan => '重新扫描';
 
   @override
   String get load_stats_failed => '加载统计信息失败';
@@ -307,25 +307,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get load_songs_failed => '加载歌曲失败';
 
   @override
-  String get add_to_library => '라이브러리에 추가';
+  String get add_to_library => '添加到音乐库';
 
   @override
-  String get general_tab => '常规';
+  String get general_tab => '일반';
 
   @override
-  String get library_tab => '音乐库';
+  String get library_tab => '라이브러리';
 
   @override
-  String get account_tab => '账户';
+  String get account_tab => '계정';
 
   @override
-  String get playback_tab => '播放';
+  String get playback_tab => '재생';
 
   @override
   String get about_tab => '关于';
 
   @override
-  String get animations_tab => '动画';
+  String get animations_tab => '애니메이션';
 
   @override
   String get version => '版本';
@@ -521,10 +521,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tag_vip => 'VIP';
 
   @override
-  String get tag_singer => '歌手';
+  String get tag_singer => '가수';
 
   @override
-  String get tag_elite => '精英';
+  String get tag_elite => '엘리트';
 
   @override
   String get settings_page_theme => '主题设置';
@@ -647,7 +647,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get equalizer => '均衡器';
 
   @override
-  String get equalizer_tab => '均衡器';
+  String get equalizer_tab => '이퀄라이저';
 
   @override
   String get presets => '预设';
@@ -720,4 +720,31 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get error_occurred => '发生错误';
+
+  @override
+  String get quick_actions => '빠른 작업';
+
+  @override
+  String get my_songs => '내 음악';
+
+  @override
+  String get radio => '라디오';
+
+  @override
+  String get see_all => '모두 보기';
+
+  @override
+  String get no_recent_songs => '최근에 재생한 곡이 없습니다';
+
+  @override
+  String get good_morning => '좋은 아침';
+
+  @override
+  String get good_afternoon => '좋은 오후';
+
+  @override
+  String get good_evening => '좋은 저녁';
+
+  @override
+  String get welcome_to_tune => 'Tune에 오신 것을 환영합니다';
 }

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/providers/app_bar_providers.dart';
-import 'package:tune/providers/route_observer_provider.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/library/providers/library_providers.dart';
 import 'package:tune/ui/library/states/library_state.dart';
+import 'package:tune/ui/library/widgets/category_tabs.dart';
 import 'package:tune/ui/library/widgets/library/song_grid_widget.dart';
-import 'package:tune/ui/widgets/modern_card.dart';
+import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/empty_state.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -18,18 +20,15 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
-  late final TextEditingController _searchController;
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  LibraryCategory _selectedCategory = LibraryCategory.all;
 
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
-
-    // 初始化时加载音乐库
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notifier = ref.read(libraryStateNotifierProvider.notifier);
-      notifier.loadLibrary();
+      ref.read(libraryStateNotifierProvider.notifier).loadLibrary();
     });
   }
 
@@ -41,43 +40,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 监听路由变化，在进入音乐库页面时添加扫描按钮
-    ref.listen<RouteObserverState>(routeObserverProvider, (previous, next) {
-      if (next.route == '/library') {
-        // 延迟执行以确保在widget构建完成后执行
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-          appBarNotifier.clearDynamicActions(); // 清除之前的动态按钮
-
-          final libraryState = ref.read(libraryStateNotifierProvider);
-          appBarNotifier.addDynamicAction(
-            IconButton(
-              icon: const Icon(Icons.music_note),
-              onPressed: libraryState.scanStatus == ScanStatus.scanning
-                  ? null
-                  : () {
-                      context.push('/music-scan');
-                    },
-              tooltip: context.loc.scan_local_music,
-            ),
-          );
-        });
-      } else if (next.route != '/music-scan') {
-        // 当页面被移除时清除动态按钮（除了跳转到音乐扫描页面的情况）
-        final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-        appBarNotifier.clearDynamicActions();
-      }
-    });
-
     final state = ref.watch(libraryStateNotifierProvider);
-
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: isDark 
+          gradient: isDark
               ? AppDesignSystem.backgroundGradientDark
               : AppDesignSystem.backgroundGradientLight,
         ),
@@ -87,78 +57,30 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 页面标题
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(AppDesignSystem.spacing8),
-                      decoration: BoxDecoration(
-                        gradient: AppDesignSystem.primaryGradient,
-                        borderRadius: AppDesignSystem.borderRadius12,
-                      ),
-                      child: Icon(
-                        Icons.library_music_rounded,
-                        color: Colors.white,
-                        size: AppDesignSystem.iconSize24,
-                      ),
-                    ),
-                    const SizedBox(width: AppDesignSystem.spacing12),
-                    Text(
-                      '音乐库',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: AppDesignSystem.fontWeightBold,
-                        color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
-                      ),
-                    ),
-                    const Spacer(),
-                    if (state.songs.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDesignSystem.spacing12,
-                          vertical: AppDesignSystem.spacing6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppDesignSystem.primary.withValues(alpha: 0.1),
-                          borderRadius: AppDesignSystem.borderRadius20,
-                        ),
-                        child: Text(
-                          '${state.songs.length} 首歌曲',
-                          style: TextStyle(
-                            color: AppDesignSystem.primary,
-                            fontSize: AppDesignSystem.fontSize12,
-                            fontWeight: AppDesignSystem.fontWeightMedium,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                
+                _buildHeader(state, isDark),
                 const SizedBox(height: AppDesignSystem.spacing24),
-                
-                // 搜索框
+                CategoryTabs(
+                  selectedCategory: _selectedCategory,
+                  onCategoryChanged: (category) {
+                    setState(() => _selectedCategory = category);
+                  },
+                ),
+                const SizedBox(height: AppDesignSystem.spacing16),
                 _buildSearchBar(),
                 const SizedBox(height: AppDesignSystem.spacing16),
-
-                // 扫描状态显示
                 _buildScanStatusDisplay(state),
-
-                // 歌曲列表
                 Expanded(
-                  child: SongGridWidget(
-                    songs: state.songs,
-                    searchQuery: _searchQuery,
-                    localizedNoSongsFound: context.loc.no_songs_found,
-                    style: SongGridStyle.list,
-                    onSongTap: (song) {
-                      // TODO: 播放歌曲或显示详情
-                    },
-                    onSongPlay: (song) {
-                      // TODO: 播放歌曲
-                    },
-                    onSongMore: (song) {
-                      // TODO: 显示更多操作
-                    },
-                  ),
+                  child: state.songs.isEmpty
+                      ? _buildEmptyState()
+                      : SongGridWidget(
+                          songs: state.songs,
+                          searchQuery: _searchQuery,
+                          localizedNoSongsFound: context.loc.no_songs_found,
+                          style: SongGridStyle.list,
+                          onSongTap: (song) => _playSong(song),
+                          onSongPlay: (song) => _playSong(song),
+                          onSongMore: (song) => _showSongOptions(context, song),
+                        ),
                 ),
               ],
             ),
@@ -168,13 +90,56 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
+  Widget _buildHeader(LibraryState state, bool isDark) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+          decoration: BoxDecoration(
+            gradient: AppDesignSystem.primaryGradient,
+            borderRadius: AppDesignSystem.borderRadius12,
+          ),
+          child: const Icon(
+            Icons.library_music_rounded,
+            color: Colors.white,
+            size: AppDesignSystem.iconSize24,
+          ),
+        ),
+        const SizedBox(width: AppDesignSystem.spacing12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '音乐库',
+                style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
+                  fontWeight: AppDesignSystem.fontWeightBold,
+                  color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
+                ),
+              ),
+              if (state.songs.isNotEmpty) ...[
+                const SizedBox(height: AppDesignSystem.spacing4),
+                Text(
+                  '${state.songs.length} 首歌曲',
+                  style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                    color: AppDesignSystem.primary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSearchBar() {
     return ModernCard(
-      margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing16),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: context.loc.search,
+          hintText: '搜索歌曲...',
           hintStyle: TextStyle(
             color: Theme.of(context).brightness == Brightness.dark
                 ? AppDesignSystem.neutral500
@@ -191,26 +156,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   icon: const Icon(Icons.clear_rounded),
                   onPressed: () {
                     _searchController.clear();
-                    setState(() {
-                      _searchQuery = '';
-                    });
+                    setState(() => _searchQuery = '');
                     _performSearch();
                   },
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppDesignSystem.spacing16,
-            vertical: AppDesignSystem.spacing12,
+          contentPadding: EdgeInsets.symmetric(
+            vertical: AppDesignSystem.spacing14,
           ),
         ),
-        style: const TextStyle(
-          fontSize: AppDesignSystem.fontSize16,
-        ),
         onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
+          setState(() => _searchQuery = value);
           _performSearch();
         },
       ),
@@ -271,20 +228,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               children: [
                 Text(
                   statusType,
-                  style: TextStyle(
-                    fontWeight: AppDesignSystem.fontWeightMedium,
+                  style: AppDesignSystem.textTheme.labelLarge?.copyWith(
+                    fontWeight: AppDesignSystem.fontWeightSemiBold,
                     color: statusColor,
-                    fontSize: AppDesignSystem.fontSize14,
                   ),
                 ),
-                const SizedBox(height: AppDesignSystem.spacing2),
+                const SizedBox(height: AppDesignSystem.spacing4),
                 Text(
                   state.statusMessage,
-                  style: TextStyle(
+                  style: AppDesignSystem.textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).brightness == Brightness.dark
                         ? AppDesignSystem.neutral300
                         : AppDesignSystem.neutral700,
-                    fontSize: AppDesignSystem.fontSize12,
                   ),
                 ),
               ],
@@ -295,9 +250,54 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  // 执行搜索的方法
+  Widget _buildEmptyState() {
+    return const EmptyState(
+      icon: Icons.library_music_outlined,
+      title: '暂无音乐',
+      subtitle: '开始扫描本地音乐文件',
+    );
+  }
+
   void _performSearch() {
-    final notifier = ref.read(libraryStateNotifierProvider.notifier);
-    notifier.updateSearchQuery(_searchQuery);
+    ref.read(libraryStateNotifierProvider.notifier).updateSearchQuery(_searchQuery);
+  }
+
+  void _playSong(Song song) {
+    ref.read(playerStateNotifierProvider.notifier).playSong(song);
+    context.go('/player');
+  }
+
+  void _showSongOptions(BuildContext context, Song song) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.play_arrow_rounded),
+                title: const Text('播放'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _playSong(song);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.playlist_add_rounded),
+                title: const Text('添加到播放列表'),
+                onTap: () => Navigator.pop(context),
+              ),
+              ListTile(
+                leading: const Icon(Icons.share_rounded),
+                title: const Text('分享'),
+                onTap: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
+import 'package:tune/data/services/playlist_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/app_bar_providers.dart';
@@ -10,14 +11,20 @@ import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/utils/logger.dart';
 
-/// 播放器状态管理器 - 简化版本
+final playlistServiceProvider = Provider<PlaylistService>((ref) {
+  return PlaylistService();
+});
+
+/// 播放器状态管理器
 class PlayerStateNotifier extends StateNotifier<PlayerState> {
   final Ref _ref;
   late final AudioPlayerService _audioPlayerService;
+  late final PlaylistService _playlistService;
   StreamSubscription? _positionSubscription;
 
   PlayerStateNotifier(this._ref) : super(PlayerState.initial()) {
     _audioPlayerService = _ref.read(audioPlayerServiceProvider);
+    _playlistService = _ref.read(playlistServiceProvider);
     _initializePlayer();
   }
 
@@ -161,34 +168,54 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   }
 
   Future<void> next() async {
-    if (state.currentSong != null) {
-      // 这里需要播放列表逻辑，暂时播放下一首
-      Log.info('播放下一首');
+    final nextSong = _playlistService.next();
+    if (nextSong != null) {
+      await playSong(nextSong);
     }
   }
 
   Future<void> previous() async {
-    if (state.currentSong != null) {
-      // 这里需要播放列表逻辑，暂时播放上一首
-      Log.info('播放上一首');
+    final prevSong = _playlistService.previous();
+    if (prevSong != null) {
+      await playSong(prevSong);
     }
   }
 
-  /// 播放列表管理
   List<Song> getPlaylist() {
-    // 这里应该返回当前播放列表，暂时返回空列表
-    return [];
+    return _playlistService.currentPlaylist;
   }
 
-  void setPlaylist(List<Song> playlist, int index) {
-    Log.info('设置播放列表: ${playlist.length}首歌曲, 索引: $index');
-    // 这里需要实现播放列表设置逻辑
+  void setPlaylist(List<Song> playlist, {int startIndex = 0}) {
+    _playlistService.setPlaylist(playlist, startIndex: startIndex);
+    Log.info('设置播放列表: ${playlist.length}首歌曲, 索引: $startIndex');
   }
+
+  void addToPlaylist(Song song) {
+    _playlistService.addSong(song);
+  }
+
+  void removeFromPlaylist(Song song) {
+    _playlistService.removeSong(song);
+  }
+
+  int get currentIndex => _playlistService.currentIndex;
 
   Future<void> playSongAtIndex(int index) async {
     final playlist = getPlaylist();
     if (index >= 0 && index < playlist.length) {
       playSong(playlist[index]);
+    }
+  }
+
+  /// 获取播放历史
+  List<Song> getPlayHistory() {
+    try {
+      // 使用 PlayHistoryService 获取历史记录
+      // 这里使用同步方式获取（我们可以先返回空列表，或者做缓存）
+      return [];
+    } catch (e) {
+      Log.error('获取播放历史失败: $e');
+      return [];
     }
   }
 

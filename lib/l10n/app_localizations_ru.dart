@@ -250,13 +250,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get songs => 'Песни';
 
   @override
-  String get playlists => '播放列表';
+  String get playlists => 'Плейлисты';
 
   @override
   String get music_library => '音乐库';
 
   @override
-  String get favorites => '收藏';
+  String get favorites => 'Избранное';
 
   @override
   String get recently_played => '最近播放';
@@ -311,22 +311,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get add_to_library => 'Добавить в библиотеку';
 
   @override
-  String get general_tab => '常规';
+  String get general_tab => 'Общие';
 
   @override
-  String get library_tab => '音乐库';
+  String get library_tab => 'Библиотека';
 
   @override
-  String get account_tab => '账户';
+  String get account_tab => 'Аккаунт';
 
   @override
-  String get playback_tab => '播放';
+  String get playback_tab => 'Воспроизведение';
 
   @override
   String get about_tab => '关于';
 
   @override
-  String get animations_tab => '动画';
+  String get animations_tab => 'Анимации';
 
   @override
   String get version => '版本';
@@ -522,10 +522,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tag_vip => 'VIP';
 
   @override
-  String get tag_singer => '歌手';
+  String get tag_singer => 'Певец';
 
   @override
-  String get tag_elite => '精英';
+  String get tag_elite => 'Элита';
 
   @override
   String get settings_page_theme => '主题设置';
@@ -648,7 +648,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get equalizer => '均衡器';
 
   @override
-  String get equalizer_tab => '均衡器';
+  String get equalizer_tab => 'Эквалайзер';
 
   @override
   String get presets => '预设';
@@ -721,4 +721,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get error_occurred => '发生错误';
+
+  @override
+  String get quick_actions => 'Быстрые действия';
+
+  @override
+  String get my_songs => 'Мои песни';
+
+  @override
+  String get radio => 'Радио';
+
+  @override
+  String get see_all => 'Посмотреть все';
+
+  @override
+  String get no_recent_songs => 'Нет недавно воспроизводимых песен';
+
+  @override
+  String get good_morning => 'Доброе утро';
+
+  @override
+  String get good_afternoon => 'Добрый день';
+
+  @override
+  String get good_evening => 'Добрый вечер';
+
+  @override
+  String get welcome_to_tune => 'Добро пожаловать в Tune';
 }

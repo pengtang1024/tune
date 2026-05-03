@@ -65,7 +65,10 @@ class MobileLayout extends ConsumerWidget {
         ),
         child: NavigationBar(
           selectedIndex: DeviceMenuItem.mobile()
-              .firstWhere((item) => item.path == menuState.path)
+              .firstWhere(
+                (item) => item.path == menuState.path,
+                orElse: () => DeviceMenuItem.mobile().first,
+              )
               .index,
           onDestinationSelected: (index) {
             menuNotifier.selectMenu(DeviceMenuItem.mobile()[index].path, false);
@@ -84,8 +87,8 @@ class MobileLayout extends ConsumerWidget {
                   item.icon,
                   color: AppDesignSystem.primary,
                 ),
-                label: item.label,
-                tooltip: item.label,
+                label: item.labelKey,
+                tooltip: item.labelKey,
               ))
               .toList(),
         ),

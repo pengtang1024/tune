@@ -17,6 +17,11 @@ class AppDesignSystem {
   static const Color secondaryLight = Color(0xFFF472B6);
   static const Color secondaryDark = Color(0xFFDB2777);
   
+  /// 第三色调
+  static const Color tertiary = Color(0xFF06B6D4);
+  static const Color tertiaryLight = Color(0xFF22D3EE);
+  static const Color tertiaryDark = Color(0xFF0891B2);
+  
   /// 强调色
   static const Color accent = Color(0xFF3B82F6);
   static const Color accentLight = Color(0xFF60A5FA);
@@ -78,13 +83,16 @@ class AppDesignSystem {
   static const double spacing4 = 4.0;
   static const double spacing6 = 6.0;
   static const double spacing8 = 8.0;
+  static const double spacing10 = 10.0;
   static const double spacing12 = 12.0;
+  static const double spacing14 = 14.0;
   static const double spacing16 = 16.0;
   static const double spacing20 = 20.0;
   static const double spacing24 = 24.0;
   static const double spacing32 = 32.0;
   static const double spacing40 = 40.0;
   static const double spacing48 = 48.0;
+  static const double spacing56 = 56.0;
   static const double spacing64 = 64.0;
   static const double spacing80 = 80.0;
   static const double spacing96 = 96.0;
@@ -117,6 +125,14 @@ class AppDesignSystem {
   static BorderRadius borderRadius64 = BorderRadius.circular(radius64);
 
   // ========== 阴影系统 ==========
+  
+  static List<BoxShadow> get shadowSmall => [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.04),
+      blurRadius: 2,
+      offset: const Offset(0, -1),
+    ),
+  ];
   
   static List<BoxShadow> get shadowLight => [
     BoxShadow(
@@ -179,6 +195,7 @@ class AppDesignSystem {
   static const double fontSize32 = 32.0;
   static const double fontSize36 = 36.0;
   static const double fontSize40 = 40.0;
+  static const double fontSize44 = 44.0;
   static const double fontSize48 = 48.0;
   static const double fontSize56 = 56.0;
   static const double fontSize64 = 64.0;
@@ -282,4 +299,87 @@ class AppDesignSystem {
   static const double opacity80 = 0.80;
   static const double opacity90 = 0.90;
   static const double opacity95 = 0.95;
+
+  // ========== 文本样式系统 ==========
+  
+  static TextTheme get textTheme => const TextTheme(
+    displayLarge: TextStyle(
+      fontSize: fontSize56,
+      fontWeight: fontWeightBold,
+      height: 1.1,
+    ),
+    displayMedium: TextStyle(
+      fontSize: fontSize44,
+      fontWeight: fontWeightBold,
+      height: 1.1,
+    ),
+    displaySmall: TextStyle(
+      fontSize: fontSize36,
+      fontWeight: fontWeightBold,
+      height: 1.15,
+    ),
+    headlineLarge: TextStyle(
+      fontSize: fontSize32,
+      fontWeight: fontWeightSemiBold,
+      height: 1.2,
+    ),
+    headlineMedium: TextStyle(
+      fontSize: fontSize28,
+      fontWeight: fontWeightSemiBold,
+      height: 1.25,
+    ),
+    headlineSmall: TextStyle(
+      fontSize: fontSize24,
+      fontWeight: fontWeightSemiBold,
+      height: 1.3,
+    ),
+    titleLarge: TextStyle(
+      fontSize: fontSize22,
+      fontWeight: fontWeightSemiBold,
+      height: 1.3,
+    ),
+    titleMedium: TextStyle(
+      fontSize: fontSize18,
+      fontWeight: fontWeightMedium,
+      height: 1.4,
+    ),
+    titleSmall: TextStyle(
+      fontSize: fontSize16,
+      fontWeight: fontWeightMedium,
+      height: 1.4,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: fontSize16,
+      fontWeight: fontWeightNormal,
+      height: 1.5,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: fontSize14,
+      fontWeight: fontWeightNormal,
+      height: 1.5,
+    ),
+    bodySmall: TextStyle(
+      fontSize: fontSize12,
+      fontWeight: fontWeightNormal,
+      height: 1.5,
+    ),
+    labelLarge: TextStyle(
+      fontSize: fontSize14,
+      fontWeight: fontWeightMedium,
+      height: 1.4,
+      letterSpacing: 0.5,
+    ),
+    labelMedium: TextStyle(
+      fontSize: fontSize12,
+      fontWeight: fontWeightMedium,
+      height: 1.4,
+      letterSpacing: 0.5,
+    ),
+    labelSmall: TextStyle(
+      fontSize: fontSize10,
+      fontWeight: fontWeightMedium,
+      height: 1.4,
+      letterSpacing: 0.5,
+    ),
+  );
 }

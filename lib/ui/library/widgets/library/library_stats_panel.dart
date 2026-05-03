@@ -209,14 +209,14 @@ class LibraryStatsPanel extends StatelessWidget {
     // 计算唯一艺术家数量
     final uniqueArtists = songs
         .map((song) => song.artist)
-        .where((artist) => artist != null && artist.isNotEmpty)
+        .where((artist) => artist.isNotEmpty)
         .toSet()
         .length;
     
     // 计算唯一专辑数量
     final uniqueAlbums = songs
         .map((song) => song.album)
-        .where((album) => album != null && album.isNotEmpty)
+        .where((album) => album.isNotEmpty)
         .toSet()
         .length;
     
@@ -229,7 +229,7 @@ class LibraryStatsPanel extends StatelessWidget {
     
     // 计算总时长
     final totalDurationMs = songs.fold<int>(
-        0, (sum, song) => sum + (song.duration ?? 0));
+        0, (sum, song) => sum + song.duration);
     final totalDuration = _formatDuration(totalDurationMs);
     
     // 计算总大小

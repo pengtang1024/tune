@@ -720,6 +720,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get error_occurred => '发生错误';
+
+  @override
+  String get quick_actions => '快捷操作';
+
+  @override
+  String get my_songs => '我的歌曲';
+
+  @override
+  String get radio => '电台';
+
+  @override
+  String get see_all => '查看全部';
+
+  @override
+  String get no_recent_songs => '暂无最近播放';
+
+  @override
+  String get good_morning => '早上好';
+
+  @override
+  String get good_afternoon => '下午好';
+
+  @override
+  String get good_evening => '晚上好';
+
+  @override
+  String get welcome_to_tune => '欢迎来到 Tune';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1438,6 +1465,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get error_occurred => '发生错误';
+
+  @override
+  String get quick_actions => '快捷操作';
+
+  @override
+  String get my_songs => '我的歌曲';
+
+  @override
+  String get radio => '电台';
+
+  @override
+  String get see_all => '查看全部';
+
+  @override
+  String get no_recent_songs => '暂无最近播放';
+
+  @override
+  String get good_morning => '早上好';
+
+  @override
+  String get good_afternoon => '下午好';
+
+  @override
+  String get good_evening => '晚上好';
+
+  @override
+  String get welcome_to_tune => '欢迎来到 Tune';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1481,6 +1535,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get songs => '首歌曲';
 
   @override
+  String get playlists => '播放列表';
+
+  @override
+  String get favorites => '收藏';
+
+  @override
   String get scan_completed_no_new_songs => '掃描完成，未找到新歌曲';
 
   @override
@@ -1490,5 +1550,59 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get add_to_library => '添加到音樂庫';
 
   @override
+  String get general_tab => '常規';
+
+  @override
+  String get library_tab => '音樂庫';
+
+  @override
+  String get account_tab => '帳戶';
+
+  @override
+  String get playback_tab => '播放';
+
+  @override
+  String get animations_tab => '動畫';
+
+  @override
   String get music_scan => '音樂掃描';
+
+  @override
+  String get tag_vip => 'VIP';
+
+  @override
+  String get tag_singer => '歌手';
+
+  @override
+  String get tag_elite => '精英';
+
+  @override
+  String get equalizer_tab => '均衡器';
+
+  @override
+  String get quick_actions => '快速操作';
+
+  @override
+  String get my_songs => '我的歌曲';
+
+  @override
+  String get radio => '電台';
+
+  @override
+  String get see_all => '查看全部';
+
+  @override
+  String get no_recent_songs => '暫無最近播放的歌曲';
+
+  @override
+  String get good_morning => '早上好';
+
+  @override
+  String get good_afternoon => '下午好';
+
+  @override
+  String get good_evening => '晚上好';
+
+  @override
+  String get welcome_to_tune => '歡迎使用Tune';
 }

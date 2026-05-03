@@ -64,7 +64,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.5.3
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^10.0.0
 
   # Network requests
   dio: ^5.4.0
@@ -93,8 +93,9 @@ dependencies:
   audio_metadata_reader: ^1.4.2
 
   # Notifications
-  flutter_local_notifications: ^19.4.0
+  flutter_local_notifications: ^19.5.0
   flutter_timezone: ^4.1.1
+  timezone: ^0.10.1
   # Equatable for value equality
   equatable: ^2.0.5
 

@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/providers/persistence_providers.dart';
-import '../components/window_size_option_button.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/settings_item.dart';
 
 class GeneralTab extends ConsumerStatefulWidget {
   const GeneralTab({super.key});
@@ -12,144 +13,13 @@ class GeneralTab extends ConsumerStatefulWidget {
   ConsumerState<GeneralTab> createState() => _GeneralTabState();
 }
 
-
-// 主题预览卡片组件
-class ThemePreviewCard extends StatelessWidget {
-  final ThemeMode themeMode;
-
-  const ThemePreviewCard({super.key, required this.themeMode});
-
-  @override
-  Widget build(BuildContext context) {
-    // 创建主题预览卡片
-    return SizedBox(
-      width: double.infinity,
-      height: 100,
-      child: Row(
-        children: [
-          // 系统主题预览
-          Expanded(
-            child: _buildThemePreviewSection(
-              context: context,
-              label: context.loc.system_mode_preview,
-              themeData: ThemeData(
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: Colors.blue,
-                  brightness: Brightness.light,
-                ),
-              ),
-              isActive: themeMode == ThemeMode.system,
-            ),
-          ),
-          const SizedBox(width: 8),
-          // 浅色主题预览
-          Expanded(
-            child: _buildThemePreviewSection(
-              context: context,
-              label: context.loc.light_mode_preview,
-              themeData: ThemeData(
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: Colors.blue,
-                  brightness: Brightness.light,
-                ),
-              ),
-              isActive: themeMode == ThemeMode.light,
-            ),
-          ),
-          const SizedBox(width: 8),
-          // 深色主题预览
-          Expanded(
-            child: _buildThemePreviewSection(
-              context: context,
-              label: context.loc.dark_mode_preview,
-              themeData: ThemeData(
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: Colors.blue,
-                  brightness: Brightness.dark,
-                ),
-              ),
-              isActive: themeMode == ThemeMode.dark,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThemePreviewSection({
-    required BuildContext context,
-    required String label,
-    required ThemeData themeData,
-    required bool isActive,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isActive
-            ? themeData.colorScheme.primary.withValues(alpha: 0.2)
-            : themeData.scaffoldBackgroundColor,
-        border: Border.all(
-          color: isActive
-              ? themeData.colorScheme.primary
-              : Colors.grey.shade300,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: themeData.textTheme.bodySmall?.color,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: themeData.colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: themeData.colorScheme.secondary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: themeData.colorScheme.surface,
-                  border: Border.all(color: themeData.dividerColor),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _GeneralTabState extends ConsumerState<GeneralTab> {
   bool _autoStart = false;
-  String _windowSize = 'medium'; // small, medium, large
+  String _windowSize = 'medium';
   bool _defaultPlayer = false;
   bool _desktopLyrics = false;
   bool _enableNotifications = true;
-  double _fontSize = 16.0; // 默认字体大小
+  double _fontSize = 16.0;
   bool _isLoading = true;
 
   @override
@@ -159,13 +29,8 @@ class _GeneralTabState extends ConsumerState<GeneralTab> {
   }
 
   Future<void> _loadSettings() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // 使用全局的sharedPreferencesServiceProvider
+    setState(() => _isLoading = true);
     final persistenceService = ref.read(sharedPreferencesServiceProvider);
-
     setState(() {
       _autoStart = persistenceService.getBool('auto_start') ?? false;
       _windowSize = persistenceService.getString('window_size') ?? 'medium';
@@ -177,7 +42,6 @@ class _GeneralTabState extends ConsumerState<GeneralTab> {
     });
   }
 
-  // 获取语言显示名称
   String _getLocaleDisplayName(Locale locale, BuildContext context) {
     switch (locale.languageCode) {
       case 'en':
@@ -206,10 +70,19 @@ class _GeneralTabState extends ConsumerState<GeneralTab> {
     }
   }
 
-  Future<void> _saveSetting(String key, dynamic value) async {
-    // 使用全局的sharedPreferencesServiceProvider
-    final persistenceService = ref.read(sharedPreferencesServiceProvider);
+  String _getThemeModeName(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return 'Light';
+      case ThemeMode.dark:
+        return 'Dark';
+      case ThemeMode.system:
+        return 'System';
+    }
+  }
 
+  Future<void> _saveSetting(String key, dynamic value) async {
+    final persistenceService = ref.read(sharedPreferencesServiceProvider);
     if (value is bool) {
       await persistenceService.setBool(key, value);
     } else if (value is String) {
@@ -221,372 +94,331 @@ class _GeneralTabState extends ConsumerState<GeneralTab> {
 
   @override
   Widget build(BuildContext context) {
-    // 监听持久化服务的变化，当设置改变时刷新UI
     ref.watch(sharedPreferencesServiceProvider);
     final appBarState = ref.watch(appBarStateNotifierProvider);
     final appBarNotifier = ref.read(appBarStateNotifierProvider.notifier);
-    
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             context.loc.general_settings,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
+              fontWeight: AppDesignSystem.fontWeightBold,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing24),
 
           // 窗口大小
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.loc.window_size,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    children: [
-                      WindowSizeOptionButton(
-                        size: 'small',
-                        currentSize: _windowSize,
-                        label: context.loc.small,
-                        description: '',
-                        onSelected: (value) {
-                          setState(() {
-                            _windowSize = value;
-                          });
-                          _saveSetting('window_size', value);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      WindowSizeOptionButton(
-                        size: 'medium',
-                        currentSize: _windowSize,
-                        label: context.loc.medium,
-                        description: '',
-                        onSelected: (value) {
-                          setState(() {
-                            _windowSize = value;
-                          });
-                          _saveSetting('window_size', value);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      WindowSizeOptionButton(
-                        size: 'large',
-                        currentSize: _windowSize,
-                        label: context.loc.large,
-                        description: '',
-                        onSelected: (value) {
-                          setState(() {
-                            _windowSize = value;
-                          });
-                          _saveSetting('window_size', value);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          _WindowSizeSelector(
+            currentSize: _windowSize,
+            onSelected: (value) {
+              setState(() => _windowSize = value);
+              _saveSetting('window_size', value);
+            },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 语言设置
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.language, color: Colors.blueAccent),
-                      const SizedBox(width: 12),
-                      Text(
-                        context.loc.language,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  DropdownButton<Locale>(
-                    value: appBarState.locale,
-                    items: appBarState.supportedLocales.map((locale) {
-                      return DropdownMenuItem<Locale>(
-                        value: locale,
-                        child: Text(_getLocaleDisplayName(locale, context)),
-                      );
-                    }).toList(),
-                    onChanged: (locale) {
-                      if (locale != null) {
-                        appBarNotifier.updateLocale(locale);
-                      }
-                    },
-                  ),
-                ],
+          SettingsItem(
+            icon: Icons.language,
+            title: context.loc.language,
+            iconColor: AppDesignSystem.primary,
+            trailing: DropdownButtonHideUnderline(
+              child: DropdownButton<Locale>(
+                value: appBarState.locale,
+                items: appBarState.supportedLocales.map((locale) {
+                  return DropdownMenuItem<Locale>(
+                    value: locale,
+                    child: Text(_getLocaleDisplayName(locale, context)),
+                  );
+                }).toList(),
+                onChanged: (locale) {
+                  if (locale != null) {
+                    appBarNotifier.updateLocale(locale);
+                  }
+                },
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 主题设置
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          appBarState.themeMode == ThemeMode.light
-                              ? Icons.light_mode
-                              : appBarState.themeMode == ThemeMode.dark
-                                  ? Icons.dark_mode
-                                  : Icons.auto_mode,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        context.loc.theme,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+          SettingsItem(
+            icon: appBarState.themeMode == ThemeMode.light
+                ? Icons.light_mode
+                : appBarState.themeMode == ThemeMode.dark
+                    ? Icons.dark_mode
+                    : Icons.auto_mode,
+            title: context.loc.theme,
+            iconColor: AppDesignSystem.primary,
+            trailing: DropdownButtonHideUnderline(
+              child: DropdownButton<ThemeMode>(
+                value: appBarState.themeMode,
+                items: [
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text(_getThemeModeName(ThemeMode.light)),
                   ),
-                  DropdownButton<ThemeMode>(
-                    value: appBarState.themeMode,
-                    items: [
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text('Light'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text('Dark'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text('System'),
-                      ),
-                    ],
-                    onChanged: (themeMode) {
-                      if (themeMode != null) {
-                        appBarNotifier.updateThemeMode(themeMode);
-                      }
-                    },
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text(_getThemeModeName(ThemeMode.dark)),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.system,
+                    child: Text(_getThemeModeName(ThemeMode.system)),
                   ),
                 ],
+                onChanged: (themeMode) {
+                  if (themeMode != null) {
+                    appBarNotifier.updateThemeMode(themeMode);
+                  }
+                },
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 开机运行
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.loc.auto_start,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Switch(
-                        value: _autoStart,
-                        onChanged: (value) {
-                          setState(() {
-                            _autoStart = value;
-                          });
-                          _saveSetting('auto_start', value);
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.loc.auto_start_description,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-
-                ],
-              ),
+          SettingsItem(
+            icon: Icons.power_settings_new,
+            title: context.loc.auto_start,
+            subtitle: context.loc.auto_start_description,
+            iconColor: AppDesignSystem.success,
+            trailing: Switch(
+              value: _autoStart,
+              onChanged: (value) {
+                setState(() => _autoStart = value);
+                _saveSetting('auto_start', value);
+              },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 默认播放器
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.loc.default_player,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Switch(
-                        value: _defaultPlayer,
-                        onChanged: (value) {
-                          setState(() {
-                            _defaultPlayer = value;
-                          });
-                          _saveSetting('default_player', value);
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.loc.default_player_description,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
+          SettingsItem(
+            icon: Icons.play_circle_filled,
+            title: context.loc.default_player,
+            subtitle: context.loc.default_player_description,
+            iconColor: AppDesignSystem.secondary,
+            trailing: Switch(
+              value: _defaultPlayer,
+              onChanged: (value) {
+                setState(() => _defaultPlayer = value);
+                _saveSetting('default_player', value);
+              },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 桌面歌词
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.loc.desktop_lyrics,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Switch(
-                        value: _desktopLyrics,
-                        onChanged: (value) {
-                          setState(() {
-                            _desktopLyrics = value;
-                          });
-                          _saveSetting('desktop_lyrics', value);
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.loc.desktop_lyrics_description,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
+          SettingsItem(
+            icon: Icons.lyrics,
+            title: context.loc.desktop_lyrics,
+            subtitle: context.loc.desktop_lyrics_description,
+            iconColor: AppDesignSystem.accent,
+            trailing: Switch(
+              value: _desktopLyrics,
+              onChanged: (value) {
+                setState(() => _desktopLyrics = value);
+                _saveSetting('desktop_lyrics', value);
+              },
             ),
           ),
-          const SizedBox(height: 16),
-          
+          const SizedBox(height: AppDesignSystem.spacing16),
+
           // 通知设置
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.loc.enable_notifications,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Switch(
-                        value: _enableNotifications,
-                        onChanged: (value) {
-                          setState(() {
-                            _enableNotifications = value;
-                          });
-                          _saveSetting('enable_notifications', value);
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.loc.enable_notifications_description,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
+          SettingsItem(
+            icon: Icons.notifications,
+            title: context.loc.enable_notifications,
+            subtitle: context.loc.enable_notifications_description,
+            iconColor: AppDesignSystem.warning,
+            trailing: Switch(
+              value: _enableNotifications,
+              onChanged: (value) {
+                setState(() => _enableNotifications = value);
+                _saveSetting('enable_notifications', value);
+              },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
 
           // 字体大小设置
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.loc.font_size,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Text(context.loc.small, style: const TextStyle(fontSize: 12)),
-                      Expanded(
-                        child: Slider(
-                          value: _fontSize,
-                          min: 12.0,
-                          max: 24.0,
-                          divisions: 12,
-                          label: _fontSize.toStringAsFixed(1),
-                          onChanged: (value) {
-                            setState(() {
-                              _fontSize = value;
-                            });
-                            _saveSetting('font_size', value);
-                          },
-                        ),
-                      ),
-                      Text(context.loc.large, style: const TextStyle(fontSize: 20)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.loc.font_size_description,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
+          _FontSizeSelector(
+            fontSize: _fontSize,
+            onChanged: (value) {
+              setState(() => _fontSize = value);
+              _saveSetting('font_size', value);
+            },
           ),
         ],
       ),
+    );
+  }
+}
+
+class _WindowSizeSelector extends StatelessWidget {
+  final String currentSize;
+  final ValueChanged<String> onSelected;
+
+  const _WindowSizeSelector({
+    required this.currentSize,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsItem(
+      icon: Icons.dock,
+      title: context.loc.window_size,
+      iconColor: AppDesignSystem.primary,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SizeButton(
+            size: 'small',
+            currentSize: currentSize,
+            label: context.loc.small,
+            onTap: () => onSelected('small'),
+          ),
+          const SizedBox(width: AppDesignSystem.spacing8),
+          _SizeButton(
+            size: 'medium',
+            currentSize: currentSize,
+            label: context.loc.medium,
+            onTap: () => onSelected('medium'),
+          ),
+          const SizedBox(width: AppDesignSystem.spacing8),
+          _SizeButton(
+            size: 'large',
+            currentSize: currentSize,
+            label: context.loc.large,
+            onTap: () => onSelected('large'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SizeButton extends StatelessWidget {
+  final String size;
+  final String currentSize;
+  final String label;
+  final VoidCallback onTap;
+
+  const _SizeButton({
+    required this.size,
+    required this.currentSize,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = size == currentSize;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDesignSystem.spacing16,
+          vertical: AppDesignSystem.spacing8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppDesignSystem.primary
+              : (isDark ? AppDesignSystem.neutral800 : AppDesignSystem.neutral100),
+          borderRadius: AppDesignSystem.borderRadius12,
+        ),
+        child: Text(
+          label,
+          style: AppDesignSystem.textTheme.labelMedium?.copyWith(
+            color: isSelected
+                ? Colors.white
+                : (isDark ? AppDesignSystem.neutral300 : AppDesignSystem.neutral700),
+            fontWeight: isSelected
+                ? AppDesignSystem.fontWeightBold
+                : AppDesignSystem.fontWeightMedium,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FontSizeSelector extends ConsumerWidget {
+  final double fontSize;
+  final ValueChanged<double> onChanged;
+
+  const _FontSizeSelector({
+    required this.fontSize,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SettingsItem(
+          icon: Icons.format_size,
+          title: context.loc.font_size,
+          iconColor: AppDesignSystem.accent,
+          trailing: null,
+        ),
+        const SizedBox(height: AppDesignSystem.spacing8),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDesignSystem.spacing56,
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    context.loc.small,
+                    style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                      color: AppDesignSystem.neutral500,
+                    ),
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: fontSize,
+                      min: 12.0,
+                      max: 24.0,
+                      divisions: 12,
+                      label: fontSize.toStringAsFixed(1),
+                      onChanged: onChanged,
+                    ),
+                  ),
+                  Text(
+                    context.loc.large,
+                    style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                      color: AppDesignSystem.neutral500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDesignSystem.spacing4),
+              Text(
+                context.loc.font_size_description,
+                style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                  color: AppDesignSystem.neutral500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

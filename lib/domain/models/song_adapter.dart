@@ -35,7 +35,7 @@ class SongAdapter extends TypeAdapter<Song> {
       'size': fields[19] as int?,
       'type': fields[20] as String?,
       'isFavorite': fields[21] as bool? ?? false,
-      'albumArt': fields[22] as String?,
+      'albumArtPath': fields[22] as String?,
     });
   }
 
@@ -88,6 +88,6 @@ class SongAdapter extends TypeAdapter<Song> {
       ..writeByte(21)
       ..write(obj.isFavorite)
       ..writeByte(22)
-      ..write(obj.albumArt);
+      ..write(obj.albumArtPath);
   }
 }

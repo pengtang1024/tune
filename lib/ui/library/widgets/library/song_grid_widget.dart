@@ -77,7 +77,7 @@ class SongGridWidget extends StatelessWidget {
               width: AppDesignSystem.albumCoverSize120,
               height: AppDesignSystem.albumCoverSize120,
               decoration: BoxDecoration(
-                color: AppDesignSystem.primary.withOpacity(0.1),
+                color: AppDesignSystem.primary.withValues(alpha: 0.1),
                 borderRadius: AppDesignSystem.borderRadius24,
               ),
               child: Icon(

@@ -227,7 +227,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
       Log.info('歌曲索引: $index');
 
       // 设置播放列表
-      playerNotifier.setPlaylist(allSongs, index);
+      playerNotifier.setPlaylist(allSongs, startIndex: index);
 
       // 播放指定歌曲
       playerNotifier.playSong(song);

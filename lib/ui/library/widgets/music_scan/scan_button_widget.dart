@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/ui/widgets/modern_button.dart';
 
 /// 扫描按钮组件
 /// 显示开始扫描按钮，根据扫描状态显示不同样式
@@ -12,17 +13,10 @@ class ScanButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
+    return ModernButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        textStyle: Theme.of(context).textTheme.labelLarge,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-      ),
-      icon: const Icon(Icons.search, size: 20),
-      label: const Text('开始扫描'),
+      icon: Icons.search,
+      text: '开始扫描',
     );
   }
 }

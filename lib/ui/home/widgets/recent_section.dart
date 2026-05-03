@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
-import 'package:tune/ui/widgets/music_card_widget.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
 /// 最近播放组件
 /// 展示最近播放的歌曲列表
@@ -27,8 +28,8 @@ class RecentSection extends ConsumerWidget {
           children: [
             Text(
               loc.recently_played,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+              style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+                    fontWeight: AppDesignSystem.fontWeightBold,
                   ),
             ),
             TextButton(
@@ -36,43 +37,41 @@ class RecentSection extends ConsumerWidget {
                 // 导航到历史记录页面
                 context.go('/history');
               },
-              child: Text(loc.see_all),
+              child: Text(
+                loc.see_all,
+                style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                  color: AppDesignSystem.primary,
+                  fontWeight: AppDesignSystem.fontWeightMedium,
+                ),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppDesignSystem.spacing12),
         if (songs.isEmpty) ...[
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    loc.no_recent_songs,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                  ),
-                ],
-              ),
+          ModernCard(
+            padding: const EdgeInsets.all(AppDesignSystem.spacing24),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.history,
+                  size: AppDesignSystem.iconSize64,
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: AppDesignSystem.spacing16),
+                Text(
+                  loc.no_recent_songs,
+                  style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.7),
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ] else ...[
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+          ModernCard(
+            padding: EdgeInsets.zero,
             child: Column(
               children: songs.take(3).map((song) {
                 return MusicCardWidget(
@@ -81,7 +80,7 @@ class RecentSection extends ConsumerWidget {
                     // 播放歌曲
                     // 设置播放列表并播放选中的歌曲
                     final index = songs.indexOf(song);
-                    playerNotifier.setPlaylist(songs, index);
+                    playerNotifier.setPlaylist(songs, startIndex: index);
                     playerNotifier.playSong(song);
                   },
                 );
@@ -91,5 +90,80 @@ class RecentSection extends ConsumerWidget {
         ],
       ],
     );
+  }
+}
+
+class MusicCardWidget extends StatelessWidget {
+  final Song song;
+  final VoidCallback onTap;
+
+  const MusicCardWidget({super.key, required this.song, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: AppDesignSystem.primaryGradient,
+                  borderRadius: AppDesignSystem.borderRadius12,
+                ),
+                child: const Icon(
+                  Icons.music_note,
+                  color: Colors.white,
+                  size: AppDesignSystem.iconSize24,
+                ),
+              ),
+              const SizedBox(width: AppDesignSystem.spacing12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      song.title,
+                      style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                        fontWeight: AppDesignSystem.fontWeightMedium,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${song.artist} - ${song.album}',
+                      style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppDesignSystem.spacing12),
+              Text(
+                _formatDuration(song.duration),
+                style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDuration(int durationInSeconds) {
+    final minutes = durationInSeconds ~/ 60;
+    final seconds = durationInSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 }

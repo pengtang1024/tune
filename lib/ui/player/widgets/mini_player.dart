@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
 /// 迷你播放器组件
 class MiniPlayer extends ConsumerWidget {
@@ -17,40 +18,34 @@ class MiniPlayer extends ConsumerWidget {
     }
 
     return Container(
-      height: 60,
+      height: 64,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           top: BorderSide(
-            // ignore: deprecated_member_use
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
-            width: 0.5,
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
+            width: 1,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, -1),
-          ),
-        ],
+        boxShadow: AppDesignSystem.shadowSmall,
       ),
       child: Row(
         children: [
           // 专辑封面
           Container(
-            width: 60,
-            height: 60,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              gradient: AppDesignSystem.primaryGradient,
+              boxShadow: AppDesignSystem.shadowColored,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.music_note,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              color: Colors.white,
+              size: AppDesignSystem.iconSize32,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDesignSystem.spacing12),
 
           // 歌曲信息
           Expanded(
@@ -60,22 +55,24 @@ class MiniPlayer extends ConsumerWidget {
               children: [
                 Text(
                   playerState.currentSong!.title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                    fontWeight: AppDesignSystem.fontWeightSemiBold,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${playerState.currentSong!.artist} - ${playerState.currentSong!.album}',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDesignSystem.spacing8),
 
           // 控制按钮
           Row(
@@ -84,22 +81,26 @@ class MiniPlayer extends ConsumerWidget {
               IconButton(
                 icon: Icon(
                   playerState.isPlaying ? Icons.pause : Icons.play_arrow,
+                  size: AppDesignSystem.iconSize28,
                 ),
+                color: AppDesignSystem.primary,
                 onPressed: playerState.isPlaying
                     ? playerNotifier.pause
                     : playerNotifier.play,
               ),
               IconButton(
-                icon: const Icon(Icons.skip_next),
+                icon: const Icon(Icons.skip_next, size: AppDesignSystem.iconSize24),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 onPressed: playerNotifier.next,
               ),
               IconButton(
-                icon: const Icon(Icons.fullscreen),
+                icon: const Icon(Icons.fullscreen, size: AppDesignSystem.iconSize24),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 onPressed: () => context.push('/player'),
               ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDesignSystem.spacing8),
         ],
       ),
     );

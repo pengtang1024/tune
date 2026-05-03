@@ -134,11 +134,11 @@ class ModernCard extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: isGradient ? null : cardSurfaceColor,
+        color: backgroundColor ?? (isGradient ? null : cardSurfaceColor),
         gradient: isGradient ? (gradient ?? AppDesignSystem.primaryGradient) : null,
         borderRadius: cardBorderRadius,
         boxShadow: cardBoxShadow,
-        border: isBordered
+        border: isBordered || borderSide != null
             ? (borderSide != null 
                 ? Border.fromBorderSide(borderSide!) 
                 : Border.all(

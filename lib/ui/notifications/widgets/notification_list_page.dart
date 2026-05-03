@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/notifications/providers/notification_providers.dart';
 import 'package:tune/ui/notifications/states/notification_state.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/empty_state.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
 /// 通知列表页面
 class NotificationListPage extends ConsumerWidget {
@@ -13,7 +16,12 @@ class NotificationListPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('通知'),
+        title: Text(
+          '通知',
+          style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+            fontWeight: AppDesignSystem.fontWeightSemiBold,
+          ),
+        ),
         actions: [
           if (notificationState.notifications.isNotEmpty)
             IconButton(
@@ -49,21 +57,15 @@ class NotificationList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (notifications.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.notifications_none, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('暂无通知', style: TextStyle(fontSize: 18, color: Colors.grey)),
-            SizedBox(height: 8),
-            Text('当您收到新通知时，它们会显示在这里', style: TextStyle(color: Colors.grey)),
-          ],
-        ),
+      return const EmptyState(
+        icon: Icons.notifications_none,
+        title: '暂无通知',
+        subtitle: '当您收到新通知时，它们会显示在这里',
       );
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.all(AppDesignSystem.spacing8),
       itemCount: notifications.length,
       itemBuilder: (context, index) {
         final notification = notifications[index];
@@ -108,7 +110,7 @@ class NotificationListItem extends StatelessWidget {
 
     // 根据通知类型确定颜色
     Color? tileColor;
-    Color? iconColor;
+    Color iconColor;
     double? borderWidth = 0;
 
     switch (notification.type) {
@@ -116,28 +118,28 @@ class NotificationListItem extends StatelessWidget {
         tileColor = isDarkMode
             ? colorScheme.error.withValues(alpha: 0.1)
             : colorScheme.error.withValues(alpha: 0.05);
-        iconColor = colorScheme.error;
+        iconColor = AppDesignSystem.error;
         borderWidth = 2;
         break;
       case NotificationType.system:
         tileColor = isDarkMode
             ? colorScheme.primary.withValues(alpha: 0.1)
             : colorScheme.primary.withValues(alpha: 0.05);
-        iconColor = colorScheme.primary;
+        iconColor = AppDesignSystem.primary;
         borderWidth = 1;
         break;
       case NotificationType.message:
         tileColor = isDarkMode
             ? colorScheme.secondary.withValues(alpha: 0.1)
             : colorScheme.secondary.withValues(alpha: 0.05);
-        iconColor = colorScheme.secondary;
+        iconColor = AppDesignSystem.secondary;
         borderWidth = 1;
         break;
       case NotificationType.update:
         tileColor = isDarkMode
             ? colorScheme.tertiary.withValues(alpha: 0.1)
             : colorScheme.tertiary.withValues(alpha: 0.05);
-        iconColor = colorScheme.tertiary;
+        iconColor = AppDesignSystem.tertiary;
         borderWidth = 1;
         break;
       case NotificationType.normal:
@@ -146,83 +148,91 @@ class NotificationListItem extends StatelessWidget {
         break;
     }
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      color: tileColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: iconColor, 
-          width: borderWidth,
-        ),
-      ),
-      child: ListTile(
-        leading: Icon(
-          notification.icon ?? _getDefaultIcon(notification.type),
-          color: iconColor,
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                notification.title,
-                style: TextStyle(
-                  fontWeight: notification.isRead
-                      ? FontWeight.normal
-                      : FontWeight.bold,
+    return ModernCard(
+      margin: const EdgeInsets.symmetric(vertical: AppDesignSystem.spacing4),
+      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+      backgroundColor: tileColor,
+      borderSide: borderWidth > 0
+          ? BorderSide(color: iconColor, width: borderWidth)
+          : null,
+      onTap: onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            notification.icon ?? _getDefaultIcon(notification.type),
+            color: iconColor,
+            size: AppDesignSystem.iconSize28,
+          ),
+          const SizedBox(width: AppDesignSystem.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        notification.title,
+                        style: AppDesignSystem.textTheme.titleSmall?.copyWith(
+                          fontWeight: notification.isRead
+                              ? AppDesignSystem.fontWeightNormal
+                              : AppDesignSystem.fontWeightBold,
+                        ),
+                      ),
+                    ),
+                    // 通知类型标签
+                    Container(
+                      margin: const EdgeInsets.only(left: AppDesignSystem.spacing8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDesignSystem.spacing8,
+                        vertical: AppDesignSystem.spacing4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: iconColor,
+                        borderRadius: AppDesignSystem.borderRadius8,
+                      ),
+                      child: Text(
+                        _getNotificationTypeName(notification.type),
+                        style: AppDesignSystem.textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (!notification.isRead)
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(left: AppDesignSystem.spacing8),
+                        decoration: BoxDecoration(
+                          color: AppDesignSystem.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: AppDesignSystem.spacing8),
+                Text(
+                  notification.content,
+                  style: AppDesignSystem.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppDesignSystem.spacing4),
+                Text(
+                  _formatTime(notification.timestamp),
+                  style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
             ),
-            // 通知类型标签
-            Container(
-              margin: const EdgeInsets.only(left: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(
-                color: iconColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                _getNotificationTypeName(notification.type),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-            if (!notification.isRead)
-              Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.only(left: 8),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(notification.content),
-            const SizedBox(height: 4),
-            Text(
-              _formatTime(notification.timestamp),
-              style: TextStyle(
-                  fontSize: 12,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-            ),
-          ],
-        ),
-        onTap: onTap,
-        trailing: SizedBox(
-          width: 40,
-          child: IconButton(
-            icon: const Icon(Icons.delete),
+          ),
+          const SizedBox(width: AppDesignSystem.spacing8),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            color: colorScheme.error.withValues(alpha: 0.8),
             onPressed: onDelete,
           ),
-        ),
+        ],
       ),
     );
   }

@@ -101,16 +101,18 @@ class LibraryCategoriesPanel extends StatelessWidget {
     // 计算艺术家分布
     final artistCount = <String, int>{};
     for (final song in songs) {
-      if (song.artist != null && song.artist!.isNotEmpty) {
-        artistCount[song.artist!] = (artistCount[song.artist!] ?? 0) + 1;
+      final artist = song.artist;
+      if (artist.isNotEmpty) {
+        artistCount[artist] = (artistCount[artist] ?? 0) + 1;
       }
     }
 
     // 计算专辑分布
     final albumCount = <String, int>{};
     for (final song in songs) {
-      if (song.album != null && song.album!.isNotEmpty) {
-        albumCount[song.album!] = (albumCount[song.album!] ?? 0) + 1;
+      final album = song.album;
+      if (album.isNotEmpty) {
+        albumCount[album] = (albumCount[album] ?? 0) + 1;
       }
     }
 

@@ -747,4 +747,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error_occurred => 'Error occurred';
+
+  @override
+  String get quick_actions => 'Quick Actions';
+
+  @override
+  String get my_songs => 'My Songs';
+
+  @override
+  String get radio => 'Radio';
+
+  @override
+  String get see_all => 'See All';
+
+  @override
+  String get no_recent_songs => 'No recent songs';
+
+  @override
+  String get good_morning => 'Good Morning';
+
+  @override
+  String get good_afternoon => 'Good Afternoon';
+
+  @override
+  String get good_evening => 'Good Evening';
+
+  @override
+  String get welcome_to_tune => 'Welcome to Tune';
 }

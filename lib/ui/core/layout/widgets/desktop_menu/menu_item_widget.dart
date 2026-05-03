@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/core/extension/theme_extension.dart';
-import 'package:tune/domain/models/menu_item.dart';
-import 'package:tune/utils/device_utils.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/menu_item.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/utils/device_utils.dart';
 
 /// 菜单项组件
 /// 仅负责显示单个菜单项
@@ -25,39 +25,57 @@ class MenuItemWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 根据设备类型设置合适的高度
     final deviceType = DeviceUtils.getDeviceType(context);
-    final itemHeight = deviceType == DeviceType.mobile ? 40.0 : 48.0;
+    final itemHeight = deviceType == DeviceType.mobile ? 48.0 : 56.0;
 
-    return Material(
-      color: isSelected ? context.theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: isSelected
+            ? AppDesignSystem.primary.withValues(alpha: 0.12)
+            : Colors.transparent,
+        borderRadius: AppDesignSystem.borderRadius12,
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing8),
       child: SizedBox(
-        height: itemHeight, // 根据设备类型设置高度
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            children: [
-              // 固定宽度的图标区域，确保展开和收起时宽度一致
-              SizedBox(
-                width: 80.0,
-                child: Center(
-                  child: Icon(
-                    item.icon,
-                    color: isSelected ? context.theme.primaryColor : context.theme.iconTheme.color,
-                    size: 24.0,
-                  ),
-                ),
-              ),
-              // 文字区域，收起时隐藏
-              if (isExpanded)
-                Expanded(
-                  child: Text(
-                    _getLocalizedLabel(context, item.labelKey), // 使用labelKey字段
-                    style: TextStyle(
-                      color: isSelected ? context.theme.primaryColor : context.theme.textTheme.bodyMedium?.color,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        height: itemHeight,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: AppDesignSystem.borderRadius12,
+            child: Row(
+              children: [
+                // 固定宽度的图标区域，确保展开和收起时宽度一致
+                SizedBox(
+                  width: 80.0,
+                  child: Center(
+                    child: Icon(
+                      item.icon,
+                      color: isSelected
+                          ? AppDesignSystem.primary
+                          : Theme.of(context).iconTheme.color,
+                      size: AppDesignSystem.iconSize24,
                     ),
                   ),
                 ),
-            ],
+                // 文字区域，收起时隐藏
+                if (isExpanded)
+                  Expanded(
+                    child: Text(
+                      _getLocalizedLabel(context, item.labelKey),
+                      style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                        color: isSelected
+                            ? AppDesignSystem.primary
+                            : Theme.of(context).textTheme.bodyMedium?.color,
+                        fontWeight: isSelected
+                            ? AppDesignSystem.fontWeightSemiBold
+                            : AppDesignSystem.fontWeightNormal,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

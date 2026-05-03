@@ -260,5 +260,14 @@
   "enable_notifications_description": "启用或禁用应用通知",
   "font_size": "字体大小",
   "font_size_description": "调整应用内文字的显示大小",
-  "error_occurred": "发生错误"
+  "error_occurred": "发生错误",
+  "quick_actions": "快捷操作",
+  "my_songs": "我的歌曲",
+  "radio": "电台",
+  "see_all": "查看全部",
+  "no_recent_songs": "暂无最近播放",
+  "good_morning": "早上好",
+  "good_afternoon": "下午好",
+  "good_evening": "晚上好",
+  "welcome_to_tune": "欢迎来到 Tune"
 }

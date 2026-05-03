@@ -260,5 +260,14 @@
   "enable_notifications_description": "Enable or disable app notifications",
   "font_size": "Font Size",
   "font_size_description": "Adjust the display size of text within the app",
-  "error_occurred": "Error occurred"
+  "error_occurred": "Error occurred",
+  "quick_actions": "Quick Actions",
+  "my_songs": "My Songs",
+  "radio": "Radio",
+  "see_all": "See All",
+  "no_recent_songs": "No recent songs",
+  "good_morning": "Good Morning",
+  "good_afternoon": "Good Afternoon",
+  "good_evening": "Good Evening",
+  "welcome_to_tune": "Welcome to Tune"
 }
