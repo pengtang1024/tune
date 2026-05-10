@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
-/// 播放速度控制组件
 class PlayerSpeed extends ConsumerWidget {
   const PlayerSpeed({super.key});
 
@@ -11,32 +11,50 @@ class PlayerSpeed extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
     final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
-    final loc = context.loc;
+
+    const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: const Icon(Icons.speed),
-          onPressed: null,
-          tooltip: loc.playback_speed,
+        Icon(
+          Icons.speed_rounded,
+          size: AppDesignSystem.iconSize20,
+          color: AppDesignSystem.primary,
         ),
-        DropdownButton<double>(
-          value: playerState.speed,
-          items: [
-            DropdownMenuItem(value: 0.5, child: Text('0.5x')),
-            DropdownMenuItem(value: 0.75, child: Text('0.75x')),
-            DropdownMenuItem(value: 1.0, child: Text('1.0x')),
-            DropdownMenuItem(value: 1.25, child: Text('1.25x')),
-            DropdownMenuItem(value: 1.5, child: Text('1.5x')),
-            DropdownMenuItem(value: 2.0, child: Text('2.0x')),
-          ],
-          onChanged: (value) {
-            if (value != null) {
-              playerNotifier.setSpeed(value);
-            }
-          },
-        ),
+        const SizedBox(width: AppDesignSystem.spacing8),
+        ...speeds.map((speed) {
+          final isActive = playerState.speed == speed;
+          return Padding(
+            padding: const EdgeInsets.only(right: AppDesignSystem.spacing4),
+            child: AppInteractions.pressableScale(
+              scaleValue: 0.93,
+              onTap: () => playerNotifier.setSpeed(speed),
+              child: AnimatedContainer(
+                duration: AppDesignSystem.duration200,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDesignSystem.spacing10,
+                  vertical: AppDesignSystem.spacing6,
+                ),
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? AppDesignSystem.primary
+                      : AppDesignSystem.primary.withValues(alpha: 0.08),
+                  borderRadius: AppDesignSystem.borderRadius8,
+                ),
+                child: Text(
+                  '${speed}x',
+                  style: AppDesignSystem.textTheme.labelSmall?.copyWith(
+                    color: isActive ? Colors.white : AppDesignSystem.primary,
+                    fontWeight: isActive
+                        ? AppDesignSystem.fontWeightBold
+                        : AppDesignSystem.fontWeightMedium,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

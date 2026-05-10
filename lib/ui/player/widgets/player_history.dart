@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
-/// 播放历史记录组件
 class PlayerHistory extends ConsumerWidget {
   const PlayerHistory({super.key});
 
@@ -12,8 +13,8 @@ class PlayerHistory extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
     final loc = context.loc;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // 获取最近播放的歌曲历史
     final List<Song> history = playerNotifier.getPlayHistory().take(5).toList();
 
     if (history.isEmpty) {
@@ -21,94 +22,101 @@ class PlayerHistory extends ConsumerWidget {
     }
 
     return Container(
-      height: 160, // 增加容器高度以解决溢出问题
-      padding: const EdgeInsets.all(16.0),
+      height: 160,
+      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        color: isDark
+            ? AppDesignSystem.neutral900.withValues(alpha: 0.6)
+            : AppDesignSystem.neutral100.withValues(alpha: 0.6),
+        borderRadius: AppDesignSystem.borderRadius16,
+        border: Border.all(
+          color: isDark ? AppDesignSystem.neutral800 : AppDesignSystem.neutral200,
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            loc.recently_played, // 使用本地化文本
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            loc.recently_played,
+            style: AppDesignSystem.textTheme.titleSmall?.copyWith(
+              fontWeight: AppDesignSystem.fontWeightSemiBold,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDesignSystem.spacing12),
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: history.length,
               itemBuilder: (context, index) {
                 final song = history[index];
-                return Container(
-                  width: 120,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Icon(
-                              Icons.music_note,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onPrimaryContainer,
-                              size: 28,
-                            ),
-                          ),
-                          const SizedBox(height: 6), // 增加间距
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight:
-                                  (constraints.maxHeight - 60) / 2, // 调整高度计算
-                            ),
-                            child: Text(
-                              song.title,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(height: 4), // 调整间距
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight:
-                                  (constraints.maxHeight - 60) / 2, // 调整高度计算
-                            ),
-                            child: Text(
-                              song.artist,
-                              style: Theme.of(context).textTheme.bodySmall,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                );
+                return _HistorySongCard(song: song);
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HistorySongCard extends ConsumerWidget {
+  final Song song;
+  const _HistorySongCard({required this.song});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+
+    return Container(
+      width: 110,
+      margin: const EdgeInsets.only(right: AppDesignSystem.spacing10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: AppDesignSystem.borderRadius12,
+        boxShadow: [AppDesignSystem.shadowLight.first],
+      ),
+      child: AppInteractions.clickableCard(
+        borderRadius: AppDesignSystem.borderRadius12,
+        onTap: () => playerNotifier.playSong(song),
+        child: Padding(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: AppDesignSystem.primaryGradient,
+                  borderRadius: AppDesignSystem.borderRadius24,
+                ),
+                child: const Icon(Icons.music_note_rounded,
+                    color: Colors.white, size: AppDesignSystem.iconSize24),
+              ),
+              const SizedBox(height: AppDesignSystem.spacing8),
+              Text(
+                song.title,
+                style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                  fontWeight: AppDesignSystem.fontWeightMedium,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                song.artist,
+                style: AppDesignSystem.textTheme.labelSmall?.copyWith(
+                  color: AppDesignSystem.neutral500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
