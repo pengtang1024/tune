@@ -6,6 +6,7 @@ import 'package:tune/data/services/providers/audio_player_service_provider.dart'
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/app_bar_providers.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/data/services/providers/play_history_service_provider.dart';
 import 'package:tune/ui/player/extensions/player_control_extension.dart';
 import 'package:tune/ui/player/extensions/resource_management_extension.dart';
 import 'package:tune/ui/player/states/player_state.dart';
@@ -113,6 +114,11 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       Log.info('播放成功: ${song.title}');
       NotificationEvents.onPlayStarted(_ref, song.title, song.artist);
       _ref.read(playStatsServiceProvider).incrementPlayCount(song.id);
+      _ref.read(playHistoryServiceProvider).addSongToHistory(song);
+      if (!_recentHistory.contains(song)) {
+        _recentHistory.insert(0, song);
+        if (_recentHistory.length > 10) _recentHistory.removeLast();
+      }
     } catch (e, stackTrace) {
       Log.error('播放失败: $e\nStack trace: $stackTrace');
       updateToError('播放失败: $e');
@@ -212,15 +218,10 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
   }
 
   /// 获取播放历史
+  final List<Song> _recentHistory = [];
+
   List<Song> getPlayHistory() {
-    try {
-      // 使用 PlayHistoryService 获取历史记录
-      // 这里使用同步方式获取（我们可以先返回空列表，或者做缓存）
-      return [];
-    } catch (e) {
-      Log.error('获取播放历史失败: $e');
-      return [];
-    }
+    return _recentHistory;
   }
 
   /// 释放资源
