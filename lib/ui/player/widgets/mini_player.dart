@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -116,6 +117,10 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
                   ),
                 ),
                 _buildControls(playerState, playerNotifier),
+                if (playerState.isPlaying)
+                  const SizedBox(width: AppDesignSystem.spacing4),
+                if (playerState.isPlaying)
+                  SizedBox(width: 32, child: _MiniVisualizer(isPlaying: playerState.isPlaying)),
                 const SizedBox(width: AppDesignSystem.spacing8),
               ],
             ),
@@ -197,6 +202,73 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MiniVisualizer extends StatefulWidget {
+  final bool isPlaying;
+  const _MiniVisualizer({required this.isPlaying});
+
+  @override
+  State<_MiniVisualizer> createState() => _MiniVisualizerState();
+}
+
+class _MiniVisualizerState extends State<_MiniVisualizer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final Random _random = Random();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    if (widget.isPlaying) _controller.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(covariant _MiniVisualizer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying && !_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    } else if (!widget.isPlaying && _controller.isAnimating) {
+      _controller.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final barCount = 5;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: List.generate(barCount, (i) {
+            final h = widget.isPlaying
+                ? 6.0 + 12.0 * _random.nextDouble()
+                : 3.0;
+            return Container(
+              width: 3,
+              height: h,
+              margin: const EdgeInsets.symmetric(horizontal: 1),
+              decoration: BoxDecoration(
+                color: AppDesignSystem.primary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }

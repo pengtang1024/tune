@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
@@ -58,7 +59,21 @@ class PlayerPage extends ConsumerWidget {
             Expanded(
               child: playerState.isLoading || playerState.isError
                   ? const Center(child: CircularProgressIndicator())
-                  : _buildResponsiveContent(context, isCompact),
+                  : GestureDetector(
+                      onHorizontalDragEnd: isCompact ? (details) {
+                        final playerNotifier = ref.read(playerStateNotifierProvider.notifier);
+                        if (details.primaryVelocity != null) {
+                          if (details.primaryVelocity! < -300) {
+                            HapticFeedback.lightImpact();
+                            playerNotifier.next();
+                          } else if (details.primaryVelocity! > 300) {
+                            HapticFeedback.lightImpact();
+                            playerNotifier.previous();
+                          }
+                        }
+                      } : null,
+                      child: _buildResponsiveContent(context, isCompact),
+                    ),
             ),
             if (!playerState.isLoading && !playerState.isError) ...[
               const AudioVisualizer(height: 32, barCount: 32),
