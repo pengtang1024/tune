@@ -5,6 +5,7 @@ import 'package:tune/data/services/playlist_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/providers/app_bar_providers.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/ui/player/extensions/player_control_extension.dart';
 import 'package:tune/ui/player/extensions/resource_management_extension.dart';
 import 'package:tune/ui/player/states/player_state.dart';
@@ -111,6 +112,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       
       Log.info('播放成功: ${song.title}');
       NotificationEvents.onPlayStarted(_ref, song.title, song.artist);
+      _ref.read(playStatsServiceProvider).incrementPlayCount(song.id);
     } catch (e, stackTrace) {
       Log.error('播放失败: $e\nStack trace: $stackTrace');
       updateToError('播放失败: $e');
