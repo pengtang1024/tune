@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
@@ -36,7 +37,9 @@ class PlayerControls extends ConsumerWidget {
           isPlaying: playerState.isPlaying,
           hasTrack: hasTrack,
           onTap: hasTrack
-              ? (playerState.isPlaying ? playerNotifier.pause : playerNotifier.resume)
+              ? (playerState.isPlaying
+                  ? () { HapticFeedback.mediumImpact(); playerNotifier.pause(); }
+                  : () { HapticFeedback.mediumImpact(); playerNotifier.resume(); })
               : null,
         ),
         const SizedBox(width: AppDesignSystem.spacing20),

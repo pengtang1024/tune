@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
@@ -157,7 +158,9 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
       children: [
         AppInteractions.pressableScale(
           scaleValue: 0.9,
-          onTap: playerState.isPlaying ? playerNotifier.pause : playerNotifier.play,
+          onTap: playerState.isPlaying
+              ? () { HapticFeedback.lightImpact(); playerNotifier.pause(); }
+              : () { HapticFeedback.lightImpact(); playerNotifier.play(); },
           child: Container(
             width: 40,
             height: 40,

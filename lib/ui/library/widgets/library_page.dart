@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
@@ -71,14 +72,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               Expanded(
                 child: state.songs.isEmpty
                     ? _buildEmptyState()
-                    : SongGridWidget(
+                    : RefreshIndicator(
+                        onRefresh: () async {
+                          ref.read(libraryStateNotifierProvider.notifier).loadLibrary();
+                        },
+                        child: SongGridWidget(
                         songs: state.songs,
                         searchQuery: _searchQuery,
                         localizedNoSongsFound: context.loc.no_songs_found,
                         style: SongGridStyle.list,
                         onSongTap: (song) => _playSong(song),
                         onSongPlay: (song) => _playSong(song),
-                        onSongMore: (song) => _showSongOptions(context, song),
+                          onSongMore: (song) => _showSongOptions(context, song),
+                        ),
                       ),
               ),
             ],

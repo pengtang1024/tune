@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
@@ -111,6 +112,7 @@ class HeroHeader extends ConsumerWidget {
           AppInteractions.pressableScale(
             scaleValue: 0.9,
             onTap: () {
+              HapticFeedback.lightImpact();
               if (playerState.isPlaying) {
                 playerNotifier.pause();
               } else {
