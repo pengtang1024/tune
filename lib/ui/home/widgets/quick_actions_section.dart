@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
-/// 快速操作组件
-/// 展示常用功能的快捷入口
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
 
@@ -16,55 +17,21 @@ class QuickActionsSection extends StatelessWidget {
       children: [
         Text(
           loc.quick_actions,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 16),
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+          style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+            fontWeight: AppDesignSystem.fontWeightBold,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _QuickActionButton(
-                  icon: Icons.music_note_outlined,
-                  label: loc.my_songs,
-                  onTap: () {
-                    // 导航到我的音乐
-                    context.go('/library/songs');
-                  },
-                ),
-                _QuickActionButton(
-                  icon: Icons.favorite_border,
-                  label: loc.favorites,
-                  onTap: () {
-                    // 导航到收藏
-                    context.go('/library/favorites');
-                  },
-                ),
-                _QuickActionButton(
-                  icon: Icons.playlist_play,
-                  label: loc.playlists,
-                  onTap: () {
-                    // 导航到播放列表
-                    context.go('/library/playlists');
-                  },
-                ),
-                _QuickActionButton(
-                  icon: Icons.radio,
-                  label: loc.radio,
-                  onTap: () {
-                    // 导航到电台
-                    context.go('/radio');
-                  },
-                ),
-              ],
-            ),
+        ),
+        const SizedBox(height: AppDesignSystem.spacing16),
+        ModernCard(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _ActionButton(icon: Icons.music_note_outlined, label: loc.my_songs, onTap: () => context.go('/library/songs')),
+              _ActionButton(icon: Icons.favorite_border, label: loc.favorites, onTap: () => context.go('/library/favorites')),
+              _ActionButton(icon: Icons.playlist_play, label: loc.playlists, onTap: () => context.go('/library/playlists')),
+              _ActionButton(icon: Icons.radio, label: loc.radio, onTap: () => context.go('/radio')),
+            ],
           ),
         ),
       ],
@@ -72,38 +39,31 @@ class QuickActionsSection extends StatelessWidget {
   }
 }
 
-/// 快速操作按钮
-class _QuickActionButton extends StatelessWidget {
+class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _QuickActionButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+  const _ActionButton({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: IconButton(
-            iconSize: 30,
-            icon: Icon(icon),
-            onPressed: onTap,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+        AppInteractions.pressableScale(
+          scaleValue: 0.92,
+          onTap: onTap,
+          child: Container(
+            width: 56, height: 56,
+            decoration: BoxDecoration(
+              color: AppDesignSystem.primary.withValues(alpha: 0.08),
+              borderRadius: AppDesignSystem.borderRadius28,
+            ),
+            child: Icon(icon, size: AppDesignSystem.iconSize28, color: AppDesignSystem.primary),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(label),
+        const SizedBox(height: AppDesignSystem.spacing8),
+        Text(label, style: AppDesignSystem.textTheme.labelSmall),
       ],
     );
   }
