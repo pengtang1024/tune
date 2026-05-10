@@ -11,6 +11,7 @@ import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart'
     as scanner_provider;
 import 'package:tune/utils/logger.dart';
+import 'package:tune/ui/notifications/utils/notification_events.dart';
 
 class LibraryStateNotifier extends StateNotifier<LibraryState> {
   final Ref _ref;
@@ -58,9 +59,9 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
     state = state.copyWith(
       scanStatus: ScanStatus.completed,
       foundSongs: songs,
-      scanProgress: 1.0,
-      statusMessage: '扫描完成，共找到 ${songs.length} 首歌曲',
+      errorMessage: null,
     );
+    NotificationEvents.onScanCompleted(_ref, songs.length);
   }
 
   void scanError(String error) {

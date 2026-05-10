@@ -9,6 +9,7 @@ import 'package:tune/ui/player/extensions/player_control_extension.dart';
 import 'package:tune/ui/player/extensions/resource_management_extension.dart';
 import 'package:tune/ui/player/states/player_state.dart';
 import 'package:tune/ui/player/states/play_mode.dart';
+import 'package:tune/ui/notifications/utils/notification_events.dart';
 import 'package:tune/utils/logger.dart';
 
 final playlistServiceProvider = Provider<PlaylistService>((ref) {
@@ -109,6 +110,7 @@ class PlayerStateNotifier extends StateNotifier<PlayerState> {
       updateToPlaying(song, stateInfo);
       
       Log.info('播放成功: ${song.title}');
+      NotificationEvents.onPlayStarted(_ref, song.title, song.artist);
     } catch (e, stackTrace) {
       Log.error('播放失败: $e\nStack trace: $stackTrace');
       updateToError('播放失败: $e');
