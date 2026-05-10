@@ -23,9 +23,9 @@ class PlayerContent extends ConsumerWidget {
         const _AlbumArt().withScaleIn(),
         const SizedBox(height: AppDesignSystem.spacing32),
         _SongInfo(
-          title: playerState.currentSong?.title ?? 'Unknown Track',
-          artist: playerState.currentSong?.artist ?? 'Unknown Artist',
-          album: playerState.currentSong?.album ?? 'Unknown Album',
+          title: playerState.currentSong?.title ?? '未知歌曲',
+          artist: playerState.currentSong?.artist ?? '未知艺术家',
+          album: playerState.currentSong?.album ?? '未知专辑',
         ).withSlideIn(delay: const Duration(milliseconds: 150)),
         const SizedBox(height: AppDesignSystem.spacing32),
         const _PlayerControlsRow().withFadeIn(delay: const Duration(milliseconds: 250)),

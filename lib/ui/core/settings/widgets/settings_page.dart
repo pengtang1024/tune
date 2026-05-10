@@ -94,7 +94,7 @@ class _SettingsTabViewState extends ConsumerState<SettingsTabView>
         ),
         const SizedBox(width: AppDesignSystem.spacing12),
         Text(
-          'Settings',
+          '设置',
           style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
           ),

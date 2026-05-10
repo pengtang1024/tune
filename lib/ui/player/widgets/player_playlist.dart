@@ -36,7 +36,7 @@ class PlayerPlaylist extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Playlist',
+            '播放列表',
             style: AppDesignSystem.textTheme.titleSmall?.copyWith(
               fontWeight: AppDesignSystem.fontWeightSemiBold,
             ),

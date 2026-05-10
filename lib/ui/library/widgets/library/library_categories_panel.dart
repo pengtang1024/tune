@@ -17,7 +17,7 @@ class LibraryCategoriesPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Categories',
+            '音乐分类',
             style: AppDesignSystem.textTheme.titleMedium?.copyWith(
               fontWeight: AppDesignSystem.fontWeightBold,
             ),
@@ -26,11 +26,11 @@ class LibraryCategoriesPanel extends StatelessWidget {
           IntrinsicHeight(
             child: Row(
               children: [
-                Expanded(child: _CategoryList(title: 'Top Artists', items: categories.topArtists)),
+                Expanded(child: _CategoryList(title: '热门艺术家', items: categories.topArtists)),
                 const VerticalDivider(width: 1),
-                Expanded(child: _CategoryList(title: 'Top Albums', items: categories.topAlbums)),
+                Expanded(child: _CategoryList(title: '热门专辑', items: categories.topAlbums)),
                 const VerticalDivider(width: 1),
-                Expanded(child: _CategoryList(title: 'Genres', items: categories.topGenres)),
+                Expanded(child: _CategoryList(title: '流派分布', items: categories.topGenres)),
               ],
             ),
           ),

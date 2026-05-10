@@ -18,7 +18,7 @@ class NotificationListPage extends ConsumerWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Notifications',
+          '通知',
           style: AppDesignSystem.textTheme.titleLarge?.copyWith(
             fontWeight: AppDesignSystem.fontWeightSemiBold,
           ),
@@ -28,13 +28,13 @@ class NotificationListPage extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.clear_all, size: AppDesignSystem.iconSize24),
               onPressed: () => ref.read(notificationStateNotifierProvider.notifier).clearAll(),
-              tooltip: 'Clear all',
+              tooltip: '清空所有通知',
             ),
           if (notificationState.unreadCount > 0)
             IconButton(
               icon: const Icon(Icons.mark_chat_read, size: AppDesignSystem.iconSize24),
               onPressed: () => ref.read(notificationStateNotifierProvider.notifier).markAllAsRead(),
-              tooltip: 'Mark all as read',
+              tooltip: '全部标记为已读',
             ),
         ],
       ),
@@ -52,8 +52,8 @@ class NotificationList extends ConsumerWidget {
     if (notifications.isEmpty) {
       return const EmptyState(
         icon: Icons.notifications_none,
-        title: 'No notifications',
-        subtitle: 'When you receive new notifications, they will appear here',
+        title: '暂无通知',
+        subtitle: '当您收到新通知时，它们会显示在这里',
       );
     }
 
@@ -193,20 +193,20 @@ class NotificationListItem extends StatelessWidget {
 
   static String _typeName(NotificationType type) {
     switch (type) {
-      case NotificationType.important: return 'Important';
-      case NotificationType.system: return 'System';
-      case NotificationType.message: return 'Message';
-      case NotificationType.update: return 'Update';
-      case NotificationType.normal: return 'Normal';
+      case NotificationType.important: return '重要';
+      case NotificationType.system: return '系统';
+      case NotificationType.message: return '消息';
+      case NotificationType.update: return '更新';
+      case NotificationType.normal: return '普通';
     }
   }
 
   static String _fmtTime(DateTime time) {
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inDays < 1) return '${diff.inHours}h ago';
-    if (diff.inDays < 30) return '${diff.inDays}d ago';
-    return '${time.month}/${time.day}';
+    if (diff.inMinutes < 1) return '刚刚';
+    if (diff.inHours < 1) return '${diff.inMinutes}分钟前';
+    if (diff.inDays < 1) return '${diff.inHours}小时前';
+    if (diff.inDays < 30) return '${diff.inDays}天前';
+    return '${time.month}月${time.day}日';
   }
 }

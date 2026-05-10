@@ -31,7 +31,7 @@ class ScanResultsDisplay extends StatelessWidget {
           const SizedBox(height: AppDesignSystem.spacing24),
           if (state.scanStatus == ScanStatus.completed && state.foundSongs.isNotEmpty) ...[
             Text(
-              'Found ${state.foundSongs.length} songs',
+              '找到 ${state.foundSongs.length} 首歌曲',
               style: AppDesignSystem.textTheme.titleMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightBold),
             ),
             const SizedBox(height: AppDesignSystem.spacing16),
@@ -57,9 +57,9 @@ class ScanResultsDisplay extends StatelessWidget {
             const SizedBox(height: AppDesignSystem.spacing24),
             Row(
               children: [
-                Expanded(child: ModernButton.primary(text: 'Add to Library', onPressed: onAddToLibrary)),
+                Expanded(child: ModernButton.primary(text: '添加到音乐库', onPressed: onAddToLibrary)),
                 const SizedBox(width: AppDesignSystem.spacing16),
-                ModernButton.outline(text: 'Rescan', onPressed: onResetScan),
+                ModernButton.outline(text: '重新扫描', onPressed: onResetScan),
               ],
             ),
           ] else if (state.scanStatus == ScanStatus.completed) ...[
@@ -69,7 +69,7 @@ class ScanResultsDisplay extends StatelessWidget {
                   Icon(Icons.search_off, size: 48, color: AppDesignSystem.neutral400),
                   const SizedBox(height: AppDesignSystem.spacing16),
                   Text(
-                    'No songs found',
+                    '未找到任何歌曲',
                     style: AppDesignSystem.textTheme.titleMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightBold),
                   ),
                   const SizedBox(height: AppDesignSystem.spacing8),
@@ -81,7 +81,7 @@ class ScanResultsDisplay extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppDesignSystem.spacing24),
-            Center(child: ModernButton.outline(text: 'Rescan', onPressed: onResetScan)),
+            Center(child: ModernButton.outline(text: '重新扫描', onPressed: onResetScan)),
           ],
         ],
       ),

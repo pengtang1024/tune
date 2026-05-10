@@ -25,9 +25,9 @@ class GroupedNotificationList extends ConsumerWidget {
           children: [
             Icon(Icons.notifications_none, size: 64, color: AppDesignSystem.neutral400),
             SizedBox(height: AppDesignSystem.spacing16),
-            Text('No notifications', style: TextStyle(fontSize: 18, color: AppDesignSystem.neutral400)),
+            Text('暂无通知', style: TextStyle(fontSize: 18, color: AppDesignSystem.neutral400)),
             SizedBox(height: AppDesignSystem.spacing8),
-            Text('When you receive new notifications, they will appear here', style: TextStyle(color: AppDesignSystem.neutral400)),
+            Text('当您收到新通知时，它们会显示在这里', style: TextStyle(color: AppDesignSystem.neutral400)),
           ],
         ),
       );
@@ -114,7 +114,7 @@ class _NotificationListPageWithGroupingState extends ConsumerState<NotificationL
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Text(
-          'Notifications',
+          '通知',
           style: AppDesignSystem.textTheme.titleLarge?.copyWith(fontWeight: AppDesignSystem.fontWeightSemiBold),
         ),
         actions: [
@@ -125,7 +125,7 @@ class _NotificationListPageWithGroupingState extends ConsumerState<NotificationL
                 value: NotificationGroupType.date,
                 child: Row(
                   children: [
-                    const Text('By date'),
+                    const Text('按日期分组'),
                     if (_currentGroupType == NotificationGroupType.date)
                       const SizedBox(width: 8),
                     if (_currentGroupType == NotificationGroupType.date)
@@ -137,7 +137,7 @@ class _NotificationListPageWithGroupingState extends ConsumerState<NotificationL
                 value: NotificationGroupType.type,
                 child: Row(
                   children: [
-                    const Text('By type'),
+                    const Text('按类型分组'),
                     if (_currentGroupType == NotificationGroupType.type)
                       const SizedBox(width: 8),
                     if (_currentGroupType == NotificationGroupType.type)
@@ -147,19 +147,19 @@ class _NotificationListPageWithGroupingState extends ConsumerState<NotificationL
               ),
             ],
             icon: const Icon(Icons.sort),
-            tooltip: 'Group by',
+            tooltip: '分组方式',
           ),
           if (notificationState.notifications.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.clear_all),
               onPressed: () => ref.read(notificationStateNotifierProvider.notifier).clearAll(),
-              tooltip: 'Clear all',
+              tooltip: '清空所有通知',
             ),
           if (notificationState.unreadCount > 0)
             IconButton(
               icon: const Icon(Icons.mark_chat_read),
               onPressed: () => ref.read(notificationStateNotifierProvider.notifier).markAllAsRead(),
-              tooltip: 'Mark all as read',
+              tooltip: '全部标记为已读',
             ),
         ],
       ),

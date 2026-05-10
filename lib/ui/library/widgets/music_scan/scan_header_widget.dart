@@ -10,14 +10,14 @@ class ScanHeaderWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Scan Local Music',
+          '扫描本地音乐',
           style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
           ),
         ),
         const SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          'Scan your local music library, organize files and extract metadata',
+          '扫描本地音乐库，自动整理您的音乐文件并提取元数据',
           style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
             color: AppDesignSystem.neutral500,
           ),

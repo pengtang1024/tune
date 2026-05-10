@@ -11,7 +11,7 @@ class CustomPathsDescriptionWidget extends StatelessWidget {
       children: [
         SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          'Add custom folder paths to scan music files from specific locations',
+          '添加自定义文件夹路径以扫描特定位置的音乐文件',
           style: TextStyle(color: Color(0xFF64748B)),
         ),
         SizedBox(height: AppDesignSystem.spacing16),

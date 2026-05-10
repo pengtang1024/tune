@@ -110,7 +110,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Library',
+                '音乐库',
                 style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
                   fontWeight: AppDesignSystem.fontWeightBold,
                   color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
@@ -188,7 +188,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     switch (state.scanStatus) {
       case ScanStatus.scanning:
         statusColor = AppDesignSystem.primary;
-        statusType = 'Scanning...';
+        statusType = '扫描中';
         statusIcon = Icons.refresh_rounded;
         break;
       case ScanStatus.error:
@@ -251,7 +251,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildEmptyState() {
     return const EmptyState(
       icon: Icons.library_music_outlined,
-      title: 'No music found',
+      title: '暂无音乐',
       subtitle: 'Please scan local music files',
     );
   }

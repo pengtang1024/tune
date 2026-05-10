@@ -15,7 +15,7 @@ class QuickActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Access',
+          '快速访问',
           style: AppDesignSystem.textTheme.titleLarge?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
             color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
@@ -27,8 +27,8 @@ class QuickActions extends StatelessWidget {
             Expanded(
               child: _QuickActionCard(
                 icon: Icons.library_music_rounded,
-                title: 'Library',
-                subtitle: 'Manage local music',
+                title: '音乐库',
+                subtitle: '管理本地音乐',
                 color: AppDesignSystem.primary,
                 onTap: () => context.go('/library'),
               ),
@@ -37,8 +37,8 @@ class QuickActions extends StatelessWidget {
             Expanded(
               child: _QuickActionCard(
                 icon: Icons.play_circle_rounded,
-                title: 'Player',
-                subtitle: 'Now playing',
+                title: '播放器',
+                subtitle: '查看播放内容',
                 color: AppDesignSystem.secondary,
                 onTap: () => context.go('/player'),
               ),

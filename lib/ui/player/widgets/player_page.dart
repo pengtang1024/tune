@@ -200,7 +200,7 @@ class PlayerPage extends ConsumerWidget {
                 const SizedBox(width: AppDesignSystem.spacing12),
                 Expanded(
                   child: Text(
-                    'Playback Error',
+                    '播放错误',
                     style: AppDesignSystem.textTheme.titleMedium?.copyWith(
                       color: AppDesignSystem.error,
                       fontWeight: AppDesignSystem.fontWeightSemiBold,
@@ -232,7 +232,7 @@ class PlayerPage extends ConsumerWidget {
                   ),
                   backgroundColor: AppDesignSystem.error,
                   child: Text(
-                    'Retry',
+                    '重试',
                     style: AppDesignSystem.textTheme.labelLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: AppDesignSystem.fontWeightSemiBold,

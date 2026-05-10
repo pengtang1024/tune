@@ -60,13 +60,13 @@ class CategoryTabs extends StatelessWidget {
   String _label(LibraryCategory c) {
     switch (c) {
       case LibraryCategory.all:
-        return 'All';
+        return '全部';
       case LibraryCategory.artists:
-        return 'Artists';
+        return '艺术家';
       case LibraryCategory.albums:
-        return 'Albums';
+        return '专辑';
       case LibraryCategory.folders:
-        return 'Folders';
+        return '文件夹';
     }
   }
 }

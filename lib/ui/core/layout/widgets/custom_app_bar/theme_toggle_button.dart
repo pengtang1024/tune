@@ -15,9 +15,9 @@ class ThemeToggleButton extends ConsumerWidget {
 
   String _getTooltip(ThemeMode mode) {
     switch (mode) {
-      case ThemeMode.light: return 'Switch to Dark';
-      case ThemeMode.dark: return 'Switch to System';
-      case ThemeMode.system: return 'Switch to Light';
+      case ThemeMode.light: return '切换到深色模式';
+      case ThemeMode.dark: return '切换到跟随系统';
+      case ThemeMode.system: return '切换到浅色模式';
     }
   }
 

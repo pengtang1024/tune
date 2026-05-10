@@ -12,7 +12,7 @@ class CustomPathsHeaderWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Custom Scan Paths',
+          '自定义扫描路径',
           style: AppDesignSystem.textTheme.titleLarge?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
           ),

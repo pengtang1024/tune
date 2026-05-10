@@ -54,7 +54,7 @@ class HeroHeader extends ConsumerWidget {
         ),
         const SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          'Every melody finds its home',
+          '让每一段旋律都找到归属',
           style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
             color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral600,
           ),

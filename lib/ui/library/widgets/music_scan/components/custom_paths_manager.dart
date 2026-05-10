@@ -30,7 +30,7 @@ class CustomPathsManager extends StatelessWidget {
         const SizedBox(height: AppDesignSystem.spacing24),
         if (customScanPaths.isNotEmpty) ...[
           Text(
-            'Custom scan paths:',
+            '自定义扫描路径:',
             style: AppDesignSystem.textTheme.titleMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightBold),
           ),
           const SizedBox(height: AppDesignSystem.spacing16),

@@ -17,7 +17,7 @@ class LibraryStatsPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Library Stats',
+            '音乐库统计',
             style: AppDesignSystem.textTheme.titleMedium?.copyWith(
               fontWeight: AppDesignSystem.fontWeightBold,
             ),
@@ -28,13 +28,13 @@ class LibraryStatsPanel extends StatelessWidget {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                _StatCard(icon: Icons.music_note, title: 'Songs', value: '${stats.totalSongs}'),
+                _StatCard(icon: Icons.music_note, title: '歌曲', value: '${stats.totalSongs}'),
                 const SizedBox(width: AppDesignSystem.spacing12),
-                _StatCard(icon: Icons.person, title: 'Artists', value: '${stats.uniqueArtists}'),
+                _StatCard(icon: Icons.person, title: '艺术家', value: '${stats.uniqueArtists}'),
                 const SizedBox(width: AppDesignSystem.spacing12),
-                _StatCard(icon: Icons.album, title: 'Albums', value: '${stats.uniqueAlbums}'),
+                _StatCard(icon: Icons.album, title: '专辑', value: '${stats.uniqueAlbums}'),
                 const SizedBox(width: AppDesignSystem.spacing12),
-                _StatCard(icon: Icons.category, title: 'Genres', value: '${stats.uniqueGenres}'),
+                _StatCard(icon: Icons.category, title: '流派', value: '${stats.uniqueGenres}'),
                 const SizedBox(width: AppDesignSystem.spacing12),
                 _StatCard(icon: Icons.access_time, title: 'Duration', value: stats.totalDuration),
                 const SizedBox(width: AppDesignSystem.spacing12),

@@ -23,7 +23,7 @@ class ScanControlButtons extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Scan Control',
+            '扫描控制',
             style: AppDesignSystem.textTheme.titleMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightBold),
           ),
           const SizedBox(height: AppDesignSystem.spacing16),

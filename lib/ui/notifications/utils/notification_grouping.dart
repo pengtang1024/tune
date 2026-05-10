@@ -39,16 +39,16 @@ class NotificationGrouping {
 
       if (date.year == now.year && date.month == now.month && date.day == now.day) {
         key = 'today';
-        title = 'Today';
+        title = '今天';
       } else if (date.isAfter(now.subtract(const Duration(days: 1))) && date.isBefore(now)) {
         key = 'yesterday';
-        title = 'Yesterday';
+        title = '昨天';
       } else if (date.isAfter(now.subtract(Duration(days: now.weekday))) && date.isBefore(now.subtract(const Duration(days: 1)))) {
         key = 'this_week';
-        title = 'This Week';
+        title = '本周';
       } else if (date.year == now.year && date.month == now.month) {
         key = 'this_month';
-        title = 'This Month';
+        title = '本月';
       } else {
         key = '${date.year}-${date.month}';
         title = '${date.year}/${date.month}';
@@ -62,7 +62,7 @@ class NotificationGrouping {
         .map((e) => NotificationGroup(title: keyToTitle[e.key] ?? e.key, notifications: e.value))
         .toList()
       ..sort((a, b) {
-        const order = ['Today', 'Yesterday', 'This Week', 'This Month'];
+        const order = ['今天', '昨天', '本周', '本月'];
         final ai = order.indexOf(a.title);
         final bi = order.indexOf(b.title);
         if (ai >= 0 && bi >= 0) return ai.compareTo(bi);
@@ -95,11 +95,11 @@ class NotificationGrouping {
 
   static String _typeName(NotificationType type) {
     switch (type) {
-      case NotificationType.important: return 'Important';
-      case NotificationType.system: return 'System';
-      case NotificationType.message: return 'Message';
-      case NotificationType.update: return 'Update';
-      case NotificationType.normal: return 'Normal';
+      case NotificationType.important: return '重要通知';
+      case NotificationType.system: return '系统通知';
+      case NotificationType.message: return '消息通知';
+      case NotificationType.update: return '更新通知';
+      case NotificationType.normal: return '普通通知';
     }
   }
 }
