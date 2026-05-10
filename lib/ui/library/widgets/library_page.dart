@@ -9,6 +9,7 @@ import 'package:tune/ui/library/widgets/category_tabs.dart';
 import 'package:tune/ui/library/widgets/library/song_grid_widget.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 import 'package:tune/ui/widgets/empty_state.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
 
@@ -41,49 +42,46 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(libraryStateNotifierProvider);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: isDark
-              ? AppDesignSystem.backgroundGradientDark
-              : AppDesignSystem.backgroundGradientLight,
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDesignSystem.spacing16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(state, isDark),
-                const SizedBox(height: AppDesignSystem.spacing24),
-                CategoryTabs(
-                  selectedCategory: _selectedCategory,
-                  onCategoryChanged: (category) {
-                    setState(() => _selectedCategory = category);
-                  },
-                ),
-                const SizedBox(height: AppDesignSystem.spacing16),
-                _buildSearchBar(),
-                const SizedBox(height: AppDesignSystem.spacing16),
-                _buildScanStatusDisplay(state),
-                Expanded(
-                  child: state.songs.isEmpty
-                      ? _buildEmptyState()
-                      : SongGridWidget(
-                          songs: state.songs,
-                          searchQuery: _searchQuery,
-                          localizedNoSongsFound: context.loc.no_songs_found,
-                          style: SongGridStyle.list,
-                          onSongTap: (song) => _playSong(song),
-                          onSongPlay: (song) => _playSong(song),
-                          onSongMore: (song) => _showSongOptions(context, song),
-                        ),
-                ),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: isDark
+            ? AppDesignSystem.backgroundGradientDark
+            : AppDesignSystem.backgroundGradientLight,
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(state, isDark).withSlideIn(),
+              const SizedBox(height: AppDesignSystem.spacing20),
+              CategoryTabs(
+                selectedCategory: _selectedCategory,
+                onCategoryChanged: (category) {
+                  setState(() => _selectedCategory = category);
+                },
+              ),
+              const SizedBox(height: AppDesignSystem.spacing16),
+              _buildSearchBar().withFadeIn(),
+              const SizedBox(height: AppDesignSystem.spacing12),
+              _buildScanStatusDisplay(state),
+              Expanded(
+                child: state.songs.isEmpty
+                    ? _buildEmptyState()
+                    : SongGridWidget(
+                        songs: state.songs,
+                        searchQuery: _searchQuery,
+                        localizedNoSongsFound: context.loc.no_songs_found,
+                        style: SongGridStyle.list,
+                        onSongTap: (song) => _playSong(song),
+                        onSongPlay: (song) => _playSong(song),
+                        onSongMore: (song) => _showSongOptions(context, song),
+                      ),
+              ),
+            ],
           ),
         ),
       ),
@@ -94,10 +92,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+          padding: const EdgeInsets.all(AppDesignSystem.spacing10),
           decoration: BoxDecoration(
             gradient: AppDesignSystem.primaryGradient,
             borderRadius: AppDesignSystem.borderRadius12,
+            boxShadow: [AppDesignSystem.shadowColored.first],
           ),
           child: const Icon(
             Icons.library_music_rounded,
@@ -111,7 +110,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '音乐库',
+                'Library',
                 style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
                   fontWeight: AppDesignSystem.fontWeightBold,
                   color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
@@ -120,9 +119,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               if (state.songs.isNotEmpty) ...[
                 const SizedBox(height: AppDesignSystem.spacing4),
                 Text(
-                  '${state.songs.length} 首歌曲',
+                  '${state.songs.length} tracks',
                   style: AppDesignSystem.textTheme.bodySmall?.copyWith(
                     color: AppDesignSystem.primary,
+                    fontWeight: AppDesignSystem.fontWeightMedium,
                   ),
                 ),
               ],
@@ -134,37 +134,39 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   Widget _buildSearchBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ModernCard(
       padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing16),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: '搜索歌曲...',
+          hintText: 'Search tracks...',
           hintStyle: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppDesignSystem.neutral500
-                : AppDesignSystem.neutral400,
+            color: isDark ? AppDesignSystem.neutral500 : AppDesignSystem.neutral400,
+            fontSize: AppDesignSystem.fontSize14,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppDesignSystem.neutral500
-                : AppDesignSystem.neutral400,
+            color: isDark ? AppDesignSystem.neutral500 : AppDesignSystem.neutral400,
+            size: AppDesignSystem.iconSize20,
           ),
           suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear_rounded),
-                  onPressed: () {
+              ? AppInteractions.pressableScale(
+                  scaleValue: 0.9,
+                  onTap: () {
                     _searchController.clear();
                     setState(() => _searchQuery = '');
                     _performSearch();
                   },
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: isDark ? AppDesignSystem.neutral500 : AppDesignSystem.neutral400,
+                    size: AppDesignSystem.iconSize20,
+                  ),
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: AppDesignSystem.spacing14,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: AppDesignSystem.spacing14),
         ),
         onChanged: (value) {
           setState(() => _searchQuery = value);
@@ -180,29 +182,29 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     }
 
     Color statusColor;
-    IconData statusIcon;
     String statusType;
+    IconData statusIcon;
 
     switch (state.scanStatus) {
       case ScanStatus.scanning:
         statusColor = AppDesignSystem.primary;
+        statusType = 'Scanning...';
         statusIcon = Icons.refresh_rounded;
-        statusType = '扫描中';
         break;
       case ScanStatus.error:
         statusColor = AppDesignSystem.error;
+        statusType = 'Error';
         statusIcon = Icons.error_rounded;
-        statusType = '错误';
         break;
       default:
         return const SizedBox.shrink();
     }
 
     return ModernCard(
-      margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing16),
-      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
-      backgroundColor: statusColor.withValues(alpha: 0.1),
-      borderSide: BorderSide(color: statusColor.withValues(alpha: 0.3)),
+      margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing12),
+      padding: const EdgeInsets.all(AppDesignSystem.spacing12),
+      backgroundColor: statusColor.withValues(alpha: 0.08),
+      borderSide: BorderSide(color: statusColor.withValues(alpha: 0.2)),
       child: Row(
         children: [
           if (state.scanStatus == ScanStatus.scanning) ...[
@@ -214,12 +216,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 valueColor: AlwaysStoppedAnimation<Color>(statusColor),
               ),
             ),
-          ] else if (state.scanStatus == ScanStatus.error) ...[
-            Icon(
-              statusIcon,
-              color: statusColor,
-              size: AppDesignSystem.iconSize20,
-            ),
+          ] else ...[
+            Icon(statusIcon, color: statusColor, size: AppDesignSystem.iconSize20),
           ],
           const SizedBox(width: AppDesignSystem.spacing12),
           Expanded(
@@ -233,7 +231,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     color: statusColor,
                   ),
                 ),
-                const SizedBox(height: AppDesignSystem.spacing4),
+                const SizedBox(height: 2),
                 Text(
                   state.statusMessage,
                   style: AppDesignSystem.textTheme.bodySmall?.copyWith(
@@ -253,8 +251,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildEmptyState() {
     return const EmptyState(
       icon: Icons.library_music_outlined,
-      title: '暂无音乐',
-      subtitle: '开始扫描本地音乐文件',
+      title: 'No music found',
+      subtitle: 'Please scan local music files',
     );
   }
 
@@ -270,15 +268,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   void _showSongOptions(BuildContext context, Song song) {
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => SafeArea(
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.all(AppDesignSystem.spacing16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
                 leading: const Icon(Icons.play_arrow_rounded),
-                title: const Text('播放'),
+                title: const Text('Play'),
                 onTap: () {
                   Navigator.pop(context);
                   _playSong(song);
@@ -286,12 +287,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.playlist_add_rounded),
-                title: const Text('添加到播放列表'),
+                title: const Text('Add to playlist'),
                 onTap: () => Navigator.pop(context),
               ),
               ListTile(
                 leading: const Icon(Icons.share_rounded),
-                title: const Text('分享'),
+                title: const Text('Share'),
                 onTap: () => Navigator.pop(context),
               ),
             ],
