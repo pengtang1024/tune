@@ -36,11 +36,36 @@ class PlayerContent extends ConsumerWidget {
   }
 }
 
-class _AlbumArt extends ConsumerWidget {
+class _AlbumArt extends ConsumerStatefulWidget {
   const _AlbumArt();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AlbumArt> createState() => _AlbumArtState();
+}
+
+class _AlbumArtState extends ConsumerState<_AlbumArt>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final playerState = ref.watch(playerStateNotifierProvider);
     final size = MediaQuery.of(context).size;
     final isCompact = size.width < AppDesignSystem.breakpointMobile;
@@ -61,12 +86,23 @@ class _AlbumArt extends ConsumerWidget {
       child: ClipRRect(
         borderRadius: AppDesignSystem.borderRadius24,
         child: artPath != null && artPath.isNotEmpty
-            ? Image.file(
-                File(artPath),
-                width: artSize,
-                height: artSize,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _defaultArt(),
+            ? FadeTransition(
+                opacity: _fadeAnimation,
+                child: Image.file(
+                  File(artPath),
+                  width: artSize,
+                  height: artSize,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _defaultArt(),
+                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded) return child;
+                    if (frame == null) {
+                      return _defaultArt();
+                    }
+                    _fadeController.forward();
+                    return child;
+                  },
+                ),
               )
             : _defaultArt(),
       ),

@@ -5,6 +5,7 @@ import 'package:tune/ui/core/layout/widgets/mobile_layout.dart';
 import 'package:tune/ui/core/layout/widgets/tablet_layout.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/keyboard_shortcut_handler.dart';
 
 enum ResponsiveLayoutType { mobile, tablet, desktop }
 
@@ -43,10 +44,12 @@ class ResponsiveShell extends ConsumerWidget {
     final playerState = ref.watch(playerStateNotifierProvider);
     final showMini = playerState.currentSong != null;
 
-    return _ResponsiveScaffold(
+    return KeyboardShortcutHandler(
+      child: _ResponsiveScaffold(
       layoutType: layoutType,
       mainContent: child,
       showMiniPlayer: showMini,
+    ),
     );
   }
 }
