@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/providers/app_bar_providers.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// AppBar 标题组件
-/// 负责显示当前页面标题
 class AppBarTitle extends ConsumerWidget {
   const AppBarTitle({super.key});
 
@@ -13,9 +12,8 @@ class AppBarTitle extends ConsumerWidget {
 
     return Text(
       appBarState.title,
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+      style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+        fontWeight: AppDesignSystem.fontWeightBold,
       ),
     );
   }

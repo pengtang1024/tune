@@ -6,12 +6,9 @@ import 'package:tune/ui/core/layout/widgets/custom_app_bar/back_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/clear_data_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/github_button.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/notification_button.dart';
-// 移除了播放按钮的导入
 import 'package:tune/ui/core/layout/widgets/custom_app_bar/user_menu_button.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 自定义AppBar组件
-/// 实现全局唯一的标题栏，所有页面共享同一实例
-/// 该组件只负责串联各个子组件，不包含具体业务逻辑
 class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 
@@ -20,37 +17,16 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final appBarState = ref.watch(appBarStateNotifierProvider);
 
     return AppBar(
-      // 标题
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
       title: const AppBarTitle(),
-
-      // 返回按钮（仅在二级页面显示）
       leading: appBarState.showBackButton ? const BackButtonWidget() : null,
-
-      // 操作按钮
       actions: [
-        // 动态按钮（最右侧，从右到左排列）
         ...appBarState.dynamicActions,
-
-        // 搜索按钮
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            // TODO: 导航到搜索页面
-          },
-        ),
-
-        // 通知按钮
+        IconButton(icon: const Icon(Icons.search, size: AppDesignSystem.iconSize24), onPressed: () {}),
         const NotificationButton(),
-
-        // 清理数据按钮（动态按钮左侧）
         const ClearDataButton(),
-
-        // GitHub按钮（清理数据按钮左侧）
         const GitHubButton(),
-
-        // 移除了播放按钮
-
-        // "我的"按钮（最左侧，但显示在最右边）
         const UserMenuButton(),
       ],
     );
