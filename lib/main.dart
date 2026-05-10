@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_initializer.dart';
 import 'package:tune/config/app_theme.dart';
@@ -11,6 +12,12 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
   runApp(
     ProviderScope(
       child: const TuneApp(),
@@ -33,8 +40,20 @@ class TuneApp extends ConsumerWidget {
         Log.info("当前主题模式: ${appBarState.themeMode}");
 
         final router = ref.watch(routerProvider);
+        final isDark = appBarState.themeMode == ThemeMode.dark ||
+            (appBarState.themeMode == ThemeMode.system &&
+                MediaQuery.of(context).platformBrightness == Brightness.dark);
 
-        return MaterialApp.router(
+        final overlayStyle = SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        );
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: MaterialApp.router(
           title: 'Tune',
           themeMode: appBarState.themeMode,
           theme: AppTheme.light,
@@ -44,6 +63,7 @@ class TuneApp extends ConsumerWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
           debugShowCheckedModeBanner: false,
+        ),
         );
       },
       loading: () => const MaterialApp(
