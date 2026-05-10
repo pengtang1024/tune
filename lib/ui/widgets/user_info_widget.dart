@@ -1,44 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 用户信息组件
 class UserInfoWidget extends StatelessWidget {
   const UserInfoWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 20,
-            child: Icon(Icons.person, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '用户名',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: isDark ? AppDesignSystem.neutral700 : AppDesignSystem.neutral200,
+          child: Icon(Icons.person, size: AppDesignSystem.iconSize20, color: AppDesignSystem.neutral400),
+        ),
+        const SizedBox(width: AppDesignSystem.spacing10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'User',
+                style: AppDesignSystem.textTheme.labelMedium?.copyWith(
+                  fontWeight: AppDesignSystem.fontWeightSemiBold,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'user@example.com',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+              ),
+              Text(
+                'user@example.com',
+                style: AppDesignSystem.textTheme.labelSmall?.copyWith(
+                  color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

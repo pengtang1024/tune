@@ -5,6 +5,7 @@ import 'package:tune/ui/core/settings/widgets/tabs/about_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/general_tab.dart';
 import 'package:tune/ui/core/settings/widgets/tabs/music_library_tab.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -17,11 +18,7 @@ class SettingsPage extends ConsumerWidget {
 
 class SettingsTabView extends ConsumerStatefulWidget {
   final int initialTabIndex;
-
-  const SettingsTabView({
-    super.key,
-    this.initialTabIndex = 0,
-  });
+  const SettingsTabView({super.key, this.initialTabIndex = 0});
 
   @override
   ConsumerState<SettingsTabView> createState() => _SettingsTabViewState();
@@ -49,8 +46,7 @@ class _SettingsTabViewState extends ConsumerState<SettingsTabView>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
@@ -64,9 +60,9 @@ class _SettingsTabViewState extends ConsumerState<SettingsTabView>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader().withSlideIn(),
               const SizedBox(height: AppDesignSystem.spacing24),
-              _buildTabBar(),
+              _buildTabBar().withFadeIn(delay: const Duration(milliseconds: 100)),
               const SizedBox(height: AppDesignSystem.spacing16),
               Expanded(
                 child: TabBarView(
@@ -89,20 +85,16 @@ class _SettingsTabViewState extends ConsumerState<SettingsTabView>
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+          padding: const EdgeInsets.all(AppDesignSystem.spacing10),
           decoration: BoxDecoration(
             gradient: AppDesignSystem.primaryGradient,
             borderRadius: AppDesignSystem.borderRadius12,
           ),
-          child: const Icon(
-            Icons.settings_rounded,
-            color: Colors.white,
-            size: AppDesignSystem.iconSize24,
-          ),
+          child: const Icon(Icons.settings_rounded, color: Colors.white, size: AppDesignSystem.iconSize24),
         ),
         const SizedBox(width: AppDesignSystem.spacing12),
         Text(
-          '设置',
+          'Settings',
           style: AppDesignSystem.textTheme.headlineSmall?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
           ),
