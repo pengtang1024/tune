@@ -52,6 +52,7 @@ dependencies:
 
   # Audio playback
   just_audio: ^0.10.4
+  audio_session: ^0.2.3
 
   # State management
   riverpod: ^2.6.1
