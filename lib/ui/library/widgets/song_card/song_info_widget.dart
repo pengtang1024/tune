@@ -1,85 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
 class SongInfoWidget extends StatelessWidget {
   final Song song;
-  final int? index; // 添加序号参数
+  final int? index;
 
   const SongInfoWidget({super.key, required this.song, this.index});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // 歌曲标题和时长 (在同一行)
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 显示序号（如果提供）
-            if (index != null)
+            if (index != null) ...[
               Text(
-                '${index! + 1}.', // 序号从1开始
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Colors.grey,
+                '${index! + 1}.',
+                style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                  color: AppDesignSystem.neutral400,
                 ),
               ),
-            if (index != null)
-              const SizedBox(width: 6),
+              const SizedBox(width: AppDesignSystem.spacing6),
+            ],
             Expanded(
               child: Text(
                 song.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14, // 减小字体大小
+                style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
+                  fontWeight: AppDesignSystem.fontWeightSemiBold,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.left,
               ),
             ),
-            const SizedBox(width: 6),
-            // 时长
+            const SizedBox(width: AppDesignSystem.spacing6),
             Text(
               _formatDuration(song.duration),
-              style: const TextStyle(
-                fontSize: 12, // 减小字体大小
-                color: Colors.grey,
+              style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral500,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 2), // 减小间距
-        // 艺术家和专辑 (在同一行)
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
-                '${song.artist} · ${song.album}',
-                style: const TextStyle(
-                  fontSize: 11, // 减小字体大小
-                  color: Colors.grey,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ],
+        const SizedBox(height: 2),
+        Text(
+          '${song.artist} · ${song.album}',
+          style: AppDesignSystem.textTheme.labelSmall?.copyWith(
+            color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral500,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
   }
 
-  /// 格式化歌曲时长
   String _formatDuration(int milliseconds) {
-    final duration = Duration(milliseconds: milliseconds);
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds.remainder(60);
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+    final d = Duration(milliseconds: milliseconds);
+    return '${d.inMinutes}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}';
   }
 }

@@ -1,22 +1,39 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
 class AlbumCoverWidget extends StatelessWidget {
-  const AlbumCoverWidget({super.key});
+  final String? albumArtPath;
+  final double size;
+
+  const AlbumCoverWidget({super.key, this.albumArtPath, this.size = 64});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 64,   // 调整封面宽度
-      height: 64,  // 调整封面高度
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(8),
+        gradient: AppDesignSystem.primaryGradient,
+        borderRadius: AppDesignSystem.borderRadius8,
       ),
-      child: Icon(
-        Icons.music_note,
-        size: 32,  // 调整图标尺寸
-        color: Colors.grey[600],
-      ),
+      child: albumArtPath != null && albumArtPath!.isNotEmpty
+          ? ClipRRect(
+              borderRadius: AppDesignSystem.borderRadius8,
+              child: Image.file(
+                File(albumArtPath!),
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _defaultIcon(),
+              ),
+            )
+          : _defaultIcon(),
     );
+  }
+
+  Widget _defaultIcon() {
+    return const Icon(Icons.music_note_rounded, size: 32, color: Colors.white);
   }
 }
