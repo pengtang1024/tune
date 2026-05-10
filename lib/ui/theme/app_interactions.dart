@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/theme/app_animations.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 统一的交互效果系统
-/// 提供应用中所有交互效果的定义和工具方法
 class AppInteractions {
   AppInteractions._();
 
-  // ========== 手势检测 ==========
-  
-  /// 创建可点击的卡片效果
   static Widget clickableCard({
     required Widget child,
     VoidCallback? onTap,
     BorderRadius? borderRadius,
     Color? splashColor,
-    bool enableScale = true,
-    double scaleValue = 0.98,
   }) {
-    return AppAnimations.rippleEffect(
-      onTap: onTap,
-      borderRadius: borderRadius,
-      rippleColor: splashColor,
-      child: child,
+    return Material(
+      color: Colors.transparent,
+      borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
+        splashColor: splashColor ?? AppDesignSystem.primary.withValues(alpha: 0.12),
+        highlightColor: (splashColor ?? AppDesignSystem.primary).withValues(alpha: 0.06),
+        child: child,
+      ),
     );
   }
 
-  /// 创建可点击的图标按钮
   static Widget clickableIcon({
     required IconData icon,
     VoidCallback? onTap,
@@ -42,43 +39,29 @@ class AppInteractions {
         color: backgroundColor,
         borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
       ),
-      child: Icon(
-        icon,
-        size: size ?? AppDesignSystem.iconSize24,
-        color: color,
-      ),
-    ).wrapWithInteraction(
-      onTap: onTap,
-      borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
-    );
+      child: Icon(icon, size: size ?? AppDesignSystem.iconSize24, color: color),
+    ).wrapWithInteraction(onTap: onTap);
   }
 
-  // ========== 加载效果 ==========
-  
-  /// 创建骨架屏效果
   static Widget skeleton({
     double? width,
     double? height,
     BorderRadius? borderRadius,
-    Color? baseColor,
-    Color? highlightColor,
   }) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: baseColor ?? AppDesignSystem.neutral300,
+        color: AppDesignSystem.neutral300,
         borderRadius: borderRadius ?? AppDesignSystem.borderRadius4,
       ),
     );
   }
 
-  /// 创建骨架屏文本效果
   static Widget skeletonText({
     double? width,
     double? lineHeight,
     int lines = 1,
-    EdgeInsetsGeometry? padding,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,59 +69,144 @@ class AppInteractions {
       children: List.generate(
         lines,
         (index) => Padding(
-          padding: index == 0 ? EdgeInsets.zero : const EdgeInsets.only(top: 4.0),
+          padding: index == 0 ? EdgeInsets.zero : const EdgeInsets.only(top: 4),
           child: skeleton(
             width: width,
-            height: lineHeight ?? 16.0,
+            height: lineHeight ?? 16,
             borderRadius: AppDesignSystem.borderRadius4,
           ),
         ),
       ),
     );
   }
+
+  static Widget pressableScale({
+    required Widget child,
+    VoidCallback? onTap,
+    double scaleValue = 0.97,
+  }) {
+    return _PressableScale(
+      scaleValue: scaleValue,
+      onTap: onTap,
+      child: child,
+    );
+  }
 }
 
-/// 扩展方法
+class _PressableScale extends StatefulWidget {
+  final Widget child;
+  final double scaleValue;
+  final VoidCallback? onTap;
+
+  const _PressableScale({
+    required this.child,
+    required this.scaleValue,
+    this.onTap,
+  });
+
+  @override
+  State<_PressableScale> createState() => _PressableScaleState();
+}
+
+class _PressableScaleState extends State<_PressableScale>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween(begin: 1.0, end: widget.scaleValue).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onTap?.call();
+  }
+
+  void _onTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 extension WidgetExtensions on Widget {
-  /// 包装交互效果
-  Widget wrapWithInteraction({
-    VoidCallback? onTap,
-    BorderRadius? borderRadius,
-    Color? splashColor,
-    bool enableScale = true,
-  }) {
+  Widget wrapWithInteraction({VoidCallback? onTap, BorderRadius? borderRadius}) {
     return AppInteractions.clickableCard(
       child: this,
       onTap: onTap,
       borderRadius: borderRadius,
-      splashColor: splashColor,
-      enableScale: enableScale,
     );
   }
 
-  /// 添加淡入动画
-  Widget withFadeIn({
-    Duration? duration,
-    Duration? delay,
-  }) {
-    return AppAnimations.fadeIn(
+  Widget withFadeIn({Duration? duration, Duration? delay}) {
+    return AnimatedOpacity(
+      opacity: 1.0,
+      duration: duration ?? AppDesignSystem.duration400,
       child: this,
-      duration: duration,
-      delay: delay,
     );
   }
 
-  /// 添加滑入动画
   Widget withSlideIn({
     Offset begin = const Offset(0.0, 0.3),
     Duration? duration,
     Duration? delay,
   }) {
-    return AppAnimations.slideIn(
+    return AnimatedSlideTransition(
       child: this,
       begin: begin,
-      duration: duration,
+      duration: duration ?? AppDesignSystem.duration300,
       delay: delay,
+    );
+  }
+
+  Widget withScaleIn({Duration? duration, Duration? delay}) {
+    return ScaleFadeTransition(
+      child: this,
+      duration: duration ?? AppDesignSystem.duration400,
+      delay: delay,
+    );
+  }
+
+  Widget withPressableScale({VoidCallback? onTap, double scaleValue = 0.97}) {
+    return AppInteractions.pressableScale(
+      onTap: onTap,
+      scaleValue: scaleValue,
+      child: this,
     );
   }
 }

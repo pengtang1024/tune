@@ -1,9 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
-/// 现代化卡片组件
-/// 提供一致的卡片样式和交互效果
 class ModernCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -21,6 +20,8 @@ class ModernCard extends StatelessWidget {
   final bool isBordered;
   final bool isGradient;
   final Gradient? gradient;
+  final bool isGlass;
+  final double glassBlur;
 
   const ModernCard({
     super.key,
@@ -40,9 +41,10 @@ class ModernCard extends StatelessWidget {
     this.isBordered = false,
     this.isGradient = false,
     this.gradient,
+    this.isGlass = false,
+    this.glassBlur = 10.0,
   });
 
-  /// 创建一个简单的卡片
   factory ModernCard.simple({
     Key? key,
     EdgeInsetsGeometry? padding,
@@ -53,11 +55,11 @@ class ModernCard extends StatelessWidget {
       key: key,
       padding: padding,
       onTap: onTap,
+      isElevated: false,
       child: child,
     );
   }
 
-  /// 创建一个突出的卡片
   factory ModernCard.elevated({
     Key? key,
     EdgeInsetsGeometry? padding,
@@ -73,7 +75,6 @@ class ModernCard extends StatelessWidget {
     );
   }
 
-  /// 创建一个带边框的卡片
   factory ModernCard.bordered({
     Key? key,
     EdgeInsetsGeometry? padding,
@@ -91,7 +92,6 @@ class ModernCard extends StatelessWidget {
     );
   }
 
-  /// 创建一个渐变卡片
   factory ModernCard.gradient({
     Key? key,
     EdgeInsetsGeometry? padding,
@@ -109,104 +109,96 @@ class ModernCard extends StatelessWidget {
     );
   }
 
+  factory ModernCard.glass({
+    Key? key,
+    EdgeInsetsGeometry? padding,
+    VoidCallback? onTap,
+    double blurAmount = 10.0,
+    required Widget child,
+  }) {
+    return ModernCard(
+      key: key,
+      padding: padding,
+      onTap: onTap,
+      isGlass: true,
+      glassBlur: blurAmount,
+      isElevated: false,
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isGlass) return _buildGlassCard(context);
+
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    Color cardSurfaceColor = surfaceColor ?? 
+    final cardSurfaceColor = surfaceColor ??
         (isDark ? AppDesignSystem.neutral800 : Colors.white);
 
-    List<BoxShadow> cardBoxShadow = boxShadow ?? 
+    final cardBoxShadow = boxShadow ??
         (isElevated ? AppDesignSystem.shadowMedium : []);
 
-    BorderRadius cardBorderRadius = borderRadius ?? AppDesignSystem.borderRadius12;
+    final cardBorderRadius = borderRadius ?? AppDesignSystem.borderRadius12;
 
     Widget cardChild = child;
-
-    // 添加内边距
     if (padding != null) {
       cardChild = Padding(padding: padding!, child: cardChild);
     }
 
-    // 创建卡片内容
     Widget cardContent = Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         color: backgroundColor ?? (isGradient ? null : cardSurfaceColor),
-        gradient: isGradient ? (gradient ?? AppDesignSystem.primaryGradient) : null,
+        gradient: isGradient
+            ? (gradient ?? AppDesignSystem.primaryGradient)
+            : null,
         borderRadius: cardBorderRadius,
         boxShadow: cardBoxShadow,
         border: isBordered || borderSide != null
-            ? (borderSide != null 
-                ? Border.fromBorderSide(borderSide!) 
+            ? (borderSide != null
+                ? Border.fromBorderSide(borderSide!)
                 : Border.all(
-                    color: isDark ? AppDesignSystem.neutral700 : AppDesignSystem.neutral200,
+                    color: isDark
+                        ? AppDesignSystem.neutral700
+                        : AppDesignSystem.neutral200,
                     width: 1,
-                  )
-              )
+                  ))
             : null,
       ),
       child: cardChild,
     );
 
-    // 如果有点击事件，包装为 InkWell
-    if (onTap != null || onLongPress != null) {
+    if (onTap != null && onLongPress == null) {
       return Container(
         margin: margin,
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: cardBorderRadius,
-          child: InkWell(
-            onTap: onTap,
-            onLongPress: onLongPress,
-            borderRadius: cardBorderRadius,
-            splashColor: AppDesignSystem.primary.withValues(alpha: 0.1),
-            highlightColor: AppDesignSystem.primary.withValues(alpha: 0.05),
-            child: cardContent,
-          ),
+        child: AppInteractions.pressableScale(
+          scaleValue: 0.98,
+          onTap: onTap,
+          child: cardContent,
         ),
       );
     }
 
-    // 否则只添加外边距
-    return Container(
-      margin: margin,
-      child: cardContent,
-    );
+    if (onTap != null || onLongPress != null) {
+      return Container(
+        margin: margin,
+        child: AppInteractions.clickableCard(
+          onTap: onTap,
+          borderRadius: cardBorderRadius,
+          child: cardContent,
+        ),
+      );
+    }
+
+    return Container(margin: margin, child: cardContent);
   }
-}
 
-/// 玻璃态卡片组件
-class GlassCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
-  final double? width;
-  final double? height;
-  final double blurAmount;
-  final double opacity;
-  final BorderRadius? borderRadius;
-  final VoidCallback? onTap;
-
-  const GlassCard({
-    super.key,
-    required this.child,
-    this.padding,
-    this.margin,
-    this.width,
-    this.height,
-    this.blurAmount = 10.0,
-    this.opacity = 0.1,
-    this.borderRadius,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+  Widget _buildGlassCard(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBorderRadius = borderRadius ?? AppDesignSystem.borderRadius16;
 
     Widget cardChild = child;
     if (padding != null) {
@@ -214,42 +206,44 @@ class GlassCard extends StatelessWidget {
     }
 
     Widget cardContent = ClipRRect(
-      borderRadius: borderRadius ?? AppDesignSystem.borderRadius16,
+      borderRadius: cardBorderRadius,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isDark 
-              ? Colors.white.withValues(alpha: opacity)
-              : Colors.black.withValues(alpha: opacity),
+          borderRadius: cardBorderRadius,
           border: Border.all(
-            color: isDark 
-                ? Colors.white.withValues(alpha: 0.2)
-                : Colors.white.withValues(alpha: 0.3),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.white.withValues(alpha: 0.6),
             width: 1,
           ),
         ),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-          child: cardChild,
+          filter: ImageFilter.blur(sigmaX: glassBlur, sigmaY: glassBlur),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.03),
+            ),
+            child: cardChild,
+          ),
         ),
       ),
     );
 
     if (onTap != null) {
-      cardContent = Material(
-        color: Colors.transparent,
-        child: InkWell(
+      return Container(
+        margin: margin,
+        child: AppInteractions.pressableScale(
+          scaleValue: 0.98,
           onTap: onTap,
-          borderRadius: borderRadius ?? AppDesignSystem.borderRadius16,
           child: cardContent,
         ),
       );
     }
 
-    return Container(
-      margin: margin,
-      child: cardContent,
-    );
+    return Container(margin: margin, child: cardContent);
   }
 }
