@@ -13,6 +13,7 @@ import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
 import 'package:tune/ui/widgets/empty_state.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
+import 'package:tune/ui/widgets/skeleton_loader.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -70,7 +71,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               const SizedBox(height: AppDesignSystem.spacing12),
               _buildScanStatusDisplay(state),
               Expanded(
-                child: state.songs.isEmpty
+                child: state.isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+                        child: SkeletonLoader.songList(),
+                      )
+                    : state.songs.isEmpty
                     ? _buildEmptyState()
                     : RefreshIndicator(
                         onRefresh: () async {
