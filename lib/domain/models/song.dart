@@ -3,95 +3,150 @@ class Song {
   final String title;
   final String artist;
   final String album;
-  final int duration; // 以毫秒为单位
+  final int duration;
   final String uri;
   final int dateAdded;
   final String? genre;
   final int? year;
-  final int? bitrate; // 比特率 (kbps)
-  final int? sampleRate; // 采样率 (Hz)
-  final int? trackNumber; // 音轨号
-  final int? trackTotal; // 总音轨数
-  final int? discNumber; // 光盘号
-  final int? totalDisc; // 总光盘数
-  final String? lyrics; // 歌词
-  final List<String>? genres; // 流派列表
-  final List<String>? performers; // 表演者列表
-  final String? language; // 语言
-  final int? size; // 文件大小（字节）
-  final String? type; // 文件类型
-  final bool isFavorite; // 是否收藏
-  final String? albumArtPath; // 专辑封面路径
+  final int? bitrate;
+  final int? sampleRate;
+  final int? trackNumber;
+  final int? trackTotal;
+  final int? discNumber;
+  final int? totalDisc;
+  final String? lyrics;
+  final List<String>? genres;
+  final List<String>? performers;
+  final String? language;
+  final int? size;
+  final String? type;
+  final bool isFavorite;
+  final String? albumArtPath;
 
-  Song(Map<String, dynamic> data)
-    : id = data['id'] ?? 0,
-      title = data['title'] ?? '',
-      artist = data['artist'] ?? '',
-      album = data['album'] ?? '',
-      duration = data['duration'] ?? 0,
-      uri = data['uri'] ?? '',
-      dateAdded = data['dateAdded'] ?? 0,
-      genre = data['genre'],
-      year = data['year'],
-      bitrate = data['bitrate'],
-      sampleRate = data['sampleRate'],
-      trackNumber = data['trackNumber'],
-      trackTotal = data['trackTotal'],
-      discNumber = data['discNumber'],
-      totalDisc = data['totalDisc'],
-      lyrics = data['lyrics'],
-      genres = data['genres'] is List
-          ? List<String>.from(data['genres'])
-          : null,
-      performers = data['performers'] is List
-          ? List<String>.from(data['performers'])
-          : null,
-      language = data['language'],
-      size = data['size'],
-      type = data['type'],
-      isFavorite = data['isFavorite'] ?? false,
-      albumArtPath = data['albumArtPath'];
+  const Song({
+    required this.id,
+    this.title = '',
+    this.artist = '',
+    this.album = '',
+    this.duration = 0,
+    this.uri = '',
+    this.dateAdded = 0,
+    this.genre,
+    this.year,
+    this.bitrate,
+    this.sampleRate,
+    this.trackNumber,
+    this.trackTotal,
+    this.discNumber,
+    this.totalDisc,
+    this.lyrics,
+    this.genres,
+    this.performers,
+    this.language,
+    this.size,
+    this.type,
+    this.isFavorite = false,
+    this.albumArtPath,
+  });
 
-  // Getters for compatibility with existing code
+  factory Song.fromMap(Map<String, dynamic> data) {
+    return Song(
+      id: data['id'] ?? 0,
+      title: data['title'] ?? '',
+      artist: data['artist'] ?? '',
+      album: data['album'] ?? '',
+      duration: data['duration'] ?? 0,
+      uri: data['uri'] ?? '',
+      dateAdded: data['dateAdded'] ?? 0,
+      genre: data['genre'],
+      year: data['year'],
+      bitrate: data['bitrate'],
+      sampleRate: data['sampleRate'],
+      trackNumber: data['trackNumber'],
+      trackTotal: data['trackTotal'],
+      discNumber: data['discNumber'],
+      totalDisc: data['totalDisc'],
+      lyrics: data['lyrics'],
+      genres: data['genres'] is List ? List<String>.from(data['genres']) : null,
+      performers: data['performers'] is List ? List<String>.from(data['performers']) : null,
+      language: data['language'],
+      size: data['size'],
+      type: data['type'],
+      isFavorite: data['isFavorite'] ?? false,
+      albumArtPath: data['albumArtPath'],
+    );
+  }
+
+  Song copyWith({
+    int? id,
+    String? title,
+    String? artist,
+    String? album,
+    int? duration,
+    String? uri,
+    int? dateAdded,
+    String? genre,
+    int? year,
+    int? bitrate,
+    int? sampleRate,
+    int? trackNumber,
+    int? trackTotal,
+    int? discNumber,
+    int? totalDisc,
+    String? lyrics,
+    List<String>? genres,
+    List<String>? performers,
+    String? language,
+    int? size,
+    String? type,
+    bool? isFavorite,
+    String? albumArtPath,
+  }) {
+    return Song(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      artist: artist ?? this.artist,
+      album: album ?? this.album,
+      duration: duration ?? this.duration,
+      uri: uri ?? this.uri,
+      dateAdded: dateAdded ?? this.dateAdded,
+      genre: genre ?? this.genre,
+      year: year ?? this.year,
+      bitrate: bitrate ?? this.bitrate,
+      sampleRate: sampleRate ?? this.sampleRate,
+      trackNumber: trackNumber ?? this.trackNumber,
+      trackTotal: trackTotal ?? this.trackTotal,
+      discNumber: discNumber ?? this.discNumber,
+      totalDisc: totalDisc ?? this.totalDisc,
+      lyrics: lyrics ?? this.lyrics,
+      genres: genres ?? this.genres,
+      performers: performers ?? this.performers,
+      language: language ?? this.language,
+      size: size ?? this.size,
+      type: type ?? this.type,
+      isFavorite: isFavorite ?? this.isFavorite,
+      albumArtPath: albumArtPath ?? this.albumArtPath,
+    );
+  }
+
   String get displayName => title;
   int get durationInMillis => duration;
   String get data => uri;
 
-  /// 转换为 JSON 对象
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'artist': artist,
-      'album': album,
-      'duration': duration,
-      'uri': uri,
-      'dateAdded': dateAdded,
-      'genre': genre,
-      'year': year,
-      'bitrate': bitrate,
-      'sampleRate': sampleRate,
-      'trackNumber': trackNumber,
-      'trackTotal': trackTotal,
-      'discNumber': discNumber,
-      'totalDisc': totalDisc,
-      'lyrics': lyrics,
-      'genres': genres,
-      'performers': performers,
-      'language': language,
-      'size': size,
-      'type': type,
-      'isFavorite': isFavorite,
-      'albumArtPath': albumArtPath,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id, 'title': title, 'artist': artist, 'album': album,
+    'duration': duration, 'uri': uri, 'dateAdded': dateAdded,
+    'genre': genre, 'year': year, 'bitrate': bitrate,
+    'sampleRate': sampleRate, 'trackNumber': trackNumber,
+    'trackTotal': trackTotal, 'discNumber': discNumber,
+    'totalDisc': totalDisc, 'lyrics': lyrics, 'genres': genres,
+    'performers': performers, 'language': language, 'size': size,
+    'type': type, 'isFavorite': isFavorite, 'albumArtPath': albumArtPath,
+  };
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    return other is Song && other.id == id;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is Song && other.id == id);
 
   @override
   int get hashCode => id.hashCode;

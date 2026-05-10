@@ -159,7 +159,7 @@ class LibraryStateNotifier extends StateNotifier<LibraryState> {
         final jsonString = await file.readAsString();
         final List<dynamic> songsData = jsonDecode(jsonString);
         return songsData
-            .map((data) => Song(data as Map<String, dynamic>))
+            .map((data) => Song.fromMap(data as Map<String, dynamic>))
             .toList();
       }
     } catch (e) {

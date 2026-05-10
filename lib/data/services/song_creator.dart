@@ -42,7 +42,7 @@ class SongCreator {
         'isFavorite': false,
       };
 
-      return Song(songData);
+      return Song.fromMap(songData);
     } catch (e) {
       Log.info(
         'SongCreator: Failed to read metadata for $filePath: $e',
@@ -51,7 +51,6 @@ class SongCreator {
     }
   }
   
-  /// 创建基本的歌曲对象（当无法读取元数据时使用）
   static Future<Song> createBasicSong(File file, String fileName, String filePath) async {
     final songData = <String, dynamic>{
       'id': filePath.hashCode,
@@ -59,7 +58,6 @@ class SongCreator {
       'artist': 'Unknown Artist',
       'album': 'Unknown Album',
       'duration': 0,
-      'data': filePath,
       'uri': filePath,
       'dateAdded': DateTime.now().millisecondsSinceEpoch,
       'year': 0,
@@ -68,6 +66,6 @@ class SongCreator {
       'isFavorite': false,
     };
 
-    return Song(songData);
+    return Song.fromMap(songData);
   }
 }

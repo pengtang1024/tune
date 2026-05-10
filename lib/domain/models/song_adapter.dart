@@ -12,7 +12,7 @@ class SongAdapter extends TypeAdapter<Song> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()
     };
 
-    return Song({
+    return Song.fromMap({
       'id': fields[0] as int? ?? 0,
       'title': fields[1] as String? ?? '',
       'artist': fields[2] as String? ?? '',
