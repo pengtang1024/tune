@@ -1,46 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// Logo区域组件
-/// 仅负责显示应用Logo和名称
 class LogoSectionWidget extends StatelessWidget {
   final bool isExpanded;
 
-  const LogoSectionWidget({
-    super.key,
-    required this.isExpanded,
-  });
+  const LogoSectionWidget({super.key, required this.isExpanded});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        height: 100,
-        padding: const EdgeInsets.all(16),
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing16),
+      child: AnimatedSwitcher(
+        duration: AppDesignSystem.duration300,
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
         child: isExpanded
             ? Row(
+                key: const ValueKey('expanded'),
                 children: [
-                  Icon(
-                    Icons.music_note,
-                    size: 48, // 增大图标尺寸
-                    color: Theme.of(context).primaryColor,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: AppDesignSystem.primaryGradient,
+                      borderRadius: AppDesignSystem.borderRadius12,
+                    ),
+                    child: const Icon(Icons.music_note_rounded, color: Colors.white, size: AppDesignSystem.iconSize24),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
+                  const SizedBox(width: AppDesignSystem.spacing12),
+                  Text(
                     'Tune',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                    style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+                      fontWeight: AppDesignSystem.fontWeightBold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],
               )
             : Center(
-                // 收起状态下Logo居中显示
-                child: Icon(
-                  Icons.music_note,
-                  size: 48, // 增大图标尺寸
-                  color: Theme.of(context).primaryColor,
+                key: const ValueKey('collapsed'),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: AppDesignSystem.primaryGradient,
+                    borderRadius: AppDesignSystem.borderRadius12,
+                  ),
+                  child: const Icon(Icons.music_note_rounded, color: Colors.white, size: AppDesignSystem.iconSize24),
                 ),
               ),
       ),
