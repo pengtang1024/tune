@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+
 import 'package:tune/ui/widgets/modern_card.dart';
 
 class QuickActions extends StatelessWidget {
@@ -8,14 +9,13 @@ class QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '快速访问',
+          'Quick Access',
           style: AppDesignSystem.textTheme.titleLarge?.copyWith(
             fontWeight: AppDesignSystem.fontWeightBold,
             color: isDark ? AppDesignSystem.neutral100 : AppDesignSystem.neutral900,
@@ -25,22 +25,20 @@ class QuickActions extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _buildActionCard(
-                context,
+              child: _QuickActionCard(
                 icon: Icons.library_music_rounded,
-                title: '音乐库',
-                subtitle: '管理本地音乐',
+                title: 'Library',
+                subtitle: 'Manage local music',
                 color: AppDesignSystem.primary,
                 onTap: () => context.go('/library'),
               ),
             ),
             const SizedBox(width: AppDesignSystem.spacing16),
             Expanded(
-              child: _buildActionCard(
-                context,
+              child: _QuickActionCard(
                 icon: Icons.play_circle_rounded,
-                title: '播放器',
-                subtitle: '查看播放内容',
+                title: 'Player',
+                subtitle: 'Now playing',
                 color: AppDesignSystem.secondary,
                 onTap: () => context.go('/player'),
               ),
@@ -50,15 +48,25 @@ class QuickActions extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+class _QuickActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ModernCard(
@@ -73,11 +81,7 @@ class QuickActions extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               borderRadius: AppDesignSystem.borderRadius12,
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: AppDesignSystem.iconSize32,
-            ),
+            child: Icon(icon, color: color, size: AppDesignSystem.iconSize32),
           ),
           const SizedBox(height: AppDesignSystem.spacing16),
           Text(
