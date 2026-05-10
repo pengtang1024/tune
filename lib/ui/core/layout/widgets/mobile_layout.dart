@@ -3,16 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/menu_item.dart';
 import 'package:tune/providers/menu_provider.dart';
 import 'package:tune/ui/core/layout/widgets/custom_app_bar.dart';
-import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/widgets/mini_player.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 现代化移动端布局
-/// 提供流畅的移动端用户体验
 class MobileLayout extends ConsumerWidget {
   final Widget child;
+  final bool showMiniPlayer;
 
-  const MobileLayout({super.key, required this.child});
+  const MobileLayout({
+    super.key,
+    required this.child,
+    this.showMiniPlayer = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,76 +22,73 @@ class MobileLayout extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final menuState = ref.watch(menuStateProvider);
     final menuNotifier = ref.read(menuStateProvider.notifier);
-    final playerState = ref.watch(playerStateNotifierProvider);
+    final items = DeviceMenuItem.mobile();
+    final selectedIndex = items.indexWhere((item) => item.path == menuState.path);
 
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: isDark 
+          gradient: isDark
               ? AppDesignSystem.backgroundGradientDark
               : AppDesignSystem.backgroundGradientLight,
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // 全局唯一的标题栏
-              const CustomAppBar(),
-              
-              // 内容展示区
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppDesignSystem.spacing16),
-                  child: ClipRRect(
-                    borderRadius: AppDesignSystem.borderRadius16,
-                    child: child,
-                  ),
-                ),
+        child: Column(
+          children: [
+            const CustomAppBar(),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: AppDesignSystem.duration200,
+                child: child,
               ),
-              
-              // 迷你播放器（如果正在播放歌曲）
-              if (playerState.currentSong != null) const MiniPlayer(),
-            ],
-          ),
+            ),
+            if (showMiniPlayer) const MiniPlayer(),
+          ],
         ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: isDark
+              ? AppDesignSystem.neutral900
+              : Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
               offset: const Offset(0, -2),
             ),
           ],
         ),
         child: NavigationBar(
-          selectedIndex: DeviceMenuItem.mobile()
-              .firstWhere(
-                (item) => item.path == menuState.path,
-                orElse: () => DeviceMenuItem.mobile().first,
-              )
-              .index,
+          selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
           onDestinationSelected: (index) {
-            menuNotifier.selectMenu(DeviceMenuItem.mobile()[index].path, false);
+            if (index >= 0 && index < items.length) {
+              menuNotifier.selectMenu(items[index].path, false);
+            }
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
-          destinations: DeviceMenuItem.mobile()
+          indicatorColor: AppDesignSystem.primary.withValues(alpha: 0.12),
+          indicatorShape: RoundedRectangleBorder(
+            borderRadius: AppDesignSystem.borderRadius12,
+          ),
+          height: 64,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: items
               .map((item) => NavigationDestination(
-                icon: Icon(
-                  item.icon,
-                  color: isDark 
-                      ? AppDesignSystem.neutral500
-                      : AppDesignSystem.neutral600,
-                ),
-                selectedIcon: Icon(
-                  item.icon,
-                  color: AppDesignSystem.primary,
-                ),
-                label: item.labelKey,
-                tooltip: item.labelKey,
-              ))
+                    icon: Icon(
+                      item.icon,
+                      color: isDark
+                          ? AppDesignSystem.neutral500
+                          : AppDesignSystem.neutral400,
+                      size: AppDesignSystem.iconSize24,
+                    ),
+                    selectedIcon: Icon(
+                      item.icon,
+                      color: AppDesignSystem.primary,
+                      size: AppDesignSystem.iconSize24,
+                    ),
+                    label: item.labelKey,
+                  ))
               .toList(),
         ),
       ),

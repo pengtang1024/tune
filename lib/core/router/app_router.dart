@@ -13,9 +13,9 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/home',
+    observers: [menuObserver],
     routes: [
       ShellRoute(
-        observers: [menuObserver],
         builder: (context, state, child) => ResponsiveShell(child: child),
         routes: [
           GoRoute(
