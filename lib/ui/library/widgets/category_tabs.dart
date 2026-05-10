@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
-enum LibraryCategory {
-  all,
-  artists,
-  albums,
-  folders,
-}
+enum LibraryCategory { all, artists, albums, folders }
 
 class CategoryTabs extends StatelessWidget {
   final LibraryCategory selectedCategory;
@@ -28,59 +24,49 @@ class CategoryTabs extends StatelessWidget {
         children: LibraryCategory.values.map((category) {
           final isSelected = category == selectedCategory;
           return Padding(
-            padding: EdgeInsets.only(
-              right: category != LibraryCategory.values.last 
-                  ? AppDesignSystem.spacing12 
-                  : 0,
+            padding: EdgeInsets.only(right: AppDesignSystem.spacing10),
+            child: AppInteractions.pressableScale(
+              scaleValue: 0.95,
+              onTap: () => onCategoryChanged(category),
+              child: AnimatedContainer(
+                duration: AppDesignSystem.duration200,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDesignSystem.spacing20,
+                  vertical: AppDesignSystem.spacing10,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppDesignSystem.primary
+                      : (isDark ? AppDesignSystem.neutral800 : AppDesignSystem.neutral100),
+                  borderRadius: AppDesignSystem.borderRadius20,
+                ),
+                child: Text(
+                  _label(category),
+                  style: AppDesignSystem.textTheme.labelLarge?.copyWith(
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? AppDesignSystem.neutral300 : AppDesignSystem.neutral700),
+                    fontWeight: AppDesignSystem.fontWeightMedium,
+                  ),
+                ),
+              ),
             ),
-            child: _buildCategoryTab(context, category, isSelected, isDark),
           );
         }).toList(),
       ),
     );
   }
 
-  Widget _buildCategoryTab(
-    BuildContext context,
-    LibraryCategory category,
-    bool isSelected,
-    bool isDark,
-  ) {
-    return GestureDetector(
-      onTap: () => onCategoryChanged(category),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppDesignSystem.spacing20,
-          vertical: AppDesignSystem.spacing10,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppDesignSystem.primary
-              : (isDark ? AppDesignSystem.neutral800 : AppDesignSystem.neutral100),
-          borderRadius: AppDesignSystem.borderRadius20,
-        ),
-        child: Text(
-          _getCategoryLabel(category),
-          style: AppDesignSystem.textTheme.labelLarge?.copyWith(
-            color: isSelected
-                ? Colors.white
-                : (isDark ? AppDesignSystem.neutral300 : AppDesignSystem.neutral700),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getCategoryLabel(LibraryCategory category) {
-    switch (category) {
+  String _label(LibraryCategory c) {
+    switch (c) {
       case LibraryCategory.all:
-        return '全部';
+        return 'All';
       case LibraryCategory.artists:
-        return '艺术家';
+        return 'Artists';
       case LibraryCategory.albums:
-        return '专辑';
+        return 'Albums';
       case LibraryCategory.folders:
-        return '文件夹';
+        return 'Folders';
     }
   }
 }
