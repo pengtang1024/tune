@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
@@ -6,6 +8,7 @@ import 'package:tune/ui/player/states/play_mode.dart';
 import 'package:tune/ui/player/widgets/player_speed.dart';
 import 'package:tune/ui/player/widgets/player_volume.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/theme/app_interactions.dart';
 
 class PlayerContent extends ConsumerWidget {
   const PlayerContent({super.key});
@@ -14,49 +17,69 @@ class PlayerContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerStateNotifierProvider);
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDesignSystem.spacing16,
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: AppDesignSystem.spacing24),
-            // 专辑封面
-            _AlbumArt(),
-            const SizedBox(height: AppDesignSystem.spacing32),
-            // 歌曲信息
-            _SongInfo(
-              title: playerState.currentSong?.title ?? '未知歌曲',
-              artist: playerState.currentSong?.artist ?? '未知艺术家',
-              album: playerState.currentSong?.album ?? '未知专辑',
-            ),
-            const SizedBox(height: AppDesignSystem.spacing32),
-            // 音量和速度控制
-            const _PlayerControlsRow(),
-            const SizedBox(height: AppDesignSystem.spacing24),
-            // 播放模式控制
-            const _PlayModeControl(),
-          ],
-        ),
-      ),
+    return Column(
+      children: [
+        const SizedBox(height: AppDesignSystem.spacing24),
+        const _AlbumArt().withScaleIn(),
+        const SizedBox(height: AppDesignSystem.spacing32),
+        _SongInfo(
+          title: playerState.currentSong?.title ?? 'Unknown Track',
+          artist: playerState.currentSong?.artist ?? 'Unknown Artist',
+          album: playerState.currentSong?.album ?? 'Unknown Album',
+        ).withSlideIn(delay: const Duration(milliseconds: 150)),
+        const SizedBox(height: AppDesignSystem.spacing32),
+        const _PlayerControlsRow().withFadeIn(delay: const Duration(milliseconds: 250)),
+        const SizedBox(height: AppDesignSystem.spacing24),
+        const _PlayModeControl().withFadeIn(delay: const Duration(milliseconds: 350)),
+      ],
     );
   }
 }
 
-class _AlbumArt extends StatelessWidget {
+class _AlbumArt extends ConsumerWidget {
+  const _AlbumArt();
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: AppDesignSystem.albumCoverSize240,
-      height: AppDesignSystem.albumCoverSize240,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerState = ref.watch(playerStateNotifierProvider);
+    final size = MediaQuery.of(context).size;
+    final isCompact = size.width < AppDesignSystem.breakpointMobile;
+    final artSize = isCompact
+        ? AppDesignSystem.albumCoverSize200
+        : AppDesignSystem.albumCoverSize240;
+
+    final artPath = playerState.currentSong?.albumArtPath;
+
+    return AnimatedContainer(
+      duration: AppDesignSystem.duration300,
+      width: artSize,
+      height: artSize,
       decoration: BoxDecoration(
-        gradient: AppDesignSystem.primaryGradient,
         borderRadius: AppDesignSystem.borderRadius24,
         boxShadow: AppDesignSystem.shadowColored,
       ),
+      child: ClipRRect(
+        borderRadius: AppDesignSystem.borderRadius24,
+        child: artPath != null && artPath.isNotEmpty
+            ? Image.file(
+                File(artPath),
+                width: artSize,
+                height: artSize,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _defaultArt(),
+              )
+            : _defaultArt(),
+      ),
+    );
+  }
+
+  Widget _defaultArt() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppDesignSystem.primaryGradient,
+      ),
       child: const Icon(
-        Icons.music_note,
+        Icons.music_note_rounded,
         size: AppDesignSystem.iconSize80,
         color: Colors.white,
       ),
@@ -92,7 +115,7 @@ class _SongInfo extends StatelessWidget {
         ),
         const SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          '$artist - $album',
+          '$artist — $album',
           style: AppDesignSystem.textTheme.titleMedium?.copyWith(
             color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral600,
           ),
@@ -152,33 +175,34 @@ class _PlayModeControl extends ConsumerWidget {
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDesignSystem.spacing20,
-        vertical: AppDesignSystem.spacing12,
-      ),
-      decoration: BoxDecoration(
-        color: AppDesignSystem.primary.withValues(alpha: 0.1),
-        borderRadius: AppDesignSystem.borderRadius16,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            getModeTooltip(),
-            style: AppDesignSystem.textTheme.labelLarge?.copyWith(
-              color: AppDesignSystem.primary,
-              fontWeight: AppDesignSystem.fontWeightMedium,
+    return AppInteractions.pressableScale(
+      onTap: playerNotifier.togglePlayMode,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDesignSystem.spacing20,
+          vertical: AppDesignSystem.spacing12,
+        ),
+        decoration: BoxDecoration(
+          color: AppDesignSystem.primary.withValues(alpha: 0.08),
+          borderRadius: AppDesignSystem.borderRadius16,
+          border: Border.all(
+            color: AppDesignSystem.primary.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              getModeTooltip(),
+              style: AppDesignSystem.textTheme.labelLarge?.copyWith(
+                color: AppDesignSystem.primary,
+                fontWeight: AppDesignSystem.fontWeightMedium,
+              ),
             ),
-          ),
-          const SizedBox(width: AppDesignSystem.spacing12),
-          IconButton(
-            icon: Icon(getModeIcon()),
-            color: AppDesignSystem.primary,
-            tooltip: getModeTooltip(),
-            onPressed: playerNotifier.togglePlayMode,
-          ),
-        ],
+            const SizedBox(width: AppDesignSystem.spacing12),
+            Icon(getModeIcon(), color: AppDesignSystem.primary),
+          ],
+        ),
       ),
     );
   }
