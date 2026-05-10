@@ -43,14 +43,32 @@ class PlayerPlaylist extends ConsumerWidget {
           ),
           const SizedBox(height: AppDesignSystem.spacing8),
           Expanded(
-            child: ListView.separated(
+            child: ReorderableListView.builder(
               itemCount: playlist.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppDesignSystem.spacing4),
+              onReorder: (oldIndex, newIndex) {
+                if (newIndex > oldIndex) newIndex--;
+                final item = playlist.removeAt(oldIndex);
+                playlist.insert(newIndex, item);
+              },
+              proxyDecorator: (child, index, animation) {
+                return AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: 1.02,
+                      child: Material(elevation: 4, borderRadius: AppDesignSystem.borderRadius8, child: child),
+                    );
+                  },
+                  child: child,
+                );
+              },
               itemBuilder: (context, index) {
                 final song = playlist[index];
                 final isCurrent = song.id == playerState.currentSong?.id;
 
-                return AppInteractions.clickableCard(
+                return Container(
+                  key: ValueKey(song.id),
+                  child: AppInteractions.clickableCard(
                   borderRadius: AppDesignSystem.borderRadius8,
                   onTap: () => playerNotifier.playSongAtIndex(index),
                   child: AnimatedContainer(
@@ -109,6 +127,7 @@ class PlayerPlaylist extends ConsumerWidget {
                       ],
                     ),
                   ),
+                ),
                 );
               },
             ),

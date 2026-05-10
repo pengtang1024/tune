@@ -7,6 +7,11 @@ import 'package:tune/ui/player/widgets/player_controls.dart';
 import 'package:tune/ui/player/widgets/player_history.dart';
 import 'package:tune/ui/player/widgets/player_options.dart';
 import 'package:tune/ui/player/widgets/player_progress.dart';
+import 'package:tune/ui/player/widgets/player_sleep_timer.dart';
+import 'package:tune/ui/player/widgets/player_lyrics.dart';
+import 'package:tune/ui/player/widgets/player_equalizer.dart';
+import 'package:tune/ui/player/widgets/player_playlist.dart';
+import 'package:tune/ui/player/widgets/audio_visualizer.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
@@ -56,6 +61,7 @@ class PlayerPage extends ConsumerWidget {
                   : _buildResponsiveContent(context, isCompact),
             ),
             if (!playerState.isLoading && !playerState.isError) ...[
+              const AudioVisualizer(height: 32, barCount: 32),
               const SizedBox(height: AppDesignSystem.spacing12),
               const PlayerProgress(),
               const SizedBox(height: AppDesignSystem.spacing16),
@@ -93,22 +99,29 @@ class PlayerPage extends ConsumerWidget {
             child: const PlayerContent(),
           ),
         ),
-        Expanded(
-          flex: 2,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDesignSystem.spacing16,
+            Expanded(
+              flex: 2,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing16),
+                child: Column(
+                  children: const [
+                    SizedBox(height: AppDesignSystem.spacing24),
+                    SleepTimer(),
+                    SizedBox(height: AppDesignSystem.spacing16),
+                    PlayerOptions(),
+                    SizedBox(height: AppDesignSystem.spacing16),
+                    PlayerEqualizer(),
+                    SizedBox(height: AppDesignSystem.spacing16),
+                    PlayerLyrics(),
+                    SizedBox(height: AppDesignSystem.spacing16),
+                    PlayerHistory(),
+                    SizedBox(height: AppDesignSystem.spacing16),
+                    PlayerPlaylist(),
+                    SizedBox(height: AppDesignSystem.spacing24),
+                  ],
+                ),
+              ),
             ),
-            child: Column(
-              children: const [
-                SizedBox(height: AppDesignSystem.spacing24),
-                PlayerOptions(),
-                SizedBox(height: AppDesignSystem.spacing16),
-                PlayerHistory(),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
