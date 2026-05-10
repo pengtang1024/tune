@@ -5,58 +5,41 @@ import 'package:tune/ui/library/widgets/music_scan/scan_status_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/scan_progress_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/empty_state_widget.dart';
 import 'package:tune/ui/library/widgets/music_scan/error_state_widget.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
 class ScanStatusDisplay extends ConsumerWidget {
   final LibraryState state;
-
   const ScanStatusDisplay({super.key, required this.state});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ModernCard(
+      padding: const EdgeInsets.all(AppDesignSystem.spacing24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '扫描状态',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            'Scan Status',
+            style: AppDesignSystem.textTheme.titleMedium?.copyWith(
+              fontWeight: AppDesignSystem.fontWeightBold,
+            ),
           ),
-          const SizedBox(height: 16),
-          
-          // 根据扫描状态显示不同内容
+          const SizedBox(height: AppDesignSystem.spacing16),
           if (state.scanStatus == ScanStatus.idle) ...[
-            const ScanStatusWidget(statusMessage: '等待开始扫描'),
-            const SizedBox(height: 16),
+            const ScanStatusWidget(statusMessage: 'Waiting to start scan'),
+            const SizedBox(height: AppDesignSystem.spacing16),
             const EmptyStateWidget(),
           ] else if (state.scanStatus == ScanStatus.scanning) ...[
-            const ScanStatusWidget(statusMessage: '正在扫描'),
-            const SizedBox(height: 16),
+            const ScanStatusWidget(statusMessage: 'Scanning...'),
+            const SizedBox(height: AppDesignSystem.spacing16),
             ScanProgressWidget(progress: state.scanProgress),
           ] else if (state.scanStatus == ScanStatus.completed) ...[
-            ScanStatusWidget(
-              statusMessage: '扫描完成，找到 ${state.foundSongs.length} 首歌曲',
-            ),
+            ScanStatusWidget(statusMessage: 'Scan complete, found ${state.foundSongs.length} songs'),
           ] else if (state.scanStatus == ScanStatus.error) ...[
-            const ScanStatusWidget(statusMessage: '扫描出错'),
-            const SizedBox(height: 16),
-            ErrorStateWidget(
-              errorMessage: state.errorMessage ?? '未知错误',
-            ),
+            const ScanStatusWidget(statusMessage: 'Scan error'),
+            const SizedBox(height: AppDesignSystem.spacing16),
+            ErrorStateWidget(errorMessage: state.errorMessage ?? 'Unknown error'),
           ],
         ],
       ),

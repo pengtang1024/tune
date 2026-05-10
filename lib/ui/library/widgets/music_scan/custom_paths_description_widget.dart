@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 自定义路径描述组件
-/// 显示自定义扫描路径的功能说明
 class CustomPathsDescriptionWidget extends StatelessWidget {
   const CustomPathsDescriptionWidget({super.key});
 
@@ -10,14 +9,12 @@ class CustomPathsDescriptionWidget extends StatelessWidget {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 8),
+        SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          '添加自定义文件夹路径以扫描特定位置的音乐文件',
-          style: TextStyle(
-            color: Colors.grey,
-          ),
+          'Add custom folder paths to scan music files from specific locations',
+          style: TextStyle(color: Color(0xFF64748B)),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: AppDesignSystem.spacing16),
       ],
     );
   }

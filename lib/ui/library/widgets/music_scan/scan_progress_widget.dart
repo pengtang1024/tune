@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:tune/core/extension/theme_extension.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
 
-/// 扫描进度条组件
-/// 显示扫描进度
 class ScanProgressWidget extends StatelessWidget {
   final double progress;
-
-  const ScanProgressWidget({
-    super.key,
-    required this.progress,
-  });
+  const ScanProgressWidget({super.key, required this.progress});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: context.theme.colorScheme.surfaceContainerHighest,
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(top: AppDesignSystem.spacing8),
+      child: ClipRRect(
+        borderRadius: AppDesignSystem.borderRadius4,
+        child: LinearProgressIndicator(
+          value: progress,
+          minHeight: 6,
+          backgroundColor: AppDesignSystem.neutral200,
+          valueColor: const AlwaysStoppedAnimation(AppDesignSystem.primary),
         ),
-      ],
+      ),
     );
   }
 }

@@ -1,45 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:tune/core/extension/theme_extension.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
-/// 歌曲列表项组件
-/// 显示单首歌曲的信息
 class SongListItemWidget extends StatelessWidget {
   final Song song;
   final String durationText;
   final VoidCallback? onPlay;
 
   const SongListItemWidget({
-    super.key, 
-    required this.song, 
-    this.durationText = '', 
-    this.onPlay
+    super.key,
+    required this.song,
+    this.durationText = '',
+    this.onPlay,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        child: ListTile(
-          leading: Container(
-            width: 50,
-            height: 50,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return ModernCard(
+      margin: const EdgeInsets.symmetric(vertical: AppDesignSystem.spacing4),
+      padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing12, vertical: AppDesignSystem.spacing10),
+      onTap: onPlay,
+      child: Row(
+        children: [
+          Container(
+            width: 44, height: 44,
             decoration: BoxDecoration(
-              color: context.theme.colorScheme.surfaceContainerHighest, 
-              borderRadius: BorderRadius.circular(8)
+              gradient: AppDesignSystem.primaryGradient,
+              borderRadius: AppDesignSystem.borderRadius8,
             ),
-            child: Icon(
-              Icons.music_note, 
-              color: context.theme.colorScheme.onSurfaceVariant
+            child: const Icon(Icons.music_note_rounded, color: Colors.white, size: AppDesignSystem.iconSize24),
+          ),
+          const SizedBox(width: AppDesignSystem.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(song.title, style: AppDesignSystem.textTheme.bodyMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightMedium), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  '${song.artist} · ${song.album}',
+                  style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+                    color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
-          title: Text(song.title),
-          subtitle: Text('${song.artist} · ${song.album}'),
-          trailing: Text(durationText),
-          onTap: onPlay,
-        ),
+          const SizedBox(width: AppDesignSystem.spacing12),
+          Text(
+            durationText,
+            style: AppDesignSystem.textTheme.bodySmall?.copyWith(
+              color: AppDesignSystem.neutral400,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }

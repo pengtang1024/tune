@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/ui/library/widgets/music_scan/scan_button_widget.dart';
+import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/ui/widgets/modern_card.dart';
 
 class ScanControlButtons extends StatelessWidget {
   final bool isScanning;
@@ -15,30 +17,16 @@ class ScanControlButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return ModernCard(
+      padding: const EdgeInsets.all(AppDesignSystem.spacing24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '扫描控制',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            'Scan Control',
+            style: AppDesignSystem.textTheme.titleMedium?.copyWith(fontWeight: AppDesignSystem.fontWeightBold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDesignSystem.spacing16),
           Center(
             child: SizedBox(
               width: 200,
