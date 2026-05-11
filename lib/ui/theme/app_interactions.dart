@@ -8,6 +8,7 @@ class AppInteractions {
   static Widget clickableCard({
     required Widget child,
     VoidCallback? onTap,
+    VoidCallback? onLongPress,
     BorderRadius? borderRadius,
     Color? splashColor,
   }) {
@@ -16,6 +17,7 @@ class AppInteractions {
       borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: borderRadius ?? AppDesignSystem.borderRadius8,
         splashColor: splashColor ?? AppDesignSystem.primary.withValues(alpha: 0.12),
         highlightColor: (splashColor ?? AppDesignSystem.primary).withValues(alpha: 0.06),

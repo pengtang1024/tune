@@ -66,8 +66,19 @@ class PlayerPlaylist extends ConsumerWidget {
                 final song = playlist[index];
                 final isCurrent = song.id == playerState.currentSong?.id;
 
-                return Container(
+                return Dismissible(
                   key: ValueKey(song.id),
+                  direction: DismissDirection.endToStart,
+                  confirmDismiss: (dir) async {
+                    ref.read(playerStateNotifierProvider.notifier).removeFromPlaylist(song);
+                    return true;
+                  },
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: AppDesignSystem.spacing20),
+                    color: AppDesignSystem.error.withValues(alpha: 0.8),
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
                   child: AppInteractions.clickableCard(
                   borderRadius: AppDesignSystem.borderRadius8,
                   onTap: () => playerNotifier.playSongAtIndex(index),
