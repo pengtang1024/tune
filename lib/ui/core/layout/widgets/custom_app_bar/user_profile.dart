@@ -55,9 +55,13 @@ class UserProfile extends StatelessWidget {
                     runSpacing: 2,
                     children: state.userTags.map<Widget>((tag) {
                       Color tagColor = AppDesignSystem.neutral500;
-                      if (tag == 'vip' || tag == context.loc.tag_vip) tagColor = AppDesignSystem.error;
-                      else if (tag == context.loc.tag_singer) tagColor = AppDesignSystem.success;
-                      else if (tag == context.loc.tag_elite) tagColor = AppDesignSystem.primary;
+                      if (tag == 'vip' || tag == context.loc.tag_vip) {
+                        tagColor = AppDesignSystem.error;
+                      } else if (tag == context.loc.tag_singer) {
+                        tagColor = AppDesignSystem.success;
+                      } else if (tag == context.loc.tag_elite) {
+                        tagColor = AppDesignSystem.primary;
+                      }
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(color: tagColor, borderRadius: AppDesignSystem.borderRadius8),

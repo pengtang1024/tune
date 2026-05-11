@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,12 +135,10 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
     if (albumArt != null && albumArt.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.zero,
-        child: Image.network(
-          albumArt,
-          width: 64,
-          height: 64,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _buildDefaultArtwork(),
+        child: Image.file(
+          File(albumArt),
+          width: 64, height: 64, fit: BoxFit.cover,
+          errorBuilder: (context, error, stack) => _buildDefaultArtwork(),
         ),
       );
     }
@@ -157,7 +156,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
     );
   }
 
-  Widget _buildControls(playerState, playerNotifier) {
+  Widget _buildControls(dynamic playerState, dynamic playerNotifier) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

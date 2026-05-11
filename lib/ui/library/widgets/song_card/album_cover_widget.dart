@@ -26,7 +26,7 @@ class AlbumCoverWidget extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _defaultIcon(),
+                errorBuilder: (context, error, stack) => _defaultIcon(),
               ),
             )
           : _defaultIcon(),

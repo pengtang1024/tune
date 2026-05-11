@@ -4,6 +4,7 @@ import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/utils/lrc_parser.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
+import 'package:tune/data/services/lrc_online_search.dart';
 
 class PlayerLyrics extends ConsumerStatefulWidget {
   const PlayerLyrics({super.key});
@@ -15,6 +16,7 @@ class PlayerLyrics extends ConsumerStatefulWidget {
 class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
   LrcParser? _parser;
   int _currentIndex = -1;
+  bool _isSearching = false;
   final ScrollController _scrollController = ScrollController();
   static const double _lineHeight = 36.0;
 
@@ -52,6 +54,8 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
             Icon(Icons.lyrics_outlined, size: AppDesignSystem.iconSize32, color: AppDesignSystem.neutral400),
             const SizedBox(height: AppDesignSystem.spacing8),
             Text('暂无歌词', style: AppDesignSystem.textTheme.bodyMedium?.copyWith(color: AppDesignSystem.neutral400)),
+            const SizedBox(height: AppDesignSystem.spacing12),
+            _buildSearchButton(),
           ],
         ),
       );
@@ -161,5 +165,39 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
       duration: AppDesignSystem.duration300,
       curve: AppDesignSystem.curveEaseInOut,
     );
+  }
+
+  Widget _buildSearchButton() {
+    final song = ref.read(playerStateNotifierProvider).currentSong;
+    if (song == null) return const SizedBox.shrink();
+
+    return _isSearching
+        ? const SizedBox(
+            width: 20, height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : GestureDetector(
+            onTap: () async {
+              setState(() => _isSearching = true);
+              final result = await LrcOnlineSearch.search(song);
+              if (result != null && mounted) {
+                setState(() {
+                  _parser = LrcParser(result.lrcContent);
+                  _currentIndex = -1;
+                  _isSearching = false;
+                });
+              } else {
+                setState(() => _isSearching = false);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing16, vertical: AppDesignSystem.spacing8),
+              decoration: BoxDecoration(
+                color: AppDesignSystem.primary.withValues(alpha: 0.08),
+                borderRadius: AppDesignSystem.borderRadius12,
+              ),
+              child: Text('在线搜索歌词', style: AppDesignSystem.textTheme.labelMedium?.copyWith(color: AppDesignSystem.primary)),
+            ),
+          );
   }
 }

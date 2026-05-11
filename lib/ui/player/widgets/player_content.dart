@@ -93,7 +93,7 @@ class _AlbumArtState extends ConsumerState<_AlbumArt>
                   width: artSize,
                   height: artSize,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _defaultArt(),
+                  errorBuilder: (context, error, stack) => _defaultArt(),
                   frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                     if (wasSynchronouslyLoaded) return child;
                     if (frame == null) {
