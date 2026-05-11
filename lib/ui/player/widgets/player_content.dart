@@ -9,6 +9,7 @@ import 'package:tune/ui/player/widgets/player_speed.dart';
 import 'package:tune/ui/player/widgets/player_volume.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
+import 'package:tune/data/services/album_art_downloader.dart';
 
 class PlayerContent extends ConsumerWidget {
   const PlayerContent({super.key});
@@ -47,6 +48,8 @@ class _AlbumArtState extends ConsumerState<_AlbumArt>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  String? _downloadedPath;
+  bool _isDownloading = false;
 
   @override
   void initState() {
@@ -74,6 +77,7 @@ class _AlbumArtState extends ConsumerState<_AlbumArt>
         : AppDesignSystem.albumCoverSize240;
 
     final artPath = playerState.currentSong?.albumArtPath;
+    final effectivePath = _downloadedPath ?? artPath;
 
     return AnimatedContainer(
       duration: AppDesignSystem.duration300,
@@ -85,11 +89,11 @@ class _AlbumArtState extends ConsumerState<_AlbumArt>
       ),
       child: ClipRRect(
         borderRadius: AppDesignSystem.borderRadius24,
-        child: artPath != null && artPath.isNotEmpty
+        child: effectivePath != null && effectivePath.isNotEmpty
             ? FadeTransition(
                 opacity: _fadeAnimation,
                 child: Image.file(
-                  File(artPath),
+                  File(effectivePath),
                   width: artSize,
                   height: artSize,
                   fit: BoxFit.cover,
@@ -110,15 +114,38 @@ class _AlbumArtState extends ConsumerState<_AlbumArt>
   }
 
   Widget _defaultArt() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppDesignSystem.primaryGradient,
-      ),
-      child: const Icon(
-        Icons.music_note_rounded,
-        size: AppDesignSystem.iconSize80,
-        color: Colors.white,
-      ),
+    final song = ref.read(playerStateNotifierProvider).currentSong;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(gradient: AppDesignSystem.primaryGradient),
+          child: const Icon(Icons.music_note_rounded, size: AppDesignSystem.iconSize80, color: Colors.white),
+        ),
+        if (song != null && song.artist.isNotEmpty && song.album.isNotEmpty)
+          Positioned(
+            bottom: 8,
+            child: GestureDetector(
+              onTap: _isDownloading ? null : () async {
+                setState(() => _isDownloading = true);
+                final path = await AlbumArtDownloader.downloadArt(song);
+                if (mounted) {
+                  setState(() {
+                    _downloadedPath = path;
+                    _isDownloading = false;
+                  });
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing8, vertical: AppDesignSystem.spacing4),
+                decoration: BoxDecoration(color: Colors.black26, borderRadius: AppDesignSystem.borderRadius8),
+                child: _isDownloading
+                    ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white))
+                    : Text('获取封面', style: AppDesignSystem.textTheme.labelSmall?.copyWith(color: Colors.white)),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
