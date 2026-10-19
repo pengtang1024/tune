@@ -464,6 +464,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => 'Paroles';
+
+  @override
+  String get lyricsLoading => 'Chargement des paroles';
+
+  @override
+  String lyricsFailed(String error) {
+    return 'Impossible de charger les paroles : $error';
+  }
+
+  @override
+  String get lyricsMissing => 'Cette chanson n’a pas de paroles';
+
+  @override
   String get settingsTitle => 'Paramètres';
 
   @override

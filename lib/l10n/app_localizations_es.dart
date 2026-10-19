@@ -462,6 +462,20 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => 'Letra';
+
+  @override
+  String get lyricsLoading => 'Cargando la letra';
+
+  @override
+  String lyricsFailed(String error) {
+    return 'No se pudo cargar la letra: $error';
+  }
+
+  @override
+  String get lyricsMissing => 'Esta canción no tiene letra';
+
+  @override
   String get settingsTitle => 'Ajustes';
 
   @override

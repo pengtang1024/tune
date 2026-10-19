@@ -451,6 +451,20 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => '\\u6b4c\\u8a5e';
+
+  @override
+  String get lyricsLoading => '歌詞を読み込んでいます';
+
+  @override
+  String lyricsFailed(String error) {
+    return '歌詞を読み込めませんでした: $error';
+  }
+
+  @override
+  String get lyricsMissing => 'この曲には歌詞がありません';
+
+  @override
   String get settingsTitle => '設定';
 
   @override

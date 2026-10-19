@@ -45,6 +45,14 @@ abstract class MusicSourceAdapter {
   Future<Song?> refreshStream(MusicSourceConfig config, Song song) async {
     return null;
   }
+
+  /// Fetches the lyrics of [song] on demand.
+  ///
+  /// Sources without lyrics return `null`; the player then shows that the
+  /// track has no lyrics.
+  Future<String?> fetchLyrics(MusicSourceConfig config, Song song) async {
+    return null;
+  }
 }
 
 SourceScanResult failedResult(String sourceId, Object error) {

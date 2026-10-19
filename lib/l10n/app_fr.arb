@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "Paroles",
+  "lyricsLoading": "Chargement des paroles",
+  "lyricsFailed": "Impossible de charger les paroles : {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "Cette chanson n’a pas de paroles",
   "settingsTitle": "Paramètres",
   "settingsSubtitle": "Ajustez l’apparence, la langue et la bibliothèque locale.",
   "settingsThemeDescription": "Choisissez l’apparence de l’interface et sa langue.",

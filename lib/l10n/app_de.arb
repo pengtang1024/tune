@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "Liedtext",
+  "lyricsLoading": "Liedtext wird geladen",
+  "lyricsFailed": "Liedtext konnte nicht geladen werden: {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "Dieses Lied hat keinen Liedtext",
   "settingsTitle": "Einstellungen",
   "settingsSubtitle": "Darstellung, Sprache und lokale Bibliothek anpassen.",
   "settingsThemeDescription": "Wählen Sie das Erscheinungsbild und die Sprache der Oberfläche.",

@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "\\u6b4c\\u8a5e",
+  "lyricsLoading": "歌詞を読み込んでいます",
+  "lyricsFailed": "歌詞を読み込めませんでした: {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "この曲には歌詞がありません",
   "settingsTitle": "設定",
   "settingsSubtitle": "外観と言語、ローカルライブラリを調整します。",
   "settingsThemeDescription": "画面の見た目と言語を選びます。",

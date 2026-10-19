@@ -459,6 +459,20 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => '\\u0421\\u043b\\u043e\\u0432\\u0430';
+
+  @override
+  String get lyricsLoading => 'Загрузка слов песни';
+
+  @override
+  String lyricsFailed(String error) {
+    return 'Не удалось загрузить слова: $error';
+  }
+
+  @override
+  String get lyricsMissing => 'У этой песни нет слов';
+
+  @override
   String get settingsTitle => 'Настройки';
 
   @override

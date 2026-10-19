@@ -83,13 +83,55 @@ void main() {
 
     expect(result.status, SourceScanStatus.needsConfiguration);
   });
+
+  test('asks the plugin for the lyrics of a track', () async {
+    final runtime = FakeRuntime(
+      items: [
+        {'id': 'track-1', 'title': 'Hello'},
+      ],
+      media: const {
+        'track-1': {'url': 'https://example.com/a.mp3'},
+      },
+      lyrics: const {
+        'track-1': {'rawLrc': '[00:01.00]Hello world'},
+      },
+    );
+    final adapter = MusicPluginSourceAdapter(config: config, runtime: runtime);
+
+    final song = await adapter.scan(request(config));
+
+    final lyrics = await adapter.fetchLyrics(config, song.songs.first);
+
+    expect(lyrics, '[00:01.00]Hello world');
+  });
+
+  test('reports no lyrics when the plugin does not know the track', () async {
+    final runtime = FakeRuntime(
+      items: [
+        {'id': 'track-1', 'title': 'Hello'},
+      ],
+      media: const {
+        'track-1': {'url': 'https://example.com/a.mp3'},
+      },
+    );
+    final adapter = MusicPluginSourceAdapter(config: config, runtime: runtime);
+
+    final song = await adapter.scan(request(config));
+
+    expect(await adapter.fetchLyrics(config, song.songs.first), isNull);
+  });
 }
 
 class FakeRuntime implements MusicPluginRuntime {
   final List<Map<String, dynamic>> items;
   final Map<String, Map<String, dynamic>> media;
+  final Map<String, Map<String, dynamic>> lyrics;
 
-  FakeRuntime({required this.items, required this.media});
+  FakeRuntime({
+    required this.items,
+    required this.media,
+    this.lyrics = const {},
+  });
 
   @override
   MusicPluginMetadata get metadata => const MusicPluginMetadata(
@@ -127,7 +169,7 @@ class FakeRuntime implements MusicPluginRuntime {
 
   @override
   Future<Map<String, dynamic>?> getLyric(Map<String, dynamic> item) async =>
-      null;
+      lyrics[item['id']];
 
   @override
   Future<Map<String, dynamic>?> getMusicInfo(Map<String, dynamic> item) async =>

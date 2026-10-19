@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "Lyrics",
+  "lyricsLoading": "Loading lyrics",
+  "lyricsFailed": "Could not load the lyrics: {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "This song has no lyrics",
   "settingsTitle": "Settings",
   "settingsSubtitle": "Adjust the look, the language and your local library.",
   "settingsThemeDescription": "Choose how the interface looks and which language it speaks.",

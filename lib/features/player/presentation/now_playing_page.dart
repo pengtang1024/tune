@@ -10,6 +10,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
+import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/source_chip.dart';
@@ -20,11 +21,19 @@ import 'package:tune/shared/utils/duration_format.dart';
 ///
 /// The page is a route of its own instead of an overlay so it can be reached
 /// from the dock, kept by the navigator and closed with the escape key.
-class NowPlayingPage extends ConsumerWidget {
+class NowPlayingPage extends ConsumerStatefulWidget {
   const NowPlayingPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NowPlayingPage> createState() => _NowPlayingPageState();
+}
+
+class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
+  /// Whether the lyrics of the track are shown instead of its information.
+  bool _showLyrics = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
@@ -55,7 +64,11 @@ class NowPlayingPage extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(28, 16, 28, 20),
                 child: Column(
                   children: [
-                    const _TopBar(),
+                    _TopBar(
+                      showLyrics: _showLyrics,
+                      onToggleLyrics: () =>
+                          setState(() => _showLyrics = !_showLyrics),
+                    ),
                     const SizedBox(height: CompactTokens.space12),
                     Expanded(
                       child: state.currentSong == null
@@ -63,6 +76,7 @@ class NowPlayingPage extends ConsumerWidget {
                           : _TrackLayout(
                               state: state,
                               song: state.currentSong!,
+                              showLyrics: _showLyrics,
                               sourceName:
                                   sourceLabel(
                                     state.currentSong!,
@@ -96,7 +110,10 @@ class NowPlayingPage extends ConsumerWidget {
 
 /// Header with the back action and the page title.
 class _TopBar extends StatelessWidget {
-  const _TopBar();
+  const _TopBar({required this.showLyrics, required this.onToggleLyrics});
+
+  final bool showLyrics;
+  final VoidCallback onToggleLyrics;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +150,12 @@ class _TopBar extends StatelessWidget {
         ),
         const Spacer(),
         _RoundButton(
+          icon: showLyrics ? Icons.lyrics_rounded : Icons.lyrics_outlined,
+          tooltip: context.loc.playerLyrics,
+          onPressed: onToggleLyrics,
+        ),
+        const SizedBox(width: 8),
+        _RoundButton(
           icon: Icons.queue_music_rounded,
           tooltip: context.loc.playerQueue,
           onPressed: () => context.go('/queue'),
@@ -147,6 +170,7 @@ class _TrackLayout extends StatelessWidget {
   const _TrackLayout({
     required this.state,
     required this.song,
+    required this.showLyrics,
     required this.sourceName,
     required this.onPrevious,
     required this.onNext,
@@ -156,6 +180,7 @@ class _TrackLayout extends StatelessWidget {
 
   final PlaybackState state;
   final Song song;
+  final bool showLyrics;
   final String sourceName;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
@@ -177,14 +202,21 @@ class _TrackLayout extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: showLyrics
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
                 children: [
-                  SourceChip(label: sourceName),
-                  const SizedBox(height: 16),
-                  _Title(song: song),
-                  const SizedBox(height: 8),
-                  _Artist(song: song),
-                  const SizedBox(height: 18),
+                  if (showLyrics) ...[
+                    Expanded(child: LyricsPanel(song: song)),
+                    const SizedBox(height: 12),
+                  ] else ...[
+                    SourceChip(label: sourceName),
+                    const SizedBox(height: 16),
+                    _Title(song: song),
+                    const SizedBox(height: 8),
+                    _Artist(song: song),
+                    const SizedBox(height: 18),
+                  ],
                   _ProgressRow(state: state, onSeek: onSeek),
                   const SizedBox(height: 18),
                   _Transport(

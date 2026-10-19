@@ -451,6 +451,20 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => '\\uac00\\uc0b0';
+
+  @override
+  String get lyricsLoading => '가산 로드를 불러오서다.';
+
+  @override
+  String lyricsFailed(String error) {
+    return '가산 로드를 불러오지 못했습니다: $error';
+  }
+
+  @override
+  String get lyricsMissing => '이 공에는 가산이 없어요.';
+
+  @override
   String get settingsTitle => '설정';
 
   @override

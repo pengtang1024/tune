@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "\\u6b4c\\u8a5e",
+  "lyricsLoading": "正在載入歌詞",
+  "lyricsFailed": "歌詞載入失敗：{error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "這首歌沒有歌詞",
   "settingsTitle": "設定",
   "settingsSubtitle": "調整外觀、語言和本機音樂庫。",
   "settingsThemeDescription": "選擇介面的明暗風格和顯示語言。",

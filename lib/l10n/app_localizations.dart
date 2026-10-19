@@ -898,6 +898,30 @@ abstract class AppLocalizations {
   /// **'更新插件失败：{error}'**
   String sourcesPluginUpdateFailed(String error);
 
+  /// No description provided for @playerLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'\\u6b4c\\u8bcd'**
+  String get playerLyrics;
+
+  /// No description provided for @lyricsLoading.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在加载歌词'**
+  String get lyricsLoading;
+
+  /// No description provided for @lyricsFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词加载失败：{error}'**
+  String lyricsFailed(String error);
+
+  /// No description provided for @lyricsMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这首歌没有歌词'**
+  String get lyricsMissing;
+
   /// No description provided for @settingsTitle.
   ///
   /// In zh_CN, this message translates to:

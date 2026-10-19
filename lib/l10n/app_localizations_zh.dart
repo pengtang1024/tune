@@ -449,6 +449,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => '\\u6b4c\\u8bcd';
+
+  @override
+  String get lyricsLoading => '正在加载歌词';
+
+  @override
+  String lyricsFailed(String error) {
+    return '歌词加载失败：$error';
+  }
+
+  @override
+  String get lyricsMissing => '这首歌没有歌词';
+
+  @override
   String get settingsTitle => '设置';
 
   @override
@@ -1539,6 +1553,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get playerLyrics => '\\u6b4c\\u8bcd';
+
+  @override
+  String get lyricsLoading => '正在加载歌词';
+
+  @override
+  String lyricsFailed(String error) {
+    return '歌词加载失败：$error';
+  }
+
+  @override
+  String get lyricsMissing => '这首歌没有歌词';
+
+  @override
   String get settingsTitle => '设置';
 
   @override
@@ -2627,6 +2655,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String sourcesPluginUpdateFailed(String error) {
     return '更新外掛失敗：$error';
   }
+
+  @override
+  String get playerLyrics => '\\u6b4c\\u8a5e';
+
+  @override
+  String get lyricsLoading => '正在載入歌詞';
+
+  @override
+  String lyricsFailed(String error) {
+    return '歌詞載入失敗：$error';
+  }
+
+  @override
+  String get lyricsMissing => '這首歌沒有歌詞';
 
   @override
   String get settingsTitle => '設定';

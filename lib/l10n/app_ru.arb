@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "\\u0421\\u043b\\u043e\\u0432\\u0430",
+  "lyricsLoading": "Загрузка слов песни",
+  "lyricsFailed": "Не удалось загрузить слова: {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "У этой песни нет слов",
   "settingsTitle": "Настройки",
   "settingsSubtitle": "Настройте внешний вид, язык и локальную библиотеку.",
   "settingsThemeDescription": "Выберите оформление интерфейса и язык.",

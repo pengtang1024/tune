@@ -462,6 +462,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => 'Liedtext';
+
+  @override
+  String get lyricsLoading => 'Liedtext wird geladen';
+
+  @override
+  String lyricsFailed(String error) {
+    return 'Liedtext konnte nicht geladen werden: $error';
+  }
+
+  @override
+  String get lyricsMissing => 'Dieses Lied hat keinen Liedtext';
+
+  @override
   String get settingsTitle => 'Einstellungen';
 
   @override

@@ -129,6 +129,30 @@ class MusicSourceService implements StreamUrlResolver {
     return null;
   }
 
+  /// Fetches the lyrics of [song] from the source that owns it.
+  ///
+  /// The lyrics of a track are only needed when the user asks for them, so
+  /// they are fetched on demand instead of during a scan. A song that already
+  /// carries lyrics keeps them.
+  Future<String?> fetchLyrics(Song song) async {
+    final stored = song.lyrics;
+    if (stored != null && stored.trim().isNotEmpty) return stored;
+
+    final sourceId = song.sourceId;
+    if (sourceId == null || sourceId.isEmpty) return null;
+
+    try {
+      final config = _configFor(sourceId);
+      if (config == null) return null;
+      final adapter = await _adapterFor(config);
+      if (adapter == null) return null;
+      return await adapter.fetchLyrics(config, song);
+    } catch (error, stackTrace) {
+      Log.error('获取歌词失败: $error\n$stackTrace');
+      return null;
+    }
+  }
+
   /// Searches every enabled remote source without touching scan timestamps.
   ///
   /// This is intentionally separate from [scanAll]: an on-demand search must

@@ -298,6 +298,17 @@
       }
     }
   },
+  "playerLyrics": "Letra",
+  "lyricsLoading": "Cargando la letra",
+  "lyricsFailed": "No se pudo cargar la letra: {error}",
+  "@lyricsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsMissing": "Esta canción no tiene letra",
   "settingsTitle": "Ajustes",
   "settingsSubtitle": "Ajusta la apariencia, el idioma y la biblioteca local.",
   "settingsThemeDescription": "Elige el aspecto de la interfaz y su idioma.",

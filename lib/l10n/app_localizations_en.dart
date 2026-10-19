@@ -459,6 +459,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get playerLyrics => 'Lyrics';
+
+  @override
+  String get lyricsLoading => 'Loading lyrics';
+
+  @override
+  String lyricsFailed(String error) {
+    return 'Could not load the lyrics: $error';
+  }
+
+  @override
+  String get lyricsMissing => 'This song has no lyrics';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

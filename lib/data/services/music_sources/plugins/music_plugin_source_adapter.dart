@@ -162,6 +162,31 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
     );
   }
 
+  /// Asks the plugin for the lyrics of a track.
+  ///
+  /// The original plugin item travels with the song, so the plugin can answer
+  /// without the user searching for the track again.
+  @override
+  Future<String?> fetchLyrics(MusicSourceConfig config, Song song) async {
+    final item = song.sourceData;
+    if (item == null) return null;
+
+    final lyric = await runtime.getLyric(item);
+    if (lyric == null) return null;
+    return lyricText(lyric);
+  }
+
+  /// Reads the lyric text out of the answer of a plugin.
+  ///
+  /// Plugins use different field names, so the common ones are tried in turn.
+  static String? lyricText(Map<String, dynamic> lyric) {
+    for (final key in const ['rawLrc', 'lrc', 'lyric', 'text']) {
+      final value = lyric[key];
+      if (value is String && value.trim().isNotEmpty) return value;
+    }
+    return null;
+  }
+
   /// Extracts the request headers a plugin demands for its stream URL.
   Map<String, String>? _headersFrom(Map<String, dynamic> media) {
     final headers = <String, String>{};
