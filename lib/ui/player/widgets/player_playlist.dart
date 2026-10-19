@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
 
 class PlayerPlaylist extends ConsumerWidget {
@@ -36,7 +37,7 @@ class PlayerPlaylist extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '播放列表',
+            context.loc.playlist,
             style: AppDesignSystem.textTheme.titleSmall?.copyWith(
               fontWeight: AppDesignSystem.fontWeightSemiBold,
             ),

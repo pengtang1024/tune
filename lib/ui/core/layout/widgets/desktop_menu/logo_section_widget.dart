@@ -29,11 +29,15 @@ class LogoSectionWidget extends StatelessWidget {
                     child: const Icon(Icons.music_note_rounded, color: Colors.white, size: AppDesignSystem.iconSize24),
                   ),
                   const SizedBox(width: AppDesignSystem.spacing12),
-                  Text(
-                    'Tune',
-                    style: AppDesignSystem.textTheme.titleLarge?.copyWith(
-                      fontWeight: AppDesignSystem.fontWeightBold,
-                      color: Theme.of(context).colorScheme.primary,
+                  Flexible(
+                    child: Text(
+                      'Tune',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppDesignSystem.textTheme.titleLarge?.copyWith(
+                        fontWeight: AppDesignSystem.fontWeightBold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
                 ],

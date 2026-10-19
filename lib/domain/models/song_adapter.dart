@@ -9,7 +9,7 @@ class SongAdapter extends TypeAdapter<Song> {
   Song read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read()
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
 
     return Song.fromMap({
@@ -36,13 +36,17 @@ class SongAdapter extends TypeAdapter<Song> {
       'type': fields[20] as String?,
       'isFavorite': fields[21] as bool? ?? false,
       'albumArtPath': fields[22] as String?,
+      'sourceId': fields[23] as String?,
+      'externalId': fields[24] as String?,
+      'streamUrl': fields[25] as String?,
+      'artworkUrl': fields[26] as String?,
     });
   }
 
   @override
   void write(BinaryWriter writer, Song obj) {
     writer
-      ..writeByte(23) // 字段数量
+      ..writeByte(27) // 字段数量
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -88,6 +92,14 @@ class SongAdapter extends TypeAdapter<Song> {
       ..writeByte(21)
       ..write(obj.isFavorite)
       ..writeByte(22)
-      ..write(obj.albumArtPath);
+      ..write(obj.albumArtPath)
+      ..writeByte(23)
+      ..write(obj.sourceId)
+      ..writeByte(24)
+      ..write(obj.externalId)
+      ..writeByte(25)
+      ..write(obj.streamUrl)
+      ..writeByte(26)
+      ..write(obj.artworkUrl);
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:io' show Platform;
+
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
@@ -12,22 +15,33 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> init() async {
     try {
+      // Linux 上 just_audio 没有官方实现，使用 media_kit（libmpv）作为后端
+      if (Platform.isLinux) {
+        JustAudioMediaKit.title = 'Tune';
+        JustAudioMediaKit.ensureInitialized(linux: true, windows: false);
+        Log.info('已注册 Linux 音频后端 (just_audio_media_kit)');
+      }
+
       final session = await AudioSession.instance;
-      await session.configure(AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playback,
-        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth |
-            AVAudioSessionCategoryOptions.defaultToSpeaker |
-            AVAudioSessionCategoryOptions.mixWithOthers,
-        avAudioSessionMode: AVAudioSessionMode.defaultMode,
-        avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
-        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-        androidAudioAttributes: AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.music,
-          usage: AndroidAudioUsage.media,
+      await session.configure(
+        AudioSessionConfiguration(
+          avAudioSessionCategory: AVAudioSessionCategory.playback,
+          avAudioSessionCategoryOptions:
+              AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.defaultToSpeaker |
+              AVAudioSessionCategoryOptions.mixWithOthers,
+          avAudioSessionMode: AVAudioSessionMode.defaultMode,
+          avAudioSessionRouteSharingPolicy:
+              AVAudioSessionRouteSharingPolicy.defaultPolicy,
+          avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+          androidAudioAttributes: AndroidAudioAttributes(
+            contentType: AndroidAudioContentType.music,
+            usage: AndroidAudioUsage.media,
+          ),
+          androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+          androidWillPauseWhenDucked: true,
         ),
-        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-        androidWillPauseWhenDucked: true,
-      ));
+      );
       _audioPlayer = AudioPlayer();
       Log.info('音频播放器初始化完成，已配置媒体会话');
     } catch (e, stackTrace) {
@@ -44,8 +58,8 @@ class JustAudioPlayerService implements AudioPlayerService {
         await init();
       }
 
-      // 使用song.uri作为音频路径
-      final String audioPath = song.uri;
+      // 远程音源使用 streamUrl，本地歌曲回退到 uri。
+      final String audioPath = song.playbackUri;
 
       // 检查音频路径是否为空
       if (audioPath.isEmpty) {
@@ -53,12 +67,18 @@ class JustAudioPlayerService implements AudioPlayerService {
         throw Exception('音频文件路径为空');
       }
 
-      Log.info('尝试播放音频文件: $audioPath');
+      Log.info('尝试播放音频: $audioPath');
 
       // 释放之前的音频源以节省内存
       if (_audioPlayer != null) {
         await _audioPlayer!.stop();
-        await _audioPlayer!.setAudioSource(AudioSource.uri(Uri.file(audioPath)));
+        final uri = Uri.tryParse(audioPath);
+        final isRemote =
+            uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+        final source = isRemote
+            ? AudioSource.uri(uri)
+            : AudioSource.uri(Uri.file(audioPath));
+        await _audioPlayer!.setAudioSource(source);
         await _audioPlayer!.play();
       }
       Log.info('音频播放成功');
@@ -183,6 +203,27 @@ class JustAudioPlayerService implements AudioPlayerService {
       Log.error('获取播放速度失败: $e\nStack trace: $stackTrace');
       return 1.0;
     }
+  }
+
+  @override
+  Stream<Duration> get positionStream =>
+      _audioPlayer?.positionStream ?? const Stream<Duration>.empty();
+
+  @override
+  Stream<Duration?> get durationStream =>
+      _audioPlayer?.durationStream ?? const Stream<Duration?>.empty();
+
+  @override
+  Stream<bool> get playingStream =>
+      _audioPlayer?.playingStream ?? const Stream<bool>.empty();
+
+  @override
+  Stream<void> get completionStream {
+    final player = _audioPlayer;
+    if (player == null) return const Stream<void>.empty();
+    return player.processingStateStream
+        .where((state) => state == ProcessingState.completed)
+        .map((_) {});
   }
 
   @override

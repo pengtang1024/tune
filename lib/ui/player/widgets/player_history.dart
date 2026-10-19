@@ -85,16 +85,16 @@ class _HistorySongCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   gradient: AppDesignSystem.primaryGradient,
                   borderRadius: AppDesignSystem.borderRadius24,
                 ),
                 child: const Icon(Icons.music_note_rounded,
-                    color: Colors.white, size: AppDesignSystem.iconSize24),
+                    color: Colors.white, size: AppDesignSystem.iconSize20),
               ),
-              const SizedBox(height: AppDesignSystem.spacing8),
+              const SizedBox(height: AppDesignSystem.spacing4),
               Text(
                 song.title,
                 style: AppDesignSystem.textTheme.bodySmall?.copyWith(
@@ -104,7 +104,6 @@ class _HistorySongCard extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 2),
               Text(
                 song.artist,
                 style: AppDesignSystem.textTheme.labelSmall?.copyWith(

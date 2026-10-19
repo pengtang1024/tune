@@ -1,0 +1,122 @@
+/// One user-editable setting declared by a music source adapter.
+///
+/// Keeping the schema in the data layer lets the settings UI render any source
+/// without knowing its id or implementation details.
+class MusicSourceField {
+  final String key;
+  final String label;
+  final String hint;
+  final bool required;
+  final bool numeric;
+
+  const MusicSourceField(
+    this.key,
+    this.label,
+    this.hint, {
+    this.required = false,
+    this.numeric = false,
+  });
+}
+
+/// How a music source gets its tracks.
+enum MusicSourceKind {
+  /// Directories on this device.
+  localDirectory,
+
+  /// A public catalogue with openly licensed audio (Openverse, Jamendo, ...).
+  openCatalog,
+
+  /// A self-hosted or remote JSON API that behaves as a source.
+  openApi,
+}
+
+/// User-editable configuration for one music source.
+///
+/// Sources are identified by a stable [id]. The [settings] map keeps adapter
+/// specific values (search keywords, client ids, API base URLs) without
+/// teaching the rest of the app about every adapter.
+class MusicSourceConfig {
+  final String id;
+  final String name;
+  final String description;
+  final MusicSourceKind kind;
+  final bool enabled;
+  final Map<String, String> settings;
+
+  const MusicSourceConfig({
+    required this.id,
+    required this.name,
+    this.description = '',
+    required this.kind,
+    this.enabled = true,
+    this.settings = const {},
+  });
+
+  bool get isLocal => kind == MusicSourceKind.localDirectory;
+
+  String? setting(String key) {
+    final value = settings[key];
+    if (value == null) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  MusicSourceConfig copyWith({
+    String? id,
+    String? name,
+    String? description,
+    MusicSourceKind? kind,
+    bool? enabled,
+    Map<String, String>? settings,
+  }) {
+    return MusicSourceConfig(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      kind: kind ?? this.kind,
+      enabled: enabled ?? this.enabled,
+      settings: settings ?? this.settings,
+    );
+  }
+
+  factory MusicSourceConfig.fromJson(Map<String, dynamic> json) {
+    final rawSettings = json['settings'];
+    final settings = <String, String>{};
+    if (rawSettings is Map) {
+      rawSettings.forEach((key, value) {
+        if (key is String && value != null) {
+          settings[key] = value.toString();
+        }
+      });
+    }
+
+    final rawEnabled = json['enabled'];
+    return MusicSourceConfig(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      kind: _kindFromName(json['kind']?.toString()),
+      enabled: rawEnabled is bool ? rawEnabled : true,
+      settings: Map.unmodifiable(settings),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'description': description,
+    'kind': kind.name,
+    'enabled': enabled,
+    'settings': settings,
+  };
+
+  static MusicSourceKind _kindFromName(String? name) {
+    return MusicSourceKind.values.firstWhere(
+      (kind) => kind.name == name,
+      orElse: () => MusicSourceKind.openApi,
+    );
+  }
+
+  @override
+  String toString() => 'MusicSourceConfig($id, enabled: $enabled)';
+}

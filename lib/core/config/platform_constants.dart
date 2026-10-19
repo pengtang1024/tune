@@ -31,15 +31,15 @@ class PlatformConstants {
     }
   }
 
-  /// 桌面端窗口默认宽度
-  static const double desktopWindowWidth = 1280;
+  /// 桌面端窗口默认宽度：紧凑双栏播放器
+  static const double desktopWindowWidth = 900;
 
-  /// 桌面端窗口默认高度 (按1280/720比例计算)
-  static const double desktopWindowHeight = 720;
+  /// 桌面端窗口默认高度
+  static const double desktopWindowHeight = 600;
 
-  /// 桌面端窗口最小宽度 (按1280/720比例计算，最小宽度为842时对应高度为473.625)
-  static const double desktopWindowMinWidth = 842;
+  /// 桌面端窗口最小宽度：保证左播放器 + 右列表仍可用
+  static const double desktopWindowMinWidth = 760;
 
-  /// 桌面端窗口最小高度 (按1280/720比例计算，最小宽度为842时对应高度为473.625)
-  static const double desktopWindowMinHeight = 473.625;
+  /// 桌面端窗口最小高度
+  static const double desktopWindowMinHeight = 520;
 }

@@ -469,7 +469,7 @@ abstract class AppLocalizations {
   /// No description provided for @scanning.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描中...'**
+  /// **'扫描中'**
   String get scanning;
 
   /// No description provided for @scan_completed.
@@ -1573,8 +1573,140 @@ abstract class AppLocalizations {
   /// No description provided for @welcome_to_tune.
   ///
   /// In zh_CN, this message translates to:
-  /// **'欢迎来到 Tune'**
+  /// **'欢迎 Tune'**
   String get welcome_to_tune;
+
+  /// No description provided for @notifications_title.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'通知'**
+  String get notifications_title;
+
+  /// No description provided for @clear_all_notifications.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空所有通知'**
+  String get clear_all_notifications;
+
+  /// No description provided for @mark_all_read.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部标记为已读'**
+  String get mark_all_read;
+
+  /// No description provided for @no_notifications.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'暂无通知'**
+  String get no_notifications;
+
+  /// No description provided for @no_notifications_subtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当您收到新通知时，它们会显示在这里'**
+  String get no_notifications_subtitle;
+
+  /// No description provided for @sort_by_date.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按日期分组'**
+  String get sort_by_date;
+
+  /// No description provided for @sort_by_type.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按类型分组'**
+  String get sort_by_type;
+
+  /// No description provided for @sort_method.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'分组方式'**
+  String get sort_method;
+
+  /// No description provided for @clear_data.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清理数据'**
+  String get clear_data;
+
+  /// No description provided for @clear_data_confirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确认清理'**
+  String get clear_data_confirm;
+
+  /// No description provided for @clear_data_description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确定要清理所有应用数据吗？此操作将清除所有设置和扫描记录，但不会删除您的音乐文件。'**
+  String get clear_data_description;
+
+  /// No description provided for @confirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确定'**
+  String get confirm;
+
+  /// No description provided for @data_cleared.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'应用数据清理完成'**
+  String get data_cleared;
+
+  /// No description provided for @data_clear_failed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'数据清理失败'**
+  String get data_clear_failed;
+
+  /// No description provided for @clear_all_data.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清理所有数据'**
+  String get clear_all_data;
+
+  /// No description provided for @no_lyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'暂无歌词'**
+  String get no_lyrics;
+
+  /// No description provided for @lyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词'**
+  String get lyrics;
+
+  /// No description provided for @search_lyrics_online.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线搜索歌词'**
+  String get search_lyrics_online;
+
+  /// No description provided for @app_slogan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'让每一段旋律都找到归属'**
+  String get app_slogan;
+
+  /// No description provided for @sleep_timer_start.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开始定时'**
+  String get sleep_timer_start;
+
+  /// No description provided for @hours.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count}小时'**
+  String hours(Object count);
+
+  /// No description provided for @minutes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count}分钟'**
+  String minutes(Object count);
 }
 
 class _AppLocalizationsDelegate

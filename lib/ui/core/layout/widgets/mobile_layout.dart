@@ -25,6 +25,9 @@ class MobileLayout extends ConsumerWidget {
     final items = DeviceMenuItem.mobile();
     final selectedIndex = items.indexWhere((item) => item.path == menuState.path);
 
+    // 获取底部安全区高度（刘海屏/手势导航条）
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -41,7 +44,11 @@ class MobileLayout extends ConsumerWidget {
                 child: child,
               ),
             ),
-            if (showMiniPlayer) const MiniPlayer(),
+            if (showMiniPlayer) ...[
+              const MiniPlayer(),
+              // MiniPlayer 底部安全区间隔
+              SizedBox(height: bottomPadding),
+            ],
           ],
         ),
       ),

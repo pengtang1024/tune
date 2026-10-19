@@ -124,6 +124,9 @@ dependencies:
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.9.0
   just_audio_windows: ^0.2.2
+  # Linux audio backend for just_audio (media_kit + system libmpv)
+  just_audio_media_kit: ^2.1.0
+  media_kit_libs_linux: ^1.2.1
 
 dev_dependencies:
   flutter_test:

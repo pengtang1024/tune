@@ -7,6 +7,7 @@ import 'package:tune/ui/theme/app_design_system.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 
 class HeroHeader extends ConsumerWidget {
   const HeroHeader({super.key});
@@ -19,7 +20,7 @@ class HeroHeader extends ConsumerWidget {
 
     return Column(
       children: [
-        _buildWelcomeSection(theme, isDark),
+        _buildWelcomeSection(context, theme, isDark),
         if (playerState.currentSong != null) ...[
           const SizedBox(height: AppDesignSystem.spacing24),
           _buildNowPlaying(context, ref, playerState.currentSong!),
@@ -28,7 +29,7 @@ class HeroHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildWelcomeSection(ThemeData theme, bool isDark) {
+  Widget _buildWelcomeSection(BuildContext context, ThemeData theme, bool isDark) {
     return Column(
       children: [
         Container(
@@ -55,7 +56,7 @@ class HeroHeader extends ConsumerWidget {
         ),
         const SizedBox(height: AppDesignSystem.spacing8),
         Text(
-          '让每一段旋律都找到归属',
+          context.loc.app_slogan,
           style: AppDesignSystem.textTheme.bodyMedium?.copyWith(
             color: isDark ? AppDesignSystem.neutral400 : AppDesignSystem.neutral600,
           ),

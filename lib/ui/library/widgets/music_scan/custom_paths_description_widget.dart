@@ -12,7 +12,7 @@ class CustomPathsDescriptionWidget extends StatelessWidget {
         SizedBox(height: AppDesignSystem.spacing8),
         Text(
           '添加自定义文件夹路径以扫描特定位置的音乐文件',
-          style: TextStyle(color: Color(0xFF64748B)),
+          style: TextStyle(color: AppDesignSystem.neutral500),
         ),
         SizedBox(height: AppDesignSystem.spacing16),
       ],

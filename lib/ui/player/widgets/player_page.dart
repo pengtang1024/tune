@@ -1,3 +1,4 @@
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,24 +32,8 @@ class PlayerPage extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: isDark
-            ? const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0F0F0F),
-                  Color(0xFF1A1A1A),
-                  Color(0xFF2D1B69),
-                ],
-              )
-            : const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFF8FAFC),
-                  Color(0xFFF1F5F9),
-                  Color(0xFFE0E7FF),
-                ],
-              ),
+            ? AppDesignSystem.playerGradientDark
+            : AppDesignSystem.playerGradientLight,
       ),
       child: SafeArea(
         child: Column(
@@ -228,7 +213,7 @@ class PlayerPage extends ConsumerWidget {
                 const SizedBox(width: AppDesignSystem.spacing12),
                 Expanded(
                   child: Text(
-                    '播放错误',
+                    context.loc.playback_error,
                     style: AppDesignSystem.textTheme.titleMedium?.copyWith(
                       color: AppDesignSystem.error,
                       fontWeight: AppDesignSystem.fontWeightSemiBold,
@@ -260,7 +245,7 @@ class PlayerPage extends ConsumerWidget {
                   ),
                   backgroundColor: AppDesignSystem.error,
                   child: Text(
-                    '重试',
+                    context.loc.retry,
                     style: AppDesignSystem.textTheme.labelLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: AppDesignSystem.fontWeightSemiBold,

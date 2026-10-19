@@ -23,6 +23,21 @@ class Song {
   final bool isFavorite;
   final String? albumArtPath;
 
+  /// Identifies the music source that produced this song.
+  ///
+  /// Local files keep this null for backward compatibility with libraries
+  /// persisted before sources were introduced.
+  final String? sourceId;
+
+  /// Provider-specific identifier used to rebuild the canonical [uri].
+  final String? externalId;
+
+  /// Direct playable URL for remote sources. [uri] stays canonical and stable.
+  final String? streamUrl;
+
+  /// Cover image URL for remote sources. Local files use [albumArtPath].
+  final String? artworkUrl;
+
   const Song({
     required this.id,
     this.title = '',
@@ -47,6 +62,10 @@ class Song {
     this.type,
     this.isFavorite = false,
     this.albumArtPath,
+    this.sourceId,
+    this.externalId,
+    this.streamUrl,
+    this.artworkUrl,
   });
 
   factory Song.fromMap(Map<String, dynamic> data) {
@@ -68,12 +87,18 @@ class Song {
       totalDisc: data['totalDisc'],
       lyrics: data['lyrics'],
       genres: data['genres'] is List ? List<String>.from(data['genres']) : null,
-      performers: data['performers'] is List ? List<String>.from(data['performers']) : null,
+      performers: data['performers'] is List
+          ? List<String>.from(data['performers'])
+          : null,
       language: data['language'],
       size: data['size'],
       type: data['type'],
       isFavorite: data['isFavorite'] ?? false,
       albumArtPath: data['albumArtPath'],
+      sourceId: data['sourceId'],
+      externalId: data['externalId'],
+      streamUrl: data['streamUrl'],
+      artworkUrl: data['artworkUrl'],
     );
   }
 
@@ -101,6 +126,10 @@ class Song {
     String? type,
     bool? isFavorite,
     String? albumArtPath,
+    String? sourceId,
+    String? externalId,
+    String? streamUrl,
+    String? artworkUrl,
   }) {
     return Song(
       id: id ?? this.id,
@@ -126,6 +155,10 @@ class Song {
       type: type ?? this.type,
       isFavorite: isFavorite ?? this.isFavorite,
       albumArtPath: albumArtPath ?? this.albumArtPath,
+      sourceId: sourceId ?? this.sourceId,
+      externalId: externalId ?? this.externalId,
+      streamUrl: streamUrl ?? this.streamUrl,
+      artworkUrl: artworkUrl ?? this.artworkUrl,
     );
   }
 
@@ -133,15 +166,41 @@ class Song {
   int get durationInMillis => duration;
   String get data => uri;
 
+  /// The URI the audio backend should load.
+  ///
+  /// Remote sources keep a canonical `tune://` URI for identity and store the
+  /// playable URL separately because it can expire between scans.
+  String get playbackUri =>
+      streamUrl != null && streamUrl!.isNotEmpty ? streamUrl! : uri;
+
   Map<String, dynamic> toJson() => {
-    'id': id, 'title': title, 'artist': artist, 'album': album,
-    'duration': duration, 'uri': uri, 'dateAdded': dateAdded,
-    'genre': genre, 'year': year, 'bitrate': bitrate,
-    'sampleRate': sampleRate, 'trackNumber': trackNumber,
-    'trackTotal': trackTotal, 'discNumber': discNumber,
-    'totalDisc': totalDisc, 'lyrics': lyrics, 'genres': genres,
-    'performers': performers, 'language': language, 'size': size,
-    'type': type, 'isFavorite': isFavorite, 'albumArtPath': albumArtPath,
+    'id': id,
+    'title': title,
+    'artist': artist,
+    'album': album,
+    'duration': duration,
+    'uri': uri,
+    'dateAdded': dateAdded,
+    'genre': genre,
+    'year': year,
+    'bitrate': bitrate,
+    'sampleRate': sampleRate,
+    'trackNumber': trackNumber,
+    'trackTotal': trackTotal,
+    'discNumber': discNumber,
+    'totalDisc': totalDisc,
+    'lyrics': lyrics,
+    'genres': genres,
+    'performers': performers,
+    'language': language,
+    'size': size,
+    'type': type,
+    'isFavorite': isFavorite,
+    'albumArtPath': albumArtPath,
+    'sourceId': sourceId,
+    'externalId': externalId,
+    'streamUrl': streamUrl,
+    'artworkUrl': artworkUrl,
   };
 
   @override

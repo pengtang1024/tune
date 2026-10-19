@@ -186,7 +186,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scan_local_music => '扫描本地音乐';
 
   @override
-  String get scanning => '扫描中...';
+  String get scanning => '扫描中';
 
   @override
   String get scan_completed => '扫描完成';
@@ -746,7 +746,78 @@ class AppLocalizationsZh extends AppLocalizations {
   String get good_evening => '晚上好';
 
   @override
-  String get welcome_to_tune => '欢迎来到 Tune';
+  String get welcome_to_tune => '欢迎 Tune';
+
+  @override
+  String get notifications_title => '通知';
+
+  @override
+  String get clear_all_notifications => '清空所有通知';
+
+  @override
+  String get mark_all_read => '全部标记为已读';
+
+  @override
+  String get no_notifications => '暂无通知';
+
+  @override
+  String get no_notifications_subtitle => '当您收到新通知时，它们会显示在这里';
+
+  @override
+  String get sort_by_date => '按日期分组';
+
+  @override
+  String get sort_by_type => '按类型分组';
+
+  @override
+  String get sort_method => '分组方式';
+
+  @override
+  String get clear_data => '清理数据';
+
+  @override
+  String get clear_data_confirm => '确认清理';
+
+  @override
+  String get clear_data_description =>
+      '确定要清理所有应用数据吗？此操作将清除所有设置和扫描记录，但不会删除您的音乐文件。';
+
+  @override
+  String get confirm => '确定';
+
+  @override
+  String get data_cleared => '应用数据清理完成';
+
+  @override
+  String get data_clear_failed => '数据清理失败';
+
+  @override
+  String get clear_all_data => '清理所有数据';
+
+  @override
+  String get no_lyrics => '暂无歌词';
+
+  @override
+  String get lyrics => '歌词';
+
+  @override
+  String get search_lyrics_online => '在线搜索歌词';
+
+  @override
+  String get app_slogan => '让每一段旋律都找到归属';
+
+  @override
+  String get sleep_timer_start => '开始定时';
+
+  @override
+  String hours(Object count) {
+    return '$count小时';
+  }
+
+  @override
+  String minutes(Object count) {
+    return '$count分钟';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -931,7 +1002,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get scan_local_music => '扫描本地音乐';
 
   @override
-  String get scanning => '扫描中...';
+  String get scanning => '扫描中';
 
   @override
   String get scan_completed => '扫描完成';
@@ -1491,7 +1562,78 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get good_evening => '晚上好';
 
   @override
-  String get welcome_to_tune => '欢迎来到 Tune';
+  String get welcome_to_tune => '欢迎 Tune';
+
+  @override
+  String get notifications_title => '通知';
+
+  @override
+  String get clear_all_notifications => '清空所有通知';
+
+  @override
+  String get mark_all_read => '全部标记为已读';
+
+  @override
+  String get no_notifications => '暂无通知';
+
+  @override
+  String get no_notifications_subtitle => '当您收到新通知时，它们会显示在这里';
+
+  @override
+  String get sort_by_date => '按日期分组';
+
+  @override
+  String get sort_by_type => '按类型分组';
+
+  @override
+  String get sort_method => '分组方式';
+
+  @override
+  String get clear_data => '清理数据';
+
+  @override
+  String get clear_data_confirm => '确认清理';
+
+  @override
+  String get clear_data_description =>
+      '确定要清理所有应用数据吗？此操作将清除所有设置和扫描记录，但不会删除您的音乐文件。';
+
+  @override
+  String get confirm => '确定';
+
+  @override
+  String get data_cleared => '应用数据清理完成';
+
+  @override
+  String get data_clear_failed => '数据清理失败';
+
+  @override
+  String get clear_all_data => '清理所有数据';
+
+  @override
+  String get no_lyrics => '暂无歌词';
+
+  @override
+  String get lyrics => '歌词';
+
+  @override
+  String get search_lyrics_online => '在线搜索歌词';
+
+  @override
+  String get app_slogan => '让每一段旋律都找到归属';
+
+  @override
+  String get sleep_timer_start => '开始定时';
+
+  @override
+  String hours(Object count) {
+    return '$count小时';
+  }
+
+  @override
+  String minutes(Object count) {
+    return '$count分钟';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

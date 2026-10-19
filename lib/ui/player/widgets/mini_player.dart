@@ -16,10 +16,13 @@ class MiniPlayer extends ConsumerStatefulWidget {
 }
 
 class _MiniPlayerState extends ConsumerState<MiniPlayer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
+
+  // 专辑封面旋转动画
+  late AnimationController _rotationController;
 
   @override
   void initState() {
@@ -39,11 +42,18 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOut),
     );
     _slideController.forward();
+
+    // 封面旋转 — 8秒一圈，播放时转，暂停时停
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    );
   }
 
   @override
   void dispose() {
     _slideController.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
@@ -54,6 +64,13 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
 
     if (playerState.currentSong == null) {
       return const SizedBox.shrink();
+    }
+
+    // 控制旋转动画
+    if (playerState.isPlaying && !_rotationController.isAnimating) {
+      _rotationController.repeat();
+    } else if (!playerState.isPlaying && _rotationController.isAnimating) {
+      _rotationController.stop();
     }
 
     final song = playerState.currentSong!;
@@ -132,12 +149,25 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
   }
 
   Widget _buildArtwork(String? albumArt) {
+    return AnimatedBuilder(
+      animation: _rotationController,
+      builder: (context, child) {
+        return Transform.rotate(
+          angle: _rotationController.value * 2 * pi,
+          child: child,
+        );
+      },
+      child: _buildArtworkInner(albumArt),
+    );
+  }
+
+  Widget _buildArtworkInner(String? albumArt) {
     if (albumArt != null && albumArt.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.zero,
+        borderRadius: BorderRadius.circular(AppDesignSystem.radius4),
         child: Image.file(
           File(albumArt),
-          width: 64, height: 64, fit: BoxFit.cover,
+          width: 52, height: 52, fit: BoxFit.cover,
           errorBuilder: (context, error, stack) => _buildDefaultArtwork(),
         ),
       );
@@ -147,12 +177,13 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer>
 
   Widget _buildDefaultArtwork() {
     return Container(
-      width: 64,
-      height: 64,
+      width: 52,
+      height: 52,
       decoration: BoxDecoration(
         gradient: AppDesignSystem.primaryGradient,
+        borderRadius: BorderRadius.circular(AppDesignSystem.radius8),
       ),
-      child: const Icon(Icons.music_note, color: Colors.white, size: AppDesignSystem.iconSize32),
+      child: const Icon(Icons.music_note, color: Colors.white, size: AppDesignSystem.iconSize24),
     );
   }
 

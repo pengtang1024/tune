@@ -4,5 +4,7 @@ import 'package:tune/data/services/impl/just_audio_player_service.dart';
 
 /// AudioPlayerService提供者
 final audioPlayerServiceProvider = Provider<AudioPlayerService>((ref) {
-  return JustAudioPlayerService();
+  final service = JustAudioPlayerService();
+  ref.onDispose(service.dispose);
+  return service;
 });

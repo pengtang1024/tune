@@ -23,8 +23,10 @@ class PlayerOptions extends ConsumerWidget {
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Wrap(
+        spacing: AppDesignSystem.spacing16,
+        runSpacing: AppDesignSystem.spacing12,
+        alignment: WrapAlignment.center,
         children: const [
           PlayerVolume(),
           PlayerSpeed(),

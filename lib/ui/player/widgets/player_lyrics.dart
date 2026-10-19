@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/player/utils/lrc_parser.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
 import 'package:tune/data/services/lrc_online_search.dart';
 
@@ -18,7 +19,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
   int _currentIndex = -1;
   bool _isSearching = false;
   final ScrollController _scrollController = ScrollController();
-  static const double _lineHeight = 36.0;
+  static const double _lineHeight = 40.0;
 
   @override
   void didChangeDependencies() {
@@ -53,7 +54,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
           children: [
             Icon(Icons.lyrics_outlined, size: AppDesignSystem.iconSize32, color: AppDesignSystem.neutral400),
             const SizedBox(height: AppDesignSystem.spacing8),
-            Text('暂无歌词', style: AppDesignSystem.textTheme.bodyMedium?.copyWith(color: AppDesignSystem.neutral400)),
+            Text(context.loc.no_lyrics, style: AppDesignSystem.textTheme.bodyMedium?.copyWith(color: AppDesignSystem.neutral400)),
             const SizedBox(height: AppDesignSystem.spacing12),
             _buildSearchButton(),
           ],
@@ -68,6 +69,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
     }
 
     final lines = _parser!.lines;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ModernCard(
       padding: const EdgeInsets.symmetric(horizontal: AppDesignSystem.spacing8, vertical: AppDesignSystem.spacing12),
@@ -78,7 +80,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
             children: [
               Icon(Icons.lyrics_rounded, size: AppDesignSystem.iconSize24, color: AppDesignSystem.primary),
               const SizedBox(width: AppDesignSystem.spacing8),
-              Text('歌词', style: AppDesignSystem.textTheme.titleSmall?.copyWith(fontWeight: AppDesignSystem.fontWeightSemiBold)),
+              Text(context.loc.lyrics, style: AppDesignSystem.textTheme.titleSmall?.copyWith(fontWeight: AppDesignSystem.fontWeightSemiBold)),
             ],
           ),
           const SizedBox(height: AppDesignSystem.spacing8),
@@ -94,23 +96,14 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
                   itemExtent: _lineHeight,
                   itemBuilder: (context, index) {
                     final isCurrent = index == _currentIndex;
-                    return AnimatedDefaultTextStyle(
-                      duration: AppDesignSystem.duration200,
-                      style: TextStyle(
-                        fontSize: isCurrent ? 16 : 13,
-                        fontWeight: isCurrent ? AppDesignSystem.fontWeightBold : AppDesignSystem.fontWeightNormal,
-                        color: isCurrent ? AppDesignSystem.primary : AppDesignSystem.neutral400,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.center,
-                      child: Text(
-                        lines[index].text,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    return _LyricLine(
+                      text: lines[index].text,
+                      isCurrent: isCurrent,
+                      isDark: isDark,
                     );
                   },
                 ),
+                // Top fade
                 Positioned(
                   top: 0, left: 0, right: 0, height: _lineHeight * 3,
                   child: IgnorePointer(
@@ -120,9 +113,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Theme.of(context).brightness == Brightness.dark
-                                ? AppDesignSystem.neutral900
-                                : Colors.white,
+                            isDark ? AppDesignSystem.neutral900 : Colors.white,
                             Colors.transparent,
                           ],
                         ),
@@ -130,6 +121,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
                     ),
                   ),
                 ),
+                // Bottom fade
                 Positioned(
                   bottom: 0, left: 0, right: 0, height: _lineHeight * 3,
                   child: IgnorePointer(
@@ -139,9 +131,7 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Theme.of(context).brightness == Brightness.dark
-                                ? AppDesignSystem.neutral900
-                                : Colors.white,
+                            isDark ? AppDesignSystem.neutral900 : Colors.white,
                             Colors.transparent,
                           ],
                         ),
@@ -162,8 +152,8 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
     final offset = _currentIndex * _lineHeight - _lineHeight * 3 + _lineHeight / 2;
     _scrollController.animateTo(
       offset.clamp(0.0, _scrollController.position.maxScrollExtent),
-      duration: AppDesignSystem.duration300,
-      curve: AppDesignSystem.curveEaseInOut,
+      duration: AppDesignSystem.duration400,
+      curve: Curves.easeOutCubic,
     );
   }
 
@@ -196,8 +186,65 @@ class _PlayerLyricsState extends ConsumerState<PlayerLyrics> {
                 color: AppDesignSystem.primary.withValues(alpha: 0.08),
                 borderRadius: AppDesignSystem.borderRadius12,
               ),
-              child: Text('在线搜索歌词', style: AppDesignSystem.textTheme.labelMedium?.copyWith(color: AppDesignSystem.primary)),
+              child: Text(context.loc.search_lyrics_online, style: AppDesignSystem.textTheme.labelMedium?.copyWith(color: AppDesignSystem.primary)),
             ),
           );
+  }
+}
+
+/// 单行歌词 — 带平滑高亮过渡和左侧 accent 边框
+class _LyricLine extends StatelessWidget {
+  final String text;
+  final bool isCurrent;
+  final bool isDark;
+
+  const _LyricLine({
+    required this.text,
+    required this.isCurrent,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDesignSystem.spacing8,
+        vertical: AppDesignSystem.spacing2,
+      ),
+      decoration: BoxDecoration(
+        color: isCurrent
+            ? AppDesignSystem.primary.withValues(alpha: 0.08)
+            : Colors.transparent,
+        borderRadius: AppDesignSystem.borderRadius8,
+        border: Border(
+          left: BorderSide(
+            color: isCurrent
+                ? AppDesignSystem.primary
+                : Colors.transparent,
+            width: 2.5,
+          ),
+        ),
+      ),
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+        style: TextStyle(
+          fontSize: isCurrent ? 16 : 13,
+          fontWeight: isCurrent ? AppDesignSystem.fontWeightBold : AppDesignSystem.fontWeightNormal,
+          color: isCurrent
+              ? AppDesignSystem.primary
+              : (isDark ? AppDesignSystem.neutral500 : AppDesignSystem.neutral400),
+          height: 1.5,
+        ),
+        textAlign: TextAlign.center,
+        child: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
   }
 }

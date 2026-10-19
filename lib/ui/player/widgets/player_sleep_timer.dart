@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/ui/player/providers/player_providers.dart';
 import 'package:tune/ui/theme/app_design_system.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/ui/theme/app_interactions.dart';
 import 'package:tune/ui/widgets/modern_card.dart';
 
@@ -109,7 +110,7 @@ class _SleepTimerState extends ConsumerState<SleepTimer> {
                       borderRadius: AppDesignSystem.borderRadius12,
                     ),
                     child: Text(
-                      m >= 60 ? '${m ~/ 60}小时' : '$m分钟',
+                      m >= 60 ? context.loc.hours(m ~/ 60) : context.loc.minutes(m),
                       style: AppDesignSystem.textTheme.labelMedium?.copyWith(
                         color: isSelected ? Colors.white : AppDesignSystem.primary,
                         fontWeight: AppDesignSystem.fontWeightMedium,
@@ -132,7 +133,7 @@ class _SleepTimerState extends ConsumerState<SleepTimer> {
                     borderRadius: AppDesignSystem.borderRadius12,
                   ),
                   child: Text(
-                    '开始定时',
+                    context.loc.sleep_timer_start,
                     style: AppDesignSystem.textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: AppDesignSystem.fontWeightBold),
                     textAlign: TextAlign.center,
                   ),

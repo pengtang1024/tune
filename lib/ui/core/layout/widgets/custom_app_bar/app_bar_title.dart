@@ -9,12 +9,13 @@ class AppBarTitle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appBarState = ref.watch(appBarStateNotifierProvider);
-
     return Text(
       appBarState.title,
       style: AppDesignSystem.textTheme.titleLarge?.copyWith(
         fontWeight: AppDesignSystem.fontWeightBold,
       ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

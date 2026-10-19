@@ -38,6 +38,18 @@ abstract class AudioPlayerService {
   /// 获取当前播放速度
   double get speed;
 
+  /// 播放位置事件流（替代 UI 轮询）
+  Stream<Duration> get positionStream;
+
+  /// 音频时长事件流
+  Stream<Duration?> get durationStream;
+
+  /// 播放/暂停状态事件流
+  Stream<bool> get playingStream;
+
+  /// 当前曲目播放完成事件流
+  Stream<void> get completionStream;
+
   /// 释放资源
   void dispose();
 }

@@ -30,14 +30,18 @@ final showMiniPlayerProvider = Provider<bool>((ref) {
 
 class ResponsiveShell extends ConsumerWidget {
   final Widget child;
-
   const ResponsiveShell({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contextState = ref.watch(responsiveContextProvider);
     if (contextState == null) {
-      ref.read(responsiveContextProvider.notifier).state = context;
+      // 延迟到 build 完成后再修改 provider，避免 Riverpod 报错
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ref.read(responsiveContextProvider) == null) {
+          ref.read(responsiveContextProvider.notifier).state = context;
+        }
+      });
     }
 
     final layoutType = ref.watch(responsiveLayoutTypeProvider);

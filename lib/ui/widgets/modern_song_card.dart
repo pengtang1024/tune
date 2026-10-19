@@ -73,7 +73,7 @@ class ModernSongCard extends StatelessWidget {
       onMore: onMore,
       isPlaying: isPlaying,
       isSelected: isSelected,
-      height: AppDesignSystem.albumCoverSize64,
+      height: AppDesignSystem.albumCoverSize72,
       margin: const EdgeInsets.symmetric(
         horizontal: AppDesignSystem.spacing16,
         vertical: AppDesignSystem.spacing4,

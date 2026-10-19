@@ -64,17 +64,51 @@ class AppDesignSystem {
     end: Alignment.bottomRight,
   );
   
-  /// 背景渐变
+  /// 背景渐变 — 通用页面背景
   static const LinearGradient backgroundGradientLight = LinearGradient(
     colors: [Color(0xFFFAFAFA), Color(0xFFF3F4F6)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
-  
+
   static const LinearGradient backgroundGradientDark = LinearGradient(
     colors: [Color(0xFF0F0F0F), Color(0xFF1A1A1A)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+
+  /// 播放器页面渐变 — 更深的紫色调，营造沉浸感
+  static const LinearGradient playerGradientLight = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFF8FAFC),
+      Color(0xFFF1F5F9),
+      Color(0xFFE0E7FF),
+    ],
+  );
+
+  static const LinearGradient playerGradientDark = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF0F0F0F),
+      Color(0xFF1A1A1A),
+      Color(0xFF2D1B69),
+    ],
+  );
+
+  /// Hero Header 渐变 — 首页顶部的活力渐变
+  static const LinearGradient heroGradientLight = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFAFAFA), Color(0xFFF3F4F6)],
+  );
+
+  static const LinearGradient heroGradientDark = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0F0F0F), Color(0xFF1A1A1A)],
   );
 
   // ========== 间距系统 ==========
@@ -178,7 +212,12 @@ class AppDesignSystem {
 
   // ========== 字体系统 ==========
   
-  static const String fontFamilyPrimary = 'SF Pro Display';
+  /// 主字体 — 不指定 fontFamily，使用平台原生字体
+  /// Android: Roboto | iOS/macOS: SF Pro | Windows: Segoe UI | Linux: Ubuntu
+  /// 这确保每个平台都有最佳的原生阅读体验
+  static const String fontFamilyPrimary = ''; // empty = use platform default
+  
+  /// 等宽字体 — 用于时间戳、代码、等宽数字
   static const String fontFamilySecondary = 'JetBrains Mono';
   
   // 字体大小
