@@ -34,9 +34,7 @@ class QueueTrackRow extends StatelessWidget {
     final accent = theme.colorScheme.primary;
 
     return Material(
-      color: selected
-          ? accent.withValues(alpha: 0.06)
-          : Colors.transparent,
+      color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
       child: InkWell(
         onTap: onTap,
         hoverColor: accent.withValues(alpha: 0.04),

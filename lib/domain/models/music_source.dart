@@ -9,12 +9,16 @@ class MusicSourceField {
   final bool required;
   final bool numeric;
 
+  /// Whether the value is a secret and must not be shown on screen.
+  final bool secret;
+
   const MusicSourceField(
     this.key,
     this.label,
     this.hint, {
     this.required = false,
     this.numeric = false,
+    this.secret = false,
   });
 }
 
@@ -64,6 +68,11 @@ class MusicSourceConfig {
   bool get isPlugin => kind == MusicSourceKind.plugin;
 
   String? get pluginFile => setting('pluginFile');
+
+  /// Address the plugin script was downloaded from.
+  ///
+  /// Only plugins that were imported by URL can be updated.
+  String? get pluginUrl => setting('pluginUrl');
 
   String? setting(String key) {
     final value = settings[key];
@@ -118,6 +127,7 @@ class MusicSourceConfig {
             item['hint']?.toString() ?? '',
             required: item['required'] == true,
             numeric: item['numeric'] == true,
+            secret: item['secret'] == true,
           ),
         );
       }
@@ -150,6 +160,7 @@ class MusicSourceConfig {
             'hint': field.hint,
             'required': field.required,
             'numeric': field.numeric,
+            'secret': field.secret,
           },
       ],
   };

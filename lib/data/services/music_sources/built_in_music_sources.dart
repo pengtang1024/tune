@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 
 /// Built-in source definitions.
 ///
@@ -7,52 +8,90 @@ import 'package:tune/domain/models/music_source.dart';
 class BuiltInMusicSources {
   const BuiltInMusicSources._();
 
-  static const local = MusicSourceConfig(
+  static final local = MusicSourceConfig(
     id: 'local',
-    name: '本地音乐',
-    description: '扫描设备上的音乐文件夹',
+    name: AppStrings.instance.sourceLocalName,
+    description: AppStrings.instance.sourceLocalDescription,
     kind: MusicSourceKind.localDirectory,
   );
 
-  static const openverse = MusicSourceConfig(
+  static final openverse = MusicSourceConfig(
     id: 'openverse',
     name: 'Openverse',
-    description: '开放版权音频聚合：Jamendo、Freesound、Wikimedia 等',
+    description: AppStrings.instance.sourceOpenverseDescription,
     kind: MusicSourceKind.openCatalog,
     settings: {'query': 'piano'},
   );
 
-  static const jamendo = MusicSourceConfig(
+  static final jamendo = MusicSourceConfig(
     id: 'jamendo',
     name: 'Jamendo',
-    description: '独立音乐开放曲库，需要免费 Client ID',
+    description: AppStrings.instance.sourceJamendoDescription,
     kind: MusicSourceKind.openCatalog,
     enabled: false,
     settings: {'query': ''},
   );
 
-  static const internetArchive = MusicSourceConfig(
+  static final internetArchive = MusicSourceConfig(
     id: 'internet_archive',
     name: 'Internet Archive',
-    description: '互联网档案馆的开放音频收藏',
+    description: AppStrings.instance.sourceInternetArchiveDescription,
     kind: MusicSourceKind.openCatalog,
     settings: {'query': 'collection:netlabels AND mediatype:audio'},
   );
 
-  static const netease = MusicSourceConfig(
+  static final netease = MusicSourceConfig(
     id: 'netease',
-    name: '网易云音乐 API',
-    description: '连接自建的 NeteaseCloudMusicApi 服务',
+    name: AppStrings.instance.sourceNeteaseName,
+    description: AppStrings.instance.sourceNeteaseDescription,
     kind: MusicSourceKind.openApi,
     enabled: false,
-    settings: {'keywords': '热门'},
+    settings: {'keywords': AppStrings.instance.neteaseHotKeyword},
   );
 
-  static const defaults = <MusicSourceConfig>[
+  static final ccmixter = MusicSourceConfig(
+    id: 'ccmixter',
+    name: 'ccMixter',
+    description: AppStrings.instance.sourceCcmixterDescription,
+    kind: MusicSourceKind.openCatalog,
+    settings: {'query': 'jazz'},
+  );
+
+  static final itunes = MusicSourceConfig(
+    id: 'itunes',
+    name: 'iTunes',
+    description: AppStrings.instance.sourceItunesDescription,
+    kind: MusicSourceKind.openCatalog,
+    settings: {'query': 'jazz'},
+  );
+
+  static final podcastRss = MusicSourceConfig(
+    id: 'podcast_rss',
+    name: AppStrings.instance.sourcePodcastRssName,
+    description: AppStrings.instance.sourcePodcastRssDescription,
+    kind: MusicSourceKind.openApi,
+    enabled: false,
+    settings: {'feed': ''},
+  );
+
+  static final subsonic = MusicSourceConfig(
+    id: 'subsonic',
+    name: 'Subsonic',
+    description: AppStrings.instance.sourceSubsonicDescription,
+    kind: MusicSourceKind.openApi,
+    enabled: false,
+    settings: {'server': '', 'user': '', 'password': ''},
+  );
+
+  static final defaults = <MusicSourceConfig>[
     local,
     openverse,
     jamendo,
     internetArchive,
     netease,
+    ccmixter,
+    itunes,
+    podcastRss,
+    subsonic,
   ];
 }

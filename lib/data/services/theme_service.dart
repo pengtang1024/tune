@@ -13,7 +13,10 @@ class ThemeService {
   /// 保存主题模式
   Future<void> saveThemeMode(ThemeMode themeMode) async {
     try {
-      await _persistenceService.setInt(AppPreferencesConstants.themeMode, themeMode.index);
+      await _persistenceService.setInt(
+        AppPreferencesConstants.themeMode,
+        themeMode.index,
+      );
     } catch (e) {
       Log.info('Failed to save theme mode: $e'); // 应该使用本地化字符串
     }

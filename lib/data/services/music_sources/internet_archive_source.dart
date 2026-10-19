@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 
@@ -33,18 +34,22 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       config.setting('query') != null;
 
   @override
-  String get configurationHint =>
-      '填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio';
+  String get configurationHint => AppStrings.instance.internetArchiveHint;
 
   @override
-  List<MusicSourceField> get configurationFields => const [
+  List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      '收录条件',
+      AppStrings.instance.internetArchiveFieldQuery,
       'collection:netlabels AND mediatype:audio',
       required: true,
     ),
-    MusicSourceField('limit', '每次扫描数量', '默认 8，最大 20', numeric: true),
+    MusicSourceField(
+      'limit',
+      AppStrings.instance.internetArchiveFieldLimit,
+      AppStrings.instance.internetArchiveFieldLimitHint,
+      numeric: true,
+    ),
   ];
 
   @override
@@ -82,7 +87,10 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final searchResponse = data?['response'];
       final docs = searchResponse is Map ? searchResponse['docs'] : null;
       if (docs is! List) {
-        return failedResult(sourceId, 'Internet Archive 返回了无法识别的响应');
+        return failedResult(
+          sourceId,
+          AppStrings.instance.internetArchiveInvalidResponse,
+        );
       }
 
       final songs = <Song>[];
@@ -107,7 +115,9 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         sourceId: sourceId,
         status: SourceScanStatus.success,
         songs: unique.values.toList(growable: false),
-        message: unique.isEmpty ? '没有找到可播放的归档音频' : null,
+        message: unique.isEmpty
+            ? AppStrings.instance.internetArchiveNoMatch
+            : null,
       );
     } catch (error) {
       return failedResult(sourceId, error);

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
+import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
@@ -9,7 +11,9 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
+import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -92,6 +96,10 @@ void main() {
         JamendoSourceAdapter(),
         InternetArchiveSourceAdapter(),
         NeteaseCloudMusicSourceAdapter(),
+        CcMixterSourceAdapter(),
+        ITunesSourceAdapter(),
+        PodcastRssSourceAdapter(),
+        SubsonicSourceAdapter(),
       ];
 
       for (final adapter in adapters) {

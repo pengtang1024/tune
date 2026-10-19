@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/music_source.dart';
 
 /// Stores imported MusicFree plugin scripts under the app support directory.
@@ -36,7 +37,7 @@ class MusicPluginStore {
   Future<String> read(MusicSourceConfig config) async {
     final file = await fileFor(config);
     if (file == null || !await file.exists()) {
-      throw StateError('插件文件不存在，请重新导入');
+      throw StateError(AppStrings.instance.pluginFileMissing);
     }
     return file.readAsString();
   }
@@ -47,6 +48,18 @@ class MusicPluginStore {
     final file = File(path.join(directory.path, fileName));
     await file.writeAsString(script, flush: true);
     return fileName;
+  }
+
+  /// Replaces the script of an already installed plugin.
+  ///
+  /// The file keeps its name, so the source id and the songs that were
+  /// scanned with the old script stay valid.
+  Future<void> writeScript(MusicSourceConfig config, String script) async {
+    final file = await fileFor(config);
+    if (file == null) {
+      throw StateError(AppStrings.instance.pluginFileMissing);
+    }
+    await file.writeAsString(script, flush: true);
   }
 
   Future<void> delete(MusicSourceConfig config) async {

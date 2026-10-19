@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
@@ -57,23 +58,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           transitionDuration: const Duration(milliseconds: 280),
           reverseTransitionDuration: const Duration(milliseconds: 200),
           child: const NowPlayingPage(),
-          transitionsBuilder:
-              (context, animation, secondaryAnimation, child) {
-                final curved = CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOutCubic,
-                );
-                return FadeTransition(
-                  opacity: curved,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.06),
-                      end: Offset.zero,
-                    ).animate(curved),
-                    child: child,
-                  ),
-                );
-              },
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            );
+            return FadeTransition(
+              opacity: curved,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.06),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: child,
+              ),
+            );
+          },
         ),
       ),
     ],
@@ -83,11 +83,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('页面不存在'),
+              Text(context.loc.routerNotFoundTitle),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: () => context.go('/library'),
-                child: const Text('返回音乐库'),
+                child: Text(context.loc.routerBackToLibrary),
               ),
             ],
           ),

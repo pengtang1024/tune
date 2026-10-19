@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
@@ -22,9 +23,7 @@ final musicSourceNamesProvider = Provider<Map<String, String>>((ref) {
       (value) => value.valueOrNull?.sources ?? const <MusicSourceConfig>[],
     ),
   );
-  return {
-    for (final source in sources) source.id: source.name,
-  };
+  return {for (final source in sources) source.id: source.name};
 });
 
 /// Owns the user-facing source list (enable flags and adapter settings).
@@ -78,17 +77,41 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
     required String originalName,
     required String script,
   }) async {
+    return _install(
+      () => _plugins.install(originalName: originalName, script: script),
+    );
+  }
+
+  /// Downloads a plugin from [url] and adds it to the source list.
+  ///
+  /// The address is remembered, so the plugin can be updated later.
+  Future<MusicSourceConfig> installPluginFromUrl(String url) async {
+    return _install(() => _plugins.installFromUrl(url));
+  }
+
+  /// Replaces the script of a plugin with the current one from its URL.
+  Future<MusicPluginUpdate> updatePlugin(String sourceId) async {
     if (_disposed || !state.hasValue) {
-      throw const MusicPluginException('音源列表尚未加载完成');
+      throw MusicPluginException(AppStrings.instance.sourcesNotLoaded);
+    }
+    final config = _current.byId(sourceId);
+    if (config == null || !config.isPlugin) {
+      throw MusicPluginException(AppStrings.instance.pluginUpdateNoUrl);
+    }
+    return _plugins.update(config);
+  }
+
+  Future<MusicSourceConfig> _install(
+    Future<MusicSourceConfig> Function() install,
+  ) async {
+    if (_disposed || !state.hasValue) {
+      throw MusicPluginException(AppStrings.instance.sourcesNotLoaded);
     }
     if (!_plugins.supportsPlugins) {
-      throw const MusicPluginException('当前平台不支持 JavaScript 插件');
+      throw MusicPluginException(AppStrings.instance.sourcesPlatformNoPlugin);
     }
 
-    final config = await _plugins.install(
-      originalName: originalName,
-      script: script,
-    );
+    final config = await install();
 
     final existing = _current.byId(config.id);
     final next = [

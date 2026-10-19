@@ -55,6 +55,7 @@ class FakePluginRepository extends MusicPluginRepository {
   Future<MusicSourceConfig> install({
     required String originalName,
     required String script,
+    String? originUrl,
   }) async {
     return const MusicSourceConfig(
       id: 'plugin_demo',

@@ -1,3 +1,4 @@
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -16,7 +17,7 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
   bool isConfigured(MusicSourceConfig config) => true;
 
   @override
-  String get configurationHint => '在音乐库设置中添加扫描目录';
+  String get configurationHint => AppStrings.instance.localSourceHint;
 
   @override
   List<MusicSourceField> get configurationFields => const [];
@@ -39,7 +40,7 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
       return SourceScanResult(
         sourceId: sourceId,
         status: SourceScanStatus.skipped,
-        message: '未配置本地音乐目录',
+        message: AppStrings.instance.localSourceNotConfigured,
       );
     }
 

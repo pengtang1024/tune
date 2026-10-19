@@ -9,813 +9,1154 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get app_name => 'Tune';
+  String get appName => 'Tune';
 
   @override
-  String get welcome_message => '欢迎使用 Tune';
+  String get appTagline => 'Un lecteur de musique local d’abord';
 
   @override
-  String get no_songs_found => '未找到歌曲';
+  String get appStartFailed => 'Échec du démarrage de Tune';
 
   @override
-  String get settings => '设置';
+  String get cancel => 'Annuler';
 
   @override
-  String get settings_saved => '设置已保存';
+  String get ok => 'OK';
 
   @override
-  String get retry => '重试';
+  String get save => 'Enregistrer';
 
   @override
-  String get home => '首页';
+  String get delete => 'Supprimer';
 
   @override
-  String get home_title => '首页';
+  String get remove => 'Retirer';
 
   @override
-  String get recommend => '推荐';
+  String get clear => 'Vider';
 
   @override
-  String get featured => '精选';
+  String get close => 'Fermer';
 
   @override
-  String get library => '音乐库';
+  String get retry => 'Réessayer';
 
   @override
-  String get library_title => '音乐库';
+  String get confirm => 'Confirmer';
 
   @override
-  String get search => '搜索';
+  String get chooseFile => 'Choisir un fichier';
 
   @override
-  String get search_title => '搜索';
+  String get unknownError => 'Erreur inconnue';
 
   @override
-  String get player => '播放器';
+  String get scanNow => 'Scanner maintenant';
 
   @override
-  String get player_title => '播放器';
+  String get search => 'Rechercher';
 
   @override
-  String get playlist => '播放列表';
+  String get scanning => 'Analyse en cours';
 
   @override
-  String get about => '关于';
+  String get about => 'À propos';
 
   @override
-  String get custom_scan_paths => '自定义扫描路径';
+  String get language => 'Langue';
 
   @override
-  String get playback_settings => '播放设置';
+  String get theme => 'Thème';
 
   @override
-  String get account_settings => '账户设置';
+  String get lightMode => 'Mode clair';
 
   @override
-  String get general_settings => '常规设置';
+  String get darkMode => 'Mode sombre';
 
   @override
-  String get music_library_settings => '音乐库设置';
+  String get systemMode => 'Suivre le système';
 
   @override
-  String get about_settings => '关于';
+  String get musicLibrary => 'Bibliothèque';
 
   @override
-  String get play_mode => '播放模式';
+  String get navLibrary => 'Bibliothèque';
 
   @override
-  String get sequence_playback => '顺序播放';
+  String get navQueue => 'File d’attente';
 
   @override
-  String get repeat_one => '单曲重复';
+  String get navSources => 'Sources';
 
   @override
-  String get shuffle_playback => '随机播放';
+  String get navSettings => 'Paramètres';
 
   @override
-  String get audio_quality => '音质';
+  String get libraryTitle => 'Bibliothèque';
 
   @override
-  String get low_quality => '低质量';
+  String get librarySubtitle =>
+      'Tous les titres de vos sources locales et en ligne';
 
   @override
-  String get medium_quality => '中等质量';
+  String get libraryClearSearch => 'Effacer la recherche';
 
   @override
-  String get high_quality => '高质量';
+  String get libraryFilterSources => 'Filtrer les sources';
 
   @override
-  String get pause_when_headset_disconnected => '耳机断开时暂停';
+  String get libraryAllSources => 'Toutes les sources';
 
   @override
-  String get audio_effects => '音频效果';
+  String get libraryScanAllSources => 'Analyser toutes les sources';
 
   @override
-  String get enable_equalizer => '启用均衡器';
-
-  @override
-  String get bass_boost => '低音增强';
-
-  @override
-  String get spatial_audio => '空间音频';
-
-  @override
-  String get username => '用户名';
-
-  @override
-  String get email => '邮箱';
-
-  @override
-  String get auto_login => '自动登录';
-
-  @override
-  String get save_password => '保存密码';
-
-  @override
-  String get save => '保存';
-
-  @override
-  String get cancel => '取消';
-
-  @override
-  String get ok => '确定';
-
-  @override
-  String get add => '添加';
-
-  @override
-  String get remove => '移除';
-
-  @override
-  String get edit => '编辑';
-
-  @override
-  String get delete => '删除';
-
-  @override
-  String get add_custom_path => '添加自定义路径';
-
-  @override
-  String get no_custom_scan_paths => '未设置自定义扫描路径';
-
-  @override
-  String get change_language => '更改语言';
-
-  @override
-  String get change_language_confirm => '确定要更改应用语言吗？这将重启应用以应用新设置。';
-
-  @override
-  String get current_language_display => '当前语言:';
-
-  @override
-  String get theme_preview => '主题预览';
-
-  @override
-  String get system_mode_preview => '系统';
-
-  @override
-  String get light_mode_preview => '浅色';
-
-  @override
-  String get dark_mode_preview => '深色';
-
-  @override
-  String get no_custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
-
-  @override
-  String get scan_local_music => '扫描本地音乐';
-
-  @override
-  String get scanning => '扫描中';
-
-  @override
-  String get scan_completed => '扫描完成';
-
-  @override
-  String get scan_failed => '扫描失败';
-
-  @override
-  String get failed_to_load_songs => '加载歌曲失败';
-
-  @override
-  String get failed_to_load_songs_description =>
-      '无法从您的音乐库加载歌曲。请检查您的网络连接或重新扫描音乐库。';
-
-  @override
-  String get try_again => '重试';
-
-  @override
-  String get scan_progress => '扫描进度';
-
-  @override
-  String get scanning_path => '正在扫描路径:';
-
-  @override
-  String get no_songs_found_description => '在您的设备上未找到任何音乐文件。';
-
-  @override
-  String get scan_again => '重新扫描';
-
-  @override
-  String get scan_local_music_description => '扫描您的设备以查找音乐文件';
-
-  @override
-  String get custom_scan_paths_description => '添加自定义文件夹路径以扫描特定位置的音乐文件';
-
-  @override
-  String get scan_button => '开始扫描';
-
-  @override
-  String get cancel_scan => '取消扫描';
-
-  @override
-  String get failed_to_save_custom_scan_paths => '保存自定义扫描路径失败';
-
-  @override
-  String get failed_to_add_custom_scan_path => '添加自定义扫描路径失败';
-
-  @override
-  String get failed_to_scan_music => '扫描音乐失败';
-
-  @override
-  String get search_songs => '搜索歌曲...';
-
-  @override
-  String get artists => '艺术家';
-
-  @override
-  String get albums => '专辑';
-
-  @override
-  String get songs => '歌曲';
-
-  @override
-  String get playlists => 'Listes de lecture';
-
-  @override
-  String get music_library => '音乐库';
-
-  @override
-  String get favorites => 'Favoris';
-
-  @override
-  String get recently_played => '最近播放';
-
-  @override
-  String get top_charts => '排行榜';
-
-  @override
-  String get new_releases => '新歌发布';
-
-  @override
-  String get genres => '流派';
-
-  @override
-  String get now_playing => '正在播放';
-
-  @override
-  String get previous => '上一首';
-
-  @override
-  String get next => '下一首';
-
-  @override
-  String get play => '播放';
-
-  @override
-  String get pause => '暂停';
-
-  @override
-  String get sequence => '顺序播放';
-
-  @override
-  String get shuffle => '随机播放';
-
-  @override
-  String get scan_completed_no_new_songs => '扫描完成，未找到新歌曲';
-
-  @override
-  String get added_scanned_songs_to_library => '已将扫描的歌曲添加到音乐库';
-
-  @override
-  String get rescan => '重新扫描';
-
-  @override
-  String get load_stats_failed => '加载统计信息失败';
-
-  @override
-  String get load_songs_failed => '加载歌曲失败';
-
-  @override
-  String get add_to_library => '添加到音乐库';
-
-  @override
-  String get general_tab => 'Général';
-
-  @override
-  String get library_tab => 'Bibliothèque';
-
-  @override
-  String get account_tab => 'Compte';
-
-  @override
-  String get playback_tab => 'Lecture';
-
-  @override
-  String get about_tab => '关于';
-
-  @override
-  String get animations_tab => 'Animations';
-
-  @override
-  String get version => '版本';
-
-  @override
-  String get platform => '平台';
-
-  @override
-  String get about_description =>
-      'Tune 是一款现代化的音乐播放器，专为音乐爱好者设计。它支持多种音频格式，提供高质量的音频播放体验。';
-
-  @override
-  String get features => '功能特性';
-
-  @override
-  String get high_quality_audio_playback => '高质量音频播放';
-
-  @override
-  String get supports_multiple_audio_formats => '支持多种音频格式（MP3、FLAC、WAV、AAC等）';
-
-  @override
-  String get local_music_management => '本地音乐管理';
-
-  @override
-  String get automatically_scans_and_organizes_local_music_library =>
-      '自动扫描并整理本地音乐库';
-
-  @override
-  String get multi_language_support => '多语言支持';
-
-  @override
-  String get supports_chinese_english_japanese_korean_russian_and_more =>
-      '支持中文、英文、日文、韩文、俄文等多种语言';
-
-  @override
-  String get multiple_themes => '多种主题';
-
-  @override
-  String get eight_theme_colors_with_dark_light_mode_switching =>
-      '8种主题颜色，支持深色/浅色模式切换';
-
-  @override
-  String get lyrics_synchronization => '歌词同步';
-
-  @override
-  String get lrc_format_lyrics_real_time_synchronization_display =>
-      'LRC格式歌词实时同步显示';
-
-  @override
-  String get smart_search => '智能搜索';
-
-  @override
-  String get supports_searching_by_song_title_artist_album_and_other_metadata =>
-      '支持按歌曲名、艺术家、专辑等元数据搜索';
-
-  @override
-  String get open_source_license => '开源许可';
-
-  @override
-  String get opensource_license_description => '本项目使用开源许可证发布，源代码可在GitHub上获取。';
-
-  @override
-  String get github_project_address => 'GitHub项目地址';
-
-  @override
-  String get contact_us => '联系我们';
-
-  @override
-  String get contact_us_description =>
-      '如有任何问题，请通过以下方式联系我们：\n邮箱：support@tune.com';
-
-  @override
-  String get official_website => '官方网站';
-
-  @override
-  String get auto_start => '开机自启';
-
-  @override
-  String get auto_start_description => '系统启动时自动运行Tune';
-
-  @override
-  String get window_size => '窗口大小';
-
-  @override
-  String get small => '小';
-
-  @override
-  String get medium => '中';
-
-  @override
-  String get large => '大';
-
-  @override
-  String get window_size_description => '设置应用窗口的默认大小';
-
-  @override
-  String get default_player => '默认播放器';
-
-  @override
-  String get default_player_description => '将Tune设置为系统默认音频播放器';
-
-  @override
-  String get desktop_lyrics => '桌面歌词';
-
-  @override
-  String get desktop_lyrics_description => '在桌面上显示实时歌词';
-
-  @override
-  String get music_library_management => '音乐库管理';
-
-  @override
-  String get add_custom_directory => '添加自定义目录';
-
-  @override
-  String get full_platform_scan_note => '全平台扫描说明：默认扫描系统音乐目录，可通过添加自定义路径扩展扫描范围。';
-
-  @override
-  String get library_info => '音乐库信息';
-
-  @override
-  String get songs_count => '歌曲总数';
-
-  @override
-  String get library_features => '音乐库功能';
-
-  @override
-  String get access_library => '访问音乐库';
-
-  @override
-  String get scan_instructions => '扫描说明';
-
-  @override
-  String get auto_extract_metadata => '自动提取元数据';
-
-  @override
-  String get add_custom_paths => '添加自定义路径';
-
-  @override
-  String get scan_completion => '扫描完成';
-
-  @override
-  String get auto_metadata_extraction => '自动元数据提取';
-
-  @override
-  String get how_to_scan => '如何扫描';
-
-  @override
-  String get scan_step1 => '1. 点击扫描按钮开始扫描';
-
-  @override
-  String get scan_step2 => '2. 系统会自动扫描默认音乐目录';
-
-  @override
-  String get scan_step3 => '3. 可添加自定义目录扩展扫描范围';
-
-  @override
-  String get scan_step4 => '4. 扫描完成后歌曲会自动添加到音乐库';
-
-  @override
-  String get faq => '常见问题';
-
-  @override
-  String get faq_scan_issue => '扫描问题';
-
-  @override
-  String get faq_scan_issue_answer => '如果扫描失败，请检查文件权限和路径是否正确。';
-
-  @override
-  String get faq_slow_scan => '扫描缓慢';
-
-  @override
-  String get faq_slow_scan_answer => '扫描速度取决于音乐库大小和硬盘性能，大库扫描可能需要较长时间。';
-
-  @override
-  String get faq_not_showing => '歌曲未显示';
-
-  @override
-  String get faq_not_showing_answer => '确保音乐文件格式受支持，并检查文件是否损坏。';
-
-  @override
-  String get music_scan => 'Scan musical';
-
-  @override
-  String get failed_to_open_github => '无法打开GitHub页面';
-
-  @override
-  String get select_language => '选择语言';
-
-  @override
-  String get unknown_user => '未知用户';
-
-  @override
-  String get tag_vip => 'VIP';
-
-  @override
-  String get tag_singer => 'Chanteur';
-
-  @override
-  String get tag_elite => 'Élite';
-
-  @override
-  String get settings_page_theme => '主题设置';
-
-  @override
-  String get settings_page_language => '语言设置';
-
-  @override
-  String get language => '语言';
-
-  @override
-  String get theme => '主题';
-
-  @override
-  String get display_settings => '显示设置';
-
-  @override
-  String get language_theme_description => '设置应用的语言和主题模式';
-
-  @override
-  String get system_mode => '跟随系统';
-
-  @override
-  String get light_mode => '浅色模式';
-
-  @override
-  String get dark_mode => '深色模式';
-
-  @override
-  String get english => '英语';
-
-  @override
-  String get chinese_simplified => '简体中文';
-
-  @override
-  String get chinese_traditional => '繁体中文';
-
-  @override
-  String get chinese => '中文';
-
-  @override
-  String get japanese => '日语';
-
-  @override
-  String get korean => '韩语';
-
-  @override
-  String get russian => '俄语';
-
-  @override
-  String get german => '德语';
-
-  @override
-  String get french => '法语';
-
-  @override
-  String get spanish => '西班牙语';
-
-  @override
-  String get search_error => '搜索错误';
-
-  @override
-  String get error => '错误';
-
-  @override
-  String get network_error => '网络错误';
-
-  @override
-  String get permission_denied => '权限被拒绝';
-
-  @override
-  String get invalid_input => '无效输入';
-
-  @override
-  String get search_no_results => '未找到搜索结果';
-
-  @override
-  String get skipToPrevious => '上一首';
-
-  @override
-  String get skipToNext => '下一首';
-
-  @override
-  String get playback_error => '播放错误';
-
-  @override
-  String get no_song_playing => '当前无歌曲播放';
-
-  @override
-  String get select_a_song_to_play => '请选择一首歌曲播放';
-
-  @override
-  String get repeat_all => '全部循环';
-
-  @override
-  String get playback_speed => '播放速度';
-
-  @override
-  String get default_playback_speed => '默认播放速度';
-
-  @override
-  String get default_playback_speed_description => '设置所有歌曲的默认播放速度';
-
-  @override
-  String get crossfade => '交叉淡入淡出';
-
-  @override
-  String get crossfade_description => '启用歌曲间的交叉淡入淡出';
-
-  @override
-  String get crossfade_duration => '交叉淡入淡出时长';
-
-  @override
-  String get gapless_playback => '无缝播放';
-
-  @override
-  String get gapless_playback_description => '启用无缝播放以实现平滑过渡';
-
-  @override
-  String get equalizer => '均衡器';
-
-  @override
-  String get equalizer_tab => 'Égaliseur';
-
-  @override
-  String get presets => '预设';
-
-  @override
-  String get flat => '平直';
-
-  @override
-  String get pop => '流行';
-
-  @override
-  String get rock => '摇滚';
-
-  @override
-  String get jazz => '爵士';
-
-  @override
-  String get classical => '古典';
-
-  @override
-  String get hip_hop => '嘻哈';
-
-  @override
-  String get custom_equalizer => '自定义均衡器';
-
-  @override
-  String get animations_settings => '动画设置';
-
-  @override
-  String get enable_animations => '启用动画';
-
-  @override
-  String get enable_animations_description => '启用或禁用UI动画';
-
-  @override
-  String get animation_speed => '动画速度';
-
-  @override
-  String get animation_speed_description => '设置UI动画的速度';
-
-  @override
-  String get very_slow => '非常慢';
-
-  @override
-  String get slow => '慢';
-
-  @override
-  String get normal => '正常';
-
-  @override
-  String get fast => '快';
-
-  @override
-  String get very_fast => '非常快';
-
-  @override
-  String get no_scan_results => '未找到扫描结果';
-
-  @override
-  String get enable_notifications => '启用通知';
-
-  @override
-  String get enable_notifications_description => '启用或禁用应用通知';
-
-  @override
-  String get font_size => '字体大小';
-
-  @override
-  String get font_size_description => '调整应用内文字的显示大小';
-
-  @override
-  String get error_occurred => '发生错误';
-
-  @override
-  String get quick_actions => 'Actions rapides';
-
-  @override
-  String get my_songs => 'Mes chansons';
-
-  @override
-  String get radio => 'Radio';
-
-  @override
-  String get see_all => 'Tout voir';
-
-  @override
-  String get no_recent_songs => 'Aucune chanson récemment jouée';
-
-  @override
-  String get good_morning => 'Bonjour';
-
-  @override
-  String get good_afternoon => 'Bon après-midi';
-
-  @override
-  String get good_evening => 'Bonsoir';
-
-  @override
-  String get welcome_to_tune => 'Bienvenue dans Tune';
-
-  @override
-  String get notifications_title => '通知';
-
-  @override
-  String get clear_all_notifications => '清空所有通知';
-
-  @override
-  String get mark_all_read => '全部标记为已读';
-
-  @override
-  String get no_notifications => '暂无通知';
-
-  @override
-  String get no_notifications_subtitle => '当您收到新通知时，它们会显示在这里';
-
-  @override
-  String get sort_by_date => '按日期分组';
-
-  @override
-  String get sort_by_type => '按类型分组';
-
-  @override
-  String get sort_method => '分组方式';
-
-  @override
-  String get clear_data => '清理数据';
-
-  @override
-  String get clear_data_confirm => '确认清理';
-
-  @override
-  String get clear_data_description =>
-      '确定要清理所有应用数据吗？此操作将清除所有设置和扫描记录，但不会删除您的音乐文件。';
-
-  @override
-  String get confirm => '确定';
-
-  @override
-  String get data_cleared => '应用数据清理完成';
-
-  @override
-  String get data_clear_failed => '数据清理失败';
-
-  @override
-  String get clear_all_data => '清理所有数据';
-
-  @override
-  String get no_lyrics => '暂无歌词';
-
-  @override
-  String get lyrics => '歌词';
-
-  @override
-  String get search_lyrics_online => '在线搜索歌词';
-
-  @override
-  String get app_slogan => '让每一段旋律都找到归属';
-
-  @override
-  String get sleep_timer_start => '开始定时';
-
-  @override
-  String hours(Object count) {
-    return '$count小时';
+  String libraryTrackCount(int count) {
+    return '$count titres';
   }
 
   @override
-  String minutes(Object count) {
-    return '$count分钟';
+  String get libraryNoMatchTitle => 'Aucun titre correspondant';
+
+  @override
+  String get libraryNoMatchSubtitle =>
+      'Essayez un autre mot-clé ou effacez la recherche';
+
+  @override
+  String get librarySourceEmptyTitle => 'Aucun titre pour cette source';
+
+  @override
+  String get librarySourceEmptySubtitle =>
+      'Passez à toutes les sources ou rescanez celle-ci';
+
+  @override
+  String get libraryViewAllSources => 'Afficher toutes les sources';
+
+  @override
+  String get libraryScanningTitle => 'Analyse de la musique';
+
+  @override
+  String get libraryEmptyTitle => 'Aucune musique pour l’instant';
+
+  @override
+  String get libraryEmptySubtitle =>
+      'Analysez un dossier local ou une source en ligne activée, ou ajustez vos sources dans les paramètres.';
+
+  @override
+  String get libraryLoadFailedTitle => 'Impossible de charger la bibliothèque';
+
+  @override
+  String get libraryAddedToQueue => 'Ajouté à la file d’attente';
+
+  @override
+  String libraryScanPaths(String paths) {
+    return 'Dossiers analysés : $paths';
   }
+
+  @override
+  String get libraryAddToQueue => 'Ajouter à la file d’attente';
+
+  @override
+  String get queueTitle => 'File d’attente';
+
+  @override
+  String get queueSubtitle => 'Ordre de lecture actuel';
+
+  @override
+  String get queueEmptyTitle => 'La file d’attente est vide';
+
+  @override
+  String get queueEmptySubtitle =>
+      'Choisissez un titre dans la bibliothèque ou ajoutez des titres à la file';
+
+  @override
+  String get queueGoToLibrary => 'Aller à la bibliothèque';
+
+  @override
+  String get queueClearTitle => 'Vider la file d’attente ?';
+
+  @override
+  String get queueClearMessage =>
+      'La lecture s’arrête. Les titres restent dans la bibliothèque.';
+
+  @override
+  String get playerNowPlaying => 'Lecture en cours';
+
+  @override
+  String get playerCollapse => 'Réduire';
+
+  @override
+  String get playerPrevious => 'Titre précédent';
+
+  @override
+  String get playerNext => 'Titre suivant';
+
+  @override
+  String get playerPlay => 'Lire';
+
+  @override
+  String get playerPause => 'Pause';
+
+  @override
+  String get playerMute => 'Muet';
+
+  @override
+  String get playerUnmute => 'Réactiver le son';
+
+  @override
+  String get playerQueue => 'File d’attente';
+
+  @override
+  String get playerPlayModeSequential => 'Tout répéter';
+
+  @override
+  String get playerPlayModeRepeatOne => 'Répéter le titre';
+
+  @override
+  String get playerPlayModeShuffle => 'Aléatoire';
+
+  @override
+  String get playerNoSongTitle => 'Choisissez un titre pour commencer';
+
+  @override
+  String get playerUnknownArtist => 'Artiste inconnu';
+
+  @override
+  String get playerDockReady => 'Tune · PRÊT';
+
+  @override
+  String playerQueueSummary(int count) {
+    return '$count dans la file';
+  }
+
+  @override
+  String get nowPlayingEmptyTitle => 'Aucune lecture en cours';
+
+  @override
+  String get nowPlayingEmptySubtitle =>
+      'Choisissez un titre dans la bibliothèque';
+
+  @override
+  String get nowPlayingUnnamedTrack => 'Titre sans nom';
+
+  @override
+  String get nowPlayingLocalMusic => 'Musique locale';
+
+  @override
+  String get trackUnknownTitle => 'Titre inconnu';
+
+  @override
+  String playbackFailed(String error) {
+    return 'Échec de la lecture : $error';
+  }
+
+  @override
+  String playbackPauseFailed(String error) {
+    return 'Impossible de mettre en pause : $error';
+  }
+
+  @override
+  String playbackResumeFailed(String error) {
+    return 'Impossible de reprendre : $error';
+  }
+
+  @override
+  String playbackSeekFailed(String error) {
+    return 'Impossible de se déplacer : $error';
+  }
+
+  @override
+  String playbackVolumeFailed(String error) {
+    return 'Impossible de régler le volume : $error';
+  }
+
+  @override
+  String playbackSpeedFailed(String error) {
+    return 'Impossible de régler la vitesse : $error';
+  }
+
+  @override
+  String get audioSourceLocal => 'Fichier local';
+
+  @override
+  String audioSourceDownloading(int percent) {
+    return 'Téléchargement $percent%';
+  }
+
+  @override
+  String get audioSourceCached => 'Prêt hors ligne';
+
+  @override
+  String get audioSourceFailed => 'Échec du téléchargement';
+
+  @override
+  String get routerNotFoundTitle => 'Page introuvable';
+
+  @override
+  String get routerBackToLibrary => 'Retour à la bibliothèque';
+
+  @override
+  String get sourcesTitle => 'Sources';
+
+  @override
+  String get sourcesSubtitle => 'Catalogues en ligne et dossiers analysés';
+
+  @override
+  String get sourcesAutoScan => 'Analyser au démarrage';
+
+  @override
+  String get sourcesAutoScanDescription =>
+      'Chaque source active est actualisée au démarrage. Un échec n’altère jamais la bibliothèque locale.';
+
+  @override
+  String get sourcesScanAll => 'Analyser toutes les sources';
+
+  @override
+  String get sourcesImportPlugin => 'Importer un plugin';
+
+  @override
+  String get sourcesScanMayTakeSeconds =>
+      'Les sources distantes peuvent prendre quelques secondes';
+
+  @override
+  String get sourcesScanCompleted => 'Analyse terminée';
+
+  @override
+  String get sourcesImportPluginTitle => 'Importer un plugin musical';
+
+  @override
+  String get sourcesImportPluginMessage =>
+      'Les plugins sont du JavaScript tiers. Ils s’exécutent dans l’application et peuvent accéder au réseau. N’importez que des sources de confiance. Un plugin reste désactivé tant que vous n’avez pas défini de mot-clé.';
+
+  @override
+  String get sourcesPluginUnreadable =>
+      'Impossible de lire le fichier du plugin';
+
+  @override
+  String get sourcesPluginTooLarge =>
+      'Le fichier du plugin ne peut pas dépasser 2 Mo';
+
+  @override
+  String sourcesPluginImportedEnabled(String name) {
+    return '$name importé et activé';
+  }
+
+  @override
+  String sourcesPluginImported(String name) {
+    return '$name importé. Il participe à l’analyse dès que vous ajoutez un mot-clé et l’activez';
+  }
+
+  @override
+  String sourcesPluginImportFailed(String error) {
+    return 'Échec de l’import du plugin : $error';
+  }
+
+  @override
+  String get sourcesPluginActions => 'Actions du plugin';
+
+  @override
+  String get sourcesConfigure => 'Configurer';
+
+  @override
+  String get sourcesDeletePlugin => 'Supprimer le plugin';
+
+  @override
+  String get sourcesUnsupported =>
+      'Cette source n’est pas prise en charge dans cette version';
+
+  @override
+  String get sourcesDisabled => 'Désactivée';
+
+  @override
+  String get sourcesNeedsConfiguration => 'Configuration requise';
+
+  @override
+  String sourcesNeedsConfigurationHint(String hint) {
+    return 'Configuration requise : $hint';
+  }
+
+  @override
+  String sourcesLastScan(String time) {
+    return 'Dernière analyse $time';
+  }
+
+  @override
+  String get sourcesAutoScanLocal =>
+      'Les dossiers locaux sont analysés au démarrage';
+
+  @override
+  String get sourcesWaitingFirstScan => 'En attente de la première analyse';
+
+  @override
+  String sourcesScannedCount(int count, String time) {
+    return '$count titres · $time';
+  }
+
+  @override
+  String get sourcesSkipped => 'Ignorée';
+
+  @override
+  String get sourcesScanFailed => 'Échec de l’analyse';
+
+  @override
+  String get sourcesDeletePluginTitle => 'Supprimer le plugin ?';
+
+  @override
+  String sourcesDeletePluginMessage(String name) {
+    return 'Cela supprime le script, les réglages et les titres analysés de $name.';
+  }
+
+  @override
+  String sourcesDeleted(String name) {
+    return '$name supprimé';
+  }
+
+  @override
+  String get sourceKindLocal => 'Local';
+
+  @override
+  String get sourceKindOpenCatalog => 'Catalogue ouvert';
+
+  @override
+  String get sourceKindOpenApi => 'API';
+
+  @override
+  String get sourceKindPlugin => 'Plugin';
+
+  @override
+  String sourcesConfigureTitle(String name) {
+    return 'Configurer $name';
+  }
+
+  @override
+  String sourcesFieldRequired(String label) {
+    return 'Veuillez renseigner $label';
+  }
+
+  @override
+  String get sourcesFieldNumeric => 'Veuillez saisir un nombre';
+
+  @override
+  String get sourcesNotLoaded =>
+      'La liste des sources est encore en cours de chargement';
+
+  @override
+  String get sourcesPlatformNoPlugin =>
+      'Cette plateforme ne prend pas en charge les plugins JavaScript';
+
+  @override
+  String get sourcesUpdatePlugin => 'Mettre à jour le plugin';
+
+  @override
+  String sourcesPluginUpdated(String name, String version) {
+    return '$name a été mis à jour vers $version';
+  }
+
+  @override
+  String sourcesPluginUpToDate(String name) {
+    return '$name est déjà à jour';
+  }
+
+  @override
+  String sourcesPluginUpdateFailed(String error) {
+    return 'Échec de la mise à jour du plugin : $error';
+  }
+
+  @override
+  String get settingsTitle => 'Paramètres';
+
+  @override
+  String get settingsSubtitle =>
+      'Ajustez l’apparence, la langue et la bibliothèque locale.';
+
+  @override
+  String get settingsThemeDescription =>
+      'Choisissez l’apparence de l’interface et sa langue.';
+
+  @override
+  String get settingsLanguageDescription =>
+      'Langue de l’interface et des menus système';
+
+  @override
+  String get settingsLibraryDescription =>
+      'Tune recherche les fichiers audio dans ces dossiers uniquement.';
+
+  @override
+  String get settingsDefaultPath => 'Par défaut';
+
+  @override
+  String get settingsNoDefaultFolder =>
+      'Aucun dossier musical par défaut trouvé';
+
+  @override
+  String get settingsCustomPath => 'Personnalisé';
+
+  @override
+  String get settingsAddFolder => 'Ajouter un dossier';
+
+  @override
+  String get settingsClearLibrary => 'Vider la bibliothèque';
+
+  @override
+  String get settingsScanSafetyNote =>
+      'L’analyse se contente de lire les fichiers audio. Rien n’est modifié ni supprimé sur le disque.';
+
+  @override
+  String get settingsAboutTitle => 'À propos de Tune';
+
+  @override
+  String get settingsChooseFolder => 'Choisir un dossier musical';
+
+  @override
+  String get settingsFolderAdded => 'Dossier d’analyse ajouté';
+
+  @override
+  String get settingsScanDone => 'Analyse terminée';
+
+  @override
+  String get settingsClearLibraryTitle => 'Vider la bibliothèque ?';
+
+  @override
+  String get settingsClearLibraryMessage =>
+      'Seul l’historique d’analyse de Tune est effacé. Les fichiers audio du disque sont conservés.';
+
+  @override
+  String get settingsLibraryCleared => 'Bibliothèque vidée';
+
+  @override
+  String settingsPathsCount(int count) {
+    return '$count chemins';
+  }
+
+  @override
+  String get searchOnlineTitle => 'Rechercher en ligne';
+
+  @override
+  String get searchOnlineHint =>
+      'Recherchez dans les sources en ligne, p. ex. jazz, piano, lo-fi';
+
+  @override
+  String get searchOnlineDescription =>
+      'Recherche dans vos sources en ligne activées. Les résultats ne sont pas enregistrés dans la bibliothèque.';
+
+  @override
+  String get searchOnlinePrompt => 'Rechercher dans les sources en ligne';
+
+  @override
+  String get searchOnlinePromptDescription =>
+      'Saisissez un mot-clé puis appuyez sur Entrée. Openverse, Jamendo, Internet Archive et les plugins importés sont interrogés en parallèle.';
+
+  @override
+  String get searchNoResults => 'Aucun résultat';
+
+  @override
+  String get searchNoResultsDescription => 'Essayez un autre mot-clé.';
+
+  @override
+  String get searchNoMatch => 'Aucun titre correspondant';
+
+  @override
+  String get searchNoMatchDescription => 'Essayez un autre mot-clé.';
+
+  @override
+  String searchSearching(String query) {
+    return 'Recherche de « $query »';
+  }
+
+  @override
+  String searchResultCount(int count) {
+    return '$count titres';
+  }
+
+  @override
+  String get searchPlayAll => 'Tout lire';
+
+  @override
+  String get searchAddToQueue => 'Ajouter à la file';
+
+  @override
+  String searchAddedToQueue(String title) {
+    return 'Ajouté à la file d’attente : $title';
+  }
+
+  @override
+  String get searchNoSourcesEnabled =>
+      'Aucune source en ligne n’est activée. Activez-en une dans les paramètres.';
+
+  @override
+  String get searchFailedShort => 'Échec de la recherche';
+
+  @override
+  String searchFailed(String error) {
+    return 'Échec de la recherche en ligne : $error';
+  }
+
+  @override
+  String get scanPreparing => 'Préparation de l’analyse…';
+
+  @override
+  String get scanNoEnabledSources => 'Aucune source activée';
+
+  @override
+  String get scanNoLocalFolders => 'Aucun dossier musical à analyser';
+
+  @override
+  String scanProgressPercent(int percent) {
+    return 'Analyse $percent%';
+  }
+
+  @override
+  String get scanAllSourcesFailed => 'Toutes les sources ont échoué';
+
+  @override
+  String scanFailed(String error) {
+    return 'Échec de l’analyse : $error';
+  }
+
+  @override
+  String clearLibraryFailed(String error) {
+    return 'Impossible de vider la bibliothèque : $error';
+  }
+
+  @override
+  String get scanNoAudioFiles => 'Aucun fichier audio trouvé';
+
+  @override
+  String scanSongCount(int count) {
+    return '$count titres analysés';
+  }
+
+  @override
+  String scanSongCountShort(int count) {
+    return '$count titres';
+  }
+
+  @override
+  String get scanSourceNotConfigured => 'La source n’est pas encore configurée';
+
+  @override
+  String get scanCachedTooSoon =>
+      'Cache conservée, la dernière analyse est trop récente';
+
+  @override
+  String scanSummary(int songs, int sources) {
+    return '$sources sources analysées, $songs titres au total';
+  }
+
+  @override
+  String scanUpdated(int failed, int songs) {
+    return '$songs titres mis à jour, échec de $failed sources';
+  }
+
+  @override
+  String sourceErrorForbidden(int status) {
+    return 'Accès refusé (HTTP $status)';
+  }
+
+  @override
+  String get sourceErrorRateLimited =>
+      'Trop de requêtes (HTTP 429). Réessayez plus tard.';
+
+  @override
+  String sourceErrorHttpStatus(int status) {
+    return 'Le service a renvoyé HTTP $status';
+  }
+
+  @override
+  String get sourceErrorTimeout => 'Délai de connexion dépassé';
+
+  @override
+  String get sourceErrorConnection =>
+      'Impossible de joindre le service de la source';
+
+  @override
+  String get sourceErrorCertificate => 'Impossible de vérifier le certificat';
+
+  @override
+  String get sourceErrorCancelled => 'La requête a été annulée';
+
+  @override
+  String sourceErrorNetwork(String message) {
+    return 'Échec de la requête réseau : $message';
+  }
+
+  @override
+  String sourceErrorPluginLoad(String message) {
+    return 'Impossible de charger le plugin : $message';
+  }
+
+  @override
+  String get sourceErrorUnsupported =>
+      'Cette source n’est pas encore prise en charge';
+
+  @override
+  String sourceErrorScanInterval(String interval) {
+    return 'La dernière analyse date de moins de $interval';
+  }
+
+  @override
+  String sourceErrorScanTimeout(int seconds) {
+    return 'L’analyse a expiré après $seconds s';
+  }
+
+  @override
+  String intervalHours(int count) {
+    return '$count heures';
+  }
+
+  @override
+  String intervalMinutes(int count) {
+    return '$count minutes';
+  }
+
+  @override
+  String get localSourceHint =>
+      'Ajoutez un dossier d’analyse dans les paramètres de la bibliothèque';
+
+  @override
+  String get localSourceNotConfigured =>
+      'Aucun dossier musical local configuré';
+
+  @override
+  String get pluginSourceHint =>
+      'Renseignez un mot-clé, p. ex. un artiste, piano ou jazz';
+
+  @override
+  String get pluginFieldQuery => 'Mot-clé de recherche';
+
+  @override
+  String get pluginFieldHint => 'p. ex. artiste, piano, jazz';
+
+  @override
+  String pluginImportedVersion(String version) {
+    return 'Plugin MusicFree importé · v$version';
+  }
+
+  @override
+  String pluginVariable(String key) {
+    return 'Variable du plugin $key';
+  }
+
+  @override
+  String get pluginFileMissing =>
+      'Le fichier du plugin est introuvable. Importez-le à nouveau.';
+
+  @override
+  String get pluginRuntimeUnsupported =>
+      'Cette plateforme ne prend pas en charge les plugins JavaScript. Importez-les sur ordinateur ou mobile.';
+
+  @override
+  String get pluginCompatLibrary => 'Bibliothèque de compatibilité des plugins';
+
+  @override
+  String get pluginBridgeScript => 'Script de pont du plugin';
+
+  @override
+  String get pluginInit => 'Initialisation du plugin';
+
+  @override
+  String get pluginScript => 'Script du plugin';
+
+  @override
+  String get pluginExports => 'Exports du plugin';
+
+  @override
+  String get pluginNoExports =>
+      'Le plugin n’exporte pas de module.exports valide';
+
+  @override
+  String get pluginIncomplete =>
+      'Le plugin est incomplet : les méthodes platform et search manquent';
+
+  @override
+  String get pluginNoMediaSource => 'Le plugin n’implémente pas getMediaSource';
+
+  @override
+  String get pluginNoStream => 'Le plugin n’a renvoyé aucune adresse lisible';
+
+  @override
+  String get pluginRuntimeClosed => 'L’environnement du plugin est fermé';
+
+  @override
+  String pluginCallFailed(String label, String message) {
+    return 'Échec de $label : $message';
+  }
+
+  @override
+  String get pluginCallTimeout => 'L’appel du plugin a expiré';
+
+  @override
+  String get pluginUnknownData => 'Le plugin a renvoyé des données illisibles';
+
+  @override
+  String get pluginCallError => 'Échec de l’appel du plugin';
+
+  @override
+  String get pluginNoMatch => 'Aucun titre correspondant';
+
+  @override
+  String pluginNoStreamResults(int count) {
+    return 'Le plugin a renvoyé $count résultats, mais aucune adresse lisible';
+  }
+
+  @override
+  String get neteaseHint =>
+      'Indiquez l’adresse de votre propre NeteaseCloudMusicApi, p. ex. http://localhost:3000';
+
+  @override
+  String get neteaseFieldApi => 'Adresse de l’API';
+
+  @override
+  String get neteaseFieldQuery => 'Mot-clé de recherche';
+
+  @override
+  String get neteaseFieldHint => 'p. ex. tendance, un artiste';
+
+  @override
+  String get neteaseFieldLimit => 'Titres par analyse';
+
+  @override
+  String get neteaseFieldLimitHint => '20 par défaut, 50 au maximum';
+
+  @override
+  String get neteaseHotKeyword => 'Tendances';
+
+  @override
+  String get neteaseEmptyResponse => 'L’API NetEase a renvoyé une réponse vide';
+
+  @override
+  String get neteaseNoMatch => 'Aucun titre correspondant';
+
+  @override
+  String get neteaseNoStream =>
+      'Le service n’a renvoyé aucune adresse lisible. Une connexion au serveur peut être nécessaire.';
+
+  @override
+  String get openverseHint =>
+      'Saisissez un mot-clé, p. ex. piano, ambient ou jazz';
+
+  @override
+  String get openverseFieldQuery => 'Mot-clé';
+
+  @override
+  String get openverseFieldHint => 'p. ex. piano, ambient, jazz';
+
+  @override
+  String get openverseEmptyResponse => 'Openverse a renvoyé une réponse vide';
+
+  @override
+  String get openverseNoMatch => 'Aucun audio ouvert correspondant';
+
+  @override
+  String get sourceLocalName => 'Musique locale';
+
+  @override
+  String get sourceLocalDescription =>
+      'Analyse les dossiers musicaux de cet appareil';
+
+  @override
+  String get sourceOpenverseDescription =>
+      'Audio ouvert de Jamendo, Freesound, Wikimedia et plus encore';
+
+  @override
+  String get sourceJamendoDescription =>
+      'Un catalogue ouvert de musique indépendante. Nécessite un Client ID gratuit.';
+
+  @override
+  String get sourceInternetArchiveDescription =>
+      'La collection audio ouverte de l’Internet Archive';
+
+  @override
+  String get sourceNeteaseName => 'API NetEase Cloud Music';
+
+  @override
+  String get sourceNeteaseDescription =>
+      'Se connecte à un service NeteaseCloudMusicApi auto-hébergé';
+
+  @override
+  String get jamendoHint =>
+      'Obtenez un Client ID gratuit sur developer.jamendo.com';
+
+  @override
+  String get jamendoFieldClientId => 'Client ID';
+
+  @override
+  String get jamendoFieldClientIdHint =>
+      'Demandez-en un gratuitement sur developer.jamendo.com';
+
+  @override
+  String get jamendoFieldQuery => 'Mot-clé (facultatif)';
+
+  @override
+  String get jamendoFieldQueryHint => 'p. ex. jazz, electronic';
+
+  @override
+  String get jamendoEmptyResponse => 'Jamendo a renvoyé une réponse vide';
+
+  @override
+  String get jamendoNoMatch => 'Aucun titre Jamendo correspondant';
+
+  @override
+  String get internetArchiveHint =>
+      'Saisissez une requête Internet Archive, p. ex. collection:netlabels AND mediatype:audio';
+
+  @override
+  String get internetArchiveFieldQuery => 'Requête';
+
+  @override
+  String get internetArchiveFieldLimit => 'Titres par analyse';
+
+  @override
+  String get internetArchiveFieldLimitHint => '8 par défaut, 20 au maximum';
+
+  @override
+  String get internetArchiveInvalidResponse =>
+      'Internet Archive a renvoyé une réponse illisible';
+
+  @override
+  String get internetArchiveNoMatch => 'Aucun audio d’archive lisible trouvé';
+
+  @override
+  String get downloadUnsupportedPlatform =>
+      'Cette plateforme n’a pas de système de fichiers, les téléchargements ne peuvent pas être mis en cache';
+
+  @override
+  String get audioLoadFailed => 'Échec du chargement de l’audio';
+
+  @override
+  String get audioPathEmpty => 'Le chemin du fichier audio est vide';
+
+  @override
+  String get pluginUpdateNoUrl =>
+      'Le plugin n’a pas d’adresse de téléchargement, il ne peut pas vérifier les mises à jour';
+
+  @override
+  String sourcesPluginUrlDownloadFailed(String error) {
+    return 'Impossible de télécharger le plugin : $error';
+  }
+
+  @override
+  String pluginStepFailed(String error, String label) {
+    return '\\u00c9chec de $label : $error';
+  }
+
+  @override
+  String get sourcesImportPluginFromUrl => 'Importer depuis une URL';
+
+  @override
+  String get sourcesPluginUrlTitle => 'URL du plugin';
+
+  @override
+  String get sourcesPluginUrlHint => 'https://example.com/plugin.js';
+
+  @override
+  String get sourcesPluginUrlInvalid =>
+      'Veuillez saisir un lien http(s) valide';
+
+  @override
+  String get pluginUrlInvalid =>
+      'L’adresse du plugin est invalide, utilisez un lien http ou https';
+
+  @override
+  String get pluginUrlEmpty => 'Le script du plugin est vide';
+
+  @override
+  String get pluginUrlTooLarge =>
+      'Le script du plugin dépasse la taille maximale';
+
+  @override
+  String pluginSandboxStartFailed(String error) {
+    return 'Le bac à sable du plugin n’a pas démarré : $error';
+  }
+
+  @override
+  String get pluginSandboxStartTimeout =>
+      'Le bac à sable du plugin a expirué au démarrage';
+
+  @override
+  String pluginScriptTooLarge(String limit) {
+    return 'Le script du plugin dépasse la limite de $limit Ko';
+  }
+
+  @override
+  String get pluginRuntimeTerminated =>
+      'L’environnement du plugin a été interrompu';
+
+  @override
+  String get pluginRuntimeTimeLimit =>
+      'L’environnement du plugin a dépassé son limite de temps';
+
+  @override
+  String get pluginSandboxNotReady =>
+      'Le bac à sable du plugin n’est pas encore prêt';
+
+  @override
+  String pluginCallTimeoutDetailed(int seconds) {
+    return 'L’appel du plugin a expirué après $seconds s';
+  }
+
+  @override
+  String get pluginRuntimeCrashed => 'L’environnement du plugin a planté';
+
+  @override
+  String pluginFetchShimFailed(String message) {
+    return 'Le shim fetch n’a pas pu être chargé : $message';
+  }
+
+  @override
+  String pluginUnknownCall(String method) {
+    return 'Appel de plugin inconnu : $method';
+  }
+
+  @override
+  String get pluginScriptMissing => 'Le script du plugin est introuvable';
+
+  @override
+  String pluginMemoryLimitExceeded(String limit) {
+    return 'Le plugin a dépassé la limite de $limit et a été interrompu';
+  }
+
+  @override
+  String get ccmixterEmptyResponse => 'ccMixter a renvoyé une réponse vide';
+
+  @override
+  String get ccmixterFieldLimit => 'Morceaux par analyse';
+
+  @override
+  String get ccmixterFieldLimitHint => '15 par défaut, 30 au maximum';
+
+  @override
+  String get ccmixterFieldQuery => 'Tag de recherche';
+
+  @override
+  String get ccmixterFieldQueryHint => 'par exemple jazz, ambient, electro';
+
+  @override
+  String get ccmixterHint =>
+      'Saisissez un tag ccMixter, par exemple jazz, ambient ou electro';
+
+  @override
+  String get ccmixterNoMatch => 'Aucun morceau ccMixter correspondant';
+
+  @override
+  String get itunesEmptyResponse => 'L\'API iTunes a renvoyé une réponse vide';
+
+  @override
+  String get itunesFieldLimit => 'Morceaux par analyse';
+
+  @override
+  String get itunesFieldLimitHint => '20 par défaut, 50 au maximum';
+
+  @override
+  String get itunesFieldQuery => 'Mot-clé';
+
+  @override
+  String get itunesFieldQueryHint => 'par exemple jazz, piano, lo-fi';
+
+  @override
+  String get itunesHint =>
+      'Saisissez un mot-clé, par exemple jazz, piano ou lo-fi';
+
+  @override
+  String get itunesNoMatch => 'Aucun morceau iTunes correspondant';
+
+  @override
+  String get podcastRssEmptyFeed =>
+      'L\'adresse du flux a renvoyé un document vide';
+
+  @override
+  String get podcastRssFieldFeed => 'Adresse du flux';
+
+  @override
+  String get podcastRssFieldFeedHint =>
+      'par exemple https://example.com/podcast.xml';
+
+  @override
+  String get podcastRssFieldLimit => 'Épisodes par analyse';
+
+  @override
+  String get podcastRssFieldLimitHint => '20 par défaut, 100 au maximum';
+
+  @override
+  String get podcastRssHint => 'Saisissez l\'adresse d\'un flux podcast (RSS)';
+
+  @override
+  String podcastRssInvalidFeed(String error) {
+    return 'L\'adresse du flux a renvoyé un XML illisible : $error';
+  }
+
+  @override
+  String get podcastRssNoMatch => 'Le flux ne contient aucun épisode lisible';
+
+  @override
+  String get sourceCcmixterDescription =>
+      'Remixes Creative Commons et musique libre';
+
+  @override
+  String get sourceItunesDescription =>
+      'Extraits de 30 secondes du catalogue Apple Music';
+
+  @override
+  String get sourcePodcastRssDescription =>
+      'Transforme un flux RSS de podcast en épisodes jouables';
+
+  @override
+  String get sourcePodcastRssName => 'Podcasts';
+
+  @override
+  String get sourceSubsonicDescription =>
+      'Se connecte à une bibliothèque Navidrome ou Subsonic auto-hébergée';
+
+  @override
+  String get subsonicAuthFailed =>
+      'Impossible de joindre le serveur de musique, vérifiez l\'adresse et le compte';
+
+  @override
+  String get subsonicEmptyResponse =>
+      'Le serveur de musique a renvoyé une réponse vide';
+
+  @override
+  String subsonicError(String error) {
+    return 'Le serveur de musique signale une erreur : $error';
+  }
+
+  @override
+  String get subsonicFieldLimit => 'Morceaux par analyse';
+
+  @override
+  String get subsonicFieldLimitHint => '25 par défaut, 100 au maximum';
+
+  @override
+  String get subsonicFieldPassword => 'Mot de passe';
+
+  @override
+  String get subsonicFieldPasswordHint =>
+      'Signe le jeton d\'accès et n\'est jamais envoyé en clair';
+
+  @override
+  String get subsonicFieldQuery => 'Mot-clé (facultatif)';
+
+  @override
+  String get subsonicFieldQueryHint => 'par exemple jazz, piano';
+
+  @override
+  String get subsonicFieldServer => 'Adresse du serveur';
+
+  @override
+  String get subsonicFieldServerHint => 'par exemple http://localhost:4533';
+
+  @override
+  String get subsonicFieldUser => 'Nom d\'utilisateur';
+
+  @override
+  String get subsonicFieldUserHint =>
+      'Le nom de connexion de votre serveur de musique';
+
+  @override
+  String get subsonicHint =>
+      'Saisissez l\'adresse et le compte de votre serveur de musique, par exemple http://localhost:4533';
+
+  @override
+  String get subsonicNoMatch => 'Aucun morceau correspondant';
 }

@@ -44,14 +44,16 @@ class SongCreator {
 
       return Song.fromMap(songData);
     } catch (e) {
-      Log.info(
-        'SongCreator: Failed to read metadata for $filePath: $e',
-      );
+      Log.info('SongCreator: Failed to read metadata for $filePath: $e');
       return await createBasicSong(file, fileName, filePath);
     }
   }
-  
-  static Future<Song> createBasicSong(File file, String fileName, String filePath) async {
+
+  static Future<Song> createBasicSong(
+    File file,
+    String fileName,
+    String filePath,
+  ) async {
     final songData = <String, dynamic>{
       'id': filePath.hashCode,
       'title': fileName,

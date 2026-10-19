@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
@@ -97,7 +98,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                               isDense: true,
                               filled: true,
                               fillColor: theme.colorScheme.surfaceContainer,
-                              hintText: '搜索在线音源，例如 jazz、钢琴、lo-fi',
+                              hintText: context.loc.searchOnlineHint,
                               hintStyle: theme.textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
                                 color: theme.colorScheme.onSurfaceVariant,
@@ -146,7 +147,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                               horizontal: CompactTokens.space16,
                             ),
                           ),
-                          child: const Text('搜索'),
+                          child: Text(context.loc.search),
                         ),
                       ],
                     ),
@@ -188,7 +189,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('已加入队列：${song.title}'),
+          content: Text(context.loc.searchAddedToQueue(song.title)),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -232,14 +233,14 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '在线搜索',
+                  context.loc.searchOnlineTitle,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  '搜索已启用的在线音源；结果不会写入音乐库',
+                  context.loc.searchOnlineDescription,
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 10,
                     color: colors.onSurfaceVariant,
@@ -249,7 +250,7 @@ class _Header extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: '关闭',
+            tooltip: context.loc.close,
             onPressed: onClose,
             icon: const Icon(Icons.close_rounded, size: 18),
             style: IconButton.styleFrom(
@@ -284,17 +285,17 @@ class _Body extends StatelessWidget {
       return _SearchingView(state: state, sourceNames: sourceNames);
     }
     if (!state.hasQuery) {
-      return const _EmptyView(
+      return _EmptyView(
         icon: Icons.travel_explore_rounded,
-        title: '搜索在线音源',
-        subtitle: '输入关键词后按回车；Openverse、Jamendo、Internet Archive 与已导入插件会并行搜索。',
+        title: context.loc.searchOnlinePrompt,
+        subtitle: context.loc.searchOnlinePromptDescription,
       );
     }
     if (state.results.isEmpty) {
       return _EmptyView(
         icon: Icons.search_off_rounded,
-        title: '没有结果',
-        subtitle: state.message ?? '换个关键词再试一次。',
+        title: context.loc.searchNoResults,
+        subtitle: state.message ?? context.loc.searchNoResultsDescription,
       );
     }
 
@@ -305,8 +306,8 @@ class _Body extends StatelessWidget {
     if (visibleGroups.isEmpty) {
       return _EmptyView(
         icon: Icons.search_off_rounded,
-        title: '没有找到匹配的歌曲',
-        subtitle: state.message ?? '换个关键词再试一次。',
+        title: context.loc.searchNoMatch,
+        subtitle: state.message ?? context.loc.searchNoMatchDescription,
       );
     }
 
@@ -344,7 +345,7 @@ class _SearchingView extends StatelessWidget {
       padding: const EdgeInsets.all(CompactTokens.space20),
       children: [
         Text(
-          '正在搜索「${state.query}」',
+          context.loc.searchSearching(state.query),
           style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13),
         ),
         const SizedBox(height: CompactTokens.space12),
@@ -422,7 +423,7 @@ class _SourceGroup extends StatelessWidget {
             const SizedBox(width: CompactTokens.space8),
             Expanded(
               child: Text(
-                '$sourceName：${result.message ?? '搜索失败'}',
+                '$sourceName：${result.message ?? context.loc.searchFailedShort}',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -455,7 +456,7 @@ class _SourceGroup extends StatelessWidget {
               ),
               const SizedBox(width: CompactTokens.space8),
               Text(
-                '${result.songs.length} 首',
+                context.loc.searchResultCount(result.songs.length),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -474,7 +475,7 @@ class _SourceGroup extends StatelessWidget {
                   textStyle: const TextStyle(fontSize: 11),
                 ),
                 icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                label: const Text('播放全部'),
+                label: Text(context.loc.searchPlayAll),
               ),
             ],
           ),
@@ -563,7 +564,7 @@ class _SongRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: '加入队列',
+              tooltip: context.loc.searchAddToQueue,
               onPressed: onAddToQueue,
               icon: const Icon(Icons.playlist_add_rounded, size: 18),
               style: IconButton.styleFrom(

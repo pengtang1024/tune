@@ -7,7 +7,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 ## 功能
 
 - 本地音乐目录扫描、搜索与持久化
-- 在线音源：Openverse、Jamendo、Internet Archive、自建 NeteaseCloudMusicApi
+- 在线音源：Openverse、Jamendo、Internet Archive、ccMixter、iTunes 试听、播客 RSS、自建 NeteaseCloudMusicApi 与自建 Navidrome/Subsonic
 - 播放队列增删、拖拽重排、点播与清空
 - 播放/暂停、上一首/下一首、进度拖拽、音量与循环模式
 - 按来源筛选音乐库，远程歌曲显示来源与封面

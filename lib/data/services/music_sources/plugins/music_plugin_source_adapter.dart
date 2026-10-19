@@ -1,3 +1,4 @@
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
@@ -27,11 +28,16 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
       config.setting('query') != null;
 
   @override
-  String get configurationHint => '填写一个搜索关键词，例如 周杰伦、piano 或 jazz';
+  String get configurationHint => AppStrings.instance.pluginSourceHint;
 
   @override
-  List<MusicSourceField> get configurationFields => const [
-    MusicSourceField('query', '搜索关键词', '例如 周杰伦、piano、jazz', required: true),
+  List<MusicSourceField> get configurationFields => [
+    MusicSourceField(
+      'query',
+      AppStrings.instance.pluginFieldQuery,
+      AppStrings.instance.pluginFieldHint,
+      required: true,
+    ),
   ];
 
   @override
@@ -58,7 +64,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
           sourceId: sourceId,
           status: SourceScanStatus.success,
           songs: const [],
-          message: '没有找到匹配的歌曲',
+          message: AppStrings.instance.pluginNoMatch,
         );
       }
 
@@ -88,7 +94,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
         return SourceScanResult(
           sourceId: sourceId,
           status: SourceScanStatus.failed,
-          message: '插件返回了 ${items.length} 个结果，但没有可播放地址',
+          message: AppStrings.instance.pluginNoStreamResults(items.length),
         );
       }
 

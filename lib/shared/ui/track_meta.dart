@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/source_chip.dart';
@@ -48,7 +49,7 @@ class TrackMeta extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                song.title.isEmpty ? '未知歌曲' : song.title,
+                song.title.isEmpty ? context.loc.trackUnknownTitle : song.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -59,7 +60,9 @@ class TrackMeta extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                song.artist.isEmpty ? '未知艺术家' : song.artist,
+                song.artist.isEmpty
+                    ? context.loc.playerUnknownArtist
+                    : song.artist,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelSmall?.copyWith(

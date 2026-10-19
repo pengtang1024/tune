@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -41,13 +42,11 @@ class QueuePane extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
           child: PageHeading(
             eyebrow: 'QUEUE',
-            title: '播放队列',
-            subtitle: '当前播放顺序',
+            title: context.loc.queueTitle,
+            subtitle: context.loc.queueSubtitle,
             trailing: _QueueActions(
               count: queue.length,
-              onClear: queue.isEmpty
-                  ? null
-                  : () => _confirmClear(context, ref),
+              onClear: queue.isEmpty ? null : () => _confirmClear(context, ref),
             ),
           ),
         ),
@@ -55,12 +54,12 @@ class QueuePane extends ConsumerWidget {
           child: queue.isEmpty
               ? EmptyStateView(
                   icon: Icons.queue_music_rounded,
-                  title: '播放队列是空的',
-                  subtitle: '从音乐库选择歌曲，或把歌曲加入队列',
+                  title: context.loc.queueEmptyTitle,
+                  subtitle: context.loc.queueEmptySubtitle,
                   action: FilledButton.icon(
                     onPressed: () => context.go('/library'),
                     icon: const Icon(Icons.library_music_outlined, size: 16),
-                    label: const Text('去音乐库'),
+                    label: Text(context.loc.queueGoToLibrary),
                   ),
                 )
               : ReorderableListView.builder(
@@ -103,16 +102,16 @@ class QueuePane extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清空播放队列？'),
-        content: const Text('当前播放会停止，队列中的歌曲不会从音乐库删除。'),
+        title: Text(context.loc.queueClearTitle),
+        content: Text(context.loc.queueClearMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.loc.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('清空'),
+            child: Text(context.loc.clear),
           ),
         ],
       ),
@@ -139,7 +138,7 @@ class _QueueActions extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '$count 首',
+          context.loc.libraryTrackCount(count),
           style: theme.textTheme.labelSmall?.copyWith(
             fontSize: 11,
             color: theme.colorScheme.onSurfaceVariant,
@@ -157,7 +156,7 @@ class _QueueActions extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             foregroundColor: theme.colorScheme.onSurfaceVariant,
           ),
-          child: const Text('清空', style: TextStyle(fontSize: 11)),
+          child: Text(context.loc.clear, style: const TextStyle(fontSize: 11)),
         ),
       ],
     );

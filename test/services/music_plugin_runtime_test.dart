@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_limits.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_io.dart';
 
 void main() {
@@ -63,6 +65,57 @@ void main() {
 
       final media = await runtime.getMediaSource(items.first);
       expect(media['url'], 'https://example.com/track-1.mp3');
+    },
+    skip: quickJsAvailable
+        ? false
+        : 'QuickJS native library is not available outside a built app.',
+  );
+
+  test(
+    'kills a plugin that blocks the engine and reports an unusable runtime',
+    () async {
+      final runtime = await IoMusicPluginRuntime.create(
+        limits: const MusicPluginLimits(
+          callTimeout: Duration(seconds: 2),
+          runtimeBudget: Duration(minutes: 5),
+        ),
+      );
+      addTearDown(runtime.dispose);
+
+      await runtime.load('''
+        module.exports = {
+          platform: 'Runaway Plugin',
+          search: function () {
+            while (true) {}
+          },
+        };
+      ''');
+
+      await expectLater(
+        runtime.search('hang'),
+        throwsA(isA<MusicPluginException>()),
+      );
+      expect(runtime.isUsable, isFalse);
+    },
+    skip: quickJsAvailable
+        ? false
+        : 'QuickJS native library is not available outside a built app.',
+    timeout: const Timeout(Duration(seconds: 60)),
+  );
+
+  test(
+    'refuses a script that is larger than the limit',
+    () async {
+      final runtime = await IoMusicPluginRuntime.create(
+        limits: const MusicPluginLimits(maxScriptBytes: 64),
+      );
+      addTearDown(runtime.dispose);
+
+      await expectLater(
+        runtime.load('// ${'x' * 200}'),
+        throwsA(isA<MusicPluginException>()),
+      );
+      expect(runtime.isUsable, isTrue);
     },
     skip: quickJsAvailable
         ? false

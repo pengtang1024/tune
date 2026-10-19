@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -30,19 +31,27 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
   bool isConfigured(MusicSourceConfig config) => _baseUrl(config) != null;
 
   @override
-  String get configurationHint =>
-      '填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000';
+  String get configurationHint => AppStrings.instance.neteaseHint;
 
   @override
-  List<MusicSourceField> get configurationFields => const [
+  List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'baseUrl',
-      'API 地址',
+      AppStrings.instance.neteaseFieldApi,
       'http://localhost:3000',
       required: true,
     ),
-    MusicSourceField('keywords', '搜索关键词', '例如 热门、周杰伦'),
-    MusicSourceField('limit', '每次扫描数量', '默认 20，最大 50', numeric: true),
+    MusicSourceField(
+      'keywords',
+      AppStrings.instance.neteaseFieldQuery,
+      AppStrings.instance.neteaseFieldHint,
+    ),
+    MusicSourceField(
+      'limit',
+      AppStrings.instance.neteaseFieldLimit,
+      AppStrings.instance.neteaseFieldLimitHint,
+      numeric: true,
+    ),
   ];
 
   @override
@@ -63,7 +72,9 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final keywords = request.config.setting('keywords') ?? '热门';
+      final keywords =
+          request.config.setting('keywords') ??
+          AppStrings.instance.neteaseHotKeyword;
       final limit = (SourceSongFactory.parseInt(
         request.config.setting('limit'),
       )).clamp(1, 50);
@@ -74,7 +85,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
       );
       final searchData = searchResponse.data;
       if (searchData == null) {
-        return failedResult(sourceId, '网易云 API 返回了空响应');
+        return failedResult(sourceId, AppStrings.instance.neteaseEmptyResponse);
       }
 
       final candidates = parseSearchResults(searchData);
@@ -83,7 +94,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
           sourceId: sourceId,
           status: SourceScanStatus.success,
           songs: const [],
-          message: '没有找到匹配的歌曲',
+          message: AppStrings.instance.neteaseNoMatch,
         );
       }
 
@@ -105,7 +116,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
         sourceId: sourceId,
         status: SourceScanStatus.success,
         songs: songs,
-        message: songs.isEmpty ? '接口未返回可播放地址（可能需要在服务端登录或受版权限制）' : null,
+        message: songs.isEmpty ? AppStrings.instance.neteaseNoStream : null,
       );
     } catch (error) {
       return failedResult(sourceId, error);

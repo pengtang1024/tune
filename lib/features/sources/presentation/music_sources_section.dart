@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -57,7 +58,7 @@ class MusicSourcesSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '音源',
+            context.loc.sourcesTitle,
             style: theme.textTheme.labelLarge?.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -85,7 +86,7 @@ class MusicSourcesSection extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '启动时自动扫描',
+                            context.loc.sourcesAutoScan,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -93,7 +94,7 @@ class MusicSourcesSection extends ConsumerWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '所有已启用音源都会在启动后自动刷新，失败不会影响本地库。',
+                            context.loc.sourcesAutoScanDescription,
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontSize: 10,
                               color: muted,
@@ -158,7 +159,7 @@ class MusicSourcesSection extends ConsumerWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.sync_rounded, size: 15),
-                label: const Text('扫描全部音源'),
+                label: Text(context.loc.sourcesScanAll),
               ),
               if (isMusicPluginRuntimeSupported) ...[
                 const SizedBox(width: CompactTokens.space8),
@@ -175,13 +176,13 @@ class MusicSourcesSection extends ConsumerWidget {
                     side: BorderSide(color: theme.colorScheme.outlineVariant),
                   ),
                   icon: const Icon(Icons.extension_outlined, size: 15),
-                  label: const Text('导入插件'),
+                  label: Text(context.loc.sourcesImportPlugin),
                 ),
               ],
               const SizedBox(width: CompactTokens.space8),
               Flexible(
                 child: Text(
-                  '含远程音源时可能需要数秒',
+                  context.loc.sourcesScanMayTakeSeconds,
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 10,
                     color: muted,
@@ -205,7 +206,10 @@ class MusicSourcesSection extends ConsumerWidget {
     if (!context.mounted) return;
 
     final state = ref.read(libraryControllerProvider).valueOrNull;
-    final message = state?.errorMessage ?? state?.statusMessage ?? '扫描已完成';
+    final message =
+        state?.errorMessage ??
+        state?.statusMessage ??
+        context.loc.sourcesScanCompleted;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -214,27 +218,34 @@ class MusicSourcesSection extends ConsumerWidget {
   }
 
   Future<void> _importPlugin(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('导入音乐插件'),
-        content: const Text(
-          '插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。'
-          '请只导入你信任的来源。导入后需要填写搜索关键词才会启用。',
-        ),
+        title: Text(context.loc.sourcesImportPluginTitle),
+        content: Text(context.loc.sourcesImportPluginMessage),
+
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(context.loc.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop('url'),
+            child: Text(context.loc.sourcesImportPluginFromUrl),
           ),
           FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('选择文件'),
+            onPressed: () => Navigator.of(context).pop('file'),
+            child: Text(context.loc.chooseFile),
           ),
         ],
       ),
     );
-    if (confirmed != true || !context.mounted) return;
+    if (!context.mounted) return;
+    if (choice == 'url') {
+      await _importPluginFromUrl(context, ref);
+      return;
+    }
+    if (choice != 'file') return;
 
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -247,11 +258,11 @@ class MusicSourcesSection extends ConsumerWidget {
 
     final bytes = file.bytes;
     if (bytes == null || bytes.isEmpty) {
-      _showMessage(context, '无法读取插件文件');
+      _showMessage(context, context.loc.sourcesPluginUnreadable);
       return;
     }
     if (bytes.length > 2 * 1024 * 1024) {
-      _showMessage(context, '插件文件不能超过 2 MB');
+      _showMessage(context, context.loc.sourcesPluginTooLarge);
       return;
     }
 
@@ -279,12 +290,47 @@ class MusicSourcesSection extends ConsumerWidget {
       _showMessage(
         context,
         saved == true
-            ? '已导入并启用 ${config.name}'
-            : '已导入 ${config.name}，填写关键词并开启后会参与扫描',
+            ? context.loc.sourcesPluginImportedEnabled(config.name)
+            : context.loc.sourcesPluginImported(config.name),
       );
     } catch (error) {
       if (!context.mounted) return;
-      _showMessage(context, '导入插件失败：$error');
+      _showMessage(context, context.loc.sourcesPluginImportFailed('$error'));
+    }
+  }
+
+  /// Downloads a plugin from a link the user typed in.
+  Future<void> _importPluginFromUrl(BuildContext context, WidgetRef ref) async {
+    final url = await showDialog<String>(
+      context: context,
+      builder: (context) => const _PluginUrlDialog(),
+    );
+    if (url == null || url.isEmpty || !context.mounted) return;
+
+    try {
+      final controller = ref.read(musicSourcesControllerProvider.notifier);
+      final config = await controller.installPluginFromUrl(url);
+      if (!context.mounted) return;
+
+      final fields = ref.read(musicSourceServiceProvider).fieldsFor(config);
+      final saved = await showDialog<bool>(
+        context: context,
+        builder: (context) =>
+            _SourceSettingsDialog(source: config, fields: fields),
+      );
+      if (saved == true) {
+        await controller.setEnabled(config.id, true);
+      }
+      if (!context.mounted) return;
+      _showMessage(
+        context,
+        saved == true
+            ? context.loc.sourcesPluginImportedEnabled(config.name)
+            : context.loc.sourcesPluginImported(config.name),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showMessage(context, context.loc.sourcesPluginImportFailed('$error'));
     }
   }
 
@@ -318,7 +364,12 @@ class _SourceTile extends ConsumerWidget {
     final supported = sourceService.supportsConfig(source);
     final fields = sourceService.fieldsFor(source);
     final configured = sourceService.isConfigured(source);
-    final status = _statusText(configured, fields, supported: supported);
+    final status = _statusText(
+      context,
+      configured,
+      fields,
+      supported: supported,
+    );
     final statusColor = _statusColor(
       context,
       configured: configured,
@@ -388,27 +439,35 @@ class _SourceTile extends ConsumerWidget {
                 width: 28,
                 height: 28,
                 child: PopupMenuButton<String>(
-                  tooltip: '插件操作',
+                  tooltip: context.loc.sourcesPluginActions,
                   enabled: !busy,
                   padding: EdgeInsets.zero,
                   icon: Icon(Icons.more_vert_rounded, size: 15, color: muted),
                   onSelected: (value) {
                     if (value == 'config') {
                       _openSettings(context, source, fields);
+                    } else if (value == 'update') {
+                      _updatePlugin(context, ref);
                     } else if (value == 'delete') {
                       _confirmRemove(context, ref);
                     }
                   },
-                  itemBuilder: (context) => const [
+                  itemBuilder: (context) => [
                     PopupMenuItem(
                       value: 'config',
                       height: 36,
-                      child: Text('配置'),
+                      child: Text(context.loc.sourcesConfigure),
                     ),
+                    if (source.pluginUrl != null)
+                      PopupMenuItem(
+                        value: 'update',
+                        height: 36,
+                        child: Text(context.loc.sourcesUpdatePlugin),
+                      ),
                     PopupMenuItem(
                       value: 'delete',
                       height: 36,
-                      child: Text('删除插件'),
+                      child: Text(context.loc.sourcesDeletePlugin),
                     ),
                   ],
                 ),
@@ -418,7 +477,7 @@ class _SourceTile extends ConsumerWidget {
                 width: 28,
                 height: 28,
                 child: IconButton(
-                  tooltip: '配置',
+                  tooltip: context.loc.sourcesConfigure,
                   onPressed: busy
                       ? null
                       : () => _openSettings(context, source, fields),
@@ -461,35 +520,43 @@ class _SourceTile extends ConsumerWidget {
   }
 
   String _statusText(
+    BuildContext context,
     bool configured,
     List<MusicSourceField> fields, {
     required bool supported,
   }) {
-    if (!supported) return '当前版本不支持该音源';
-    if (!source.enabled) return '已关闭';
+    if (!supported) return context.loc.sourcesUnsupported;
+    if (!source.enabled) return context.loc.sourcesDisabled;
     if (!configured) {
       final required = fields.where((field) => field.required);
       final hint = required.isEmpty ? '' : required.first.hint;
-      return hint.isEmpty ? '需要配置' : '需要配置：$hint';
+      return hint.isEmpty
+          ? context.loc.sourcesNeedsConfiguration
+          : context.loc.sourcesNeedsConfigurationHint(hint);
     }
 
     final result = summary;
     if (result == null) {
-      if (lastScanAt != null) return '上次扫描 ${_formatTime(lastScanAt!)}';
+      if (lastScanAt != null) {
+        return context.loc.sourcesLastScan(_formatTime(lastScanAt!));
+      }
       return source.kind == MusicSourceKind.localDirectory
-          ? '启动后自动扫描本地目录'
-          : '等待首次扫描';
+          ? context.loc.sourcesAutoScanLocal
+          : context.loc.sourcesWaitingFirstScan;
     }
 
     switch (result.status) {
       case SourceScanStatus.success:
-        return '已扫描 ${result.songCount} 首 · ${_formatTime(result.scannedAt)}';
+        return context.loc.sourcesScannedCount(
+          result.songCount,
+          _formatTime(result.scannedAt),
+        );
       case SourceScanStatus.needsConfiguration:
-        return result.message ?? '需要配置';
+        return result.message ?? context.loc.sourcesNeedsConfiguration;
       case SourceScanStatus.skipped:
-        return result.message ?? '已跳过';
+        return result.message ?? context.loc.sourcesSkipped;
       case SourceScanStatus.failed:
-        return result.message ?? '扫描失败';
+        return result.message ?? context.loc.sourcesScanFailed;
     }
   }
 
@@ -521,20 +588,48 @@ class _SourceTile extends ConsumerWidget {
     return saved == true;
   }
 
+  /// Fetches the current script of a plugin that was imported by URL.
+  Future<void> _updatePlugin(BuildContext context, WidgetRef ref) async {
+    final source = this.source;
+    try {
+      final update = await ref
+          .read(musicSourcesControllerProvider.notifier)
+          .updatePlugin(source.id);
+      if (!context.mounted) return;
+      _showMessage(
+        context,
+        update.changed
+            ? context.loc.sourcesPluginUpdated(source.name, update.version)
+            : context.loc.sourcesPluginUpToDate(source.name),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showMessage(context, context.loc.sourcesPluginUpdateFailed('$error'));
+    }
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+      );
+  }
+
   Future<void> _confirmRemove(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除插件？'),
-        content: Text('将删除 ${source.name} 的脚本、配置以及已扫描的歌曲。'),
+        title: Text(context.loc.sourcesDeletePluginTitle),
+        content: Text(context.loc.sourcesDeletePluginMessage(source.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.loc.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('删除'),
+            child: Text(context.loc.delete),
           ),
         ],
       ),
@@ -551,7 +646,7 @@ class _SourceTile extends ConsumerWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('已删除 ${source.name}'),
+          content: Text(context.loc.sourcesDeleted(source.name)),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -567,10 +662,10 @@ class _KindBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final label = switch (kind) {
-      MusicSourceKind.localDirectory => '本地',
-      MusicSourceKind.openCatalog => '开放曲库',
-      MusicSourceKind.openApi => 'API',
-      MusicSourceKind.plugin => '插件',
+      MusicSourceKind.localDirectory => context.loc.sourceKindLocal,
+      MusicSourceKind.openCatalog => context.loc.sourceKindOpenCatalog,
+      MusicSourceKind.openApi => context.loc.sourceKindOpenApi,
+      MusicSourceKind.plugin => context.loc.sourceKindPlugin,
     };
 
     return Container(
@@ -587,6 +682,67 @@ class _KindBadge extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Asks for the address of a plugin script.
+class _PluginUrlDialog extends StatefulWidget {
+  const _PluginUrlDialog();
+
+  @override
+  State<_PluginUrlDialog> createState() => _PluginUrlDialogState();
+}
+
+class _PluginUrlDialogState extends State<_PluginUrlDialog> {
+  final TextEditingController _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(context.loc.sourcesPluginUrlTitle),
+      content: SizedBox(
+        width: 360,
+        child: TextField(
+          controller: _controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: context.loc.sourcesPluginUrlTitle,
+            hintText: context.loc.sourcesPluginUrlHint,
+            errorText: _error,
+            isDense: true,
+            border: const OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.url,
+          onSubmitted: (_) => _submit(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.loc.cancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(context.loc.ok)),
+      ],
+    );
+  }
+
+  void _submit() {
+    final url = _controller.text.trim();
+    final uri = Uri.tryParse(url);
+    if (url.isEmpty ||
+        uri == null ||
+        (uri.scheme != 'http' && uri.scheme != 'https')) {
+      setState(() => _error = context.loc.sourcesPluginUrlInvalid);
+      return;
+    }
+    Navigator.of(context).pop(url);
   }
 }
 
@@ -627,7 +783,7 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('配置 ${widget.source.name}'),
+      title: Text(context.loc.sourcesConfigureTitle(widget.source.name)),
       content: SizedBox(
         width: 360,
         child: SingleChildScrollView(
@@ -637,6 +793,7 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
               for (final field in widget.fields) ...[
                 TextField(
                   controller: _controllers[field.key],
+                  obscureText: field.secret,
                   decoration: InputDecoration(
                     labelText: field.label,
                     hintText: field.hint,
@@ -657,9 +814,9 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(context.loc.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('保存')),
+        FilledButton(onPressed: _save, child: Text(context.loc.save)),
       ],
     );
   }
@@ -671,10 +828,10 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
     for (final field in widget.fields) {
       final value = _controllers[field.key]?.text.trim() ?? '';
       if (field.required && value.isEmpty) {
-        _errors[field.key] = '请填写${field.label}';
+        _errors[field.key] = context.loc.sourcesFieldRequired(field.label);
       }
       if (field.numeric && value.isNotEmpty && int.tryParse(value) == null) {
-        _errors[field.key] = '请输入数字';
+        _errors[field.key] = context.loc.sourcesFieldNumeric;
       }
       settings[field.key] = value;
     }

@@ -68,7 +68,7 @@ class LibraryToolbar extends StatelessWidget {
                 suffixIcon: query.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: '清除搜索',
+                        tooltip: context.loc.libraryClearSearch,
                         onPressed: onClearQuery,
                         icon: const Icon(Icons.close_rounded, size: 14),
                         padding: EdgeInsets.zero,
@@ -111,7 +111,7 @@ class LibraryToolbar extends StatelessWidget {
           ],
           const SizedBox(width: CompactTokens.space8),
           Text(
-            '$filteredCount 首',
+            context.loc.libraryTrackCount(filteredCount),
             style: theme.textTheme.labelSmall?.copyWith(
               fontSize: 11,
               color: theme.colorScheme.onSurfaceVariant,
@@ -144,21 +144,21 @@ class _SourceFilter extends StatelessWidget {
     final theme = Theme.of(context);
     final active = sourceFilter != null;
     final label = sourceFilter == null
-        ? '全部来源'
+        ? context.loc.libraryAllSources
         : (sourceNames[sourceFilter] ?? sourceFilter!);
 
     return PopupMenuButton<String>(
-      tooltip: '筛选来源',
+      tooltip: context.loc.libraryFilterSources,
       padding: EdgeInsets.zero,
       initialValue: sourceFilter ?? allSourcesFilterValue,
       onSelected: (value) {
         onSourceFilter(value == allSourcesFilterValue ? null : value);
       },
       itemBuilder: (context) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: allSourcesFilterValue,
           height: 36,
-          child: Text('全部来源'),
+          child: Text(context.loc.libraryAllSources),
         ),
         for (final sourceId in sources)
           PopupMenuItem<String>(
@@ -222,7 +222,7 @@ class _ScanButton extends StatelessWidget {
     final theme = Theme.of(context);
 
     return IconButton(
-      tooltip: '扫描全部音源',
+      tooltip: context.loc.libraryScanAllSources,
       onPressed: onPressed,
       icon: scanning
           ? const SizedBox(

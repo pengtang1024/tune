@@ -9,6 +9,7 @@ import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
+import 'package:tune/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('online search sheet renders grouped results', (tester) async {
@@ -23,6 +24,9 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(

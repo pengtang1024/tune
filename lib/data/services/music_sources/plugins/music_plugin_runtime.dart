@@ -79,6 +79,13 @@ class MusicPluginMetadata {
 abstract class MusicPluginRuntime {
   MusicPluginMetadata get metadata;
 
+  /// Whether the runtime can still execute calls.
+  ///
+  /// A runtime that was stopped by the sandbox, that ran out of its time
+  /// budget or that was disposed reports `false`. The owner then builds a
+  /// fresh runtime instead of handing out a dead one.
+  bool get isUsable;
+
   Future<void> load(
     String script, {
     Map<String, String> userVariables = const {},

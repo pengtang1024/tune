@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -59,11 +60,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     if (state == null) {
       return EmptyStateView(
         icon: Icons.error_outline_rounded,
-        title: '音乐库加载失败',
-        subtitle: '${library.error ?? '未知错误'}',
+        title: context.loc.libraryLoadFailedTitle,
+        subtitle: '${library.error ?? context.loc.unknownError}',
         action: FilledButton(
           onPressed: () => ref.invalidate(libraryControllerProvider),
-          child: const Text('重试'),
+          child: Text(context.loc.retry),
         ),
       );
     }
@@ -86,8 +87,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
           child: PageHeading(
             eyebrow: 'COLLECTION',
-            title: '音乐库',
-            subtitle: '本地与在线音源的全部曲目',
+            title: context.loc.libraryTitle,
+            subtitle: context.loc.librarySubtitle,
             trailing: OutlinedButton.icon(
               onPressed: () => showOnlineSearchSheet(context),
               style: OutlinedButton.styleFrom(
@@ -98,10 +99,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
                 textStyle: const TextStyle(fontSize: 11),
-                side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ),
               icon: const Icon(Icons.travel_explore_rounded, size: 16),
-              label: const Text('在线搜索'),
+              label: Text(context.loc.searchOnlineTitle),
             ),
           ),
         ),
@@ -120,7 +123,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             },
             onClearQuery: _clearQuery,
             onSourceFilter: (value) {
-              ref.read(libraryControllerProvider.notifier).setSourceFilter(value);
+              ref
+                  .read(libraryControllerProvider.notifier)
+                  .setSourceFilter(value);
             },
             onScan: state.isScanning || state.isLoading ? null : _scan,
           ),
@@ -141,7 +146,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               CompactTokens.space12,
             ),
             child: Text(
-              '扫描目录：${settings.effectiveScanPaths.join('  ·  ')}',
+              context.loc.libraryScanPaths(
+                settings.effectiveScanPaths.join('  ·  '),
+              ),
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontSize: 10,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -159,13 +166,14 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibraryState state,
     Map<String, String> sourceNames,
   ) {
-    final sources = state.songs
-        .map((song) => song.sourceId ?? 'local')
-        .toSet()
-        .toList(growable: false)
-      ..sort(
-        (a, b) => (sourceNames[a] ?? a).compareTo(sourceNames[b] ?? b),
-      );
+    final sources =
+        state.songs
+            .map((song) => song.sourceId ?? 'local')
+            .toSet()
+            .toList(growable: false)
+          ..sort(
+            (a, b) => (sourceNames[a] ?? a).compareTo(sourceNames[b] ?? b),
+          );
     return sources;
   }
 
@@ -214,8 +222,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(
-          content: Text('已加入播放队列'),
+        SnackBar(
+          content: Text(context.loc.libraryAddedToQueue),
           duration: Duration(milliseconds: 1200),
         ),
       );

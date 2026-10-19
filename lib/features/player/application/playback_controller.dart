@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
@@ -137,7 +138,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       index: state.currentIndex,
       song: song,
       request: _loadRequest,
-      message: '播放失败: ${error.message}',
+      message: AppStrings.instance.playbackFailed(error.message),
     );
   }
 
@@ -198,7 +199,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       await _audio.pause();
       state = state.copyWith(status: PlaybackStatus.paused);
     } catch (error, stackTrace) {
-      _setError('暂停失败: $error', stackTrace);
+      _setError(AppStrings.instance.playbackPauseFailed('$error'), stackTrace);
     }
   }
 
@@ -215,7 +216,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       await _audio.resume();
       state = state.copyWith(status: PlaybackStatus.playing);
     } catch (error, stackTrace) {
-      _setError('继续播放失败: $error', stackTrace);
+      _setError(AppStrings.instance.playbackResumeFailed('$error'), stackTrace);
     }
   }
 
@@ -253,7 +254,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       await _audio.seekTo(clamped);
       state = state.copyWith(position: clamped);
     } catch (error, stackTrace) {
-      _setError('跳转失败: $error', stackTrace);
+      _setError(AppStrings.instance.playbackSeekFailed('$error'), stackTrace);
     }
   }
 
@@ -263,7 +264,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       await _audio.setVolume(clamped);
       state = state.copyWith(volume: clamped);
     } catch (error, stackTrace) {
-      _setError('设置音量失败: $error', stackTrace);
+      _setError(AppStrings.instance.playbackVolumeFailed('$error'), stackTrace);
     }
   }
 
@@ -273,7 +274,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       await _audio.setSpeed(clamped);
       state = state.copyWith(speed: clamped);
     } catch (error, stackTrace) {
-      _setError('设置速度失败: $error', stackTrace);
+      _setError(AppStrings.instance.playbackSpeedFailed('$error'), stackTrace);
     }
   }
 
@@ -442,7 +443,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
         index: index,
         song: song,
         request: request,
-        message: '播放失败: $error',
+        message: AppStrings.instance.playbackFailed('$error'),
         stackTrace: stackTrace,
       );
     }

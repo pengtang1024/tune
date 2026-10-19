@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -57,31 +58,33 @@ SourceScanResult failedResult(String sourceId, Object error) {
 String describeSourceError(Object error) {
   if (error is DioException) {
     final status = error.response?.statusCode;
-    if (status == 401 || status == 403) {
-      return '访问被拒绝（HTTP $status）';
+    if (status != null && (status == 401 || status == 403)) {
+      return AppStrings.instance.sourceErrorForbidden(status);
     }
     if (status == 429) {
-      return '请求过于频繁（HTTP 429），请稍后再试';
+      return AppStrings.instance.sourceErrorRateLimited;
     }
     if (status != null) {
-      return '接口返回 HTTP $status';
+      return AppStrings.instance.sourceErrorHttpStatus(status);
     }
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.transformTimeout:
-        return '网络连接超时';
+        return AppStrings.instance.sourceErrorTimeout;
       case DioExceptionType.connectionError:
-        return '无法连接音源服务';
+        return AppStrings.instance.sourceErrorConnection;
       case DioExceptionType.badCertificate:
-        return '证书校验失败';
+        return AppStrings.instance.sourceErrorCertificate;
       case DioExceptionType.cancel:
-        return '请求已取消';
+        return AppStrings.instance.sourceErrorCancelled;
       case DioExceptionType.badResponse:
       case DioExceptionType.unknown:
-        return '网络请求失败：${error.message ?? error.type.name}';
+        return AppStrings.instance.sourceErrorNetwork(
+          error.message ?? error.type.name,
+        );
     }
   }
-  return error.toString();
+  return AppStrings.instance.sourceErrorNetwork(error.toString());
 }

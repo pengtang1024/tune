@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_downloader.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_source_adapter.dart';
@@ -22,21 +24,39 @@ class _CachedPluginAdapter {
   });
 }
 
+/// Outcome of a plugin update.
+class MusicPluginUpdate {
+  /// Whether the script behind the source changed.
+  final bool changed;
+
+  /// Version of the plugin after the update.
+  final String version;
+
+  const MusicPluginUpdate({required this.changed, required this.version});
+}
+
 /// Loads imported MusicFree plugins and keeps one runtime per script.
 class MusicPluginRepository {
   final MusicPluginStore _store;
+  final MusicPluginDownloader _downloader;
+  final Future<MusicPluginRuntime> Function() _runtimeFactory;
   final Map<String, _CachedPluginAdapter> _adapters = {};
   bool _disposed = false;
 
-  MusicPluginRepository({MusicPluginStore? store})
-    : _store = store ?? MusicPluginStore();
+  MusicPluginRepository({
+    MusicPluginStore? store,
+    MusicPluginDownloader? downloader,
+    Future<MusicPluginRuntime> Function()? runtimeFactory,
+  }) : _store = store ?? MusicPluginStore(),
+       _downloader = downloader ?? MusicPluginDownloader(),
+       _runtimeFactory = runtimeFactory ?? createMusicPluginRuntime;
 
   bool get supportsPlugins => isMusicPluginRuntimeSupported;
 
-  static const _queryField = MusicSourceField(
+  static final _queryField = MusicSourceField(
     'query',
-    '搜索关键词',
-    '例如 周杰伦、piano、jazz',
+    AppStrings.instance.pluginFieldQuery,
+    AppStrings.instance.pluginFieldHint,
     required: true,
   );
 
@@ -53,7 +73,7 @@ class MusicPluginRepository {
 
   /// Loads a plugin only to read its metadata. Used by the import flow.
   Future<MusicPluginMetadata> inspect(String script) async {
-    final runtime = await createMusicPluginRuntime();
+    final runtime = await _runtimeFactory();
     try {
       await runtime.load(script);
       return runtime.metadata;
@@ -66,9 +86,13 @@ class MusicPluginRepository {
   ///
   /// The returned config starts disabled; the UI asks for a search keyword
   /// before enabling it so an unconfigured plugin never joins a scan.
+  ///
+  /// [originUrl] is remembered when the script came from the network, so the
+  /// plugin can be updated later without asking for the link again.
   Future<MusicSourceConfig> install({
     required String originalName,
     required String script,
+    String? originUrl,
   }) async {
     final metadata = await inspect(script);
     final id =
@@ -79,13 +103,14 @@ class MusicPluginRepository {
       id: id,
       name: metadata.platform,
       description: metadata.description.isEmpty
-          ? '导入的 MusicFree 插件 · v${metadata.version}'
+          ? AppStrings.instance.pluginImportedVersion(metadata.version)
           : metadata.description,
       kind: MusicSourceKind.plugin,
       enabled: false,
       settings: {
         'pluginFile': fileName,
         'query': '',
+        'pluginUrl': ?originUrl,
         for (final variable in metadata.userVariables)
           variable.key: variable.defaultValue,
       },
@@ -94,16 +119,50 @@ class MusicPluginRepository {
           MusicSourceField(
             variable.key,
             variable.title.isEmpty ? variable.key : variable.title,
-            '插件变量 ${variable.key}',
+            AppStrings.instance.pluginVariable(variable.key),
           ),
       ],
     );
   }
 
+  /// Downloads a plugin from [url] and installs it.
+  Future<MusicSourceConfig> installFromUrl(String url) async {
+    final script = await _downloader.download(url);
+    return install(
+      originalName: MusicPluginDownloader.fileNameFor(url),
+      script: script,
+      originUrl: url.trim(),
+    );
+  }
+
+  /// Replaces the script of [config] with the current one from its URL.
+  ///
+  /// The source keeps its id, so the songs that were scanned with the old
+  /// script stay in the library.
+  Future<MusicPluginUpdate> update(MusicSourceConfig config) async {
+    final url = config.pluginUrl;
+    if (url == null) {
+      throw MusicPluginException(AppStrings.instance.pluginUpdateNoUrl);
+    }
+
+    final script = await _downloader.download(url);
+    final current = await _store.read(config);
+    if (current == script) {
+      return MusicPluginUpdate(changed: false, version: config.name);
+    }
+
+    await _store.writeScript(config, script);
+    final cached = _adapters.remove(config.id);
+    await cached?.adapter.runtime.dispose();
+
+    final metadata = await inspect(script);
+    return MusicPluginUpdate(changed: true, version: metadata.version);
+  }
+
   Future<MusicPluginSourceAdapter> adapterFor(MusicSourceConfig config) async {
     final file = await _store.fileFor(config);
     if (file == null || !await file.exists()) {
-      throw StateError('插件文件不存在，请重新导入');
+      throw StateError(AppStrings.instance.pluginFileMissing);
     }
 
     final modified = await file.lastModified();
@@ -113,10 +172,13 @@ class MusicPluginRepository {
     };
     final signature = jsonEncode(userVariables);
     final cached = _adapters[config.id];
-    if (cached != null &&
+    final reusable =
+        cached != null &&
         cached.path == file.path &&
         cached.modified == modified &&
-        cached.signature == signature) {
+        cached.signature == signature &&
+        cached.adapter.runtime.isUsable;
+    if (reusable) {
       return cached.adapter;
     }
 
@@ -126,7 +188,7 @@ class MusicPluginRepository {
     }
 
     final script = await file.readAsString();
-    final runtime = await createMusicPluginRuntime();
+    final runtime = await _runtimeFactory();
     try {
       await runtime.load(script, userVariables: userVariables);
       final adapter = MusicPluginSourceAdapter(

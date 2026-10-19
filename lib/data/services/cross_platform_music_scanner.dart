@@ -239,7 +239,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
                   Log.info('无效文件路径，跳过: ${file.path}');
                   continue;
                 }
-                
+
                 if (MusicScannerConfig.isAudioFile(file.path)) {
                   final song = await SongCreator.createFromFile(file);
                   if (song != null) {

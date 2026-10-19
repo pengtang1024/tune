@@ -1,273 +1,742 @@
 {
   "@@locale": "en",
-  "@@last_modified": "2024-05-21T10:00:00.000Z",
-  "app_name": "Tune",
-  "welcome_message": "Welcome to Tune",
-  "no_songs_found": "No songs found",
-  "settings": "Settings",
-  "settings_saved": "Settings saved",
-  "retry": "Retry",
-  "home": "Home",
-  "home_title": "Home",
-  "recommend": "Recommend",
-  "featured": "Featured",
-  "library": "Library",
-  "library_title": "Library",
-  "search": "Search",
-  "search_title": "Search",
-  "player": "Player",
-  "player_title": "Player",
-  "playlist": "Playlist",
-  "about": "About",
-  "custom_scan_paths": "Custom Scan Paths",
-  "playback_settings": "Playback Settings",
-  "account_settings": "Account Settings",
-  "general_settings": "General Settings",
-  "music_library_settings": "Music Library Settings",
-  "about_settings": "About",
-  "play_mode": "Play Mode",
-  "sequence_playback": "Sequence Playback",
-  "repeat_one": "Repeat One",
-  "shuffle_playback": "Shuffle Playback",
-  "audio_quality": "Audio Quality",
-  "low_quality": "Low Quality",
-  "medium_quality": "Medium Quality",
-  "high_quality": "High Quality",
-  "pause_when_headset_disconnected": "Pause When Headset Disconnected",
-  "audio_effects": "Audio Effects",
-  "enable_equalizer": "Enable Equalizer",
-  "bass_boost": "Bass Boost",
-  "spatial_audio": "Spatial Audio",
-  "username": "Username",
-  "email": "Email",
-  "auto_login": "Auto Login",
-  "save_password": "Save Password",
-  "save": "Save",
+  "appName": "Tune",
+  "appTagline": "A local-first desktop music player",
+  "appStartFailed": "Tune failed to start",
   "cancel": "Cancel",
   "ok": "OK",
-  "add": "Add",
-  "remove": "Remove",
-  "edit": "Edit",
+  "save": "Save",
   "delete": "Delete",
+  "remove": "Remove",
+  "clear": "Clear",
+  "close": "Close",
   "retry": "Retry",
-  "home": "Home",
-  "home_title": "Home",
-  "recommend": "Recommend",
-  "featured": "Featured",
-  "library": "Library",
-  "library_title": "Library",
+  "confirm": "Confirm",
+  "chooseFile": "Choose file",
+  "unknownError": "Unknown error",
+  "scanNow": "Scan now",
   "search": "Search",
-  "search_title": "Search",
-  "player": "Player",
-  "player_title": "Player",
-  "playlist": "Playlist",
+  "scanning": "Scanning",
   "about": "About",
-  "custom_scan_paths": "Custom Scan Paths",
-  "add_custom_path": "Add Custom Path",
-  "no_custom_scan_paths": "No custom scan paths",
-  "change_language": "Change Language",
-  "change_language_confirm": "Are you sure you want to change the app language? This will restart the app to apply the new settings.",
-  "current_language_display": "Current Language:",
-  "theme_preview": "Theme Preview",
-  "system_mode_preview": "System",
-  "light_mode_preview": "Light",
-  "dark_mode_preview": "Dark",
-  "no_custom_scan_paths_description": "Add custom folder paths to scan music files in specific locations",
-  "scan_local_music": "Scan Local Music",
-  "scanning": "Scanning...",
-  "scan_completed": "Scan Completed",
-  "scan_failed": "Scan Failed",
-  "failed_to_load_songs": "Failed to load songs",
-  "failed_to_load_songs_description": "Unable to load songs from your music library. Please check your network connection or rescan your music library.",
-  "try_again": "Try Again",
-  "scan_progress": "Scan Progress",
-  "scanning_path": "Scanning path:",
-  "no_songs_found": "No songs found",
-  "no_songs_found_description": "No music files were found on your device.",
-  "scan_again": "Scan Again",
-  "scan_local_music_description": "Scan your device to find music files",
-  "custom_scan_paths_description": "Add custom folder paths to scan music files in specific locations",
-  "scan_button": "Start Scan",
-  "cancel_scan": "Cancel Scan",
-  "failed_to_save_custom_scan_paths": "Failed to save custom scan paths",
-  "failed_to_add_custom_scan_path": "Failed to add custom scan path",
-  "failed_to_scan_music": "Failed to scan music",
-  "search_songs": "Search songs...",
-  "artists": "Artists",
-  "albums": "Albums",
-  "songs": "Songs",
-  "playlists": "Playlists",
-  "music_library": "Music Library",
-  "favorites": "Favorites",
-  "recently_played": "Recently Played",
-  "top_charts": "Top Charts",
-  "new_releases": "New Releases",
-  "genres": "Genres",
-  "now_playing": "Now Playing",
-  "previous": "Previous",
-  "next": "Next",
-  "play": "Play",
-  "pause": "Pause",
-  "sequence": "Sequence",
-  "shuffle": "Shuffle",
-  "scan_completed_no_new_songs": "Scan completed, no new songs found",
-  "added_scanned_songs_to_library": "Added scanned songs to music library",
-  "rescan": "Rescan",
-  "load_stats_failed": "Failed to load stats",
-  "load_songs_failed": "Failed to load songs",
-  "add_to_library": "Add to Library",
-  "general_tab": "General",
-  "library_tab": "Library",
-  "account_tab": "Account",
-  "playback_tab": "Playback",
-  "about_tab": "About",
-  "animations_tab": "Animations",
-  "version": "Version",
-  "platform": "Platform",
-  "about_description": "Tune is a modern music player designed for music lovers. It supports multiple audio formats and provides high-quality audio playback experience.",
-  "features": "Features",
-  "high_quality_audio_playback": "High-quality audio playback",
-  "supports_multiple_audio_formats": "Supports multiple audio formats (MP3, FLAC, WAV, AAC, etc.)",
-  "local_music_management": "Local music management",
-  "automatically_scans_and_organizes_local_music_library": "Automatically scans and organizes local music library",
-  "multi_language_support": "Multi-language support",
-  "supports_chinese_english_japanese_korean_russian_and_more": "Supports Chinese, English, Japanese, Korean, Russian and more languages",
-  "multiple_themes": "Multiple themes",
-  "eight_theme_colors_with_dark_light_mode_switching": "8 theme colors with dark/light mode switching",
-  "lyrics_synchronization": "Lyrics synchronization",
-  "lrc_format_lyrics_real_time_synchronization_display": "LRC format lyrics real-time synchronization display",
-  "smart_search": "Smart search",
-  "supports_searching_by_song_title_artist_album_and_other_metadata": "Supports searching by song title, artist, album and other metadata",
-  "open_source_license": "Open Source License",
-  "opensource_license_description": "This project is released under an open source license. The source code is available on GitHub.",
-  "github_project_address": "GitHub Project Address",
-  "contact_us": "Contact Us",
-  "contact_us_description": "If you have any questions, please contact us through the following ways:\nEmail: support@tune.com",
-  "official_website": "Official Website",
-  "auto_start": "Auto Start",
-  "auto_start_description": "Automatically run Tune when the system starts",
-  "window_size": "Window Size",
-  "small": "Small",
-  "medium": "Medium",
-  "large": "Large",
-  "window_size_description": "Set the default size of the application window",
-  "default_player": "Default Player",
-  "default_player_description": "Set Tune as the system default audio player",
-  "desktop_lyrics": "Desktop Lyrics",
-  "desktop_lyrics_description": "Display real-time lyrics on the desktop",
-  "music_library_management": "Music Library Management",
-  "add_custom_directory": "Add Custom Directory",
-  "no_custom_scan_paths": "No custom scan paths",
-  "full_platform_scan_note": "Full platform scan note: By default, the system music directory is scanned, and the scan range can be expanded by adding custom paths.",
-  "library_info": "Library Info",
-  "songs_count": "Songs Count",
-  "library_features": "Library Features",
-  "access_library": "Access Library",
-  "scan_instructions": "Scan Instructions",
-  "auto_extract_metadata": "Auto Extract Metadata",
-  "add_custom_paths": "Add Custom Paths",
-  "scan_completion": "Scan Completion",
-  "auto_metadata_extraction": "Auto Metadata Extraction",
-  "how_to_scan": "How to Scan",
-  "scan_step1": "1. Click the scan button to start scanning",
-  "scan_step2": "2. The system will automatically scan the default music directory",
-  "scan_step3": "3. Custom directories can be added to expand the scan range",
-  "scan_step4": "4. After scanning is complete, songs will be automatically added to the music library",
-  "faq": "FAQ",
-  "faq_scan_issue": "Scan Issue",
-  "faq_scan_issue_answer": "If scanning fails, please check if file permissions and paths are correct.",
-  "faq_slow_scan": "Slow Scan",
-  "faq_slow_scan_answer": "Scan speed depends on music library size and hard disk performance. Large library scans may take a long time.",
-  "faq_not_showing": "Songs Not Showing",
-  "faq_not_showing_answer": "Ensure that the music file format is supported and check if the file is corrupted.",
-  "music_scan": "Music Scan",
-  "failed_to_open_github": "Failed to open GitHub page",
-  "select_language": "Select Language",
-  "unknown_user": "Unknown User",
-  "tag_vip": "VIP",
-  "tag_singer": "Singer",
-  "tag_elite": "Elite",
-  "settings_page_theme": "Theme Settings",
-  "settings_page_language": "Language Settings",
   "language": "Language",
   "theme": "Theme",
-  "display_settings": "Display Settings",
-  "language_theme_description": "Set the language and theme mode of the application",
-  "system_mode": "System Mode",
-  "light_mode": "Light Mode",
-  "dark_mode": "Dark Mode",
-  "english": "English",
-  "chinese_simplified": "Chinese Simplified",
-  "chinese_traditional": "Chinese Traditional",
-  "chinese": "Chinese",
-  "japanese": "Japanese",
-  "korean": "Korean",
-  "russian": "Russian",
-  "german": "German",
-  "french": "French",
-  "spanish": "Spanish",
-  "search_error": "Search Error",
-  "error": "Error",
-  "network_error": "Network Error",
-  "permission_denied": "Permission Denied",
-  "invalid_input": "Invalid Input",
-  "search_no_results": "No search results found",
-  "skipToPrevious": "Skip to Previous",
-  "skipToNext": "Skip to Next",
-  "playback_error": "Playback Error",
-  "no_song_playing": "No song playing",
-  "select_a_song_to_play": "Please select a song to play",
-  "repeat_all": "Repeat All",
-  "playback_speed": "Playback Speed",
-  "default_playback_speed": "Default Playback Speed",
-  "default_playback_speed_description": "Set the default playback speed for all songs",
-  "crossfade": "Crossfade",
-  "crossfade_description": "Enable crossfade between songs",
-  "crossfade_duration": "Crossfade Duration",
-  "gapless_playback": "Gapless Playback",
-  "gapless_playback_description": "Enable gapless playback for smooth transitions",
-  "equalizer": "Equalizer",
-  "equalizer_tab": "Equalizer",
-  "enable_equalizer": "Enable Equalizer",
-  "presets": "Presets",
-  "flat": "Flat",
-  "pop": "Pop",
-  "rock": "Rock",
-  "jazz": "Jazz",
-  "classical": "Classical",
-  "hip_hop": "Hip Hop",
-  "custom_equalizer": "Custom Equalizer",
-  "animations_settings": "Animations Settings",
-  "enable_animations": "Enable Animations",
-  "enable_animations_description": "Enable or disable UI animations",
-  "animation_speed": "Animation Speed",
-  "animation_speed_description": "Set the speed of UI animations",
-  "very_slow": "Very Slow",
-  "slow": "Slow",
-  "normal": "Normal",
-  "fast": "Fast",
-  "very_fast": "Very Fast",
-  "no_scan_results": "No scan results found",
-  "no_custom_scan_paths": "No custom scan paths",
-  "change_language": "Change Language",
-  "change_language_confirm": "Are you sure you want to change the app language? This will restart the app to apply the new settings.",
-  "current_language_display": "Current Language:",
-  "theme_preview": "Theme Preview",
-  "system_mode_preview": "System",
-  "light_mode_preview": "Light",
-  "dark_mode_preview": "Dark",
-  "enable_notifications": "Enable Notifications",
-  "enable_notifications_description": "Enable or disable app notifications",
-  "font_size": "Font Size",
-  "font_size_description": "Adjust the display size of text within the app",
-  "error_occurred": "Error occurred",
-  "quick_actions": "Quick Actions",
-  "my_songs": "My Songs",
-  "radio": "Radio",
-  "see_all": "See All",
-  "no_recent_songs": "No recent songs",
-  "good_morning": "Good Morning",
-  "good_afternoon": "Good Afternoon",
-  "good_evening": "Good Evening",
-  "welcome_to_tune": "Welcome to Tune"
+  "lightMode": "Light mode",
+  "darkMode": "Dark mode",
+  "systemMode": "Follow system",
+  "musicLibrary": "Library",
+  "navLibrary": "Library",
+  "navQueue": "Queue",
+  "navSources": "Sources",
+  "navSettings": "Settings",
+  "libraryTitle": "Library",
+  "librarySubtitle": "Every track from your local and online sources",
+  "libraryClearSearch": "Clear search",
+  "libraryFilterSources": "Filter sources",
+  "libraryAllSources": "All sources",
+  "libraryScanAllSources": "Scan all sources",
+  "libraryTrackCount": "{count} tracks",
+  "@libraryTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryNoMatchTitle": "No matching songs",
+  "libraryNoMatchSubtitle": "Try another keyword or clear the search",
+  "librarySourceEmptyTitle": "No songs from this source",
+  "librarySourceEmptySubtitle": "Switch to all sources or rescan this one",
+  "libraryViewAllSources": "Show all sources",
+  "libraryScanningTitle": "Scanning music",
+  "libraryEmptyTitle": "No music yet",
+  "libraryEmptySubtitle": "Scan a local folder or an enabled online source, or adjust your sources in settings.",
+  "libraryLoadFailedTitle": "Could not load the library",
+  "libraryAddedToQueue": "Added to the queue",
+  "libraryScanPaths": "Scan folders: {paths}",
+  "@libraryScanPaths": {
+    "placeholders": {
+      "paths": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryAddToQueue": "Add to queue",
+  "queueTitle": "Queue",
+  "queueSubtitle": "Current play order",
+  "queueEmptyTitle": "The queue is empty",
+  "queueEmptySubtitle": "Pick a song in the library or add songs to the queue",
+  "queueGoToLibrary": "Go to library",
+  "queueClearTitle": "Clear the queue?",
+  "queueClearMessage": "Playback stops. The songs stay in your library.",
+  "playerNowPlaying": "Now playing",
+  "playerCollapse": "Collapse",
+  "playerPrevious": "Previous",
+  "playerNext": "Next",
+  "playerPlay": "Play",
+  "playerPause": "Pause",
+  "playerMute": "Mute",
+  "playerUnmute": "Unmute",
+  "playerQueue": "Queue",
+  "playerPlayModeSequential": "Repeat all",
+  "playerPlayModeRepeatOne": "Repeat one",
+  "playerPlayModeShuffle": "Shuffle",
+  "playerNoSongTitle": "Pick a song to start",
+  "playerUnknownArtist": "Unknown artist",
+  "playerDockReady": "Tune · READY",
+  "playerQueueSummary": "{count} in queue",
+  "@playerQueueSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nowPlayingEmptyTitle": "Nothing is playing yet",
+  "nowPlayingEmptySubtitle": "Pick one from the library to begin",
+  "nowPlayingUnnamedTrack": "Untitled track",
+  "nowPlayingLocalMusic": "Local music",
+  "trackUnknownTitle": "Unknown song",
+  "playbackFailed": "Playback failed: {error}",
+  "@playbackFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackPauseFailed": "Could not pause: {error}",
+  "@playbackPauseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackResumeFailed": "Could not resume: {error}",
+  "@playbackResumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSeekFailed": "Could not seek: {error}",
+  "@playbackSeekFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackVolumeFailed": "Could not set the volume: {error}",
+  "@playbackVolumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSpeedFailed": "Could not set the speed: {error}",
+  "@playbackSpeedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "audioSourceLocal": "Local file",
+  "audioSourceDownloading": "Downloading {percent}%",
+  "@audioSourceDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "audioSourceCached": "Offline ready",
+  "audioSourceFailed": "Download failed",
+  "routerNotFoundTitle": "Page not found",
+  "routerBackToLibrary": "Back to library",
+  "sourcesTitle": "Sources",
+  "sourcesSubtitle": "Online catalogs and scan folders",
+  "sourcesAutoScan": "Scan on startup",
+  "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
+  "sourcesScanAll": "Scan all sources",
+  "sourcesImportPlugin": "Import plugin",
+  "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",
+  "sourcesScanCompleted": "Scan finished",
+  "sourcesImportPluginTitle": "Import a music plugin",
+  "sourcesImportPluginMessage": "Plugins are third-party JavaScript. They run inside the app and can reach the network. Only import sources you trust. A plugin stays disabled until you give it a search keyword.",
+  "sourcesPluginUnreadable": "Could not read the plugin file",
+  "sourcesPluginTooLarge": "The plugin file cannot exceed 2 MB",
+  "sourcesPluginImportedEnabled": "Imported and enabled {name}",
+  "@sourcesPluginImportedEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImported": "Imported {name}. It joins the scan once you add a keyword and enable it.",
+  "@sourcesPluginImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImportFailed": "Could not import the plugin: {error}",
+  "@sourcesPluginImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginActions": "Plugin actions",
+  "sourcesConfigure": "Configure",
+  "sourcesDeletePlugin": "Delete plugin",
+  "sourcesUnsupported": "This source is not supported in this version",
+  "sourcesDisabled": "Off",
+  "sourcesNeedsConfiguration": "Needs configuration",
+  "sourcesNeedsConfigurationHint": "Needs configuration: {hint}",
+  "@sourcesNeedsConfigurationHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesLastScan": "Last scan {time}",
+  "@sourcesLastScan": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesAutoScanLocal": "Local folders are scanned after startup",
+  "sourcesWaitingFirstScan": "Waiting for the first scan",
+  "sourcesScannedCount": "{count} tracks · {time}",
+  "@sourcesScannedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesSkipped": "Skipped",
+  "sourcesScanFailed": "Scan failed",
+  "sourcesDeletePluginTitle": "Delete the plugin?",
+  "sourcesDeletePluginMessage": "This deletes the script, the settings and the scanned songs of {name}.",
+  "@sourcesDeletePluginMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleted": "Deleted {name}",
+  "@sourcesDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceKindLocal": "Local",
+  "sourceKindOpenCatalog": "Open catalog",
+  "sourceKindOpenApi": "API",
+  "sourceKindPlugin": "Plugin",
+  "sourcesConfigureTitle": "Configure {name}",
+  "@sourcesConfigureTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldRequired": "Please fill in {label}",
+  "@sourcesFieldRequired": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldNumeric": "Please enter a number",
+  "sourcesNotLoaded": "The source list is still loading",
+  "sourcesPlatformNoPlugin": "This platform does not support JavaScript plugins",
+  "sourcesUpdatePlugin": "Update plugin",
+  "sourcesPluginUpdated": "{name} was updated to {version}",
+  "@sourcesPluginUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpToDate": "{name} is already up to date",
+  "@sourcesPluginUpToDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpdateFailed": "Could not update the plugin: {error}",
+  "@sourcesPluginUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTitle": "Settings",
+  "settingsSubtitle": "Adjust the look, the language and your local library.",
+  "settingsThemeDescription": "Choose how the interface looks and which language it speaks.",
+  "settingsLanguageDescription": "Language of the interface and the system menus",
+  "settingsLibraryDescription": "Tune looks for audio files in these folders only.",
+  "settingsDefaultPath": "Default",
+  "settingsNoDefaultFolder": "No default music folder found",
+  "settingsCustomPath": "Custom",
+  "settingsAddFolder": "Add folder",
+  "settingsClearLibrary": "Clear library",
+  "settingsScanSafetyNote": "Scanning only reads audio files. Nothing on disk is changed or deleted.",
+  "settingsAboutTitle": "About Tune",
+  "settingsChooseFolder": "Choose a music folder",
+  "settingsFolderAdded": "Scan folder added",
+  "settingsScanDone": "Scan finished",
+  "settingsClearLibraryTitle": "Clear the library?",
+  "settingsClearLibraryMessage": "This only clears the scan history of Tune. Music files on disk stay untouched.",
+  "settingsLibraryCleared": "Library cleared",
+  "settingsPathsCount": "{count} paths",
+  "@settingsPathsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnlineTitle": "Search online",
+  "searchOnlineHint": "Search the online sources, e.g. jazz, piano, lo-fi",
+  "searchOnlineDescription": "Search your enabled online sources. Results are not written to the library.",
+  "searchOnlinePrompt": "Search the online sources",
+  "searchOnlinePromptDescription": "Type a keyword and press enter. Openverse, Jamendo, Internet Archive and every imported plugin are searched in parallel.",
+  "searchNoResults": "No results",
+  "searchNoResultsDescription": "Try another keyword.",
+  "searchNoMatch": "No matching songs",
+  "searchNoMatchDescription": "Try another keyword.",
+  "searchSearching": "Searching for “{query}”",
+  "@searchSearching": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultCount": "{count} tracks",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchPlayAll": "Play all",
+  "searchAddToQueue": "Add to queue",
+  "searchAddedToQueue": "Added to the queue: {title}",
+  "@searchAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoSourcesEnabled": "No online source is enabled. Turn one on in settings first.",
+  "searchFailedShort": "Search failed",
+  "searchFailed": "Online search failed: {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPreparing": "Preparing the scan...",
+  "scanNoEnabledSources": "No source is enabled",
+  "scanNoLocalFolders": "No music folder to scan",
+  "scanProgressPercent": "Scanning {percent}%",
+  "@scanProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "scanAllSourcesFailed": "Every source failed to scan",
+  "scanFailed": "Scan failed: {error}",
+  "@scanFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "clearLibraryFailed": "Could not clear the library: {error}",
+  "@clearLibraryFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoAudioFiles": "No audio files found",
+  "scanSongCount": "Scanned {count} songs",
+  "@scanSongCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSongCountShort": "{count} songs",
+  "@scanSongCountShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSourceNotConfigured": "The source is not configured yet",
+  "scanCachedTooSoon": "Cache kept, the last scan is still too recent",
+  "scanSummary": "Scanned {sources} sources, {songs} songs in total",
+  "@scanSummary": {
+    "placeholders": {
+      "songs": {
+        "type": "int"
+      },
+      "sources": {
+        "type": "int"
+      }
+    }
+  },
+  "scanUpdated": "Updated {songs} songs, {failed} sources failed",
+  "@scanUpdated": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      },
+      "songs": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorForbidden": "Access denied (HTTP {status})",
+  "@sourceErrorForbidden": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorRateLimited": "Too many requests (HTTP 429). Try again later.",
+  "sourceErrorHttpStatus": "The service returned HTTP {status}",
+  "@sourceErrorHttpStatus": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorTimeout": "The connection timed out",
+  "sourceErrorConnection": "Could not reach the source service",
+  "sourceErrorCertificate": "The certificate could not be verified",
+  "sourceErrorCancelled": "The request was cancelled",
+  "sourceErrorNetwork": "Network request failed: {message}",
+  "@sourceErrorNetwork": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorPluginLoad": "Could not load the plugin: {message}",
+  "@sourceErrorPluginLoad": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorUnsupported": "This source is not supported yet",
+  "sourceErrorScanInterval": "The last scan is less than {interval} ago",
+  "@sourceErrorScanInterval": {
+    "placeholders": {
+      "interval": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorScanTimeout": "The scan timed out after {seconds}s",
+  "@sourceErrorScanTimeout": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalHours": "{count} hours",
+  "@intervalHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalMinutes": "{count} minutes",
+  "@intervalMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "localSourceHint": "Add a scan folder in the library settings",
+  "localSourceNotConfigured": "No local music folder configured",
+  "pluginSourceHint": "Fill in a search keyword, e.g. an artist, piano or jazz",
+  "pluginFieldQuery": "Search keyword",
+  "pluginFieldHint": "e.g. an artist, piano, jazz",
+  "pluginImportedVersion": "Imported MusicFree plugin · v{version}",
+  "@pluginImportedVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginVariable": "Plugin variable {key}",
+  "@pluginVariable": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginFileMissing": "The plugin file is missing. Import it again.",
+  "pluginRuntimeUnsupported": "This platform does not support JavaScript music plugins. Import them on desktop or mobile.",
+  "pluginCompatLibrary": "Plugin compatibility library",
+  "pluginBridgeScript": "Plugin bridge script",
+  "pluginInit": "Plugin initialization",
+  "pluginScript": "Plugin script",
+  "pluginExports": "Plugin exports",
+  "pluginNoExports": "The plugin does not export a valid module.exports",
+  "pluginIncomplete": "The plugin is incomplete: it needs the platform and search methods",
+  "pluginNoMediaSource": "The plugin does not implement getMediaSource",
+  "pluginNoStream": "The plugin returned no playable address",
+  "pluginRuntimeClosed": "The plugin runtime is closed",
+  "pluginCallFailed": "{label} failed: {message}",
+  "@pluginCallFailed": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginCallTimeout": "The plugin call timed out",
+  "pluginUnknownData": "The plugin returned data that could not be read",
+  "pluginCallError": "The plugin call failed",
+  "pluginNoMatch": "No matching songs",
+  "pluginNoStreamResults": "The plugin returned {count} results, but no playable address",
+  "@pluginNoStreamResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "neteaseHint": "Enter the address of your own NeteaseCloudMusicApi, e.g. http://localhost:3000",
+  "neteaseFieldApi": "API address",
+  "neteaseFieldQuery": "Search keyword",
+  "neteaseFieldHint": "e.g. trending, an artist",
+  "neteaseFieldLimit": "Tracks per scan",
+  "neteaseFieldLimitHint": "20 by default, 50 at most",
+  "neteaseHotKeyword": "trending",
+  "neteaseEmptyResponse": "The NetEase API returned an empty response",
+  "neteaseNoMatch": "No matching songs",
+  "neteaseNoStream": "The service returned no playable address. You may need to sign in on the server, or the track is restricted.",
+  "openverseHint": "Enter a scan keyword, e.g. piano, ambient or jazz",
+  "openverseFieldQuery": "Scan keyword",
+  "openverseFieldHint": "e.g. piano, ambient, jazz",
+  "openverseEmptyResponse": "Openverse returned an empty response",
+  "openverseNoMatch": "No matching open audio found",
+  "sourceLocalName": "Local music",
+  "sourceLocalDescription": "Scan the music folders on this device",
+  "sourceOpenverseDescription": "Open audio from Jamendo, Freesound, Wikimedia and more",
+  "sourceJamendoDescription": "An open catalog of independent music. Needs a free Client ID.",
+  "sourceInternetArchiveDescription": "The open audio collection of the Internet Archive",
+  "sourceNeteaseName": "NetEase Cloud Music API",
+  "sourceNeteaseDescription": "Connects to a self-hosted NeteaseCloudMusicApi service",
+  "jamendoHint": "Get a free Client ID at developer.jamendo.com and paste it here",
+  "jamendoFieldClientId": "Client ID",
+  "jamendoFieldClientIdHint": "Apply for free at developer.jamendo.com",
+  "jamendoFieldQuery": "Search keyword (optional)",
+  "jamendoFieldQueryHint": "e.g. jazz, electronic",
+  "jamendoEmptyResponse": "Jamendo returned an empty response",
+  "jamendoNoMatch": "No matching Jamendo tracks",
+  "internetArchiveHint": "Enter an Internet Archive query, e.g. collection:netlabels AND mediatype:audio",
+  "internetArchiveFieldQuery": "Query",
+  "internetArchiveFieldLimit": "Tracks per scan",
+  "internetArchiveFieldLimitHint": "8 by default, 20 at most",
+  "internetArchiveInvalidResponse": "Internet Archive returned an unreadable response",
+  "internetArchiveNoMatch": "No playable archived audio found",
+  "downloadUnsupportedPlatform": "This platform has no file system, so downloads cannot be cached",
+  "audioLoadFailed": "Audio loading failed",
+  "audioPathEmpty": "The audio path is empty",
+  "pluginUpdateNoUrl": "The plugin has no download address, so it cannot be checked for updates",
+  "sourcesPluginUrlDownloadFailed": "Could not download the plugin: {error}",
+  "@sourcesPluginUrlDownloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginStepFailed": "{label} failed: {error}",
+  "@pluginStepFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesImportPluginFromUrl": "Import from URL",
+  "sourcesPluginUrlTitle": "Plugin URL",
+  "sourcesPluginUrlHint": "https://example.com/plugin.js",
+  "sourcesPluginUrlInvalid": "Please enter a valid http(s) link",
+  "pluginUrlInvalid": "The plugin address is invalid, please use an http or https link",
+  "pluginUrlEmpty": "The plugin script is empty",
+  "pluginUrlTooLarge": "The plugin script exceeds the size limit",
+  "pluginSandboxStartFailed": "The plugin sandbox failed to start: {error}",
+  "@pluginSandboxStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSandboxStartTimeout": "The plugin sandbox timed out while starting",
+  "pluginScriptTooLarge": "The plugin script exceeds the limit of {limit} KB",
+  "@pluginScriptTooLarge": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginRuntimeTerminated": "The plugin runtime was terminated",
+  "pluginRuntimeTimeLimit": "The plugin runtime exceeded its time limit",
+  "pluginSandboxNotReady": "The plugin sandbox is not ready yet",
+  "pluginCallTimeoutDetailed": "The plugin call timed out after {seconds}s",
+  "@pluginCallTimeoutDetailed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pluginRuntimeCrashed": "The plugin runtime crashed",
+  "pluginFetchShimFailed": "The fetch shim failed to load: {message}",
+  "@pluginFetchShimFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUnknownCall": "Unknown plugin call: {method}",
+  "@pluginUnknownCall": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginScriptMissing": "The plugin script is missing",
+  "pluginMemoryLimitExceeded": "The plugin used more than the limit of {limit} and was terminated",
+  "@pluginMemoryLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "ccmixterEmptyResponse": "ccMixter returned an empty response",
+  "ccmixterFieldLimit": "Tracks per scan",
+  "ccmixterFieldLimitHint": "15 by default, 30 at most",
+  "ccmixterFieldQuery": "Scan tag",
+  "ccmixterFieldQueryHint": "e.g. jazz, ambient, electro",
+  "ccmixterHint": "Enter a ccMixter tag, e.g. jazz, ambient or electro",
+  "ccmixterNoMatch": "No matching ccMixter tracks",
+  "itunesEmptyResponse": "The iTunes API returned an empty response",
+  "itunesFieldLimit": "Tracks per scan",
+  "itunesFieldLimitHint": "20 by default, 50 at most",
+  "itunesFieldQuery": "Search keyword",
+  "itunesFieldQueryHint": "e.g. jazz, piano, lo-fi",
+  "itunesHint": "Enter a search keyword, e.g. jazz, piano or lo-fi",
+  "itunesNoMatch": "No matching iTunes tracks",
+  "podcastRssEmptyFeed": "The feed address returned an empty document",
+  "podcastRssFieldFeed": "Feed address",
+  "podcastRssFieldFeedHint": "e.g. https://example.com/podcast.xml",
+  "podcastRssFieldLimit": "Episodes per scan",
+  "podcastRssFieldLimitHint": "20 by default, 100 at most",
+  "podcastRssHint": "Enter the address of a podcast feed (RSS)",
+  "podcastRssInvalidFeed": "The feed address returned XML that cannot be read: {error}",
+  "@podcastRssInvalidFeed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastRssNoMatch": "The feed has no playable episode",
+  "sourceCcmixterDescription": "Creative Commons remixes and open music",
+  "sourceItunesDescription": "30 second previews from the Apple Music catalog",
+  "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
+  "sourcePodcastRssName": "Podcasts",
+  "sourceSubsonicDescription": "Connects to a self-hosted Navidrome or Subsonic library",
+  "subsonicAuthFailed": "Cannot reach the music server, check the address and the account",
+  "subsonicEmptyResponse": "The music server returned an empty response",
+  "subsonicError": "The music server reported an error: {error}",
+  "@subsonicError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "subsonicFieldLimit": "Tracks per scan",
+  "subsonicFieldLimitHint": "25 by default, 100 at most",
+  "subsonicFieldPassword": "Password",
+  "subsonicFieldPasswordHint": "Used to sign the access token, never sent in plain text",
+  "subsonicFieldQuery": "Search keyword (optional)",
+  "subsonicFieldQueryHint": "e.g. jazz, piano",
+  "subsonicFieldServer": "Server address",
+  "subsonicFieldServerHint": "e.g. http://localhost:4533",
+  "subsonicFieldUser": "User name",
+  "subsonicFieldUserHint": "The login name of your music server",
+  "subsonicHint": "Enter the address and the account of your own music server, e.g. http://localhost:4533",
+  "subsonicNoMatch": "No matching tracks"
 }

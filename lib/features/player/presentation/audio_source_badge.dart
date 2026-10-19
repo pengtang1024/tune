@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 
 /// Tells where the audio of the current track comes from.
@@ -39,7 +40,7 @@ class AudioSourceBadge extends StatelessWidget {
           Icon(_icon, size: dense ? 10 : 12, color: color),
           SizedBox(width: dense ? 4 : 5),
           Text(
-            _label(percent),
+            _label(context, percent),
             style: TextStyle(
               fontFamily: 'JetBrains Mono',
               fontSize: dense ? 8 : 9,
@@ -53,12 +54,14 @@ class AudioSourceBadge extends StatelessWidget {
     );
   }
 
-  String _label(int percent) {
+  String _label(BuildContext context, int percent) {
     return switch (status) {
-      AudioSourceStatus.local => 'LOCAL FILE',
-      AudioSourceStatus.downloading => 'DOWNLOADING $percent%',
-      AudioSourceStatus.cached => 'OFFLINE READY',
-      AudioSourceStatus.failed => 'DOWNLOAD FAILED',
+      AudioSourceStatus.local => context.loc.audioSourceLocal,
+      AudioSourceStatus.downloading => context.loc.audioSourceDownloading(
+        percent,
+      ),
+      AudioSourceStatus.cached => context.loc.audioSourceCached,
+      AudioSourceStatus.failed => context.loc.audioSourceFailed,
     };
   }
 

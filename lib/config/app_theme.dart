@@ -19,122 +19,118 @@ abstract final class AppTheme {
   static const Color cardDark = Color(0xFF1A1A1A);
 
   // The FlexColorScheme defined light mode ThemeData.
-  static ThemeData light = FlexThemeData.light(
-    // Using custom color scheme for music app
-    scheme: FlexScheme.deepPurple,
-    colorScheme: const ColorScheme.light(
-      primary: primaryViolet,
-      secondary: accentPink,
-      tertiary: accentBlue,
-      surface: surfaceLight,
-      surfaceContainer: cardLight,
-      surfaceContainerHighest: Color(0xFFF1F5F9),
-      inverseSurface: Color(0xFF1E293B),
-      onSurface: Color(0xFF1E293B),
-      onSurfaceVariant: Color(0xFF64748B),
-      outline: Color(0xFFE2E8F0),
-      outlineVariant: Color(0xFFF1F5F9),
-    ),
-    // Component theme configurations for light mode.
-    subThemesData: const FlexSubThemesData(
-      inputDecoratorIsFilled: true,
-      alignedDropdown: true,
-      tooltipRadius: 8,
-      tooltipSchemeColor: SchemeColor.inverseSurface,
-      tooltipOpacity: 0.95,
-      snackBarElevation: 8,
-      snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
-      navigationRailUseIndicator: true,
-      cardRadius: 12.0,
-      cardElevation: 2.0,
-      dialogRadius: 16.0,
-      bottomSheetRadius: 20.0,
-      inputDecoratorRadius: 12.0,
-      chipRadius: 20.0,
-      thickBorderWidth: 2.0,
-      blendOnColors: true,
-    ),
-    // ColorScheme seed generation configuration for light mode.
-    keyColors: const FlexKeyColors(
-      useKeyColors: true,
-      keepPrimary: true,
-    ),
-    // Direct ThemeData properties.
-    visualDensity: FlexColorScheme.comfortablePlatformDensity,
-    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    // Enhanced typography
-    textTheme: _buildTextTheme(Brightness.light),
-    // Custom app bar theme is now set through subThemesData in newer FlexColorScheme versions
-  ).copyWith(
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: true,
-      surfaceTintColor: Colors.transparent,
-    ),
-  );
+  static ThemeData light =
+      FlexThemeData.light(
+        // Using custom color scheme for music app
+        scheme: FlexScheme.deepPurple,
+        colorScheme: const ColorScheme.light(
+          primary: primaryViolet,
+          secondary: accentPink,
+          tertiary: accentBlue,
+          surface: surfaceLight,
+          surfaceContainer: cardLight,
+          surfaceContainerHighest: Color(0xFFF1F5F9),
+          inverseSurface: Color(0xFF1E293B),
+          onSurface: Color(0xFF1E293B),
+          onSurfaceVariant: Color(0xFF64748B),
+          outline: Color(0xFFE2E8F0),
+          outlineVariant: Color(0xFFF1F5F9),
+        ),
+        // Component theme configurations for light mode.
+        subThemesData: const FlexSubThemesData(
+          inputDecoratorIsFilled: true,
+          alignedDropdown: true,
+          tooltipRadius: 8,
+          tooltipSchemeColor: SchemeColor.inverseSurface,
+          tooltipOpacity: 0.95,
+          snackBarElevation: 8,
+          snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
+          navigationRailUseIndicator: true,
+          cardRadius: 12.0,
+          cardElevation: 2.0,
+          dialogRadius: 16.0,
+          bottomSheetRadius: 20.0,
+          inputDecoratorRadius: 12.0,
+          chipRadius: 20.0,
+          thickBorderWidth: 2.0,
+          blendOnColors: true,
+        ),
+        // ColorScheme seed generation configuration for light mode.
+        keyColors: const FlexKeyColors(useKeyColors: true, keepPrimary: true),
+        // Direct ThemeData properties.
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+        // Enhanced typography
+        textTheme: _buildTextTheme(Brightness.light),
+        // Custom app bar theme is now set through subThemesData in newer FlexColorScheme versions
+      ).copyWith(
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          surfaceTintColor: Colors.transparent,
+        ),
+      );
 
   // The FlexColorScheme defined dark mode ThemeData.
-  static ThemeData dark = FlexThemeData.dark(
-    // Using custom color scheme for music app
-    scheme: FlexScheme.deepPurple,
-    colorScheme: const ColorScheme.dark(
-      primary: primaryPurple,
-      secondary: accentPink,
-      tertiary: accentBlue,
-      surface: surfaceDark,
-      surfaceContainer: cardDark,
-      surfaceContainerHighest: Color(0xFF262626),
-      inverseSurface: Color(0xFFF8FAFC),
-      onSurface: Color(0xFFF8FAFC),
-      onSurfaceVariant: Color(0xFF94A3B8),
-      outline: Color(0xFF334155),
-      outlineVariant: Color(0xFF1E293B),
-    ),
-    // Component theme configurations for dark mode.
-    subThemesData: const FlexSubThemesData(
-      blendOnColors: true,
-      inputDecoratorIsFilled: true,
-      alignedDropdown: true,
-      tooltipRadius: 8,
-      tooltipSchemeColor: SchemeColor.inverseSurface,
-      tooltipOpacity: 0.95,
-      snackBarElevation: 8,
-      snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
-      navigationRailUseIndicator: true,
-      cardRadius: 12.0,
-      cardElevation: 2.0,
-      dialogRadius: 16.0,
-      bottomSheetRadius: 20.0,
-      inputDecoratorRadius: 12.0,
-      chipRadius: 20.0,
-      thickBorderWidth: 2.0,
-      useM2StyleDividerInM3: true,
-    ),
-    // ColorScheme seed configuration setup for dark mode.
-    keyColors: const FlexKeyColors(
-      useKeyColors: true,
-      keepPrimary: true,
-    ),
-    // Direct ThemeData properties.
-    visualDensity: FlexColorScheme.comfortablePlatformDensity,
-    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    // Enhanced typography
-    textTheme: _buildTextTheme(Brightness.dark),
-    // Custom app bar theme is now set through subThemesData in newer FlexColorScheme versions
-  ).copyWith(
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: true,
-      surfaceTintColor: Colors.transparent,
-    ),
-  );
+  static ThemeData dark =
+      FlexThemeData.dark(
+        // Using custom color scheme for music app
+        scheme: FlexScheme.deepPurple,
+        colorScheme: const ColorScheme.dark(
+          primary: primaryPurple,
+          secondary: accentPink,
+          tertiary: accentBlue,
+          surface: surfaceDark,
+          surfaceContainer: cardDark,
+          surfaceContainerHighest: Color(0xFF262626),
+          inverseSurface: Color(0xFFF8FAFC),
+          onSurface: Color(0xFFF8FAFC),
+          onSurfaceVariant: Color(0xFF94A3B8),
+          outline: Color(0xFF334155),
+          outlineVariant: Color(0xFF1E293B),
+        ),
+        // Component theme configurations for dark mode.
+        subThemesData: const FlexSubThemesData(
+          blendOnColors: true,
+          inputDecoratorIsFilled: true,
+          alignedDropdown: true,
+          tooltipRadius: 8,
+          tooltipSchemeColor: SchemeColor.inverseSurface,
+          tooltipOpacity: 0.95,
+          snackBarElevation: 8,
+          snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
+          navigationRailUseIndicator: true,
+          cardRadius: 12.0,
+          cardElevation: 2.0,
+          dialogRadius: 16.0,
+          bottomSheetRadius: 20.0,
+          inputDecoratorRadius: 12.0,
+          chipRadius: 20.0,
+          thickBorderWidth: 2.0,
+          useM2StyleDividerInM3: true,
+        ),
+        // ColorScheme seed configuration setup for dark mode.
+        keyColors: const FlexKeyColors(useKeyColors: true, keepPrimary: true),
+        // Direct ThemeData properties.
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+        // Enhanced typography
+        textTheme: _buildTextTheme(Brightness.dark),
+        // Custom app bar theme is now set through subThemesData in newer FlexColorScheme versions
+      ).copyWith(
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          surfaceTintColor: Colors.transparent,
+        ),
+      );
 
   // Build custom typography theme
   static TextTheme _buildTextTheme(Brightness brightness) {
-    final textColor = brightness == Brightness.light 
-        ? const Color(0xFF1E293B) 
+    final textColor = brightness == Brightness.light
+        ? const Color(0xFF1E293B)
         : const Color(0xFFF8FAFC);
-    
+
     return TextTheme(
       displayLarge: TextStyle(
         fontSize: 57,

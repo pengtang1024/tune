@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
@@ -39,7 +40,10 @@ class OnlineSearchController
         .toList(growable: false);
     if (remoteSources.isEmpty) {
       state = AsyncData(
-        OnlineSearchState(query: query, message: '没有启用在线音源，请先在设置中开启'),
+        OnlineSearchState(
+          query: query,
+          message: AppStrings.instance.searchNoSourcesEnabled,
+        ),
       );
       return;
     }
@@ -80,14 +84,17 @@ class OnlineSearchController
         OnlineSearchState(
           query: query,
           results: bySource,
-          message: total == 0 ? '没有找到匹配的歌曲' : null,
+          message: total == 0 ? AppStrings.instance.searchNoMatch : null,
         ),
       );
     } catch (error, stackTrace) {
       Log.error('在线搜索失败: $error\n$stackTrace');
       if (_disposed || generation != _generation) return;
       state = AsyncData(
-        OnlineSearchState(query: query, message: '在线搜索失败：$error'),
+        OnlineSearchState(
+          query: query,
+          message: AppStrings.instance.searchFailed('$error'),
+        ),
       );
     }
   }

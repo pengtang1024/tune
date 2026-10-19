@@ -81,6 +81,9 @@ class _SearchRuntime implements MusicPluginRuntime {
   );
 
   @override
+  bool get isUsable => true;
+
+  @override
   Future<void> load(
     String script, {
     Map<String, String> userVariables = const {},

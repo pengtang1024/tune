@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_version.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
@@ -72,13 +73,13 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   Future<void> _pickDirectory() async {
     final path = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: '选择音乐文件夹',
+      dialogTitle: context.loc.settingsChooseFolder,
     );
     if (path == null || !mounted) return;
 
     await ref.read(settingsControllerProvider.notifier).addScanPath(path);
     if (!mounted) return;
-    _showMessage('已添加扫描目录');
+    _showMessage(context.loc.settingsFolderAdded);
   }
 
   Future<void> _scan() async {
@@ -88,23 +89,27 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         .scan(settings.effectiveScanPaths);
     if (!mounted) return;
     final state = ref.read(libraryControllerProvider).valueOrNull;
-    _showMessage(state?.errorMessage ?? state?.statusMessage ?? '扫描完成');
+    _showMessage(
+      state?.errorMessage ??
+          state?.statusMessage ??
+          context.loc.settingsScanDone,
+    );
   }
 
   Future<void> _clearLibrary() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清空音乐库？'),
-        content: const Text('只会清除 Tune 的扫描记录，不会删除磁盘上的音乐文件。'),
+        title: Text(context.loc.settingsClearLibraryTitle),
+        content: Text(context.loc.settingsClearLibraryMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.loc.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('清空'),
+            child: Text(context.loc.clear),
           ),
         ],
       ),
@@ -114,7 +119,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     await ref.read(libraryControllerProvider.notifier).clearLibrary();
     if (!mounted) return;
     final state = ref.read(libraryControllerProvider).valueOrNull;
-    _showMessage(state?.errorMessage ?? '音乐库已清空');
+    _showMessage(state?.errorMessage ?? context.loc.settingsLibraryCleared);
   }
 
   void _showMessage(String message) {

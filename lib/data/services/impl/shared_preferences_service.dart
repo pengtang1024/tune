@@ -4,7 +4,7 @@ import 'package:tune/data/services/persistence_service.dart';
 /// SharedPreferences持久化服务实现
 class SharedPreferencesService implements PersistenceService {
   SharedPreferences? _prefs;
-  
+
   SharedPreferencesService();
 
   @override
@@ -99,8 +99,10 @@ class SharedPreferencesService implements PersistenceService {
   /// 确保服务已初始化
   void _ensureInitialized() {
     if (_prefs == null) {
-      throw StateError('SharedPreferencesService not initialized. '
-          'Please call init() before using any methods.');
+      throw StateError(
+        'SharedPreferencesService not initialized. '
+        'Please call init() before using any methods.',
+      );
     }
   }
 }

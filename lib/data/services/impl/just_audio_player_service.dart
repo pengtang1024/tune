@@ -5,6 +5,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -68,7 +69,10 @@ class JustAudioPlayerService implements AudioPlayerService {
       Log.error('播放后端报错: $error');
       if (_errorController.isClosed) return;
       _errorController.add(
-        AudioPlayerError(message: error.message ?? '音频加载失败', code: error.code),
+        AudioPlayerError(
+          message: error.message ?? AppStrings.instance.audioLoadFailed,
+          code: error.code,
+        ),
       );
     });
   }
@@ -88,8 +92,9 @@ class JustAudioPlayerService implements AudioPlayerService {
 
       // 检查音频路径是否为空
       if (audioPath.isEmpty) {
-        Log.error('音频文件路径为空');
-        throw Exception('音频文件路径为空');
+        final message = AppStrings.instance.audioPathEmpty;
+        Log.error(message);
+        throw Exception(message);
       }
 
       Log.info('尝试播放音频: $audioPath');

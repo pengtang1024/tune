@@ -1,40 +1,742 @@
 {
   "@@locale": "ja",
-  "@@last_modified": "2024-05-21T10:00:00.000Z",
-  "app_name": "Tune",
-  "no_songs_found": "曲が見つかりません",
-  "settings": "設定",
+  "appName": "Tune",
+  "appTagline": "ローカル優先のデスクトップ音楽プレーヤー",
+  "appStartFailed": "Tune を起動できませんでした",
+  "cancel": "キャンセル",
+  "ok": "OK",
+  "save": "保存",
+  "delete": "削除",
+  "remove": "削除",
+  "clear": "クリア",
+  "close": "閉じる",
   "retry": "再試行",
-  "home": "ホーム",
-  "library": "ライブラリ",
+  "confirm": "確認",
+  "chooseFile": "ファイルを選択",
+  "unknownError": "不明なエラー",
+  "scanNow": "今すぐスキャン",
   "search": "検索",
-  "player": "プレーヤー",
-  "about": "アプリについて",
-  "songs": "曲",
-  "music_scan": "音楽スキャン",
-  "scan_local_music": "ローカル音楽をスキャン",
-  "search_songs": "曲を検索...",
-  "add_to_library": "ライブラリに追加",
-  "scan_completed_no_new_songs": "スキャン完了、新しい曲が見つかりません",
-  "rescan": "再スキャン",
-  "good_morning": "おはようございます",
-  "good_afternoon": "こんにちは",
-  "good_evening": "こんばんは",
-  "welcome_to_tune": "Tuneへようこそ",
-  "see_all": "すべて見る",
-  "no_recent_songs": "最近再生した楽曲はありません",
-  "quick_actions": "クイックアクション",
-  "my_songs": "マイソング",
-  "favorites": "お気に入り",
-  "playlists": "プレイリスト",
-  "radio": "ラジオ",
-  "tag_vip": "VIP",
-  "tag_singer": "歌手",
-  "tag_elite": "エリート",
-  "general_tab": "一般",
-  "library_tab": "ライブラリ",
-  "account_tab": "アカウント",
-  "playback_tab": "再生",
-  "equalizer_tab": "イコライザー",
-  "animations_tab": "アニメーション"
+  "scanning": "スキャン中",
+  "about": "概要",
+  "language": "言語",
+  "theme": "テーマ",
+  "lightMode": "ライトモード",
+  "darkMode": "ダークモード",
+  "systemMode": "システムに従う",
+  "musicLibrary": "ライブラリ",
+  "navLibrary": "ライブラリ",
+  "navQueue": "キュー",
+  "navSources": "ソース",
+  "navSettings": "設定",
+  "libraryTitle": "ライブラリ",
+  "librarySubtitle": "ローカルとオンラインのソースのすべてのトラック",
+  "libraryClearSearch": "検索をクリア",
+  "libraryFilterSources": "ソースで絞り込む",
+  "libraryAllSources": "すべてのソース",
+  "libraryScanAllSources": "すべてのソースをスキャン",
+  "libraryTrackCount": "{count} 曲",
+  "@libraryTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryNoMatchTitle": "一致する曲がありません",
+  "libraryNoMatchSubtitle": "別のキーワードを試すか、検索条件を消してください",
+  "librarySourceEmptyTitle": "このソースには曲がありません",
+  "librarySourceEmptySubtitle": "すべてのソースに切り替えるか、このソースを再スキャンしてください",
+  "libraryViewAllSources": "すべてのソースを見る",
+  "libraryScanningTitle": "音楽をスキャン中",
+  "libraryEmptyTitle": "まだ曲がありません",
+  "libraryEmptySubtitle": "ローカルフォルダまたは有効なオンラインソースをスキャンするか、設定でソースを調整してください。",
+  "libraryLoadFailedTitle": "ライブラリを読み込めませんでした",
+  "libraryAddedToQueue": "キューに追加しました",
+  "libraryScanPaths": "スキャン対象：{paths}",
+  "@libraryScanPaths": {
+    "placeholders": {
+      "paths": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryAddToQueue": "キューに追加",
+  "queueTitle": "キュー",
+  "queueSubtitle": "現在の再生順",
+  "queueEmptyTitle": "キューは空です",
+  "queueEmptySubtitle": "ライブラリから曲を選ぶか、曲をキューに追加してください",
+  "queueGoToLibrary": "ライブラリへ",
+  "queueClearTitle": "キューを空にしますか？",
+  "queueClearMessage": "再生は停止します。曲がライブラリから削除されることはありません。",
+  "playerNowPlaying": "再生中",
+  "playerCollapse": "閉じる",
+  "playerPrevious": "前の曲",
+  "playerNext": "次の曲",
+  "playerPlay": "再生",
+  "playerPause": "一時停止",
+  "playerMute": "ミュート",
+  "playerUnmute": "ミュート解除",
+  "playerQueue": "キュー",
+  "playerPlayModeSequential": "全曲リピート",
+  "playerPlayModeRepeatOne": "1曲リピート",
+  "playerPlayModeShuffle": "シャッフル",
+  "playerNoSongTitle": "曲を選んで始めましょう",
+  "playerUnknownArtist": "不明なアーティスト",
+  "playerDockReady": "Tune · 準備完了",
+  "playerQueueSummary": "キュー {count} 曲",
+  "@playerQueueSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nowPlayingEmptyTitle": "まだ再生中の曲はありません",
+  "nowPlayingEmptySubtitle": "ライブラリから曲を選んで始めましょう",
+  "nowPlayingUnnamedTrack": "無題のトラック",
+  "nowPlayingLocalMusic": "ローカル音楽",
+  "trackUnknownTitle": "不明な曲",
+  "playbackFailed": "再生に失敗しました: {error}",
+  "@playbackFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackPauseFailed": "一時停止に失敗しました: {error}",
+  "@playbackPauseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackResumeFailed": "再生の再開に失敗しました: {error}",
+  "@playbackResumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSeekFailed": "シークに失敗しました: {error}",
+  "@playbackSeekFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackVolumeFailed": "音量の設定に失敗しました: {error}",
+  "@playbackVolumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSpeedFailed": "再生速度の設定に失敗しました: {error}",
+  "@playbackSpeedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "audioSourceLocal": "ローカルファイル",
+  "audioSourceDownloading": "ダウンロード中 {percent}%",
+  "@audioSourceDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "audioSourceCached": "オフライン準備完了",
+  "audioSourceFailed": "ダウンロード失敗",
+  "routerNotFoundTitle": "ページが見つかりません",
+  "routerBackToLibrary": "ライブラリへ戻る",
+  "sourcesTitle": "ソース",
+  "sourcesSubtitle": "オンラインカタログとスキャン先",
+  "sourcesAutoScan": "起動時に自動スキャン",
+  "sourcesAutoScanDescription": "有効なソースは起動時に自動で更新されます。失敗してもローカルライブラリには影響しません。",
+  "sourcesScanAll": "すべてのソースをスキャン",
+  "sourcesImportPlugin": "プラグインを取り込む",
+  "sourcesScanMayTakeSeconds": "リモートソースは数秒かかることがあります",
+  "sourcesScanCompleted": "スキャンが完了しました",
+  "sourcesImportPluginTitle": "音楽プラグインの取り込み",
+  "sourcesImportPluginMessage": "プラグインは第三者の JavaScript で、アプリ内で実行されネットワークにアクセスできます。信頼できるものだけを取り込んでください。検索キーワードを入力すると有効になります。",
+  "sourcesPluginUnreadable": "プラグインファイルを読み込めませんでした",
+  "sourcesPluginTooLarge": "プラグインファイルは 2 MB までです",
+  "sourcesPluginImportedEnabled": "{name} を有効にして取り込みました",
+  "@sourcesPluginImportedEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImported": "{name} を取り込みました。キーワードを入力して有効にするとスキャンされます",
+  "@sourcesPluginImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImportFailed": "プラグインの取り込みに失敗しました：{error}",
+  "@sourcesPluginImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginActions": "プラグインの操作",
+  "sourcesConfigure": "設定",
+  "sourcesDeletePlugin": "プラグインを削除",
+  "sourcesUnsupported": "このバージョンではこのソースに未対応です",
+  "sourcesDisabled": "オフ",
+  "sourcesNeedsConfiguration": "設定が必要です",
+  "sourcesNeedsConfigurationHint": "設定が必要：{hint}",
+  "@sourcesNeedsConfigurationHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesLastScan": "前回のスキャン {time}",
+  "@sourcesLastScan": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesAutoScanLocal": "起動後にローカルフォルダを自動スキャンします",
+  "sourcesWaitingFirstScan": "初回のスキャンを待っています",
+  "sourcesScannedCount": "{count} 曲 · {time}",
+  "@sourcesScannedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesSkipped": "スキップしました",
+  "sourcesScanFailed": "スキャンに失敗しました",
+  "sourcesDeletePluginTitle": "プラグインを削除しますか？",
+  "sourcesDeletePluginMessage": "{name} のスクリプト、設定、スキャン済みの曲が削除されます。",
+  "@sourcesDeletePluginMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleted": "{name} を削除しました",
+  "@sourcesDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceKindLocal": "ローカル",
+  "sourceKindOpenCatalog": "オープンカタログ",
+  "sourceKindOpenApi": "API",
+  "sourceKindPlugin": "プラグイン",
+  "sourcesConfigureTitle": "{name} を設定",
+  "@sourcesConfigureTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldRequired": "{label} を入力してください",
+  "@sourcesFieldRequired": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldNumeric": "数値を入力してください",
+  "sourcesNotLoaded": "ソース一覧を読み込んでいます",
+  "sourcesPlatformNoPlugin": "このプラットフォームは JavaScript プラグインに未対応です",
+  "sourcesUpdatePlugin": "プラグインを更新",
+  "sourcesPluginUpdated": "{name} を {version} に更新しました",
+  "@sourcesPluginUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpToDate": "{name} はすでに最新です",
+  "@sourcesPluginUpToDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpdateFailed": "プラグインの更新に失敗しました: {error}",
+  "@sourcesPluginUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTitle": "設定",
+  "settingsSubtitle": "外観と言語、ローカルライブラリを調整します。",
+  "settingsThemeDescription": "画面の見た目と言語を選びます。",
+  "settingsLanguageDescription": "画面とシステムメニューの言語",
+  "settingsLibraryDescription": "Tune はこのフォルダ内の音声ファイルのみを検索します。",
+  "settingsDefaultPath": "デフォルト",
+  "settingsNoDefaultFolder": "デフォルトの音楽フォルダが見つかりません",
+  "settingsCustomPath": "カスタム",
+  "settingsAddFolder": "フォルダを追加",
+  "settingsClearLibrary": "ライブラリを空にする",
+  "settingsScanSafetyNote": "スキャンは音声ファイルを読むだけで、ディスクの内容を変更・削除しません。",
+  "settingsAboutTitle": "Tune について",
+  "settingsChooseFolder": "音楽フォルダを選択",
+  "settingsFolderAdded": "スキャン先を追加しました",
+  "settingsScanDone": "スキャンが完了しました",
+  "settingsClearLibraryTitle": "ライブラリを空にしますか？",
+  "settingsClearLibraryMessage": "Tune のスキャン履歴だけを消します。ディスク上の音楽ファイルは削除されません。",
+  "settingsLibraryCleared": "ライブラリを空にしました",
+  "settingsPathsCount": "{count} 件",
+  "@settingsPathsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnlineTitle": "オンライン検索",
+  "searchOnlineHint": "オンラインソースを検索します（jazz、ピアノ、lo-fi など）",
+  "searchOnlineDescription": "有効なオンラインソースを検索します。結果はライブラリに保存されません。",
+  "searchOnlinePrompt": "オンラインソースを検索",
+  "searchOnlinePromptDescription": "キーワードを入力して Enter キーを押すと、Openverse、Jamendo、Internet Archive と取り込んだプラグインが並行して検索されます。",
+  "searchNoResults": "結果がありません",
+  "searchNoResultsDescription": "別のキーワードでお試しください。",
+  "searchNoMatch": "一致する曲が見つかりません",
+  "searchNoMatchDescription": "別のキーワードでお試しください。",
+  "searchSearching": "「{query}」を検索中",
+  "@searchSearching": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultCount": "{count} 曲",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchPlayAll": "すべて再生",
+  "searchAddToQueue": "キューに追加",
+  "searchAddedToQueue": "キューに追加しました：{title}",
+  "@searchAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoSourcesEnabled": "有効なオンラインソースがありません。先に設定で有効にしてください。",
+  "searchFailedShort": "検索に失敗しました",
+  "searchFailed": "オンライン検索に失敗しました：{error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPreparing": "スキャンを準備中…",
+  "scanNoEnabledSources": "有効なソースがありません",
+  "scanNoLocalFolders": "スキャンできる音楽フォルダがありません",
+  "scanProgressPercent": "スキャン中 {percent}%",
+  "@scanProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "scanAllSourcesFailed": "すべてのソースのスキャンに失敗しました",
+  "scanFailed": "スキャンに失敗しました: {error}",
+  "@scanFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "clearLibraryFailed": "ライブラリを空にできませんでした: {error}",
+  "@clearLibraryFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoAudioFiles": "音声ファイルが見つかりません",
+  "scanSongCount": "{count} 曲をスキャンしました",
+  "@scanSongCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSongCountShort": "{count} 曲",
+  "@scanSongCountShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSourceNotConfigured": "ソースが未設定です",
+  "scanCachedTooSoon": "前回のスキャン間隔が近いため、キャッシュを保持しました",
+  "scanSummary": "{sources} 個のソース、合計 {songs} 曲をスキャンしました",
+  "@scanSummary": {
+    "placeholders": {
+      "songs": {
+        "type": "int"
+      },
+      "sources": {
+        "type": "int"
+      }
+    }
+  },
+  "scanUpdated": "{songs} 曲を更新し、{failed} 個のソースが失敗しました",
+  "@scanUpdated": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      },
+      "songs": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorForbidden": "アクセスが拒否されました（HTTP {status}）",
+  "@sourceErrorForbidden": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorRateLimited": "リクエストが多すぎます（HTTP 429）。しばらくしてからお試しください。",
+  "sourceErrorHttpStatus": "API が HTTP {status} を返しました",
+  "@sourceErrorHttpStatus": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorTimeout": "接続がタイムアウトしました",
+  "sourceErrorConnection": "ソースサービスに接続できません",
+  "sourceErrorCertificate": "証明書を検証できません",
+  "sourceErrorCancelled": "リクエストはキャンセルされました",
+  "sourceErrorNetwork": "ネットワークリクエストに失敗しました：{message}",
+  "@sourceErrorNetwork": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorPluginLoad": "プラグインを読み込めませんでした：{message}",
+  "@sourceErrorPluginLoad": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorUnsupported": "このソースはまだ未対応です",
+  "sourceErrorScanInterval": "前回のスキャンから {interval} 未満です",
+  "@sourceErrorScanInterval": {
+    "placeholders": {
+      "interval": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorScanTimeout": "スキャンが {seconds} 秒でタイムアウトしました",
+  "@sourceErrorScanTimeout": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalHours": "{count} 時間",
+  "@intervalHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalMinutes": "{count} 分",
+  "@intervalMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "localSourceHint": "ライブラリ設定でスキャン先を追加してください",
+  "localSourceNotConfigured": "ローカル音楽フォルダが未設定です",
+  "pluginSourceHint": "検索キーワードを入力してください（例：アーティスト、piano、jazz）",
+  "pluginFieldQuery": "検索キーワード",
+  "pluginFieldHint": "例：アーティスト、piano、jazz",
+  "pluginImportedVersion": "取り込んだ MusicFree プラグイン · v{version}",
+  "@pluginImportedVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginVariable": "プラグイン変数 {key}",
+  "@pluginVariable": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginFileMissing": "プラグインファイルがありません。もう一度取り込んでください。",
+  "pluginRuntimeUnsupported": "このプラットフォームは JavaScript 音楽プラグインに未対応です。デスクトップまたはモバイルで取り込んでください。",
+  "pluginCompatLibrary": "プラグイン互換ライブラリ",
+  "pluginBridgeScript": "プラグインブリッジスクリプト",
+  "pluginInit": "プラグインの初期化",
+  "pluginScript": "プラグインスクリプト",
+  "pluginExports": "プラグインのエクスポート",
+  "pluginNoExports": "プラグインが有効な module.exports をエクスポートしていません",
+  "pluginIncomplete": "プラグインが不完全です：platform と search メソッドが必要です",
+  "pluginNoMediaSource": "プラグインが getMediaSource を実装していません",
+  "pluginNoStream": "プラグインが再生可能なアドレスを返しませんでした",
+  "pluginRuntimeClosed": "プラグインの実行環境が閉じました",
+  "pluginCallFailed": "{label} に失敗しました：{message}",
+  "@pluginCallFailed": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginCallTimeout": "プラグインの呼び出しがタイムアウトしました",
+  "pluginUnknownData": "プラグインが読み取れないデータを返しました",
+  "pluginCallError": "プラグインの呼び出しに失敗しました",
+  "pluginNoMatch": "一致する曲が見つかりません",
+  "pluginNoStreamResults": "プラグインは {count} 件の結果を返しましたが、再生可能なアドレスがありませんでした",
+  "@pluginNoStreamResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "neteaseHint": "自前の NeteaseCloudMusicApi のアドレスを入力してください（例：http://localhost:3000）",
+  "neteaseFieldApi": "API アドレス",
+  "neteaseFieldQuery": "検索キーワード",
+  "neteaseFieldHint": "例：人気、アーティスト",
+  "neteaseFieldLimit": "1回のスキャン件数",
+  "neteaseFieldLimitHint": "既定は 20、最大 50",
+  "neteaseHotKeyword": "人気",
+  "neteaseEmptyResponse": "NetEase API が空のレスポンスを返しました",
+  "neteaseNoMatch": "一致する曲が見つかりません",
+  "neteaseNoStream": "API が再生可能なアドレスを返しませんでした（サーバーでのログインが必要な場合があります）",
+  "openverseHint": "スキャンキーワードを入力してください（例：piano、ambient、jazz）",
+  "openverseFieldQuery": "スキャンキーワード",
+  "openverseFieldHint": "例：piano、ambient、jazz",
+  "openverseEmptyResponse": "Openverse が空のレスポンスを返しました",
+  "openverseNoMatch": "一致するオープンオーディオが見つかりません",
+  "sourceLocalName": "ローカル音楽",
+  "sourceLocalDescription": "デバイス上の音楽フォルダをスキャン",
+  "sourceOpenverseDescription": "Jamendo、Freesound、Wikimedia などのオープン音楽の集い",
+  "sourceJamendoDescription": "独立音楽のオープンカタログ。無料の Client ID が必要です。",
+  "sourceInternetArchiveDescription": "Internet Archive のオープン音楽集",
+  "sourceNeteaseName": "NetEase Cloud Music API",
+  "sourceNeteaseDescription": "自前の NeteaseCloudMusicApi サーバーに接続します",
+  "jamendoHint": "developer.jamendo.com で無料の Client ID を取得して入力してください",
+  "jamendoFieldClientId": "Client ID",
+  "jamendoFieldClientIdHint": "developer.jamendo.com で無料申請",
+  "jamendoFieldQuery": "検索キーワード（任意）",
+  "jamendoFieldQueryHint": "例：jazz、electronic",
+  "jamendoEmptyResponse": "Jamendo が空のレスポンスを返しました",
+  "jamendoNoMatch": "一致する Jamendo 曲が見つかりません",
+  "internetArchiveHint": "Internet Archive の検索条件を入力してください（例：collection:netlabels AND mediatype:audio）",
+  "internetArchiveFieldQuery": "検索条件",
+  "internetArchiveFieldLimit": "1回のスキャン件数",
+  "internetArchiveFieldLimitHint": "既定は 8、最大 20",
+  "internetArchiveInvalidResponse": "Internet Archive が読み取りできないレスポンスを返しました",
+  "internetArchiveNoMatch": "再生可能なアーカイブ音楽が見つかりません",
+  "downloadUnsupportedPlatform": "このプラットフォムにはファイルシステムがないため、ダウンロードの保存はできません",
+  "audioLoadFailed": "音声の読み込みに失敗しました",
+  "audioPathEmpty": "音声のパスが空です",
+  "pluginUpdateNoUrl": "プラグインにダウンロード元が記録されていないためアップデートを確認できません",
+  "sourcesPluginUrlDownloadFailed": "プラグインをダウンロードできませんでした: {error}",
+  "@sourcesPluginUrlDownloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginStepFailed": "{label} \\u306b\\u5931\\u6557\\u3057\\u307e\\u3057\\u305f: {error}",
+  "@pluginStepFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesImportPluginFromUrl": "URL からインポート",
+  "sourcesPluginUrlTitle": "プラグインの URL",
+  "sourcesPluginUrlHint": "https://example.com/plugin.js",
+  "sourcesPluginUrlInvalid": "有効な http(s)リンクを入力してください",
+  "pluginUrlInvalid": "プラグインのアドレスが無効です。http または https のリンクを使ってください",
+  "pluginUrlEmpty": "プラグインスクリプトが空です",
+  "pluginUrlTooLarge": "プラグインスクリプトがサイズ上限を超えました",
+  "pluginSandboxStartFailed": "プラグインのサンドボックスを起動できません: {error}",
+  "@pluginSandboxStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSandboxStartTimeout": "プラグインのサンドボックスの起動がタイムアウトしました",
+  "pluginScriptTooLarge": "プラグインスクリプトが {limit} KB の上限を超えました",
+  "@pluginScriptTooLarge": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginRuntimeTerminated": "プラグインのランタイムは終止されました",
+  "pluginRuntimeTimeLimit": "プラグインのランタイムが実行時間上限を超えました",
+  "pluginSandboxNotReady": "プラグインのサンドボックスはまだ準備されていません",
+  "pluginCallTimeoutDetailed": "プラグインの呼び出しが {seconds} 秒でタイムアウトしました",
+  "@pluginCallTimeoutDetailed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pluginRuntimeCrashed": "プラグインのランタイムがクラッシュしました",
+  "pluginFetchShimFailed": "fetch シムの読み込みに失敗しました: {message}",
+  "@pluginFetchShimFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUnknownCall": "未知のプラグイン呼び出しです: {method}",
+  "@pluginUnknownCall": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginScriptMissing": "プラグインスクリプトが存在しません",
+  "pluginMemoryLimitExceeded": "プラグインのメモリ使用量が {limit} を超えたため終止されました",
+  "@pluginMemoryLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "ccmixterEmptyResponse": "ccMixter が空のレスポンスを返しました",
+  "ccmixterFieldLimit": "1回のスキャン件数",
+  "ccmixterFieldLimitHint": "既定は 15、最大 30",
+  "ccmixterFieldQuery": "検索タグ",
+  "ccmixterFieldQueryHint": "例：jazz、ambient、electro",
+  "ccmixterHint": "ccMixter のタグを入力してください（例：jazz、ambient、electro）",
+  "ccmixterNoMatch": "一致する ccMixter 曲が見つかりません",
+  "itunesEmptyResponse": "iTunes API が空のレスポンスを返しました",
+  "itunesFieldLimit": "1回のスキャン件数",
+  "itunesFieldLimitHint": "既定は 20、最大 50",
+  "itunesFieldQuery": "検索キーワード",
+  "itunesFieldQueryHint": "例：jazz、piano、lo-fi",
+  "itunesHint": "検索キーワードを入力してください（例：jazz、piano、lo-fi）",
+  "itunesNoMatch": "一致する iTunes 曲が見つかりません",
+  "podcastRssEmptyFeed": "フィードのアドレスが空のドキュメントを返しました",
+  "podcastRssFieldFeed": "フィードのアドレス",
+  "podcastRssFieldFeedHint": "例：https://example.com/podcast.xml",
+  "podcastRssFieldLimit": "1回のスキャン件数",
+  "podcastRssFieldLimitHint": "既定は 20、最大 100",
+  "podcastRssHint": "ポッドキャストフィード（RSS）のアドレスを入力してください",
+  "podcastRssInvalidFeed": "フィードのアドレスが読み取れない XML を返しました: {error}",
+  "@podcastRssInvalidFeed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastRssNoMatch": "フィードに再生できるエピソードがありません",
+  "sourceCcmixterDescription": "Creative Commons のリミックスとオープン音楽",
+  "sourceItunesDescription": "Apple Music カタログの 30 秒プレビュー",
+  "sourcePodcastRssDescription": "任意の podcast RSS フィードを再生可能なエピソードに変換します",
+  "sourcePodcastRssName": "ポッドキャスト",
+  "sourceSubsonicDescription": "自前の Navidrome / Subsonic 音楽ライブラリに接続します",
+  "subsonicAuthFailed": "音楽サーバーに接続できません。アドレスとアカウントを確認してください",
+  "subsonicEmptyResponse": "音楽サーバーが空のレスポンスを返しました",
+  "subsonicError": "音楽サーバーがエラーを返しました: {error}",
+  "@subsonicError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "subsonicFieldLimit": "1回のスキャン件数",
+  "subsonicFieldLimitHint": "既定は 25、最大 100",
+  "subsonicFieldPassword": "パスワード",
+  "subsonicFieldPasswordHint": "アクセストークンの署名に使われ、平文で送信されません",
+  "subsonicFieldQuery": "検索キーワード（任意）",
+  "subsonicFieldQueryHint": "例：jazz、piano",
+  "subsonicFieldServer": "サーバーアドレス",
+  "subsonicFieldServerHint": "例：http://localhost:4533",
+  "subsonicFieldUser": "ユーザー名",
+  "subsonicFieldUserHint": "音楽サーバーのログインユーザー名",
+  "subsonicHint": "自前の音楽サーバーのアドレスとアカウントを入力してください（例：http://localhost:4533）",
+  "subsonicNoMatch": "一致する曲が見つかりません"
 }

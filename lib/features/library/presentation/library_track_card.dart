@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -88,7 +89,7 @@ class _AddToQueueButton extends StatelessWidget {
     final theme = Theme.of(context);
 
     return IconButton(
-      tooltip: '加入播放队列',
+      tooltip: context.loc.libraryAddToQueue,
       onPressed: onPressed,
       icon: const Icon(Icons.playlist_add_rounded, size: 18),
       padding: EdgeInsets.zero,

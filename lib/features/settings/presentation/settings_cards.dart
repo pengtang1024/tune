@@ -38,7 +38,7 @@ class SettingsPageHeader extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                '调整外观、语言和本地音乐库。',
+                context.loc.settingsSubtitle,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -105,7 +105,7 @@ class SettingsInterfaceCard extends StatelessWidget {
       index: '01',
       eyebrow: 'INTERFACE',
       title: context.loc.theme,
-      description: '选择界面的明暗气质和显示语言。',
+      description: context.loc.settingsThemeDescription,
       child: Column(
         children: [
           Row(
@@ -115,9 +115,9 @@ class SettingsInterfaceCard extends StatelessWidget {
                   child: _ThemePreview(
                     mode: mode,
                     label: switch (mode) {
-                      ThemeMode.system => context.loc.system_mode,
-                      ThemeMode.light => context.loc.light_mode,
-                      ThemeMode.dark => context.loc.dark_mode,
+                      ThemeMode.system => context.loc.systemMode,
+                      ThemeMode.light => context.loc.lightMode,
+                      ThemeMode.dark => context.loc.darkMode,
                     },
                     selected: themeMode == mode,
                     onTap: () => onThemeChanged(mode),
@@ -151,7 +151,7 @@ class SettingsInterfaceCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '界面文字和系统菜单语言',
+                      context.loc.settingsLanguageDescription,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 10.5,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -199,8 +199,8 @@ class SettingsLibraryCard extends StatelessWidget {
     return _SettingsCard(
       index: '02',
       eyebrow: 'LIBRARY',
-      title: context.loc.music_library,
-      description: 'Tune 只会在这些目录中查找音频文件。',
+      title: context.loc.musicLibrary,
+      description: context.loc.settingsLibraryDescription,
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
         decoration: BoxDecoration(
@@ -222,15 +222,18 @@ class SettingsLibraryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final path in settings.defaultScanPaths)
-            _PathRow(path: path, label: '默认'),
+            _PathRow(path: path, label: context.loc.settingsDefaultPath),
           if (settings.defaultScanPaths.isEmpty)
-            _EmptyPath(icon: Icons.folder_off_outlined, text: '未找到默认音乐目录'),
+            _EmptyPath(
+              icon: Icons.folder_off_outlined,
+              text: context.loc.settingsNoDefaultFolder,
+            ),
           if (settings.customScanPaths.isNotEmpty) ...[
             const SizedBox(height: 6),
             for (final path in settings.customScanPaths)
               _PathRow(
                 path: path,
-                label: '自定义',
+                label: context.loc.settingsCustomPath,
                 onRemove: () => onRemoveFolder(path),
               ),
           ],
@@ -243,7 +246,7 @@ class SettingsLibraryCard extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onAddFolder,
                 icon: const Icon(Icons.create_new_folder_outlined, size: 15),
-                label: const Text('添加文件夹'),
+                label: Text(context.loc.settingsAddFolder),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -259,7 +262,9 @@ class SettingsLibraryCard extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.refresh_rounded, size: 15),
-                label: Text(scanning ? context.loc.scanning : '立即扫描'),
+                label: Text(
+                  scanning ? context.loc.scanning : context.loc.scanNow,
+                ),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -269,7 +274,7 @@ class SettingsLibraryCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onClear,
                 icon: const Icon(Icons.delete_sweep_outlined, size: 15),
-                label: const Text('清空音乐库'),
+                label: Text(context.loc.settingsClearLibrary),
                 style: TextButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 9),
@@ -290,7 +295,7 @@ class SettingsLibraryCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  '扫描只读取音频文件，不会修改或删除磁盘内容。',
+                  context.loc.settingsScanSafetyNote,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 10.5,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -317,7 +322,7 @@ class SettingsAboutCard extends StatelessWidget {
     return _SettingsCard(
       index: '03',
       eyebrow: 'ABOUT',
-      title: '关于 Tune',
+      title: context.loc.settingsAboutTitle,
       description: context.loc.about,
       child: Row(
         children: [
@@ -362,7 +367,7 @@ class SettingsAboutCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '本地优先的桌面音乐播放器',
+                  context.loc.appTagline,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 11,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -827,7 +832,7 @@ class _PathRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDefault = label == '默认';
+    final isDefault = label == context.loc.settingsDefaultPath;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),

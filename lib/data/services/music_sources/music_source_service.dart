@@ -1,15 +1,20 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
+import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/local_directory_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
+import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -38,6 +43,10 @@ class MusicSourceService implements StreamUrlResolver {
          'jamendo': JamendoSourceAdapter(dio: dio),
          'internet_archive': InternetArchiveSourceAdapter(dio: dio),
          'netease': NeteaseCloudMusicSourceAdapter(dio: dio),
+         'ccmixter': CcMixterSourceAdapter(dio: dio),
+         'itunes': ITunesSourceAdapter(dio: dio),
+         'podcast_rss': PodcastRssSourceAdapter(dio: dio),
+         'subsonic': SubsonicSourceAdapter(dio: dio),
        };
 
   List<MusicSourceAdapter> get adapters => List.unmodifiable(_adapters.values);
@@ -77,8 +86,9 @@ class MusicSourceService implements StreamUrlResolver {
   }
 
   String configurationHint(MusicSourceConfig config) {
-    if (config.isPlugin) return '填写搜索关键词后即可扫描插件音源';
-    return _adapters[config.id]?.configurationHint ?? '暂不支持该音源';
+    if (config.isPlugin) return AppStrings.instance.pluginSourceHint;
+    return _adapters[config.id]?.configurationHint ??
+        AppStrings.instance.sourceErrorUnsupported;
   }
 
   Future<MusicSourceAdapter?> _adapterFor(MusicSourceConfig config) async {
@@ -147,7 +157,9 @@ class MusicSourceService implements StreamUrlResolver {
             sourceId: config.id,
             status: SourceScanStatus.failed,
             message: config.isPlugin
-                ? '插件加载失败：${describeSourceError(error)}'
+                ? AppStrings.instance.sourceErrorPluginLoad(
+                    describeSourceError(error),
+                  )
                 : describeSourceError(error),
           );
         }
@@ -155,7 +167,7 @@ class MusicSourceService implements StreamUrlResolver {
           return SourceScanResult(
             sourceId: config.id,
             status: SourceScanStatus.failed,
-            message: '暂不支持该音源',
+            message: AppStrings.instance.sourceErrorUnsupported,
           );
         }
 
@@ -232,7 +244,9 @@ class MusicSourceService implements StreamUrlResolver {
         sourceId: config.id,
         status: SourceScanStatus.failed,
         message: config.isPlugin
-            ? '插件加载失败：${describeSourceError(error)}'
+            ? AppStrings.instance.sourceErrorPluginLoad(
+                describeSourceError(error),
+              )
             : describeSourceError(error),
       );
     }
@@ -241,7 +255,7 @@ class MusicSourceService implements StreamUrlResolver {
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.failed,
-        message: '暂不支持该音源',
+        message: AppStrings.instance.sourceErrorUnsupported,
       );
     }
 
@@ -253,7 +267,9 @@ class MusicSourceService implements StreamUrlResolver {
           return SourceScanResult(
             sourceId: config.id,
             status: SourceScanStatus.skipped,
-            message: '距上次扫描不足 ${_intervalLabel(adapter.autoScanInterval)}',
+            message: AppStrings.instance.sourceErrorScanInterval(
+              _intervalLabel(adapter.autoScanInterval),
+            ),
           );
         }
       }
@@ -285,7 +301,9 @@ class MusicSourceService implements StreamUrlResolver {
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.failed,
-        message: '扫描超时（${adapter.scanTimeout.inSeconds}s）',
+        message: AppStrings.instance.sourceErrorScanTimeout(
+          adapter.scanTimeout.inSeconds,
+        ),
         elapsed: watch.elapsed,
       );
     } catch (error) {
@@ -300,8 +318,10 @@ class MusicSourceService implements StreamUrlResolver {
   }
 
   String _intervalLabel(Duration interval) {
-    if (interval.inHours >= 1) return '${interval.inHours} 小时';
-    return '${interval.inMinutes} 分钟';
+    if (interval.inHours > 0) {
+      return AppStrings.instance.intervalHours(interval.inHours);
+    }
+    return AppStrings.instance.intervalMinutes(interval.inMinutes);
   }
 
   Future<void> dispose() => _pluginRepository.dispose();

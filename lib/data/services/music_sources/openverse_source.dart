@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -35,11 +36,16 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
       config.setting('query') != null;
 
   @override
-  String get configurationHint => '填写一个扫描关键词，例如 piano、ambient 或 jazz';
+  String get configurationHint => AppStrings.instance.openverseHint;
 
   @override
-  List<MusicSourceField> get configurationFields => const [
-    MusicSourceField('query', '扫描关键词', '例如 piano、ambient、jazz', required: true),
+  List<MusicSourceField> get configurationFields => [
+    MusicSourceField(
+      'query',
+      AppStrings.instance.openverseFieldQuery,
+      AppStrings.instance.openverseFieldHint,
+      required: true,
+    ),
   ];
 
   @override
@@ -66,7 +72,10 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(sourceId, 'Openverse 返回了空响应');
+        return failedResult(
+          sourceId,
+          AppStrings.instance.openverseEmptyResponse,
+        );
       }
 
       final songs = parseResults(data, sourceId: sourceId);
@@ -74,7 +83,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
         sourceId: sourceId,
         status: SourceScanStatus.success,
         songs: songs,
-        message: songs.isEmpty ? '没有找到匹配的开放音频' : null,
+        message: songs.isEmpty ? AppStrings.instance.openverseNoMatch : null,
       );
     } catch (error) {
       return failedResult(sourceId, error);

@@ -112,257 +112,23 @@ abstract class AppLocalizations {
     Locale('zh', 'TW'),
   ];
 
-  /// No description provided for @app_name.
+  /// No description provided for @appName.
   ///
   /// In zh_CN, this message translates to:
   /// **'Tune'**
-  String get app_name;
+  String get appName;
 
-  /// No description provided for @welcome_message.
+  /// No description provided for @appTagline.
   ///
   /// In zh_CN, this message translates to:
-  /// **'欢迎使用 Tune'**
-  String get welcome_message;
+  /// **'本地优先的桌面音乐播放器'**
+  String get appTagline;
 
-  /// No description provided for @no_songs_found.
+  /// No description provided for @appStartFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'未找到歌曲'**
-  String get no_songs_found;
-
-  /// No description provided for @settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'设置'**
-  String get settings;
-
-  /// No description provided for @settings_saved.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'设置已保存'**
-  String get settings_saved;
-
-  /// No description provided for @retry.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重试'**
-  String get retry;
-
-  /// No description provided for @home.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'首页'**
-  String get home;
-
-  /// No description provided for @home_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'首页'**
-  String get home_title;
-
-  /// No description provided for @recommend.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'推荐'**
-  String get recommend;
-
-  /// No description provided for @featured.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'精选'**
-  String get featured;
-
-  /// No description provided for @library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get library;
-
-  /// No description provided for @library_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get library_title;
-
-  /// No description provided for @search.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索'**
-  String get search;
-
-  /// No description provided for @search_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索'**
-  String get search_title;
-
-  /// No description provided for @player.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放器'**
-  String get player;
-
-  /// No description provided for @player_title.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放器'**
-  String get player_title;
-
-  /// No description provided for @playlist.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放列表'**
-  String get playlist;
-
-  /// No description provided for @about.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'关于'**
-  String get about;
-
-  /// No description provided for @custom_scan_paths.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自定义扫描路径'**
-  String get custom_scan_paths;
-
-  /// No description provided for @playback_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放设置'**
-  String get playback_settings;
-
-  /// No description provided for @account_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'账户设置'**
-  String get account_settings;
-
-  /// No description provided for @general_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'常规设置'**
-  String get general_settings;
-
-  /// No description provided for @music_library_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库设置'**
-  String get music_library_settings;
-
-  /// No description provided for @about_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'关于'**
-  String get about_settings;
-
-  /// No description provided for @play_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放模式'**
-  String get play_mode;
-
-  /// No description provided for @sequence_playback.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'顺序播放'**
-  String get sequence_playback;
-
-  /// No description provided for @repeat_one.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'单曲重复'**
-  String get repeat_one;
-
-  /// No description provided for @shuffle_playback.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'随机播放'**
-  String get shuffle_playback;
-
-  /// No description provided for @audio_quality.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音质'**
-  String get audio_quality;
-
-  /// No description provided for @low_quality.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'低质量'**
-  String get low_quality;
-
-  /// No description provided for @medium_quality.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'中等质量'**
-  String get medium_quality;
-
-  /// No description provided for @high_quality.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'高质量'**
-  String get high_quality;
-
-  /// No description provided for @pause_when_headset_disconnected.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'耳机断开时暂停'**
-  String get pause_when_headset_disconnected;
-
-  /// No description provided for @audio_effects.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音频效果'**
-  String get audio_effects;
-
-  /// No description provided for @enable_equalizer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'启用均衡器'**
-  String get enable_equalizer;
-
-  /// No description provided for @bass_boost.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'低音增强'**
-  String get bass_boost;
-
-  /// No description provided for @spatial_audio.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'空间音频'**
-  String get spatial_audio;
-
-  /// No description provided for @username.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'用户名'**
-  String get username;
-
-  /// No description provided for @email.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'邮箱'**
-  String get email;
-
-  /// No description provided for @auto_login.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自动登录'**
-  String get auto_login;
-
-  /// No description provided for @save_password.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'保存密码'**
-  String get save_password;
-
-  /// No description provided for @save.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'保存'**
-  String get save;
+  /// **'Tune 启动失败'**
+  String get appStartFailed;
 
   /// No description provided for @cancel.
   ///
@@ -376,23 +142,11 @@ abstract class AppLocalizations {
   /// **'确定'**
   String get ok;
 
-  /// No description provided for @add.
+  /// No description provided for @save.
   ///
   /// In zh_CN, this message translates to:
-  /// **'添加'**
-  String get add;
-
-  /// No description provided for @remove.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'移除'**
-  String get remove;
-
-  /// No description provided for @edit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'编辑'**
-  String get edit;
+  /// **'保存'**
+  String get save;
 
   /// No description provided for @delete.
   ///
@@ -400,71 +154,59 @@ abstract class AppLocalizations {
   /// **'删除'**
   String get delete;
 
-  /// No description provided for @add_custom_path.
+  /// No description provided for @remove.
   ///
   /// In zh_CN, this message translates to:
-  /// **'添加自定义路径'**
-  String get add_custom_path;
+  /// **'移除'**
+  String get remove;
 
-  /// No description provided for @no_custom_scan_paths.
+  /// No description provided for @clear.
   ///
   /// In zh_CN, this message translates to:
-  /// **'未设置自定义扫描路径'**
-  String get no_custom_scan_paths;
+  /// **'清空'**
+  String get clear;
 
-  /// No description provided for @change_language.
+  /// No description provided for @close.
   ///
   /// In zh_CN, this message translates to:
-  /// **'更改语言'**
-  String get change_language;
+  /// **'关闭'**
+  String get close;
 
-  /// No description provided for @change_language_confirm.
+  /// No description provided for @retry.
   ///
   /// In zh_CN, this message translates to:
-  /// **'确定要更改应用语言吗？这将重启应用以应用新设置。'**
-  String get change_language_confirm;
+  /// **'重试'**
+  String get retry;
 
-  /// No description provided for @current_language_display.
+  /// No description provided for @confirm.
   ///
   /// In zh_CN, this message translates to:
-  /// **'当前语言:'**
-  String get current_language_display;
+  /// **'确认'**
+  String get confirm;
 
-  /// No description provided for @theme_preview.
+  /// No description provided for @chooseFile.
   ///
   /// In zh_CN, this message translates to:
-  /// **'主题预览'**
-  String get theme_preview;
+  /// **'选择文件'**
+  String get chooseFile;
 
-  /// No description provided for @system_mode_preview.
+  /// No description provided for @unknownError.
   ///
   /// In zh_CN, this message translates to:
-  /// **'系统'**
-  String get system_mode_preview;
+  /// **'未知错误'**
+  String get unknownError;
 
-  /// No description provided for @light_mode_preview.
+  /// No description provided for @scanNow.
   ///
   /// In zh_CN, this message translates to:
-  /// **'浅色'**
-  String get light_mode_preview;
+  /// **'立即扫描'**
+  String get scanNow;
 
-  /// No description provided for @dark_mode_preview.
+  /// No description provided for @search.
   ///
   /// In zh_CN, this message translates to:
-  /// **'深色'**
-  String get dark_mode_preview;
-
-  /// No description provided for @no_custom_scan_paths_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加自定义文件夹路径以扫描特定位置的音乐文件'**
-  String get no_custom_scan_paths_description;
-
-  /// No description provided for @scan_local_music.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描本地音乐'**
-  String get scan_local_music;
+  /// **'搜索'**
+  String get search;
 
   /// No description provided for @scanning.
   ///
@@ -472,677 +214,11 @@ abstract class AppLocalizations {
   /// **'扫描中'**
   String get scanning;
 
-  /// No description provided for @scan_completed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描完成'**
-  String get scan_completed;
-
-  /// No description provided for @scan_failed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描失败'**
-  String get scan_failed;
-
-  /// No description provided for @failed_to_load_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'加载歌曲失败'**
-  String get failed_to_load_songs;
-
-  /// No description provided for @failed_to_load_songs_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'无法从您的音乐库加载歌曲。请检查您的网络连接或重新扫描音乐库。'**
-  String get failed_to_load_songs_description;
-
-  /// No description provided for @try_again.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重试'**
-  String get try_again;
-
-  /// No description provided for @scan_progress.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描进度'**
-  String get scan_progress;
-
-  /// No description provided for @scanning_path.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在扫描路径:'**
-  String get scanning_path;
-
-  /// No description provided for @no_songs_found_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'在您的设备上未找到任何音乐文件。'**
-  String get no_songs_found_description;
-
-  /// No description provided for @scan_again.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重新扫描'**
-  String get scan_again;
-
-  /// No description provided for @scan_local_music_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描您的设备以查找音乐文件'**
-  String get scan_local_music_description;
-
-  /// No description provided for @custom_scan_paths_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加自定义文件夹路径以扫描特定位置的音乐文件'**
-  String get custom_scan_paths_description;
-
-  /// No description provided for @scan_button.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'开始扫描'**
-  String get scan_button;
-
-  /// No description provided for @cancel_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'取消扫描'**
-  String get cancel_scan;
-
-  /// No description provided for @failed_to_save_custom_scan_paths.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'保存自定义扫描路径失败'**
-  String get failed_to_save_custom_scan_paths;
-
-  /// No description provided for @failed_to_add_custom_scan_path.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加自定义扫描路径失败'**
-  String get failed_to_add_custom_scan_path;
-
-  /// No description provided for @failed_to_scan_music.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描音乐失败'**
-  String get failed_to_scan_music;
-
-  /// No description provided for @search_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索歌曲...'**
-  String get search_songs;
-
-  /// No description provided for @artists.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺术家'**
-  String get artists;
-
-  /// No description provided for @albums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get albums;
-
-  /// No description provided for @songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌曲'**
-  String get songs;
-
-  /// No description provided for @playlists.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放列表'**
-  String get playlists;
-
-  /// No description provided for @music_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get music_library;
-
-  /// No description provided for @favorites.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'收藏'**
-  String get favorites;
-
-  /// No description provided for @recently_played.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'最近播放'**
-  String get recently_played;
-
-  /// No description provided for @top_charts.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'排行榜'**
-  String get top_charts;
-
-  /// No description provided for @new_releases.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'新歌发布'**
-  String get new_releases;
-
-  /// No description provided for @genres.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'流派'**
-  String get genres;
-
-  /// No description provided for @now_playing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在播放'**
-  String get now_playing;
-
-  /// No description provided for @previous.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'上一首'**
-  String get previous;
-
-  /// No description provided for @next.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'下一首'**
-  String get next;
-
-  /// No description provided for @play.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放'**
-  String get play;
-
-  /// No description provided for @pause.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'暂停'**
-  String get pause;
-
-  /// No description provided for @sequence.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'顺序播放'**
-  String get sequence;
-
-  /// No description provided for @shuffle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'随机播放'**
-  String get shuffle;
-
-  /// No description provided for @scan_completed_no_new_songs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描完成，未找到新歌曲'**
-  String get scan_completed_no_new_songs;
-
-  /// No description provided for @added_scanned_songs_to_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'已将扫描的歌曲添加到音乐库'**
-  String get added_scanned_songs_to_library;
-
-  /// No description provided for @rescan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重新扫描'**
-  String get rescan;
-
-  /// No description provided for @load_stats_failed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'加载统计信息失败'**
-  String get load_stats_failed;
-
-  /// No description provided for @load_songs_failed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'加载歌曲失败'**
-  String get load_songs_failed;
-
-  /// No description provided for @add_to_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加到音乐库'**
-  String get add_to_library;
-
-  /// No description provided for @general_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'常规'**
-  String get general_tab;
-
-  /// No description provided for @library_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get library_tab;
-
-  /// No description provided for @account_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'账户'**
-  String get account_tab;
-
-  /// No description provided for @playback_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放'**
-  String get playback_tab;
-
-  /// No description provided for @about_tab.
+  /// No description provided for @about.
   ///
   /// In zh_CN, this message translates to:
   /// **'关于'**
-  String get about_tab;
-
-  /// No description provided for @animations_tab.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'动画'**
-  String get animations_tab;
-
-  /// No description provided for @version.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'版本'**
-  String get version;
-
-  /// No description provided for @platform.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'平台'**
-  String get platform;
-
-  /// No description provided for @about_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'Tune 是一款现代化的音乐播放器，专为音乐爱好者设计。它支持多种音频格式，提供高质量的音频播放体验。'**
-  String get about_description;
-
-  /// No description provided for @features.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'功能特性'**
-  String get features;
-
-  /// No description provided for @high_quality_audio_playback.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'高质量音频播放'**
-  String get high_quality_audio_playback;
-
-  /// No description provided for @supports_multiple_audio_formats.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'支持多种音频格式（MP3、FLAC、WAV、AAC等）'**
-  String get supports_multiple_audio_formats;
-
-  /// No description provided for @local_music_management.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'本地音乐管理'**
-  String get local_music_management;
-
-  /// No description provided for @automatically_scans_and_organizes_local_music_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自动扫描并整理本地音乐库'**
-  String get automatically_scans_and_organizes_local_music_library;
-
-  /// No description provided for @multi_language_support.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'多语言支持'**
-  String get multi_language_support;
-
-  /// No description provided for @supports_chinese_english_japanese_korean_russian_and_more.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'支持中文、英文、日文、韩文、俄文等多种语言'**
-  String get supports_chinese_english_japanese_korean_russian_and_more;
-
-  /// No description provided for @multiple_themes.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'多种主题'**
-  String get multiple_themes;
-
-  /// No description provided for @eight_theme_colors_with_dark_light_mode_switching.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'8种主题颜色，支持深色/浅色模式切换'**
-  String get eight_theme_colors_with_dark_light_mode_switching;
-
-  /// No description provided for @lyrics_synchronization.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌词同步'**
-  String get lyrics_synchronization;
-
-  /// No description provided for @lrc_format_lyrics_real_time_synchronization_display.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'LRC格式歌词实时同步显示'**
-  String get lrc_format_lyrics_real_time_synchronization_display;
-
-  /// No description provided for @smart_search.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'智能搜索'**
-  String get smart_search;
-
-  /// No description provided for @supports_searching_by_song_title_artist_album_and_other_metadata.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'支持按歌曲名、艺术家、专辑等元数据搜索'**
-  String get supports_searching_by_song_title_artist_album_and_other_metadata;
-
-  /// No description provided for @open_source_license.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'开源许可'**
-  String get open_source_license;
-
-  /// No description provided for @opensource_license_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'本项目使用开源许可证发布，源代码可在GitHub上获取。'**
-  String get opensource_license_description;
-
-  /// No description provided for @github_project_address.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'GitHub项目地址'**
-  String get github_project_address;
-
-  /// No description provided for @contact_us.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'联系我们'**
-  String get contact_us;
-
-  /// No description provided for @contact_us_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'如有任何问题，请通过以下方式联系我们：\n邮箱：support@tune.com'**
-  String get contact_us_description;
-
-  /// No description provided for @official_website.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'官方网站'**
-  String get official_website;
-
-  /// No description provided for @auto_start.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'开机自启'**
-  String get auto_start;
-
-  /// No description provided for @auto_start_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'系统启动时自动运行Tune'**
-  String get auto_start_description;
-
-  /// No description provided for @window_size.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'窗口大小'**
-  String get window_size;
-
-  /// No description provided for @small.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'小'**
-  String get small;
-
-  /// No description provided for @medium.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'中'**
-  String get medium;
-
-  /// No description provided for @large.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'大'**
-  String get large;
-
-  /// No description provided for @window_size_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'设置应用窗口的默认大小'**
-  String get window_size_description;
-
-  /// No description provided for @default_player.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认播放器'**
-  String get default_player;
-
-  /// No description provided for @default_player_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'将Tune设置为系统默认音频播放器'**
-  String get default_player_description;
-
-  /// No description provided for @desktop_lyrics.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'桌面歌词'**
-  String get desktop_lyrics;
-
-  /// No description provided for @desktop_lyrics_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'在桌面上显示实时歌词'**
-  String get desktop_lyrics_description;
-
-  /// No description provided for @music_library_management.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库管理'**
-  String get music_library_management;
-
-  /// No description provided for @add_custom_directory.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加自定义目录'**
-  String get add_custom_directory;
-
-  /// No description provided for @full_platform_scan_note.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'全平台扫描说明：默认扫描系统音乐目录，可通过添加自定义路径扩展扫描范围。'**
-  String get full_platform_scan_note;
-
-  /// No description provided for @library_info.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库信息'**
-  String get library_info;
-
-  /// No description provided for @songs_count.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌曲总数'**
-  String get songs_count;
-
-  /// No description provided for @library_features.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库功能'**
-  String get library_features;
-
-  /// No description provided for @access_library.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'访问音乐库'**
-  String get access_library;
-
-  /// No description provided for @scan_instructions.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描说明'**
-  String get scan_instructions;
-
-  /// No description provided for @auto_extract_metadata.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自动提取元数据'**
-  String get auto_extract_metadata;
-
-  /// No description provided for @add_custom_paths.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'添加自定义路径'**
-  String get add_custom_paths;
-
-  /// No description provided for @scan_completion.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描完成'**
-  String get scan_completion;
-
-  /// No description provided for @auto_metadata_extraction.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'自动元数据提取'**
-  String get auto_metadata_extraction;
-
-  /// No description provided for @how_to_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'如何扫描'**
-  String get how_to_scan;
-
-  /// No description provided for @scan_step1.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'1. 点击扫描按钮开始扫描'**
-  String get scan_step1;
-
-  /// No description provided for @scan_step2.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'2. 系统会自动扫描默认音乐目录'**
-  String get scan_step2;
-
-  /// No description provided for @scan_step3.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'3. 可添加自定义目录扩展扫描范围'**
-  String get scan_step3;
-
-  /// No description provided for @scan_step4.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'4. 扫描完成后歌曲会自动添加到音乐库'**
-  String get scan_step4;
-
-  /// No description provided for @faq.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'常见问题'**
-  String get faq;
-
-  /// No description provided for @faq_scan_issue.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描问题'**
-  String get faq_scan_issue;
-
-  /// No description provided for @faq_scan_issue_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'如果扫描失败，请检查文件权限和路径是否正确。'**
-  String get faq_scan_issue_answer;
-
-  /// No description provided for @faq_slow_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描缓慢'**
-  String get faq_slow_scan;
-
-  /// No description provided for @faq_slow_scan_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描速度取决于音乐库大小和硬盘性能，大库扫描可能需要较长时间。'**
-  String get faq_slow_scan_answer;
-
-  /// No description provided for @faq_not_showing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌曲未显示'**
-  String get faq_not_showing;
-
-  /// No description provided for @faq_not_showing_answer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'确保音乐文件格式受支持，并检查文件是否损坏。'**
-  String get faq_not_showing_answer;
-
-  /// No description provided for @music_scan.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐扫描'**
-  String get music_scan;
-
-  /// No description provided for @failed_to_open_github.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'无法打开GitHub页面'**
-  String get failed_to_open_github;
-
-  /// No description provided for @select_language.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'选择语言'**
-  String get select_language;
-
-  /// No description provided for @unknown_user.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知用户'**
-  String get unknown_user;
-
-  /// No description provided for @tag_vip.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'VIP'**
-  String get tag_vip;
-
-  /// No description provided for @tag_singer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌手'**
-  String get tag_singer;
-
-  /// No description provided for @tag_elite.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'精英'**
-  String get tag_elite;
-
-  /// No description provided for @settings_page_theme.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'主题设置'**
-  String get settings_page_theme;
-
-  /// No description provided for @settings_page_language.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'语言设置'**
-  String get settings_page_language;
+  String get about;
 
   /// No description provided for @language.
   ///
@@ -1156,557 +232,1817 @@ abstract class AppLocalizations {
   /// **'主题'**
   String get theme;
 
-  /// No description provided for @display_settings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'显示设置'**
-  String get display_settings;
-
-  /// No description provided for @language_theme_description.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'设置应用的语言和主题模式'**
-  String get language_theme_description;
-
-  /// No description provided for @system_mode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'跟随系统'**
-  String get system_mode;
-
-  /// No description provided for @light_mode.
+  /// No description provided for @lightMode.
   ///
   /// In zh_CN, this message translates to:
   /// **'浅色模式'**
-  String get light_mode;
+  String get lightMode;
 
-  /// No description provided for @dark_mode.
+  /// No description provided for @darkMode.
   ///
   /// In zh_CN, this message translates to:
   /// **'深色模式'**
-  String get dark_mode;
+  String get darkMode;
 
-  /// No description provided for @english.
+  /// No description provided for @systemMode.
   ///
   /// In zh_CN, this message translates to:
-  /// **'英语'**
-  String get english;
+  /// **'跟随系统'**
+  String get systemMode;
 
-  /// No description provided for @chinese_simplified.
+  /// No description provided for @musicLibrary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'简体中文'**
-  String get chinese_simplified;
+  /// **'音乐库'**
+  String get musicLibrary;
 
-  /// No description provided for @chinese_traditional.
+  /// No description provided for @navLibrary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'繁体中文'**
-  String get chinese_traditional;
+  /// **'音乐库'**
+  String get navLibrary;
 
-  /// No description provided for @chinese.
+  /// No description provided for @navQueue.
   ///
   /// In zh_CN, this message translates to:
-  /// **'中文'**
-  String get chinese;
+  /// **'播放队列'**
+  String get navQueue;
 
-  /// No description provided for @japanese.
+  /// No description provided for @navSources.
   ///
   /// In zh_CN, this message translates to:
-  /// **'日语'**
-  String get japanese;
+  /// **'音源'**
+  String get navSources;
 
-  /// No description provided for @korean.
+  /// No description provided for @navSettings.
   ///
   /// In zh_CN, this message translates to:
-  /// **'韩语'**
-  String get korean;
+  /// **'设置'**
+  String get navSettings;
 
-  /// No description provided for @russian.
+  /// No description provided for @libraryTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'俄语'**
-  String get russian;
+  /// **'音乐库'**
+  String get libraryTitle;
 
-  /// No description provided for @german.
+  /// No description provided for @librarySubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'德语'**
-  String get german;
+  /// **'本地与在线音源的全部曲目'**
+  String get librarySubtitle;
 
-  /// No description provided for @french.
+  /// No description provided for @libraryClearSearch.
   ///
   /// In zh_CN, this message translates to:
-  /// **'法语'**
-  String get french;
+  /// **'清除搜索'**
+  String get libraryClearSearch;
 
-  /// No description provided for @spanish.
+  /// No description provided for @libraryFilterSources.
   ///
   /// In zh_CN, this message translates to:
-  /// **'西班牙语'**
-  String get spanish;
+  /// **'筛选来源'**
+  String get libraryFilterSources;
 
-  /// No description provided for @search_error.
+  /// No description provided for @libraryAllSources.
   ///
   /// In zh_CN, this message translates to:
-  /// **'搜索错误'**
-  String get search_error;
+  /// **'全部来源'**
+  String get libraryAllSources;
 
-  /// No description provided for @error.
+  /// No description provided for @libraryScanAllSources.
   ///
   /// In zh_CN, this message translates to:
-  /// **'错误'**
-  String get error;
+  /// **'扫描全部音源'**
+  String get libraryScanAllSources;
 
-  /// No description provided for @network_error.
+  /// No description provided for @libraryTrackCount.
   ///
   /// In zh_CN, this message translates to:
-  /// **'网络错误'**
-  String get network_error;
+  /// **'{count} 首'**
+  String libraryTrackCount(int count);
 
-  /// No description provided for @permission_denied.
+  /// No description provided for @libraryNoMatchTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'权限被拒绝'**
-  String get permission_denied;
+  /// **'没有匹配的歌曲'**
+  String get libraryNoMatchTitle;
 
-  /// No description provided for @invalid_input.
+  /// No description provided for @libraryNoMatchSubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'无效输入'**
-  String get invalid_input;
+  /// **'换个关键词，或清除搜索条件'**
+  String get libraryNoMatchSubtitle;
 
-  /// No description provided for @search_no_results.
+  /// No description provided for @librarySourceEmptyTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'未找到搜索结果'**
-  String get search_no_results;
+  /// **'该来源暂无歌曲'**
+  String get librarySourceEmptyTitle;
 
-  /// No description provided for @skipToPrevious.
+  /// No description provided for @librarySourceEmptySubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'切换到全部来源，或重新扫描该音源'**
+  String get librarySourceEmptySubtitle;
+
+  /// No description provided for @libraryViewAllSources.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查看全部来源'**
+  String get libraryViewAllSources;
+
+  /// No description provided for @libraryScanningTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在扫描音乐'**
+  String get libraryScanningTitle;
+
+  /// No description provided for @libraryEmptyTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有音乐'**
+  String get libraryEmptyTitle;
+
+  /// No description provided for @libraryEmptySubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描本地目录或已启用的在线音源，也可以在设置中调整音源。'**
+  String get libraryEmptySubtitle;
+
+  /// No description provided for @libraryLoadFailedTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库加载失败'**
+  String get libraryLoadFailedTitle;
+
+  /// No description provided for @libraryAddedToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入播放队列'**
+  String get libraryAddedToQueue;
+
+  /// No description provided for @libraryScanPaths.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描目录：{paths}'**
+  String libraryScanPaths(String paths);
+
+  /// No description provided for @libraryAddToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入播放队列'**
+  String get libraryAddToQueue;
+
+  /// No description provided for @queueTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放队列'**
+  String get queueTitle;
+
+  /// No description provided for @queueSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前播放顺序'**
+  String get queueSubtitle;
+
+  /// No description provided for @queueEmptyTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放队列是空的'**
+  String get queueEmptyTitle;
+
+  /// No description provided for @queueEmptySubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'从音乐库选择歌曲，或把歌曲加入队列'**
+  String get queueEmptySubtitle;
+
+  /// No description provided for @queueGoToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'去音乐库'**
+  String get queueGoToLibrary;
+
+  /// No description provided for @queueClearTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空播放队列？'**
+  String get queueClearTitle;
+
+  /// No description provided for @queueClearMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前播放会停止，队列中的歌曲不会从音乐库删除。'**
+  String get queueClearMessage;
+
+  /// No description provided for @playerNowPlaying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放'**
+  String get playerNowPlaying;
+
+  /// No description provided for @playerCollapse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起'**
+  String get playerCollapse;
+
+  /// No description provided for @playerPrevious.
   ///
   /// In zh_CN, this message translates to:
   /// **'上一首'**
-  String get skipToPrevious;
+  String get playerPrevious;
 
-  /// No description provided for @skipToNext.
+  /// No description provided for @playerNext.
   ///
   /// In zh_CN, this message translates to:
   /// **'下一首'**
-  String get skipToNext;
+  String get playerNext;
 
-  /// No description provided for @playback_error.
+  /// No description provided for @playerPlay.
   ///
   /// In zh_CN, this message translates to:
-  /// **'播放错误'**
-  String get playback_error;
+  /// **'播放'**
+  String get playerPlay;
 
-  /// No description provided for @no_song_playing.
+  /// No description provided for @playerPause.
   ///
   /// In zh_CN, this message translates to:
-  /// **'当前无歌曲播放'**
-  String get no_song_playing;
+  /// **'暂停'**
+  String get playerPause;
 
-  /// No description provided for @select_a_song_to_play.
+  /// No description provided for @playerMute.
   ///
   /// In zh_CN, this message translates to:
-  /// **'请选择一首歌曲播放'**
-  String get select_a_song_to_play;
+  /// **'静音'**
+  String get playerMute;
 
-  /// No description provided for @repeat_all.
+  /// No description provided for @playerUnmute.
   ///
   /// In zh_CN, this message translates to:
-  /// **'全部循环'**
-  String get repeat_all;
+  /// **'恢复音量'**
+  String get playerUnmute;
 
-  /// No description provided for @playback_speed.
+  /// No description provided for @playerQueue.
   ///
   /// In zh_CN, this message translates to:
-  /// **'播放速度'**
-  String get playback_speed;
+  /// **'播放队列'**
+  String get playerQueue;
 
-  /// No description provided for @default_playback_speed.
+  /// No description provided for @playerPlayModeSequential.
   ///
   /// In zh_CN, this message translates to:
-  /// **'默认播放速度'**
-  String get default_playback_speed;
+  /// **'列表循环'**
+  String get playerPlayModeSequential;
 
-  /// No description provided for @default_playback_speed_description.
+  /// No description provided for @playerPlayModeRepeatOne.
   ///
   /// In zh_CN, this message translates to:
-  /// **'设置所有歌曲的默认播放速度'**
-  String get default_playback_speed_description;
+  /// **'单曲循环'**
+  String get playerPlayModeRepeatOne;
 
-  /// No description provided for @crossfade.
+  /// No description provided for @playerPlayModeShuffle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'交叉淡入淡出'**
-  String get crossfade;
+  /// **'随机播放'**
+  String get playerPlayModeShuffle;
 
-  /// No description provided for @crossfade_description.
+  /// No description provided for @playerNoSongTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用歌曲间的交叉淡入淡出'**
-  String get crossfade_description;
+  /// **'选择一首歌开始'**
+  String get playerNoSongTitle;
 
-  /// No description provided for @crossfade_duration.
+  /// No description provided for @playerUnknownArtist.
   ///
   /// In zh_CN, this message translates to:
-  /// **'交叉淡入淡出时长'**
-  String get crossfade_duration;
+  /// **'未知艺术家'**
+  String get playerUnknownArtist;
 
-  /// No description provided for @gapless_playback.
+  /// No description provided for @playerDockReady.
   ///
   /// In zh_CN, this message translates to:
-  /// **'无缝播放'**
-  String get gapless_playback;
+  /// **'Tune · 就绪'**
+  String get playerDockReady;
 
-  /// No description provided for @gapless_playback_description.
+  /// No description provided for @playerQueueSummary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用无缝播放以实现平滑过渡'**
-  String get gapless_playback_description;
+  /// **'队列 {count} 首'**
+  String playerQueueSummary(int count);
 
-  /// No description provided for @equalizer.
+  /// No description provided for @nowPlayingEmptyTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'均衡器'**
-  String get equalizer;
+  /// **'还没有播放的曲目'**
+  String get nowPlayingEmptyTitle;
 
-  /// No description provided for @equalizer_tab.
+  /// No description provided for @nowPlayingEmptySubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'均衡器'**
-  String get equalizer_tab;
+  /// **'从音乐库里挑一首开始'**
+  String get nowPlayingEmptySubtitle;
 
-  /// No description provided for @presets.
+  /// No description provided for @nowPlayingUnnamedTrack.
   ///
   /// In zh_CN, this message translates to:
-  /// **'预设'**
-  String get presets;
+  /// **'未命名曲目'**
+  String get nowPlayingUnnamedTrack;
 
-  /// No description provided for @flat.
+  /// No description provided for @nowPlayingLocalMusic.
   ///
   /// In zh_CN, this message translates to:
-  /// **'平直'**
-  String get flat;
+  /// **'本地音乐'**
+  String get nowPlayingLocalMusic;
 
-  /// No description provided for @pop.
+  /// No description provided for @trackUnknownTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'流行'**
-  String get pop;
+  /// **'未知歌曲'**
+  String get trackUnknownTitle;
 
-  /// No description provided for @rock.
+  /// No description provided for @playbackFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'摇滚'**
-  String get rock;
+  /// **'播放失败: {error}'**
+  String playbackFailed(String error);
 
-  /// No description provided for @jazz.
+  /// No description provided for @playbackPauseFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'爵士'**
-  String get jazz;
+  /// **'暂停失败: {error}'**
+  String playbackPauseFailed(String error);
 
-  /// No description provided for @classical.
+  /// No description provided for @playbackResumeFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'古典'**
-  String get classical;
+  /// **'继续播放失败: {error}'**
+  String playbackResumeFailed(String error);
 
-  /// No description provided for @hip_hop.
+  /// No description provided for @playbackSeekFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'嘻哈'**
-  String get hip_hop;
+  /// **'跳转失败: {error}'**
+  String playbackSeekFailed(String error);
 
-  /// No description provided for @custom_equalizer.
+  /// No description provided for @playbackVolumeFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'自定义均衡器'**
-  String get custom_equalizer;
+  /// **'设置音量失败: {error}'**
+  String playbackVolumeFailed(String error);
 
-  /// No description provided for @animations_settings.
+  /// No description provided for @playbackSpeedFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'动画设置'**
-  String get animations_settings;
+  /// **'设置速度失败: {error}'**
+  String playbackSpeedFailed(String error);
 
-  /// No description provided for @enable_animations.
+  /// No description provided for @audioSourceLocal.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用动画'**
-  String get enable_animations;
+  /// **'本地文件'**
+  String get audioSourceLocal;
 
-  /// No description provided for @enable_animations_description.
+  /// No description provided for @audioSourceDownloading.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用或禁用UI动画'**
-  String get enable_animations_description;
+  /// **'下载中 {percent}%'**
+  String audioSourceDownloading(int percent);
 
-  /// No description provided for @animation_speed.
+  /// No description provided for @audioSourceCached.
   ///
   /// In zh_CN, this message translates to:
-  /// **'动画速度'**
-  String get animation_speed;
+  /// **'已缓存'**
+  String get audioSourceCached;
 
-  /// No description provided for @animation_speed_description.
+  /// No description provided for @audioSourceFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'设置UI动画的速度'**
-  String get animation_speed_description;
+  /// **'下载失败'**
+  String get audioSourceFailed;
 
-  /// No description provided for @very_slow.
+  /// No description provided for @routerNotFoundTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'非常慢'**
-  String get very_slow;
+  /// **'页面不存在'**
+  String get routerNotFoundTitle;
 
-  /// No description provided for @slow.
+  /// No description provided for @routerBackToLibrary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'慢'**
-  String get slow;
+  /// **'返回音乐库'**
+  String get routerBackToLibrary;
 
-  /// No description provided for @normal.
+  /// No description provided for @sourcesTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'正常'**
-  String get normal;
+  /// **'音源'**
+  String get sourcesTitle;
 
-  /// No description provided for @fast.
+  /// No description provided for @sourcesSubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'快'**
-  String get fast;
+  /// **'在线曲库与扫描目录'**
+  String get sourcesSubtitle;
 
-  /// No description provided for @very_fast.
+  /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:
-  /// **'非常快'**
-  String get very_fast;
+  /// **'启动时自动扫描'**
+  String get sourcesAutoScan;
 
-  /// No description provided for @no_scan_results.
+  /// No description provided for @sourcesAutoScanDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'未找到扫描结果'**
-  String get no_scan_results;
+  /// **'所有已启用音源都会在启动后自动刷新，失败不会影响本地库。'**
+  String get sourcesAutoScanDescription;
 
-  /// No description provided for @enable_notifications.
+  /// No description provided for @sourcesScanAll.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用通知'**
-  String get enable_notifications;
+  /// **'扫描全部音源'**
+  String get sourcesScanAll;
 
-  /// No description provided for @enable_notifications_description.
+  /// No description provided for @sourcesImportPlugin.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用或禁用应用通知'**
-  String get enable_notifications_description;
+  /// **'导入插件'**
+  String get sourcesImportPlugin;
 
-  /// No description provided for @font_size.
+  /// No description provided for @sourcesScanMayTakeSeconds.
   ///
   /// In zh_CN, this message translates to:
-  /// **'字体大小'**
-  String get font_size;
+  /// **'含远程音源时可能需要数秒'**
+  String get sourcesScanMayTakeSeconds;
 
-  /// No description provided for @font_size_description.
+  /// No description provided for @sourcesScanCompleted.
   ///
   /// In zh_CN, this message translates to:
-  /// **'调整应用内文字的显示大小'**
-  String get font_size_description;
+  /// **'扫描已完成'**
+  String get sourcesScanCompleted;
 
-  /// No description provided for @error_occurred.
+  /// No description provided for @sourcesImportPluginTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'发生错误'**
-  String get error_occurred;
+  /// **'导入音乐插件'**
+  String get sourcesImportPluginTitle;
 
-  /// No description provided for @quick_actions.
+  /// No description provided for @sourcesImportPluginMessage.
   ///
   /// In zh_CN, this message translates to:
-  /// **'快捷操作'**
-  String get quick_actions;
+  /// **'插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。请只导入你信任的来源。导入后需要填写搜索关键词才会启用。'**
+  String get sourcesImportPluginMessage;
 
-  /// No description provided for @my_songs.
+  /// No description provided for @sourcesPluginUnreadable.
   ///
   /// In zh_CN, this message translates to:
-  /// **'我的歌曲'**
-  String get my_songs;
+  /// **'无法读取插件文件'**
+  String get sourcesPluginUnreadable;
 
-  /// No description provided for @radio.
+  /// No description provided for @sourcesPluginTooLarge.
   ///
   /// In zh_CN, this message translates to:
-  /// **'电台'**
-  String get radio;
+  /// **'插件文件不能超过 2 MB'**
+  String get sourcesPluginTooLarge;
 
-  /// No description provided for @see_all.
+  /// No description provided for @sourcesPluginImportedEnabled.
   ///
   /// In zh_CN, this message translates to:
-  /// **'查看全部'**
-  String get see_all;
+  /// **'已导入并启用 {name}'**
+  String sourcesPluginImportedEnabled(String name);
 
-  /// No description provided for @no_recent_songs.
+  /// No description provided for @sourcesPluginImported.
   ///
   /// In zh_CN, this message translates to:
-  /// **'暂无最近播放'**
-  String get no_recent_songs;
+  /// **'已导入 {name}，填写关键词并开启后会参与扫描'**
+  String sourcesPluginImported(String name);
 
-  /// No description provided for @good_morning.
+  /// No description provided for @sourcesPluginImportFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'早上好'**
-  String get good_morning;
+  /// **'导入插件失败：{error}'**
+  String sourcesPluginImportFailed(String error);
 
-  /// No description provided for @good_afternoon.
+  /// No description provided for @sourcesPluginActions.
   ///
   /// In zh_CN, this message translates to:
-  /// **'下午好'**
-  String get good_afternoon;
+  /// **'插件操作'**
+  String get sourcesPluginActions;
 
-  /// No description provided for @good_evening.
+  /// No description provided for @sourcesConfigure.
   ///
   /// In zh_CN, this message translates to:
-  /// **'晚上好'**
-  String get good_evening;
+  /// **'配置'**
+  String get sourcesConfigure;
 
-  /// No description provided for @welcome_to_tune.
+  /// No description provided for @sourcesDeletePlugin.
   ///
   /// In zh_CN, this message translates to:
-  /// **'欢迎 Tune'**
-  String get welcome_to_tune;
+  /// **'删除插件'**
+  String get sourcesDeletePlugin;
 
-  /// No description provided for @notifications_title.
+  /// No description provided for @sourcesUnsupported.
   ///
   /// In zh_CN, this message translates to:
-  /// **'通知'**
-  String get notifications_title;
+  /// **'当前版本不支持该音源'**
+  String get sourcesUnsupported;
 
-  /// No description provided for @clear_all_notifications.
+  /// No description provided for @sourcesDisabled.
   ///
   /// In zh_CN, this message translates to:
-  /// **'清空所有通知'**
-  String get clear_all_notifications;
+  /// **'已关闭'**
+  String get sourcesDisabled;
 
-  /// No description provided for @mark_all_read.
+  /// No description provided for @sourcesNeedsConfiguration.
   ///
   /// In zh_CN, this message translates to:
-  /// **'全部标记为已读'**
-  String get mark_all_read;
+  /// **'需要配置'**
+  String get sourcesNeedsConfiguration;
 
-  /// No description provided for @no_notifications.
+  /// No description provided for @sourcesNeedsConfigurationHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'暂无通知'**
-  String get no_notifications;
+  /// **'需要配置：{hint}'**
+  String sourcesNeedsConfigurationHint(String hint);
 
-  /// No description provided for @no_notifications_subtitle.
+  /// No description provided for @sourcesLastScan.
   ///
   /// In zh_CN, this message translates to:
-  /// **'当您收到新通知时，它们会显示在这里'**
-  String get no_notifications_subtitle;
+  /// **'上次扫描 {time}'**
+  String sourcesLastScan(String time);
 
-  /// No description provided for @sort_by_date.
+  /// No description provided for @sourcesAutoScanLocal.
   ///
   /// In zh_CN, this message translates to:
-  /// **'按日期分组'**
-  String get sort_by_date;
+  /// **'启动后自动扫描本地目录'**
+  String get sourcesAutoScanLocal;
 
-  /// No description provided for @sort_by_type.
+  /// No description provided for @sourcesWaitingFirstScan.
   ///
   /// In zh_CN, this message translates to:
-  /// **'按类型分组'**
-  String get sort_by_type;
+  /// **'等待首次扫描'**
+  String get sourcesWaitingFirstScan;
 
-  /// No description provided for @sort_method.
+  /// No description provided for @sourcesScannedCount.
   ///
   /// In zh_CN, this message translates to:
-  /// **'分组方式'**
-  String get sort_method;
+  /// **'已扫描 {count} 首 · {time}'**
+  String sourcesScannedCount(int count, String time);
 
-  /// No description provided for @clear_data.
+  /// No description provided for @sourcesSkipped.
   ///
   /// In zh_CN, this message translates to:
-  /// **'清理数据'**
-  String get clear_data;
+  /// **'已跳过'**
+  String get sourcesSkipped;
 
-  /// No description provided for @clear_data_confirm.
+  /// No description provided for @sourcesScanFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'确认清理'**
-  String get clear_data_confirm;
+  /// **'扫描失败'**
+  String get sourcesScanFailed;
 
-  /// No description provided for @clear_data_description.
+  /// No description provided for @sourcesDeletePluginTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'确定要清理所有应用数据吗？此操作将清除所有设置和扫描记录，但不会删除您的音乐文件。'**
-  String get clear_data_description;
+  /// **'删除插件？'**
+  String get sourcesDeletePluginTitle;
 
-  /// No description provided for @confirm.
+  /// No description provided for @sourcesDeletePluginMessage.
   ///
   /// In zh_CN, this message translates to:
-  /// **'确定'**
-  String get confirm;
+  /// **'将删除 {name} 的脚本、配置以及已扫描的歌曲。'**
+  String sourcesDeletePluginMessage(String name);
 
-  /// No description provided for @data_cleared.
+  /// No description provided for @sourcesDeleted.
   ///
   /// In zh_CN, this message translates to:
-  /// **'应用数据清理完成'**
-  String get data_cleared;
+  /// **'已删除 {name}'**
+  String sourcesDeleted(String name);
 
-  /// No description provided for @data_clear_failed.
+  /// No description provided for @sourceKindLocal.
   ///
   /// In zh_CN, this message translates to:
-  /// **'数据清理失败'**
-  String get data_clear_failed;
+  /// **'本地'**
+  String get sourceKindLocal;
 
-  /// No description provided for @clear_all_data.
+  /// No description provided for @sourceKindOpenCatalog.
   ///
   /// In zh_CN, this message translates to:
-  /// **'清理所有数据'**
-  String get clear_all_data;
+  /// **'开放曲库'**
+  String get sourceKindOpenCatalog;
 
-  /// No description provided for @no_lyrics.
+  /// No description provided for @sourceKindOpenApi.
   ///
   /// In zh_CN, this message translates to:
-  /// **'暂无歌词'**
-  String get no_lyrics;
+  /// **'API'**
+  String get sourceKindOpenApi;
 
-  /// No description provided for @lyrics.
+  /// No description provided for @sourceKindPlugin.
   ///
   /// In zh_CN, this message translates to:
-  /// **'歌词'**
-  String get lyrics;
+  /// **'插件'**
+  String get sourceKindPlugin;
 
-  /// No description provided for @search_lyrics_online.
+  /// No description provided for @sourcesConfigureTitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'在线搜索歌词'**
-  String get search_lyrics_online;
+  /// **'配置 {name}'**
+  String sourcesConfigureTitle(String name);
 
-  /// No description provided for @app_slogan.
+  /// No description provided for @sourcesFieldRequired.
   ///
   /// In zh_CN, this message translates to:
-  /// **'让每一段旋律都找到归属'**
-  String get app_slogan;
+  /// **'请填写{label}'**
+  String sourcesFieldRequired(String label);
 
-  /// No description provided for @sleep_timer_start.
+  /// No description provided for @sourcesFieldNumeric.
   ///
   /// In zh_CN, this message translates to:
-  /// **'开始定时'**
-  String get sleep_timer_start;
+  /// **'请输入数字'**
+  String get sourcesFieldNumeric;
 
-  /// No description provided for @hours.
+  /// No description provided for @sourcesNotLoaded.
   ///
   /// In zh_CN, this message translates to:
-  /// **'{count}小时'**
-  String hours(Object count);
+  /// **'音源列表尚未加载完成'**
+  String get sourcesNotLoaded;
 
-  /// No description provided for @minutes.
+  /// No description provided for @sourcesPlatformNoPlugin.
   ///
   /// In zh_CN, this message translates to:
-  /// **'{count}分钟'**
-  String minutes(Object count);
+  /// **'当前平台不支持 JavaScript 插件'**
+  String get sourcesPlatformNoPlugin;
+
+  /// No description provided for @sourcesUpdatePlugin.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更新插件'**
+  String get sourcesUpdatePlugin;
+
+  /// No description provided for @sourcesPluginUpdated.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{name} 已更新到 {version}'**
+  String sourcesPluginUpdated(String name, String version);
+
+  /// No description provided for @sourcesPluginUpToDate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{name} 已是最新版本'**
+  String sourcesPluginUpToDate(String name);
+
+  /// No description provided for @sourcesPluginUpdateFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更新插件失败：{error}'**
+  String sourcesPluginUpdateFailed(String error);
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'调整外观、语言和本地音乐库。'**
+  String get settingsSubtitle;
+
+  /// No description provided for @settingsThemeDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择界面的明暗气质和显示语言。'**
+  String get settingsThemeDescription;
+
+  /// No description provided for @settingsLanguageDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'界面文字和系统菜单语言'**
+  String get settingsLanguageDescription;
+
+  /// No description provided for @settingsLibraryDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Tune 只会在这些目录中查找音频文件。'**
+  String get settingsLibraryDescription;
+
+  /// No description provided for @settingsDefaultPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认'**
+  String get settingsDefaultPath;
+
+  /// No description provided for @settingsNoDefaultFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未找到默认音乐目录'**
+  String get settingsNoDefaultFolder;
+
+  /// No description provided for @settingsCustomPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义'**
+  String get settingsCustomPath;
+
+  /// No description provided for @settingsAddFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加文件夹'**
+  String get settingsAddFolder;
+
+  /// No description provided for @settingsClearLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空音乐库'**
+  String get settingsClearLibrary;
+
+  /// No description provided for @settingsScanSafetyNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描只读取音频文件，不会修改或删除磁盘内容。'**
+  String get settingsScanSafetyNote;
+
+  /// No description provided for @settingsAboutTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关于 Tune'**
+  String get settingsAboutTitle;
+
+  /// No description provided for @settingsChooseFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择音乐文件夹'**
+  String get settingsChooseFolder;
+
+  /// No description provided for @settingsFolderAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已添加扫描目录'**
+  String get settingsFolderAdded;
+
+  /// No description provided for @settingsScanDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描完成'**
+  String get settingsScanDone;
+
+  /// No description provided for @settingsClearLibraryTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空音乐库？'**
+  String get settingsClearLibraryTitle;
+
+  /// No description provided for @settingsClearLibraryMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只会清除 Tune 的扫描记录，不会删除磁盘上的音乐文件。'**
+  String get settingsClearLibraryMessage;
+
+  /// No description provided for @settingsLibraryCleared.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库已清空'**
+  String get settingsLibraryCleared;
+
+  /// No description provided for @settingsPathsCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 个目录'**
+  String settingsPathsCount(int count);
+
+  /// No description provided for @searchOnlineTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线搜索'**
+  String get searchOnlineTitle;
+
+  /// No description provided for @searchOnlineHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索在线音源，例如 jazz、钢琴、lo-fi'**
+  String get searchOnlineHint;
+
+  /// No description provided for @searchOnlineDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索已启用的在线音源；结果不会写入音乐库'**
+  String get searchOnlineDescription;
+
+  /// No description provided for @searchOnlinePrompt.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索在线音源'**
+  String get searchOnlinePrompt;
+
+  /// No description provided for @searchOnlinePromptDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'输入关键词后按回车；Openverse、Jamendo、Internet Archive 与已导入插件会并行搜索。'**
+  String get searchOnlinePromptDescription;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有结果'**
+  String get searchNoResults;
+
+  /// No description provided for @searchNoResultsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'换个关键词再试一次。'**
+  String get searchNoResultsDescription;
+
+  /// No description provided for @searchNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的歌曲'**
+  String get searchNoMatch;
+
+  /// No description provided for @searchNoMatchDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'换个关键词再试一次。'**
+  String get searchNoMatchDescription;
+
+  /// No description provided for @searchSearching.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在搜索「{query}」'**
+  String searchSearching(String query);
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 首'**
+  String searchResultCount(int count);
+
+  /// No description provided for @searchPlayAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放全部'**
+  String get searchPlayAll;
+
+  /// No description provided for @searchAddToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入队列'**
+  String get searchAddToQueue;
+
+  /// No description provided for @searchAddedToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入队列：{title}'**
+  String searchAddedToQueue(String title);
+
+  /// No description provided for @searchNoSourcesEnabled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有启用在线音源，请先在设置中开启'**
+  String get searchNoSourcesEnabled;
+
+  /// No description provided for @searchFailedShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索失败'**
+  String get searchFailedShort;
+
+  /// No description provided for @searchFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线搜索失败：{error}'**
+  String searchFailed(String error);
+
+  /// No description provided for @scanPreparing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'准备扫描...'**
+  String get scanPreparing;
+
+  /// No description provided for @scanNoEnabledSources.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有启用的音源'**
+  String get scanNoEnabledSources;
+
+  /// No description provided for @scanNoLocalFolders.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有可扫描的音乐目录'**
+  String get scanNoLocalFolders;
+
+  /// No description provided for @scanProgressPercent.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描中 {percent}%'**
+  String scanProgressPercent(int percent);
+
+  /// No description provided for @scanAllSourcesFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'所有音源扫描失败'**
+  String get scanAllSourcesFailed;
+
+  /// No description provided for @scanFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描失败: {error}'**
+  String scanFailed(String error);
+
+  /// No description provided for @clearLibraryFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空音乐库失败: {error}'**
+  String clearLibraryFailed(String error);
+
+  /// No description provided for @scanNoAudioFiles.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未找到音频文件'**
+  String get scanNoAudioFiles;
+
+  /// No description provided for @scanSongCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已扫描 {count} 首歌曲'**
+  String scanSongCount(int count);
+
+  /// No description provided for @scanSongCountShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 首歌曲'**
+  String scanSongCountShort(int count);
+
+  /// No description provided for @scanSourceNotConfigured.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音源尚未配置'**
+  String get scanSourceNotConfigured;
+
+  /// No description provided for @scanCachedTooSoon.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已保留缓存，距上次扫描不足间隔'**
+  String get scanCachedTooSoon;
+
+  /// No description provided for @scanSummary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已扫描 {sources} 个音源，共 {songs} 首歌曲'**
+  String scanSummary(int songs, int sources);
+
+  /// No description provided for @scanUpdated.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已更新 {songs} 首歌曲，{failed} 个音源失败'**
+  String scanUpdated(int failed, int songs);
+
+  /// No description provided for @sourceErrorForbidden.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'访问被拒绝（HTTP {status}）'**
+  String sourceErrorForbidden(int status);
+
+  /// No description provided for @sourceErrorRateLimited.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求过于频繁（HTTP 429），请稍后再试'**
+  String get sourceErrorRateLimited;
+
+  /// No description provided for @sourceErrorHttpStatus.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口返回 HTTP {status}'**
+  String sourceErrorHttpStatus(int status);
+
+  /// No description provided for @sourceErrorTimeout.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络连接超时'**
+  String get sourceErrorTimeout;
+
+  /// No description provided for @sourceErrorConnection.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接音源服务'**
+  String get sourceErrorConnection;
+
+  /// No description provided for @sourceErrorCertificate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'证书校验失败'**
+  String get sourceErrorCertificate;
+
+  /// No description provided for @sourceErrorCancelled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求已取消'**
+  String get sourceErrorCancelled;
+
+  /// No description provided for @sourceErrorNetwork.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络请求失败：{message}'**
+  String sourceErrorNetwork(String message);
+
+  /// No description provided for @sourceErrorPluginLoad.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件加载失败：{message}'**
+  String sourceErrorPluginLoad(String message);
+
+  /// No description provided for @sourceErrorUnsupported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'暂不支持该音源'**
+  String get sourceErrorUnsupported;
+
+  /// No description provided for @sourceErrorScanInterval.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'距上次扫描不足 {interval}'**
+  String sourceErrorScanInterval(String interval);
+
+  /// No description provided for @sourceErrorScanTimeout.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描超时（{seconds}s）'**
+  String sourceErrorScanTimeout(int seconds);
+
+  /// No description provided for @intervalHours.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 小时'**
+  String intervalHours(int count);
+
+  /// No description provided for @intervalMinutes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 分钟'**
+  String intervalMinutes(int count);
+
+  /// No description provided for @localSourceHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在音乐库设置中添加扫描目录'**
+  String get localSourceHint;
+
+  /// No description provided for @localSourceNotConfigured.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未配置本地音乐目录'**
+  String get localSourceNotConfigured;
+
+  /// No description provided for @pluginSourceHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写一个搜索关键词，例如 周杰伦、piano 或 jazz'**
+  String get pluginSourceHint;
+
+  /// No description provided for @pluginFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get pluginFieldQuery;
+
+  /// No description provided for @pluginFieldHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 周杰伦、piano、jazz'**
+  String get pluginFieldHint;
+
+  /// No description provided for @pluginImportedVersion.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'导入的 MusicFree 插件 · v{version}'**
+  String pluginImportedVersion(String version);
+
+  /// No description provided for @pluginVariable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件变量 {key}'**
+  String pluginVariable(String key);
+
+  /// No description provided for @pluginFileMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件文件不存在，请重新导入'**
+  String get pluginFileMissing;
+
+  /// No description provided for @pluginRuntimeUnsupported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前平台不支持 JavaScript 音乐插件，请在桌面端或移动端导入'**
+  String get pluginRuntimeUnsupported;
+
+  /// No description provided for @pluginCompatLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件兼容库'**
+  String get pluginCompatLibrary;
+
+  /// No description provided for @pluginBridgeScript.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件桥接脚本'**
+  String get pluginBridgeScript;
+
+  /// No description provided for @pluginInit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件初始化'**
+  String get pluginInit;
+
+  /// No description provided for @pluginScript.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件脚本'**
+  String get pluginScript;
+
+  /// No description provided for @pluginExports.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件导出'**
+  String get pluginExports;
+
+  /// No description provided for @pluginNoExports.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件没有导出有效的 module.exports'**
+  String get pluginNoExports;
+
+  /// No description provided for @pluginIncomplete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件不完整：需要 platform 和 search 方法'**
+  String get pluginIncomplete;
+
+  /// No description provided for @pluginNoMediaSource.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件未实现 getMediaSource'**
+  String get pluginNoMediaSource;
+
+  /// No description provided for @pluginNoStream.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件没有返回可播放地址'**
+  String get pluginNoStream;
+
+  /// No description provided for @pluginRuntimeClosed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件运行时已关闭'**
+  String get pluginRuntimeClosed;
+
+  /// No description provided for @pluginCallFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{label} 失败：{message}'**
+  String pluginCallFailed(String label, String message);
+
+  /// No description provided for @pluginCallTimeout.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件调用超时'**
+  String get pluginCallTimeout;
+
+  /// No description provided for @pluginUnknownData.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件返回了无法识别的数据'**
+  String get pluginUnknownData;
+
+  /// No description provided for @pluginCallError.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件调用失败'**
+  String get pluginCallError;
+
+  /// No description provided for @pluginNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的歌曲'**
+  String get pluginNoMatch;
+
+  /// No description provided for @pluginNoStreamResults.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件返回了 {count} 个结果，但没有可播放地址'**
+  String pluginNoStreamResults(int count);
+
+  /// No description provided for @neteaseHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000'**
+  String get neteaseHint;
+
+  /// No description provided for @neteaseFieldApi.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'API 地址'**
+  String get neteaseFieldApi;
+
+  /// No description provided for @neteaseFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get neteaseFieldQuery;
+
+  /// No description provided for @neteaseFieldHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 热门、周杰伦'**
+  String get neteaseFieldHint;
+
+  /// No description provided for @neteaseFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get neteaseFieldLimit;
+
+  /// No description provided for @neteaseFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 20，最大 50'**
+  String get neteaseFieldLimitHint;
+
+  /// No description provided for @neteaseHotKeyword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'热门'**
+  String get neteaseHotKeyword;
+
+  /// No description provided for @neteaseEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网易云 API 返回了空响应'**
+  String get neteaseEmptyResponse;
+
+  /// No description provided for @neteaseNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的歌曲'**
+  String get neteaseNoMatch;
+
+  /// No description provided for @neteaseNoStream.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口未返回可播放地址（可能需要在服务端登录或受版权限制）'**
+  String get neteaseNoStream;
+
+  /// No description provided for @openverseHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写一个扫描关键词，例如 piano、ambient 或 jazz'**
+  String get openverseHint;
+
+  /// No description provided for @openverseFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描关键词'**
+  String get openverseFieldQuery;
+
+  /// No description provided for @openverseFieldHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 piano、ambient、jazz'**
+  String get openverseFieldHint;
+
+  /// No description provided for @openverseEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Openverse 返回了空响应'**
+  String get openverseEmptyResponse;
+
+  /// No description provided for @openverseNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的开放音频'**
+  String get openverseNoMatch;
+
+  /// No description provided for @sourceLocalName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地音乐'**
+  String get sourceLocalName;
+
+  /// No description provided for @sourceLocalDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描设备上的音乐文件夹'**
+  String get sourceLocalDescription;
+
+  /// No description provided for @sourceOpenverseDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开放版权音频聚合：Jamendo、Freesound、Wikimedia 等'**
+  String get sourceOpenverseDescription;
+
+  /// No description provided for @sourceJamendoDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'独立音乐开放曲库，需要免费 Client ID'**
+  String get sourceJamendoDescription;
+
+  /// No description provided for @sourceInternetArchiveDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'互联网档案馆的开放音频收藏'**
+  String get sourceInternetArchiveDescription;
+
+  /// No description provided for @sourceNeteaseName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网易云音乐 API'**
+  String get sourceNeteaseName;
+
+  /// No description provided for @sourceNeteaseDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接自建的 NeteaseCloudMusicApi 服务'**
+  String get sourceNeteaseDescription;
+
+  /// No description provided for @jamendoHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在 developer.jamendo.com 免费申请 Client ID 后填入'**
+  String get jamendoHint;
+
+  /// No description provided for @jamendoFieldClientId.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Client ID'**
+  String get jamendoFieldClientId;
+
+  /// No description provided for @jamendoFieldClientIdHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在 developer.jamendo.com 免费申请'**
+  String get jamendoFieldClientIdHint;
+
+  /// No description provided for @jamendoFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词（可选）'**
+  String get jamendoFieldQuery;
+
+  /// No description provided for @jamendoFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、electronic'**
+  String get jamendoFieldQueryHint;
+
+  /// No description provided for @jamendoEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Jamendo 返回了空响应'**
+  String get jamendoEmptyResponse;
+
+  /// No description provided for @jamendoNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的 Jamendo 曲目'**
+  String get jamendoNoMatch;
+
+  /// No description provided for @internetArchiveHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio'**
+  String get internetArchiveHint;
+
+  /// No description provided for @internetArchiveFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收录条件'**
+  String get internetArchiveFieldQuery;
+
+  /// No description provided for @internetArchiveFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get internetArchiveFieldLimit;
+
+  /// No description provided for @internetArchiveFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 8，最大 20'**
+  String get internetArchiveFieldLimitHint;
+
+  /// No description provided for @internetArchiveInvalidResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 返回了无法识别的响应'**
+  String get internetArchiveInvalidResponse;
+
+  /// No description provided for @internetArchiveNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到可播放的归档音频'**
+  String get internetArchiveNoMatch;
+
+  /// No description provided for @downloadUnsupportedPlatform.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前平台没有文件系统，无法缓存下载'**
+  String get downloadUnsupportedPlatform;
+
+  /// No description provided for @audioLoadFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频加载失败'**
+  String get audioLoadFailed;
+
+  /// No description provided for @audioPathEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频文件路径为空'**
+  String get audioPathEmpty;
+
+  /// No description provided for @pluginUpdateNoUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'该插件没有记录下载地址，无法检查更新'**
+  String get pluginUpdateNoUrl;
+
+  /// No description provided for @sourcesPluginUrlDownloadFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载插件失败：{error}'**
+  String sourcesPluginUrlDownloadFailed(String error);
+
+  /// No description provided for @pluginStepFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{label} \\u5931\\u8d25\\uff1a{error}'**
+  String pluginStepFailed(String error, String label);
+
+  /// No description provided for @sourcesImportPluginFromUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'从 URL 导入'**
+  String get sourcesImportPluginFromUrl;
+
+  /// No description provided for @sourcesPluginUrlTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件地址'**
+  String get sourcesPluginUrlTitle;
+
+  /// No description provided for @sourcesPluginUrlHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'https://example.com/plugin.js'**
+  String get sourcesPluginUrlHint;
+
+  /// No description provided for @sourcesPluginUrlInvalid.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请输入有效的 http(s) 链接'**
+  String get sourcesPluginUrlInvalid;
+
+  /// No description provided for @pluginUrlInvalid.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件地址无效，请使用 http 或 https 链接'**
+  String get pluginUrlInvalid;
+
+  /// No description provided for @pluginUrlEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件脚本内容为空'**
+  String get pluginUrlEmpty;
+
+  /// No description provided for @pluginUrlTooLarge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件脚本超过大小限制'**
+  String get pluginUrlTooLarge;
+
+  /// No description provided for @pluginSandboxStartFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件沙箱启动失败：{error}'**
+  String pluginSandboxStartFailed(String error);
+
+  /// No description provided for @pluginSandboxStartTimeout.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件沙箱启动超时'**
+  String get pluginSandboxStartTimeout;
+
+  /// No description provided for @pluginScriptTooLarge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件脚本超过 {limit} KB 限制'**
+  String pluginScriptTooLarge(String limit);
+
+  /// No description provided for @pluginRuntimeTerminated.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件运行时已终止'**
+  String get pluginRuntimeTerminated;
+
+  /// No description provided for @pluginRuntimeTimeLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件运行时已超过运行时间上限'**
+  String get pluginRuntimeTimeLimit;
+
+  /// No description provided for @pluginSandboxNotReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件沙箱尚未就绪'**
+  String get pluginSandboxNotReady;
+
+  /// No description provided for @pluginCallTimeoutDetailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件调用超时（{seconds}s）'**
+  String pluginCallTimeoutDetailed(int seconds);
+
+  /// No description provided for @pluginRuntimeCrashed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件运行时已崩溃'**
+  String get pluginRuntimeCrashed;
+
+  /// No description provided for @pluginFetchShimFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'fetch 兼容库加载失败：{message}'**
+  String pluginFetchShimFailed(String message);
+
+  /// No description provided for @pluginUnknownCall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未知的插件调用：{method}'**
+  String pluginUnknownCall(String method);
+
+  /// No description provided for @pluginScriptMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件脚本缺失'**
+  String get pluginScriptMissing;
+
+  /// No description provided for @pluginMemoryLimitExceeded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'插件内存占用超过 {limit} 限制，已终止'**
+  String pluginMemoryLimitExceeded(String limit);
+
+  /// No description provided for @ccmixterEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'ccMixter 返回了空响应'**
+  String get ccmixterEmptyResponse;
+
+  /// No description provided for @ccmixterFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get ccmixterFieldLimit;
+
+  /// No description provided for @ccmixterFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 15，最大 30'**
+  String get ccmixterFieldLimitHint;
+
+  /// No description provided for @ccmixterFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描标签'**
+  String get ccmixterFieldQuery;
+
+  /// No description provided for @ccmixterFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、ambient、electro'**
+  String get ccmixterFieldQueryHint;
+
+  /// No description provided for @ccmixterHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 ccMixter 标签，例如 jazz、ambient 或 electro'**
+  String get ccmixterHint;
+
+  /// No description provided for @ccmixterNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的 ccMixter 曲目'**
+  String get ccmixterNoMatch;
+
+  /// No description provided for @itunesEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'iTunes API 返回了空响应'**
+  String get itunesEmptyResponse;
+
+  /// No description provided for @itunesFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get itunesFieldLimit;
+
+  /// No description provided for @itunesFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 20，最大 50'**
+  String get itunesFieldLimitHint;
+
+  /// No description provided for @itunesFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get itunesFieldQuery;
+
+  /// No description provided for @itunesFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、piano、lo-fi'**
+  String get itunesFieldQueryHint;
+
+  /// No description provided for @itunesHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写搜索关键词，例如 jazz、piano 或 lo-fi'**
+  String get itunesHint;
+
+  /// No description provided for @itunesNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的 iTunes 曲目'**
+  String get itunesNoMatch;
+
+  /// No description provided for @podcastRssEmptyFeed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅地址返回了空内容'**
+  String get podcastRssEmptyFeed;
+
+  /// No description provided for @podcastRssFieldFeed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅地址'**
+  String get podcastRssFieldFeed;
+
+  /// No description provided for @podcastRssFieldFeedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://example.com/podcast.xml'**
+  String get podcastRssFieldFeedHint;
+
+  /// No description provided for @podcastRssFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描集数'**
+  String get podcastRssFieldLimit;
+
+  /// No description provided for @podcastRssFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 20，最大 100'**
+  String get podcastRssFieldLimitHint;
+
+  /// No description provided for @podcastRssHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写播客订阅地址（RSS）'**
+  String get podcastRssHint;
+
+  /// No description provided for @podcastRssInvalidFeed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅地址返回了无法解析的 XML：{error}'**
+  String podcastRssInvalidFeed(String error);
+
+  /// No description provided for @podcastRssNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅源里没有可播放的单集'**
+  String get podcastRssNoMatch;
+
+  /// No description provided for @sourceCcmixterDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Creative Commons 混音与开放音乐曲库'**
+  String get sourceCcmixterDescription;
+
+  /// No description provided for @sourceItunesDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Apple Music 目录的 30 秒试听片段'**
+  String get sourceItunesDescription;
+
+  /// No description provided for @sourcePodcastRssDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把任意 RSS 播客订阅变成可播放的单集'**
+  String get sourcePodcastRssDescription;
+
+  /// No description provided for @sourcePodcastRssName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播客订阅'**
+  String get sourcePodcastRssName;
+
+  /// No description provided for @sourceSubsonicDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接自建的 Navidrome / Subsonic 音乐库'**
+  String get sourceSubsonicDescription;
+
+  /// No description provided for @subsonicAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接音乐服务器，请检查地址与账号'**
+  String get subsonicAuthFailed;
+
+  /// No description provided for @subsonicEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐服务器返回了空响应'**
+  String get subsonicEmptyResponse;
+
+  /// No description provided for @subsonicError.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐服务器返回错误：{error}'**
+  String subsonicError(String error);
+
+  /// No description provided for @subsonicFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get subsonicFieldLimit;
+
+  /// No description provided for @subsonicFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 25，最大 100'**
+  String get subsonicFieldLimitHint;
+
+  /// No description provided for @subsonicFieldPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码'**
+  String get subsonicFieldPassword;
+
+  /// No description provided for @subsonicFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用于计算访问令牌，不会明文发送'**
+  String get subsonicFieldPasswordHint;
+
+  /// No description provided for @subsonicFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词（可选）'**
+  String get subsonicFieldQuery;
+
+  /// No description provided for @subsonicFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、piano'**
+  String get subsonicFieldQueryHint;
+
+  /// No description provided for @subsonicFieldServer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器地址'**
+  String get subsonicFieldServer;
+
+  /// No description provided for @subsonicFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:4533'**
+  String get subsonicFieldServerHint;
+
+  /// No description provided for @subsonicFieldUser.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用户名'**
+  String get subsonicFieldUser;
+
+  /// No description provided for @subsonicFieldUserHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建音乐库的登录用户名'**
+  String get subsonicFieldUserHint;
+
+  /// No description provided for @subsonicHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写自建音乐库的地址与账号，例如 http://localhost:4533'**
+  String get subsonicHint;
+
+  /// No description provided for @subsonicNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的曲目'**
+  String get subsonicNoMatch;
 }
 
 class _AppLocalizationsDelegate

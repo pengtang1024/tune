@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 
@@ -31,17 +32,21 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       config.setting('clientId') != null;
 
   @override
-  String get configurationHint => '在 developer.jamendo.com 免费申请 Client ID 后填入';
+  String get configurationHint => AppStrings.instance.jamendoHint;
 
   @override
-  List<MusicSourceField> get configurationFields => const [
+  List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'clientId',
-      'Client ID',
-      '在 developer.jamendo.com 免费申请',
+      AppStrings.instance.jamendoFieldClientId,
+      AppStrings.instance.jamendoFieldClientIdHint,
       required: true,
     ),
-    MusicSourceField('query', '搜索关键词（可选）', '例如 jazz、electronic'),
+    MusicSourceField(
+      'query',
+      AppStrings.instance.jamendoFieldQuery,
+      AppStrings.instance.jamendoFieldQueryHint,
+    ),
   ];
 
   @override
@@ -81,7 +86,7 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(sourceId, 'Jamendo 返回了空响应');
+        return failedResult(sourceId, AppStrings.instance.jamendoEmptyResponse);
       }
 
       final songs = parseResults(data, sourceId: sourceId);
@@ -89,7 +94,7 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
         sourceId: sourceId,
         status: SourceScanStatus.success,
         songs: songs,
-        message: songs.isEmpty ? '没有找到匹配的 Jamendo 曲目' : null,
+        message: songs.isEmpty ? AppStrings.instance.jamendoNoMatch : null,
       );
     } catch (error) {
       return failedResult(sourceId, error);

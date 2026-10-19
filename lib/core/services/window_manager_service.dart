@@ -39,7 +39,9 @@ class WindowManagerService with WindowListener {
         titleBarStyle: TitleBarStyle.normal,
       );
 
-      Log.info('窗口选项设置完成，最小尺寸: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}');
+      Log.info(
+        '窗口选项设置完成，最小尺寸: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}',
+      );
 
       // 注册事件监听（替代 Timer 轮询）
       windowManager.addListener(instance);
@@ -96,11 +98,15 @@ class WindowManagerService with WindowListener {
   /// 设置窗口最小尺寸
   static Future<void> setMinimumSize() async {
     if (kIsWeb || !(PlatformConstants.isDesktop)) return;
-    Log.info('设置窗口最小尺寸为: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}');
-    await windowManager.setMinimumSize(const Size(
-      PlatformConstants.desktopWindowMinWidth,
-      PlatformConstants.desktopWindowMinHeight,
-    ));
+    Log.info(
+      '设置窗口最小尺寸为: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}',
+    );
+    await windowManager.setMinimumSize(
+      const Size(
+        PlatformConstants.desktopWindowMinWidth,
+        PlatformConstants.desktopWindowMinHeight,
+      ),
+    );
   }
 
   /// 设置窗口最大尺寸

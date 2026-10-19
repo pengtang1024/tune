@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
@@ -43,7 +44,9 @@ class PlayerDock extends ConsumerWidget {
               Expanded(
                 flex: 3,
                 child: InkWell(
-                  onTap: song == null ? null : () => context.push('/now-playing'),
+                  onTap: song == null
+                      ? null
+                      : () => context.push('/now-playing'),
                   borderRadius: BorderRadius.circular(12),
                   child: Row(
                     children: [
@@ -62,7 +65,7 @@ class PlayerDock extends ConsumerWidget {
                             Text(
                               song?.title.isNotEmpty == true
                                   ? song!.title
-                                  : '选择一首歌开始',
+                                  : context.loc.playerNoSongTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.titleMedium?.copyWith(
@@ -76,9 +79,9 @@ class PlayerDock extends ConsumerWidget {
                                 Expanded(
                                   child: Text(
                                     song == null
-                                        ? 'TUNE · READY'
+                                        ? context.loc.playerDockReady
                                         : (song.artist.isEmpty
-                                              ? 'UNKNOWN ARTIST'
+                                              ? context.loc.playerUnknownArtist
                                               : song.artist),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -123,7 +126,7 @@ class PlayerDock extends ConsumerWidget {
                         const SizedBox(width: 8),
                         _DockIcon(
                           icon: Icons.skip_previous_rounded,
-                          tooltip: '上一首',
+                          tooltip: context.loc.playerPrevious,
                           size: 20,
                           onPressed: state.hasTrack
                               ? controller.previous
@@ -139,7 +142,7 @@ class PlayerDock extends ConsumerWidget {
                         const SizedBox(width: 4),
                         _DockIcon(
                           icon: Icons.skip_next_rounded,
-                          tooltip: '下一首',
+                          tooltip: context.loc.playerNext,
                           size: 20,
                           onPressed: state.hasTrack ? controller.next : null,
                         ),
@@ -189,7 +192,9 @@ class PlayerDock extends ConsumerWidget {
                   children: [
                     if (!narrow) ...[
                       IconButton(
-                        tooltip: state.volume > 0 ? '静音' : '恢复音量',
+                        tooltip: state.volume > 0
+                            ? context.loc.playerMute
+                            : context.loc.playerUnmute,
                         onPressed: () =>
                             controller.setVolume(state.volume > 0 ? 0 : 1),
                         icon: Icon(
@@ -212,13 +217,13 @@ class PlayerDock extends ConsumerWidget {
                     ],
                     _DockIcon(
                       icon: Icons.queue_music_rounded,
-                      tooltip: '播放队列',
+                      tooltip: context.loc.playerQueue,
                       size: 19,
                       onPressed: () => context.go('/queue'),
                     ),
                     _DockIcon(
                       icon: Icons.open_in_full_rounded,
-                      tooltip: '正在播放',
+                      tooltip: context.loc.playerNowPlaying,
                       size: 17,
                       onPressed: song == null
                           ? null
@@ -268,7 +273,9 @@ class _PlayButton extends StatelessWidget {
       width: 34,
       height: 34,
       child: IconButton.filled(
-        tooltip: state.isPlaying ? '暂停' : '播放',
+        tooltip: state.isPlaying
+            ? context.loc.playerPause
+            : context.loc.playerPlay,
         onPressed: onPressed,
         padding: EdgeInsets.zero,
         style: IconButton.styleFrom(
@@ -341,9 +348,9 @@ class _ModeButton extends StatelessWidget {
     };
     return Tooltip(
       message: switch (state.playMode) {
-        PlayMode.sequential => '列表循环',
-        PlayMode.repeatOne => '单曲循环',
-        PlayMode.shuffle => '随机播放',
+        PlayMode.sequential => context.loc.playerPlayModeSequential,
+        PlayMode.repeatOne => context.loc.playerPlayModeRepeatOne,
+        PlayMode.shuffle => context.loc.playerPlayModeShuffle,
       },
       child: InkWell(
         onTap: onPressed,

@@ -7,7 +7,7 @@ Tune은 Flutter로 만든 간결한 로컬 및 온라인 음악 플레이어입�
 ## 기능
 
 - 로컬 음악 폴더 스캔, 검색, 영구 저장
-- 온라인 음원: Openverse, Jamendo, Internet Archive, 자체 NeteaseCloudMusicApi
+- 온라인 음원: Openverse, Jamendo, Internet Archive, ccMixter, iTunes 미리듣기, 팟캐스트 RSS, 자체 NeteaseCloudMusicApi 또는 Navidrome/Subsonic
 - 재생 대기열 추가·삭제·드래그 정렬·비우기
 - 재생/일시정지, 이전/다음, 탐색, 볼륨, 반복 모드
 - 음원별 라이브러리 필터, 원격 곡의 음원 표시와 커버

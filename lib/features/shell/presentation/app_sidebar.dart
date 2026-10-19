@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 
 class AppSidebar extends StatelessWidget {
   final String currentPath;
@@ -52,7 +53,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.library_music_rounded,
-                        label: '音乐库',
+                        label: context.loc.navLibrary,
                         path: '/library',
                         currentPath: currentPath,
                         compact: compact,
@@ -60,7 +61,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 4),
                       _NavItem(
                         icon: Icons.queue_music_rounded,
-                        label: '播放队列',
+                        label: context.loc.navQueue,
                         path: '/queue',
                         currentPath: currentPath,
                         compact: compact,
@@ -70,7 +71,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.podcasts_rounded,
-                        label: '音源',
+                        label: context.loc.navSources,
                         path: '/sources',
                         currentPath: currentPath,
                         compact: compact,
@@ -78,7 +79,7 @@ class AppSidebar extends StatelessWidget {
                       const Spacer(),
                       _NavItem(
                         icon: Icons.tune_rounded,
-                        label: '设置',
+                        label: context.loc.navSettings,
                         path: '/settings',
                         currentPath: currentPath,
                         compact: compact,

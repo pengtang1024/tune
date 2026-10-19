@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/shared/ui/page_heading.dart';
 
@@ -17,10 +18,10 @@ class SourcesPane extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const PageHeading(
+            PageHeading(
               eyebrow: 'CONNECTIONS',
-              title: '音源',
-              subtitle: '在线曲库与扫描目录',
+              title: context.loc.sourcesTitle,
+              subtitle: context.loc.sourcesSubtitle,
             ),
             const SizedBox(height: 24),
             const MusicSourcesSection(),

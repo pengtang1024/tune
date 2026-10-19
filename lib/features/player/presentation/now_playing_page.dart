@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
@@ -63,16 +64,19 @@ class NowPlayingPage extends ConsumerWidget {
                               state: state,
                               song: state.currentSong!,
                               sourceName:
-                                  sourceLabel(state.currentSong!, sourceNames) ??
-                                  '本地音乐',
+                                  sourceLabel(
+                                    state.currentSong!,
+                                    sourceNames,
+                                  ) ??
+                                  context.loc.nowPlayingLocalMusic,
                               onPrevious: controller.previous,
                               onNext: controller.next,
                               onTogglePlay: controller.togglePlayPause,
                               onSeek: (value) => controller.seekTo(
                                 Duration(
-                                  milliseconds: (state.duration.inMilliseconds *
-                                          value)
-                                      .round(),
+                                  milliseconds:
+                                      (state.duration.inMilliseconds * value)
+                                          .round(),
                                 ),
                               ),
                             ),
@@ -101,7 +105,7 @@ class _TopBar extends StatelessWidget {
       children: [
         _RoundButton(
           icon: Icons.keyboard_arrow_down_rounded,
-          tooltip: '收起',
+          tooltip: context.loc.playerCollapse,
           onPressed: () => context.canPop() ? context.pop() : null,
         ),
         const SizedBox(width: 14),
@@ -110,7 +114,7 @@ class _TopBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '正在播放',
+              context.loc.playerNowPlaying,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -130,7 +134,7 @@ class _TopBar extends StatelessWidget {
         const Spacer(),
         _RoundButton(
           icon: Icons.queue_music_rounded,
-          tooltip: '播放队列',
+          tooltip: context.loc.playerQueue,
           onPressed: () => context.go('/queue'),
         ),
       ],
@@ -241,7 +245,7 @@ class _Title extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Text(
-      song.title.isEmpty ? '未命名曲目' : song.title,
+      song.title.isEmpty ? context.loc.nowPlayingUnnamedTrack : song.title,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: theme.textTheme.displayMedium?.copyWith(
@@ -262,7 +266,9 @@ class _Artist extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final artist = song.artist.isEmpty ? '未知艺术家' : song.artist;
+    final artist = song.artist.isEmpty
+        ? context.loc.playerUnknownArtist
+        : song.artist;
     final details = <String>[
       if (song.album.isNotEmpty) song.album,
       if (song.year != null) song.year.toString(),
@@ -390,7 +396,7 @@ class _Transport extends StatelessWidget {
       children: [
         _RoundButton(
           icon: Icons.skip_previous_rounded,
-          tooltip: '上一首',
+          tooltip: context.loc.playerPrevious,
           size: 24,
           onPressed: state.hasTrack ? onPrevious : null,
         ),
@@ -399,7 +405,9 @@ class _Transport extends StatelessWidget {
           width: 56,
           height: 56,
           child: IconButton.filled(
-            tooltip: state.isPlaying ? '暂停' : '播放',
+            tooltip: state.isPlaying
+                ? context.loc.playerPause
+                : context.loc.playerPlay,
             onPressed: state.hasTrack && !state.isLoading ? onTogglePlay : null,
             padding: EdgeInsets.zero,
             style: IconButton.styleFrom(
@@ -430,7 +438,7 @@ class _Transport extends StatelessWidget {
         const SizedBox(width: 10),
         _RoundButton(
           icon: Icons.skip_next_rounded,
-          tooltip: '下一首',
+          tooltip: context.loc.playerNext,
           size: 24,
           onPressed: state.hasTrack ? onNext : null,
         ),
@@ -472,7 +480,7 @@ class _Footer extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          '队列 ${state.queue.length} 首',
+          context.loc.playerQueueSummary(state.queue.length),
           style: TextStyle(
             fontFamily: 'JetBrains Mono',
             fontSize: 9,
@@ -517,7 +525,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '还没有播放的曲目',
+            context.loc.nowPlayingEmptyTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontFamily: 'Fraunces',
               fontSize: 22,
@@ -525,7 +533,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '从音乐库里挑一首开始',
+            context.loc.nowPlayingEmptySubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

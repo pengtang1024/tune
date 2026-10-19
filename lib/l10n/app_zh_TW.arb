@@ -1,40 +1,742 @@
 {
   "@@locale": "zh_TW",
-  "@@last_modified": "2024-05-21T10:00:00.000Z",
-  "good_morning": "早上好",
-  "good_afternoon": "下午好",
-  "good_evening": "晚上好",
-  "welcome_to_tune": "歡迎使用Tune",
-  "see_all": "查看全部",
-  "no_recent_songs": "暫無最近播放的歌曲",
-  "quick_actions": "快速操作",
-  "my_songs": "我的歌曲",
-  "favorites": "收藏",
-  "playlists": "播放列表",
-  "radio": "電台",
-  "app_name": "Tune",
-  "no_songs_found": "未找到歌曲",
-  "settings": "設定",
+  "appName": "Tune",
+  "appTagline": "本機優先的桌面音樂播放器",
+  "appStartFailed": "Tune 啟動失敗",
+  "cancel": "取消",
+  "ok": "確定",
+  "save": "儲存",
+  "delete": "刪除",
+  "remove": "移除",
+  "clear": "清空",
+  "close": "關閉",
   "retry": "重試",
-  "home": "首頁",
-  "library": "音樂庫",
+  "confirm": "確認",
+  "chooseFile": "選擇檔案",
+  "unknownError": "未知錯誤",
+  "scanNow": "立即掃描",
   "search": "搜尋",
-  "player": "播放器",
+  "scanning": "掃描中",
   "about": "關於",
-  "songs": "首歌曲",
-  "music_scan": "音樂掃描",
-  "scan_local_music": "掃描本地音樂",
-  "search_songs": "搜尋歌曲...",
-  "add_to_library": "添加到音樂庫",
-  "scan_completed_no_new_songs": "掃描完成，未找到新歌曲",
-  "rescan": "重新掃描",
-  "tag_vip": "VIP",
-  "tag_singer": "歌手",
-  "tag_elite": "精英",
-  "general_tab": "常規",
-  "library_tab": "音樂庫",
-  "account_tab": "帳戶",
-  "playback_tab": "播放",
-  "equalizer_tab": "均衡器",
-  "animations_tab": "動畫"
+  "language": "語言",
+  "theme": "主題",
+  "lightMode": "淺色模式",
+  "darkMode": "深色模式",
+  "systemMode": "跟隨系統",
+  "musicLibrary": "音樂庫",
+  "navLibrary": "音樂庫",
+  "navQueue": "播放佇列",
+  "navSources": "音源",
+  "navSettings": "設定",
+  "libraryTitle": "音樂庫",
+  "librarySubtitle": "本地與線上音源的全部曲目",
+  "libraryClearSearch": "清除搜尋",
+  "libraryFilterSources": "篩選來源",
+  "libraryAllSources": "全部來源",
+  "libraryScanAllSources": "掃描全部音源",
+  "libraryTrackCount": "{count} 首",
+  "@libraryTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryNoMatchTitle": "沒有符合的歌曲",
+  "libraryNoMatchSubtitle": "換個關鍵字，或清除搜尋條件",
+  "librarySourceEmptyTitle": "該來源暫無歌曲",
+  "librarySourceEmptySubtitle": "切換到全部來源，或重新掃描該音源",
+  "libraryViewAllSources": "查看全部來源",
+  "libraryScanningTitle": "正在掃描音樂",
+  "libraryEmptyTitle": "還沒有音樂",
+  "libraryEmptySubtitle": "掃描本地目錄或已啟用的線上音源，也可以在設定中調整音源。",
+  "libraryLoadFailedTitle": "音樂庫載入失敗",
+  "libraryAddedToQueue": "已加入播放佇列",
+  "libraryScanPaths": "掃描目錄：{paths}",
+  "@libraryScanPaths": {
+    "placeholders": {
+      "paths": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryAddToQueue": "加入播放佇列",
+  "queueTitle": "播放佇列",
+  "queueSubtitle": "目前播放順序",
+  "queueEmptyTitle": "播放佇列是空的",
+  "queueEmptySubtitle": "從音樂庫選擇歌曲，或把歌曲加入佇列",
+  "queueGoToLibrary": "去音樂庫",
+  "queueClearTitle": "清空播放佇列？",
+  "queueClearMessage": "目前播放會停止，佇列中的歌曲不會從音樂庫刪除。",
+  "playerNowPlaying": "正在播放",
+  "playerCollapse": "收起",
+  "playerPrevious": "上一首",
+  "playerNext": "下一首",
+  "playerPlay": "播放",
+  "playerPause": "暫停",
+  "playerMute": "靜音",
+  "playerUnmute": "恢復音量",
+  "playerQueue": "播放佇列",
+  "playerPlayModeSequential": "清單循環",
+  "playerPlayModeRepeatOne": "單曲循環",
+  "playerPlayModeShuffle": "隨機播放",
+  "playerNoSongTitle": "選擇一首歌開始",
+  "playerUnknownArtist": "未知藝術家",
+  "playerDockReady": "Tune · 就緒",
+  "playerQueueSummary": "佇列 {count} 首",
+  "@playerQueueSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nowPlayingEmptyTitle": "還沒有播放的曲目",
+  "nowPlayingEmptySubtitle": "從音樂庫裡挑一首開始",
+  "nowPlayingUnnamedTrack": "未命名曲目",
+  "nowPlayingLocalMusic": "本機音樂",
+  "trackUnknownTitle": "未知歌曲",
+  "playbackFailed": "播放失敗: {error}",
+  "@playbackFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackPauseFailed": "暫停失敗: {error}",
+  "@playbackPauseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackResumeFailed": "繼續播放失敗: {error}",
+  "@playbackResumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSeekFailed": "跳轉失敗: {error}",
+  "@playbackSeekFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackVolumeFailed": "設定音量失敗: {error}",
+  "@playbackVolumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSpeedFailed": "設定速度失敗: {error}",
+  "@playbackSpeedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "audioSourceLocal": "本機檔案",
+  "audioSourceDownloading": "下載中 {percent}%",
+  "@audioSourceDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "audioSourceCached": "已快取",
+  "audioSourceFailed": "下載失敗",
+  "routerNotFoundTitle": "頁面不存在",
+  "routerBackToLibrary": "返回音樂庫",
+  "sourcesTitle": "音源",
+  "sourcesSubtitle": "線上曲庫與掃描目錄",
+  "sourcesAutoScan": "啟動時自動掃描",
+  "sourcesAutoScanDescription": "所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。",
+  "sourcesScanAll": "掃描全部音源",
+  "sourcesImportPlugin": "匯入外掛",
+  "sourcesScanMayTakeSeconds": "含遠端音源時可能需要數秒",
+  "sourcesScanCompleted": "掃描已完成",
+  "sourcesImportPluginTitle": "匯入音樂外掛",
+  "sourcesImportPluginMessage": "外掛是第三方 JavaScript 程式碼，會在應用程式內執行並可存取網路。請只匯入你信任的來源。匯入後需要填寫搜尋關鍵字才會啟用。",
+  "sourcesPluginUnreadable": "無法讀取外掛檔案",
+  "sourcesPluginTooLarge": "外掛檔案不能超過 2 MB",
+  "sourcesPluginImportedEnabled": "已匯入並啟用 {name}",
+  "@sourcesPluginImportedEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImported": "已匯入 {name}，填寫關鍵字並開啟後會參與掃描",
+  "@sourcesPluginImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImportFailed": "匯入外掛失敗：{error}",
+  "@sourcesPluginImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginActions": "外掛操作",
+  "sourcesConfigure": "設定",
+  "sourcesDeletePlugin": "刪除外掛",
+  "sourcesUnsupported": "目前版本不支援該音源",
+  "sourcesDisabled": "已關閉",
+  "sourcesNeedsConfiguration": "需要設定",
+  "sourcesNeedsConfigurationHint": "需要設定：{hint}",
+  "@sourcesNeedsConfigurationHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesLastScan": "上次掃描 {time}",
+  "@sourcesLastScan": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesAutoScanLocal": "啟動後自動掃描本機目錄",
+  "sourcesWaitingFirstScan": "等待首次掃描",
+  "sourcesScannedCount": "已掃描 {count} 首 · {time}",
+  "@sourcesScannedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesSkipped": "已跳過",
+  "sourcesScanFailed": "掃描失敗",
+  "sourcesDeletePluginTitle": "刪除外掛？",
+  "sourcesDeletePluginMessage": "將刪除 {name} 的指令碼、設定以及已掃描的歌曲。",
+  "@sourcesDeletePluginMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleted": "已刪除 {name}",
+  "@sourcesDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceKindLocal": "本機",
+  "sourceKindOpenCatalog": "開放曲庫",
+  "sourceKindOpenApi": "API",
+  "sourceKindPlugin": "外掛",
+  "sourcesConfigureTitle": "設定 {name}",
+  "@sourcesConfigureTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldRequired": "請填寫{label}",
+  "@sourcesFieldRequired": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldNumeric": "請輸入數字",
+  "sourcesNotLoaded": "音源列表尚未載入完成",
+  "sourcesPlatformNoPlugin": "目前平台不支援 JavaScript 外掛",
+  "sourcesUpdatePlugin": "更新外掛",
+  "sourcesPluginUpdated": "{name} 已更新至 {version}",
+  "@sourcesPluginUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpToDate": "{name} 已是最新版本",
+  "@sourcesPluginUpToDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpdateFailed": "更新外掛失敗：{error}",
+  "@sourcesPluginUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTitle": "設定",
+  "settingsSubtitle": "調整外觀、語言和本機音樂庫。",
+  "settingsThemeDescription": "選擇介面的明暗風格和顯示語言。",
+  "settingsLanguageDescription": "介面文字和系統選單語言",
+  "settingsLibraryDescription": "Tune 只會在這些目錄中尋找音訊檔案。",
+  "settingsDefaultPath": "預設",
+  "settingsNoDefaultFolder": "找不到預設音樂目錄",
+  "settingsCustomPath": "自訂",
+  "settingsAddFolder": "新增資料夾",
+  "settingsClearLibrary": "清空音樂庫",
+  "settingsScanSafetyNote": "掃描只讀取音訊檔案，不會修改或刪除磁碟內容。",
+  "settingsAboutTitle": "關於 Tune",
+  "settingsChooseFolder": "選擇音樂資料夾",
+  "settingsFolderAdded": "已新增掃描目錄",
+  "settingsScanDone": "掃描完成",
+  "settingsClearLibraryTitle": "清空音樂庫？",
+  "settingsClearLibraryMessage": "只會清除 Tune 的掃描記錄，不會刪除磁碟上的音樂檔案。",
+  "settingsLibraryCleared": "音樂庫已清空",
+  "settingsPathsCount": "{count} 個目錄",
+  "@settingsPathsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnlineTitle": "線上搜尋",
+  "searchOnlineHint": "搜尋線上音源，例如 jazz、鋼琴、lo-fi",
+  "searchOnlineDescription": "搜尋已啟用的線上音源；結果不會寫入音樂庫",
+  "searchOnlinePrompt": "搜尋線上音源",
+  "searchOnlinePromptDescription": "輸入關鍵字後按 Enter；Openverse、Jamendo、Internet Archive 與已匯入的外掛會同時搜尋。",
+  "searchNoResults": "沒有結果",
+  "searchNoResultsDescription": "換個關鍵字再試一次。",
+  "searchNoMatch": "沒有找到符合的歌曲",
+  "searchNoMatchDescription": "換個關鍵字再試一次。",
+  "searchSearching": "正在搜尋「{query}」",
+  "@searchSearching": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultCount": "{count} 首",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchPlayAll": "播放全部",
+  "searchAddToQueue": "加入佇列",
+  "searchAddedToQueue": "已加入佇列：{title}",
+  "@searchAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoSourcesEnabled": "沒有啟用線上音源，請先在設定中開啟",
+  "searchFailedShort": "搜尋失敗",
+  "searchFailed": "線上搜尋失敗：{error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPreparing": "準備掃描...",
+  "scanNoEnabledSources": "沒有啟用的音源",
+  "scanNoLocalFolders": "沒有可掃描的音樂目錄",
+  "scanProgressPercent": "掃描中 {percent}%",
+  "@scanProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "scanAllSourcesFailed": "所有音源掃描失敗",
+  "scanFailed": "掃描失敗: {error}",
+  "@scanFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "clearLibraryFailed": "清空音樂庫失敗: {error}",
+  "@clearLibraryFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoAudioFiles": "找不到音訊檔案",
+  "scanSongCount": "已掃描 {count} 首歌曲",
+  "@scanSongCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSongCountShort": "{count} 首歌曲",
+  "@scanSongCountShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSourceNotConfigured": "音源尚未設定",
+  "scanCachedTooSoon": "已保留快取，距上次掃描不足間隔",
+  "scanSummary": "已掃描 {sources} 個音源，共 {songs} 首歌曲",
+  "@scanSummary": {
+    "placeholders": {
+      "songs": {
+        "type": "int"
+      },
+      "sources": {
+        "type": "int"
+      }
+    }
+  },
+  "scanUpdated": "已更新 {songs} 首歌曲，{failed} 個音源失敗",
+  "@scanUpdated": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      },
+      "songs": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorForbidden": "存取被拒絕（HTTP {status}）",
+  "@sourceErrorForbidden": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorRateLimited": "請求過於頻繁（HTTP 429），請稍後再試",
+  "sourceErrorHttpStatus": "介面回傳 HTTP {status}",
+  "@sourceErrorHttpStatus": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorTimeout": "網路連線逾時",
+  "sourceErrorConnection": "無法連線到音源服務",
+  "sourceErrorCertificate": "憑證驗證失敗",
+  "sourceErrorCancelled": "請求已取消",
+  "sourceErrorNetwork": "網路請求失敗：{message}",
+  "@sourceErrorNetwork": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorPluginLoad": "外掛載入失敗：{message}",
+  "@sourceErrorPluginLoad": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorUnsupported": "暫不支援該音源",
+  "sourceErrorScanInterval": "距上次掃描不足 {interval}",
+  "@sourceErrorScanInterval": {
+    "placeholders": {
+      "interval": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorScanTimeout": "掃描逾時（{seconds}s）",
+  "@sourceErrorScanTimeout": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalHours": "{count} 小時",
+  "@intervalHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalMinutes": "{count} 分鐘",
+  "@intervalMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "localSourceHint": "在音樂庫設定中新增掃描目錄",
+  "localSourceNotConfigured": "未設定本機音樂目錄",
+  "pluginSourceHint": "填寫一個搜尋關鍵字，例如 周杰倫、piano 或 jazz",
+  "pluginFieldQuery": "搜尋關鍵字",
+  "pluginFieldHint": "例如 周杰倫、piano、jazz",
+  "pluginImportedVersion": "匯入的 MusicFree 外掛 · v{version}",
+  "@pluginImportedVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginVariable": "外掛變數 {key}",
+  "@pluginVariable": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginFileMissing": "外掛檔案不存在，請重新匯入",
+  "pluginRuntimeUnsupported": "目前平台不支援 JavaScript 音樂外掛，請在桌面端或行動端匯入",
+  "pluginCompatLibrary": "外掛相容函式庫",
+  "pluginBridgeScript": "外掛橋接指令碼",
+  "pluginInit": "外掛初始化",
+  "pluginScript": "外掛指令碼",
+  "pluginExports": "外掛匯出",
+  "pluginNoExports": "外掛沒有匯出有效的 module.exports",
+  "pluginIncomplete": "外掛不完整：需要 platform 和 search 方法",
+  "pluginNoMediaSource": "外掛未實作 getMediaSource",
+  "pluginNoStream": "外掛沒有回傳可播放網址",
+  "pluginRuntimeClosed": "外掛執行環境已關閉",
+  "pluginCallFailed": "{label} 失敗：{message}",
+  "@pluginCallFailed": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginCallTimeout": "外掛呼叫逾時",
+  "pluginUnknownData": "外掛回傳了無法辨識的資料",
+  "pluginCallError": "外掛呼叫失敗",
+  "pluginNoMatch": "沒有找到符合的歌曲",
+  "pluginNoStreamResults": "外掛回傳了 {count} 個結果，但沒有可播放網址",
+  "@pluginNoStreamResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "neteaseHint": "填寫自建的 NeteaseCloudMusicApi 位址，例如 http://localhost:3000",
+  "neteaseFieldApi": "API 位址",
+  "neteaseFieldQuery": "搜尋關鍵字",
+  "neteaseFieldHint": "例如 熱門、周杰倫",
+  "neteaseFieldLimit": "每次掃描數量",
+  "neteaseFieldLimitHint": "預設 20，最大 50",
+  "neteaseHotKeyword": "熱門",
+  "neteaseEmptyResponse": "網易雲 API 回傳了空回應",
+  "neteaseNoMatch": "沒有找到符合的歌曲",
+  "neteaseNoStream": "介面未回傳可播放網址（可能需要在伺服器端登入或受版權限制）",
+  "openverseHint": "填寫一個掃描關鍵字，例如 piano、ambient 或 jazz",
+  "openverseFieldQuery": "掃描關鍵字",
+  "openverseFieldHint": "例如 piano、ambient、jazz",
+  "openverseEmptyResponse": "Openverse 回傳了空回應",
+  "openverseNoMatch": "沒有找到符合的開放音訊",
+  "sourceLocalName": "本機音樂",
+  "sourceLocalDescription": "掃描裝置上的音樂檔案夾",
+  "sourceOpenverseDescription": "開放版權音頻聚合：Jamendo、Freesound、Wikimedia 等",
+  "sourceJamendoDescription": "獨立音樂開放曲庫，需要免費 Client ID",
+  "sourceInternetArchiveDescription": "互聯網檔案館的開放音頻收藏",
+  "sourceNeteaseName": "網易雲音樂 API",
+  "sourceNeteaseDescription": "連結自建的 NeteaseCloudMusicApi 服務",
+  "jamendoHint": "在 developer.jamendo.com 免費申請 Client ID 後填入",
+  "jamendoFieldClientId": "Client ID",
+  "jamendoFieldClientIdHint": "在 developer.jamendo.com 免費申請",
+  "jamendoFieldQuery": "搜尋關鍵字（可選）",
+  "jamendoFieldQueryHint": "例如 jazz、electronic",
+  "jamendoEmptyResponse": "Jamendo 回傳了空回應",
+  "jamendoNoMatch": "沒有找到符合的 Jamendo 曲目",
+  "internetArchiveHint": "填寫 Internet Archive 收錄條件，例如 collection:netlabels AND mediatype:audio",
+  "internetArchiveFieldQuery": "收錄條件",
+  "internetArchiveFieldLimit": "每次掃描數量",
+  "internetArchiveFieldLimitHint": "預設 8，最大 20",
+  "internetArchiveInvalidResponse": "Internet Archive 回傳了無法識別的回應",
+  "internetArchiveNoMatch": "沒有找到可播放的归檔音訊",
+  "downloadUnsupportedPlatform": "目前平台沒有檔案系統，無法待處下載",
+  "audioLoadFailed": "音訊載入失敗",
+  "audioPathEmpty": "音訊檔案路徑為空",
+  "pluginUpdateNoUrl": "該外掛沒有記錄下載網址，無法檢查更新",
+  "sourcesPluginUrlDownloadFailed": "下載外掛失敗：{error}",
+  "@sourcesPluginUrlDownloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginStepFailed": "{label} \\u5931\\u6557\\uff1a{error}",
+  "@pluginStepFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesImportPluginFromUrl": "從 URL 匯入",
+  "sourcesPluginUrlTitle": "外掛網址",
+  "sourcesPluginUrlHint": "https://example.com/plugin.js",
+  "sourcesPluginUrlInvalid": "請輸入有效的 http(s) 連結",
+  "pluginUrlInvalid": "外掛網址無效，請使用 http 或 https 連結",
+  "pluginUrlEmpty": "外掛腳本內容為空",
+  "pluginUrlTooLarge": "外掛腳本超過大小限制",
+  "pluginSandboxStartFailed": "外掛沙箱啟動失敗：{error}",
+  "@pluginSandboxStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSandboxStartTimeout": "外掛沙箱啟動逾時",
+  "pluginScriptTooLarge": "外掛腳本超過 {limit} KB 限制",
+  "@pluginScriptTooLarge": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginRuntimeTerminated": "外掛執行環境已終止",
+  "pluginRuntimeTimeLimit": "外掛執行環境已超過執行時間上限",
+  "pluginSandboxNotReady": "外掛沙箱尚未就緒",
+  "pluginCallTimeoutDetailed": "外掛呼叫逾時（{seconds}s）",
+  "@pluginCallTimeoutDetailed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pluginRuntimeCrashed": "外掛執行環境已崩潰",
+  "pluginFetchShimFailed": "fetch 相容函式庫載入失敗：{message}",
+  "@pluginFetchShimFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUnknownCall": "未知的外掛呼叫：{method}",
+  "@pluginUnknownCall": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginScriptMissing": "外掛腳本缺失",
+  "pluginMemoryLimitExceeded": "外掛記憶體用量超過 {limit} 限制，已終止",
+  "@pluginMemoryLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "ccmixterEmptyResponse": "ccMixter 回傳了空回應",
+  "ccmixterFieldLimit": "每次掃描數量",
+  "ccmixterFieldLimitHint": "預設 15，最大 30",
+  "ccmixterFieldQuery": "掃描標籤",
+  "ccmixterFieldQueryHint": "例如 jazz、ambient、electro",
+  "ccmixterHint": "填寫 ccMixter 標籤，例如 jazz、ambient 或 electro",
+  "ccmixterNoMatch": "找不到符合的 ccMixter 曲目",
+  "itunesEmptyResponse": "iTunes API 回傳了空回應",
+  "itunesFieldLimit": "每次掃描數量",
+  "itunesFieldLimitHint": "預設 20，最大 50",
+  "itunesFieldQuery": "搜尋關鍵字",
+  "itunesFieldQueryHint": "例如 jazz、piano、lo-fi",
+  "itunesHint": "填寫搜尋關鍵字，例如 jazz、piano 或 lo-fi",
+  "itunesNoMatch": "找不到符合的 iTunes 曲目",
+  "podcastRssEmptyFeed": "訂閱網址回傳了空內容",
+  "podcastRssFieldFeed": "訂閱網址",
+  "podcastRssFieldFeedHint": "例如 https://example.com/podcast.xml",
+  "podcastRssFieldLimit": "每次掃描集數",
+  "podcastRssFieldLimitHint": "預設 20，最大 100",
+  "podcastRssHint": "填寫 podcast 訂閱網址（RSS）",
+  "podcastRssInvalidFeed": "訂閱網址回傳了無法解析的 XML：{error}",
+  "@podcastRssInvalidFeed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastRssNoMatch": "訂閱來源裡沒有可播放的單集",
+  "sourceCcmixterDescription": "Creative Commons 混音與開放音樂曲庫",
+  "sourceItunesDescription": "Apple Music 目錄的 30 秒試聽片段",
+  "sourcePodcastRssDescription": "把任意 RSS podcast 訂閱變成可播放的單集",
+  "sourcePodcastRssName": "Podcast 訂閱",
+  "sourceSubsonicDescription": "連線自建的 Navidrome / Subsonic 音樂庫",
+  "subsonicAuthFailed": "無法連線音樂伺服器，請檢查位址與帳號",
+  "subsonicEmptyResponse": "音樂伺服器回傳了空回應",
+  "subsonicError": "音樂伺服器回傳錯誤：{error}",
+  "@subsonicError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "subsonicFieldLimit": "每次掃描數量",
+  "subsonicFieldLimitHint": "預設 25，最大 100",
+  "subsonicFieldPassword": "密碼",
+  "subsonicFieldPasswordHint": "用於計算存取權杖，不會明文傳送",
+  "subsonicFieldQuery": "搜尋關鍵字（可選）",
+  "subsonicFieldQueryHint": "例如 jazz、piano",
+  "subsonicFieldServer": "伺服器位址",
+  "subsonicFieldServerHint": "例如 http://localhost:4533",
+  "subsonicFieldUser": "使用者名稱",
+  "subsonicFieldUserHint": "自建音樂庫的登入使用者名稱",
+  "subsonicHint": "填寫自建音樂庫的位址與帳號，例如 http://localhost:4533",
+  "subsonicNoMatch": "找不到符合的曲目"
 }

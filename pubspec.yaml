@@ -63,6 +63,12 @@ dependencies:
   # Network requests
   dio: ^5.4.0
 
+  # RSS parsing for the podcast source
+  xml: ^6.6.1
+
+  # Token signing for the Subsonic source
+  crypto: ^3.0.7
+
   # Routing
   go_router: ^16.1.0
 

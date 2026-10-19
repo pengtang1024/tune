@@ -1,25 +1,742 @@
 {
   "@@locale": "fr",
-  "@@last_modified": "2024-05-21T10:00:00.000Z",
-  "good_morning": "Bonjour",
-  "good_afternoon": "Bon après-midi",
-  "good_evening": "Bonsoir",
-  "welcome_to_tune": "Bienvenue dans Tune",
-  "see_all": "Tout voir",
-  "no_recent_songs": "Aucune chanson récemment jouée",
-  "quick_actions": "Actions rapides",
-  "my_songs": "Mes chansons",
-  "favorites": "Favoris",
-  "playlists": "Listes de lecture",
-  "radio": "Radio",
-  "music_scan": "Scan musical",
-  "tag_vip": "VIP",
-  "tag_singer": "Chanteur",
-  "tag_elite": "Élite",
-  "general_tab": "Général",
-  "library_tab": "Bibliothèque",
-  "account_tab": "Compte",
-  "playback_tab": "Lecture",
-  "equalizer_tab": "Égaliseur",
-  "animations_tab": "Animations"
+  "appName": "Tune",
+  "appTagline": "Un lecteur de musique local d’abord",
+  "appStartFailed": "Échec du démarrage de Tune",
+  "cancel": "Annuler",
+  "ok": "OK",
+  "save": "Enregistrer",
+  "delete": "Supprimer",
+  "remove": "Retirer",
+  "clear": "Vider",
+  "close": "Fermer",
+  "retry": "Réessayer",
+  "confirm": "Confirmer",
+  "chooseFile": "Choisir un fichier",
+  "unknownError": "Erreur inconnue",
+  "scanNow": "Scanner maintenant",
+  "search": "Rechercher",
+  "scanning": "Analyse en cours",
+  "about": "À propos",
+  "language": "Langue",
+  "theme": "Thème",
+  "lightMode": "Mode clair",
+  "darkMode": "Mode sombre",
+  "systemMode": "Suivre le système",
+  "musicLibrary": "Bibliothèque",
+  "navLibrary": "Bibliothèque",
+  "navQueue": "File d’attente",
+  "navSources": "Sources",
+  "navSettings": "Paramètres",
+  "libraryTitle": "Bibliothèque",
+  "librarySubtitle": "Tous les titres de vos sources locales et en ligne",
+  "libraryClearSearch": "Effacer la recherche",
+  "libraryFilterSources": "Filtrer les sources",
+  "libraryAllSources": "Toutes les sources",
+  "libraryScanAllSources": "Analyser toutes les sources",
+  "libraryTrackCount": "{count} titres",
+  "@libraryTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryNoMatchTitle": "Aucun titre correspondant",
+  "libraryNoMatchSubtitle": "Essayez un autre mot-clé ou effacez la recherche",
+  "librarySourceEmptyTitle": "Aucun titre pour cette source",
+  "librarySourceEmptySubtitle": "Passez à toutes les sources ou rescanez celle-ci",
+  "libraryViewAllSources": "Afficher toutes les sources",
+  "libraryScanningTitle": "Analyse de la musique",
+  "libraryEmptyTitle": "Aucune musique pour l’instant",
+  "libraryEmptySubtitle": "Analysez un dossier local ou une source en ligne activée, ou ajustez vos sources dans les paramètres.",
+  "libraryLoadFailedTitle": "Impossible de charger la bibliothèque",
+  "libraryAddedToQueue": "Ajouté à la file d’attente",
+  "libraryScanPaths": "Dossiers analysés : {paths}",
+  "@libraryScanPaths": {
+    "placeholders": {
+      "paths": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryAddToQueue": "Ajouter à la file d’attente",
+  "queueTitle": "File d’attente",
+  "queueSubtitle": "Ordre de lecture actuel",
+  "queueEmptyTitle": "La file d’attente est vide",
+  "queueEmptySubtitle": "Choisissez un titre dans la bibliothèque ou ajoutez des titres à la file",
+  "queueGoToLibrary": "Aller à la bibliothèque",
+  "queueClearTitle": "Vider la file d’attente ?",
+  "queueClearMessage": "La lecture s’arrête. Les titres restent dans la bibliothèque.",
+  "playerNowPlaying": "Lecture en cours",
+  "playerCollapse": "Réduire",
+  "playerPrevious": "Titre précédent",
+  "playerNext": "Titre suivant",
+  "playerPlay": "Lire",
+  "playerPause": "Pause",
+  "playerMute": "Muet",
+  "playerUnmute": "Réactiver le son",
+  "playerQueue": "File d’attente",
+  "playerPlayModeSequential": "Tout répéter",
+  "playerPlayModeRepeatOne": "Répéter le titre",
+  "playerPlayModeShuffle": "Aléatoire",
+  "playerNoSongTitle": "Choisissez un titre pour commencer",
+  "playerUnknownArtist": "Artiste inconnu",
+  "playerDockReady": "Tune · PRÊT",
+  "playerQueueSummary": "{count} dans la file",
+  "@playerQueueSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nowPlayingEmptyTitle": "Aucune lecture en cours",
+  "nowPlayingEmptySubtitle": "Choisissez un titre dans la bibliothèque",
+  "nowPlayingUnnamedTrack": "Titre sans nom",
+  "nowPlayingLocalMusic": "Musique locale",
+  "trackUnknownTitle": "Titre inconnu",
+  "playbackFailed": "Échec de la lecture : {error}",
+  "@playbackFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackPauseFailed": "Impossible de mettre en pause : {error}",
+  "@playbackPauseFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackResumeFailed": "Impossible de reprendre : {error}",
+  "@playbackResumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSeekFailed": "Impossible de se déplacer : {error}",
+  "@playbackSeekFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackVolumeFailed": "Impossible de régler le volume : {error}",
+  "@playbackVolumeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackSpeedFailed": "Impossible de régler la vitesse : {error}",
+  "@playbackSpeedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "audioSourceLocal": "Fichier local",
+  "audioSourceDownloading": "Téléchargement {percent}%",
+  "@audioSourceDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "audioSourceCached": "Prêt hors ligne",
+  "audioSourceFailed": "Échec du téléchargement",
+  "routerNotFoundTitle": "Page introuvable",
+  "routerBackToLibrary": "Retour à la bibliothèque",
+  "sourcesTitle": "Sources",
+  "sourcesSubtitle": "Catalogues en ligne et dossiers analysés",
+  "sourcesAutoScan": "Analyser au démarrage",
+  "sourcesAutoScanDescription": "Chaque source active est actualisée au démarrage. Un échec n’altère jamais la bibliothèque locale.",
+  "sourcesScanAll": "Analyser toutes les sources",
+  "sourcesImportPlugin": "Importer un plugin",
+  "sourcesScanMayTakeSeconds": "Les sources distantes peuvent prendre quelques secondes",
+  "sourcesScanCompleted": "Analyse terminée",
+  "sourcesImportPluginTitle": "Importer un plugin musical",
+  "sourcesImportPluginMessage": "Les plugins sont du JavaScript tiers. Ils s’exécutent dans l’application et peuvent accéder au réseau. N’importez que des sources de confiance. Un plugin reste désactivé tant que vous n’avez pas défini de mot-clé.",
+  "sourcesPluginUnreadable": "Impossible de lire le fichier du plugin",
+  "sourcesPluginTooLarge": "Le fichier du plugin ne peut pas dépasser 2 Mo",
+  "sourcesPluginImportedEnabled": "{name} importé et activé",
+  "@sourcesPluginImportedEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImported": "{name} importé. Il participe à l’analyse dès que vous ajoutez un mot-clé et l’activez",
+  "@sourcesPluginImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginImportFailed": "Échec de l’import du plugin : {error}",
+  "@sourcesPluginImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginActions": "Actions du plugin",
+  "sourcesConfigure": "Configurer",
+  "sourcesDeletePlugin": "Supprimer le plugin",
+  "sourcesUnsupported": "Cette source n’est pas prise en charge dans cette version",
+  "sourcesDisabled": "Désactivée",
+  "sourcesNeedsConfiguration": "Configuration requise",
+  "sourcesNeedsConfigurationHint": "Configuration requise : {hint}",
+  "@sourcesNeedsConfigurationHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesLastScan": "Dernière analyse {time}",
+  "@sourcesLastScan": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesAutoScanLocal": "Les dossiers locaux sont analysés au démarrage",
+  "sourcesWaitingFirstScan": "En attente de la première analyse",
+  "sourcesScannedCount": "{count} titres · {time}",
+  "@sourcesScannedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesSkipped": "Ignorée",
+  "sourcesScanFailed": "Échec de l’analyse",
+  "sourcesDeletePluginTitle": "Supprimer le plugin ?",
+  "sourcesDeletePluginMessage": "Cela supprime le script, les réglages et les titres analysés de {name}.",
+  "@sourcesDeletePluginMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleted": "{name} supprimé",
+  "@sourcesDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceKindLocal": "Local",
+  "sourceKindOpenCatalog": "Catalogue ouvert",
+  "sourceKindOpenApi": "API",
+  "sourceKindPlugin": "Plugin",
+  "sourcesConfigureTitle": "Configurer {name}",
+  "@sourcesConfigureTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldRequired": "Veuillez renseigner {label}",
+  "@sourcesFieldRequired": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldNumeric": "Veuillez saisir un nombre",
+  "sourcesNotLoaded": "La liste des sources est encore en cours de chargement",
+  "sourcesPlatformNoPlugin": "Cette plateforme ne prend pas en charge les plugins JavaScript",
+  "sourcesUpdatePlugin": "Mettre à jour le plugin",
+  "sourcesPluginUpdated": "{name} a été mis à jour vers {version}",
+  "@sourcesPluginUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpToDate": "{name} est déjà à jour",
+  "@sourcesPluginUpToDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesPluginUpdateFailed": "Échec de la mise à jour du plugin : {error}",
+  "@sourcesPluginUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTitle": "Paramètres",
+  "settingsSubtitle": "Ajustez l’apparence, la langue et la bibliothèque locale.",
+  "settingsThemeDescription": "Choisissez l’apparence de l’interface et sa langue.",
+  "settingsLanguageDescription": "Langue de l’interface et des menus système",
+  "settingsLibraryDescription": "Tune recherche les fichiers audio dans ces dossiers uniquement.",
+  "settingsDefaultPath": "Par défaut",
+  "settingsNoDefaultFolder": "Aucun dossier musical par défaut trouvé",
+  "settingsCustomPath": "Personnalisé",
+  "settingsAddFolder": "Ajouter un dossier",
+  "settingsClearLibrary": "Vider la bibliothèque",
+  "settingsScanSafetyNote": "L’analyse se contente de lire les fichiers audio. Rien n’est modifié ni supprimé sur le disque.",
+  "settingsAboutTitle": "À propos de Tune",
+  "settingsChooseFolder": "Choisir un dossier musical",
+  "settingsFolderAdded": "Dossier d’analyse ajouté",
+  "settingsScanDone": "Analyse terminée",
+  "settingsClearLibraryTitle": "Vider la bibliothèque ?",
+  "settingsClearLibraryMessage": "Seul l’historique d’analyse de Tune est effacé. Les fichiers audio du disque sont conservés.",
+  "settingsLibraryCleared": "Bibliothèque vidée",
+  "settingsPathsCount": "{count} chemins",
+  "@settingsPathsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchOnlineTitle": "Rechercher en ligne",
+  "searchOnlineHint": "Recherchez dans les sources en ligne, p. ex. jazz, piano, lo-fi",
+  "searchOnlineDescription": "Recherche dans vos sources en ligne activées. Les résultats ne sont pas enregistrés dans la bibliothèque.",
+  "searchOnlinePrompt": "Rechercher dans les sources en ligne",
+  "searchOnlinePromptDescription": "Saisissez un mot-clé puis appuyez sur Entrée. Openverse, Jamendo, Internet Archive et les plugins importés sont interrogés en parallèle.",
+  "searchNoResults": "Aucun résultat",
+  "searchNoResultsDescription": "Essayez un autre mot-clé.",
+  "searchNoMatch": "Aucun titre correspondant",
+  "searchNoMatchDescription": "Essayez un autre mot-clé.",
+  "searchSearching": "Recherche de « {query} »",
+  "@searchSearching": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultCount": "{count} titres",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchPlayAll": "Tout lire",
+  "searchAddToQueue": "Ajouter à la file",
+  "searchAddedToQueue": "Ajouté à la file d’attente : {title}",
+  "@searchAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoSourcesEnabled": "Aucune source en ligne n’est activée. Activez-en une dans les paramètres.",
+  "searchFailedShort": "Échec de la recherche",
+  "searchFailed": "Échec de la recherche en ligne : {error}",
+  "@searchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPreparing": "Préparation de l’analyse…",
+  "scanNoEnabledSources": "Aucune source activée",
+  "scanNoLocalFolders": "Aucun dossier musical à analyser",
+  "scanProgressPercent": "Analyse {percent}%",
+  "@scanProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "scanAllSourcesFailed": "Toutes les sources ont échoué",
+  "scanFailed": "Échec de l’analyse : {error}",
+  "@scanFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "clearLibraryFailed": "Impossible de vider la bibliothèque : {error}",
+  "@clearLibraryFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoAudioFiles": "Aucun fichier audio trouvé",
+  "scanSongCount": "{count} titres analysés",
+  "@scanSongCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSongCountShort": "{count} titres",
+  "@scanSongCountShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanSourceNotConfigured": "La source n’est pas encore configurée",
+  "scanCachedTooSoon": "Cache conservée, la dernière analyse est trop récente",
+  "scanSummary": "{sources} sources analysées, {songs} titres au total",
+  "@scanSummary": {
+    "placeholders": {
+      "songs": {
+        "type": "int"
+      },
+      "sources": {
+        "type": "int"
+      }
+    }
+  },
+  "scanUpdated": "{songs} titres mis à jour, échec de {failed} sources",
+  "@scanUpdated": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      },
+      "songs": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorForbidden": "Accès refusé (HTTP {status})",
+  "@sourceErrorForbidden": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorRateLimited": "Trop de requêtes (HTTP 429). Réessayez plus tard.",
+  "sourceErrorHttpStatus": "Le service a renvoyé HTTP {status}",
+  "@sourceErrorHttpStatus": {
+    "placeholders": {
+      "status": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceErrorTimeout": "Délai de connexion dépassé",
+  "sourceErrorConnection": "Impossible de joindre le service de la source",
+  "sourceErrorCertificate": "Impossible de vérifier le certificat",
+  "sourceErrorCancelled": "La requête a été annulée",
+  "sourceErrorNetwork": "Échec de la requête réseau : {message}",
+  "@sourceErrorNetwork": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorPluginLoad": "Impossible de charger le plugin : {message}",
+  "@sourceErrorPluginLoad": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorUnsupported": "Cette source n’est pas encore prise en charge",
+  "sourceErrorScanInterval": "La dernière analyse date de moins de {interval}",
+  "@sourceErrorScanInterval": {
+    "placeholders": {
+      "interval": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceErrorScanTimeout": "L’analyse a expiré après {seconds} s",
+  "@sourceErrorScanTimeout": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalHours": "{count} heures",
+  "@intervalHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intervalMinutes": "{count} minutes",
+  "@intervalMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "localSourceHint": "Ajoutez un dossier d’analyse dans les paramètres de la bibliothèque",
+  "localSourceNotConfigured": "Aucun dossier musical local configuré",
+  "pluginSourceHint": "Renseignez un mot-clé, p. ex. un artiste, piano ou jazz",
+  "pluginFieldQuery": "Mot-clé de recherche",
+  "pluginFieldHint": "p. ex. artiste, piano, jazz",
+  "pluginImportedVersion": "Plugin MusicFree importé · v{version}",
+  "@pluginImportedVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginVariable": "Variable du plugin {key}",
+  "@pluginVariable": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginFileMissing": "Le fichier du plugin est introuvable. Importez-le à nouveau.",
+  "pluginRuntimeUnsupported": "Cette plateforme ne prend pas en charge les plugins JavaScript. Importez-les sur ordinateur ou mobile.",
+  "pluginCompatLibrary": "Bibliothèque de compatibilité des plugins",
+  "pluginBridgeScript": "Script de pont du plugin",
+  "pluginInit": "Initialisation du plugin",
+  "pluginScript": "Script du plugin",
+  "pluginExports": "Exports du plugin",
+  "pluginNoExports": "Le plugin n’exporte pas de module.exports valide",
+  "pluginIncomplete": "Le plugin est incomplet : les méthodes platform et search manquent",
+  "pluginNoMediaSource": "Le plugin n’implémente pas getMediaSource",
+  "pluginNoStream": "Le plugin n’a renvoyé aucune adresse lisible",
+  "pluginRuntimeClosed": "L’environnement du plugin est fermé",
+  "pluginCallFailed": "Échec de {label} : {message}",
+  "@pluginCallFailed": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginCallTimeout": "L’appel du plugin a expiré",
+  "pluginUnknownData": "Le plugin a renvoyé des données illisibles",
+  "pluginCallError": "Échec de l’appel du plugin",
+  "pluginNoMatch": "Aucun titre correspondant",
+  "pluginNoStreamResults": "Le plugin a renvoyé {count} résultats, mais aucune adresse lisible",
+  "@pluginNoStreamResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "neteaseHint": "Indiquez l’adresse de votre propre NeteaseCloudMusicApi, p. ex. http://localhost:3000",
+  "neteaseFieldApi": "Adresse de l’API",
+  "neteaseFieldQuery": "Mot-clé de recherche",
+  "neteaseFieldHint": "p. ex. tendance, un artiste",
+  "neteaseFieldLimit": "Titres par analyse",
+  "neteaseFieldLimitHint": "20 par défaut, 50 au maximum",
+  "neteaseHotKeyword": "Tendances",
+  "neteaseEmptyResponse": "L’API NetEase a renvoyé une réponse vide",
+  "neteaseNoMatch": "Aucun titre correspondant",
+  "neteaseNoStream": "Le service n’a renvoyé aucune adresse lisible. Une connexion au serveur peut être nécessaire.",
+  "openverseHint": "Saisissez un mot-clé, p. ex. piano, ambient ou jazz",
+  "openverseFieldQuery": "Mot-clé",
+  "openverseFieldHint": "p. ex. piano, ambient, jazz",
+  "openverseEmptyResponse": "Openverse a renvoyé une réponse vide",
+  "openverseNoMatch": "Aucun audio ouvert correspondant",
+  "sourceLocalName": "Musique locale",
+  "sourceLocalDescription": "Analyse les dossiers musicaux de cet appareil",
+  "sourceOpenverseDescription": "Audio ouvert de Jamendo, Freesound, Wikimedia et plus encore",
+  "sourceJamendoDescription": "Un catalogue ouvert de musique indépendante. Nécessite un Client ID gratuit.",
+  "sourceInternetArchiveDescription": "La collection audio ouverte de l’Internet Archive",
+  "sourceNeteaseName": "API NetEase Cloud Music",
+  "sourceNeteaseDescription": "Se connecte à un service NeteaseCloudMusicApi auto-hébergé",
+  "jamendoHint": "Obtenez un Client ID gratuit sur developer.jamendo.com",
+  "jamendoFieldClientId": "Client ID",
+  "jamendoFieldClientIdHint": "Demandez-en un gratuitement sur developer.jamendo.com",
+  "jamendoFieldQuery": "Mot-clé (facultatif)",
+  "jamendoFieldQueryHint": "p. ex. jazz, electronic",
+  "jamendoEmptyResponse": "Jamendo a renvoyé une réponse vide",
+  "jamendoNoMatch": "Aucun titre Jamendo correspondant",
+  "internetArchiveHint": "Saisissez une requête Internet Archive, p. ex. collection:netlabels AND mediatype:audio",
+  "internetArchiveFieldQuery": "Requête",
+  "internetArchiveFieldLimit": "Titres par analyse",
+  "internetArchiveFieldLimitHint": "8 par défaut, 20 au maximum",
+  "internetArchiveInvalidResponse": "Internet Archive a renvoyé une réponse illisible",
+  "internetArchiveNoMatch": "Aucun audio d’archive lisible trouvé",
+  "downloadUnsupportedPlatform": "Cette plateforme n’a pas de système de fichiers, les téléchargements ne peuvent pas être mis en cache",
+  "audioLoadFailed": "Échec du chargement de l’audio",
+  "audioPathEmpty": "Le chemin du fichier audio est vide",
+  "pluginUpdateNoUrl": "Le plugin n’a pas d’adresse de téléchargement, il ne peut pas vérifier les mises à jour",
+  "sourcesPluginUrlDownloadFailed": "Impossible de télécharger le plugin : {error}",
+  "@sourcesPluginUrlDownloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginStepFailed": "\\u00c9chec de {label} : {error}",
+  "@pluginStepFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesImportPluginFromUrl": "Importer depuis une URL",
+  "sourcesPluginUrlTitle": "URL du plugin",
+  "sourcesPluginUrlHint": "https://example.com/plugin.js",
+  "sourcesPluginUrlInvalid": "Veuillez saisir un lien http(s) valide",
+  "pluginUrlInvalid": "L’adresse du plugin est invalide, utilisez un lien http ou https",
+  "pluginUrlEmpty": "Le script du plugin est vide",
+  "pluginUrlTooLarge": "Le script du plugin dépasse la taille maximale",
+  "pluginSandboxStartFailed": "Le bac à sable du plugin n’a pas démarré : {error}",
+  "@pluginSandboxStartFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSandboxStartTimeout": "Le bac à sable du plugin a expirué au démarrage",
+  "pluginScriptTooLarge": "Le script du plugin dépasse la limite de {limit} Ko",
+  "@pluginScriptTooLarge": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginRuntimeTerminated": "L’environnement du plugin a été interrompu",
+  "pluginRuntimeTimeLimit": "L’environnement du plugin a dépassé son limite de temps",
+  "pluginSandboxNotReady": "Le bac à sable du plugin n’est pas encore prêt",
+  "pluginCallTimeoutDetailed": "L’appel du plugin a expirué après {seconds} s",
+  "@pluginCallTimeoutDetailed": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pluginRuntimeCrashed": "L’environnement du plugin a planté",
+  "pluginFetchShimFailed": "Le shim fetch n’a pas pu être chargé : {message}",
+  "@pluginFetchShimFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUnknownCall": "Appel de plugin inconnu : {method}",
+  "@pluginUnknownCall": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginScriptMissing": "Le script du plugin est introuvable",
+  "pluginMemoryLimitExceeded": "Le plugin a dépassé la limite de {limit} et a été interrompu",
+  "@pluginMemoryLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "ccmixterEmptyResponse": "ccMixter a renvoyé une réponse vide",
+  "ccmixterFieldLimit": "Morceaux par analyse",
+  "ccmixterFieldLimitHint": "15 par défaut, 30 au maximum",
+  "ccmixterFieldQuery": "Tag de recherche",
+  "ccmixterFieldQueryHint": "par exemple jazz, ambient, electro",
+  "ccmixterHint": "Saisissez un tag ccMixter, par exemple jazz, ambient ou electro",
+  "ccmixterNoMatch": "Aucun morceau ccMixter correspondant",
+  "itunesEmptyResponse": "L'API iTunes a renvoyé une réponse vide",
+  "itunesFieldLimit": "Morceaux par analyse",
+  "itunesFieldLimitHint": "20 par défaut, 50 au maximum",
+  "itunesFieldQuery": "Mot-clé",
+  "itunesFieldQueryHint": "par exemple jazz, piano, lo-fi",
+  "itunesHint": "Saisissez un mot-clé, par exemple jazz, piano ou lo-fi",
+  "itunesNoMatch": "Aucun morceau iTunes correspondant",
+  "podcastRssEmptyFeed": "L'adresse du flux a renvoyé un document vide",
+  "podcastRssFieldFeed": "Adresse du flux",
+  "podcastRssFieldFeedHint": "par exemple https://example.com/podcast.xml",
+  "podcastRssFieldLimit": "Épisodes par analyse",
+  "podcastRssFieldLimitHint": "20 par défaut, 100 au maximum",
+  "podcastRssHint": "Saisissez l'adresse d'un flux podcast (RSS)",
+  "podcastRssInvalidFeed": "L'adresse du flux a renvoyé un XML illisible : {error}",
+  "@podcastRssInvalidFeed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastRssNoMatch": "Le flux ne contient aucun épisode lisible",
+  "sourceCcmixterDescription": "Remixes Creative Commons et musique libre",
+  "sourceItunesDescription": "Extraits de 30 secondes du catalogue Apple Music",
+  "sourcePodcastRssDescription": "Transforme un flux RSS de podcast en épisodes jouables",
+  "sourcePodcastRssName": "Podcasts",
+  "sourceSubsonicDescription": "Se connecte à une bibliothèque Navidrome ou Subsonic auto-hébergée",
+  "subsonicAuthFailed": "Impossible de joindre le serveur de musique, vérifiez l'adresse et le compte",
+  "subsonicEmptyResponse": "Le serveur de musique a renvoyé une réponse vide",
+  "subsonicError": "Le serveur de musique signale une erreur : {error}",
+  "@subsonicError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "subsonicFieldLimit": "Morceaux par analyse",
+  "subsonicFieldLimitHint": "25 par défaut, 100 au maximum",
+  "subsonicFieldPassword": "Mot de passe",
+  "subsonicFieldPasswordHint": "Signe le jeton d'accès et n'est jamais envoyé en clair",
+  "subsonicFieldQuery": "Mot-clé (facultatif)",
+  "subsonicFieldQueryHint": "par exemple jazz, piano",
+  "subsonicFieldServer": "Adresse du serveur",
+  "subsonicFieldServerHint": "par exemple http://localhost:4533",
+  "subsonicFieldUser": "Nom d'utilisateur",
+  "subsonicFieldUserHint": "Le nom de connexion de votre serveur de musique",
+  "subsonicHint": "Saisissez l'adresse et le compte de votre serveur de musique, par exemple http://localhost:4533",
+  "subsonicNoMatch": "Aucun morceau correspondant"
 }

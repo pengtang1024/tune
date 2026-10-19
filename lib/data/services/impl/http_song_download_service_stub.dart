@@ -1,4 +1,5 @@
 import 'package:tune/data/services/downloads/song_download_service.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// Download store for platforms without a file system.
@@ -18,7 +19,7 @@ class HttpSongDownloadService implements SongDownloadService {
     Song song, {
     void Function(double progress)? onProgress,
   }) {
-    throw UnsupportedError('当前平台没有文件系统，无法缓存下载');
+    throw UnsupportedError(AppStrings.instance.downloadUnsupportedPlatform);
   }
 
   @override

@@ -7,7 +7,7 @@ Tune is a compact local and online music player built with Flutter. A persistent
 ## Features
 
 - Scan, search, and persist local music folders
-- Online sources: Openverse, Jamendo, Internet Archive, and self-hosted NeteaseCloudMusicApi
+- Online sources: Openverse, Jamendo, Internet Archive, ccMixter, iTunes previews, podcast RSS, and self-hosted NeteaseCloudMusicApi or Navidrome/Subsonic
 - Queue management with reorder, play-at-index, and clear
 - Play/pause, previous/next, seek, volume, and repeat modes
 - Filter the library by source; remote tracks show source and artwork

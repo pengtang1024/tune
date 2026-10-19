@@ -12,7 +12,7 @@ class MusicScannerConfig {
     '.aac',
     '.ogg',
   ];
-  
+
   // 获取默认音乐路径
   static List<String> getDefaultMusicPaths() {
     final paths = <String>[];
@@ -38,7 +38,7 @@ class MusicScannerConfig {
 
     return paths;
   }
-  
+
   // 获取移动平台音乐路径
   static List<String> getMobileMusicPaths() {
     if (Platform.isAndroid) {
@@ -48,13 +48,13 @@ class MusicScannerConfig {
     }
     return [];
   }
-  
+
   // 检查文件是否为音频文件
   static bool isAudioFile(String filePath) {
     final ext = path.extension(filePath).toLowerCase();
     return supportedAudioExtensions.contains(ext);
   }
-  
+
   // 验证路径是否安全，防止路径遍历攻击
   static bool isValidPath(String inputPath) {
     try {

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
@@ -41,7 +42,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final songs = await _storage.load();
     return LibraryState(
       songs: List.unmodifiable(songs),
-      statusMessage: songs.isEmpty ? null : '${songs.length} 首歌曲',
+      statusMessage: songs.isEmpty
+          ? null
+          : AppStrings.instance.scanSongCountShort(songs.length),
     );
   }
 
@@ -76,7 +79,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       _current.copyWith(
         scanStatus: LibraryScanStatus.scanning,
         scanProgress: 0,
-        statusMessage: '准备扫描...',
+        statusMessage: AppStrings.instance.scanPreparing,
         errorMessage: null,
       ),
     );
@@ -94,7 +97,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             scanStatus: LibraryScanStatus.error,
             isLoading: false,
             statusMessage: null,
-            errorMessage: '没有启用的音源',
+            errorMessage: AppStrings.instance.scanNoEnabledSources,
           ),
         );
         return;
@@ -107,7 +110,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             scanStatus: LibraryScanStatus.error,
             isLoading: false,
             statusMessage: null,
-            errorMessage: '没有可扫描的音乐目录',
+            errorMessage: AppStrings.instance.scanNoLocalFolders,
           ),
         );
         return;
@@ -132,7 +135,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         state = AsyncData(
           _current.copyWith(
             scanProgress: overall,
-            statusMessage: '扫描中 $percent%',
+            statusMessage: AppStrings.instance.scanProgressPercent(percent),
           ),
         );
       }
@@ -188,7 +191,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             needsConfigCount: needsConfigCount,
           ),
           errorMessage: successCount == 0 && failedCount > 0
-              ? '所有音源扫描失败'
+              ? AppStrings.instance.scanAllSourcesFailed
               : null,
           sourceSummaries: Map.unmodifiable(summaries),
         ),
@@ -201,7 +204,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           scanStatus: LibraryScanStatus.error,
           isLoading: false,
           statusMessage: null,
-          errorMessage: '扫描失败: $error',
+          errorMessage: AppStrings.instance.scanFailed('$error'),
         ),
       );
     }
@@ -259,7 +262,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       Log.error('清空音乐库失败: $error\n$stackTrace');
       if (_disposed) return;
       state = AsyncData(
-        _current.copyWith(isLoading: false, errorMessage: '清空音乐库失败: $error'),
+        _current.copyWith(
+          isLoading: false,
+          errorMessage: AppStrings.instance.clearLibraryFailed('$error'),
+        ),
       );
     }
   }
@@ -297,18 +303,26 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     required int needsConfigCount,
   }) {
     if (results.length == 1 && results.first.isSuccess) {
-      return songCount == 0 ? '未找到音频文件' : '已扫描 $songCount 首歌曲';
+      return songCount == 0
+          ? AppStrings.instance.scanNoAudioFiles
+          : AppStrings.instance.scanSongCount(songCount);
     }
     if (successCount == 0) {
-      if (failedCount > 0) return '所有音源扫描失败';
-      if (needsConfigCount > 0) return '音源尚未配置';
-      if (skippedCount > 0) return '已保留缓存，距上次扫描不足间隔';
+      if (failedCount > 0) return AppStrings.instance.scanAllSourcesFailed;
+      if (needsConfigCount > 0) {
+        return AppStrings.instance.scanSourceNotConfigured;
+      }
+      if (skippedCount > 0) return AppStrings.instance.scanCachedTooSoon;
     }
     if (failedCount == 0) {
-      return '已扫描 $successCount 个音源，共 $songCount 首歌曲';
+      // The generated getters order their parameters alphabetically:
+      // scanSummary(songs, sources).
+      return AppStrings.instance.scanSummary(songCount, successCount);
     }
-    if (successCount == 0) return '所有音源扫描失败';
-    return '已更新 $songCount 首歌曲，$failedCount 个音源失败';
+    if (successCount == 0) return AppStrings.instance.scanAllSourcesFailed;
+    // The generated getters order their parameters alphabetically:
+    // scanUpdated(failed, songs).
+    return AppStrings.instance.scanUpdated(failedCount, songCount);
   }
 
   Future<bool> _saveQuietly(List<Song> songs) async {

@@ -1,53 +1,105 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_js/extensions/fetch.dart';
-import 'package:flutter_js/flutter_js.dart';
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_limits.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_worker.dart';
 import 'package:tune/utils/logger.dart';
 
 const bool isPlatformRuntimeSupported = true;
 
 const _shimsAsset = 'assets/js/music_plugin_shims.js';
 const _bootstrapAsset = 'assets/js/music_plugin_bootstrap.js';
-const _invokeTimeout = Duration(seconds: 60);
+const _fetchPolyfillAsset = 'packages/flutter_js/assets/js/fetch.js';
+
+/// Longest grace period the application waits before it kills a stuck
+/// sandbox.
+///
+/// The sandbox reports a timeout on its own when a promise never settles; the
+/// grace period only covers a script that blocks the engine itself.
+const _maxKillGrace = Duration(seconds: 10);
 
 Future<MusicPluginRuntime> createPlatformMusicPluginRuntime() async {
-  final runtime = await IoMusicPluginRuntime.create();
-  return runtime;
+  return IoMusicPluginRuntime.create();
 }
 
-/// QuickJS-backed MusicFree plugin runtime.
+/// Runs a MusicFree plugin inside a sandbox isolate.
+///
+/// The JavaScript engine lives in its own isolate, so a plugin that hangs or
+/// allocates endlessly can be killed without freezing the application. The
+/// application isolate only exchanges JSON messages with it.
 class IoMusicPluginRuntime implements MusicPluginRuntime {
-  final JavascriptRuntime _runtime;
+  final MusicPluginLimits _limits;
+  Isolate? _worker;
+  late final ReceivePort _inbox;
+  late final ReceivePort _lifecycle;
+  final Completer<void> _ready = Completer<void>();
+  final Map<int, Completer<dynamic>> _pending = {};
+
+  SendPort? _commands;
   MusicPluginMetadata _metadata = const MusicPluginMetadata(platform: '');
-
-  /// QuickJS can only run one script at a time, so every public call is queued.
-  Future<void> _queue = Future<void>.value();
+  final DateTime _startedAt = DateTime.now();
+  int _nextId = 0;
   bool _disposed = false;
+  bool _broken = false;
+  String? _failureReason;
 
-  IoMusicPluginRuntime._(this._runtime);
+  IoMusicPluginRuntime._(this._limits) {
+    _inbox = ReceivePort();
+    _lifecycle = ReceivePort();
+    _lifecycle.listen(_handleLifecycle);
+  }
 
-  static Future<IoMusicPluginRuntime> create() async {
-    final runtime = getJavascriptRuntime(xhr: false);
-    await runtime.enableFetch();
-    runtime.enableHandlePromises();
+  /// Builds a runtime and waits until the sandbox is ready to take commands.
+  static Future<IoMusicPluginRuntime> create({
+    MusicPluginLimits limits = const MusicPluginLimits(),
+  }) async {
+    final shims = await rootBundle.loadString(_shimsAsset);
+    final bootstrap = await rootBundle.loadString(_bootstrapAsset);
+    final fetchPolyfill = await rootBundle.loadString(_fetchPolyfillAsset);
 
-    final instance = IoMusicPluginRuntime._(runtime);
+    final runtime = IoMusicPluginRuntime._(limits);
+    await runtime._start(shims, bootstrap, fetchPolyfill);
+    return runtime;
+  }
+
+  /// Spawns the sandbox and waits for its handshake.
+  Future<void> _start(
+    String shims,
+    String bootstrap,
+    String fetchPolyfill,
+  ) async {
     try {
-      await instance._evaluate(
-        await rootBundle.loadString(_shimsAsset),
-        label: '插件兼容库',
+      _worker = await Isolate.spawn(
+        musicPluginWorkerMain,
+        MusicPluginWorkerSetup(
+          replyTo: _inbox.sendPort,
+          shims: shims,
+          bootstrap: bootstrap,
+          fetchPolyfill: fetchPolyfill,
+          limits: _limits,
+        ),
+        onError: _lifecycle.sendPort,
+        onExit: _lifecycle.sendPort,
+        errorsAreFatal: true,
+        debugName: 'tune-music-plugin',
       );
-      await instance._evaluate(
-        await rootBundle.loadString(_bootstrapAsset),
-        label: '插件桥接脚本',
-      );
-      return instance;
-    } catch (_) {
-      runtime.dispose();
-      rethrow;
+    } catch (error) {
+      final message = AppStrings.instance.pluginSandboxStartFailed('$error');
+      _breakRuntime(message);
+      throw MusicPluginException(message);
+    }
+
+    _inbox.listen(_handleInbox);
+
+    try {
+      await _ready.future.timeout(const Duration(seconds: 20));
+    } on TimeoutException {
+      _breakRuntime(AppStrings.instance.pluginSandboxStartTimeout);
+      await dispose();
+      throw MusicPluginException(AppStrings.instance.pluginSandboxStartTimeout);
     }
   }
 
@@ -55,182 +107,211 @@ class IoMusicPluginRuntime implements MusicPluginRuntime {
   MusicPluginMetadata get metadata => _metadata;
 
   @override
-  Future<void> load(
-    String script, {
-    Map<String, String> userVariables = const {},
-  }) {
-    return _serialized(() async {
-      _metadata = const MusicPluginMetadata(platform: '');
-      await _evaluate(
-        'globalThis.module = { exports: {} }; '
-        'globalThis.exports = globalThis.module.exports; '
-        'globalThis.__TUNE_USER_VARIABLES = ${jsonEncode(userVariables)}; '
-        'true',
-        label: '插件初始化',
-      );
-      await _evaluate(script, label: '插件脚本');
-      await _evaluate(
-        'globalThis.__tune_plugin = globalThis.module.exports; '
-        'globalThis.__tune_metadata();',
-        label: '插件导出',
-      );
-
-      final raw = _runtime.evaluate('globalThis.__tune_metadata()');
-      if (raw.isError) {
-        throw MusicPluginException(raw.stringResult);
-      }
-      final decoded = jsonDecode(raw.stringResult);
-      if (decoded is! Map) {
-        throw const MusicPluginException('插件没有导出有效的 module.exports');
-      }
-      _metadata = MusicPluginMetadata.fromJson(
-        Map<String, dynamic>.from(decoded),
-      );
-      if (!_metadata.isValid) {
-        throw MusicPluginException('插件不完整：需要 platform 和 search 方法');
-      }
-    });
+  bool get isUsable {
+    if (_disposed || _broken) return false;
+    return DateTime.now().difference(_startedAt) <= _limits.runtimeBudget;
   }
 
   @override
-  Future<List<Map<String, dynamic>>> search(String query, {int page = 1}) {
-    return _serialized(() async {
-      final value = await _invoke('search', [query, page, 'music']);
-      final rawItems = value is List
-          ? value
-          : value is Map
-          ? value['data']
-          : null;
-      if (rawItems is! List) return const [];
-      return rawItems
-          .whereType<Map>()
-          .map((item) => Map<String, dynamic>.from(item))
-          .toList(growable: false);
+  Future<void> load(
+    String script, {
+    Map<String, String> userVariables = const {},
+  }) async {
+    if (script.length > _limits.maxScriptBytes) {
+      throw MusicPluginException(
+        AppStrings.instance.pluginScriptTooLarge(
+          '${_limits.maxScriptBytes ~/ 1024}',
+        ),
+      );
+    }
+
+    final value = await _request('load', {
+      'script': script,
+      'userVariables': userVariables,
     });
+    if (value is! Map) {
+      throw MusicPluginException(AppStrings.instance.pluginNoExports);
+    }
+
+    _metadata = MusicPluginMetadata.fromJson(Map<String, dynamic>.from(value));
+    if (!_metadata.isValid) {
+      throw MusicPluginException(AppStrings.instance.pluginIncomplete);
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> search(
+    String query, {
+    int page = 1,
+  }) async {
+    final value = await _request('search', {'query': query, 'page': page});
+    if (value is! List) return const [];
+    return value
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
   }
 
   @override
   Future<Map<String, dynamic>> getMediaSource(
     Map<String, dynamic> item, {
     String quality = 'standard',
-  }) {
-    return _serialized(() async {
-      if (!_metadata.hasMediaSource) {
-        final direct = item['url'];
-        if (direct is String && direct.isNotEmpty) return {'url': direct};
-        throw const MusicPluginException('插件未实现 getMediaSource');
-      }
-
-      final value = await _invoke('getMediaSource', [item, quality]);
-      if (value is String && value.isNotEmpty) return {'url': value};
-      if (value is Map && value['url'] is String) {
-        return Map<String, dynamic>.from(value);
-      }
-      throw const MusicPluginException('插件没有返回可播放地址');
+  }) async {
+    final value = await _request('getMediaSource', {
+      'item': item,
+      'quality': quality,
     });
+    if (value is! Map) {
+      throw MusicPluginException(AppStrings.instance.pluginNoStream);
+    }
+    return Map<String, dynamic>.from(value);
   }
 
   @override
-  Future<Map<String, dynamic>?> getLyric(Map<String, dynamic> item) {
-    return _serialized(() async {
-      if (!_metadata.hasLyric) return null;
-      final value = await _invoke('getLyric', [item]);
-      if (value is String) return {'rawLrc': value};
-      if (value is Map) return Map<String, dynamic>.from(value);
-      return null;
-    });
+  Future<Map<String, dynamic>?> getLyric(Map<String, dynamic> item) async {
+    final value = await _request('getLyric', {'item': item});
+    if (value is! Map) return null;
+    return Map<String, dynamic>.from(value);
   }
 
   @override
-  Future<Map<String, dynamic>?> getMusicInfo(Map<String, dynamic> item) {
-    return _serialized(() async {
-      if (!_metadata.hasMusicInfo) return null;
-      final value = await _invoke('getMusicInfo', [item]);
-      return value is Map ? Map<String, dynamic>.from(value) : null;
-    });
+  Future<Map<String, dynamic>?> getMusicInfo(Map<String, dynamic> item) async {
+    final value = await _request('getMusicInfo', {'item': item});
+    if (value is! Map) return null;
+    return Map<String, dynamic>.from(value);
   }
 
   @override
   Future<void> dispose() async {
     if (_disposed) return;
     _disposed = true;
-    try {
-      await _queue;
-    } catch (_) {
-      // A failed call must not prevent the runtime from being released.
+    _failPending(MusicPluginException(AppStrings.instance.pluginRuntimeClosed));
+    if (!_ready.isCompleted) {
+      _ready.completeError(
+        MusicPluginException(AppStrings.instance.pluginRuntimeClosed),
+      );
     }
-    try {
-      _runtime.dispose();
-    } catch (error, stackTrace) {
-      Log.error('释放音乐插件运行时失败: $error\n$stackTrace');
-    }
+    _commands?.send({'method': 'dispose'});
+    _worker?.kill(priority: Isolate.immediate);
+    _inbox.close();
+    _lifecycle.close();
   }
 
-  Future<T> _serialized<T>(Future<T> Function() action) {
-    final completer = Completer<T>();
-    _queue = _queue.then((_) async {
-      if (_disposed) {
-        completer.completeError(const MusicPluginException('插件运行时已关闭'));
-        return;
-      }
-      try {
-        completer.complete(await action());
-      } catch (error, stackTrace) {
-        completer.completeError(error, stackTrace);
-      }
+  /// Sends one command to the sandbox and waits for its answer.
+  Future<dynamic> _request(String method, Map<String, dynamic> payload) {
+    if (_disposed) {
+      return Future.error(
+        MusicPluginException(AppStrings.instance.pluginRuntimeClosed),
+      );
+    }
+    if (_broken) {
+      return Future.error(
+        MusicPluginException(
+          _failureReason ?? AppStrings.instance.pluginRuntimeTerminated,
+        ),
+      );
+    }
+    if (DateTime.now().difference(_startedAt) > _limits.runtimeBudget) {
+      _breakRuntime(AppStrings.instance.pluginRuntimeTimeLimit);
+      return Future.error(MusicPluginException(_failureReason!));
+    }
+
+    final commands = _commands;
+    if (commands == null) {
+      return Future.error(
+        MusicPluginException(AppStrings.instance.pluginSandboxNotReady),
+      );
+    }
+
+    final id = _nextId++;
+    final completer = Completer<dynamic>();
+    _pending[id] = completer;
+    commands.send({'id': id, 'method': method, ...payload});
+
+    final timer = Timer(_limits.callTimeout + _killGrace, () {
+      if (!_pending.containsKey(id)) return;
+      _breakRuntime(
+        AppStrings.instance.pluginCallTimeoutDetailed(
+          _limits.callTimeout.inSeconds,
+        ),
+      );
+      _worker?.kill(priority: Isolate.immediate);
     });
-    return completer.future;
+
+    return completer.future.whenComplete(timer.cancel);
   }
 
-  Future<void> _evaluate(String code, {required String label}) async {
-    final result = _runtime.evaluate(code);
-    if (result.isError) {
-      throw MusicPluginException('$label 失败：${result.stringResult}');
+  /// Time the application waits before it kills a stuck sandbox.
+  ///
+  /// The grace period only covers a script that blocks the engine itself; a
+  /// promise that never settles is reported by the sandbox on its own.
+  Duration get _killGrace {
+    final limit = _limits.callTimeout;
+    return limit < _maxKillGrace ? limit : _maxKillGrace;
+  }
+
+  /// Reads one message of the sandbox: the handshake, a fatal notice or the
+  /// answer of a command.
+  void _handleInbox(Object? message) {
+    if (message is! Map) return;
+
+    final commands = message['commands'];
+    if (commands is SendPort) {
+      _commands = commands;
+      if (!_ready.isCompleted) _ready.complete();
+      return;
+    }
+
+    final fatal = message['fatal'];
+    if (fatal is String) {
+      _breakRuntime(fatal);
+      return;
+    }
+
+    final id = message['id'];
+    if (id is! int) return;
+    final completer = _pending.remove(id);
+    if (completer == null || completer.isCompleted) return;
+
+    if (message['ok'] == true) {
+      completer.complete(message['value']);
+    } else {
+      completer.completeError(
+        MusicPluginException(
+          message['error']?.toString() ?? AppStrings.instance.pluginCallError,
+        ),
+      );
     }
   }
 
-  Future<dynamic> _invoke(String method, List<dynamic> args) async {
-    final code =
-        '''
-(async () => {
-  try {
-    const value = await globalThis.__tune_invoke(
-      ${jsonEncode(method)},
-      ${jsonEncode(args)}
-    );
-    return JSON.stringify({
-      ok: true,
-      value: value === undefined ? null : value
-    });
-  } catch (error) {
-    return JSON.stringify({
-      ok: false,
-      error: String((error && error.stack) || error)
-    });
+  /// Reacts to a crash or to an unexpected end of the sandbox.
+  void _handleLifecycle(Object? message) {
+    if (_disposed) return;
+    final reason = message is List && message.isNotEmpty
+        ? message.first.toString()
+        : AppStrings.instance.pluginRuntimeCrashed;
+    _breakRuntime(reason);
   }
-})()
-''';
 
-    final pending = _runtime.evaluate(code);
-    if (pending.isError) {
-      throw MusicPluginException(pending.stringResult);
+  /// Marks the runtime as dead and fails every waiting command.
+  void _breakRuntime(String reason) {
+    if (_broken) return;
+    _broken = true;
+    _failureReason = reason;
+    Log.error('音乐插件运行时已终止：$reason');
+    if (!_ready.isCompleted) {
+      _ready.completeError(MusicPluginException(reason));
     }
+    _failPending(MusicPluginException(reason));
+    _worker?.kill(priority: Isolate.immediate);
+  }
 
-    JsEvalResult resolved;
-    try {
-      resolved = await _runtime.handlePromise(pending, timeout: _invokeTimeout);
-    } on TimeoutException {
-      throw const MusicPluginException('插件调用超时');
+  void _failPending(Object error) {
+    if (_pending.isEmpty) return;
+    final pending = Map<int, Completer<dynamic>>.from(_pending);
+    _pending.clear();
+    for (final completer in pending.values) {
+      if (!completer.isCompleted) completer.completeError(error);
     }
-
-    var payload = jsonDecode(resolved.stringResult);
-    if (payload is String) payload = jsonDecode(payload);
-    if (payload is! Map) {
-      throw const MusicPluginException('插件返回了无法识别的数据');
-    }
-    if (payload['ok'] != true) {
-      throw MusicPluginException(payload['error']?.toString() ?? '插件调用失败');
-    }
-    return payload['value'];
   }
 }
