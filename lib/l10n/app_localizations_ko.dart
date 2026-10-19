@@ -112,7 +112,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count 곡';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 곡';
   }
 
   @override
@@ -222,7 +226,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return '대기열 $count곡';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '대기열 $countString곡';
   }
 
   @override
@@ -379,7 +387,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '$count곡 · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString곡 · $time';
   }
 
   @override
@@ -522,7 +534,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count개';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString개';
   }
 
   @override
@@ -561,7 +577,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count곡';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString곡';
   }
 
   @override
@@ -618,12 +638,20 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return '$count곡을 스캔했습니다';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString곡을 스캔했습니다';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count곡';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString곡';
   }
 
   @override
@@ -634,12 +662,26 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '$sources개 소스, 총 $songs곡을 스캔했습니다';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$sourcesString개 소스, 총 $songsString곡을 스캔했습니다';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '$songs곡을 업데이트했고 $failed개 소스가 실패했습니다';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '$songsString곡을 업데이트했고 $failedString개 소스가 실패했습니다';
   }
 
   @override
@@ -781,7 +823,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return '플러그인이 $count개의 결과를 반환했지만 재생 가능한 주소가 없습니다';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '플러그인이 $countString개의 결과를 반환했지만 재생 가능한 주소가 없습니다';
   }
 
   @override

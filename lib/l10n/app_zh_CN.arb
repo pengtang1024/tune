@@ -38,7 +38,8 @@
   "@libraryTrackCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -87,7 +88,8 @@
   "@playerQueueSummary": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -221,7 +223,8 @@
   "@sourcesScannedCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "time": {
         "type": "String"
@@ -331,7 +334,8 @@
   "@settingsPathsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -356,7 +360,8 @@
   "@searchResultCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -413,7 +418,8 @@
   "@scanSongCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -421,7 +427,8 @@
   "@scanSongCountShort": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -431,10 +438,12 @@
   "@scanSummary": {
     "placeholders": {
       "songs": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "sources": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -442,10 +451,12 @@
   "@scanUpdated": {
     "placeholders": {
       "failed": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "songs": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -571,7 +582,8 @@
   "@pluginNoStreamResults": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },

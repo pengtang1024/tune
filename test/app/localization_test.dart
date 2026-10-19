@@ -50,7 +50,8 @@ void main() {
         final value = entry.value;
         if (value is! String || value.isEmpty) continue;
 
-        for (final text in _expectedTexts(value)) {
+        final formatted = _formattedPlaceholders(catalogue['@${entry.key}']);
+        for (final text in _expectedTexts(value, formatted)) {
           if (!texts.contains(text)) {
             failures.add('$locale ${entry.key}: "$text" is not shown');
           }
@@ -357,10 +358,10 @@ String _unescape(String raw) {
 /// A message that counts something is written as a plural, so the generator
 /// splits it into the texts of its branches. Every other message stays one
 /// text.
-List<String> _expectedTexts(String message) {
+List<String> _expectedTexts(String message, Set<String> formatted) {
   final branches = _pluralBranches(message).toList();
-  if (branches.isEmpty) return [_dartText(message)];
-  return branches.map(_dartText).toList();
+  if (branches.isEmpty) return [_dartText(message, formatted)];
+  return branches.map((branch) => _dartText(branch, formatted)).toList();
 }
 
 /// The texts of the plural branches of a message.
@@ -409,14 +410,31 @@ int _matchingBrace(String message, int open) {
 
 /// The text as the generator writes it into the class of a locale.
 ///
-/// A placeholder of the catalogue becomes a variable of the generated code.
-String _dartText(String message) {
+/// A placeholder of the catalogue becomes a variable of the generated code. A
+/// placeholder the catalogue asks to format becomes a text instead, so the
+/// generator names it after the placeholder.
+String _dartText(String message, Set<String> formatted) {
   return message.replaceAllMapped(RegExp(r'\{(\w+)\}'), (match) {
     final name = match.group(1)!;
+    final variable = formatted.contains(name) ? '${name}String' : name;
     final next = match.end < message.length ? message[match.end] : '';
-    if (next.isNotEmpty && _identifier.hasMatch(next)) return '\${$name}';
-    return '\$$name';
+    if (next.isNotEmpty && _identifier.hasMatch(next)) return '\${$variable}';
+    return '\$$variable';
   });
+}
+
+/// The placeholders the generator turns into a formatted text.
+Set<String> _formattedPlaceholders(Object? metadata) {
+  if (metadata is! Map) return const {};
+  final placeholders = metadata['placeholders'];
+  if (placeholders is! Map) return const {};
+  return placeholders.entries
+      .where(
+        (entry) =>
+            entry.value is Map && (entry.value as Map)['format'] is String,
+      )
+      .map((entry) => entry.key as String)
+      .toSet();
 }
 
 final _identifier = RegExp(r'[A-Za-z0-9_]');

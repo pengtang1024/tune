@@ -112,7 +112,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count Titel';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Titel';
   }
 
   @override
@@ -226,7 +230,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return '$count in der Warteschlange';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString in der Warteschlange';
   }
 
   @override
@@ -390,7 +398,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '$count Titel · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Titel · $time';
   }
 
   @override
@@ -538,7 +550,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count Pfade';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Pfade';
   }
 
   @override
@@ -579,7 +595,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count Titel';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Titel';
   }
 
   @override
@@ -637,12 +657,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return '$count Titel gescannt';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Titel gescannt';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count Titel';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Titel';
   }
 
   @override
@@ -655,12 +683,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '$sources Quellen gescannt, insgesamt $songs Titel';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$sourcesString Quellen gescannt, insgesamt $songsString Titel';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '$songs Titel aktualisiert, $failed Quellen fehlgeschlagen';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '$songsString Titel aktualisiert, $failedString Quellen fehlgeschlagen';
   }
 
   @override
@@ -813,7 +855,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return 'Das Plugin lieferte $count Ergebnisse, aber keine abspielbare Adresse';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Das Plugin lieferte $countString Ergebnisse, aber keine abspielbare Adresse';
   }
 
   @override

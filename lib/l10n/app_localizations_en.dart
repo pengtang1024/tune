@@ -113,10 +113,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tracks',
+      other: '$countString tracks',
       one: '1 track',
     );
     return '$_temp0';
@@ -233,10 +237,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tracks in queue',
+      other: '$countString tracks in queue',
       one: '1 track in queue',
     );
     return '$_temp0';
@@ -399,10 +407,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tracks',
+      other: '$countString tracks',
       one: '1 track',
     );
     return '$_temp0 · $time';
@@ -553,10 +565,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count folders',
+      other: '$countString folders',
       one: '1 folder',
     );
     return '$_temp0';
@@ -599,10 +615,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tracks',
+      other: '$countString tracks',
       one: '1 track',
     );
     return '$_temp0';
@@ -663,10 +683,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Scanned $count songs',
+      other: 'Scanned $countString songs',
       one: 'Scanned 1 song',
     );
     return '$_temp0';
@@ -674,10 +698,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanSongCountShort(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count songs',
+      other: '$countString songs',
       one: '1 song',
     );
     return '$_temp0';
@@ -692,16 +720,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
     String _temp0 = intl.Intl.pluralLogic(
       sources,
       locale: localeName,
-      other: 'Scanned $sources sources',
+      other: 'Scanned $sourcesString sources',
       one: 'Scanned 1 source',
     );
     String _temp1 = intl.Intl.pluralLogic(
       songs,
       locale: localeName,
-      other: '$songs songs',
+      other: '$songsString songs',
       one: '1 song',
     );
     return '$_temp0, $_temp1 in total';
@@ -709,16 +744,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanUpdated(int failed, int songs) {
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
     String _temp0 = intl.Intl.pluralLogic(
       songs,
       locale: localeName,
-      other: '$songs songs',
+      other: '$songsString songs',
       one: '1 song',
     );
     String _temp1 = intl.Intl.pluralLogic(
       failed,
       locale: localeName,
-      other: '$failed sources failed',
+      other: '$failedString sources failed',
       one: '1 source failed',
     );
     return 'Updated $_temp0, $_temp1';
@@ -882,10 +924,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'The plugin returned $count results, but no playable address',
+      other:
+          'The plugin returned $countString results, but no playable address',
       one: 'The plugin returned 1 result, but no playable address',
     );
     return '$_temp0';

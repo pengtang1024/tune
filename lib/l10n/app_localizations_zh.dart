@@ -112,7 +112,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -221,7 +225,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return '队列 $count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '队列 $countString 首';
   }
 
   @override
@@ -377,7 +385,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '已扫描 $count 首 · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已扫描 $countString 首 · $time';
   }
 
   @override
@@ -518,7 +530,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count 个目录';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 个目录';
   }
 
   @override
@@ -556,7 +572,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -613,12 +633,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return '已扫描 $count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已扫描 $countString 首歌曲';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首歌曲';
   }
 
   @override
@@ -629,12 +657,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '已扫描 $sources 个音源，共 $songs 首歌曲';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '已扫描 $sourcesString 个音源，共 $songsString 首歌曲';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '已更新 $songs 首歌曲，$failed 个音源失败';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '已更新 $songsString 首歌曲，$failedString 个音源失败';
   }
 
   @override
@@ -775,7 +817,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return '插件返回了 $count 个结果，但没有可播放地址';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '插件返回了 $countString 个结果，但没有可播放地址';
   }
 
   @override
@@ -1397,7 +1443,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -1506,7 +1556,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String playerQueueSummary(int count) {
-    return '队列 $count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '队列 $countString 首';
   }
 
   @override
@@ -1662,7 +1716,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '已扫描 $count 首 · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已扫描 $countString 首 · $time';
   }
 
   @override
@@ -1803,7 +1861,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count 个目录';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 个目录';
   }
 
   @override
@@ -1841,7 +1903,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String searchResultCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -1898,12 +1964,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String scanSongCount(int count) {
-    return '已扫描 $count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已扫描 $countString 首歌曲';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首歌曲';
   }
 
   @override
@@ -1914,12 +1988,26 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '已扫描 $sources 个音源，共 $songs 首歌曲';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '已扫描 $sourcesString 个音源，共 $songsString 首歌曲';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '已更新 $songs 首歌曲，$failed 个音源失败';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '已更新 $songsString 首歌曲，$failedString 个音源失败';
   }
 
   @override
@@ -2060,7 +2148,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String pluginNoStreamResults(int count) {
-    return '插件返回了 $count 个结果，但没有可播放地址';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '插件返回了 $countString 个结果，但没有可播放地址';
   }
 
   @override
@@ -2682,7 +2774,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -2791,7 +2887,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String playerQueueSummary(int count) {
-    return '佇列 $count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '佇列 $countString 首';
   }
 
   @override
@@ -2947,7 +3047,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '已掃描 $count 首 · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已掃描 $countString 首 · $time';
   }
 
   @override
@@ -3088,7 +3192,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count 個目錄';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 個目錄';
   }
 
   @override
@@ -3126,7 +3234,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String searchResultCount(int count) {
-    return '$count 首';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首';
   }
 
   @override
@@ -3183,12 +3295,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String scanSongCount(int count) {
-    return '已掃描 $count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已掃描 $countString 首歌曲';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count 首歌曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 首歌曲';
   }
 
   @override
@@ -3199,12 +3319,26 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '已掃描 $sources 個音源，共 $songs 首歌曲';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '已掃描 $sourcesString 個音源，共 $songsString 首歌曲';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '已更新 $songs 首歌曲，$failed 個音源失敗';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '已更新 $songsString 首歌曲，$failedString 個音源失敗';
   }
 
   @override
@@ -3345,7 +3479,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String pluginNoStreamResults(int count) {
-    return '外掛回傳了 $count 個結果，但沒有可播放網址';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '外掛回傳了 $countString 個結果，但沒有可播放網址';
   }
 
   @override

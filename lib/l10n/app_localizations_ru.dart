@@ -112,7 +112,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count треков';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString треков';
   }
 
   @override
@@ -226,7 +230,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return 'в очереди $count';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'в очереди $countString';
   }
 
   @override
@@ -387,7 +395,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '$count треков · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString треков · $time';
   }
 
   @override
@@ -534,7 +546,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count путей';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString путей';
   }
 
   @override
@@ -574,7 +590,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count треков';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString треков';
   }
 
   @override
@@ -632,12 +652,20 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return 'Просканировано треков: $count';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Просканировано треков: $countString';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count треков';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString треков';
   }
 
   @override
@@ -649,12 +677,26 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return 'Просканировано источников: $sources, треков: $songs';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return 'Просканировано источников: $sourcesString, треков: $songsString';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return 'Обновлено треков: $songs, источников с ошибкой: $failed';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return 'Обновлено треков: $songsString, источников с ошибкой: $failedString';
   }
 
   @override
@@ -803,7 +845,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return 'Плагин вернул $count результатов, но без воспроизводимого адреса';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Плагин вернул $countString результатов, но без воспроизводимого адреса';
   }
 
   @override

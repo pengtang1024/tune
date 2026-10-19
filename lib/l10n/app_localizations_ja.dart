@@ -112,7 +112,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count 曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 曲';
   }
 
   @override
@@ -222,7 +226,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return 'キュー $count 曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'キュー $countString 曲';
   }
 
   @override
@@ -379,7 +387,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '$count 曲 · $time';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 曲 · $time';
   }
 
   @override
@@ -521,7 +533,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count 件';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 件';
   }
 
   @override
@@ -559,7 +575,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count 曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 曲';
   }
 
   @override
@@ -616,12 +636,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return '$count 曲をスキャンしました';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 曲をスキャンしました';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count 曲';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 曲';
   }
 
   @override
@@ -632,12 +660,26 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return '$sources 個のソース、合計 $songs 曲をスキャンしました';
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$sourcesString 個のソース、合計 $songsString 曲をスキャンしました';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return '$songs 曲を更新し、$failed 個のソースが失敗しました';
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat songsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String songsString = songsNumberFormat.format(songs);
+
+    return '$songsString 曲を更新し、$failedString 個のソースが失敗しました';
   }
 
   @override
@@ -779,7 +821,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return 'プラグインは $count 件の結果を返しましたが、再生可能なアドレスがありませんでした';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'プラグインは $countString 件の結果を返しましたが、再生可能なアドレスがありませんでした';
   }
 
   @override
