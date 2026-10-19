@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
@@ -28,6 +29,12 @@ class QueuePane extends ConsumerWidget {
     final currentUri = view.$3;
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
+    final sourceNames = ref.watch(
+      musicSourcesControllerProvider.select((value) {
+        final sources = value.valueOrNull?.sources ?? const [];
+        return {for (final source in sources) source.id: source.name};
+      }),
+    );
     final theme = Theme.of(context);
 
     return Column(
@@ -50,7 +57,7 @@ class QueuePane extends ConsumerWidget {
               ),
               const SizedBox(width: CompactTokens.space8),
               Text(
-                '${queue.length}',
+                '${queue.length} 首',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 11,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -107,6 +114,10 @@ class QueuePane extends ConsumerWidget {
                       index: index,
                       selected: index == currentIndex,
                       playing: isPlaying && song.uri == currentUri,
+                      sourceName:
+                          song.sourceId == null || song.sourceId == 'local'
+                          ? null
+                          : sourceNames[song.sourceId] ?? song.sourceId,
                       onTap: () => controller.playAt(index),
                       onRemove: () => controller.removeFromQueue(index),
                     );
@@ -147,6 +158,7 @@ class _QueueSongRow extends StatelessWidget {
   final int index;
   final bool selected;
   final bool playing;
+  final String? sourceName;
   final VoidCallback onTap;
   final VoidCallback onRemove;
 
@@ -156,6 +168,7 @@ class _QueueSongRow extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.playing,
+    this.sourceName,
     required this.onTap,
     required this.onRemove,
   });
@@ -236,6 +249,17 @@ class _QueueSongRow extends StatelessWidget {
                 ],
               ),
             ),
+            if (sourceName != null) ...[
+              const SizedBox(width: CompactTokens.space6),
+              Tooltip(
+                message: sourceName!,
+                child: Icon(
+                  Icons.public_rounded,
+                  size: 12,
+                  color: muted.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
             const SizedBox(width: CompactTokens.space8),
             Text(
               formatDuration(Duration(milliseconds: song.durationInMillis)),

@@ -67,10 +67,17 @@ class _VolumeControlState extends ConsumerState<VolumeControl> {
           ),
         ),
         const SizedBox(width: CompactTokens.space6),
-        Icon(
-          Icons.volume_up_rounded,
-          size: CompactTokens.icon16,
-          color: theme.colorScheme.onSurfaceVariant,
+        SizedBox(
+          width: 30,
+          child: Text(
+            '${(volume.clamp(0.0, 1.0) * 100).round()}%',
+            textAlign: TextAlign.right,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontSize: 10,
+              color: theme.colorScheme.onSurfaceVariant,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
         ),
       ],
     );

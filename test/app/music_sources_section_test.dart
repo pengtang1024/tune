@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/impl/shared_preferences_service.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
@@ -70,6 +71,48 @@ void main() {
     expect(controller.settingsChanges['jamendo']?['clientId'], 'client-id');
     expect(controller.enabledChanges, [true]);
     expect(tester.widget<Switch>(sourceSwitch).value, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('plugin sources render keyword and custom fields', (
+    tester,
+  ) async {
+    const plugin = MusicSourceConfig(
+      id: 'plugin_demo',
+      name: 'Demo Plugin',
+      description: 'Imported plugin',
+      kind: MusicSourceKind.plugin,
+      enabled: false,
+      settings: {'pluginFile': 'plugin_demo.js'},
+      customFields: [
+        MusicSourceField('cookie', 'Cookie', '登录后的 Cookie', required: true),
+      ],
+    );
+    final controller = FakeMusicSourcesController(
+      const MusicSourcesState(sources: [plugin]),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Demo Plugin'), findsOneWidget);
+    expect(find.text('插件'), findsOneWidget);
+    expect(find.text('已关闭'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('source-switch-plugin_demo')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('配置 Demo Plugin'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(2));
+
+    await tester.enterText(find.byType(TextField).at(0), 'hello');
+    await tester.enterText(find.byType(TextField).at(1), 'session=1');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+
+    expect(controller.settingsChanges['plugin_demo']?['query'], 'hello');
+    expect(controller.settingsChanges['plugin_demo']?['cookie'], 'session=1');
+    expect(controller.enabledChanges, [true]);
     expect(tester.takeException(), isNull);
   });
 }

@@ -1,13 +1,14 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
-import 'package:tune/features/sources/presentation/music_sources_section.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -36,129 +37,145 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     final busy = scanning || clearing;
     final settingsController = ref.read(settingsControllerProvider.notifier);
 
-    return Scrollbar(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          CompactTokens.space16,
-          CompactTokens.space16,
-          CompactTokens.space16,
-          CompactTokens.space24,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.loc.settings,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/library');
+          }
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scrollbar(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              CompactTokens.space16,
+              CompactTokens.space16,
+              CompactTokens.space16,
+              CompactTokens.space24,
             ),
-            const SizedBox(height: 4),
-            Text(
-              '外观、语言、本地目录和在线音源',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 11,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: CompactTokens.space20),
-            _Section(
-              title: context.loc.theme,
-              child: Wrap(
-                spacing: CompactTokens.space8,
-                runSpacing: CompactTokens.space8,
-                children: [
-                  _ThemeChip(
-                    label: context.loc.system_mode,
-                    mode: ThemeMode.system,
-                    current: settings.themeMode,
-                    onSelected: settingsController.setThemeMode,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Settings',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    fontFamily: 'Fraunces',
+                    fontSize: 34,
+                    height: 0.95,
                   ),
-                  _ThemeChip(
-                    label: context.loc.light_mode,
-                    mode: ThemeMode.light,
-                    current: settings.themeMode,
-                    onSelected: settingsController.setThemeMode,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '外观、语言与本地目录',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  _ThemeChip(
-                    label: context.loc.dark_mode,
-                    mode: ThemeMode.dark,
-                    current: settings.themeMode,
-                    onSelected: settingsController.setThemeMode,
-                  ),
-                ],
-              ),
-            ),
-            _Section(
-              title: context.loc.language,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '界面语言',
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 150,
-                    child: _LanguageDropdown(
-                      locale: settings.locale,
-                      onChanged: settingsController.setLocale,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _Section(
-              title: context.loc.music_library,
-              child: _LibrarySettings(
-                settings: settings,
-                scanning: scanning,
-                canScan: libraryReady && !busy,
-                onAddFolder: _pickDirectory,
-                onRemoveFolder: settingsController.removeScanPath,
-                onScan: _scan,
-                onClear: libraryReady && !busy ? _clearLibrary : null,
-              ),
-            ),
-            const MusicSourcesSection(),
-            _Section(
-              title: context.loc.about,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                ),
+                const SizedBox(height: CompactTokens.space20),
+                _Section(
+                  title: context.loc.theme,
+                  child: Wrap(
+                    spacing: CompactTokens.space8,
+                    runSpacing: CompactTokens.space8,
                     children: [
-                      Text(
-                        'Tune',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                      _ThemeChip(
+                        label: context.loc.system_mode,
+                        mode: ThemeMode.system,
+                        current: settings.themeMode,
+                        onSelected: settingsController.setThemeMode,
+                      ),
+                      _ThemeChip(
+                        label: context.loc.light_mode,
+                        mode: ThemeMode.light,
+                        current: settings.themeMode,
+                        onSelected: settingsController.setThemeMode,
+                      ),
+                      _ThemeChip(
+                        label: context.loc.dark_mode,
+                        mode: ThemeMode.dark,
+                        current: settings.themeMode,
+                        onSelected: settingsController.setThemeMode,
+                      ),
+                    ],
+                  ),
+                ),
+                _Section(
+                  title: context.loc.language,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '界面语言',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: CompactTokens.space8),
+                      SizedBox(
+                        width: 150,
+                        child: _LanguageDropdown(
+                          locale: settings.locale,
+                          onChanged: settingsController.setLocale,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _Section(
+                  title: context.loc.music_library,
+                  child: _LibrarySettings(
+                    settings: settings,
+                    scanning: scanning,
+                    canScan: libraryReady && !busy,
+                    onAddFolder: _pickDirectory,
+                    onRemoveFolder: settingsController.removeScanPath,
+                    onScan: _scan,
+                    onClear: libraryReady && !busy ? _clearLibrary : null,
+                  ),
+                ),
+                _Section(
+                  title: context.loc.about,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Tune',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: CompactTokens.space8),
+                          Text(
+                            'v${AppVersion.version}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 11,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
                       Text(
-                        'v${AppVersion.version}',
-                        style: theme.textTheme.labelSmall?.copyWith(
+                        '本地优先的紧凑音乐播放器',
+                        style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '本地优先的紧凑音乐播放器',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

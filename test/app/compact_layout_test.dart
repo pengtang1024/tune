@@ -285,6 +285,63 @@ void main() {
     expect(find.text('播放队列'), findsNWidgets(2));
   });
 
+  testWidgets('queue rows show the remote source name', (tester) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final controller = PlaybackController(audio);
+    await controller.playQueue([remoteSong]);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/queue', child: QueuePane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          playbackControllerProvider.overrideWith((ref) => controller),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byType(QueuePane),
+        matching: find.text(remoteSong.title),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byTooltip('Openverse'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('settings pane tolerates 1.3 text scaling at 760x483', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('settings pane lays out at 760x483', (tester) async {
     await setSurface(tester, const Size(760, 483));
     final audio = FakeAudioPlayerService();
@@ -308,7 +365,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('设置'), findsOneWidget);
-    expect(find.text('音乐库'), findsOneWidget);
+    expect(find.text('音乐库'), findsNWidgets(2));
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {

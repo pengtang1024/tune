@@ -76,7 +76,7 @@ class JustAudioPlayerService implements AudioPlayerService {
         final isRemote =
             uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
         final source = isRemote
-            ? AudioSource.uri(uri)
+            ? AudioSource.uri(uri, headers: song.httpHeaders)
             : AudioSource.uri(Uri.file(audioPath));
         await _audioPlayer!.setAudioSource(source);
         await _audioPlayer!.play();

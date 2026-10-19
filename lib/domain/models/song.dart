@@ -38,6 +38,15 @@ class Song {
   /// Cover image URL for remote sources. Local files use [albumArtPath].
   final String? artworkUrl;
 
+  /// Original provider payload for plugin-backed sources.
+  ///
+  /// It is passed back to the plugin when resolving playback URLs, lyrics or
+  /// extra metadata. Built-in adapters leave it null.
+  final Map<String, dynamic>? sourceData;
+
+  /// Extra HTTP headers required by some plugin-provided stream URLs.
+  final Map<String, String>? httpHeaders;
+
   const Song({
     required this.id,
     this.title = '',
@@ -66,6 +75,8 @@ class Song {
     this.externalId,
     this.streamUrl,
     this.artworkUrl,
+    this.sourceData,
+    this.httpHeaders,
   });
 
   factory Song.fromMap(Map<String, dynamic> data) {
@@ -99,6 +110,14 @@ class Song {
       externalId: data['externalId'],
       streamUrl: data['streamUrl'],
       artworkUrl: data['artworkUrl'],
+      sourceData: data['sourceData'] is Map
+          ? Map<String, dynamic>.from(data['sourceData'] as Map)
+          : null,
+      httpHeaders: data['httpHeaders'] is Map
+          ? (data['httpHeaders'] as Map).map(
+              (key, value) => MapEntry(key.toString(), value.toString()),
+            )
+          : null,
     );
   }
 
@@ -130,6 +149,8 @@ class Song {
     String? externalId,
     String? streamUrl,
     String? artworkUrl,
+    Map<String, dynamic>? sourceData,
+    Map<String, String>? httpHeaders,
   }) {
     return Song(
       id: id ?? this.id,
@@ -159,6 +180,8 @@ class Song {
       externalId: externalId ?? this.externalId,
       streamUrl: streamUrl ?? this.streamUrl,
       artworkUrl: artworkUrl ?? this.artworkUrl,
+      sourceData: sourceData ?? this.sourceData,
+      httpHeaders: httpHeaders ?? this.httpHeaders,
     );
   }
 
@@ -201,6 +224,8 @@ class Song {
     'externalId': externalId,
     'streamUrl': streamUrl,
     'artworkUrl': artworkUrl,
+    'sourceData': sourceData,
+    'httpHeaders': httpHeaders,
   };
 
   @override

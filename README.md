@@ -1,91 +1,59 @@
-# Tune - 现代化音乐播放器
+# Tune
 
-Tune 是一款现代化的跨平台音乐播放器应用，使用 Flutter 框架开发，支持 Windows、Android 和 iOS 平台。
+[中文](README.md) · [English](README_en.md) · [日本語](README_ja.md) · [한국어](README_ko.md) · [Русский](README_ru.md)
 
-## 功能特性
+Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。界面采用双栏布局：左侧常驻播放器，右侧在音乐库、播放队列和设置之间切换。
 
-- 🎵 本地音乐播放
-- 📊 智能音乐库管理
-- 🎨 个性化主题定制
-- ⚡ 高性能音频解码
-- 📱 跨平台支持
-- 🔒 安全数据存储
+## 功能
+
+- 本地音乐目录扫描、搜索与持久化
+- 在线音源：Openverse、Jamendo、Internet Archive、自建 NeteaseCloudMusicApi
+- 播放队列增删、拖拽重排、点播与清空
+- 播放/暂停、上一首/下一首、进度拖拽、音量与循环模式
+- 按来源筛选音乐库，远程歌曲显示来源与封面
+- 浅色 / 深色 / 系统主题，扫描目录与音源配置持久化
+- 900×600 默认窗口，最小 760×520
 
 ## 技术栈
 
-- **框架**: Flutter
-- **状态管理**: Riverpod
-- **路由管理**: Go Router
-- **主题管理**: FlexColorScheme
-- **音频播放**: just_audio
-- **本地存储**: Hive, Shared Preferences, Flutter Secure Storage
-- **权限管理**: Permission Handler
-- **国际化**: Flutter Intl
-
-## 安全特性
-
-- 使用 `flutter_secure_storage` 加密存储敏感数据
-- 路径验证防止路径遍历攻击
-- 输入验证和错误处理
-
-## 性能优化
-
-- 图片加载优化（cacheWidth/cacheHeight）
-- 列表渲染优化（cacheExtent）
-- 音频播放资源管理
-- 内存泄漏预防
+- Flutter + Riverpod + go_router
+- just_audio；Linux 使用 just_audio_media_kit + 系统 libmpv
+- Dio、shared_preferences、file_picker
+- flutter_localizations / gen-l10n
 
 ## 项目结构
 
-```
+```text
 lib/
-├── core/                 # 核心功能
-│   ├── extension/        # 扩展功能
-│   ├── router/           # 路由管理
-│   └── settings/         # 设置相关
-├── data/                 # 数据层
-│   ├── models/           # 数据模型
-│   ├── repositories/     # 数据仓库
-│   └── services/         # 数据服务
-├── domain/               # 业务逻辑层
-│   └── models/           # 领域模型
-├── ui/                   # 表现层
-│   ├── core/             # 核心UI组件
-│   ├── home/             # 首页
-│   ├── library/          # 音乐库
-│   ├── player/           # 播放器
-│   └── widgets/          # 通用组件
-├── providers/            # Riverpod提供者
-└── utils/                # 工具类
+├── app/                  # 应用入口、路由、主题、壳层
+├── features/             # player / library / queue / settings / sources
+├── data/services/        # 音频、扫描、音源适配器、持久化
+├── domain/models/        # Song、音源配置与扫描结果
+├── shared/               # 通用 UI 与工具
+└── l10n/                 # 国际化资源
 ```
 
-## 安装与运行
+音源模型与扩展方式见 [需求/音源设计.md](需求/音源设计.md)。
 
-1. 克隆项目
-```bash
-git clone <repository-url>
-cd tune
-```
+## 运行
 
-2. 安装依赖
 ```bash
 flutter pub get
-```
-
-3. 运行应用
-```bash
-flutter run
+flutter run -d linux
 ```
 
 ## 构建
 
-- Windows: `flutter build windows`
-- Android: `flutter build apk`
-- iOS: `flutter build ios`
+```bash
+flutter build linux --debug
+```
 
-## 贡献
+## 已知限制
 
-欢迎提交 Issue 和 Pull Request 来帮助改进项目。
+- 当前主要验收平台为 Linux 桌面端。
+- 远程播放依赖网络，暂未提供下载/离线缓存。
+- 远程播放地址可能过期，需要重新扫描对应音源刷新。
+- 旧版移动端通知、歌词、均衡器、播放历史与账户功能已移出主链路。
 
 ## 许可证
 

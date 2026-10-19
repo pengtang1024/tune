@@ -8,6 +8,7 @@ import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -28,6 +29,8 @@ void main() {
         externalId: 'abc',
         streamUrl: 'https://example.com/a.mp3',
         artworkUrl: 'https://example.com/a.jpg',
+        sourceData: {'id': 'abc', 'custom': 42},
+        httpHeaders: {'Referer': 'https://example.com'},
       );
 
       final restored = Song.fromMap(song.toJson());
@@ -36,6 +39,8 @@ void main() {
       expect(restored.externalId, 'abc');
       expect(restored.streamUrl, 'https://example.com/a.mp3');
       expect(restored.artworkUrl, 'https://example.com/a.jpg');
+      expect(restored.sourceData?['custom'], 42);
+      expect(restored.httpHeaders?['Referer'], 'https://example.com');
       expect(restored.playbackUri, 'https://example.com/a.mp3');
     });
 
@@ -262,6 +267,33 @@ void main() {
     });
   });
 
+  group('plugin source schema', () {
+    test('reuses the adapter field contract for imported plugins', () {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      const config = MusicSourceConfig(
+        id: 'plugin_demo',
+        name: 'Demo',
+        kind: MusicSourceKind.plugin,
+        settings: {'pluginFile': 'plugin_demo.js'},
+      );
+
+      expect(service.supportsConfig(config), isMusicPluginRuntimeSupported);
+      expect(service.fieldsFor(config).single.key, 'query');
+      expect(service.isConfigured(config), isFalse);
+      expect(
+        service.isConfigured(
+          config.copyWith(
+            settings: {'pluginFile': 'plugin_demo.js', 'query': 'hello'},
+          ),
+        ),
+        isTrue,
+      );
+    });
+  });
+
   group('MusicSourceConfig', () {
     test('round-trips through JSON', () {
       const config = MusicSourceConfig(
@@ -271,6 +303,9 @@ void main() {
         kind: MusicSourceKind.openApi,
         enabled: false,
         settings: {'baseUrl': 'http://localhost:3000'},
+        customFields: [
+          MusicSourceField('cookie', 'Cookie', '登录后的 Cookie', required: true),
+        ],
       );
 
       final restored = MusicSourceConfig.fromJson(config.toJson());
@@ -278,6 +313,8 @@ void main() {
       expect(restored.kind, MusicSourceKind.openApi);
       expect(restored.enabled, isFalse);
       expect(restored.setting('baseUrl'), 'http://localhost:3000');
+      expect(restored.customFields.single.key, 'cookie');
+      expect(restored.customFields.single.required, isTrue);
     });
 
     test('malformed enabled values fall back to enabled', () {
@@ -290,4 +327,14 @@ void main() {
       expect(restored.enabled, isTrue);
     });
   });
+}
+
+class _NoopScanner extends CrossPlatformMusicScannerImpl {
+  @override
+  Future<List<Song>> scanMusicInDirectoriesWithProgress(
+    List<String> directoryPaths,
+    Function(double) onProgress,
+  ) async {
+    return const [];
+  }
 }

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -44,7 +48,7 @@ class MusicSourcesSection extends ConsumerWidget {
     final canScan =
         !busy &&
         sources.any(
-          (source) => source.enabled && sourceService.supports(source.id),
+          (source) => source.enabled && sourceService.supportsConfig(source),
         );
 
     return Padding(
@@ -156,12 +160,34 @@ class MusicSourcesSection extends ConsumerWidget {
                     : const Icon(Icons.sync_rounded, size: 15),
                 label: const Text('扫描全部音源'),
               ),
+              if (isMusicPluginRuntimeSupported) ...[
+                const SizedBox(width: CompactTokens.space8),
+                OutlinedButton.icon(
+                  onPressed: busy ? null : () => _importPlugin(context, ref),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 30),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: CompactTokens.space8,
+                    ),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    textStyle: const TextStyle(fontSize: 11),
+                    side: BorderSide(color: theme.colorScheme.outlineVariant),
+                  ),
+                  icon: const Icon(Icons.extension_outlined, size: 15),
+                  label: const Text('导入插件'),
+                ),
+              ],
               const SizedBox(width: CompactTokens.space8),
-              Text(
-                '含远程音源时可能需要数秒',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 10,
-                  color: muted,
+              Flexible(
+                child: Text(
+                  '含远程音源时可能需要数秒',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    color: muted,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -186,6 +212,89 @@ class MusicSourcesSection extends ConsumerWidget {
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
   }
+
+  Future<void> _importPlugin(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('导入音乐插件'),
+        content: const Text(
+          '插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。'
+          '请只导入你信任的来源。导入后需要填写搜索关键词才会启用。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('选择文件'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['js'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+    if (!context.mounted) return;
+    final file = result.files.first;
+
+    final bytes = file.bytes;
+    if (bytes == null || bytes.isEmpty) {
+      _showMessage(context, '无法读取插件文件');
+      return;
+    }
+    if (bytes.length > 2 * 1024 * 1024) {
+      _showMessage(context, '插件文件不能超过 2 MB');
+      return;
+    }
+
+    final script = utf8.decode(bytes, allowMalformed: true);
+    if (!context.mounted) return;
+
+    try {
+      final controller = ref.read(musicSourcesControllerProvider.notifier);
+      final config = await controller.installPlugin(
+        originalName: file.name,
+        script: script,
+      );
+      if (!context.mounted) return;
+
+      final fields = ref.read(musicSourceServiceProvider).fieldsFor(config);
+      final saved = await showDialog<bool>(
+        context: context,
+        builder: (context) =>
+            _SourceSettingsDialog(source: config, fields: fields),
+      );
+      if (saved == true) {
+        await controller.setEnabled(config.id, true);
+      }
+      if (!context.mounted) return;
+      _showMessage(
+        context,
+        saved == true
+            ? '已导入并启用 ${config.name}'
+            : '已导入 ${config.name}，填写关键词并开启后会参与扫描',
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      _showMessage(context, '导入插件失败：$error');
+    }
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+      );
+  }
 }
 
 class _SourceTile extends ConsumerWidget {
@@ -206,8 +315,8 @@ class _SourceTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final muted = theme.colorScheme.onSurfaceVariant;
     final sourceService = ref.watch(musicSourceServiceProvider);
-    final supported = sourceService.supports(source.id);
-    final fields = sourceService.fieldsFor(source.id);
+    final supported = sourceService.supportsConfig(source);
+    final fields = sourceService.fieldsFor(source);
     final configured = sourceService.isConfigured(source);
     final status = _statusText(configured, fields, supported: supported);
     final statusColor = _statusColor(
@@ -220,7 +329,7 @@ class _SourceTile extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: CompactTokens.space4),
       padding: const EdgeInsets.symmetric(
         horizontal: CompactTokens.space8,
-        vertical: CompactTokens.space6,
+        vertical: CompactTokens.space4,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
@@ -238,14 +347,17 @@ class _SourceTile extends ConsumerWidget {
                 Row(
                   children: [
                     Flexible(
-                      child: Text(
-                        source.name,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                      child: Tooltip(
+                        message: source.description,
+                        child: Text(
+                          source.name,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (source.kind != MusicSourceKind.localDirectory) ...[
@@ -253,16 +365,6 @@ class _SourceTile extends ConsumerWidget {
                       _KindBadge(kind: source.kind),
                     ],
                   ],
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  source.description,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    color: muted,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Tooltip(
@@ -281,27 +383,58 @@ class _SourceTile extends ConsumerWidget {
             ),
           ),
           if (fields.isNotEmpty && supported)
-            SizedBox(
-              width: 28,
-              height: 28,
-              child: IconButton(
-                tooltip: '配置',
-                onPressed: busy
-                    ? null
-                    : () => _openSettings(context, source, fields),
-                icon: const Icon(Icons.tune_rounded, size: 15),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(
-                  width: 28,
-                  height: 28,
+            if (source.isPlugin)
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: PopupMenuButton<String>(
+                  tooltip: '插件操作',
+                  enabled: !busy,
+                  padding: EdgeInsets.zero,
+                  icon: Icon(Icons.more_vert_rounded, size: 15, color: muted),
+                  onSelected: (value) {
+                    if (value == 'config') {
+                      _openSettings(context, source, fields);
+                    } else if (value == 'delete') {
+                      _confirmRemove(context, ref);
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 'config',
+                      height: 36,
+                      child: Text('配置'),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      height: 36,
+                      child: Text('删除插件'),
+                    ),
+                  ],
                 ),
-                style: IconButton.styleFrom(
-                  foregroundColor: muted,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
+              )
+            else
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: IconButton(
+                  tooltip: '配置',
+                  onPressed: busy
+                      ? null
+                      : () => _openSettings(context, source, fields),
+                  icon: const Icon(Icons.tune_rounded, size: 15),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 28,
+                    height: 28,
+                  ),
+                  style: IconButton.styleFrom(
+                    foregroundColor: muted,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
               ),
-            ),
           Switch(
             key: ValueKey('source-switch-${source.id}'),
             value: source.enabled,
@@ -387,6 +520,42 @@ class _SourceTile extends ConsumerWidget {
     );
     return saved == true;
   }
+
+  Future<void> _confirmRemove(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('删除插件？'),
+        content: Text('将删除 ${source.name} 的脚本、配置以及已扫描的歌曲。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    await ref
+        .read(musicSourcesControllerProvider.notifier)
+        .removePlugin(source.id);
+    if (!context.mounted) return;
+    await ref.read(libraryControllerProvider.notifier).dropSource(source.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('已删除 ${source.name}'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+  }
 }
 
 class _KindBadge extends StatelessWidget {
@@ -397,7 +566,12 @@ class _KindBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final label = kind == MusicSourceKind.openCatalog ? '开放曲库' : 'API';
+    final label = switch (kind) {
+      MusicSourceKind.localDirectory => '本地',
+      MusicSourceKind.openCatalog => '开放曲库',
+      MusicSourceKind.openApi => 'API',
+      MusicSourceKind.plugin => '插件',
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
@@ -523,6 +697,7 @@ IconData _icon(MusicSourceKind kind) {
     MusicSourceKind.localDirectory => Icons.folder_outlined,
     MusicSourceKind.openCatalog => Icons.public_rounded,
     MusicSourceKind.openApi => Icons.api_rounded,
+    MusicSourceKind.plugin => Icons.extension_rounded,
   };
 }
 

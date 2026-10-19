@@ -212,6 +212,29 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(_current.copyWith(query: query));
   }
 
+  /// Removes a source's songs immediately, e.g. after deleting a plugin.
+  Future<void> dropSource(String sourceId) async {
+    if (_disposed || !state.hasValue) return;
+
+    final songs = _current.songs
+        .where((song) => (song.sourceId ?? 'local') != sourceId)
+        .toList(growable: false);
+    final summaries = Map<String, SourceScanSummary>.of(
+      _current.sourceSummaries,
+    )..remove(sourceId);
+
+    state = AsyncData(
+      _current.copyWith(
+        songs: List.unmodifiable(songs),
+        sourceSummaries: Map.unmodifiable(summaries),
+        sourceFilter: _current.sourceFilter == sourceId
+            ? null
+            : _current.sourceFilter,
+      ),
+    );
+    await _saveQuietly(songs);
+  }
+
   void setSourceFilter(String? sourceId) {
     if (_disposed || !state.hasValue) return;
     final normalized = sourceId?.trim();

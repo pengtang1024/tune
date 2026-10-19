@@ -90,12 +90,47 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            CompactTokens.space16,
-            CompactTokens.space12,
-            CompactTokens.space16,
-            CompactTokens.space8,
+          padding: const EdgeInsets.fromLTRB(28, 26, 28, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'COLLECTION',
+                      style: TextStyle(
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: 9,
+                        letterSpacing: 2,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Library',
+                      style: theme.textTheme.displayMedium?.copyWith(
+                        fontFamily: 'Fraunces',
+                        fontSize: 38,
+                        height: 0.95,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '音乐库 · ${filteredSongs.length} 首',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 0, 28, 10),
           child: _Toolbar(
             controller: _searchController,
             state: state,
@@ -382,7 +417,7 @@ class _Toolbar extends StatelessWidget {
           ],
           const SizedBox(width: CompactTokens.space8),
           Text(
-            '$filteredCount',
+            '$filteredCount 首',
             style: theme.textTheme.labelSmall?.copyWith(
               fontSize: 11,
               color: theme.colorScheme.onSurfaceVariant,

@@ -5,13 +5,17 @@ import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
+import 'package:tune/features/sources/presentation/sources_pane.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: '/library',
     redirect: (context, state) {
       final path = state.uri.path;
-      if (path == '/library' || path == '/queue' || path == '/settings') {
+      if (path == '/library' ||
+          path == '/queue' ||
+          path == '/sources' ||
+          path == '/settings') {
         return null;
       }
       // The compact player replaces the old four-tab shell. Any old deep link
@@ -31,6 +35,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/queue',
             builder: (context, state) => const QueuePane(),
+          ),
+          GoRoute(
+            path: '/sources',
+            builder: (context, state) => const SourcesPane(),
           ),
           GoRoute(
             path: '/settings',

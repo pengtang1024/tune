@@ -18,6 +18,9 @@ class SourceSongFactory {
     String? artworkUrl,
     String? genre,
     int? year,
+    String? lyrics,
+    Map<String, dynamic>? sourceData,
+    Map<String, String>? httpHeaders,
   }) {
     final uri = 'tune://$sourceId/${Uri.encodeComponent(externalId)}';
 
@@ -31,11 +34,14 @@ class SourceSongFactory {
       dateAdded: DateTime.now().millisecondsSinceEpoch,
       genre: genre,
       year: year,
+      lyrics: lyrics,
       type: 'remote',
       sourceId: sourceId,
       externalId: externalId,
       streamUrl: normalizeUrl(streamUrl),
       artworkUrl: normalizeUrl(artworkUrl),
+      sourceData: sourceData,
+      httpHeaders: httpHeaders,
     );
   }
 

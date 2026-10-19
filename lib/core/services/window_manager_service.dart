@@ -62,8 +62,7 @@ class WindowManagerService with WindowListener {
 
   @override
   void onWindowResize() {
-    // 窗口大小变化时由 Flutter 响应式系统自动处理布局
-    // 无需额外逻辑 — ResponsiveShell 已监听 MediaQuery
+    // 窗口大小变化由 CompactShell 的 LayoutBuilder 自动响应。
   }
 
   @override

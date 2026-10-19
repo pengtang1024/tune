@@ -47,8 +47,18 @@ class AppHeader extends StatelessWidget {
           ),
           const Spacer(),
           IconButton(
-            tooltip: isSettings ? '返回音乐库' : '设置',
-            onPressed: () => context.go(isSettings ? '/library' : '/settings'),
+            tooltip: isSettings ? '返回' : '设置',
+            onPressed: () {
+              if (!isSettings) {
+                context.push('/settings');
+                return;
+              }
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/library');
+              }
+            },
             icon: Icon(
               isSettings ? Icons.close_rounded : Icons.settings_outlined,
               size: CompactTokens.icon20,

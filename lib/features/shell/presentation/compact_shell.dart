@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tune/features/player/presentation/player_pane.dart';
-import 'package:tune/features/shell/presentation/app_header.dart';
-import 'package:tune/features/shell/presentation/pane_tabs.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/features/player/presentation/player_dock.dart';
+import 'package:tune/features/shell/presentation/app_sidebar.dart';
 
 class CompactShell extends StatelessWidget {
   final String currentPath;
@@ -16,43 +16,55 @@ class CompactShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final showTabs = currentPath == '/library' || currentPath == '/queue';
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      body: Column(
-        children: [
-          AppHeader(currentPath: currentPath),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final leftWidth = (constraints.maxWidth * 0.38)
-                    .clamp(300.0, 360.0)
-                    .toDouble();
-
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(width: leftWidth, child: const PlayerPane()),
-                    VerticalDivider(
-                      width: 1,
-                      thickness: 1,
-                      color: theme.colorScheme.outlineVariant,
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          if (showTabs) PaneTabs(currentPath: currentPath),
-                          Expanded(child: child),
-                        ],
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxWidth < 700;
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppSidebar(currentPath: currentPath, compact: compact),
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              center: const Alignment(0.9, -1.0),
+                              radius: 1.2,
+                              colors: [
+                                theme.colorScheme.primary.withValues(
+                                  alpha: 0.05,
+                                ),
+                                Colors.transparent,
+                              ],
+                              stops: const [0, 0.7],
+                            ),
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: CompactTokens.standardMotion,
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            child: KeyedSubtree(
+                              key: ValueKey(currentPath),
+                              child: child,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            const PlayerDock(),
+          ],
+        ),
       ),
     );
   }

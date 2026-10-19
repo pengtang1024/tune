@@ -28,6 +28,9 @@ enum MusicSourceKind {
 
   /// A self-hosted or remote JSON API that behaves as a source.
   openApi,
+
+  /// A user-imported JavaScript plugin (MusicFree protocol).
+  plugin,
 }
 
 /// User-editable configuration for one music source.
@@ -43,6 +46,9 @@ class MusicSourceConfig {
   final bool enabled;
   final Map<String, String> settings;
 
+  /// Extra settings declared by a plugin (cookies, tokens, ...).
+  final List<MusicSourceField> customFields;
+
   const MusicSourceConfig({
     required this.id,
     required this.name,
@@ -50,9 +56,14 @@ class MusicSourceConfig {
     required this.kind,
     this.enabled = true,
     this.settings = const {},
+    this.customFields = const [],
   });
 
   bool get isLocal => kind == MusicSourceKind.localDirectory;
+
+  bool get isPlugin => kind == MusicSourceKind.plugin;
+
+  String? get pluginFile => setting('pluginFile');
 
   String? setting(String key) {
     final value = settings[key];
@@ -68,6 +79,7 @@ class MusicSourceConfig {
     MusicSourceKind? kind,
     bool? enabled,
     Map<String, String>? settings,
+    List<MusicSourceField>? customFields,
   }) {
     return MusicSourceConfig(
       id: id ?? this.id,
@@ -76,6 +88,7 @@ class MusicSourceConfig {
       kind: kind ?? this.kind,
       enabled: enabled ?? this.enabled,
       settings: settings ?? this.settings,
+      customFields: customFields ?? this.customFields,
     );
   }
 
@@ -91,6 +104,25 @@ class MusicSourceConfig {
     }
 
     final rawEnabled = json['enabled'];
+    final fields = <MusicSourceField>[];
+    final rawFields = json['customFields'];
+    if (rawFields is List) {
+      for (final item in rawFields) {
+        if (item is! Map) continue;
+        final key = item['key']?.toString() ?? '';
+        if (key.isEmpty) continue;
+        fields.add(
+          MusicSourceField(
+            key,
+            item['label']?.toString() ?? key,
+            item['hint']?.toString() ?? '',
+            required: item['required'] == true,
+            numeric: item['numeric'] == true,
+          ),
+        );
+      }
+    }
+
     return MusicSourceConfig(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
@@ -98,6 +130,7 @@ class MusicSourceConfig {
       kind: _kindFromName(json['kind']?.toString()),
       enabled: rawEnabled is bool ? rawEnabled : true,
       settings: Map.unmodifiable(settings),
+      customFields: List.unmodifiable(fields),
     );
   }
 
@@ -108,6 +141,17 @@ class MusicSourceConfig {
     'kind': kind.name,
     'enabled': enabled,
     'settings': settings,
+    if (customFields.isNotEmpty)
+      'customFields': [
+        for (final field in customFields)
+          {
+            'key': field.key,
+            'label': field.label,
+            'hint': field.hint,
+            'required': field.required,
+            'numeric': field.numeric,
+          },
+      ],
   };
 
   static MusicSourceKind _kindFromName(String? name) {
