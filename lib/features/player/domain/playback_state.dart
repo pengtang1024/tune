@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 
 enum PlaybackStatus { idle, loading, playing, paused, error }
@@ -18,6 +19,12 @@ class PlaybackState {
   final int currentIndex;
   final String? errorMessage;
 
+  /// Where the audio of [currentSong] is read from.
+  final AudioSourceStatus audioSourceStatus;
+
+  /// Progress of the running download, between 0 and 1.
+  final double downloadProgress;
+
   const PlaybackState({
     this.currentSong,
     this.status = PlaybackStatus.idle,
@@ -29,6 +36,8 @@ class PlaybackState {
     this.queue = const [],
     this.currentIndex = -1,
     this.errorMessage,
+    this.audioSourceStatus = AudioSourceStatus.local,
+    this.downloadProgress = 0,
   });
 
   static const PlaybackState initial = PlaybackState();
@@ -39,6 +48,8 @@ class PlaybackState {
   bool get hasError => status == PlaybackStatus.error;
   bool get canGoNext => queue.length > 1;
   bool get canGoPrevious => queue.length > 1;
+
+  bool get isDownloading => audioSourceStatus == AudioSourceStatus.downloading;
 
   double get progress {
     if (duration.inMilliseconds <= 0) return 0;
@@ -58,6 +69,8 @@ class PlaybackState {
     List<Song>? queue,
     int? currentIndex,
     Object? errorMessage = _keep,
+    AudioSourceStatus? audioSourceStatus,
+    double? downloadProgress,
   }) {
     return PlaybackState(
       currentSong: identical(currentSong, _keep)
@@ -74,6 +87,8 @@ class PlaybackState {
       errorMessage: identical(errorMessage, _keep)
           ? this.errorMessage
           : errorMessage as String?,
+      audioSourceStatus: audioSourceStatus ?? this.audioSourceStatus,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
     );
   }
 }

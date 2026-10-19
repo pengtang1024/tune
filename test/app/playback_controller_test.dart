@@ -3,13 +3,18 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 
 import 'fake_audio_player_service.dart';
+import 'fake_song_download_service.dart';
+import 'fake_stream_url_resolver.dart';
 
 void main() {
   late FakeAudioPlayerService audio;
+  late FakeSongDownloadService downloads;
+  late FakeStreamUrlResolver resolver;
   late PlaybackController controller;
 
   const songA = Song(
@@ -37,9 +42,33 @@ void main() {
     uri: '/music/c.mp3',
   );
 
+  const remoteSong = Song(
+    id: 5,
+    title: 'Remote',
+    artist: 'Artist R',
+    album: 'Album R',
+    duration: 150000,
+    uri: 'tune://openverse/remote-1',
+    streamUrl: 'https://cdn.example.com/remote-1.mp3',
+  );
+
+  const expiringSong = Song(
+    id: 6,
+    title: 'Expiring',
+    artist: 'Artist E',
+    album: 'Album E',
+    duration: 100000,
+    uri: 'tune://netease/expiring-1',
+    sourceId: 'netease',
+    externalId: 'expiring-1',
+    streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=old',
+  );
+
   setUp(() {
     audio = FakeAudioPlayerService();
-    controller = PlaybackController(audio);
+    downloads = FakeSongDownloadService();
+    resolver = FakeStreamUrlResolver();
+    controller = PlaybackController(audio, downloads, resolver);
   });
 
   tearDown(() {
@@ -163,4 +192,140 @@ void main() {
       expect(audio.playedSong, songA);
     },
   );
+
+  group('local sources', () {
+    test('a local track plays straight from disk', () async {
+      await controller.playQueue([songA]);
+
+      expect(downloads.downloadedUris, isEmpty);
+      expect(audio.playedLocalFilePath, isNull);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.local);
+    });
+  });
+
+  group('remote sources', () {
+    test('a remote track is fetched before it plays', () async {
+      await controller.playQueue([remoteSong]);
+
+      expect(downloads.downloadedUris, [remoteSong.uri]);
+      expect(audio.playedLocalFilePath, isNotNull);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.cached);
+      expect(controller.state.downloadProgress, 1);
+      expect(controller.state.status, PlaybackStatus.playing);
+    });
+
+    test('a stored track is replayed without a new transfer', () async {
+      downloads.storedFiles[remoteSong.uri] = '/store/remote-1.mp3';
+
+      await controller.playQueue([remoteSong]);
+
+      expect(downloads.downloadedUris, isEmpty);
+      expect(audio.playedLocalFilePath, '/store/remote-1.mp3');
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.cached);
+    });
+
+    test('the transfer progress reaches the playback state', () async {
+      final observed = <double>[];
+      downloads.progressObserver = (_) {
+        observed.add(controller.state.downloadProgress);
+      };
+
+      await controller.playQueue([remoteSong]);
+
+      expect(observed, [0.5, 1.0]);
+    });
+
+    test('a failed transfer marks the source as failed', () async {
+      downloads.failDownloads = true;
+
+      await controller.playQueue([remoteSong]);
+
+      expect(controller.state.status, PlaybackStatus.error);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.failed);
+      expect(audio.playedSong, isNull);
+    });
+
+    test('a platform without a file system streams the track', () async {
+      downloads.isSupported = false;
+
+      await controller.playQueue([remoteSong]);
+
+      expect(downloads.downloadedUris, isEmpty);
+      expect(audio.playedLocalFilePath, isNull);
+      expect(audio.playedSong, remoteSong);
+      expect(controller.state.status, PlaybackStatus.playing);
+    });
+  });
+
+  group('expired addresses', () {
+    test('a broken address is refreshed once and replayed', () async {
+      resolver.responses[expiringSong.uri] = expiringSong.copyWith(
+        streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=new',
+      );
+      audio.nextPlayError = StateError('address expired');
+
+      await controller.playQueue([expiringSong]);
+
+      expect(resolver.refreshedUris, [expiringSong.uri]);
+      expect(audio.playCount, 2);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(
+        controller.state.queue.first.streamUrl,
+        'https://cdn.example.com/expiring-1.mp3?token=new',
+      );
+    });
+
+    test('a track that keeps failing ends in the error state', () async {
+      resolver.responses[expiringSong.uri] = expiringSong.copyWith(
+        streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=new',
+      );
+      audio.failPlays = true;
+
+      await controller.playQueue([expiringSong]);
+
+      expect(resolver.refreshedUris, [expiringSong.uri]);
+      expect(audio.playCount, 2);
+      expect(controller.state.status, PlaybackStatus.error);
+      expect(controller.state.errorMessage, contains('播放失败'));
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.failed);
+    });
+
+    test('a track without a source is not refreshed', () async {
+      audio.nextPlayError = StateError('cannot play');
+
+      await controller.playQueue([songA]);
+
+      expect(resolver.refreshedUris, isEmpty);
+      expect(audio.playCount, 1);
+      expect(controller.state.status, PlaybackStatus.error);
+    });
+
+    test(
+      'a backend error reported while loading triggers the refresh',
+      () async {
+        final gate = Completer<void>();
+        audio.playGate = gate;
+        resolver.responses[expiringSong.uri] = expiringSong.copyWith(
+          streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=new',
+        );
+
+        final playback = controller.playQueue([expiringSong]);
+        await pumpEventQueue();
+        expect(controller.state.status, PlaybackStatus.loading);
+
+        audio.emitError('address expired');
+        await pumpEventQueue();
+        gate.complete();
+        await playback;
+        await pumpEventQueue();
+
+        expect(resolver.refreshedUris, [expiringSong.uri]);
+        expect(controller.state.status, PlaybackStatus.playing);
+        expect(
+          controller.state.queue.first.streamUrl,
+          'https://cdn.example.com/expiring-1.mp3?token=new',
+        );
+      },
+    );
+  });
 }

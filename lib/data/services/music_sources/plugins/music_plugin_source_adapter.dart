@@ -10,7 +10,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// Playback URLs are resolved during the scan because the rest of the player
 /// only needs a plain [Song] with a `streamUrl`. Failed lookups are skipped so
 /// a single broken track cannot poison the whole source.
-class MusicPluginSourceAdapter implements MusicSourceAdapter {
+class MusicPluginSourceAdapter extends MusicSourceAdapter {
   static const _maxTracks = 12;
   static const _parallelism = 4;
 
@@ -115,20 +115,6 @@ class MusicPluginSourceAdapter implements MusicSourceAdapter {
       final url = SourceSongFactory.normalizeUrl(media['url']?.toString());
       if (url == null) return null;
 
-      final headers = <String, String>{};
-      final rawHeaders = media['headers'];
-      if (rawHeaders is Map) {
-        rawHeaders.forEach((key, value) {
-          if (key != null && value != null) {
-            headers[key.toString()] = value.toString();
-          }
-        });
-      }
-      final userAgent = media['userAgent']?.toString();
-      if (userAgent != null && userAgent.isNotEmpty) {
-        headers.putIfAbsent('User-Agent', () => userAgent);
-      }
-
       final durationSeconds = SourceSongFactory.parseInt(item['duration']);
       return SourceSongFactory.create(
         sourceId: sourceId,
@@ -140,12 +126,51 @@ class MusicPluginSourceAdapter implements MusicSourceAdapter {
         streamUrl: url,
         artworkUrl: item['artwork']?.toString(),
         sourceData: item,
-        httpHeaders: headers.isEmpty ? null : Map.unmodifiable(headers),
+        httpHeaders: _headersFrom(media),
         lyrics: item['rawLrc']?.toString(),
       );
     } catch (_) {
       // A broken item is skipped; the rest of the plugin results stay usable.
       return null;
     }
+  }
+
+  /// Asks the plugin for a new address of a track whose link expired.
+  ///
+  /// The original plugin item travels with the song, so the plugin can issue
+  /// a fresh link without the user searching again.
+  @override
+  Future<Song?> refreshStream(MusicSourceConfig config, Song song) async {
+    final item = song.sourceData;
+    if (item == null) return null;
+
+    final media = await runtime.getMediaSource(item);
+    final url = SourceSongFactory.normalizeUrl(media['url']?.toString());
+    if (url == null) return null;
+
+    final headers = _headersFrom(media);
+    return song.copyWith(
+      sourceId: config.id,
+      streamUrl: url,
+      httpHeaders: headers ?? song.httpHeaders,
+    );
+  }
+
+  /// Extracts the request headers a plugin demands for its stream URL.
+  Map<String, String>? _headersFrom(Map<String, dynamic> media) {
+    final headers = <String, String>{};
+    final rawHeaders = media['headers'];
+    if (rawHeaders is Map) {
+      rawHeaders.forEach((key, value) {
+        if (key != null && value != null) {
+          headers[key.toString()] = value.toString();
+        }
+      });
+    }
+    final userAgent = media['userAgent']?.toString();
+    if (userAgent != null && userAgent.isNotEmpty) {
+      headers.putIfAbsent('User-Agent', () => userAgent);
+    }
+    return headers.isEmpty ? null : Map.unmodifiable(headers);
   }
 }

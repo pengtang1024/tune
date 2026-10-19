@@ -8,10 +8,19 @@ class FakeAudioPlayerService implements AudioPlayerService {
   final _durationController = StreamController<Duration?>.broadcast();
   final _playingController = StreamController<bool>.broadcast();
   final _completionController = StreamController<void>.broadcast();
+  final _errorController = StreamController<AudioPlayerError>.broadcast();
 
   Song? playedSong;
+  String? playedLocalFilePath;
   int playCount = 0;
   Completer<void>? playGate;
+
+  /// When set, the next [play] call throws this error and clears the field.
+  Object? nextPlayError;
+
+  /// When true every [play] call throws.
+  bool failPlays = false;
+
   bool _playing = false;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
@@ -22,9 +31,16 @@ class FakeAudioPlayerService implements AudioPlayerService {
   Future<void> init() async {}
 
   @override
-  Future<void> play(Song song) async {
+  Future<void> play(Song song, {String? localFilePath}) async {
     playedSong = song;
+    playedLocalFilePath = localFilePath;
     playCount++;
+    if (failPlays) throw StateError('play failed');
+    final error = nextPlayError;
+    if (error != null) {
+      nextPlayError = null;
+      throw error;
+    }
     _position = Duration.zero;
     _duration = Duration(milliseconds: song.durationInMillis);
     if (playGate != null) await playGate!.future;
@@ -96,6 +112,9 @@ class FakeAudioPlayerService implements AudioPlayerService {
   @override
   Stream<void> get completionStream => _completionController.stream;
 
+  @override
+  Stream<AudioPlayerError> get errorStream => _errorController.stream;
+
   void emitPosition(Duration position) {
     _position = position;
     _positionController.add(position);
@@ -106,11 +125,17 @@ class FakeAudioPlayerService implements AudioPlayerService {
     _completionController.add(null);
   }
 
+  /// Reports a backend failure the way a real player does.
+  void emitError(String message, {int? code}) {
+    _errorController.add(AudioPlayerError(message: message, code: code));
+  }
+
   @override
   void dispose() {
     _positionController.close();
     _durationController.close();
     _playingController.close();
     _completionController.close();
+    _errorController.close();
   }
 }

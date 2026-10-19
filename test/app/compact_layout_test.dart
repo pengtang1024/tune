@@ -19,6 +19,8 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 import 'fake_audio_player_service.dart';
+import 'fake_song_download_service.dart';
+import 'fake_stream_url_resolver.dart';
 
 void main() {
   const songA = Song(
@@ -265,7 +267,11 @@ void main() {
     await setSurface(tester, const Size(760, 483));
     final audio = FakeAudioPlayerService();
     addTearDown(audio.dispose);
-    final controller = PlaybackController(audio);
+    final controller = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
     await controller.playQueue([songA, songB, songC]);
 
     await tester.pumpWidget(
@@ -289,7 +295,11 @@ void main() {
     await setSurface(tester, const Size(760, 483));
     final audio = FakeAudioPlayerService();
     addTearDown(audio.dispose);
-    final controller = PlaybackController(audio);
+    final controller = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
     await controller.playQueue([remoteSong]);
 
     await tester.pumpWidget(

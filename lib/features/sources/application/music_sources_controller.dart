@@ -12,6 +12,21 @@ final musicSourcesControllerProvider =
       MusicSourcesController.new,
     );
 
+/// Display names of every configured source, keyed by source id.
+///
+/// Track lists resolve the name of the source a track came from through this
+/// map, so the same source is never named differently in two places.
+final musicSourceNamesProvider = Provider<Map<String, String>>((ref) {
+  final sources = ref.watch(
+    musicSourcesControllerProvider.select(
+      (value) => value.valueOrNull?.sources ?? const <MusicSourceConfig>[],
+    ),
+  );
+  return {
+    for (final source in sources) source.id: source.name,
+  };
+});
+
 /// Owns the user-facing source list (enable flags and adapter settings).
 ///
 /// Scanned songs belong to the library controller; this controller never

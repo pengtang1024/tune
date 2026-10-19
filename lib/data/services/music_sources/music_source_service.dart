@@ -10,7 +10,9 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
+import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -18,7 +20,7 @@ import 'package:tune/utils/logger.dart';
 ///
 /// The service is intentionally independent from Riverpod; the library
 /// controller owns progress and state, while this class only orchestrates I/O.
-class MusicSourceService {
+class MusicSourceService implements StreamUrlResolver {
   final MusicSourceStore _store;
   final MusicPluginRepository _pluginRepository;
   final Map<String, MusicSourceAdapter> _adapters;
@@ -83,6 +85,37 @@ class MusicSourceService {
     final builtIn = _adapters[config.id];
     if (builtIn != null) return builtIn;
     if (config.isPlugin) return _pluginRepository.adapterFor(config);
+    return null;
+  }
+
+  /// Asks the owning source for a fresh address of [song].
+  ///
+  /// Only remote tracks can expire, so local files never reach the source.
+  /// Errors are swallowed on purpose: the player reports the failure and the
+  /// user decides what to do next.
+  @override
+  Future<Song?> refresh(Song song) async {
+    final sourceId = song.sourceId;
+    if (sourceId == null || sourceId.isEmpty) return null;
+    if (!song.isRemote) return null;
+
+    try {
+      final config = _configFor(sourceId);
+      if (config == null) return null;
+      final adapter = await _adapterFor(config);
+      if (adapter == null) return null;
+      return await adapter.refreshStream(config, song);
+    } catch (error, stackTrace) {
+      Log.error('刷新播放地址失败: $error\n$stackTrace');
+      return null;
+    }
+  }
+
+  /// Looks up the persisted configuration that owns [sourceId].
+  MusicSourceConfig? _configFor(String sourceId) {
+    for (final config in _store.loadConfigs()) {
+      if (config.id == sourceId) return config;
+    }
     return null;
   }
 

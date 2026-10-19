@@ -9,7 +9,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 ///
 /// The adapter only talks to the base URL configured by the user; it does not
 /// bundle or call any third-party service by default.
-class NeteaseCloudMusicSourceAdapter implements MusicSourceAdapter {
+class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
   final Dio _dio;
 
   NeteaseCloudMusicSourceAdapter({Dio? dio})
@@ -110,6 +110,25 @@ class NeteaseCloudMusicSourceAdapter implements MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
+  }
+
+  /// Asks the self-hosted API for a fresh address of a track.
+  ///
+  /// Netease links carry a short-lived signature, so a cached link stops
+  /// working a few minutes after the scan.
+  @override
+  Future<Song?> refreshStream(MusicSourceConfig config, Song song) async {
+    final baseUrl = _baseUrl(config);
+    if (baseUrl == null) return null;
+
+    final externalId = song.externalId ?? '';
+    if (externalId.isEmpty) return null;
+
+    final urls = await _resolveStreamUrls(baseUrl, [externalId]);
+    final url = urls[externalId];
+    if (url == null) return null;
+
+    return song.copyWith(streamUrl: url);
   }
 
   String? _baseUrl(MusicSourceConfig config) {

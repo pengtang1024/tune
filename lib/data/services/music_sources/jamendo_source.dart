@@ -9,7 +9,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 ///
 /// It requires a free Client ID from https://developer.jamendo.com/, so the
 /// source stays disabled until the user configures one.
-class JamendoSourceAdapter implements MusicSourceAdapter {
+class JamendoSourceAdapter extends MusicSourceAdapter {
   final Dio _dio;
 
   JamendoSourceAdapter({Dio? dio})

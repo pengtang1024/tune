@@ -10,7 +10,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 ///
 /// The API works without a key. Anonymous requests are rate limited, so the
 /// source is scanned at most once per [autoScanInterval].
-class OpenverseSourceAdapter implements MusicSourceAdapter {
+class OpenverseSourceAdapter extends MusicSourceAdapter {
   final Dio _dio;
 
   OpenverseSourceAdapter({Dio? dio})

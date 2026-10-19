@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
-import 'package:tune/shared/utils/duration_format.dart';
+import 'package:tune/shared/ui/page_heading.dart';
+import 'package:tune/shared/ui/source_label.dart';
 
+/// The play queue page.
+///
+/// The page owns the order of the queue; every entry is rendered by
+/// [QueueTrackRow].
 class QueuePane extends ConsumerWidget {
   const QueuePane({super.key});
 
@@ -29,57 +33,22 @@ class QueuePane extends ConsumerWidget {
     final currentUri = view.$3;
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
-    final sourceNames = ref.watch(
-      musicSourcesControllerProvider.select((value) {
-        final sources = value.valueOrNull?.sources ?? const [];
-        return {for (final source in sources) source.id: source.name};
-      }),
-    );
-    final theme = Theme.of(context);
+    final sourceNames = ref.watch(musicSourceNamesProvider);
 
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            CompactTokens.space16,
-            CompactTokens.space12,
-            CompactTokens.space8,
-            CompactTokens.space8,
-          ),
-          child: Row(
-            children: [
-              Text(
-                '播放队列',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: CompactTokens.space8),
-              Text(
-                '${queue.length} 首',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: queue.isEmpty
-                    ? null
-                    : () => _confirmClear(context, ref),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 28),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CompactTokens.space8,
-                  ),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  foregroundColor: theme.colorScheme.onSurfaceVariant,
-                ),
-                child: const Text('清空', style: TextStyle(fontSize: 11)),
-              ),
-            ],
+          padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
+          child: PageHeading(
+            eyebrow: 'QUEUE',
+            title: '播放队列',
+            subtitle: '当前播放顺序',
+            trailing: _QueueActions(
+              count: queue.length,
+              onClear: queue.isEmpty
+                  ? null
+                  : () => _confirmClear(context, ref),
+            ),
           ),
         ),
         Expanded(
@@ -95,29 +64,31 @@ class QueuePane extends ConsumerWidget {
                   ),
                 )
               : ReorderableListView.builder(
-                  padding: const EdgeInsets.only(bottom: CompactTokens.space8),
+                  padding: const EdgeInsets.fromLTRB(
+                    28,
+                    0,
+                    28,
+                    CompactTokens.space8,
+                  ),
                   buildDefaultDragHandles: false,
                   itemCount: queue.length,
                   onReorder: controller.reorderQueue,
                   proxyDecorator: (child, index, animation) {
                     return Material(
                       elevation: 2,
-                      color: theme.colorScheme.surfaceContainer,
+                      color: Theme.of(context).colorScheme.surfaceContainer,
                       child: child,
                     );
                   },
                   itemBuilder: (context, index) {
                     final song = queue[index];
-                    return _QueueSongRow(
+                    return QueueTrackRow(
                       key: ValueKey(song.uri),
                       song: song,
                       index: index,
                       selected: index == currentIndex,
                       playing: isPlaying && song.uri == currentUri,
-                      sourceName:
-                          song.sourceId == null || song.sourceId == 'local'
-                          ? null
-                          : sourceNames[song.sourceId] ?? song.sourceId,
+                      sourceName: sourceLabel(song, sourceNames),
                       onTap: () => controller.playAt(index),
                       onRemove: () => controller.removeFromQueue(index),
                     );
@@ -153,159 +124,42 @@ class QueuePane extends ConsumerWidget {
   }
 }
 
-class _QueueSongRow extends StatelessWidget {
-  final Song song;
-  final int index;
-  final bool selected;
-  final bool playing;
-  final String? sourceName;
-  final VoidCallback onTap;
-  final VoidCallback onRemove;
+/// Track count and the action that empties the queue.
+class _QueueActions extends StatelessWidget {
+  final int count;
+  final VoidCallback? onClear;
 
-  const _QueueSongRow({
-    super.key,
-    required this.song,
-    required this.index,
-    required this.selected,
-    required this.playing,
-    this.sourceName,
-    required this.onTap,
-    required this.onRemove,
-  });
+  const _QueueActions({required this.count, required this.onClear});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
 
-    return InkWell(
-      onTap: onTap,
-      hoverColor: theme.colorScheme.primary.withValues(alpha: 0.04),
-      child: Container(
-        height: CompactTokens.rowHeight,
-        decoration: BoxDecoration(
-          color: selected
-              ? theme.colorScheme.primary.withValues(alpha: 0.06)
-              : Colors.transparent,
-          border: Border(
-            bottom: BorderSide(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-            ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$count 首',
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontSize: 11,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 2,
-              height: double.infinity,
-              color: selected ? theme.colorScheme.primary : Colors.transparent,
+        const SizedBox(width: CompactTokens.space8),
+        TextButton(
+          onPressed: onClear,
+          style: TextButton.styleFrom(
+            minimumSize: const Size(0, 28),
+            padding: const EdgeInsets.symmetric(
+              horizontal: CompactTokens.space8,
             ),
-            const SizedBox(width: CompactTokens.space8),
-            SizedBox(
-              width: 22,
-              child: Center(
-                child: selected
-                    ? Icon(
-                        playing
-                            ? Icons.equalizer_rounded
-                            : Icons.play_arrow_rounded,
-                        size: CompactTokens.icon16,
-                        color: theme.colorScheme.primary,
-                      )
-                    : Text(
-                        '${index + 1}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontSize: 11,
-                          color: muted,
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(width: CompactTokens.space8),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    song.title.isEmpty ? '未知歌曲' : song.title,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 13,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected ? theme.colorScheme.primary : null,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    song.artist.isEmpty ? '未知艺术家' : song.artist,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 11,
-                      color: muted,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            if (sourceName != null) ...[
-              const SizedBox(width: CompactTokens.space6),
-              Tooltip(
-                message: sourceName!,
-                child: Icon(
-                  Icons.public_rounded,
-                  size: 12,
-                  color: muted.withValues(alpha: 0.8),
-                ),
-              ),
-            ],
-            const SizedBox(width: CompactTokens.space8),
-            Text(
-              formatDuration(Duration(milliseconds: song.durationInMillis)),
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 11,
-                color: muted,
-              ),
-            ),
-            ReorderableDragStartListener(
-              index: index,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.grab,
-                child: SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: Icon(
-                    Icons.drag_indicator_rounded,
-                    size: CompactTokens.icon16,
-                    color: muted.withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 28,
-              height: 28,
-              child: IconButton(
-                tooltip: context.loc.remove,
-                onPressed: onRemove,
-                icon: const Icon(Icons.close_rounded, size: 14),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(
-                  width: 28,
-                  height: 28,
-                ),
-                style: IconButton.styleFrom(
-                  foregroundColor: muted,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-            ),
-            const SizedBox(width: CompactTokens.space4),
-          ],
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+            foregroundColor: theme.colorScheme.onSurfaceVariant,
+          ),
+          child: const Text('清空', style: TextStyle(fontSize: 11)),
         ),
-      ),
+      ],
     );
   }
 }

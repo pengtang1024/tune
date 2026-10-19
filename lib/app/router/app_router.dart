@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
@@ -15,7 +16,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (path == '/library' ||
           path == '/queue' ||
           path == '/sources' ||
-          path == '/settings') {
+          path == '/settings' ||
+          path == '/now-playing') {
         return null;
       }
       // The compact player replaces the old four-tab shell. Any old deep link
@@ -45,6 +47,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const SettingsPane(),
           ),
         ],
+      ),
+      // The now playing view lives on the root navigator so it covers the
+      // whole window instead of only the content area of the shell.
+      GoRoute(
+        path: '/now-playing',
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 280),
+          reverseTransitionDuration: const Duration(milliseconds: 200),
+          child: const NowPlayingPage(),
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) {
+                final curved = CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                );
+                return FadeTransition(
+                  opacity: curved,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.06),
+                      end: Offset.zero,
+                    ).animate(curved),
+                    child: child,
+                  ),
+                );
+              },
+        ),
       ),
     ],
     errorBuilder: (context, state) {

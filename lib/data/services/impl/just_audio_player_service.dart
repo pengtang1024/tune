@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
@@ -10,6 +11,15 @@ import 'package:tune/utils/logger.dart';
 /// 基于just_audio的音频播放服务实现
 class JustAudioPlayerService implements AudioPlayerService {
   AudioPlayer? _audioPlayer;
+
+  /// 广播控制器：把 just_audio 的错误事件转成应用层错误。
+  ///
+  /// 控制器在字段初始化时创建，避免每次读取 [errorStream] 都新建一个
+  /// 无人监听的流。
+  final StreamController<AudioPlayerError> _errorController =
+      StreamController<AudioPlayerError>.broadcast();
+
+  StreamSubscription<PlayerException>? _errorSubscription;
 
   /// 初始化服务
   @override
@@ -43,6 +53,7 @@ class JustAudioPlayerService implements AudioPlayerService {
         ),
       );
       _audioPlayer = AudioPlayer();
+      _listenForErrors(_audioPlayer!);
       Log.info('音频播放器初始化完成，已配置媒体会话');
     } catch (e, stackTrace) {
       Log.error('初始化音频播放器失败: $e\nStack trace: $stackTrace');
@@ -50,16 +61,30 @@ class JustAudioPlayerService implements AudioPlayerService {
     }
   }
 
+  /// 把播放后端的错误事件转发给上层。
+  void _listenForErrors(AudioPlayer player) {
+    _errorSubscription?.cancel();
+    _errorSubscription = player.errorStream.listen((error) {
+      Log.error('播放后端报错: $error');
+      if (_errorController.isClosed) return;
+      _errorController.add(
+        AudioPlayerError(message: error.message ?? '音频加载失败', code: error.code),
+      );
+    });
+  }
+
   @override
-  Future<void> play(Song song) async {
+  Future<void> play(Song song, {String? localFilePath}) async {
     try {
       // 确保播放器已初始化
       if (_audioPlayer == null) {
         await init();
       }
 
-      // 远程音源使用 streamUrl，本地歌曲回退到 uri。
-      final String audioPath = song.playbackUri;
+      // 本地副本优先；没有副本时才回退到歌曲自身的地址。
+      final String audioPath = localFilePath != null && localFilePath.isNotEmpty
+          ? localFilePath
+          : song.playbackUri;
 
       // 检查音频路径是否为空
       if (audioPath.isEmpty) {
@@ -227,8 +252,16 @@ class JustAudioPlayerService implements AudioPlayerService {
   }
 
   @override
+  Stream<AudioPlayerError> get errorStream => _errorController.stream;
+
+  @override
   void dispose() {
     try {
+      _errorSubscription?.cancel();
+      _errorSubscription = null;
+      if (!_errorController.isClosed) {
+        _errorController.close();
+      }
       _audioPlayer?.dispose();
       _audioPlayer = null;
       Log.info('音频播放器资源释放成功');

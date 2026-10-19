@@ -196,6 +196,14 @@ class Song {
   String get playbackUri =>
       streamUrl != null && streamUrl!.isNotEmpty ? streamUrl! : uri;
 
+  /// Whether the audio has to be fetched from the network.
+  ///
+  /// Local tracks carry a file path, remote sources carry an HTTP URL.
+  bool get isRemote {
+    final target = playbackUri;
+    return target.startsWith('http://') || target.startsWith('https://');
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,

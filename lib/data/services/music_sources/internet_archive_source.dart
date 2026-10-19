@@ -9,7 +9,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 ///
 /// The advanced search returns item identifiers, and a second metadata request
 /// resolves the first playable audio file inside each item.
-class InternetArchiveSourceAdapter implements MusicSourceAdapter {
+class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   static const _audioExtensions = ['.mp3', '.ogg', '.m4a', '.flac'];
 
   final Dio _dio;

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 
 /// Everything an adapter needs for one scan.
@@ -35,6 +36,14 @@ abstract class MusicSourceAdapter {
   Duration get scanTimeout => const Duration(seconds: 45);
 
   Future<SourceScanResult> scan(MusicSourceScanRequest request);
+
+  /// Rebuilds the playable address of [song] when the stored one expired.
+  ///
+  /// Adapters whose addresses never expire return `null`, which tells the
+  /// player that no retry is possible.
+  Future<Song?> refreshStream(MusicSourceConfig config, Song song) async {
+    return null;
+  }
 }
 
 SourceScanResult failedResult(String sourceId, Object error) {

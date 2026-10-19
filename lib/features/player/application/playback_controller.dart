@@ -3,8 +3,13 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/audio_player_service.dart';
+import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/data/services/providers/song_download_service_provider.dart';
+import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
+import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/utils/logger.dart';
@@ -12,7 +17,9 @@ import 'package:tune/utils/logger.dart';
 final playbackControllerProvider =
     StateNotifierProvider<PlaybackController, PlaybackState>((ref) {
       final audio = ref.watch(audioPlayerServiceProvider);
-      return PlaybackController(audio);
+      final downloads = ref.watch(songDownloadServiceProvider);
+      final resolver = ref.watch(streamUrlResolverProvider);
+      return PlaybackController(audio, downloads, resolver);
     });
 
 /// Owns playback and queue state.
@@ -21,7 +28,8 @@ final playbackControllerProvider =
 /// notifications, or library widgets. Side effects such as statistics or
 /// history belong in listeners outside this class.
 class PlaybackController extends StateNotifier<PlaybackState> {
-  PlaybackController(this._audio) : super(PlaybackState.initial) {
+  PlaybackController(this._audio, this._downloads, this._resolver)
+    : super(PlaybackState.initial) {
     _subscriptions.add(_audio.positionStream.listen(_handlePosition));
     _subscriptions.add(_audio.durationStream.listen(_handleDuration));
     _subscriptions.add(_audio.playingStream.listen(_handlePlaying));
@@ -30,15 +38,34 @@ class PlaybackController extends StateNotifier<PlaybackState> {
         _handleCompletion();
       }),
     );
+    _subscriptions.add(_audio.errorStream.listen(_handlePlayerError));
   }
 
   final AudioPlayerService _audio;
+  final SongDownloadService _downloads;
+  final StreamUrlResolver _resolver;
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   final Random _random = Random();
+
+  /// How many times a failing track may get a fresh address.
+  static const _maxRefreshAttempts = 1;
 
   String? _loadedSongUri;
   bool _handlingCompletion = false;
   int _loadRequest = 0;
+
+  /// Number of refresh attempts spent on the current track.
+  int _refreshAttempts = 0;
+
+  /// Guards the asynchronous backend error handler while a refresh runs.
+  bool _retryInProgress = false;
+
+  /// Load request whose failure was already handled.
+  ///
+  /// A failing load can report the problem twice: once through the thrown
+  /// exception and once through the backend error stream. Both must end up in
+  /// the same handler, but only once.
+  int? _failureHandledForRequest;
 
   // ---------------------------------------------------------------------------
   // Audio event handlers
@@ -94,6 +121,26 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
   }
 
+  /// Handles a failure the backend reported asynchronously.
+  ///
+  /// The backend may report a broken address long after the load future
+  /// returned, so the track can sit in "loading" forever without this hook.
+  Future<void> _handlePlayerError(AudioPlayerError error) async {
+    if (!mounted || state.hasError || !state.hasTrack) return;
+    if (state.status != PlaybackStatus.loading) return;
+    if (_retryInProgress) return;
+
+    final song = state.currentSong;
+    if (song == null) return;
+
+    await _handleLoadFailure(
+      index: state.currentIndex,
+      song: song,
+      request: _loadRequest,
+      message: '播放失败: ${error.message}',
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Public playback API
   // ---------------------------------------------------------------------------
@@ -116,14 +163,17 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     final queue = List<Song>.unmodifiable(playable);
     if (!foundStart) index = queue.length - 1;
     index = index.clamp(0, queue.length - 1);
+    final song = queue[index];
     state = state.copyWith(
       queue: queue,
       currentIndex: index,
-      currentSong: queue[index],
+      currentSong: song,
       status: PlaybackStatus.loading,
       position: Duration.zero,
-      duration: _knownDuration(queue[index]),
+      duration: _knownDuration(song),
       errorMessage: null,
+      audioSourceStatus: _initialSourceStatus(song),
+      downloadProgress: 0,
     );
 
     await _startAt(index);
@@ -339,6 +389,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       queue: const [],
       currentIndex: -1,
       errorMessage: null,
+      audioSourceStatus: AudioSourceStatus.local,
+      downloadProgress: 0,
     );
   }
 
@@ -346,10 +398,16 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   // Internals
   // ---------------------------------------------------------------------------
 
-  Future<void> _startAt(int index) async {
+  /// Loads the track at [index] and starts playing it.
+  ///
+  /// [isRetry] marks the attempt that follows a successful address refresh;
+  /// only that attempt keeps the refresh budget, every fresh selection starts
+  /// over with a full budget.
+  Future<void> _startAt(int index, {bool isRetry = false}) async {
     if (index < 0 || index >= state.queue.length) return;
     final song = state.queue[index];
     final request = ++_loadRequest;
+    if (!isRetry) _refreshAttempts = 0;
 
     state = state.copyWith(
       currentIndex: index,
@@ -358,10 +416,15 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       position: Duration.zero,
       duration: _knownDuration(song),
       errorMessage: null,
+      audioSourceStatus: _initialSourceStatus(song),
+      downloadProgress: 0,
     );
 
     try {
-      await _audio.play(song);
+      final localFile = await _resolveLocalFile(song, request);
+      if (!mounted || request != _loadRequest) return;
+
+      await _audio.play(song, localFilePath: localFile);
       if (!mounted || request != _loadRequest) return;
       _loadedSongUri = song.uri;
 
@@ -375,9 +438,127 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       );
     } catch (error, stackTrace) {
       if (!mounted || request != _loadRequest) return;
-      _loadedSongUri = null;
-      _setError('播放失败: $error', stackTrace);
+      await _handleLoadFailure(
+        index: index,
+        song: song,
+        request: request,
+        message: '播放失败: $error',
+        stackTrace: stackTrace,
+      );
     }
+  }
+
+  /// Single entry point for every playback failure.
+  ///
+  /// A remote track whose address expired gets one fresh address and one
+  /// retry; everything else fails right away so the user sees the error.
+  Future<void> _handleLoadFailure({
+    required int index,
+    required Song song,
+    required int request,
+    required String message,
+    StackTrace? stackTrace,
+  }) async {
+    if (!mounted || request != _loadRequest) return;
+    if (_failureHandledForRequest == request) return;
+    _failureHandledForRequest = request;
+    _loadedSongUri = null;
+
+    final refreshed = await _tryRefresh(song, request);
+    if (!mounted || request != _loadRequest) return;
+
+    if (refreshed != null) {
+      _replaceQueueEntry(index, refreshed);
+      await _startAt(index, isRetry: true);
+      return;
+    }
+
+    if (song.isRemote) {
+      state = state.copyWith(audioSourceStatus: AudioSourceStatus.failed);
+    }
+    _setError(message, stackTrace);
+  }
+
+  /// Asks the owning source for a new address of [song].
+  ///
+  /// Returns `null` when the track has no source, when the source cannot
+  /// issue a new address, or when the refresh budget is used up.
+  Future<Song?> _tryRefresh(Song song, int request) async {
+    if (_refreshAttempts >= _maxRefreshAttempts) return null;
+    if (!song.isRemote) return null;
+    final sourceId = song.sourceId;
+    if (sourceId == null || sourceId.isEmpty) return null;
+
+    _refreshAttempts++;
+    _retryInProgress = true;
+    try {
+      final refreshed = await _resolver.refresh(song);
+      if (!mounted || request != _loadRequest) return null;
+      if (refreshed == null) return null;
+      Log.info('已刷新播放地址: ${song.title}');
+      return refreshed;
+    } catch (error, stackTrace) {
+      Log.error('刷新播放地址失败: $error\n$stackTrace');
+      return null;
+    } finally {
+      _retryInProgress = false;
+    }
+  }
+
+  /// Replaces the queued track with the refreshed one.
+  ///
+  /// The new address stays inside the queue; the library keeps the address
+  /// that was stored during the last scan.
+  void _replaceQueueEntry(int index, Song song) {
+    if (index < 0 || index >= state.queue.length) return;
+    final queue = List<Song>.of(state.queue)..[index] = song;
+    state = state.copyWith(queue: List<Song>.unmodifiable(queue));
+  }
+
+  /// Makes sure a remote track is stored on disk before it is played.
+  ///
+  /// Local tracks are returned as `null` so the backend keeps using their own
+  /// path. Remote tracks are downloaded once and replayed from the store
+  /// afterwards. Platforms without a file system stream the track directly.
+  Future<String?> _resolveLocalFile(Song song, int request) async {
+    if (!song.isRemote || !_downloads.isSupported) return null;
+
+    final stored = await _downloads.storedFileFor(song);
+    if (!mounted || request != _loadRequest) return null;
+    if (stored != null) {
+      state = state.copyWith(
+        audioSourceStatus: AudioSourceStatus.cached,
+        downloadProgress: 1,
+      );
+      return stored;
+    }
+
+    state = state.copyWith(
+      audioSourceStatus: AudioSourceStatus.downloading,
+      downloadProgress: 0,
+    );
+
+    final downloaded = await _downloads.download(
+      song,
+      onProgress: (progress) {
+        if (!mounted || request != _loadRequest) return;
+        state = state.copyWith(downloadProgress: progress);
+      },
+    );
+    if (!mounted || request != _loadRequest) return null;
+
+    state = state.copyWith(
+      audioSourceStatus: AudioSourceStatus.cached,
+      downloadProgress: 1,
+    );
+    return downloaded;
+  }
+
+  /// The source status a track starts in before it is resolved.
+  AudioSourceStatus _initialSourceStatus(Song song) {
+    return song.isRemote
+        ? AudioSourceStatus.downloading
+        : AudioSourceStatus.local;
   }
 
   int _randomIndex({required int excluding}) {

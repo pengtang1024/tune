@@ -4,7 +4,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 
 /// Wraps the existing recursive file scanner as the built-in local source.
-class LocalDirectorySourceAdapter implements MusicSourceAdapter {
+class LocalDirectorySourceAdapter extends MusicSourceAdapter {
   final CrossPlatformMusicScanner _scanner;
 
   LocalDirectorySourceAdapter(this._scanner);

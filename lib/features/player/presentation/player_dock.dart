@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
+import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
@@ -41,9 +43,7 @@ class PlayerDock extends ConsumerWidget {
               Expanded(
                 flex: 3,
                 child: InkWell(
-                  onTap: song == null
-                      ? null
-                      : () => _showNowPlaying(context, state),
+                  onTap: song == null ? null : () => context.push('/now-playing'),
                   borderRadius: BorderRadius.circular(12),
                   child: Row(
                     children: [
@@ -71,20 +71,35 @@ class PlayerDock extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 3),
-                            Text(
-                              song == null
-                                  ? 'TUNE · READY'
-                                  : (song.artist.isEmpty
-                                        ? 'UNKNOWN ARTIST'
-                                        : song.artist),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontFamily: 'JetBrains Mono',
-                                fontSize: 9,
-                                letterSpacing: 0.5,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    song == null
+                                        ? 'TUNE · READY'
+                                        : (song.artist.isEmpty
+                                              ? 'UNKNOWN ARTIST'
+                                              : song.artist),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontFamily: 'JetBrains Mono',
+                                      fontSize: 9,
+                                      letterSpacing: 0.5,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                if (state.audioSourceStatus !=
+                                    AudioSourceStatus.local) ...[
+                                  const SizedBox(width: 8),
+                                  AudioSourceBadge(
+                                    status: state.audioSourceStatus,
+                                    progress: state.downloadProgress,
+                                    dense: true,
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
@@ -207,7 +222,7 @@ class PlayerDock extends ConsumerWidget {
                       size: 17,
                       onPressed: song == null
                           ? null
-                          : () => _showNowPlaying(context, state),
+                          : () => context.push('/now-playing'),
                     ),
                   ],
                 ),
@@ -237,31 +252,6 @@ class PlayerDock extends ConsumerWidget {
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
-    );
-  }
-
-  void _showNowPlaying(BuildContext context, PlaybackState state) {
-    showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Now playing',
-      barrierColor: Colors.black.withValues(alpha: 0.55),
-      transitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          NowPlayingView(state: state),
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(
-            scale: Tween(begin: 0.97, end: 1.0).animate(curved),
-            child: child,
-          ),
-        );
-      },
     );
   }
 }
@@ -367,140 +357,6 @@ class _ModeButton extends StatelessWidget {
             color: active
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class NowPlayingView extends ConsumerWidget {
-  final PlaybackState state;
-  const NowPlayingView({super.key, required this.state});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final controller = ref.read(playbackControllerProvider.notifier);
-    final current = ref.watch(playbackControllerProvider).currentSong;
-
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: 560,
-          height: 460,
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: theme.colorScheme.outlineVariant),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.45),
-                blurRadius: 50,
-                offset: const Offset(0, 22),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Row(
-                children: [
-                  ArtworkThumb(
-                    path: current?.albumArtPath,
-                    imageUrl: current?.artworkUrl,
-                    size: 300,
-                    radius: 22,
-                  ),
-                  const SizedBox(width: 30),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'NOW PLAYING',
-                          style: TextStyle(
-                            fontFamily: 'JetBrains Mono',
-                            fontSize: 9,
-                            letterSpacing: 1.8,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          current?.title ?? 'Tune',
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            fontFamily: 'Fraunces',
-                            fontSize: 38,
-                            height: 1.02,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          current?.artist ?? 'Waiting for a track',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            _DockIcon(
-                              icon: Icons.skip_previous_rounded,
-                              tooltip: '上一首',
-                              size: 24,
-                              onPressed: controller.previous,
-                            ),
-                            const SizedBox(width: 8),
-                            _PlayButton(
-                              state: state,
-                              onPressed: controller.togglePlayPause,
-                            ),
-                            const SizedBox(width: 8),
-                            _DockIcon(
-                              icon: Icons.skip_next_rounded,
-                              tooltip: '下一首',
-                              size: 24,
-                              onPressed: controller.next,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                        Slider(
-                          value: state.duration.inMilliseconds <= 0
-                              ? 0
-                              : (state.position.inMilliseconds /
-                                        state.duration.inMilliseconds)
-                                    .clamp(0.0, 1.0),
-                          onChanged: (value) => controller.seekTo(
-                            Duration(
-                              milliseconds:
-                                  (state.duration.inMilliseconds * value)
-                                      .round(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
-                  tooltip: '关闭',
-                ),
-              ),
-            ],
           ),
         ),
       ),
