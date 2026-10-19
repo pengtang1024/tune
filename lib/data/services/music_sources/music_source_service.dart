@@ -86,6 +86,65 @@ class MusicSourceService {
     return null;
   }
 
+  /// Searches every enabled remote source without touching scan timestamps.
+  ///
+  /// This is intentionally separate from [scanAll]: an on-demand search must
+  /// not make the startup auto-scan believe a source has already been refreshed.
+  Future<List<SourceScanResult>> search({
+    required List<MusicSourceConfig> sources,
+    required String query,
+    void Function(String sourceId, double progress)? onProgress,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return const [];
+
+    final candidates = sources
+        .where((config) => config.enabled && !config.isLocal)
+        .toList(growable: false);
+    if (candidates.isEmpty) return const [];
+
+    return Future.wait(
+      candidates.map((config) async {
+        onProgress?.call(config.id, 0);
+        final MusicSourceAdapter? adapter;
+        try {
+          adapter = await _adapterFor(config);
+        } catch (error) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.failed,
+            message: config.isPlugin
+                ? '插件加载失败：${describeSourceError(error)}'
+                : describeSourceError(error),
+          );
+        }
+        if (adapter == null) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.failed,
+            message: '暂不支持该音源',
+          );
+        }
+
+        final searchConfig = config.copyWith(
+          settings: {...config.settings, 'query': trimmed, 'keywords': trimmed},
+        );
+        try {
+          final result = await adapter.scan(
+            MusicSourceScanRequest(
+              config: searchConfig,
+              onProgress: (progress) => onProgress?.call(config.id, progress),
+            ),
+          );
+          onProgress?.call(config.id, 1);
+          return result;
+        } catch (error) {
+          return failedResult(config.id, error);
+        }
+      }),
+    );
+  }
+
   Future<List<SourceScanResult>> scanAll({
     required List<MusicSourceConfig> sources,
     required List<String> localPaths,

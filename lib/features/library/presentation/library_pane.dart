@@ -8,6 +8,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_song_row.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
@@ -125,6 +126,22 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(width: CompactTokens.space12),
+              OutlinedButton.icon(
+                onPressed: () => showOnlineSearchSheet(context),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 34),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: CompactTokens.space12,
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  textStyle: const TextStyle(fontSize: 11),
+                  side: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
+                icon: const Icon(Icons.travel_explore_rounded, size: 16),
+                label: const Text('在线搜索'),
               ),
             ],
           ),
