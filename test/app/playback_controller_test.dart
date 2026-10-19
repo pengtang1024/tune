@@ -64,6 +64,19 @@ void main() {
     streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=old',
   );
 
+  const liveSong = Song(
+    id: 7,
+    title: 'Jazz FM',
+    artist: 'Miles Davis',
+    album: 'So What',
+    duration: 0,
+    uri: 'tune://radio/browser%2Fstation-1',
+    sourceId: 'radio',
+    externalId: 'browser/station-1',
+    streamUrl: 'https://stream.example.com/jazz',
+    isLiveStream: true,
+  );
+
   setUp(() {
     audio = FakeAudioPlayerService();
     downloads = FakeSongDownloadService();
@@ -253,6 +266,20 @@ void main() {
       expect(downloads.downloadedUris, isEmpty);
       expect(audio.playedLocalFilePath, isNull);
       expect(audio.playedSong, remoteSong);
+      expect(controller.state.status, PlaybackStatus.playing);
+    });
+  });
+
+  group('live streams', () {
+    test('a live stream plays from the network and is never stored', () async {
+      await controller.playQueue([liveSong]);
+
+      expect(downloads.downloadedUris, isEmpty);
+      expect(downloads.storedFiles, isEmpty);
+      expect(audio.playedLocalFilePath, isNull);
+      expect(audio.playedSong, liveSong);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.streaming);
+      expect(controller.state.downloadProgress, 0);
       expect(controller.state.status, PlaybackStatus.playing);
     });
   });

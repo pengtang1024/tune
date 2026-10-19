@@ -21,6 +21,19 @@ class SourceSongFactory {
     String? lyrics,
     Map<String, dynamic>? sourceData,
     Map<String, String>? httpHeaders,
+    int? bitrate,
+    int? sampleRate,
+    int? trackNumber,
+    int? trackTotal,
+    int? discNumber,
+    int? totalDisc,
+    List<String>? genres,
+    List<String>? performers,
+    String? language,
+    int? size,
+    bool isLiveStream = false,
+    String? license,
+    String? description,
   }) {
     final uri = 'tune://$sourceId/${Uri.encodeComponent(externalId)}';
 
@@ -42,6 +55,19 @@ class SourceSongFactory {
       artworkUrl: normalizeUrl(artworkUrl),
       sourceData: sourceData,
       httpHeaders: httpHeaders,
+      bitrate: bitrate,
+      sampleRate: sampleRate,
+      trackNumber: trackNumber,
+      trackTotal: trackTotal,
+      discNumber: discNumber,
+      totalDisc: totalDisc,
+      genres: genres,
+      performers: performers,
+      language: language,
+      size: size,
+      isLiveStream: isLiveStream,
+      license: license,
+      description: description,
     );
   }
 

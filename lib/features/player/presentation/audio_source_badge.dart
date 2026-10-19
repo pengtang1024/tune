@@ -61,6 +61,7 @@ class AudioSourceBadge extends StatelessWidget {
         percent,
       ),
       AudioSourceStatus.cached => context.loc.audioSourceCached,
+      AudioSourceStatus.streaming => context.loc.audioSourceStreaming,
       AudioSourceStatus.failed => context.loc.audioSourceFailed,
     };
   }
@@ -70,6 +71,7 @@ class AudioSourceBadge extends StatelessWidget {
       AudioSourceStatus.local => Icons.sd_storage_rounded,
       AudioSourceStatus.downloading => Icons.downloading_rounded,
       AudioSourceStatus.cached => Icons.offline_pin_rounded,
+      AudioSourceStatus.streaming => Icons.podcasts_rounded,
       AudioSourceStatus.failed => Icons.error_outline_rounded,
     };
   }
@@ -79,6 +81,7 @@ class AudioSourceBadge extends StatelessWidget {
       AudioSourceStatus.local => theme.colorScheme.onSurfaceVariant,
       AudioSourceStatus.downloading => theme.colorScheme.primary,
       AudioSourceStatus.cached => theme.colorScheme.secondary,
+      AudioSourceStatus.streaming => theme.colorScheme.tertiary,
       AudioSourceStatus.failed => theme.colorScheme.error,
     };
   }

@@ -5,6 +5,7 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/utils/logger.dart';
 
 /// Connects to a self-hosted NeteaseCloudMusicApi instance.
 ///
@@ -140,6 +141,52 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     if (url == null) return null;
 
     return song.copyWith(streamUrl: url);
+  }
+
+  /// Reads the lyrics of a track from the self-hosted API.
+  ///
+  /// The API answers with the original text and, when it knows it, with a
+  /// translation. The timed sheet is preferred because the player can follow
+  /// the line that is sung.
+  @override
+  Future<String?> fetchLyrics(MusicSourceConfig config, Song song) async {
+    final baseUrl = _baseUrl(config);
+    if (baseUrl == null) return null;
+
+    final externalId = song.externalId ?? '';
+    if (externalId.isEmpty) return null;
+
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '$baseUrl/lyric',
+        queryParameters: {'id': externalId},
+      );
+      final data = response.data;
+      if (data == null) return null;
+      return parseLyrics(data);
+    } catch (error) {
+      Log.error('读取网易云歌词失败: $error');
+      return null;
+    }
+  }
+
+  /// Reads the text of the lyrics out of a `lyric` answer.
+  ///
+  /// Kept static so the mapping can be tested without network access.
+  static String? parseLyrics(Map<String, dynamic> data) {
+    final timed = data['tlyric'];
+    if (timed is Map) {
+      final text = timed['lyric']?.toString().trim() ?? '';
+      if (text.isNotEmpty) return text;
+    }
+
+    final plain = data['lrc'];
+    if (plain is Map) {
+      final text = plain['lyric']?.toString().trim() ?? '';
+      if (text.isNotEmpty) return text;
+    }
+
+    return null;
   }
 
   String? _baseUrl(MusicSourceConfig config) {

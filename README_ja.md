@@ -7,7 +7,7 @@ Tune は Flutter で作られたコンパクトなローカル／オンライン
 ## 機能
 
 - ローカル音楽フォルダのスキャン、検索、永続化
-- オンライン音源：Openverse、Jamendo、Internet Archive、ccMixter、iTunes プレビュー、ポッドキャスト RSS、自建 NeteaseCloudMusicApi と自建 Navidrome/Subsonic
+- オンライン音源：Openverse、Jamendo、Internet Archive、ccMixter、iTunes プレビュー、ポッドキャスト RSS、Audius、Wikimedia Commons、インターネットラジオ、自建 NeteaseCloudMusicApi と自建 Navidrome/Subsonic・Jellyfin
 - キューの追加・削除・ドラッグ並べ替え・クリア
 - 再生／一時停止、前へ／次へ、シーク、音量、リピートモード
 - ライブラリを音源で絞り込み、リモート曲に音源とカバーを表示
@@ -51,8 +51,9 @@ flutter build linux --debug
 ## 既知の制限
 
 - 現在の主な対象は Linux デスクトップです。
-- リモート再生にはネットワークが必要で、ダウンロード／オフラインキャッシュは未実装です。
-- リモートの再生 URL は期限切れになる場合があり、音源の再スキャンが必要です。
+- リモート再生にはネットワークが必要です。デスクトップ版は先にローカルへキャッシュし、Web 版はストリーミング再生します。
+- リモートの再生 URL は期限切れになることがあります。netease・Subsonic・ポッドキャスト・Jellyfin は曲単位でアドレスを更新できますが、他の音源は再スキャンが必要です。
+- インターネットラジオはライブストリームで、キャッシュも進捗バーもありません。
 - 旧モバイル通知、歌詞、イコライザー、履歴、アカウント機能はメイン経路から外れています。
 
 ## ライセンス

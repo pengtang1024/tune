@@ -81,15 +81,45 @@ class TrackMeta extends StatelessWidget {
           ),
         ],
         const SizedBox(width: CompactTokens.space8),
-        Text(
-          formatDuration(Duration(milliseconds: song.durationInMillis)),
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 10,
-            color: theme.colorScheme.onSurfaceVariant,
+        if (song.isLiveStream)
+          _LiveMark()
+        else
+          Text(
+            formatDuration(Duration(milliseconds: song.durationInMillis)),
+            style: TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 10,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
       ],
+    );
+  }
+}
+
+/// The mark that tells the user the track is a live stream.
+class _LiveMark extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.tertiary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        context.loc.playerLiveBadge,
+        style: TextStyle(
+          fontFamily: 'JetBrains Mono',
+          fontSize: 8,
+          letterSpacing: 0.6,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
     );
   }
 }

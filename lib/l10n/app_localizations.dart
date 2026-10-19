@@ -643,7 +643,7 @@ abstract class AppLocalizations {
   /// No description provided for @sourcesSubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'在线曲库与扫描目录'**
+  /// **'在线曲库、自建服务与扫描目录'**
   String get sourcesSubtitle;
 
   /// No description provided for @sourcesAutoScan.
@@ -901,7 +901,7 @@ abstract class AppLocalizations {
   /// No description provided for @playerLyrics.
   ///
   /// In zh_CN, this message translates to:
-  /// **'\\u6b4c\\u8bcd'**
+  /// **'歌词'**
   String get playerLyrics;
 
   /// No description provided for @lyricsLoading.
@@ -1063,7 +1063,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchOnlinePromptDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'输入关键词后按回车；Openverse、Jamendo、Internet Archive 与已导入插件会并行搜索。'**
+  /// **'输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。'**
   String get searchOnlinePromptDescription;
 
   /// No description provided for @searchNoResults.
@@ -1519,13 +1519,13 @@ abstract class AppLocalizations {
   /// No description provided for @openverseHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'填写一个扫描关键词，例如 piano、ambient 或 jazz'**
+  /// **'填写搜索关键词，例如 piano、ambient 或 jazz'**
   String get openverseHint;
 
   /// No description provided for @openverseFieldQuery.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描关键词'**
+  /// **'搜索关键词'**
   String get openverseFieldQuery;
 
   /// No description provided for @openverseFieldHint.
@@ -1699,7 +1699,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginStepFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'{label} \\u5931\\u8d25\\uff1a{error}'**
+  /// **'{label} 失败：{error}'**
   String pluginStepFailed(String error, String label);
 
   /// No description provided for @sourcesImportPluginFromUrl.
@@ -1837,7 +1837,7 @@ abstract class AppLocalizations {
   /// No description provided for @ccmixterFieldQuery.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描标签'**
+  /// **'搜索标签'**
   String get ccmixterFieldQuery;
 
   /// No description provided for @ccmixterFieldQueryHint.
@@ -2067,6 +2067,366 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'没有找到匹配的曲目'**
   String get subsonicNoMatch;
+
+  /// No description provided for @sourceAudiusDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Audius 开放音乐网络的完整曲目'**
+  String get sourceAudiusDescription;
+
+  /// No description provided for @audiusHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写搜索关键词，例如 jazz、ambient 或 electronic'**
+  String get audiusHint;
+
+  /// No description provided for @audiusFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get audiusFieldQuery;
+
+  /// No description provided for @audiusFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、ambient、electronic'**
+  String get audiusFieldQueryHint;
+
+  /// No description provided for @audiusFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get audiusFieldLimit;
+
+  /// No description provided for @audiusFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 20，最大 50'**
+  String get audiusFieldLimitHint;
+
+  /// No description provided for @audiusEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Audius 返回了空响应'**
+  String get audiusEmptyResponse;
+
+  /// No description provided for @audiusNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的 Audius 曲目'**
+  String get audiusNoMatch;
+
+  /// No description provided for @sourceRadioDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'公开网络电台的直播流'**
+  String get sourceRadioDescription;
+
+  /// No description provided for @radioHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择电台目录，关键词可进一步过滤'**
+  String get radioHint;
+
+  /// No description provided for @radioFieldProvider.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台目录'**
+  String get radioFieldProvider;
+
+  /// No description provided for @radioFieldProviderHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部目录、Radio Browser、SomaFM 或 Radio Paradise'**
+  String get radioFieldProviderHint;
+
+  /// No description provided for @radioProviderAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部目录'**
+  String get radioProviderAll;
+
+  /// No description provided for @radioFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台关键词'**
+  String get radioFieldQuery;
+
+  /// No description provided for @radioFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、ambient 或 SomaFM'**
+  String get radioFieldQueryHint;
+
+  /// No description provided for @radioFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描电台数'**
+  String get radioFieldLimit;
+
+  /// No description provided for @radioFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 20，最大 100'**
+  String get radioFieldLimitHint;
+
+  /// No description provided for @radioNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的电台'**
+  String get radioNoMatch;
+
+  /// No description provided for @sourceWikimediaDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'维基共享资源的开放音频'**
+  String get sourceWikimediaDescription;
+
+  /// No description provided for @wikimediaHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写搜索关键词，例如 piano、lecture 或 birdsong'**
+  String get wikimediaHint;
+
+  /// No description provided for @wikimediaFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get wikimediaFieldQuery;
+
+  /// No description provided for @wikimediaFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 piano、lecture、birdsong'**
+  String get wikimediaFieldQueryHint;
+
+  /// No description provided for @wikimediaFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get wikimediaFieldLimit;
+
+  /// No description provided for @wikimediaFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 15，最大 30'**
+  String get wikimediaFieldLimitHint;
+
+  /// No description provided for @wikimediaEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'维基共享资源返回了空响应'**
+  String get wikimediaEmptyResponse;
+
+  /// No description provided for @wikimediaNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到可播放的共享音频'**
+  String get wikimediaNoMatch;
+
+  /// No description provided for @sourceJellyfinDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接自建的 Jellyfin 媒体库'**
+  String get sourceJellyfinDescription;
+
+  /// No description provided for @jellyfinHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写自建 Jellyfin 的地址与账号'**
+  String get jellyfinHint;
+
+  /// No description provided for @jellyfinFieldServer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器地址'**
+  String get jellyfinFieldServer;
+
+  /// No description provided for @jellyfinFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:8096'**
+  String get jellyfinFieldServerHint;
+
+  /// No description provided for @jellyfinFieldUser.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用户名'**
+  String get jellyfinFieldUser;
+
+  /// No description provided for @jellyfinFieldUserHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Jellyfin 的登录用户名'**
+  String get jellyfinFieldUserHint;
+
+  /// No description provided for @jellyfinFieldPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码'**
+  String get jellyfinFieldPassword;
+
+  /// No description provided for @jellyfinFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用于换取访问令牌'**
+  String get jellyfinFieldPasswordHint;
+
+  /// No description provided for @jellyfinFieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get jellyfinFieldLimit;
+
+  /// No description provided for @jellyfinFieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 50，最大 200'**
+  String get jellyfinFieldLimitHint;
+
+  /// No description provided for @jellyfinEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Jellyfin 返回了空响应'**
+  String get jellyfinEmptyResponse;
+
+  /// No description provided for @jellyfinNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的曲目'**
+  String get jellyfinNoMatch;
+
+  /// No description provided for @jellyfinAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接 Jellyfin 服务器，请检查地址与账号'**
+  String get jellyfinAuthFailed;
+
+  /// No description provided for @audioSourceStreaming.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'直播'**
+  String get audioSourceStreaming;
+
+  /// No description provided for @playerLiveBadge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'直播中'**
+  String get playerLiveBadge;
+
+  /// No description provided for @nowPlayingLiveStream.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'直播流，没有固定时长'**
+  String get nowPlayingLiveStream;
+
+  /// No description provided for @nowPlayingDetails.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'曲目信息'**
+  String get nowPlayingDetails;
+
+  /// No description provided for @nowPlayingDetailAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get nowPlayingDetailAlbum;
+
+  /// No description provided for @nowPlayingDetailYear.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'年份'**
+  String get nowPlayingDetailYear;
+
+  /// No description provided for @nowPlayingDetailGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流派'**
+  String get nowPlayingDetailGenre;
+
+  /// No description provided for @nowPlayingDetailBitrate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'码率'**
+  String get nowPlayingDetailBitrate;
+
+  /// No description provided for @nowPlayingDetailSampleRate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'采样率'**
+  String get nowPlayingDetailSampleRate;
+
+  /// No description provided for @nowPlayingDetailTrack.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音轨'**
+  String get nowPlayingDetailTrack;
+
+  /// No description provided for @nowPlayingDetailDisc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'碟片'**
+  String get nowPlayingDetailDisc;
+
+  /// No description provided for @nowPlayingDetailLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get nowPlayingDetailLanguage;
+
+  /// No description provided for @nowPlayingDetailLicense.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'许可'**
+  String get nowPlayingDetailLicense;
+
+  /// No description provided for @nowPlayingDetailSource.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来源'**
+  String get nowPlayingDetailSource;
+
+  /// No description provided for @nowPlayingDetailNowPlaying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放'**
+  String get nowPlayingDetailNowPlaying;
+
+  /// No description provided for @jamendoFieldFormat.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音质'**
+  String get jamendoFieldFormat;
+
+  /// No description provided for @jamendoFieldFormatHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 192 kbps'**
+  String get jamendoFieldFormatHint;
+
+  /// No description provided for @subsonicFieldFormat.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音质'**
+  String get subsonicFieldFormat;
+
+  /// No description provided for @subsonicFieldFormatHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认原始音质'**
+  String get subsonicFieldFormatHint;
+
+  /// No description provided for @subsonicFormatOriginal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'原始音质'**
+  String get subsonicFormatOriginal;
+
+  /// No description provided for @sourceRadioName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络电台'**
+  String get sourceRadioName;
 }
 
 class _AppLocalizationsDelegate

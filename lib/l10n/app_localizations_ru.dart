@@ -298,7 +298,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sourcesTitle => 'Источники';
 
   @override
-  String get sourcesSubtitle => 'Онлайн-каталоги и папки сканирования';
+  String get sourcesSubtitle =>
+      'Онлайн-каталоги, собственные сервисы и папки для сканирования';
 
   @override
   String get sourcesAutoScan => 'Сканировать при запуске';
@@ -459,7 +460,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get playerLyrics => '\\u0421\\u043b\\u043e\\u0432\\u0430';
+  String get playerLyrics => 'Слова';
 
   @override
   String get lyricsLoading => 'Загрузка слов песни';
@@ -552,7 +553,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      'Введите запрос и нажмите Enter. Openverse, Jamendo, Internet Archive и импортированные плагины ищутся параллельно.';
+      'Введите запрос и нажмите Enter. Все включённые онлайн-источники и импортированные плагины ищутся параллельно.';
 
   @override
   String get searchNoResults => 'Ничего не найдено';
@@ -943,7 +944,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '\\u0421\\u0431\\u043e\\u0439 $label: $error';
+    return 'Сбой $label: $error';
   }
 
   @override
@@ -1158,4 +1159,193 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => 'Подходящих треков не найдено';
+
+  @override
+  String get sourceAudiusDescription => 'Полные треки из открытой сети Audius';
+
+  @override
+  String get audiusHint =>
+      'Введите поисковый запрос, например jazz, ambient или electronic';
+
+  @override
+  String get audiusFieldQuery => 'Поисковый запрос';
+
+  @override
+  String get audiusFieldQueryHint => 'например jazz, ambient, electronic';
+
+  @override
+  String get audiusFieldLimit => 'Треков за скан';
+
+  @override
+  String get audiusFieldLimitHint => 'По умолчанию 20, максимум 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius вернул пустой ответ';
+
+  @override
+  String get audiusNoMatch => 'Подходящих треков на Audius нет';
+
+  @override
+  String get sourceRadioDescription =>
+      'Прямые трансляции публичных интернет-радиостанций';
+
+  @override
+  String get radioHint => 'Выберите каталог станций, запрос отфильтрует их';
+
+  @override
+  String get radioFieldProvider => 'Каталог станций';
+
+  @override
+  String get radioFieldProviderHint =>
+      'Все каталоги, Radio Browser, SomaFM или Radio Paradise';
+
+  @override
+  String get radioProviderAll => 'Все каталоги';
+
+  @override
+  String get radioFieldQuery => 'Ключевое слово станции';
+
+  @override
+  String get radioFieldQueryHint => 'например jazz, ambient или SomaFM';
+
+  @override
+  String get radioFieldLimit => 'Станций за скан';
+
+  @override
+  String get radioFieldLimitHint => 'По умолчанию 20, максимум 100';
+
+  @override
+  String get radioNoMatch => 'Подходящих станций нет';
+
+  @override
+  String get sourceWikimediaDescription => 'Открытое аудио из Викисклада';
+
+  @override
+  String get wikimediaHint =>
+      'Введите запрос, например piano, lecture или birdsong';
+
+  @override
+  String get wikimediaFieldQuery => 'Поисковый запрос';
+
+  @override
+  String get wikimediaFieldQueryHint => 'например piano, lecture, birdsong';
+
+  @override
+  String get wikimediaFieldLimit => 'Файлов за скан';
+
+  @override
+  String get wikimediaFieldLimitHint => 'По умолчанию 15, максимум 30';
+
+  @override
+  String get wikimediaEmptyResponse => 'Викисклад вернул пустой ответ';
+
+  @override
+  String get wikimediaNoMatch => 'Играбельного аудио не найдено';
+
+  @override
+  String get sourceJellyfinDescription =>
+      'Подключение к своей библиотеке Jellyfin';
+
+  @override
+  String get jellyfinHint =>
+      'Введите адрес и учётную запись своего сервера Jellyfin';
+
+  @override
+  String get jellyfinFieldServer => 'Адрес сервера';
+
+  @override
+  String get jellyfinFieldServerHint => 'например http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => 'Имя пользователя';
+
+  @override
+  String get jellyfinFieldUserHint => 'Имя входа в учётную запись Jellyfin';
+
+  @override
+  String get jellyfinFieldPassword => 'Пароль';
+
+  @override
+  String get jellyfinFieldPasswordHint =>
+      'Используется для получения токена доступа';
+
+  @override
+  String get jellyfinFieldLimit => 'Треков за скан';
+
+  @override
+  String get jellyfinFieldLimitHint => 'По умолчанию 50, максимум 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin вернул пустой ответ';
+
+  @override
+  String get jellyfinNoMatch => 'Подходящих треков нет';
+
+  @override
+  String get jellyfinAuthFailed =>
+      'Не удалось связаться с сервером Jellyfin, проверьте адрес и учётную запись';
+
+  @override
+  String get audioSourceStreaming => 'Прямой эфир';
+
+  @override
+  String get playerLiveBadge => 'ЭФИР';
+
+  @override
+  String get nowPlayingLiveStream =>
+      'Прямой эфир без фиксированной длительности';
+
+  @override
+  String get nowPlayingDetails => 'Сведения о треке';
+
+  @override
+  String get nowPlayingDetailAlbum => 'Альбом';
+
+  @override
+  String get nowPlayingDetailYear => 'Год';
+
+  @override
+  String get nowPlayingDetailGenre => 'Жанр';
+
+  @override
+  String get nowPlayingDetailBitrate => 'Битрейт';
+
+  @override
+  String get nowPlayingDetailSampleRate => 'Частота дискретизации';
+
+  @override
+  String get nowPlayingDetailTrack => 'Дорожка';
+
+  @override
+  String get nowPlayingDetailDisc => 'Диск';
+
+  @override
+  String get nowPlayingDetailLanguage => 'Язык';
+
+  @override
+  String get nowPlayingDetailLicense => 'Лицензия';
+
+  @override
+  String get nowPlayingDetailSource => 'Источник';
+
+  @override
+  String get nowPlayingDetailNowPlaying => 'В эфире';
+
+  @override
+  String get jamendoFieldFormat => 'Качество';
+
+  @override
+  String get jamendoFieldFormatHint => 'По умолчанию 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => 'Качество';
+
+  @override
+  String get subsonicFieldFormatHint => 'По умолчанию исходное качество';
+
+  @override
+  String get subsonicFormatOriginal => 'Исходное качество';
+
+  @override
+  String get sourceRadioName => 'Интернет-радио';
 }

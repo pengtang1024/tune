@@ -293,7 +293,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesTitle => '音源';
 
   @override
-  String get sourcesSubtitle => '在线曲库与扫描目录';
+  String get sourcesSubtitle => '在线曲库、自建服务与扫描目录';
 
   @override
   String get sourcesAutoScan => '启动时自动扫描';
@@ -449,7 +449,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get playerLyrics => '\\u6b4c\\u8bcd';
+  String get playerLyrics => '歌词';
 
   @override
   String get lyricsLoading => '正在加载歌词';
@@ -535,7 +535,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      '输入关键词后按回车；Openverse、Jamendo、Internet Archive 与已导入插件会并行搜索。';
+      '输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。';
 
   @override
   String get searchNoResults => '没有结果';
@@ -810,10 +810,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
 
   @override
-  String get openverseHint => '填写一个扫描关键词，例如 piano、ambient 或 jazz';
+  String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '扫描关键词';
+  String get openverseFieldQuery => '搜索关键词';
 
   @override
   String get openverseFieldHint => '例如 piano、ambient、jazz';
@@ -905,7 +905,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '$label \\u5931\\u8d25\\uff1a$error';
+    return '$label 失败：$error';
   }
 
   @override
@@ -987,7 +987,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterFieldLimitHint => '默认 15，最大 30';
 
   @override
-  String get ccmixterFieldQuery => '扫描标签';
+  String get ccmixterFieldQuery => '搜索标签';
 
   @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
@@ -1106,6 +1106,187 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+
+  @override
+  String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
+
+  @override
+  String get audiusFieldQuery => '搜索关键词';
+
+  @override
+  String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
+
+  @override
+  String get audiusFieldLimit => '每次扫描数量';
+
+  @override
+  String get audiusFieldLimitHint => '默认 20，最大 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius 返回了空响应';
+
+  @override
+  String get audiusNoMatch => '没有找到匹配的 Audius 曲目';
+
+  @override
+  String get sourceRadioDescription => '公开网络电台的直播流';
+
+  @override
+  String get radioHint => '选择电台目录，关键词可进一步过滤';
+
+  @override
+  String get radioFieldProvider => '电台目录';
+
+  @override
+  String get radioFieldProviderHint =>
+      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+
+  @override
+  String get radioProviderAll => '全部目录';
+
+  @override
+  String get radioFieldQuery => '电台关键词';
+
+  @override
+  String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
+
+  @override
+  String get radioFieldLimit => '每次扫描电台数';
+
+  @override
+  String get radioFieldLimitHint => '默认 20，最大 100';
+
+  @override
+  String get radioNoMatch => '没有找到匹配的电台';
+
+  @override
+  String get sourceWikimediaDescription => '维基共享资源的开放音频';
+
+  @override
+  String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldQuery => '搜索关键词';
+
+  @override
+  String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
+
+  @override
+  String get wikimediaFieldLimit => '每次扫描数量';
+
+  @override
+  String get wikimediaFieldLimitHint => '默认 15，最大 30';
+
+  @override
+  String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
+
+  @override
+  String get wikimediaNoMatch => '没有找到可播放的共享音频';
+
+  @override
+  String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
+
+  @override
+  String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
+
+  @override
+  String get jellyfinFieldServer => '服务器地址';
+
+  @override
+  String get jellyfinFieldServerHint => '例如 http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => '用户名';
+
+  @override
+  String get jellyfinFieldUserHint => 'Jellyfin 的登录用户名';
+
+  @override
+  String get jellyfinFieldPassword => '密码';
+
+  @override
+  String get jellyfinFieldPasswordHint => '用于换取访问令牌';
+
+  @override
+  String get jellyfinFieldLimit => '每次扫描数量';
+
+  @override
+  String get jellyfinFieldLimitHint => '默认 50，最大 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin 返回了空响应';
+
+  @override
+  String get jellyfinNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
+
+  @override
+  String get audioSourceStreaming => '直播';
+
+  @override
+  String get playerLiveBadge => '直播中';
+
+  @override
+  String get nowPlayingLiveStream => '直播流，没有固定时长';
+
+  @override
+  String get nowPlayingDetails => '曲目信息';
+
+  @override
+  String get nowPlayingDetailAlbum => '专辑';
+
+  @override
+  String get nowPlayingDetailYear => '年份';
+
+  @override
+  String get nowPlayingDetailGenre => '流派';
+
+  @override
+  String get nowPlayingDetailBitrate => '码率';
+
+  @override
+  String get nowPlayingDetailSampleRate => '采样率';
+
+  @override
+  String get nowPlayingDetailTrack => '音轨';
+
+  @override
+  String get nowPlayingDetailDisc => '碟片';
+
+  @override
+  String get nowPlayingDetailLanguage => '语言';
+
+  @override
+  String get nowPlayingDetailLicense => '许可';
+
+  @override
+  String get nowPlayingDetailSource => '来源';
+
+  @override
+  String get nowPlayingDetailNowPlaying => '正在播放';
+
+  @override
+  String get jamendoFieldFormat => '音质';
+
+  @override
+  String get jamendoFieldFormatHint => '默认 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => '音质';
+
+  @override
+  String get subsonicFieldFormatHint => '默认原始音质';
+
+  @override
+  String get subsonicFormatOriginal => '原始音质';
+
+  @override
+  String get sourceRadioName => '网络电台';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1397,7 +1578,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesTitle => '音源';
 
   @override
-  String get sourcesSubtitle => '在线曲库与扫描目录';
+  String get sourcesSubtitle => '在线曲库、自建服务与扫描目录';
 
   @override
   String get sourcesAutoScan => '启动时自动扫描';
@@ -1553,7 +1734,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String get playerLyrics => '\\u6b4c\\u8bcd';
+  String get playerLyrics => '歌词';
 
   @override
   String get lyricsLoading => '正在加载歌词';
@@ -1639,7 +1820,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get searchOnlinePromptDescription =>
-      '输入关键词后按回车；Openverse、Jamendo、Internet Archive 与已导入插件会并行搜索。';
+      '输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。';
 
   @override
   String get searchNoResults => '没有结果';
@@ -1914,10 +2095,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
 
   @override
-  String get openverseHint => '填写一个扫描关键词，例如 piano、ambient 或 jazz';
+  String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '扫描关键词';
+  String get openverseFieldQuery => '搜索关键词';
 
   @override
   String get openverseFieldHint => '例如 piano、ambient、jazz';
@@ -2009,7 +2190,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '$label \\u5931\\u8d25\\uff1a$error';
+    return '$label 失败：$error';
   }
 
   @override
@@ -2091,7 +2272,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterFieldLimitHint => '默认 15，最大 30';
 
   @override
-  String get ccmixterFieldQuery => '扫描标签';
+  String get ccmixterFieldQuery => '搜索标签';
 
   @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
@@ -2210,6 +2391,187 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get subsonicNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+
+  @override
+  String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
+
+  @override
+  String get audiusFieldQuery => '搜索关键词';
+
+  @override
+  String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
+
+  @override
+  String get audiusFieldLimit => '每次扫描数量';
+
+  @override
+  String get audiusFieldLimitHint => '默认 20，最大 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius 返回了空响应';
+
+  @override
+  String get audiusNoMatch => '没有找到匹配的 Audius 曲目';
+
+  @override
+  String get sourceRadioDescription => '公开网络电台的直播流';
+
+  @override
+  String get radioHint => '选择电台目录，关键词可进一步过滤';
+
+  @override
+  String get radioFieldProvider => '电台目录';
+
+  @override
+  String get radioFieldProviderHint =>
+      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+
+  @override
+  String get radioProviderAll => '全部目录';
+
+  @override
+  String get radioFieldQuery => '电台关键词';
+
+  @override
+  String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
+
+  @override
+  String get radioFieldLimit => '每次扫描电台数';
+
+  @override
+  String get radioFieldLimitHint => '默认 20，最大 100';
+
+  @override
+  String get radioNoMatch => '没有找到匹配的电台';
+
+  @override
+  String get sourceWikimediaDescription => '维基共享资源的开放音频';
+
+  @override
+  String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldQuery => '搜索关键词';
+
+  @override
+  String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
+
+  @override
+  String get wikimediaFieldLimit => '每次扫描数量';
+
+  @override
+  String get wikimediaFieldLimitHint => '默认 15，最大 30';
+
+  @override
+  String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
+
+  @override
+  String get wikimediaNoMatch => '没有找到可播放的共享音频';
+
+  @override
+  String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
+
+  @override
+  String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
+
+  @override
+  String get jellyfinFieldServer => '服务器地址';
+
+  @override
+  String get jellyfinFieldServerHint => '例如 http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => '用户名';
+
+  @override
+  String get jellyfinFieldUserHint => 'Jellyfin 的登录用户名';
+
+  @override
+  String get jellyfinFieldPassword => '密码';
+
+  @override
+  String get jellyfinFieldPasswordHint => '用于换取访问令牌';
+
+  @override
+  String get jellyfinFieldLimit => '每次扫描数量';
+
+  @override
+  String get jellyfinFieldLimitHint => '默认 50，最大 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin 返回了空响应';
+
+  @override
+  String get jellyfinNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
+
+  @override
+  String get audioSourceStreaming => '直播';
+
+  @override
+  String get playerLiveBadge => '直播中';
+
+  @override
+  String get nowPlayingLiveStream => '直播流，没有固定时长';
+
+  @override
+  String get nowPlayingDetails => '曲目信息';
+
+  @override
+  String get nowPlayingDetailAlbum => '专辑';
+
+  @override
+  String get nowPlayingDetailYear => '年份';
+
+  @override
+  String get nowPlayingDetailGenre => '流派';
+
+  @override
+  String get nowPlayingDetailBitrate => '码率';
+
+  @override
+  String get nowPlayingDetailSampleRate => '采样率';
+
+  @override
+  String get nowPlayingDetailTrack => '音轨';
+
+  @override
+  String get nowPlayingDetailDisc => '碟片';
+
+  @override
+  String get nowPlayingDetailLanguage => '语言';
+
+  @override
+  String get nowPlayingDetailLicense => '许可';
+
+  @override
+  String get nowPlayingDetailSource => '来源';
+
+  @override
+  String get nowPlayingDetailNowPlaying => '正在播放';
+
+  @override
+  String get jamendoFieldFormat => '音质';
+
+  @override
+  String get jamendoFieldFormatHint => '默认 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => '音质';
+
+  @override
+  String get subsonicFieldFormatHint => '默认原始音质';
+
+  @override
+  String get subsonicFormatOriginal => '原始音质';
+
+  @override
+  String get sourceRadioName => '网络电台';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -2501,7 +2863,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesTitle => '音源';
 
   @override
-  String get sourcesSubtitle => '線上曲庫與掃描目錄';
+  String get sourcesSubtitle => '線上曲庫、自建服務與掃描目錄';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';
@@ -2657,7 +3019,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get playerLyrics => '\\u6b4c\\u8a5e';
+  String get playerLyrics => '歌詞';
 
   @override
   String get lyricsLoading => '正在載入歌詞';
@@ -2743,7 +3105,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get searchOnlinePromptDescription =>
-      '輸入關鍵字後按 Enter；Openverse、Jamendo、Internet Archive 與已匯入的外掛會同時搜尋。';
+      '輸入關鍵字後按 Enter；所有已啟用的線上音源與已匯入的外掛會同時搜尋。';
 
   @override
   String get searchNoResults => '沒有結果';
@@ -3018,10 +3380,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get neteaseNoStream => '介面未回傳可播放網址（可能需要在伺服器端登入或受版權限制）';
 
   @override
-  String get openverseHint => '填寫一個掃描關鍵字，例如 piano、ambient 或 jazz';
+  String get openverseHint => '填寫搜尋關鍵字，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '掃描關鍵字';
+  String get openverseFieldQuery => '搜尋關鍵字';
 
   @override
   String get openverseFieldHint => '例如 piano、ambient、jazz';
@@ -3113,7 +3475,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '$label \\u5931\\u6557\\uff1a$error';
+    return '$label 失敗：$error';
   }
 
   @override
@@ -3195,7 +3557,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get ccmixterFieldLimitHint => '預設 15，最大 30';
 
   @override
-  String get ccmixterFieldQuery => '掃描標籤';
+  String get ccmixterFieldQuery => '搜尋標籤';
 
   @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
@@ -3314,4 +3676,185 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get subsonicNoMatch => '找不到符合的曲目';
+
+  @override
+  String get sourceAudiusDescription => 'Audius 開放音樂網路的完整曲目';
+
+  @override
+  String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
+
+  @override
+  String get audiusFieldQuery => '搜尋關鍵字';
+
+  @override
+  String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
+
+  @override
+  String get audiusFieldLimit => '每次掃描數量';
+
+  @override
+  String get audiusFieldLimitHint => '預設 20，最多 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius 回傳了空回應';
+
+  @override
+  String get audiusNoMatch => '找不到符合的 Audius 曲目';
+
+  @override
+  String get sourceRadioDescription => '公開網路電台的直播串流';
+
+  @override
+  String get radioHint => '選擇電台目錄，關鍵字可進一步篩選';
+
+  @override
+  String get radioFieldProvider => '電台目錄';
+
+  @override
+  String get radioFieldProviderHint =>
+      '全部目錄、Radio Browser、SomaFM 或 Radio Paradise';
+
+  @override
+  String get radioProviderAll => '全部目錄';
+
+  @override
+  String get radioFieldQuery => '電台關鍵字';
+
+  @override
+  String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
+
+  @override
+  String get radioFieldLimit => '每次掃描電台數';
+
+  @override
+  String get radioFieldLimitHint => '預設 20，最多 100';
+
+  @override
+  String get radioNoMatch => '找不到符合的電台';
+
+  @override
+  String get sourceWikimediaDescription => '維基共享資源的開放音訊';
+
+  @override
+  String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldQuery => '搜尋關鍵字';
+
+  @override
+  String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
+
+  @override
+  String get wikimediaFieldLimit => '每次掃描數量';
+
+  @override
+  String get wikimediaFieldLimitHint => '預設 15，最多 30';
+
+  @override
+  String get wikimediaEmptyResponse => '維基共享資源回傳了空回應';
+
+  @override
+  String get wikimediaNoMatch => '找不到可播放的共享音訊';
+
+  @override
+  String get sourceJellyfinDescription => '連接自建的 Jellyfin 媒體庫';
+
+  @override
+  String get jellyfinHint => '填寫自建 Jellyfin 的位址與帳號';
+
+  @override
+  String get jellyfinFieldServer => '伺服器位址';
+
+  @override
+  String get jellyfinFieldServerHint => '例如 http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => '使用者名稱';
+
+  @override
+  String get jellyfinFieldUserHint => 'Jellyfin 的登入使用者名稱';
+
+  @override
+  String get jellyfinFieldPassword => '密碼';
+
+  @override
+  String get jellyfinFieldPasswordHint => '用於換取存取權杖';
+
+  @override
+  String get jellyfinFieldLimit => '每次掃描數量';
+
+  @override
+  String get jellyfinFieldLimitHint => '預設 50，最多 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin 回傳了空回應';
+
+  @override
+  String get jellyfinNoMatch => '找不到符合的曲目';
+
+  @override
+  String get jellyfinAuthFailed => '無法連線 Jellyfin 伺服器，請檢查位址與帳號';
+
+  @override
+  String get audioSourceStreaming => '直播';
+
+  @override
+  String get playerLiveBadge => '直播中';
+
+  @override
+  String get nowPlayingLiveStream => '直播串流，沒有固定時長';
+
+  @override
+  String get nowPlayingDetails => '曲目資訊';
+
+  @override
+  String get nowPlayingDetailAlbum => '專輯';
+
+  @override
+  String get nowPlayingDetailYear => '年份';
+
+  @override
+  String get nowPlayingDetailGenre => '風格';
+
+  @override
+  String get nowPlayingDetailBitrate => '位元率';
+
+  @override
+  String get nowPlayingDetailSampleRate => '取樣率';
+
+  @override
+  String get nowPlayingDetailTrack => '音軌';
+
+  @override
+  String get nowPlayingDetailDisc => '光碟';
+
+  @override
+  String get nowPlayingDetailLanguage => '語言';
+
+  @override
+  String get nowPlayingDetailLicense => '授權';
+
+  @override
+  String get nowPlayingDetailSource => '來源';
+
+  @override
+  String get nowPlayingDetailNowPlaying => '正在播放';
+
+  @override
+  String get jamendoFieldFormat => '音質';
+
+  @override
+  String get jamendoFieldFormatHint => '預設 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => '音質';
+
+  @override
+  String get subsonicFieldFormatHint => '預設原始音質';
+
+  @override
+  String get subsonicFormatOriginal => '原始音質';
+
+  @override
+  String get sourceRadioName => '網路電台';
 }

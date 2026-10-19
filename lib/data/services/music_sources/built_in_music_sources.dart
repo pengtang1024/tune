@@ -29,7 +29,7 @@ class BuiltInMusicSources {
     description: AppStrings.instance.sourceJamendoDescription,
     kind: MusicSourceKind.openCatalog,
     enabled: false,
-    settings: {'query': ''},
+    settings: {'query': '', 'format': 'mp32'},
   );
 
   static final internetArchive = MusicSourceConfig(
@@ -80,6 +80,39 @@ class BuiltInMusicSources {
     description: AppStrings.instance.sourceSubsonicDescription,
     kind: MusicSourceKind.openApi,
     enabled: false,
+    settings: {'server': '', 'user': '', 'password': '', 'format': 'original'},
+  );
+
+  static final audius = MusicSourceConfig(
+    id: 'audius',
+    name: 'Audius',
+    description: AppStrings.instance.sourceAudiusDescription,
+    kind: MusicSourceKind.openCatalog,
+    settings: {'query': 'ambient'},
+  );
+
+  static final radio = MusicSourceConfig(
+    id: 'radio',
+    name: AppStrings.instance.sourceRadioName,
+    description: AppStrings.instance.sourceRadioDescription,
+    kind: MusicSourceKind.openCatalog,
+    settings: {'provider': 'all', 'query': ''},
+  );
+
+  static final wikimedia = MusicSourceConfig(
+    id: 'wikimedia',
+    name: 'Wikimedia Commons',
+    description: AppStrings.instance.sourceWikimediaDescription,
+    kind: MusicSourceKind.openCatalog,
+    settings: {'query': 'piano'},
+  );
+
+  static final jellyfin = MusicSourceConfig(
+    id: 'jellyfin',
+    name: 'Jellyfin',
+    description: AppStrings.instance.sourceJellyfinDescription,
+    kind: MusicSourceKind.openApi,
+    enabled: false,
     settings: {'server': '', 'user': '', 'password': ''},
   );
 
@@ -93,5 +126,9 @@ class BuiltInMusicSources {
     itunes,
     podcastRss,
     subsonic,
+    audius,
+    radio,
+    wikimedia,
+    jellyfin,
   ];
 }

@@ -7,7 +7,7 @@ Tune is a compact local and online music player built with Flutter. A persistent
 ## Features
 
 - Scan, search, and persist local music folders
-- Online sources: Openverse, Jamendo, Internet Archive, ccMixter, iTunes previews, podcast RSS, and self-hosted NeteaseCloudMusicApi or Navidrome/Subsonic
+- Online sources: Openverse, Jamendo, Internet Archive, ccMixter, iTunes previews, podcast RSS, Audius, Wikimedia Commons, internet radio, and self-hosted NeteaseCloudMusicApi, Navidrome/Subsonic, or Jellyfin
 - Queue management with reorder, play-at-index, and clear
 - Play/pause, previous/next, seek, volume, and repeat modes
 - Filter the library by source; remote tracks show source and artwork
@@ -51,8 +51,9 @@ flutter build linux --debug
 ## Known limitations
 
 - Linux desktop is the primary target for the current release.
-- Remote playback requires a network connection; downloads/offline caching are not implemented.
-- Remote stream URLs can expire and must be refreshed by rescanning the source.
+- Remote playback requires a network connection; the desktop app caches tracks locally first, the web build streams them.
+- Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
+- Internet radio is a live stream: it is never cached and shows no progress bar.
 - Legacy mobile notifications, lyrics, equalizer, history, and account features are no longer part of the main path.
 
 ## License

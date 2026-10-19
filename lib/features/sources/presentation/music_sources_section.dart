@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
@@ -477,6 +478,7 @@ class _SourceTile extends ConsumerWidget {
                 width: 28,
                 height: 28,
                 child: IconButton(
+                  key: ValueKey('source-config-${source.id}'),
                   tooltip: context.loc.sourcesConfigure,
                   onPressed: busy
                       ? null
@@ -538,7 +540,7 @@ class _SourceTile extends ConsumerWidget {
     final result = summary;
     if (result == null) {
       if (lastScanAt != null) {
-        return context.loc.sourcesLastScan(_formatTime(lastScanAt!));
+        return context.loc.sourcesLastScan(_formatTime(context, lastScanAt!));
       }
       return source.kind == MusicSourceKind.localDirectory
           ? context.loc.sourcesAutoScanLocal
@@ -549,7 +551,7 @@ class _SourceTile extends ConsumerWidget {
       case SourceScanStatus.success:
         return context.loc.sourcesScannedCount(
           result.songCount,
-          _formatTime(result.scannedAt),
+          _formatTime(context, result.scannedAt),
         );
       case SourceScanStatus.needsConfiguration:
         return result.message ?? context.loc.sourcesNeedsConfiguration;
@@ -791,20 +793,27 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (final field in widget.fields) ...[
-                TextField(
-                  controller: _controllers[field.key],
-                  obscureText: field.secret,
-                  decoration: InputDecoration(
-                    labelText: field.label,
-                    hintText: field.hint,
-                    errorText: _errors[field.key],
-                    isDense: true,
-                    border: const OutlineInputBorder(),
+                if (field.choices.isNotEmpty)
+                  _ChoiceField(
+                    field: field,
+                    value: _choiceValue(field),
+                    onChanged: (value) => _selectChoice(field, value),
+                  )
+                else
+                  TextField(
+                    controller: _controllers[field.key],
+                    obscureText: field.secret,
+                    decoration: InputDecoration(
+                      labelText: field.label,
+                      hintText: field.hint,
+                      errorText: _errors[field.key],
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: field.numeric
+                        ? const TextInputType.numberWithOptions(decimal: false)
+                        : TextInputType.text,
                   ),
-                  keyboardType: field.numeric
-                      ? const TextInputType.numberWithOptions(decimal: false)
-                      : TextInputType.text,
-                ),
                 const SizedBox(height: 10),
               ],
             ],
@@ -826,7 +835,9 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
     final settings = <String, String>{};
 
     for (final field in widget.fields) {
-      final value = _controllers[field.key]?.text.trim() ?? '';
+      final value = field.choices.isEmpty
+          ? (_controllers[field.key]?.text.trim() ?? '')
+          : _choiceValue(field);
       if (field.required && value.isEmpty) {
         _errors[field.key] = context.loc.sourcesFieldRequired(field.label);
       }
@@ -847,6 +858,59 @@ class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }
+
+  /// The value a setting of a fixed set of choices shows.
+  String _choiceValue(MusicSourceField field) {
+    final current = _controllers[field.key]?.text ?? '';
+    for (final choice in field.choices) {
+      if (choice.value == current) return current;
+    }
+    return field.choices.first.value;
+  }
+
+  /// Keeps the value of a choice in the controller of its field.
+  void _selectChoice(MusicSourceField field, String value) {
+    _controllers[field.key]?.text = value;
+    setState(() {});
+  }
+}
+
+/// A setting that only allows a fixed set of values.
+///
+/// The source declares the options, so the interface does not have to know
+/// which setting of which source it is showing.
+class _ChoiceField extends StatelessWidget {
+  const _ChoiceField({
+    required this.field,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final MusicSourceField field;
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      isDense: true,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: field.label,
+        hintText: field.hint,
+        isDense: true,
+        border: const OutlineInputBorder(),
+      ),
+      items: [
+        for (final choice in field.choices)
+          DropdownMenuItem(value: choice.value, child: Text(choice.label)),
+      ],
+      onChanged: (selected) {
+        if (selected != null) onChanged(selected);
+      },
+    );
+  }
 }
 
 IconData _icon(MusicSourceKind kind) {
@@ -858,11 +922,17 @@ IconData _icon(MusicSourceKind kind) {
   };
 }
 
-String _formatTime(DateTime time) {
+/// The time of the last scan, written the way the locale writes it.
+///
+/// The clock and the day follow the language of the interface, so a reader
+/// never has to read a date of another language.
+String _formatTime(BuildContext context, DateTime time) {
+  final locale = Localizations.localeOf(context).toString();
   final now = DateTime.now();
   final sameDay =
       now.year == time.year && now.month == time.month && now.day == time.day;
-  final hour = time.hour.toString().padLeft(2, '0');
-  final minute = time.minute.toString().padLeft(2, '0');
-  return sameDay ? '$hour:$minute' : '${time.month}-${time.day} $hour:$minute';
+
+  final clock = DateFormat.Hm(locale).format(time);
+  if (sameDay) return clock;
+  return '${DateFormat.yMd(locale).format(time)} $clock';
 }

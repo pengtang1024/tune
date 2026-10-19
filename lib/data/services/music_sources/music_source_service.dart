@@ -3,18 +3,24 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
+import 'package:tune/data/services/music_sources/jellyfin_source.dart';
 import 'package:tune/data/services/music_sources/local_directory_source.dart';
+import 'package:tune/data/services/music_sources/lrclib_lyrics_provider.dart';
+import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
+import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
+import 'package:tune/data/services/music_sources/wikimedia_source.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -28,6 +34,7 @@ import 'package:tune/utils/logger.dart';
 class MusicSourceService implements StreamUrlResolver {
   final MusicSourceStore _store;
   final MusicPluginRepository _pluginRepository;
+  final LyricsProvider _lyricsProvider;
   final Map<String, MusicSourceAdapter> _adapters;
 
   MusicSourceService({
@@ -35,8 +42,10 @@ class MusicSourceService implements StreamUrlResolver {
     required MusicSourceStore store,
     Dio? dio,
     MusicPluginRepository? pluginRepository,
+    LyricsProvider? lyricsProvider,
   }) : _store = store,
        _pluginRepository = pluginRepository ?? MusicPluginRepository(),
+       _lyricsProvider = lyricsProvider ?? LrclibLyricsProvider(dio: dio),
        _adapters = {
          'local': LocalDirectorySourceAdapter(scanner),
          'openverse': OpenverseSourceAdapter(dio: dio),
@@ -47,6 +56,10 @@ class MusicSourceService implements StreamUrlResolver {
          'itunes': ITunesSourceAdapter(dio: dio),
          'podcast_rss': PodcastRssSourceAdapter(dio: dio),
          'subsonic': SubsonicSourceAdapter(dio: dio),
+         'audius': AudiusSourceAdapter(dio: dio),
+         'radio': RadioSourceAdapter(dio: dio),
+         'wikimedia': WikimediaSourceAdapter(dio: dio),
+         'jellyfin': JellyfinSourceAdapter(dio: dio),
        };
 
   List<MusicSourceAdapter> get adapters => List.unmodifiable(_adapters.values);
@@ -133,7 +146,9 @@ class MusicSourceService implements StreamUrlResolver {
   ///
   /// The lyrics of a track are only needed when the user asks for them, so
   /// they are fetched on demand instead of during a scan. A song that already
-  /// carries lyrics keeps them.
+  /// carries lyrics keeps them. A source without lyrics falls back to the
+  /// shared lyrics database, so an open catalogue can be read along with its
+  /// words.
   Future<String?> fetchLyrics(Song song) async {
     final stored = song.lyrics;
     if (stored != null && stored.trim().isNotEmpty) return stored;
@@ -146,7 +161,11 @@ class MusicSourceService implements StreamUrlResolver {
       if (config == null) return null;
       final adapter = await _adapterFor(config);
       if (adapter == null) return null;
-      return await adapter.fetchLyrics(config, song);
+
+      final fromSource = await adapter.fetchLyrics(config, song);
+      if (fromSource != null && fromSource.trim().isNotEmpty) return fromSource;
+
+      return await _lyricsProvider.lookup(song);
     } catch (error, stackTrace) {
       Log.error('获取歌词失败: $error\n$stackTrace');
       return null;

@@ -153,31 +153,36 @@ class PlayerDock extends ConsumerWidget {
                       children: [
                         _time(context, state.position),
                         Expanded(
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 2,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 4,
-                              ),
-                              overlayShape: SliderComponentShape.noOverlay,
-                            ),
-                            child: SizedBox(
-                              height: 18,
-                              child: Slider(
-                                value: _progress(state),
-                                onChanged: state.hasTrack
-                                    ? (value) => controller.seekTo(
-                                        Duration(
-                                          milliseconds:
-                                              (state.duration.inMilliseconds *
-                                                      value)
-                                                  .round(),
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                            ),
-                          ),
+                          child: state.currentSong?.isLiveStream ?? false
+                              ? const _LiveMark()
+                              : SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    trackHeight: 2,
+                                    thumbShape: const RoundSliderThumbShape(
+                                      enabledThumbRadius: 4,
+                                    ),
+                                    overlayShape:
+                                        SliderComponentShape.noOverlay,
+                                  ),
+                                  child: SizedBox(
+                                    height: 18,
+                                    child: Slider(
+                                      value: _progress(state),
+                                      onChanged: state.hasTrack
+                                          ? (value) => controller.seekTo(
+                                              Duration(
+                                                milliseconds:
+                                                    (state
+                                                                .duration
+                                                                .inMilliseconds *
+                                                            value)
+                                                        .round(),
+                                              ),
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                ),
                         ),
                         _time(context, state.duration),
                       ],
@@ -255,6 +260,38 @@ class PlayerDock extends ConsumerWidget {
           fontFamily: 'JetBrains Mono',
           fontSize: 8.5,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+}
+
+/// The mark that replaces the seek bar of a live stream.
+class _LiveMark extends StatelessWidget {
+  const _LiveMark();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.tertiary;
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Text(
+          context.loc.playerLiveBadge,
+          style: TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 8,
+            letterSpacing: 0.8,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
         ),
       ),
     );

@@ -34,7 +34,7 @@
   "libraryFilterSources": "Filter sources",
   "libraryAllSources": "All sources",
   "libraryScanAllSources": "Scan all sources",
-  "libraryTrackCount": "{count} tracks",
+  "libraryTrackCount": "{count, plural, =1{1 track} other{{count} tracks}}",
   "@libraryTrackCount": {
     "placeholders": {
       "count": {
@@ -83,7 +83,7 @@
   "playerNoSongTitle": "Pick a song to start",
   "playerUnknownArtist": "Unknown artist",
   "playerDockReady": "Tune · READY",
-  "playerQueueSummary": "{count} in queue",
+  "playerQueueSummary": "{count, plural, =1{1 track in queue} other{{count} tracks in queue}}",
   "@playerQueueSummary": {
     "placeholders": {
       "count": {
@@ -158,7 +158,7 @@
   "routerNotFoundTitle": "Page not found",
   "routerBackToLibrary": "Back to library",
   "sourcesTitle": "Sources",
-  "sourcesSubtitle": "Online catalogs and scan folders",
+  "sourcesSubtitle": "Online catalogs, self-hosted services and scan folders",
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
   "sourcesScanAll": "Scan all sources",
@@ -217,7 +217,7 @@
   },
   "sourcesAutoScanLocal": "Local folders are scanned after startup",
   "sourcesWaitingFirstScan": "Waiting for the first scan",
-  "sourcesScannedCount": "{count} tracks · {time}",
+  "sourcesScannedCount": "{count, plural, =1{1 track} other{{count} tracks}} · {time}",
   "@sourcesScannedCount": {
     "placeholders": {
       "count": {
@@ -327,7 +327,7 @@
   "settingsClearLibraryTitle": "Clear the library?",
   "settingsClearLibraryMessage": "This only clears the scan history of Tune. Music files on disk stay untouched.",
   "settingsLibraryCleared": "Library cleared",
-  "settingsPathsCount": "{count} paths",
+  "settingsPathsCount": "{count, plural, =1{1 folder} other{{count} folders}}",
   "@settingsPathsCount": {
     "placeholders": {
       "count": {
@@ -339,7 +339,7 @@
   "searchOnlineHint": "Search the online sources, e.g. jazz, piano, lo-fi",
   "searchOnlineDescription": "Search your enabled online sources. Results are not written to the library.",
   "searchOnlinePrompt": "Search the online sources",
-  "searchOnlinePromptDescription": "Type a keyword and press enter. Openverse, Jamendo, Internet Archive and every imported plugin are searched in parallel.",
+  "searchOnlinePromptDescription": "Type a keyword and press enter. Every enabled online source and every imported plugin are searched in parallel.",
   "searchNoResults": "No results",
   "searchNoResultsDescription": "Try another keyword.",
   "searchNoMatch": "No matching songs",
@@ -352,7 +352,7 @@
       }
     }
   },
-  "searchResultCount": "{count} tracks",
+  "searchResultCount": "{count, plural, =1{1 track} other{{count} tracks}}",
   "@searchResultCount": {
     "placeholders": {
       "count": {
@@ -409,7 +409,7 @@
     }
   },
   "scanNoAudioFiles": "No audio files found",
-  "scanSongCount": "Scanned {count} songs",
+  "scanSongCount": "{count, plural, =1{Scanned 1 song} other{Scanned {count} songs}}",
   "@scanSongCount": {
     "placeholders": {
       "count": {
@@ -417,7 +417,7 @@
       }
     }
   },
-  "scanSongCountShort": "{count} songs",
+  "scanSongCountShort": "{count, plural, =1{1 song} other{{count} songs}}",
   "@scanSongCountShort": {
     "placeholders": {
       "count": {
@@ -427,7 +427,7 @@
   },
   "scanSourceNotConfigured": "The source is not configured yet",
   "scanCachedTooSoon": "Cache kept, the last scan is still too recent",
-  "scanSummary": "Scanned {sources} sources, {songs} songs in total",
+  "scanSummary": "{sources, plural, =1{Scanned 1 source} other{Scanned {sources} sources}}, {songs, plural, =1{1 song} other{{songs} songs}} in total",
   "@scanSummary": {
     "placeholders": {
       "songs": {
@@ -438,7 +438,7 @@
       }
     }
   },
-  "scanUpdated": "Updated {songs} songs, {failed} sources failed",
+  "scanUpdated": "Updated {songs, plural, =1{1 song} other{{songs} songs}}, {failed, plural, =1{1 source failed} other{{failed} sources failed}}",
   "@scanUpdated": {
     "placeholders": {
       "failed": {
@@ -503,7 +503,7 @@
       }
     }
   },
-  "intervalHours": "{count} hours",
+  "intervalHours": "{count, plural, =1{1 hour} other{{count} hours}}",
   "@intervalHours": {
     "placeholders": {
       "count": {
@@ -511,7 +511,7 @@
       }
     }
   },
-  "intervalMinutes": "{count} minutes",
+  "intervalMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
   "@intervalMinutes": {
     "placeholders": {
       "count": {
@@ -567,7 +567,7 @@
   "pluginUnknownData": "The plugin returned data that could not be read",
   "pluginCallError": "The plugin call failed",
   "pluginNoMatch": "No matching songs",
-  "pluginNoStreamResults": "The plugin returned {count} results, but no playable address",
+  "pluginNoStreamResults": "{count, plural, =1{The plugin returned 1 result, but no playable address} other{The plugin returned {count} results, but no playable address}}",
   "@pluginNoStreamResults": {
     "placeholders": {
       "count": {
@@ -585,8 +585,8 @@
   "neteaseEmptyResponse": "The NetEase API returned an empty response",
   "neteaseNoMatch": "No matching songs",
   "neteaseNoStream": "The service returned no playable address. You may need to sign in on the server, or the track is restricted.",
-  "openverseHint": "Enter a scan keyword, e.g. piano, ambient or jazz",
-  "openverseFieldQuery": "Scan keyword",
+  "openverseHint": "Enter a search keyword, e.g. piano, ambient or jazz",
+  "openverseFieldQuery": "Search keyword",
   "openverseFieldHint": "e.g. piano, ambient, jazz",
   "openverseEmptyResponse": "Openverse returned an empty response",
   "openverseNoMatch": "No matching open audio found",
@@ -697,7 +697,7 @@
   "ccmixterEmptyResponse": "ccMixter returned an empty response",
   "ccmixterFieldLimit": "Tracks per scan",
   "ccmixterFieldLimitHint": "15 by default, 30 at most",
-  "ccmixterFieldQuery": "Scan tag",
+  "ccmixterFieldQuery": "Search tag",
   "ccmixterFieldQueryHint": "e.g. jazz, ambient, electro",
   "ccmixterHint": "Enter a ccMixter tag, e.g. jazz, ambient or electro",
   "ccmixterNoMatch": "No matching ccMixter tracks",
@@ -749,5 +749,65 @@
   "subsonicFieldUser": "User name",
   "subsonicFieldUserHint": "The login name of your music server",
   "subsonicHint": "Enter the address and the account of your own music server, e.g. http://localhost:4533",
-  "subsonicNoMatch": "No matching tracks"
+  "subsonicNoMatch": "No matching tracks",
+  "sourceAudiusDescription": "Complete tracks from the open Audius network",
+  "audiusHint": "Type a search keyword, e.g. jazz, ambient or electronic",
+  "audiusFieldQuery": "Search keyword",
+  "audiusFieldQueryHint": "e.g. jazz, ambient, electronic",
+  "audiusFieldLimit": "Tracks per scan",
+  "audiusFieldLimitHint": "20 by default, 50 at most",
+  "audiusEmptyResponse": "Audius returned an empty response",
+  "audiusNoMatch": "No matching tracks on Audius",
+  "sourceRadioDescription": "Live streams of public internet radio",
+  "radioHint": "Pick a directory of stations, a keyword filters them",
+  "radioFieldProvider": "Station directory",
+  "radioFieldProviderHint": "All directories, Radio Browser, SomaFM or Radio Paradise",
+  "radioProviderAll": "All directories",
+  "radioFieldQuery": "Station keyword",
+  "radioFieldQueryHint": "e.g. jazz, ambient or SomaFM",
+  "radioFieldLimit": "Stations per scan",
+  "radioFieldLimitHint": "20 by default, 100 at most",
+  "radioNoMatch": "No matching stations",
+  "sourceWikimediaDescription": "Open audio from Wikimedia Commons",
+  "wikimediaHint": "Type a search keyword, e.g. piano, lecture or birdsong",
+  "wikimediaFieldQuery": "Search keyword",
+  "wikimediaFieldQueryHint": "e.g. piano, lecture, birdsong",
+  "wikimediaFieldLimit": "Files per scan",
+  "wikimediaFieldLimitHint": "15 by default, 30 at most",
+  "wikimediaEmptyResponse": "Wikimedia Commons returned an empty response",
+  "wikimediaNoMatch": "No playable audio found on Commons",
+  "sourceJellyfinDescription": "Connect to a self-hosted Jellyfin library",
+  "jellyfinHint": "Type the address and the account of your Jellyfin server",
+  "jellyfinFieldServer": "Server address",
+  "jellyfinFieldServerHint": "e.g. http://localhost:8096",
+  "jellyfinFieldUser": "Username",
+  "jellyfinFieldUserHint": "The login name of your Jellyfin account",
+  "jellyfinFieldPassword": "Password",
+  "jellyfinFieldPasswordHint": "Used to obtain an access token",
+  "jellyfinFieldLimit": "Tracks per scan",
+  "jellyfinFieldLimitHint": "50 by default, 200 at most",
+  "jellyfinEmptyResponse": "Jellyfin returned an empty response",
+  "jellyfinNoMatch": "No matching tracks",
+  "jellyfinAuthFailed": "Cannot reach the Jellyfin server, check the address and the account",
+  "audioSourceStreaming": "Live",
+  "playerLiveBadge": "LIVE",
+  "nowPlayingLiveStream": "Live stream, no fixed length",
+  "nowPlayingDetails": "Track details",
+  "nowPlayingDetailAlbum": "Album",
+  "nowPlayingDetailYear": "Year",
+  "nowPlayingDetailGenre": "Genre",
+  "nowPlayingDetailBitrate": "Bitrate",
+  "nowPlayingDetailSampleRate": "Sample rate",
+  "nowPlayingDetailTrack": "Track",
+  "nowPlayingDetailDisc": "Disc",
+  "nowPlayingDetailLanguage": "Language",
+  "nowPlayingDetailLicense": "License",
+  "nowPlayingDetailSource": "Source",
+  "nowPlayingDetailNowPlaying": "On air",
+  "jamendoFieldFormat": "Quality",
+  "jamendoFieldFormatHint": "192 kbps by default",
+  "subsonicFieldFormat": "Quality",
+  "subsonicFieldFormatHint": "Original quality by default",
+  "subsonicFormatOriginal": "Original quality",
+  "sourceRadioName": "Internet radio"
 }

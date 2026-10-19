@@ -47,6 +47,19 @@ class Song {
   /// Extra HTTP headers required by some plugin-provided stream URLs.
   final Map<String, String>? httpHeaders;
 
+  /// Whether the track is a live stream instead of a fixed recording.
+  ///
+  /// A live stream never ends, so it is played straight from the network
+  /// instead of being fetched to disk first, and the player does not offer a
+  /// position inside it.
+  final bool isLiveStream;
+
+  /// The licence the track is published under, when the source states one.
+  final String? license;
+
+  /// A short description of the track, when the source provides one.
+  final String? description;
+
   const Song({
     required this.id,
     this.title = '',
@@ -77,6 +90,9 @@ class Song {
     this.artworkUrl,
     this.sourceData,
     this.httpHeaders,
+    this.isLiveStream = false,
+    this.license,
+    this.description,
   });
 
   factory Song.fromMap(Map<String, dynamic> data) {
@@ -118,6 +134,9 @@ class Song {
               (key, value) => MapEntry(key.toString(), value.toString()),
             )
           : null,
+      isLiveStream: data['isLiveStream'] == true,
+      license: data['license'],
+      description: data['description'],
     );
   }
 
@@ -151,6 +170,9 @@ class Song {
     String? artworkUrl,
     Map<String, dynamic>? sourceData,
     Map<String, String>? httpHeaders,
+    bool? isLiveStream,
+    String? license,
+    String? description,
   }) {
     return Song(
       id: id ?? this.id,
@@ -182,6 +204,9 @@ class Song {
       artworkUrl: artworkUrl ?? this.artworkUrl,
       sourceData: sourceData ?? this.sourceData,
       httpHeaders: httpHeaders ?? this.httpHeaders,
+      isLiveStream: isLiveStream ?? this.isLiveStream,
+      license: license ?? this.license,
+      description: description ?? this.description,
     );
   }
 
@@ -234,6 +259,9 @@ class Song {
     'artworkUrl': artworkUrl,
     'sourceData': sourceData,
     'httpHeaders': httpHeaders,
+    'isLiveStream': isLiveStream,
+    'license': license,
+    'description': description,
   };
 
   @override

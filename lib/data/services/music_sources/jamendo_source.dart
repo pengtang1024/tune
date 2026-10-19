@@ -47,6 +47,16 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.jamendoFieldQuery,
       AppStrings.instance.jamendoFieldQueryHint,
     ),
+    MusicSourceField(
+      'format',
+      AppStrings.instance.jamendoFieldFormat,
+      AppStrings.instance.jamendoFieldFormatHint,
+      choices: const [
+        MusicSourceChoice('mp31', 'MP3 · 96 kbps'),
+        MusicSourceChoice('mp32', 'MP3 · 192 kbps'),
+        MusicSourceChoice('mp3', 'MP3 · 320 kbps'),
+      ],
+    ),
   ];
 
   @override
@@ -74,7 +84,7 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
         'limit': 20,
         'order': 'popularity_total',
         'include': 'musicinfo',
-        'audioformat': 'mp32',
+        'audioformat': _format(request.config),
       };
       if (query != null) {
         parameters['search'] = query;
@@ -99,6 +109,18 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
+  }
+
+  /// The audio format the tracks are delivered in.
+  ///
+  /// Jamendo offers the same track in three qualities; the catalogue keeps
+  /// the one the user picked and falls back to the middle one.
+  static String _format(MusicSourceConfig config) {
+    final format = config.setting('format');
+    if (format == 'mp31' || format == 'mp3') {
+      return format!;
+    }
+    return 'mp32';
   }
 
   /// Kept static so JSON mapping can be tested without network access.
@@ -129,14 +151,19 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
 
       final musicInfo = raw['musicinfo'];
       String? genre;
+      final genres = <String>[];
       if (musicInfo is Map) {
         final tags = musicInfo['tags'];
         if (tags is Map) {
-          final genres = tags['genres'];
-          if (genres is List && genres.isNotEmpty) {
-            genre = genres.first?.toString();
+          final rawGenres = tags['genres'];
+          if (rawGenres is List) {
+            for (final item in rawGenres) {
+              final name = item?.toString().trim() ?? '';
+              if (name.isNotEmpty) genres.add(name);
+            }
           }
         }
+        genre = genres.isEmpty ? null : genres.first;
       }
 
       final releaseDate = raw['releasedate']?.toString() ?? '';
@@ -153,9 +180,12 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
           album: raw['album_name']?.toString() ?? '',
           duration: SourceSongFactory.parseInt(raw['duration']) * 1000,
           streamUrl: streamUrl,
-          artworkUrl: raw['image']?.toString(),
+          artworkUrl:
+              raw['album_image']?.toString() ?? raw['image']?.toString(),
           genre: genre,
+          genres: genres.isEmpty ? null : genres,
           year: year,
+          license: raw['license_ccurl']?.toString(),
         ),
       );
     }

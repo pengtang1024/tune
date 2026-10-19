@@ -300,7 +300,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sourcesTitle => 'Fuentes';
 
   @override
-  String get sourcesSubtitle => 'Catálogos en línea y carpetas';
+  String get sourcesSubtitle =>
+      'Catálogos en línea, servicios autoalojados y carpetas de análisis';
 
   @override
   String get sourcesAutoScan => 'Escanear al iniciar';
@@ -557,7 +558,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      'Escribe una palabra clave y pulsa Enter. Openverse, Jamendo, Internet Archive y los plugins importados se consultan en paralelo.';
+      'Escribe una palabra clave y pulsa Enter. Todas las fuentes en línea activadas y los plugins importados se consultan en paralelo.';
 
   @override
   String get searchNoResults => 'Sin resultados';
@@ -1175,4 +1176,196 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => 'No hay pistas coincidentes';
+
+  @override
+  String get sourceAudiusDescription =>
+      'Pistas completas de la red abierta Audius';
+
+  @override
+  String get audiusHint =>
+      'Escribe una palabra clave, p. ej. jazz, ambient o electronic';
+
+  @override
+  String get audiusFieldQuery => 'Palabra clave';
+
+  @override
+  String get audiusFieldQueryHint => 'p. ej. jazz, ambient, electronic';
+
+  @override
+  String get audiusFieldLimit => 'Pistas por análisis';
+
+  @override
+  String get audiusFieldLimitHint => '20 por defecto, 50 como máximo';
+
+  @override
+  String get audiusEmptyResponse => 'Audius devolvió una respuesta vacía';
+
+  @override
+  String get audiusNoMatch => 'No hay pistas coincidentes en Audius';
+
+  @override
+  String get sourceRadioDescription =>
+      'Emisiones en directo de radios públicas';
+
+  @override
+  String get radioHint =>
+      'Elige un directorio de emisoras, una palabra clave las filtra';
+
+  @override
+  String get radioFieldProvider => 'Directorio de emisoras';
+
+  @override
+  String get radioFieldProviderHint =>
+      'Todos los directorios, Radio Browser, SomaFM o Radio Paradise';
+
+  @override
+  String get radioProviderAll => 'Todos los directorios';
+
+  @override
+  String get radioFieldQuery => 'Palabra clave de emisora';
+
+  @override
+  String get radioFieldQueryHint => 'p. ej. jazz, ambient o SomaFM';
+
+  @override
+  String get radioFieldLimit => 'Emisoras por análisis';
+
+  @override
+  String get radioFieldLimitHint => '20 por defecto, 100 como máximo';
+
+  @override
+  String get radioNoMatch => 'No hay emisoras coincidentes';
+
+  @override
+  String get sourceWikimediaDescription => 'Audio abierto de Wikimedia Commons';
+
+  @override
+  String get wikimediaHint =>
+      'Escribe una palabra clave, p. ej. piano, lecture o birdsong';
+
+  @override
+  String get wikimediaFieldQuery => 'Palabra clave';
+
+  @override
+  String get wikimediaFieldQueryHint => 'p. ej. piano, lecture, birdsong';
+
+  @override
+  String get wikimediaFieldLimit => 'Archivos por análisis';
+
+  @override
+  String get wikimediaFieldLimitHint => '15 por defecto, 30 como máximo';
+
+  @override
+  String get wikimediaEmptyResponse =>
+      'Wikimedia Commons devolvió una respuesta vacía';
+
+  @override
+  String get wikimediaNoMatch => 'No se encontró audio reproducible';
+
+  @override
+  String get sourceJellyfinDescription =>
+      'Conectar con una biblioteca Jellyfin autoalojada';
+
+  @override
+  String get jellyfinHint =>
+      'Escribe la dirección y la cuenta de tu servidor Jellyfin';
+
+  @override
+  String get jellyfinFieldServer => 'Dirección del servidor';
+
+  @override
+  String get jellyfinFieldServerHint => 'p. ej. http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => 'Nombre de usuario';
+
+  @override
+  String get jellyfinFieldUserHint =>
+      'El nombre de inicio de sesión de tu cuenta Jellyfin';
+
+  @override
+  String get jellyfinFieldPassword => 'Contraseña';
+
+  @override
+  String get jellyfinFieldPasswordHint =>
+      'Sirve para obtener un token de acceso';
+
+  @override
+  String get jellyfinFieldLimit => 'Pistas por análisis';
+
+  @override
+  String get jellyfinFieldLimitHint => '50 por defecto, 200 como máximo';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin devolvió una respuesta vacía';
+
+  @override
+  String get jellyfinNoMatch => 'No hay pistas coincidentes';
+
+  @override
+  String get jellyfinAuthFailed =>
+      'No se puede conectar con el servidor Jellyfin, revisa la dirección y la cuenta';
+
+  @override
+  String get audioSourceStreaming => 'En directo';
+
+  @override
+  String get playerLiveBadge => 'EN DIRECTO';
+
+  @override
+  String get nowPlayingLiveStream => 'Emisión en directo, sin duración fija';
+
+  @override
+  String get nowPlayingDetails => 'Detalles de la pista';
+
+  @override
+  String get nowPlayingDetailAlbum => 'Álbum';
+
+  @override
+  String get nowPlayingDetailYear => 'Año';
+
+  @override
+  String get nowPlayingDetailGenre => 'Género';
+
+  @override
+  String get nowPlayingDetailBitrate => 'Tasa de bits';
+
+  @override
+  String get nowPlayingDetailSampleRate => 'Frecuencia de muestreo';
+
+  @override
+  String get nowPlayingDetailTrack => 'Pista';
+
+  @override
+  String get nowPlayingDetailDisc => 'Disco';
+
+  @override
+  String get nowPlayingDetailLanguage => 'Idioma';
+
+  @override
+  String get nowPlayingDetailLicense => 'Licencia';
+
+  @override
+  String get nowPlayingDetailSource => 'Fuente';
+
+  @override
+  String get nowPlayingDetailNowPlaying => 'En emisión';
+
+  @override
+  String get jamendoFieldFormat => 'Calidad';
+
+  @override
+  String get jamendoFieldFormatHint => '192 kbps por defecto';
+
+  @override
+  String get subsonicFieldFormat => 'Calidad';
+
+  @override
+  String get subsonicFieldFormatHint => 'Calidad original por defecto';
+
+  @override
+  String get subsonicFormatOriginal => 'Calidad original';
+
+  @override
+  String get sourceRadioName => 'Radio por internet';
 }

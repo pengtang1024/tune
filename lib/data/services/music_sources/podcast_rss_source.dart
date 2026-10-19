@@ -5,6 +5,7 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/utils/logger.dart';
 import 'package:xml/xml.dart';
 
 /// A podcast feed is a plain RSS document that lists episodes.
@@ -91,6 +92,44 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       );
     } catch (error) {
       return failedResult(sourceId, error);
+    }
+  }
+
+  /// Reads the feed again and takes the address of the episode.
+  ///
+  /// Hosts move their audio files, so the address of an episode stops working
+  /// after a while. The feed still knows where the episode lives, so the
+  /// player can recover without waiting for the next scan.
+  @override
+  Future<Song?> refreshStream(MusicSourceConfig config, Song song) async {
+    final feed = config.setting('feed');
+    if (feed == null) return null;
+
+    final externalId = song.externalId ?? '';
+    if (externalId.isEmpty) return null;
+
+    try {
+      final response = await _dio.get<String>(feed);
+      final body = response.data;
+      if (body == null || body.trim().isEmpty) return null;
+
+      final document = XmlDocument.parse(body);
+      for (final item in document.findAllElements('item')) {
+        final guid = _firstText([item], 'guid');
+        final enclosure = _enclosureUrl(item);
+        if (enclosure == null) continue;
+
+        final matches = guid.isNotEmpty
+            ? guid == externalId
+            : enclosure == externalId;
+        if (!matches) continue;
+
+        return song.copyWith(streamUrl: enclosure);
+      }
+      return null;
+    } catch (error) {
+      Log.error('刷新播客地址失败: $error');
+      return null;
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/l10n/locale_labels.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 
 class SettingsPageHeader extends StatelessWidget {
@@ -749,21 +750,10 @@ class _LanguageDropdown extends StatelessWidget {
 
   const _LanguageDropdown({required this.locale, required this.onChanged});
 
-  static const _locales = <Locale>[
-    Locale('zh', 'CN'),
-    Locale('zh', 'TW'),
-    Locale('en'),
-    Locale('ja'),
-    Locale('ko'),
-    Locale('de'),
-    Locale('fr'),
-    Locale('es'),
-    Locale('ru'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final locales = offerableLocales();
 
     return Container(
       width: 150,
@@ -776,7 +766,7 @@ class _LanguageDropdown extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Locale>(
-          value: locale,
+          value: _selected(locales),
           isDense: true,
           isExpanded: true,
           icon: Icon(
@@ -791,11 +781,11 @@ class _LanguageDropdown extends StatelessWidget {
           dropdownColor: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
           menuMaxHeight: 250,
-          items: _locales
+          items: locales
               .map(
                 (item) => DropdownMenuItem<Locale>(
                   value: item,
-                  child: Text(_label(item)),
+                  child: Text(localeEndonym(item)),
                 ),
               )
               .toList(growable: false),
@@ -807,18 +797,18 @@ class _LanguageDropdown extends StatelessWidget {
     );
   }
 
-  String _label(Locale item) {
-    return switch (item.languageCode) {
-      'zh' => item.countryCode == 'TW' ? '繁體中文' : '简体中文',
-      'en' => 'English',
-      'ja' => '日本語',
-      'ko' => '한국어',
-      'de' => 'Deutsch',
-      'fr' => 'Français',
-      'es' => 'Español',
-      'ru' => 'Русский',
-      _ => item.toLanguageTag(),
-    };
+  /// The entry that shows the locale of the app.
+  ///
+  /// A locale outside of the catalogue falls back to the first entry of its
+  /// language, so the dropdown always shows where the app stands.
+  Locale? _selected(List<Locale> locales) {
+    for (final item in locales) {
+      if (item == locale) return item;
+    }
+    for (final item in locales) {
+      if (item.languageCode == locale.languageCode) return item;
+    }
+    return null;
   }
 }
 

@@ -294,7 +294,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sourcesTitle => '소스';
 
   @override
-  String get sourcesSubtitle => '온라인 카탈로그와 스캔 폴더';
+  String get sourcesSubtitle => '온라인 카탈로그, 자체 호스팅 서비스, 스캔 폴더';
 
   @override
   String get sourcesAutoScan => '시작할 때 자동 스캔';
@@ -451,7 +451,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get playerLyrics => '\\uac00\\uc0b0';
+  String get playerLyrics => '가산';
 
   @override
   String get lyricsLoading => '가산 로드를 불러오서다.';
@@ -540,7 +540,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      '키워드를 입력하고 Enter 키를 누르면 Openverse, Jamendo, Internet Archive와 가져온 플러그인이 동시에 검색됩니다.';
+      '키워드를 입력하고 Enter 키를 누르면 활성화된 온라인音源과 가져온 플러그인이 동시에 검색됩니다.';
 
   @override
   String get searchNoResults => '결과 없음';
@@ -819,7 +819,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get openverseHint => '스캔 키워드를 입력하세요 (예: piano, ambient, jazz)';
 
   @override
-  String get openverseFieldQuery => '스캔 키워드';
+  String get openverseFieldQuery => '검색 키워드';
 
   @override
   String get openverseFieldHint => '예: piano, ambient, jazz';
@@ -913,7 +913,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '$label\\uc5d0 \\uc2e4\\ud328\\ud588\\uc2b5\\ub2c8\\ub2e4: $error';
+    return '$label에 실패했습니다: $error';
   }
 
   @override
@@ -1117,4 +1117,185 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => '일치하는 곡을 찾을 수 없습니다';
+
+  @override
+  String get sourceAudiusDescription => '열린 음악 네트워크 Audius의 전체 트랙';
+
+  @override
+  String get audiusHint => '검색 키워드를 입력하세요 (예: jazz, ambient, electronic)';
+
+  @override
+  String get audiusFieldQuery => '검색 키워드';
+
+  @override
+  String get audiusFieldQueryHint => '예: jazz, ambient, electronic';
+
+  @override
+  String get audiusFieldLimit => '한 번에 스캔할 곡 수';
+
+  @override
+  String get audiusFieldLimitHint => '기본 20, 최대 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius가 빈 응답을 반환했습니다';
+
+  @override
+  String get audiusNoMatch => '조건에 맞는 Audius 트랙이 없습니다';
+
+  @override
+  String get sourceRadioDescription => '공개 인터넷 라디오의 라이브 스트림';
+
+  @override
+  String get radioHint => '방송국 디렉터리를 고르고 키워드로 거를 수 있습니다';
+
+  @override
+  String get radioFieldProvider => '방송국 디렉터리';
+
+  @override
+  String get radioFieldProviderHint =>
+      '전체 디렉터리, Radio Browser, SomaFM 또는 Radio Paradise';
+
+  @override
+  String get radioProviderAll => '전체 디렉터리';
+
+  @override
+  String get radioFieldQuery => '방송국 키워드';
+
+  @override
+  String get radioFieldQueryHint => '예: jazz, ambient 또는 SomaFM';
+
+  @override
+  String get radioFieldLimit => '한 번에 스캔할 방송국 수';
+
+  @override
+  String get radioFieldLimitHint => '기본 20, 최대 100';
+
+  @override
+  String get radioNoMatch => '조건에 맞는 방송국이 없습니다';
+
+  @override
+  String get sourceWikimediaDescription => '위키미디어 커먼즈의 열린 오디오';
+
+  @override
+  String get wikimediaHint => '검색 키워드를 입력하세요 (예: piano, lecture, birdsong)';
+
+  @override
+  String get wikimediaFieldQuery => '검색 키워드';
+
+  @override
+  String get wikimediaFieldQueryHint => '예: piano, lecture, birdsong';
+
+  @override
+  String get wikimediaFieldLimit => '한 번에 스캔할 파일 수';
+
+  @override
+  String get wikimediaFieldLimitHint => '기본 15, 최대 30';
+
+  @override
+  String get wikimediaEmptyResponse => '위키미디어 커먼즈가 빈 응답을 반환했습니다';
+
+  @override
+  String get wikimediaNoMatch => '재생할 수 있는 오디오를 찾지 못했습니다';
+
+  @override
+  String get sourceJellyfinDescription => '직접 호스팅한 Jellyfin 라이브러리에 연결합니다';
+
+  @override
+  String get jellyfinHint => 'Jellyfin 서버 주소와 계정을 입력하세요';
+
+  @override
+  String get jellyfinFieldServer => '서버 주소';
+
+  @override
+  String get jellyfinFieldServerHint => '예: http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => '사용자 이름';
+
+  @override
+  String get jellyfinFieldUserHint => 'Jellyfin 계정의 로그인 이름';
+
+  @override
+  String get jellyfinFieldPassword => '비밀번호';
+
+  @override
+  String get jellyfinFieldPasswordHint => '액세스 토큰을 얻는 데 사용합니다';
+
+  @override
+  String get jellyfinFieldLimit => '한 번에 스캔할 곡 수';
+
+  @override
+  String get jellyfinFieldLimitHint => '기본 50, 최대 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin이 빈 응답을 반환했습니다';
+
+  @override
+  String get jellyfinNoMatch => '조건에 맞는 트랙이 없습니다';
+
+  @override
+  String get jellyfinAuthFailed => 'Jellyfin 서버에 연결할 수 없습니다. 주소와 계정을 확인하세요';
+
+  @override
+  String get audioSourceStreaming => '라이브';
+
+  @override
+  String get playerLiveBadge => '라이브 중';
+
+  @override
+  String get nowPlayingLiveStream => '라이브 스트림이라 고정 길이가 없습니다';
+
+  @override
+  String get nowPlayingDetails => '곡 정보';
+
+  @override
+  String get nowPlayingDetailAlbum => '앨범';
+
+  @override
+  String get nowPlayingDetailYear => '연도';
+
+  @override
+  String get nowPlayingDetailGenre => '장르';
+
+  @override
+  String get nowPlayingDetailBitrate => '비트레이트';
+
+  @override
+  String get nowPlayingDetailSampleRate => '샘플레이트';
+
+  @override
+  String get nowPlayingDetailTrack => '트랙 번호';
+
+  @override
+  String get nowPlayingDetailDisc => '디스크 번호';
+
+  @override
+  String get nowPlayingDetailLanguage => '언어';
+
+  @override
+  String get nowPlayingDetailLicense => '라이선스';
+
+  @override
+  String get nowPlayingDetailSource => '출처';
+
+  @override
+  String get nowPlayingDetailNowPlaying => '방송 중';
+
+  @override
+  String get jamendoFieldFormat => '음질';
+
+  @override
+  String get jamendoFieldFormatHint => '기본 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => '음질';
+
+  @override
+  String get subsonicFieldFormatHint => '기본은 원본 음질';
+
+  @override
+  String get subsonicFormatOriginal => '원본 음질';
+
+  @override
+  String get sourceRadioName => '인터넷 라디오';
 }

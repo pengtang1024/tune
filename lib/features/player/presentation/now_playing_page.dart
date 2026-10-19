@@ -215,6 +215,8 @@ class _TrackLayout extends StatelessWidget {
                     _Title(song: song),
                     const SizedBox(height: 8),
                     _Artist(song: song),
+                    const SizedBox(height: 14),
+                    _TrackDetails(song: song, sourceName: sourceName),
                     const SizedBox(height: 18),
                   ],
                   _ProgressRow(state: state, onSeek: onSeek),
@@ -336,6 +338,140 @@ class _Artist extends StatelessWidget {
   }
 }
 
+/// The facts the source published about the track.
+///
+/// Every source knows different things about a track, so the panel shows
+/// whatever is known: the album, the year, the style, the quality of the
+/// file, the licence and the station that plays it.
+class _TrackDetails extends StatelessWidget {
+  const _TrackDetails({required this.song, required this.sourceName});
+
+  final Song song;
+  final String sourceName;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = _entries(context);
+    if (entries.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: 14,
+      runSpacing: 6,
+      children: [
+        for (final entry in entries)
+          _DetailItem(label: entry.$1, value: entry.$2),
+      ],
+    );
+  }
+
+  /// The facts that are known about the track.
+  List<(String, String)> _entries(BuildContext context) {
+    final entries = <(String, String)>[];
+
+    void add(String label, String? value) {
+      final text = value?.trim() ?? '';
+      if (text.isEmpty) return;
+      entries.add((label, text));
+    }
+
+    add(context.loc.nowPlayingDetailAlbum, song.album);
+    add(context.loc.nowPlayingDetailYear, song.year?.toString());
+    add(context.loc.nowPlayingDetailGenre, _genre());
+    add(context.loc.nowPlayingDetailBitrate, _bitrate());
+    add(context.loc.nowPlayingDetailSampleRate, _sampleRate());
+    add(context.loc.nowPlayingDetailTrack, _track());
+    add(context.loc.nowPlayingDetailDisc, _disc());
+    add(context.loc.nowPlayingDetailLanguage, song.language);
+    add(context.loc.nowPlayingDetailLicense, song.license);
+    add(context.loc.nowPlayingDetailNowPlaying, _onAir());
+    add(context.loc.nowPlayingDetailSource, sourceName);
+
+    return entries;
+  }
+
+  String? _genre() {
+    final genres = song.genres;
+    if (genres != null && genres.isNotEmpty) return genres.join(' / ');
+    return song.genre;
+  }
+
+  String? _bitrate() {
+    final bitrate = song.bitrate;
+    if (bitrate == null || bitrate <= 0) return null;
+    return '$bitrate kbps';
+  }
+
+  String? _sampleRate() {
+    final rate = song.sampleRate;
+    if (rate == null || rate <= 0) return null;
+    final kilohertz = rate / 1000;
+    return kilohertz == kilohertz.roundToDouble()
+        ? '${kilohertz.toInt()} kHz'
+        : '${kilohertz.toStringAsFixed(1)} kHz';
+  }
+
+  String? _track() {
+    final number = song.trackNumber;
+    if (number == null || number <= 0) return null;
+    final total = song.trackTotal;
+    return total != null && total > 0 ? '$number / $total' : '$number';
+  }
+
+  String? _disc() {
+    final number = song.discNumber;
+    if (number == null || number <= 0) return null;
+    final total = song.totalDisc;
+    return total != null && total > 0 ? '$number / $total' : '$number';
+  }
+
+  /// The track a station is playing right now.
+  String? _onAir() {
+    final nowPlaying = song.sourceData?['nowPlaying']?.toString() ?? '';
+    return nowPlaying.isEmpty ? null : nowPlaying;
+  }
+}
+
+/// One fact of the track, written as `label value`.
+class _DetailItem extends StatelessWidget {
+  const _DetailItem({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
+
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$label ',
+            style: TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 9.5,
+              letterSpacing: 0.3,
+              color: muted.withValues(alpha: 0.75),
+            ),
+          ),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 9.5,
+              letterSpacing: 0.3,
+              color: muted,
+            ),
+          ),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
 /// The seek bar with the elapsed and the total time.
 class _ProgressRow extends StatelessWidget {
   const _ProgressRow({required this.state, required this.onSeek});
@@ -351,6 +487,29 @@ class _ProgressRow extends StatelessWidget {
             0.0,
             1.0,
           );
+
+    final isLive = state.currentSong?.isLiveStream ?? false;
+
+    if (isLive) {
+      return Row(
+        children: [
+          _TimeLabel(value: state.position),
+          const SizedBox(width: 10),
+          const _LiveBadge(),
+          const Spacer(),
+          SizedBox(
+            width: 92,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: AudioSourceBadge(
+                status: state.audioSourceStatus,
+                progress: state.downloadProgress,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
     return Row(
       children: [
@@ -381,6 +540,43 @@ class _ProgressRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The mark that tells the user the track never ends.
+class _LiveBadge extends StatelessWidget {
+  const _LiveBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.tertiary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.podcasts_rounded, size: 11, color: color),
+          const SizedBox(width: 5),
+          Text(
+            context.loc.playerLiveBadge,
+            style: TextStyle(
+              fontFamily: 'JetBrains Mono',
+              fontSize: 9,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,3 +1,14 @@
+/// One option of a setting that only allows a fixed set of values.
+///
+/// The value is what gets stored, the label is what the user reads, so a
+/// source can offer translated labels without changing its saved data.
+class MusicSourceChoice {
+  final String value;
+  final String label;
+
+  const MusicSourceChoice(this.value, this.label);
+}
+
 /// One user-editable setting declared by a music source adapter.
 ///
 /// Keeping the schema in the data layer lets the settings UI render any source
@@ -12,6 +23,11 @@ class MusicSourceField {
   /// Whether the value is a secret and must not be shown on screen.
   final bool secret;
 
+  /// The values the setting allows.
+  ///
+  /// An empty list leaves the setting a free text field.
+  final List<MusicSourceChoice> choices;
+
   const MusicSourceField(
     this.key,
     this.label,
@@ -19,6 +35,7 @@ class MusicSourceField {
     this.required = false,
     this.numeric = false,
     this.secret = false,
+    this.choices = const [],
   });
 }
 
@@ -128,6 +145,7 @@ class MusicSourceConfig {
             required: item['required'] == true,
             numeric: item['numeric'] == true,
             secret: item['secret'] == true,
+            choices: _choicesFromJson(item['choices']),
           ),
         );
       }
@@ -161,6 +179,11 @@ class MusicSourceConfig {
             'required': field.required,
             'numeric': field.numeric,
             'secret': field.secret,
+            if (field.choices.isNotEmpty)
+              'choices': [
+                for (final choice in field.choices)
+                  {'value': choice.value, 'label': choice.label},
+              ],
           },
       ],
   };
@@ -170,6 +193,19 @@ class MusicSourceConfig {
       (kind) => kind.name == name,
       orElse: () => MusicSourceKind.openApi,
     );
+  }
+
+  /// Reads the options of a setting back from the stored schema.
+  static List<MusicSourceChoice> _choicesFromJson(Object? raw) {
+    if (raw is! List) return const [];
+    final choices = <MusicSourceChoice>[];
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final value = item['value']?.toString() ?? '';
+      if (value.isEmpty) continue;
+      choices.add(MusicSourceChoice(value, item['label']?.toString() ?? value));
+    }
+    return List.unmodifiable(choices);
   }
 
   @override

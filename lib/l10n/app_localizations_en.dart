@@ -113,7 +113,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String libraryTrackCount(int count) {
-    return '$count tracks';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks',
+      one: '1 track',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -227,7 +233,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String playerQueueSummary(int count) {
-    return '$count in queue';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks in queue',
+      one: '1 track in queue',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -299,7 +311,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesTitle => 'Sources';
 
   @override
-  String get sourcesSubtitle => 'Online catalogs and scan folders';
+  String get sourcesSubtitle =>
+      'Online catalogs, self-hosted services and scan folders';
 
   @override
   String get sourcesAutoScan => 'Scan on startup';
@@ -386,7 +399,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String sourcesScannedCount(int count, String time) {
-    return '$count tracks · $time';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks',
+      one: '1 track',
+    );
+    return '$_temp0 · $time';
   }
 
   @override
@@ -534,7 +553,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String settingsPathsCount(int count) {
-    return '$count paths';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count folders',
+      one: '1 folder',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -553,7 +578,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      'Type a keyword and press enter. Openverse, Jamendo, Internet Archive and every imported plugin are searched in parallel.';
+      'Type a keyword and press enter. Every enabled online source and every imported plugin are searched in parallel.';
 
   @override
   String get searchNoResults => 'No results';
@@ -574,7 +599,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String searchResultCount(int count) {
-    return '$count tracks';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks',
+      one: '1 track',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -632,12 +663,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanSongCount(int count) {
-    return 'Scanned $count songs';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Scanned $count songs',
+      one: 'Scanned 1 song',
+    );
+    return '$_temp0';
   }
 
   @override
   String scanSongCountShort(int count) {
-    return '$count songs';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count songs',
+      one: '1 song',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -649,12 +692,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scanSummary(int songs, int sources) {
-    return 'Scanned $sources sources, $songs songs in total';
+    String _temp0 = intl.Intl.pluralLogic(
+      sources,
+      locale: localeName,
+      other: 'Scanned $sources sources',
+      one: 'Scanned 1 source',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      songs,
+      locale: localeName,
+      other: '$songs songs',
+      one: '1 song',
+    );
+    return '$_temp0, $_temp1 in total';
   }
 
   @override
   String scanUpdated(int failed, int songs) {
-    return 'Updated $songs songs, $failed sources failed';
+    String _temp0 = intl.Intl.pluralLogic(
+      songs,
+      locale: localeName,
+      other: '$songs songs',
+      one: '1 song',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed sources failed',
+      one: '1 source failed',
+    );
+    return 'Updated $_temp0, $_temp1';
   }
 
   @override
@@ -708,12 +775,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String intervalHours(int count) {
-    return '$count hours';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours',
+      one: '1 hour',
+    );
+    return '$_temp0';
   }
 
   @override
   String intervalMinutes(int count) {
-    return '$count minutes';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -803,7 +882,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pluginNoStreamResults(int count) {
-    return 'The plugin returned $count results, but no playable address';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'The plugin returned $count results, but no playable address',
+      one: 'The plugin returned 1 result, but no playable address',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -841,10 +926,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openverseHint =>
-      'Enter a scan keyword, e.g. piano, ambient or jazz';
+      'Enter a search keyword, e.g. piano, ambient or jazz';
 
   @override
-  String get openverseFieldQuery => 'Scan keyword';
+  String get openverseFieldQuery => 'Search keyword';
 
   @override
   String get openverseFieldHint => 'e.g. piano, ambient, jazz';
@@ -1029,7 +1114,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterFieldLimitHint => '15 by default, 30 at most';
 
   @override
-  String get ccmixterFieldQuery => 'Scan tag';
+  String get ccmixterFieldQuery => 'Search tag';
 
   @override
   String get ccmixterFieldQueryHint => 'e.g. jazz, ambient, electro';
@@ -1158,4 +1243,193 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => 'No matching tracks';
+
+  @override
+  String get sourceAudiusDescription =>
+      'Complete tracks from the open Audius network';
+
+  @override
+  String get audiusHint =>
+      'Type a search keyword, e.g. jazz, ambient or electronic';
+
+  @override
+  String get audiusFieldQuery => 'Search keyword';
+
+  @override
+  String get audiusFieldQueryHint => 'e.g. jazz, ambient, electronic';
+
+  @override
+  String get audiusFieldLimit => 'Tracks per scan';
+
+  @override
+  String get audiusFieldLimitHint => '20 by default, 50 at most';
+
+  @override
+  String get audiusEmptyResponse => 'Audius returned an empty response';
+
+  @override
+  String get audiusNoMatch => 'No matching tracks on Audius';
+
+  @override
+  String get sourceRadioDescription => 'Live streams of public internet radio';
+
+  @override
+  String get radioHint =>
+      'Pick a directory of stations, a keyword filters them';
+
+  @override
+  String get radioFieldProvider => 'Station directory';
+
+  @override
+  String get radioFieldProviderHint =>
+      'All directories, Radio Browser, SomaFM or Radio Paradise';
+
+  @override
+  String get radioProviderAll => 'All directories';
+
+  @override
+  String get radioFieldQuery => 'Station keyword';
+
+  @override
+  String get radioFieldQueryHint => 'e.g. jazz, ambient or SomaFM';
+
+  @override
+  String get radioFieldLimit => 'Stations per scan';
+
+  @override
+  String get radioFieldLimitHint => '20 by default, 100 at most';
+
+  @override
+  String get radioNoMatch => 'No matching stations';
+
+  @override
+  String get sourceWikimediaDescription => 'Open audio from Wikimedia Commons';
+
+  @override
+  String get wikimediaHint =>
+      'Type a search keyword, e.g. piano, lecture or birdsong';
+
+  @override
+  String get wikimediaFieldQuery => 'Search keyword';
+
+  @override
+  String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
+
+  @override
+  String get wikimediaFieldLimit => 'Files per scan';
+
+  @override
+  String get wikimediaFieldLimitHint => '15 by default, 30 at most';
+
+  @override
+  String get wikimediaEmptyResponse =>
+      'Wikimedia Commons returned an empty response';
+
+  @override
+  String get wikimediaNoMatch => 'No playable audio found on Commons';
+
+  @override
+  String get sourceJellyfinDescription =>
+      'Connect to a self-hosted Jellyfin library';
+
+  @override
+  String get jellyfinHint =>
+      'Type the address and the account of your Jellyfin server';
+
+  @override
+  String get jellyfinFieldServer => 'Server address';
+
+  @override
+  String get jellyfinFieldServerHint => 'e.g. http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => 'Username';
+
+  @override
+  String get jellyfinFieldUserHint => 'The login name of your Jellyfin account';
+
+  @override
+  String get jellyfinFieldPassword => 'Password';
+
+  @override
+  String get jellyfinFieldPasswordHint => 'Used to obtain an access token';
+
+  @override
+  String get jellyfinFieldLimit => 'Tracks per scan';
+
+  @override
+  String get jellyfinFieldLimitHint => '50 by default, 200 at most';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin returned an empty response';
+
+  @override
+  String get jellyfinNoMatch => 'No matching tracks';
+
+  @override
+  String get jellyfinAuthFailed =>
+      'Cannot reach the Jellyfin server, check the address and the account';
+
+  @override
+  String get audioSourceStreaming => 'Live';
+
+  @override
+  String get playerLiveBadge => 'LIVE';
+
+  @override
+  String get nowPlayingLiveStream => 'Live stream, no fixed length';
+
+  @override
+  String get nowPlayingDetails => 'Track details';
+
+  @override
+  String get nowPlayingDetailAlbum => 'Album';
+
+  @override
+  String get nowPlayingDetailYear => 'Year';
+
+  @override
+  String get nowPlayingDetailGenre => 'Genre';
+
+  @override
+  String get nowPlayingDetailBitrate => 'Bitrate';
+
+  @override
+  String get nowPlayingDetailSampleRate => 'Sample rate';
+
+  @override
+  String get nowPlayingDetailTrack => 'Track';
+
+  @override
+  String get nowPlayingDetailDisc => 'Disc';
+
+  @override
+  String get nowPlayingDetailLanguage => 'Language';
+
+  @override
+  String get nowPlayingDetailLicense => 'License';
+
+  @override
+  String get nowPlayingDetailSource => 'Source';
+
+  @override
+  String get nowPlayingDetailNowPlaying => 'On air';
+
+  @override
+  String get jamendoFieldFormat => 'Quality';
+
+  @override
+  String get jamendoFieldFormatHint => '192 kbps by default';
+
+  @override
+  String get subsonicFieldFormat => 'Quality';
+
+  @override
+  String get subsonicFieldFormatHint => 'Original quality by default';
+
+  @override
+  String get subsonicFormatOriginal => 'Original quality';
+
+  @override
+  String get sourceRadioName => 'Internet radio';
 }

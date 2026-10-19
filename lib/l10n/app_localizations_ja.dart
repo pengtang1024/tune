@@ -294,7 +294,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sourcesTitle => 'ソース';
 
   @override
-  String get sourcesSubtitle => 'オンラインカタログとスキャン先';
+  String get sourcesSubtitle => 'オンラインカタログ、セルフホストサービス、スキャンフォルダ';
 
   @override
   String get sourcesAutoScan => '起動時に自動スキャン';
@@ -451,7 +451,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get playerLyrics => '\\u6b4c\\u8a5e';
+  String get playerLyrics => '歌詞';
 
   @override
   String get lyricsLoading => '歌詞を読み込んでいます';
@@ -538,7 +538,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      'キーワードを入力して Enter キーを押すと、Openverse、Jamendo、Internet Archive と取り込んだプラグインが並行して検索されます。';
+      'キーワードを入力して Enter キーを押すと、有効なオンライン音源と取り込んだプラグインが並行して検索されます。';
 
   @override
   String get searchNoResults => '結果がありません';
@@ -818,7 +818,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get openverseHint => 'スキャンキーワードを入力してください（例：piano、ambient、jazz）';
 
   @override
-  String get openverseFieldQuery => 'スキャンキーワード';
+  String get openverseFieldQuery => '検索キーワード';
 
   @override
   String get openverseFieldHint => '例：piano、ambient、jazz';
@@ -913,7 +913,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String pluginStepFailed(String error, String label) {
-    return '$label \\u306b\\u5931\\u6557\\u3057\\u307e\\u3057\\u305f: $error';
+    return '$label に失敗しました: $error';
   }
 
   @override
@@ -1117,4 +1117,185 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get subsonicNoMatch => '一致する曲が見つかりません';
+
+  @override
+  String get sourceAudiusDescription => 'オープンな音楽ネットワーク Audius のフルトラック';
+
+  @override
+  String get audiusHint => '検索キーワードを入力します（例：jazz、ambient、electronic）';
+
+  @override
+  String get audiusFieldQuery => '検索キーワード';
+
+  @override
+  String get audiusFieldQueryHint => '例：jazz、ambient、electronic';
+
+  @override
+  String get audiusFieldLimit => '1 回のスキャン件数';
+
+  @override
+  String get audiusFieldLimitHint => '既定 20、最大 50';
+
+  @override
+  String get audiusEmptyResponse => 'Audius が空の応答を返しました';
+
+  @override
+  String get audiusNoMatch => '条件に一致する Audius のトラックがありません';
+
+  @override
+  String get sourceRadioDescription => '公開インターネットラジオのライブ配信';
+
+  @override
+  String get radioHint => '放送局のディレクトリを選び、キーワードで絞り込めます';
+
+  @override
+  String get radioFieldProvider => '放送局のディレクトリ';
+
+  @override
+  String get radioFieldProviderHint =>
+      'すべてのディレクトリ、Radio Browser、SomaFM、Radio Paradise';
+
+  @override
+  String get radioProviderAll => 'すべてのディレクトリ';
+
+  @override
+  String get radioFieldQuery => '放送局のキーワード';
+
+  @override
+  String get radioFieldQueryHint => '例：jazz、ambient、SomaFM';
+
+  @override
+  String get radioFieldLimit => '1 回のスキャンする局数';
+
+  @override
+  String get radioFieldLimitHint => '既定 20、最大 100';
+
+  @override
+  String get radioNoMatch => '条件に一致する放送局がありません';
+
+  @override
+  String get sourceWikimediaDescription => 'ウィキメディア・コモンズのオープン音声';
+
+  @override
+  String get wikimediaHint => '検索キーワードを入力します（例：piano、lecture、birdsong）';
+
+  @override
+  String get wikimediaFieldQuery => '検索キーワード';
+
+  @override
+  String get wikimediaFieldQueryHint => '例：piano、lecture、birdsong';
+
+  @override
+  String get wikimediaFieldLimit => '1 回のスキャン件数';
+
+  @override
+  String get wikimediaFieldLimitHint => '既定 15、最大 30';
+
+  @override
+  String get wikimediaEmptyResponse => 'ウィキメディア・コモンズが空の応答を返しました';
+
+  @override
+  String get wikimediaNoMatch => '再生できる音声が見つかりません';
+
+  @override
+  String get sourceJellyfinDescription => '自前の Jellyfin ライブラリに接続します';
+
+  @override
+  String get jellyfinHint => 'Jellyfin サーバーのアドレスとアカウントを入力します';
+
+  @override
+  String get jellyfinFieldServer => 'サーバーアドレス';
+
+  @override
+  String get jellyfinFieldServerHint => '例：http://localhost:8096';
+
+  @override
+  String get jellyfinFieldUser => 'ユーザー名';
+
+  @override
+  String get jellyfinFieldUserHint => 'Jellyfin アカウントのログイン名';
+
+  @override
+  String get jellyfinFieldPassword => 'パスワード';
+
+  @override
+  String get jellyfinFieldPasswordHint => 'アクセストークンの取得に使用します';
+
+  @override
+  String get jellyfinFieldLimit => '1 回のスキャン件数';
+
+  @override
+  String get jellyfinFieldLimitHint => '既定 50、最大 200';
+
+  @override
+  String get jellyfinEmptyResponse => 'Jellyfin が空の応答を返しました';
+
+  @override
+  String get jellyfinNoMatch => '条件に一致するトラックがありません';
+
+  @override
+  String get jellyfinAuthFailed => 'Jellyfin サーバーに接続できません。アドレスとアカウントを確認してください';
+
+  @override
+  String get audioSourceStreaming => 'ライブ';
+
+  @override
+  String get playerLiveBadge => 'ライブ配信中';
+
+  @override
+  String get nowPlayingLiveStream => 'ライブ配信のため固定長はありません';
+
+  @override
+  String get nowPlayingDetails => 'トラック情報';
+
+  @override
+  String get nowPlayingDetailAlbum => 'アルバム';
+
+  @override
+  String get nowPlayingDetailYear => '年';
+
+  @override
+  String get nowPlayingDetailGenre => 'ジャンル';
+
+  @override
+  String get nowPlayingDetailBitrate => 'ビットレート';
+
+  @override
+  String get nowPlayingDetailSampleRate => 'サンプリング周波数';
+
+  @override
+  String get nowPlayingDetailTrack => 'トラック番号';
+
+  @override
+  String get nowPlayingDetailDisc => 'ディスク番号';
+
+  @override
+  String get nowPlayingDetailLanguage => '言語';
+
+  @override
+  String get nowPlayingDetailLicense => 'ライセンス';
+
+  @override
+  String get nowPlayingDetailSource => 'ソース';
+
+  @override
+  String get nowPlayingDetailNowPlaying => '放送中';
+
+  @override
+  String get jamendoFieldFormat => '音質';
+
+  @override
+  String get jamendoFieldFormatHint => '既定は 192 kbps';
+
+  @override
+  String get subsonicFieldFormat => '音質';
+
+  @override
+  String get subsonicFieldFormatHint => '既定は元と同じ音質';
+
+  @override
+  String get subsonicFormatOriginal => '元の音質';
+
+  @override
+  String get sourceRadioName => 'インターネットラジオ';
 }

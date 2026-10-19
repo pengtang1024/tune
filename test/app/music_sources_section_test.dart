@@ -148,6 +148,97 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the new sources render their own fields', (tester) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [
+          BuiltInMusicSources.audius,
+          BuiltInMusicSources.radio,
+          BuiltInMusicSources.wikimedia,
+          BuiltInMusicSources.jellyfin,
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    for (final id in ['audius', 'radio', 'wikimedia', 'jellyfin']) {
+      expect(
+        find.byKey(ValueKey('source-switch-$id')),
+        findsOneWidget,
+        reason: '$id is missing from the sources list',
+      );
+    }
+    expect(find.text('Audius'), findsOneWidget);
+    expect(find.text('网络电台'), findsOneWidget);
+    expect(find.text('Wikimedia Commons'), findsOneWidget);
+    expect(find.text('Jellyfin'), findsOneWidget);
+
+    // The self-hosted library asks for its address and its account.
+    final jellyfinConfig = find.byKey(const ValueKey('source-config-jellyfin'));
+    await tester.ensureVisible(jellyfinConfig);
+    await tester.pumpAndSettle();
+    await tester.tap(jellyfinConfig);
+    await tester.pumpAndSettle();
+
+    expect(find.text('配置 Jellyfin'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(4));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the radio source picks its directory in a dropdown', (
+    tester,
+  ) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(sources: [BuiltInMusicSources.radio]),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('source-config-radio')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('配置 网络电台'), findsOneWidget);
+    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    expect(find.text('全部目录'), findsOneWidget);
+
+    await tester.tap(find.text('全部目录'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Radio Browser'), findsOneWidget);
+    expect(find.text('SomaFM'), findsOneWidget);
+    expect(find.text('Radio Paradise'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the quality of a source is picked in a dropdown', (
+    tester,
+  ) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(sources: [BuiltInMusicSources.subsonic]),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('source-config-subsonic')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('配置 Subsonic'), findsOneWidget);
+    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    expect(find.text('原始音质'), findsOneWidget);
+
+    await tester.tap(find.text('原始音质'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('MP3'), findsOneWidget);
+    expect(find.text('Opus'), findsOneWidget);
+    expect(find.text('FLAC'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('plugin sources render keyword and custom fields', (
     tester,
   ) async {

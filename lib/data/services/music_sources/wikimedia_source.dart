@@ -1,0 +1,267 @@
+import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
+
+/// Wikimedia Commons hosts the media files of the Wikipedia projects.
+///
+/// The search API of the wiki answers with the metadata of every audio file
+/// it finds, including the artist, the licence and the download address, so a
+/// single request is enough to build a playable track.
+class WikimediaSourceAdapter extends MusicSourceAdapter {
+  /// The search endpoint of the Commons API.
+  static const _apiHost = 'https://commons.wikimedia.org/w/api.php';
+
+  /// Commons keeps its media files in the file namespace.
+  static const _fileNamespace = 6;
+
+  /// The category that names the genre of an audio file.
+  static const _genreCategory = 'Audio files of';
+
+  final Dio _dio;
+
+  WikimediaSourceAdapter({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 20),
+              headers: const {
+                'Accept': 'application/json',
+                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
+              },
+            ),
+          );
+
+  @override
+  String get sourceId => 'wikimedia';
+
+  /// Commons asks for no key, so the source works as soon as it is enabled.
+  ///
+  /// The keyword stays optional: an empty search returns the audio files of
+  /// the whole wiki, which is a usable answer as well.
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
+
+  @override
+  String get configurationHint => AppStrings.instance.wikimediaHint;
+
+  @override
+  List<MusicSourceField> get configurationFields => [
+    MusicSourceField(
+      'query',
+      AppStrings.instance.wikimediaFieldQuery,
+      AppStrings.instance.wikimediaFieldQueryHint,
+    ),
+    MusicSourceField(
+      'limit',
+      AppStrings.instance.wikimediaFieldLimit,
+      AppStrings.instance.wikimediaFieldLimitHint,
+      numeric: true,
+    ),
+  ];
+
+  @override
+  Duration get autoScanInterval => const Duration(hours: 6);
+
+  @override
+  Duration get scanTimeout => const Duration(seconds: 45);
+
+  @override
+  Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
+    try {
+      final limit = _readLimit(request.config);
+      final response = await _dio.get<Map<String, dynamic>>(
+        _apiHost,
+        queryParameters: {
+          'action': 'query',
+          'format': 'json',
+          'generator': 'search',
+          'gsrsearch': searchTerm(request.config.setting('query')),
+          'gsrnamespace': _fileNamespace,
+          'gsrlimit': limit,
+          'prop': 'imageinfo',
+          'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
+        },
+      );
+      final data = response.data;
+      if (data == null) {
+        return failedResult(
+          sourceId,
+          AppStrings.instance.wikimediaEmptyResponse,
+        );
+      }
+      final songs = parseResults(data, sourceId: sourceId, limit: limit);
+      return SourceScanResult(
+        sourceId: sourceId,
+        status: SourceScanStatus.success,
+        songs: songs,
+        message: songs.isEmpty ? AppStrings.instance.wikimediaNoMatch : null,
+      );
+    } catch (error) {
+      return failedResult(sourceId, error);
+    }
+  }
+
+  int _readLimit(MusicSourceConfig config) {
+    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
+    if (parsed <= 0) return 15;
+    return parsed.clamp(1, 30);
+  }
+
+  /// The search term of the wiki.
+  ///
+  /// The file type filter keeps images and videos out of the answer, and the
+  /// keyword narrows it down when the user typed one.
+  static String searchTerm(String? keyword) {
+    final query = keyword?.trim() ?? '';
+    return query.isEmpty ? 'filetype:audio' : 'filetype:audio $query';
+  }
+
+  /// Kept static so JSON mapping can be tested without network access.
+  static List<Song> parseResults(
+    Map<String, dynamic> data, {
+    required String sourceId,
+    int limit = 15,
+  }) {
+    final query = data['query'];
+    final pages = query is Map ? query['pages'] : null;
+    if (pages is! Map) return const [];
+
+    final songs = <Song>[];
+    final seen = <String>{};
+    for (final page in pages.values) {
+      if (songs.length >= limit) break;
+      if (page is! Map) continue;
+      final song = _songOf(page, sourceId: sourceId);
+      if (song == null || !seen.add(song.externalId ?? '')) continue;
+      songs.add(song);
+    }
+    return songs;
+  }
+
+  /// Turns one page of the answer into a track.
+  ///
+  /// Only audio files that carry a download address can be played, so every
+  /// other page is dropped.
+  static Song? _songOf(Map<dynamic, dynamic> page, {required String sourceId}) {
+    final infos = page['imageinfo'];
+    if (infos is! List || infos.isEmpty) return null;
+    final info = infos.first;
+    if (info is! Map) return null;
+    if (!_isAudio(info)) return null;
+
+    final streamUrl = _streamUrl(info['url']);
+    if (streamUrl == null) return null;
+
+    final raw = info['extmetadata'];
+    final meta = raw is Map ? raw : const <dynamic, dynamic>{};
+    final file = page['title']?.toString().trim() ?? '';
+    final name = _meta(meta, 'ObjectName');
+    final title = name.isNotEmpty
+        ? name
+        : file.replaceFirst('File:', '').trim();
+    if (title.isEmpty) return null;
+
+    return SourceSongFactory.create(
+      sourceId: sourceId,
+      externalId: file.isNotEmpty ? file : title,
+      title: title,
+      artist: _meta(meta, 'Artist'),
+      duration: _durationOf(info['duration']),
+      streamUrl: streamUrl,
+      genre: _genreOf(_meta(meta, 'Categories')),
+      year: _yearOf(_meta(meta, 'DateTimeOriginal')),
+      license: _licenseOf(meta),
+      description: _emptyToNull(_meta(meta, 'ImageDescription')),
+      size: _sizeOf(info['size']),
+    );
+  }
+
+  /// Whether the file holds audio.
+  ///
+  /// The media type is the reliable answer, but the mime type still tells the
+  /// kind of the file when the answer leaves the media type out.
+  static bool _isAudio(Map<dynamic, dynamic> info) {
+    final type = info['mediatype']?.toString();
+    if (type != null) return type == 'AUDIO';
+    return (info['mime']?.toString() ?? '').startsWith('audio/');
+  }
+
+  /// The text of a metadata field.
+  ///
+  /// The API wraps every value in an object that also names its source.
+  static String _meta(Map<dynamic, dynamic> meta, String key) {
+    final value = meta[key];
+    final text = value is Map ? value['value'] : value;
+    return stripHtml('${text ?? ''}');
+  }
+
+  /// The download address of a file without its tracking parameters.
+  static String? _streamUrl(Object? raw) {
+    final url = '${raw ?? ''}'.trim();
+    if (url.isEmpty) return null;
+    final cut = url.indexOf('?');
+    final clean = cut < 0 ? url : url.substring(0, cut);
+    return SourceSongFactory.normalizeUrl(clean);
+  }
+
+  /// The length of a file in milliseconds, the API counts in seconds.
+  static int _durationOf(Object? raw) {
+    final seconds = raw is num ? raw : double.tryParse('$raw');
+    return seconds == null ? 0 : (seconds * 1000).round();
+  }
+
+  static int? _sizeOf(Object? raw) {
+    final size = SourceSongFactory.parseInt(raw);
+    return size > 0 ? size : null;
+  }
+
+  /// The licence of a file, falling back to the terms of its use.
+  static String? _licenseOf(Map<dynamic, dynamic> meta) {
+    final short = _meta(meta, 'LicenseShortName');
+    if (short.isNotEmpty) return short;
+    return _emptyToNull(_meta(meta, 'UsageTerms'));
+  }
+
+  /// The year of a file, taken from the date of the recording.
+  static int? _yearOf(String value) =>
+      value.length < 4 ? null : int.tryParse(value.substring(0, 4));
+
+  /// The genre of a file, taken from its categories.
+  ///
+  /// Commons names the genre in a category such as `Audio files of jazz`, so
+  /// the first matching category carries the genre.
+  static String? _genreOf(String categories) {
+    for (final part in categories.split('|')) {
+      final index = part.toLowerCase().indexOf(_genreCategory.toLowerCase());
+      if (index < 0) continue;
+      final genre = part.substring(index + _genreCategory.length).trim();
+      if (genre.isNotEmpty) return genre;
+    }
+    return null;
+  }
+
+  /// Removes the markup of the wiki markup.
+  ///
+  /// The metadata is written for the wiki, so the artist and the description
+  /// arrive as small HTML fragments that have to be plain text again.
+  static String stripHtml(String value) {
+    return value
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&amp;', '&')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  static String? _emptyToNull(String value) => value.isEmpty ? null : value;
+}

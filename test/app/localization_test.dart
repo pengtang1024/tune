@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/l10n/app_localizations.dart';
 
 /// Guards the localisation of the app.
 ///
-/// Three rules are checked:
+/// Five rules are checked:
 ///
 /// * every locale ships the same catalogue, so no language falls back to
 ///   another one by accident,
+/// * every locale shows its own text, so the interface never mixes two
+///   languages,
 /// * every key the code reads exists, so a renamed message never silently
 ///   disappears from the interface,
+/// * no locale borrows the script of another one,
 /// * the interface itself carries no hardcoded text, so a new page cannot
 ///   reintroduce a single language.
 void main() {
@@ -28,23 +29,31 @@ void main() {
           .toList()
         ..sort();
 
-  test('every locale resolves its own translation', () {
+  test('every locale shows its own catalogue', () {
     final failures = <String>[];
 
-    for (final locale in AppLocalizations.supportedLocales) {
-      final catalogue = _catalogue(locale);
-      final strings = lookupAppLocalizations(locale);
+    for (final file in locales) {
+      final locale = file.substring('app_'.length, file.length - '.arb'.length);
+      final body = _generatedClassBody(locale);
+      if (body == null) {
+        failures.add('$locale has no generated class');
+        continue;
+      }
 
-      for (final sample in _samples.entries) {
-        final expected = _render(
-          catalogue[sample.key]! as String,
-          catalogue['@${sample.key}'],
-        );
-        final actual = sample.value(strings);
-        if (expected != actual) {
-          failures.add(
-            '$locale ${sample.key}: expected "$expected", got "$actual"',
-          );
+      final texts = _literals(body);
+      final catalogue =
+          jsonDecode(File('$arbDirectory/$file').readAsStringSync())
+              as Map<String, dynamic>;
+
+      for (final entry in catalogue.entries) {
+        if (entry.key.startsWith('@')) continue;
+        final value = entry.value;
+        if (value is! String || value.isEmpty) continue;
+
+        for (final text in _expectedTexts(value)) {
+          if (!texts.contains(text)) {
+            failures.add('$locale ${entry.key}: "$text" is not shown');
+          }
         }
       }
     }
@@ -52,8 +61,8 @@ void main() {
     expect(
       failures,
       isEmpty,
-      reason: 'a locale does not resolve its own catalogue:\n'
-          '${failures.join('\n')}',
+      reason:
+          'a locale does not show its own catalogue:\n${failures.join('\n')}',
     );
   });
 
@@ -141,8 +150,7 @@ void main() {
       offenders,
       isEmpty,
       reason:
-          'a locale shows text of another language:\n'
-          '${offenders.join('\n')}',
+          'a locale shows text of another language:\n${offenders.join('\n')}',
     );
   });
 
@@ -223,6 +231,15 @@ const _languageNames = {
   'Español',
   'Русский',
   'English',
+  'Italiano',
+  'Português',
+  'Türkçe',
+  'Polski',
+  'Nederlands',
+  'Tiếng Việt',
+  'Bahasa Indonesia',
+  'Українська',
+  'العربية',
 };
 
 final _chinese = RegExp(r'[\u4e00-\u9fff]');
@@ -249,7 +266,6 @@ bool _onlyLanguageNames(String line) {
       .map((match) => match.group(1)!)
       .where((literal) => _chinese.hasMatch(literal))
       .toList();
-
   if (literals.isEmpty) return false;
   return literals.every((literal) => _languageNames.contains(literal));
 }
@@ -261,80 +277,149 @@ Set<String> _declaredKeys(String generatedSource) {
   ).allMatches(generatedSource).map((match) => match.group(1)!).toSet();
 }
 
-/// A sample of the catalogue, one per area of the app.
+/// The body of the generated class of a locale.
 ///
-/// The values are read at runtime, so the test fails as soon as the app
-/// stops resolving the catalogue of the locale the user picked.
-final _samples = <String, String Function(AppLocalizations)>{
-  'navLibrary': (s) => s.navLibrary,
-  'navQueue': (s) => s.navQueue,
-  'navSources': (s) => s.navSources,
-  'navSettings': (s) => s.navSettings,
-  'sourcesTitle': (s) => s.sourcesTitle,
-  'searchOnlineTitle': (s) => s.searchOnlineTitle,
-  'playerLyrics': (s) => s.playerLyrics,
-  'lyricsMissing': (s) => s.lyricsMissing,
-  'libraryNoMatchTitle': (s) => s.libraryNoMatchTitle,
-  'settingsTitle': (s) => s.settingsTitle,
-  'sourcesPluginImported': (s) => s.sourcesPluginImported(_text['name']!),
-  'libraryTrackCount': (s) => s.libraryTrackCount(_numbers['count']!),
-  'scanSummary': (s) => s.scanSummary(_numbers['songs']!, _numbers['sources']!),
-  'pluginStepFailed': (s) =>
-      s.pluginStepFailed(_text['error']!, _text['label']!),
-};
+/// The generator gives every locale a class of its own, the shared catalogue
+/// lives in the abstract base class.
+String? _generatedClassBody(String locale) {
+  final className = 'AppLocalizations${_camelCase(locale)}';
 
-/// The value every text placeholder is filled with.
-final _text = <String, String>{
-  'name': 'N',
-  'error': 'E',
-  'label': 'L',
-  'time': 'T',
-  'hint': 'H',
-  'paths': 'P',
-  'query': 'Q',
-  'title': 'Ti',
-  'version': 'V',
-  'method': 'M',
-  'message': 'Ms',
-  'limit': 'Li',
-  'key': 'K',
-  'interval': 'I',
-};
+  for (final file in Directory('lib/l10n').listSync().whereType<File>()) {
+    if (!file.path.endsWith('.dart')) continue;
+    final source = file.readAsStringSync();
+    final start = source.indexOf('class $className ');
+    if (start < 0) continue;
 
-/// The value every number placeholder is filled with.
-final _numbers = <String, int>{
-  'count': 7,
-  'songs': 7,
-  'sources': 3,
-  'failed': 1,
-  'percent': 50,
-  'seconds': 2,
-  'status': 500,
-};
+    final body = source.substring(start);
+    final next = body.indexOf('\nclass ');
+    return next < 0 ? body : body.substring(0, next);
+  }
 
-/// The catalogue of a locale as it sits on disk.
-Map<String, dynamic> _catalogue(Locale locale) {
-  final name = locale.countryCode == null
-      ? 'app_${locale.languageCode}.arb'
-      : 'app_${locale.languageCode}_${locale.countryCode}.arb';
-  return jsonDecode(File('lib/l10n/$name').readAsStringSync())
-      as Map<String, dynamic>;
+  return null;
 }
 
-/// Fills the placeholders of a message with the values of the sample.
-String _render(String message, Object? metadata) {
-  if (metadata is! Map) return message;
+/// The name of a locale as the generator writes it.
+String _camelCase(String locale) {
+  return locale
+      .split('_')
+      .where((part) => part.isNotEmpty)
+      .map((part) => part[0].toUpperCase() + part.substring(1).toLowerCase())
+      .join();
+}
 
-  final placeholders = metadata['placeholders'];
-  if (placeholders is! Map) return message;
+/// The texts the generated class writes down.
+///
+/// Only the code of the class counts, a comment never carries a message.
+Set<String> _literals(String body) {
+  final code = body
+      .split('\n')
+      .where((line) => !line.trimLeft().startsWith('//'))
+      .join('\n');
 
+  return RegExp(
+    r"'((?:[^'\\]|\\.)*)'",
+  ).allMatches(code).map((match) => _unescape(match.group(1)!)).toSet();
+}
+
+/// The text a string literal carries.
+String _unescape(String raw) {
+  final buffer = StringBuffer();
+  for (var index = 0; index < raw.length; index++) {
+    final char = raw[index];
+    if (char != r'\' || index + 1 >= raw.length) {
+      buffer.write(char);
+      continue;
+    }
+
+    index++;
+    switch (raw[index]) {
+      case 'n':
+        buffer.write('\n');
+      case 't':
+        buffer.write('\t');
+      case 'r':
+        buffer.write('\r');
+      case "'":
+        buffer.write("'");
+      case r'$':
+        buffer.write(r'$');
+      case r'\':
+        buffer.write(r'\');
+      default:
+        buffer.write(raw[index]);
+    }
+  }
+  return buffer.toString();
+}
+
+/// The texts a message is made of.
+///
+/// A message that counts something is written as a plural, so the generator
+/// splits it into the texts of its branches. Every other message stays one
+/// text.
+List<String> _expectedTexts(String message) {
+  final branches = _pluralBranches(message).toList();
+  if (branches.isEmpty) return [_dartText(message)];
+  return branches.map(_dartText).toList();
+}
+
+/// The texts of the plural branches of a message.
+Iterable<String> _pluralBranches(String message) sync* {
+  var index = 0;
+  while (true) {
+    final marker = message.indexOf(', plural,', index);
+    if (marker < 0) return;
+
+    var cursor = marker + ', plural,'.length;
+    while (true) {
+      final branch = _branchAt(message, cursor);
+      if (branch == null) break;
+
+      final end = _matchingBrace(message, branch.start);
+      final text = message.substring(branch.start + 1, end);
+      yield text;
+      yield* _pluralBranches(text);
+
+      cursor = end + 1;
+    }
+
+    index = cursor;
+  }
+}
+
+/// The branch of a plural that starts at a position.
+({int start})? _branchAt(String message, int cursor) {
+  final match = RegExp(r'\s*[A-Za-z0-9_=]+\{').matchAsPrefix(message, cursor);
+  if (match == null) return null;
+  return (start: match.end - 1);
+}
+
+/// The brace that closes the one at a position.
+int _matchingBrace(String message, int open) {
+  var depth = 0;
+  for (var index = open; index < message.length; index++) {
+    if (message[index] == '{') depth++;
+    if (message[index] == '}') {
+      depth--;
+      if (depth == 0) return index;
+    }
+  }
+  return message.length - 1;
+}
+
+/// The text as the generator writes it into the class of a locale.
+///
+/// A placeholder of the catalogue becomes a variable of the generated code.
+String _dartText(String message) {
   return message.replaceAllMapped(RegExp(r'\{(\w+)\}'), (match) {
     final name = match.group(1)!;
-    final type = placeholders[name] is Map ? placeholders[name]['type'] : null;
-    if (type == 'int') return '${_numbers[name]}';
-    return _text[name] ?? match.group(0)!;
+    final next = match.end < message.length ? message[match.end] : '';
+    if (next.isNotEmpty && _identifier.hasMatch(next)) return '\${$name}';
+    return '\$$name';
   });
 }
+
+final _identifier = RegExp(r'[A-Za-z0-9_]');
 
 Iterable<File> _dartFiles(String directory) {
   return Directory(directory)

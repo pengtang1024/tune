@@ -521,8 +521,17 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   /// Local tracks are returned as `null` so the backend keeps using their own
   /// path. Remote tracks are downloaded once and replayed from the store
   /// afterwards. Platforms without a file system stream the track directly.
+  /// A live stream is never stored: it has no end, so it is always played
+  /// straight from the network.
   Future<String?> _resolveLocalFile(Song song, int request) async {
     if (!song.isRemote || !_downloads.isSupported) return null;
+    if (song.isLiveStream) {
+      state = state.copyWith(
+        audioSourceStatus: AudioSourceStatus.streaming,
+        downloadProgress: 0,
+      );
+      return null;
+    }
 
     final stored = await _downloads.storedFileFor(song);
     if (!mounted || request != _loadRequest) return null;
@@ -557,9 +566,10 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   /// The source status a track starts in before it is resolved.
   AudioSourceStatus _initialSourceStatus(Song song) {
-    return song.isRemote
-        ? AudioSourceStatus.downloading
-        : AudioSourceStatus.local;
+    if (!song.isRemote) return AudioSourceStatus.local;
+    return song.isLiveStream
+        ? AudioSourceStatus.streaming
+        : AudioSourceStatus.downloading;
   }
 
   int _randomIndex({required int excluding}) {

@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/itunes_source.dart';
+import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
@@ -212,6 +213,87 @@ void main() {
 
       expect(result.status, SourceScanStatus.needsConfiguration);
     });
+
+    test('refreshes the address of an episode from the feed', () async {
+      final server = await _startServer((request) async {
+        request.response.headers.contentType = ContentType.text;
+        request.response.write(_podcastFeed);
+      });
+
+      final adapter = PodcastRssSourceAdapter(dio: _localDio(server.port));
+      const song = Song(
+        id: 1,
+        title: 'Episode 1',
+        uri: 'tune://podcast_rss/ep-1',
+        sourceId: 'podcast_rss',
+        externalId: 'ep-1',
+        streamUrl: 'https://old.example.com/ep1.mp3',
+      );
+
+      final refreshed = await adapter.refreshStream(
+        _request('podcast_rss', {
+          'feed': 'http://127.0.0.1/podcast.xml',
+        }).config,
+        song,
+      );
+
+      expect(refreshed, isNotNull);
+      expect(refreshed!.streamUrl, 'https://example.com/ep1.mp3');
+    });
+
+    test('keeps the address when the feed does not know the episode', () async {
+      final server = await _startServer((request) async {
+        request.response.headers.contentType = ContentType.text;
+        request.response.write(_podcastFeed);
+      });
+
+      final adapter = PodcastRssSourceAdapter(dio: _localDio(server.port));
+      const song = Song(
+        id: 1,
+        title: 'Unknown episode',
+        uri: 'tune://podcast_rss/unknown',
+        sourceId: 'podcast_rss',
+        externalId: 'unknown',
+        streamUrl: 'https://old.example.com/ep1.mp3',
+      );
+
+      final refreshed = await adapter.refreshStream(
+        _request('podcast_rss', {
+          'feed': 'http://127.0.0.1/podcast.xml',
+        }).config,
+        song,
+      );
+
+      expect(refreshed, isNull);
+    });
+  });
+
+  group('Jamendo adapter', () {
+    test('asks for the quality the user picked', () async {
+      final server = await _startServer((request) async {
+        expect(request.uri.queryParameters['audioformat'], 'mp3');
+        await _writeJsonBody(request, const {'results': []});
+      });
+
+      final result = await JamendoSourceAdapter(
+        dio: _localDio(server.port),
+      ).scan(_request('jamendo', {'clientId': 'demo', 'format': 'mp3'}));
+
+      expect(result.status, SourceScanStatus.success);
+    });
+
+    test('falls back to the middle quality', () async {
+      final server = await _startServer((request) async {
+        expect(request.uri.queryParameters['audioformat'], 'mp32');
+        await _writeJsonBody(request, const {'results': []});
+      });
+
+      final result = await JamendoSourceAdapter(
+        dio: _localDio(server.port),
+      ).scan(_request('jamendo', {'clientId': 'demo'}));
+
+      expect(result.status, SourceScanStatus.success);
+    });
   });
 
   group('Subsonic adapter', () {
@@ -345,6 +427,55 @@ void main() {
 
       expect(result.status, SourceScanStatus.needsConfiguration);
     });
+
+    test('delivers the track in the quality the user picked', () async {
+      final config = _subsonicConfig(4533, password).copyWith(
+        settings: {
+          'server': 'http://127.0.0.1:4533',
+          'user': 'demo',
+          'password': password,
+          'format': 'opus',
+        },
+      );
+      const song = Song(
+        id: 1,
+        title: 'Night Drive',
+        uri: 'tune://subsonic/tr-1',
+        sourceId: 'subsonic',
+        externalId: 'tr-1',
+        sourceData: {'id': 'tr-1', 'suffix': 'flac'},
+      );
+
+      final refreshed = await SubsonicSourceAdapter().refreshStream(
+        config,
+        song,
+      );
+
+      expect(refreshed, isNotNull);
+      final url = Uri.parse(refreshed!.streamUrl!);
+      expect(url.queryParameters['f'], 'opus');
+    });
+
+    test('keeps the quality of the file when none was picked', () async {
+      final config = _subsonicConfig(4533, password);
+      const song = Song(
+        id: 1,
+        title: 'Night Drive',
+        uri: 'tune://subsonic/tr-1',
+        sourceId: 'subsonic',
+        externalId: 'tr-1',
+        sourceData: {'id': 'tr-1', 'suffix': 'flac'},
+      );
+
+      final refreshed = await SubsonicSourceAdapter().refreshStream(
+        config,
+        song,
+      );
+
+      expect(refreshed, isNotNull);
+      final url = Uri.parse(refreshed!.streamUrl!);
+      expect(url.queryParameters['f'], 'flac');
+    });
   });
 }
 
@@ -448,6 +579,13 @@ Future<void> _writeJson(HttpRequest request, Object body) async {
   // The real services answer with `text/plain` or `text/javascript`, so the
   // mock does the same.
   request.response.headers.contentType = ContentType.text;
+  request.response.write(jsonEncode(body));
+  await request.response.close();
+}
+
+/// Writes an answer the way the JSON APIs of the services answer.
+Future<void> _writeJsonBody(HttpRequest request, Object body) async {
+  request.response.headers.contentType = ContentType.json;
   request.response.write(jsonEncode(body));
   await request.response.close();
 }

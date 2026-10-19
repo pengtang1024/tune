@@ -9,6 +9,7 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/utils/logger.dart';
 
 /// A Subsonic server hosts a whole music library.
 ///
@@ -77,6 +78,20 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.subsonicFieldLimit,
       AppStrings.instance.subsonicFieldLimitHint,
       numeric: true,
+    ),
+    MusicSourceField(
+      'format',
+      AppStrings.instance.subsonicFieldFormat,
+      AppStrings.instance.subsonicFieldFormatHint,
+      choices: [
+        MusicSourceChoice(
+          'original',
+          AppStrings.instance.subsonicFormatOriginal,
+        ),
+        const MusicSourceChoice('mp3', 'MP3'),
+        const MusicSourceChoice('opus', 'Opus'),
+        const MusicSourceChoice('flac', 'FLAC'),
+      ],
     ),
   ];
 
@@ -174,6 +189,57 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
     return song.copyWith(streamUrl: url);
   }
 
+  /// Reads the lyrics a Subsonic server stores for a track.
+  ///
+  /// Servers that keep lyrics answer with the text of the track, so the
+  /// player can show it next to the cover.
+  @override
+  Future<String?> fetchLyrics(MusicSourceConfig config, Song song) async {
+    if (!isConfigured(config)) return null;
+    if (song.title.trim().isEmpty) return null;
+
+    try {
+      final response = await _dio.get<String>(
+        _endpoint(config, 'getLyrics'),
+        queryParameters: {
+          ..._auth(config),
+          'f': 'json',
+          'artist': song.artist,
+          'title': song.title,
+        },
+        options: Options(responseType: ResponseType.plain),
+      );
+
+      final body = response.data;
+      if (body == null || body.trim().isEmpty) return null;
+
+      final decoded = jsonDecode(body);
+      if (decoded is! Map<String, dynamic>) return null;
+
+      final payload = _payload(decoded);
+      if (payload == null) return null;
+
+      return parseLyrics(payload);
+    } catch (error) {
+      Log.error('读取 Subsonic 歌词失败: $error');
+      return null;
+    }
+  }
+
+  /// Reads the text of the lyrics out of a `getLyrics` answer.
+  ///
+  /// Kept static so the mapping can be tested without network access.
+  static String? parseLyrics(Map<String, dynamic> payload) {
+    final lyrics = payload['lyrics'];
+    if (lyrics is! Map) return null;
+
+    final song = lyrics['song'];
+    if (song is! Map) return null;
+
+    final value = song['value']?.toString().trim() ?? '';
+    return value.isEmpty ? null : value;
+  }
+
   /// Reads the search answer of a Subsonic server.
   ///
   /// Kept static so JSON mapping can be tested without network access.
@@ -202,6 +268,9 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       if (streamUrl == null) continue;
 
       final year = SourceSongFactory.parseInt(raw['year']);
+      final trackNumber = SourceSongFactory.parseInt(raw['track']);
+      final bitrate = SourceSongFactory.parseInt(raw['bitRate']);
+
       songs.add(
         SourceSongFactory.create(
           sourceId: sourceId,
@@ -214,6 +283,9 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
           artworkUrl: _coverUrl(config, raw['coverArt']?.toString()),
           genre: raw['genre']?.toString(),
           year: year > 0 ? year : null,
+          trackNumber: trackNumber > 0 ? trackNumber : null,
+          bitrate: bitrate > 0 ? bitrate : null,
+          size: SourceSongFactory.parseInt(raw['size']),
           sourceData: {'id': id, if (suffix.isNotEmpty) 'suffix': suffix},
         ),
       );
@@ -242,7 +314,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
 
     final salt = _salt();
     final token = md5.convert(utf8.encode('$password$salt')).toString();
-    final format = suffix.isEmpty ? 'mp3' : suffix;
+    final format = _format(config, suffix);
 
     return Uri.parse('$server/rest/stream')
         .replace(
@@ -253,6 +325,18 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
           },
         )
         .toString();
+  }
+
+  /// The format the server delivers the track in.
+  ///
+  /// The user may ask for a smaller file, otherwise the track keeps the
+  /// format it is stored in.
+  static String _format(MusicSourceConfig config, String suffix) {
+    final chosen = config.setting('format');
+    if (chosen == 'mp3' || chosen == 'opus' || chosen == 'flac') {
+      return chosen!;
+    }
+    return suffix.isEmpty ? 'mp3' : suffix;
   }
 
   /// Builds the signed address of a cover.

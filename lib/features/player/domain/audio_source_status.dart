@@ -2,6 +2,7 @@
 ///
 /// The player never streams straight from the network: a remote track is
 /// fetched to disk first and replayed from the local copy afterwards.
+/// A live stream is the exception, it is played straight from the network.
 enum AudioSourceStatus {
   /// The track always lived on this machine.
   local,
@@ -11,6 +12,9 @@ enum AudioSourceStatus {
 
   /// The track was fetched before and is replayed from the local copy.
   cached,
+
+  /// The track is a live stream and is played straight from the network.
+  streaming,
 
   /// The fetch failed, so the track cannot be played.
   failed,
