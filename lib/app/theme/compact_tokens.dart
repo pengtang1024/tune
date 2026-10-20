@@ -148,6 +148,13 @@ abstract final class CompactTokens {
   /// would only hide the request.
   static const double sheetWidth = 640;
 
+  /// The room a sheet keeps above it.
+  ///
+  /// A sheet that reaches the top of the window leaves the reader no way to
+  /// close it with the mouse, because the barrier behind it is covered. Every
+  /// sheet keeps this much room above it, so there is always a place to tap.
+  static const double sheetBarrierGap = 64;
+
   /// Radius of the top corners of a bottom sheet.
   static const double sheetRadius = 20;
 

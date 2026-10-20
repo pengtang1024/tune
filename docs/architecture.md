@@ -196,6 +196,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/compact_sheet.dart` | `showCompactSheet`：贴底、只占自己高度的浮层 |
 
 - 浮层只占它自己的高度，窗口其余的地方留给遮罩，所以点浮层以外的地方（上方、左右都行）都能关掉它。浮层撑满窗口的话，空白的地方会把这些点击吃掉，读者只剩浮层两侧的窄条可以关。
+- 浮层的高度有上限：内容比窗口高的时候，浮层自己在里面滚动，窗口上方始终留着 `CompactTokens.sheetBarrierGap` 的一截遮罩可以点。没有这一截，浮层就把遮罩盖满了，读者只能靠键盘关它。
 - 宽度上限走 `CompactTokens.sheetWidth`，圆角走 `CompactTokens.sheetRadius`。
 
 ## 扩展路径
