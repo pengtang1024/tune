@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:dbus/dbus.dart';
+import 'package:tune/data/services/impl/mpris/mpris_bus.dart';
 import 'package:tune/data/services/impl/mpris/mpris_dbus_object.dart';
 import 'package:tune/data/services/impl/mpris/mpris_interfaces.dart';
 import 'package:tune/data/services/impl/mpris/mpris_values.dart';
@@ -19,9 +20,10 @@ const mprisObjectPath = '/org/mpris/MediaPlayer2';
 /// The service owns the bus name and answers the calls of the desktop; the
 /// player only publishes snapshots and carries the commands out.
 class MprisServiceImpl implements MprisService, MprisObjectDelegate {
-  MprisServiceImpl();
+  MprisServiceImpl({MprisBus? bus}) : _bus = bus ?? SessionMprisBus();
 
-  DBusClient? _client;
+  final MprisBus _bus;
+
   MprisDbusObject? _object;
   MprisBackend? _backend;
   MprisSnapshot _snapshot = const MprisSnapshot();
@@ -40,22 +42,22 @@ class MprisServiceImpl implements MprisService, MprisObjectDelegate {
 
     _backend = backend;
     try {
-      final client = DBusClient.session();
-      final reply = await client.requestName(
-        mprisBusName,
-        flags: {DBusRequestNameFlag.doNotQueue},
-      );
-      if (reply != DBusRequestNameReply.primaryOwner) {
+      final object = MprisDbusObject(DBusObjectPath(mprisObjectPath), this);
+
+      // The object answers on the bus before the name shows up on it. The
+      // desktop looks the player up the moment the name appears, so a name
+      // without an object behind it would leave the desktop with an empty
+      // interface and an unknown application.
+      await _bus.publish(object);
+      _object = object;
+
+      if (!await _bus.claim(mprisBusName)) {
         // Another player already answers on this name.
         Log.info('系统媒体控制的名字已被占用，放弃注册');
-        await client.close();
+        await _close();
         return false;
       }
 
-      final object = MprisDbusObject(DBusObjectPath(mprisObjectPath), this);
-      await client.registerObject(object);
-      _client = client;
-      _object = object;
       Log.info('系统媒体控制已注册: $mprisBusName');
       return true;
     } catch (error, stackTrace) {
@@ -89,7 +91,6 @@ class MprisServiceImpl implements MprisService, MprisObjectDelegate {
   @override
   Future<void> dispose() async {
     _backend = null;
-    _object = null;
     await _close();
   }
 
@@ -160,11 +161,9 @@ class MprisServiceImpl implements MprisService, MprisObjectDelegate {
 
   /// Closes the connection to the bus.
   Future<void> _close() async {
-    final client = _client;
-    _client = null;
-    if (client == null) return;
+    _object = null;
     try {
-      await client.close();
+      await _bus.close();
     } catch (error, stackTrace) {
       Log.error('断开与总线的连接失败: $error\n$stackTrace');
     }
