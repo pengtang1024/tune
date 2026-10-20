@@ -20,6 +20,9 @@
 
 - 字体的唯一入口是 `CompactTypography`（`lib/app/theme/compact_typography.dart`）：拉丁三个脸 Fraunces / Instrument Sans / JetBrains Mono 只带拉丁字形，中文靠回退家族接上。
 - 中文用随包发布的思源黑体（`Noto Sans SC`）与思源宋体（`Noto Serif SC`），标题走宋体、正文走黑体；不要依赖系统装了什么字体，也不要在 widget 里写 `fontFamily`。
+- 这两个字族打包的是 Noto CJK 的**变量字体**（`assets/fonts/NotoSansSC/NotoSansSC-VF.ttf`、`assets/fonts/NotoSerifSC/NotoSerifSC-VF.ttf`）：一份文件覆盖所有字重，标题的粗体是真的，不是引擎合成的假粗体。
+- 字重统一由 `CompactTypography` 钉在 `wght` 轴上（`weightVariations` / `displayVariations`）。引擎只按字体自带的命名实例匹配，这两个字族缺 600 这一档，不钉轴的话 `w600` 会落到 `w500` 上。
+- 拉丁展示体 Fraunces 走 `SOFT=100`（圆润那版）+ `WONK=1`，`opsz` 跟字号走；改展示观感改 `CompactTypography.displayVariations`，不要在调用点加 `fontVariations`。
 - 需要新样式就调 `CompactTypography.sans` / `display` / `mono` / `asDisplay`，不要在调用点直接 `TextStyle(fontFamily: ...)`。
 
 ### 字号梯度

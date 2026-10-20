@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 ///
 /// Noto Sans SC and Noto Serif SC ship with the app, so the Chinese text looks
 /// the same on every machine instead of depending on the fonts a user happens
-/// to have installed. The system CJK families stay in the list as a safety net
-/// for the rare glyph the bundled faces do not carry.
+/// to have installed. Both are variable fonts: one file covers every weight,
+/// so a bold heading is a real bold and not a smeared synthetic one. The
+/// system CJK families stay in the list as a safety net for the rare glyph the
+/// bundled faces do not carry.
 ///
 /// Every style built here keeps its Latin face first and names the CJK
 /// families after it: Latin text keeps the designed face, CJK text keeps a
