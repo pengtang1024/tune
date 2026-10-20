@@ -394,6 +394,48 @@ abstract class AppLocalizations {
   /// **'当前播放会停止，队列中的歌曲不会从音乐库删除。'**
   String get queueClearMessage;
 
+  /// No description provided for @favoritesTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'喜欢'**
+  String get favoritesTitle;
+
+  /// No description provided for @favoritesSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标了心的曲子都在这里'**
+  String get favoritesSubtitle;
+
+  /// No description provided for @favoritesEmptyTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有喜欢的曲子'**
+  String get favoritesEmptyTitle;
+
+  /// No description provided for @favoritesEmptySubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在音乐库里点一下红心，喜欢的曲子就会收在这里'**
+  String get favoritesEmptySubtitle;
+
+  /// No description provided for @favoritesGoToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'去音乐库'**
+  String get favoritesGoToLibrary;
+
+  /// No description provided for @favoriteAdd.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入收藏'**
+  String get favoriteAdd;
+
+  /// No description provided for @favoriteRemove.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消收藏'**
+  String get favoriteRemove;
+
   /// No description provided for @playerNowPlaying.
   ///
   /// In zh_CN, this message translates to:
@@ -1555,13 +1597,13 @@ abstract class AppLocalizations {
   /// No description provided for @sourceInternetArchiveDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'互联网档案馆的开放音频收藏'**
+  /// **'Internet Archive 的开放音频收藏'**
   String get sourceInternetArchiveDescription;
 
   /// No description provided for @sourceInternetArchiveName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'互联网档案馆'**
+  /// **'公共领域音频'**
   String get sourceInternetArchiveName;
 
   /// No description provided for @sourceNeteaseName.
@@ -1879,19 +1921,19 @@ abstract class AppLocalizations {
   /// No description provided for @sourceCcmixterName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'共享音乐混音'**
+  /// **'共享混音素材'**
   String get sourceCcmixterName;
 
   /// No description provided for @sourceItunesDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'Apple Music 目录的 30 秒试听片段'**
+  /// **'iTunes 目录的 30 秒试听片段'**
   String get sourceItunesDescription;
 
   /// No description provided for @sourceItunesName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'苹果音乐试听'**
+  /// **'商店试听片段'**
   String get sourceItunesName;
 
   /// No description provided for @sourcePodcastRssDescription.
@@ -1975,13 +2017,13 @@ abstract class AppLocalizations {
   /// No description provided for @sourceAudiusDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'Audius 开放音乐网络的完整曲目'**
+  /// **'Audius 上音乐人直发的完整曲目'**
   String get sourceAudiusDescription;
 
   /// No description provided for @sourceAudiusName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'开放音乐网络'**
+  /// **'音乐人直发'**
   String get sourceAudiusName;
 
   /// No description provided for @audiusHint.
@@ -2059,13 +2101,13 @@ abstract class AppLocalizations {
   /// No description provided for @sourceWikimediaDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'维基共享资源的开放音频'**
+  /// **'Wikimedia Commons 的开放音频'**
   String get sourceWikimediaDescription;
 
   /// No description provided for @sourceWikimediaName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'维基共享资源'**
+  /// **'自由授权媒体'**
   String get sourceWikimediaName;
 
   /// No description provided for @wikimediaHint.
@@ -2083,7 +2125,7 @@ abstract class AppLocalizations {
   /// No description provided for @wikimediaEmptyResponse.
   ///
   /// In zh_CN, this message translates to:
-  /// **'维基共享资源返回了空响应'**
+  /// **'Wikimedia Commons 返回了空响应'**
   String get wikimediaEmptyResponse;
 
   /// No description provided for @wikimediaNoMatch.
@@ -2451,18 +2493,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'已包含'**
   String get trackFactLyricsIncluded;
-
-  /// No description provided for @trackFactFavorite.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'收藏'**
-  String get trackFactFavorite;
-
-  /// No description provided for @trackFactFavorited.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'已收藏'**
-  String get trackFactFavorited;
 
   /// No description provided for @trackFactPerformers.
   ///

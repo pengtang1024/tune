@@ -14,6 +14,7 @@ import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 
 class PlayerDock extends ConsumerWidget {
   const PlayerDock({super.key});
@@ -180,7 +181,7 @@ class PlayerDock extends ConsumerWidget {
                         _time(context, state.position),
                         Expanded(
                           child: state.currentSong?.isLiveStream ?? false
-                              ? const _LiveMark()
+                              ? const LiveBadge()
                               : SliderTheme(
                                   data: SliderTheme.of(context).copyWith(
                                     trackHeight: 2,
@@ -286,37 +287,6 @@ class PlayerDock extends ConsumerWidget {
         style: CompactTypography.mono(
           Theme.of(context).colorScheme.onSurfaceVariant,
           size: CompactTypeScale.mark,
-        ),
-      ),
-    );
-  }
-}
-
-/// The mark that replaces the seek bar of a live stream.
-class _LiveMark extends StatelessWidget {
-  const _LiveMark();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.tertiary;
-
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Text(
-          context.loc.playerLiveBadge,
-          style: CompactTypography.mono(
-            color,
-            size: CompactTypeScale.mark,
-            weight: FontWeight.w600,
-            letterSpacing: 0.8,
-          ),
         ),
       ),
     );

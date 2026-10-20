@@ -49,7 +49,9 @@ void main() {
     await tester.tap(find.text('搜索'));
     await tester.pumpAndSettle();
 
-    expect(find.text('DEMO SOURCE', findRichText: true), findsOneWidget);
+    // The name of the source lives in the tooltip of its mark: the mark
+    // itself is an icon, so a row of results keeps the same shape.
+    expect(find.byTooltip('Demo Source'), findsOneWidget);
     expect(find.text('Song hello'), findsOneWidget);
     expect(find.text('播放全部'), findsOneWidget);
     expect(tester.takeException(), isNull);

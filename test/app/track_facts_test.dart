@@ -41,7 +41,6 @@ void main() {
     license: 'CC-BY',
     language: 'zh',
     size: 38000000,
-    isFavorite: true,
     lyrics: '[00:00.00] 歌词',
     dateAdded: 1700000000000,
   );
@@ -96,18 +95,6 @@ void main() {
     expect(find.text('980 kbps'), findsNothing);
     expect(find.byIcon(Icons.audio_file_rounded), findsOneWidget);
     expect(find.byIcon(Icons.speed_rounded), findsOneWidget);
-  });
-
-  testWidgets('a row marks a track that is a favourite', (tester) async {
-    await tester.pumpWidget(
-      app(
-        const TrackMeta(song: lossless, index: 0),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final favourite = find.byIcon(Icons.favorite_rounded);
-    expect(favourite, findsOneWidget);
   });
 
   testWidgets('a row keeps the state of a live stream', (tester) async {
@@ -347,12 +334,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The state is the one word of the row, the numbers are a hover away.
-    expect(find.text('已扫描'), findsOneWidget);
+    // The state is an icon like every other mark of a row; the words wait
+    // in the tooltip.
     expect(find.byIcon(Icons.check_circle_outline_rounded), findsOneWidget);
+    expect(find.byTooltip(RegExp('已扫描')), findsOneWidget);
     expect(find.byTooltip('曲目 · 12'), findsOneWidget);
     expect(find.byTooltip('上次扫描 · $clock'), findsOneWidget);
     expect(find.text('曲目'), findsNothing);
+    expect(find.text('已扫描'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

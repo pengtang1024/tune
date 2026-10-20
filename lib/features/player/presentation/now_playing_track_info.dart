@@ -8,7 +8,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
-import 'package:tune/shared/ui/source_chip.dart';
+import 'package:tune/shared/ui/source_badge.dart';
+import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
 /// The words of the track that is playing.
@@ -45,7 +46,12 @@ class NowPlayingTrackInfo extends StatelessWidget {
         children: [
           Row(
             children: [
-              SourceChip(label: source),
+              SourceBadge(
+                label: source,
+                dense: false,
+                onTap: () =>
+                    showTrackDetailSheet(context, song, source: source),
+              ),
               const SizedBox(width: CompactTokens.space8),
               // The badge tells where the sound comes from, so it belongs
               // next to the name of the source instead of floating at the
@@ -58,7 +64,7 @@ class NowPlayingTrackInfo extends StatelessWidget {
           const SizedBox(height: CompactTokens.space8),
           _Artist(song: song),
           const SizedBox(height: CompactTokens.space14),
-          _TrackDetails(song: song),
+          _TrackDetails(song: song, source: source),
         ],
       ),
     );
@@ -139,12 +145,14 @@ class _Artist extends StatelessWidget {
 /// whatever is known: the album, the year, the style, the quality of the
 /// file, the licence and the station that plays it.
 ///
-/// The panel shows the value of a fact and keeps its name for the tooltip, so
-/// the eye reads the values and the mouse names them.
+/// The facts are icons, not words: a row of facts keeps the same shape
+/// whatever the values are. The mouse names a fact and the details panel
+/// writes all of them down.
 class _TrackDetails extends StatelessWidget {
-  const _TrackDetails({required this.song});
+  const _TrackDetails({required this.song, required this.source});
 
   final Song song;
+  final SourceLabel? source;
 
   @override
   Widget build(BuildContext context) {
@@ -166,15 +174,17 @@ class _TrackDetails extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Wrap(
-          spacing: 6,
-          runSpacing: 6,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             for (final fact in facts)
-              MetaChip(
+              MetaBadge(
                 icon: fact.icon,
-                value: fact.value,
                 tooltip: fact.sentence,
                 tone: fact.tone,
+                size: 15,
+                onTap: () =>
+                    showTrackDetailSheet(context, song, source: source),
               ),
           ],
         ),

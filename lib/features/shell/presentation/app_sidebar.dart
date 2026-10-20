@@ -75,6 +75,14 @@ class AppSidebar extends StatelessWidget {
                         currentPath: currentPath,
                         compact: compact,
                       ),
+                      const SizedBox(height: 4),
+                      _NavItem(
+                        icon: Icons.favorite_rounded,
+                        label: context.loc.favoritesTitle,
+                        path: '/favorites',
+                        currentPath: currentPath,
+                        compact: compact,
+                      ),
                       const SizedBox(height: 24),
                       _SectionLabel(
                         context.loc.sidebarConnect,

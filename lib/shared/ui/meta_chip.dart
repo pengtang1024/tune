@@ -103,6 +103,7 @@ class MetaBadge extends StatelessWidget {
   final String tooltip;
   final FactTone tone;
   final double size;
+  final VoidCallback? onTap;
 
   const MetaBadge({
     super.key,
@@ -110,14 +111,22 @@ class MetaBadge extends StatelessWidget {
     required this.tooltip,
     this.tone = FactTone.neutral,
     this.size = 13,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final color = factToneColor(tone, Theme.of(context).colorScheme);
+    final mark = Icon(icon, size: size, color: color);
     return TuneTooltip(
       message: tooltip,
-      child: Icon(icon, size: size, color: color),
+      child: onTap == null
+          ? mark
+          : InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(4),
+              child: mark,
+            ),
     );
   }
 }

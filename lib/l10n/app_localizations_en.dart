@@ -176,6 +176,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Playback stops. The songs stay in your library.';
 
   @override
+  String get favoritesTitle => 'Liked';
+
+  @override
+  String get favoritesSubtitle => 'The tracks you marked with a heart';
+
+  @override
+  String get favoritesEmptyTitle => 'No favorites yet';
+
+  @override
+  String get favoritesEmptySubtitle =>
+      'Tap the heart in the library and the track lands here';
+
+  @override
+  String get favoritesGoToLibrary => 'Go to library';
+
+  @override
+  String get favoriteAdd => 'Add to favorites';
+
+  @override
+  String get favoriteRemove => 'Remove from favorites';
+
+  @override
   String get playerNowPlaying => 'Now playing';
 
   @override
@@ -995,7 +1017,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The open audio collection of the Internet Archive';
 
   @override
-  String get sourceInternetArchiveName => 'Web archive';
+  String get sourceInternetArchiveName => 'Public domain';
 
   @override
   String get sourceNeteaseName => 'NetEase Cloud Music API';
@@ -1183,14 +1205,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Creative Commons remixes and open music';
 
   @override
-  String get sourceCcmixterName => 'Shared mixes';
+  String get sourceCcmixterName => 'Shared remixes';
 
   @override
   String get sourceItunesDescription =>
-      '30 second previews from the Apple Music catalog';
+      '30 second previews from the iTunes catalog';
 
   @override
-  String get sourceItunesName => 'Apple previews';
+  String get sourceItunesName => 'Store previews';
 
   @override
   String get sourcePodcastRssDescription =>
@@ -1244,7 +1266,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Complete tracks from the open Audius network';
 
   @override
-  String get sourceAudiusName => 'Artist network';
+  String get sourceAudiusName => 'Artist uploads';
 
   @override
   String get audiusHint =>
@@ -1289,7 +1311,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceWikimediaDescription => 'Open audio from Wikimedia Commons';
 
   @override
-  String get sourceWikimediaName => 'Shared media';
+  String get sourceWikimediaName => 'Free media';
 
   @override
   String get wikimediaHint =>
@@ -1487,12 +1509,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackFactLyricsIncluded => 'Included';
-
-  @override
-  String get trackFactFavorite => 'Favorite';
-
-  @override
-  String get trackFactFavorited => 'Favorited';
 
   @override
   String get trackFactPerformers => 'Performers';

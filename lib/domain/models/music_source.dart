@@ -82,11 +82,22 @@ enum MusicSourceKind {
 /// its own spelling in every language); the localized name is what the source
 /// is called in the language of the reader. The two travel together, so a
 /// source is never named in one place and named differently in another.
+///
+/// The id and the kind are what the interface needs to draw the source
+/// without reading its name: the id picks the icon that stands for the
+/// source, the kind picks one when the source has no icon of its own.
 class SourceLabel {
   final String name;
   final String localizedName;
+  final String id;
+  final MusicSourceKind kind;
 
-  const SourceLabel({required this.name, this.localizedName = ''});
+  const SourceLabel({
+    required this.name,
+    this.localizedName = '',
+    this.id = '',
+    this.kind = MusicSourceKind.openCatalog,
+  });
 
   @override
   String toString() => 'SourceLabel($name, $localizedName)';

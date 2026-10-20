@@ -164,6 +164,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get queueClearMessage => '当前播放会停止，队列中的歌曲不会从音乐库删除。';
 
   @override
+  String get favoritesTitle => '喜欢';
+
+  @override
+  String get favoritesSubtitle => '标了心的曲子都在这里';
+
+  @override
+  String get favoritesEmptyTitle => '还没有喜欢的曲子';
+
+  @override
+  String get favoritesEmptySubtitle => '在音乐库里点一下红心，喜欢的曲子就会收在这里';
+
+  @override
+  String get favoritesGoToLibrary => '去音乐库';
+
+  @override
+  String get favoriteAdd => '加入收藏';
+
+  @override
+  String get favoriteRemove => '取消收藏';
+
+  @override
   String get playerNowPlaying => '正在播放';
 
   @override
@@ -879,10 +900,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceJamendoName => '独立音乐曲库';
 
   @override
-  String get sourceInternetArchiveDescription => '互联网档案馆的开放音频收藏';
+  String get sourceInternetArchiveDescription => 'Internet Archive 的开放音频收藏';
 
   @override
-  String get sourceInternetArchiveName => '互联网档案馆';
+  String get sourceInternetArchiveName => '公共领域音频';
 
   @override
   String get sourceNeteaseName => '网易云音乐 API';
@@ -1058,13 +1079,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceCcmixterDescription => 'Creative Commons 混音与开放音乐曲库';
 
   @override
-  String get sourceCcmixterName => '共享音乐混音';
+  String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'Apple Music 目录的 30 秒试听片段';
+  String get sourceItunesDescription => 'iTunes 目录的 30 秒试听片段';
 
   @override
-  String get sourceItunesName => '苹果音乐试听';
+  String get sourceItunesName => '商店试听片段';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -1108,10 +1129,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get subsonicNoMatch => '没有找到匹配的曲目';
 
   @override
-  String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+  String get sourceAudiusDescription => 'Audius 上音乐人直发的完整曲目';
 
   @override
-  String get sourceAudiusName => '开放音乐网络';
+  String get sourceAudiusName => '音乐人直发';
 
   @override
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
@@ -1151,10 +1172,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioNoMatch => '没有找到匹配的电台';
 
   @override
-  String get sourceWikimediaDescription => '维基共享资源的开放音频';
+  String get sourceWikimediaDescription => 'Wikimedia Commons 的开放音频';
 
   @override
-  String get sourceWikimediaName => '维基共享资源';
+  String get sourceWikimediaName => '自由授权媒体';
 
   @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
@@ -1163,7 +1184,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
-  String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
+  String get wikimediaEmptyResponse => 'Wikimedia Commons 返回了空响应';
 
   @override
   String get wikimediaNoMatch => '没有找到可播放的共享音频';
@@ -1347,12 +1368,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trackFactLyricsIncluded => '已包含';
-
-  @override
-  String get trackFactFavorite => '收藏';
-
-  @override
-  String get trackFactFavorited => '已收藏';
 
   @override
   String get trackFactPerformers => '演奏者';
@@ -1670,6 +1685,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get queueClearMessage => '当前播放会停止，队列中的歌曲不会从音乐库删除。';
 
   @override
+  String get favoritesTitle => '喜欢';
+
+  @override
+  String get favoritesSubtitle => '标了心的曲子都在这里';
+
+  @override
+  String get favoritesEmptyTitle => '还没有喜欢的曲子';
+
+  @override
+  String get favoritesEmptySubtitle => '在音乐库里点一下红心，喜欢的曲子就会收在这里';
+
+  @override
+  String get favoritesGoToLibrary => '去音乐库';
+
+  @override
+  String get favoriteAdd => '加入收藏';
+
+  @override
+  String get favoriteRemove => '取消收藏';
+
+  @override
   String get playerNowPlaying => '正在播放';
 
   @override
@@ -2385,10 +2421,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceJamendoName => '独立音乐曲库';
 
   @override
-  String get sourceInternetArchiveDescription => '互联网档案馆的开放音频收藏';
+  String get sourceInternetArchiveDescription => 'Internet Archive 的开放音频收藏';
 
   @override
-  String get sourceInternetArchiveName => '互联网档案馆';
+  String get sourceInternetArchiveName => '公共领域音频';
 
   @override
   String get sourceNeteaseName => '网易云音乐 API';
@@ -2564,13 +2600,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceCcmixterDescription => 'Creative Commons 混音与开放音乐曲库';
 
   @override
-  String get sourceCcmixterName => '共享音乐混音';
+  String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'Apple Music 目录的 30 秒试听片段';
+  String get sourceItunesDescription => 'iTunes 目录的 30 秒试听片段';
 
   @override
-  String get sourceItunesName => '苹果音乐试听';
+  String get sourceItunesName => '商店试听片段';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -2614,10 +2650,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get subsonicNoMatch => '没有找到匹配的曲目';
 
   @override
-  String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+  String get sourceAudiusDescription => 'Audius 上音乐人直发的完整曲目';
 
   @override
-  String get sourceAudiusName => '开放音乐网络';
+  String get sourceAudiusName => '音乐人直发';
 
   @override
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
@@ -2657,10 +2693,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioNoMatch => '没有找到匹配的电台';
 
   @override
-  String get sourceWikimediaDescription => '维基共享资源的开放音频';
+  String get sourceWikimediaDescription => 'Wikimedia Commons 的开放音频';
 
   @override
-  String get sourceWikimediaName => '维基共享资源';
+  String get sourceWikimediaName => '自由授权媒体';
 
   @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
@@ -2669,7 +2705,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
-  String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
+  String get wikimediaEmptyResponse => 'Wikimedia Commons 返回了空响应';
 
   @override
   String get wikimediaNoMatch => '没有找到可播放的共享音频';
@@ -2853,12 +2889,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get trackFactLyricsIncluded => '已包含';
-
-  @override
-  String get trackFactFavorite => '收藏';
-
-  @override
-  String get trackFactFavorited => '已收藏';
 
   @override
   String get trackFactPerformers => '演奏者';
@@ -3174,6 +3204,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get queueClearMessage => '目前播放會停止，佇列中的歌曲不會從音樂庫刪除。';
+
+  @override
+  String get favoritesTitle => '喜歡';
+
+  @override
+  String get favoritesSubtitle => '標了心的曲子都在這裡';
+
+  @override
+  String get favoritesEmptyTitle => '還沒有喜歡的曲子';
+
+  @override
+  String get favoritesEmptySubtitle => '在音樂庫裡點一下紅心，喜歡的曲子就會收在這裡';
+
+  @override
+  String get favoritesGoToLibrary => '去音樂庫';
+
+  @override
+  String get favoriteAdd => '加入收藏';
+
+  @override
+  String get favoriteRemove => '取消收藏';
 
   @override
   String get playerNowPlaying => '正在播放';
@@ -3891,10 +3942,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceJamendoName => '獨立音樂曲庫';
 
   @override
-  String get sourceInternetArchiveDescription => '互聯網檔案館的開放音頻收藏';
+  String get sourceInternetArchiveDescription => 'Internet Archive 的開放音頻收藏';
 
   @override
-  String get sourceInternetArchiveName => '網際網路檔案館';
+  String get sourceInternetArchiveName => '公共領域音頻';
 
   @override
   String get sourceNeteaseName => '網易雲音樂 API';
@@ -4070,13 +4121,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceCcmixterDescription => 'Creative Commons 混音與開放音樂曲庫';
 
   @override
-  String get sourceCcmixterName => '共享音樂混音';
+  String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'Apple Music 目錄的 30 秒試聽片段';
+  String get sourceItunesDescription => 'iTunes 目錄的 30 秒試聽片段';
 
   @override
-  String get sourceItunesName => '蘋果音樂試聽';
+  String get sourceItunesName => '商店試聽片段';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
@@ -4120,10 +4171,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get subsonicNoMatch => '找不到符合的曲目';
 
   @override
-  String get sourceAudiusDescription => 'Audius 開放音樂網路的完整曲目';
+  String get sourceAudiusDescription => 'Audius 上音樂人直發的完整曲目';
 
   @override
-  String get sourceAudiusName => '開放音樂網路';
+  String get sourceAudiusName => '音樂人直發';
 
   @override
   String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
@@ -4163,10 +4214,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioNoMatch => '找不到符合的電台';
 
   @override
-  String get sourceWikimediaDescription => '維基共享資源的開放音訊';
+  String get sourceWikimediaDescription => 'Wikimedia Commons 的開放音訊';
 
   @override
-  String get sourceWikimediaName => '維基共享資源';
+  String get sourceWikimediaName => '自由授權媒體';
 
   @override
   String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
@@ -4175,7 +4226,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
-  String get wikimediaEmptyResponse => '維基共享資源回傳了空回應';
+  String get wikimediaEmptyResponse => 'Wikimedia Commons 回傳了空回應';
 
   @override
   String get wikimediaNoMatch => '找不到可播放的共享音訊';
@@ -4359,12 +4410,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackFactLyricsIncluded => '已包含';
-
-  @override
-  String get trackFactFavorite => '收藏';
-
-  @override
-  String get trackFactFavorited => '已收藏';
 
   @override
   String get trackFactPerformers => '演奏者';

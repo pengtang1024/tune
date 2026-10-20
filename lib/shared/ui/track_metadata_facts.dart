@@ -20,7 +20,6 @@ List<TrackFact?> metadataFactsOf(BuildContext context, Song song) {
     _languageFact(context, song),
     _licenseFact(context, song),
     _lyricsFact(context, song),
-    _favoriteFact(context, song),
     _performersFact(context, song),
     _addedFact(context, song),
     _descriptionFact(context, song),
@@ -120,19 +119,6 @@ TrackFact? _lyricsFact(BuildContext context, Song song) {
     value: context.loc.trackFactLyricsIncluded,
     icon: Icons.lyrics_rounded,
     compact: true,
-  );
-}
-
-TrackFact? _favoriteFact(BuildContext context, Song song) {
-  if (!song.isFavorite) return null;
-
-  return TrackFact(
-    label: context.loc.trackFactFavorite,
-    value: context.loc.trackFactFavorited,
-    icon: Icons.favorite_rounded,
-    tone: FactTone.primary,
-    compact: true,
-    sentence: context.loc.trackFactFavorited,
   );
 }
 

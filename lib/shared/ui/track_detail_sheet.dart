@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
@@ -17,24 +18,24 @@ import 'package:tune/shared/ui/track_path_row.dart';
 Future<void> showTrackDetailSheet(
   BuildContext context,
   Song song, {
-  String? sourceName,
+  SourceLabel? source,
 }) {
   return showCompactSheet<void>(
     context,
-    (context) => _TrackDetailSheet(song: song, sourceName: sourceName),
+    (context) => _TrackDetailSheet(song: song, source: source),
   );
 }
 
 class _TrackDetailSheet extends StatelessWidget {
   final Song song;
-  final String? sourceName;
+  final SourceLabel? source;
 
-  const _TrackDetailSheet({required this.song, this.sourceName});
+  const _TrackDetailSheet({required this.song, this.source});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final facts = trackFactsOf(context, song, sourceName: sourceName);
+    final facts = trackFactsOf(context, song, source: source);
 
     return Material(
       color: theme.colorScheme.surface,

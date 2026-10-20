@@ -170,7 +170,11 @@ class _SourceFilter extends StatelessWidget {
         : (sourceLabels[sourceFilter]?.name ?? sourceFilter!);
 
     return TuneTooltip(
-      message: context.loc.libraryFilterSources,
+      // The button says what it filters in its tooltip: the words of a chip
+      // belong to the mouse, not to the toolbar.
+      message: active
+          ? '${context.loc.libraryFilterSources} · $label'
+          : context.loc.libraryFilterSources,
       child: PopupMenuButton<String>(
         padding: EdgeInsets.zero,
         initialValue: sourceFilter ?? allSourcesFilterValue,
@@ -215,15 +219,6 @@ class _SourceFilter extends StatelessWidget {
                     : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: CompactTokens.space4),
-              Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: active
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface,
-                ),
-              ),
               const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: CompactTokens.icon14,

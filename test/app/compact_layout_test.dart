@@ -15,6 +15,7 @@ import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/source_badge.dart';
 import '../services/fake_persistence.dart';
 
 
@@ -286,7 +287,9 @@ void main() {
     expect(find.text(songA.title), findsOneWidget);
     expect(find.text(remoteSong.title), findsOneWidget);
     expect(find.byTooltip('Openverse · 开放版权聚合'), findsOneWidget);
-    expect(find.textContaining('开放版权聚合', findRichText: true), findsOneWidget);
+    // The mark of the source is an icon: the name of the source waits in the
+    // tooltip, so the row keeps its shape whatever the source is called.
+    expect(find.byType(SourceBadge), findsOneWidget);
 
     await tester.tap(find.byTooltip('筛选来源'));
     await tester.pumpAndSettle();
@@ -393,7 +396,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.byTooltip('Openverse · 开放版权聚合'), findsOneWidget);
-    expect(find.textContaining('开放版权聚合', findRichText: true), findsOneWidget);
+    expect(find.byType(SourceBadge), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

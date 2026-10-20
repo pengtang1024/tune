@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/track_metadata_facts.dart';
 
@@ -12,11 +14,11 @@ import 'package:tune/shared/ui/track_metadata_facts.dart';
 List<TrackFact> trackFactsOf(
   BuildContext context,
   Song song, {
-  String? sourceName,
+  SourceLabel? source,
   bool compactOnly = false,
 }) {
   final facts = <TrackFact?>[
-    if (sourceName != null) _sourceFact(context, sourceName),
+    if (source != null) _sourceFact(context, source),
     _liveFact(context, song),
     ...fileFactsOf(context, song),
     ...metadataFactsOf(context, song),
@@ -33,15 +35,19 @@ List<TrackFact> rowFactsOf(BuildContext context, Song song) {
   return trackFactsOf(context, song, compactOnly: true);
 }
 
-TrackFact? _sourceFact(BuildContext context, String sourceName) {
-  final name = sourceName.trim();
+/// The source of the track, named the way the source names itself.
+TrackFact? _sourceFact(BuildContext context, SourceLabel source) {
+  final name = source.name.trim();
   if (name.isEmpty) return null;
+  final localized = source.localizedName.trim();
+  final value = localized.isEmpty ? name : '$name · $localized';
 
   return TrackFact(
     label: context.loc.trackFactSource,
-    value: name,
-    icon: Icons.travel_explore_rounded,
+    value: value,
+    icon: sourceIconOf(source.id, source.kind),
     tone: FactTone.primary,
+    sentence: value,
   );
 }
 

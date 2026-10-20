@@ -54,33 +54,33 @@ class SettingsPageHeader extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
+          child: TuneTooltip(
+            message: context.loc.sidebarVersionLine(context.loc.appName, version),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'v$version',
-                style: CompactTypography.mono(
-                  theme.colorScheme.onSurfaceVariant,
-                  size: CompactTypeScale.mark,
-                  letterSpacing: 0.4,
+                const SizedBox(width: 6),
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: CompactTokens.icon14,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -209,19 +209,19 @@ class SettingsLibraryCard extends StatelessWidget {
       eyebrow: context.loc.libraryEyebrow,
       title: context.loc.libraryTitle,
       description: context.loc.settingsLibraryDescription,
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
-        ),
-        child: Text(
-          context.loc.settingsPathsCount(pathCount),
-          style: CompactTypography.mono(
-            theme.colorScheme.onSurfaceVariant,
-            size: CompactTypeScale.mark,
-            letterSpacing: 0.6,
+      trailing: TuneTooltip(
+        message: context.loc.settingsPathsCount(pathCount),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+          child: Icon(
+            Icons.folder_rounded,
+            size: CompactTokens.icon14,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ),
@@ -365,18 +365,18 @@ class SettingsAboutCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              context.loc.settingsLocalFirst,
-              style: CompactTypography.mono(
-                theme.colorScheme.primary,
-                size: CompactTypeScale.mark,
-                letterSpacing: 0.8,
+          TuneTooltip(
+            message: context.loc.settingsLocalFirst,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Icon(
+                Icons.verified_rounded,
+                size: CompactTokens.icon14,
+                color: theme.colorScheme.primary,
               ),
             ),
           ),
@@ -818,22 +818,22 @@ class _PathRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-            decoration: BoxDecoration(
-              color: isDefault
-                  ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                  : theme.colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Text(
-              label,
-              style: CompactTypography.mono(
-                isDefault
+          TuneTooltip(
+            message: label,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: isDefault
+                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                    : theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(
+                isDefault ? Icons.star_rounded : Icons.star_border_rounded,
+                size: CompactTokens.icon12,
+                color: isDefault
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
-                size: CompactTypeScale.mark,
-                letterSpacing: 0.3,
               ),
             ),
           ),

@@ -33,31 +33,31 @@
 
 ## 音源的两个名字
 
-品牌名不翻译，但读者仍要知道那是什么音源，所以音源的 chip 写两个名字、两种颜色：品牌名大而醒目（等宽大写、主色），本地化名小而次要（次级色）。名字本来就在读者语言里的音源（本地音乐、播客订阅、网络电台）不写第二段。
+品牌名不翻译，但读者仍要知道那是什么音源，所以每个音源有两个名字：品牌名（`Openverse`，它是标识）与本地化名（`开放版权聚合`，它说明这是什么）。名字本来就在读者语言里的音源（本地音乐、播客订阅、网络电台）不写第二段。
 
-- **两个名字写在同一段富文本里**（`Text.rich` + 两个 `TextSpan`）。这样空间不够时让出去的是小的一半（末尾省略号），品牌名始终完整。
-- **不能用两个 `Flexible` 实现**：flex 会先把空余空间按比例切掉再交给每个子项，小字即使还有位置也会被截断。
-- 密集 chip 的最大宽度是 168（`shared/ui/track_meta.dart`）：英文的名字比中文长一倍，两个名字都要放得下。
-- chip 的提示气泡写完整的文字：`Openverse · 开放版权聚合`。
-- 测试里断言 chip 的字要用 `find.textContaining(..., findRichText: true)`：`Text.rich` 不是一个 `Text`，`find.text` 找不到它。
+- **chip 的正文只有图标**（`SourceBadge`，`shared/ui/source_badge.dart`）：图标固定大小，名字不写进去，一行曲子的宽窄不再被音源名字牵着走。
+- **两个名字写在提示气泡里**：`Openverse · 开放版权聚合`；详情面板的「来源」那条事实也把它们写全。
+- **每个音源一个自己的图标**（`shared/ui/source_icon.dart`）；用户自带的音源按种类兜底。
+- **本地化名说明这是什么，不把品牌名翻一遍**。`互联网档案馆`、`维基共享资源`、`苹果音乐试听`都是品牌名的中文版（`苹果音乐试听`还把 iTunes 说成了另一个服务）。本地化名写这个音源是干什么的：`公共领域音频`、`商店试听片段`、`自由授权媒体`。
+- **描述里提到品牌，用品牌自己的拼法**：`Internet Archive 的开放音频收藏`、`Wikimedia Commons 的开放音频`、`iTunes 目录的 30 秒试听片段`，不写"互联网档案馆"这种中文版。
 
 ## 还没做完的
 
-- **9 个品牌音源的本地化名待确认**。现在这批是按"这个音源是干什么的"写的，确认或换掉只改 ARB：
+- **9 个品牌音源的本地化名已定**。按"这个音源是干什么的"写，只改 ARB：
 
   | 音源 | 简体 | 繁体 | English |
   | --- | --- | --- | --- |
   | Openverse | 开放版权聚合 | 開放版權聚合 | Open audio |
   | Jamendo | 独立音乐曲库 | 獨立音樂曲庫 | Indie music |
-  | Internet Archive | 互联网档案馆 | 網際網路檔案館 | Web archive |
-  | ccMixter | 共享音乐混音 | 共享音樂混音 | Shared mixes |
-  | iTunes | 苹果音乐试听 | 蘋果音樂試聽 | Apple previews |
+  | Internet Archive | 公共领域音频 | 公共領域音頻 | Public domain |
+  | ccMixter | 共享混音素材 | 共享混音素材 | Shared remixes |
+  | iTunes | 商店试听片段 | 商店試聽片段 | Store previews |
   | Subsonic | 自建音乐库 | 自建音樂庫 | Self-hosted |
-  | Audius | 开放音乐网络 | 開放音樂網路 | Artist network |
-  | Wikimedia Commons | 维基共享资源 | 維基共享資源 | Shared media |
+  | Audius | 音乐人直发 | 音樂人直發 | Artist uploads |
+  | Wikimedia Commons | 自由授权媒体 | 自由授權媒體 | Free media |
   | Jellyfin | 自建媒体库 | 自建媒體庫 | Media server |
 
-- **英文那列压到了 14 个字符以内**，因为英文 chip 比中文长一倍，再长就要挤掉品牌名。想要更准确的英文说法，得先放宽 chip 的宽度。
-- **源 chip 与 `MetaChip` 的关系没定**：`shared/ui/meta_chip.dart` 是另一个会话写的（标签用语气色、值用另一种颜色，文字进提示气泡），源 chip 是同一想法的另一份实现。全应用的 chip 最好只有一种写法。
+- **英文那列压到了 14 个字符以内**，因为英文比中文长一倍；名字现在只出现在提示气泡与详情面板里，还是短一点好。想要更准确的英文说法，得先放宽提示气泡的宽度。
+- **源 chip 与 `MetaChip` 的关系没定**：`shared/ui/meta_chip.dart` 写事实（标签用语气色、值用另一种颜色，文字进提示气泡），`shared/ui/source_badge.dart` 写音源（只有图标）。全应用的 chip 最好只有一种写法。
 - **门禁还没画到的界面**：深色主题（现在只画浅色）、播放器的溢出菜单、插件安装对话框、音源页上除 jamendo 以外的每一种配置对话框。
 - `test/services/music_source_live_test.dart` 偶尔因为 TLS 握手失败而红，那是网络问题，与本地化无关。

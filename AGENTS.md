@@ -19,6 +19,7 @@
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
 | 继续查本地化覆盖、接着做审计 | [`docs/localization-audit.md`](docs/localization-audit.md) |
 | 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
+| 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
 

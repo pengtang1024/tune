@@ -9,7 +9,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
-import 'package:tune/shared/ui/source_chip.dart';
+import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
@@ -320,7 +320,7 @@ class _Body extends StatelessWidget {
             result: result,
             sourceLabel:
                 sourceLabels[result.sourceId] ??
-                SourceLabel(name: result.sourceId),
+                SourceLabel(name: result.sourceId, id: result.sourceId),
             onPlay: onPlay,
             onAddToQueue: onAddToQueue,
           ),
@@ -445,7 +445,7 @@ class _SourceGroup extends StatelessWidget {
           ),
           child: Row(
             children: [
-              SourceChip(label: sourceLabel, dense: true),
+              SourceBadge(label: sourceLabel, dense: true),
               const SizedBox(width: CompactTokens.space8),
               Text(
                 context.loc.libraryTrackCount(result.songs.length),
@@ -476,6 +476,7 @@ class _SourceGroup extends StatelessWidget {
         for (var index = 0; index < result.songs.length; index++)
           _SongRow(
             song: result.songs[index],
+            source: sourceLabel,
             onPlay: () => onPlay(result, index),
             onAddToQueue: () => onAddToQueue(result.songs[index]),
           ),
@@ -487,11 +488,13 @@ class _SourceGroup extends StatelessWidget {
 
 class _SongRow extends StatelessWidget {
   final Song song;
+  final SourceLabel source;
   final VoidCallback onPlay;
   final VoidCallback onAddToQueue;
 
   const _SongRow({
     required this.song,
+    required this.source,
     required this.onPlay,
     required this.onAddToQueue,
   });
@@ -559,7 +562,7 @@ class _SongRow extends StatelessWidget {
             TuneTooltip(
               message: context.loc.trackDetailsTooltip,
               child: IconButton(
-                onPressed: () => showTrackDetailSheet(context, song),
+                onPressed: () => showTrackDetailSheet(context, song, source: source),
                 icon: const Icon(
                   Icons.info_outline_rounded,
                   size: CompactTokens.icon16,

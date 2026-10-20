@@ -46,6 +46,7 @@ presentation → application → domain
 | --- | --- | --- |
 | 播放 + 队列 | `PlaybackController` / `PlaybackState`（`features/player`） | 队列是 `PlaybackState` 的一部分，仓库里没有第二个队列容器 |
 | 音乐库 | `LibraryController` / `LibraryState`（`features/library`） | 加载、扫描、过滤；不负责播放 |
+| 喜欢 | `FavoritesController` / `FavoritesState`（`features/favorites`） | 标了心的曲目；曲目本身还是音乐库里的那一首 |
 | 设置 | `SettingsController` / `SettingsState`（`features/settings`） | 主题、语言、扫描目录、自动扫描 |
 | 音源 | `MusicSourcesController` / `MusicSourcesState`（`features/sources`） | 音源开关与配置 |
 
@@ -87,6 +88,7 @@ presentation → application → domain
 | 数据 | 落在哪 | 谁写 |
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
+| 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
@@ -131,17 +133,35 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | --- | --- |
 | `lib/shared/ui/track_fact.dart` | 事实模型：名字、值、图标、色调 |
 | `lib/shared/ui/track_facts.dart` | 文件类事实：位置、格式、音质、码率、采样率、大小 |
-| `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、收藏、演奏者、添加时间、简介、正在播放 |
+| `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、演奏者、添加时间、简介、正在播放 |
 | `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板 |
 | `lib/shared/ui/track_path_row.dart` | 详情面板里的文件路径与复制 |
 | `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字）与 `MetaBadge`（纯图标 + tooltip） |
+| `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
+| `lib/shared/ui/source_icon.dart` | 每个音源一个图标；用户自带的音源按种类兜底 |
+| `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
 
 同一份事实按三档呈现，读者想要多少信息就看到多少：
 
 1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
 2. 正在播放页：画图标 + 值，名字留给 tooltip。
 3. 详情面板：画图标 + 名字 + 值，并给出文件路径。
+
+**音源也一样**：行里只画一个固定大小的图标（`SourceBadge`），品牌名与本地化名都在 tooltip 里，详情面板的「来源」那条事实把它们写全。图标不随名字长短变形，一行曲子的宽窄不再被音源名字牵着走。
+
+**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列与正在播放页的顶栏，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。
+
+## chip 的样子
+
+全应用的 chip 只有一种写法：**图标说话，颜色说类别，文字进 tooltip，细节进详情面板**。规范在 [chips.md](chips.md)，这里只列谁拥有什么。
+
+| 文件 | 职责 |
+| --- | --- |
+| `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字，只在详情面板里用）与 `MetaBadge`（纯图标 + tooltip） |
+| `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
+| `lib/shared/ui/source_mark.dart` | 每个音源一个图标；颜色按音源的类别（`sourceToneOf`） |
+| `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
 
 ## 提示（tooltip）
 

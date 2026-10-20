@@ -261,8 +261,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Demo Plugin'), findsOneWidget);
-    expect(find.text('插件'), findsOneWidget);
-    expect(find.text('已关闭'), findsOneWidget);
+    // The kind of a source is the colour of its icon and a word in the
+    // tooltip, not a chip of its own.
+    expect(find.byTooltip('插件'), findsOneWidget);
+    expect(find.text('插件'), findsNothing);
+    expect(find.byTooltip('已关闭'), findsOneWidget);
+    expect(find.text('已关闭'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('source-switch-plugin_demo')));
     await tester.pumpAndSettle();

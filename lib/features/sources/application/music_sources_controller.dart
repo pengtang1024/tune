@@ -56,6 +56,8 @@ Map<String, SourceLabel> sourceLabelsOf(
       source.id: SourceLabel(
         name: catalogue[source.id]?.name ?? source.name,
         localizedName: catalogue[source.id]?.localizedName ?? '',
+        id: source.id,
+        kind: source.kind,
       ),
   };
 }

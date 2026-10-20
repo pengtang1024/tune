@@ -16,6 +16,7 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -385,7 +386,19 @@ class _SourceTile extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(_icon(source.kind), size: CompactTokens.icon16, color: muted),
+          // The icon says which source it is, the colour says what kind of
+          // source it is: the name of the source is written next to it.
+          TuneTooltip(
+            message: source.kind.label(context.loc),
+            child: Icon(
+              sourceIconOf(source.id, source.kind),
+              size: CompactTokens.icon16,
+              color: factToneColor(
+                sourceToneOf(source.kind),
+                theme.colorScheme,
+              ),
+            ),
+          ),
           const SizedBox(width: CompactTokens.space8),
           Expanded(
             child: Column(
@@ -407,10 +420,6 @@ class _SourceTile extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    if (source.kind != MusicSourceKind.localDirectory) ...[
-                      const SizedBox(width: CompactTokens.space4),
-                      _KindBadge(kind: source.kind),
-                    ],
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -419,12 +428,11 @@ class _SourceTile extends ConsumerWidget {
                   runSpacing: 4,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    MetaChip(
+                    MetaBadge(
                       icon: mark.icon,
-                      label: mark.label,
                       tooltip: status,
                       tone: mark.tone,
-                      dense: true,
+                      size: CompactTokens.icon14,
                     ),
                     if (summary != null)
                       MetaBadge(
@@ -730,21 +738,6 @@ class _SourceMark {
   });
 }
 
-class _KindBadge extends StatelessWidget {
-  final MusicSourceKind kind;
-
-  const _KindBadge({required this.kind});
-
-  @override
-  Widget build(BuildContext context) {
-    return MetaChip(
-      label: kind.label(context.loc),
-      tone: FactTone.primary,
-      dense: true,
-    );
-  }
-}
-
 /// Asks for the address of a plugin script.
 class _PluginUrlDialog extends StatefulWidget {
   const _PluginUrlDialog();
@@ -969,15 +962,6 @@ class _ChoiceField extends StatelessWidget {
       },
     );
   }
-}
-
-IconData _icon(MusicSourceKind kind) {
-  return switch (kind) {
-    MusicSourceKind.localDirectory => Icons.folder_outlined,
-    MusicSourceKind.openCatalog => Icons.public_rounded,
-    MusicSourceKind.openApi => Icons.api_rounded,
-    MusicSourceKind.plugin => Icons.extension_rounded,
-  };
 }
 
 /// The time of the last scan, written the way the locale writes it.

@@ -64,6 +64,12 @@
 - 输入框不要拉成细长条：`CompactTokens.searchFieldMaxWidth` 给了上限，右侧留给页面自己的动作。
 - 悬浮元素（徽标、状态标签）跟着它描述的对象走，不要漂在行尾。
 
+## 标识（chip）
+
+- chip 的写法只有一份规范：[chips.md](chips.md)。要加标识、加事实、加音源的图标，先读它。
+- 一句话版本：**chip 里不写字**——图标说"是哪一个"，颜色说"是哪一类"，字在 tooltip 里，细节在详情面板里。控件（下拉框、开关、按钮）显示自己的值，那不是 chip。
+- `test/app/chip_style_test.dart` 扫源码守这条线：带文字的 chip 只许出现在详情面板里，药丸不许写字。
+
 ## 提示（tooltip）
 
 - 界面上没写出来的说明一律走 `TuneTooltip`（`lib/shared/ui/tune_tooltip.dart`），不要直接用 `Tooltip`。

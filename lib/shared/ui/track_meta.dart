@@ -6,7 +6,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
-import 'package:tune/shared/ui/source_chip.dart';
+import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -81,10 +81,7 @@ class TrackMeta extends StatelessWidget {
         TrackFactStrip(song: song),
         const SizedBox(width: CompactTokens.space8),
         if (source != null) ...[
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 168),
-            child: SourceChip(label: source!, dense: true),
-          ),
+          SourceBadge(label: source!, dense: true),
           const SizedBox(width: CompactTokens.space8),
         ],
         if (!song.isLiveStream)
@@ -96,7 +93,7 @@ class TrackMeta extends StatelessWidget {
             ),
           ),
         const SizedBox(width: CompactTokens.space4),
-        _DetailsButton(song: song, sourceName: source?.name),
+        _DetailsButton(song: song, source: source),
       ],
     );
   }
@@ -105,9 +102,9 @@ class TrackMeta extends StatelessWidget {
 /// The action that opens everything that is known about a track.
 class _DetailsButton extends StatelessWidget {
   final Song song;
-  final String? sourceName;
+  final SourceLabel? source;
 
-  const _DetailsButton({required this.song, this.sourceName});
+  const _DetailsButton({required this.song, this.source});
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +113,7 @@ class _DetailsButton extends StatelessWidget {
     return TuneTooltip(
       message: context.loc.trackDetailsTooltip,
       child: IconButton(
-        onPressed: () =>
-            showTrackDetailSheet(context, song, sourceName: sourceName),
+        onPressed: () => showTrackDetailSheet(context, song, source: source),
         icon: const Icon(
           Icons.info_outline_rounded,
           size: CompactTokens.icon16,

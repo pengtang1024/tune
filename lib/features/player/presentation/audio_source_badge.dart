@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:tune/app/theme/compact_type_scale.dart';
-import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Tells where the audio of the current track comes from.
 ///
 /// The badge is shared by the dock and the now playing page so both surfaces
 /// describe a remote track the same way.
+///
+/// The badge is an icon, not a word: the dock is the tightest place in the
+/// app, and a badge that grows with its words would push the title around.
+/// The mouse says what the badge means, and the colour says how it goes.
 class AudioSourceBadge extends StatelessWidget {
   final AudioSourceStatus status;
   final double progress;
@@ -26,37 +29,18 @@ class AudioSourceBadge extends StatelessWidget {
     final color = _color(theme);
     final percent = (progress.clamp(0.0, 1.0) * 100).round();
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: dense ? 7 : 9,
-        vertical: dense ? 2.5 : 4,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(dense ? 6 : 8),
-        border: Border.all(color: color.withValues(alpha: 0.28)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(_icon, size: dense ? 10 : 12, color: color),
-          SizedBox(width: dense ? 4 : 5),
-          // The label of a language can be longer than the room the badge
-          // gets, so the text gives way instead of overflowing the row.
-          Flexible(
-            child: Text(
-              _label(context, percent),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: CompactTypography.mono(
-                color,
-                size: CompactTypeScale.mark,
-                weight: FontWeight.w600,
-                letterSpacing: 0.6,
-              ),
-            ),
-          ),
-        ],
+    return TuneTooltip(
+      message: _label(context, percent),
+      child: Container(
+        width: dense ? 18 : 22,
+        height: dense ? 18 : 22,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(dense ? 5 : 6),
+          border: Border.all(color: color.withValues(alpha: 0.28)),
+        ),
+        child: Icon(_icon, size: dense ? 11 : 13, color: color),
       ),
     );
   }
