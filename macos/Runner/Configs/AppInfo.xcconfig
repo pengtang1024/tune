@@ -8,7 +8,7 @@
 PRODUCT_NAME = tune
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.iouf.tune
+PRODUCT_BUNDLE_IDENTIFIER = cn.iouf.tune
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.iouf. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 iouf.cn. All rights reserved.

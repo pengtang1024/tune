@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.iouf" "\0"
+            VALUE "CompanyName", "iouf.cn" "\0"
             VALUE "FileDescription", "tune" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "tune" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.iouf. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 iouf.cn. All rights reserved." "\0"
             VALUE "OriginalFilename", "tune.exe" "\0"
             VALUE "ProductName", "tune" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

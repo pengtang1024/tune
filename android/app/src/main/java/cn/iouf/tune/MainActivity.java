@@ -1,4 +1,4 @@
-package com.iouf.tune;
+package cn.iouf.tune;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -7,7 +7,7 @@ project(runner LANGUAGES CXX)
 set(BINARY_NAME "tune")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.iouf.tune")
+set(APPLICATION_ID "cn.iouf.tune")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -103,19 +103,19 @@ install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon.png"
 
 # The desktop entry and the icon of the theme, so the program shows up in the
 # list of the applications with its own icon.
-install(FILES "${PROJECT_SOURCE_DIR}/com.iouf.tune.desktop"
+install(FILES "${PROJECT_SOURCE_DIR}/cn.iouf.tune.desktop"
   DESTINATION "share/applications"
   COMPONENT Runtime)
 
 install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon.png"
   DESTINATION "share/icons/hicolor/256x256/apps"
-  RENAME "com.iouf.tune.png"
+  RENAME "cn.iouf.tune.png"
   COMPONENT Runtime)
 
 foreach(icon_size 16 32 48 64 128)
   install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon_${icon_size}.png"
     DESTINATION "share/icons/hicolor/${icon_size}x${icon_size}/apps"
-    RENAME "com.iouf.tune.png"
+    RENAME "cn.iouf.tune.png"
     COMPONENT Runtime)
 endforeach()
 
