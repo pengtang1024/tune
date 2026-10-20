@@ -173,40 +173,9 @@
   "sourcesSubtitle": "在线曲库、自建服务与扫描目录",
   "sourcesAutoScan": "启动时自动扫描",
   "sourcesAutoScanDescription": "所有已启用音源都会在启动后自动刷新，失败不会影响本地库。",
-  "sourcesImportPlugin": "导入插件",
   "sourcesScanMayTakeSeconds": "含远程音源时可能需要数秒",
   "sourcesScanCompleted": "扫描已完成",
-  "sourcesImportPluginTitle": "导入音乐插件",
-  "sourcesImportPluginMessage": "插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。请只导入你信任的来源。导入后需要填写搜索关键词才会启用。",
-  "sourcesPluginUnreadable": "无法读取插件文件",
-  "sourcesPluginTooLarge": "插件文件不能超过 2 MB",
-  "sourcesPluginImportedEnabled": "已导入并启用 {name}",
-  "@sourcesPluginImportedEnabled": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImported": "已导入 {name}，填写关键词并开启后会参与扫描",
-  "@sourcesPluginImported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImportFailed": "导入插件失败：{error}",
-  "@sourcesPluginImportFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginActions": "插件操作",
   "sourcesConfigure": "配置",
-  "sourcesDeletePlugin": "删除插件",
   "sourcesUnsupported": "当前版本不支持该音源",
   "sourcesDisabled": "已关闭",
   "sourcesNeedsConfiguration": "需要配置",
@@ -242,15 +211,6 @@
   },
   "sourcesSkipped": "已跳过",
   "sourcesScanFailed": "扫描失败",
-  "sourcesDeletePluginTitle": "删除插件？",
-  "sourcesDeletePluginMessage": "将删除 {name} 的脚本、配置以及已扫描的歌曲。",
-  "@sourcesDeletePluginMessage": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "sourcesDeleted": "已删除 {name}",
   "@sourcesDeleted": {
     "placeholders": {
@@ -262,7 +222,7 @@
   "sourceKindLocal": "本地",
   "sourceKindOpenCatalog": "开放曲库",
   "sourceKindOpenApi": "API",
-  "sourceKindPlugin": "插件",
+  "sourceKindCustom": "自定义",
   "sourcesConfigureTitle": "配置 {name}",
   "@sourcesConfigureTitle": {
     "placeholders": {
@@ -307,35 +267,6 @@
   "fieldPassword": "密码",
   "fieldFormat": "音质",
   "sourcesNotLoaded": "音源列表尚未加载完成",
-  "sourcesPlatformNoPlugin": "当前平台不支持 JavaScript 插件",
-  "sourcesUpdatePlugin": "更新插件",
-  "sourcesPluginUpdated": "{name} 已更新到 {version}",
-  "@sourcesPluginUpdated": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpToDate": "{name} 已是最新版本",
-  "@sourcesPluginUpToDate": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpdateFailed": "更新插件失败：{error}",
-  "@sourcesPluginUpdateFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "playerLyrics": "歌词",
   "lyricsLoading": "正在加载歌词",
   "lyricsFailed": "歌词加载失败",
@@ -374,7 +305,7 @@
   "searchOnlineHint": "搜索在线音源，例如 jazz、钢琴、lo-fi",
   "searchOnlineDescription": "搜索已启用的在线音源；结果不会写入音乐库",
   "searchOnlinePrompt": "搜索在线音源",
-  "searchOnlinePromptDescription": "输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。",
+  "searchOnlinePromptDescription": "输入关键词后按回车；所有已启用的在线音源会并行搜索。",
   "searchNoResults": "没有结果",
   "searchNoResultsDescription": "换个关键词再试一次。",
   "searchNoMatch": "没有找到匹配的歌曲",
@@ -510,14 +441,6 @@
       }
     }
   },
-  "sourceErrorPluginLoad": "插件加载失败：{message}",
-  "@sourceErrorPluginLoad": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "sourceErrorUnsupported": "暂不支持该音源",
   "sourceErrorScanInterval": "距上次扫描不足 {interval}",
   "@sourceErrorScanInterval": {
@@ -553,47 +476,6 @@
   },
   "localSourceHint": "在音乐库设置中添加扫描目录",
   "localSourceNotConfigured": "未配置本地音乐目录",
-  "pluginSourceHint": "填写一个搜索关键词，例如 周杰伦、piano 或 jazz",
-  "pluginFieldQueryHint": "例如 周杰伦、piano、jazz",
-  "pluginImportedVersion": "导入的 MusicFree 插件 · v{version}",
-  "@pluginImportedVersion": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginVariable": "插件变量 {key}",
-  "@pluginVariable": {
-    "placeholders": {
-      "key": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginFileMissing": "插件文件不存在，请重新导入",
-  "pluginRuntimeUnsupported": "当前平台不支持 JavaScript 音乐插件，请在桌面端或移动端导入",
-  "pluginCompatLibrary": "插件兼容库",
-  "pluginBridgeScript": "插件桥接脚本",
-  "pluginInit": "插件初始化",
-  "pluginScript": "插件脚本",
-  "pluginExports": "插件导出",
-  "pluginNoExports": "插件没有导出有效的 module.exports",
-  "pluginIncomplete": "插件不完整：需要 platform 和 search 方法",
-  "pluginNoMediaSource": "插件未实现 getMediaSource",
-  "pluginNoStream": "插件没有返回可播放地址",
-  "pluginRuntimeClosed": "插件运行时已关闭",
-  "pluginUnknownData": "插件返回了无法识别的数据",
-  "pluginCallError": "插件调用失败",
-  "pluginNoStreamResults": "插件返回了 {count} 个结果，但没有可播放地址",
-  "@pluginNoStreamResults": {
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "format": "decimalPattern"
-      }
-    }
-  },
   "neteaseHint": "填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000",
   "neteaseFieldApi": "API 地址",
   "neteaseFieldQueryHint": "例如 热门、周杰伦",
@@ -627,79 +509,6 @@
   "downloadUnsupportedPlatform": "当前平台没有文件系统，无法缓存下载",
   "audioLoadFailed": "音频加载失败",
   "audioPathEmpty": "音频文件路径为空",
-  "pluginUpdateNoUrl": "该插件没有记录下载地址，无法检查更新",
-  "pluginStepFailed": "{label} 失败：{error}",
-  "@pluginStepFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      },
-      "label": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesImportPluginFromUrl": "从 URL 导入",
-  "sourcesPluginUrlTitle": "插件地址",
-  "sourcesPluginUrlHint": "https://example.com/plugin.js",
-  "sourcesPluginUrlInvalid": "请输入有效的 http(s) 链接",
-  "pluginUrlInvalid": "插件地址无效，请使用 http 或 https 链接",
-  "pluginUrlEmpty": "插件脚本内容为空",
-  "pluginUrlTooLarge": "插件脚本超过大小限制",
-  "pluginSandboxStartFailed": "插件沙箱启动失败：{error}",
-  "@pluginSandboxStartFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginSandboxStartTimeout": "插件沙箱启动超时",
-  "pluginScriptTooLarge": "插件脚本超过 {limit} KB 限制",
-  "@pluginScriptTooLarge": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginRuntimeTerminated": "插件运行时已终止",
-  "pluginRuntimeTimeLimit": "插件运行时已超过运行时间上限",
-  "pluginSandboxNotReady": "插件沙箱尚未就绪",
-  "pluginCallTimeoutDetailed": "插件调用超时（{seconds}s）",
-  "@pluginCallTimeoutDetailed": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "pluginRuntimeCrashed": "插件运行时已崩溃",
-  "pluginFetchShimFailed": "fetch 兼容库加载失败：{message}",
-  "@pluginFetchShimFailed": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginUnknownCall": "未知的插件调用：{method}",
-  "@pluginUnknownCall": {
-    "placeholders": {
-      "method": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginScriptMissing": "插件脚本缺失",
-  "pluginMemoryLimitExceeded": "插件内存占用超过 {limit} 限制，已终止",
-  "@pluginMemoryLimitExceeded": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
   "ccmixterEmptyResponse": "ccMixter 返回了空响应",
   "ccmixterFieldQuery": "搜索标签",
   "ccmixterFieldQueryHint": "例如 jazz、ambient、electro",

@@ -1,13 +1,9 @@
-import 'dart:convert';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/source_kind_label.dart';
-import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -160,26 +156,6 @@ class MusicSourcesSection extends ConsumerWidget {
                       ),
                 label: Text(context.loc.libraryScanAllSources),
               ),
-              if (isMusicPluginRuntimeSupported) ...[
-                const SizedBox(width: CompactTokens.space8),
-                OutlinedButton.icon(
-                  onPressed: busy ? null : () => _importPlugin(context, ref),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, CompactTokens.controlCompact),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CompactTokens.space8,
-                    ),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                    side: BorderSide(color: theme.colorScheme.outlineVariant),
-                  ),
-                  icon: const Icon(
-                    Icons.extension_outlined,
-                    size: CompactTokens.icon16,
-                  ),
-                  label: Text(context.loc.sourcesImportPlugin),
-                ),
-              ],
               const SizedBox(width: CompactTokens.space8),
               Flexible(
                 child: Text(
@@ -212,131 +188,6 @@ class MusicSourcesSection extends ConsumerWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-      );
-  }
-
-  Future<void> _importPlugin(BuildContext context, WidgetRef ref) async {
-    final choice = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.loc.sourcesImportPluginTitle),
-        content: Text(context.loc.sourcesImportPluginMessage),
-
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(context.loc.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop('url'),
-            child: Text(context.loc.sourcesImportPluginFromUrl),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop('file'),
-            child: Text(context.loc.chooseFile),
-          ),
-        ],
-      ),
-    );
-    if (!context.mounted) return;
-    if (choice == 'url') {
-      await _importPluginFromUrl(context, ref);
-      return;
-    }
-    if (choice != 'file') return;
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['js'],
-      withData: true,
-    );
-    if (result == null || result.files.isEmpty) return;
-    if (!context.mounted) return;
-    final file = result.files.first;
-
-    final bytes = file.bytes;
-    if (bytes == null || bytes.isEmpty) {
-      _showMessage(context, context.loc.sourcesPluginUnreadable);
-      return;
-    }
-    if (bytes.length > 2 * 1024 * 1024) {
-      _showMessage(context, context.loc.sourcesPluginTooLarge);
-      return;
-    }
-
-    final script = utf8.decode(bytes, allowMalformed: true);
-    if (!context.mounted) return;
-
-    try {
-      final controller = ref.read(musicSourcesControllerProvider.notifier);
-      final config = await controller.installPlugin(
-        originalName: file.name,
-        script: script,
-      );
-      if (!context.mounted) return;
-
-      final fields = ref.read(musicSourceServiceProvider).fieldsFor(config);
-      final saved = await showDialog<bool>(
-        context: context,
-        builder: (context) =>
-            _SourceSettingsDialog(source: config, fields: fields),
-      );
-      if (saved == true) {
-        await controller.setEnabled(config.id, true);
-      }
-      if (!context.mounted) return;
-      _showMessage(
-        context,
-        saved == true
-            ? context.loc.sourcesPluginImportedEnabled(config.name)
-            : context.loc.sourcesPluginImported(config.name),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      _showMessage(context, context.loc.sourcesPluginImportFailed('$error'));
-    }
-  }
-
-  /// Downloads a plugin from a link the user typed in.
-  Future<void> _importPluginFromUrl(BuildContext context, WidgetRef ref) async {
-    final url = await showDialog<String>(
-      context: context,
-      builder: (context) => const _PluginUrlDialog(),
-    );
-    if (url == null || url.isEmpty || !context.mounted) return;
-
-    try {
-      final controller = ref.read(musicSourcesControllerProvider.notifier);
-      final config = await controller.installPluginFromUrl(url);
-      if (!context.mounted) return;
-
-      final fields = ref.read(musicSourceServiceProvider).fieldsFor(config);
-      final saved = await showDialog<bool>(
-        context: context,
-        builder: (context) =>
-            _SourceSettingsDialog(source: config, fields: fields),
-      );
-      if (saved == true) {
-        await controller.setEnabled(config.id, true);
-      }
-      if (!context.mounted) return;
-      _showMessage(
-        context,
-        saved == true
-            ? context.loc.sourcesPluginImportedEnabled(config.name)
-            : context.loc.sourcesPluginImported(config.name),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      _showMessage(context, context.loc.sourcesPluginImportFailed('$error'));
-    }
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
       );
   }
 }
@@ -452,52 +303,7 @@ class _SourceTile extends ConsumerWidget {
             ),
           ),
           if (fields.isNotEmpty && supported)
-            if (source.isPlugin)
-              SizedBox(
-                width: 28,
-                height: 28,
-                child: TuneTooltip(
-                  message: context.loc.sourcesPluginActions,
-                  child: PopupMenuButton<String>(
-                    enabled: !busy,
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      size: CompactTokens.icon16,
-                      color: muted,
-                    ),
-                    onSelected: (value) {
-                      if (value == 'config') {
-                        _openSettings(context, source, fields);
-                      } else if (value == 'update') {
-                        _updatePlugin(context, ref);
-                      } else if (value == 'delete') {
-                        _confirmRemove(context, ref);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'config',
-                        height: 36,
-                        child: Text(context.loc.sourcesConfigure),
-                      ),
-                      if (source.pluginUrl != null)
-                        PopupMenuItem(
-                          value: 'update',
-                          height: 36,
-                          child: Text(context.loc.sourcesUpdatePlugin),
-                        ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        height: 36,
-                        child: Text(context.loc.sourcesDeletePlugin),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              SizedBox(
+            SizedBox(
                 width: 28,
                 height: 28,
                 child: TuneTooltip(
@@ -660,69 +466,6 @@ class _SourceTile extends ConsumerWidget {
     return saved == true;
   }
 
-  /// Fetches the current script of a plugin that was imported by URL.
-  Future<void> _updatePlugin(BuildContext context, WidgetRef ref) async {
-    final source = this.source;
-    try {
-      final update = await ref
-          .read(musicSourcesControllerProvider.notifier)
-          .updatePlugin(source.id);
-      if (!context.mounted) return;
-      _showMessage(
-        context,
-        update.changed
-            ? context.loc.sourcesPluginUpdated(source.name, update.version)
-            : context.loc.sourcesPluginUpToDate(source.name),
-      );
-    } catch (error) {
-      if (!context.mounted) return;
-      _showMessage(context, context.loc.sourcesPluginUpdateFailed('$error'));
-    }
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
-      );
-  }
-
-  Future<void> _confirmRemove(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.loc.sourcesDeletePluginTitle),
-        content: Text(context.loc.sourcesDeletePluginMessage(source.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(context.loc.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(context.loc.delete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !context.mounted) return;
-
-    await ref
-        .read(musicSourcesControllerProvider.notifier)
-        .removePlugin(source.id);
-    if (!context.mounted) return;
-    await ref.read(libraryControllerProvider.notifier).dropSource(source.id);
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.loc.sourcesDeleted(source.name)),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-  }
 }
 
 /// The state of a source, drawn as a chip.
@@ -736,67 +479,6 @@ class _SourceMark {
     required this.label,
     required this.tone,
   });
-}
-
-/// Asks for the address of a plugin script.
-class _PluginUrlDialog extends StatefulWidget {
-  const _PluginUrlDialog();
-
-  @override
-  State<_PluginUrlDialog> createState() => _PluginUrlDialogState();
-}
-
-class _PluginUrlDialogState extends State<_PluginUrlDialog> {
-  final TextEditingController _controller = TextEditingController();
-  String? _error;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(context.loc.sourcesPluginUrlTitle),
-      content: SizedBox(
-        width: 360,
-        child: TextField(
-          controller: _controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: context.loc.sourcesPluginUrlTitle,
-            hintText: context.loc.sourcesPluginUrlHint,
-            errorText: _error,
-            isDense: true,
-            border: const OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.url,
-          onSubmitted: (_) => _submit(),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(context.loc.cancel),
-        ),
-        FilledButton(onPressed: _submit, child: Text(context.loc.ok)),
-      ],
-    );
-  }
-
-  void _submit() {
-    final url = _controller.text.trim();
-    final uri = Uri.tryParse(url);
-    if (url.isEmpty ||
-        uri == null ||
-        (uri.scheme != 'http' && uri.scheme != 'https')) {
-      setState(() => _error = context.loc.sourcesPluginUrlInvalid);
-      return;
-    }
-    Navigator.of(context).pop(url);
-  }
 }
 
 class _SourceSettingsDialog extends ConsumerStatefulWidget {

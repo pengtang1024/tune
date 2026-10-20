@@ -78,18 +78,18 @@ void main() {
       isNot(sourceToneOf(MusicSourceKind.openApi)),
     );
     expect(
-      sourceToneOf(MusicSourceKind.plugin),
+      sourceToneOf(MusicSourceKind.custom),
       isNot(sourceToneOf(MusicSourceKind.localDirectory)),
     );
   });
 
   test('a source the user brought along falls back to the icon of its kind', () {
     expect(
-      sourceIconOf('my_own_source', MusicSourceKind.plugin),
-      sourceIconOf('another_one', MusicSourceKind.plugin),
+      sourceIconOf('my_own_source', MusicSourceKind.custom),
+      sourceIconOf('another_one', MusicSourceKind.custom),
     );
     expect(
-      sourceIconOf('my_own_source', MusicSourceKind.plugin),
+      sourceIconOf('my_own_source', MusicSourceKind.custom),
       isNot(sourceIconOf('another_one', MusicSourceKind.openApi)),
     );
   });

@@ -65,7 +65,11 @@ class MusicSourceStore {
     }
 
     // Preserve future user-imported sources instead of silently dropping them.
-    merged.addAll(stored.values);
+    merged.addAll(
+      stored.values.where(
+        (config) => config.sourceType != retiredPluginType,
+      ),
+    );
     return List.unmodifiable(merged);
   }
 

@@ -61,6 +61,13 @@ class MusicSourceField {
   });
 }
 
+/// The type of the sources the app used to run as scripts.
+///
+/// The app does not run scripts any more, so a configuration of this type is
+/// dropped when the sources are read back: it has no adapter, and a source
+/// that never opens is worse than no source at all.
+const String retiredPluginType = 'plugin';
+
 /// How a music source gets its tracks.
 enum MusicSourceKind {
   /// Directories on this device.
@@ -72,8 +79,9 @@ enum MusicSourceKind {
   /// A self-hosted or remote JSON API that behaves as a source.
   openApi,
 
-  /// A user-imported JavaScript plugin (MusicFree protocol).
-  plugin,
+  /// A source the reader added with its own parameters: a feed, an address,
+  /// a mapped API.
+  custom,
 }
 
 /// What the interface shows about a source.
@@ -136,9 +144,6 @@ class MusicSourceConfig {
   /// user added can be deleted with its tracks.
   final bool builtIn;
 
-  /// Extra settings declared by a plugin (cookies, tokens, ...).
-  final List<MusicSourceField> customFields;
-
   const MusicSourceConfig({
     required this.id,
     this.type = '',
@@ -149,7 +154,6 @@ class MusicSourceConfig {
     this.enabled = true,
     this.settings = const {},
     this.builtIn = false,
-    this.customFields = const [],
   });
 
   /// The type the adapter registry is asked for.
@@ -163,15 +167,6 @@ class MusicSourceConfig {
       id.startsWith('plugin_') ? 'plugin' : id;
 
   bool get isLocal => kind == MusicSourceKind.localDirectory;
-
-  bool get isPlugin => kind == MusicSourceKind.plugin;
-
-  String? get pluginFile => setting('pluginFile');
-
-  /// Address the plugin script was downloaded from.
-  ///
-  /// Only plugins that were imported by URL can be updated.
-  String? get pluginUrl => setting('pluginUrl');
 
   String? setting(String key) {
     final value = settings[key];
@@ -190,7 +185,6 @@ class MusicSourceConfig {
     bool? enabled,
     Map<String, String>? settings,
     bool? builtIn,
-    List<MusicSourceField>? customFields,
   }) {
     return MusicSourceConfig(
       id: id ?? this.id,
@@ -202,7 +196,6 @@ class MusicSourceConfig {
       enabled: enabled ?? this.enabled,
       settings: settings ?? this.settings,
       builtIn: builtIn ?? this.builtIn,
-      customFields: customFields ?? this.customFields,
     );
   }
 
@@ -218,26 +211,6 @@ class MusicSourceConfig {
     }
 
     final rawEnabled = json['enabled'];
-    final fields = <MusicSourceField>[];
-    final rawFields = json['customFields'];
-    if (rawFields is List) {
-      for (final item in rawFields) {
-        if (item is! Map) continue;
-        final key = item['key']?.toString() ?? '';
-        if (key.isEmpty) continue;
-        fields.add(
-          MusicSourceField(
-            key,
-            item['label']?.toString() ?? key,
-            item['hint']?.toString() ?? '',
-            required: item['required'] == true,
-            numeric: item['numeric'] == true,
-            secret: item['secret'] == true,
-            choices: _choicesFromJson(item['choices']),
-          ),
-        );
-      }
-    }
 
     final id = json['id']?.toString() ?? '';
     return MusicSourceConfig(
@@ -250,7 +223,6 @@ class MusicSourceConfig {
       enabled: rawEnabled is bool ? rawEnabled : true,
       settings: Map.unmodifiable(settings),
       builtIn: json['builtIn'] == true,
-      customFields: List.unmodifiable(fields),
     );
   }
 
@@ -263,23 +235,6 @@ class MusicSourceConfig {
     'kind': kind.name,
     'enabled': enabled,
     'settings': settings,
-    if (customFields.isNotEmpty)
-      'customFields': [
-        for (final field in customFields)
-          {
-            'key': field.key,
-            'label': field.label,
-            'hint': field.hint,
-            'required': field.required,
-            'numeric': field.numeric,
-            'secret': field.secret,
-            if (field.choices.isNotEmpty)
-              'choices': [
-                for (final choice in field.choices)
-                  {'value': choice.value, 'label': choice.label},
-              ],
-          },
-      ],
   };
 
   static MusicSourceKind _kindFromName(String? name) {
@@ -287,19 +242,6 @@ class MusicSourceConfig {
       (kind) => kind.name == name,
       orElse: () => MusicSourceKind.openApi,
     );
-  }
-
-  /// Reads the options of a setting back from the stored schema.
-  static List<MusicSourceChoice> _choicesFromJson(Object? raw) {
-    if (raw is! List) return const [];
-    final choices = <MusicSourceChoice>[];
-    for (final item in raw) {
-      if (item is! Map) continue;
-      final value = item['value']?.toString() ?? '';
-      if (value.isEmpty) continue;
-      choices.add(MusicSourceChoice(value, item['label']?.toString() ?? value));
-    }
-    return List.unmodifiable(choices);
   }
 
   @override

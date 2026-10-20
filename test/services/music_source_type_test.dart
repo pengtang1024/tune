@@ -42,14 +42,14 @@ void main() {
       expect(config.sourceType, 'subsonic');
     });
 
-    test('the id of a plugin carries a hash, so its type is the plugin', () {
+    test('the id of a retired plugin carries a hash, so its type is known', () {
       const config = MusicSourceConfig(
         id: 'plugin_1a2b3c',
         name: 'Demo',
-        kind: MusicSourceKind.plugin,
+        kind: MusicSourceKind.custom,
       );
 
-      expect(config.sourceType, 'plugin');
+      expect(config.sourceType, retiredPluginType);
     });
 
     test('the type survives a round trip through the storage', () {

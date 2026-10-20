@@ -106,10 +106,11 @@ class _FakeSourcesController extends MusicSourcesController {
     return const MusicSourcesState(
       sources: [
         MusicSourceConfig(
-          id: 'plugin_demo',
+          id: 'demo:1',
+          type: 'demo',
           name: 'Demo Source',
-          kind: MusicSourceKind.plugin,
-          settings: {'pluginFile': 'demo.js', 'query': 'hello'},
+          kind: MusicSourceKind.custom,
+          settings: {'query': 'hello'},
         ),
       ],
     );
@@ -126,12 +127,12 @@ class _FakeOnlineSearchController extends OnlineSearchController {
       OnlineSearchState(
         query: query,
         results: {
-          'plugin_demo': SourceScanResult(
-            sourceId: 'plugin_demo',
+          'demo:1': SourceScanResult(
+            sourceId: 'demo:1',
             status: SourceScanStatus.success,
             songs: [
               SourceSongFactory.create(
-                sourceId: 'plugin_demo',
+                sourceId: 'demo:1',
                 externalId: '1',
                 title: 'Song $query',
                 artist: 'Artist',

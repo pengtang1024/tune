@@ -343,9 +343,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Every enabled source refreshes on startup. A failure never touches your local library.';
 
   @override
-  String get sourcesImportPlugin => 'Import plugin';
-
-  @override
   String get sourcesScanMayTakeSeconds =>
       'Remote sources can take a few seconds';
 
@@ -353,41 +350,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesScanCompleted => 'Scan finished';
 
   @override
-  String get sourcesImportPluginTitle => 'Import a music plugin';
-
-  @override
-  String get sourcesImportPluginMessage =>
-      'Plugins are third-party JavaScript. They run inside the app and can reach the network. Only import sources you trust. A plugin stays disabled until you give it a search keyword.';
-
-  @override
-  String get sourcesPluginUnreadable => 'Could not read the plugin file';
-
-  @override
-  String get sourcesPluginTooLarge => 'The plugin file cannot exceed 2 MB';
-
-  @override
-  String sourcesPluginImportedEnabled(String name) {
-    return 'Imported and enabled $name';
-  }
-
-  @override
-  String sourcesPluginImported(String name) {
-    return 'Imported $name. It joins the scan once you add a keyword and enable it.';
-  }
-
-  @override
-  String sourcesPluginImportFailed(String error) {
-    return 'Could not import the plugin: $error';
-  }
-
-  @override
-  String get sourcesPluginActions => 'Plugin actions';
-
-  @override
   String get sourcesConfigure => 'Configure';
-
-  @override
-  String get sourcesDeletePlugin => 'Delete plugin';
 
   @override
   String get sourcesUnsupported =>
@@ -437,14 +400,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesScanFailed => 'Scan failed';
 
   @override
-  String get sourcesDeletePluginTitle => 'Delete the plugin?';
-
-  @override
-  String sourcesDeletePluginMessage(String name) {
-    return 'This deletes the script, the settings and the scanned songs of $name.';
-  }
-
-  @override
   String sourcesDeleted(String name) {
     return 'Deleted $name';
   }
@@ -459,7 +414,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceKindOpenApi => 'API';
 
   @override
-  String get sourceKindPlugin => 'Plugin';
+  String get sourceKindCustom => 'Custom';
 
   @override
   String sourcesConfigureTitle(String name) {
@@ -527,28 +482,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesNotLoaded => 'The source list is still loading';
-
-  @override
-  String get sourcesPlatformNoPlugin =>
-      'This platform does not support JavaScript plugins';
-
-  @override
-  String get sourcesUpdatePlugin => 'Update plugin';
-
-  @override
-  String sourcesPluginUpdated(String name, String version) {
-    return '$name was updated to $version';
-  }
-
-  @override
-  String sourcesPluginUpToDate(String name) {
-    return '$name is already up to date';
-  }
-
-  @override
-  String sourcesPluginUpdateFailed(String error) {
-    return 'Could not update the plugin: $error';
-  }
 
   @override
   String get playerLyrics => 'Lyrics';
@@ -662,7 +595,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchOnlinePromptDescription =>
-      'Type a keyword and press enter. Every enabled online source and every imported plugin are searched in parallel.';
+      'Type a keyword and press enter. Every enabled online source is searched in parallel.';
 
   @override
   String get searchNoResults => 'No results';
@@ -848,11 +781,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String sourceErrorPluginLoad(String message) {
-    return 'Could not load the plugin: $message';
-  }
-
-  @override
   String get sourceErrorUnsupported => 'This source is not supported yet';
 
   @override
@@ -892,87 +820,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localSourceNotConfigured => 'No local music folder configured';
-
-  @override
-  String get pluginSourceHint =>
-      'Fill in a search keyword, e.g. an artist, piano or jazz';
-
-  @override
-  String get pluginFieldQueryHint => 'e.g. an artist, piano, jazz';
-
-  @override
-  String pluginImportedVersion(String version) {
-    return 'Imported MusicFree plugin · v$version';
-  }
-
-  @override
-  String pluginVariable(String key) {
-    return 'Plugin variable $key';
-  }
-
-  @override
-  String get pluginFileMissing =>
-      'The plugin file is missing. Import it again.';
-
-  @override
-  String get pluginRuntimeUnsupported =>
-      'This platform does not support JavaScript music plugins. Import them on desktop or mobile.';
-
-  @override
-  String get pluginCompatLibrary => 'Plugin compatibility library';
-
-  @override
-  String get pluginBridgeScript => 'Plugin bridge script';
-
-  @override
-  String get pluginInit => 'Plugin initialization';
-
-  @override
-  String get pluginScript => 'Plugin script';
-
-  @override
-  String get pluginExports => 'Plugin exports';
-
-  @override
-  String get pluginNoExports =>
-      'The plugin does not export a valid module.exports';
-
-  @override
-  String get pluginIncomplete =>
-      'The plugin is incomplete: it needs the platform and search methods';
-
-  @override
-  String get pluginNoMediaSource =>
-      'The plugin does not implement getMediaSource';
-
-  @override
-  String get pluginNoStream => 'The plugin returned no playable address';
-
-  @override
-  String get pluginRuntimeClosed => 'The plugin runtime is closed';
-
-  @override
-  String get pluginUnknownData =>
-      'The plugin returned data that could not be read';
-
-  @override
-  String get pluginCallError => 'The plugin call failed';
-
-  @override
-  String pluginNoStreamResults(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          'The plugin returned $countString results, but no playable address',
-      one: 'The plugin returned 1 result, but no playable address',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get neteaseHint =>
@@ -1085,87 +932,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioPathEmpty => 'The audio path is empty';
-
-  @override
-  String get pluginUpdateNoUrl =>
-      'The plugin has no download address, so it cannot be checked for updates';
-
-  @override
-  String pluginStepFailed(String error, String label) {
-    return '$label failed: $error';
-  }
-
-  @override
-  String get sourcesImportPluginFromUrl => 'Import from URL';
-
-  @override
-  String get sourcesPluginUrlTitle => 'Plugin URL';
-
-  @override
-  String get sourcesPluginUrlHint => 'https://example.com/plugin.js';
-
-  @override
-  String get sourcesPluginUrlInvalid => 'Please enter a valid http(s) link';
-
-  @override
-  String get pluginUrlInvalid =>
-      'The plugin address is invalid, please use an http or https link';
-
-  @override
-  String get pluginUrlEmpty => 'The plugin script is empty';
-
-  @override
-  String get pluginUrlTooLarge => 'The plugin script exceeds the size limit';
-
-  @override
-  String pluginSandboxStartFailed(String error) {
-    return 'The plugin sandbox failed to start: $error';
-  }
-
-  @override
-  String get pluginSandboxStartTimeout =>
-      'The plugin sandbox timed out while starting';
-
-  @override
-  String pluginScriptTooLarge(String limit) {
-    return 'The plugin script exceeds the limit of $limit KB';
-  }
-
-  @override
-  String get pluginRuntimeTerminated => 'The plugin runtime was terminated';
-
-  @override
-  String get pluginRuntimeTimeLimit =>
-      'The plugin runtime exceeded its time limit';
-
-  @override
-  String get pluginSandboxNotReady => 'The plugin sandbox is not ready yet';
-
-  @override
-  String pluginCallTimeoutDetailed(int seconds) {
-    return 'The plugin call timed out after ${seconds}s';
-  }
-
-  @override
-  String get pluginRuntimeCrashed => 'The plugin runtime crashed';
-
-  @override
-  String pluginFetchShimFailed(String message) {
-    return 'The fetch shim failed to load: $message';
-  }
-
-  @override
-  String pluginUnknownCall(String method) {
-    return 'Unknown plugin call: $method';
-  }
-
-  @override
-  String get pluginScriptMissing => 'The plugin script is missing';
-
-  @override
-  String pluginMemoryLimitExceeded(String limit) {
-    return 'The plugin used more than the limit of $limit and was terminated';
-  }
 
   @override
   String get ccmixterEmptyResponse => 'ccMixter returned an empty response';

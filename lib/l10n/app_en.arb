@@ -173,40 +173,9 @@
   "sourcesSubtitle": "Online catalogs, self-hosted services and scan folders",
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
-  "sourcesImportPlugin": "Import plugin",
   "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",
   "sourcesScanCompleted": "Scan finished",
-  "sourcesImportPluginTitle": "Import a music plugin",
-  "sourcesImportPluginMessage": "Plugins are third-party JavaScript. They run inside the app and can reach the network. Only import sources you trust. A plugin stays disabled until you give it a search keyword.",
-  "sourcesPluginUnreadable": "Could not read the plugin file",
-  "sourcesPluginTooLarge": "The plugin file cannot exceed 2 MB",
-  "sourcesPluginImportedEnabled": "Imported and enabled {name}",
-  "@sourcesPluginImportedEnabled": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImported": "Imported {name}. It joins the scan once you add a keyword and enable it.",
-  "@sourcesPluginImported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImportFailed": "Could not import the plugin: {error}",
-  "@sourcesPluginImportFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginActions": "Plugin actions",
   "sourcesConfigure": "Configure",
-  "sourcesDeletePlugin": "Delete plugin",
   "sourcesUnsupported": "This source is not supported in this version",
   "sourcesDisabled": "Off",
   "sourcesNeedsConfiguration": "Needs configuration",
@@ -242,15 +211,6 @@
   },
   "sourcesSkipped": "Skipped",
   "sourcesScanFailed": "Scan failed",
-  "sourcesDeletePluginTitle": "Delete the plugin?",
-  "sourcesDeletePluginMessage": "This deletes the script, the settings and the scanned songs of {name}.",
-  "@sourcesDeletePluginMessage": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "sourcesDeleted": "Deleted {name}",
   "@sourcesDeleted": {
     "placeholders": {
@@ -262,7 +222,7 @@
   "sourceKindLocal": "Local",
   "sourceKindOpenCatalog": "Open catalog",
   "sourceKindOpenApi": "API",
-  "sourceKindPlugin": "Plugin",
+  "sourceKindCustom": "Custom",
   "sourcesConfigureTitle": "Configure {name}",
   "@sourcesConfigureTitle": {
     "placeholders": {
@@ -307,35 +267,6 @@
   "fieldPassword": "Password",
   "fieldFormat": "Quality",
   "sourcesNotLoaded": "The source list is still loading",
-  "sourcesPlatformNoPlugin": "This platform does not support JavaScript plugins",
-  "sourcesUpdatePlugin": "Update plugin",
-  "sourcesPluginUpdated": "{name} was updated to {version}",
-  "@sourcesPluginUpdated": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpToDate": "{name} is already up to date",
-  "@sourcesPluginUpToDate": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpdateFailed": "Could not update the plugin: {error}",
-  "@sourcesPluginUpdateFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "playerLyrics": "Lyrics",
   "lyricsLoading": "Loading lyrics",
   "lyricsFailed": "Could not load the lyrics",
@@ -374,7 +305,7 @@
   "searchOnlineHint": "Search the online sources, e.g. jazz, piano, lo-fi",
   "searchOnlineDescription": "Search your enabled online sources. Results are not written to the library.",
   "searchOnlinePrompt": "Search the online sources",
-  "searchOnlinePromptDescription": "Type a keyword and press enter. Every enabled online source and every imported plugin are searched in parallel.",
+  "searchOnlinePromptDescription": "Type a keyword and press enter. Every enabled online source is searched in parallel.",
   "searchNoResults": "No results",
   "searchNoResultsDescription": "Try another keyword.",
   "searchNoMatch": "No matching songs",
@@ -510,14 +441,6 @@
       }
     }
   },
-  "sourceErrorPluginLoad": "Could not load the plugin: {message}",
-  "@sourceErrorPluginLoad": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "sourceErrorUnsupported": "This source is not supported yet",
   "sourceErrorScanInterval": "The last scan is less than {interval} ago",
   "@sourceErrorScanInterval": {
@@ -553,47 +476,6 @@
   },
   "localSourceHint": "Add a scan folder in the library settings",
   "localSourceNotConfigured": "No local music folder configured",
-  "pluginSourceHint": "Fill in a search keyword, e.g. an artist, piano or jazz",
-  "pluginFieldQueryHint": "e.g. an artist, piano, jazz",
-  "pluginImportedVersion": "Imported MusicFree plugin · v{version}",
-  "@pluginImportedVersion": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginVariable": "Plugin variable {key}",
-  "@pluginVariable": {
-    "placeholders": {
-      "key": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginFileMissing": "The plugin file is missing. Import it again.",
-  "pluginRuntimeUnsupported": "This platform does not support JavaScript music plugins. Import them on desktop or mobile.",
-  "pluginCompatLibrary": "Plugin compatibility library",
-  "pluginBridgeScript": "Plugin bridge script",
-  "pluginInit": "Plugin initialization",
-  "pluginScript": "Plugin script",
-  "pluginExports": "Plugin exports",
-  "pluginNoExports": "The plugin does not export a valid module.exports",
-  "pluginIncomplete": "The plugin is incomplete: it needs the platform and search methods",
-  "pluginNoMediaSource": "The plugin does not implement getMediaSource",
-  "pluginNoStream": "The plugin returned no playable address",
-  "pluginRuntimeClosed": "The plugin runtime is closed",
-  "pluginUnknownData": "The plugin returned data that could not be read",
-  "pluginCallError": "The plugin call failed",
-  "pluginNoStreamResults": "{count, plural, =1{The plugin returned 1 result, but no playable address} other{The plugin returned {count} results, but no playable address}}",
-  "@pluginNoStreamResults": {
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "format": "decimalPattern"
-      }
-    }
-  },
   "neteaseHint": "Enter the address of your own NeteaseCloudMusicApi, e.g. http://localhost:3000",
   "neteaseFieldApi": "API address",
   "neteaseFieldQueryHint": "e.g. trending, an artist",
@@ -627,79 +509,6 @@
   "downloadUnsupportedPlatform": "This platform has no file system, so downloads cannot be cached",
   "audioLoadFailed": "Audio loading failed",
   "audioPathEmpty": "The audio path is empty",
-  "pluginUpdateNoUrl": "The plugin has no download address, so it cannot be checked for updates",
-  "pluginStepFailed": "{label} failed: {error}",
-  "@pluginStepFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      },
-      "label": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesImportPluginFromUrl": "Import from URL",
-  "sourcesPluginUrlTitle": "Plugin URL",
-  "sourcesPluginUrlHint": "https://example.com/plugin.js",
-  "sourcesPluginUrlInvalid": "Please enter a valid http(s) link",
-  "pluginUrlInvalid": "The plugin address is invalid, please use an http or https link",
-  "pluginUrlEmpty": "The plugin script is empty",
-  "pluginUrlTooLarge": "The plugin script exceeds the size limit",
-  "pluginSandboxStartFailed": "The plugin sandbox failed to start: {error}",
-  "@pluginSandboxStartFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginSandboxStartTimeout": "The plugin sandbox timed out while starting",
-  "pluginScriptTooLarge": "The plugin script exceeds the limit of {limit} KB",
-  "@pluginScriptTooLarge": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginRuntimeTerminated": "The plugin runtime was terminated",
-  "pluginRuntimeTimeLimit": "The plugin runtime exceeded its time limit",
-  "pluginSandboxNotReady": "The plugin sandbox is not ready yet",
-  "pluginCallTimeoutDetailed": "The plugin call timed out after {seconds}s",
-  "@pluginCallTimeoutDetailed": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "pluginRuntimeCrashed": "The plugin runtime crashed",
-  "pluginFetchShimFailed": "The fetch shim failed to load: {message}",
-  "@pluginFetchShimFailed": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginUnknownCall": "Unknown plugin call: {method}",
-  "@pluginUnknownCall": {
-    "placeholders": {
-      "method": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginScriptMissing": "The plugin script is missing",
-  "pluginMemoryLimitExceeded": "The plugin used more than the limit of {limit} and was terminated",
-  "@pluginMemoryLimitExceeded": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
   "ccmixterEmptyResponse": "ccMixter returned an empty response",
   "ccmixterFieldQuery": "Search tag",
   "ccmixterFieldQueryHint": "e.g. jazz, ambient, electro",

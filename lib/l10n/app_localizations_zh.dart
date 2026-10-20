@@ -322,50 +322,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesAutoScanDescription => '所有已启用音源都会在启动后自动刷新，失败不会影响本地库。';
 
   @override
-  String get sourcesImportPlugin => '导入插件';
-
-  @override
   String get sourcesScanMayTakeSeconds => '含远程音源时可能需要数秒';
 
   @override
   String get sourcesScanCompleted => '扫描已完成';
 
   @override
-  String get sourcesImportPluginTitle => '导入音乐插件';
-
-  @override
-  String get sourcesImportPluginMessage =>
-      '插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。请只导入你信任的来源。导入后需要填写搜索关键词才会启用。';
-
-  @override
-  String get sourcesPluginUnreadable => '无法读取插件文件';
-
-  @override
-  String get sourcesPluginTooLarge => '插件文件不能超过 2 MB';
-
-  @override
-  String sourcesPluginImportedEnabled(String name) {
-    return '已导入并启用 $name';
-  }
-
-  @override
-  String sourcesPluginImported(String name) {
-    return '已导入 $name，填写关键词并开启后会参与扫描';
-  }
-
-  @override
-  String sourcesPluginImportFailed(String error) {
-    return '导入插件失败：$error';
-  }
-
-  @override
-  String get sourcesPluginActions => '插件操作';
-
-  @override
   String get sourcesConfigure => '配置';
-
-  @override
-  String get sourcesDeletePlugin => '删除插件';
 
   @override
   String get sourcesUnsupported => '当前版本不支持该音源';
@@ -408,14 +371,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesScanFailed => '扫描失败';
 
   @override
-  String get sourcesDeletePluginTitle => '删除插件？';
-
-  @override
-  String sourcesDeletePluginMessage(String name) {
-    return '将删除 $name 的脚本、配置以及已扫描的歌曲。';
-  }
-
-  @override
   String sourcesDeleted(String name) {
     return '已删除 $name';
   }
@@ -430,7 +385,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceKindOpenApi => 'API';
 
   @override
-  String get sourceKindPlugin => '插件';
+  String get sourceKindCustom => '自定义';
 
   @override
   String sourcesConfigureTitle(String name) {
@@ -497,27 +452,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourcesNotLoaded => '音源列表尚未加载完成';
-
-  @override
-  String get sourcesPlatformNoPlugin => '当前平台不支持 JavaScript 插件';
-
-  @override
-  String get sourcesUpdatePlugin => '更新插件';
-
-  @override
-  String sourcesPluginUpdated(String name, String version) {
-    return '$name 已更新到 $version';
-  }
-
-  @override
-  String sourcesPluginUpToDate(String name) {
-    return '$name 已是最新版本';
-  }
-
-  @override
-  String sourcesPluginUpdateFailed(String error) {
-    return '更新插件失败：$error';
-  }
 
   @override
   String get playerLyrics => '歌词';
@@ -616,8 +550,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchOnlinePrompt => '搜索在线音源';
 
   @override
-  String get searchOnlinePromptDescription =>
-      '输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。';
+  String get searchOnlinePromptDescription => '输入关键词后按回车；所有已启用的在线音源会并行搜索。';
 
   @override
   String get searchNoResults => '没有结果';
@@ -764,11 +697,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String sourceErrorPluginLoad(String message) {
-    return '插件加载失败：$message';
-  }
-
-  @override
   String get sourceErrorUnsupported => '暂不支持该音源';
 
   @override
@@ -796,73 +724,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get localSourceNotConfigured => '未配置本地音乐目录';
-
-  @override
-  String get pluginSourceHint => '填写一个搜索关键词，例如 周杰伦、piano 或 jazz';
-
-  @override
-  String get pluginFieldQueryHint => '例如 周杰伦、piano、jazz';
-
-  @override
-  String pluginImportedVersion(String version) {
-    return '导入的 MusicFree 插件 · v$version';
-  }
-
-  @override
-  String pluginVariable(String key) {
-    return '插件变量 $key';
-  }
-
-  @override
-  String get pluginFileMissing => '插件文件不存在，请重新导入';
-
-  @override
-  String get pluginRuntimeUnsupported => '当前平台不支持 JavaScript 音乐插件，请在桌面端或移动端导入';
-
-  @override
-  String get pluginCompatLibrary => '插件兼容库';
-
-  @override
-  String get pluginBridgeScript => '插件桥接脚本';
-
-  @override
-  String get pluginInit => '插件初始化';
-
-  @override
-  String get pluginScript => '插件脚本';
-
-  @override
-  String get pluginExports => '插件导出';
-
-  @override
-  String get pluginNoExports => '插件没有导出有效的 module.exports';
-
-  @override
-  String get pluginIncomplete => '插件不完整：需要 platform 和 search 方法';
-
-  @override
-  String get pluginNoMediaSource => '插件未实现 getMediaSource';
-
-  @override
-  String get pluginNoStream => '插件没有返回可播放地址';
-
-  @override
-  String get pluginRuntimeClosed => '插件运行时已关闭';
-
-  @override
-  String get pluginUnknownData => '插件返回了无法识别的数据';
-
-  @override
-  String get pluginCallError => '插件调用失败';
-
-  @override
-  String pluginNoStreamResults(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '插件返回了 $countString 个结果，但没有可播放地址';
-  }
 
   @override
   String get neteaseHint =>
@@ -965,83 +826,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get audioPathEmpty => '音频文件路径为空';
-
-  @override
-  String get pluginUpdateNoUrl => '该插件没有记录下载地址，无法检查更新';
-
-  @override
-  String pluginStepFailed(String error, String label) {
-    return '$label 失败：$error';
-  }
-
-  @override
-  String get sourcesImportPluginFromUrl => '从 URL 导入';
-
-  @override
-  String get sourcesPluginUrlTitle => '插件地址';
-
-  @override
-  String get sourcesPluginUrlHint => 'https://example.com/plugin.js';
-
-  @override
-  String get sourcesPluginUrlInvalid => '请输入有效的 http(s) 链接';
-
-  @override
-  String get pluginUrlInvalid => '插件地址无效，请使用 http 或 https 链接';
-
-  @override
-  String get pluginUrlEmpty => '插件脚本内容为空';
-
-  @override
-  String get pluginUrlTooLarge => '插件脚本超过大小限制';
-
-  @override
-  String pluginSandboxStartFailed(String error) {
-    return '插件沙箱启动失败：$error';
-  }
-
-  @override
-  String get pluginSandboxStartTimeout => '插件沙箱启动超时';
-
-  @override
-  String pluginScriptTooLarge(String limit) {
-    return '插件脚本超过 $limit KB 限制';
-  }
-
-  @override
-  String get pluginRuntimeTerminated => '插件运行时已终止';
-
-  @override
-  String get pluginRuntimeTimeLimit => '插件运行时已超过运行时间上限';
-
-  @override
-  String get pluginSandboxNotReady => '插件沙箱尚未就绪';
-
-  @override
-  String pluginCallTimeoutDetailed(int seconds) {
-    return '插件调用超时（${seconds}s）';
-  }
-
-  @override
-  String get pluginRuntimeCrashed => '插件运行时已崩溃';
-
-  @override
-  String pluginFetchShimFailed(String message) {
-    return 'fetch 兼容库加载失败：$message';
-  }
-
-  @override
-  String pluginUnknownCall(String method) {
-    return '未知的插件调用：$method';
-  }
-
-  @override
-  String get pluginScriptMissing => '插件脚本缺失';
-
-  @override
-  String pluginMemoryLimitExceeded(String limit) {
-    return '插件内存占用超过 $limit 限制，已终止';
-  }
 
   @override
   String get ccmixterEmptyResponse => 'ccMixter 返回了空响应';
@@ -1912,50 +1696,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesAutoScanDescription => '所有已启用音源都会在启动后自动刷新，失败不会影响本地库。';
 
   @override
-  String get sourcesImportPlugin => '导入插件';
-
-  @override
   String get sourcesScanMayTakeSeconds => '含远程音源时可能需要数秒';
 
   @override
   String get sourcesScanCompleted => '扫描已完成';
 
   @override
-  String get sourcesImportPluginTitle => '导入音乐插件';
-
-  @override
-  String get sourcesImportPluginMessage =>
-      '插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。请只导入你信任的来源。导入后需要填写搜索关键词才会启用。';
-
-  @override
-  String get sourcesPluginUnreadable => '无法读取插件文件';
-
-  @override
-  String get sourcesPluginTooLarge => '插件文件不能超过 2 MB';
-
-  @override
-  String sourcesPluginImportedEnabled(String name) {
-    return '已导入并启用 $name';
-  }
-
-  @override
-  String sourcesPluginImported(String name) {
-    return '已导入 $name，填写关键词并开启后会参与扫描';
-  }
-
-  @override
-  String sourcesPluginImportFailed(String error) {
-    return '导入插件失败：$error';
-  }
-
-  @override
-  String get sourcesPluginActions => '插件操作';
-
-  @override
   String get sourcesConfigure => '配置';
-
-  @override
-  String get sourcesDeletePlugin => '删除插件';
 
   @override
   String get sourcesUnsupported => '当前版本不支持该音源';
@@ -1998,14 +1745,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesScanFailed => '扫描失败';
 
   @override
-  String get sourcesDeletePluginTitle => '删除插件？';
-
-  @override
-  String sourcesDeletePluginMessage(String name) {
-    return '将删除 $name 的脚本、配置以及已扫描的歌曲。';
-  }
-
-  @override
   String sourcesDeleted(String name) {
     return '已删除 $name';
   }
@@ -2020,7 +1759,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceKindOpenApi => 'API';
 
   @override
-  String get sourceKindPlugin => '插件';
+  String get sourceKindCustom => '自定义';
 
   @override
   String sourcesConfigureTitle(String name) {
@@ -2087,27 +1826,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourcesNotLoaded => '音源列表尚未加载完成';
-
-  @override
-  String get sourcesPlatformNoPlugin => '当前平台不支持 JavaScript 插件';
-
-  @override
-  String get sourcesUpdatePlugin => '更新插件';
-
-  @override
-  String sourcesPluginUpdated(String name, String version) {
-    return '$name 已更新到 $version';
-  }
-
-  @override
-  String sourcesPluginUpToDate(String name) {
-    return '$name 已是最新版本';
-  }
-
-  @override
-  String sourcesPluginUpdateFailed(String error) {
-    return '更新插件失败：$error';
-  }
 
   @override
   String get playerLyrics => '歌词';
@@ -2206,8 +1924,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get searchOnlinePrompt => '搜索在线音源';
 
   @override
-  String get searchOnlinePromptDescription =>
-      '输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。';
+  String get searchOnlinePromptDescription => '输入关键词后按回车；所有已启用的在线音源会并行搜索。';
 
   @override
   String get searchNoResults => '没有结果';
@@ -2354,11 +2071,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String sourceErrorPluginLoad(String message) {
-    return '插件加载失败：$message';
-  }
-
-  @override
   String get sourceErrorUnsupported => '暂不支持该音源';
 
   @override
@@ -2386,73 +2098,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get localSourceNotConfigured => '未配置本地音乐目录';
-
-  @override
-  String get pluginSourceHint => '填写一个搜索关键词，例如 周杰伦、piano 或 jazz';
-
-  @override
-  String get pluginFieldQueryHint => '例如 周杰伦、piano、jazz';
-
-  @override
-  String pluginImportedVersion(String version) {
-    return '导入的 MusicFree 插件 · v$version';
-  }
-
-  @override
-  String pluginVariable(String key) {
-    return '插件变量 $key';
-  }
-
-  @override
-  String get pluginFileMissing => '插件文件不存在，请重新导入';
-
-  @override
-  String get pluginRuntimeUnsupported => '当前平台不支持 JavaScript 音乐插件，请在桌面端或移动端导入';
-
-  @override
-  String get pluginCompatLibrary => '插件兼容库';
-
-  @override
-  String get pluginBridgeScript => '插件桥接脚本';
-
-  @override
-  String get pluginInit => '插件初始化';
-
-  @override
-  String get pluginScript => '插件脚本';
-
-  @override
-  String get pluginExports => '插件导出';
-
-  @override
-  String get pluginNoExports => '插件没有导出有效的 module.exports';
-
-  @override
-  String get pluginIncomplete => '插件不完整：需要 platform 和 search 方法';
-
-  @override
-  String get pluginNoMediaSource => '插件未实现 getMediaSource';
-
-  @override
-  String get pluginNoStream => '插件没有返回可播放地址';
-
-  @override
-  String get pluginRuntimeClosed => '插件运行时已关闭';
-
-  @override
-  String get pluginUnknownData => '插件返回了无法识别的数据';
-
-  @override
-  String get pluginCallError => '插件调用失败';
-
-  @override
-  String pluginNoStreamResults(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '插件返回了 $countString 个结果，但没有可播放地址';
-  }
 
   @override
   String get neteaseHint =>
@@ -2555,83 +2200,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get audioPathEmpty => '音频文件路径为空';
-
-  @override
-  String get pluginUpdateNoUrl => '该插件没有记录下载地址，无法检查更新';
-
-  @override
-  String pluginStepFailed(String error, String label) {
-    return '$label 失败：$error';
-  }
-
-  @override
-  String get sourcesImportPluginFromUrl => '从 URL 导入';
-
-  @override
-  String get sourcesPluginUrlTitle => '插件地址';
-
-  @override
-  String get sourcesPluginUrlHint => 'https://example.com/plugin.js';
-
-  @override
-  String get sourcesPluginUrlInvalid => '请输入有效的 http(s) 链接';
-
-  @override
-  String get pluginUrlInvalid => '插件地址无效，请使用 http 或 https 链接';
-
-  @override
-  String get pluginUrlEmpty => '插件脚本内容为空';
-
-  @override
-  String get pluginUrlTooLarge => '插件脚本超过大小限制';
-
-  @override
-  String pluginSandboxStartFailed(String error) {
-    return '插件沙箱启动失败：$error';
-  }
-
-  @override
-  String get pluginSandboxStartTimeout => '插件沙箱启动超时';
-
-  @override
-  String pluginScriptTooLarge(String limit) {
-    return '插件脚本超过 $limit KB 限制';
-  }
-
-  @override
-  String get pluginRuntimeTerminated => '插件运行时已终止';
-
-  @override
-  String get pluginRuntimeTimeLimit => '插件运行时已超过运行时间上限';
-
-  @override
-  String get pluginSandboxNotReady => '插件沙箱尚未就绪';
-
-  @override
-  String pluginCallTimeoutDetailed(int seconds) {
-    return '插件调用超时（${seconds}s）';
-  }
-
-  @override
-  String get pluginRuntimeCrashed => '插件运行时已崩溃';
-
-  @override
-  String pluginFetchShimFailed(String message) {
-    return 'fetch 兼容库加载失败：$message';
-  }
-
-  @override
-  String pluginUnknownCall(String method) {
-    return '未知的插件调用：$method';
-  }
-
-  @override
-  String get pluginScriptMissing => '插件脚本缺失';
-
-  @override
-  String pluginMemoryLimitExceeded(String limit) {
-    return '插件内存占用超过 $limit 限制，已终止';
-  }
 
   @override
   String get ccmixterEmptyResponse => 'ccMixter 返回了空响应';
@@ -3502,50 +3070,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesAutoScanDescription => '所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。';
 
   @override
-  String get sourcesImportPlugin => '匯入外掛';
-
-  @override
   String get sourcesScanMayTakeSeconds => '含遠端音源時可能需要數秒';
 
   @override
   String get sourcesScanCompleted => '掃描已完成';
 
   @override
-  String get sourcesImportPluginTitle => '匯入音樂外掛';
-
-  @override
-  String get sourcesImportPluginMessage =>
-      '外掛是第三方 JavaScript 程式碼，會在應用程式內執行並可存取網路。請只匯入你信任的來源。匯入後需要填寫搜尋關鍵字才會啟用。';
-
-  @override
-  String get sourcesPluginUnreadable => '無法讀取外掛檔案';
-
-  @override
-  String get sourcesPluginTooLarge => '外掛檔案不能超過 2 MB';
-
-  @override
-  String sourcesPluginImportedEnabled(String name) {
-    return '已匯入並啟用 $name';
-  }
-
-  @override
-  String sourcesPluginImported(String name) {
-    return '已匯入 $name，填寫關鍵字並開啟後會參與掃描';
-  }
-
-  @override
-  String sourcesPluginImportFailed(String error) {
-    return '匯入外掛失敗：$error';
-  }
-
-  @override
-  String get sourcesPluginActions => '外掛操作';
-
-  @override
   String get sourcesConfigure => '設定';
-
-  @override
-  String get sourcesDeletePlugin => '刪除外掛';
 
   @override
   String get sourcesUnsupported => '目前版本不支援該音源';
@@ -3588,14 +3119,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesScanFailed => '掃描失敗';
 
   @override
-  String get sourcesDeletePluginTitle => '刪除外掛？';
-
-  @override
-  String sourcesDeletePluginMessage(String name) {
-    return '將刪除 $name 的指令碼、設定以及已掃描的歌曲。';
-  }
-
-  @override
   String sourcesDeleted(String name) {
     return '已刪除 $name';
   }
@@ -3610,7 +3133,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceKindOpenApi => 'API';
 
   @override
-  String get sourceKindPlugin => '外掛';
+  String get sourceKindCustom => '自訂';
 
   @override
   String sourcesConfigureTitle(String name) {
@@ -3677,27 +3200,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesNotLoaded => '音源列表尚未載入完成';
-
-  @override
-  String get sourcesPlatformNoPlugin => '目前平台不支援 JavaScript 外掛';
-
-  @override
-  String get sourcesUpdatePlugin => '更新外掛';
-
-  @override
-  String sourcesPluginUpdated(String name, String version) {
-    return '$name 已更新至 $version';
-  }
-
-  @override
-  String sourcesPluginUpToDate(String name) {
-    return '$name 已是最新版本';
-  }
-
-  @override
-  String sourcesPluginUpdateFailed(String error) {
-    return '更新外掛失敗：$error';
-  }
 
   @override
   String get playerLyrics => '歌詞';
@@ -3796,8 +3298,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get searchOnlinePrompt => '搜尋線上音源';
 
   @override
-  String get searchOnlinePromptDescription =>
-      '輸入關鍵字後按 Enter；所有已啟用的線上音源與已匯入的外掛會同時搜尋。';
+  String get searchOnlinePromptDescription => '輸入關鍵字後按 Enter；所有已啟用的線上音源會同時搜尋。';
 
   @override
   String get searchNoResults => '沒有結果';
@@ -3944,11 +3445,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String sourceErrorPluginLoad(String message) {
-    return '外掛載入失敗：$message';
-  }
-
-  @override
   String get sourceErrorUnsupported => '暫不支援該音源';
 
   @override
@@ -3976,73 +3472,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get localSourceNotConfigured => '未設定本機音樂目錄';
-
-  @override
-  String get pluginSourceHint => '填寫一個搜尋關鍵字，例如 周杰倫、piano 或 jazz';
-
-  @override
-  String get pluginFieldQueryHint => '例如 周杰倫、piano、jazz';
-
-  @override
-  String pluginImportedVersion(String version) {
-    return '匯入的 MusicFree 外掛 · v$version';
-  }
-
-  @override
-  String pluginVariable(String key) {
-    return '外掛變數 $key';
-  }
-
-  @override
-  String get pluginFileMissing => '外掛檔案不存在，請重新匯入';
-
-  @override
-  String get pluginRuntimeUnsupported => '目前平台不支援 JavaScript 音樂外掛，請在桌面端或行動端匯入';
-
-  @override
-  String get pluginCompatLibrary => '外掛相容函式庫';
-
-  @override
-  String get pluginBridgeScript => '外掛橋接指令碼';
-
-  @override
-  String get pluginInit => '外掛初始化';
-
-  @override
-  String get pluginScript => '外掛指令碼';
-
-  @override
-  String get pluginExports => '外掛匯出';
-
-  @override
-  String get pluginNoExports => '外掛沒有匯出有效的 module.exports';
-
-  @override
-  String get pluginIncomplete => '外掛不完整：需要 platform 和 search 方法';
-
-  @override
-  String get pluginNoMediaSource => '外掛未實作 getMediaSource';
-
-  @override
-  String get pluginNoStream => '外掛沒有回傳可播放網址';
-
-  @override
-  String get pluginRuntimeClosed => '外掛執行環境已關閉';
-
-  @override
-  String get pluginUnknownData => '外掛回傳了無法辨識的資料';
-
-  @override
-  String get pluginCallError => '外掛呼叫失敗';
-
-  @override
-  String pluginNoStreamResults(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '外掛回傳了 $countString 個結果，但沒有可播放網址';
-  }
 
   @override
   String get neteaseHint =>
@@ -4145,83 +3574,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get audioPathEmpty => '音訊檔案路徑為空';
-
-  @override
-  String get pluginUpdateNoUrl => '該外掛沒有記錄下載網址，無法檢查更新';
-
-  @override
-  String pluginStepFailed(String error, String label) {
-    return '$label 失敗：$error';
-  }
-
-  @override
-  String get sourcesImportPluginFromUrl => '從 URL 匯入';
-
-  @override
-  String get sourcesPluginUrlTitle => '外掛網址';
-
-  @override
-  String get sourcesPluginUrlHint => 'https://example.com/plugin.js';
-
-  @override
-  String get sourcesPluginUrlInvalid => '請輸入有效的 http(s) 連結';
-
-  @override
-  String get pluginUrlInvalid => '外掛網址無效，請使用 http 或 https 連結';
-
-  @override
-  String get pluginUrlEmpty => '外掛腳本內容為空';
-
-  @override
-  String get pluginUrlTooLarge => '外掛腳本超過大小限制';
-
-  @override
-  String pluginSandboxStartFailed(String error) {
-    return '外掛沙箱啟動失敗：$error';
-  }
-
-  @override
-  String get pluginSandboxStartTimeout => '外掛沙箱啟動逾時';
-
-  @override
-  String pluginScriptTooLarge(String limit) {
-    return '外掛腳本超過 $limit KB 限制';
-  }
-
-  @override
-  String get pluginRuntimeTerminated => '外掛執行環境已終止';
-
-  @override
-  String get pluginRuntimeTimeLimit => '外掛執行環境已超過執行時間上限';
-
-  @override
-  String get pluginSandboxNotReady => '外掛沙箱尚未就緒';
-
-  @override
-  String pluginCallTimeoutDetailed(int seconds) {
-    return '外掛呼叫逾時（${seconds}s）';
-  }
-
-  @override
-  String get pluginRuntimeCrashed => '外掛執行環境已崩潰';
-
-  @override
-  String pluginFetchShimFailed(String message) {
-    return 'fetch 相容函式庫載入失敗：$message';
-  }
-
-  @override
-  String pluginUnknownCall(String method) {
-    return '未知的外掛呼叫：$method';
-  }
-
-  @override
-  String get pluginScriptMissing => '外掛腳本缺失';
-
-  @override
-  String pluginMemoryLimitExceeded(String limit) {
-    return '外掛記憶體用量超過 $limit 限制，已終止';
-  }
 
   @override
   String get ccmixterEmptyResponse => 'ccMixter 回傳了空回應';

@@ -96,7 +96,6 @@ dependencies:
   # Linux audio backend for just_audio (media_kit + system libmpv).
   just_audio_media_kit: ^2.1.0
   media_kit_libs_linux: ^1.2.1
-  flutter_js: ^0.8.7
 
 dev_dependencies:
   flutter_test:

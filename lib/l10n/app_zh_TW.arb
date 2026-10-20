@@ -173,40 +173,9 @@
   "sourcesSubtitle": "線上曲庫、自建服務與掃描目錄",
   "sourcesAutoScan": "啟動時自動掃描",
   "sourcesAutoScanDescription": "所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。",
-  "sourcesImportPlugin": "匯入外掛",
   "sourcesScanMayTakeSeconds": "含遠端音源時可能需要數秒",
   "sourcesScanCompleted": "掃描已完成",
-  "sourcesImportPluginTitle": "匯入音樂外掛",
-  "sourcesImportPluginMessage": "外掛是第三方 JavaScript 程式碼，會在應用程式內執行並可存取網路。請只匯入你信任的來源。匯入後需要填寫搜尋關鍵字才會啟用。",
-  "sourcesPluginUnreadable": "無法讀取外掛檔案",
-  "sourcesPluginTooLarge": "外掛檔案不能超過 2 MB",
-  "sourcesPluginImportedEnabled": "已匯入並啟用 {name}",
-  "@sourcesPluginImportedEnabled": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImported": "已匯入 {name}，填寫關鍵字並開啟後會參與掃描",
-  "@sourcesPluginImported": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginImportFailed": "匯入外掛失敗：{error}",
-  "@sourcesPluginImportFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginActions": "外掛操作",
   "sourcesConfigure": "設定",
-  "sourcesDeletePlugin": "刪除外掛",
   "sourcesUnsupported": "目前版本不支援該音源",
   "sourcesDisabled": "已關閉",
   "sourcesNeedsConfiguration": "需要設定",
@@ -242,15 +211,6 @@
   },
   "sourcesSkipped": "已跳過",
   "sourcesScanFailed": "掃描失敗",
-  "sourcesDeletePluginTitle": "刪除外掛？",
-  "sourcesDeletePluginMessage": "將刪除 {name} 的指令碼、設定以及已掃描的歌曲。",
-  "@sourcesDeletePluginMessage": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "sourcesDeleted": "已刪除 {name}",
   "@sourcesDeleted": {
     "placeholders": {
@@ -262,7 +222,7 @@
   "sourceKindLocal": "本機",
   "sourceKindOpenCatalog": "開放曲庫",
   "sourceKindOpenApi": "API",
-  "sourceKindPlugin": "外掛",
+  "sourceKindCustom": "自訂",
   "sourcesConfigureTitle": "設定 {name}",
   "@sourcesConfigureTitle": {
     "placeholders": {
@@ -307,35 +267,6 @@
   "fieldPassword": "密碼",
   "fieldFormat": "音質",
   "sourcesNotLoaded": "音源列表尚未載入完成",
-  "sourcesPlatformNoPlugin": "目前平台不支援 JavaScript 外掛",
-  "sourcesUpdatePlugin": "更新外掛",
-  "sourcesPluginUpdated": "{name} 已更新至 {version}",
-  "@sourcesPluginUpdated": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpToDate": "{name} 已是最新版本",
-  "@sourcesPluginUpToDate": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesPluginUpdateFailed": "更新外掛失敗：{error}",
-  "@sourcesPluginUpdateFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "playerLyrics": "歌詞",
   "lyricsLoading": "正在載入歌詞",
   "lyricsFailed": "歌詞載入失敗",
@@ -374,7 +305,7 @@
   "searchOnlineHint": "搜尋線上音源，例如 jazz、鋼琴、lo-fi",
   "searchOnlineDescription": "搜尋已啟用的線上音源；結果不會寫入音樂庫",
   "searchOnlinePrompt": "搜尋線上音源",
-  "searchOnlinePromptDescription": "輸入關鍵字後按 Enter；所有已啟用的線上音源與已匯入的外掛會同時搜尋。",
+  "searchOnlinePromptDescription": "輸入關鍵字後按 Enter；所有已啟用的線上音源會同時搜尋。",
   "searchNoResults": "沒有結果",
   "searchNoResultsDescription": "換個關鍵字再試一次。",
   "searchNoMatch": "沒有找到符合的歌曲",
@@ -510,14 +441,6 @@
       }
     }
   },
-  "sourceErrorPluginLoad": "外掛載入失敗：{message}",
-  "@sourceErrorPluginLoad": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "sourceErrorUnsupported": "暫不支援該音源",
   "sourceErrorScanInterval": "距上次掃描不足 {interval}",
   "@sourceErrorScanInterval": {
@@ -553,47 +476,6 @@
   },
   "localSourceHint": "在音樂庫設定中新增掃描目錄",
   "localSourceNotConfigured": "未設定本機音樂目錄",
-  "pluginSourceHint": "填寫一個搜尋關鍵字，例如 周杰倫、piano 或 jazz",
-  "pluginFieldQueryHint": "例如 周杰倫、piano、jazz",
-  "pluginImportedVersion": "匯入的 MusicFree 外掛 · v{version}",
-  "@pluginImportedVersion": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginVariable": "外掛變數 {key}",
-  "@pluginVariable": {
-    "placeholders": {
-      "key": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginFileMissing": "外掛檔案不存在，請重新匯入",
-  "pluginRuntimeUnsupported": "目前平台不支援 JavaScript 音樂外掛，請在桌面端或行動端匯入",
-  "pluginCompatLibrary": "外掛相容函式庫",
-  "pluginBridgeScript": "外掛橋接指令碼",
-  "pluginInit": "外掛初始化",
-  "pluginScript": "外掛指令碼",
-  "pluginExports": "外掛匯出",
-  "pluginNoExports": "外掛沒有匯出有效的 module.exports",
-  "pluginIncomplete": "外掛不完整：需要 platform 和 search 方法",
-  "pluginNoMediaSource": "外掛未實作 getMediaSource",
-  "pluginNoStream": "外掛沒有回傳可播放網址",
-  "pluginRuntimeClosed": "外掛執行環境已關閉",
-  "pluginUnknownData": "外掛回傳了無法辨識的資料",
-  "pluginCallError": "外掛呼叫失敗",
-  "pluginNoStreamResults": "外掛回傳了 {count} 個結果，但沒有可播放網址",
-  "@pluginNoStreamResults": {
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "format": "decimalPattern"
-      }
-    }
-  },
   "neteaseHint": "填寫自建的 NeteaseCloudMusicApi 位址，例如 http://localhost:3000",
   "neteaseFieldApi": "API 位址",
   "neteaseFieldQueryHint": "例如 熱門、周杰倫",
@@ -627,79 +509,6 @@
   "downloadUnsupportedPlatform": "目前平台沒有檔案系統，無法待處下載",
   "audioLoadFailed": "音訊載入失敗",
   "audioPathEmpty": "音訊檔案路徑為空",
-  "pluginUpdateNoUrl": "該外掛沒有記錄下載網址，無法檢查更新",
-  "pluginStepFailed": "{label} 失敗：{error}",
-  "@pluginStepFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      },
-      "label": {
-        "type": "String"
-      }
-    }
-  },
-  "sourcesImportPluginFromUrl": "從 URL 匯入",
-  "sourcesPluginUrlTitle": "外掛網址",
-  "sourcesPluginUrlHint": "https://example.com/plugin.js",
-  "sourcesPluginUrlInvalid": "請輸入有效的 http(s) 連結",
-  "pluginUrlInvalid": "外掛網址無效，請使用 http 或 https 連結",
-  "pluginUrlEmpty": "外掛腳本內容為空",
-  "pluginUrlTooLarge": "外掛腳本超過大小限制",
-  "pluginSandboxStartFailed": "外掛沙箱啟動失敗：{error}",
-  "@pluginSandboxStartFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginSandboxStartTimeout": "外掛沙箱啟動逾時",
-  "pluginScriptTooLarge": "外掛腳本超過 {limit} KB 限制",
-  "@pluginScriptTooLarge": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginRuntimeTerminated": "外掛執行環境已終止",
-  "pluginRuntimeTimeLimit": "外掛執行環境已超過執行時間上限",
-  "pluginSandboxNotReady": "外掛沙箱尚未就緒",
-  "pluginCallTimeoutDetailed": "外掛呼叫逾時（{seconds}s）",
-  "@pluginCallTimeoutDetailed": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "pluginRuntimeCrashed": "外掛執行環境已崩潰",
-  "pluginFetchShimFailed": "fetch 相容函式庫載入失敗：{message}",
-  "@pluginFetchShimFailed": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginUnknownCall": "未知的外掛呼叫：{method}",
-  "@pluginUnknownCall": {
-    "placeholders": {
-      "method": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginScriptMissing": "外掛腳本缺失",
-  "pluginMemoryLimitExceeded": "外掛記憶體用量超過 {limit} 限制，已終止",
-  "@pluginMemoryLimitExceeded": {
-    "placeholders": {
-      "limit": {
-        "type": "String"
-      }
-    }
-  },
   "ccmixterEmptyResponse": "ccMixter 回傳了空回應",
   "ccmixterFieldQuery": "搜尋標籤",
   "ccmixterFieldQueryHint": "例如 jazz、ambient、electro",

@@ -12,7 +12,7 @@ extension MusicSourceKindLabel on MusicSourceKind {
       MusicSourceKind.localDirectory => strings.sourceKindLocal,
       MusicSourceKind.openCatalog => strings.sourceKindOpenCatalog,
       MusicSourceKind.openApi => strings.sourceKindOpenApi,
-      MusicSourceKind.plugin => strings.sourceKindPlugin,
+      MusicSourceKind.custom => strings.sourceKindCustom,
     };
   }
 }

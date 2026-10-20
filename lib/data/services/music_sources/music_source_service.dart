@@ -18,7 +18,6 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
-import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
@@ -34,7 +33,6 @@ import 'package:tune/utils/logger.dart';
 /// controller owns progress and state, while this class only orchestrates I/O.
 class MusicSourceService implements StreamUrlResolver {
   final MusicSourceStore _store;
-  final MusicPluginRepository _pluginRepository;
   final LyricsProvider _lyricsProvider;
   final Map<String, MusicSourceAdapter> _adapters;
 
@@ -42,26 +40,36 @@ class MusicSourceService implements StreamUrlResolver {
     required CrossPlatformMusicScanner scanner,
     required MusicSourceStore store,
     Dio? dio,
-    MusicPluginRepository? pluginRepository,
     LyricsProvider? lyricsProvider,
+    Map<String, MusicSourceAdapter>? adapters,
   }) : _store = store,
-       _pluginRepository = pluginRepository ?? MusicPluginRepository(),
        _lyricsProvider = lyricsProvider ?? LrclibLyricsProvider(dio: dio),
-       _adapters = {
-         'local': LocalDirectorySourceAdapter(scanner),
-         'openverse': OpenverseSourceAdapter(dio: dio),
-         'jamendo': JamendoSourceAdapter(dio: dio),
-         'internet_archive': InternetArchiveSourceAdapter(dio: dio),
-         'netease': NeteaseCloudMusicSourceAdapter(dio: dio),
-         'ccmixter': CcMixterSourceAdapter(dio: dio),
-         'itunes': ITunesSourceAdapter(dio: dio),
-         'podcast_rss': PodcastRssSourceAdapter(dio: dio),
-         'subsonic': SubsonicSourceAdapter(dio: dio),
-         'audius': AudiusSourceAdapter(dio: dio),
-         'radio': RadioSourceAdapter(dio: dio),
-         'wikimedia': WikimediaSourceAdapter(dio: dio),
-         'jellyfin': JellyfinSourceAdapter(dio: dio),
-       };
+       _adapters = adapters ?? _registryOf(scanner, dio);
+
+  /// The types the app serves out of the box.
+  ///
+  /// The registry is data, not code: a caller that serves other types hands
+  /// its own map in instead of this one.
+  static Map<String, MusicSourceAdapter> _registryOf(
+    CrossPlatformMusicScanner scanner,
+    Dio? dio,
+  ) {
+    return {
+      'local': LocalDirectorySourceAdapter(scanner),
+      'openverse': OpenverseSourceAdapter(dio: dio),
+      'jamendo': JamendoSourceAdapter(dio: dio),
+      'internet_archive': InternetArchiveSourceAdapter(dio: dio),
+      'netease': NeteaseCloudMusicSourceAdapter(dio: dio),
+      'ccmixter': CcMixterSourceAdapter(dio: dio),
+      'itunes': ITunesSourceAdapter(dio: dio),
+      'podcast_rss': PodcastRssSourceAdapter(dio: dio),
+      'subsonic': SubsonicSourceAdapter(dio: dio),
+      'audius': AudiusSourceAdapter(dio: dio),
+      'radio': RadioSourceAdapter(dio: dio),
+      'wikimedia': WikimediaSourceAdapter(dio: dio),
+      'jellyfin': JellyfinSourceAdapter(dio: dio),
+    };
+  }
 
   List<MusicSourceAdapter> get adapters => List.unmodifiable(_adapters.values);
 
@@ -72,7 +80,6 @@ class MusicSourceService implements StreamUrlResolver {
   bool supports(String sourceType) => _adapters.containsKey(sourceType);
 
   bool supportsConfig(MusicSourceConfig config) {
-    if (config.isPlugin) return _pluginRepository.supportsPlugins;
     return supports(config.sourceType);
   }
 
@@ -92,7 +99,6 @@ class MusicSourceService implements StreamUrlResolver {
   }
 
   List<MusicSourceField> fieldsFor(MusicSourceConfig config) {
-    if (config.isPlugin) return _pluginRepository.fieldsFor(config);
     final adapter = _adapters[config.sourceType];
     if (adapter == null) return const [];
     return [
@@ -119,21 +125,16 @@ class MusicSourceService implements StreamUrlResolver {
   }
 
   bool isConfigured(MusicSourceConfig config) {
-    if (config.isPlugin) return _pluginRepository.isConfigured(config);
     return _adapters[config.sourceType]?.isConfigured(config) ?? false;
   }
 
   String configurationHint(MusicSourceConfig config) {
-    if (config.isPlugin) return AppStrings.instance.pluginSourceHint;
     return _adapters[config.sourceType]?.configurationHint ??
         AppStrings.instance.sourceErrorUnsupported;
   }
 
   Future<MusicSourceAdapter?> _adapterFor(MusicSourceConfig config) async {
-    final builtIn = _adapters[config.sourceType];
-    if (builtIn != null) return builtIn;
-    if (config.isPlugin) return _pluginRepository.adapterFor(config);
-    return null;
+    return _adapters[config.sourceType];
   }
 
   /// Asks the owning source for a fresh address of [song].
@@ -224,11 +225,7 @@ class MusicSourceService implements StreamUrlResolver {
           return SourceScanResult(
             sourceId: config.id,
             status: SourceScanStatus.failed,
-            message: config.isPlugin
-                ? AppStrings.instance.sourceErrorPluginLoad(
-                    describeSourceError(error),
-                  )
-                : describeSourceError(error),
+            message: describeSourceError(error),
           );
         }
         if (adapter == null) {
@@ -311,11 +308,7 @@ class MusicSourceService implements StreamUrlResolver {
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.failed,
-        message: config.isPlugin
-            ? AppStrings.instance.sourceErrorPluginLoad(
-                describeSourceError(error),
-              )
-            : describeSourceError(error),
+        message: describeSourceError(error),
       );
     }
 
@@ -391,6 +384,4 @@ class MusicSourceService implements StreamUrlResolver {
     }
     return AppStrings.instance.intervalMinutes(interval.inMinutes);
   }
-
-  Future<void> dispose() => _pluginRepository.dispose();
 }

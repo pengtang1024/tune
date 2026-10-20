@@ -658,12 +658,6 @@ abstract class AppLocalizations {
   /// **'所有已启用音源都会在启动后自动刷新，失败不会影响本地库。'**
   String get sourcesAutoScanDescription;
 
-  /// No description provided for @sourcesImportPlugin.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'导入插件'**
-  String get sourcesImportPlugin;
-
   /// No description provided for @sourcesScanMayTakeSeconds.
   ///
   /// In zh_CN, this message translates to:
@@ -676,65 +670,11 @@ abstract class AppLocalizations {
   /// **'扫描已完成'**
   String get sourcesScanCompleted;
 
-  /// No description provided for @sourcesImportPluginTitle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'导入音乐插件'**
-  String get sourcesImportPluginTitle;
-
-  /// No description provided for @sourcesImportPluginMessage.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件是第三方 JavaScript 代码，会在应用内执行并可访问网络。请只导入你信任的来源。导入后需要填写搜索关键词才会启用。'**
-  String get sourcesImportPluginMessage;
-
-  /// No description provided for @sourcesPluginUnreadable.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'无法读取插件文件'**
-  String get sourcesPluginUnreadable;
-
-  /// No description provided for @sourcesPluginTooLarge.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件文件不能超过 2 MB'**
-  String get sourcesPluginTooLarge;
-
-  /// No description provided for @sourcesPluginImportedEnabled.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'已导入并启用 {name}'**
-  String sourcesPluginImportedEnabled(String name);
-
-  /// No description provided for @sourcesPluginImported.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'已导入 {name}，填写关键词并开启后会参与扫描'**
-  String sourcesPluginImported(String name);
-
-  /// No description provided for @sourcesPluginImportFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'导入插件失败：{error}'**
-  String sourcesPluginImportFailed(String error);
-
-  /// No description provided for @sourcesPluginActions.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件操作'**
-  String get sourcesPluginActions;
-
   /// No description provided for @sourcesConfigure.
   ///
   /// In zh_CN, this message translates to:
   /// **'配置'**
   String get sourcesConfigure;
-
-  /// No description provided for @sourcesDeletePlugin.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'删除插件'**
-  String get sourcesDeletePlugin;
 
   /// No description provided for @sourcesUnsupported.
   ///
@@ -796,18 +736,6 @@ abstract class AppLocalizations {
   /// **'扫描失败'**
   String get sourcesScanFailed;
 
-  /// No description provided for @sourcesDeletePluginTitle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'删除插件？'**
-  String get sourcesDeletePluginTitle;
-
-  /// No description provided for @sourcesDeletePluginMessage.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'将删除 {name} 的脚本、配置以及已扫描的歌曲。'**
-  String sourcesDeletePluginMessage(String name);
-
   /// No description provided for @sourcesDeleted.
   ///
   /// In zh_CN, this message translates to:
@@ -832,11 +760,11 @@ abstract class AppLocalizations {
   /// **'API'**
   String get sourceKindOpenApi;
 
-  /// No description provided for @sourceKindPlugin.
+  /// No description provided for @sourceKindCustom.
   ///
   /// In zh_CN, this message translates to:
-  /// **'插件'**
-  String get sourceKindPlugin;
+  /// **'自定义'**
+  String get sourceKindCustom;
 
   /// No description provided for @sourcesConfigureTitle.
   ///
@@ -957,36 +885,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'音源列表尚未加载完成'**
   String get sourcesNotLoaded;
-
-  /// No description provided for @sourcesPlatformNoPlugin.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'当前平台不支持 JavaScript 插件'**
-  String get sourcesPlatformNoPlugin;
-
-  /// No description provided for @sourcesUpdatePlugin.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'更新插件'**
-  String get sourcesUpdatePlugin;
-
-  /// No description provided for @sourcesPluginUpdated.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{name} 已更新到 {version}'**
-  String sourcesPluginUpdated(String name, String version);
-
-  /// No description provided for @sourcesPluginUpToDate.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{name} 已是最新版本'**
-  String sourcesPluginUpToDate(String name);
-
-  /// No description provided for @sourcesPluginUpdateFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'更新插件失败：{error}'**
-  String sourcesPluginUpdateFailed(String error);
 
   /// No description provided for @playerLyrics.
   ///
@@ -1171,7 +1069,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchOnlinePromptDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'输入关键词后按回车；所有已启用的在线音源与已导入插件会并行搜索。'**
+  /// **'输入关键词后按回车；所有已启用的在线音源会并行搜索。'**
   String get searchOnlinePromptDescription;
 
   /// No description provided for @searchNoResults.
@@ -1366,12 +1264,6 @@ abstract class AppLocalizations {
   /// **'网络请求失败：{message}'**
   String sourceErrorNetwork(String message);
 
-  /// No description provided for @sourceErrorPluginLoad.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件加载失败：{message}'**
-  String sourceErrorPluginLoad(String message);
-
   /// No description provided for @sourceErrorUnsupported.
   ///
   /// In zh_CN, this message translates to:
@@ -1413,120 +1305,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'未配置本地音乐目录'**
   String get localSourceNotConfigured;
-
-  /// No description provided for @pluginSourceHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'填写一个搜索关键词，例如 周杰伦、piano 或 jazz'**
-  String get pluginSourceHint;
-
-  /// No description provided for @pluginFieldQueryHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'例如 周杰伦、piano、jazz'**
-  String get pluginFieldQueryHint;
-
-  /// No description provided for @pluginImportedVersion.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'导入的 MusicFree 插件 · v{version}'**
-  String pluginImportedVersion(String version);
-
-  /// No description provided for @pluginVariable.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件变量 {key}'**
-  String pluginVariable(String key);
-
-  /// No description provided for @pluginFileMissing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件文件不存在，请重新导入'**
-  String get pluginFileMissing;
-
-  /// No description provided for @pluginRuntimeUnsupported.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'当前平台不支持 JavaScript 音乐插件，请在桌面端或移动端导入'**
-  String get pluginRuntimeUnsupported;
-
-  /// No description provided for @pluginCompatLibrary.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件兼容库'**
-  String get pluginCompatLibrary;
-
-  /// No description provided for @pluginBridgeScript.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件桥接脚本'**
-  String get pluginBridgeScript;
-
-  /// No description provided for @pluginInit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件初始化'**
-  String get pluginInit;
-
-  /// No description provided for @pluginScript.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件脚本'**
-  String get pluginScript;
-
-  /// No description provided for @pluginExports.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件导出'**
-  String get pluginExports;
-
-  /// No description provided for @pluginNoExports.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件没有导出有效的 module.exports'**
-  String get pluginNoExports;
-
-  /// No description provided for @pluginIncomplete.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件不完整：需要 platform 和 search 方法'**
-  String get pluginIncomplete;
-
-  /// No description provided for @pluginNoMediaSource.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件未实现 getMediaSource'**
-  String get pluginNoMediaSource;
-
-  /// No description provided for @pluginNoStream.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件没有返回可播放地址'**
-  String get pluginNoStream;
-
-  /// No description provided for @pluginRuntimeClosed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件运行时已关闭'**
-  String get pluginRuntimeClosed;
-
-  /// No description provided for @pluginUnknownData.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件返回了无法识别的数据'**
-  String get pluginUnknownData;
-
-  /// No description provided for @pluginCallError.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件调用失败'**
-  String get pluginCallError;
-
-  /// No description provided for @pluginNoStreamResults.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件返回了 {count} 个结果，但没有可播放地址'**
-  String pluginNoStreamResults(int count);
 
   /// No description provided for @neteaseHint.
   ///
@@ -1725,132 +1503,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'音频文件路径为空'**
   String get audioPathEmpty;
-
-  /// No description provided for @pluginUpdateNoUrl.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'该插件没有记录下载地址，无法检查更新'**
-  String get pluginUpdateNoUrl;
-
-  /// No description provided for @pluginStepFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{label} 失败：{error}'**
-  String pluginStepFailed(String error, String label);
-
-  /// No description provided for @sourcesImportPluginFromUrl.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'从 URL 导入'**
-  String get sourcesImportPluginFromUrl;
-
-  /// No description provided for @sourcesPluginUrlTitle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件地址'**
-  String get sourcesPluginUrlTitle;
-
-  /// No description provided for @sourcesPluginUrlHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'https://example.com/plugin.js'**
-  String get sourcesPluginUrlHint;
-
-  /// No description provided for @sourcesPluginUrlInvalid.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'请输入有效的 http(s) 链接'**
-  String get sourcesPluginUrlInvalid;
-
-  /// No description provided for @pluginUrlInvalid.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件地址无效，请使用 http 或 https 链接'**
-  String get pluginUrlInvalid;
-
-  /// No description provided for @pluginUrlEmpty.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件脚本内容为空'**
-  String get pluginUrlEmpty;
-
-  /// No description provided for @pluginUrlTooLarge.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件脚本超过大小限制'**
-  String get pluginUrlTooLarge;
-
-  /// No description provided for @pluginSandboxStartFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件沙箱启动失败：{error}'**
-  String pluginSandboxStartFailed(String error);
-
-  /// No description provided for @pluginSandboxStartTimeout.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件沙箱启动超时'**
-  String get pluginSandboxStartTimeout;
-
-  /// No description provided for @pluginScriptTooLarge.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件脚本超过 {limit} KB 限制'**
-  String pluginScriptTooLarge(String limit);
-
-  /// No description provided for @pluginRuntimeTerminated.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件运行时已终止'**
-  String get pluginRuntimeTerminated;
-
-  /// No description provided for @pluginRuntimeTimeLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件运行时已超过运行时间上限'**
-  String get pluginRuntimeTimeLimit;
-
-  /// No description provided for @pluginSandboxNotReady.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件沙箱尚未就绪'**
-  String get pluginSandboxNotReady;
-
-  /// No description provided for @pluginCallTimeoutDetailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件调用超时（{seconds}s）'**
-  String pluginCallTimeoutDetailed(int seconds);
-
-  /// No description provided for @pluginRuntimeCrashed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件运行时已崩溃'**
-  String get pluginRuntimeCrashed;
-
-  /// No description provided for @pluginFetchShimFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'fetch 兼容库加载失败：{message}'**
-  String pluginFetchShimFailed(String message);
-
-  /// No description provided for @pluginUnknownCall.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知的插件调用：{method}'**
-  String pluginUnknownCall(String method);
-
-  /// No description provided for @pluginScriptMissing.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件脚本缺失'**
-  String get pluginScriptMissing;
-
-  /// No description provided for @pluginMemoryLimitExceeded.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件内存占用超过 {limit} 限制，已终止'**
-  String pluginMemoryLimitExceeded(String limit);
 
   /// No description provided for @ccmixterEmptyResponse.
   ///

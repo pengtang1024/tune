@@ -31,7 +31,7 @@ IconData sourceIconOf(String type, MusicSourceKind kind) {
       MusicSourceKind.localDirectory => Icons.folder_rounded,
       MusicSourceKind.openCatalog => Icons.public_rounded,
       MusicSourceKind.openApi => Icons.api_rounded,
-      MusicSourceKind.plugin => Icons.extension_rounded,
+      MusicSourceKind.custom => Icons.extension_rounded,
     },
   };
 }
@@ -46,6 +46,6 @@ FactTone sourceToneOf(MusicSourceKind kind) {
     MusicSourceKind.localDirectory => FactTone.neutral,
     MusicSourceKind.openCatalog => FactTone.primary,
     MusicSourceKind.openApi => FactTone.secondary,
-    MusicSourceKind.plugin => FactTone.tertiary,
+    MusicSourceKind.custom => FactTone.tertiary,
   };
 }
