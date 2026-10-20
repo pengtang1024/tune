@@ -173,6 +173,29 @@
   "sourcesSubtitle": "Online catalogs, self-hosted services and scan folders",
   "sourcesGroupMore": "More sources",
   "sourcesGroupAdded": "Added by me",
+  "sourcesAdd": "Add source",
+  "sourcesAddChooseType": "Choose a source type",
+  "sourcesAddTitle": "Add {name}",
+  "@sourcesAddTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldName": "Name",
+  "sourcesFieldNameHint": "Leave empty to use the type name and a number",
+  "sourcesDelete": "Delete",
+  "sourcesDeleteTitle": "Delete \"{name}\"?",
+  "@sourcesDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleteHint": "The tracks this source brought in are removed with it.",
+  "sourcesMenu": "More actions",
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
   "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",

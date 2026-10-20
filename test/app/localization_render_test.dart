@@ -445,7 +445,11 @@ class FakeMusicSourcesController extends MusicSourcesController {
   Future<void> setEnabled(String sourceId, bool enabled) async {}
 
   @override
-  Future<void> updateSettings(String id, Map<String, String> settings) async {}
+  Future<void> updateSettings(
+    String id,
+    Map<String, String> settings, {
+    String? name,
+  }) async {}
 }
 
 /// The search results the test draws.

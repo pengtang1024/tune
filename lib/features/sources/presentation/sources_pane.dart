@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/sources/presentation/add_source_button.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/shared/ui/page_heading.dart';
 
@@ -28,6 +29,7 @@ class SourcesPane extends StatelessWidget {
               eyebrow: context.loc.sourcesEyebrow,
               title: context.loc.sourcesTitle,
               subtitle: context.loc.sourcesSubtitle,
+              trailing: const AddSourceButton(),
             ),
             const SizedBox(height: 24),
             const MusicSourcesSection(),

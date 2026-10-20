@@ -342,6 +342,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesGroupAdded => 'Added by me';
 
   @override
+  String get sourcesAdd => 'Add source';
+
+  @override
+  String get sourcesAddChooseType => 'Choose a source type';
+
+  @override
+  String sourcesAddTitle(String name) {
+    return 'Add $name';
+  }
+
+  @override
+  String get sourcesFieldName => 'Name';
+
+  @override
+  String get sourcesFieldNameHint =>
+      'Leave empty to use the type name and a number';
+
+  @override
+  String get sourcesDelete => 'Delete';
+
+  @override
+  String sourcesDeleteTitle(String name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get sourcesDeleteHint =>
+      'The tracks this source brought in are removed with it.';
+
+  @override
+  String get sourcesMenu => 'More actions';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

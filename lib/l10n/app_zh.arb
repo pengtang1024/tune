@@ -173,6 +173,29 @@
   "sourcesSubtitle": "在线曲库、自建服务与扫描目录",
   "sourcesGroupMore": "更多音源",
   "sourcesGroupAdded": "我添加的",
+  "sourcesAdd": "添加音源",
+  "sourcesAddChooseType": "选择音源类型",
+  "sourcesAddTitle": "添加 {name}",
+  "@sourcesAddTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldName": "名称",
+  "sourcesFieldNameHint": "留空则用类型名加序号",
+  "sourcesDelete": "删除",
+  "sourcesDeleteTitle": "删除「{name}」？",
+  "@sourcesDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleteHint": "这个音源带来的曲目也会一并移除。",
+  "sourcesMenu": "更多操作",
   "sourcesAutoScan": "启动时自动扫描",
   "sourcesAutoScanDescription": "所有已启用音源都会在启动后自动刷新，失败不会影响本地库。",
   "sourcesScanMayTakeSeconds": "含远程音源时可能需要数秒",

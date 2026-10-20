@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
+import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
@@ -23,7 +24,7 @@ List<MusicSourceConfig> localizedSources(
   AppLocalizations strings,
   List<MusicSourceConfig> sources,
 ) {
-  final catalogue = BuiltInMusicSources.catalogueOf(strings);
+  final catalogue = SourceTypeCatalogue.byType(strings);
   return sources
       .map((source) {
         final entry = catalogue[source.sourceType];
@@ -50,7 +51,7 @@ Map<String, SourceLabel> sourceLabelsOf(
   AppLocalizations strings,
   List<MusicSourceConfig> sources,
 ) {
-  final catalogue = BuiltInMusicSources.catalogueOf(strings);
+  final catalogue = SourceTypeCatalogue.byType(strings);
   return {
     for (final source in sources)
       source.id: SourceLabel(
@@ -100,13 +101,78 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
     return _update(sourceId, (config) => config.copyWith(enabled: enabled));
   }
 
-  Future<void> updateSettings(String sourceId, Map<String, String> settings) {
+  /// Saves what the reader filled into the form of an instance.
+  ///
+  /// The name is only written when the form shows it: a built-in source is
+  /// named by its type, so its name is not the reader's to change.
+  Future<void> updateSettings(
+    String sourceId,
+    Map<String, String> settings, {
+    String? name,
+  }) {
     return _update(
       sourceId,
       (config) => config.copyWith(
+        name: name ?? config.name,
         settings: Map.unmodifiable({...config.settings, ...settings}),
       ),
     );
+  }
+
+  /// Adds an instance of a type the reader picked.
+  ///
+  /// The instance gets the next free id of its type and is enabled right
+  /// away: the reader asked for it, so it should work.
+  Future<void> addInstance({
+    required String type,
+    required String name,
+    required Map<String, String> settings,
+  }) async {
+    if (_disposed || !state.hasValue) return;
+
+    final descriptor = SourceTypeCatalogue.byType(AppStrings.instance)[type];
+    if (descriptor == null) return;
+
+    final instance = newSourceInstance(
+      type: type,
+      typeName: descriptor.name,
+      name: name,
+      sources: _current.sources,
+    );
+
+    final config = MusicSourceConfig(
+      id: instance.id,
+      type: type,
+      name: instance.name,
+      kind: descriptor.kind,
+      enabled: true,
+      settings: Map.unmodifiable(settings),
+    );
+
+    final updated = List<MusicSourceConfig>.unmodifiable([
+      ..._current.sources,
+      config,
+    ]);
+    state = AsyncData(_current.copyWith(sources: updated));
+    await _save(updated);
+  }
+
+  /// Removes an instance the reader added.
+  ///
+  /// A built-in instance is never removed: it came with the app, so it can be
+  /// switched off but not deleted.
+  Future<void> removeInstance(String sourceId) async {
+    if (_disposed || !state.hasValue) return;
+
+    final current = _current.sources;
+    final matching = current.where((config) => config.id == sourceId);
+    if (matching.isEmpty || matching.first.builtIn) return;
+
+    final updated = List<MusicSourceConfig>.unmodifiable(
+      current.where((config) => config.id != sourceId),
+    );
+    state = AsyncData(_current.copyWith(sources: updated));
+    await _save(updated);
   }
 
   Future<void> _save(List<MusicSourceConfig> sources) async {

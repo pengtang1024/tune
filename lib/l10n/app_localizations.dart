@@ -658,6 +658,60 @@ abstract class AppLocalizations {
   /// **'我添加的'**
   String get sourcesGroupAdded;
 
+  /// No description provided for @sourcesAdd.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加音源'**
+  String get sourcesAdd;
+
+  /// No description provided for @sourcesAddChooseType.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择音源类型'**
+  String get sourcesAddChooseType;
+
+  /// No description provided for @sourcesAddTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'添加 {name}'**
+  String sourcesAddTitle(String name);
+
+  /// No description provided for @sourcesFieldName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'名称'**
+  String get sourcesFieldName;
+
+  /// No description provided for @sourcesFieldNameHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'留空则用类型名加序号'**
+  String get sourcesFieldNameHint;
+
+  /// No description provided for @sourcesDelete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除'**
+  String get sourcesDelete;
+
+  /// No description provided for @sourcesDeleteTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除「{name}」？'**
+  String sourcesDeleteTitle(String name);
+
+  /// No description provided for @sourcesDeleteHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个音源带来的曲目也会一并移除。'**
+  String get sourcesDeleteHint;
+
+  /// No description provided for @sourcesMenu.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多操作'**
+  String get sourcesMenu;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

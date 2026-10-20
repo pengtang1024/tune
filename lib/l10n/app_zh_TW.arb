@@ -173,6 +173,29 @@
   "sourcesSubtitle": "線上曲庫、自建服務與掃描目錄",
   "sourcesGroupMore": "更多音源",
   "sourcesGroupAdded": "我新增的",
+  "sourcesAdd": "新增音源",
+  "sourcesAddChooseType": "選擇音源類型",
+  "sourcesAddTitle": "新增 {name}",
+  "@sourcesAddTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesFieldName": "名稱",
+  "sourcesFieldNameHint": "留空則用類型名加序號",
+  "sourcesDelete": "刪除",
+  "sourcesDeleteTitle": "刪除「{name}」？",
+  "@sourcesDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesDeleteHint": "這個音源帶來的曲目也會一併移除。",
+  "sourcesMenu": "更多操作",
   "sourcesAutoScan": "啟動時自動掃描",
   "sourcesAutoScanDescription": "所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。",
   "sourcesScanMayTakeSeconds": "含遠端音源時可能需要數秒",

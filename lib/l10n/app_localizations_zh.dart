@@ -322,6 +322,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesGroupAdded => '我添加的';
 
   @override
+  String get sourcesAdd => '添加音源';
+
+  @override
+  String get sourcesAddChooseType => '选择音源类型';
+
+  @override
+  String sourcesAddTitle(String name) {
+    return '添加 $name';
+  }
+
+  @override
+  String get sourcesFieldName => '名称';
+
+  @override
+  String get sourcesFieldNameHint => '留空则用类型名加序号';
+
+  @override
+  String get sourcesDelete => '删除';
+
+  @override
+  String sourcesDeleteTitle(String name) {
+    return '删除「$name」？';
+  }
+
+  @override
+  String get sourcesDeleteHint => '这个音源带来的曲目也会一并移除。';
+
+  @override
+  String get sourcesMenu => '更多操作';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -1703,6 +1734,37 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesGroupAdded => '我添加的';
 
   @override
+  String get sourcesAdd => '添加音源';
+
+  @override
+  String get sourcesAddChooseType => '选择音源类型';
+
+  @override
+  String sourcesAddTitle(String name) {
+    return '添加 $name';
+  }
+
+  @override
+  String get sourcesFieldName => '名称';
+
+  @override
+  String get sourcesFieldNameHint => '留空则用类型名加序号';
+
+  @override
+  String get sourcesDelete => '删除';
+
+  @override
+  String sourcesDeleteTitle(String name) {
+    return '删除「$name」？';
+  }
+
+  @override
+  String get sourcesDeleteHint => '这个音源带来的曲目也会一并移除。';
+
+  @override
+  String get sourcesMenu => '更多操作';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3082,6 +3144,37 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesGroupAdded => '我新增的';
+
+  @override
+  String get sourcesAdd => '新增音源';
+
+  @override
+  String get sourcesAddChooseType => '選擇音源類型';
+
+  @override
+  String sourcesAddTitle(String name) {
+    return '新增 $name';
+  }
+
+  @override
+  String get sourcesFieldName => '名稱';
+
+  @override
+  String get sourcesFieldNameHint => '留空則用類型名加序號';
+
+  @override
+  String get sourcesDelete => '刪除';
+
+  @override
+  String sourcesDeleteTitle(String name) {
+    return '刪除「$name」？';
+  }
+
+  @override
+  String get sourcesDeleteHint => '這個音源帶來的曲目也會一併移除。';
+
+  @override
+  String get sourcesMenu => '更多操作';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

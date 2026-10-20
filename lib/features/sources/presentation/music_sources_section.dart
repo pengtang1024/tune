@@ -13,6 +13,8 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/presentation/source_form_dialog.dart';
+import 'package:tune/features/sources/presentation/source_menu_button.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
 import 'package:tune/shared/ui/source_mark.dart';
@@ -431,6 +433,8 @@ class _SourceTile extends ConsumerWidget {
               ],
             ),
           ),
+          if (!source.builtIn)
+            SourceMenuButton(source: source, enabled: !busy),
           if (fields.isNotEmpty && supported)
             SizedBox(
                 width: 28,
@@ -590,7 +594,7 @@ class _SourceTile extends ConsumerWidget {
     final saved = await showDialog<bool>(
       context: context,
       builder: (context) =>
-          _SourceSettingsDialog(source: source, fields: fields),
+          SourceFormDialog.edit(source: source, fields: fields),
     );
     return saved == true;
   }
@@ -608,171 +612,6 @@ class _SourceMark {
     required this.label,
     required this.tone,
   });
-}
-
-class _SourceSettingsDialog extends ConsumerStatefulWidget {
-  final MusicSourceConfig source;
-  final List<MusicSourceField> fields;
-
-  const _SourceSettingsDialog({required this.source, required this.fields});
-
-  @override
-  ConsumerState<_SourceSettingsDialog> createState() =>
-      _SourceSettingsDialogState();
-}
-
-class _SourceSettingsDialogState extends ConsumerState<_SourceSettingsDialog> {
-  late final Map<String, TextEditingController> _controllers;
-  final Map<String, String> _errors = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _controllers = {
-      for (final field in widget.fields)
-        field.key: TextEditingController(
-          text: widget.source.setting(field.key) ?? '',
-        ),
-    };
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(context.loc.sourcesConfigureTitle(widget.source.name)),
-      content: SizedBox(
-        width: 360,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final field in widget.fields) ...[
-                if (field.choices.isNotEmpty)
-                  _ChoiceField(
-                    field: field,
-                    value: _choiceValue(field),
-                    onChanged: (value) => _selectChoice(field, value),
-                  )
-                else
-                  TextField(
-                    controller: _controllers[field.key],
-                    obscureText: field.secret,
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      hintText: field.hint,
-                      errorText: _errors[field.key],
-                      isDense: true,
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: field.numeric
-                        ? const TextInputType.numberWithOptions(decimal: false)
-                        : TextInputType.text,
-                  ),
-                const SizedBox(height: 10),
-              ],
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(context.loc.cancel),
-        ),
-        FilledButton(onPressed: _save, child: Text(context.loc.save)),
-      ],
-    );
-  }
-
-  Future<void> _save() async {
-    _errors.clear();
-    final settings = <String, String>{};
-
-    for (final field in widget.fields) {
-      final value = field.choices.isEmpty
-          ? (_controllers[field.key]?.text.trim() ?? '')
-          : _choiceValue(field);
-      if (field.required && value.isEmpty) {
-        _errors[field.key] = context.loc.sourcesFieldRequired(field.label);
-      }
-      if (field.numeric && value.isNotEmpty && int.tryParse(value) == null) {
-        _errors[field.key] = context.loc.sourcesFieldNumeric;
-      }
-      settings[field.key] = value;
-    }
-
-    if (_errors.isNotEmpty) {
-      setState(() {});
-      return;
-    }
-
-    await ref
-        .read(musicSourcesControllerProvider.notifier)
-        .updateSettings(widget.source.id, settings);
-    if (!mounted) return;
-    Navigator.of(context).pop(true);
-  }
-
-  /// The value a setting of a fixed set of choices shows.
-  String _choiceValue(MusicSourceField field) {
-    final current = _controllers[field.key]?.text ?? '';
-    for (final choice in field.choices) {
-      if (choice.value == current) return current;
-    }
-    return field.choices.first.value;
-  }
-
-  /// Keeps the value of a choice in the controller of its field.
-  void _selectChoice(MusicSourceField field, String value) {
-    _controllers[field.key]?.text = value;
-    setState(() {});
-  }
-}
-
-/// A setting that only allows a fixed set of values.
-///
-/// The source declares the options, so the interface does not have to know
-/// which setting of which source it is showing.
-class _ChoiceField extends StatelessWidget {
-  const _ChoiceField({
-    required this.field,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final MusicSourceField field;
-  final String value;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isDense: true,
-      isExpanded: true,
-      decoration: InputDecoration(
-        labelText: field.label,
-        hintText: field.hint,
-        isDense: true,
-        border: const OutlineInputBorder(),
-      ),
-      items: [
-        for (final choice in field.choices)
-          DropdownMenuItem(value: choice.value, child: Text(choice.label)),
-      ],
-      onChanged: (selected) {
-        if (selected != null) onChanged(selected);
-      },
-    );
-  }
 }
 
 /// The time of the last scan, written the way the locale writes it.
