@@ -78,7 +78,13 @@ class QueuePane extends ConsumerWidget {
                   ),
                   buildDefaultDragHandles: false,
                   itemCount: queue.length,
-                  onReorder: controller.reorderQueue,
+                  onReorderItem: (oldIndex, newIndex) {
+                    // The list names the place without the moved track, so
+                    // the number goes back to the shape the controller
+                    // counts in.
+                    final drop = newIndex >= oldIndex ? newIndex + 1 : newIndex;
+                    controller.reorderQueue(oldIndex, drop);
+                  },
                   proxyDecorator: (child, index, animation) {
                     return Material(
                       elevation: 2,
