@@ -2235,6 +2235,108 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'SomaFM 没有返回电台列表'**
   String get radioNoChannelList;
+
+  /// No description provided for @trayPlayPause.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放 / 暂停'**
+  String get trayPlayPause;
+
+  /// No description provided for @trayPrevious.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'上一首'**
+  String get trayPrevious;
+
+  /// No description provided for @trayNext.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下一首'**
+  String get trayNext;
+
+  /// No description provided for @trayShowWindow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'显示主窗口'**
+  String get trayShowWindow;
+
+  /// No description provided for @trayQuit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'退出'**
+  String get trayQuit;
+
+  /// No description provided for @settingsSectionDesktop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'桌面'**
+  String get settingsSectionDesktop;
+
+  /// No description provided for @settingsDesktopTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'桌面集成'**
+  String get settingsDesktopTitle;
+
+  /// No description provided for @settingsDesktopDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'让 Tune 在后台继续播放，并成为默认的音频播放器'**
+  String get settingsDesktopDescription;
+
+  /// No description provided for @settingsCloseToTray.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭窗口时最小化到托盘'**
+  String get settingsCloseToTray;
+
+  /// No description provided for @settingsCloseToTrayHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关掉窗口后仍在托盘里继续播放'**
+  String get settingsCloseToTrayHint;
+
+  /// No description provided for @settingsMediaControls.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在系统媒体中心显示 Tune'**
+  String get settingsMediaControls;
+
+  /// No description provided for @settingsMediaControlsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'让媒体键和媒体菜单控制 Tune'**
+  String get settingsMediaControlsHint;
+
+  /// No description provided for @settingsSetDefaultPlayer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设为默认播放器'**
+  String get settingsSetDefaultPlayer;
+
+  /// No description provided for @settingsDefaultPlayerActive.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已是默认播放器'**
+  String get settingsDefaultPlayerActive;
+
+  /// No description provided for @settingsDefaultPlayerDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Tune 已经是默认播放器了'**
+  String get settingsDefaultPlayerDone;
+
+  /// No description provided for @settingsDefaultPlayerFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置失败，请先安装桌面项'**
+  String get settingsDefaultPlayerFailed;
+
+  /// No description provided for @settingsDefaultPlayerMissingEntry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有安装桌面项，先运行 linux/install-desktop-entry.sh'**
+  String get settingsDefaultPlayerMissingEntry;
 }
 
 class _AppLocalizationsDelegate

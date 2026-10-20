@@ -789,5 +789,22 @@
       }
     }
   },
-  "radioNoChannelList": "SomaFM 沒有回傳電台列表"
+  "radioNoChannelList": "SomaFM 沒有回傳電台列表",
+  "trayPlayPause": "播放 / 暫停",
+  "trayPrevious": "上一首",
+  "trayNext": "下一首",
+  "trayShowWindow": "顯示主視窗",
+  "trayQuit": "結束",
+  "settingsSectionDesktop": "桌面",
+  "settingsDesktopTitle": "桌面整合",
+  "settingsDesktopDescription": "讓 Tune 在背景繼續播放，並成為預設的音訊播放器",
+  "settingsCloseToTray": "關閉視窗時縮到系統匣",
+  "settingsCloseToTrayHint": "關掉視窗後仍在系統匣裡繼續播放",
+  "settingsMediaControls": "在系統媒體中心顯示 Tune",
+  "settingsMediaControlsHint": "讓媒體鍵與媒體選單控制 Tune",
+  "settingsSetDefaultPlayer": "設為預設播放器",
+  "settingsDefaultPlayerActive": "已是預設播放器",
+  "settingsDefaultPlayerDone": "Tune 已是預設播放器了",
+  "settingsDefaultPlayerFailed": "設定失敗，請先安裝桌面項目",
+  "settingsDefaultPlayerMissingEntry": "還沒有安裝桌面項目，先執行 linux/install-desktop-entry.sh"
 }

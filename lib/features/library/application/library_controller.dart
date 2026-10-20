@@ -211,6 +211,22 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     }
   }
 
+  /// Puts songs into the library.
+  ///
+  /// The files the desktop hands to the player belong in the library, so they
+  /// show up in the list like every other track.
+  Future<void> addSongs(List<Song> songs) async {
+    if (songs.isEmpty) return;
+    await future;
+    if (_disposed || !state.hasValue) return;
+
+    final merged = _dedupe([..._current.songs, ...songs]);
+    state = AsyncData(
+      _current.copyWith(songs: List<Song>.unmodifiable(merged)),
+    );
+    await _saveQuietly(merged);
+  }
+
   void setQuery(String query) {
     if (_disposed || !state.hasValue) return;
     state = AsyncData(_current.copyWith(query: query));

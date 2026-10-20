@@ -13,6 +13,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 - 按来源筛选音乐库，远程歌曲显示来源与封面
 - 浅色 / 深色 / 系统主题，扫描目录与音源配置持久化
 - 界面语言：简体中文、繁體中文、中文（通用）、English；切换语言后音源名、日期与数字格式一起跟随
+- Linux 桌面集成：系统托盘常驻（关窗口后继续播放）、MPRIS 系统媒体控制（键盘媒体键、`playerctl`）、可设为音频文件的默认程序
 - 900×600 默认窗口，最小 760×520
 
 ## 技术栈
@@ -27,8 +28,8 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 ```text
 lib/
 ├── app/                  # 应用入口、路由、主题、壳层
-├── features/             # player / library / queue / settings / sources
-├── data/services/        # 音频、扫描、音源适配器、持久化
+├── features/             # player / library / queue / settings / sources / desktop
+├── data/services/        # 音频、扫描、音源适配器、持久化、MPRIS、托盘
 ├── domain/models/        # Song、音源配置与扫描结果
 ├── shared/               # 通用 UI 与工具
 └── l10n/                 # 国际化资源

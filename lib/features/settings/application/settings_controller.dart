@@ -35,6 +35,9 @@ class SettingsController extends StateNotifier<SettingsState> {
           ),
           autoScanOnStartup:
               _persistence.getBool('auto_scan_on_startup') ?? true,
+          closeToTray: _persistence.getBool('close_to_tray') ?? true,
+          mediaControlsEnabled:
+              _persistence.getBool('media_controls_enabled') ?? true,
         ),
       );
 
@@ -66,6 +69,26 @@ class SettingsController extends StateNotifier<SettingsState> {
     state = state.copyWith(autoScanOnStartup: value);
     await _persistence.setBool('auto_scan_on_startup', value);
   }
+
+  /// Sets whether closing the window only hides it.
+  Future<void> setCloseToTray(bool value) async {
+    if (state.closeToTray == value) return;
+    state = state.copyWith(closeToTray: value);
+    await _persistence.setBool('close_to_tray', value);
+  }
+
+  /// Sets whether the player shows up in the media controls of the system.
+  Future<void> setMediaControlsEnabled(bool value) async {
+    if (state.mediaControlsEnabled == value) return;
+    state = state.copyWith(mediaControlsEnabled: value);
+    await _persistence.setBool('media_controls_enabled', value);
+  }
+
+  /// The preferences of the user right now.
+  ///
+  /// The state of a state holder is protected, so callers outside of the
+  /// controller read it through this door.
+  SettingsState get snapshot => state;
 
   Future<void> addScanPath(String path) async {
     final normalized = path.trim();

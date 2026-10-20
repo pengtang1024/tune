@@ -1,10 +1,11 @@
 [Desktop Entry]
 Name=Tune
 Comment=A local-first desktop music player
-Exec=tune
+Exec=tune %U
 Icon=cn.iouf.tune
 Type=Application
 Terminal=false
 StartupNotify=true
 StartupWMClass=cn.iouf.tune
 Categories=AudioVideo;Audio;Player;Music;
+MimeType=audio/mpeg;audio/mp3;audio/x-wav;audio/wav;audio/wave;audio/x-pn-wav;audio/flac;audio/x-flac;audio/ogg;audio/x-ogg;audio/opus;audio/mp4;audio/x-m4a;audio/aac;audio/x-aac;

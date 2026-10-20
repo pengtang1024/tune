@@ -16,6 +16,9 @@ lib/
 ├── shared/ui/                # 跨 feature 复用的 widget（不含业务状态）
 ├── core/                     # 通用能力：l10n、常量、扩展、窗口服务
 ├── data/services/            # 全局服务：播放、扫描、音源适配器、持久化
+│   ├── mpris/                # 系统媒体控制的接口与快照模型
+│   ├── tray/                 # 系统托盘的接口与菜单项模型
+│   └── desktop/              # 默认播放器、单实例、启动参数
 ├── domain/models/            # 全局实体：Song、MusicSourceConfig
 ├── l10n/                     # ARB 源文件 + gen-l10n 产物（产物入库）
 └── utils/                    # logger 等
@@ -49,6 +52,33 @@ presentation → application → domain
 - 状态只在 application 层修改；presentation 层只 `ref.watch` 读、`ref.read(...notifier)` 写。
 - 纯逻辑下沉到 domain，I/O 下沉到 `data/services`；service 不依赖 Riverpod——`MusicSourceService` 是范例：它只编排 I/O，状态由 controller 持有。
 - 播放副作用（统计、历史、通知）不写进 `PlaybackController` 的核心方法，由 app 级监听器订阅状态。
+
+## 桌面集成
+
+桌面相关的外部输入都汇到 `features/desktop/application`，它们是适配器，不持有播放状态。
+
+| 位置 | 职责 |
+| --- | --- |
+| `lib/features/desktop/application/desktop_integration_provider.dart` | 装配 controller，并跟随设置与语言的变化 |
+| `lib/features/desktop/application/desktop_integration_controller.dart` | 总装：起服务、订阅播放状态、把设置与语言的变化同步给托盘 |
+| `lib/features/desktop/application/desktop_window.dart` | 窗口的显示、隐藏与退出 |
+| `lib/features/desktop/application/mpris_state_mapper.dart` | 播放状态 → MPRIS 快照 |
+| `lib/features/desktop/application/tray_integration.dart` | 托盘菜单、提示与动作 |
+| `lib/features/desktop/application/playback_mpris_backend.dart` | MPRIS 命令 → `PlaybackController` 的动作 |
+| `lib/features/desktop/application/opened_files_handler.dart` | 桌面交来的文件 → 扫描 → 入库并播放 |
+| `lib/data/services/mpris/` | MPRIS 接口与快照模型（无平台依赖） |
+| `lib/data/services/impl/mpris/` | MPRIS 的 D-Bus 实现 |
+| `lib/data/services/tray/` | 托盘接口与菜单项模型 |
+| `lib/data/services/impl/tray/` | 托盘的 StatusNotifierItem + dbusmenu 实现 |
+| `lib/data/services/desktop/` | 默认播放器、单实例、启动参数、音频 MIME 列表 |
+| `lib/data/services/impl/desktop/` | 上面这些在 Linux 上的实现 |
+
+硬约束：
+
+- 播放状态仍只有 `PlaybackController` 一个来源；桌面集成只读它、只调它的公开动作。
+- service 不依赖 Riverpod，不 import `features/`；平台差异按 `*_io.dart` / `*_stub.dart` 成对实现。
+- MPRIS、托盘、单实例都走**会话总线**（`DBusClient.session()`），不是系统总线。
+- 详细的协议与验收见 [桌面集成方案](../需求/桌面集成方案.md)。
 
 ## 扩展路径
 

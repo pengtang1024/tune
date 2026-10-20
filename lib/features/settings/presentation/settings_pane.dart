@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/desktop/audio_mime_types.dart';
+import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
+import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -15,6 +18,18 @@ class SettingsPane extends ConsumerStatefulWidget {
 }
 
 class _SettingsPaneState extends ConsumerState<SettingsPane> {
+  /// Whether the desktop already opens audio files with Tune.
+  bool? _isDefaultPlayer;
+
+  /// Whether the desktop entry of Tune is in place.
+  bool _desktopEntryInstalled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDefaultPlayerState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsControllerProvider);
@@ -60,6 +75,19 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onRemoveFolder: settingsController.removeScanPath,
                   onScan: _scan,
                   onClear: libraryReady && !busy ? _clearLibrary : null,
+                ),
+                const SizedBox(height: 14),
+                SettingsDesktopCard(
+                  closeToTray: settings.closeToTray,
+                  mediaControlsEnabled: settings.mediaControlsEnabled,
+                  isDefaultPlayer: _isDefaultPlayer ?? false,
+                  desktopEntryInstalled: _desktopEntryInstalled,
+                  onCloseToTrayChanged: settingsController.setCloseToTray,
+                  onMediaControlsChanged: settingsController
+                      .setMediaControlsEnabled,
+                  onSetDefaultPlayer: _canSetDefaultPlayer
+                      ? _setDefaultPlayer
+                      : null,
                 ),
                 const SizedBox(height: 14),
                 SettingsAboutCard(version: AppVersion.version),
@@ -128,5 +156,50 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       ..showSnackBar(
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
+  }
+
+  /// Whether the desktop can name Tune as the default player.
+  bool get _canSetDefaultPlayer {
+    return ref.read(defaultPlayerServiceProvider).isSupported;
+  }
+
+  /// Reads whether the desktop already opens audio files with Tune.
+  Future<void> _loadDefaultPlayerState() async {
+    final service = ref.read(defaultPlayerServiceProvider);
+    if (!service.isSupported) return;
+
+    final installed = await service.isDesktopEntryInstalled();
+    if (!mounted) return;
+    setState(() => _desktopEntryInstalled = installed);
+    if (!installed) return;
+
+    final isDefault = await service.isDefaultHandler('audio/mpeg');
+    if (!mounted) return;
+    setState(() => _isDefaultPlayer = isDefault);
+  }
+
+  /// Makes Tune the program the desktop opens audio files with.
+  Future<void> _setDefaultPlayer() async {
+    final service = ref.read(defaultPlayerServiceProvider);
+
+    final installed = await service.isDesktopEntryInstalled();
+    if (!installed) {
+      if (!mounted) return;
+      _showMessage(context.loc.settingsDefaultPlayerFailed);
+      return;
+    }
+
+    var succeeded = true;
+    for (final mimeType in supportedAudioMimeTypes) {
+      succeeded = await service.makeDefaultHandler(mimeType) && succeeded;
+    }
+    if (!mounted) return;
+
+    setState(() => _isDefaultPlayer = succeeded);
+    _showMessage(
+      succeeded
+          ? context.loc.settingsDefaultPlayerDone
+          : context.loc.settingsDefaultPlayerFailed,
+    );
   }
 }

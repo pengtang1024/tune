@@ -12,6 +12,12 @@ class WindowManagerService with WindowListener {
   factory WindowManagerService() => _instance;
   WindowManagerService._();
 
+  /// What to do when the user closes the window.
+  ///
+  /// The desktop integration decides whether the window is only hidden, so the
+  /// service does not decide on its own.
+  static Future<void> Function()? _closeHandler;
+
   /// 初始化窗口管理器
   static Future<void> init() async {
     // 仅在桌面端初始化
@@ -84,10 +90,35 @@ class WindowManagerService with WindowListener {
 
   @override
   void onWindowClose() {
-    Log.info('窗口关闭');
+    final handler = _closeHandler;
+    if (handler == null) {
+      Log.info('窗口关闭');
+      return;
+    }
+    handler();
   }
 
   // ========== 公开 API ==========
+
+  /// Sets what happens when the user closes the window.
+  ///
+  /// The window stays open until the handler says otherwise, so the handler
+  /// has to hide the window or close it for good.
+  static void setCloseHandler(Future<void> Function()? handler) {
+    _closeHandler = handler;
+  }
+
+  /// Keeps the window from closing on its own.
+  static Future<void> setPreventClose(bool prevent) async {
+    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    await windowManager.setPreventClose(prevent);
+  }
+
+  /// Closes the window for good, which ends the app.
+  static Future<void> destroy() async {
+    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    await windowManager.destroy();
+  }
 
   /// 设置窗口大小
   static Future<void> setSize(Size size) async {

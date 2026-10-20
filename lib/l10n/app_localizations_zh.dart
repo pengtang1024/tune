@@ -1237,6 +1237,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radioNoChannelList => 'SomaFM 没有返回电台列表';
+
+  @override
+  String get trayPlayPause => '播放 / 暂停';
+
+  @override
+  String get trayPrevious => '上一首';
+
+  @override
+  String get trayNext => '下一首';
+
+  @override
+  String get trayShowWindow => '显示主窗口';
+
+  @override
+  String get trayQuit => '退出';
+
+  @override
+  String get settingsSectionDesktop => '桌面';
+
+  @override
+  String get settingsDesktopTitle => '桌面集成';
+
+  @override
+  String get settingsDesktopDescription => '让 Tune 在后台继续播放，并成为默认的音频播放器';
+
+  @override
+  String get settingsCloseToTray => '关闭窗口时最小化到托盘';
+
+  @override
+  String get settingsCloseToTrayHint => '关掉窗口后仍在托盘里继续播放';
+
+  @override
+  String get settingsMediaControls => '在系统媒体中心显示 Tune';
+
+  @override
+  String get settingsMediaControlsHint => '让媒体键和媒体菜单控制 Tune';
+
+  @override
+  String get settingsSetDefaultPlayer => '设为默认播放器';
+
+  @override
+  String get settingsDefaultPlayerActive => '已是默认播放器';
+
+  @override
+  String get settingsDefaultPlayerDone => 'Tune 已经是默认播放器了';
+
+  @override
+  String get settingsDefaultPlayerFailed => '设置失败，请先安装桌面项';
+
+  @override
+  String get settingsDefaultPlayerMissingEntry =>
+      '还没有安装桌面项，先运行 linux/install-desktop-entry.sh';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -2472,6 +2524,58 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get radioNoChannelList => 'SomaFM 没有返回电台列表';
+
+  @override
+  String get trayPlayPause => '播放 / 暂停';
+
+  @override
+  String get trayPrevious => '上一首';
+
+  @override
+  String get trayNext => '下一首';
+
+  @override
+  String get trayShowWindow => '显示主窗口';
+
+  @override
+  String get trayQuit => '退出';
+
+  @override
+  String get settingsSectionDesktop => '桌面';
+
+  @override
+  String get settingsDesktopTitle => '桌面集成';
+
+  @override
+  String get settingsDesktopDescription => '让 Tune 在后台继续播放，并成为默认的音频播放器';
+
+  @override
+  String get settingsCloseToTray => '关闭窗口时最小化到托盘';
+
+  @override
+  String get settingsCloseToTrayHint => '关掉窗口后仍在托盘里继续播放';
+
+  @override
+  String get settingsMediaControls => '在系统媒体中心显示 Tune';
+
+  @override
+  String get settingsMediaControlsHint => '让媒体键和媒体菜单控制 Tune';
+
+  @override
+  String get settingsSetDefaultPlayer => '设为默认播放器';
+
+  @override
+  String get settingsDefaultPlayerActive => '已是默认播放器';
+
+  @override
+  String get settingsDefaultPlayerDone => 'Tune 已经是默认播放器了';
+
+  @override
+  String get settingsDefaultPlayerFailed => '设置失败，请先安装桌面项';
+
+  @override
+  String get settingsDefaultPlayerMissingEntry =>
+      '还没有安装桌面项，先运行 linux/install-desktop-entry.sh';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -3707,4 +3811,56 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioNoChannelList => 'SomaFM 沒有回傳電台列表';
+
+  @override
+  String get trayPlayPause => '播放 / 暫停';
+
+  @override
+  String get trayPrevious => '上一首';
+
+  @override
+  String get trayNext => '下一首';
+
+  @override
+  String get trayShowWindow => '顯示主視窗';
+
+  @override
+  String get trayQuit => '結束';
+
+  @override
+  String get settingsSectionDesktop => '桌面';
+
+  @override
+  String get settingsDesktopTitle => '桌面整合';
+
+  @override
+  String get settingsDesktopDescription => '讓 Tune 在背景繼續播放，並成為預設的音訊播放器';
+
+  @override
+  String get settingsCloseToTray => '關閉視窗時縮到系統匣';
+
+  @override
+  String get settingsCloseToTrayHint => '關掉視窗後仍在系統匣裡繼續播放';
+
+  @override
+  String get settingsMediaControls => '在系統媒體中心顯示 Tune';
+
+  @override
+  String get settingsMediaControlsHint => '讓媒體鍵與媒體選單控制 Tune';
+
+  @override
+  String get settingsSetDefaultPlayer => '設為預設播放器';
+
+  @override
+  String get settingsDefaultPlayerActive => '已是預設播放器';
+
+  @override
+  String get settingsDefaultPlayerDone => 'Tune 已是預設播放器了';
+
+  @override
+  String get settingsDefaultPlayerFailed => '設定失敗，請先安裝桌面項目';
+
+  @override
+  String get settingsDefaultPlayerMissingEntry =>
+      '還沒有安裝桌面項目，先執行 linux/install-desktop-entry.sh';
 }

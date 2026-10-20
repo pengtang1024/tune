@@ -84,6 +84,12 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   /// the same handler, but only once.
   int? _failureHandledForRequest;
 
+  /// The state of the player right now.
+  ///
+  /// The state of a state holder is protected, so callers outside of the
+  /// controller read it through this door.
+  PlaybackState get snapshot => state;
+
   // ---------------------------------------------------------------------------
   // Audio event handlers
   // ---------------------------------------------------------------------------
@@ -245,6 +251,23 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
   }
 
+  /// Stops the playback but keeps the queue.
+  ///
+  /// The system media controls ask for a stop that only ends the sound; the
+  /// track stays in the queue so it can be started again.
+  Future<void> stop() async {
+    if (!state.hasTrack) return;
+    try {
+      await _audio.stop();
+      state = state.copyWith(
+        status: PlaybackStatus.paused,
+        position: Duration.zero,
+      );
+    } catch (error, stackTrace) {
+      _setError(AppStrings.instance.playbackPauseFailed('$error'), stackTrace);
+    }
+  }
+
   Future<void> resume() async {
     if (!state.hasTrack) return;
 
@@ -341,20 +364,29 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   }
 
   /// Switches to the next play mode.
+  void cyclePlayMode() {
+    final nextMode =
+        PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
+    setPlayMode(nextMode);
+  }
+
+  /// Sets how the queue plays.
   ///
   /// Switching to shuffle rearranges the queue once, so the list the user
   /// sees is the order that plays. Switching back restores the order the
   /// queue had before, unless the queue was edited in the meantime.
-  void cyclePlayMode() {
-    final nextMode =
-        PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
+  ///
+  /// The system media controls switch the random order and the repeat mode on
+  /// their own, so the mode is set directly instead of being cycled.
+  void setPlayMode(PlayMode mode) {
+    if (state.playMode == mode) return;
     var queue = state.queue;
-    if (nextMode == PlayMode.shuffle) {
+    if (mode == PlayMode.shuffle) {
       queue = _shuffledQueue();
     } else if (state.playMode == PlayMode.shuffle) {
       queue = _restoredQueue();
     }
-    state = state.copyWith(queue: queue, playMode: nextMode);
+    state = state.copyWith(queue: queue, playMode: mode);
   }
 
   // ---------------------------------------------------------------------------

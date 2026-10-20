@@ -51,6 +51,10 @@ dependencies:
   just_audio: ^0.10.4
   audio_session: ^0.2.3
 
+  # D-Bus, for the media controls and the system tray of the desktop.
+  # file_picker still asks for the 0.7 line, so 0.8 cannot come in yet.
+  dbus: ^0.7.15
+
   # State management
   riverpod: ^2.6.1
   flutter_riverpod: ^2.6.1

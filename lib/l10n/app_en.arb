@@ -789,5 +789,22 @@
       }
     }
   },
-  "radioNoChannelList": "SomaFM did not return a list of stations"
+  "radioNoChannelList": "SomaFM did not return a list of stations",
+  "trayPlayPause": "Play / Pause",
+  "trayPrevious": "Previous",
+  "trayNext": "Next",
+  "trayShowWindow": "Show window",
+  "trayQuit": "Quit",
+  "settingsSectionDesktop": "Desktop",
+  "settingsDesktopTitle": "Desktop integration",
+  "settingsDesktopDescription": "Keep Tune playing in the background and open audio files with it by default",
+  "settingsCloseToTray": "Minimize to the tray when the window closes",
+  "settingsCloseToTrayHint": "Keep playing in the tray after the window is closed",
+  "settingsMediaControls": "Show Tune in the system media controls",
+  "settingsMediaControlsHint": "Let the media keys and the media menu control Tune",
+  "settingsSetDefaultPlayer": "Set as default player",
+  "settingsDefaultPlayerActive": "Already the default player",
+  "settingsDefaultPlayerDone": "Tune is now the default player",
+  "settingsDefaultPlayerFailed": "Could not change it, install the desktop entry first",
+  "settingsDefaultPlayerMissingEntry": "The desktop entry is not installed yet, run linux/install-desktop-entry.sh"
 }

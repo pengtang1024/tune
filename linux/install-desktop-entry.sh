@@ -11,9 +11,12 @@ root="$(dirname "$here")"
 
 bundle="${1:-}"
 if [[ -z "$bundle" ]]; then
-  for candidate in "$root"/build/linux/x64/*/bundle; do
+  # 发布版优先：桌面上跑的就是发布版，不会和 flutter run 的调试版抢同一个目录。
+  for candidate in "$root"/build/linux/x64/release/bundle \
+                   "$root"/build/linux/x64/debug/bundle; do
     if [[ -d "$candidate/share/applications" ]]; then
       bundle="$candidate"
+      break
     fi
   done
 fi
@@ -32,7 +35,7 @@ binary="$(cd "$bundle" && pwd)/tune"
 for entry in "$data_home"/applications/*.desktop; do
   case "$(basename "$entry")" in
     *iouf.tune*)
-      sed -i "s|^Exec=.*|Exec=$binary|" "$entry"
+      sed -i "s|^Exec=.*|Exec=$binary %U|" "$entry"
       echo "装好了：$entry"
       ;;
   esac

@@ -1377,4 +1377,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioNoChannelList => 'SomaFM did not return a list of stations';
+
+  @override
+  String get trayPlayPause => 'Play / Pause';
+
+  @override
+  String get trayPrevious => 'Previous';
+
+  @override
+  String get trayNext => 'Next';
+
+  @override
+  String get trayShowWindow => 'Show window';
+
+  @override
+  String get trayQuit => 'Quit';
+
+  @override
+  String get settingsSectionDesktop => 'Desktop';
+
+  @override
+  String get settingsDesktopTitle => 'Desktop integration';
+
+  @override
+  String get settingsDesktopDescription =>
+      'Keep Tune playing in the background and open audio files with it by default';
+
+  @override
+  String get settingsCloseToTray =>
+      'Minimize to the tray when the window closes';
+
+  @override
+  String get settingsCloseToTrayHint =>
+      'Keep playing in the tray after the window is closed';
+
+  @override
+  String get settingsMediaControls => 'Show Tune in the system media controls';
+
+  @override
+  String get settingsMediaControlsHint =>
+      'Let the media keys and the media menu control Tune';
+
+  @override
+  String get settingsSetDefaultPlayer => 'Set as default player';
+
+  @override
+  String get settingsDefaultPlayerActive => 'Already the default player';
+
+  @override
+  String get settingsDefaultPlayerDone => 'Tune is now the default player';
+
+  @override
+  String get settingsDefaultPlayerFailed =>
+      'Could not change it, install the desktop entry first';
+
+  @override
+  String get settingsDefaultPlayerMissingEntry =>
+      'The desktop entry is not installed yet, run linux/install-desktop-entry.sh';
 }

@@ -30,6 +30,12 @@ const _outputDir = 'linux/runner/resources';
 /// 素材里的那份 256 图标，程序没有自带的图标时用它兜底。
 const _assetPath = 'assets/icons/app_icon_linux.png';
 
+/// 托盘图标的边长。面板会把它缩到自己的大小，原图给大一点才不糊。
+const _traySize = 64;
+
+/// 托盘图标的文件名，托盘直接把这份素材当像素图送过去。
+const _trayAssetPath = 'assets/icons/app_icon_tray.png';
+
 void main() {
   final source = img.decodePng(File(_sourcePath).readAsBytesSync());
   if (source == null) {
@@ -66,4 +72,14 @@ void main() {
       stdout.writeln('写出 $_assetPath');
     }
   }
+
+  // 托盘图标铺满画布：它不是主题图标，而是自己带着像素图送过去的。
+  final tray = img.copyResize(
+    source,
+    width: _traySize,
+    height: _traySize,
+    interpolation: img.Interpolation.average,
+  );
+  File(_trayAssetPath).writeAsBytesSync(img.encodePng(tray));
+  stdout.writeln('写出 $_trayAssetPath：$_traySize×$_traySize');
 }
