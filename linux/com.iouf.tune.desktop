@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Tune
+Comment=A local-first desktop music player
+Exec=tune
+Icon=com.iouf.tune
+Type=Application
+Terminal=false
+StartupNotify=true
+StartupWMClass=com.iouf.tune
+Categories=AudioVideo;Audio;Player;Music;

@@ -14,6 +14,35 @@ struct _TuneApplication {
 
 G_DEFINE_TYPE(TuneApplication, my_application, GTK_TYPE_APPLICATION)
 
+// The icon of the window, so the dock and the task switcher show Tune and
+// not the icon every other program shares.
+//
+// The icon is looked up next to the program, where the bundle keeps it, and
+// in the assets of the program, where it lives when the app runs from the
+// source tree.
+static void set_window_icon(GtkWindow* window) {
+  GdkPixbuf* icon = nullptr;
+
+  char* executable = g_file_read_link("/proc/self/exe", nullptr);
+  if (executable != nullptr) {
+    char* directory = g_path_get_dirname(executable);
+    g_free(executable);
+
+    char* path = g_build_filename(directory, "resources", "app_icon.png", nullptr);
+    g_free(directory);
+    icon = gdk_pixbuf_new_from_file(path, nullptr);
+    g_free(path);
+  }
+
+  if (icon == nullptr) {
+    icon = gdk_pixbuf_new_from_file("data/flutter_assets/assets/icons/app_icon.png", nullptr);
+  }
+
+  if (icon == nullptr) return;
+  gtk_window_set_icon(window, icon);
+  g_object_unref(icon);
+}
+
 // Implements GApplication::activate.
 static void my_application_activate(GApplication* application) {
   TuneApplication* self = MY_APPLICATION(application);
@@ -56,6 +85,10 @@ static void my_application_activate(GApplication* application) {
   gtk_window_set_geometry_hints(window, nullptr, &geometry, GDK_HINT_MIN_SIZE);
 
   gtk_widget_show(GTK_WIDGET(window));
+
+  // The icon goes on after the window is realized, so the dock really gets
+  // it and not only the program keeps it.
+  set_window_icon(window);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(project, self->dart_entrypoint_arguments);

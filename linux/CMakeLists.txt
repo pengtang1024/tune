@@ -90,9 +90,34 @@ install(CODE "
 
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+set(INSTALL_BUNDLE_RESOURCES_DIR "${CMAKE_INSTALL_PREFIX}/resources")
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
+
+# The icon of the window, next to the program, so the dock and the task
+# switcher show Tune instead of the icon every other program shares.
+install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon.png"
+  DESTINATION "${INSTALL_BUNDLE_RESOURCES_DIR}"
+  COMPONENT Runtime)
+
+# The desktop entry and the icon of the theme, so the program shows up in the
+# list of the applications with its own icon.
+install(FILES "${PROJECT_SOURCE_DIR}/com.iouf.tune.desktop"
+  DESTINATION "share/applications"
+  COMPONENT Runtime)
+
+install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon.png"
+  DESTINATION "share/icons/hicolor/256x256/apps"
+  RENAME "com.iouf.tune.png"
+  COMPONENT Runtime)
+
+foreach(icon_size 16 32 48 64 128)
+  install(FILES "${PROJECT_SOURCE_DIR}/runner/resources/app_icon_${icon_size}.png"
+    DESTINATION "share/icons/hicolor/${icon_size}x${icon_size}/apps"
+    RENAME "com.iouf.tune.png"
+    COMPONENT Runtime)
+endforeach()
 
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   COMPONENT Runtime)
