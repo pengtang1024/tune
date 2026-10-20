@@ -11,7 +11,6 @@
   "clear": "クリア",
   "close": "閉じる",
   "retry": "再試行",
-  "confirm": "確認",
   "chooseFile": "ファイルを選択",
   "unknownError": "不明なエラー",
   "scanNow": "今すぐスキャン",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "歌詞",
   "lyricsLoading": "歌詞を読み込んでいます",
-  "lyricsFailed": "歌詞を読み込めませんでした: {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "歌詞を読み込めませんでした",
   "lyricsMissing": "この曲には歌詞がありません",
   "settingsTitle": "設定",
   "settingsSubtitle": "外観と言語、ローカルライブラリを調整します。",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "プラグインが getMediaSource を実装していません",
   "pluginNoStream": "プラグインが再生可能なアドレスを返しませんでした",
   "pluginRuntimeClosed": "プラグインの実行環境が閉じました",
-  "pluginCallFailed": "{label} に失敗しました：{message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "プラグインの呼び出しがタイムアウトしました",
   "pluginUnknownData": "プラグインが読み取れないデータを返しました",
   "pluginCallError": "プラグインの呼び出しに失敗しました",
   "pluginNoMatch": "一致する曲が見つかりません",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "音声の読み込みに失敗しました",
   "audioPathEmpty": "音声のパスが空です",
   "pluginUpdateNoUrl": "プラグインにダウンロード元が記録されていないためアップデートを確認できません",
-  "sourcesPluginUrlDownloadFailed": "プラグインをダウンロードできませんでした: {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "{label} に失敗しました: {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "音質",
   "subsonicFieldFormatHint": "既定は元と同じ音質",
   "subsonicFormatOriginal": "元の音質",
-  "sourceRadioName": "インターネットラジオ"
+  "sourceRadioName": "インターネットラジオ",
+  "settingsEyebrow": "環境設定",
+  "settingsSectionInterface": "インターフェース",
+  "settingsSectionLibrary": "ライブラリ",
+  "settingsSectionAbout": "このアプリについて",
+  "settingsLocalFirst": "ローカル優先",
+  "libraryEyebrow": "コレクション",
+  "queueEyebrow": "キュー",
+  "sourcesEyebrow": "接続",
+  "sidebarCollect": "コレクション",
+  "sidebarConnect": "接続",
+  "sidebarLocalOnline": "ローカル + オンライン",
+  "sidebarVersionLine": "{name} デスクトップ版 · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "再生中",
+  "searchSourceError": "{source}：{message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM は电台リストを返しませんでした"
 }

@@ -15,7 +15,9 @@ import 'package:flutter_test/flutter_test.dart';
 ///   disappears from the interface,
 /// * no locale borrows the script of another one,
 /// * the interface itself carries no hardcoded text, so a new page cannot
-///   reintroduce a single language.
+///   reintroduce a single language,
+/// * the interface writes no text of a language of its own, so a new page
+///   cannot bring back a single English label.
 void main() {
   const arbDirectory = 'lib/l10n';
   const generatedCatalogue = 'lib/l10n/app_localizations.dart';
@@ -188,6 +190,126 @@ void main() {
       reason: 'hardcoded text in the interface:\n${offenders.join('\n')}',
     );
   });
+
+  test('the interface writes no text of its own language', () {
+    final offenders = <String>[];
+
+    for (final file in _interfaceFiles()) {
+      final lines = file.readAsLinesSync();
+      var insideLog = false;
+      for (var index = 0; index < lines.length; index++) {
+        final line = lines[index];
+        final trimmed = line.trim();
+
+        // A log message stays in the language of the developer, it never
+        // reaches the interface.
+        if (insideLog) {
+          if (trimmed.startsWith(')')) insideLog = false;
+          continue;
+        }
+        if (trimmed.startsWith('//')) continue;
+        if (_logCall.hasMatch(trimmed)) {
+          if (!_closesOnSameLine(trimmed)) insideLog = true;
+          continue;
+        }
+
+        final literal = _visibleLiteral(lines, index);
+        if (literal == null) continue;
+
+        final text = literal.replaceAll(_interpolation, '');
+        if (!_latinWord.hasMatch(text)) continue;
+        if (_properNames.contains(text.trim())) continue;
+
+        offenders.add('${file.path}:${index + 1} "$literal"');
+      }
+    }
+
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'hardcoded text in the interface:\n${offenders.join('\n')}',
+    );
+  });
+}
+
+/// The text of a widget that a reader can see.
+final _textWidget = RegExp(r'\b(?:Text|TextSpan)\s*\(\s*');
+
+/// The named arguments of a widget that a reader can see.
+final _namedSlot = RegExp(
+  r'\b(?:labelText|hintText|helperText|errorText|semanticLabel|tooltip|title|'
+  r'subtitle|eyebrow|label|hint|message|content|placeholder|description|text|'
+  r'name)\s*:\s*',
+);
+
+/// A string literal at the beginning of a text.
+final _leadingLiteral = RegExp(r"^'((?:[^'\\\n]|\\.)*)'");
+
+/// The part of a text that a variable fills in.
+final _interpolation = RegExp(r'\$(?:\{[^}]*\}|[A-Za-z_][A-Za-z0-9_.]*)');
+
+/// A word of the Latin script.
+final _latinWord = RegExp(r'[A-Za-z]{2,}');
+
+/// The names the app does not translate.
+///
+/// The app and the services it talks to carry a name of their own, so those
+/// names stay the same in every language.
+const _properNames = {
+  'Tune',
+  'TUNE',
+  'Openverse',
+  'Jamendo',
+  'Internet Archive',
+  'ccMixter',
+  'iTunes',
+  'Subsonic',
+  'Audius',
+  'Wikimedia Commons',
+  'Jellyfin',
+  'Radio Paradise Main',
+  'Radio Paradise Mellow',
+  'Radio Paradise Eclectic',
+  'Radio Paradise Rock',
+  'Radio Paradise World',
+};
+
+/// The text a reader can see at a line, if the line holds one.
+///
+/// Only the places a reader can see count: the argument of a text widget and
+/// the named argument of a widget. Everything else is a key of a map, an
+/// address or the name of a file.
+String? _visibleLiteral(List<String> lines, int index) {
+  final line = lines[index];
+
+  final widget = _textWidget.firstMatch(line);
+  if (widget != null) {
+    return _literalAfter(lines, index, line.substring(widget.end));
+  }
+
+  final slot = _namedSlot.firstMatch(line);
+  if (slot == null) return null;
+
+  // The slot has to be a named argument and not a word of an expression.
+  final before = line.substring(0, slot.start).trimRight();
+  if (before.isNotEmpty && !before.endsWith('(') && !before.endsWith(',')) {
+    return null;
+  }
+
+  return _literalAfter(lines, index, line.substring(slot.end));
+}
+
+/// The literal that follows a place, on the line or on the next one.
+String? _literalAfter(List<String> lines, int index, String tail) {
+  final literal = _leadingLiteral.firstMatch(tail);
+  if (literal != null) return literal.group(1);
+
+  // The text of a widget may stand on the next line.
+  if (tail.trim().isEmpty && index + 1 < lines.length) {
+    final next = _leadingLiteral.firstMatch(lines[index + 1].trimLeft());
+    if (next != null) return next.group(1);
+  }
+  return null;
 }
 
 /// The files whose text a user can read.

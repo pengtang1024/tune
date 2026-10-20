@@ -17,8 +17,8 @@ class SongCreator {
       final songData = <String, dynamic>{
         'id': filePath.hashCode,
         'title': metadata.title ?? fileName,
-        'artist': metadata.artist ?? 'Unknown Artist',
-        'album': metadata.album ?? 'Unknown Album',
+        'artist': metadata.artist ?? '',
+        'album': metadata.album ?? '',
         'duration': metadata.duration?.inMilliseconds ?? 0,
         'data': filePath,
         'uri': filePath,
@@ -57,8 +57,8 @@ class SongCreator {
     final songData = <String, dynamic>{
       'id': filePath.hashCode,
       'title': fileName,
-      'artist': 'Unknown Artist',
-      'album': 'Unknown Album',
+      'artist': '',
+      'album': '',
       'duration': 0,
       'uri': filePath,
       'dateAdded': DateTime.now().millisecondsSinceEpoch,

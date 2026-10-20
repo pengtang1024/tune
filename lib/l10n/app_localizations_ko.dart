@@ -42,9 +42,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get retry => '다시 시도';
 
   @override
-  String get confirm => '확인';
-
-  @override
   String get chooseFile => '파일 선택';
 
   @override
@@ -469,9 +466,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get lyricsLoading => '가산 로드를 불러오서다.';
 
   @override
-  String lyricsFailed(String error) {
-    return '가산 로드를 불러오지 못했습니다: $error';
-  }
+  String get lyricsFailed => '가사를 불러올 수 없습니다';
 
   @override
   String get lyricsMissing => '이 공에는 가산이 없어요.';
@@ -805,14 +800,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pluginRuntimeClosed => '플러그인 실행 환경이 종료되었습니다';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label 실패: $message';
-  }
-
-  @override
-  String get pluginCallTimeout => '플러그인 호출이 시간 초과되었습니다';
-
-  @override
   String get pluginUnknownData => '플러그인이 읽을 수 없는 데이터를 반환했습니다';
 
   @override
@@ -951,11 +938,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pluginUpdateNoUrl => '플러그인 다운로드 주소가 기록되어 있지 않아 업데이트를 확인할 수 없습니다.';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return '플러그인을 다운로드할 수 없습니다: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1344,4 +1326,53 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sourceRadioName => '인터넷 라디오';
+
+  @override
+  String get settingsEyebrow => '환경설정';
+
+  @override
+  String get settingsSectionInterface => '인터페이스';
+
+  @override
+  String get settingsSectionLibrary => '라이브러리';
+
+  @override
+  String get settingsSectionAbout => '정보';
+
+  @override
+  String get settingsLocalFirst => '로컬 우선';
+
+  @override
+  String get libraryEyebrow => '컬렉션';
+
+  @override
+  String get queueEyebrow => '대기열';
+
+  @override
+  String get sourcesEyebrow => '연결';
+
+  @override
+  String get sidebarCollect => '컬렉션';
+
+  @override
+  String get sidebarConnect => '연결';
+
+  @override
+  String get sidebarLocalOnline => '로컬 + 온라인';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name 데스크톱 · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => '재생 중';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source: $message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM이 방송 목록을 반환하지 않았습니다';
 }

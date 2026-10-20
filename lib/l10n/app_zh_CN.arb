@@ -11,7 +11,6 @@
   "clear": "清空",
   "close": "关闭",
   "retry": "重试",
-  "confirm": "确认",
   "chooseFile": "选择文件",
   "unknownError": "未知错误",
   "scanNow": "立即扫描",
@@ -98,7 +97,7 @@
   "nowPlayingUnnamedTrack": "未命名曲目",
   "nowPlayingLocalMusic": "本地音乐",
   "trackUnknownTitle": "未知歌曲",
-  "playbackFailed": "播放失败: {error}",
+  "playbackFailed": "播放失败：{error}",
   "@playbackFailed": {
     "placeholders": {
       "error": {
@@ -106,7 +105,7 @@
       }
     }
   },
-  "playbackPauseFailed": "暂停失败: {error}",
+  "playbackPauseFailed": "暂停失败：{error}",
   "@playbackPauseFailed": {
     "placeholders": {
       "error": {
@@ -114,7 +113,7 @@
       }
     }
   },
-  "playbackResumeFailed": "继续播放失败: {error}",
+  "playbackResumeFailed": "继续播放失败：{error}",
   "@playbackResumeFailed": {
     "placeholders": {
       "error": {
@@ -122,7 +121,7 @@
       }
     }
   },
-  "playbackSeekFailed": "跳转失败: {error}",
+  "playbackSeekFailed": "跳转失败：{error}",
   "@playbackSeekFailed": {
     "placeholders": {
       "error": {
@@ -130,7 +129,7 @@
       }
     }
   },
-  "playbackVolumeFailed": "设置音量失败: {error}",
+  "playbackVolumeFailed": "设置音量失败：{error}",
   "@playbackVolumeFailed": {
     "placeholders": {
       "error": {
@@ -138,7 +137,7 @@
       }
     }
   },
-  "playbackSpeedFailed": "设置速度失败: {error}",
+  "playbackSpeedFailed": "设置速度失败：{error}",
   "@playbackSpeedFailed": {
     "placeholders": {
       "error": {
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "歌词",
   "lyricsLoading": "正在加载歌词",
-  "lyricsFailed": "歌词加载失败：{error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "歌词加载失败",
   "lyricsMissing": "这首歌没有歌词",
   "settingsTitle": "设置",
   "settingsSubtitle": "调整外观、语言和本地音乐库。",
@@ -397,7 +389,7 @@
     }
   },
   "scanAllSourcesFailed": "所有音源扫描失败",
-  "scanFailed": "扫描失败: {error}",
+  "scanFailed": "扫描失败：{error}",
   "@scanFailed": {
     "placeholders": {
       "error": {
@@ -405,7 +397,7 @@
       }
     }
   },
-  "clearLibraryFailed": "清空音乐库失败: {error}",
+  "clearLibraryFailed": "清空音乐库失败：{error}",
   "@clearLibraryFailed": {
     "placeholders": {
       "error": {
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "插件未实现 getMediaSource",
   "pluginNoStream": "插件没有返回可播放地址",
   "pluginRuntimeClosed": "插件运行时已关闭",
-  "pluginCallFailed": "{label} 失败：{message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "插件调用超时",
   "pluginUnknownData": "插件返回了无法识别的数据",
   "pluginCallError": "插件调用失败",
   "pluginNoMatch": "没有找到匹配的歌曲",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "音频加载失败",
   "audioPathEmpty": "音频文件路径为空",
   "pluginUpdateNoUrl": "该插件没有记录下载地址，无法检查更新",
-  "sourcesPluginUrlDownloadFailed": "下载插件失败：{error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "{label} 失败：{error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "音质",
   "subsonicFieldFormatHint": "默认原始音质",
   "subsonicFormatOriginal": "原始音质",
-  "sourceRadioName": "网络电台"
+  "sourceRadioName": "网络电台",
+  "settingsEyebrow": "偏好",
+  "settingsSectionInterface": "界面",
+  "settingsSectionLibrary": "音乐库",
+  "settingsSectionAbout": "关于",
+  "settingsLocalFirst": "本地优先",
+  "libraryEyebrow": "收藏",
+  "queueEyebrow": "队列",
+  "sourcesEyebrow": "连接",
+  "sidebarCollect": "收藏",
+  "sidebarConnect": "连接",
+  "sidebarLocalOnline": "本地 + 在线",
+  "sidebarVersionLine": "{name} 桌面版 · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "正在播放",
+  "searchSourceError": "{source}：{message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM 没有返回电台列表"
 }

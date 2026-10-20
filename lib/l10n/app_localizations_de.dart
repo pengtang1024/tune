@@ -42,9 +42,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get retry => 'Erneut versuchen';
 
   @override
-  String get confirm => 'Bestätigen';
-
-  @override
   String get chooseFile => 'Datei wählen';
 
   @override
@@ -481,9 +478,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lyricsLoading => 'Liedtext wird geladen';
 
   @override
-  String lyricsFailed(String error) {
-    return 'Liedtext konnte nicht geladen werden: $error';
-  }
+  String get lyricsFailed => 'Songtext konnte nicht geladen werden';
 
   @override
   String get lyricsMissing => 'Dieses Lied hat keinen Liedtext';
@@ -837,14 +832,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Plugin-Laufzeitumgebung ist geschlossen';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label fehlgeschlagen: $message';
-  }
-
-  @override
-  String get pluginCallTimeout => 'Zeitüberschreitung beim Plugin-Aufruf';
-
-  @override
   String get pluginUnknownData => 'Das Plugin lieferte nicht lesbare Daten';
 
   @override
@@ -993,11 +980,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get pluginUpdateNoUrl =>
       'Das Plugin hat keine Download-Adresse, daher kann es nicht auf Aktualisierungen geprüft werden';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return 'Plugin konnte nicht geladen werden: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1415,4 +1397,54 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sourceRadioName => 'Internetradio';
+
+  @override
+  String get settingsEyebrow => 'Einstellungen';
+
+  @override
+  String get settingsSectionInterface => 'Oberfläche';
+
+  @override
+  String get settingsSectionLibrary => 'Bibliothek';
+
+  @override
+  String get settingsSectionAbout => 'Über';
+
+  @override
+  String get settingsLocalFirst => 'Lokal zuerst';
+
+  @override
+  String get libraryEyebrow => 'Sammlung';
+
+  @override
+  String get queueEyebrow => 'Warteschlange';
+
+  @override
+  String get sourcesEyebrow => 'Verbindungen';
+
+  @override
+  String get sidebarCollect => 'Sammeln';
+
+  @override
+  String get sidebarConnect => 'Verbinden';
+
+  @override
+  String get sidebarLocalOnline => 'Lokal + online';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name Desktop · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => 'Wird abgespielt';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source: $message';
+  }
+
+  @override
+  String get radioNoChannelList =>
+      'SomaFM hat keine Liste von Sendern geliefert';
 }

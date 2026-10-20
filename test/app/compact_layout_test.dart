@@ -374,8 +374,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('设置'), findsOneWidget);
-    expect(find.text('音乐库'), findsNWidgets(2));
+    // The page writes its title in the language of the interface, so the
+    // heading and the entry of the sidebar carry the same word.
+    expect(find.text('设置'), findsNWidgets(2));
+    expect(find.text('偏好'), findsOneWidget);
+    expect(find.text('音乐库'), findsNWidgets(3));
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {

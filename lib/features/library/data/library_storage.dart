@@ -31,7 +31,7 @@ class LibraryStorage {
 
       return decoded
           .whereType<Map<String, dynamic>>()
-          .map(Song.fromMap)
+          .map((entry) => Song.fromMap(withoutLegacyNames(entry)))
           .where((song) => song.uri.isNotEmpty)
           .toList(growable: false);
     } catch (error, stackTrace) {
@@ -52,4 +52,27 @@ class LibraryStorage {
       await file.delete();
     }
   }
+}
+
+/// The words an older version wrote when a file carried no name.
+///
+/// The library of an older version wrote these words instead of leaving the
+/// name empty, so a reader saw them in the language of that version. The
+/// interface writes a missing name in the language of the app now, so the old
+/// words are dropped when the library is read.
+const _legacyNames = {'Unknown Artist', 'Unknown Album'};
+
+/// A song without the words an older version wrote for a missing name.
+///
+/// The name of a file that carries no artist or no album is empty, and the
+/// interface writes the missing name in the language of the app.
+Map<String, dynamic> withoutLegacyNames(Map<String, dynamic> entry) {
+  final cleaned = Map<String, dynamic>.of(entry);
+  for (final field in const ['artist', 'album']) {
+    final value = cleaned[field];
+    if (value is String && _legacyNames.contains(value)) {
+      cleaned[field] = '';
+    }
+  }
+  return cleaned;
 }

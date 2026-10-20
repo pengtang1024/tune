@@ -67,9 +67,9 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
         icon: Icons.hourglass_empty_rounded,
       );
     }
-    if (lyrics.error != null) {
+    if (lyrics.failed) {
       return _Message(
-        text: context.loc.lyricsFailed(lyrics.error!),
+        text: context.loc.lyricsFailed,
         icon: Icons.error_outline_rounded,
       );
     }

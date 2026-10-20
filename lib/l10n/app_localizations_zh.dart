@@ -42,9 +42,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retry => '重试';
 
   @override
-  String get confirm => '确认';
-
-  @override
   String get chooseFile => '选择文件';
 
   @override
@@ -249,32 +246,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String playbackFailed(String error) {
-    return '播放失败: $error';
+    return '播放失败：$error';
   }
 
   @override
   String playbackPauseFailed(String error) {
-    return '暂停失败: $error';
+    return '暂停失败：$error';
   }
 
   @override
   String playbackResumeFailed(String error) {
-    return '继续播放失败: $error';
+    return '继续播放失败：$error';
   }
 
   @override
   String playbackSeekFailed(String error) {
-    return '跳转失败: $error';
+    return '跳转失败：$error';
   }
 
   @override
   String playbackVolumeFailed(String error) {
-    return '设置音量失败: $error';
+    return '设置音量失败：$error';
   }
 
   @override
   String playbackSpeedFailed(String error) {
-    return '设置速度失败: $error';
+    return '设置速度失败：$error';
   }
 
   @override
@@ -467,9 +464,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsLoading => '正在加载歌词';
 
   @override
-  String lyricsFailed(String error) {
-    return '歌词加载失败：$error';
-  }
+  String get lyricsFailed => '歌词加载失败';
 
   @override
   String get lyricsMissing => '这首歌没有歌词';
@@ -620,12 +615,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String scanFailed(String error) {
-    return '扫描失败: $error';
+    return '扫描失败：$error';
   }
 
   @override
   String clearLibraryFailed(String error) {
-    return '清空音乐库失败: $error';
+    return '清空音乐库失败：$error';
   }
 
   @override
@@ -799,14 +794,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pluginRuntimeClosed => '插件运行时已关闭';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label 失败：$message';
-  }
-
-  @override
-  String get pluginCallTimeout => '插件调用超时';
-
-  @override
   String get pluginUnknownData => '插件返回了无法识别的数据';
 
   @override
@@ -943,11 +930,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pluginUpdateNoUrl => '该插件没有记录下载地址，无法检查更新';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return '下载插件失败：$error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1333,6 +1315,55 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourceRadioName => '网络电台';
+
+  @override
+  String get settingsEyebrow => '偏好';
+
+  @override
+  String get settingsSectionInterface => '界面';
+
+  @override
+  String get settingsSectionLibrary => '音乐库';
+
+  @override
+  String get settingsSectionAbout => '关于';
+
+  @override
+  String get settingsLocalFirst => '本地优先';
+
+  @override
+  String get libraryEyebrow => '收藏';
+
+  @override
+  String get queueEyebrow => '队列';
+
+  @override
+  String get sourcesEyebrow => '连接';
+
+  @override
+  String get sidebarCollect => '收藏';
+
+  @override
+  String get sidebarConnect => '连接';
+
+  @override
+  String get sidebarLocalOnline => '本地 + 在线';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name 桌面版 · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => '正在播放';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source：$message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM 没有返回电台列表';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1373,9 +1404,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get retry => '重试';
 
   @override
-  String get confirm => '确认';
-
-  @override
   String get chooseFile => '选择文件';
 
   @override
@@ -1580,32 +1608,32 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String playbackFailed(String error) {
-    return '播放失败: $error';
+    return '播放失败：$error';
   }
 
   @override
   String playbackPauseFailed(String error) {
-    return '暂停失败: $error';
+    return '暂停失败：$error';
   }
 
   @override
   String playbackResumeFailed(String error) {
-    return '继续播放失败: $error';
+    return '继续播放失败：$error';
   }
 
   @override
   String playbackSeekFailed(String error) {
-    return '跳转失败: $error';
+    return '跳转失败：$error';
   }
 
   @override
   String playbackVolumeFailed(String error) {
-    return '设置音量失败: $error';
+    return '设置音量失败：$error';
   }
 
   @override
   String playbackSpeedFailed(String error) {
-    return '设置速度失败: $error';
+    return '设置速度失败：$error';
   }
 
   @override
@@ -1798,9 +1826,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsLoading => '正在加载歌词';
 
   @override
-  String lyricsFailed(String error) {
-    return '歌词加载失败：$error';
-  }
+  String get lyricsFailed => '歌词加载失败';
 
   @override
   String get lyricsMissing => '这首歌没有歌词';
@@ -1951,12 +1977,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String scanFailed(String error) {
-    return '扫描失败: $error';
+    return '扫描失败：$error';
   }
 
   @override
   String clearLibraryFailed(String error) {
-    return '清空音乐库失败: $error';
+    return '清空音乐库失败：$error';
   }
 
   @override
@@ -2130,14 +2156,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get pluginRuntimeClosed => '插件运行时已关闭';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label 失败：$message';
-  }
-
-  @override
-  String get pluginCallTimeout => '插件调用超时';
-
-  @override
   String get pluginUnknownData => '插件返回了无法识别的数据';
 
   @override
@@ -2274,11 +2292,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get pluginUpdateNoUrl => '该插件没有记录下载地址，无法检查更新';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return '下载插件失败：$error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -2664,6 +2677,55 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourceRadioName => '网络电台';
+
+  @override
+  String get settingsEyebrow => '偏好';
+
+  @override
+  String get settingsSectionInterface => '界面';
+
+  @override
+  String get settingsSectionLibrary => '音乐库';
+
+  @override
+  String get settingsSectionAbout => '关于';
+
+  @override
+  String get settingsLocalFirst => '本地优先';
+
+  @override
+  String get libraryEyebrow => '收藏';
+
+  @override
+  String get queueEyebrow => '队列';
+
+  @override
+  String get sourcesEyebrow => '连接';
+
+  @override
+  String get sidebarCollect => '收藏';
+
+  @override
+  String get sidebarConnect => '连接';
+
+  @override
+  String get sidebarLocalOnline => '本地 + 在线';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name 桌面版 · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => '正在播放';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source：$message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM 没有返回电台列表';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -2702,9 +2764,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get retry => '重試';
-
-  @override
-  String get confirm => '確認';
 
   @override
   String get chooseFile => '選擇檔案';
@@ -2911,32 +2970,32 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String playbackFailed(String error) {
-    return '播放失敗: $error';
+    return '播放失敗：$error';
   }
 
   @override
   String playbackPauseFailed(String error) {
-    return '暫停失敗: $error';
+    return '暫停失敗：$error';
   }
 
   @override
   String playbackResumeFailed(String error) {
-    return '繼續播放失敗: $error';
+    return '繼續播放失敗：$error';
   }
 
   @override
   String playbackSeekFailed(String error) {
-    return '跳轉失敗: $error';
+    return '跳轉失敗：$error';
   }
 
   @override
   String playbackVolumeFailed(String error) {
-    return '設定音量失敗: $error';
+    return '設定音量失敗：$error';
   }
 
   @override
   String playbackSpeedFailed(String error) {
-    return '設定速度失敗: $error';
+    return '設定速度失敗：$error';
   }
 
   @override
@@ -3129,9 +3188,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get lyricsLoading => '正在載入歌詞';
 
   @override
-  String lyricsFailed(String error) {
-    return '歌詞載入失敗：$error';
-  }
+  String get lyricsFailed => '歌詞載入失敗';
 
   @override
   String get lyricsMissing => '這首歌沒有歌詞';
@@ -3282,12 +3339,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String scanFailed(String error) {
-    return '掃描失敗: $error';
+    return '掃描失敗：$error';
   }
 
   @override
   String clearLibraryFailed(String error) {
-    return '清空音樂庫失敗: $error';
+    return '清空音樂庫失敗：$error';
   }
 
   @override
@@ -3461,14 +3518,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get pluginRuntimeClosed => '外掛執行環境已關閉';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label 失敗：$message';
-  }
-
-  @override
-  String get pluginCallTimeout => '外掛呼叫逾時';
-
-  @override
   String get pluginUnknownData => '外掛回傳了無法辨識的資料';
 
   @override
@@ -3605,11 +3654,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get pluginUpdateNoUrl => '該外掛沒有記錄下載網址，無法檢查更新';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return '下載外掛失敗：$error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -3995,4 +4039,53 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceRadioName => '網路電台';
+
+  @override
+  String get settingsEyebrow => '偏好';
+
+  @override
+  String get settingsSectionInterface => '介面';
+
+  @override
+  String get settingsSectionLibrary => '音樂庫';
+
+  @override
+  String get settingsSectionAbout => '關於';
+
+  @override
+  String get settingsLocalFirst => '本機優先';
+
+  @override
+  String get libraryEyebrow => '收藏';
+
+  @override
+  String get queueEyebrow => '佇列';
+
+  @override
+  String get sourcesEyebrow => '連線';
+
+  @override
+  String get sidebarCollect => '收藏';
+
+  @override
+  String get sidebarConnect => '連線';
+
+  @override
+  String get sidebarLocalOnline => '本機 + 線上';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name 桌面版 · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => '正在播放';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source：$message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM 沒有回傳電台列表';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
@@ -290,8 +291,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     // Sources that are disabled have no result, so their cached songs are
     // intentionally dropped from the active library.
-    return _dedupe(merged)
-      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    return _dedupe(merged)..sort((a, b) => compareText(a.title, b.title));
   }
 
   String _statusMessage({

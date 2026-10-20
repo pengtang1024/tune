@@ -29,6 +29,8 @@ class SourceChip extends StatelessWidget {
           ),
         ),
         child: Text(
+          // Dart writes the upper case of a letter the same way in every
+          // language, so the chip reads the same wherever the app runs.
           label.toUpperCase(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

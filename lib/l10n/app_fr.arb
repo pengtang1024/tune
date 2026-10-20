@@ -11,7 +11,6 @@
   "clear": "Vider",
   "close": "Fermer",
   "retry": "Réessayer",
-  "confirm": "Confirmer",
   "chooseFile": "Choisir un fichier",
   "unknownError": "Erreur inconnue",
   "scanNow": "Scanner maintenant",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "Paroles",
   "lyricsLoading": "Chargement des paroles",
-  "lyricsFailed": "Impossible de charger les paroles : {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "Impossible de charger les paroles",
   "lyricsMissing": "Cette chanson n’a pas de paroles",
   "settingsTitle": "Paramètres",
   "settingsSubtitle": "Ajustez l’apparence, la langue et la bibliothèque locale.",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "Le plugin n’implémente pas getMediaSource",
   "pluginNoStream": "Le plugin n’a renvoyé aucune adresse lisible",
   "pluginRuntimeClosed": "L’environnement du plugin est fermé",
-  "pluginCallFailed": "Échec de {label} : {message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "L’appel du plugin a expiré",
   "pluginUnknownData": "Le plugin a renvoyé des données illisibles",
   "pluginCallError": "Échec de l’appel du plugin",
   "pluginNoMatch": "Aucun titre correspondant",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "Échec du chargement de l’audio",
   "audioPathEmpty": "Le chemin du fichier audio est vide",
   "pluginUpdateNoUrl": "Le plugin n’a pas d’adresse de téléchargement, il ne peut pas vérifier les mises à jour",
-  "sourcesPluginUrlDownloadFailed": "Impossible de télécharger le plugin : {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "Échec de {label} : {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "Qualité",
   "subsonicFieldFormatHint": "Qualité d'origine par défaut",
   "subsonicFormatOriginal": "Qualité d'origine",
-  "sourceRadioName": "Radio internet"
+  "sourceRadioName": "Radio internet",
+  "settingsEyebrow": "Préférences",
+  "settingsSectionInterface": "Interface",
+  "settingsSectionLibrary": "Bibliothèque",
+  "settingsSectionAbout": "À propos",
+  "settingsLocalFirst": "Local d'abord",
+  "libraryEyebrow": "Collection",
+  "queueEyebrow": "File d'attente",
+  "sourcesEyebrow": "Connexions",
+  "sidebarCollect": "Collecter",
+  "sidebarConnect": "Connecter",
+  "sidebarLocalOnline": "Local + en ligne",
+  "sidebarVersionLine": "{name} bureau · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "En cours de lecture",
+  "searchSourceError": "{source} : {message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM n'a pas renvoyé de liste de stations"
 }

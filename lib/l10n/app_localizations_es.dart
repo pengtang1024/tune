@@ -42,9 +42,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retry => 'Reintentar';
 
   @override
-  String get confirm => 'Confirmar';
-
-  @override
   String get chooseFile => 'Elegir archivo';
 
   @override
@@ -481,9 +478,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get lyricsLoading => 'Cargando la letra';
 
   @override
-  String lyricsFailed(String error) {
-    return 'No se pudo cargar la letra: $error';
-  }
+  String get lyricsFailed => 'No se pudieron cargar las letras';
 
   @override
   String get lyricsMissing => 'Esta canción no tiene letra';
@@ -834,14 +829,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'El entorno de ejecución del plugin está cerrado';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label falló: $message';
-  }
-
-  @override
-  String get pluginCallTimeout => 'La llamada al plugin expiró';
-
-  @override
   String get pluginUnknownData => 'El plugin devolvió datos ilegibles';
 
   @override
@@ -991,11 +978,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get pluginUpdateNoUrl =>
       'El plugin no tiene dirección de descarga, así que no puede comprobarse';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return 'No se pudo descargar el plugin: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1414,4 +1396,53 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sourceRadioName => 'Radio por internet';
+
+  @override
+  String get settingsEyebrow => 'Preferencias';
+
+  @override
+  String get settingsSectionInterface => 'Interfaz';
+
+  @override
+  String get settingsSectionLibrary => 'Biblioteca';
+
+  @override
+  String get settingsSectionAbout => 'Acerca de';
+
+  @override
+  String get settingsLocalFirst => 'Local primero';
+
+  @override
+  String get libraryEyebrow => 'Colección';
+
+  @override
+  String get queueEyebrow => 'Cola';
+
+  @override
+  String get sourcesEyebrow => 'Conexiones';
+
+  @override
+  String get sidebarCollect => 'Coleccionar';
+
+  @override
+  String get sidebarConnect => 'Conectar';
+
+  @override
+  String get sidebarLocalOnline => 'Local + en línea';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name escritorio · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => 'Reproduciendo';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source: $message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM no devolvió una lista de emisoras';
 }

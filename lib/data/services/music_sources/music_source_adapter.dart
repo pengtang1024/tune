@@ -55,6 +55,19 @@ abstract class MusicSourceAdapter {
   }
 }
 
+/// A failure a source reports in the language of the interface.
+///
+/// The message is already written for the reader, so the failure is shown as
+/// it is instead of being wrapped in a frame of another language.
+class MusicSourceFailure implements Exception {
+  const MusicSourceFailure(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 SourceScanResult failedResult(String sourceId, Object error) {
   return SourceScanResult(
     sourceId: sourceId,
@@ -64,6 +77,7 @@ SourceScanResult failedResult(String sourceId, Object error) {
 }
 
 String describeSourceError(Object error) {
+  if (error is MusicSourceFailure) return error.message;
   if (error is DioException) {
     final status = error.response?.statusCode;
     if (status != null && (status == 401 || status == 403)) {

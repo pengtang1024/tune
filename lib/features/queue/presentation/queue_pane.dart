@@ -34,14 +34,21 @@ class QueuePane extends ConsumerWidget {
     final currentUri = view.$3;
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
-    final sourceNames = ref.watch(musicSourceNamesProvider);
+    final sourceNames = sourceNamesOf(
+      context.loc,
+      ref.watch(
+        musicSourcesControllerProvider.select(
+          (value) => value.valueOrNull?.sources ?? const [],
+        ),
+      ),
+    );
 
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
           child: PageHeading(
-            eyebrow: 'QUEUE',
+            eyebrow: context.loc.queueEyebrow,
             title: context.loc.queueTitle,
             subtitle: context.loc.queueSubtitle,
             trailing: _QueueActions(

@@ -70,7 +70,9 @@ class JustAudioPlayerService implements AudioPlayerService {
       if (_errorController.isClosed) return;
       _errorController.add(
         AudioPlayerError(
-          message: error.message ?? AppStrings.instance.audioLoadFailed,
+          // The message of the backend is written in the language of the
+          // backend, so the reader gets the one of the interface instead.
+          message: AppStrings.instance.audioLoadFailed,
           code: error.code,
         ),
       );

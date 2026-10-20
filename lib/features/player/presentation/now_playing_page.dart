@@ -37,7 +37,14 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     final theme = Theme.of(context);
     final state = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
-    final sourceNames = ref.watch(musicSourceNamesProvider);
+    final sourceNames = sourceNamesOf(
+      context.loc,
+      ref.watch(
+        musicSourcesControllerProvider.select(
+          (value) => value.valueOrNull?.sources ?? const [],
+        ),
+      ),
+    );
 
     return CallbackShortcuts(
       bindings: {
@@ -138,7 +145,7 @@ class _TopBar extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'NOW PLAYING',
+              context.loc.nowPlayingEyebrow,
               style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 9,
@@ -353,13 +360,30 @@ class _TrackDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final entries = _entries(context);
     if (entries.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
 
-    return Wrap(
-      spacing: 14,
-      runSpacing: 6,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final entry in entries)
-          _DetailItem(label: entry.$1, value: entry.$2),
+        Text(
+          context.loc.nowPlayingDetails,
+          style: TextStyle(
+            fontFamily: 'JetBrains Mono',
+            fontSize: 8.5,
+            letterSpacing: 1.4,
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 14,
+          runSpacing: 6,
+          children: [
+            for (final entry in entries)
+              _DetailItem(label: entry.$1, value: entry.$2),
+          ],
+        ),
       ],
     );
   }
@@ -553,29 +577,32 @@ class _LiveBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme.tertiary;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.podcasts_rounded, size: 11, color: color),
-          const SizedBox(width: 5),
-          Text(
-            context.loc.playerLiveBadge,
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 9,
-              letterSpacing: 0.8,
-              fontWeight: FontWeight.w600,
-              color: color,
+    return Tooltip(
+      message: context.loc.nowPlayingLiveStream,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.podcasts_rounded, size: 11, color: color),
+            const SizedBox(width: 5),
+            Text(
+              context.loc.playerLiveBadge,
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 9,
+                letterSpacing: 0.8,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

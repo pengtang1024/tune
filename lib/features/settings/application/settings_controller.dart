@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
@@ -49,6 +50,9 @@ class SettingsController extends StateNotifier<SettingsState> {
   Future<void> setLocale(Locale locale) async {
     if (state.locale == locale) return;
     state = state.copyWith(locale: locale);
+    // The string table follows the language right away, so a service that
+    // reads a translated text never answers in the language of before.
+    AppStrings.use(locale);
     await _persistence.setString('language_code', locale.languageCode);
     if (locale.countryCode == null) {
       await _persistence.remove('country_code');

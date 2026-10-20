@@ -43,7 +43,10 @@ class MusicSourcesSection extends ConsumerWidget {
     final scanning = library.scanning;
     final busy = scanning || library.loading;
 
-    final sources = sourcesAsync.valueOrNull?.sources ?? const [];
+    final sources = localizedSources(
+      context.loc,
+      sourcesAsync.valueOrNull?.sources ?? const <MusicSourceConfig>[],
+    );
     final lastScanAt =
         sourcesAsync.valueOrNull?.lastScanAt ?? const <String, DateTime>{};
     final sourceService = ref.watch(musicSourceServiceProvider);
@@ -925,14 +928,16 @@ IconData _icon(MusicSourceKind kind) {
 /// The time of the last scan, written the way the locale writes it.
 ///
 /// The clock and the day follow the language of the interface, so a reader
-/// never has to read a date of another language.
+/// never has to read a date of another language. The clock also follows the
+/// way the language counts the hours, so an English reader sees "9:05 PM"
+/// where a German reader sees "21:05".
 String _formatTime(BuildContext context, DateTime time) {
   final locale = Localizations.localeOf(context).toString();
   final now = DateTime.now();
   final sameDay =
       now.year == time.year && now.month == time.month && now.day == time.day;
 
-  final clock = DateFormat.Hm(locale).format(time);
+  final clock = DateFormat.jm(locale).format(time);
   if (sameDay) return clock;
-  return '${DateFormat.yMd(locale).format(time)} $clock';
+  return '${DateFormat.yMMMd(locale).format(time)} $clock';
 }

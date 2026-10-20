@@ -178,12 +178,6 @@ abstract class AppLocalizations {
   /// **'重试'**
   String get retry;
 
-  /// No description provided for @confirm.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'确认'**
-  String get confirm;
-
   /// No description provided for @chooseFile.
   ///
   /// In zh_CN, this message translates to:
@@ -565,37 +559,37 @@ abstract class AppLocalizations {
   /// No description provided for @playbackFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'播放失败: {error}'**
+  /// **'播放失败：{error}'**
   String playbackFailed(String error);
 
   /// No description provided for @playbackPauseFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'暂停失败: {error}'**
+  /// **'暂停失败：{error}'**
   String playbackPauseFailed(String error);
 
   /// No description provided for @playbackResumeFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'继续播放失败: {error}'**
+  /// **'继续播放失败：{error}'**
   String playbackResumeFailed(String error);
 
   /// No description provided for @playbackSeekFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'跳转失败: {error}'**
+  /// **'跳转失败：{error}'**
   String playbackSeekFailed(String error);
 
   /// No description provided for @playbackVolumeFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'设置音量失败: {error}'**
+  /// **'设置音量失败：{error}'**
   String playbackVolumeFailed(String error);
 
   /// No description provided for @playbackSpeedFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'设置速度失败: {error}'**
+  /// **'设置速度失败：{error}'**
   String playbackSpeedFailed(String error);
 
   /// No description provided for @audioSourceLocal.
@@ -913,8 +907,8 @@ abstract class AppLocalizations {
   /// No description provided for @lyricsFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'歌词加载失败：{error}'**
-  String lyricsFailed(String error);
+  /// **'歌词加载失败'**
+  String get lyricsFailed;
 
   /// No description provided for @lyricsMissing.
   ///
@@ -1171,13 +1165,13 @@ abstract class AppLocalizations {
   /// No description provided for @scanFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'扫描失败: {error}'**
+  /// **'扫描失败：{error}'**
   String scanFailed(String error);
 
   /// No description provided for @clearLibraryFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'清空音乐库失败: {error}'**
+  /// **'清空音乐库失败：{error}'**
   String clearLibraryFailed(String error);
 
   /// No description provided for @scanNoAudioFiles.
@@ -1419,18 +1413,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'插件运行时已关闭'**
   String get pluginRuntimeClosed;
-
-  /// No description provided for @pluginCallFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{label} 失败：{message}'**
-  String pluginCallFailed(String label, String message);
-
-  /// No description provided for @pluginCallTimeout.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'插件调用超时'**
-  String get pluginCallTimeout;
 
   /// No description provided for @pluginUnknownData.
   ///
@@ -1689,12 +1671,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'该插件没有记录下载地址，无法检查更新'**
   String get pluginUpdateNoUrl;
-
-  /// No description provided for @sourcesPluginUrlDownloadFailed.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'下载插件失败：{error}'**
-  String sourcesPluginUrlDownloadFailed(String error);
 
   /// No description provided for @pluginStepFailed.
   ///
@@ -2427,6 +2403,96 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'网络电台'**
   String get sourceRadioName;
+
+  /// No description provided for @settingsEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'偏好'**
+  String get settingsEyebrow;
+
+  /// No description provided for @settingsSectionInterface.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'界面'**
+  String get settingsSectionInterface;
+
+  /// No description provided for @settingsSectionLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库'**
+  String get settingsSectionLibrary;
+
+  /// No description provided for @settingsSectionAbout.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关于'**
+  String get settingsSectionAbout;
+
+  /// No description provided for @settingsLocalFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地优先'**
+  String get settingsLocalFirst;
+
+  /// No description provided for @libraryEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏'**
+  String get libraryEyebrow;
+
+  /// No description provided for @queueEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'队列'**
+  String get queueEyebrow;
+
+  /// No description provided for @sourcesEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接'**
+  String get sourcesEyebrow;
+
+  /// No description provided for @sidebarCollect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏'**
+  String get sidebarCollect;
+
+  /// No description provided for @sidebarConnect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接'**
+  String get sidebarConnect;
+
+  /// No description provided for @sidebarLocalOnline.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地 + 在线'**
+  String get sidebarLocalOnline;
+
+  /// No description provided for @sidebarVersionLine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{name} 桌面版 · {version}'**
+  String sidebarVersionLine(String name, String version);
+
+  /// No description provided for @nowPlayingEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放'**
+  String get nowPlayingEyebrow;
+
+  /// No description provided for @searchSourceError.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{source}：{message}'**
+  String searchSourceError(String source, String message);
+
+  /// No description provided for @radioNoChannelList.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'SomaFM 没有返回电台列表'**
+  String get radioNoChannelList;
 }
 
 class _AppLocalizationsDelegate

@@ -11,7 +11,6 @@
   "clear": "Leeren",
   "close": "Schließen",
   "retry": "Erneut versuchen",
-  "confirm": "Bestätigen",
   "chooseFile": "Datei wählen",
   "unknownError": "Unbekannter Fehler",
   "scanNow": "Jetzt scannen",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "Liedtext",
   "lyricsLoading": "Liedtext wird geladen",
-  "lyricsFailed": "Liedtext konnte nicht geladen werden: {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "Songtext konnte nicht geladen werden",
   "lyricsMissing": "Dieses Lied hat keinen Liedtext",
   "settingsTitle": "Einstellungen",
   "settingsSubtitle": "Darstellung, Sprache und lokale Bibliothek anpassen.",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "Das Plugin implementiert getMediaSource nicht",
   "pluginNoStream": "Das Plugin hat keine abspielbare Adresse geliefert",
   "pluginRuntimeClosed": "Die Plugin-Laufzeitumgebung ist geschlossen",
-  "pluginCallFailed": "{label} fehlgeschlagen: {message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "Zeitüberschreitung beim Plugin-Aufruf",
   "pluginUnknownData": "Das Plugin lieferte nicht lesbare Daten",
   "pluginCallError": "Der Plugin-Aufruf ist fehlgeschlagen",
   "pluginNoMatch": "Keine passenden Titel",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "Audio konnte nicht geladen werden",
   "audioPathEmpty": "Der Audiopfad ist leer",
   "pluginUpdateNoUrl": "Das Plugin hat keine Download-Adresse, daher kann es nicht auf Aktualisierungen geprüft werden",
-  "sourcesPluginUrlDownloadFailed": "Plugin konnte nicht geladen werden: {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "{label} fehlgeschlagen: {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "Qualität",
   "subsonicFieldFormatHint": "Standard: Originalqualität",
   "subsonicFormatOriginal": "Originalqualität",
-  "sourceRadioName": "Internetradio"
+  "sourceRadioName": "Internetradio",
+  "settingsEyebrow": "Einstellungen",
+  "settingsSectionInterface": "Oberfläche",
+  "settingsSectionLibrary": "Bibliothek",
+  "settingsSectionAbout": "Über",
+  "settingsLocalFirst": "Lokal zuerst",
+  "libraryEyebrow": "Sammlung",
+  "queueEyebrow": "Warteschlange",
+  "sourcesEyebrow": "Verbindungen",
+  "sidebarCollect": "Sammeln",
+  "sidebarConnect": "Verbinden",
+  "sidebarLocalOnline": "Lokal + online",
+  "sidebarVersionLine": "{name} Desktop · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "Wird abgespielt",
+  "searchSourceError": "{source}: {message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM hat keine Liste von Sendern geliefert"
 }

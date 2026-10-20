@@ -19,7 +19,7 @@ class SourcesPane extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PageHeading(
-              eyebrow: 'CONNECTIONS',
+              eyebrow: context.loc.sourcesEyebrow,
               title: context.loc.sourcesTitle,
               subtitle: context.loc.sourcesSubtitle,
             ),

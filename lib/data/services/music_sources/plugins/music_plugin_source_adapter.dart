@@ -1,4 +1,5 @@
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
@@ -98,9 +99,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      songs.sort(
-        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
-      );
+      songs.sort((a, b) => compareText(a.title, b.title));
       return SourceScanResult(
         sourceId: sourceId,
         status: SourceScanStatus.success,

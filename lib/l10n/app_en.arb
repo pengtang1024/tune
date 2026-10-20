@@ -11,7 +11,6 @@
   "clear": "Clear",
   "close": "Close",
   "retry": "Retry",
-  "confirm": "Confirm",
   "chooseFile": "Choose file",
   "unknownError": "Unknown error",
   "scanNow": "Scan now",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "Lyrics",
   "lyricsLoading": "Loading lyrics",
-  "lyricsFailed": "Could not load the lyrics: {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "Could not load the lyrics",
   "lyricsMissing": "This song has no lyrics",
   "settingsTitle": "Settings",
   "settingsSubtitle": "Adjust the look, the language and your local library.",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "The plugin does not implement getMediaSource",
   "pluginNoStream": "The plugin returned no playable address",
   "pluginRuntimeClosed": "The plugin runtime is closed",
-  "pluginCallFailed": "{label} failed: {message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "The plugin call timed out",
   "pluginUnknownData": "The plugin returned data that could not be read",
   "pluginCallError": "The plugin call failed",
   "pluginNoMatch": "No matching songs",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "Audio loading failed",
   "audioPathEmpty": "The audio path is empty",
   "pluginUpdateNoUrl": "The plugin has no download address, so it cannot be checked for updates",
-  "sourcesPluginUrlDownloadFailed": "Could not download the plugin: {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "{label} failed: {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "Quality",
   "subsonicFieldFormatHint": "Original quality by default",
   "subsonicFormatOriginal": "Original quality",
-  "sourceRadioName": "Internet radio"
+  "sourceRadioName": "Internet radio",
+  "settingsEyebrow": "Preferences",
+  "settingsSectionInterface": "Interface",
+  "settingsSectionLibrary": "Library",
+  "settingsSectionAbout": "About",
+  "settingsLocalFirst": "Local first",
+  "libraryEyebrow": "Collection",
+  "queueEyebrow": "Queue",
+  "sourcesEyebrow": "Connections",
+  "sidebarCollect": "Collect",
+  "sidebarConnect": "Connect",
+  "sidebarLocalOnline": "Local + online",
+  "sidebarVersionLine": "{name} desktop · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "Now playing",
+  "searchSourceError": "{source}: {message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM did not return a list of stations"
 }

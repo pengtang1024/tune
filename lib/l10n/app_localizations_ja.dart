@@ -42,9 +42,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get retry => '再試行';
 
   @override
-  String get confirm => '確認';
-
-  @override
   String get chooseFile => 'ファイルを選択';
 
   @override
@@ -469,9 +466,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get lyricsLoading => '歌詞を読み込んでいます';
 
   @override
-  String lyricsFailed(String error) {
-    return '歌詞を読み込めませんでした: $error';
-  }
+  String get lyricsFailed => '歌詞を読み込めませんでした';
 
   @override
   String get lyricsMissing => 'この曲には歌詞がありません';
@@ -803,14 +798,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pluginRuntimeClosed => 'プラグインの実行環境が閉じました';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label に失敗しました：$message';
-  }
-
-  @override
-  String get pluginCallTimeout => 'プラグインの呼び出しがタイムアウトしました';
-
-  @override
   String get pluginUnknownData => 'プラグインが読み取れないデータを返しました';
 
   @override
@@ -951,11 +938,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pluginUpdateNoUrl => 'プラグインにダウンロード元が記録されていないためアップデートを確認できません';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return 'プラグインをダウンロードできませんでした: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1344,4 +1326,53 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get sourceRadioName => 'インターネットラジオ';
+
+  @override
+  String get settingsEyebrow => '環境設定';
+
+  @override
+  String get settingsSectionInterface => 'インターフェース';
+
+  @override
+  String get settingsSectionLibrary => 'ライブラリ';
+
+  @override
+  String get settingsSectionAbout => 'このアプリについて';
+
+  @override
+  String get settingsLocalFirst => 'ローカル優先';
+
+  @override
+  String get libraryEyebrow => 'コレクション';
+
+  @override
+  String get queueEyebrow => 'キュー';
+
+  @override
+  String get sourcesEyebrow => '接続';
+
+  @override
+  String get sidebarCollect => 'コレクション';
+
+  @override
+  String get sidebarConnect => '接続';
+
+  @override
+  String get sidebarLocalOnline => 'ローカル + オンライン';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name デスクトップ版 · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => '再生中';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source：$message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM は电台リストを返しませんでした';
 }

@@ -11,7 +11,6 @@
   "clear": "Vaciar",
   "close": "Cerrar",
   "retry": "Reintentar",
-  "confirm": "Confirmar",
   "chooseFile": "Elegir archivo",
   "unknownError": "Error desconocido",
   "scanNow": "Escanear ahora",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "Letra",
   "lyricsLoading": "Cargando la letra",
-  "lyricsFailed": "No se pudo cargar la letra: {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "No se pudieron cargar las letras",
   "lyricsMissing": "Esta canción no tiene letra",
   "settingsTitle": "Ajustes",
   "settingsSubtitle": "Ajusta la apariencia, el idioma y la biblioteca local.",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "El plugin no implementa getMediaSource",
   "pluginNoStream": "El plugin no devolvió una dirección reproducible",
   "pluginRuntimeClosed": "El entorno de ejecución del plugin está cerrado",
-  "pluginCallFailed": "{label} falló: {message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "La llamada al plugin expiró",
   "pluginUnknownData": "El plugin devolvió datos ilegibles",
   "pluginCallError": "La llamada al plugin falló",
   "pluginNoMatch": "Ninguna pista coincide",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "No se pudo cargar el audio",
   "audioPathEmpty": "La ruta del archivo de audio está vacía",
   "pluginUpdateNoUrl": "El plugin no tiene dirección de descarga, así que no puede comprobarse",
-  "sourcesPluginUrlDownloadFailed": "No se pudo descargar el plugin: {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "Error en {label}: {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "Calidad",
   "subsonicFieldFormatHint": "Calidad original por defecto",
   "subsonicFormatOriginal": "Calidad original",
-  "sourceRadioName": "Radio por internet"
+  "sourceRadioName": "Radio por internet",
+  "settingsEyebrow": "Preferencias",
+  "settingsSectionInterface": "Interfaz",
+  "settingsSectionLibrary": "Biblioteca",
+  "settingsSectionAbout": "Acerca de",
+  "settingsLocalFirst": "Local primero",
+  "libraryEyebrow": "Colección",
+  "queueEyebrow": "Cola",
+  "sourcesEyebrow": "Conexiones",
+  "sidebarCollect": "Coleccionar",
+  "sidebarConnect": "Conectar",
+  "sidebarLocalOnline": "Local + en línea",
+  "sidebarVersionLine": "{name} escritorio · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "Reproduciendo",
+  "searchSourceError": "{source}: {message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM no devolvió una lista de emisoras"
 }

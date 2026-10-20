@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/utils/logger.dart';
 
 final lyricsControllerProvider =
     NotifierProvider<LyricsController, LyricsState>(LyricsController.new);
@@ -20,15 +21,18 @@ class LyricsState {
   /// Whether the source knows lyrics for this track.
   final bool missing;
 
-  /// Message of a failed request.
-  final String? error;
+  /// Whether the request failed.
+  ///
+  /// The state carries the fact and not the wording, so the interface writes
+  /// the reason of the failure in the language the app renders in.
+  final bool failed;
 
   const LyricsState({
     this.songId,
     this.document,
     this.loading = false,
     this.missing = false,
-    this.error,
+    this.failed = false,
   });
 
   /// Whether there is something to show.
@@ -67,8 +71,9 @@ class LyricsController extends Notifier<LyricsState> {
       final document = LyricsDocument.parse(raw);
       _cache[song.id] = document;
       state = LyricsState(songId: song.id, document: document);
-    } catch (error) {
-      state = LyricsState(songId: song.id, error: '$error');
+    } catch (error, stackTrace) {
+      Log.error('歌词加载失败: $error', stackTrace);
+      state = LyricsState(songId: song.id, failed: true);
     }
   }
 }

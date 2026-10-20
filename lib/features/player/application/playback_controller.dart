@@ -138,7 +138,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       index: state.currentIndex,
       song: song,
       request: _loadRequest,
-      message: AppStrings.instance.playbackFailed(error.message),
+      // The backend already reported the failure in the language of the
+      // interface, so the message is shown as it is.
+      message: error.message,
     );
   }
 

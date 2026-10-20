@@ -20,7 +20,7 @@ class SettingsPageHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'PREFERENCES',
+                context.loc.settingsEyebrow,
                 style: TextStyle(
                   fontFamily: 'JetBrains Mono',
                   fontSize: 9,
@@ -30,7 +30,7 @@ class SettingsPageHeader extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'Settings',
+                context.loc.settingsTitle,
                 style: theme.textTheme.displayMedium?.copyWith(
                   fontFamily: 'Fraunces',
                   fontSize: 40,
@@ -104,7 +104,7 @@ class SettingsInterfaceCard extends StatelessWidget {
 
     return _SettingsCard(
       index: '01',
-      eyebrow: 'INTERFACE',
+      eyebrow: context.loc.settingsSectionInterface,
       title: context.loc.theme,
       description: context.loc.settingsThemeDescription,
       child: Column(
@@ -199,7 +199,7 @@ class SettingsLibraryCard extends StatelessWidget {
 
     return _SettingsCard(
       index: '02',
-      eyebrow: 'LIBRARY',
+      eyebrow: context.loc.settingsSectionLibrary,
       title: context.loc.musicLibrary,
       description: context.loc.settingsLibraryDescription,
       trailing: Container(
@@ -210,7 +210,7 @@ class SettingsLibraryCard extends StatelessWidget {
           border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
         child: Text(
-          '$pathCount PATHS',
+          context.loc.settingsPathsCount(pathCount),
           style: TextStyle(
             fontFamily: 'JetBrains Mono',
             fontSize: 8,
@@ -322,7 +322,7 @@ class SettingsAboutCard extends StatelessWidget {
 
     return _SettingsCard(
       index: '03',
-      eyebrow: 'ABOUT',
+      eyebrow: context.loc.settingsSectionAbout,
       title: context.loc.settingsAboutTitle,
       description: context.loc.about,
       child: Row(
@@ -348,7 +348,7 @@ class SettingsAboutCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Tune',
+                      context.loc.appName,
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontFamily: 'Fraunces',
                         fontSize: 21,
@@ -385,7 +385,7 @@ class SettingsAboutCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              'LOCAL FIRST',
+              context.loc.settingsLocalFirst,
               style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 7.5,

@@ -53,7 +53,11 @@ class MusicPluginRepository {
 
   bool get supportsPlugins => isMusicPluginRuntimeSupported;
 
-  static final _queryField = MusicSourceField(
+  /// The keyword every plugin is searched with.
+  ///
+  /// The label is written in the language the app renders in, so the field is
+  /// read again on every access instead of being kept from the first one.
+  static MusicSourceField get _queryField => MusicSourceField(
     'query',
     AppStrings.instance.pluginFieldQuery,
     AppStrings.instance.pluginFieldHint,

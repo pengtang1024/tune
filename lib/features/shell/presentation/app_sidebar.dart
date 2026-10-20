@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 
 class AppSidebar extends StatelessWidget {
@@ -49,7 +50,10 @@ class AppSidebar extends StatelessWidget {
                     children: [
                       _Brand(compact: compact),
                       SizedBox(height: short ? 24 : 34),
-                      _SectionLabel('COLLECT', compact: compact),
+                      _SectionLabel(
+                        context.loc.sidebarCollect,
+                        compact: compact,
+                      ),
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.library_music_rounded,
@@ -67,7 +71,10 @@ class AppSidebar extends StatelessWidget {
                         compact: compact,
                       ),
                       const SizedBox(height: 24),
-                      _SectionLabel('CONNECT', compact: compact),
+                      _SectionLabel(
+                        context.loc.sidebarConnect,
+                        compact: compact,
+                      ),
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.podcasts_rounded,
@@ -87,7 +94,7 @@ class AppSidebar extends StatelessWidget {
                       if (!compact && !short) ...[
                         const SizedBox(height: 18),
                         Text(
-                          'LOCAL + ONLINE',
+                          context.loc.sidebarLocalOnline,
                           style: TextStyle(
                             fontFamily: 'JetBrains Mono',
                             fontSize: 8,
@@ -98,7 +105,10 @@ class AppSidebar extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          'TUNE DESKTOP · 1.0',
+                          context.loc.sidebarVersionLine(
+                            context.loc.appName,
+                            AppVersion.version,
+                          ),
                           style: TextStyle(
                             fontFamily: 'JetBrains Mono',
                             fontSize: 8,
@@ -149,7 +159,7 @@ class _Brand extends StatelessWidget {
         const SizedBox(width: 10),
         Flexible(
           child: Text(
-            'Tune',
+            context.loc.appName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.headlineSmall?.copyWith(

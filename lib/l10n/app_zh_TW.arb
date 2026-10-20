@@ -11,7 +11,6 @@
   "clear": "清空",
   "close": "關閉",
   "retry": "重試",
-  "confirm": "確認",
   "chooseFile": "選擇檔案",
   "unknownError": "未知錯誤",
   "scanNow": "立即掃描",
@@ -98,7 +97,7 @@
   "nowPlayingUnnamedTrack": "未命名曲目",
   "nowPlayingLocalMusic": "本機音樂",
   "trackUnknownTitle": "未知歌曲",
-  "playbackFailed": "播放失敗: {error}",
+  "playbackFailed": "播放失敗：{error}",
   "@playbackFailed": {
     "placeholders": {
       "error": {
@@ -106,7 +105,7 @@
       }
     }
   },
-  "playbackPauseFailed": "暫停失敗: {error}",
+  "playbackPauseFailed": "暫停失敗：{error}",
   "@playbackPauseFailed": {
     "placeholders": {
       "error": {
@@ -114,7 +113,7 @@
       }
     }
   },
-  "playbackResumeFailed": "繼續播放失敗: {error}",
+  "playbackResumeFailed": "繼續播放失敗：{error}",
   "@playbackResumeFailed": {
     "placeholders": {
       "error": {
@@ -122,7 +121,7 @@
       }
     }
   },
-  "playbackSeekFailed": "跳轉失敗: {error}",
+  "playbackSeekFailed": "跳轉失敗：{error}",
   "@playbackSeekFailed": {
     "placeholders": {
       "error": {
@@ -130,7 +129,7 @@
       }
     }
   },
-  "playbackVolumeFailed": "設定音量失敗: {error}",
+  "playbackVolumeFailed": "設定音量失敗：{error}",
   "@playbackVolumeFailed": {
     "placeholders": {
       "error": {
@@ -138,7 +137,7 @@
       }
     }
   },
-  "playbackSpeedFailed": "設定速度失敗: {error}",
+  "playbackSpeedFailed": "設定速度失敗：{error}",
   "@playbackSpeedFailed": {
     "placeholders": {
       "error": {
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "歌詞",
   "lyricsLoading": "正在載入歌詞",
-  "lyricsFailed": "歌詞載入失敗：{error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "歌詞載入失敗",
   "lyricsMissing": "這首歌沒有歌詞",
   "settingsTitle": "設定",
   "settingsSubtitle": "調整外觀、語言和本機音樂庫。",
@@ -397,7 +389,7 @@
     }
   },
   "scanAllSourcesFailed": "所有音源掃描失敗",
-  "scanFailed": "掃描失敗: {error}",
+  "scanFailed": "掃描失敗：{error}",
   "@scanFailed": {
     "placeholders": {
       "error": {
@@ -405,7 +397,7 @@
       }
     }
   },
-  "clearLibraryFailed": "清空音樂庫失敗: {error}",
+  "clearLibraryFailed": "清空音樂庫失敗：{error}",
   "@clearLibraryFailed": {
     "placeholders": {
       "error": {
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "外掛未實作 getMediaSource",
   "pluginNoStream": "外掛沒有回傳可播放網址",
   "pluginRuntimeClosed": "外掛執行環境已關閉",
-  "pluginCallFailed": "{label} 失敗：{message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "外掛呼叫逾時",
   "pluginUnknownData": "外掛回傳了無法辨識的資料",
   "pluginCallError": "外掛呼叫失敗",
   "pluginNoMatch": "沒有找到符合的歌曲",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "音訊載入失敗",
   "audioPathEmpty": "音訊檔案路徑為空",
   "pluginUpdateNoUrl": "該外掛沒有記錄下載網址，無法檢查更新",
-  "sourcesPluginUrlDownloadFailed": "下載外掛失敗：{error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "{label} 失敗：{error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "音質",
   "subsonicFieldFormatHint": "預設原始音質",
   "subsonicFormatOriginal": "原始音質",
-  "sourceRadioName": "網路電台"
+  "sourceRadioName": "網路電台",
+  "settingsEyebrow": "偏好",
+  "settingsSectionInterface": "介面",
+  "settingsSectionLibrary": "音樂庫",
+  "settingsSectionAbout": "關於",
+  "settingsLocalFirst": "本機優先",
+  "libraryEyebrow": "收藏",
+  "queueEyebrow": "佇列",
+  "sourcesEyebrow": "連線",
+  "sidebarCollect": "收藏",
+  "sidebarConnect": "連線",
+  "sidebarLocalOnline": "本機 + 線上",
+  "sidebarVersionLine": "{name} 桌面版 · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "正在播放",
+  "searchSourceError": "{source}：{message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM 沒有回傳電台列表"
 }

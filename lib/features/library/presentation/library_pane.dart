@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -75,7 +76,14 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         (value) => (value.currentSong?.uri, value.isPlaying),
       ),
     );
-    final sourceNames = ref.watch(musicSourceNamesProvider);
+    final sourceNames = sourceNamesOf(
+      context.loc,
+      ref.watch(
+        musicSourcesControllerProvider.select(
+          (value) => value.valueOrNull?.sources ?? const [],
+        ),
+      ),
+    );
     final songs = state.filteredSongs;
     final hasSourceIssues = state.sourceSummaries.values.any(
       (summary) => summary.status != SourceScanStatus.success,
@@ -86,7 +94,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         Padding(
           padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
           child: PageHeading(
-            eyebrow: 'COLLECTION',
+            eyebrow: context.loc.libraryEyebrow,
             title: context.loc.libraryTitle,
             subtitle: context.loc.librarySubtitle,
             trailing: OutlinedButton.icon(
@@ -172,7 +180,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             .toSet()
             .toList(growable: false)
           ..sort(
-            (a, b) => (sourceNames[a] ?? a).compareTo(sourceNames[b] ?? b),
+            (a, b) => compareText(sourceNames[a] ?? a, sourceNames[b] ?? b),
           );
     return sources;
   }

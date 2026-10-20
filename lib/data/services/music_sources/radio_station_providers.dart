@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/radio_station.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 
@@ -175,7 +177,7 @@ class SomaFmProvider extends RadioStationProvider {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
     if (data == null) {
-      throw StateError('SomaFM did not return a channel list');
+      throw MusicSourceFailure(AppStrings.instance.radioNoChannelList);
     }
 
     final stations = parseChannels(data);

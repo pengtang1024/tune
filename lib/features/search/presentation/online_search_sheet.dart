@@ -4,6 +4,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
@@ -50,9 +51,11 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final search = ref.watch(onlineSearchControllerProvider).valueOrNull;
-    final sources =
-        ref.watch(musicSourcesControllerProvider).valueOrNull?.sources ??
-        const [];
+    final sources = localizedSources(
+      context.loc,
+      ref.watch(musicSourcesControllerProvider).valueOrNull?.sources ??
+          const <MusicSourceConfig>[],
+    );
     final sourceNames = {for (final source in sources) source.id: source.name};
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final height = MediaQuery.sizeOf(context).height * 0.86;
@@ -423,7 +426,10 @@ class _SourceGroup extends StatelessWidget {
             const SizedBox(width: CompactTokens.space8),
             Expanded(
               child: Text(
-                '$sourceName：${result.message ?? context.loc.searchFailedShort}',
+                context.loc.searchSourceError(
+                  sourceName,
+                  result.message ?? context.loc.searchFailedShort,
+                ),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,

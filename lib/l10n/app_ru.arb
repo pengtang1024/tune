@@ -11,7 +11,6 @@
   "clear": "Очистить",
   "close": "Закрыть",
   "retry": "Повторить",
-  "confirm": "Подтвердить",
   "chooseFile": "Выбрать файл",
   "unknownError": "Неизвестная ошибка",
   "scanNow": "Сканировать сейчас",
@@ -303,14 +302,7 @@
   },
   "playerLyrics": "Слова",
   "lyricsLoading": "Загрузка слов песни",
-  "lyricsFailed": "Не удалось загрузить слова: {error}",
-  "@lyricsFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
+  "lyricsFailed": "Не удалось загрузить текст песни",
   "lyricsMissing": "У этой песни нет слов",
   "settingsTitle": "Настройки",
   "settingsSubtitle": "Настройте внешний вид, язык и локальную библиотеку.",
@@ -563,18 +555,6 @@
   "pluginNoMediaSource": "Плагин не реализует getMediaSource",
   "pluginNoStream": "Плагин не вернул воспроизводимый адрес",
   "pluginRuntimeClosed": "Среда выполнения плагина закрыта",
-  "pluginCallFailed": "Не удалось выполнить {label}: {message}",
-  "@pluginCallFailed": {
-    "placeholders": {
-      "label": {
-        "type": "String"
-      },
-      "message": {
-        "type": "String"
-      }
-    }
-  },
-  "pluginCallTimeout": "Истекло время вызова плагина",
   "pluginUnknownData": "Плагин вернул нечитаемые данные",
   "pluginCallError": "Вызов плагина не удался",
   "pluginNoMatch": "Нет подходящих треков",
@@ -626,14 +606,6 @@
   "audioLoadFailed": "Не удалось загрузить аудио",
   "audioPathEmpty": "Путь к аудиофайлу пуст",
   "pluginUpdateNoUrl": "У плагина нет адреса загрузки, поэтому обновления проверить нельзя",
-  "sourcesPluginUrlDownloadFailed": "Не удалось загрузить плагин: {error}",
-  "@sourcesPluginUrlDownloadFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "pluginStepFailed": "Сбой {label}: {error}",
   "@pluginStepFailed": {
     "placeholders": {
@@ -821,5 +793,40 @@
   "subsonicFieldFormat": "Качество",
   "subsonicFieldFormatHint": "По умолчанию исходное качество",
   "subsonicFormatOriginal": "Исходное качество",
-  "sourceRadioName": "Интернет-радио"
+  "sourceRadioName": "Интернет-радио",
+  "settingsEyebrow": "Настройки",
+  "settingsSectionInterface": "Интерфейс",
+  "settingsSectionLibrary": "Библиотека",
+  "settingsSectionAbout": "О программе",
+  "settingsLocalFirst": "Локально прежде всего",
+  "libraryEyebrow": "Коллекция",
+  "queueEyebrow": "Очередь",
+  "sourcesEyebrow": "Подключения",
+  "sidebarCollect": "Коллекция",
+  "sidebarConnect": "Подключения",
+  "sidebarLocalOnline": "Локально + онлайн",
+  "sidebarVersionLine": "{name} для компьютера · {version}",
+  "@sidebarVersionLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlayingEyebrow": "Сейчас играет",
+  "searchSourceError": "{source}: {message}",
+  "@searchSourceError": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "radioNoChannelList": "SomaFM не вернул список станций"
 }

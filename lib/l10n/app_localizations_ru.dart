@@ -42,9 +42,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get retry => 'Повторить';
 
   @override
-  String get confirm => 'Подтвердить';
-
-  @override
   String get chooseFile => 'Выбрать файл';
 
   @override
@@ -478,9 +475,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lyricsLoading => 'Загрузка слов песни';
 
   @override
-  String lyricsFailed(String error) {
-    return 'Не удалось загрузить слова: $error';
-  }
+  String get lyricsFailed => 'Не удалось загрузить текст песни';
 
   @override
   String get lyricsMissing => 'У этой песни нет слов';
@@ -827,14 +822,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pluginRuntimeClosed => 'Среда выполнения плагина закрыта';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return 'Не удалось выполнить $label: $message';
-  }
-
-  @override
-  String get pluginCallTimeout => 'Истекло время вызова плагина';
-
-  @override
   String get pluginUnknownData => 'Плагин вернул нечитаемые данные';
 
   @override
@@ -982,11 +969,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pluginUpdateNoUrl =>
       'У плагина нет адреса загрузки, поэтому обновления проверить нельзя';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return 'Не удалось загрузить плагин: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1394,4 +1376,53 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sourceRadioName => 'Интернет-радио';
+
+  @override
+  String get settingsEyebrow => 'Настройки';
+
+  @override
+  String get settingsSectionInterface => 'Интерфейс';
+
+  @override
+  String get settingsSectionLibrary => 'Библиотека';
+
+  @override
+  String get settingsSectionAbout => 'О программе';
+
+  @override
+  String get settingsLocalFirst => 'Локально прежде всего';
+
+  @override
+  String get libraryEyebrow => 'Коллекция';
+
+  @override
+  String get queueEyebrow => 'Очередь';
+
+  @override
+  String get sourcesEyebrow => 'Подключения';
+
+  @override
+  String get sidebarCollect => 'Коллекция';
+
+  @override
+  String get sidebarConnect => 'Подключения';
+
+  @override
+  String get sidebarLocalOnline => 'Локально + онлайн';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name для компьютера · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => 'Сейчас играет';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source: $message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM не вернул список станций';
 }

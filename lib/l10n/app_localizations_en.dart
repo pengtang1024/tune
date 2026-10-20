@@ -42,9 +42,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Retry';
 
   @override
-  String get confirm => 'Confirm';
-
-  @override
   String get chooseFile => 'Choose file';
 
   @override
@@ -496,9 +493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsLoading => 'Loading lyrics';
 
   @override
-  String lyricsFailed(String error) {
-    return 'Could not load the lyrics: $error';
-  }
+  String get lyricsFailed => 'Could not load the lyrics';
 
   @override
   String get lyricsMissing => 'This song has no lyrics';
@@ -905,14 +900,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pluginRuntimeClosed => 'The plugin runtime is closed';
 
   @override
-  String pluginCallFailed(String label, String message) {
-    return '$label failed: $message';
-  }
-
-  @override
-  String get pluginCallTimeout => 'The plugin call timed out';
-
-  @override
   String get pluginUnknownData =>
       'The plugin returned data that could not be read';
 
@@ -1068,11 +1055,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pluginUpdateNoUrl =>
       'The plugin has no download address, so it cannot be checked for updates';
-
-  @override
-  String sourcesPluginUrlDownloadFailed(String error) {
-    return 'Could not download the plugin: $error';
-  }
 
   @override
   String pluginStepFailed(String error, String label) {
@@ -1479,4 +1461,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceRadioName => 'Internet radio';
+
+  @override
+  String get settingsEyebrow => 'Preferences';
+
+  @override
+  String get settingsSectionInterface => 'Interface';
+
+  @override
+  String get settingsSectionLibrary => 'Library';
+
+  @override
+  String get settingsSectionAbout => 'About';
+
+  @override
+  String get settingsLocalFirst => 'Local first';
+
+  @override
+  String get libraryEyebrow => 'Collection';
+
+  @override
+  String get queueEyebrow => 'Queue';
+
+  @override
+  String get sourcesEyebrow => 'Connections';
+
+  @override
+  String get sidebarCollect => 'Collect';
+
+  @override
+  String get sidebarConnect => 'Connect';
+
+  @override
+  String get sidebarLocalOnline => 'Local + online';
+
+  @override
+  String sidebarVersionLine(String name, String version) {
+    return '$name desktop · $version';
+  }
+
+  @override
+  String get nowPlayingEyebrow => 'Now playing';
+
+  @override
+  String searchSourceError(String source, String message) {
+    return '$source: $message';
+  }
+
+  @override
+  String get radioNoChannelList => 'SomaFM did not return a list of stations';
 }

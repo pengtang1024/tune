@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_repository.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
+import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/utils/logger.dart';
 
 final musicSourcesControllerProvider =
@@ -13,18 +15,45 @@ final musicSourcesControllerProvider =
       MusicSourcesController.new,
     );
 
+/// The sources of the app, named in the language the app renders in.
+///
+/// A built-in source is named by the catalogue, so picking another language
+/// renames it; a source the user imported keeps the name it was given.
+///
+/// The translations are read from the caller, so the names are written in the
+/// language the interface draws in.
+List<MusicSourceConfig> localizedSources(
+  AppLocalizations strings,
+  List<MusicSourceConfig> sources,
+) {
+  final catalogue = BuiltInMusicSources.catalogueOf(strings);
+  return sources
+      .map((source) {
+        final entry = catalogue[source.id];
+        if (entry == null) return source;
+        return source.copyWith(
+          name: entry.name,
+          description: entry.description,
+        );
+      })
+      .toList(growable: false);
+}
+
 /// Display names of every configured source, keyed by source id.
 ///
 /// Track lists resolve the name of the source a track came from through this
-/// map, so the same source is never named differently in two places.
-final musicSourceNamesProvider = Provider<Map<String, String>>((ref) {
-  final sources = ref.watch(
-    musicSourcesControllerProvider.select(
-      (value) => value.valueOrNull?.sources ?? const <MusicSourceConfig>[],
-    ),
-  );
-  return {for (final source in sources) source.id: source.name};
-});
+/// map, so the same source is never named differently in two places. The
+/// names are written in the language the interface draws in.
+Map<String, String> sourceNamesOf(
+  AppLocalizations strings,
+  List<MusicSourceConfig> sources,
+) {
+  final catalogue = BuiltInMusicSources.catalogueOf(strings);
+  return {
+    for (final source in sources)
+      source.id: catalogue[source.id]?.name ?? source.name,
+  };
+}
 
 /// Owns the user-facing source list (enable flags and adapter settings).
 ///

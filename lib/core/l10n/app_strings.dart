@@ -22,4 +22,10 @@ class AppStrings {
 
   /// The translations of the current locale.
   static AppLocalizations get instance => lookupAppLocalizations(_locale);
+
+  /// The translations of a language, whatever the app renders in.
+  ///
+  /// A caller that knows the language of its text asks for it here, so the
+  /// text never depends on the order the parts of the app run in.
+  static AppLocalizations of(Locale locale) => lookupAppLocalizations(locale);
 }
