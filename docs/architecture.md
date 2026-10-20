@@ -62,7 +62,7 @@ presentation → application → domain
 | --- | --- | --- |
 | 是什么 | 适配器（`lib/data/services/music_sources/`） | `MusicSourceConfig`（一条配置） |
 | 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关 |
-| 标识 | `type` | `id`（内置沿用旧 id，用户实例是 `<type>:<序号>`） |
+| 标识 | `type` | `id`（内置沿用旧 id，用户实例是 `<type>-<序号>`） |
 
 - 注册表是 `type → adapter` 的数据（`MusicSourceService`），可以注入，测试因此不用改全局状态。
 - 名称、品牌图标与浏览流都按类型查，界面不按 id 硬编码。
@@ -220,11 +220,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 1. 实现 `MusicSourceAdapter`：`lib/data/services/music_sources/music_source_adapter.dart`。
 2. 在 `lib/data/services/music_sources/music_source_service.dart` 的注册表里注册这个 `type`。
-3. 要做成内置实例，再在 `lib/data/services/music_sources/built_in_music_sources.dart`
+3. 在 `lib/data/services/music_sources/source_type_catalogue.dart` 加一条：类型名、
+   本地化名、一句说明、类别，以及它能不能被添加。
+4. 要做成内置实例，再在 `lib/data/services/music_sources/built_in_music_sources.dart`
    加一条预置配置，名称走 `AppStrings`。
-4. 在 `lib/l10n/*.arb` 补名称与描述（见 [i18n.md](i18n.md)）。
-5. 品牌名音源还要补一条本地化名（chip 上的小字，见 `需求/多语言设计.md` 的「音源的两个名字」）。
-6. 按需补 `test/app/localization_sources_test.dart` 的词汇。
+5. 在 `lib/l10n/*.arb` 补名称与描述（见 [i18n.md](i18n.md)）。
+6. 品牌名音源还要补一条本地化名（chip 上的小字，见 `需求/多语言设计.md` 的「音源的两个名字」）。
+7. 按需补 `test/app/localization_sources_test.dart` 的词汇。
 
 播放器与音乐库 UI 不需要改：一个类型可以被多个实例共用，界面对实例一视同仁。
 
