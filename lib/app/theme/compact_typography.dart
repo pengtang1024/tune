@@ -63,12 +63,22 @@ abstract final class CompactTypography {
     return TextStyle(
       fontFamily: sansFamily,
       fontFamilyFallback: sansFallback,
+      fontVariations: weightVariations(weight),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
       color: color,
       height: height,
     );
+  }
+
+  /// The weight axis, pinned so a variable face lands on the exact weight.
+  ///
+  /// The engine matches a variable font by the named instances it happens to
+  /// carry, and the CJK faces skip some steps, so a `w600` request can land on
+  /// a `w500` instance. Pinning the axis keeps the weight that was asked for.
+  static List<FontVariation> weightVariations(FontWeight weight) {
+    return <FontVariation>[FontVariation('wght', weight.value.toDouble())];
   }
 
   /// The axis values the display face is drawn with.
@@ -79,11 +89,15 @@ abstract final class CompactTypography {
   /// strokes and opens up the curves, `WONK=1` keeps the wonky alternates,
   /// and `opsz` follows the text size so a 38px heading gets display
   /// proportions instead of text ones.
-  static List<FontVariation> displayVariations(double size) {
+  static List<FontVariation> displayVariations(
+    double size,
+    FontWeight weight,
+  ) {
     return <FontVariation>[
       FontVariation('opsz', size.clamp(9, 144)),
       FontVariation('SOFT', 100),
       FontVariation('WONK', 1),
+      FontVariation('wght', weight.value.toDouble()),
     ];
   }
 
@@ -98,7 +112,7 @@ abstract final class CompactTypography {
     return TextStyle(
       fontFamily: displayFamily,
       fontFamilyFallback: serifFallback,
-      fontVariations: displayVariations(size),
+      fontVariations: displayVariations(size, weight),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
@@ -118,6 +132,7 @@ abstract final class CompactTypography {
     return TextStyle(
       fontFamily: monoFamily,
       fontFamilyFallback: monoFallback,
+      fontVariations: weightVariations(weight),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
@@ -140,7 +155,10 @@ abstract final class CompactTypography {
     return base?.copyWith(
       fontFamily: displayFamily,
       fontFamilyFallback: serifFallback,
-      fontVariations: displayVariations(size ?? base.fontSize ?? 20),
+      fontVariations: displayVariations(
+        size ?? base.fontSize ?? 20,
+        weight ?? base.fontWeight ?? FontWeight.w600,
+      ),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
