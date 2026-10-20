@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
@@ -77,7 +78,8 @@ List<Override> _overrides = const [];
 Future<void> _loadFonts() async {
   const families = {
     'Fraunces': 'assets/fonts/Fraunces/Fraunces-Variable.ttf',
-    'Instrument Sans': 'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf',
+    'Instrument Sans':
+        'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf',
     'JetBrains Mono': 'assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf',
     'Noto Sans SC': 'assets/fonts/NotoSansSC/NotoSansSC-VF.ttf',
     'Noto Serif SC': 'assets/fonts/NotoSerifSC/NotoSerifSC-VF.ttf',
@@ -85,9 +87,7 @@ Future<void> _loadFonts() async {
   for (final entry in families.entries) {
     final loader = FontLoader(entry.key)
       ..addFont(
-        Future.value(
-          File(entry.value).readAsBytesSync().buffer.asByteData(),
-        ),
+        Future.value(File(entry.value).readAsBytesSync().buffer.asByteData()),
       );
     await loader.load();
   }
@@ -115,9 +115,9 @@ Future<void> _shot(WidgetTester tester, String name) async {
     final boundary =
         _rootKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: 1.0);
-    final bytes = (await image.toByteData(format: ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    final bytes = (await image.toByteData(
+      format: ImageByteFormat.png,
+    ))!.buffer.asUint8List();
     final file = File('build/layout-shots/$name.png');
     await file.parent.create(recursive: true);
     await file.writeAsBytes(bytes);
@@ -132,6 +132,8 @@ void main() {
     // file as a test and refuses the test-only mock. It is a mock here too.
     // ignore: invalid_use_of_visible_for_testing_member
     persistence = FakePersistenceService();
+    // The shot of the favorites needs tracks that are marked.
+    persistence.values['favorite_tracks'] = ['/music/a.mp3', '/music/c.mp3'];
     await _loadFonts();
   });
 
@@ -143,10 +145,7 @@ void main() {
   // The override has to be undone inside the body of the test, because the
   // framework checks its own debug variables before the tear down runs.
 
-  Widget app({
-    required Widget home,
-    Brightness brightness = Brightness.light,
-  }) {
+  Widget app({required Widget home, Brightness brightness = Brightness.light}) {
     return ProviderScope(
       overrides: _overrides,
       child: RepaintBoundary(
@@ -194,22 +193,43 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
     );
     await _shot(tester, 'library$suffix');
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/queue', child: QueuePane())),
+      app(
+        home: const CompactShell(currentPath: '/queue', child: QueuePane()),
+      ),
     );
     await _shot(tester, 'queue$suffix');
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/settings', child: SettingsPane())),
+      app(
+        home: const CompactShell(
+          currentPath: '/favorites',
+          child: FavoritesPane(),
+        ),
+      ),
+    );
+    await _shot(tester, 'favorites$suffix');
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+      ),
     );
     await _shot(tester, 'settings$suffix');
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/sources', child: SourcesPane())),
+      app(
+        home: const CompactShell(currentPath: '/sources', child: SourcesPane()),
+      ),
     );
     await _shot(tester, 'sources$suffix');
 
@@ -239,7 +259,9 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
     );
     await tester.pump();
     unawaited(showOnlineSearchSheet(tester.element(find.byType(LibraryPane))));
@@ -270,7 +292,10 @@ void main() {
     await tester.pumpWidget(app(home: const NowPlayingPage()));
     await tester.pump();
     unawaited(
-      showTrackDetailSheet(tester.element(find.byType(NowPlayingPage)), _songs.first),
+      showTrackDetailSheet(
+        tester.element(find.byType(NowPlayingPage)),
+        _songs.first,
+      ),
     );
     await _shot(tester, 'track_sheet$suffix');
   }

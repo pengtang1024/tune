@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
@@ -16,6 +17,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final path = state.uri.path;
       if (path == '/library' ||
           path == '/queue' ||
+          path == '/favorites' ||
           path == '/sources' ||
           path == '/settings' ||
           path == '/now-playing') {
@@ -38,6 +40,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/queue',
             builder: (context, state) => const QueuePane(),
+          ),
+          GoRoute(
+            path: '/favorites',
+            builder: (context, state) => const FavoritesPane(),
           ),
           GoRoute(
             path: '/sources',

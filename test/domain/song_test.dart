@@ -32,7 +32,6 @@ void main() {
 
       expect(song.id, 42);
       expect(song.title, '');
-      expect(song.isFavorite, isFalse);
     });
 
     test('equality is based on id', () {

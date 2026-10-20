@@ -73,8 +73,10 @@ void main() {
                 index: 0,
                 selected: false,
                 playing: false,
+                isFavorite: false,
                 onTap: _noop,
                 onAddToQueue: _noop,
+                onToggleFavorite: _noop,
               ),
             ),
           ),
@@ -83,7 +85,8 @@ void main() {
       await tester.pumpAndSettle();
 
       final card = find.byWidgetPredicate(
-        (widget) => widget is Material && widget.shape is RoundedRectangleBorder,
+        (widget) =>
+            widget is Material && widget.shape is RoundedRectangleBorder,
       );
       expect(tester.getSize(card.first).height, CompactTokens.listRowHeight);
 
@@ -146,7 +149,8 @@ void main() {
       expect(
         steps,
         contains(size),
-        reason: 'the role ${entry.key} of the theme writes ${size}px, '
+        reason:
+            'the role ${entry.key} of the theme writes ${size}px, '
             'which is not a step of the scale',
       );
     }

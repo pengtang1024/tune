@@ -40,14 +40,21 @@ void main() {
   ) async {
     for (final scale in const [1.25, 1.5, 2.0]) {
       for (final width in const [1400.0, 760.0, 420.0]) {
-        await _drawAt(tester, scale, width, const LibraryTrackCard(
-          song: song,
-          index: 0,
-          selected: false,
-          playing: false,
-          onTap: _noop,
-          onAddToQueue: _noop,
-        ));
+        await _drawAt(
+          tester,
+          scale,
+          width,
+          const LibraryTrackCard(
+            song: song,
+            index: 0,
+            selected: false,
+            playing: false,
+            isFavorite: false,
+            onTap: _noop,
+            onAddToQueue: _noop,
+            onToggleFavorite: _noop,
+          ),
+        );
 
         expect(
           tester.takeException(),
@@ -64,13 +71,18 @@ void main() {
   ) async {
     for (final scale in const [1.25, 1.5, 2.0]) {
       for (final width in const [1400.0, 760.0, 420.0]) {
-        await _drawAt(tester, scale, width, SettingsCard(
-          index: '01',
-          eyebrow: '界面',
-          title: '主题',
-          description: '选择界面的明暗气质和显示语言。',
-          child: const Text('内容'),
-        ));
+        await _drawAt(
+          tester,
+          scale,
+          width,
+          SettingsCard(
+            index: '01',
+            eyebrow: '界面',
+            title: '主题',
+            description: '选择界面的明暗气质和显示语言。',
+            child: const Text('内容'),
+          ),
+        );
 
         expect(
           tester.takeException(),

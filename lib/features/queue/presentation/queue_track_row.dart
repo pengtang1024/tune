@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -15,9 +16,11 @@ class QueueTrackRow extends StatelessWidget {
   final int index;
   final bool selected;
   final bool playing;
+  final bool isFavorite;
   final SourceLabel? source;
   final VoidCallback onTap;
   final VoidCallback onRemove;
+  final VoidCallback onToggleFavorite;
 
   const QueueTrackRow({
     super.key,
@@ -25,9 +28,11 @@ class QueueTrackRow extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.playing,
+    required this.isFavorite,
     this.source,
     required this.onTap,
     required this.onRemove,
+    required this.onToggleFavorite,
   });
 
   @override
@@ -75,6 +80,11 @@ class QueueTrackRow extends StatelessWidget {
                         selected: selected,
                         playing: playing,
                       ),
+                    ),
+                    const SizedBox(width: CompactTokens.space4),
+                    FavoriteButton(
+                      isFavorite: isFavorite,
+                      onPressed: onToggleFavorite,
                     ),
                     const SizedBox(width: CompactTokens.space4),
                     ReorderableDragStartListener(

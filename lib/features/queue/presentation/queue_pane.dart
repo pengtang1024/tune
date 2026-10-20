@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -34,6 +35,7 @@ class QueuePane extends ConsumerWidget {
     final currentUri = view.$3;
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
+    final favorites = ref.watch(favoritesControllerProvider);
     final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
@@ -111,9 +113,13 @@ class QueuePane extends ConsumerWidget {
                       index: index,
                       selected: index == currentIndex,
                       playing: isPlaying && song.uri == currentUri,
+                      isFavorite: favorites.contains(song.uri),
                       source: sourceLabel(song, sourceLabels),
                       onTap: () => controller.playAt(index),
                       onRemove: () => controller.removeFromQueue(index),
+                      onToggleFavorite: () => ref
+                          .read(favoritesControllerProvider.notifier)
+                          .toggle(song.uri),
                     );
                   },
                 ),

@@ -20,7 +20,6 @@ class Song {
   final String? language;
   final int? size;
   final String? type;
-  final bool isFavorite;
   final String? albumArtPath;
 
   /// Identifies the music source that produced this song.
@@ -90,7 +89,6 @@ class Song {
     this.language,
     this.size,
     this.type,
-    this.isFavorite = false,
     this.albumArtPath,
     this.sourceId,
     this.externalId,
@@ -129,7 +127,6 @@ class Song {
       language: data['language'],
       size: data['size'],
       type: data['type'],
-      isFavorite: data['isFavorite'] ?? false,
       albumArtPath: data['albumArtPath'],
       sourceId: data['sourceId'],
       externalId: data['externalId'],
@@ -172,7 +169,6 @@ class Song {
     String? language,
     int? size,
     String? type,
-    bool? isFavorite,
     String? albumArtPath,
     String? sourceId,
     String? externalId,
@@ -207,7 +203,6 @@ class Song {
       language: language ?? this.language,
       size: size ?? this.size,
       type: type ?? this.type,
-      isFavorite: isFavorite ?? this.isFavorite,
       albumArtPath: albumArtPath ?? this.albumArtPath,
       sourceId: sourceId ?? this.sourceId,
       externalId: externalId ?? this.externalId,
@@ -300,7 +295,6 @@ class Song {
       size: file.size ?? track.size,
       albumArtPath: track.albumArtPath ?? file.albumArtPath,
       localPath: file.localPath ?? (file.isLocalFile ? file.uri : null),
-      isFavorite: track.isFavorite || file.isFavorite,
     );
   }
 
@@ -326,7 +320,6 @@ class Song {
     'language': language,
     'size': size,
     'type': type,
-    'isFavorite': isFavorite,
     'albumArtPath': albumArtPath,
     'sourceId': sourceId,
     'externalId': externalId,

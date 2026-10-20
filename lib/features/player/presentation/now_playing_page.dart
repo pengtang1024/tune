@@ -10,6 +10,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
@@ -20,6 +21,7 @@ import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 
 /// Full window view of the track that is playing right now.
 ///
@@ -41,6 +43,8 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     final theme = Theme.of(context);
     final state = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
+    final favorites = ref.watch(favoritesControllerProvider);
+    final currentUri = state.currentSong?.uri;
     final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
@@ -89,6 +93,13 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                       showLyrics: _showLyrics,
                       onToggleLyrics: () =>
                           setState(() => _showLyrics = !_showLyrics),
+                      isFavorite:
+                          currentUri != null && favorites.contains(currentUri),
+                      onToggleFavorite: currentUri == null
+                          ? null
+                          : () => ref
+                                .read(favoritesControllerProvider.notifier)
+                                .toggle(currentUri),
                     ),
                     const SizedBox(height: CompactTokens.space12),
                     Expanded(
@@ -137,11 +148,15 @@ class _TopBar extends StatelessWidget {
     required this.state,
     required this.showLyrics,
     required this.onToggleLyrics,
+    required this.isFavorite,
+    required this.onToggleFavorite,
   });
 
   final PlaybackState state;
   final bool showLyrics;
   final VoidCallback onToggleLyrics;
+  final bool isFavorite;
+  final VoidCallback? onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +193,17 @@ class _TopBar extends StatelessWidget {
           ],
         ),
         const Spacer(),
+        _RoundButton(
+          icon: isFavorite
+              ? Icons.favorite_rounded
+              : Icons.favorite_border_rounded,
+          tooltip: isFavorite
+              ? context.loc.favoriteRemove
+              : context.loc.favoriteAdd,
+          color: isFavorite ? theme.colorScheme.primary : null,
+          onPressed: onToggleFavorite,
+        ),
+        const SizedBox(width: 8),
         _RoundButton(
           icon: showLyrics ? Icons.lyrics_rounded : Icons.lyrics_outlined,
           tooltip: context.loc.playerLyrics,
@@ -344,7 +370,7 @@ class _ProgressRow extends StatelessWidget {
         children: [
           _TimeLabel(value: state.position),
           const SizedBox(width: CompactTokens.space12),
-          const _LiveBadge(),
+          const LiveBadge(),
           const Spacer(),
         ],
       );
@@ -368,49 +394,6 @@ class _ProgressRow extends StatelessWidget {
         ),
         _TimeLabel(value: state.duration),
       ],
-    );
-  }
-}
-
-/// The mark that tells the user the track never ends.
-class _LiveBadge extends StatelessWidget {
-  const _LiveBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.tertiary;
-
-    return TuneTooltip(
-      message: context.loc.nowPlayingLiveStream,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.podcasts_rounded,
-              size: CompactTokens.icon12,
-              color: color,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              context.loc.playerLiveBadge,
-              style: CompactTypography.mono(
-                color,
-                size: CompactTypeScale.mark,
-                weight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -609,12 +592,16 @@ class _RoundButton extends StatelessWidget {
     required this.tooltip,
     required this.onPressed,
     this.size = 20,
+    this.color,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback? onPressed;
   final double size;
+
+  /// The color of the icon, when the button says something of its own.
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -630,9 +617,10 @@ class _RoundButton extends StatelessWidget {
           child: Icon(
             icon,
             size: size,
-            color: onPressed == null
-                ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
-                : theme.colorScheme.onSurfaceVariant,
+            color: color ??
+                (onPressed == null
+                    ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
+                    : theme.colorScheme.onSurfaceVariant),
           ),
         ),
       ),

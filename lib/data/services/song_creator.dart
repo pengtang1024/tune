@@ -50,7 +50,6 @@ class SongCreator {
         'language': metadata.language,
         'size': await file.length(),
         'type': 'audio',
-        'isFavorite': false,
       };
 
       return Song.fromMap(songData);
@@ -82,7 +81,6 @@ class SongCreator {
       'year': 0,
       'size': await file.length(),
       'type': 'audio',
-      'isFavorite': false,
     };
 
     return Song.fromMap(songData);

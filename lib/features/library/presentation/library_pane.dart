@@ -6,6 +6,8 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
@@ -74,6 +76,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     final settings = ref.watch(settingsControllerProvider);
+    final favorites = ref.watch(favoritesControllerProvider);
     final playback = ref.watch(
       playbackControllerProvider.select(
         (value) => (value.currentSong?.uri, value.isPlaying),
@@ -167,7 +170,14 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         Expanded(
           child: state.isLoading
               ? const Center(child: CompactSpinner.large())
-              : _body(state, songs, playback.$1, playback.$2, sourceLabels),
+              : _body(
+                  state,
+                  songs,
+                  playback.$1,
+                  playback.$2,
+                  sourceLabels,
+                  favorites,
+                ),
         ),
         if (!state.hasSongs && !state.isScanning && state.errorMessage == null)
           Padding(
@@ -217,6 +227,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     String? currentUri,
     bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
+    FavoritesState favorites,
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
@@ -244,6 +255,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           index: index,
           selected: song.uri == currentUri,
           playing: isPlaying,
+          isFavorite: favorites.contains(song.uri),
           source: sourceLabel(song, sourceLabels),
           onTap: () {
             // A track is played on its own: the queue holds what the user
@@ -251,6 +263,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             ref.read(playbackControllerProvider.notifier).playSong(song);
           },
           onAddToQueue: () => _addToQueue(song),
+          onToggleFavorite: () => _toggleFavorite(song),
         );
       },
     );
@@ -266,6 +279,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           duration: Duration(milliseconds: 1200),
         ),
       );
+  }
+
+  /// Marks the track, or takes the mark away when it is already there.
+  void _toggleFavorite(Song song) {
+    ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
   }
 
   /// Puts the whole visible list into the queue.

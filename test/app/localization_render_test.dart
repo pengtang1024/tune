@@ -8,6 +8,7 @@ import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
@@ -194,10 +195,13 @@ Future<void> _drawEveryScreen(
   final strings = lookupAppLocalizations(locale);
 
   // The library with the shell around it.
-  await _draw(tester, locale, size, 'library', const CompactShell(
-    currentPath: '/library',
-    child: LibraryPane(),
-  ));
+  await _draw(
+    tester,
+    locale,
+    size,
+    'library',
+    const CompactShell(currentPath: '/library', child: LibraryPane()),
+  );
   _collect(tester, collect);
 
   // The sheet that tells everything about a track.
@@ -236,24 +240,43 @@ Future<void> _drawEveryScreen(
   await _closeWindow(tester);
 
   // The queue.
-  await _draw(tester, locale, size, 'queue', const CompactShell(
-    currentPath: '/queue',
-    child: QueuePane(),
-  ));
+  await _draw(
+    tester,
+    locale,
+    size,
+    'queue',
+    const CompactShell(currentPath: '/queue', child: QueuePane()),
+  );
+  _collect(tester, collect);
+
+  // The favorites.
+  await _draw(
+    tester,
+    locale,
+    size,
+    'favorites',
+    const CompactShell(currentPath: '/favorites', child: FavoritesPane()),
+  );
   _collect(tester, collect);
 
   // The settings.
-  await _draw(tester, locale, size, 'settings', const CompactShell(
-    currentPath: '/settings',
-    child: SettingsPane(),
-  ));
+  await _draw(
+    tester,
+    locale,
+    size,
+    'settings',
+    const CompactShell(currentPath: '/settings', child: SettingsPane()),
+  );
   _collect(tester, collect);
 
   // The sources with the settings of one of them.
-  await _draw(tester, locale, size, 'sources', const CompactShell(
-    currentPath: '/sources',
-    child: SourcesPane(),
-  ));
+  await _draw(
+    tester,
+    locale,
+    size,
+    'sources',
+    const CompactShell(currentPath: '/sources', child: SourcesPane()),
+  );
   _collect(tester, collect);
 
   final config = find.byKey(const ValueKey('source-config-jamendo'));
@@ -288,9 +311,7 @@ Future<void> _draw(
   String screen,
   Widget home,
 ) async {
-  await tester.pumpWidget(
-    _app(tester, locale, size, screen, home),
-  );
+  await tester.pumpWidget(_app(tester, locale, size, screen, home));
   await tester.pumpAndSettle();
 }
 
@@ -388,9 +409,8 @@ Widget _app(
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) => LocalizationBridge(
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) =>
+          LocalizationBridge(child: child ?? const SizedBox.shrink()),
       home: home,
     ),
   );
