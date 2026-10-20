@@ -506,6 +506,31 @@ class AppLocalizationsEn extends AppLocalizations {
       'The JSON object of a POST; the keyword is written into the placeholder';
 
   @override
+  String get sourceGraphqlName => 'GraphQL API';
+
+  @override
+  String get sourceGraphqlDescription =>
+      'Ask the interface with a query document; the conditions live in the document';
+
+  @override
+  String get graphqlHint =>
+      'Fill in the address, the query document and the paths of the fields';
+
+  @override
+  String get graphqlFieldQuery => 'Query document';
+
+  @override
+  String get graphqlFieldQueryHint =>
+      'A GraphQL query document; the conditions live in it';
+
+  @override
+  String get graphqlFieldVariables => 'Variables';
+
+  @override
+  String get graphqlFieldVariablesHint =>
+      'A JSON object; the keyword is written into the placeholder';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

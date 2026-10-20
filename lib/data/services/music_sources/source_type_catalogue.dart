@@ -155,6 +155,12 @@ class SourceTypeCatalogue {
         description: strings.sourceJsonApiDescription,
         kind: MusicSourceKind.custom,
       ),
+      SourceTypeDescriptor(
+        type: 'graphql',
+        name: strings.sourceGraphqlName,
+        description: strings.sourceGraphqlDescription,
+        kind: MusicSourceKind.custom,
+      ),
     ];
   }
 

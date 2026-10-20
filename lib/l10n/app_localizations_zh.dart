@@ -473,6 +473,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jsonApiFieldBodyHint => 'POST 时的 JSON 对象；关键词会填进占位符';
 
   @override
+  String get sourceGraphqlName => 'GraphQL 接口';
+
+  @override
+  String get sourceGraphqlDescription => '用一份查询文档问接口，筛选条件写在文档里';
+
+  @override
+  String get graphqlHint => '填写接口地址、查询文档与各字段的路径';
+
+  @override
+  String get graphqlFieldQuery => '查询文档';
+
+  @override
+  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+
+  @override
+  String get graphqlFieldVariables => '变量';
+
+  @override
+  String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -2005,6 +2026,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jsonApiFieldBodyHint => 'POST 时的 JSON 对象；关键词会填进占位符';
 
   @override
+  String get sourceGraphqlName => 'GraphQL 接口';
+
+  @override
+  String get sourceGraphqlDescription => '用一份查询文档问接口，筛选条件写在文档里';
+
+  @override
+  String get graphqlHint => '填写接口地址、查询文档与各字段的路径';
+
+  @override
+  String get graphqlFieldQuery => '查询文档';
+
+  @override
+  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+
+  @override
+  String get graphqlFieldVariables => '变量';
+
+  @override
+  String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3535,6 +3577,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get jsonApiFieldBodyHint => 'POST 時的 JSON 物件；關鍵字會填進佔位符';
+
+  @override
+  String get sourceGraphqlName => 'GraphQL 介面';
+
+  @override
+  String get sourceGraphqlDescription => '用一份查詢文件問介面，篩選條件寫在文件裡';
+
+  @override
+  String get graphqlHint => '填寫介面網址、查詢文件與各欄位的路徑';
+
+  @override
+  String get graphqlFieldQuery => '查詢文件';
+
+  @override
+  String get graphqlFieldQueryHint => 'GraphQL 查詢文件，篩選條件寫在裡面';
+
+  @override
+  String get graphqlFieldVariables => '變數';
+
+  @override
+  String get graphqlFieldVariablesHint => 'JSON 物件；關鍵字會填進佔位符';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

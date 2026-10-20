@@ -211,6 +211,10 @@ void main() {
         addable.where((type) => type.type == 'json_api'),
         hasLength(1),
       );
+      expect(
+        addable.where((type) => type.type == 'graphql'),
+        hasLength(1),
+      );
     });
   });
 

@@ -952,6 +952,48 @@ abstract class AppLocalizations {
   /// **'POST 时的 JSON 对象；关键词会填进占位符'**
   String get jsonApiFieldBodyHint;
 
+  /// No description provided for @sourceGraphqlName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'GraphQL 接口'**
+  String get sourceGraphqlName;
+
+  /// No description provided for @sourceGraphqlDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用一份查询文档问接口，筛选条件写在文档里'**
+  String get sourceGraphqlDescription;
+
+  /// No description provided for @graphqlHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写接口地址、查询文档与各字段的路径'**
+  String get graphqlHint;
+
+  /// No description provided for @graphqlFieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查询文档'**
+  String get graphqlFieldQuery;
+
+  /// No description provided for @graphqlFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'GraphQL 查询文档，筛选条件写在里面'**
+  String get graphqlFieldQueryHint;
+
+  /// No description provided for @graphqlFieldVariables.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'变量'**
+  String get graphqlFieldVariables;
+
+  /// No description provided for @graphqlFieldVariablesHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'JSON 对象；关键词会填进占位符'**
+  String get graphqlFieldVariablesHint;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:
