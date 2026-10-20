@@ -139,6 +139,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：属性表、地址与写出来的正文 |
 | `lib/shared/ui/track_detail_table.dart` | 详情面板的属性表：名字一列，值一列 |
 | `lib/shared/ui/track_detail_row.dart` | 属性表里的一行：名字、图标、值 |
+| `lib/shared/ui/track_detail_copy_button.dart` | 属性表里把值复制走的那颗按钮 |
 | `lib/shared/ui/track_detail_heading.dart` | 一组内容的名字 |
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四行地址：本机文件路径、在线地址、封面地址、规范身份 |
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |

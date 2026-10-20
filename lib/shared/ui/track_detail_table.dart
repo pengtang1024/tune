@@ -1,15 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
-import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
+import 'package:tune/shared/ui/track_detail_copy_button.dart';
 import 'package:tune/shared/ui/track_detail_heading.dart';
 import 'package:tune/shared/ui/track_detail_row.dart';
-import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// A group of lines under a name.
 class TrackDetailSection {
@@ -137,25 +135,36 @@ class TrackDetailLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: CompactTokens.space12),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: SelectableText(
-                    row.value,
-                    style: _valueStyle(context),
-                  ),
-                ),
-                if (row.copyHint != null) ...[
-                  const SizedBox(width: CompactTokens.space8),
-                  _CopyButton(hint: row.copyHint!, value: row.value),
-                ],
-              ],
-            ),
-          ),
+          Expanded(child: _ValueCell(row: row)),
         ],
       ),
+    );
+  }
+
+}
+
+/// The value of a line, and the button that takes it away.
+class _ValueCell extends StatelessWidget {
+  final TrackDetailRow row;
+
+  const _ValueCell({required this.row});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurface;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SelectableText(row.value, style: _valueStyle(context, color)),
+        ),
+        if (row.copyHint != null) ...[
+          const SizedBox(width: CompactTokens.space8),
+          TrackDetailCopyButton(hint: row.copyHint!, value: row.value),
+        ],
+      ],
     );
   }
 
@@ -163,9 +172,8 @@ class TrackDetailLine extends StatelessWidget {
   ///
   /// A value that a machine wrote keeps the machine face, so the reader can
   /// tell the words of a person from the words of a program at a glance.
-  TextStyle _valueStyle(BuildContext context) {
+  TextStyle _valueStyle(BuildContext context, Color color) {
     final theme = Theme.of(context);
-    final color = theme.colorScheme.onSurface;
 
     if (row.machine) {
       return CompactTypography.mono(color, size: CompactTypeScale.body);
@@ -173,45 +181,5 @@ class TrackDetailLine extends StatelessWidget {
 
     return theme.textTheme.bodySmall?.copyWith(color: color) ??
         CompactTypography.sans(color, size: CompactTypeScale.body);
-  }
-}
-
-/// The button that takes the value of a line away.
-class _CopyButton extends StatelessWidget {
-  final String hint;
-  final String value;
-
-  const _CopyButton({required this.hint, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return TuneTooltip(
-      message: hint,
-      child: IconButton(
-        onPressed: () => _copy(context),
-        icon: const Icon(Icons.copy_rounded, size: CompactTokens.icon16),
-        style: IconButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _copy(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: value));
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(context.loc.trackDetailsCopied),
-          duration: const Duration(milliseconds: 1500),
-        ),
-      );
   }
 }
