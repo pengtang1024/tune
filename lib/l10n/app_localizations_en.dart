@@ -150,6 +150,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryAddToQueue => 'Add to queue';
 
   @override
+  String get libraryAddAllToQueue => 'Add the whole list to the queue';
+
+  @override
   String get queueTitle => 'Queue';
 
   @override

@@ -346,6 +346,12 @@ abstract class AppLocalizations {
   /// **'加入播放队列'**
   String get libraryAddToQueue;
 
+  /// No description provided for @libraryAddAllToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'将整个列表加入队列'**
+  String get libraryAddAllToQueue;
+
   /// No description provided for @queueTitle.
   ///
   /// In zh_CN, this message translates to:

@@ -56,6 +56,7 @@
     }
   },
   "libraryAddToQueue": "加入播放队列",
+  "libraryAddAllToQueue": "将整个列表加入队列",
   "queueTitle": "播放队列",
   "queueSubtitle": "当前播放顺序",
   "queueEmptyTitle": "播放队列是空的",

@@ -381,6 +381,40 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     state = state.copyWith(queue: queue);
   }
 
+  /// Adds every track of [songs] to the queue.
+  ///
+  /// The whole list goes in at once, so a library with thousands of tracks
+  /// does not rebuild the queue thousands of times. Tracks that are queued
+  /// already are left out.
+  ///
+  /// Returns how many tracks were added.
+  int addAllToQueue(List<Song> songs) {
+    final queued = state.queue.map((song) => song.uri).toSet();
+    final additions = <Song>[];
+    for (final song in songs) {
+      if (song.uri.isEmpty) continue;
+      if (!queued.add(song.uri)) continue;
+      additions.add(song);
+    }
+    if (additions.isEmpty) return 0;
+
+    final queue = List<Song>.unmodifiable([...state.queue, ...additions]);
+    _orderBeforeShuffle = null;
+    if (!state.hasTrack) {
+      state = state.copyWith(
+        queue: queue,
+        currentUri: additions.first.uri,
+        status: PlaybackStatus.paused,
+        duration: _knownDuration(additions.first),
+        errorMessage: null,
+      );
+      return additions.length;
+    }
+
+    state = state.copyWith(queue: queue);
+    return additions.length;
+  }
+
   Future<void> removeFromQueue(int index) async {
     if (index < 0 || index >= state.queue.length) return;
 

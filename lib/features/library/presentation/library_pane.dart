@@ -8,6 +8,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
+import 'package:tune/features/library/presentation/library_queue_all_button.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
@@ -97,22 +98,31 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             eyebrow: context.loc.libraryEyebrow,
             title: context.loc.libraryTitle,
             subtitle: context.loc.librarySubtitle,
-            trailing: OutlinedButton.icon(
-              onPressed: () => showOnlineSearchSheet(context),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, 34),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: CompactTokens.space12,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LibraryQueueAllButton(
+                  onPressed: songs.isEmpty ? null : () => _addAllToQueue(songs),
                 ),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                textStyle: const TextStyle(fontSize: 11),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+                const SizedBox(width: CompactTokens.space8),
+                OutlinedButton.icon(
+                  onPressed: () => showOnlineSearchSheet(context),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 34),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: CompactTokens.space12,
+                    ),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    textStyle: const TextStyle(fontSize: 11),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                  ),
+                  icon: const Icon(Icons.travel_explore_rounded, size: 16),
+                  label: Text(context.loc.searchOnlineTitle),
                 ),
-              ),
-              icon: const Icon(Icons.travel_explore_rounded, size: 16),
-              label: Text(context.loc.searchOnlineTitle),
+              ],
             ),
           ),
         ),
@@ -215,9 +225,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           playing: isPlaying,
           sourceName: sourceLabel(song, sourceNames),
           onTap: () {
-            ref
-                .read(playbackControllerProvider.notifier)
-                .playQueue(songs, startIndex: index);
+            // A track is played on its own: the queue holds what the user
+            // puts into it, not the list that happens to be on screen.
+            ref.read(playbackControllerProvider.notifier).playSong(song);
           },
           onAddToQueue: () => _addToQueue(song),
         );
@@ -227,6 +237,22 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
   void _addToQueue(Song song) {
     ref.read(playbackControllerProvider.notifier).addToQueue(song);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(context.loc.libraryAddedToQueue),
+          duration: Duration(milliseconds: 1200),
+        ),
+      );
+  }
+
+  /// Puts the whole visible list into the queue.
+  void _addAllToQueue(List<Song> songs) {
+    final added = ref
+        .read(playbackControllerProvider.notifier)
+        .addAllToQueue(songs);
+    if (added == 0) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(

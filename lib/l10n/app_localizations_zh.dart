@@ -140,6 +140,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryAddToQueue => '加入播放队列';
 
   @override
+  String get libraryAddAllToQueue => '将整个列表加入队列';
+
+  @override
   String get queueTitle => '播放队列';
 
   @override
@@ -1372,6 +1375,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryAddToQueue => '加入播放队列';
 
   @override
+  String get libraryAddAllToQueue => '将整个列表加入队列';
+
+  @override
   String get queueTitle => '播放队列';
 
   @override
@@ -2602,6 +2608,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryAddToQueue => '加入播放佇列';
+
+  @override
+  String get libraryAddAllToQueue => '將整個清單加入佇列';
 
   @override
   String get queueTitle => '播放佇列';

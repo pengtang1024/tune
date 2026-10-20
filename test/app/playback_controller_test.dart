@@ -235,6 +235,35 @@ void main() {
     },
   );
 
+  test('addAllToQueue puts the whole list in at once', () {
+    controller.addToQueue(songA);
+
+    final added = controller.addAllToQueue([songA, songB, songC]);
+
+    expect(added, 2);
+    expect(controller.state.queue, [songA, songB, songC]);
+    expect(controller.state.currentSong, songA);
+  });
+
+  test('addAllToQueue stages the first track of an empty queue', () {
+    final added = controller.addAllToQueue([songA, songB]);
+
+    expect(added, 2);
+    expect(controller.state.queue, [songA, songB]);
+    expect(controller.state.currentSong, songA);
+    expect(controller.state.status, PlaybackStatus.paused);
+  });
+
+  test('addAllToQueue leaves the queue alone when everything is queued', () {
+    controller.addToQueue(songA);
+    controller.addToQueue(songB);
+
+    final added = controller.addAllToQueue([songA, songB]);
+
+    expect(added, 0);
+    expect(controller.state.queue, [songA, songB]);
+  });
+
   group('queue model', () {
     test('the current track is kept by identity', () async {
       await controller.playQueue([songA, songB, songC]);
