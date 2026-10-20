@@ -354,6 +354,64 @@ void main() {
     });
   });
 
+  group('sequential playback', () {
+    test('the next track walks the queue and wraps around', () async {
+      await controller.playQueue([songA, songB, songC]);
+
+      await controller.next();
+      expect(audio.playedSong, songB);
+      await controller.next();
+      expect(audio.playedSong, songC);
+      await controller.next();
+      expect(audio.playedSong, songA);
+    });
+
+    test('the previous track walks the queue back and wraps around', () async {
+      await controller.playQueue([songA, songB, songC], startIndex: 1);
+
+      await controller.previous();
+      expect(audio.playedSong, songA);
+      await controller.previous();
+      expect(audio.playedSong, songC);
+    });
+
+    test('walking back does not bounce between two tracks', () async {
+      await controller.playQueue([songA, songB, songC, songD]);
+      await controller.next();
+      await controller.next();
+      await controller.next();
+
+      await controller.previous();
+      expect(audio.playedSong, songC);
+      await controller.previous();
+      expect(audio.playedSong, songB);
+      await controller.previous();
+      expect(audio.playedSong, songA);
+    });
+
+    test('the shuffle leaves the sequential order untouched', () async {
+      await controller.playQueue([songA, songB, songC]);
+      final order = controller.state.queue;
+
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+
+      expect(controller.state.playMode, PlayMode.sequential);
+      expect(controller.state.queue, order);
+    });
+
+    test('a played shuffle round leaves the sequential order untouched', () async {
+      await controller.playQueue([songA, songB, songC]);
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+      await controller.next();
+      controller.cyclePlayMode();
+
+      expect(controller.state.queue, [songA, songB, songC]);
+    });
+  });
+
   group('local sources', () {
     test('a local track plays straight from disk', () async {
       await controller.playQueue([songA]);
