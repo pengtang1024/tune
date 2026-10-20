@@ -171,6 +171,8 @@
   "routerBackToLibrary": "返回音乐库",
   "sourcesTitle": "音源",
   "sourcesSubtitle": "在线曲库、自建服务与扫描目录",
+  "sourcesGroupMore": "更多音源",
+  "sourcesGroupAdded": "我添加的",
   "sourcesAutoScan": "启动时自动扫描",
   "sourcesAutoScanDescription": "所有已启用音源都会在启动后自动刷新，失败不会影响本地库。",
   "sourcesScanMayTakeSeconds": "含远程音源时可能需要数秒",

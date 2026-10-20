@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
@@ -14,9 +15,10 @@ import '../services/fake_persistence.dart';
 void main() {
   late FakePersistenceService persistence;
 
-  setUpAll(() async {
+  setUp(() {
     // The page renders in Chinese, so the settings that drive the language
-    // of the app have to be in Chinese too.
+    // of the app have to be in Chinese too. Every test gets its own
+    // preferences, so one test does not fold the group for the next.
     persistence = FakePersistenceService()..values['language_code'] = 'zh';
   });
 
@@ -36,6 +38,12 @@ void main() {
         ),
       ),
     );
+  }
+
+  /// Opens the group of the sources that need a key.
+  Future<void> openMoreSources(WidgetTester tester) async {
+    await tester.tap(find.byKey(const ValueKey('sources-more-toggle')));
+    await tester.pumpAndSettle();
   }
 
   testWidgets('unconfigured source only enables after saving settings', (
@@ -89,6 +97,9 @@ void main() {
 
     await tester.pumpWidget(app(controller));
     await tester.pumpAndSettle();
+
+    // The sources that need a key wait in the folded group.
+    await openMoreSources(tester);
 
     // Every new source is listed with its own switch.
     for (final id in ['ccmixter', 'itunes', 'podcast_rss', 'subsonic']) {
@@ -162,6 +173,9 @@ void main() {
     await tester.pumpWidget(app(controller));
     await tester.pumpAndSettle();
 
+    // Jellyfin asks for an account, so it waits in the folded group.
+    await openMoreSources(tester);
+
     for (final id in ['audius', 'radio', 'wikimedia', 'jellyfin']) {
       expect(
         find.byKey(ValueKey('source-switch-$id')),
@@ -222,6 +236,8 @@ void main() {
     await tester.pumpWidget(app(controller));
     await tester.pumpAndSettle();
 
+    await openMoreSources(tester);
+
     await tester.tap(find.byKey(const ValueKey('source-config-subsonic')));
     await tester.pumpAndSettle();
 
@@ -238,6 +254,75 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the sources that need no key stand at the top', (
+    tester,
+  ) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [
+          BuiltInMusicSources.ccmixter,
+          BuiltInMusicSources.itunes,
+          BuiltInMusicSources.subsonic,
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    // The source that asks nothing of the reader is there; the ones that
+    // need a key wait in the folded group.
+    expect(
+      find.byKey(const ValueKey('source-switch-ccmixter')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('source-switch-itunes')), findsNothing);
+    expect(find.byKey(const ValueKey('source-switch-subsonic')), findsNothing);
+    expect(find.text('更多音源'), findsOneWidget);
+    expect(find.text('我添加的'), findsNothing);
+  });
+
+  testWidgets('the folded group opens once and stays open', (tester) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [BuiltInMusicSources.ccmixter, BuiltInMusicSources.itunes],
+      ),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    await openMoreSources(tester);
+
+    expect(find.byKey(const ValueKey('source-switch-itunes')), findsOneWidget);
+    expect(persistence.getBool('sources_more_expanded'), isTrue);
+  });
+
+  testWidgets('the sources the reader added are theirs', (tester) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [
+          BuiltInMusicSources.ccmixter,
+          const MusicSourceConfig(
+            id: 'podcast_rss:1',
+            type: 'podcast_rss',
+            name: '我的播客',
+            kind: MusicSourceKind.custom,
+          ),
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('我添加的'), findsOneWidget);
+    expect(find.text('我的播客'), findsOneWidget);
+
+    // The source of the reader is not folded away with the ones that need
+    // a key.
+    expect(find.text('更多音源'), findsNothing);
+  });
 }
 
 class FakeMusicSourcesController extends MusicSourcesController {

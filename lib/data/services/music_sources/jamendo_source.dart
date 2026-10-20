@@ -28,6 +28,11 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'jamendo';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   /// Jamendo serves its own charts and its own newest releases, so the
   /// source only needs the key it asks for.
   @override

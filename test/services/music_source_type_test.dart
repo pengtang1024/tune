@@ -138,6 +138,20 @@ void main() {
       expect(localized.single.localizedName, isNotEmpty);
     });
 
+    test('a source the reader added keeps the name they gave it', () {
+      const instance = MusicSourceConfig(
+        id: 'subsonic:1',
+        type: 'subsonic',
+        name: 'My server',
+        kind: MusicSourceKind.custom,
+      );
+
+      final localized = localizedSources(english, [instance]);
+
+      expect(localized.single.name, 'My server');
+      expect(localized.single.localizedName, isNotEmpty);
+    });
+
     test('an instance of a built-in type keeps the icon of the type', () {
       const instance = MusicSourceConfig(
         id: 'jamendo:1',
@@ -152,4 +166,71 @@ void main() {
       );
     });
   });
+
+  group('where a source belongs in the list', () {
+    test('the type says whether it stands at the top', () {
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final id in [
+        'local',
+        'radio',
+        'openverse',
+        'jamendo',
+        'internet_archive',
+        'ccmixter',
+        'audius',
+        'wikimedia',
+      ]) {
+        expect(
+          service.isFeatured(_builtIn(id)),
+          isTrue,
+          reason: '$id asks nothing of the reader, so it stands at the top',
+        );
+      }
+
+      for (final id in [
+        'itunes',
+        'podcast_rss',
+        'netease',
+        'subsonic',
+        'jellyfin',
+      ]) {
+        expect(
+          service.isFeatured(_builtIn(id)),
+          isFalse,
+          reason: '$id needs a key or a decision, so it waits in the folded group',
+        );
+      }
+    });
+
+    test('a source the reader added is never at the top', () {
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      const added = MusicSourceConfig(
+        id: 'jamendo:1',
+        type: 'jamendo',
+        name: '我的 Jamendo',
+        kind: MusicSourceKind.custom,
+      );
+
+      expect(service.isFeatured(added), isFalse);
+    });
+  });
+}
+
+/// A built-in source of the given type.
+MusicSourceConfig _builtIn(String type) {
+  return MusicSourceConfig(
+    id: type,
+    type: type,
+    name: type,
+    kind: MusicSourceKind.openCatalog,
+    builtIn: true,
+  );
 }

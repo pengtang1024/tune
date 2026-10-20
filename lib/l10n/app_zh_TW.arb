@@ -171,6 +171,8 @@
   "routerBackToLibrary": "返回音樂庫",
   "sourcesTitle": "音源",
   "sourcesSubtitle": "線上曲庫、自建服務與掃描目錄",
+  "sourcesGroupMore": "更多音源",
+  "sourcesGroupAdded": "我新增的",
   "sourcesAutoScan": "啟動時自動掃描",
   "sourcesAutoScanDescription": "所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。",
   "sourcesScanMayTakeSeconds": "含遠端音源時可能需要數秒",

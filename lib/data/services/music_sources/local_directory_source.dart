@@ -13,6 +13,11 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'local';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   @override
   bool isConfigured(MusicSourceConfig config) => true;
 

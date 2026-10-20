@@ -43,6 +43,8 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('replace_queue_on_click') ?? false,
           onlyLikeOnDoubleClick:
               _persistence.getBool('only_like_on_double_click') ?? false,
+          sourcesMoreExpanded:
+              _persistence.getBool('sources_more_expanded') ?? false,
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -109,6 +111,13 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.onlyLikeOnDoubleClick == value) return;
     state = state.copyWith(onlyLikeOnDoubleClick: value);
     await _persistence.setBool('only_like_on_double_click', value);
+  }
+
+  /// Opens or folds the group of the sources that need a key.
+  Future<void> setSourcesMoreExpanded(bool value) async {
+    if (state.sourcesMoreExpanded == value) return;
+    state = state.copyWith(sourcesMoreExpanded: value);
+    await _persistence.setBool('sources_more_expanded', value);
   }
 
   /// Sets the folder the app writes the files it fetches into.

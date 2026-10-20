@@ -646,6 +646,18 @@ abstract class AppLocalizations {
   /// **'在线曲库、自建服务与扫描目录'**
   String get sourcesSubtitle;
 
+  /// No description provided for @sourcesGroupMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多音源'**
+  String get sourcesGroupMore;
+
+  /// No description provided for @sourcesGroupAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'我添加的'**
+  String get sourcesGroupAdded;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

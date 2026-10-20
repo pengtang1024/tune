@@ -32,6 +32,13 @@ class SettingsState {
   /// folder.
   final String? libraryFolder;
 
+  /// Whether the folded group of the sources needs a key is open.
+  ///
+  /// The sources that ask for a key wait in a folded section, so they do
+  /// not push the ones that work right away out of sight. The reader opens
+  /// the section once and it stays open.
+  final bool sourcesMoreExpanded;
+
   /// The music library of the machine.
   final String defaultLibraryFolder;
 
@@ -45,6 +52,7 @@ class SettingsState {
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
     this.onlyLikeOnDoubleClick = false,
+    this.sourcesMoreExpanded = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
   });
@@ -64,6 +72,7 @@ class SettingsState {
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
     bool? onlyLikeOnDoubleClick,
+    bool? sourcesMoreExpanded,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
   }) {
@@ -78,6 +87,8 @@ class SettingsState {
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
       onlyLikeOnDoubleClick:
           onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
+      sourcesMoreExpanded:
+          sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
           : libraryFolder as String?,

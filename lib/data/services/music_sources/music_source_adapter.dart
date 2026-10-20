@@ -52,6 +52,13 @@ abstract class MusicSourceAdapter {
     return browseModes.first;
   }
 
+  /// Whether the source belongs to the top of the list.
+  ///
+  /// The sources that ask nothing of the reader are the ones met first; the
+  /// ones that need a key or a decision wait in a folded section below them.
+  /// The type says where it belongs, so the interface never names a source.
+  bool get featured => false;
+
   /// Fields the settings dialog should render for this source.
   List<MusicSourceField> get configurationFields => const [];
 

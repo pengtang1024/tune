@@ -32,6 +32,11 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'openverse';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   /// Openverse serves the audio it published last, so the source is ready as
   /// it is: a keyword is a choice, not a requirement.
   @override

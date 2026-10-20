@@ -92,6 +92,12 @@ MusicSourceConfig（实例 · 数据）
 
 `direct_url` / `m3u` / `json_api` / `graphql` 是新增类型，`json_api` 与 `graphql` 排到最后做（见 §6）。
 
+**哪些类型站在顶层**：本地目录、网络电台，以及六个明确开放授权的曲库
+（Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
+其余的内置类型（iTunes、播客 RSS、网易云 API、Subsonic、Jellyfin）要么要凭据，
+要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
+`featured`），界面不按 id 硬编码。
+
 `json_api` 与 `graphql` 是同一件事的两档：JSON 接口够用时就用 JSON 接口，
 接口需要「按条件挑」而 JSON 的路径映射表达不了时，换 GraphQL —— 它的查询文档
 是声明式的，不是表达式，所以不违反 §7 的「不做求值」。
@@ -319,7 +325,10 @@ flutter test
 
 新增测试：
 
-- `test/services/music_source_type_test.dart`：类型解析、`type` 回退、内置判定。
+- `test/services/music_source_type_test.dart`：类型解析、`type` 回退、内置判定、
+  类型是否属于顶层。
+- `test/app/music_sources_section_test.dart`：三分区的顺序、「更多音源」的折叠与
+  记住展开状态。
 - `test/services/music_source_browse_test.dart`：各浏览流的请求形态（排行走 trending、
   最新走无词列表）、以及「有浏览流即已配置」的判定。
 - `test/app/music_sources_add_test.dart`：添加实例、id 分配、删除实例与歌曲。

@@ -38,6 +38,11 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'ccmixter';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   /// ccMixter serves its own newest uploads and its own charts, so the
   /// source is ready as it is: a keyword is a choice, not a requirement.
   @override

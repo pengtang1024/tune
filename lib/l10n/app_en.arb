@@ -171,6 +171,8 @@
   "routerBackToLibrary": "Back to library",
   "sourcesTitle": "Sources",
   "sourcesSubtitle": "Online catalogs, self-hosted services and scan folders",
+  "sourcesGroupMore": "More sources",
+  "sourcesGroupAdded": "Added by me",
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
   "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",

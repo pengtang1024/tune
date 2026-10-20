@@ -28,8 +28,11 @@ List<MusicSourceConfig> localizedSources(
       .map((source) {
         final entry = catalogue[source.sourceType];
         if (entry == null) return source;
+        // A built-in source is named by the catalogue, so the reader meets it
+        // in their own language. A source the reader added keeps the name
+        // they gave it: two instances of one type are told apart by it.
         return source.copyWith(
-          name: entry.name,
+          name: source.builtIn ? entry.name : source.name,
           localizedName: entry.localizedName,
           description: entry.description,
         );
@@ -51,7 +54,11 @@ Map<String, SourceLabel> sourceLabelsOf(
   return {
     for (final source in sources)
       source.id: SourceLabel(
-        name: catalogue[source.sourceType]?.name ?? source.name,
+        // The name of a built-in source is the name of its type; a source the
+        // reader added keeps the name they gave it.
+        name: source.builtIn
+            ? (catalogue[source.sourceType]?.name ?? source.name)
+            : source.name,
         localizedName: catalogue[source.sourceType]?.localizedName ?? '',
         type: source.sourceType,
         kind: source.kind,

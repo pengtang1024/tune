@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/source_kind_label.dart';
+import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -52,6 +55,7 @@ class MusicSourcesSection extends ConsumerWidget {
     final lastScanAt =
         sourcesAsync.valueOrNull?.lastScanAt ?? const <String, DateTime>{};
     final sourceService = ref.watch(musicSourceServiceProvider);
+    final groups = _groupSources(sources, sourceService);
     final canScan =
         !busy &&
         sources.any(
@@ -126,14 +130,44 @@ class MusicSourcesSection extends ConsumerWidget {
               padding: EdgeInsets.symmetric(vertical: CompactTokens.space8),
               child: LinearProgressIndicator(minHeight: 2),
             )
-          else
-            for (final source in sources)
+          else ...[
+            for (final source in groups.featured)
               _SourceTile(
                 source: source,
                 summary: library.summaries[source.id],
                 lastScanAt: lastScanAt[source.id],
                 busy: busy,
               ),
+            if (groups.more.isNotEmpty) ...[
+              const SizedBox(height: CompactTokens.space6),
+              _GroupHeader(
+                title: context.loc.sourcesGroupMore,
+                expanded: settings.sourcesMoreExpanded,
+                onTap: () => ref
+                    .read(settingsControllerProvider.notifier)
+                    .setSourcesMoreExpanded(!settings.sourcesMoreExpanded),
+              ),
+              if (settings.sourcesMoreExpanded)
+                for (final source in groups.more)
+                  _SourceTile(
+                    source: source,
+                    summary: library.summaries[source.id],
+                    lastScanAt: lastScanAt[source.id],
+                    busy: busy,
+                  ),
+            ],
+            if (groups.added.isNotEmpty) ...[
+              const SizedBox(height: CompactTokens.space6),
+              _GroupHeader(title: context.loc.sourcesGroupAdded),
+              for (final source in groups.added)
+                _SourceTile(
+                  source: source,
+                  summary: library.summaries[source.id],
+                  lastScanAt: lastScanAt[source.id],
+                  busy: busy,
+                ),
+            ],
+          ],
           const SizedBox(height: CompactTokens.space8),
           Row(
             children: [
@@ -189,6 +223,101 @@ class MusicSourcesSection extends ConsumerWidget {
       ..showSnackBar(
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
+  }
+}
+
+/// The sources of the list, split into the groups the reader sees.
+///
+/// The sources that work right away stand at the top, the ones that need a
+/// key wait in a folded group, and the ones the reader added are theirs.
+class _SourceGroups {
+  final List<MusicSourceConfig> featured;
+  final List<MusicSourceConfig> more;
+  final List<MusicSourceConfig> added;
+
+  const _SourceGroups({
+    required this.featured,
+    required this.more,
+    required this.added,
+  });
+}
+
+/// Splits the sources of the list into the groups the reader sees.
+///
+/// Which group a source belongs to is said by the type, not by its id, so a
+/// new type lands in the right place without the interface knowing it.
+_SourceGroups _groupSources(
+  List<MusicSourceConfig> sources,
+  MusicSourceService service,
+) {
+  final featured = <MusicSourceConfig>[];
+  final more = <MusicSourceConfig>[];
+  final added = <MusicSourceConfig>[];
+
+  for (final source in sources) {
+    if (!source.builtIn) {
+      added.add(source);
+    } else if (service.isFeatured(source)) {
+      featured.add(source);
+    } else {
+      more.add(source);
+    }
+  }
+
+  return _SourceGroups(featured: featured, more: more, added: added);
+}
+
+/// The name of a group of sources.
+///
+/// A group that can be folded says so with a chevron, so the reader knows
+/// there is more under the name.
+class _GroupHeader extends StatelessWidget {
+  final String title;
+  final bool? expanded;
+  final VoidCallback? onTap;
+
+  const _GroupHeader({required this.title, this.expanded, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: CompactTokens.space4,
+        bottom: CompactTokens.space6,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: CompactTypography.sans(
+                theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.label,
+                weight: FontWeight.w600,
+              ),
+            ),
+          ),
+          if (onTap != null)
+            InkWell(
+              key: const ValueKey('sources-more-toggle'),
+              onTap: onTap,
+              borderRadius: CompactTokens.borderRadius6,
+              child: Padding(
+                padding: const EdgeInsets.all(CompactTokens.space4),
+                child: Icon(
+                  expanded == true
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  size: CompactTokens.icon18,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

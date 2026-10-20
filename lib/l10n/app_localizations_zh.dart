@@ -316,6 +316,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesSubtitle => '在线曲库、自建服务与扫描目录';
 
   @override
+  String get sourcesGroupMore => '更多音源';
+
+  @override
+  String get sourcesGroupAdded => '我添加的';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -1691,6 +1697,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesSubtitle => '在线曲库、自建服务与扫描目录';
 
   @override
+  String get sourcesGroupMore => '更多音源';
+
+  @override
+  String get sourcesGroupAdded => '我添加的';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3064,6 +3076,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesSubtitle => '線上曲庫、自建服務與掃描目錄';
+
+  @override
+  String get sourcesGroupMore => '更多音源';
+
+  @override
+  String get sourcesGroupAdded => '我新增的';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

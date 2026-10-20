@@ -336,6 +336,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Online catalogs, self-hosted services and scan folders';
 
   @override
+  String get sourcesGroupMore => 'More sources';
+
+  @override
+  String get sourcesGroupAdded => 'Added by me';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

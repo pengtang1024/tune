@@ -48,6 +48,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'wikimedia';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   /// Commons asks for no key and serves its own audio categories, so the
   /// source is ready as it is: a keyword is a choice, not a requirement.
   @override

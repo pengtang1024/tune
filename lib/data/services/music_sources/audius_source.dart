@@ -42,6 +42,11 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'audius';
 
+  /// The source asks nothing of the reader, so it belongs to the top
+  /// of the list.
+  @override
+  bool get featured => true;
+
   /// Audius serves the tracks everybody plays, so the source is ready as it
   /// is: a keyword is a choice, not a requirement.
   @override

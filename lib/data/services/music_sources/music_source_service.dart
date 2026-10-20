@@ -83,6 +83,15 @@ class MusicSourceService implements StreamUrlResolver {
     return supports(config.sourceType);
   }
 
+  /// Whether the source belongs to the top of the list.
+  ///
+  /// The type says where it belongs; an instance the reader added is never
+  /// at the top, it is in the group of the ones they added.
+  bool isFeatured(MusicSourceConfig config) {
+    if (!config.builtIn) return false;
+    return _adapters[config.sourceType]?.featured ?? false;
+  }
+
   /// Persists scan timestamps after the library controller has saved songs.
   ///
   /// Marking inside [_scanOne] would let a crash leave a "scanned" timestamp
