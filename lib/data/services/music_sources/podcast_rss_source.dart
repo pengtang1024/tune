@@ -33,7 +33,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'podcast_rss';
+  String get sourceType => 'podcast_rss';
 
   @override
   bool isConfigured(MusicSourceConfig config) => config.setting('feed') != null;
@@ -68,7 +68,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final feed = request.config.setting('feed');
     if (feed == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -79,23 +79,23 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       final response = await _dio.get<String>(feed);
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
-        return failedResult(sourceId, AppStrings.instance.podcastRssEmptyFeed);
+        return failedResult(request.config.id, AppStrings.instance.podcastRssEmptyFeed);
       }
 
-      final songs = parseFeed(body, sourceId: sourceId, limit: limit);
+      final songs = parseFeed(body, sourceId: request.config.id, limit: limit);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.podcastRssNoMatch : null,
       );
     } on XmlException catch (error) {
       return failedResult(
-        sourceId,
+        request.config.id,
         AppStrings.instance.podcastRssInvalidFeed(error.message),
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

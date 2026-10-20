@@ -42,7 +42,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'wikimedia';
+  String get sourceType => 'wikimedia';
 
   /// Commons asks for no key, so the source works as soon as it is enabled.
   ///
@@ -95,19 +95,19 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       final data = response.data;
       if (data == null) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.wikimediaEmptyResponse,
         );
       }
-      final songs = parseResults(data, sourceId: sourceId, limit: limit);
+      final songs = parseResults(data, sourceId: request.config.id, limit: limit);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.wikimediaNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

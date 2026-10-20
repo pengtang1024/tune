@@ -33,7 +33,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
           ];
 
   @override
-  String get sourceId => 'radio';
+  String get sourceType => 'radio';
 
   @override
   bool isConfigured(MusicSourceConfig config) => true;
@@ -90,12 +90,12 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     }
 
     if (stations.isEmpty && failures.isNotEmpty) {
-      return failedResult(sourceId, failures.first);
+      return failedResult(request.config.id, failures.first);
     }
 
-    final songs = buildSongs(stations, sourceId: sourceId);
+    final songs = buildSongs(stations, sourceId: request.config.id);
     return SourceScanResult(
-      sourceId: sourceId,
+      sourceId: request.config.id,
       status: SourceScanStatus.success,
       songs: songs,
       message: songs.isEmpty ? AppStrings.instance.radioNoMatch : null,

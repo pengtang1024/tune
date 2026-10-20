@@ -145,7 +145,7 @@ void main() {
             expect(
               messages,
               contains(field.label),
-              reason: '${adapter.sourceId} names its own ${field.key} field',
+              reason: '${adapter.sourceType} names its own ${field.key} field',
             );
           }
         }
@@ -163,12 +163,12 @@ void main() {
         final fields = adapter.configurationFields
             .where((field) => field.key == 'limit')
             .toList(growable: false);
-        expect(fields, hasLength(1), reason: adapter.sourceId);
+        expect(fields, hasLength(1), reason: adapter.sourceType);
 
         expect(
           fields.single.hint,
           strings.fieldLimitHint(limit.count, limit.max),
-          reason: '${adapter.sourceId} shows other numbers than it counts',
+          reason: '${adapter.sourceType} shows other numbers than it counts',
         );
       }
     });

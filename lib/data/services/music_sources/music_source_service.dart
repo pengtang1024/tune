@@ -64,13 +64,15 @@ class MusicSourceService implements StreamUrlResolver {
 
   List<MusicSourceAdapter> get adapters => List.unmodifiable(_adapters.values);
 
-  MusicSourceAdapter? adapterFor(String sourceId) => _adapters[sourceId];
+  /// The adapter of a type, when the registry knows it.
+  MusicSourceAdapter? adapterFor(String sourceType) => _adapters[sourceType];
 
-  bool supports(String sourceId) => _adapters.containsKey(sourceId);
+  /// Whether a type is served by an adapter of the registry.
+  bool supports(String sourceType) => _adapters.containsKey(sourceType);
 
   bool supportsConfig(MusicSourceConfig config) {
     if (config.isPlugin) return _pluginRepository.supportsPlugins;
-    return supports(config.id);
+    return supports(config.sourceType);
   }
 
   /// Persists scan timestamps after the library controller has saved songs.
@@ -90,22 +92,22 @@ class MusicSourceService implements StreamUrlResolver {
 
   List<MusicSourceField> fieldsFor(MusicSourceConfig config) {
     if (config.isPlugin) return _pluginRepository.fieldsFor(config);
-    return _adapters[config.id]?.configurationFields ?? const [];
+    return _adapters[config.sourceType]?.configurationFields ?? const [];
   }
 
   bool isConfigured(MusicSourceConfig config) {
     if (config.isPlugin) return _pluginRepository.isConfigured(config);
-    return _adapters[config.id]?.isConfigured(config) ?? false;
+    return _adapters[config.sourceType]?.isConfigured(config) ?? false;
   }
 
   String configurationHint(MusicSourceConfig config) {
     if (config.isPlugin) return AppStrings.instance.pluginSourceHint;
-    return _adapters[config.id]?.configurationHint ??
+    return _adapters[config.sourceType]?.configurationHint ??
         AppStrings.instance.sourceErrorUnsupported;
   }
 
   Future<MusicSourceAdapter?> _adapterFor(MusicSourceConfig config) async {
-    final builtIn = _adapters[config.id];
+    final builtIn = _adapters[config.sourceType];
     if (builtIn != null) return builtIn;
     if (config.isPlugin) return _pluginRepository.adapterFor(config);
     return null;

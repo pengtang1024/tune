@@ -83,19 +83,19 @@ enum MusicSourceKind {
 /// is called in the language of the reader. The two travel together, so a
 /// source is never named in one place and named differently in another.
 ///
-/// The id and the kind are what the interface needs to draw the source
-/// without reading its name: the id picks the icon that stands for the
+/// The type and the kind are what the interface needs to draw the source
+/// without reading its name: the type picks the icon that stands for the
 /// source, the kind picks one when the source has no icon of its own.
 class SourceLabel {
   final String name;
   final String localizedName;
-  final String id;
+  final String type;
   final MusicSourceKind kind;
 
   const SourceLabel({
     required this.name,
     this.localizedName = '',
-    this.id = '',
+    this.type = '',
     this.kind = MusicSourceKind.openCatalog,
   });
 
@@ -110,6 +110,13 @@ class SourceLabel {
 /// teaching the rest of the app about every adapter.
 class MusicSourceConfig {
   final String id;
+
+  /// The type of the source: the key the adapter registry looks up.
+  ///
+  /// A type says *how* the tracks are fetched; an instance says *which* one.
+  /// Several instances may share a type — a second Jamendo, another Subsonic
+  /// server — so the type is not the id.
+  final String type;
   final String name;
 
   /// The name of the source in the language of the reader.
@@ -123,19 +130,37 @@ class MusicSourceConfig {
   final bool enabled;
   final Map<String, String> settings;
 
+  /// Whether the source came with the app.
+  ///
+  /// A built-in source can be switched off but not deleted; a source the
+  /// user added can be deleted with its tracks.
+  final bool builtIn;
+
   /// Extra settings declared by a plugin (cookies, tokens, ...).
   final List<MusicSourceField> customFields;
 
   const MusicSourceConfig({
     required this.id,
+    this.type = '',
     required this.name,
     this.localizedName = '',
     this.description = '',
     required this.kind,
     this.enabled = true,
     this.settings = const {},
+    this.builtIn = false,
     this.customFields = const [],
   });
+
+  /// The type the adapter registry is asked for.
+  ///
+  /// A configuration written before the split carries no type: its id was
+  /// the type, except for plugins, whose id carries a hash.
+  String get sourceType => type.isNotEmpty ? type : legacyTypeOf(id);
+
+  /// The type a configuration written before the split had.
+  static String legacyTypeOf(String id) =>
+      id.startsWith('plugin_') ? 'plugin' : id;
 
   bool get isLocal => kind == MusicSourceKind.localDirectory;
 
@@ -157,22 +182,26 @@ class MusicSourceConfig {
 
   MusicSourceConfig copyWith({
     String? id,
+    String? type,
     String? name,
     String? localizedName,
     String? description,
     MusicSourceKind? kind,
     bool? enabled,
     Map<String, String>? settings,
+    bool? builtIn,
     List<MusicSourceField>? customFields,
   }) {
     return MusicSourceConfig(
       id: id ?? this.id,
+      type: type ?? this.type,
       name: name ?? this.name,
       localizedName: localizedName ?? this.localizedName,
       description: description ?? this.description,
       kind: kind ?? this.kind,
       enabled: enabled ?? this.enabled,
       settings: settings ?? this.settings,
+      builtIn: builtIn ?? this.builtIn,
       customFields: customFields ?? this.customFields,
     );
   }
@@ -210,20 +239,24 @@ class MusicSourceConfig {
       }
     }
 
+    final id = json['id']?.toString() ?? '';
     return MusicSourceConfig(
-      id: json['id']?.toString() ?? '',
+      id: id,
+      type: json['type']?.toString() ?? legacyTypeOf(id),
       name: json['name']?.toString() ?? '',
       localizedName: json['localizedName']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       kind: _kindFromName(json['kind']?.toString()),
       enabled: rawEnabled is bool ? rawEnabled : true,
       settings: Map.unmodifiable(settings),
+      builtIn: json['builtIn'] == true,
       customFields: List.unmodifiable(fields),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'type': sourceType,
     'name': name,
     'localizedName': localizedName,
     'description': description,

@@ -35,7 +35,7 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'ccmixter';
+  String get sourceType => 'ccmixter';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -71,7 +71,7 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -89,7 +89,7 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.ccmixterEmptyResponse,
         );
       }
@@ -97,20 +97,20 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
       final decoded = jsonDecode(body);
       if (decoded is! List) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.ccmixterEmptyResponse,
         );
       }
 
-      final songs = parseResults(decoded, sourceId: sourceId);
+      final songs = parseResults(decoded, sourceId: request.config.id);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.ccmixterNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

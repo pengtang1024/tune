@@ -12,8 +12,8 @@ import 'package:tune/shared/ui/track_fact.dart';
 /// catalogue: the catalogue names the sources, this file draws them. The
 /// colour of the mark belongs to the kind of the source, the shape belongs
 /// to the source itself.
-IconData sourceIconOf(String id, MusicSourceKind kind) {
-  return switch (id) {
+IconData sourceIconOf(String type, MusicSourceKind kind) {
+  return switch (type) {
     'local' => Icons.library_music_rounded,
     'openverse' => Icons.public_rounded,
     'jamendo' => Icons.music_note_rounded,

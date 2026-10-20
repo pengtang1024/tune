@@ -25,7 +25,7 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'jamendo';
+  String get sourceType => 'jamendo';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -70,7 +70,7 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
     final clientId = request.config.setting('clientId');
     if (clientId == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -96,18 +96,18 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(sourceId, AppStrings.instance.jamendoEmptyResponse);
+        return failedResult(request.config.id, AppStrings.instance.jamendoEmptyResponse);
       }
 
-      final songs = parseResults(data, sourceId: sourceId);
+      final songs = parseResults(data, sourceId: request.config.id);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.jamendoNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

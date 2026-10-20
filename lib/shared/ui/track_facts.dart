@@ -45,7 +45,7 @@ TrackFact? _sourceFact(BuildContext context, SourceLabel source) {
   return TrackFact(
     label: context.loc.trackFactSource,
     value: value,
-    icon: sourceIconOf(source.id, source.kind),
+    icon: sourceIconOf(source.type, source.kind),
     tone: FactTone.primary,
     sentence: value,
   );

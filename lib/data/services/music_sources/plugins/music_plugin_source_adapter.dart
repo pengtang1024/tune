@@ -22,7 +22,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
   MusicPluginSourceAdapter({required this.config, required this.runtime});
 
   @override
-  String get sourceId => config.id;
+  String get sourceType => 'plugin';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -52,7 +52,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -62,7 +62,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
       final items = await runtime.search(query);
       if (items.isEmpty) {
         return SourceScanResult(
-          sourceId: sourceId,
+          sourceId: config.id,
           status: SourceScanStatus.success,
           songs: const [],
           message: AppStrings.instance.searchNoMatch,
@@ -93,7 +93,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
 
       if (songs.isEmpty) {
         return SourceScanResult(
-          sourceId: sourceId,
+          sourceId: config.id,
           status: SourceScanStatus.failed,
           message: AppStrings.instance.pluginNoStreamResults(items.length),
         );
@@ -101,12 +101,12 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
 
       songs.sort((a, b) => compareText(a.title, b.title));
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: config.id,
         status: SourceScanStatus.success,
         songs: songs,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(config.id, error);
     }
   }
 
@@ -122,7 +122,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
 
       final durationSeconds = SourceSongFactory.parseInt(item['duration']);
       return SourceSongFactory.create(
-        sourceId: sourceId,
+        sourceId: config.id,
         externalId: externalId,
         title: title,
         artist: item['artist']?.toString() ?? '',

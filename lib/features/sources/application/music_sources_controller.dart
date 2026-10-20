@@ -29,7 +29,7 @@ List<MusicSourceConfig> localizedSources(
   final catalogue = BuiltInMusicSources.catalogueOf(strings);
   return sources
       .map((source) {
-        final entry = catalogue[source.id];
+        final entry = catalogue[source.sourceType];
         if (entry == null) return source;
         return source.copyWith(
           name: entry.name,
@@ -54,9 +54,9 @@ Map<String, SourceLabel> sourceLabelsOf(
   return {
     for (final source in sources)
       source.id: SourceLabel(
-        name: catalogue[source.id]?.name ?? source.name,
-        localizedName: catalogue[source.id]?.localizedName ?? '',
-        id: source.id,
+        name: catalogue[source.sourceType]?.name ?? source.name,
+        localizedName: catalogue[source.sourceType]?.localizedName ?? '',
+        type: source.sourceType,
         kind: source.kind,
       ),
   };

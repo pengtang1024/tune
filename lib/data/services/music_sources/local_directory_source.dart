@@ -11,7 +11,7 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
   LocalDirectorySourceAdapter(this._scanner);
 
   @override
-  String get sourceId => 'local';
+  String get sourceType => 'local';
 
   @override
   bool isConfigured(MusicSourceConfig config) => true;
@@ -38,7 +38,7 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
 
     if (paths.isEmpty) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.skipped,
         message: AppStrings.instance.localSourceNotConfigured,
       );
@@ -50,12 +50,12 @@ class LocalDirectorySourceAdapter extends MusicSourceAdapter {
         (progress) => request.onProgress?.call(progress.clamp(0.0, 1.0)),
       );
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 }

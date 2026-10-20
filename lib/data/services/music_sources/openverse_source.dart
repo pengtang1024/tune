@@ -29,7 +29,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'openverse';
+  String get sourceType => 'openverse';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -59,7 +59,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -73,20 +73,20 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
       final data = response.data;
       if (data == null) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.openverseEmptyResponse,
         );
       }
 
-      final songs = parseResults(data, sourceId: sourceId);
+      final songs = parseResults(data, sourceId: request.config.id);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.openverseNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

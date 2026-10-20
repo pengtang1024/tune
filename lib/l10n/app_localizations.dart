@@ -2554,6 +2554,60 @@ abstract class AppLocalizations {
   /// **'已复制到剪贴板'**
   String get trackDetailsCopied;
 
+  /// No description provided for @trackFactDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get trackFactDuration;
+
+  /// No description provided for @trackFactSourceId.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来源编号'**
+  String get trackFactSourceId;
+
+  /// No description provided for @trackFactMediaType.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'媒体类型'**
+  String get trackFactMediaType;
+
+  /// No description provided for @trackFactCover.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'封面'**
+  String get trackFactCover;
+
+  /// No description provided for @trackFactIdentity.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'身份'**
+  String get trackFactIdentity;
+
+  /// No description provided for @trackFactHeaders.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求头'**
+  String get trackFactHeaders;
+
+  /// No description provided for @trackFactRawData.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'原始数据'**
+  String get trackFactRawData;
+
+  /// No description provided for @trackDetailsCopyCover.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'复制封面'**
+  String get trackDetailsCopyCover;
+
+  /// No description provided for @trackDetailsCopyIdentity.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'复制身份'**
+  String get trackDetailsCopyIdentity;
+
   /// No description provided for @sourceStatusEnabled.
   ///
   /// In zh_CN, this message translates to:

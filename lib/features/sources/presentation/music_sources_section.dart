@@ -391,7 +391,7 @@ class _SourceTile extends ConsumerWidget {
           TuneTooltip(
             message: source.kind.label(context.loc),
             child: Icon(
-              sourceIconOf(source.id, source.kind),
+              sourceIconOf(source.sourceType, source.kind),
               size: CompactTokens.icon16,
               color: factToneColor(
                 sourceToneOf(source.kind),

@@ -39,7 +39,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'subsonic';
+  String get sourceType => 'subsonic';
 
   @override
   bool isConfigured(MusicSourceConfig config) {
@@ -110,7 +110,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
     final config = request.config;
     if (!isConfigured(config)) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -137,7 +137,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.subsonicEmptyResponse,
         );
       }
@@ -145,18 +145,18 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       final decoded = jsonDecode(body);
       if (decoded is! Map<String, dynamic>) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.subsonicEmptyResponse,
         );
       }
 
       final payload = _payload(decoded);
       if (payload == null) {
-        return failedResult(sourceId, AppStrings.instance.subsonicAuthFailed);
+        return failedResult(request.config.id, AppStrings.instance.subsonicAuthFailed);
       }
       if (payload['status']?.toString() != 'ok') {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.subsonicError(
             payload['error']?.toString() ?? 'unknown',
           ),
@@ -165,13 +165,13 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
 
       final songs = parseSearchResults(payload, config: config);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.subsonicNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

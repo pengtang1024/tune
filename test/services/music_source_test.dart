@@ -81,7 +81,7 @@ void main() {
       );
 
       expect(
-        service.adapters.map((adapter) => adapter.sourceId).toSet(),
+        service.adapters.map((adapter) => adapter.sourceType).toSet(),
         BuiltInMusicSources.defaults.map((source) => source.id).toSet(),
       );
       expect(service.supports('openverse'), isTrue);
@@ -104,8 +104,8 @@ void main() {
 
       for (final adapter in adapters) {
         final empty = MusicSourceConfig(
-          id: adapter.sourceId,
-          name: adapter.sourceId,
+          id: adapter.sourceType,
+          name: adapter.sourceType,
           kind: MusicSourceKind.openApi,
         );
         final required = adapter.configurationFields
@@ -115,7 +115,7 @@ void main() {
         expect(
           adapter.isConfigured(empty),
           required.isEmpty,
-          reason: adapter.sourceId,
+          reason: adapter.sourceType,
         );
 
         if (required.isEmpty) continue;
@@ -126,7 +126,7 @@ void main() {
               field.key: field.numeric ? '1' : 'value',
           },
         );
-        expect(adapter.isConfigured(filled), isTrue, reason: adapter.sourceId);
+        expect(adapter.isConfigured(filled), isTrue, reason: adapter.sourceType);
       }
     });
   });

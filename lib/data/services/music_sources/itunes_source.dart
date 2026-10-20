@@ -34,7 +34,7 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'itunes';
+  String get sourceType => 'itunes';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -70,7 +70,7 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -92,23 +92,23 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
       );
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
-        return failedResult(sourceId, AppStrings.instance.itunesEmptyResponse);
+        return failedResult(request.config.id, AppStrings.instance.itunesEmptyResponse);
       }
 
       final decoded = jsonDecode(body);
       if (decoded is! Map<String, dynamic>) {
-        return failedResult(sourceId, AppStrings.instance.itunesEmptyResponse);
+        return failedResult(request.config.id, AppStrings.instance.itunesEmptyResponse);
       }
 
-      final songs = parseResults(decoded, sourceId: sourceId);
+      final songs = parseResults(decoded, sourceId: request.config.id);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.itunesNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

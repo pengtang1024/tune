@@ -39,7 +39,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'jellyfin';
+  String get sourceType => 'jellyfin';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -93,7 +93,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
         config.setting('user') == null ||
         config.setting('password') == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -101,7 +101,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
 
     try {
       final token = await _authenticate(config);
-      if (token == null) return _authFailed();
+      if (token == null) return _authFailed(request.config.id);
 
       final limit = scanLimit.read(config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
@@ -117,30 +117,30 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
       final data = response.data;
       if (data == null) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.jellyfinEmptyResponse,
         );
       }
 
       final songs = parseItems(
         data,
-        sourceId: sourceId,
+        sourceId: request.config.id,
         server: server,
         token: token,
         limit: limit,
       );
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.subsonicNoMatch : null,
       );
     } on DioException catch (error) {
       final status = error.response?.statusCode;
-      if (status == 401 || status == 403) return _authFailed();
-      return failedResult(sourceId, error);
+      if (status == 401 || status == 403) return _authFailed(request.config.id);
+      return failedResult(request.config.id, error);
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 
@@ -209,7 +209,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The failure of a server that did not accept the credentials.
-  SourceScanResult _authFailed() {
+  SourceScanResult _authFailed(String sourceId) {
     return SourceScanResult(
       sourceId: sourceId,
       status: SourceScanStatus.failed,

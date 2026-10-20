@@ -13,7 +13,7 @@ void main() {
         const SourceLabel(
           name: 'Openverse',
           localizedName: '开放版权聚合',
-          id: 'openverse',
+          type: 'openverse',
         ),
       ),
     );
@@ -30,13 +30,13 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _app(
-        const SourceLabel(name: 'Wikimedia Commons', id: 'wikimedia'),
+        const SourceLabel(name: 'Wikimedia Commons', type: 'wikimedia'),
       ),
     );
     final wide = tester.getSize(find.byType(SourceBadge));
 
     await tester.pumpWidget(
-      _app(const SourceLabel(name: 'iTunes', id: 'itunes')),
+      _app(const SourceLabel(name: 'iTunes', type: 'itunes')),
     );
     final narrow = tester.getSize(find.byType(SourceBadge));
 

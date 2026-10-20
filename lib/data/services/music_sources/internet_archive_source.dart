@@ -31,7 +31,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'internet_archive';
+  String get sourceType => 'internet_archive';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -67,7 +67,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -92,7 +92,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final docs = searchResponse is Map ? searchResponse['docs'] : null;
       if (docs is! List) {
         return failedResult(
-          sourceId,
+          request.config.id,
           AppStrings.instance.internetArchiveInvalidResponse,
         );
       }
@@ -116,7 +116,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       }
 
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: unique.values.toList(growable: false),
         message: unique.isEmpty
@@ -124,7 +124,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 
@@ -174,7 +174,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           .join('/');
 
       return SourceSongFactory.create(
-        sourceId: sourceId,
+        sourceId: config.id,
         externalId: '$identifier/$fileName',
         title: title,
         artist: artist,

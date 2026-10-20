@@ -39,7 +39,7 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'audius';
+  String get sourceType => 'audius';
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -75,7 +75,7 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     if (query == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -88,19 +88,19 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(sourceId, AppStrings.instance.audiusEmptyResponse);
+        return failedResult(request.config.id, AppStrings.instance.audiusEmptyResponse);
       }
 
       final limit = scanLimit.read(request.config.setting('limit'));
-      final songs = parseResults(data, sourceId: sourceId, limit: limit);
+      final songs = parseResults(data, sourceId: request.config.id, limit: limit);
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.audiusNoMatch : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

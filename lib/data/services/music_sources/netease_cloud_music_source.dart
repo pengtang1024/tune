@@ -30,7 +30,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
           );
 
   @override
-  String get sourceId => 'netease';
+  String get sourceType => 'netease';
 
   @override
   bool isConfigured(MusicSourceConfig config) => _baseUrl(config) != null;
@@ -70,7 +70,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     final baseUrl = _baseUrl(request.config);
     if (baseUrl == null) {
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.needsConfiguration,
         message: configurationHint,
       );
@@ -88,13 +88,13 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
       );
       final searchData = searchResponse.data;
       if (searchData == null) {
-        return failedResult(sourceId, AppStrings.instance.neteaseEmptyResponse);
+        return failedResult(request.config.id, AppStrings.instance.neteaseEmptyResponse);
       }
 
       final candidates = parseSearchResults(searchData);
       if (candidates.isEmpty) {
         return SourceScanResult(
-          sourceId: sourceId,
+          sourceId: request.config.id,
           status: SourceScanStatus.success,
           songs: const [],
           message: AppStrings.instance.searchNoMatch,
@@ -116,13 +116,13 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
       }
 
       return SourceScanResult(
-        sourceId: sourceId,
+        sourceId: request.config.id,
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.neteaseNoStream : null,
       );
     } catch (error) {
-      return failedResult(sourceId, error);
+      return failedResult(request.config.id, error);
     }
   }
 

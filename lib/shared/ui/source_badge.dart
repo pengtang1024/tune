@@ -43,7 +43,7 @@ class SourceBadge extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.26)),
       ),
       child: Icon(
-        sourceIconOf(label.id, label.kind),
+        sourceIconOf(label.type, label.kind),
         size: dense ? 11 : 13,
         color: color,
       ),

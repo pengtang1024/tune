@@ -1541,6 +1541,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackDetailsCopied => 'Copied to the clipboard';
 
   @override
+  String get trackFactDuration => 'Duration';
+
+  @override
+  String get trackFactSourceId => 'Source ID';
+
+  @override
+  String get trackFactMediaType => 'Media type';
+
+  @override
+  String get trackFactCover => 'Cover';
+
+  @override
+  String get trackFactIdentity => 'Identity';
+
+  @override
+  String get trackFactHeaders => 'Request headers';
+
+  @override
+  String get trackFactRawData => 'Raw data';
+
+  @override
+  String get trackDetailsCopyCover => 'Copy cover';
+
+  @override
+  String get trackDetailsCopyIdentity => 'Copy identity';
+
+  @override
   String get sourceStatusEnabled => 'Enabled';
 
   @override

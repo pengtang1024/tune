@@ -19,10 +19,14 @@ class MusicSourceScanRequest {
 
 /// Contract implemented by every music source.
 ///
-/// Adding a new built-in source (or a future plugin) only requires a new
-/// adapter and one registry entry; library scanning and the UI stay unchanged.
+/// Adding a new type of source only requires a new adapter and one registry
+/// entry; library scanning and the UI stay unchanged.
 abstract class MusicSourceAdapter {
-  String get sourceId;
+  /// The type of the source: the key the registry looks the adapter up by.
+  ///
+  /// The type says how the tracks are fetched. It is not the id of an
+  /// instance: several instances may share one type.
+  String get sourceType;
 
   bool isConfigured(MusicSourceConfig config);
 
@@ -75,6 +79,9 @@ class MusicSourceFailure implements Exception {
   String toString() => message;
 }
 
+/// A failure of one source instance.
+///
+/// The id is the id of the instance the failure belongs to, not the type.
 SourceScanResult failedResult(String sourceId, Object error) {
   return SourceScanResult(
     sourceId: sourceId,

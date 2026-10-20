@@ -21,12 +21,16 @@ class BuiltInMusicSources {
     return [
       MusicSourceConfig(
         id: 'local',
+        type: 'local',
+        builtIn: true,
         name: strings.sourceLocalName,
         description: strings.sourceLocalDescription,
         kind: MusicSourceKind.localDirectory,
       ),
       MusicSourceConfig(
         id: 'openverse',
+        type: 'openverse',
+        builtIn: true,
         name: 'Openverse',
         localizedName: strings.sourceOpenverseName,
         description: strings.sourceOpenverseDescription,
@@ -35,6 +39,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'jamendo',
+        type: 'jamendo',
+        builtIn: true,
         name: 'Jamendo',
         localizedName: strings.sourceJamendoName,
         description: strings.sourceJamendoDescription,
@@ -44,6 +50,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'internet_archive',
+        type: 'internet_archive',
+        builtIn: true,
         name: 'Internet Archive',
         localizedName: strings.sourceInternetArchiveName,
         description: strings.sourceInternetArchiveDescription,
@@ -52,6 +60,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'netease',
+        type: 'netease',
+        builtIn: true,
         name: strings.sourceNeteaseName,
         description: strings.sourceNeteaseDescription,
         kind: MusicSourceKind.openApi,
@@ -60,6 +70,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'ccmixter',
+        type: 'ccmixter',
+        builtIn: true,
         name: 'ccMixter',
         localizedName: strings.sourceCcmixterName,
         description: strings.sourceCcmixterDescription,
@@ -68,6 +80,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'itunes',
+        type: 'itunes',
+        builtIn: true,
         name: 'iTunes',
         localizedName: strings.sourceItunesName,
         description: strings.sourceItunesDescription,
@@ -76,6 +90,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'podcast_rss',
+        type: 'podcast_rss',
+        builtIn: true,
         name: strings.sourcePodcastRssName,
         description: strings.sourcePodcastRssDescription,
         kind: MusicSourceKind.openApi,
@@ -84,6 +100,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'subsonic',
+        type: 'subsonic',
+        builtIn: true,
         name: 'Subsonic',
         localizedName: strings.sourceSubsonicName,
         description: strings.sourceSubsonicDescription,
@@ -98,6 +116,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'audius',
+        type: 'audius',
+        builtIn: true,
         name: 'Audius',
         localizedName: strings.sourceAudiusName,
         description: strings.sourceAudiusDescription,
@@ -106,6 +126,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'radio',
+        type: 'radio',
+        builtIn: true,
         name: strings.sourceRadioName,
         description: strings.sourceRadioDescription,
         kind: MusicSourceKind.openCatalog,
@@ -113,6 +135,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'wikimedia',
+        type: 'wikimedia',
+        builtIn: true,
         name: 'Wikimedia Commons',
         localizedName: strings.sourceWikimediaName,
         description: strings.sourceWikimediaDescription,
@@ -121,6 +145,8 @@ class BuiltInMusicSources {
       ),
       MusicSourceConfig(
         id: 'jellyfin',
+        type: 'jellyfin',
+        builtIn: true,
         name: 'Jellyfin',
         localizedName: strings.sourceJellyfinName,
         description: strings.sourceJellyfinDescription,
@@ -131,7 +157,11 @@ class BuiltInMusicSources {
     ];
   }
 
-  /// The catalogue of the built-in sources in a language, keyed by its id.
+  /// The catalogue of the built-in sources in a language, keyed by its type.
+  ///
+  /// A built-in source and its type share the same key, so the catalogue
+  /// answers for the type: an instance the user added of a built-in type
+  /// borrows the same name and the same icon.
   static Map<String, MusicSourceConfig> catalogueOf(AppLocalizations strings) {
     return {for (final config in of(strings)) config.id: config};
   }
@@ -146,7 +176,7 @@ class BuiltInMusicSources {
   /// A source the user imported keeps the name it was given; only the
   /// built-in ones are named by the catalogue.
   static String nameOf(MusicSourceConfig config, AppLocalizations strings) {
-    return catalogueOf(strings)[config.id]?.name ?? config.name;
+    return catalogueOf(strings)[config.sourceType]?.name ?? config.name;
   }
 
   /// The description of a source in a language.
@@ -154,7 +184,7 @@ class BuiltInMusicSources {
     MusicSourceConfig config,
     AppLocalizations strings,
   ) {
-    return catalogueOf(strings)[config.id]?.description ?? config.description;
+    return catalogueOf(strings)[config.sourceType]?.description ?? config.description;
   }
 
   /// The source of the local music folders.

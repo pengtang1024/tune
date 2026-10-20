@@ -320,7 +320,7 @@ class _Body extends StatelessWidget {
             result: result,
             sourceLabel:
                 sourceLabels[result.sourceId] ??
-                SourceLabel(name: result.sourceId, id: result.sourceId),
+                SourceLabel(name: result.sourceId, type: result.sourceId),
             onPlay: onPlay,
             onAddToQueue: onAddToQueue,
           ),
