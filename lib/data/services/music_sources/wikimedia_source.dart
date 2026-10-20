@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -25,6 +26,9 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   /// The category that names the genre of an audio file.
   static const _genreCategory = 'Audio files of';
 
+  /// The category a scan browses when the reader names no keyword.
+  static const _browseCategory = 'Category:Audio files of music';
+
   final Dio _dio;
 
   WikimediaSourceAdapter({Dio? dio})
@@ -44,10 +48,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'wikimedia';
 
-  /// Commons asks for no key, so the source works as soon as it is enabled.
-  ///
-  /// The keyword stays optional: an empty search returns the audio files of
-  /// the whole wiki, which is a usable answer as well.
+  /// Commons asks for no key and serves its own audio categories, so the
+  /// source is ready as it is: a keyword is a choice, not a requirement.
+  @override
+  List<String> get browseModes => const [BrowseMode.latest];
+
   @override
   bool isConfigured(MusicSourceConfig config) => true;
 
@@ -58,7 +63,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.fieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.wikimediaFieldQueryHint,
     ),
     MusicSourceField(
@@ -79,18 +84,32 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
+      final keyword = request.config.setting('query');
       final response = await _dio.get<Map<String, dynamic>>(
         _apiHost,
-        queryParameters: {
-          'action': 'query',
-          'format': 'json',
-          'generator': 'search',
-          'gsrsearch': searchTerm(request.config.setting('query')),
-          'gsrnamespace': _fileNamespace,
-          'gsrlimit': limit,
-          'prop': 'imageinfo',
-          'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
-        },
+        queryParameters: keyword == null
+            ? {
+                // Without a keyword the scan walks a category of the wiki.
+                'action': 'query',
+                'format': 'json',
+                'generator': 'categorymembers',
+                'gcmtitle': _browseCategory,
+                'gcmtype': 'file',
+                'gcmnamespace': _fileNamespace,
+                'gcmlimit': limit,
+                'prop': 'imageinfo',
+                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
+              }
+            : {
+                'action': 'query',
+                'format': 'json',
+                'generator': 'search',
+                'gsrsearch': searchTerm(keyword),
+                'gsrnamespace': _fileNamespace,
+                'gsrlimit': limit,
+                'prop': 'imageinfo',
+                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
+              },
       );
       final data = response.data;
       if (data == null) {

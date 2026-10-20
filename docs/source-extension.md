@@ -136,16 +136,24 @@ MusicSourceConfig（实例 · 数据）
 | type | 浏览流 | 无词时怎么取 | 验证 |
 | --- | --- | --- | --- |
 | `audius` | `charts` | 换成 `/v1/tracks/trending` | ✅ |
-| `ccmixter` | `charts` / `latest` | 去掉 `tags`（已验证有数据），排行靠接口的排序参数 | ✅ |
+| `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
 | `internet_archive` | `charts` | `q` 只留 `mediatype:audio`，`sort[]=downloads desc` 已经就位 | ✅ |
-| `jamendo` | `charts` | 不传 `search` —— 代码里本来就是可选的，`order=popularity_total` 就是排行 | 代码已支持 |
-| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页） | ✅ |
+| `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
+| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
-| `netease` | `daily` / `charts` | 换 `/personalized`（每日推荐）或 `/top/song`（热歌榜），看自建服务有哪个 | 待定 |
+| `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
 | `itunes` | 无 | `term` 是必填的，接口不提供无词列表 | — |
 
+**浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
+浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。
+
 **「已配置」的定义跟着变**：有浏览流就等于已配置（不用填任何东西）；
-只有不支持浏览流的类型（目前只有 iTunes）才要求填检索词。
+只有不支持浏览流的类型（目前只有 iTunes）才要求填检索词。凭据还是要的：
+Jamendo 没有 Client ID 照样扫不了，它只是不用填关键词。
+
+**老用户的关键词**：内置实例以前由应用写死一个词（`piano`、`jazz`、`ambient`…），
+那是应用的口味，不是用户的。这个词在实例「一个设置都没改过」时会被拿走，
+平台自己的列表接上；用户改过的实例保留它写的词。
 
 **类型只是类型，可以有很多个**：同一个类型下，用户可以加多个实例 ——
 Jamendo 可以有一个走排行的、一个走检索「ambient」的；Subsonic 可以有一个接家、

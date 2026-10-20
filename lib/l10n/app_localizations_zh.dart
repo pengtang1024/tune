@@ -452,6 +452,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldQueryOptional => '搜索关键词（可选）';
 
   @override
+  String get fieldBrowse => '浏览流';
+
+  @override
+  String get fieldBrowseHint => '不填关键词时拉取的内容；填了关键词就按关键词搜';
+
+  @override
+  String get browseModeLatest => '最新';
+
+  @override
+  String get browseModeCharts => '排行';
+
+  @override
+  String get browseModeDaily => '每日推荐';
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -2027,6 +2042,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldQueryOptional => '搜索关键词（可选）';
 
   @override
+  String get fieldBrowse => '浏览流';
+
+  @override
+  String get fieldBrowseHint => '不填关键词时拉取的内容；填了关键词就按关键词搜';
+
+  @override
+  String get browseModeLatest => '最新';
+
+  @override
+  String get browseModeCharts => '排行';
+
+  @override
+  String get browseModeDaily => '每日推荐';
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -3600,6 +3630,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get fieldQueryOptional => '搜尋關鍵字（可選）';
+
+  @override
+  String get fieldBrowse => '瀏覽流';
+
+  @override
+  String get fieldBrowseHint => '不填關鍵字時拉取的內容；填了關鍵字就按關鍵字搜';
+
+  @override
+  String get browseModeLatest => '最新';
+
+  @override
+  String get browseModeCharts => '排行';
+
+  @override
+  String get browseModeDaily => '每日推薦';
 
   @override
   String get fieldLimit => '每次掃描數量';

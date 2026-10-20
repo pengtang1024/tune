@@ -88,12 +88,43 @@ void main() {
       expect(server.port, greaterThan(0));
     });
 
-    test('reports a missing keyword as unconfigured', () async {
-      final result = await CcMixterSourceAdapter().scan(
-        _request('ccmixter', const {}),
-      );
+    test('asks the site for its charts when no keyword is given', () async {
+      final server = await _startServer((request) async {
+        expect(request.uri.queryParameters.containsKey('tags'), isFalse);
+        expect(request.uri.queryParameters['sort'], 'rank');
+        await _writeJson(request, [
+          {
+            'upload_id': 71274,
+            'upload_name': 'You were a puppet master',
+            'user_name': 'JeffSpeed68',
+            'upload_extra': {'usertags': 'chill,guitar,jazz'},
+            'files': [
+              {
+                'file_name': 'a.mp3',
+                'download_url': 'https://ccmixter.org/content/a.mp3',
+                'file_format_info': {
+                  'media-type': 'audio',
+                  'mime_type': 'audio/mpeg',
+                  'ps': '3:16',
+                },
+              },
+            ],
+          },
+        ]);
+      });
 
-      expect(result.status, SourceScanStatus.needsConfiguration);
+      final result = await CcMixterSourceAdapter(
+        dio: _localDio(server.port),
+      ).scan(_request('ccmixter', const {}));
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(1));
+    });
+
+    test('is ready without a keyword, because the site serves its charts', () {
+      final adapter = CcMixterSourceAdapter();
+
+      expect(adapter.isConfigured(_request('ccmixter', const {}).config), isTrue);
     });
   });
 

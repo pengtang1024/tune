@@ -32,6 +32,26 @@ abstract class MusicSourceAdapter {
 
   String get configurationHint;
 
+  /// The browse streams this type offers.
+  ///
+  /// A browse stream is a list the platform serves by itself: the tracks that
+  /// were published last, the charts, the daily picks. A type that offers
+  /// one is ready as it is — the app does not pick a taste for the reader.
+  ///
+  /// A type that offers none needs a keyword to search with. The first
+  /// stream of the list is the one the type prefers.
+  List<String> get browseModes => const [];
+
+  /// The browse stream an instance of this type pulls.
+  ///
+  /// The instance names one of [browseModes]; a name the type does not offer
+  /// falls back to the stream the type prefers.
+  String browseModeOf(MusicSourceConfig config) {
+    final chosen = config.setting('browse');
+    if (chosen != null && browseModes.contains(chosen)) return chosen;
+    return browseModes.first;
+  }
+
   /// Fields the settings dialog should render for this source.
   List<MusicSourceField> get configurationFields => const [];
 

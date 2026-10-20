@@ -481,6 +481,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldQueryOptional => 'Search keyword (optional)';
 
   @override
+  String get fieldBrowse => 'Browse';
+
+  @override
+  String get fieldBrowseHint =>
+      'What a scan pulls without a keyword; a keyword searches instead';
+
+  @override
+  String get browseModeLatest => 'Latest';
+
+  @override
+  String get browseModeCharts => 'Charts';
+
+  @override
+  String get browseModeDaily => 'Daily picks';
+
+  @override
   String get fieldLimit => 'Tracks per scan';
 
   @override

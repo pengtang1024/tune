@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/itunes_source.dart';
@@ -92,7 +93,29 @@ class MusicSourceService implements StreamUrlResolver {
 
   List<MusicSourceField> fieldsFor(MusicSourceConfig config) {
     if (config.isPlugin) return _pluginRepository.fieldsFor(config);
-    return _adapters[config.sourceType]?.configurationFields ?? const [];
+    final adapter = _adapters[config.sourceType];
+    if (adapter == null) return const [];
+    return [
+      if (adapter.browseModes.isNotEmpty) _browseField(adapter),
+      ...adapter.configurationFields,
+    ];
+  }
+
+  /// The field that picks the browse stream of an instance.
+  ///
+  /// The options come from the type, so the interface knows no stream of any
+  /// source: it only shows what the type declares.
+  MusicSourceField _browseField(MusicSourceAdapter adapter) {
+    final strings = AppStrings.instance;
+    return MusicSourceField(
+      'browse',
+      strings.fieldBrowse,
+      strings.fieldBrowseHint,
+      choices: [
+        for (final mode in adapter.browseModes)
+          MusicSourceChoice(mode, BrowseMode.labelOf(mode, strings)),
+      ],
+    );
   }
 
   bool isConfigured(MusicSourceConfig config) {

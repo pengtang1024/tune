@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -33,9 +34,13 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'internet_archive';
 
+  /// The archive serves the audio everybody downloaded most, so the source
+  /// is ready as it is: a keyword is a choice, not a requirement.
   @override
-  bool isConfigured(MusicSourceConfig config) =>
-      config.setting('query') != null;
+  List<String> get browseModes => const [BrowseMode.charts];
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
 
   @override
   String get configurationHint => AppStrings.instance.internetArchiveHint;
@@ -46,7 +51,6 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       'query',
       AppStrings.instance.internetArchiveFieldQuery,
       'collection:netlabels AND mediatype:audio',
-      required: true,
     ),
     MusicSourceField(
       'limit',
@@ -65,20 +69,15 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
-    if (query == null) {
-      return SourceScanResult(
-        sourceId: request.config.id,
-        status: SourceScanStatus.needsConfiguration,
-        message: configurationHint,
-      );
-    }
 
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
         'https://archive.org/advancedsearch.php',
         queryParameters: {
-          'q': query,
+          // Without a keyword the archive serves the audio everybody
+          // downloaded most.
+          'q': query ?? 'mediatype:audio',
           'fl[]': ['identifier', 'title', 'creator', 'date'],
           'rows': limit,
           'page': 1,

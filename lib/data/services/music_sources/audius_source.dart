@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -41,9 +42,13 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'audius';
 
+  /// Audius serves the tracks everybody plays, so the source is ready as it
+  /// is: a keyword is a choice, not a requirement.
   @override
-  bool isConfigured(MusicSourceConfig config) =>
-      config.setting('query') != null;
+  List<String> get browseModes => const [BrowseMode.charts];
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
 
   @override
   String get configurationHint => AppStrings.instance.audiusHint;
@@ -52,9 +57,8 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.fieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.audiusFieldQueryHint,
-      required: true,
     ),
     MusicSourceField(
       'limit',
@@ -73,18 +77,18 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
-    if (query == null) {
-      return SourceScanResult(
-        sourceId: request.config.id,
-        status: SourceScanStatus.needsConfiguration,
-        message: configurationHint,
-      );
-    }
 
     try {
+      // Without a keyword the scan pulls the tracks everybody plays; with
+      // one it searches for it.
+      final browsing = query == null;
       final response = await _dio.get<Map<String, dynamic>>(
-        '$_discoveryHost/v1/tracks/search',
-        queryParameters: {'query': query, 'app_name': _appName},
+        browsing
+            ? '$_discoveryHost/v1/tracks/trending'
+            : '$_discoveryHost/v1/tracks/search',
+        queryParameters: browsing
+            ? {'app_name': _appName}
+            : {'query': query, 'app_name': _appName},
       );
       final data = response.data;
       if (data == null) {

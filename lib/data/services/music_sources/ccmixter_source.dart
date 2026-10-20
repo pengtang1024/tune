@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -37,9 +38,13 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'ccmixter';
 
+  /// ccMixter serves its own newest uploads and its own charts, so the
+  /// source is ready as it is: a keyword is a choice, not a requirement.
   @override
-  bool isConfigured(MusicSourceConfig config) =>
-      config.setting('query') != null;
+  List<String> get browseModes => const [BrowseMode.charts, BrowseMode.latest];
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
 
   @override
   String get configurationHint => AppStrings.instance.ccmixterHint;
@@ -48,9 +53,8 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.ccmixterFieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.ccmixterFieldQueryHint,
-      required: true,
     ),
     MusicSourceField(
       'limit',
@@ -69,19 +73,20 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
-    if (query == null) {
-      return SourceScanResult(
-        sourceId: request.config.id,
-        status: SourceScanStatus.needsConfiguration,
-        message: configurationHint,
-      );
-    }
 
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
+      final parameters = <String, dynamic>{'f': 'json', 'limit': limit};
+      if (query != null) {
+        parameters['tags'] = query;
+      } else if (browseModeOf(request.config) == BrowseMode.charts) {
+        // The charts of the site: the uploads everybody downloaded most.
+        parameters['sort'] = 'rank';
+      }
+
       final response = await _dio.get<String>(
         _endpoint,
-        queryParameters: {'f': 'json', 'limit': limit, 'tags': query},
+        queryParameters: parameters,
         // The API answers with `text/plain`, so the body is decoded here
         // instead of by the transformer.
         options: Options(responseType: ResponseType.plain),

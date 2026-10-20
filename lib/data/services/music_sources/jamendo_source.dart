@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -26,6 +27,11 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
 
   @override
   String get sourceType => 'jamendo';
+
+  /// Jamendo serves its own charts and its own newest releases, so the
+  /// source only needs the key it asks for.
+  @override
+  List<String> get browseModes => const [BrowseMode.charts, BrowseMode.latest];
 
   @override
   bool isConfigured(MusicSourceConfig config) =>
@@ -82,7 +88,9 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
         'client_id': clientId,
         'format': 'json',
         'limit': 20,
-        'order': 'popularity_total',
+        'order': browseModeOf(request.config) == BrowseMode.latest
+            ? 'release_date'
+            : 'popularity_total',
         'include': 'musicinfo',
         'audioformat': _format(request.config),
       };

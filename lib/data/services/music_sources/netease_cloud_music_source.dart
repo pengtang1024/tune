@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -32,6 +33,11 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'netease';
 
+  /// The self-hosted service serves the daily picks and the charts of the
+  /// platform, so the source only needs the address of the service.
+  @override
+  List<String> get browseModes => const [BrowseMode.daily, BrowseMode.charts];
+
   @override
   bool isConfigured(MusicSourceConfig config) => _baseUrl(config) != null;
 
@@ -48,7 +54,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'keywords',
-      AppStrings.instance.fieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.neteaseFieldQueryHint,
     ),
     MusicSourceField(
@@ -77,14 +83,19 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final keywords =
-          request.config.setting('keywords') ??
-          AppStrings.instance.neteaseHotKeyword;
+      final keywords = request.config.setting('keywords');
       final limit = scanLimit.read(request.config.setting('limit'));
 
+      // Without a keyword the service serves its own daily picks or its own
+      // charts; with one it searches for it.
+      final browsing = keywords == null;
       final searchResponse = await _dio.get<Map<String, dynamic>>(
-        '$baseUrl/search',
-        queryParameters: {'keywords': keywords, 'limit': limit, 'type': 1},
+        browsing
+            ? '$baseUrl/${browseModeOf(request.config) == BrowseMode.daily ? 'personalized' : 'top/song'}'
+            : '$baseUrl/search',
+        queryParameters: browsing
+            ? {'type': 0}
+            : {'keywords': keywords, 'limit': limit, 'type': 1},
       );
       final searchData = searchResponse.data;
       if (searchData == null) {
@@ -257,10 +268,25 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     return urls;
   }
 
+  /// The list of tracks the service answered with.
+  ///
+  /// The search answers with `result.songs`, the daily picks with `result`
+  /// and the charts with `data`; the tracks look the same in all of them.
+  static Object? _rawSongsOf(Map<String, dynamic> data) {
+    final result = data['result'];
+    if (result is List) return result;
+    if (result is Map && result['songs'] is List) return result['songs'];
+
+    final songs = data['songs'];
+    if (songs is List) return songs;
+
+    final charts = data['data'];
+    return charts is List ? charts : null;
+  }
+
   /// Kept static so JSON mapping can be tested without network access.
   static List<Song> parseSearchResults(Map<String, dynamic> data) {
-    final result = data['result'];
-    final rawSongs = result is Map ? result['songs'] : data['songs'];
+    final rawSongs = _rawSongsOf(data);
 
     if (rawSongs is! List) return const [];
 

@@ -35,7 +35,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceOpenverseName,
         description: strings.sourceOpenverseDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'piano'},
       ),
       MusicSourceConfig(
         id: 'jamendo',
@@ -46,7 +45,7 @@ class BuiltInMusicSources {
         description: strings.sourceJamendoDescription,
         kind: MusicSourceKind.openCatalog,
         enabled: false,
-        settings: {'query': '', 'format': 'mp32'},
+        settings: {'format': 'mp32'},
       ),
       MusicSourceConfig(
         id: 'internet_archive',
@@ -56,7 +55,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceInternetArchiveName,
         description: strings.sourceInternetArchiveDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'collection:netlabels AND mediatype:audio'},
       ),
       MusicSourceConfig(
         id: 'netease',
@@ -66,7 +64,6 @@ class BuiltInMusicSources {
         description: strings.sourceNeteaseDescription,
         kind: MusicSourceKind.openApi,
         enabled: false,
-        settings: {'keywords': strings.neteaseHotKeyword},
       ),
       MusicSourceConfig(
         id: 'ccmixter',
@@ -76,7 +73,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceCcmixterName,
         description: strings.sourceCcmixterDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'jazz'},
       ),
       MusicSourceConfig(
         id: 'itunes',
@@ -86,7 +82,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceItunesName,
         description: strings.sourceItunesDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'jazz'},
       ),
       MusicSourceConfig(
         id: 'podcast_rss',
@@ -122,7 +117,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceAudiusName,
         description: strings.sourceAudiusDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'ambient'},
       ),
       MusicSourceConfig(
         id: 'radio',
@@ -141,7 +135,6 @@ class BuiltInMusicSources {
         localizedName: strings.sourceWikimediaName,
         description: strings.sourceWikimediaDescription,
         kind: MusicSourceKind.openCatalog,
-        settings: {'query': 'piano'},
       ),
       MusicSourceConfig(
         id: 'jellyfin',
@@ -169,6 +162,28 @@ class BuiltInMusicSources {
   /// The catalogue entry of a built-in source in the language of the app.
   static MusicSourceConfig? descriptorOf(String id) {
     return catalogueOf(AppStrings.instance)[id];
+  }
+
+  /// The settings the app used to write into a built-in instance.
+  ///
+  /// They were the app's taste, not the reader's: a source that serves a
+  /// browse stream of its own does not need a keyword. An instance that still
+  /// carries exactly these settings was never touched by the reader, so they
+  /// are taken away when the instance is read back and the platform's own
+  /// list takes its place. Settings the reader changed are kept.
+  static Map<String, String> retiredSettingsOf(String type) {
+    return switch (type) {
+      'openverse' => const {'query': 'piano'},
+      'internet_archive' => const {
+        'query': 'collection:netlabels AND mediatype:audio',
+      },
+      'ccmixter' => const {'query': 'jazz'},
+      'itunes' => const {'query': 'jazz'},
+      'audius' => const {'query': 'ambient'},
+      'wikimedia' => const {'query': 'piano'},
+      'netease' => {'keywords': AppStrings.instance.neteaseHotKeyword},
+      _ => const {},
+    };
   }
 
   /// The name of a source in a language.

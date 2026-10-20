@@ -59,7 +59,7 @@ class MusicSourceStore {
       merged.add(
         builtIn.copyWith(
           enabled: saved.enabled,
-          settings: {...builtIn.settings, ...saved.settings},
+          settings: _mergedSettings(builtIn, saved),
         ),
       );
     }
@@ -67,6 +67,38 @@ class MusicSourceStore {
     // Preserve future user-imported sources instead of silently dropping them.
     merged.addAll(stored.values);
     return List.unmodifiable(merged);
+  }
+
+  /// The settings of a built-in instance, after the ones the app wrote are
+  /// taken away.
+  ///
+  /// A built-in instance that still carries exactly the settings the app used
+  /// to write was never touched by the reader, so the keyword in it goes and
+  /// the platform's own list takes its place. An instance the reader changed
+  /// keeps its settings.
+  Map<String, String> _mergedSettings(
+    MusicSourceConfig builtIn,
+    MusicSourceConfig saved,
+  ) {
+    final settings = {...builtIn.settings, ...saved.settings};
+    final retired = BuiltInMusicSources.retiredSettingsOf(builtIn.sourceType);
+    if (retired.isEmpty || !_sameSettings(saved.settings, retired)) {
+      return settings;
+    }
+    final merged = {...settings};
+    for (final key in retired.keys) {
+      merged.remove(key);
+    }
+    return merged;
+  }
+
+  /// Whether two sets of settings say the same thing.
+  bool _sameSettings(Map<String, String> left, Map<String, String> right) {
+    if (left.length != right.length) return false;
+    for (final entry in right.entries) {
+      if (left[entry.key] != entry.value) return false;
+    }
+    return true;
   }
 
   Future<void> saveConfigs(List<MusicSourceConfig> configs) async {

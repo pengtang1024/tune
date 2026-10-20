@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -31,9 +32,13 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   String get sourceType => 'openverse';
 
+  /// Openverse serves the audio it published last, so the source is ready as
+  /// it is: a keyword is a choice, not a requirement.
   @override
-  bool isConfigured(MusicSourceConfig config) =>
-      config.setting('query') != null;
+  List<String> get browseModes => const [BrowseMode.latest];
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
 
   @override
   String get configurationHint => AppStrings.instance.openverseHint;
@@ -42,9 +47,8 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.fieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.openverseFieldQueryHint,
-      required: true,
     ),
   ];
 
@@ -57,18 +61,12 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
-    if (query == null) {
-      return SourceScanResult(
-        sourceId: request.config.id,
-        status: SourceScanStatus.needsConfiguration,
-        message: configurationHint,
-      );
-    }
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://api.openverse.org/v1/audio/',
-        queryParameters: {'q': query, 'page_size': 20},
+        // Without a keyword the service serves the audio it published last.
+        queryParameters: {'q': ?query, 'page_size': 20},
       );
       final data = response.data;
       if (data == null) {

@@ -868,6 +868,36 @@ abstract class AppLocalizations {
   /// **'搜索关键词（可选）'**
   String get fieldQueryOptional;
 
+  /// No description provided for @fieldBrowse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'浏览流'**
+  String get fieldBrowse;
+
+  /// No description provided for @fieldBrowseHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不填关键词时拉取的内容；填了关键词就按关键词搜'**
+  String get fieldBrowseHint;
+
+  /// No description provided for @browseModeLatest.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最新'**
+  String get browseModeLatest;
+
+  /// No description provided for @browseModeCharts.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排行'**
+  String get browseModeCharts;
+
+  /// No description provided for @browseModeDaily.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每日推荐'**
+  String get browseModeDaily;
+
   /// No description provided for @fieldLimit.
   ///
   /// In zh_CN, this message translates to:
