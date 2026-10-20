@@ -1504,10 +1504,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'When off, a click queues the track and plays it right away; the rest of the queue stays';
 
   @override
-  String get settingsPlayOnDoubleClick =>
-      'Play the track on a double click too';
+  String get settingsOnlyLikeOnDoubleClick =>
+      'Only like the track on a double click';
 
   @override
-  String get settingsPlayOnDoubleClickHint =>
-      'When off, a double click only likes the track and leaves the music alone';
+  String get settingsOnlyLikeOnDoubleClickHint =>
+      'When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well';
 }

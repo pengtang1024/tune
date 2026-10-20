@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
-import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 import 'package:tune/shared/ui/page_heading.dart';
@@ -37,6 +38,7 @@ class QueuePane extends ConsumerWidget {
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
     final favorites = ref.watch(favoritesControllerProvider);
+    final settings = ref.watch(settingsControllerProvider);
     final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
@@ -117,19 +119,21 @@ class QueuePane extends ConsumerWidget {
                       isFavorite: favorites.contains(song.uri),
                       source: sourceLabel(song, sourceLabels),
                       onTap: () => controller.playAt(index),
-                      onDoubleTap: () => ref
-                          .read(listDoubleClickProvider)
-                          .like(song),
+                      onDoubleTap: () => _toggleFavorite(ref, song),
+                      waitsForDoubleClick: settings.onlyLikeOnDoubleClick,
                       onRemove: () => controller.removeFromQueue(index),
-                      onToggleFavorite: () => ref
-                          .read(favoritesControllerProvider.notifier)
-                          .toggle(song.uri),
+                      onToggleFavorite: () => _toggleFavorite(ref, song),
                     );
                   },
                 ),
         ),
       ],
     );
+  }
+
+  /// Marks the track, or takes the mark away when it is already there.
+  void _toggleFavorite(WidgetRef ref, Song song) {
+    ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
   }
 
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {

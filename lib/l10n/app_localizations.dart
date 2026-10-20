@@ -2572,17 +2572,17 @@ abstract class AppLocalizations {
   /// **'关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留'**
   String get settingsReplaceQueueOnClickHint;
 
-  /// No description provided for @settingsPlayOnDoubleClick.
+  /// No description provided for @settingsOnlyLikeOnDoubleClick.
   ///
   /// In zh_CN, this message translates to:
-  /// **'双击时也播放这一首'**
-  String get settingsPlayOnDoubleClick;
+  /// **'双击时只标成喜欢'**
+  String get settingsOnlyLikeOnDoubleClick;
 
-  /// No description provided for @settingsPlayOnDoubleClickHint.
+  /// No description provided for @settingsOnlyLikeOnDoubleClickHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'关掉时双击只切换喜欢，正在放的曲子不受影响'**
-  String get settingsPlayOnDoubleClickHint;
+  /// **'打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢'**
+  String get settingsOnlyLikeOnDoubleClickHint;
 }
 
 class _AppLocalizationsDelegate

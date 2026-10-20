@@ -52,6 +52,7 @@ void main() {
             isFavorite: false,
             onTap: _noop,
             onDoubleTap: _noop,
+            waitsForDoubleClick: false,
             onAddToQueue: _noop,
             onToggleFavorite: _noop,
           ),

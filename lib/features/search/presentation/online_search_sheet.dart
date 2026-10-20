@@ -5,9 +5,10 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/features/player/application/list_double_click.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -62,6 +63,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
           const <MusicSourceConfig>[],
     );
     final sourceLabels = sourceLabelsOf(context.loc, sources);
+    final settings = ref.watch(settingsControllerProvider);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final height = MediaQuery.sizeOf(context).height * 0.86;
 
@@ -165,6 +167,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   onPlay: _play,
                   onDoubleTap: _like,
                   onAddToQueue: _addToQueue,
+                  waitsForDoubleClick: settings.onlyLikeOnDoubleClick,
                 ),
               ),
             ],
@@ -182,8 +185,9 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  /// Marks the track, or takes the mark away when it is already there.
   void _like(Song song) {
-    ref.read(listDoubleClickProvider).like(song);
+    ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
   }
 
   void _addToQueue(Song song) {
@@ -275,12 +279,19 @@ class _Body extends StatelessWidget {
   final ValueChanged<Song> onDoubleTap;
   final ValueChanged<Song> onAddToQueue;
 
+  /// Whether a click waits for a possible second click before it plays.
+  ///
+  /// A double click that only likes the track may not play it, so the click
+  /// has to wait to see whether a second click follows.
+  final bool waitsForDoubleClick;
+
   const _Body({
     required this.search,
     required this.sourceLabels,
     required this.onPlay,
     required this.onDoubleTap,
     required this.onAddToQueue,
+    required this.waitsForDoubleClick,
   });
 
   @override
@@ -333,6 +344,7 @@ class _Body extends StatelessWidget {
             onPlay: onPlay,
             onDoubleTap: onDoubleTap,
             onAddToQueue: onAddToQueue,
+            waitsForDoubleClick: waitsForDoubleClick,
           ),
       ],
     );
@@ -402,12 +414,19 @@ class _SourceGroup extends StatelessWidget {
   final ValueChanged<Song> onDoubleTap;
   final ValueChanged<Song> onAddToQueue;
 
+  /// Whether a click waits for a possible second click before it plays.
+  ///
+  /// A double click that only likes the track may not play it, so the click
+  /// has to wait to see whether a second click follows.
+  final bool waitsForDoubleClick;
+
   const _SourceGroup({
     required this.result,
     required this.sourceLabel,
     required this.onPlay,
     required this.onDoubleTap,
     required this.onAddToQueue,
+    required this.waitsForDoubleClick,
   });
 
   @override
@@ -492,6 +511,7 @@ class _SourceGroup extends StatelessWidget {
             onPlay: () => onPlay(result, index),
             onDoubleTap: () => onDoubleTap(result.songs[index]),
             onAddToQueue: () => onAddToQueue(result.songs[index]),
+            waitsForDoubleClick: waitsForDoubleClick,
           ),
         const SizedBox(height: CompactTokens.space4),
       ],
@@ -506,12 +526,19 @@ class _SongRow extends StatelessWidget {
   final VoidCallback onDoubleTap;
   final VoidCallback onAddToQueue;
 
+  /// Whether a click waits for a possible second click before it plays.
+  ///
+  /// A double click that only likes the track may not play it, so the click
+  /// has to wait to see whether a second click follows.
+  final bool waitsForDoubleClick;
+
   const _SongRow({
     required this.song,
     required this.source,
     required this.onPlay,
     required this.onDoubleTap,
     required this.onAddToQueue,
+    required this.waitsForDoubleClick,
   });
 
   @override
@@ -525,6 +552,7 @@ class _SongRow extends StatelessWidget {
     return TrackClickArea(
       onClick: onPlay,
       onDoubleClick: onDoubleTap,
+      waitsForDoubleClick: waitsForDoubleClick,
       borderRadius: CompactTokens.borderRadius8,
       child: Padding(
         padding: const EdgeInsets.symmetric(

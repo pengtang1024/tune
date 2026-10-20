@@ -721,6 +721,6 @@
   "settingsPlaybackDescription": "What a single click and a double click on a track do",
   "settingsReplaceQueueOnClick": "Replace the play queue when a track is clicked",
   "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays",
-  "settingsPlayOnDoubleClick": "Play the track on a double click too",
-  "settingsPlayOnDoubleClickHint": "When off, a double click only likes the track and leaves the music alone"
+  "settingsOnlyLikeOnDoubleClick": "Only like the track on a double click",
+  "settingsOnlyLikeOnDoubleClickHint": "When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well"
 }

@@ -19,11 +19,12 @@ class SettingsState {
   /// queue grows instead of turning into a single song.
   final bool replaceQueueOnClick;
 
-  /// Whether a double click on a track plays it as well.
+  /// Whether a double click on a track only marks it as a favorite.
   ///
-  /// A double click marks the track as a favorite; when this is on it plays
-  /// the track too, the way a single click does.
-  final bool playOnDoubleClick;
+  /// A double click plays the track as well, because the first click of it
+  /// plays the track already. When this is on the double click leaves the
+  /// music alone and only changes the heart.
+  final bool onlyLikeOnDoubleClick;
 
   /// The folder the app writes the files it fetches into.
   ///
@@ -43,7 +44,7 @@ class SettingsState {
     this.closeToTray = true,
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
-    this.playOnDoubleClick = false,
+    this.onlyLikeOnDoubleClick = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
   });
@@ -62,7 +63,7 @@ class SettingsState {
     bool? closeToTray,
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
-    bool? playOnDoubleClick,
+    bool? onlyLikeOnDoubleClick,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
   }) {
@@ -75,7 +76,8 @@ class SettingsState {
       closeToTray: closeToTray ?? this.closeToTray,
       mediaControlsEnabled: mediaControlsEnabled ?? this.mediaControlsEnabled,
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
-      playOnDoubleClick: playOnDoubleClick ?? this.playOnDoubleClick,
+      onlyLikeOnDoubleClick:
+          onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
           : libraryFolder as String?,

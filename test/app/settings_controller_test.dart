@@ -63,28 +63,28 @@ void main() {
     expect(reloaded.state.replaceQueueOnClick, isTrue);
   });
 
-  test('a double click only likes the track until the user asks for more', () async {
+  test('a double click plays and likes the track by default', () async {
     final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
     addTearDown(controller.dispose);
 
-    expect(controller.state.playOnDoubleClick, isFalse);
+    expect(controller.state.onlyLikeOnDoubleClick, isFalse);
 
-    await controller.setPlayOnDoubleClick(true);
-    expect(controller.state.playOnDoubleClick, isTrue);
+    await controller.setOnlyLikeOnDoubleClick(true);
+    expect(controller.state.onlyLikeOnDoubleClick, isTrue);
   });
 
   test('the double click behavior survives a controller rebuild', () async {
     final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
-    await controller.setPlayOnDoubleClick(true);
+    await controller.setOnlyLikeOnDoubleClick(true);
     controller.dispose();
 
     final reloaded = SettingsController(persistence);
     addTearDown(reloaded.dispose);
 
-    expect(reloaded.state.playOnDoubleClick, isTrue);
+    expect(reloaded.state.onlyLikeOnDoubleClick, isTrue);
   });
 }

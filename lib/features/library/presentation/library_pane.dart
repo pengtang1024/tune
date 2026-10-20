@@ -15,7 +15,6 @@ import 'package:tune/features/library/presentation/library_queue_all_button.dart
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
-import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
@@ -179,6 +178,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   playback.$2,
                   sourceLabels,
                   favorites,
+                  settings.onlyLikeOnDoubleClick,
                 ),
         ),
         if (!state.hasSongs && !state.isScanning && state.errorMessage == null)
@@ -230,6 +230,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
     FavoritesState favorites,
+    bool onlyLikeOnDoubleClick,
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
@@ -264,7 +265,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             // by default the track joins the queue and plays right away.
             ref.read(listPlaybackProvider).play(song);
           },
-          onDoubleTap: () => ref.read(listDoubleClickProvider).like(song),
+          onDoubleTap: () => _toggleFavorite(song),
+          waitsForDoubleClick: onlyLikeOnDoubleClick,
           onAddToQueue: () => _addToQueue(song),
           onToggleFavorite: () => _toggleFavorite(song),
         );

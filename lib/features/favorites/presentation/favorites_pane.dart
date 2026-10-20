@@ -10,9 +10,9 @@ import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/favorites/presentation/favorites_track_row.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
-import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
@@ -31,6 +31,7 @@ class FavoritesPane extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final library = ref.watch(libraryControllerProvider);
     final favorites = ref.watch(favoritesControllerProvider);
+    final settings = ref.watch(settingsControllerProvider);
     final playback = ref.watch(
       playbackControllerProvider.select(
         (value) => (value.currentSong?.uri, value.isPlaying),
@@ -74,7 +75,15 @@ class FavoritesPane extends ConsumerWidget {
           ),
         ),
         Expanded(
-          child: _body(context, ref, library, songs, playback, sourceLabels),
+          child: _body(
+            context,
+            ref,
+            library,
+            songs,
+            playback,
+            sourceLabels,
+            settings.onlyLikeOnDoubleClick,
+          ),
         ),
       ],
     );
@@ -94,6 +103,7 @@ class FavoritesPane extends ConsumerWidget {
     List<Song> songs,
     (String?, bool) playback,
     Map<String, SourceLabel> sourceLabels,
+    bool onlyLikeOnDoubleClick,
   ) {
     if (library.isLoading && !library.hasValue) {
       return const Center(child: CompactSpinner.large());
@@ -145,11 +155,16 @@ class FavoritesPane extends ConsumerWidget {
             // by default the track joins the queue and plays right away.
             ref.read(listPlaybackProvider).play(song);
           },
-          onDoubleTap: () => ref.read(listDoubleClickProvider).like(song),
-          onToggleFavorite: () =>
-              ref.read(favoritesControllerProvider.notifier).toggle(song.uri),
+          onDoubleTap: () => _toggleFavorite(ref, song),
+          waitsForDoubleClick: onlyLikeOnDoubleClick,
+          onToggleFavorite: () => _toggleFavorite(ref, song),
         );
       },
     );
+  }
+
+  /// Marks the track, or takes the mark away when it is already there.
+  void _toggleFavorite(WidgetRef ref, Song song) {
+    ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
   }
 }

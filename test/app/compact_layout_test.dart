@@ -9,6 +9,7 @@ import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -68,6 +69,17 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
+  /// The row of the library that shows [title].
+  ///
+  /// The player bar shows the title of the track that plays, so a plain text
+  /// finder finds the title twice as soon as a track plays.
+  Finder libraryRowOf(String title) {
+    return find.descendant(
+      of: find.byType(LibraryTrackCard),
+      matching: find.text(title),
+    );
   }
 
   Widget app({required Widget home, required List<Override> overrides}) {
@@ -216,7 +228,7 @@ void main() {
       tester.element(find.byType(LibraryPane)),
     );
 
-    await tester.tap(find.text(songB.title));
+    await tester.tap(libraryRowOf(songB.title));
     await tester.pumpAndSettle();
 
     final state = container.read(playbackControllerProvider);
@@ -253,7 +265,7 @@ void main() {
     );
     container.read(playbackControllerProvider.notifier).addToQueue(songA);
 
-    await tester.tap(find.text(songB.title));
+    await tester.tap(libraryRowOf(songB.title));
     await tester.pumpAndSettle();
 
     final state = container.read(playbackControllerProvider);
@@ -262,7 +274,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('library double click likes the track and leaves the music alone', (
+  testWidgets('library double click likes the track and plays it', (
     tester,
   ) async {
     await setSurface(tester, const Size(760, 483));
@@ -288,17 +300,99 @@ void main() {
       tester.element(find.byType(LibraryPane)),
     );
 
-    await tester.tap(find.text(songB.title));
+    await tester.tap(libraryRowOf(songB.title));
     await tester.pump(const Duration(milliseconds: 50));
-    await tester.tap(find.text(songB.title));
+    await tester.tap(libraryRowOf(songB.title));
     await tester.pumpAndSettle();
 
     expect(
       container.read(favoritesControllerProvider).contains(songB.uri),
       isTrue,
     );
+    final playback = container.read(playbackControllerProvider);
+    expect(playback.queue.map((song) => song.uri), [songB.uri]);
+    expect(playback.currentSong?.uri, songB.uri);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('library single click plays the track right away', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(
+              const LibraryState(songs: [songA, songB, songC]),
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+
+    await tester.tap(libraryRowOf(songB.title));
+    await tester.pump();
+
+    // The click plays the track without waiting for a second click.
+    final playback = container.read(playbackControllerProvider);
+    expect(playback.queue.map((song) => song.uri), [songB.uri]);
+    expect(playback.currentSong?.uri, songB.uri);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('library double click only likes the track when asked for it', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(
+              const LibraryState(songs: [songA, songB, songC]),
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+    final settings = container.read(settingsControllerProvider.notifier);
+    await settings.setOnlyLikeOnDoubleClick(true);
+    await tester.pump();
+
+    await tester.tap(libraryRowOf(songC.title));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(libraryRowOf(songC.title));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(favoritesControllerProvider).contains(songC.uri),
+      isTrue,
+    );
     expect(container.read(playbackControllerProvider).queue, isEmpty);
     expect(tester.takeException(), isNull);
+
+    await settings.setOnlyLikeOnDoubleClick(false);
   });
 
   testWidgets('library queue all button adds the whole visible list', (

@@ -21,6 +21,12 @@ class LibraryTrackCard extends StatelessWidget {
   final SourceLabel? source;
   final VoidCallback onTap;
   final VoidCallback onDoubleTap;
+
+  /// Whether a click waits for a possible second click before it plays.
+  ///
+  /// A double click that only likes the track may not play it, so the
+  /// click has to wait to see whether a second click follows.
+  final bool waitsForDoubleClick;
   final VoidCallback onAddToQueue;
   final VoidCallback onToggleFavorite;
 
@@ -34,6 +40,7 @@ class LibraryTrackCard extends StatelessWidget {
     this.source,
     required this.onTap,
     required this.onDoubleTap,
+    required this.waitsForDoubleClick,
     required this.onAddToQueue,
     required this.onToggleFavorite,
   });
@@ -61,6 +68,7 @@ class LibraryTrackCard extends StatelessWidget {
         child: TrackClickArea(
           onClick: onTap,
           onDoubleClick: onDoubleTap,
+          waitsForDoubleClick: waitsForDoubleClick,
           hoverColor: accent.withValues(alpha: 0.05),
           child: Padding(
             padding: const EdgeInsets.symmetric(

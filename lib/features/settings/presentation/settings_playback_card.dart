@@ -10,16 +10,16 @@ import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 /// whether the track is only liked or played as well.
 class SettingsPlaybackCard extends StatelessWidget {
   final bool replaceQueueOnClick;
-  final bool playOnDoubleClick;
+  final bool onlyLikeOnDoubleClick;
   final ValueChanged<bool> onReplaceQueueOnClick;
-  final ValueChanged<bool> onPlayOnDoubleClick;
+  final ValueChanged<bool> onOnlyLikeOnDoubleClick;
 
   const SettingsPlaybackCard({
     super.key,
     required this.replaceQueueOnClick,
-    required this.playOnDoubleClick,
+    required this.onlyLikeOnDoubleClick,
     required this.onReplaceQueueOnClick,
-    required this.onPlayOnDoubleClick,
+    required this.onOnlyLikeOnDoubleClick,
   });
 
   @override
@@ -40,10 +40,10 @@ class SettingsPlaybackCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SettingsSwitchRow(
-            title: context.loc.settingsPlayOnDoubleClick,
-            description: context.loc.settingsPlayOnDoubleClickHint,
-            value: playOnDoubleClick,
-            onChanged: onPlayOnDoubleClick,
+            title: context.loc.settingsOnlyLikeOnDoubleClick,
+            description: context.loc.settingsOnlyLikeOnDoubleClickHint,
+            value: onlyLikeOnDoubleClick,
+            onChanged: onOnlyLikeOnDoubleClick,
           ),
         ],
       ),

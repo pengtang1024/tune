@@ -1372,10 +1372,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
 
   @override
-  String get settingsPlayOnDoubleClick => '双击时也播放这一首';
+  String get settingsOnlyLikeOnDoubleClick => '双击时只标成喜欢';
 
   @override
-  String get settingsPlayOnDoubleClickHint => '关掉时双击只切换喜欢，正在放的曲子不受影响';
+  String get settingsOnlyLikeOnDoubleClickHint =>
+      '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -2746,10 +2747,11 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
 
   @override
-  String get settingsPlayOnDoubleClick => '双击时也播放这一首';
+  String get settingsOnlyLikeOnDoubleClick => '双击时只标成喜欢';
 
   @override
-  String get settingsPlayOnDoubleClickHint => '关掉时双击只切换喜欢，正在放的曲子不受影响';
+  String get settingsOnlyLikeOnDoubleClickHint =>
+      '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4120,8 +4122,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsReplaceQueueOnClickHint => '關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留';
 
   @override
-  String get settingsPlayOnDoubleClick => '雙擊時也播放這首';
+  String get settingsOnlyLikeOnDoubleClick => '雙擊時只標成喜歡';
 
   @override
-  String get settingsPlayOnDoubleClickHint => '關掉時雙擊只切換喜歡，正在放的曲子不受影響';
+  String get settingsOnlyLikeOnDoubleClickHint =>
+      '打開時雙擊只標成喜歡，不打斷正在放的曲子；關掉時雙擊照常播放並標成喜歡';
 }
