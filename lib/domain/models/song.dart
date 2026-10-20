@@ -37,13 +37,13 @@ class Song {
   /// Cover image URL for remote sources. Local files use [albumArtPath].
   final String? artworkUrl;
 
-  /// Original provider payload for plugin-backed sources.
+  /// The original payload the source answered with.
   ///
-  /// It is passed back to the plugin when resolving playback URLs, lyrics or
-  /// extra metadata. Built-in adapters leave it null.
+  /// A source that has to hand its own data back to resolve a playback URL
+  /// or a lyric keeps it here. Built-in adapters leave it null.
   final Map<String, dynamic>? sourceData;
 
-  /// Extra HTTP headers required by some plugin-provided stream URLs.
+  /// Extra HTTP headers required by some remote stream URLs.
   final Map<String, String>? httpHeaders;
 
   /// Whether the track is a live stream instead of a fixed recording.

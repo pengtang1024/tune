@@ -256,7 +256,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(_current.copyWith(query: query));
   }
 
-  /// Removes a source's songs immediately, e.g. after deleting a plugin.
+  /// Removes a source's songs immediately, e.g. after the reader removes it.
   Future<void> dropSource(String sourceId) async {
     if (_disposed || !state.hasValue) return;
 

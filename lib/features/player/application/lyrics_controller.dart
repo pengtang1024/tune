@@ -45,7 +45,7 @@ class LyricsState {
 /// Loads the lyrics of a track on demand.
 ///
 /// Lyrics are fetched only when the user opens them, so a scan never pays
-/// for them. The text of a track is kept for the session, because a plugin
+/// for them. The text of a track is kept for the session, because a source
 /// answers the same question with the same sheet.
 class LyricsController extends Notifier<LyricsState> {
   final Map<int, LyricsDocument> _cache = {};
