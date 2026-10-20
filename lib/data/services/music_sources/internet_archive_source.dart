@@ -11,6 +11,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// The advanced search returns item identifiers, and a second metadata request
 /// resolves the first playable audio file inside each item.
 class InternetArchiveSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(8, 20);
+
   static const _audioExtensions = ['.mp3', '.ogg', '.m4a', '.flac'];
 
   final Dio _dio;
@@ -46,8 +50,8 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.internetArchiveFieldLimit,
-      AppStrings.instance.internetArchiveFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -70,7 +74,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
         'https://archive.org/advancedsearch.php',
         queryParameters: {
@@ -122,12 +126,6 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 8;
-    return parsed.clamp(1, 20);
   }
 
   Future<Song?> _fetchTrack(Object? rawDoc, MusicSourceConfig config) async {

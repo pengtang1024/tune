@@ -75,21 +75,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get systemMode => '跟随系统';
 
   @override
-  String get musicLibrary => '音乐库';
-
-  @override
-  String get navLibrary => '音乐库';
-
-  @override
-  String get navQueue => '播放队列';
-
-  @override
-  String get navSources => '音源';
-
-  @override
-  String get navSettings => '设置';
-
-  @override
   String get libraryTitle => '音乐库';
 
   @override
@@ -200,9 +185,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerUnmute => '恢复音量';
 
   @override
-  String get playerQueue => '播放队列';
-
-  @override
   String get playerPlayModeSequential => '列表循环';
 
   @override
@@ -237,9 +219,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get nowPlayingUnnamedTrack => '未命名曲目';
-
-  @override
-  String get nowPlayingLocalMusic => '本地音乐';
 
   @override
   String get trackUnknownTitle => '未知歌曲';
@@ -305,9 +284,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourcesAutoScanDescription => '所有已启用音源都会在启动后自动刷新，失败不会影响本地库。';
-
-  @override
-  String get sourcesScanAll => '扫描全部音源';
 
   @override
   String get sourcesImportPlugin => '导入插件';
@@ -434,6 +410,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesFieldNumeric => '请输入数字';
 
   @override
+  String get fieldQuery => '搜索关键词';
+
+  @override
+  String get fieldQueryOptional => '搜索关键词（可选）';
+
+  @override
+  String get fieldLimit => '每次扫描数量';
+
+  @override
+  String get fieldLimitFiles => '每次扫描文件数';
+
+  @override
+  String get fieldLimitEpisodes => '每次扫描集数';
+
+  @override
+  String get fieldLimitStations => '每次扫描电台数';
+
+  @override
+  String fieldLimitHint(int count, int max) {
+    return '默认 $count，最大 $max';
+  }
+
+  @override
+  String get fieldServer => '服务器地址';
+
+  @override
+  String get fieldUser => '用户名';
+
+  @override
+  String get fieldPassword => '密码';
+
+  @override
+  String get fieldFormat => '音质';
+
+  @override
   String get sourcesNotLoaded => '音源列表尚未加载完成';
 
   @override
@@ -558,20 +569,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchNoMatch => '没有找到匹配的歌曲';
 
   @override
-  String get searchNoMatchDescription => '换个关键词再试一次。';
-
-  @override
   String searchSearching(String query) {
     return '正在搜索「$query」';
-  }
-
-  @override
-  String searchResultCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '$countString 首';
   }
 
   @override
@@ -742,10 +741,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pluginSourceHint => '填写一个搜索关键词，例如 周杰伦、piano 或 jazz';
 
   @override
-  String get pluginFieldQuery => '搜索关键词';
-
-  @override
-  String get pluginFieldHint => '例如 周杰伦、piano、jazz';
+  String get pluginFieldQueryHint => '例如 周杰伦、piano、jazz';
 
   @override
   String pluginImportedVersion(String version) {
@@ -800,9 +796,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pluginCallError => '插件调用失败';
 
   @override
-  String get pluginNoMatch => '没有找到匹配的歌曲';
-
-  @override
   String pluginNoStreamResults(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -819,16 +812,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get neteaseFieldApi => 'API 地址';
 
   @override
-  String get neteaseFieldQuery => '搜索关键词';
-
-  @override
-  String get neteaseFieldHint => '例如 热门、周杰伦';
-
-  @override
-  String get neteaseFieldLimit => '每次扫描数量';
-
-  @override
-  String get neteaseFieldLimitHint => '默认 20，最大 50';
+  String get neteaseFieldQueryHint => '例如 热门、周杰伦';
 
   @override
   String get neteaseHotKeyword => '热门';
@@ -837,19 +821,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get neteaseEmptyResponse => '网易云 API 返回了空响应';
 
   @override
-  String get neteaseNoMatch => '没有找到匹配的歌曲';
-
-  @override
   String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
 
   @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '搜索关键词';
-
-  @override
-  String get openverseFieldHint => '例如 piano、ambient、jazz';
+  String get openverseFieldQueryHint => '例如 piano、ambient、jazz';
 
   @override
   String get openverseEmptyResponse => 'Openverse 返回了空响应';
@@ -889,9 +867,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jamendoFieldClientIdHint => '在 developer.jamendo.com 免费申请';
 
   @override
-  String get jamendoFieldQuery => '搜索关键词（可选）';
-
-  @override
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
@@ -906,12 +881,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get internetArchiveFieldQuery => '收录条件';
-
-  @override
-  String get internetArchiveFieldLimit => '每次扫描数量';
-
-  @override
-  String get internetArchiveFieldLimitHint => '默认 8，最大 20';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
@@ -1009,12 +978,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterEmptyResponse => 'ccMixter 返回了空响应';
 
   @override
-  String get ccmixterFieldLimit => '每次扫描数量';
-
-  @override
-  String get ccmixterFieldLimitHint => '默认 15，最大 30';
-
-  @override
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
@@ -1028,15 +991,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get itunesEmptyResponse => 'iTunes API 返回了空响应';
-
-  @override
-  String get itunesFieldLimit => '每次扫描数量';
-
-  @override
-  String get itunesFieldLimitHint => '默认 20，最大 50';
-
-  @override
-  String get itunesFieldQuery => '搜索关键词';
 
   @override
   String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
@@ -1055,12 +1009,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
-
-  @override
-  String get podcastRssFieldLimit => '每次扫描集数';
-
-  @override
-  String get podcastRssFieldLimitHint => '默认 20，最大 100';
 
   @override
   String get podcastRssHint => '填写播客订阅地址（RSS）';
@@ -1100,31 +1048,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get subsonicFieldLimit => '每次扫描数量';
-
-  @override
-  String get subsonicFieldLimitHint => '默认 25，最大 100';
-
-  @override
-  String get subsonicFieldPassword => '密码';
-
-  @override
   String get subsonicFieldPasswordHint => '用于计算访问令牌，不会明文发送';
-
-  @override
-  String get subsonicFieldQuery => '搜索关键词（可选）';
 
   @override
   String get subsonicFieldQueryHint => '例如 jazz、piano';
 
   @override
-  String get subsonicFieldServer => '服务器地址';
-
-  @override
   String get subsonicFieldServerHint => '例如 http://localhost:4533';
-
-  @override
-  String get subsonicFieldUser => '用户名';
 
   @override
   String get subsonicFieldUserHint => '自建音乐库的登录用户名';
@@ -1142,16 +1072,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
-  String get audiusFieldQuery => '搜索关键词';
-
-  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
-
-  @override
-  String get audiusFieldLimit => '每次扫描数量';
-
-  @override
-  String get audiusFieldLimitHint => '默认 20，最大 50';
 
   @override
   String get audiusEmptyResponse => 'Audius 返回了空响应';
@@ -1182,12 +1103,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
 
   @override
-  String get radioFieldLimit => '每次扫描电台数';
-
-  @override
-  String get radioFieldLimitHint => '默认 20，最大 100';
-
-  @override
   String get radioNoMatch => '没有找到匹配的电台';
 
   @override
@@ -1197,16 +1112,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
-  String get wikimediaFieldQuery => '搜索关键词';
-
-  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
-
-  @override
-  String get wikimediaFieldLimit => '每次扫描数量';
-
-  @override
-  String get wikimediaFieldLimitHint => '默认 15，最大 30';
 
   @override
   String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
@@ -1221,34 +1127,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
 
   @override
-  String get jellyfinFieldServer => '服务器地址';
-
-  @override
   String get jellyfinFieldServerHint => '例如 http://localhost:8096';
-
-  @override
-  String get jellyfinFieldUser => '用户名';
 
   @override
   String get jellyfinFieldUserHint => 'Jellyfin 的登录用户名';
 
   @override
-  String get jellyfinFieldPassword => '密码';
-
-  @override
   String get jellyfinFieldPasswordHint => '用于换取访问令牌';
 
   @override
-  String get jellyfinFieldLimit => '每次扫描数量';
-
-  @override
-  String get jellyfinFieldLimitHint => '默认 50，最大 200';
-
-  @override
   String get jellyfinEmptyResponse => 'Jellyfin 返回了空响应';
-
-  @override
-  String get jellyfinNoMatch => '没有找到匹配的曲目';
 
   @override
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
@@ -1287,9 +1175,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nowPlayingDetailDisc => '碟片';
 
   @override
-  String get nowPlayingDetailLanguage => '语言';
-
-  @override
   String get nowPlayingDetailLicense => '许可';
 
   @override
@@ -1299,13 +1184,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
-  String get jamendoFieldFormat => '音质';
-
-  @override
   String get jamendoFieldFormatHint => '默认 192 kbps';
-
-  @override
-  String get subsonicFieldFormat => '音质';
 
   @override
   String get subsonicFieldFormatHint => '默认原始音质';
@@ -1321,12 +1200,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSectionInterface => '界面';
-
-  @override
-  String get settingsSectionLibrary => '音乐库';
-
-  @override
-  String get settingsSectionAbout => '关于';
 
   @override
   String get settingsLocalFirst => '本地优先';
@@ -1353,9 +1226,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String sidebarVersionLine(String name, String version) {
     return '$name 桌面版 · $version';
   }
-
-  @override
-  String get nowPlayingEyebrow => '正在播放';
 
   @override
   String searchSourceError(String source, String message) {
@@ -1437,21 +1307,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get systemMode => '跟随系统';
 
   @override
-  String get musicLibrary => '音乐库';
-
-  @override
-  String get navLibrary => '音乐库';
-
-  @override
-  String get navQueue => '播放队列';
-
-  @override
-  String get navSources => '音源';
-
-  @override
-  String get navSettings => '设置';
-
-  @override
   String get libraryTitle => '音乐库';
 
   @override
@@ -1562,9 +1417,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get playerUnmute => '恢复音量';
 
   @override
-  String get playerQueue => '播放队列';
-
-  @override
   String get playerPlayModeSequential => '列表循环';
 
   @override
@@ -1599,9 +1451,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get nowPlayingUnnamedTrack => '未命名曲目';
-
-  @override
-  String get nowPlayingLocalMusic => '本地音乐';
 
   @override
   String get trackUnknownTitle => '未知歌曲';
@@ -1667,9 +1516,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourcesAutoScanDescription => '所有已启用音源都会在启动后自动刷新，失败不会影响本地库。';
-
-  @override
-  String get sourcesScanAll => '扫描全部音源';
 
   @override
   String get sourcesImportPlugin => '导入插件';
@@ -1796,6 +1642,41 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesFieldNumeric => '请输入数字';
 
   @override
+  String get fieldQuery => '搜索关键词';
+
+  @override
+  String get fieldQueryOptional => '搜索关键词（可选）';
+
+  @override
+  String get fieldLimit => '每次扫描数量';
+
+  @override
+  String get fieldLimitFiles => '每次扫描文件数';
+
+  @override
+  String get fieldLimitEpisodes => '每次扫描集数';
+
+  @override
+  String get fieldLimitStations => '每次扫描电台数';
+
+  @override
+  String fieldLimitHint(int count, int max) {
+    return '默认 $count，最大 $max';
+  }
+
+  @override
+  String get fieldServer => '服务器地址';
+
+  @override
+  String get fieldUser => '用户名';
+
+  @override
+  String get fieldPassword => '密码';
+
+  @override
+  String get fieldFormat => '音质';
+
+  @override
   String get sourcesNotLoaded => '音源列表尚未加载完成';
 
   @override
@@ -1920,20 +1801,8 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get searchNoMatch => '没有找到匹配的歌曲';
 
   @override
-  String get searchNoMatchDescription => '换个关键词再试一次。';
-
-  @override
   String searchSearching(String query) {
     return '正在搜索「$query」';
-  }
-
-  @override
-  String searchResultCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '$countString 首';
   }
 
   @override
@@ -2104,10 +1973,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get pluginSourceHint => '填写一个搜索关键词，例如 周杰伦、piano 或 jazz';
 
   @override
-  String get pluginFieldQuery => '搜索关键词';
-
-  @override
-  String get pluginFieldHint => '例如 周杰伦、piano、jazz';
+  String get pluginFieldQueryHint => '例如 周杰伦、piano、jazz';
 
   @override
   String pluginImportedVersion(String version) {
@@ -2162,9 +2028,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get pluginCallError => '插件调用失败';
 
   @override
-  String get pluginNoMatch => '没有找到匹配的歌曲';
-
-  @override
   String pluginNoStreamResults(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2181,16 +2044,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get neteaseFieldApi => 'API 地址';
 
   @override
-  String get neteaseFieldQuery => '搜索关键词';
-
-  @override
-  String get neteaseFieldHint => '例如 热门、周杰伦';
-
-  @override
-  String get neteaseFieldLimit => '每次扫描数量';
-
-  @override
-  String get neteaseFieldLimitHint => '默认 20，最大 50';
+  String get neteaseFieldQueryHint => '例如 热门、周杰伦';
 
   @override
   String get neteaseHotKeyword => '热门';
@@ -2199,19 +2053,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get neteaseEmptyResponse => '网易云 API 返回了空响应';
 
   @override
-  String get neteaseNoMatch => '没有找到匹配的歌曲';
-
-  @override
   String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
 
   @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '搜索关键词';
-
-  @override
-  String get openverseFieldHint => '例如 piano、ambient、jazz';
+  String get openverseFieldQueryHint => '例如 piano、ambient、jazz';
 
   @override
   String get openverseEmptyResponse => 'Openverse 返回了空响应';
@@ -2251,9 +2099,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jamendoFieldClientIdHint => '在 developer.jamendo.com 免费申请';
 
   @override
-  String get jamendoFieldQuery => '搜索关键词（可选）';
-
-  @override
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
@@ -2268,12 +2113,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get internetArchiveFieldQuery => '收录条件';
-
-  @override
-  String get internetArchiveFieldLimit => '每次扫描数量';
-
-  @override
-  String get internetArchiveFieldLimitHint => '默认 8，最大 20';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
@@ -2371,12 +2210,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterEmptyResponse => 'ccMixter 返回了空响应';
 
   @override
-  String get ccmixterFieldLimit => '每次扫描数量';
-
-  @override
-  String get ccmixterFieldLimitHint => '默认 15，最大 30';
-
-  @override
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
@@ -2390,15 +2223,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get itunesEmptyResponse => 'iTunes API 返回了空响应';
-
-  @override
-  String get itunesFieldLimit => '每次扫描数量';
-
-  @override
-  String get itunesFieldLimitHint => '默认 20，最大 50';
-
-  @override
-  String get itunesFieldQuery => '搜索关键词';
 
   @override
   String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
@@ -2417,12 +2241,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
-
-  @override
-  String get podcastRssFieldLimit => '每次扫描集数';
-
-  @override
-  String get podcastRssFieldLimitHint => '默认 20，最大 100';
 
   @override
   String get podcastRssHint => '填写播客订阅地址（RSS）';
@@ -2462,31 +2280,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String get subsonicFieldLimit => '每次扫描数量';
-
-  @override
-  String get subsonicFieldLimitHint => '默认 25，最大 100';
-
-  @override
-  String get subsonicFieldPassword => '密码';
-
-  @override
   String get subsonicFieldPasswordHint => '用于计算访问令牌，不会明文发送';
-
-  @override
-  String get subsonicFieldQuery => '搜索关键词（可选）';
 
   @override
   String get subsonicFieldQueryHint => '例如 jazz、piano';
 
   @override
-  String get subsonicFieldServer => '服务器地址';
-
-  @override
   String get subsonicFieldServerHint => '例如 http://localhost:4533';
-
-  @override
-  String get subsonicFieldUser => '用户名';
 
   @override
   String get subsonicFieldUserHint => '自建音乐库的登录用户名';
@@ -2504,16 +2304,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
-  String get audiusFieldQuery => '搜索关键词';
-
-  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
-
-  @override
-  String get audiusFieldLimit => '每次扫描数量';
-
-  @override
-  String get audiusFieldLimitHint => '默认 20，最大 50';
 
   @override
   String get audiusEmptyResponse => 'Audius 返回了空响应';
@@ -2544,12 +2335,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
 
   @override
-  String get radioFieldLimit => '每次扫描电台数';
-
-  @override
-  String get radioFieldLimitHint => '默认 20，最大 100';
-
-  @override
   String get radioNoMatch => '没有找到匹配的电台';
 
   @override
@@ -2559,16 +2344,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
-  String get wikimediaFieldQuery => '搜索关键词';
-
-  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
-
-  @override
-  String get wikimediaFieldLimit => '每次扫描数量';
-
-  @override
-  String get wikimediaFieldLimitHint => '默认 15，最大 30';
 
   @override
   String get wikimediaEmptyResponse => '维基共享资源返回了空响应';
@@ -2583,34 +2359,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
 
   @override
-  String get jellyfinFieldServer => '服务器地址';
-
-  @override
   String get jellyfinFieldServerHint => '例如 http://localhost:8096';
-
-  @override
-  String get jellyfinFieldUser => '用户名';
 
   @override
   String get jellyfinFieldUserHint => 'Jellyfin 的登录用户名';
 
   @override
-  String get jellyfinFieldPassword => '密码';
-
-  @override
   String get jellyfinFieldPasswordHint => '用于换取访问令牌';
 
   @override
-  String get jellyfinFieldLimit => '每次扫描数量';
-
-  @override
-  String get jellyfinFieldLimitHint => '默认 50，最大 200';
-
-  @override
   String get jellyfinEmptyResponse => 'Jellyfin 返回了空响应';
-
-  @override
-  String get jellyfinNoMatch => '没有找到匹配的曲目';
 
   @override
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
@@ -2649,9 +2407,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get nowPlayingDetailDisc => '碟片';
 
   @override
-  String get nowPlayingDetailLanguage => '语言';
-
-  @override
   String get nowPlayingDetailLicense => '许可';
 
   @override
@@ -2661,13 +2416,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
-  String get jamendoFieldFormat => '音质';
-
-  @override
   String get jamendoFieldFormatHint => '默认 192 kbps';
-
-  @override
-  String get subsonicFieldFormat => '音质';
 
   @override
   String get subsonicFieldFormatHint => '默认原始音质';
@@ -2683,12 +2432,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSectionInterface => '界面';
-
-  @override
-  String get settingsSectionLibrary => '音乐库';
-
-  @override
-  String get settingsSectionAbout => '关于';
 
   @override
   String get settingsLocalFirst => '本地优先';
@@ -2715,9 +2458,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String sidebarVersionLine(String name, String version) {
     return '$name 桌面版 · $version';
   }
-
-  @override
-  String get nowPlayingEyebrow => '正在播放';
 
   @override
   String searchSourceError(String source, String message) {
@@ -2797,21 +2537,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get systemMode => '跟隨系統';
-
-  @override
-  String get musicLibrary => '音樂庫';
-
-  @override
-  String get navLibrary => '音樂庫';
-
-  @override
-  String get navQueue => '播放佇列';
-
-  @override
-  String get navSources => '音源';
-
-  @override
-  String get navSettings => '設定';
 
   @override
   String get libraryTitle => '音樂庫';
@@ -2924,9 +2649,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get playerUnmute => '恢復音量';
 
   @override
-  String get playerQueue => '播放佇列';
-
-  @override
   String get playerPlayModeSequential => '清單循環';
 
   @override
@@ -2961,9 +2683,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get nowPlayingUnnamedTrack => '未命名曲目';
-
-  @override
-  String get nowPlayingLocalMusic => '本機音樂';
 
   @override
   String get trackUnknownTitle => '未知歌曲';
@@ -3029,9 +2748,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesAutoScanDescription => '所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。';
-
-  @override
-  String get sourcesScanAll => '掃描全部音源';
 
   @override
   String get sourcesImportPlugin => '匯入外掛';
@@ -3158,6 +2874,41 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesFieldNumeric => '請輸入數字';
 
   @override
+  String get fieldQuery => '搜尋關鍵字';
+
+  @override
+  String get fieldQueryOptional => '搜尋關鍵字（可選）';
+
+  @override
+  String get fieldLimit => '每次掃描數量';
+
+  @override
+  String get fieldLimitFiles => '每次掃描檔案數';
+
+  @override
+  String get fieldLimitEpisodes => '每次掃描集數';
+
+  @override
+  String get fieldLimitStations => '每次掃描電台數';
+
+  @override
+  String fieldLimitHint(int count, int max) {
+    return '預設 $count，最多 $max';
+  }
+
+  @override
+  String get fieldServer => '伺服器位址';
+
+  @override
+  String get fieldUser => '使用者名稱';
+
+  @override
+  String get fieldPassword => '密碼';
+
+  @override
+  String get fieldFormat => '音質';
+
+  @override
   String get sourcesNotLoaded => '音源列表尚未載入完成';
 
   @override
@@ -3282,20 +3033,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get searchNoMatch => '沒有找到符合的歌曲';
 
   @override
-  String get searchNoMatchDescription => '換個關鍵字再試一次。';
-
-  @override
   String searchSearching(String query) {
     return '正在搜尋「$query」';
-  }
-
-  @override
-  String searchResultCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '$countString 首';
   }
 
   @override
@@ -3466,10 +3205,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get pluginSourceHint => '填寫一個搜尋關鍵字，例如 周杰倫、piano 或 jazz';
 
   @override
-  String get pluginFieldQuery => '搜尋關鍵字';
-
-  @override
-  String get pluginFieldHint => '例如 周杰倫、piano、jazz';
+  String get pluginFieldQueryHint => '例如 周杰倫、piano、jazz';
 
   @override
   String pluginImportedVersion(String version) {
@@ -3524,9 +3260,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get pluginCallError => '外掛呼叫失敗';
 
   @override
-  String get pluginNoMatch => '沒有找到符合的歌曲';
-
-  @override
   String pluginNoStreamResults(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3543,16 +3276,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get neteaseFieldApi => 'API 位址';
 
   @override
-  String get neteaseFieldQuery => '搜尋關鍵字';
-
-  @override
-  String get neteaseFieldHint => '例如 熱門、周杰倫';
-
-  @override
-  String get neteaseFieldLimit => '每次掃描數量';
-
-  @override
-  String get neteaseFieldLimitHint => '預設 20，最大 50';
+  String get neteaseFieldQueryHint => '例如 熱門、周杰倫';
 
   @override
   String get neteaseHotKeyword => '熱門';
@@ -3561,19 +3285,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get neteaseEmptyResponse => '網易雲 API 回傳了空回應';
 
   @override
-  String get neteaseNoMatch => '沒有找到符合的歌曲';
-
-  @override
   String get neteaseNoStream => '介面未回傳可播放網址（可能需要在伺服器端登入或受版權限制）';
 
   @override
   String get openverseHint => '填寫搜尋關鍵字，例如 piano、ambient 或 jazz';
 
   @override
-  String get openverseFieldQuery => '搜尋關鍵字';
-
-  @override
-  String get openverseFieldHint => '例如 piano、ambient、jazz';
+  String get openverseFieldQueryHint => '例如 piano、ambient、jazz';
 
   @override
   String get openverseEmptyResponse => 'Openverse 回傳了空回應';
@@ -3613,9 +3331,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jamendoFieldClientIdHint => '在 developer.jamendo.com 免費申請';
 
   @override
-  String get jamendoFieldQuery => '搜尋關鍵字（可選）';
-
-  @override
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
@@ -3630,12 +3345,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get internetArchiveFieldQuery => '收錄條件';
-
-  @override
-  String get internetArchiveFieldLimit => '每次掃描數量';
-
-  @override
-  String get internetArchiveFieldLimitHint => '預設 8，最大 20';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 回傳了無法識別的回應';
@@ -3733,12 +3442,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get ccmixterEmptyResponse => 'ccMixter 回傳了空回應';
 
   @override
-  String get ccmixterFieldLimit => '每次掃描數量';
-
-  @override
-  String get ccmixterFieldLimitHint => '預設 15，最大 30';
-
-  @override
   String get ccmixterFieldQuery => '搜尋標籤';
 
   @override
@@ -3752,15 +3455,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get itunesEmptyResponse => 'iTunes API 回傳了空回應';
-
-  @override
-  String get itunesFieldLimit => '每次掃描數量';
-
-  @override
-  String get itunesFieldLimitHint => '預設 20，最大 50';
-
-  @override
-  String get itunesFieldQuery => '搜尋關鍵字';
 
   @override
   String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
@@ -3779,12 +3473,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
-
-  @override
-  String get podcastRssFieldLimit => '每次掃描集數';
-
-  @override
-  String get podcastRssFieldLimitHint => '預設 20，最大 100';
 
   @override
   String get podcastRssHint => '填寫 podcast 訂閱網址（RSS）';
@@ -3824,31 +3512,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get subsonicFieldLimit => '每次掃描數量';
-
-  @override
-  String get subsonicFieldLimitHint => '預設 25，最大 100';
-
-  @override
-  String get subsonicFieldPassword => '密碼';
-
-  @override
   String get subsonicFieldPasswordHint => '用於計算存取權杖，不會明文傳送';
-
-  @override
-  String get subsonicFieldQuery => '搜尋關鍵字（可選）';
 
   @override
   String get subsonicFieldQueryHint => '例如 jazz、piano';
 
   @override
-  String get subsonicFieldServer => '伺服器位址';
-
-  @override
   String get subsonicFieldServerHint => '例如 http://localhost:4533';
-
-  @override
-  String get subsonicFieldUser => '使用者名稱';
 
   @override
   String get subsonicFieldUserHint => '自建音樂庫的登入使用者名稱';
@@ -3866,16 +3536,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
 
   @override
-  String get audiusFieldQuery => '搜尋關鍵字';
-
-  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
-
-  @override
-  String get audiusFieldLimit => '每次掃描數量';
-
-  @override
-  String get audiusFieldLimitHint => '預設 20，最多 50';
 
   @override
   String get audiusEmptyResponse => 'Audius 回傳了空回應';
@@ -3906,12 +3567,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioFieldQueryHint => '例如 jazz、ambient 或 SomaFM';
 
   @override
-  String get radioFieldLimit => '每次掃描電台數';
-
-  @override
-  String get radioFieldLimitHint => '預設 20，最多 100';
-
-  @override
   String get radioNoMatch => '找不到符合的電台';
 
   @override
@@ -3921,16 +3576,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
 
   @override
-  String get wikimediaFieldQuery => '搜尋關鍵字';
-
-  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
-
-  @override
-  String get wikimediaFieldLimit => '每次掃描數量';
-
-  @override
-  String get wikimediaFieldLimitHint => '預設 15，最多 30';
 
   @override
   String get wikimediaEmptyResponse => '維基共享資源回傳了空回應';
@@ -3945,34 +3591,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jellyfinHint => '填寫自建 Jellyfin 的位址與帳號';
 
   @override
-  String get jellyfinFieldServer => '伺服器位址';
-
-  @override
   String get jellyfinFieldServerHint => '例如 http://localhost:8096';
-
-  @override
-  String get jellyfinFieldUser => '使用者名稱';
 
   @override
   String get jellyfinFieldUserHint => 'Jellyfin 的登入使用者名稱';
 
   @override
-  String get jellyfinFieldPassword => '密碼';
-
-  @override
   String get jellyfinFieldPasswordHint => '用於換取存取權杖';
 
   @override
-  String get jellyfinFieldLimit => '每次掃描數量';
-
-  @override
-  String get jellyfinFieldLimitHint => '預設 50，最多 200';
-
-  @override
   String get jellyfinEmptyResponse => 'Jellyfin 回傳了空回應';
-
-  @override
-  String get jellyfinNoMatch => '找不到符合的曲目';
 
   @override
   String get jellyfinAuthFailed => '無法連線 Jellyfin 伺服器，請檢查位址與帳號';
@@ -4011,9 +3639,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get nowPlayingDetailDisc => '光碟';
 
   @override
-  String get nowPlayingDetailLanguage => '語言';
-
-  @override
   String get nowPlayingDetailLicense => '授權';
 
   @override
@@ -4023,13 +3648,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
-  String get jamendoFieldFormat => '音質';
-
-  @override
   String get jamendoFieldFormatHint => '預設 192 kbps';
-
-  @override
-  String get subsonicFieldFormat => '音質';
 
   @override
   String get subsonicFieldFormatHint => '預設原始音質';
@@ -4045,12 +3664,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSectionInterface => '介面';
-
-  @override
-  String get settingsSectionLibrary => '音樂庫';
-
-  @override
-  String get settingsSectionAbout => '關於';
 
   @override
   String get settingsLocalFirst => '本機優先';
@@ -4077,9 +3690,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String sidebarVersionLine(String name, String version) {
     return '$name 桌面版 · $version';
   }
-
-  @override
-  String get nowPlayingEyebrow => '正在播放';
 
   @override
   String searchSourceError(String source, String message) {

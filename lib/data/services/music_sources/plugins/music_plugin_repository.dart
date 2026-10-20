@@ -59,8 +59,8 @@ class MusicPluginRepository {
   /// read again on every access instead of being kept from the first one.
   static MusicSourceField get _queryField => MusicSourceField(
     'query',
-    AppStrings.instance.pluginFieldQuery,
-    AppStrings.instance.pluginFieldHint,
+    AppStrings.instance.fieldQuery,
+    AppStrings.instance.pluginFieldQueryHint,
     required: true,
   );
 

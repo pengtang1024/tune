@@ -44,12 +44,12 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'query',
-      AppStrings.instance.jamendoFieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.jamendoFieldQueryHint,
     ),
     MusicSourceField(
       'format',
-      AppStrings.instance.jamendoFieldFormat,
+      AppStrings.instance.fieldFormat,
       AppStrings.instance.jamendoFieldFormatHint,
       choices: const [
         MusicSourceChoice('mp31', 'MP3 · 96 kbps'),

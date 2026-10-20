@@ -14,6 +14,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// result carries a 30 second preview, which is the part Apple allows to be
 /// streamed, so the source plays previews instead of full tracks.
 class ITunesSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 50);
+
   static const _endpoint = 'https://itunes.apple.com/search';
 
   final Dio _dio;
@@ -43,14 +47,14 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.itunesFieldQuery,
+      AppStrings.instance.fieldQuery,
       AppStrings.instance.itunesFieldQueryHint,
       required: true,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.itunesFieldLimit,
-      AppStrings.instance.itunesFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -73,7 +77,7 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<String>(
         _endpoint,
         queryParameters: {
@@ -106,12 +110,6 @@ class ITunesSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 20;
-    return parsed.clamp(1, 50);
   }
 
   /// Kept static so JSON mapping can be tested without network access.

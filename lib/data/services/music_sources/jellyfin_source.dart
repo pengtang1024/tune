@@ -12,6 +12,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// following request, so the adapter logs in once per scan and keeps the
 /// token for the lifetime of that scan only.
 class JellyfinSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(50, 200);
+
   /// The name the server shows in its logs.
   static const _clientName = 'Tune';
 
@@ -50,27 +54,27 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'server',
-      AppStrings.instance.jellyfinFieldServer,
+      AppStrings.instance.fieldServer,
       AppStrings.instance.jellyfinFieldServerHint,
       required: true,
     ),
     MusicSourceField(
       'user',
-      AppStrings.instance.jellyfinFieldUser,
+      AppStrings.instance.fieldUser,
       AppStrings.instance.jellyfinFieldUserHint,
       required: true,
     ),
     MusicSourceField(
       'password',
-      AppStrings.instance.jellyfinFieldPassword,
+      AppStrings.instance.fieldPassword,
       AppStrings.instance.jellyfinFieldPasswordHint,
       required: true,
       secret: true,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.jellyfinFieldLimit,
-      AppStrings.instance.jellyfinFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -99,7 +103,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
       final token = await _authenticate(config);
       if (token == null) return _authFailed();
 
-      final limit = _readLimit(config);
+      final limit = scanLimit.read(config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
         '$server/Items',
         queryParameters: {
@@ -129,7 +133,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
         sourceId: sourceId,
         status: SourceScanStatus.success,
         songs: songs,
-        message: songs.isEmpty ? AppStrings.instance.jellyfinNoMatch : null,
+        message: songs.isEmpty ? AppStrings.instance.subsonicNoMatch : null,
       );
     } on DioException catch (error) {
       final status = error.response?.statusCode;
@@ -211,12 +215,6 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
       status: SourceScanStatus.failed,
       message: AppStrings.instance.jellyfinAuthFailed,
     );
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 50;
-    return parsed.clamp(1, 200);
   }
 
   /// The header the Jellyfin API expects on every request.

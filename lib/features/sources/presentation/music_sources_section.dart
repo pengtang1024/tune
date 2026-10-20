@@ -163,7 +163,7 @@ class MusicSourcesSection extends ConsumerWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.sync_rounded, size: 15),
-                label: Text(context.loc.sourcesScanAll),
+                label: Text(context.loc.libraryScanAllSources),
               ),
               if (isMusicPluginRuntimeSupported) ...[
                 const SizedBox(width: CompactTokens.space8),

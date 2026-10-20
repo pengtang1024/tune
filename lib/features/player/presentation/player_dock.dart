@@ -222,7 +222,7 @@ class PlayerDock extends ConsumerWidget {
                     ],
                     _DockIcon(
                       icon: Icons.queue_music_rounded,
-                      tooltip: context.loc.playerQueue,
+                      tooltip: context.loc.queueTitle,
                       size: 19,
                       onPressed: () => context.go('/queue'),
                     ),

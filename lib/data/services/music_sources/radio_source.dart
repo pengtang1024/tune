@@ -15,6 +15,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// curated stations of Radio Paradise. A station is a live stream, so it is
 /// played straight from the network and never stored on disk.
 class RadioSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 100);
+
   static const _allProviders = 'all';
 
   final List<RadioStationProvider> _providers;
@@ -56,8 +60,8 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.radioFieldLimit,
-      AppStrings.instance.radioFieldLimitHint,
+      AppStrings.instance.fieldLimitStations,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -71,7 +75,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query') ?? '';
-    final limit = _readLimit(request.config);
+    final limit = scanLimit.read(request.config.setting('limit'));
     final selected = _selectedProviders(request.config);
 
     final stations = <RadioStation>[];
@@ -96,12 +100,6 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       songs: songs,
       message: songs.isEmpty ? AppStrings.instance.radioNoMatch : null,
     );
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 20;
-    return parsed.clamp(1, 100);
   }
 
   /// The directories the user picked, or all of them.

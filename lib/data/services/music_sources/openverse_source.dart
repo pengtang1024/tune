@@ -42,8 +42,8 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.openverseFieldQuery,
-      AppStrings.instance.openverseFieldHint,
+      AppStrings.instance.fieldQuery,
+      AppStrings.instance.openverseFieldQueryHint,
       required: true,
     ),
   ];

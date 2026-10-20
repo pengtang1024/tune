@@ -9,17 +9,7 @@ void main() {
 
       expect(
         locales.map((locale) => locale.toLanguageTag()),
-        containsAll([
-          'zh-CN',
-          'zh-TW',
-          'en',
-          'ja',
-          'ko',
-          'de',
-          'fr',
-          'es',
-          'ru',
-        ]),
+        containsAll(['zh-CN', 'zh-TW', 'en']),
       );
     });
 
@@ -42,12 +32,6 @@ void main() {
     test('writes a language in its own script', () {
       expect(localeEndonym(const Locale('zh', 'CN')), '简体中文');
       expect(localeEndonym(const Locale('zh', 'TW')), '繁體中文');
-      expect(localeEndonym(const Locale('ja')), '日本語');
-      expect(localeEndonym(const Locale('ko')), '한국어');
-      expect(localeEndonym(const Locale('de')), 'Deutsch');
-      expect(localeEndonym(const Locale('fr')), 'Français');
-      expect(localeEndonym(const Locale('es')), 'Español');
-      expect(localeEndonym(const Locale('ru')), 'Русский');
       expect(localeEndonym(const Locale('en')), 'English');
     });
 

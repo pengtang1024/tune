@@ -9,6 +9,28 @@ class MusicSourceChoice {
   const MusicSourceChoice(this.value, this.label);
 }
 
+/// How many tracks one scan of a source fetches.
+///
+/// A source counts its tracks in a unit of its own, and the interface shows
+/// that number and its ceiling. Both live here, so the field the user reads
+/// and the scan that runs never drift apart.
+class MusicSourceLimit {
+  /// How many tracks a scan fetches when the user set no limit.
+  final int count;
+
+  /// The most tracks one scan may fetch.
+  final int max;
+
+  const MusicSourceLimit(this.count, this.max);
+
+  /// The limit a configuration asks for, inside the bounds of the source.
+  int read(String? raw) {
+    final parsed = int.tryParse(raw ?? '') ?? 0;
+    if (parsed <= 0) return count;
+    return parsed.clamp(1, max);
+  }
+}
+
 /// One user-editable setting declared by a music source adapter.
 ///
 /// Keeping the schema in the data layer lets the settings UI render any source

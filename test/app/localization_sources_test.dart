@@ -1,10 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/music_source_service.dart';
+import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+
+import '../services/fake_persistence.dart';
 
 /// The names of the sources follow the language of the app.
 ///
@@ -87,4 +92,78 @@ void main() {
       expect(described, isNot(startsWith('socket closed')));
     });
   });
+
+  group('the field vocabulary of the sources', () {
+    test(
+      'the sources share the messages of the fields they have in common',
+      () {
+        final service = _service();
+        final strings = AppStrings.instance;
+
+        // A field that means the same thing everywhere reads the same message.
+        final shared = <String, Set<String>>{
+          'query': {
+            strings.fieldQuery,
+            strings.fieldQueryOptional,
+            // These three ask for something else than a keyword.
+            strings.ccmixterFieldQuery,
+            strings.internetArchiveFieldQuery,
+            strings.radioFieldQuery,
+          },
+          'limit': {
+            strings.fieldLimit,
+            strings.fieldLimitFiles,
+            strings.fieldLimitEpisodes,
+            strings.fieldLimitStations,
+          },
+          'server': {strings.fieldServer},
+          'user': {strings.fieldUser},
+          'password': {strings.fieldPassword},
+          'format': {strings.fieldFormat},
+        };
+
+        for (final adapter in service.adapters) {
+          for (final field in adapter.configurationFields) {
+            final messages = shared[field.key];
+            if (messages == null) continue;
+
+            expect(
+              messages,
+              contains(field.label),
+              reason: '${adapter.sourceId} names its own ${field.key} field',
+            );
+          }
+        }
+      },
+    );
+
+    test('the hint of the limit names the numbers the source counts', () {
+      final service = _service();
+      final strings = AppStrings.instance;
+
+      for (final adapter in service.adapters) {
+        final limit = adapter.scanLimit;
+        if (limit == null) continue;
+
+        final fields = adapter.configurationFields
+            .where((field) => field.key == 'limit')
+            .toList(growable: false);
+        expect(fields, hasLength(1), reason: adapter.sourceId);
+
+        expect(
+          fields.single.hint,
+          strings.fieldLimitHint(limit.count, limit.max),
+          reason: '${adapter.sourceId} shows other numbers than it counts',
+        );
+      }
+    });
+  });
+}
+
+/// The registry of the built-in sources.
+MusicSourceService _service() {
+  return MusicSourceService(
+    scanner: CrossPlatformMusicScannerImpl(),
+    store: MusicSourceStore(FakePersistenceService()),
+  );
 }

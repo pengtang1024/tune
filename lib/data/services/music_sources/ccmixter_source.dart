@@ -14,6 +14,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// hotlink check, so every song carries the `Referer` header the site
 /// expects; without it the download answers with HTTP 403.
 class CcMixterSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(15, 30);
+
   static const _endpoint = 'https://ccmixter.org/api/query';
   static const _referer = 'https://ccmixter.org/';
 
@@ -50,8 +54,8 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.ccmixterFieldLimit,
-      AppStrings.instance.ccmixterFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -74,7 +78,7 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<String>(
         _endpoint,
         queryParameters: {'f': 'json', 'limit': limit, 'tags': query},
@@ -108,12 +112,6 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 15;
-    return parsed.clamp(1, 30);
   }
 
   /// Kept static so JSON mapping can be tested without network access.

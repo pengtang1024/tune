@@ -18,6 +18,10 @@ import 'package:tune/utils/logger.dart';
 /// this adapter builds from the password, and it answers with JSON when the
 /// `f=json` parameter is used.
 class SubsonicSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(25, 100);
+
   static const _apiVersion = '1.16.1';
   static const _clientName = 'tune';
 
@@ -51,37 +55,37 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'server',
-      AppStrings.instance.subsonicFieldServer,
+      AppStrings.instance.fieldServer,
       AppStrings.instance.subsonicFieldServerHint,
       required: true,
     ),
     MusicSourceField(
       'user',
-      AppStrings.instance.subsonicFieldUser,
+      AppStrings.instance.fieldUser,
       AppStrings.instance.subsonicFieldUserHint,
       required: true,
     ),
     MusicSourceField(
       'password',
-      AppStrings.instance.subsonicFieldPassword,
+      AppStrings.instance.fieldPassword,
       AppStrings.instance.subsonicFieldPasswordHint,
       required: true,
       secret: true,
     ),
     MusicSourceField(
       'query',
-      AppStrings.instance.subsonicFieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.subsonicFieldQueryHint,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.subsonicFieldLimit,
-      AppStrings.instance.subsonicFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
     MusicSourceField(
       'format',
-      AppStrings.instance.subsonicFieldFormat,
+      AppStrings.instance.fieldFormat,
       AppStrings.instance.subsonicFieldFormatHint,
       choices: [
         MusicSourceChoice(
@@ -114,7 +118,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
 
     try {
       final query = config.setting('query') ?? config.setting('keywords');
-      final limit = _readLimit(config);
+      final limit = scanLimit.read(config.setting('limit'));
       final response = await _dio.get<String>(
         _endpoint(config, 'search3'),
         queryParameters: {
@@ -397,11 +401,5 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
   static String _salt() {
     final random = Random.secure();
     return List.generate(8, (_) => random.nextInt(36).toRadixString(36)).join();
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 25;
-    return parsed.clamp(1, 100);
   }
 }

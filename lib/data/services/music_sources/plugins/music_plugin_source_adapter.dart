@@ -35,8 +35,8 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.pluginFieldQuery,
-      AppStrings.instance.pluginFieldHint,
+      AppStrings.instance.fieldQuery,
+      AppStrings.instance.pluginFieldQueryHint,
       required: true,
     ),
   ];
@@ -65,7 +65,7 @@ class MusicPluginSourceAdapter extends MusicSourceAdapter {
           sourceId: sourceId,
           status: SourceScanStatus.success,
           songs: const [],
-          message: AppStrings.instance.pluginNoMatch,
+          message: AppStrings.instance.searchNoMatch,
         );
       }
 

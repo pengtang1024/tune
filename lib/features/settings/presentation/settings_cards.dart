@@ -199,8 +199,8 @@ class SettingsLibraryCard extends StatelessWidget {
 
     return _SettingsCard(
       index: '02',
-      eyebrow: context.loc.settingsSectionLibrary,
-      title: context.loc.musicLibrary,
+      eyebrow: context.loc.libraryTitle,
+      title: context.loc.libraryTitle,
       description: context.loc.settingsLibraryDescription,
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
@@ -322,7 +322,7 @@ class SettingsAboutCard extends StatelessWidget {
 
     return _SettingsCard(
       index: '03',
-      eyebrow: context.loc.settingsSectionAbout,
+      eyebrow: context.loc.about,
       title: context.loc.settingsAboutTitle,
       description: context.loc.about,
       child: Row(

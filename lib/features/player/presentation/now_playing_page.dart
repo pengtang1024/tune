@@ -89,7 +89,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                                     state.currentSong!,
                                     sourceNames,
                                   ) ??
-                                  context.loc.nowPlayingLocalMusic,
+                                  context.loc.sourceLocalName,
                               onPrevious: controller.previous,
                               onNext: controller.next,
                               onTogglePlay: controller.togglePlayPause,
@@ -145,7 +145,7 @@ class _TopBar extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              context.loc.nowPlayingEyebrow,
+              context.loc.playerNowPlaying,
               style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 9,
@@ -164,7 +164,7 @@ class _TopBar extends StatelessWidget {
         const SizedBox(width: 8),
         _RoundButton(
           icon: Icons.queue_music_rounded,
-          tooltip: context.loc.playerQueue,
+          tooltip: context.loc.queueTitle,
           onPressed: () => context.go('/queue'),
         ),
       ],
@@ -405,7 +405,7 @@ class _TrackDetails extends StatelessWidget {
     add(context.loc.nowPlayingDetailSampleRate, _sampleRate());
     add(context.loc.nowPlayingDetailTrack, _track());
     add(context.loc.nowPlayingDetailDisc, _disc());
-    add(context.loc.nowPlayingDetailLanguage, song.language);
+    add(context.loc.language, song.language);
     add(context.loc.nowPlayingDetailLicense, song.license);
     add(context.loc.nowPlayingDetailNowPlaying, _onAir());
     add(context.loc.nowPlayingDetailSource, sourceName);

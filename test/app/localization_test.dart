@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Guards the localisation of the app.
 ///
-/// Five rules are checked:
+/// Six rules are checked:
 ///
 /// * every locale ships the same catalogue, so no language falls back to
 ///   another one by accident,
@@ -344,26 +344,7 @@ bool _closesOnSameLine(String line) {
 }
 
 /// The language names the settings page lists in their own language.
-const _languageNames = {
-  '繁體中文',
-  '简体中文',
-  '日本語',
-  '한국어',
-  'Deutsch',
-  'Français',
-  'Español',
-  'Русский',
-  'English',
-  'Italiano',
-  'Português',
-  'Türkçe',
-  'Polski',
-  'Nederlands',
-  'Tiếng Việt',
-  'Bahasa Indonesia',
-  'Українська',
-  'العربية',
-};
+const _languageNames = {'繁體中文', '简体中文', 'English'};
 
 final _chinese = RegExp(r'[\u4e00-\u9fff]');
 final _stringLiteral = RegExp(r"'([^'\n]*)'");
@@ -374,12 +355,6 @@ final _stringLiteral = RegExp(r"'([^'\n]*)'");
 /// applies to the locales that spell their words with another script.
 final _foreignScripts = <String, RegExp>{
   'en': RegExp(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff]'),
-  'de': RegExp(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff]'),
-  'fr': RegExp(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff]'),
-  'es': RegExp(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff]'),
-  'ru': RegExp(r'[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]'),
-  'ko': RegExp(r'[\u3040-\u30ff]'),
-  'ja': RegExp(r'[\uac00-\ud7af\u0400-\u04ff]'),
 };
 
 /// Whether every Chinese text of the line is the name of a language.

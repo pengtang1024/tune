@@ -75,21 +75,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemMode => 'Follow system';
 
   @override
-  String get musicLibrary => 'Library';
-
-  @override
-  String get navLibrary => 'Library';
-
-  @override
-  String get navQueue => 'Queue';
-
-  @override
-  String get navSources => 'Sources';
-
-  @override
-  String get navSettings => 'Settings';
-
-  @override
   String get libraryTitle => 'Library';
 
   @override
@@ -212,9 +197,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerUnmute => 'Unmute';
 
   @override
-  String get playerQueue => 'Queue';
-
-  @override
   String get playerPlayModeSequential => 'Repeat all';
 
   @override
@@ -255,9 +237,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nowPlayingUnnamedTrack => 'Untitled track';
-
-  @override
-  String get nowPlayingLocalMusic => 'Local music';
 
   @override
   String get trackUnknownTitle => 'Unknown song';
@@ -325,9 +304,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sourcesAutoScanDescription =>
       'Every enabled source refreshes on startup. A failure never touches your local library.';
-
-  @override
-  String get sourcesScanAll => 'Scan all sources';
 
   @override
   String get sourcesImportPlugin => 'Import plugin';
@@ -460,6 +436,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesFieldNumeric => 'Please enter a number';
+
+  @override
+  String get fieldQuery => 'Search keyword';
+
+  @override
+  String get fieldQueryOptional => 'Search keyword (optional)';
+
+  @override
+  String get fieldLimit => 'Tracks per scan';
+
+  @override
+  String get fieldLimitFiles => 'Files per scan';
+
+  @override
+  String get fieldLimitEpisodes => 'Episodes per scan';
+
+  @override
+  String get fieldLimitStations => 'Stations per scan';
+
+  @override
+  String fieldLimitHint(int count, int max) {
+    return '$count by default, $max at most';
+  }
+
+  @override
+  String get fieldServer => 'Server address';
+
+  @override
+  String get fieldUser => 'User name';
+
+  @override
+  String get fieldPassword => 'Password';
+
+  @override
+  String get fieldFormat => 'Quality';
 
   @override
   String get sourcesNotLoaded => 'The source list is still loading';
@@ -601,26 +612,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchNoMatch => 'No matching songs';
 
   @override
-  String get searchNoMatchDescription => 'Try another keyword.';
-
-  @override
   String searchSearching(String query) {
     return 'Searching for “$query”';
-  }
-
-  @override
-  String searchResultCount(int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString tracks',
-      one: '1 track',
-    );
-    return '$_temp0';
   }
 
   @override
@@ -843,10 +836,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Fill in a search keyword, e.g. an artist, piano or jazz';
 
   @override
-  String get pluginFieldQuery => 'Search keyword';
-
-  @override
-  String get pluginFieldHint => 'e.g. an artist, piano, jazz';
+  String get pluginFieldQueryHint => 'e.g. an artist, piano, jazz';
 
   @override
   String pluginImportedVersion(String version) {
@@ -907,9 +897,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pluginCallError => 'The plugin call failed';
 
   @override
-  String get pluginNoMatch => 'No matching songs';
-
-  @override
   String pluginNoStreamResults(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -933,16 +920,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get neteaseFieldApi => 'API address';
 
   @override
-  String get neteaseFieldQuery => 'Search keyword';
-
-  @override
-  String get neteaseFieldHint => 'e.g. trending, an artist';
-
-  @override
-  String get neteaseFieldLimit => 'Tracks per scan';
-
-  @override
-  String get neteaseFieldLimitHint => '20 by default, 50 at most';
+  String get neteaseFieldQueryHint => 'e.g. trending, an artist';
 
   @override
   String get neteaseHotKeyword => 'trending';
@@ -950,9 +928,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get neteaseEmptyResponse =>
       'The NetEase API returned an empty response';
-
-  @override
-  String get neteaseNoMatch => 'No matching songs';
 
   @override
   String get neteaseNoStream =>
@@ -963,10 +938,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter a search keyword, e.g. piano, ambient or jazz';
 
   @override
-  String get openverseFieldQuery => 'Search keyword';
-
-  @override
-  String get openverseFieldHint => 'e.g. piano, ambient, jazz';
+  String get openverseFieldQueryHint => 'e.g. piano, ambient, jazz';
 
   @override
   String get openverseEmptyResponse => 'Openverse returned an empty response';
@@ -1011,9 +983,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Apply for free at developer.jamendo.com';
 
   @override
-  String get jamendoFieldQuery => 'Search keyword (optional)';
-
-  @override
   String get jamendoFieldQueryHint => 'e.g. jazz, electronic';
 
   @override
@@ -1028,12 +997,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get internetArchiveFieldQuery => 'Query';
-
-  @override
-  String get internetArchiveFieldLimit => 'Tracks per scan';
-
-  @override
-  String get internetArchiveFieldLimitHint => '8 by default, 20 at most';
 
   @override
   String get internetArchiveInvalidResponse =>
@@ -1137,12 +1100,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterEmptyResponse => 'ccMixter returned an empty response';
 
   @override
-  String get ccmixterFieldLimit => 'Tracks per scan';
-
-  @override
-  String get ccmixterFieldLimitHint => '15 by default, 30 at most';
-
-  @override
   String get ccmixterFieldQuery => 'Search tag';
 
   @override
@@ -1157,15 +1114,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get itunesEmptyResponse => 'The iTunes API returned an empty response';
-
-  @override
-  String get itunesFieldLimit => 'Tracks per scan';
-
-  @override
-  String get itunesFieldLimitHint => '20 by default, 50 at most';
-
-  @override
-  String get itunesFieldQuery => 'Search keyword';
 
   @override
   String get itunesFieldQueryHint => 'e.g. jazz, piano, lo-fi';
@@ -1185,12 +1133,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get podcastRssFieldFeedHint => 'e.g. https://example.com/podcast.xml';
-
-  @override
-  String get podcastRssFieldLimit => 'Episodes per scan';
-
-  @override
-  String get podcastRssFieldLimitHint => '20 by default, 100 at most';
 
   @override
   String get podcastRssHint => 'Enter the address of a podcast feed (RSS)';
@@ -1236,32 +1178,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get subsonicFieldLimit => 'Tracks per scan';
-
-  @override
-  String get subsonicFieldLimitHint => '25 by default, 100 at most';
-
-  @override
-  String get subsonicFieldPassword => 'Password';
-
-  @override
   String get subsonicFieldPasswordHint =>
       'Used to sign the access token, never sent in plain text';
-
-  @override
-  String get subsonicFieldQuery => 'Search keyword (optional)';
 
   @override
   String get subsonicFieldQueryHint => 'e.g. jazz, piano';
 
   @override
-  String get subsonicFieldServer => 'Server address';
-
-  @override
   String get subsonicFieldServerHint => 'e.g. http://localhost:4533';
-
-  @override
-  String get subsonicFieldUser => 'User name';
 
   @override
   String get subsonicFieldUserHint => 'The login name of your music server';
@@ -1282,16 +1206,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a search keyword, e.g. jazz, ambient or electronic';
 
   @override
-  String get audiusFieldQuery => 'Search keyword';
-
-  @override
   String get audiusFieldQueryHint => 'e.g. jazz, ambient, electronic';
-
-  @override
-  String get audiusFieldLimit => 'Tracks per scan';
-
-  @override
-  String get audiusFieldLimitHint => '20 by default, 50 at most';
 
   @override
   String get audiusEmptyResponse => 'Audius returned an empty response';
@@ -1323,12 +1238,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radioFieldQueryHint => 'e.g. jazz, ambient or SomaFM';
 
   @override
-  String get radioFieldLimit => 'Stations per scan';
-
-  @override
-  String get radioFieldLimitHint => '20 by default, 100 at most';
-
-  @override
   String get radioNoMatch => 'No matching stations';
 
   @override
@@ -1339,16 +1248,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a search keyword, e.g. piano, lecture or birdsong';
 
   @override
-  String get wikimediaFieldQuery => 'Search keyword';
-
-  @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
-
-  @override
-  String get wikimediaFieldLimit => 'Files per scan';
-
-  @override
-  String get wikimediaFieldLimitHint => '15 by default, 30 at most';
 
   @override
   String get wikimediaEmptyResponse =>
@@ -1366,34 +1266,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type the address and the account of your Jellyfin server';
 
   @override
-  String get jellyfinFieldServer => 'Server address';
-
-  @override
   String get jellyfinFieldServerHint => 'e.g. http://localhost:8096';
-
-  @override
-  String get jellyfinFieldUser => 'Username';
 
   @override
   String get jellyfinFieldUserHint => 'The login name of your Jellyfin account';
 
   @override
-  String get jellyfinFieldPassword => 'Password';
-
-  @override
   String get jellyfinFieldPasswordHint => 'Used to obtain an access token';
 
   @override
-  String get jellyfinFieldLimit => 'Tracks per scan';
-
-  @override
-  String get jellyfinFieldLimitHint => '50 by default, 200 at most';
-
-  @override
   String get jellyfinEmptyResponse => 'Jellyfin returned an empty response';
-
-  @override
-  String get jellyfinNoMatch => 'No matching tracks';
 
   @override
   String get jellyfinAuthFailed =>
@@ -1433,9 +1315,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nowPlayingDetailDisc => 'Disc';
 
   @override
-  String get nowPlayingDetailLanguage => 'Language';
-
-  @override
   String get nowPlayingDetailLicense => 'License';
 
   @override
@@ -1445,13 +1324,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nowPlayingDetailNowPlaying => 'On air';
 
   @override
-  String get jamendoFieldFormat => 'Quality';
-
-  @override
   String get jamendoFieldFormatHint => '192 kbps by default';
-
-  @override
-  String get subsonicFieldFormat => 'Quality';
 
   @override
   String get subsonicFieldFormatHint => 'Original quality by default';
@@ -1467,12 +1340,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSectionInterface => 'Interface';
-
-  @override
-  String get settingsSectionLibrary => 'Library';
-
-  @override
-  String get settingsSectionAbout => 'About';
 
   @override
   String get settingsLocalFirst => 'Local first';
@@ -1499,9 +1366,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String sidebarVersionLine(String name, String version) {
     return '$name desktop · $version';
   }
-
-  @override
-  String get nowPlayingEyebrow => 'Now playing';
 
   @override
   String searchSourceError(String source, String message) {

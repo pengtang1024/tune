@@ -5,13 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
-import 'app_localizations_es.dart';
-import 'app_localizations_fr.dart';
-import 'app_localizations_ja.dart';
-import 'app_localizations_ko.dart';
-import 'app_localizations_ru.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -100,13 +94,7 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
-    Locale('de'),
     Locale('en'),
-    Locale('es'),
-    Locale('fr'),
-    Locale('ja'),
-    Locale('ko'),
-    Locale('ru'),
     Locale('zh'),
     Locale('zh', 'CN'),
     Locale('zh', 'TW'),
@@ -243,36 +231,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'跟随系统'**
   String get systemMode;
-
-  /// No description provided for @musicLibrary.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get musicLibrary;
-
-  /// No description provided for @navLibrary.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get navLibrary;
-
-  /// No description provided for @navQueue.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放队列'**
-  String get navQueue;
-
-  /// No description provided for @navSources.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音源'**
-  String get navSources;
-
-  /// No description provided for @navSettings.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'设置'**
-  String get navSettings;
 
   /// No description provided for @libraryTitle.
   ///
@@ -478,12 +436,6 @@ abstract class AppLocalizations {
   /// **'恢复音量'**
   String get playerUnmute;
 
-  /// No description provided for @playerQueue.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'播放队列'**
-  String get playerQueue;
-
   /// No description provided for @playerPlayModeSequential.
   ///
   /// In zh_CN, this message translates to:
@@ -543,12 +495,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'未命名曲目'**
   String get nowPlayingUnnamedTrack;
-
-  /// No description provided for @nowPlayingLocalMusic.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'本地音乐'**
-  String get nowPlayingLocalMusic;
 
   /// No description provided for @trackUnknownTitle.
   ///
@@ -651,12 +597,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'所有已启用音源都会在启动后自动刷新，失败不会影响本地库。'**
   String get sourcesAutoScanDescription;
-
-  /// No description provided for @sourcesScanAll.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'扫描全部音源'**
-  String get sourcesScanAll;
 
   /// No description provided for @sourcesImportPlugin.
   ///
@@ -855,6 +795,72 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'请输入数字'**
   String get sourcesFieldNumeric;
+
+  /// No description provided for @fieldQuery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词'**
+  String get fieldQuery;
+
+  /// No description provided for @fieldQueryOptional.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索关键词（可选）'**
+  String get fieldQueryOptional;
+
+  /// No description provided for @fieldLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描数量'**
+  String get fieldLimit;
+
+  /// No description provided for @fieldLimitFiles.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描文件数'**
+  String get fieldLimitFiles;
+
+  /// No description provided for @fieldLimitEpisodes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描集数'**
+  String get fieldLimitEpisodes;
+
+  /// No description provided for @fieldLimitStations.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描电台数'**
+  String get fieldLimitStations;
+
+  /// No description provided for @fieldLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 {count}，最大 {max}'**
+  String fieldLimitHint(int count, int max);
+
+  /// No description provided for @fieldServer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器地址'**
+  String get fieldServer;
+
+  /// No description provided for @fieldUser.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用户名'**
+  String get fieldUser;
+
+  /// No description provided for @fieldPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码'**
+  String get fieldPassword;
+
+  /// No description provided for @fieldFormat.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音质'**
+  String get fieldFormat;
 
   /// No description provided for @sourcesNotLoaded.
   ///
@@ -1078,23 +1084,11 @@ abstract class AppLocalizations {
   /// **'没有找到匹配的歌曲'**
   String get searchNoMatch;
 
-  /// No description provided for @searchNoMatchDescription.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'换个关键词再试一次。'**
-  String get searchNoMatchDescription;
-
   /// No description provided for @searchSearching.
   ///
   /// In zh_CN, this message translates to:
   /// **'正在搜索「{query}」'**
   String searchSearching(String query);
-
-  /// No description provided for @searchResultCount.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{count} 首'**
-  String searchResultCount(int count);
 
   /// No description provided for @searchPlayAll.
   ///
@@ -1318,17 +1312,11 @@ abstract class AppLocalizations {
   /// **'填写一个搜索关键词，例如 周杰伦、piano 或 jazz'**
   String get pluginSourceHint;
 
-  /// No description provided for @pluginFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get pluginFieldQuery;
-
-  /// No description provided for @pluginFieldHint.
+  /// No description provided for @pluginFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 周杰伦、piano、jazz'**
-  String get pluginFieldHint;
+  String get pluginFieldQueryHint;
 
   /// No description provided for @pluginImportedVersion.
   ///
@@ -1426,12 +1414,6 @@ abstract class AppLocalizations {
   /// **'插件调用失败'**
   String get pluginCallError;
 
-  /// No description provided for @pluginNoMatch.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'没有找到匹配的歌曲'**
-  String get pluginNoMatch;
-
   /// No description provided for @pluginNoStreamResults.
   ///
   /// In zh_CN, this message translates to:
@@ -1450,29 +1432,11 @@ abstract class AppLocalizations {
   /// **'API 地址'**
   String get neteaseFieldApi;
 
-  /// No description provided for @neteaseFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get neteaseFieldQuery;
-
-  /// No description provided for @neteaseFieldHint.
+  /// No description provided for @neteaseFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 热门、周杰伦'**
-  String get neteaseFieldHint;
-
-  /// No description provided for @neteaseFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get neteaseFieldLimit;
-
-  /// No description provided for @neteaseFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 20，最大 50'**
-  String get neteaseFieldLimitHint;
+  String get neteaseFieldQueryHint;
 
   /// No description provided for @neteaseHotKeyword.
   ///
@@ -1486,12 +1450,6 @@ abstract class AppLocalizations {
   /// **'网易云 API 返回了空响应'**
   String get neteaseEmptyResponse;
 
-  /// No description provided for @neteaseNoMatch.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'没有找到匹配的歌曲'**
-  String get neteaseNoMatch;
-
   /// No description provided for @neteaseNoStream.
   ///
   /// In zh_CN, this message translates to:
@@ -1504,17 +1462,11 @@ abstract class AppLocalizations {
   /// **'填写搜索关键词，例如 piano、ambient 或 jazz'**
   String get openverseHint;
 
-  /// No description provided for @openverseFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get openverseFieldQuery;
-
-  /// No description provided for @openverseFieldHint.
+  /// No description provided for @openverseFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 piano、ambient、jazz'**
-  String get openverseFieldHint;
+  String get openverseFieldQueryHint;
 
   /// No description provided for @openverseEmptyResponse.
   ///
@@ -1588,12 +1540,6 @@ abstract class AppLocalizations {
   /// **'在 developer.jamendo.com 免费申请'**
   String get jamendoFieldClientIdHint;
 
-  /// No description provided for @jamendoFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词（可选）'**
-  String get jamendoFieldQuery;
-
   /// No description provided for @jamendoFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
@@ -1623,18 +1569,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'收录条件'**
   String get internetArchiveFieldQuery;
-
-  /// No description provided for @internetArchiveFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get internetArchiveFieldLimit;
-
-  /// No description provided for @internetArchiveFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 8，最大 20'**
-  String get internetArchiveFieldLimitHint;
 
   /// No description provided for @internetArchiveInvalidResponse.
   ///
@@ -1798,18 +1732,6 @@ abstract class AppLocalizations {
   /// **'ccMixter 返回了空响应'**
   String get ccmixterEmptyResponse;
 
-  /// No description provided for @ccmixterFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get ccmixterFieldLimit;
-
-  /// No description provided for @ccmixterFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 15，最大 30'**
-  String get ccmixterFieldLimitHint;
-
   /// No description provided for @ccmixterFieldQuery.
   ///
   /// In zh_CN, this message translates to:
@@ -1839,24 +1761,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'iTunes API 返回了空响应'**
   String get itunesEmptyResponse;
-
-  /// No description provided for @itunesFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get itunesFieldLimit;
-
-  /// No description provided for @itunesFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 20，最大 50'**
-  String get itunesFieldLimitHint;
-
-  /// No description provided for @itunesFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get itunesFieldQuery;
 
   /// No description provided for @itunesFieldQueryHint.
   ///
@@ -1893,18 +1797,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'例如 https://example.com/podcast.xml'**
   String get podcastRssFieldFeedHint;
-
-  /// No description provided for @podcastRssFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描集数'**
-  String get podcastRssFieldLimit;
-
-  /// No description provided for @podcastRssFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 20，最大 100'**
-  String get podcastRssFieldLimitHint;
 
   /// No description provided for @podcastRssHint.
   ///
@@ -1972,35 +1864,11 @@ abstract class AppLocalizations {
   /// **'音乐服务器返回错误：{error}'**
   String subsonicError(String error);
 
-  /// No description provided for @subsonicFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get subsonicFieldLimit;
-
-  /// No description provided for @subsonicFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 25，最大 100'**
-  String get subsonicFieldLimitHint;
-
-  /// No description provided for @subsonicFieldPassword.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'密码'**
-  String get subsonicFieldPassword;
-
   /// No description provided for @subsonicFieldPasswordHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'用于计算访问令牌，不会明文发送'**
   String get subsonicFieldPasswordHint;
-
-  /// No description provided for @subsonicFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词（可选）'**
-  String get subsonicFieldQuery;
 
   /// No description provided for @subsonicFieldQueryHint.
   ///
@@ -2008,23 +1876,11 @@ abstract class AppLocalizations {
   /// **'例如 jazz、piano'**
   String get subsonicFieldQueryHint;
 
-  /// No description provided for @subsonicFieldServer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'服务器地址'**
-  String get subsonicFieldServer;
-
   /// No description provided for @subsonicFieldServerHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 http://localhost:4533'**
   String get subsonicFieldServerHint;
-
-  /// No description provided for @subsonicFieldUser.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'用户名'**
-  String get subsonicFieldUser;
 
   /// No description provided for @subsonicFieldUserHint.
   ///
@@ -2056,29 +1912,11 @@ abstract class AppLocalizations {
   /// **'填写搜索关键词，例如 jazz、ambient 或 electronic'**
   String get audiusHint;
 
-  /// No description provided for @audiusFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get audiusFieldQuery;
-
   /// No description provided for @audiusFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 jazz、ambient、electronic'**
   String get audiusFieldQueryHint;
-
-  /// No description provided for @audiusFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get audiusFieldLimit;
-
-  /// No description provided for @audiusFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 20，最大 50'**
-  String get audiusFieldLimitHint;
 
   /// No description provided for @audiusEmptyResponse.
   ///
@@ -2134,18 +1972,6 @@ abstract class AppLocalizations {
   /// **'例如 jazz、ambient 或 SomaFM'**
   String get radioFieldQueryHint;
 
-  /// No description provided for @radioFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描电台数'**
-  String get radioFieldLimit;
-
-  /// No description provided for @radioFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 20，最大 100'**
-  String get radioFieldLimitHint;
-
   /// No description provided for @radioNoMatch.
   ///
   /// In zh_CN, this message translates to:
@@ -2164,29 +1990,11 @@ abstract class AppLocalizations {
   /// **'填写搜索关键词，例如 piano、lecture 或 birdsong'**
   String get wikimediaHint;
 
-  /// No description provided for @wikimediaFieldQuery.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'搜索关键词'**
-  String get wikimediaFieldQuery;
-
   /// No description provided for @wikimediaFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 piano、lecture、birdsong'**
   String get wikimediaFieldQueryHint;
-
-  /// No description provided for @wikimediaFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get wikimediaFieldLimit;
-
-  /// No description provided for @wikimediaFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 15，最大 30'**
-  String get wikimediaFieldLimitHint;
 
   /// No description provided for @wikimediaEmptyResponse.
   ///
@@ -2212,23 +2020,11 @@ abstract class AppLocalizations {
   /// **'填写自建 Jellyfin 的地址与账号'**
   String get jellyfinHint;
 
-  /// No description provided for @jellyfinFieldServer.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'服务器地址'**
-  String get jellyfinFieldServer;
-
   /// No description provided for @jellyfinFieldServerHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'例如 http://localhost:8096'**
   String get jellyfinFieldServerHint;
-
-  /// No description provided for @jellyfinFieldUser.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'用户名'**
-  String get jellyfinFieldUser;
 
   /// No description provided for @jellyfinFieldUserHint.
   ///
@@ -2236,41 +2032,17 @@ abstract class AppLocalizations {
   /// **'Jellyfin 的登录用户名'**
   String get jellyfinFieldUserHint;
 
-  /// No description provided for @jellyfinFieldPassword.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'密码'**
-  String get jellyfinFieldPassword;
-
   /// No description provided for @jellyfinFieldPasswordHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'用于换取访问令牌'**
   String get jellyfinFieldPasswordHint;
 
-  /// No description provided for @jellyfinFieldLimit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'每次扫描数量'**
-  String get jellyfinFieldLimit;
-
-  /// No description provided for @jellyfinFieldLimitHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'默认 50，最大 200'**
-  String get jellyfinFieldLimitHint;
-
   /// No description provided for @jellyfinEmptyResponse.
   ///
   /// In zh_CN, this message translates to:
   /// **'Jellyfin 返回了空响应'**
   String get jellyfinEmptyResponse;
-
-  /// No description provided for @jellyfinNoMatch.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'没有找到匹配的曲目'**
-  String get jellyfinNoMatch;
 
   /// No description provided for @jellyfinAuthFailed.
   ///
@@ -2344,12 +2116,6 @@ abstract class AppLocalizations {
   /// **'碟片'**
   String get nowPlayingDetailDisc;
 
-  /// No description provided for @nowPlayingDetailLanguage.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'语言'**
-  String get nowPlayingDetailLanguage;
-
   /// No description provided for @nowPlayingDetailLicense.
   ///
   /// In zh_CN, this message translates to:
@@ -2368,23 +2134,11 @@ abstract class AppLocalizations {
   /// **'正在播放'**
   String get nowPlayingDetailNowPlaying;
 
-  /// No description provided for @jamendoFieldFormat.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音质'**
-  String get jamendoFieldFormat;
-
   /// No description provided for @jamendoFieldFormatHint.
   ///
   /// In zh_CN, this message translates to:
   /// **'默认 192 kbps'**
   String get jamendoFieldFormatHint;
-
-  /// No description provided for @subsonicFieldFormat.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音质'**
-  String get subsonicFieldFormat;
 
   /// No description provided for @subsonicFieldFormatHint.
   ///
@@ -2415,18 +2169,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'界面'**
   String get settingsSectionInterface;
-
-  /// No description provided for @settingsSectionLibrary.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'音乐库'**
-  String get settingsSectionLibrary;
-
-  /// No description provided for @settingsSectionAbout.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'关于'**
-  String get settingsSectionAbout;
 
   /// No description provided for @settingsLocalFirst.
   ///
@@ -2476,12 +2218,6 @@ abstract class AppLocalizations {
   /// **'{name} 桌面版 · {version}'**
   String sidebarVersionLine(String name, String version);
 
-  /// No description provided for @nowPlayingEyebrow.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在播放'**
-  String get nowPlayingEyebrow;
-
   /// No description provided for @searchSourceError.
   ///
   /// In zh_CN, this message translates to:
@@ -2505,16 +2241,8 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) => <String>[
-    'de',
-    'en',
-    'es',
-    'fr',
-    'ja',
-    'ko',
-    'ru',
-    'zh',
-  ].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2537,20 +2265,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'de':
-      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
-    case 'es':
-      return AppLocalizationsEs();
-    case 'fr':
-      return AppLocalizationsFr();
-    case 'ja':
-      return AppLocalizationsJa();
-    case 'ko':
-      return AppLocalizationsKo();
-    case 'ru':
-      return AppLocalizationsRu();
     case 'zh':
       return AppLocalizationsZh();
   }

@@ -12,6 +12,10 @@ import 'package:tune/utils/logger.dart';
 /// The adapter only talks to the base URL configured by the user; it does not
 /// bundle or call any third-party service by default.
 class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 50);
+
   final Dio _dio;
 
   NeteaseCloudMusicSourceAdapter({Dio? dio})
@@ -44,13 +48,13 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'keywords',
-      AppStrings.instance.neteaseFieldQuery,
-      AppStrings.instance.neteaseFieldHint,
+      AppStrings.instance.fieldQuery,
+      AppStrings.instance.neteaseFieldQueryHint,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.neteaseFieldLimit,
-      AppStrings.instance.neteaseFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -76,9 +80,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
       final keywords =
           request.config.setting('keywords') ??
           AppStrings.instance.neteaseHotKeyword;
-      final limit = (SourceSongFactory.parseInt(
-        request.config.setting('limit'),
-      )).clamp(1, 50);
+      final limit = scanLimit.read(request.config.setting('limit'));
 
       final searchResponse = await _dio.get<Map<String, dynamic>>(
         '$baseUrl/search',
@@ -95,7 +97,7 @@ class NeteaseCloudMusicSourceAdapter extends MusicSourceAdapter {
           sourceId: sourceId,
           status: SourceScanStatus.success,
           songs: const [],
-          message: AppStrings.instance.neteaseNoMatch,
+          message: AppStrings.instance.searchNoMatch,
         );
       }
 

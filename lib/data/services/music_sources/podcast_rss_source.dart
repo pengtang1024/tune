@@ -14,6 +14,10 @@ import 'package:xml/xml.dart';
 /// track, so the whole feed becomes playable inside the player. The keyword
 /// of the source is not used: a feed already knows what it publishes.
 class PodcastRssSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 100);
+
   final Dio _dio;
 
   PodcastRssSourceAdapter({Dio? dio})
@@ -47,8 +51,8 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.podcastRssFieldLimit,
-      AppStrings.instance.podcastRssFieldLimitHint,
+      AppStrings.instance.fieldLimitEpisodes,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -71,7 +75,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     }
 
     try {
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<String>(feed);
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
@@ -131,12 +135,6 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       Log.error('刷新播客地址失败: $error');
       return null;
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 20;
-    return parsed.clamp(1, 100);
   }
 
   /// Kept static so feed parsing can be tested without network access.

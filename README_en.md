@@ -12,7 +12,7 @@ Tune is a compact local and online music player built with Flutter. A persistent
 - Play/pause, previous/next, seek, volume, and repeat modes
 - Filter the library by source; remote tracks show source and artwork
 - Light / dark / system themes; persistent scan paths and source settings
-- Interface languages: 简体中文, 繁體中文, English, 日本語, 한국어, Deutsch, Français, Español, Русский — source names, dates and number formats follow the choice
+- Interface languages: 简体中文, 繁體中文, 中文（通用）, English — source names, dates and number formats follow the choice
 - 900×600 default window, 760×520 minimum
 
 ## Stack

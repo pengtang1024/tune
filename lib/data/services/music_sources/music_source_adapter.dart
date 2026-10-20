@@ -31,6 +31,13 @@ abstract class MusicSourceAdapter {
   /// Fields the settings dialog should render for this source.
   List<MusicSourceField> get configurationFields => const [];
 
+  /// How many tracks one scan of this source fetches.
+  ///
+  /// Sources that do not count their tracks return `null`. The setting the
+  /// user sees and the scan that runs read this one number, so the two never
+  /// drift apart.
+  MusicSourceLimit? get scanLimit => null;
+
   /// Remote sources are not re-scanned on every launch; local files are.
   Duration get autoScanInterval => const Duration(hours: 6);
 

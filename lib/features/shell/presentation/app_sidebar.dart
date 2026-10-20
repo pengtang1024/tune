@@ -57,7 +57,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.library_music_rounded,
-                        label: context.loc.navLibrary,
+                        label: context.loc.libraryTitle,
                         path: '/library',
                         currentPath: currentPath,
                         compact: compact,
@@ -65,7 +65,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 4),
                       _NavItem(
                         icon: Icons.queue_music_rounded,
-                        label: context.loc.navQueue,
+                        label: context.loc.queueTitle,
                         path: '/queue',
                         currentPath: currentPath,
                         compact: compact,
@@ -78,7 +78,7 @@ class AppSidebar extends StatelessWidget {
                       const SizedBox(height: 8),
                       _NavItem(
                         icon: Icons.podcasts_rounded,
-                        label: context.loc.navSources,
+                        label: context.loc.sourcesTitle,
                         path: '/sources',
                         currentPath: currentPath,
                         compact: compact,
@@ -86,7 +86,7 @@ class AppSidebar extends StatelessWidget {
                       const Spacer(),
                       _NavItem(
                         icon: Icons.tune_rounded,
-                        label: context.loc.navSettings,
+                        label: context.loc.settingsTitle,
                         path: '/settings',
                         currentPath: currentPath,
                         compact: compact,

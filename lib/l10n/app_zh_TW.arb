@@ -22,11 +22,6 @@
   "lightMode": "淺色模式",
   "darkMode": "深色模式",
   "systemMode": "跟隨系統",
-  "musicLibrary": "音樂庫",
-  "navLibrary": "音樂庫",
-  "navQueue": "播放佇列",
-  "navSources": "音源",
-  "navSettings": "設定",
   "libraryTitle": "音樂庫",
   "librarySubtitle": "本地與線上音源的全部曲目",
   "libraryClearSearch": "清除搜尋",
@@ -76,7 +71,6 @@
   "playerPause": "暫停",
   "playerMute": "靜音",
   "playerUnmute": "恢復音量",
-  "playerQueue": "播放佇列",
   "playerPlayModeSequential": "清單循環",
   "playerPlayModeRepeatOne": "單曲循環",
   "playerPlayModeShuffle": "隨機播放",
@@ -95,7 +89,6 @@
   "nowPlayingEmptyTitle": "還沒有播放的曲目",
   "nowPlayingEmptySubtitle": "從音樂庫裡挑一首開始",
   "nowPlayingUnnamedTrack": "未命名曲目",
-  "nowPlayingLocalMusic": "本機音樂",
   "trackUnknownTitle": "未知歌曲",
   "playbackFailed": "播放失敗：{error}",
   "@playbackFailed": {
@@ -162,7 +155,6 @@
   "sourcesSubtitle": "線上曲庫、自建服務與掃描目錄",
   "sourcesAutoScan": "啟動時自動掃描",
   "sourcesAutoScanDescription": "所有已啟用音源都會在啟動後自動重新整理，失敗不會影響本機曲庫。",
-  "sourcesScanAll": "掃描全部音源",
   "sourcesImportPlugin": "匯入外掛",
   "sourcesScanMayTakeSeconds": "含遠端音源時可能需要數秒",
   "sourcesScanCompleted": "掃描已完成",
@@ -270,6 +262,27 @@
     }
   },
   "sourcesFieldNumeric": "請輸入數字",
+  "fieldQuery": "搜尋關鍵字",
+  "fieldQueryOptional": "搜尋關鍵字（可選）",
+  "fieldLimit": "每次掃描數量",
+  "fieldLimitFiles": "每次掃描檔案數",
+  "fieldLimitEpisodes": "每次掃描集數",
+  "fieldLimitStations": "每次掃描電台數",
+  "fieldLimitHint": "預設 {count}，最多 {max}",
+  "@fieldLimitHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldServer": "伺服器位址",
+  "fieldUser": "使用者名稱",
+  "fieldPassword": "密碼",
+  "fieldFormat": "音質",
   "sourcesNotLoaded": "音源列表尚未載入完成",
   "sourcesPlatformNoPlugin": "目前平台不支援 JavaScript 外掛",
   "sourcesUpdatePlugin": "更新外掛",
@@ -339,21 +352,11 @@
   "searchNoResults": "沒有結果",
   "searchNoResultsDescription": "換個關鍵字再試一次。",
   "searchNoMatch": "沒有找到符合的歌曲",
-  "searchNoMatchDescription": "換個關鍵字再試一次。",
   "searchSearching": "正在搜尋「{query}」",
   "@searchSearching": {
     "placeholders": {
       "query": {
         "type": "String"
-      }
-    }
-  },
-  "searchResultCount": "{count} 首",
-  "@searchResultCount": {
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "format": "decimalPattern"
       }
     }
   },
@@ -525,8 +528,7 @@
   "localSourceHint": "在音樂庫設定中新增掃描目錄",
   "localSourceNotConfigured": "未設定本機音樂目錄",
   "pluginSourceHint": "填寫一個搜尋關鍵字，例如 周杰倫、piano 或 jazz",
-  "pluginFieldQuery": "搜尋關鍵字",
-  "pluginFieldHint": "例如 周杰倫、piano、jazz",
+  "pluginFieldQueryHint": "例如 周杰倫、piano、jazz",
   "pluginImportedVersion": "匯入的 MusicFree 外掛 · v{version}",
   "@pluginImportedVersion": {
     "placeholders": {
@@ -557,7 +559,6 @@
   "pluginRuntimeClosed": "外掛執行環境已關閉",
   "pluginUnknownData": "外掛回傳了無法辨識的資料",
   "pluginCallError": "外掛呼叫失敗",
-  "pluginNoMatch": "沒有找到符合的歌曲",
   "pluginNoStreamResults": "外掛回傳了 {count} 個結果，但沒有可播放網址",
   "@pluginNoStreamResults": {
     "placeholders": {
@@ -569,17 +570,12 @@
   },
   "neteaseHint": "填寫自建的 NeteaseCloudMusicApi 位址，例如 http://localhost:3000",
   "neteaseFieldApi": "API 位址",
-  "neteaseFieldQuery": "搜尋關鍵字",
-  "neteaseFieldHint": "例如 熱門、周杰倫",
-  "neteaseFieldLimit": "每次掃描數量",
-  "neteaseFieldLimitHint": "預設 20，最大 50",
+  "neteaseFieldQueryHint": "例如 熱門、周杰倫",
   "neteaseHotKeyword": "熱門",
   "neteaseEmptyResponse": "網易雲 API 回傳了空回應",
-  "neteaseNoMatch": "沒有找到符合的歌曲",
   "neteaseNoStream": "介面未回傳可播放網址（可能需要在伺服器端登入或受版權限制）",
   "openverseHint": "填寫搜尋關鍵字，例如 piano、ambient 或 jazz",
-  "openverseFieldQuery": "搜尋關鍵字",
-  "openverseFieldHint": "例如 piano、ambient、jazz",
+  "openverseFieldQueryHint": "例如 piano、ambient、jazz",
   "openverseEmptyResponse": "Openverse 回傳了空回應",
   "openverseNoMatch": "沒有找到符合的開放音訊",
   "sourceLocalName": "本機音樂",
@@ -592,14 +588,11 @@
   "jamendoHint": "在 developer.jamendo.com 免費申請 Client ID 後填入",
   "jamendoFieldClientId": "Client ID",
   "jamendoFieldClientIdHint": "在 developer.jamendo.com 免費申請",
-  "jamendoFieldQuery": "搜尋關鍵字（可選）",
   "jamendoFieldQueryHint": "例如 jazz、electronic",
   "jamendoEmptyResponse": "Jamendo 回傳了空回應",
   "jamendoNoMatch": "沒有找到符合的 Jamendo 曲目",
   "internetArchiveHint": "填寫 Internet Archive 收錄條件，例如 collection:netlabels AND mediatype:audio",
   "internetArchiveFieldQuery": "收錄條件",
-  "internetArchiveFieldLimit": "每次掃描數量",
-  "internetArchiveFieldLimitHint": "預設 8，最大 20",
   "internetArchiveInvalidResponse": "Internet Archive 回傳了無法識別的回應",
   "internetArchiveNoMatch": "沒有找到可播放的归檔音訊",
   "downloadUnsupportedPlatform": "目前平台沒有檔案系統，無法待處下載",
@@ -679,24 +672,17 @@
     }
   },
   "ccmixterEmptyResponse": "ccMixter 回傳了空回應",
-  "ccmixterFieldLimit": "每次掃描數量",
-  "ccmixterFieldLimitHint": "預設 15，最大 30",
   "ccmixterFieldQuery": "搜尋標籤",
   "ccmixterFieldQueryHint": "例如 jazz、ambient、electro",
   "ccmixterHint": "填寫 ccMixter 標籤，例如 jazz、ambient 或 electro",
   "ccmixterNoMatch": "找不到符合的 ccMixter 曲目",
   "itunesEmptyResponse": "iTunes API 回傳了空回應",
-  "itunesFieldLimit": "每次掃描數量",
-  "itunesFieldLimitHint": "預設 20，最大 50",
-  "itunesFieldQuery": "搜尋關鍵字",
   "itunesFieldQueryHint": "例如 jazz、piano、lo-fi",
   "itunesHint": "填寫搜尋關鍵字，例如 jazz、piano 或 lo-fi",
   "itunesNoMatch": "找不到符合的 iTunes 曲目",
   "podcastRssEmptyFeed": "訂閱網址回傳了空內容",
   "podcastRssFieldFeed": "訂閱網址",
   "podcastRssFieldFeedHint": "例如 https://example.com/podcast.xml",
-  "podcastRssFieldLimit": "每次掃描集數",
-  "podcastRssFieldLimitHint": "預設 20，最大 100",
   "podcastRssHint": "填寫 podcast 訂閱網址（RSS）",
   "podcastRssInvalidFeed": "訂閱網址回傳了無法解析的 XML：{error}",
   "@podcastRssInvalidFeed": {
@@ -722,24 +708,15 @@
       }
     }
   },
-  "subsonicFieldLimit": "每次掃描數量",
-  "subsonicFieldLimitHint": "預設 25，最大 100",
-  "subsonicFieldPassword": "密碼",
   "subsonicFieldPasswordHint": "用於計算存取權杖，不會明文傳送",
-  "subsonicFieldQuery": "搜尋關鍵字（可選）",
   "subsonicFieldQueryHint": "例如 jazz、piano",
-  "subsonicFieldServer": "伺服器位址",
   "subsonicFieldServerHint": "例如 http://localhost:4533",
-  "subsonicFieldUser": "使用者名稱",
   "subsonicFieldUserHint": "自建音樂庫的登入使用者名稱",
   "subsonicHint": "填寫自建音樂庫的位址與帳號，例如 http://localhost:4533",
   "subsonicNoMatch": "找不到符合的曲目",
   "sourceAudiusDescription": "Audius 開放音樂網路的完整曲目",
   "audiusHint": "填寫搜尋關鍵字，例如 jazz、ambient 或 electronic",
-  "audiusFieldQuery": "搜尋關鍵字",
   "audiusFieldQueryHint": "例如 jazz、ambient、electronic",
-  "audiusFieldLimit": "每次掃描數量",
-  "audiusFieldLimitHint": "預設 20，最多 50",
   "audiusEmptyResponse": "Audius 回傳了空回應",
   "audiusNoMatch": "找不到符合的 Audius 曲目",
   "sourceRadioDescription": "公開網路電台的直播串流",
@@ -749,29 +726,18 @@
   "radioProviderAll": "全部目錄",
   "radioFieldQuery": "電台關鍵字",
   "radioFieldQueryHint": "例如 jazz、ambient 或 SomaFM",
-  "radioFieldLimit": "每次掃描電台數",
-  "radioFieldLimitHint": "預設 20，最多 100",
   "radioNoMatch": "找不到符合的電台",
   "sourceWikimediaDescription": "維基共享資源的開放音訊",
   "wikimediaHint": "填寫搜尋關鍵字，例如 piano、lecture 或 birdsong",
-  "wikimediaFieldQuery": "搜尋關鍵字",
   "wikimediaFieldQueryHint": "例如 piano、lecture、birdsong",
-  "wikimediaFieldLimit": "每次掃描數量",
-  "wikimediaFieldLimitHint": "預設 15，最多 30",
   "wikimediaEmptyResponse": "維基共享資源回傳了空回應",
   "wikimediaNoMatch": "找不到可播放的共享音訊",
   "sourceJellyfinDescription": "連接自建的 Jellyfin 媒體庫",
   "jellyfinHint": "填寫自建 Jellyfin 的位址與帳號",
-  "jellyfinFieldServer": "伺服器位址",
   "jellyfinFieldServerHint": "例如 http://localhost:8096",
-  "jellyfinFieldUser": "使用者名稱",
   "jellyfinFieldUserHint": "Jellyfin 的登入使用者名稱",
-  "jellyfinFieldPassword": "密碼",
   "jellyfinFieldPasswordHint": "用於換取存取權杖",
-  "jellyfinFieldLimit": "每次掃描數量",
-  "jellyfinFieldLimitHint": "預設 50，最多 200",
   "jellyfinEmptyResponse": "Jellyfin 回傳了空回應",
-  "jellyfinNoMatch": "找不到符合的曲目",
   "jellyfinAuthFailed": "無法連線 Jellyfin 伺服器，請檢查位址與帳號",
   "audioSourceStreaming": "直播",
   "playerLiveBadge": "直播中",
@@ -784,20 +750,15 @@
   "nowPlayingDetailSampleRate": "取樣率",
   "nowPlayingDetailTrack": "音軌",
   "nowPlayingDetailDisc": "光碟",
-  "nowPlayingDetailLanguage": "語言",
   "nowPlayingDetailLicense": "授權",
   "nowPlayingDetailSource": "來源",
   "nowPlayingDetailNowPlaying": "正在播放",
-  "jamendoFieldFormat": "音質",
   "jamendoFieldFormatHint": "預設 192 kbps",
-  "subsonicFieldFormat": "音質",
   "subsonicFieldFormatHint": "預設原始音質",
   "subsonicFormatOriginal": "原始音質",
   "sourceRadioName": "網路電台",
   "settingsEyebrow": "偏好",
   "settingsSectionInterface": "介面",
-  "settingsSectionLibrary": "音樂庫",
-  "settingsSectionAbout": "關於",
   "settingsLocalFirst": "本機優先",
   "libraryEyebrow": "收藏",
   "queueEyebrow": "佇列",
@@ -816,7 +777,6 @@
       }
     }
   },
-  "nowPlayingEyebrow": "正在播放",
   "searchSourceError": "{source}：{message}",
   "@searchSourceError": {
     "placeholders": {

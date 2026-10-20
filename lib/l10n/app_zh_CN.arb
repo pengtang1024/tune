@@ -22,11 +22,6 @@
   "lightMode": "浅色模式",
   "darkMode": "深色模式",
   "systemMode": "跟随系统",
-  "musicLibrary": "音乐库",
-  "navLibrary": "音乐库",
-  "navQueue": "播放队列",
-  "navSources": "音源",
-  "navSettings": "设置",
   "libraryTitle": "音乐库",
   "librarySubtitle": "本地与在线音源的全部曲目",
   "libraryClearSearch": "清除搜索",
@@ -76,7 +71,6 @@
   "playerPause": "暂停",
   "playerMute": "静音",
   "playerUnmute": "恢复音量",
-  "playerQueue": "播放队列",
   "playerPlayModeSequential": "列表循环",
   "playerPlayModeRepeatOne": "单曲循环",
   "playerPlayModeShuffle": "随机播放",
@@ -95,7 +89,6 @@
   "nowPlayingEmptyTitle": "还没有播放的曲目",
   "nowPlayingEmptySubtitle": "从音乐库里挑一首开始",
   "nowPlayingUnnamedTrack": "未命名曲目",
-  "nowPlayingLocalMusic": "本地音乐",
   "trackUnknownTitle": "未知歌曲",
   "playbackFailed": "播放失败：{error}",
   "@playbackFailed": {
@@ -162,7 +155,6 @@
   "sourcesSubtitle": "在线曲库、自建服务与扫描目录",
   "sourcesAutoScan": "启动时自动扫描",
   "sourcesAutoScanDescription": "所有已启用音源都会在启动后自动刷新，失败不会影响本地库。",
-  "sourcesScanAll": "扫描全部音源",
   "sourcesImportPlugin": "导入插件",
   "sourcesScanMayTakeSeconds": "含远程音源时可能需要数秒",
   "sourcesScanCompleted": "扫描已完成",
@@ -270,6 +262,27 @@
     }
   },
   "sourcesFieldNumeric": "请输入数字",
+  "fieldQuery": "搜索关键词",
+  "fieldQueryOptional": "搜索关键词（可选）",
+  "fieldLimit": "每次扫描数量",
+  "fieldLimitFiles": "每次扫描文件数",
+  "fieldLimitEpisodes": "每次扫描集数",
+  "fieldLimitStations": "每次扫描电台数",
+  "fieldLimitHint": "默认 {count}，最大 {max}",
+  "@fieldLimitHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldServer": "服务器地址",
+  "fieldUser": "用户名",
+  "fieldPassword": "密码",
+  "fieldFormat": "音质",
   "sourcesNotLoaded": "音源列表尚未加载完成",
   "sourcesPlatformNoPlugin": "当前平台不支持 JavaScript 插件",
   "sourcesUpdatePlugin": "更新插件",
@@ -339,21 +352,11 @@
   "searchNoResults": "没有结果",
   "searchNoResultsDescription": "换个关键词再试一次。",
   "searchNoMatch": "没有找到匹配的歌曲",
-  "searchNoMatchDescription": "换个关键词再试一次。",
   "searchSearching": "正在搜索「{query}」",
   "@searchSearching": {
     "placeholders": {
       "query": {
         "type": "String"
-      }
-    }
-  },
-  "searchResultCount": "{count} 首",
-  "@searchResultCount": {
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "format": "decimalPattern"
       }
     }
   },
@@ -525,8 +528,7 @@
   "localSourceHint": "在音乐库设置中添加扫描目录",
   "localSourceNotConfigured": "未配置本地音乐目录",
   "pluginSourceHint": "填写一个搜索关键词，例如 周杰伦、piano 或 jazz",
-  "pluginFieldQuery": "搜索关键词",
-  "pluginFieldHint": "例如 周杰伦、piano、jazz",
+  "pluginFieldQueryHint": "例如 周杰伦、piano、jazz",
   "pluginImportedVersion": "导入的 MusicFree 插件 · v{version}",
   "@pluginImportedVersion": {
     "placeholders": {
@@ -557,7 +559,6 @@
   "pluginRuntimeClosed": "插件运行时已关闭",
   "pluginUnknownData": "插件返回了无法识别的数据",
   "pluginCallError": "插件调用失败",
-  "pluginNoMatch": "没有找到匹配的歌曲",
   "pluginNoStreamResults": "插件返回了 {count} 个结果，但没有可播放地址",
   "@pluginNoStreamResults": {
     "placeholders": {
@@ -569,17 +570,12 @@
   },
   "neteaseHint": "填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000",
   "neteaseFieldApi": "API 地址",
-  "neteaseFieldQuery": "搜索关键词",
-  "neteaseFieldHint": "例如 热门、周杰伦",
-  "neteaseFieldLimit": "每次扫描数量",
-  "neteaseFieldLimitHint": "默认 20，最大 50",
+  "neteaseFieldQueryHint": "例如 热门、周杰伦",
   "neteaseHotKeyword": "热门",
   "neteaseEmptyResponse": "网易云 API 返回了空响应",
-  "neteaseNoMatch": "没有找到匹配的歌曲",
   "neteaseNoStream": "接口未返回可播放地址（可能需要在服务端登录或受版权限制）",
   "openverseHint": "填写搜索关键词，例如 piano、ambient 或 jazz",
-  "openverseFieldQuery": "搜索关键词",
-  "openverseFieldHint": "例如 piano、ambient、jazz",
+  "openverseFieldQueryHint": "例如 piano、ambient、jazz",
   "openverseEmptyResponse": "Openverse 返回了空响应",
   "openverseNoMatch": "没有找到匹配的开放音频",
   "sourceLocalName": "本地音乐",
@@ -592,14 +588,11 @@
   "jamendoHint": "在 developer.jamendo.com 免费申请 Client ID 后填入",
   "jamendoFieldClientId": "Client ID",
   "jamendoFieldClientIdHint": "在 developer.jamendo.com 免费申请",
-  "jamendoFieldQuery": "搜索关键词（可选）",
   "jamendoFieldQueryHint": "例如 jazz、electronic",
   "jamendoEmptyResponse": "Jamendo 返回了空响应",
   "jamendoNoMatch": "没有找到匹配的 Jamendo 曲目",
   "internetArchiveHint": "填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio",
   "internetArchiveFieldQuery": "收录条件",
-  "internetArchiveFieldLimit": "每次扫描数量",
-  "internetArchiveFieldLimitHint": "默认 8，最大 20",
   "internetArchiveInvalidResponse": "Internet Archive 返回了无法识别的响应",
   "internetArchiveNoMatch": "没有找到可播放的归档音频",
   "downloadUnsupportedPlatform": "当前平台没有文件系统，无法缓存下载",
@@ -679,24 +672,17 @@
     }
   },
   "ccmixterEmptyResponse": "ccMixter 返回了空响应",
-  "ccmixterFieldLimit": "每次扫描数量",
-  "ccmixterFieldLimitHint": "默认 15，最大 30",
   "ccmixterFieldQuery": "搜索标签",
   "ccmixterFieldQueryHint": "例如 jazz、ambient、electro",
   "ccmixterHint": "填写 ccMixter 标签，例如 jazz、ambient 或 electro",
   "ccmixterNoMatch": "没有找到匹配的 ccMixter 曲目",
   "itunesEmptyResponse": "iTunes API 返回了空响应",
-  "itunesFieldLimit": "每次扫描数量",
-  "itunesFieldLimitHint": "默认 20，最大 50",
-  "itunesFieldQuery": "搜索关键词",
   "itunesFieldQueryHint": "例如 jazz、piano、lo-fi",
   "itunesHint": "填写搜索关键词，例如 jazz、piano 或 lo-fi",
   "itunesNoMatch": "没有找到匹配的 iTunes 曲目",
   "podcastRssEmptyFeed": "订阅地址返回了空内容",
   "podcastRssFieldFeed": "订阅地址",
   "podcastRssFieldFeedHint": "例如 https://example.com/podcast.xml",
-  "podcastRssFieldLimit": "每次扫描集数",
-  "podcastRssFieldLimitHint": "默认 20，最大 100",
   "podcastRssHint": "填写播客订阅地址（RSS）",
   "podcastRssInvalidFeed": "订阅地址返回了无法解析的 XML：{error}",
   "@podcastRssInvalidFeed": {
@@ -722,24 +708,15 @@
       }
     }
   },
-  "subsonicFieldLimit": "每次扫描数量",
-  "subsonicFieldLimitHint": "默认 25，最大 100",
-  "subsonicFieldPassword": "密码",
   "subsonicFieldPasswordHint": "用于计算访问令牌，不会明文发送",
-  "subsonicFieldQuery": "搜索关键词（可选）",
   "subsonicFieldQueryHint": "例如 jazz、piano",
-  "subsonicFieldServer": "服务器地址",
   "subsonicFieldServerHint": "例如 http://localhost:4533",
-  "subsonicFieldUser": "用户名",
   "subsonicFieldUserHint": "自建音乐库的登录用户名",
   "subsonicHint": "填写自建音乐库的地址与账号，例如 http://localhost:4533",
   "subsonicNoMatch": "没有找到匹配的曲目",
   "sourceAudiusDescription": "Audius 开放音乐网络的完整曲目",
   "audiusHint": "填写搜索关键词，例如 jazz、ambient 或 electronic",
-  "audiusFieldQuery": "搜索关键词",
   "audiusFieldQueryHint": "例如 jazz、ambient、electronic",
-  "audiusFieldLimit": "每次扫描数量",
-  "audiusFieldLimitHint": "默认 20，最大 50",
   "audiusEmptyResponse": "Audius 返回了空响应",
   "audiusNoMatch": "没有找到匹配的 Audius 曲目",
   "sourceRadioDescription": "公开网络电台的直播流",
@@ -749,29 +726,18 @@
   "radioProviderAll": "全部目录",
   "radioFieldQuery": "电台关键词",
   "radioFieldQueryHint": "例如 jazz、ambient 或 SomaFM",
-  "radioFieldLimit": "每次扫描电台数",
-  "radioFieldLimitHint": "默认 20，最大 100",
   "radioNoMatch": "没有找到匹配的电台",
   "sourceWikimediaDescription": "维基共享资源的开放音频",
   "wikimediaHint": "填写搜索关键词，例如 piano、lecture 或 birdsong",
-  "wikimediaFieldQuery": "搜索关键词",
   "wikimediaFieldQueryHint": "例如 piano、lecture、birdsong",
-  "wikimediaFieldLimit": "每次扫描数量",
-  "wikimediaFieldLimitHint": "默认 15，最大 30",
   "wikimediaEmptyResponse": "维基共享资源返回了空响应",
   "wikimediaNoMatch": "没有找到可播放的共享音频",
   "sourceJellyfinDescription": "连接自建的 Jellyfin 媒体库",
   "jellyfinHint": "填写自建 Jellyfin 的地址与账号",
-  "jellyfinFieldServer": "服务器地址",
   "jellyfinFieldServerHint": "例如 http://localhost:8096",
-  "jellyfinFieldUser": "用户名",
   "jellyfinFieldUserHint": "Jellyfin 的登录用户名",
-  "jellyfinFieldPassword": "密码",
   "jellyfinFieldPasswordHint": "用于换取访问令牌",
-  "jellyfinFieldLimit": "每次扫描数量",
-  "jellyfinFieldLimitHint": "默认 50，最大 200",
   "jellyfinEmptyResponse": "Jellyfin 返回了空响应",
-  "jellyfinNoMatch": "没有找到匹配的曲目",
   "jellyfinAuthFailed": "无法连接 Jellyfin 服务器，请检查地址与账号",
   "audioSourceStreaming": "直播",
   "playerLiveBadge": "直播中",
@@ -784,20 +750,15 @@
   "nowPlayingDetailSampleRate": "采样率",
   "nowPlayingDetailTrack": "音轨",
   "nowPlayingDetailDisc": "碟片",
-  "nowPlayingDetailLanguage": "语言",
   "nowPlayingDetailLicense": "许可",
   "nowPlayingDetailSource": "来源",
   "nowPlayingDetailNowPlaying": "正在播放",
-  "jamendoFieldFormat": "音质",
   "jamendoFieldFormatHint": "默认 192 kbps",
-  "subsonicFieldFormat": "音质",
   "subsonicFieldFormatHint": "默认原始音质",
   "subsonicFormatOriginal": "原始音质",
   "sourceRadioName": "网络电台",
   "settingsEyebrow": "偏好",
   "settingsSectionInterface": "界面",
-  "settingsSectionLibrary": "音乐库",
-  "settingsSectionAbout": "关于",
   "settingsLocalFirst": "本地优先",
   "libraryEyebrow": "收藏",
   "queueEyebrow": "队列",
@@ -816,7 +777,6 @@
       }
     }
   },
-  "nowPlayingEyebrow": "正在播放",
   "searchSourceError": "{source}：{message}",
   "@searchSourceError": {
     "placeholders": {

@@ -12,6 +12,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// it finds, including the artist, the licence and the download address, so a
 /// single request is enough to build a playable track.
 class WikimediaSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(15, 30);
+
   /// The search endpoint of the Commons API.
   static const _apiHost = 'https://commons.wikimedia.org/w/api.php';
 
@@ -54,13 +58,13 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.wikimediaFieldQuery,
+      AppStrings.instance.fieldQuery,
       AppStrings.instance.wikimediaFieldQueryHint,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.wikimediaFieldLimit,
-      AppStrings.instance.wikimediaFieldLimitHint,
+      AppStrings.instance.fieldLimitFiles,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -74,7 +78,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     try {
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
         _apiHost,
         queryParameters: {
@@ -105,12 +109,6 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 15;
-    return parsed.clamp(1, 30);
   }
 
   /// The search term of the wiki.

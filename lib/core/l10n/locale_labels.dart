@@ -7,13 +7,7 @@ import 'package:tune/l10n/app_localizations.dart';
 /// so a reader finds their own language at a glance. The names never change
 /// with the locale of the interface, a language is always written in itself.
 const Map<String, String> _endonyms = {
-  'de': 'Deutsch',
   'en': 'English',
-  'es': 'Español',
-  'fr': 'Français',
-  'ja': '日本語',
-  'ko': '한국어',
-  'ru': 'Русский',
   'zh': '简体中文',
   'zh_CN': '简体中文',
   'zh_TW': '繁體中文',

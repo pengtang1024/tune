@@ -12,6 +12,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// together with the metadata a listener wants to see: artist, album, genre,
 /// mood, release date, licence and the cover of the release.
 class AudiusSourceAdapter extends MusicSourceAdapter {
+  /// How many tracks a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 50);
+
   /// The discovery node that answers searches and hands out stream addresses.
   static const _discoveryHost = 'https://discoveryprovider.audius.co';
 
@@ -48,14 +52,14 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
-      AppStrings.instance.audiusFieldQuery,
+      AppStrings.instance.fieldQuery,
       AppStrings.instance.audiusFieldQueryHint,
       required: true,
     ),
     MusicSourceField(
       'limit',
-      AppStrings.instance.audiusFieldLimit,
-      AppStrings.instance.audiusFieldLimitHint,
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
@@ -87,7 +91,7 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
         return failedResult(sourceId, AppStrings.instance.audiusEmptyResponse);
       }
 
-      final limit = _readLimit(request.config);
+      final limit = scanLimit.read(request.config.setting('limit'));
       final songs = parseResults(data, sourceId: sourceId, limit: limit);
       return SourceScanResult(
         sourceId: sourceId,
@@ -98,12 +102,6 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(sourceId, error);
     }
-  }
-
-  int _readLimit(MusicSourceConfig config) {
-    final parsed = SourceSongFactory.parseInt(config.setting('limit'));
-    if (parsed <= 0) return 20;
-    return parsed.clamp(1, 50);
   }
 
   /// Kept static so JSON mapping can be tested without network access.

@@ -310,7 +310,7 @@ class _Body extends StatelessWidget {
       return _EmptyView(
         icon: Icons.search_off_rounded,
         title: context.loc.searchNoMatch,
-        subtitle: state.message ?? context.loc.searchNoMatchDescription,
+        subtitle: state.message ?? context.loc.searchNoResultsDescription,
       );
     }
 
@@ -462,7 +462,7 @@ class _SourceGroup extends StatelessWidget {
               ),
               const SizedBox(width: CompactTokens.space8),
               Text(
-                context.loc.searchResultCount(result.songs.length),
+                context.loc.libraryTrackCount(result.songs.length),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,
