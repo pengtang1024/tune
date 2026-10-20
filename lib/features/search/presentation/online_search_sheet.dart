@@ -5,6 +5,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
@@ -13,6 +14,7 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
+import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -161,6 +163,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   search: search,
                   sourceLabels: sourceLabels,
                   onPlay: _play,
+                  onDoubleTap: _like,
                   onAddToQueue: _addToQueue,
                 ),
               ),
@@ -177,6 +180,10 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
     final start = index.clamp(0, songs.length - 1);
     await ref.read(listPlaybackProvider).playFrom(songs[start], songs, start);
     if (mounted) Navigator.of(context).pop();
+  }
+
+  void _like(Song song) {
+    ref.read(listDoubleClickProvider).like(song);
   }
 
   void _addToQueue(Song song) {
@@ -265,12 +272,14 @@ class _Body extends StatelessWidget {
   final OnlineSearchState? search;
   final Map<String, SourceLabel> sourceLabels;
   final Future<void> Function(SourceScanResult result, int index) onPlay;
+  final ValueChanged<Song> onDoubleTap;
   final ValueChanged<Song> onAddToQueue;
 
   const _Body({
     required this.search,
     required this.sourceLabels,
     required this.onPlay,
+    required this.onDoubleTap,
     required this.onAddToQueue,
   });
 
@@ -322,6 +331,7 @@ class _Body extends StatelessWidget {
                 sourceLabels[result.sourceId] ??
                 SourceLabel(name: result.sourceId, type: result.sourceId),
             onPlay: onPlay,
+            onDoubleTap: onDoubleTap,
             onAddToQueue: onAddToQueue,
           ),
       ],
@@ -389,12 +399,14 @@ class _SourceGroup extends StatelessWidget {
   final SourceScanResult result;
   final SourceLabel sourceLabel;
   final Future<void> Function(SourceScanResult result, int index) onPlay;
+  final ValueChanged<Song> onDoubleTap;
   final ValueChanged<Song> onAddToQueue;
 
   const _SourceGroup({
     required this.result,
     required this.sourceLabel,
     required this.onPlay,
+    required this.onDoubleTap,
     required this.onAddToQueue,
   });
 
@@ -478,6 +490,7 @@ class _SourceGroup extends StatelessWidget {
             song: result.songs[index],
             source: sourceLabel,
             onPlay: () => onPlay(result, index),
+            onDoubleTap: () => onDoubleTap(result.songs[index]),
             onAddToQueue: () => onAddToQueue(result.songs[index]),
           ),
         const SizedBox(height: CompactTokens.space4),
@@ -490,12 +503,14 @@ class _SongRow extends StatelessWidget {
   final Song song;
   final SourceLabel source;
   final VoidCallback onPlay;
+  final VoidCallback onDoubleTap;
   final VoidCallback onAddToQueue;
 
   const _SongRow({
     required this.song,
     required this.source,
     required this.onPlay,
+    required this.onDoubleTap,
     required this.onAddToQueue,
   });
 
@@ -507,8 +522,9 @@ class _SongRow extends StatelessWidget {
       song.album,
     ].where((value) => value.trim().isNotEmpty).join(' · ');
 
-    return InkWell(
-      onTap: onPlay,
+    return TrackClickArea(
+      onClick: onPlay,
+      onDoubleClick: onDoubleTap,
       borderRadius: CompactTokens.borderRadius8,
       child: Padding(
         padding: const EdgeInsets.symmetric(

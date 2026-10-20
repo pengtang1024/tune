@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -116,6 +117,9 @@ class QueuePane extends ConsumerWidget {
                       isFavorite: favorites.contains(song.uri),
                       source: sourceLabel(song, sourceLabels),
                       onTap: () => controller.playAt(index),
+                      onDoubleTap: () => ref
+                          .read(listDoubleClickProvider)
+                          .like(song),
                       onRemove: () => controller.removeFromQueue(index),
                       onToggleFavorite: () => ref
                           .read(favoritesControllerProvider.notifier)

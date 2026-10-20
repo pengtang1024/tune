@@ -895,7 +895,9 @@
   "settingsDefaultPlayerMissingEntry": "还没有安装桌面项，先运行 linux/install-desktop-entry.sh",
   "settingsSectionPlayback": "播放",
   "settingsPlaybackTitle": "播放行为",
-  "settingsPlaybackDescription": "决定单击歌曲时播放队列怎么变",
+  "settingsPlaybackDescription": "决定单击与双击歌曲时会发生什么",
   "settingsReplaceQueueOnClick": "单击歌曲时替换播放队列",
-  "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留"
+  "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留",
+  "settingsPlayOnDoubleClick": "双击时也播放这一首",
+  "settingsPlayOnDoubleClickHint": "关掉时双击只切换喜欢，正在放的曲子不受影响"
 }

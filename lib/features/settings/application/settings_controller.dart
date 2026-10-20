@@ -41,6 +41,8 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('media_controls_enabled') ?? true,
           replaceQueueOnClick:
               _persistence.getBool('replace_queue_on_click') ?? false,
+          playOnDoubleClick:
+              _persistence.getBool('play_on_double_click') ?? false,
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -100,6 +102,13 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.replaceQueueOnClick == value) return;
     state = state.copyWith(replaceQueueOnClick: value);
     await _persistence.setBool('replace_queue_on_click', value);
+  }
+
+  /// Sets whether a double click on a track plays it as well.
+  Future<void> setPlayOnDoubleClick(bool value) async {
+    if (state.playOnDoubleClick == value) return;
+    state = state.copyWith(playOnDoubleClick: value);
+    await _persistence.setBool('play_on_double_click', value);
   }
 
   /// Sets the folder the app writes the files it fetches into.

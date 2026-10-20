@@ -1400,33 +1400,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackDetailsCopied => '已复制到剪贴板';
 
   @override
-  String get trackFactDuration => '时长';
-
-  @override
-  String get trackFactSourceId => '来源编号';
-
-  @override
-  String get trackFactMediaType => '媒体类型';
-
-  @override
-  String get trackFactCover => '封面';
-
-  @override
-  String get trackFactIdentity => '身份';
-
-  @override
-  String get trackFactHeaders => '请求头';
-
-  @override
-  String get trackFactRawData => '原始数据';
-
-  @override
-  String get trackDetailsCopyCover => '复制封面';
-
-  @override
-  String get trackDetailsCopyIdentity => '复制身份';
-
-  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -1564,13 +1537,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPlaybackTitle => '播放行为';
 
   @override
-  String get settingsPlaybackDescription => '决定单击歌曲时播放队列怎么变';
+  String get settingsPlaybackDescription => '决定单击与双击歌曲时会发生什么';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
 
   @override
   String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
+
+  @override
+  String get settingsPlayOnDoubleClick => '双击时也播放这一首';
+
+  @override
+  String get settingsPlayOnDoubleClickHint => '关掉时双击只切换喜欢，正在放的曲子不受影响';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -2969,33 +2948,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackDetailsCopied => '已复制到剪贴板';
 
   @override
-  String get trackFactDuration => '时长';
-
-  @override
-  String get trackFactSourceId => '来源编号';
-
-  @override
-  String get trackFactMediaType => '媒体类型';
-
-  @override
-  String get trackFactCover => '封面';
-
-  @override
-  String get trackFactIdentity => '身份';
-
-  @override
-  String get trackFactHeaders => '请求头';
-
-  @override
-  String get trackFactRawData => '原始数据';
-
-  @override
-  String get trackDetailsCopyCover => '复制封面';
-
-  @override
-  String get trackDetailsCopyIdentity => '复制身份';
-
-  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -3133,13 +3085,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsPlaybackTitle => '播放行为';
 
   @override
-  String get settingsPlaybackDescription => '决定单击歌曲时播放队列怎么变';
+  String get settingsPlaybackDescription => '决定单击与双击歌曲时会发生什么';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
 
   @override
   String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
+
+  @override
+  String get settingsPlayOnDoubleClick => '双击时也播放这一首';
+
+  @override
+  String get settingsPlayOnDoubleClickHint => '关掉时双击只切换喜欢，正在放的曲子不受影响';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4538,33 +4496,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get trackDetailsCopied => '已複製到剪貼簿';
 
   @override
-  String get trackFactDuration => '時長';
-
-  @override
-  String get trackFactSourceId => '來源編號';
-
-  @override
-  String get trackFactMediaType => '媒體類型';
-
-  @override
-  String get trackFactCover => '封面';
-
-  @override
-  String get trackFactIdentity => '身分';
-
-  @override
-  String get trackFactHeaders => '請求標頭';
-
-  @override
-  String get trackFactRawData => '原始資料';
-
-  @override
-  String get trackDetailsCopyCover => '複製封面';
-
-  @override
-  String get trackDetailsCopyIdentity => '複製身分';
-
-  @override
   String get sourceStatusEnabled => '已啟用';
 
   @override
@@ -4702,11 +4633,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsPlaybackTitle => '播放行為';
 
   @override
-  String get settingsPlaybackDescription => '決定單擊歌曲時播放佇列怎麼變';
+  String get settingsPlaybackDescription => '決定單擊與雙擊歌曲時會發生什麼';
 
   @override
   String get settingsReplaceQueueOnClick => '單擊歌曲時取代播放佇列';
 
   @override
   String get settingsReplaceQueueOnClickHint => '關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留';
+
+  @override
+  String get settingsPlayOnDoubleClick => '雙擊時也播放這首';
+
+  @override
+  String get settingsPlayOnDoubleClickHint => '關掉時雙擊只切換喜歡，正在放的曲子不受影響';
 }

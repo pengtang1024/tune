@@ -5,16 +5,21 @@ import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 
 /// The settings of the playback.
 ///
-/// The group holds the rule of what a single click on a track means, because
-/// it decides whether the play queue survives the click.
+/// The group holds the rules of what a click on a track means: a single
+/// click decides whether the play queue survives, a double click decides
+/// whether the track is only liked or played as well.
 class SettingsPlaybackCard extends StatelessWidget {
   final bool replaceQueueOnClick;
+  final bool playOnDoubleClick;
   final ValueChanged<bool> onReplaceQueueOnClick;
+  final ValueChanged<bool> onPlayOnDoubleClick;
 
   const SettingsPlaybackCard({
     super.key,
     required this.replaceQueueOnClick,
+    required this.playOnDoubleClick,
     required this.onReplaceQueueOnClick,
+    required this.onPlayOnDoubleClick,
   });
 
   @override
@@ -24,11 +29,23 @@ class SettingsPlaybackCard extends StatelessWidget {
       eyebrow: context.loc.settingsSectionPlayback,
       title: context.loc.settingsPlaybackTitle,
       description: context.loc.settingsPlaybackDescription,
-      child: SettingsSwitchRow(
-        title: context.loc.settingsReplaceQueueOnClick,
-        description: context.loc.settingsReplaceQueueOnClickHint,
-        value: replaceQueueOnClick,
-        onChanged: onReplaceQueueOnClick,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SettingsSwitchRow(
+            title: context.loc.settingsReplaceQueueOnClick,
+            description: context.loc.settingsReplaceQueueOnClickHint,
+            value: replaceQueueOnClick,
+            onChanged: onReplaceQueueOnClick,
+          ),
+          const SizedBox(height: 8),
+          SettingsSwitchRow(
+            title: context.loc.settingsPlayOnDoubleClick,
+            description: context.loc.settingsPlayOnDoubleClickHint,
+            value: playOnDoubleClick,
+            onChanged: onPlayOnDoubleClick,
+          ),
+        ],
       ),
     );
   }

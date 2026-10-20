@@ -4,6 +4,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -19,6 +20,7 @@ class LibraryTrackCard extends StatelessWidget {
   final bool isFavorite;
   final SourceLabel? source;
   final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
   final VoidCallback onAddToQueue;
   final VoidCallback onToggleFavorite;
 
@@ -31,6 +33,7 @@ class LibraryTrackCard extends StatelessWidget {
     required this.isFavorite,
     this.source,
     required this.onTap,
+    required this.onDoubleTap,
     required this.onAddToQueue,
     required this.onToggleFavorite,
   });
@@ -55,8 +58,9 @@ class LibraryTrackCard extends StatelessWidget {
           ),
         ),
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
+        child: TrackClickArea(
+          onClick: onTap,
+          onDoubleClick: onDoubleTap,
           hoverColor: accent.withValues(alpha: 0.05),
           child: Padding(
             padding: const EdgeInsets.symmetric(

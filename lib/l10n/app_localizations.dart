@@ -2554,60 +2554,6 @@ abstract class AppLocalizations {
   /// **'已复制到剪贴板'**
   String get trackDetailsCopied;
 
-  /// No description provided for @trackFactDuration.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'时长'**
-  String get trackFactDuration;
-
-  /// No description provided for @trackFactSourceId.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'来源编号'**
-  String get trackFactSourceId;
-
-  /// No description provided for @trackFactMediaType.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'媒体类型'**
-  String get trackFactMediaType;
-
-  /// No description provided for @trackFactCover.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'封面'**
-  String get trackFactCover;
-
-  /// No description provided for @trackFactIdentity.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'身份'**
-  String get trackFactIdentity;
-
-  /// No description provided for @trackFactHeaders.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'请求头'**
-  String get trackFactHeaders;
-
-  /// No description provided for @trackFactRawData.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'原始数据'**
-  String get trackFactRawData;
-
-  /// No description provided for @trackDetailsCopyCover.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'复制封面'**
-  String get trackDetailsCopyCover;
-
-  /// No description provided for @trackDetailsCopyIdentity.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'复制身份'**
-  String get trackDetailsCopyIdentity;
-
   /// No description provided for @sourceStatusEnabled.
   ///
   /// In zh_CN, this message translates to:
@@ -2875,7 +2821,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPlaybackDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'决定单击歌曲时播放队列怎么变'**
+  /// **'决定单击与双击歌曲时会发生什么'**
   String get settingsPlaybackDescription;
 
   /// No description provided for @settingsReplaceQueueOnClick.
@@ -2889,6 +2835,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留'**
   String get settingsReplaceQueueOnClickHint;
+
+  /// No description provided for @settingsPlayOnDoubleClick.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双击时也播放这一首'**
+  String get settingsPlayOnDoubleClick;
+
+  /// No description provided for @settingsPlayOnDoubleClickHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关掉时双击只切换喜欢，正在放的曲子不受影响'**
+  String get settingsPlayOnDoubleClickHint;
 }
 
 class _AppLocalizationsDelegate

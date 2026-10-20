@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
@@ -258,6 +259,45 @@ void main() {
     final state = container.read(playbackControllerProvider);
     expect(state.queue.map((song) => song.uri), [songA.uri, songB.uri]);
     expect(state.currentSong?.uri, songB.uri);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('library double click likes the track and leaves the music alone', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(
+              const LibraryState(songs: [songA, songB, songC]),
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+
+    await tester.tap(find.text(songB.title));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text(songB.title));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(favoritesControllerProvider).contains(songB.uri),
+      isTrue,
+    );
+    expect(container.read(playbackControllerProvider).queue, isEmpty);
     expect(tester.takeException(), isNull);
   });
 

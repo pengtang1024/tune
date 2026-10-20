@@ -4,6 +4,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -19,6 +20,7 @@ class QueueTrackRow extends StatelessWidget {
   final bool isFavorite;
   final SourceLabel? source;
   final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
   final VoidCallback onRemove;
   final VoidCallback onToggleFavorite;
 
@@ -31,6 +33,7 @@ class QueueTrackRow extends StatelessWidget {
     required this.isFavorite,
     this.source,
     required this.onTap,
+    required this.onDoubleTap,
     required this.onRemove,
     required this.onToggleFavorite,
   });
@@ -42,8 +45,9 @@ class QueueTrackRow extends StatelessWidget {
 
     return Material(
       color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
+      child: TrackClickArea(
+        onClick: onTap,
+        onDoubleClick: onDoubleTap,
         hoverColor: accent.withValues(alpha: 0.04),
         child: Container(
           decoration: BoxDecoration(

@@ -75,6 +75,7 @@ void main() {
                 playing: false,
                 isFavorite: false,
                 onTap: _noop,
+                onDoubleTap: _noop,
                 onAddToQueue: _noop,
                 onToggleFavorite: _noop,
               ),

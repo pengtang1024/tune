@@ -88,8 +88,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 const SizedBox(height: 14),
                 SettingsPlaybackCard(
                   replaceQueueOnClick: settings.replaceQueueOnClick,
+                  playOnDoubleClick: settings.playOnDoubleClick,
                   onReplaceQueueOnClick:
                       settingsController.setReplaceQueueOnClick,
+                  onPlayOnDoubleClick: settingsController.setPlayOnDoubleClick,
                 ),
                 const SizedBox(height: 14),
                 SettingsDesktopCard(

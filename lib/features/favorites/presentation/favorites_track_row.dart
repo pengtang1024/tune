@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
 /// A track the user marked with a heart.
@@ -16,6 +17,7 @@ class FavoritesTrackRow extends StatelessWidget {
   final bool playing;
   final SourceLabel? source;
   final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
   final VoidCallback onToggleFavorite;
 
   const FavoritesTrackRow({
@@ -26,6 +28,7 @@ class FavoritesTrackRow extends StatelessWidget {
     required this.playing,
     this.source,
     required this.onTap,
+    required this.onDoubleTap,
     required this.onToggleFavorite,
   });
 
@@ -36,8 +39,9 @@ class FavoritesTrackRow extends StatelessWidget {
 
     return Material(
       color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
+      child: TrackClickArea(
+        onClick: onTap,
+        onDoubleClick: onDoubleTap,
         hoverColor: accent.withValues(alpha: 0.04),
         child: Container(
           decoration: BoxDecoration(

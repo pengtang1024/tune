@@ -10,6 +10,7 @@ import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/favorites/presentation/favorites_track_row.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/player/application/list_double_click.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -144,6 +145,7 @@ class FavoritesPane extends ConsumerWidget {
             // by default the track joins the queue and plays right away.
             ref.read(listPlaybackProvider).play(song);
           },
+          onDoubleTap: () => ref.read(listDoubleClickProvider).like(song),
           onToggleFavorite: () =>
               ref.read(favoritesControllerProvider.notifier).toggle(song.uri),
         );

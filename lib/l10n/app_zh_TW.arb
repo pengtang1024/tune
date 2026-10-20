@@ -895,7 +895,9 @@
   "settingsDefaultPlayerMissingEntry": "還沒有安裝桌面項目，先執行 linux/install-desktop-entry.sh",
   "settingsSectionPlayback": "播放",
   "settingsPlaybackTitle": "播放行為",
-  "settingsPlaybackDescription": "決定單擊歌曲時播放佇列怎麼變",
+  "settingsPlaybackDescription": "決定單擊與雙擊歌曲時會發生什麼",
   "settingsReplaceQueueOnClick": "單擊歌曲時取代播放佇列",
-  "settingsReplaceQueueOnClickHint": "關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留"
+  "settingsReplaceQueueOnClickHint": "關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留",
+  "settingsPlayOnDoubleClick": "雙擊時也播放這首",
+  "settingsPlayOnDoubleClickHint": "關掉時雙擊只切換喜歡，正在放的曲子不受影響"
 }

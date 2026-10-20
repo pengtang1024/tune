@@ -1541,33 +1541,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackDetailsCopied => 'Copied to the clipboard';
 
   @override
-  String get trackFactDuration => 'Duration';
-
-  @override
-  String get trackFactSourceId => 'Source ID';
-
-  @override
-  String get trackFactMediaType => 'Media type';
-
-  @override
-  String get trackFactCover => 'Cover';
-
-  @override
-  String get trackFactIdentity => 'Identity';
-
-  @override
-  String get trackFactHeaders => 'Request headers';
-
-  @override
-  String get trackFactRawData => 'Raw data';
-
-  @override
-  String get trackDetailsCopyCover => 'Copy cover';
-
-  @override
-  String get trackDetailsCopyIdentity => 'Copy identity';
-
-  @override
   String get sourceStatusEnabled => 'Enabled';
 
   @override
@@ -1711,7 +1684,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPlaybackDescription =>
-      'What happens to the play queue when a track is clicked';
+      'What a single click and a double click on a track do';
 
   @override
   String get settingsReplaceQueueOnClick =>
@@ -1720,4 +1693,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsReplaceQueueOnClickHint =>
       'When off, a click queues the track and plays it right away; the rest of the queue stays';
+
+  @override
+  String get settingsPlayOnDoubleClick =>
+      'Play the track on a double click too';
+
+  @override
+  String get settingsPlayOnDoubleClickHint =>
+      'When off, a double click only likes the track and leaves the music alone';
 }
