@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
@@ -50,7 +51,7 @@ class TrackPathRow extends StatelessWidget {
         IconButton(
           tooltip: context.loc.trackDetailsCopyPath,
           onPressed: () => _copy(context),
-          icon: const Icon(Icons.copy_rounded, size: 16),
+          icon: const Icon(Icons.copy_rounded, size: CompactTokens.icon16),
           style: IconButton.styleFrom(
             foregroundColor: theme.colorScheme.onSurfaceVariant,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,

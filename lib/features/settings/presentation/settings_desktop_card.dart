@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 
@@ -62,10 +63,10 @@ class SettingsDesktopCard extends StatelessWidget {
             children: [
               OutlinedButton.icon(
                 onPressed: onSetDefaultPlayer,
-                icon: const Icon(Icons.album_outlined, size: 15),
+                icon: const Icon(Icons.album_outlined, size: CompactTokens.icon16),
                 label: Text(context.loc.settingsSetDefaultPlayer),
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 34),
+                  minimumSize: const Size(0, CompactTokens.controlDefault),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
                 ),
               ),
@@ -73,7 +74,7 @@ class SettingsDesktopCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 Icon(
                   Icons.check_circle_outline,
-                  size: 14,
+                  size: CompactTokens.icon14,
                   color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 5),

@@ -351,7 +351,7 @@ class _Title extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: CompactTypography.asDisplay(
         theme.textTheme.displayMedium,
-        size: 36,
+        size: CompactTypeScale.displayLarge,
         height: 1.06,
       ),
     );
@@ -526,7 +526,7 @@ class _LiveBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.podcasts_rounded, size: 11, color: color),
+            Icon(Icons.podcasts_rounded, size: CompactTokens.icon12, color: color),
             const SizedBox(width: 5),
             Text(
               context.loc.playerLiveBadge,
@@ -590,7 +590,7 @@ class _Transport extends StatelessWidget {
         _RoundButton(
           icon: Icons.skip_previous_rounded,
           tooltip: context.loc.playerPrevious,
-          size: 24,
+          size: CompactTokens.icon24,
           onPressed: state.hasTrack ? onPrevious : null,
         ),
         const SizedBox(width: CompactTokens.space10),
@@ -617,7 +617,7 @@ class _Transport extends StatelessWidget {
                     state.isPlaying
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
-                    size: 28,
+                    size: CompactTokens.icon28,
                   ),
           ),
         ),
@@ -625,7 +625,7 @@ class _Transport extends StatelessWidget {
         _RoundButton(
           icon: Icons.skip_next_rounded,
           tooltip: context.loc.playerNext,
-          size: 24,
+          size: CompactTokens.icon24,
           onPressed: state.hasTrack ? onNext : null,
         ),
       ],
@@ -703,7 +703,7 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(
             Icons.graphic_eq_rounded,
-            size: 44,
+            size: CompactTokens.illustrationLarge,
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
@@ -711,7 +711,7 @@ class _EmptyState extends StatelessWidget {
             context.loc.nowPlayingEmptyTitle,
             style: CompactTypography.asDisplay(
               theme.textTheme.titleMedium,
-              size: 22,
+              size: CompactTypeScale.displayMedium,
             ),
           ),
           const SizedBox(height: 6),

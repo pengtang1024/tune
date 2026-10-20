@@ -141,7 +141,7 @@ class PlayerDock extends ConsumerWidget {
                         _DockIcon(
                           icon: Icons.skip_previous_rounded,
                           tooltip: context.loc.playerPrevious,
-                          size: 20,
+                          size: CompactTokens.icon20,
                           onPressed: state.hasTrack
                               ? controller.previous
                               : null,
@@ -157,7 +157,7 @@ class PlayerDock extends ConsumerWidget {
                         _DockIcon(
                           icon: Icons.skip_next_rounded,
                           tooltip: context.loc.playerNext,
-                          size: 20,
+                          size: CompactTokens.icon20,
                           onPressed: state.hasTrack ? controller.next : null,
                         ),
                         // The empty twin of the mode button keeps the play
@@ -227,7 +227,7 @@ class PlayerDock extends ConsumerWidget {
                           state.volume == 0
                               ? Icons.volume_off_rounded
                               : Icons.volume_up_rounded,
-                          size: 17,
+                          size: CompactTokens.icon18,
                         ),
                         color: theme.colorScheme.onSurfaceVariant,
                         visualDensity: VisualDensity.compact,
@@ -244,13 +244,13 @@ class PlayerDock extends ConsumerWidget {
                     _DockIcon(
                       icon: Icons.queue_music_rounded,
                       tooltip: context.loc.queueTitle,
-                      size: 19,
+                      size: CompactTokens.icon20,
                       onPressed: () => context.go('/queue'),
                     ),
                     _DockIcon(
                       icon: Icons.open_in_full_rounded,
                       tooltip: context.loc.playerExpandNowPlaying,
-                      size: 17,
+                      size: CompactTokens.icon18,
                       onPressed: song == null
                           ? null
                           : () => context.push('/now-playing'),
@@ -348,7 +348,7 @@ class _PlayButton extends StatelessWidget {
                 state.isPlaying
                     ? Icons.pause_rounded
                     : Icons.play_arrow_rounded,
-                size: 20,
+                size: CompactTokens.icon20,
               ),
       ),
     );
@@ -409,7 +409,7 @@ class _ModeButton extends StatelessWidget {
           height: CompactTokens.modeButtonSize,
           child: Icon(
             icon,
-            size: 16,
+            size: CompactTokens.icon16,
             color: active
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,

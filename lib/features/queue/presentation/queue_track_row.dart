@@ -125,7 +125,7 @@ class _RemoveButton extends StatelessWidget {
       child: IconButton(
         tooltip: context.loc.remove,
         onPressed: onPressed,
-        icon: const Icon(Icons.close_rounded, size: 14),
+        icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(width: 28, height: 28),
         style: IconButton.styleFrom(

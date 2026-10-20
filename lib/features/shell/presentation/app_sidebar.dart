@@ -151,7 +151,7 @@ class _Brand extends StatelessWidget {
       ),
       child: Icon(
         Icons.graphic_eq_rounded,
-        size: 19,
+        size: CompactTokens.icon20,
         color: theme.colorScheme.onPrimary,
       ),
     );
@@ -169,7 +169,7 @@ class _Brand extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: CompactTypography.asDisplay(
               theme.textTheme.headlineSmall,
-              size: 25,
+              size: CompactTypeScale.displayMedium,
               weight: FontWeight.w600,
               letterSpacing: -0.6,
               height: 1,

@@ -60,4 +60,13 @@ abstract final class CompactTypeScale {
   ///
   /// The title of a sheet and of a dialog.
   static const double heading = 16;
+
+  /// The size of a heading in the display face.
+  ///
+  /// The display face is the big serif voice of the shell: it writes the
+  /// title of a page, the name of the app and the title of the track that
+  /// plays now. It sits above the scale of the interface text.
+  static const double displaySmall = 17;
+  static const double displayMedium = 24;
+  static const double displayLarge = 38;
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 
@@ -121,12 +122,12 @@ abstract final class CompactTheme {
         surfaceTintColor: Colors.transparent,
       ),
       dividerTheme: DividerThemeData(color: border, thickness: 1, space: 1),
-      iconTheme: IconThemeData(color: muted, size: 20),
+      iconTheme: IconThemeData(color: muted, size: CompactTokens.icon20),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: onPrimary,
-          minimumSize: const Size(0, 38),
+          minimumSize: const Size(0, CompactTokens.controlMedium),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -137,7 +138,7 @@ abstract final class CompactTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: text,
-          minimumSize: const Size(0, 34),
+          minimumSize: const Size(0, CompactTokens.controlDefault),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           side: BorderSide(color: border),
           shape: const RoundedRectangleBorder(
@@ -149,7 +150,7 @@ abstract final class CompactTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: text,
-          minimumSize: const Size(0, 32),
+          minimumSize: const Size(0, CompactTokens.controlSmall),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(9)),

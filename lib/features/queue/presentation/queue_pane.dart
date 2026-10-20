@@ -72,7 +72,7 @@ class QueuePane extends ConsumerWidget {
                   subtitle: context.loc.queueEmptySubtitle,
                   action: FilledButton.icon(
                     onPressed: () => context.go('/library'),
-                    icon: const Icon(Icons.library_music_outlined, size: 16),
+                    icon: const Icon(Icons.library_music_outlined, size: CompactTokens.icon16),
                     label: Text(context.loc.queueGoToLibrary),
                   ),
                 )
@@ -168,7 +168,7 @@ class _QueueActions extends StatelessWidget {
         TextButton(
           onPressed: onClear,
           style: TextButton.styleFrom(
-            minimumSize: const Size(0, 28),
+            minimumSize: const Size(0, CompactTokens.controlTiny),
             padding: const EdgeInsets.symmetric(
               horizontal: CompactTokens.space8,
             ),

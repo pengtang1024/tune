@@ -138,7 +138,7 @@ class SettingsInterfaceCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.translate_rounded,
-                size: 17,
+                size: CompactTokens.icon18,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 10),
@@ -247,10 +247,10 @@ class SettingsLibraryCard extends StatelessWidget {
             children: [
               FilledButton.icon(
                 onPressed: onAddFolder,
-                icon: const Icon(Icons.create_new_folder_outlined, size: 15),
+                icon: const Icon(Icons.create_new_folder_outlined, size: CompactTokens.icon16),
                 label: Text(context.loc.settingsAddFolder),
                 style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, 34),
+                  minimumSize: const Size(0, CompactTokens.controlDefault),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
                 ),
               ),
@@ -258,21 +258,21 @@ class SettingsLibraryCard extends StatelessWidget {
                 onPressed: canScan ? onScan : null,
                 icon: scanning
                     ? const CompactSpinner.small()
-                    : const Icon(Icons.refresh_rounded, size: 15),
+                    : const Icon(Icons.refresh_rounded, size: CompactTokens.icon16),
                 label: Text(
                   scanning ? context.loc.scanning : context.loc.scanNow,
                 ),
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 34),
+                  minimumSize: const Size(0, CompactTokens.controlDefault),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
                 ),
               ),
               TextButton.icon(
                 onPressed: onClear,
-                icon: const Icon(Icons.delete_sweep_outlined, size: 15),
+                icon: const Icon(Icons.delete_sweep_outlined, size: CompactTokens.icon16),
                 label: Text(context.loc.settingsClearLibrary),
                 style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 34),
+                  minimumSize: const Size(0, CompactTokens.controlDefault),
                   padding: const EdgeInsets.symmetric(horizontal: 9),
                   foregroundColor: theme.colorScheme.error,
                 ),
@@ -284,7 +284,7 @@ class SettingsLibraryCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.shield_outlined,
-                size: 13,
+                size: CompactTokens.icon14,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 6),
@@ -329,7 +329,7 @@ class SettingsAboutCard extends StatelessWidget {
             ),
             child: Icon(
               Icons.graphic_eq_rounded,
-              size: 27,
+              size: CompactTokens.icon28,
               color: theme.colorScheme.onPrimary,
             ),
           ),
@@ -640,7 +640,7 @@ class _LanguageDropdown extends StatelessWidget {
           isExpanded: true,
           icon: Icon(
             Icons.expand_more_rounded,
-            size: 16,
+            size: CompactTokens.icon16,
             color: theme.colorScheme.onSurfaceVariant,
           ),
           style: theme.textTheme.bodySmall?.copyWith(
@@ -703,7 +703,7 @@ class _PathRow extends StatelessWidget {
         children: [
           Icon(
             Icons.folder_outlined,
-            size: 15,
+            size: CompactTokens.icon16,
             color: theme.colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 8),
@@ -746,7 +746,7 @@ class _PathRow extends StatelessWidget {
               child: IconButton(
                 tooltip: context.loc.remove,
                 onPressed: onRemove,
-                icon: const Icon(Icons.close_rounded, size: 14),
+                icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints.tightFor(
                   width: 26,
@@ -785,7 +785,7 @@ class _EmptyPath extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 15, color: theme.colorScheme.onSurfaceVariant),
+          Icon(icon, size: CompactTokens.icon16, color: theme.colorScheme.onSurfaceVariant),
           const SizedBox(width: 8),
           Text(
             text,

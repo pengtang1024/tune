@@ -150,7 +150,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                               ? null
                               : _search,
                           style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, 40),
+                            minimumSize: const Size(0, CompactTokens.controlMedium),
                             padding: const EdgeInsets.symmetric(
                               horizontal: CompactTokens.space16,
                             ),
@@ -258,7 +258,7 @@ class _Header extends StatelessWidget {
           IconButton(
             tooltip: context.loc.close,
             onPressed: onClose,
-            icon: const Icon(Icons.close_rounded, size: 18),
+            icon: const Icon(Icons.close_rounded, size: CompactTokens.icon18),
             style: IconButton.styleFrom(
               foregroundColor: colors.onSurfaceVariant,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -466,14 +466,14 @@ class _SourceGroup extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => onPlay(result, 0),
                 style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 28),
+                  minimumSize: const Size(0, CompactTokens.controlTiny),
                   padding: const EdgeInsets.symmetric(
                     horizontal: CompactTokens.space8,
                   ),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
-                icon: const Icon(Icons.play_arrow_rounded, size: 16),
+                icon: const Icon(Icons.play_arrow_rounded, size: CompactTokens.icon16),
                 label: Text(context.loc.searchPlayAll),
               ),
             ],
@@ -523,7 +523,7 @@ class _SongRow extends StatelessWidget {
             ArtworkThumb(
               path: song.albumArtPath,
               imageUrl: song.artworkUrl,
-              size: 38,
+              size: CompactTokens.artworkRow,
               radius: CompactTokens.radius8,
             ),
             const SizedBox(width: CompactTokens.space12),
@@ -565,7 +565,7 @@ class _SongRow extends StatelessWidget {
             IconButton(
               tooltip: context.loc.trackDetailsTooltip,
               onPressed: () => showTrackDetailSheet(context, song),
-              icon: const Icon(Icons.info_outline_rounded, size: 16),
+              icon: const Icon(Icons.info_outline_rounded, size: CompactTokens.icon16),
               style: IconButton.styleFrom(
                 foregroundColor: theme.colorScheme.onSurfaceVariant,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -575,7 +575,7 @@ class _SongRow extends StatelessWidget {
             IconButton(
               tooltip: context.loc.searchAddToQueue,
               onPressed: onAddToQueue,
-              icon: const Icon(Icons.playlist_add_rounded, size: 18),
+              icon: const Icon(Icons.playlist_add_rounded, size: CompactTokens.icon18),
               style: IconButton.styleFrom(
                 foregroundColor: theme.colorScheme.onSurfaceVariant,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -609,7 +609,7 @@ class _EmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 34, color: theme.colorScheme.onSurfaceVariant),
+            Icon(icon, size: CompactTokens.illustration, color: theme.colorScheme.onSurfaceVariant),
             const SizedBox(height: CompactTokens.space12),
             Text(
               title,

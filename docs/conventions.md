@@ -13,6 +13,8 @@
 - 间距、圆角、图标尺寸取 `CompactTokens`（`lib/app/theme/compact_tokens.dart`）。
 - 颜色走 `Theme.of(context)` 或 `CompactTheme`（`lib/app/theme/compact_theme.dart`），不写裸色值与魔法数。
 - 改外观先找现成 token，不要在 widget 里现编尺寸。
+- 图标走 `icon12 / icon14 / icon16 / icon18 / icon20 / icon24 / icon28` 这一条两像素一级的梯子：跟正文（`body`）并排的图标取 `icon16`，大按钮里的取 `icon18` 或 `icon20`。
+- 按钮高度走 `controlTiny / controlCompact / controlSmall / controlDefault / controlMedium / controlLarge`。空画面上的插图（`illustration*`）是画不是控件的图标，它有自己的尺寸。
 
 ## 字体
 

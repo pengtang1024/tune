@@ -27,7 +27,7 @@ class EmptyStateView extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 36,
+              size: CompactTokens.illustration,
               color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
             const SizedBox(height: CompactTokens.space12),

@@ -92,7 +92,7 @@ class _AddToQueueButton extends StatelessWidget {
     return IconButton(
       tooltip: context.loc.libraryAddToQueue,
       onPressed: onPressed,
-      icon: const Icon(Icons.playlist_add_rounded, size: 18),
+      icon: const Icon(Icons.playlist_add_rounded, size: CompactTokens.icon18),
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(width: 28, height: 28),
       style: IconButton.styleFrom(

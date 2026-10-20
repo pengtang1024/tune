@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
@@ -59,7 +60,7 @@ class LibraryEmptyState extends StatelessWidget {
           ? null
           : FilledButton.icon(
               onPressed: onScan,
-              icon: const Icon(Icons.search_rounded, size: 16),
+              icon: const Icon(Icons.search_rounded, size: CompactTokens.icon16),
               label: Text(context.loc.libraryScanAllSources),
             ),
     );

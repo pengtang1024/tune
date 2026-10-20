@@ -115,7 +115,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 OutlinedButton.icon(
                   onPressed: () => showOnlineSearchSheet(context),
                   style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, 34),
+                    minimumSize: const Size(0, CompactTokens.controlDefault),
                     padding: const EdgeInsets.symmetric(
                       horizontal: CompactTokens.space12,
                     ),
@@ -125,7 +125,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                       color: Theme.of(context).colorScheme.outlineVariant,
                     ),
                   ),
-                  icon: const Icon(Icons.travel_explore_rounded, size: 16),
+                  icon: const Icon(Icons.travel_explore_rounded, size: CompactTokens.icon16),
                   label: Text(context.loc.searchOnlineTitle),
                 ),
               ],

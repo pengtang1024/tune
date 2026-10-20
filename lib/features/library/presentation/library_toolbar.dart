@@ -82,7 +82,7 @@ class LibraryToolbar extends StatelessWidget {
                           : IconButton(
                               tooltip: context.loc.libraryClearSearch,
                               onPressed: onClearQuery,
-                              icon: const Icon(Icons.close_rounded, size: 14),
+                              icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints.tightFor(
                                 width: 28,
@@ -217,7 +217,7 @@ class _SourceFilter extends StatelessWidget {
                     : theme.colorScheme.onSurface,
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down_rounded, size: 14),
+            const Icon(Icons.keyboard_arrow_down_rounded, size: CompactTokens.icon14),
           ],
         ),
       ),
@@ -241,7 +241,7 @@ class _ScanButton extends StatelessWidget {
       onPressed: onPressed,
       icon: scanning
           ? const CompactSpinner.small()
-          : const Icon(Icons.refresh_rounded, size: 18),
+          : const Icon(Icons.refresh_rounded, size: CompactTokens.icon18),
       style: IconButton.styleFrom(
         fixedSize: const Size.square(CompactTokens.controlSmall),
         minimumSize: const Size.square(CompactTokens.controlSmall),

@@ -116,7 +116,7 @@ class _DetailsButton extends StatelessWidget {
       tooltip: context.loc.trackDetailsTooltip,
       onPressed: () =>
           showTrackDetailSheet(context, song, sourceName: sourceName),
-      icon: const Icon(Icons.info_outline_rounded, size: 15),
+      icon: const Icon(Icons.info_outline_rounded, size: CompactTokens.icon16),
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(width: 28, height: 28),
       style: IconButton.styleFrom(

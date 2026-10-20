@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/router/app_router.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/config/app_initializer.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/localization_bridge.dart';
@@ -117,7 +118,7 @@ class _StartupError extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline_rounded, size: 32),
+                  const Icon(Icons.error_outline_rounded, size: CompactTokens.illustrationSmall),
                   const SizedBox(height: 12),
                   Text(context.loc.appStartFailed),
                   const SizedBox(height: 8),

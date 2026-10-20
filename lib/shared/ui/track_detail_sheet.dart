@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
@@ -100,7 +101,7 @@ class _Header extends StatelessWidget {
         ArtworkThumb(
           path: song.albumArtPath,
           imageUrl: song.artworkUrl,
-          size: 56,
+          size: CompactTokens.artworkHero,
           radius: 12,
         ),
         const SizedBox(width: 12),
@@ -115,7 +116,7 @@ class _Header extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: CompactTypography.asDisplay(
                   theme.textTheme.titleMedium,
-                  size: 17,
+                  size: CompactTypeScale.displaySmall,
                   height: 1.15,
                 ),
               ),

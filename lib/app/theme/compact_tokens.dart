@@ -24,6 +24,14 @@ abstract final class CompactTokens {
   static const double radius10 = 10;
   static const double radius12 = 12;
 
+  /// Size of the icon of a mark, next to a label of the mark family.
+  static const double icon12 = 12;
+
+  /// Size of the icon of a control.
+  ///
+  /// The ladder runs in steps of two pixels, so an icon next to a label of
+  /// the body size is one step above it and an icon of a big button is two
+  /// steps above that.
   static const double icon14 = 14;
   static const double icon16 = 16;
   static const double icon18 = 18;
@@ -31,10 +39,25 @@ abstract final class CompactTokens {
   static const double icon24 = 24;
   static const double icon28 = 28;
 
+  /// Size of the drawings that stand for a screen with nothing in it.
+  ///
+  /// They are pictures and not the icon of a control, so they are allowed a
+  /// size of their own.
+  static const double illustrationSmall = 32;
+  static const double illustration = 36;
+  static const double illustrationLarge = 44;
+
   static const double headerHeight = 44;
   static const double tabsHeight = 44;
   static const double rowHeight = 52;
+  /// Height of the controls of the shell.
+  ///
+  /// The shell keeps its buttons dense, so the ladder runs in steps of two
+  /// pixels up to the default and then jumps to the roomy ones.
+  static const double controlTiny = 28;
+  static const double controlCompact = 30;
   static const double controlSmall = 32;
+  static const double controlDefault = 34;
   static const double controlMedium = 40;
   static const double controlLarge = 56;
   static const double inputHeight = 36;
@@ -92,6 +115,9 @@ abstract final class CompactTokens {
 
   /// Artwork of a track inside a list.
   static const double artworkRow = 40;
+
+  /// Artwork of a track that a sheet shows on its own.
+  static const double artworkHero = 56;
 
   /// Height of a row of a track list.
   ///

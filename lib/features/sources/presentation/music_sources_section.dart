@@ -143,7 +143,7 @@ class MusicSourcesSection extends ConsumerWidget {
               OutlinedButton.icon(
                 onPressed: canScan ? () => _scanAll(context, ref) : null,
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 30),
+                  minimumSize: const Size(0, CompactTokens.controlCompact),
                   padding: const EdgeInsets.symmetric(
                     horizontal: CompactTokens.space8,
                   ),
@@ -153,7 +153,7 @@ class MusicSourcesSection extends ConsumerWidget {
                 ),
                 icon: scanning
                     ? const CompactSpinner.small()
-                    : const Icon(Icons.sync_rounded, size: 15),
+                    : const Icon(Icons.sync_rounded, size: CompactTokens.icon16),
                 label: Text(context.loc.libraryScanAllSources),
               ),
               if (isMusicPluginRuntimeSupported) ...[
@@ -161,7 +161,7 @@ class MusicSourcesSection extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: busy ? null : () => _importPlugin(context, ref),
                   style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, 30),
+                    minimumSize: const Size(0, CompactTokens.controlCompact),
                     padding: const EdgeInsets.symmetric(
                       horizontal: CompactTokens.space8,
                     ),
@@ -169,7 +169,7 @@ class MusicSourcesSection extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     side: BorderSide(color: theme.colorScheme.outlineVariant),
                   ),
-                  icon: const Icon(Icons.extension_outlined, size: 15),
+                  icon: const Icon(Icons.extension_outlined, size: CompactTokens.icon16),
                   label: Text(context.loc.sourcesImportPlugin),
                 ),
               ],
@@ -381,7 +381,7 @@ class _SourceTile extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(_icon(source.kind), size: 16, color: muted),
+          Icon(_icon(source.kind), size: CompactTokens.icon16, color: muted),
           const SizedBox(width: CompactTokens.space8),
           Expanded(
             child: Column(
@@ -448,7 +448,7 @@ class _SourceTile extends ConsumerWidget {
                   tooltip: context.loc.sourcesPluginActions,
                   enabled: !busy,
                   padding: EdgeInsets.zero,
-                  icon: Icon(Icons.more_vert_rounded, size: 15, color: muted),
+                  icon: Icon(Icons.more_vert_rounded, size: CompactTokens.icon16, color: muted),
                   onSelected: (value) {
                     if (value == 'config') {
                       _openSettings(context, source, fields);
@@ -488,7 +488,7 @@ class _SourceTile extends ConsumerWidget {
                   onPressed: busy
                       ? null
                       : () => _openSettings(context, source, fields),
-                  icon: const Icon(Icons.tune_rounded, size: 15),
+                  icon: const Icon(Icons.tune_rounded, size: CompactTokens.icon16),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints.tightFor(
                     width: 28,
