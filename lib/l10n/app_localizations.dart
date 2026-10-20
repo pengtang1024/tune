@@ -2805,6 +2805,36 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'还没有安装桌面项，先运行 linux/install-desktop-entry.sh'**
   String get settingsDefaultPlayerMissingEntry;
+
+  /// No description provided for @settingsSectionPlayback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放'**
+  String get settingsSectionPlayback;
+
+  /// No description provided for @settingsPlaybackTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放行为'**
+  String get settingsPlaybackTitle;
+
+  /// No description provided for @settingsPlaybackDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'决定单击歌曲时播放队列怎么变'**
+  String get settingsPlaybackDescription;
+
+  /// No description provided for @settingsReplaceQueueOnClick.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单击歌曲时替换播放队列'**
+  String get settingsReplaceQueueOnClick;
+
+  /// No description provided for @settingsReplaceQueueOnClickHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留'**
+  String get settingsReplaceQueueOnClickHint;
 }
 
 class _AppLocalizationsDelegate

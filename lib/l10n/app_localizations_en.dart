@@ -1675,4 +1675,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsDefaultPlayerMissingEntry =>
       'The desktop entry is not installed yet, run linux/install-desktop-entry.sh';
+
+  @override
+  String get settingsSectionPlayback => 'Playback';
+
+  @override
+  String get settingsPlaybackTitle => 'Playback behavior';
+
+  @override
+  String get settingsPlaybackDescription =>
+      'What happens to the play queue when a track is clicked';
+
+  @override
+  String get settingsReplaceQueueOnClick =>
+      'Replace the play queue when a track is clicked';
+
+  @override
+  String get settingsReplaceQueueOnClickHint =>
+      'When off, a click queues the track and plays it right away; the rest of the queue stays';
 }

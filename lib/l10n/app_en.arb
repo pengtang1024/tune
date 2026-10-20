@@ -892,5 +892,10 @@
   "settingsDefaultPlayerActive": "Already the default player",
   "settingsDefaultPlayerDone": "Tune is now the default player",
   "settingsDefaultPlayerFailed": "Could not change it, install the desktop entry first",
-  "settingsDefaultPlayerMissingEntry": "The desktop entry is not installed yet, run linux/install-desktop-entry.sh"
+  "settingsDefaultPlayerMissingEntry": "The desktop entry is not installed yet, run linux/install-desktop-entry.sh",
+  "settingsSectionPlayback": "Playback",
+  "settingsPlaybackTitle": "Playback behavior",
+  "settingsPlaybackDescription": "What happens to the play queue when a track is clicked",
+  "settingsReplaceQueueOnClick": "Replace the play queue when a track is clicked",
+  "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays"
 }

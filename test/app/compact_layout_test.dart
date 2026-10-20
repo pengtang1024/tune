@@ -191,7 +191,7 @@ void main() {
     expect(audio.playedSong?.uri, songA.uri);
   });
 
-  testWidgets('library track click queues that track only', (tester) async {
+  testWidgets('library track click plays the track it picked', (tester) async {
     await setSurface(tester, const Size(760, 483));
     final audio = FakeAudioPlayerService();
     addTearDown(audio.dispose);
@@ -222,6 +222,42 @@ void main() {
     expect(state.queue.map((song) => song.uri), [songB.uri]);
     expect(state.currentSong?.uri, songB.uri);
     expect(audio.playedSong?.uri, songB.uri);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('library track click keeps the queue that is already there', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(
+              const LibraryState(songs: [songA, songB, songC]),
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+    container.read(playbackControllerProvider.notifier).addToQueue(songA);
+
+    await tester.tap(find.text(songB.title));
+    await tester.pumpAndSettle();
+
+    final state = container.read(playbackControllerProvider);
+    expect(state.queue.map((song) => song.uri), [songA.uri, songB.uri]);
+    expect(state.currentSong?.uri, songB.uri);
     expect(tester.takeException(), isNull);
   });
 
@@ -495,6 +531,53 @@ void main() {
     expect(
       container.read(settingsControllerProvider).themeMode,
       ThemeMode.dark,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('settings playback card switches the click behavior', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/settings', child: SettingsPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsPane)),
+    );
+    expect(
+      container.read(settingsControllerProvider).replaceQueueOnClick,
+      isFalse,
+    );
+    expect(find.text('单击歌曲时替换播放队列'), findsOneWidget);
+
+    final row = find
+        .ancestor(
+          of: find.text('单击歌曲时替换播放队列'),
+          matching: find.byType(Row),
+        )
+        .first;
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: row, matching: find.byType(Switch)));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(settingsControllerProvider).replaceQueueOnClick,
+      isTrue,
     );
     expect(tester.takeException(), isNull);
   });

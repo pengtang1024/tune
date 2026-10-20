@@ -15,6 +15,7 @@ import 'package:tune/features/library/presentation/library_queue_all_button.dart
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
+import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -258,9 +259,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           isFavorite: favorites.contains(song.uri),
           source: sourceLabel(song, sourceLabels),
           onTap: () {
-            // A track is played on its own: the queue holds what the user
-            // puts into it, not the list that happens to be on screen.
-            ref.read(playbackControllerProvider.notifier).playSong(song);
+            // The list the user clicks in decides what happens to the queue;
+            // by default the track joins the queue and plays right away.
+            ref.read(listPlaybackProvider).play(song);
           },
           onAddToQueue: () => _addToQueue(song),
           onToggleFavorite: () => _toggleFavorite(song),

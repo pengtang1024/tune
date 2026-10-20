@@ -10,6 +10,7 @@ import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/favorites/presentation/favorites_track_row.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
@@ -139,9 +140,9 @@ class FavoritesPane extends ConsumerWidget {
           playing: playback.$2,
           source: sourceLabel(song, sourceLabels),
           onTap: () {
-            // A track is played on its own: the queue holds what the user
-            // puts into it, not the list that happens to be on screen.
-            ref.read(playbackControllerProvider.notifier).playSong(song);
+            // The list the user clicks in decides what happens to the queue;
+            // by default the track joins the queue and plays right away.
+            ref.read(listPlaybackProvider).play(song);
           },
           onToggleFavorite: () =>
               ref.read(favoritesControllerProvider.notifier).toggle(song.uri),

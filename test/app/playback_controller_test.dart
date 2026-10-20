@@ -264,6 +264,48 @@ void main() {
     expect(controller.state.queue, [songA, songB]);
   });
 
+  group('enqueueAndPlay', () {
+    test('keeps the queue and plays the track that was picked', () async {
+      await controller.playQueue([songA, songB]);
+
+      await controller.enqueueAndPlay(songC);
+
+      expect(controller.state.queue, [songA, songB, songC]);
+      expect(controller.state.currentSong, songC);
+      expect(controller.state.currentIndex, 2);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(audio.playedSong, songC);
+    });
+
+    test('plays a track that is queued already without queuing it twice',
+        () async {
+      await controller.playQueue([songA, songB]);
+
+      await controller.enqueueAndPlay(songA);
+
+      expect(controller.state.queue, [songA, songB]);
+      expect(controller.state.currentSong, songA);
+      expect(controller.state.currentIndex, 0);
+      expect(audio.playedSong, songA);
+    });
+
+    test('starts the track when the queue is empty', () async {
+      await controller.enqueueAndPlay(songA);
+
+      expect(controller.state.queue, [songA]);
+      expect(controller.state.currentSong, songA);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(audio.playedSong, songA);
+    });
+
+    test('the track that played before stays in the history', () async {
+      await controller.playQueue([songA, songB]);
+      await controller.enqueueAndPlay(songC);
+
+      expect(controller.state.history, [songA.uri]);
+    });
+  });
+
   group('queue model', () {
     test('the current track is kept by identity', () async {
       await controller.playQueue([songA, songB, songC]);

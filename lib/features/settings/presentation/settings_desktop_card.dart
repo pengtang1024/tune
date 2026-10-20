@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 
 /// The settings of the desktop integration.
 ///
@@ -38,21 +39,21 @@ class SettingsDesktopCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '03',
+      index: '04',
       eyebrow: context.loc.settingsSectionDesktop,
       title: context.loc.settingsDesktopTitle,
       description: context.loc.settingsDesktopDescription,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SwitchRow(
+          SettingsSwitchRow(
             title: context.loc.settingsCloseToTray,
             description: context.loc.settingsCloseToTrayHint,
             value: closeToTray,
             onChanged: onCloseToTrayChanged,
           ),
           const SizedBox(height: 8),
-          _SwitchRow(
+          SettingsSwitchRow(
             title: context.loc.settingsMediaControls,
             description: context.loc.settingsMediaControlsHint,
             value: mediaControlsEnabled,
@@ -101,53 +102,6 @@ class SettingsDesktopCard extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-/// A switch with the text that explains it.
-class _SwitchRow extends StatelessWidget {
-  final String title;
-  final String description;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _SwitchRow({
-    required this.title,
-    required this.description,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                description,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Switch(value: value, onChanged: onChanged),
-      ],
     );
   }
 }

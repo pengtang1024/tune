@@ -230,6 +230,18 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   Future<void> playSong(Song song) => playQueue([song]);
 
+  /// Plays a track the user picked and keeps the queue.
+  ///
+  /// The track joins the queue and starts right away; the tracks that are
+  /// queued already keep their place, so the queue grows instead of turning
+  /// into a single song.
+  Future<void> enqueueAndPlay(Song song) async {
+    addToQueue(song);
+    final index = state.queue.indexWhere((item) => item.uri == song.uri);
+    if (index < 0) return;
+    await _startAt(index);
+  }
+
   Future<void> playAt(int index) => _startAt(index);
 
   Future<void> togglePlayPause() async {

@@ -10,6 +10,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
+import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -83,6 +84,12 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onClear: libraryReady && !busy ? _clearLibrary : null,
                   onChooseLibraryFolder: _pickLibraryFolder,
                   onResetLibraryFolder: _resetLibraryFolder,
+                ),
+                const SizedBox(height: 14),
+                SettingsPlaybackCard(
+                  replaceQueueOnClick: settings.replaceQueueOnClick,
+                  onReplaceQueueOnClick:
+                      settingsController.setReplaceQueueOnClick,
                 ),
                 const SizedBox(height: 14),
                 SettingsDesktopCard(

@@ -5,6 +5,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
@@ -173,9 +174,8 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   Future<void> _play(SourceScanResult result, int index) async {
     final songs = result.songs;
     if (songs.isEmpty) return;
-    await ref
-        .read(playbackControllerProvider.notifier)
-        .playQueue(songs, startIndex: index.clamp(0, songs.length - 1));
+    final start = index.clamp(0, songs.length - 1);
+    await ref.read(listPlaybackProvider).playFrom(songs[start], songs, start);
     if (mounted) Navigator.of(context).pop();
   }
 

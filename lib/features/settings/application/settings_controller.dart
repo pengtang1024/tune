@@ -39,6 +39,8 @@ class SettingsController extends StateNotifier<SettingsState> {
           closeToTray: _persistence.getBool('close_to_tray') ?? true,
           mediaControlsEnabled:
               _persistence.getBool('media_controls_enabled') ?? true,
+          replaceQueueOnClick:
+              _persistence.getBool('replace_queue_on_click') ?? false,
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -91,6 +93,13 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.mediaControlsEnabled == value) return;
     state = state.copyWith(mediaControlsEnabled: value);
     await _persistence.setBool('media_controls_enabled', value);
+  }
+
+  /// Sets whether a single click on a track replaces the play queue.
+  Future<void> setReplaceQueueOnClick(bool value) async {
+    if (state.replaceQueueOnClick == value) return;
+    state = state.copyWith(replaceQueueOnClick: value);
+    await _persistence.setBool('replace_queue_on_click', value);
   }
 
   /// Sets the folder the app writes the files it fetches into.

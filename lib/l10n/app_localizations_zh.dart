@@ -1529,6 +1529,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settingsDefaultPlayerMissingEntry =>
       '还没有安装桌面项，先运行 linux/install-desktop-entry.sh';
+
+  @override
+  String get settingsSectionPlayback => '播放';
+
+  @override
+  String get settingsPlaybackTitle => '播放行为';
+
+  @override
+  String get settingsPlaybackDescription => '决定单击歌曲时播放队列怎么变';
+
+  @override
+  String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
+
+  @override
+  String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3056,6 +3071,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   @override
   String get settingsDefaultPlayerMissingEntry =>
       '还没有安装桌面项，先运行 linux/install-desktop-entry.sh';
+
+  @override
+  String get settingsSectionPlayback => '播放';
+
+  @override
+  String get settingsPlaybackTitle => '播放行为';
+
+  @override
+  String get settingsPlaybackDescription => '决定单击歌曲时播放队列怎么变';
+
+  @override
+  String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
+
+  @override
+  String get settingsReplaceQueueOnClickHint => '关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -4583,4 +4613,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsDefaultPlayerMissingEntry =>
       '還沒有安裝桌面項目，先執行 linux/install-desktop-entry.sh';
+
+  @override
+  String get settingsSectionPlayback => '播放';
+
+  @override
+  String get settingsPlaybackTitle => '播放行為';
+
+  @override
+  String get settingsPlaybackDescription => '決定單擊歌曲時播放佇列怎麼變';
+
+  @override
+  String get settingsReplaceQueueOnClick => '單擊歌曲時取代播放佇列';
+
+  @override
+  String get settingsReplaceQueueOnClickHint => '關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留';
 }

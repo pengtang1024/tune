@@ -37,4 +37,29 @@ void main() {
 
     expect(controller.state.customScanPaths, ['/music/extra']);
   });
+
+  test('a click keeps the queue until the user asks for the other', () async {
+    final persistence = FakePersistenceService();
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    expect(controller.state.replaceQueueOnClick, isFalse);
+
+    await controller.setReplaceQueueOnClick(true);
+    expect(controller.state.replaceQueueOnClick, isTrue);
+  });
+
+  test('the click behavior survives a controller rebuild', () async {
+    final persistence = FakePersistenceService();
+
+    final controller = SettingsController(persistence);
+    await controller.setReplaceQueueOnClick(true);
+    controller.dispose();
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+
+    expect(reloaded.state.replaceQueueOnClick, isTrue);
+  });
 }

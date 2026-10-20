@@ -892,5 +892,10 @@
   "settingsDefaultPlayerActive": "已是默认播放器",
   "settingsDefaultPlayerDone": "Tune 已经是默认播放器了",
   "settingsDefaultPlayerFailed": "设置失败，请先安装桌面项",
-  "settingsDefaultPlayerMissingEntry": "还没有安装桌面项，先运行 linux/install-desktop-entry.sh"
+  "settingsDefaultPlayerMissingEntry": "还没有安装桌面项，先运行 linux/install-desktop-entry.sh",
+  "settingsSectionPlayback": "播放",
+  "settingsPlaybackTitle": "播放行为",
+  "settingsPlaybackDescription": "决定单击歌曲时播放队列怎么变",
+  "settingsReplaceQueueOnClick": "单击歌曲时替换播放队列",
+  "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留"
 }
