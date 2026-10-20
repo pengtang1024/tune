@@ -115,10 +115,17 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   /// The file of a track that is on the disk, when the track is one.
+  ///
+  /// A remote track keeps a canonical `tune://` URI for its identity, and
+  /// that URI names the track instead of pointing at a file. Only a track
+  /// that really has a file of its own keeps the place it is in.
   File? _localFileOf(Song song) {
-    final uri = song.uri;
-    if (uri.isEmpty || _isRemote(uri)) return null;
-    return File(uri);
+    if (!song.isLocalFile) return null;
+    final parsed = Uri.tryParse(song.uri);
+    if (parsed != null && parsed.scheme == 'file') {
+      return File(parsed.toFilePath());
+    }
+    return File(song.uri);
   }
 
   /// The folder of a track that is on the disk, when the track is one.
@@ -126,12 +133,5 @@ class FileLibraryPaths implements LibraryPaths {
     final file = _localFileOf(song);
     if (file == null) return null;
     return file.parent;
-  }
-
-  /// Whether the address points at the network instead of the disk.
-  static bool _isRemote(String uri) {
-    final parsed = Uri.tryParse(uri);
-    return parsed != null &&
-        (parsed.scheme == 'http' || parsed.scheme == 'https');
   }
 }

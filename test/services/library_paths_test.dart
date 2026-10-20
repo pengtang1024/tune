@@ -65,6 +65,27 @@ void main() {
     expect(paths.nameFor(song), 'Track');
   });
 
+  test('a remote track gets a folder of its own in the library', () async {
+    // The canonical URI names the track, it is not a path: the copy the app
+    // fetches belongs in the music library, not in a folder of that name.
+    const song = Song(
+      id: 1,
+      title: 'So What',
+      artist: 'Miles Davis',
+      album: 'Kind of Blue',
+      uri: 'tune://openverse/so-what',
+      streamUrl: 'https://cdn.example.com/so-what.mp3',
+    );
+
+    final folder = await paths.folderFor(song);
+
+    expect(
+      folder.path,
+      path.join(root.path, 'Miles Davis', 'Kind of Blue', 'So What'),
+    );
+    expect(paths.nameFor(song), 'So What');
+  });
+
   test('the files of a track sit next to each other', () async {
     const song = Song(
       id: 1,

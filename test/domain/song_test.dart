@@ -60,4 +60,30 @@ void main() {
       expect(restored.bitrate, original.bitrate);
     });
   });
+
+  group('the file of a track', () {
+    test('a track that lives on the disk owns a file', () {
+      const song = Song(id: 1, uri: '/music/one.mp3');
+
+      expect(song.isLocalFile, isTrue);
+    });
+
+    test('a remote track owns a file only after it was fetched', () {
+      const song = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        streamUrl: 'https://cdn.example.com/one.mp3',
+      );
+
+      // The canonical URI names the track, it is not a path.
+      expect(song.isLocalFile, isFalse);
+      expect(song.isRemote, isTrue);
+    });
+
+    test('a network address is not a file', () {
+      const song = Song(id: 1, uri: 'https://source.test/one');
+
+      expect(song.isLocalFile, isFalse);
+    });
+  });
 }

@@ -5,6 +5,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
+import 'package:tune/data/services/audio_source_address.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
@@ -88,28 +89,24 @@ class JustAudioPlayerService implements AudioPlayerService {
       }
 
       // 本地副本优先；没有副本时才回退到歌曲自身的地址。
-      final String audioPath = localFilePath != null && localFilePath.isNotEmpty
+      final stored = localFilePath != null && localFilePath.isNotEmpty
           ? localFilePath
-          : song.playbackUri;
+          : null;
+      final String address = stored ?? song.playbackUri;
 
       // 检查音频路径是否为空
-      if (audioPath.isEmpty) {
+      if (address.isEmpty) {
         final message = AppStrings.instance.audioPathEmpty;
         Log.error(message);
         throw Exception(message);
       }
 
-      Log.info('尝试播放音频: $audioPath');
+      Log.info('尝试播放音频: $address');
 
       // 释放之前的音频源以节省内存
       if (_audioPlayer != null) {
         await _audioPlayer!.stop();
-        final uri = Uri.tryParse(audioPath);
-        final isRemote =
-            uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
-        final source = isRemote
-            ? AudioSource.uri(uri, headers: song.httpHeaders)
-            : AudioSource.uri(Uri.file(audioPath));
+        final source = _sourceFor(song, address, fromStore: stored != null);
         await _audioPlayer!.setAudioSource(source);
         await _audioPlayer!.play();
       }
@@ -118,6 +115,16 @@ class JustAudioPlayerService implements AudioPlayerService {
       Log.error('播放音频失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
+  }
+
+  /// The source the backend loads.
+  ///
+  /// A stored copy is a file on the disk, and the address of the track itself
+  /// is a network address for a remote track and a path for a local one.
+  AudioSource _sourceFor(Song song, String address, {required bool fromStore}) {
+    final uri = audioSourceAddress(song, address, fromStore: fromStore);
+    final isNetwork = !fromStore && song.isRemote;
+    return AudioSource.uri(uri, headers: isNetwork ? song.httpHeaders : null);
   }
 
   @override

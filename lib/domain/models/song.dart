@@ -229,6 +229,23 @@ class Song {
     return target.startsWith('http://') || target.startsWith('https://');
   }
 
+  /// Whether the track has a file of its own on this machine.
+  ///
+  /// A remote source keeps a canonical `tune://` URI for the identity of the
+  /// track. That URI names the track, it is not a path: the track owns a file
+  /// only when it was fetched to the disk or when it always lived here.
+  bool get isLocalFile {
+    final target = uri;
+    if (target.isEmpty) return false;
+    final parsed = Uri.tryParse(target);
+    // A path that cannot be read as an URI is a path all the same.
+    if (parsed == null) return true;
+    final scheme = parsed.scheme;
+    // A single letter is the drive letter of a Windows path, not a scheme.
+    if (scheme.isEmpty || scheme.length == 1) return true;
+    return scheme == 'file';
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:tune/data/services/impl/library_paths_io.dart';
 import 'package:tune/domain/models/song.dart';
 
 import 'fake_artwork_cache.dart';
+import 'fake_http_adapter.dart';
 import 'fake_persistence.dart';
 
 void main() {
@@ -24,6 +24,15 @@ void main() {
     artist: 'Artist',
     uri: 'https://source.test/one',
     streamUrl: 'https://cdn.test/one.mp3',
+  );
+
+  /// A track of a real remote source: its own address names the track.
+  const canonicalSong = Song(
+    id: 2,
+    title: 'Two',
+    artist: 'Artist',
+    uri: 'tune://openverse/two',
+    streamUrl: 'https://cdn.test/two.mp3',
   );
 
   setUp(() async {
@@ -55,6 +64,19 @@ void main() {
       path.join(store.path, 'Artist', 'One', 'One.mp3'),
     );
     expect(adapter.requestedUrls, ['https://cdn.test/one.mp3']);
+  });
+
+  test('a track of a remote source lands in the music library', () async {
+    final file = await service.download(canonicalSong);
+
+    expect(File(file).existsSync(), isTrue);
+    expect(await service.storedFileFor(canonicalSong), file);
+    expect(
+      file,
+      path.join(store.path, 'Artist', 'Two', 'Two.mp3'),
+    );
+    // The copy never leaves the folder the app put it in.
+    expect(path.isWithin(store.path, file), isTrue);
   });
 
   test('two callers share one transfer', () async {
@@ -140,59 +162,4 @@ void main() {
     expect(leftover.existsSync(), isFalse);
     expect(File(path.join(folder.path, 'One.mp3')).existsSync(), isTrue);
   });
-}
-
-/// Answers every request with the same bytes and remembers what was asked.
-class FakeHttpAdapter implements HttpClientAdapter {
-  /// Holds the answer until the test releases it.
-  Completer<void>? gate;
-
-  /// When set the request fails with this error.
-  Object? failure;
-
-  /// The addresses that were requested.
-  final List<String> requestedUrls = [];
-
-  final List<void Function()> _arrivals = [];
-
-  /// Completes as soon as a request reaches the adapter.
-  Future<void> waitForRequest() {
-    if (requestedUrls.isNotEmpty) return Future<void>.value();
-    final completer = Completer<void>();
-    _arrivals.add(completer.complete);
-    return completer.future;
-  }
-
-  @override
-  Future<ResponseBody> fetch(
-    RequestOptions options,
-    Stream<Uint8List>? requestStream,
-    Future<void>? cancelFuture,
-  ) async {
-    requestedUrls.add(options.uri.toString());
-    for (final arrival in List.of(_arrivals)) {
-      arrival();
-    }
-    _arrivals.clear();
-
-    final gate = this.gate;
-    if (gate != null) {
-      await gate.future;
-    }
-    final failure = this.failure;
-    if (failure != null) {
-      throw failure;
-    }
-    final bytes = Uint8List.fromList(List<int>.filled(1024, 7));
-    return ResponseBody(
-      Stream<Uint8List>.value(bytes),
-      200,
-      headers: {
-        Headers.contentLengthHeader: [bytes.length.toString()],
-      },
-    );
-  }
-
-  @override
-  void close({bool force = false}) {}
 }
