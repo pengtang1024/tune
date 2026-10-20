@@ -117,7 +117,7 @@
 
 - `tool/` 放开发脚本（`generate_linux_icons.dart`、`layout_shots_test.dart`），不放业务代码。
 - **测试专用 API 只能在 `test/` 下用**：`SharedPreferences.setMockInitialValues` 这类成员在 `tool/` 里会触发 `invalid_use_of_visible_for_testing_member`。
-  - app 自己的持久化在测试里用 `FakePersistenceService` 隔离，不去碰真的插件存储。
+  - app 自己的持久化在测试里用 `FakePersistenceService` 隔离，不去碰真的磁盘存储。
   - 脚本要留在 `tool/`（不进常规 `flutter test`）就在调用处加 `// ignore: invalid_use_of_visible_for_testing_member` 并写明原因。
   - 脚本要进常规测试运行就挪到 `test/` 下。
 - 详见 [verification.md](verification.md)。

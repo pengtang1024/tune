@@ -54,6 +54,23 @@ presentation → application → domain
 - 纯逻辑下沉到 domain，I/O 下沉到 `data/services`；service 不依赖 Riverpod——`MusicSourceService` 是范例：它只编排 I/O，状态由 controller 持有。
 - 播放副作用（统计、历史、通知）不写进 `PlaybackController` 的核心方法，由 app 级监听器订阅状态。
 
+### 音源的类型与实例
+
+音源是「类型 + 实例」：类型是代码里的适配器，实例是读者的一条配置。
+
+| | 类型 | 实例 |
+| --- | --- | --- |
+| 是什么 | 适配器（`lib/data/services/music_sources/`） | `MusicSourceConfig`（一条配置） |
+| 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关 |
+| 标识 | `type` | `id`（内置沿用旧 id，用户实例是 `<type>:<序号>`） |
+
+- 注册表是 `type → adapter` 的数据（`MusicSourceService`），可以注入，测试因此不用改全局状态。
+- 名称、品牌图标与浏览流都按类型查，界面不按 id 硬编码。
+- 列表分三段：顶层、「更多音源」（折叠）、读者自己加的（永远显示）。分区依据是
+  `builtIn` 与类型声明的 `featured`。
+- 内置实例的检索词一律留空：平台自己有浏览流（最新、排行、每日推荐），应用不替读者挑口味。
+- 不执行读者带来的任何脚本：自定义音源只接受声明式的参数，没有表达式，也没有求值器。
+
 ## 桌面集成
 
 桌面相关的外部输入都汇到 `features/desktop/application`，它们是适配器，不持有播放状态。
@@ -94,7 +111,6 @@ presentation → application → domain
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
 | 歌词 | 曲目所在目录，`<歌名>.lrc` | `LyricsController` → `LibraryPaths` |
-| 插件脚本 | `<应用支持目录>/music_plugins/` | `MusicPluginStore` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
@@ -142,7 +158,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：歌词、原始数据、请求头 |
 | `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字）与 `MetaBadge`（纯图标 + tooltip） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
-| `lib/shared/ui/source_icon.dart` | 每个音源一个图标；用户自带的音源按种类兜底 |
+| `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
 
 同一份事实按三档呈现，读者想要多少信息就看到多少：
@@ -171,7 +187,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | --- | --- |
 | `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字，只在详情面板里用）与 `MetaBadge`（纯图标 + tooltip） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
-| `lib/shared/ui/source_mark.dart` | 每个音源一个图标；颜色按音源的类别（`sourceToneOf`） |
+| `lib/shared/ui/source_mark.dart` | 图标按类型查；颜色按音源的类别（`sourceToneOf`） |
 | `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
 
 ## 提示（tooltip）
@@ -200,16 +216,17 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 ## 扩展路径
 
-### 加一个音源
+### 注册一个音源类型
 
 1. 实现 `MusicSourceAdapter`：`lib/data/services/music_sources/music_source_adapter.dart`。
-2. 在 `lib/data/services/music_sources/music_source_service.dart` 的 `_adapters` 里注册。
-3. 在 `lib/data/services/music_sources/built_in_music_sources.dart` 加条目，名称走 `AppStrings`。
+2. 在 `lib/data/services/music_sources/music_source_service.dart` 的注册表里注册这个 `type`。
+3. 要做成内置实例，再在 `lib/data/services/music_sources/built_in_music_sources.dart`
+   加一条预置配置，名称走 `AppStrings`。
 4. 在 `lib/l10n/*.arb` 补名称与描述（见 [i18n.md](i18n.md)）。
 5. 品牌名音源还要补一条本地化名（chip 上的小字，见 `需求/多语言设计.md` 的「音源的两个名字」）。
 6. 按需补 `test/app/localization_sources_test.dart` 的词汇。
 
-播放器与音乐库 UI 不需要改。
+播放器与音乐库 UI 不需要改：一个类型可以被多个实例共用，界面对实例一视同仁。
 
 ### 加一个页面 / 页签
 

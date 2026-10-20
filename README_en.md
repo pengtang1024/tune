@@ -71,6 +71,7 @@ flutter build linux --debug
 - Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
 - Internet radio is a live stream: it is never cached and shows no progress bar.
 - Legacy mobile notifications, lyrics, equalizer, history, and account features are no longer part of the main path.
+- Arbitrary script plugins are not supported: the former MusicFree JS plugin support is gone, custom sources take declarative parameters only.
 
 ## License
 

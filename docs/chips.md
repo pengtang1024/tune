@@ -31,13 +31,13 @@ chip 只有两样东西：
 | 本地目录 `localDirectory` | 中性 `onSurfaceVariant` | 本地音乐 |
 | 公开目录 `openCatalog` | 主色 `primary` | Openverse、Jamendo、Internet Archive、ccMixter、iTunes、Audius、Wikimedia Commons、网络电台 |
 | 自建接口 `openApi` | 次色 `secondary` | 网易云音乐 API、播客 RSS、Subsonic、Jellyfin |
-| 插件 `plugin` | 三色 `tertiary` | 用户导入的插件音源 |
+| 自定义 `custom` | 三色 `tertiary` | 用户自己加的实例（自己的 feed、直链音频、映射好的接口） |
 
 事实也有自己的语气色（`FactTone`）：中性、主色、次色、三色、错误色——同一件事在哪儿都是同一个颜色。
 
 ## 图标：再说个体
 
-- 13 个内置音源各有一个自己的图标（`sourceIconOf`）；用户自己加的音源没有自己的图标，按类别兜底。
+- 图标按**类型**查（`sourceIconOf(type, kind)`）：同一类型的实例共用一个图标；目录里没有的类型按类别兜底。
 - 一个事实一个图标（格式、码率、画质、歌词、存储、直播……），行内靠图标就能分清。
 - 直播标记只有一份实现（`shared/ui/live_badge.dart`），底栏与正在播放页共用。
 - **喜欢是控件，不是标识**：红心（`shared/ui/favorite_button.dart`）自己就是那个动作，标过与没标过一眼看得出来，所以它不进事实条。
