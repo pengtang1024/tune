@@ -17,46 +17,49 @@
 /// once.
 ///
 /// The scale has two ladders. The lower one is the sans text of the
-/// interface and runs from [markDense] to [heading] in steps of one to one
-/// and a half pixels. The upper one is the serif voice of the shell and
-/// starts a pixel above the top of the lower one: [displaySmall] is a
-/// serif, and a serif next to a sans of the same size reads as a different
-/// kind of text even when the two numbers are equal. A page that needs a
-/// big heading asks the display ladder for it.
+/// interface and runs from [mark] to [heading] in steps of one pixel. The
+/// upper one is the serif voice of the shell and starts a pixel above the
+/// top of the lower one: [displaySmall] is a serif, and a serif next to a
+/// sans of the same size reads as a different kind of text even when the two
+/// numbers are equal. A page that needs a big heading asks the display
+/// ladder for it.
+///
+/// The lower ladder starts at eleven pixels, and that is a floor and not a
+/// preference. The app is a Chinese one, and a Chinese glyph packs a dozen
+/// strokes into the space of a letter: below eleven pixels the strokes of
+/// one character fall on top of each other and the character turns into a
+/// blot. The shell used to write its eyebrows, its pills and its counts at
+/// eight and nine pixels, and on a screen that is not scaled up there was
+/// nothing left to read.
 abstract final class CompactTypeScale {
-  /// The size of a mark in a place that has little room for it.
+  /// The size of a mark and of a small number.
   ///
-  /// A mark is not read as a sentence. It is set in the mono face, in upper
-  /// case and with wide letter spacing, so it can sit below the smallest
-  /// size of the interface text without becoming noise.
-  static const double markDense = 8;
-
-  /// The size of a mark: the eyebrow of a page, the label of a pill.
-  static const double mark = 9;
-
-  /// Counts, timestamps and other text the machine wrote.
+  /// A mark is not read as a sentence: the eyebrow of a page, the label of
+  /// a pill, the number of a section, a timestamp, a count. It is set in
+  /// the mono face with wide letter spacing, so it stays a mark next to the
+  /// text around it.
   ///
-  /// The smallest readable size of the shell. It is only used for text that
-  /// carries a number or a name that the user already knows.
-  static const double micro = 10.5;
+  /// This is the floor of the scale. Anything that carries Chinese has to
+  /// be at least this big.
+  static const double mark = 11;
 
   /// The label of a control and the other secondary descriptions.
   ///
-  /// One step above [micro], and the size of the text of a filter, of a count
-  /// next to a title and of a note under a field.
-  static const double label = 11.5;
+  /// The size of the text of a filter, of a count next to a title and of a
+  /// note under a field.
+  static const double label = 12;
 
   /// The text of an input, of a list entry and of a paragraph.
   ///
   /// The size most of the text of the shell uses. It is the body of a card
   /// and the title of a track in a list.
-  static const double body = 12.5;
+  static const double body = 13;
 
   /// The title of a track, of a card and of a button.
   ///
   /// The step where the text carries weight. It is the title of the track
   /// that plays and the label of the button that starts the scan.
-  static const double strong = 13.5;
+  static const double strong = 14;
 
   /// The title of a group of content.
   ///

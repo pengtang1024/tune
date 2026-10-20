@@ -48,10 +48,18 @@ abstract final class CompactTypography {
   ];
 
   /// Monospace CJK families, tried in order.
-  static const List<String> monoFallback = <String>[
+  ///
+  /// The bundled face comes first on purpose. The system monospace CJK
+  /// families are not able to draw every character: some of them hand back an
+  /// empty box where a character should be, and a box in the middle of a
+  /// sentence is worse than a face that is not quite monospaced. The
+  /// bundled face carries the same Chinese as the interface face, so the
+  /// monospaced labels and the rest of the text look like one voice.
+  static final List<String> monoFallback = <String>[
+    'Noto Sans SC',
     'Noto Sans Mono CJK SC',
     'Noto Sans Mono CJK TC',
-    ...sansFallback,
+    ...sansFallback.skip(1),
   ];
 
   /// Interface text.
@@ -91,10 +99,7 @@ abstract final class CompactTypography {
   /// strokes and opens up the curves, `WONK=1` keeps the wonky alternates,
   /// and `opsz` follows the text size so a 38px heading gets display
   /// proportions instead of text ones.
-  static List<FontVariation> displayVariations(
-    double size,
-    FontWeight weight,
-  ) {
+  static List<FontVariation> displayVariations(double size, FontWeight weight) {
     return <FontVariation>[
       FontVariation('opsz', size.clamp(9, 144)),
       FontVariation('SOFT', 100),

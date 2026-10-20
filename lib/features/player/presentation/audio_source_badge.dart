@@ -50,7 +50,7 @@ class AudioSourceBadge extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: CompactTypography.mono(
                 color,
-                size: dense ? CompactTypeScale.markDense : CompactTypeScale.mark,
+                size: CompactTypeScale.mark,
                 weight: FontWeight.w600,
                 letterSpacing: 0.6,
               ),

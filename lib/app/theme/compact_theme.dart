@@ -12,7 +12,16 @@ import 'package:tune/app/theme/compact_typography.dart';
 /// Those three faces carry Latin glyphs only, so every style also names a CJK
 /// family to fall back on. See [CompactTypography].
 abstract final class CompactTheme {
-  static const Color accent = Color(0xFFE6532F);
+  /// The vermilion of the shell.
+  ///
+  /// The light one is deeper than a bright vermilion on purpose. The accent
+  /// is not only a fill: it writes the eyebrow of a page, the number of a
+  /// section and the title of the track that plays, and white sits on it
+  /// inside the button that starts the scan. A bright vermilion gives three
+  /// and a half to one against white, so every one of those places was hard
+  /// to read. This one clears four and a half to one against every surface
+  /// of the light scheme, and gives white six and a half.
+  static const Color accent = Color(0xFFA83616);
   static const Color accentDark = Color(0xFFFF6B48);
   static const Color moss = Color(0xFF5D7050);
   static const Color mossDark = Color(0xFFA9BE93);
@@ -30,7 +39,7 @@ abstract final class CompactTheme {
         ? const Color(0xFF211E19)
         : const Color(0xFFE8E1D5);
     final text = isDark ? const Color(0xFFF2EBDD) : const Color(0xFF171512);
-    final muted = isDark ? const Color(0xFFA59B8C) : const Color(0xFF746C60);
+    final muted = isDark ? const Color(0xFFA59B8C) : const Color(0xFF635B50);
     final border = isDark ? const Color(0xFF2C2822) : const Color(0xFFD9D0C2);
     final primary = isDark ? accentDark : accent;
     final onPrimary = isDark
@@ -69,7 +78,7 @@ abstract final class CompactTheme {
           outline: isDark ? const Color(0xFF4A443B) : const Color(0xFFB8AD9C),
           outlineVariant: border,
           surfaceTint: Colors.transparent,
-          error: isDark ? const Color(0xFFFF7A6E) : const Color(0xFFC43A2F),
+          error: isDark ? const Color(0xFFFF7A6E) : const Color(0xFFA82C1D),
           onError: isDark ? const Color(0xFF1B0B08) : Colors.white,
         );
 
@@ -107,7 +116,7 @@ abstract final class CompactTheme {
       bodySmall: _sans(text, CompactTypeScale.body, FontWeight.w400),
       labelLarge: _sans(text, CompactTypeScale.strong, FontWeight.w600, 0.1),
       labelMedium: _sans(text, CompactTypeScale.label, FontWeight.w600, 0.2),
-      labelSmall: _sans(text, CompactTypeScale.micro, FontWeight.w600, 0.4),
+      labelSmall: _sans(text, CompactTypeScale.mark, FontWeight.w600, 0.4),
     );
 
     return ThemeData(
@@ -209,7 +218,11 @@ abstract final class CompactTheme {
         side: BorderSide(color: border),
         shape: const StadiumBorder(),
         labelStyle: _sans(muted, CompactTypeScale.body, FontWeight.w600),
-        secondaryLabelStyle: _sans(primary, CompactTypeScale.body, FontWeight.w600),
+        secondaryLabelStyle: _sans(
+          primary,
+          CompactTypeScale.body,
+          FontWeight.w600,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
       dialogTheme: DialogThemeData(

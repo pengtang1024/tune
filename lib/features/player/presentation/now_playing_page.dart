@@ -393,8 +393,8 @@ class _Artist extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: CompactTypography.mono(
-              theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-              size: CompactTypeScale.micro,
+              theme.colorScheme.onSurfaceVariant,
+              size: CompactTypeScale.mark,
               letterSpacing: 0.4,
             ),
           ),
@@ -429,7 +429,7 @@ class _TrackDetails extends StatelessWidget {
         Text(
           context.loc.nowPlayingDetails,
           style: CompactTypography.mono(
-            theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            theme.colorScheme.onSurfaceVariant,
             size: CompactTypeScale.mark,
             weight: FontWeight.w500,
             letterSpacing: 1.4,
@@ -558,7 +558,7 @@ class _TimeLabel extends StatelessWidget {
         formatDuration(value),
         style: CompactTypography.mono(
           Theme.of(context).colorScheme.onSurfaceVariant,
-          size: CompactTypeScale.micro,
+          size: CompactTypeScale.mark,
         ),
       ),
     );
@@ -642,7 +642,7 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7);
+    final muted = theme.colorScheme.onSurfaceVariant;
     return Row(
       children: [
         Text(
@@ -681,7 +681,7 @@ class _Footer extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: CompactTypography.mono(
                 theme.colorScheme.error,
-                size: CompactTypeScale.micro,
+                size: CompactTypeScale.mark,
               ),
             ),
           ),

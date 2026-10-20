@@ -137,7 +137,7 @@ class _LyricLine extends StatelessWidget {
         fontWeight: active ? FontWeight.w600 : FontWeight.w400,
         color: active
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.85),
       ),
     );
   }

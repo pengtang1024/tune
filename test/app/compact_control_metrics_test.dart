@@ -92,11 +92,22 @@ void main() {
     });
   });
 
+  test('the smallest step of the scale still carries a Chinese character', () {
+    // A Chinese glyph packs a dozen strokes into the space of a letter.
+    // Below eleven pixels the strokes fall on top of each other and the
+    // character turns into a blot, which is what the eyebrow of a page used
+    // to look like on a screen that is not scaled up.
+    expect(CompactTypeScale.mark, greaterThanOrEqualTo(11));
+    expect(CompactTypeScale.label, greaterThan(CompactTypeScale.mark));
+    expect(CompactTypeScale.body, greaterThan(CompactTypeScale.label));
+    expect(CompactTypeScale.strong, greaterThan(CompactTypeScale.body));
+    expect(CompactTypeScale.title, greaterThan(CompactTypeScale.strong));
+    expect(CompactTypeScale.heading, greaterThan(CompactTypeScale.title));
+  });
+
   test('every role of the theme is a step of the scale', () {
     final steps = <double>[
-      CompactTypeScale.markDense,
       CompactTypeScale.mark,
-      CompactTypeScale.micro,
       CompactTypeScale.label,
       CompactTypeScale.body,
       CompactTypeScale.strong,

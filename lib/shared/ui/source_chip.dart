@@ -49,9 +49,7 @@ class SourceChip extends StatelessWidget {
                 text: label.name.toUpperCase(),
                 style: CompactTypography.mono(
                   color,
-                  size: dense
-                      ? CompactTypeScale.markDense
-                      : CompactTypeScale.mark,
+                  size: CompactTypeScale.mark,
                   weight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
@@ -60,9 +58,7 @@ class SourceChip extends StatelessWidget {
                 TextSpan(
                   text: ' · ${label.localizedName}',
                   style: TextStyle(
-                    fontSize: dense
-                        ? CompactTypeScale.markDense
-                        : CompactTypeScale.mark,
+                    fontSize: CompactTypeScale.mark,
                     fontWeight: FontWeight.w500,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

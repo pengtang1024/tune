@@ -63,10 +63,8 @@ class SettingsCard extends StatelessWidget {
                     Text(
                       eyebrow,
                       style: CompactTypography.mono(
-                        theme.colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.65,
-                        ),
-                        size: CompactTypeScale.markDense,
+                        theme.colorScheme.onSurfaceVariant,
+                        size: CompactTypeScale.mark,
                         letterSpacing: 1.5,
                       ),
                     ),

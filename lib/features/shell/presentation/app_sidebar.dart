@@ -101,10 +101,8 @@ class AppSidebar extends StatelessWidget {
                         Text(
                           context.loc.sidebarLocalOnline,
                           style: CompactTypography.mono(
-                            theme.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.6,
-                            ),
-                            size: CompactTypeScale.markDense,
+                            theme.colorScheme.onSurfaceVariant,
+                            size: CompactTypeScale.mark,
                             letterSpacing: 1.1,
                           ),
                         ),
@@ -115,10 +113,8 @@ class AppSidebar extends StatelessWidget {
                             AppVersion.version,
                           ),
                           style: CompactTypography.mono(
-                            theme.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.45,
-                            ),
-                            size: CompactTypeScale.markDense,
+                            theme.colorScheme.onSurfaceVariant,
+                            size: CompactTypeScale.mark,
                             letterSpacing: 0.8,
                           ),
                         ),
@@ -200,9 +196,7 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         text,
         style: CompactTypography.mono(
-          Theme.of(
-            context,
-          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+          Theme.of(context).colorScheme.onSurfaceVariant,
           size: CompactTypeScale.mark,
           weight: FontWeight.w500,
           letterSpacing: 1.4,

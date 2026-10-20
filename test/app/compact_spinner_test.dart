@@ -109,16 +109,17 @@ void main() {
 
   test('the scale holds one size per role', () {
     final sizes = <double>{
-      CompactTypeScale.markDense,
       CompactTypeScale.mark,
-      CompactTypeScale.micro,
       CompactTypeScale.label,
       CompactTypeScale.body,
       CompactTypeScale.strong,
       CompactTypeScale.title,
       CompactTypeScale.heading,
+      CompactTypeScale.displaySmall,
+      CompactTypeScale.displayMedium,
+      CompactTypeScale.displayLarge,
     };
-    expect(sizes.length, 8, reason: 'two roles may not share a size');
+    expect(sizes.length, 9, reason: 'two roles may not share a size');
     final sorted = sizes.toList()..sort();
     for (var i = 1; i < sorted.length; i++) {
       expect(sorted[i] - sorted[i - 1], greaterThan(0));

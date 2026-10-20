@@ -100,7 +100,7 @@ class PlayerDock extends ConsumerWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: CompactTypography.mono(
                                       theme.colorScheme.onSurfaceVariant,
-                                      size: CompactTypeScale.micro,
+                                      size: CompactTypeScale.mark,
                                       letterSpacing: 0.5,
                                     ),
                                   ),
@@ -279,7 +279,7 @@ class PlayerDock extends ConsumerWidget {
         textAlign: TextAlign.center,
         style: CompactTypography.mono(
           Theme.of(context).colorScheme.onSurfaceVariant,
-          size: CompactTypeScale.micro,
+          size: CompactTypeScale.mark,
         ),
       ),
     );
@@ -307,7 +307,7 @@ class _LiveMark extends StatelessWidget {
           context.loc.playerLiveBadge,
           style: CompactTypography.mono(
             color,
-            size: CompactTypeScale.markDense,
+            size: CompactTypeScale.mark,
             weight: FontWeight.w600,
             letterSpacing: 0.8,
           ),

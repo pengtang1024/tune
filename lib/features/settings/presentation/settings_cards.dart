@@ -215,7 +215,7 @@ class SettingsLibraryCard extends StatelessWidget {
           context.loc.settingsPathsCount(pathCount),
           style: CompactTypography.mono(
             theme.colorScheme.onSurfaceVariant,
-            size: CompactTypeScale.markDense,
+            size: CompactTypeScale.mark,
             letterSpacing: 0.6,
           ),
         ),
@@ -339,7 +339,7 @@ class SettingsAboutCard extends StatelessWidget {
               'v$version',
               style: CompactTypography.mono(
                 theme.colorScheme.onSurfaceVariant,
-                size: CompactTypeScale.micro,
+                size: CompactTypeScale.mark,
               ),
             ),
           ),
@@ -354,7 +354,7 @@ class SettingsAboutCard extends StatelessWidget {
               context.loc.settingsLocalFirst,
               style: CompactTypography.mono(
                 theme.colorScheme.primary,
-                size: CompactTypeScale.markDense,
+                size: CompactTypeScale.mark,
                 letterSpacing: 0.8,
               ),
             ),
@@ -429,7 +429,7 @@ class _ThemePreview extends StatelessWidget {
                     child: selected
                         ? Icon(
                             Icons.check_rounded,
-                            size: CompactTypeScale.micro,
+                            size: CompactTypeScale.mark,
                             color: theme.colorScheme.onPrimary,
                           )
                         : null,
@@ -714,7 +714,7 @@ class _PathRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: CompactTypography.mono(
                 theme.colorScheme.onSurface,
-                size: CompactTypeScale.micro,
+                size: CompactTypeScale.mark,
               ),
             ),
           ),
@@ -733,7 +733,7 @@ class _PathRow extends StatelessWidget {
                 isDefault
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
-                size: CompactTypeScale.markDense,
+                size: CompactTypeScale.mark,
                 letterSpacing: 0.3,
               ),
             ),

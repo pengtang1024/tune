@@ -41,7 +41,7 @@ class TrackPathRow extends StatelessWidget {
                 maxLines: 3,
                 style: CompactTypography.mono(
                   theme.colorScheme.onSurfaceVariant,
-                  size: CompactTypeScale.micro,
+                  size: CompactTypeScale.mark,
                 ),
               ),
             ],

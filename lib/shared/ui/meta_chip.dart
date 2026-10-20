@@ -70,7 +70,7 @@ class MetaChip extends StatelessWidget {
               label!,
               style: CompactTypography.mono(
                 color,
-                size: dense ? CompactTypeScale.markDense : CompactTypeScale.mark,
+                size: CompactTypeScale.mark,
                 weight: FontWeight.w600,
                 letterSpacing: 0.4,
               ),
@@ -81,7 +81,7 @@ class MetaChip extends StatelessWidget {
               value!,
               style: CompactTypography.mono(
                 theme.colorScheme.onSurface,
-                size: dense ? CompactTypeScale.markDense : CompactTypeScale.mark,
+                size: CompactTypeScale.mark,
                 letterSpacing: 0.3,
               ),
             ),

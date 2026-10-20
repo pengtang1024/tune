@@ -91,7 +91,7 @@ class TrackMeta extends StatelessWidget {
             formatDuration(Duration(milliseconds: song.durationInMillis)),
             style: CompactTypography.mono(
               theme.colorScheme.onSurfaceVariant,
-              size: CompactTypeScale.micro,
+              size: CompactTypeScale.mark,
             ),
           ),
         const SizedBox(width: CompactTokens.space4),
@@ -159,8 +159,8 @@ class _Position extends StatelessWidget {
             : Text(
                 '${index + 1}',
                 style: CompactTypography.mono(
-                  theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
-                  size: CompactTypeScale.micro,
+                  theme.colorScheme.onSurfaceVariant,
+                  size: CompactTypeScale.mark,
                 ),
               ),
       ),

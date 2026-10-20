@@ -73,6 +73,7 @@ flutter --version
 - `test/app/layout_alignment_test.dart`：盯住容易漂的几处——播放按钮落在底栏中线、音乐库与队列的封面列同位、标题与列表同一条左边缘、正在播放页的整块居中、搜索框不越宽上限。
 - `test/app/compact_spinner_test.dart`：盯住加载圈的描边没有被自己的框裁掉（Material 的现行样式会裁），以及字号梯度里没有两档共用一个尺寸。
 - `test/app/compact_control_metrics_test.dart`：盯住 token 说的是真话——三种按钮画出来一样高且等于 `controlDefault`，列表行等于 `listRowHeight`，主题里的每个字号角色都是梯度上的一档。
+- `test/app/theme_contrast_test.dart`：盯住纸上的字看得见——明暗两套主题里，正文色、次要色、强调色与错误色在每一层底色上都要过 4.5:1，白字压在强调色和错误色上也要过 4.5:1。改了 `CompactTheme` 的颜色就要跑它。
 - 改了 `CompactTokens`、`CompactTypeScale` 或动了上面几处布局，要连这三个文件一起跑。
 
 ## 联网测试
