@@ -24,10 +24,7 @@ List<DBusIntrospectInterface> mprisInterfaces() {
   return [
     DBusIntrospectInterface(
       mprisPlayerInterface,
-      methods: [
-        dbusMethod('Raise'),
-        dbusMethod('Quit'),
-      ],
+      methods: [dbusMethod('Raise'), dbusMethod('Quit')],
       properties: [
         dbusProperty('Identity', 's'),
         dbusProperty('DesktopEntry', 's'),
@@ -42,10 +39,7 @@ List<DBusIntrospectInterface> mprisInterfaces() {
         dbusMethod('Stop'),
         dbusMethod('Next'),
         dbusMethod('Previous'),
-        dbusMethod(
-          'Seek',
-          inArgs: [('x', _seekOffsetArgument)],
-        ),
+        dbusMethod('Seek', inArgs: [('x', _seekOffsetArgument)]),
         dbusMethod(
           'SetPosition',
           inArgs: [
@@ -53,10 +47,7 @@ List<DBusIntrospectInterface> mprisInterfaces() {
             ('x', _setPositionPositionArgument),
           ],
         ),
-        dbusMethod(
-          'OpenUri',
-          inArgs: [('s', _openUriArgument)],
-        ),
+        dbusMethod('OpenUri', inArgs: [('s', _openUriArgument)]),
       ],
       properties: [
         dbusProperty('PlaybackStatus', 's'),

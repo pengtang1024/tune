@@ -153,7 +153,10 @@ class MusicSourcesSection extends ConsumerWidget {
                 ),
                 icon: scanning
                     ? const CompactSpinner.small()
-                    : const Icon(Icons.sync_rounded, size: CompactTokens.icon16),
+                    : const Icon(
+                        Icons.sync_rounded,
+                        size: CompactTokens.icon16,
+                      ),
                 label: Text(context.loc.libraryScanAllSources),
               ),
               if (isMusicPluginRuntimeSupported) ...[
@@ -169,7 +172,10 @@ class MusicSourcesSection extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     side: BorderSide(color: theme.colorScheme.outlineVariant),
                   ),
-                  icon: const Icon(Icons.extension_outlined, size: CompactTokens.icon16),
+                  icon: const Icon(
+                    Icons.extension_outlined,
+                    size: CompactTokens.icon16,
+                  ),
                   label: Text(context.loc.sourcesImportPlugin),
                 ),
               ],
@@ -177,9 +183,7 @@ class MusicSourcesSection extends ConsumerWidget {
               Flexible(
                 child: Text(
                   context.loc.sourcesScanMayTakeSeconds,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: muted,
-                  ),
+                  style: theme.textTheme.labelSmall?.copyWith(color: muted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -444,60 +448,71 @@ class _SourceTile extends ConsumerWidget {
               SizedBox(
                 width: 28,
                 height: 28,
-                child: PopupMenuButton<String>(
-                  tooltip: context.loc.sourcesPluginActions,
-                  enabled: !busy,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(Icons.more_vert_rounded, size: CompactTokens.icon16, color: muted),
-                  onSelected: (value) {
-                    if (value == 'config') {
-                      _openSettings(context, source, fields);
-                    } else if (value == 'update') {
-                      _updatePlugin(context, ref);
-                    } else if (value == 'delete') {
-                      _confirmRemove(context, ref);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'config',
-                      height: 36,
-                      child: Text(context.loc.sourcesConfigure),
+                child: TuneTooltip(
+                  message: context.loc.sourcesPluginActions,
+                  child: PopupMenuButton<String>(
+                    enabled: !busy,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      size: CompactTokens.icon16,
+                      color: muted,
                     ),
-                    if (source.pluginUrl != null)
+                    onSelected: (value) {
+                      if (value == 'config') {
+                        _openSettings(context, source, fields);
+                      } else if (value == 'update') {
+                        _updatePlugin(context, ref);
+                      } else if (value == 'delete') {
+                        _confirmRemove(context, ref);
+                      }
+                    },
+                    itemBuilder: (context) => [
                       PopupMenuItem(
-                        value: 'update',
+                        value: 'config',
                         height: 36,
-                        child: Text(context.loc.sourcesUpdatePlugin),
+                        child: Text(context.loc.sourcesConfigure),
                       ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      height: 36,
-                      child: Text(context.loc.sourcesDeletePlugin),
-                    ),
-                  ],
+                      if (source.pluginUrl != null)
+                        PopupMenuItem(
+                          value: 'update',
+                          height: 36,
+                          child: Text(context.loc.sourcesUpdatePlugin),
+                        ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        height: 36,
+                        child: Text(context.loc.sourcesDeletePlugin),
+                      ),
+                    ],
+                  ),
                 ),
               )
             else
               SizedBox(
                 width: 28,
                 height: 28,
-                child: IconButton(
-                  key: ValueKey('source-config-${source.id}'),
-                  tooltip: context.loc.sourcesConfigure,
-                  onPressed: busy
-                      ? null
-                      : () => _openSettings(context, source, fields),
-                  icon: const Icon(Icons.tune_rounded, size: CompactTokens.icon16),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 28,
-                    height: 28,
-                  ),
-                  style: IconButton.styleFrom(
-                    foregroundColor: muted,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
+                child: TuneTooltip(
+                  message: context.loc.sourcesConfigure,
+                  child: IconButton(
+                    key: ValueKey('source-config-${source.id}'),
+                    onPressed: busy
+                        ? null
+                        : () => _openSettings(context, source, fields),
+                    icon: const Icon(
+                      Icons.tune_rounded,
+                      size: CompactTokens.icon16,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 28,
+                      height: 28,
+                    ),
+                    style: IconButton.styleFrom(
+                      foregroundColor: muted,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
                 ),
               ),

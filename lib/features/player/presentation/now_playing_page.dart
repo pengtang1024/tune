@@ -103,7 +103,9 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                                     state.currentSong!,
                                     sourceLabels,
                                   ) ??
-                                  SourceLabel(name: context.loc.sourceLocalName),
+                                  SourceLabel(
+                                    name: context.loc.sourceLocalName,
+                                  ),
                               onPrevious: controller.previous,
                               onNext: controller.next,
                               onTogglePlay: controller.togglePlayPause,
@@ -235,10 +237,7 @@ class _TrackLayout extends StatelessWidget {
           constraints.maxWidth * 0.46,
         );
         final artworkSize = math
-            .min(
-              constraints.maxHeight * 0.94,
-              constraints.maxWidth * 0.40,
-            )
+            .min(constraints.maxHeight * 0.94, constraints.maxWidth * 0.40)
             .clamp(120.0, CompactTokens.artworkNowPlaying);
         return Center(
           child: Row(
@@ -322,8 +321,6 @@ class _Artwork extends StatelessWidget {
   }
 }
 
-
-
 /// The seek bar with the elapsed and the total time.
 class _ProgressRow extends StatelessWidget {
   const _ProgressRow({required this.state, required this.onSeek});
@@ -396,7 +393,11 @@ class _LiveBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.podcasts_rounded, size: CompactTokens.icon12, color: color),
+            Icon(
+              Icons.podcasts_rounded,
+              size: CompactTokens.icon12,
+              color: color,
+            ),
             const SizedBox(width: 5),
             Text(
               context.loc.playerLiveBadge,
@@ -467,28 +468,32 @@ class _Transport extends StatelessWidget {
         SizedBox(
           width: 56,
           height: 56,
-          child: IconButton.filled(
-            tooltip: state.isPlaying
+          child: TuneTooltip(
+            message: state.isPlaying
                 ? context.loc.playerPause
                 : context.loc.playerPlay,
-            onPressed: state.hasTrack && !state.isLoading ? onTogglePlay : null,
-            padding: EdgeInsets.zero,
-            style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              disabledBackgroundColor: theme.colorScheme.primary.withValues(
-                alpha: 0.3,
+            child: IconButton.filled(
+              onPressed: state.hasTrack && !state.isLoading
+                  ? onTogglePlay
+                  : null,
+              padding: EdgeInsets.zero,
+              style: IconButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                disabledBackgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.3,
+                ),
+                shape: const CircleBorder(),
               ),
-              shape: const CircleBorder(),
+              icon: state.isLoading
+                  ? CompactSpinner.medium(color: theme.colorScheme.onPrimary)
+                  : Icon(
+                      state.isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      size: CompactTokens.icon28,
+                    ),
             ),
-            icon: state.isLoading
-                ? CompactSpinner.medium(color: theme.colorScheme.onPrimary)
-                : Icon(
-                    state.isPlaying
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
-                    size: CompactTokens.icon28,
-                  ),
           ),
         ),
         const SizedBox(width: CompactTokens.space10),

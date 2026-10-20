@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Value of the source filter that stands for "every source".
 const String allSourcesFilterValue = '__all_sources__';
@@ -79,14 +80,19 @@ class LibraryToolbar extends StatelessWidget {
                       ),
                       suffixIcon: query.isEmpty
                           ? null
-                          : IconButton(
-                              tooltip: context.loc.libraryClearSearch,
-                              onPressed: onClearQuery,
-                              icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints.tightFor(
-                                width: 28,
-                                height: 28,
+                          : TuneTooltip(
+                              message: context.loc.libraryClearSearch,
+                              child: IconButton(
+                                onPressed: onClearQuery,
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  size: CompactTokens.icon14,
+                                ),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 28,
+                                  height: 28,
+                                ),
                               ),
                             ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -163,62 +169,67 @@ class _SourceFilter extends StatelessWidget {
         ? context.loc.libraryAllSources
         : (sourceLabels[sourceFilter]?.name ?? sourceFilter!);
 
-    return PopupMenuButton<String>(
-      tooltip: context.loc.libraryFilterSources,
-      padding: EdgeInsets.zero,
-      initialValue: sourceFilter ?? allSourcesFilterValue,
-      onSelected: (value) {
-        onSourceFilter(value == allSourcesFilterValue ? null : value);
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem<String>(
-          value: allSourcesFilterValue,
-          height: 36,
-          child: Text(context.loc.libraryAllSources),
-        ),
-        for (final sourceId in sources)
+    return TuneTooltip(
+      message: context.loc.libraryFilterSources,
+      child: PopupMenuButton<String>(
+        padding: EdgeInsets.zero,
+        initialValue: sourceFilter ?? allSourcesFilterValue,
+        onSelected: (value) {
+          onSourceFilter(value == allSourcesFilterValue ? null : value);
+        },
+        itemBuilder: (context) => [
           PopupMenuItem<String>(
-            value: sourceId,
+            value: allSourcesFilterValue,
             height: 36,
-            child: Text(sourceLabels[sourceId]?.name ?? sourceId),
+            child: Text(context.loc.libraryAllSources),
           ),
-      ],
-      child: Container(
-        height: CompactTokens.inputHeight,
-        padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
-        decoration: BoxDecoration(
-          color: active
-              ? theme.colorScheme.primary.withValues(alpha: 0.12)
-              : theme.colorScheme.surfaceContainer,
-          borderRadius: CompactTokens.borderRadius8,
-          border: Border.all(
-            color: active
-                ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                : theme.colorScheme.outlineVariant,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.filter_list_rounded,
-              size: CompactTokens.icon16,
-              color: active
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+          for (final sourceId in sources)
+            PopupMenuItem<String>(
+              value: sourceId,
+              height: 36,
+              child: Text(sourceLabels[sourceId]?.name ?? sourceId),
             ),
-            const SizedBox(width: CompactTokens.space4),
-            Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+        ],
+        child: Container(
+          height: CompactTokens.inputHeight,
+          padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
+          decoration: BoxDecoration(
+            color: active
+                ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                : theme.colorScheme.surfaceContainer,
+            borderRadius: CompactTokens.borderRadius8,
+            border: Border.all(
+              color: active
+                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                  : theme.colorScheme.outlineVariant,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.filter_list_rounded,
+                size: CompactTokens.icon16,
                 color: active
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface,
+                    : theme.colorScheme.onSurfaceVariant,
               ),
-            ),
-            const Icon(Icons.keyboard_arrow_down_rounded, size: CompactTokens.icon14),
-          ],
+              const SizedBox(width: CompactTokens.space4),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: active
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+              const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: CompactTokens.icon14,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -236,19 +247,21 @@ class _ScanButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return IconButton(
-      tooltip: context.loc.libraryScanAllSources,
-      onPressed: onPressed,
-      icon: scanning
-          ? const CompactSpinner.small()
-          : const Icon(Icons.refresh_rounded, size: CompactTokens.icon18),
-      style: IconButton.styleFrom(
-        fixedSize: const Size.square(CompactTokens.controlSmall),
-        minimumSize: const Size.square(CompactTokens.controlSmall),
-        padding: EdgeInsets.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        foregroundColor: theme.colorScheme.onSurfaceVariant,
+    return TuneTooltip(
+      message: context.loc.libraryScanAllSources,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: scanning
+            ? const CompactSpinner.small()
+            : const Icon(Icons.refresh_rounded, size: CompactTokens.icon18),
+        style: IconButton.styleFrom(
+          fixedSize: const Size.square(CompactTokens.controlSmall),
+          minimumSize: const Size.square(CompactTokens.controlSmall),
+          padding: EdgeInsets.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+          foregroundColor: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }

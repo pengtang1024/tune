@@ -10,10 +10,7 @@ class TrayMenuEntry {
   });
 
   /// A line that only separates the entries above from the ones below.
-  const TrayMenuEntry.separator()
-    : key = '',
-      label = '',
-      enabled = false;
+  const TrayMenuEntry.separator() : key = '', label = '', enabled = false;
 
   /// The name of the action behind the entry.
   final String key;

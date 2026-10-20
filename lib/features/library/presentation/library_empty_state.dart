@@ -60,7 +60,10 @@ class LibraryEmptyState extends StatelessWidget {
           ? null
           : FilledButton.icon(
               onPressed: onScan,
-              icon: const Icon(Icons.search_rounded, size: CompactTokens.icon16),
+              icon: const Icon(
+                Icons.search_rounded,
+                size: CompactTokens.icon16,
+              ),
               label: Text(context.loc.libraryScanAllSources),
             ),
     );

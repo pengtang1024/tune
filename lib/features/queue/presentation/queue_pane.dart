@@ -72,7 +72,10 @@ class QueuePane extends ConsumerWidget {
                   subtitle: context.loc.queueEmptySubtitle,
                   action: FilledButton.icon(
                     onPressed: () => context.go('/library'),
-                    icon: const Icon(Icons.library_music_outlined, size: CompactTokens.icon16),
+                    icon: const Icon(
+                      Icons.library_music_outlined,
+                      size: CompactTokens.icon16,
+                    ),
                     label: Text(context.loc.queueGoToLibrary),
                   ),
                 )

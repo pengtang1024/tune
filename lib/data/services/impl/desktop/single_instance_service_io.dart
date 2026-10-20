@@ -30,7 +30,8 @@ class SingleInstanceServiceImpl implements SingleInstanceService {
   Stream<List<String>> get requestedFiles => _requestedFiles.stream;
 
   @override
-  List<String> get startupFiles => startup.startupFiles(_commandLineArguments());
+  List<String> get startupFiles =>
+      startup.startupFiles(_commandLineArguments());
 
   @override
   Stream<void> get activationRequests => _activationRequests.stream;
@@ -111,7 +112,10 @@ class SingleInstanceServiceImpl implements SingleInstanceService {
   }
 
   /// Calls a method of the player that holds the place.
-  Future<void> _callOwner(String method, [List<DBusValue> values = const []]) async {
+  Future<void> _callOwner(
+    String method, [
+    List<DBusValue> values = const [],
+  ]) async {
     final client = _client;
     if (client == null) return;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
@@ -38,6 +39,9 @@ class SettingsController extends StateNotifier<SettingsState> {
           closeToTray: _persistence.getBool('close_to_tray') ?? true,
           mediaControlsEnabled:
               _persistence.getBool('media_controls_enabled') ?? true,
+          libraryFolder: _persistence.getString(LibraryPaths.rootKey),
+          defaultLibraryFolder:
+              MusicScannerConfig.getDefaultMusicLibrary() ?? '',
         ),
       ) {
     // The string table follows the language of the settings right away, so a
@@ -87,6 +91,25 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.mediaControlsEnabled == value) return;
     state = state.copyWith(mediaControlsEnabled: value);
     await _persistence.setBool('media_controls_enabled', value);
+  }
+
+  /// Sets the folder the app writes the files it fetches into.
+  ///
+  /// A folder of `null` puts the files back into the music library of the
+  /// machine.
+  Future<void> setLibraryFolder(String? folder) async {
+    final cleaned = folder?.trim();
+    if ((cleaned == null || cleaned.isEmpty) && state.libraryFolder == null) {
+      return;
+    }
+    if (cleaned == state.libraryFolder) return;
+
+    state = state.copyWith(libraryFolder: cleaned);
+    if (cleaned == null || cleaned.isEmpty) {
+      await _persistence.remove(LibraryPaths.rootKey);
+    } else {
+      await _persistence.setString(LibraryPaths.rootKey, cleaned);
+    }
   }
 
   /// The preferences of the user right now.

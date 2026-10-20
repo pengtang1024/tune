@@ -6,8 +6,10 @@ import 'package:tune/data/services/providers/artwork_cache_provider.dart';
 ///
 /// The picture is fetched through the artwork cache, so a cover that was
 /// fetched before comes from the disk instead of the network.
-final artworkImageProvider =
-    Provider.family<ArtworkImageProvider, String>((ref, url) {
+final artworkImageProvider = Provider.family<ArtworkImageProvider, String>((
+  ref,
+  url,
+) {
   final cache = ref.watch(artworkCacheProvider);
   return ArtworkImageProvider(url, cache: cache);
 });

@@ -9,6 +9,7 @@ import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/source_chip.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// Identity of a track inside a list: position, artwork, metadata, source.
@@ -112,17 +113,22 @@ class _DetailsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return IconButton(
-      tooltip: context.loc.trackDetailsTooltip,
-      onPressed: () =>
-          showTrackDetailSheet(context, song, sourceName: sourceName),
-      icon: const Icon(Icons.info_outline_rounded, size: CompactTokens.icon16),
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-      style: IconButton.styleFrom(
-        foregroundColor: theme.colorScheme.onSurfaceVariant,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
+    return TuneTooltip(
+      message: context.loc.trackDetailsTooltip,
+      child: IconButton(
+        onPressed: () =>
+            showTrackDetailSheet(context, song, sourceName: sourceName),
+        icon: const Icon(
+          Icons.info_outline_rounded,
+          size: CompactTokens.icon16,
+        ),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+        style: IconButton.styleFrom(
+          foregroundColor: theme.colorScheme.onSurfaceVariant,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
       ),
     );
   }

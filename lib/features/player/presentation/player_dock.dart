@@ -30,9 +30,7 @@ class PlayerDock extends ConsumerWidget {
       // of the clock asks for more room. The desktop has a text scale of
       // its own, and a user who raises it gets a taller bar rather than a
       // clock that runs over the edge of it.
-      constraints: const BoxConstraints(
-        minHeight: CompactTokens.dockHeight,
-      ),
+      constraints: const BoxConstraints(minHeight: CompactTokens.dockHeight),
       margin: const EdgeInsets.fromLTRB(
         CompactTokens.dockMargin,
         0,
@@ -223,20 +221,22 @@ class PlayerDock extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     if (!narrow) ...[
-                      IconButton(
-                        tooltip: state.volume > 0
+                      TuneTooltip(
+                        message: state.volume > 0
                             ? context.loc.playerMute
                             : context.loc.playerUnmute,
-                        onPressed: () =>
-                            controller.setVolume(state.volume > 0 ? 0 : 1),
-                        icon: Icon(
-                          state.volume == 0
-                              ? Icons.volume_off_rounded
-                              : Icons.volume_up_rounded,
-                          size: CompactTokens.icon18,
+                        child: IconButton(
+                          onPressed: () =>
+                              controller.setVolume(state.volume > 0 ? 0 : 1),
+                          icon: Icon(
+                            state.volume == 0
+                                ? Icons.volume_off_rounded
+                                : Icons.volume_up_rounded,
+                            size: CompactTokens.icon18,
+                          ),
+                          color: theme.colorScheme.onSurfaceVariant,
+                          visualDensity: VisualDensity.compact,
                         ),
-                        color: theme.colorScheme.onSurfaceVariant,
-                        visualDensity: VisualDensity.compact,
                       ),
                       SizedBox(
                         width: 74,
@@ -334,28 +334,30 @@ class _PlayButton extends StatelessWidget {
     return SizedBox(
       width: 34,
       height: 34,
-      child: IconButton.filled(
-        tooltip: state.isPlaying
+      child: TuneTooltip(
+        message: state.isPlaying
             ? context.loc.playerPause
             : context.loc.playerPlay,
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        style: IconButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          disabledBackgroundColor: theme.colorScheme.primary.withValues(
-            alpha: 0.3,
+        child: IconButton.filled(
+          onPressed: onPressed,
+          padding: EdgeInsets.zero,
+          style: IconButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            disabledBackgroundColor: theme.colorScheme.primary.withValues(
+              alpha: 0.3,
+            ),
+            shape: const CircleBorder(),
           ),
-          shape: const CircleBorder(),
+          icon: state.isLoading
+              ? CompactSpinner.small(color: theme.colorScheme.onPrimary)
+              : Icon(
+                  state.isPlaying
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  size: CompactTokens.icon20,
+                ),
         ),
-        icon: state.isLoading
-            ? CompactSpinner.small(color: theme.colorScheme.onPrimary)
-            : Icon(
-                state.isPlaying
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded,
-                size: CompactTokens.icon20,
-              ),
       ),
     );
   }
@@ -375,14 +377,16 @@ class _DockIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon, size: size),
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+    return TuneTooltip(
+      message: tooltip,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, size: size),
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        visualDensity: VisualDensity.compact,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+      ),
     );
   }
 }

@@ -63,7 +63,10 @@ class SettingsDesktopCard extends StatelessWidget {
             children: [
               OutlinedButton.icon(
                 onPressed: onSetDefaultPlayer,
-                icon: const Icon(Icons.album_outlined, size: CompactTokens.icon16),
+                icon: const Icon(
+                  Icons.album_outlined,
+                  size: CompactTokens.icon16,
+                ),
                 label: Text(context.loc.settingsSetDefaultPlayer),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, CompactTokens.controlDefault),

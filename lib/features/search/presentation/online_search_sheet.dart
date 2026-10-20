@@ -11,17 +11,16 @@ import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/source_chip.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 Future<void> showOnlineSearchSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => const _OnlineSearchSheet(),
+  return showCompactSheet<void>(
+    context,
+    (context) => const _OnlineSearchSheet(),
   );
 }
 
@@ -65,117 +64,106 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: CompactTokens.sheetWidth,
-          ),
-          child: Material(
-            color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(CompactTokens.sheetRadius),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: SizedBox(
-              height: height,
-              child: Column(
-                children: [
-                  _Header(
-                    onClose: () => Navigator.of(context).pop(),
-                    colors: theme.colorScheme,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      CompactTokens.space20,
-                      0,
-                      CompactTokens.space20,
-                      CompactTokens.space12,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _queryController,
-                            focusNode: _focusNode,
-                            autofocus: true,
-                            textInputAction: TextInputAction.search,
-                            onSubmitted: (_) => _search(),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                            ),
-                            decoration: InputDecoration(
-                              isDense: true,
-                              filled: true,
-                              fillColor: theme.colorScheme.surfaceContainer,
-                              hintText: context.loc.searchOnlineHint,
-                              hintStyle: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              prefixIcon: const Icon(
-                                Icons.search_rounded,
-                                size: CompactTokens.icon18,
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 36,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: CompactTokens.borderRadius8,
-                                borderSide: BorderSide(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: CompactTokens.borderRadius8,
-                                borderSide: BorderSide(
-                                  color: theme.colorScheme.outlineVariant,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: CompactTokens.borderRadius8,
-                                borderSide: BorderSide(
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: CompactTokens.space8,
-                                vertical: CompactTokens.space12,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: CompactTokens.space8),
-                        FilledButton(
-                          onPressed: search?.isSearching == true
-                              ? null
-                              : _search,
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, CompactTokens.controlMedium),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: CompactTokens.space16,
-                            ),
-                          ),
-                          child: Text(context.loc.search),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                  Expanded(
-                    child: _Body(
-                      search: search,
-                      sourceLabels: sourceLabels,
-                      onPlay: _play,
-                      onAddToQueue: _addToQueue,
-                    ),
-                  ),
-                ],
+      child: Material(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(CompactTokens.sheetRadius),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: height,
+          child: Column(
+            children: [
+              _Header(
+                onClose: () => Navigator.of(context).pop(),
+                colors: theme.colorScheme,
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  CompactTokens.space20,
+                  0,
+                  CompactTokens.space20,
+                  CompactTokens.space12,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _queryController,
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) => _search(),
+                        style: theme.textTheme.bodyMedium?.copyWith(),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: theme.colorScheme.surfaceContainer,
+                          hintText: context.loc.searchOnlineHint,
+                          hintStyle: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            size: CompactTokens.icon18,
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: CompactTokens.borderRadius8,
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outlineVariant,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: CompactTokens.borderRadius8,
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outlineVariant,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: CompactTokens.borderRadius8,
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: CompactTokens.space8,
+                            vertical: CompactTokens.space12,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: CompactTokens.space8),
+                    FilledButton(
+                      onPressed: search?.isSearching == true ? null : _search,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(0, CompactTokens.controlMedium),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: CompactTokens.space16,
+                        ),
+                      ),
+                      child: Text(context.loc.search),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: theme.colorScheme.outlineVariant,
+              ),
+              Expanded(
+                child: _Body(
+                  search: search,
+                  sourceLabels: sourceLabels,
+                  onPlay: _play,
+                  onAddToQueue: _addToQueue,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -255,14 +243,16 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            tooltip: context.loc.close,
-            onPressed: onClose,
-            icon: const Icon(Icons.close_rounded, size: CompactTokens.icon18),
-            style: IconButton.styleFrom(
-              foregroundColor: colors.onSurfaceVariant,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              visualDensity: VisualDensity.compact,
+          TuneTooltip(
+            message: context.loc.close,
+            child: IconButton(
+              onPressed: onClose,
+              icon: const Icon(Icons.close_rounded, size: CompactTokens.icon18),
+              style: IconButton.styleFrom(
+                foregroundColor: colors.onSurfaceVariant,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
             ),
           ),
         ],
@@ -328,7 +318,8 @@ class _Body extends StatelessWidget {
         for (final result in visibleGroups)
           _SourceGroup(
             result: result,
-            sourceLabel: sourceLabels[result.sourceId] ??
+            sourceLabel:
+                sourceLabels[result.sourceId] ??
                 SourceLabel(name: result.sourceId),
             onPlay: onPlay,
             onAddToQueue: onAddToQueue,
@@ -473,7 +464,10 @@ class _SourceGroup extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
-                icon: const Icon(Icons.play_arrow_rounded, size: CompactTokens.icon16),
+                icon: const Icon(
+                  Icons.play_arrow_rounded,
+                  size: CompactTokens.icon16,
+                ),
                 label: Text(context.loc.searchPlayAll),
               ),
             ],
@@ -562,24 +556,34 @@ class _SongRow extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            IconButton(
-              tooltip: context.loc.trackDetailsTooltip,
-              onPressed: () => showTrackDetailSheet(context, song),
-              icon: const Icon(Icons.info_outline_rounded, size: CompactTokens.icon16),
-              style: IconButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurfaceVariant,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
+            TuneTooltip(
+              message: context.loc.trackDetailsTooltip,
+              child: IconButton(
+                onPressed: () => showTrackDetailSheet(context, song),
+                icon: const Icon(
+                  Icons.info_outline_rounded,
+                  size: CompactTokens.icon16,
+                ),
+                style: IconButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
             ),
-            IconButton(
-              tooltip: context.loc.searchAddToQueue,
-              onPressed: onAddToQueue,
-              icon: const Icon(Icons.playlist_add_rounded, size: CompactTokens.icon18),
-              style: IconButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurfaceVariant,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
+            TuneTooltip(
+              message: context.loc.searchAddToQueue,
+              child: IconButton(
+                onPressed: onAddToQueue,
+                icon: const Icon(
+                  Icons.playlist_add_rounded,
+                  size: CompactTokens.icon18,
+                ),
+                style: IconButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
             ),
           ],
@@ -609,7 +613,11 @@ class _EmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: CompactTokens.illustration, color: theme.colorScheme.onSurfaceVariant),
+            Icon(
+              icon,
+              size: CompactTokens.illustration,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(height: CompactTokens.space12),
             Text(
               title,

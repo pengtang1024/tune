@@ -6,7 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/data/services/impl/http_song_download_service_io.dart';
+import 'package:tune/data/services/library/library_paths.dart';
+import 'package:tune/data/services/impl/library_paths_io.dart';
 import 'package:tune/domain/models/song.dart';
+
+import 'fake_artwork_cache.dart';
+import 'fake_persistence.dart';
 
 void main() {
   late Directory store;
@@ -17,16 +22,19 @@ void main() {
     id: 1,
     title: 'One',
     artist: 'Artist',
-    uri: 'tune://test/one',
+    uri: 'https://source.test/one',
     streamUrl: 'https://cdn.test/one.mp3',
   );
 
   setUp(() async {
     store = await Directory.systemTemp.createTemp('tune-download-test');
     adapter = FakeHttpAdapter();
+    final persistence = FakePersistenceService()
+      ..values[LibraryPaths.rootKey] = store.path;
     service = HttpSongDownloadService(
       client: Dio()..httpClientAdapter = adapter,
-      storeDirectory: () async => store,
+      paths: FileLibraryPaths(persistence),
+      artwork: FakeArtworkCache(),
     );
   });
 
@@ -37,11 +45,15 @@ void main() {
     }
   });
 
-  test('the fetched track lands in the store', () async {
+  test('the fetched track lands in the folder of the track', () async {
     final file = await service.download(song);
 
     expect(File(file).existsSync(), isTrue);
     expect(await service.storedFileFor(song), file);
+    expect(
+      file,
+      path.join(store.path, 'Artist', 'One', 'One.mp3'),
+    );
     expect(adapter.requestedUrls, ['https://cdn.test/one.mp3']);
   });
 
@@ -98,8 +110,11 @@ void main() {
     await failure;
     await pumpEventQueue();
 
-    final downloads = Directory(path.join(store.path, 'downloads'));
-    expect(downloads.listSync(), isEmpty);
+    final folder = Directory(path.join(store.path, 'Artist', 'One'));
+    final files = folder.existsSync()
+        ? folder.listSync(recursive: true).whereType<File>()
+        : const <File>[];
+    expect(files, isEmpty);
   });
 
   test('a failed transfer leaves nothing behind', () async {
@@ -114,15 +129,16 @@ void main() {
     expect(partials, isEmpty);
   });
 
-  test('the partial files of an earlier run are removed', () async {
-    final downloads = Directory(path.join(store.path, 'downloads'))
+  test('a partial file of an earlier run does not stop the download', () async {
+    final folder = Directory(path.join(store.path, 'Artist', 'One'))
       ..createSync(recursive: true);
-    final leftover = File(path.join(downloads.path, 'leftover.part'));
+    final leftover = File(path.join(folder.path, 'One.mp3.part'));
     await leftover.writeAsString('half a track');
 
     await service.download(song);
 
     expect(leftover.existsSync(), isFalse);
+    expect(File(path.join(folder.path, 'One.mp3')).existsSync(), isTrue);
   });
 }
 

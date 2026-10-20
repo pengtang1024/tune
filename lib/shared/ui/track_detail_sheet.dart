@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/track_path_row.dart';
@@ -18,12 +19,9 @@ Future<void> showTrackDetailSheet(
   Song song, {
   String? sourceName,
 }) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => _TrackDetailSheet(song: song, sourceName: sourceName),
+  return showCompactSheet<void>(
+    context,
+    (context) => _TrackDetailSheet(song: song, sourceName: sourceName),
   );
 }
 
@@ -38,47 +36,43 @@ class _TrackDetailSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final facts = trackFactsOf(context, song, sourceName: sourceName);
 
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: CompactTokens.sheetWidth),
-        child: Material(
-          color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          clipBehavior: Clip.antiAlias,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              CompactTokens.space20,
-              CompactTokens.space16,
-              CompactTokens.space20,
-              CompactTokens.space24,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(CompactTokens.sheetRadius),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.space20,
+          CompactTokens.space16,
+          CompactTokens.space20,
+          CompactTokens.space24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _Header(song: song),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
               children: [
-                _Header(song: song),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    for (final fact in facts)
-                      MetaChip(
-                        icon: fact.icon,
-                        label: fact.label,
-                        value: fact.value,
-                        tone: fact.tone,
-                      ),
-                  ],
-                ),
-                if (song.uri.isNotEmpty) ...[
-                  const SizedBox(height: 18),
-                  TrackPathRow(uri: song.uri),
-                ],
+                for (final fact in facts)
+                  MetaChip(
+                    icon: fact.icon,
+                    label: fact.label,
+                    value: fact.value,
+                    tone: fact.tone,
+                  ),
               ],
             ),
-          ),
+            if (song.uri.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              TrackPathRow(uri: song.uri),
+            ],
+          ],
         ),
       ),
     );

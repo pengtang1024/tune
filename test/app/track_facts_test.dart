@@ -200,6 +200,51 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the details sheet closes when the reader taps outside it', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: lossless, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsOneWidget);
+
+    // The room above the sheet belongs to the barrier, so a tap there closes
+    // the sheet instead of being swallowed by the empty part of it.
+    await tester.tapAt(const Offset(400, 40));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a tap on the details sheet keeps it open', (tester) async {
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: lossless, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    final title = find.descendant(
+      of: find.byType(BottomSheet),
+      matching: find.text('夜曲'),
+    );
+    await tester.tapAt(tester.getCenter(title));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a chip that shows a value keeps the name of the fact away', (
     tester,
   ) async {

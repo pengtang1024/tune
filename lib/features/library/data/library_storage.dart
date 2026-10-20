@@ -109,7 +109,8 @@ class LibraryStorage {
   Future<File?> _olderFile() async {
     try {
       final documents =
-          await (_documentsDirectory?.call() ?? getApplicationDocumentsDirectory());
+          await (_documentsDirectory?.call() ??
+              getApplicationDocumentsDirectory());
       final file = File(path.join(documents.path, _fileName));
       return await file.exists() ? file : null;
     } catch (error) {

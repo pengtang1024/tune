@@ -3,13 +3,20 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/artwork/artwork_cache.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
+import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:tune/utils/stable_key.dart';
 
-/// Fetches remote tracks over HTTP and keeps them in the app support folder.
+/// The download store of a build that has a file system.
+SongDownloadService createSongDownloadService({
+  required LibraryPaths paths,
+  required ArtworkCache artwork,
+}) => HttpSongDownloadService(paths: paths, artwork: artwork);
+
+/// Fetches remote tracks over HTTP and keeps them in the music library.
 ///
 /// The file name is derived from a stable hash of the canonical song URI so
 /// the same track always maps to the same file, and the audio extension is
@@ -21,7 +28,8 @@ import 'package:tune/utils/stable_key.dart';
 class HttpSongDownloadService implements SongDownloadService {
   HttpSongDownloadService({
     Dio? client,
-    Future<Directory> Function()? storeDirectory,
+    required LibraryPaths paths,
+    required ArtworkCache artwork,
   }) : _client =
            client ??
            Dio(
@@ -31,21 +39,19 @@ class HttpSongDownloadService implements SongDownloadService {
                followRedirects: true,
              ),
            ),
-       _storeDirectory = storeDirectory;
+       _paths = paths,
+       _artwork = artwork;
 
   final Dio _client;
 
-  /// Where the fetched tracks are kept, when the caller decides it.
-  final Future<Directory> Function()? _storeDirectory;
+  /// Where the fetched track and its files are kept.
+  final LibraryPaths _paths;
 
-  /// The store of the fetched tracks, created once.
-  Future<Directory>? _storeFuture;
+  /// Where the cover of the track comes from.
+  final ArtworkCache _artwork;
 
   /// The transfers that are running right now, keyed by the cache key.
   final Map<String, _Transfer> _transfers = {};
-
-  /// Distinguishes the partial files of parallel transfers.
-  int _transferCounter = 0;
 
   @override
   bool get isSupported => true;
@@ -102,7 +108,7 @@ class HttpSongDownloadService implements SongDownloadService {
     try {
       final target = await _targetFile(song);
       await target.parent.create(recursive: true);
-      final partial = File('${target.path}.${_transferCounter++}.part');
+      final partial = File('${target.path}.part');
 
       try {
         await _client.download(
@@ -129,6 +135,7 @@ class HttpSongDownloadService implements SongDownloadService {
       await _replaceFile(partial, target);
       transfer.report(1);
       transfer.complete(target.path);
+      unawaited(_storeCover(song));
     } catch (error, stackTrace) {
       if (!transfer.isCompleted) {
         transfer.fail(error, stackTrace);
@@ -156,40 +163,29 @@ class HttpSongDownloadService implements SongDownloadService {
   }
 
   /// Resolves the file a track is stored in.
-  Future<File> _targetFile(Song song) async {
-    final directory = await _store();
-    final name = '${stableKey(song.uri)}.${_extensionFor(song.playbackUri)}';
-    return File(path.join(directory.path, name));
-  }
-
-  /// The directory the fetched tracks live in.
   ///
-  /// The future is kept so that parallel calls share one creation, and the
-  /// leftover partial files are only removed once, before any transfer of
-  /// this run writes its own partial file.
-  Future<Directory> _store() {
-    return _storeFuture ??= _createStore();
+  /// The file sits in the folder of the track, next to the cover and the
+  /// lyrics, so the music library holds one folder per track.
+  Future<File> _targetFile(Song song) async {
+    final folder = await _paths.folderFor(song);
+    final name = '${_paths.nameFor(song)}.${_extensionFor(song.playbackUri)}';
+    return File(path.join(folder.path, name));
   }
 
-  Future<Directory> _createStore() async {
-    final base =
-        await (_storeDirectory?.call() ?? getApplicationSupportDirectory());
-    final directory = Directory(path.join(base.path, 'downloads'));
-    await directory.create(recursive: true);
-    await _removeStaleParts(directory);
-    return directory;
-  }
-
-  /// Removes the partial files of transfers that did not survive a restart.
-  Future<void> _removeStaleParts(Directory directory) async {
+  /// Puts the cover of the track next to the fetched file.
+  ///
+  /// A cover that cannot be written does not fail the download: the track is
+  /// there, and the cover comes with the next run.
+  Future<void> _storeCover(Song song) async {
+    final url = song.artworkUrl;
+    if (url == null || url.isEmpty) return;
     try {
-      await for (final entity in directory.list()) {
-        if (entity is File && entity.path.endsWith('.part')) {
-          await entity.delete();
-        }
-      }
+      final image = await _artwork.imageFor(url);
+      final file = await _paths.coverFileFor(song, image.extension);
+      await file.parent.create(recursive: true);
+      await file.writeAsBytes(image.bytes, flush: true);
     } catch (error, stackTrace) {
-      Log.error('清理未完成的下载文件失败: $error\n$stackTrace');
+      Log.error('保存封面失败: ${song.title}\n$stackTrace');
     }
   }
 

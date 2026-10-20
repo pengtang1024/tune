@@ -19,25 +19,16 @@ DBusIntrospectInterface dbusMenuInterface() {
           ('i', 'recursionDepth'),
           ('as', 'propertyNames'),
         ],
-        outArgs: [
-          ('u', 'revision'),
-          ('(ia{sv}av)', 'layout'),
-        ],
+        outArgs: [('u', 'revision'), ('(ia{sv}av)', 'layout')],
       ),
       dbusMethod(
         'GetGroupProperties',
-        inArgs: [
-          ('ai', 'ids'),
-          ('as', 'propertyNames'),
-        ],
+        inArgs: [('ai', 'ids'), ('as', 'propertyNames')],
         outArgs: [('a(ia{sv})', 'properties')],
       ),
       dbusMethod(
         'GetProperty',
-        inArgs: [
-          ('i', 'id'),
-          ('s', 'name'),
-        ],
+        inArgs: [('i', 'id'), ('s', 'name')],
         outArgs: [('v', 'value')],
       ),
       dbusMethod(

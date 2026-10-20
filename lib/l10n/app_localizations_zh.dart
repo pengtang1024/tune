@@ -535,6 +535,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFolderAdded => '已添加扫描目录';
 
   @override
+  String get settingsLibraryFolder => '文件存放位置';
+
+  @override
+  String get settingsChangeLibraryFolder => '更换位置';
+
+  @override
+  String get settingsUseDefaultLibraryFolder => '用默认位置';
+
+  @override
+  String get settingsNoLibraryFolder => '这个平台没有音乐目录';
+
+  @override
   String get settingsScanDone => '扫描完成';
 
   @override
@@ -2029,6 +2041,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsFolderAdded => '已添加扫描目录';
 
   @override
+  String get settingsLibraryFolder => '文件存放位置';
+
+  @override
+  String get settingsChangeLibraryFolder => '更换位置';
+
+  @override
+  String get settingsUseDefaultLibraryFolder => '用默认位置';
+
+  @override
+  String get settingsNoLibraryFolder => '这个平台没有音乐目录';
+
+  @override
   String get settingsScanDone => '扫描完成';
 
   @override
@@ -3521,6 +3545,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsFolderAdded => '已新增掃描目錄';
+
+  @override
+  String get settingsLibraryFolder => '檔案存放位置';
+
+  @override
+  String get settingsChangeLibraryFolder => '更換位置';
+
+  @override
+  String get settingsUseDefaultLibraryFolder => '用預設位置';
+
+  @override
+  String get settingsNoLibraryFolder => '這個平台沒有音樂目錄';
 
   @override
   String get settingsScanDone => '掃描完成';

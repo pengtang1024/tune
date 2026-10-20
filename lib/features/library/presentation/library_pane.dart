@@ -125,7 +125,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                       color: Theme.of(context).colorScheme.outlineVariant,
                     ),
                   ),
-                  icon: const Icon(Icons.travel_explore_rounded, size: CompactTokens.icon16),
+                  icon: const Icon(
+                    Icons.travel_explore_rounded,
+                    size: CompactTokens.icon16,
+                  ),
                   label: Text(context.loc.searchOnlineTitle),
                 ),
               ],
@@ -200,8 +203,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             .toSet()
             .toList(growable: false)
           ..sort(
-            (a, b) =>
-                compareText(sourceLabels[a]?.name ?? a, sourceLabels[b]?.name ?? b),
+            (a, b) => compareText(
+              sourceLabels[a]?.name ?? a,
+              sourceLabels[b]?.name ?? b,
+            ),
           );
     return sources;
   }

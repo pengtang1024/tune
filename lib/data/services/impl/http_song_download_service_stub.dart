@@ -1,6 +1,14 @@
-import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/artwork/artwork_cache.dart';
+import 'package:tune/data/services/downloads/song_download_service.dart';
+import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/domain/models/song.dart';
+
+/// The download store of a build that has no file system.
+SongDownloadService createSongDownloadService({
+  required LibraryPaths paths,
+  required ArtworkCache artwork,
+}) => HttpSongDownloadService();
 
 /// Download store for platforms without a file system.
 ///

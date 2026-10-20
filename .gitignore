@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Golden 差异产物：跑 golden 测试时生成，不入库
+tool/failures/

@@ -118,7 +118,10 @@ class _StartupError extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline_rounded, size: CompactTokens.illustrationSmall),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: CompactTokens.illustrationSmall,
+                  ),
                   const SizedBox(height: 12),
                   Text(context.loc.appStartFailed),
                   const SizedBox(height: 8),

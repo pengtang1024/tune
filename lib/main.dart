@@ -34,10 +34,7 @@ Future<void> main() async {
   }
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const TuneApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const TuneApp()),
   );
 }
 

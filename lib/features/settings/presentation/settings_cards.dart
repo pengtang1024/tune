@@ -7,6 +7,7 @@ import 'package:tune/core/l10n/locale_labels.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 class SettingsPageHeader extends StatelessWidget {
   final String version;
@@ -180,6 +181,8 @@ class SettingsLibraryCard extends StatelessWidget {
   final ValueChanged<String> onRemoveFolder;
   final VoidCallback onScan;
   final VoidCallback? onClear;
+  final VoidCallback onChooseLibraryFolder;
+  final VoidCallback onResetLibraryFolder;
 
   const SettingsLibraryCard({
     super.key,
@@ -190,6 +193,8 @@ class SettingsLibraryCard extends StatelessWidget {
     required this.onRemoveFolder,
     required this.onScan,
     required this.onClear,
+    required this.onChooseLibraryFolder,
+    required this.onResetLibraryFolder,
   });
 
   @override
@@ -240,6 +245,13 @@ class SettingsLibraryCard extends StatelessWidget {
               ),
           ],
           const SizedBox(height: 14),
+          _LibraryFolderRow(
+            folder: settings.libraryFolder ?? settings.defaultLibraryFolder,
+            isCustom: settings.libraryFolder != null,
+            onChoose: onChooseLibraryFolder,
+            onReset: onResetLibraryFolder,
+          ),
+          const SizedBox(height: 14),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -247,7 +259,10 @@ class SettingsLibraryCard extends StatelessWidget {
             children: [
               FilledButton.icon(
                 onPressed: onAddFolder,
-                icon: const Icon(Icons.create_new_folder_outlined, size: CompactTokens.icon16),
+                icon: const Icon(
+                  Icons.create_new_folder_outlined,
+                  size: CompactTokens.icon16,
+                ),
                 label: Text(context.loc.settingsAddFolder),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, CompactTokens.controlDefault),
@@ -258,7 +273,10 @@ class SettingsLibraryCard extends StatelessWidget {
                 onPressed: canScan ? onScan : null,
                 icon: scanning
                     ? const CompactSpinner.small()
-                    : const Icon(Icons.refresh_rounded, size: CompactTokens.icon16),
+                    : const Icon(
+                        Icons.refresh_rounded,
+                        size: CompactTokens.icon16,
+                      ),
                 label: Text(
                   scanning ? context.loc.scanning : context.loc.scanNow,
                 ),
@@ -269,7 +287,10 @@ class SettingsLibraryCard extends StatelessWidget {
               ),
               TextButton.icon(
                 onPressed: onClear,
-                icon: const Icon(Icons.delete_sweep_outlined, size: CompactTokens.icon16),
+                icon: const Icon(
+                  Icons.delete_sweep_outlined,
+                  size: CompactTokens.icon16,
+                ),
                 label: Text(context.loc.settingsClearLibrary),
                 style: TextButton.styleFrom(
                   minimumSize: const Size(0, CompactTokens.controlDefault),
@@ -684,6 +705,80 @@ class _LanguageDropdown extends StatelessWidget {
   }
 }
 
+/// The folder the app writes the files it fetches into.
+class _LibraryFolderRow extends StatelessWidget {
+  final String folder;
+  final bool isCustom;
+  final VoidCallback onChoose;
+  final VoidCallback onReset;
+
+  const _LibraryFolderRow({
+    required this.folder,
+    required this.isCustom,
+    required this.onChoose,
+    required this.onReset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.sd_storage_outlined,
+                size: CompactTokens.icon16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.loc.settingsLibraryFolder,
+                  style: CompactTypography.mono(
+                    theme.colorScheme.onSurface,
+                    size: CompactTypeScale.mark,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: onChoose,
+                child: Text(context.loc.settingsChangeLibraryFolder),
+              ),
+              if (isCustom)
+                TextButton(
+                  onPressed: onReset,
+                  child: Text(context.loc.settingsUseDefaultLibraryFolder),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: Text(
+              folder.isEmpty ? context.loc.settingsNoLibraryFolder : folder,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.mark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _PathRow extends StatelessWidget {
   final String path;
   final String label;
@@ -747,19 +842,24 @@ class _PathRow extends StatelessWidget {
             SizedBox(
               width: 26,
               height: 26,
-              child: IconButton(
-                tooltip: context.loc.remove,
-                onPressed: onRemove,
-                icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(
-                  width: 26,
-                  height: 26,
-                ),
-                style: IconButton.styleFrom(
-                  foregroundColor: theme.colorScheme.onSurfaceVariant,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
+              child: TuneTooltip(
+                message: context.loc.remove,
+                child: IconButton(
+                  onPressed: onRemove,
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: CompactTokens.icon14,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 26,
+                    height: 26,
+                  ),
+                  style: IconButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onSurfaceVariant,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
               ),
             ),
@@ -789,7 +889,11 @@ class _EmptyPath extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: CompactTokens.icon16, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            icon,
+            size: CompactTokens.icon16,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 8),
           Text(
             text,

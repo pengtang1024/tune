@@ -157,7 +157,11 @@ class _Message extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: CompactTokens.icon20, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            icon,
+            size: CompactTokens.icon20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(height: CompactTokens.space6),
           Text(
             text,

@@ -14,9 +14,9 @@ class FakeArtworkCache implements ArtworkCache {
   final List<String> asked = [];
 
   @override
-  Future<Uint8List> bytesFor(String url) async {
+  Future<CoverImage> imageFor(String url) async {
     asked.add(url);
-    return bytes;
+    return CoverImage(bytes, 'png');
   }
 
   @override

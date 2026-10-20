@@ -64,8 +64,9 @@ class PlaybackState {
   ///
   /// It is -1 when the track is not part of the queue, which happens while the
   /// queue is replaced.
-  int get currentIndex =>
-      currentUri == null ? -1 : queue.indexWhere((song) => song.uri == currentUri);
+  int get currentIndex => currentUri == null
+      ? -1
+      : queue.indexWhere((song) => song.uri == currentUri);
 
   bool get isPlaying => status == PlaybackStatus.playing;
   bool get isLoading => status == PlaybackStatus.loading;

@@ -3,51 +3,44 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/artwork/artwork_cache.dart';
+import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:tune/utils/stable_key.dart';
 
 /// The artwork cache of a build that has a file system.
-ArtworkCache createArtworkCache() => FileArtworkCache();
+ArtworkCache createArtworkCache(LibraryPaths paths) => FileArtworkCache(paths);
 
 /// Keeps the covers on disk, one file per address.
 ///
 /// The file name is derived from a stable hash of the address, so the same
 /// cover is fetched once and then read from the disk after a restart. The
-/// store is the artwork folder of the application support folder, next to
-/// the other data of the app.
+/// files are spread over subfolders, so a single folder never holds more
+/// than a handful of pictures.
 class FileArtworkCache implements ArtworkCache {
-  FileArtworkCache({
-    Dio? client,
-    Future<Directory> Function()? storeDirectory,
-  })  : _client =
-            client ??
-            Dio(
-              BaseOptions(
-                connectTimeout: const Duration(seconds: 20),
-                receiveTimeout: const Duration(seconds: 60),
-                followRedirects: true,
-              ),
+  FileArtworkCache(this._paths, {Dio? client})
+    : _client =
+          client ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 20),
+              receiveTimeout: const Duration(seconds: 60),
+              followRedirects: true,
             ),
-        _storeDirectory = storeDirectory;
+          );
 
-  /// The folder inside the application support folder that holds the covers.
-  static const String folderName = 'artwork';
-
+  final LibraryPaths _paths;
   final Dio _client;
 
-  /// Where the covers are kept, when the caller decides it.
-  final Future<Directory> Function()? _storeDirectory;
-
   /// The fetches that are running right now, keyed by the address.
-  final Map<String, Future<Uint8List>> _running = {};
+  final Map<String, Future<CoverImage>> _running = {};
 
   @override
-  Future<Uint8List> bytesFor(String url) async {
+  Future<CoverImage> imageFor(String url) async {
     final file = await _fileFor(url);
     if (await file.exists()) {
-      return await file.readAsBytes();
+      final bytes = await file.readAsBytes();
+      return CoverImage(bytes, imageExtension(bytes));
     }
 
     // Two covers of the same address on the screen are fetched once.
@@ -63,14 +56,14 @@ class FileArtworkCache implements ArtworkCache {
     }
   }
 
-  Future<Uint8List> _fetch(String url, File file) async {
+  Future<CoverImage> _fetch(String url, File file) async {
     final response = await _client.get<List<int>>(
       url,
       options: Options(responseType: ResponseType.bytes),
     );
     final bytes = Uint8List.fromList(response.data ?? const <int>[]);
     await _store(file, bytes);
-    return bytes;
+    return CoverImage(bytes, imageExtension(bytes));
   }
 
   /// Writes the cover into the store.
@@ -90,10 +83,10 @@ class FileArtworkCache implements ArtworkCache {
   }
 
   Future<File> _fileFor(String url) async {
-    final base =
-        await (_storeDirectory?.call() ?? getApplicationSupportDirectory());
-    final directory = Directory(path.join(base.path, folderName));
-    return File(path.join(directory.path, '${stableKey(url)}.img'));
+    final folder = await _paths.coverCacheFolder();
+    final key = stableKey(url);
+    final bucket = key.substring(0, 2);
+    return File(path.join(folder.path, bucket, '$key.img'));
   }
 
   @override

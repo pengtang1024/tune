@@ -13,6 +13,8 @@
 | 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
+| 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
+| 查桌面集成（MPRIS、托盘、默认播放器） | [`需求/桌面集成方案.md`](需求/桌面集成方案.md) |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
 | 继续查本地化覆盖、接着做审计 | [`docs/localization-audit.md`](docs/localization-audit.md) |
@@ -25,8 +27,19 @@
 - 产品：紧凑的桌面音乐播放器（Flutter）。双栏布局：左栏常驻播放器，右栏在音乐库 / 队列 / 音源 / 设置之间切换。
 - 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅 Web 存储与旧数据迁移）· gen-l10n。
 - 验收平台：Linux 桌面优先；Android / iOS / Windows / macOS / Web 保留工程入口，但不是 v1 验收目标。
-- 需求文档：`需求/README.md` 是入口。`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`多语言设计.md`（文案规则）是当前权威；`架构需求.md`、`框架.md`、`ai架构需求.md` 属早期规划，已被取代，不要照着实现。
+- 需求文档：`需求/README.md` 是入口，那里列的四份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。
+- **旧稿在 [`需求/历史/`](需求/历史/README.md)**：2025 年 12 月那版的架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范都在那里。它们描述的是当时的目录与调色板，**只当历史读，不作规范**。
 - `.trae/documents/` 是历史迭代计划，其中还引用 `lib/ui`、`PlaylistService` 等已删除的结构——只当历史读，不当规范。
+
+### 0.1 残留文档：先查，再写
+
+旧稿留在仓库里，是为了留住当初的意图，不是待办。动笔之前：
+
+- **只从本页的地图里取依据**。地图里没有的文档，默认是历史稿，不要照着实现。
+- 发现文档与代码冲突，**以代码为准，并顺手改掉那句**（AGENTS.md §3）。
+- 看到某一处规则被改过、而文档还写着旧说法，那份文档就是带偏的来源——先改文档，再继续做。
+- 新写的设计说明写进 `docs/`，不要另起一份散在仓库根目录。
+
 
 ## 1. 最高优先级：架构优化优先于代码优化
 

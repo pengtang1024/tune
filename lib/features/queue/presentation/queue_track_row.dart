@@ -4,6 +4,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/track_meta.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// A track of the play queue.
 ///
@@ -57,10 +58,7 @@ class QueueTrackRow extends StatelessWidget {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: Container(
-                    width: 2,
-                    color: accent,
-                  ),
+                  child: Container(width: 2, color: accent),
                 ),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -89,9 +87,8 @@ class QueueTrackRow extends StatelessWidget {
                           child: Icon(
                             Icons.drag_indicator_rounded,
                             size: CompactTokens.icon16,
-                            color: theme.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.7,
-                            ),
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -122,16 +119,18 @@ class _RemoveButton extends StatelessWidget {
     return SizedBox(
       width: 28,
       height: 28,
-      child: IconButton(
-        tooltip: context.loc.remove,
-        onPressed: onPressed,
-        icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-        style: IconButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
+      child: TuneTooltip(
+        message: context.loc.remove,
+        child: IconButton(
+          onPressed: onPressed,
+          icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+          style: IconButton.styleFrom(
+            foregroundColor: theme.colorScheme.onSurfaceVariant,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
         ),
       ),
     );

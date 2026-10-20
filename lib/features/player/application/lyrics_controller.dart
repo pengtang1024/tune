@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
@@ -62,7 +65,7 @@ class LyricsController extends Notifier<LyricsState> {
 
     state = LyricsState(songId: song.id, loading: true);
     try {
-      final raw = await ref.read(musicSourceServiceProvider).fetchLyrics(song);
+      final raw = await _lyricsFor(song);
       if (raw == null || raw.trim().isEmpty) {
         state = LyricsState(songId: song.id, missing: true);
         return;
@@ -75,5 +78,23 @@ class LyricsController extends Notifier<LyricsState> {
       Log.error('歌词加载失败: $error', stackTrace);
       state = LyricsState(songId: song.id, failed: true);
     }
+  }
+
+  /// The lyrics of [song], from the file next to it or from the source.
+  ///
+  /// The file next to the track is read first, so a sheet that was matched
+  /// once is used without asking the network again. A sheet that came from
+  /// the source is written next to the track, so the next run finds it there.
+  Future<String?> _lyricsFor(Song song) async {
+    final paths = ref.read(libraryPathsProvider);
+
+    final stored = await paths.readLyrics(song);
+    if (stored != null && stored.trim().isNotEmpty) return stored;
+
+    final raw = await ref.read(musicSourceServiceProvider).fetchLyrics(song);
+    if (raw == null || raw.trim().isEmpty) return raw;
+
+    unawaited(paths.saveLyrics(song, raw));
+    return raw;
   }
 }

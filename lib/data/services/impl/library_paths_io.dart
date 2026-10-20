@@ -1,0 +1,137 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
+import 'package:tune/data/services/library/library_paths.dart';
+import 'package:tune/data/services/music_scanner_config.dart';
+import 'package:tune/data/services/persistence_service.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/utils/file_name.dart';
+
+/// The library paths of a build that has a file system.
+LibraryPaths createLibraryPaths(PersistenceService persistence) =>
+    FileLibraryPaths(persistence);
+
+/// Keeps the files of the app in the music library of the machine.
+///
+/// A track the user already has keeps the folder it is in: the cover and the
+/// lyrics are written next to it, under the name of the file. A track the app
+/// fetches gets a folder of its own, named after the artist, the album and
+/// the title, so the music library stays a library and no folder holds more
+/// than a handful of tracks.
+class FileLibraryPaths implements LibraryPaths {
+  FileLibraryPaths(this._persistence);
+
+  /// The folder of the app inside the music library.
+  ///
+  /// It holds the covers of the tracks that were not fetched. The name starts
+  /// with a dot, so a music scanner walks past it.
+  static const String cacheFolderName = '.tune';
+
+  /// The folder inside the app folder that holds the covers.
+  static const String artworkFolderName = 'artwork';
+
+  /// The number of files one folder of the cover cache holds.
+  ///
+  /// The covers are spread over subfolders, so a single folder never holds
+  /// more than a handful of pictures.
+  static const int coversPerFolder = 256;
+
+  final PersistenceService _persistence;
+
+  @override
+  Future<Directory> root() async {
+    final picked = _persistence.getString(LibraryPaths.rootKey);
+    if (picked != null && picked.trim().isNotEmpty) {
+      return Directory(picked.trim());
+    }
+    return defaultRoot();
+  }
+
+  /// The music library of the machine.
+  static Directory defaultRoot() {
+    final folder = MusicScannerConfig.getDefaultMusicLibrary();
+    if (folder == null) {
+      throw StateError('the platform has no music folder');
+    }
+    return Directory(folder);
+  }
+
+  @override
+  Future<Directory> folderFor(Song song) async {
+    final local = _localFolderOf(song);
+    if (local != null) return local;
+
+    final root = await this.root();
+    final segments = [
+      song.artist,
+      song.album,
+      song.title,
+    ].where((part) => part.trim().isNotEmpty).map(safeFileName);
+    return Directory(path.joinAll([root.path, ...segments]));
+  }
+
+  @override
+  String nameFor(Song song) {
+    final local = _localFileOf(song);
+    if (local != null) return path.basenameWithoutExtension(local.path);
+    return safeFileName(song.title);
+  }
+
+  @override
+  Future<File> coverFileFor(Song song, String extension) async {
+    final folder = await folderFor(song);
+    final suffix = extension.startsWith('.') ? extension : '.$extension';
+    return File(path.join(folder.path, '${nameFor(song)}$suffix'));
+  }
+
+  @override
+  Future<File> lyricsFileFor(Song song) async {
+    final folder = await folderFor(song);
+    return File(path.join(folder.path, '${nameFor(song)}.lrc'));
+  }
+
+  @override
+  Future<Directory> coverCacheFolder() async {
+    final root = await this.root();
+    return Directory(path.join(root.path, cacheFolderName, artworkFolderName));
+  }
+
+  @override
+  Future<String?> readLyrics(Song song) async {
+    try {
+      final file = await lyricsFileFor(song);
+      if (!await file.exists()) return null;
+      return await file.readAsString();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveLyrics(Song song, String lyrics) async {
+    final file = await lyricsFileFor(song);
+    await file.parent.create(recursive: true);
+    await file.writeAsString(lyrics, flush: true);
+  }
+
+  /// The file of a track that is on the disk, when the track is one.
+  File? _localFileOf(Song song) {
+    final uri = song.uri;
+    if (uri.isEmpty || _isRemote(uri)) return null;
+    return File(uri);
+  }
+
+  /// The folder of a track that is on the disk, when the track is one.
+  Directory? _localFolderOf(Song song) {
+    final file = _localFileOf(song);
+    if (file == null) return null;
+    return file.parent;
+  }
+
+  /// Whether the address points at the network instead of the disk.
+  static bool _isRemote(String uri) {
+    final parsed = Uri.tryParse(uri);
+    return parsed != null &&
+        (parsed.scheme == 'http' || parsed.scheme == 'https');
+  }
+}

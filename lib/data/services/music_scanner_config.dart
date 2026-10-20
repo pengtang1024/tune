@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'dart:io' show Directory, Platform;
 import 'package:path/path.dart' as path;
 
 /// 音乐扫描配置类
@@ -37,6 +37,17 @@ class MusicScannerConfig {
     }
 
     return paths;
+  }
+
+  /// 机器上的音乐库：第一个存在的默认音乐路径。
+  ///
+  /// 扫描路径和 app 写入文件的位置都用它，两边说的是同一个地方。
+  static String? getDefaultMusicLibrary() {
+    final paths = getDefaultMusicPaths();
+    for (final candidate in paths) {
+      if (Directory(candidate).existsSync()) return candidate;
+    }
+    return paths.isEmpty ? null : paths.first;
   }
 
   // 获取移动平台音乐路径

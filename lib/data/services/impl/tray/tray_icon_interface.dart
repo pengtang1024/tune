@@ -12,34 +12,10 @@ DBusIntrospectInterface trayIconInterface() {
   return DBusIntrospectInterface(
     trayIconInterfaceName,
     methods: [
-      dbusMethod(
-        'Activate',
-        inArgs: [
-          ('i', 'x'),
-          ('i', 'y'),
-        ],
-      ),
-      dbusMethod(
-        'SecondaryActivate',
-        inArgs: [
-          ('i', 'x'),
-          ('i', 'y'),
-        ],
-      ),
-      dbusMethod(
-        'ContextMenu',
-        inArgs: [
-          ('i', 'x'),
-          ('i', 'y'),
-        ],
-      ),
-      dbusMethod(
-        'Scroll',
-        inArgs: [
-          ('i', 'delta'),
-          ('s', 'orientation'),
-        ],
-      ),
+      dbusMethod('Activate', inArgs: [('i', 'x'), ('i', 'y')]),
+      dbusMethod('SecondaryActivate', inArgs: [('i', 'x'), ('i', 'y')]),
+      dbusMethod('ContextMenu', inArgs: [('i', 'x'), ('i', 'y')]),
+      dbusMethod('Scroll', inArgs: [('i', 'delta'), ('s', 'orientation')]),
     ],
     signals: [
       dbusSignal('NewIcon'),

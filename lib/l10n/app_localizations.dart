@@ -1018,6 +1018,30 @@ abstract class AppLocalizations {
   /// **'已添加扫描目录'**
   String get settingsFolderAdded;
 
+  /// No description provided for @settingsLibraryFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'文件存放位置'**
+  String get settingsLibraryFolder;
+
+  /// No description provided for @settingsChangeLibraryFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更换位置'**
+  String get settingsChangeLibraryFolder;
+
+  /// No description provided for @settingsUseDefaultLibraryFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用默认位置'**
+  String get settingsUseDefaultLibraryFolder;
+
+  /// No description provided for @settingsNoLibraryFolder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个平台没有音乐目录'**
+  String get settingsNoLibraryFolder;
+
   /// No description provided for @settingsScanDone.
   ///
   /// In zh_CN, this message translates to:

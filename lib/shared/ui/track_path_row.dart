@@ -4,6 +4,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The address of the file, with a way to take it away.
 ///
@@ -48,14 +49,16 @@ class TrackPathRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          tooltip: context.loc.trackDetailsCopyPath,
-          onPressed: () => _copy(context),
-          icon: const Icon(Icons.copy_rounded, size: CompactTokens.icon16),
-          style: IconButton.styleFrom(
-            foregroundColor: theme.colorScheme.onSurfaceVariant,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            visualDensity: VisualDensity.compact,
+        TuneTooltip(
+          message: context.loc.trackDetailsCopyPath,
+          child: IconButton(
+            onPressed: () => _copy(context),
+            icon: const Icon(Icons.copy_rounded, size: CompactTokens.icon16),
+            style: IconButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurfaceVariant,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
           ),
         ),
       ],

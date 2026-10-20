@@ -29,12 +29,12 @@ final desktopIntegrationProvider = Provider<DesktopIntegrationController>((
   );
   ref.onDispose(controller.dispose);
 
-  ref.listen(settingsControllerProvider.select((state) => state.mediaControlsEnabled), (
-    previous,
-    next,
-  ) {
-    controller.setMediaControlsEnabled(next);
-  });
+  ref.listen(
+    settingsControllerProvider.select((state) => state.mediaControlsEnabled),
+    (previous, next) {
+      controller.setMediaControlsEnabled(next);
+    },
+  );
   ref.listen(settingsControllerProvider.select((state) => state.locale), (
     previous,
     next,

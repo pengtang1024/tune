@@ -250,7 +250,7 @@ abstract final class CompactTheme {
         insetPadding: const EdgeInsets.all(16),
         elevation: 0,
       ),
-      tooltipTheme: _tooltipTheme(isDark),
+      tooltipTheme: _tooltipTheme(scheme, isDark),
       sliderTheme: SliderThemeData(
         trackHeight: 3,
         activeTrackColor: primary,
@@ -298,19 +298,19 @@ abstract final class CompactTheme {
 
   /// The look of every hint of the app.
   ///
-  /// A hint is a drop of ink: a dark card with paper words, in the light theme
-  /// and in the dark one. In the light theme it is deep ink on the paper of
-  /// the page. In the dark theme it is a panel of the app, lifted by a rim of
-  /// a warmer tone and by a shadow, so that it stays a card and never becomes
-  /// a white box on a dark desk.
+  /// A hint is a card of the theme it stands on: the deepest surface of the
+  /// theme, with the words of the theme on it and the outline of the theme
+  /// as its rim. The dark theme has a dark hint, the light theme a paper
+  /// one, so the hint follows the theme in every sense and never turns into
+  /// a white box on the dark desk.
   ///
   /// The hint opens above the thing it belongs to, because a pointer that
   /// rests on a button would cover a hint below it, and it stays long enough
   /// to be read.
-  static TooltipThemeData _tooltipTheme(bool isDark) {
-    final card = isDark ? const Color(0xFF211E19) : const Color(0xFF171512);
-    final rim = isDark ? const Color(0xFF4A443B) : const Color(0xFF3B332A);
-    final words = const Color(0xFFF2EBDD);
+  static TooltipThemeData _tooltipTheme(ColorScheme scheme, bool isDark) {
+    final card = scheme.surfaceContainerHighest;
+    final rim = scheme.outline;
+    final words = scheme.onSurface;
 
     return TooltipThemeData(
       waitDuration: const Duration(milliseconds: 400),

@@ -68,8 +68,11 @@
 
 - 界面上没写出来的说明一律走 `TuneTooltip`（`lib/shared/ui/tune_tooltip.dart`），不要直接用 `Tooltip`。
 - 外观只有一处：`CompactTheme.tooltipTheme`（`lib/app/theme/compact_theme.dart`）。改动外观改主题，不要在调用点写 `decoration`。
-- 提示是**一滴墨**：明暗两套主题都是深色卡片 + 纸色文字。深色主题下不要换成纸色卡片，否则深色桌面上会浮起一个白盒子。
-- 图标按钮用 `IconButton(tooltip: ...)`，它跟 `TuneTooltip` 走同一份主题。
+- 提示是**主题自己的一张卡片**：卡片用主题的 `surfaceContainerHighest`，字用 `onSurface`，描边用 `outline`，投影跟主题一致。亮色主题下是纸色卡片配墨字，暗色主题下是深色卡片配纸字——暗色用暗色，明亮用明亮，主题里有现成的颜色就别另造。
+- **字永远跟卡片反色，用哪个令牌由主题说了算**：不要把纸色或墨色写死在提示里。亮色主题的提示是纸卡片配墨字，暗色主题的提示是墨卡片配纸字。
+- 提示的外观跟着应用主题走：**还开着的提示也会当场换成新主题的卡片**，不用等它关掉重开。
+- 提示站在 `RawTooltip` 上而不是框架的 `Tooltip`：框架只在提示打开时把卡片画一次，画完就留着，所以它跟着不了主题。`TuneTooltip` 在 overlay 里读主题——也就是卡片真正被画出来的地方——所以主题一变，提示当场跟着变。
+- 图标按钮的提示也走 `TuneTooltip`：`TuneTooltip(message: ..., child: IconButton(...))`。不要用 `IconButton(tooltip: ...)` 或 `PopupMenuButton(tooltip: ...)`，那是框架自己的提示，跟不了主题。`test/app/tooltip_style_test.dart` 里有守卫拦着。
 - 提示没有文案就不该存在：`TuneTooltip` 会直接把子组件原样返回，不要用空字符串凑一个空框。
 
 ## 常量

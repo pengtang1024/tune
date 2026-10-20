@@ -569,6 +569,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFolderAdded => 'Scan folder added';
 
   @override
+  String get settingsLibraryFolder => 'Where the files are kept';
+
+  @override
+  String get settingsChangeLibraryFolder => 'Change';
+
+  @override
+  String get settingsUseDefaultLibraryFolder => 'Use the default';
+
+  @override
+  String get settingsNoLibraryFolder => 'This platform has no music folder';
+
+  @override
   String get settingsScanDone => 'Scan finished';
 
   @override

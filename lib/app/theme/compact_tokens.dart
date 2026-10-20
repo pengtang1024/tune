@@ -50,6 +50,7 @@ abstract final class CompactTokens {
   static const double headerHeight = 44;
   static const double tabsHeight = 44;
   static const double rowHeight = 52;
+
   /// Height of the controls of the shell.
   ///
   /// The shell keeps its buttons dense, so the ladder runs in steps of two

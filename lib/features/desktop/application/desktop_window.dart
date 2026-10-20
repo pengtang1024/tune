@@ -5,10 +5,7 @@ import 'package:tune/core/services/window_manager_service.dart';
 /// The window can be hidden while the tray keeps the player alive, so the
 /// window is a thing of its own and not a part of the layout.
 class DesktopWindow {
-  DesktopWindow({
-    required this.closeToTray,
-    required this.hasTray,
-  });
+  DesktopWindow({required this.closeToTray, required this.hasTray});
 
   /// Whether closing the window only hides it.
   final bool Function() closeToTray;

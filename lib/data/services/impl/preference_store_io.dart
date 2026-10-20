@@ -180,8 +180,7 @@ class FilePersistenceService implements PersistenceService {
   ///
   /// The key is encoded, so that every key fits a file name on every
   /// platform, and so that the key can be read back exactly.
-  static String _fileName(String key) =>
-      '${_encoded(key)}.json';
+  static String _fileName(String key) => '${_encoded(key)}.json';
 
   /// The key a file name belongs to, or null when the name is not ours.
   static String? _keyOf(String filePath) {

@@ -44,8 +44,8 @@ class ArtworkImageProvider extends ImageProvider<ArtworkImageProvider> {
     ArtworkImageProvider key,
     ImageDecoderCallback decode,
   ) async {
-    final bytes = await key.cache.bytesFor(key.url);
-    return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+    final image = await key.cache.imageFor(key.url);
+    return decode(await ui.ImmutableBuffer.fromUint8List(image.bytes));
   }
 
   @override

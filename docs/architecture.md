@@ -88,14 +88,36 @@ presentation → application → domain
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
-| 下载的曲目 | `<应用支持目录>/downloads/` | `HttpSongDownloadService` |
-| 封面图 | `<应用支持目录>/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
+| 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
+| 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
+| 歌词 | 曲目所在目录，`<歌名>.lrc` | `LyricsController` → `LibraryPaths` |
 | 插件脚本 | `<应用支持目录>/music_plugins/` | `MusicPluginStore` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
 - Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
 - **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
+
+## 音乐库的目录
+
+app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录（Linux `~/Music`、macOS / Windows `~/Music`、Android `/storage/emulated/0/Music`），也就是 `MusicScannerConfig.getDefaultMusicPaths()` 给的那几个。设置里可以改成别的目录（`library_folder` 偏好），默认就是音乐库。
+
+目录的形状由 `LibraryPaths`（`lib/data/services/library/library_paths.dart`）说了算，别处不要自己拼路径：
+
+```text
+<音乐库>/
+├── .tune/artwork/<哈希前两位>/<哈希>.img   # 只浏览过、没下载的曲目的封面
+├── <歌手>/<专辑>/<歌名>/
+│   ├── <歌名>.mp3                          # 下载的音频
+│   ├── <歌名>.jpg                          # 封面
+│   └── <歌名>.lrc                          # 匹配到的歌词
+└── ...
+```
+
+- **一首歌一个目录**：音频、封面、歌词放在同一个目录里，别的播放器打开这个目录就知道这是一首歌。
+- 用户磁盘上已有的曲子不动，app 只把歌词写在它旁边（`<歌名>.lrc`），封面和音频不覆盖用户自己的文件。
+- 目录名经过 `safeFileName`（`lib/utils/file_name.dart`）：路径分隔符和 Windows 不允许的字符被换掉，名字短到任何文件系统都收得下。
+- 单个目录不放太多东西：曲目按歌手 / 专辑 / 歌名分层，封面缓存按哈希前两位分桶。
 - 音乐库是 app 对磁盘上音乐的索引，属于 app 的数据；用户的音乐文件从不搬动。
 
 ## 曲目事实（track facts）
@@ -125,10 +147,22 @@ presentation → application → domain
 | 文件 | 职责 |
 | --- | --- |
 | `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：唯一的提示 widget，没有文案就不显示 |
-| `lib/app/theme/compact_theme.dart` | `tooltipTheme`：提示的样子——一滴墨（深色卡片 + 纸色文字，明暗主题一致）、圆角、投影、停留时间 |
+| `lib/app/theme/compact_theme.dart` | `tooltipTheme`：提示的样子——主题自己的一张卡片（`surfaceContainerHighest` + `onSurface` + `outline`，亮色是纸色卡片，暗色是深色卡片）、圆角、投影、停留时间 |
 
-- widget 不直接用 `Tooltip`；图标按钮用 `IconButton(tooltip: ...)`，两者走同一份主题。
+- widget 不直接用 `Tooltip`；图标按钮用 `TuneTooltip(message: ..., child: IconButton(...))`，两者走同一份主题。
+- 提示站在 `RawTooltip` 上，卡片在 overlay 里读主题，所以主题切换时**还开着的提示也会当场换成新主题的卡片**。
 - 提示文案走 l10n，不要写死。
+
+## 底部浮层（sheet）
+
+底部浮层只有一条路走：`lib/shared/ui/compact_sheet.dart` 的 `showCompactSheet`。
+
+| 文件 | 职责 |
+| --- | --- |
+| `lib/shared/ui/compact_sheet.dart` | `showCompactSheet`：贴底、只占自己高度的浮层 |
+
+- 浮层只占它自己的高度，窗口其余的地方留给遮罩，所以点浮层以外的地方（上方、左右都行）都能关掉它。浮层撑满窗口的话，空白的地方会把这些点击吃掉，读者只剩浮层两侧的窄条可以关。
+- 宽度上限走 `CompactTokens.sheetWidth`，圆角走 `CompactTokens.sheetRadius`。
 
 ## 扩展路径
 

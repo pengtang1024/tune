@@ -131,9 +131,7 @@ TrackFact? _sampleRateFact(BuildContext context, Song song) {
 
   final kilohertz = rate / 1000;
   final whole = kilohertz == kilohertz.roundToDouble();
-  final value = whole
-      ? '${kilohertz.toInt()}'
-      : kilohertz.toStringAsFixed(1);
+  final value = whole ? '${kilohertz.toInt()}' : kilohertz.toStringAsFixed(1);
 
   return TrackFact(
     label: context.loc.nowPlayingDetailSampleRate,

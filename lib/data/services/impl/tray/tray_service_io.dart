@@ -61,7 +61,10 @@ class TrayServiceImpl implements TrayService {
         return false;
       }
 
-      final menuObject = TrayMenuObject(DBusObjectPath(_menuPath), onMenuItemClick);
+      final menuObject = TrayMenuObject(
+        DBusObjectPath(_menuPath),
+        onMenuItemClick,
+      );
       menuObject.setEntries(menu);
       await client.registerObject(menuObject);
 

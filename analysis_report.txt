@@ -1,1 +1,0 @@
-[info] Use a 'SizedBox' to add whitespace to a layout (C:\Users\pengt\IdeaProjects\tune\lib\ui\widgets\modern_song_card.dart:337:22)

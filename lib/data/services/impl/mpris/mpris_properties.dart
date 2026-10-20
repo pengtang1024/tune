@@ -13,10 +13,11 @@ Map<String, DBusValue> mprisPlayerProperties() {
     'HasTrackList': const DBusBoolean(false),
     'Identity': const DBusString('Tune'),
     'DesktopEntry': const DBusString('cn.iouf.tune'),
-    'SupportedUriSchemes': DBusArray(
-      DBusSignature('s'),
-      const [DBusString('file'), DBusString('http'), DBusString('https')],
-    ),
+    'SupportedUriSchemes': DBusArray(DBusSignature('s'), const [
+      DBusString('file'),
+      DBusString('http'),
+      DBusString('https'),
+    ]),
     'SupportedMimeTypes': DBusArray(
       DBusSignature('s'),
       supportedAudioMimeTypes.map(DBusString.new),

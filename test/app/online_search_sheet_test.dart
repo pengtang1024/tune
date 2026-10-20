@@ -54,6 +54,48 @@ void main() {
     expect(find.text('播放全部'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('the search sheet closes when the reader taps outside it', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          musicSourcesControllerProvider.overrideWith(
+            () => _FakeSourcesController(),
+          ),
+          onlineSearchControllerProvider.overrideWith(
+            () => _FakeOnlineSearchController(),
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showOnlineSearchSheet(context),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsOneWidget);
+
+    // The room above the sheet belongs to the barrier, so a tap there closes
+    // the sheet instead of being swallowed by the empty part of it.
+    await tester.tapAt(const Offset(400, 20));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _FakeSourcesController extends MusicSourcesController {

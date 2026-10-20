@@ -636,9 +636,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
     final duration = _audio.duration;
     state = state.copyWith(
-      status: _audio.isPlaying
-          ? PlaybackStatus.playing
-          : PlaybackStatus.paused,
+      status: _audio.isPlaying ? PlaybackStatus.playing : PlaybackStatus.paused,
       position: _audio.currentPosition,
       duration: duration.inMilliseconds > 0 ? duration : _knownDuration(song),
     );
@@ -755,7 +753,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   /// The source status a track starts in before it is resolved.
   AudioSourceStatus _initialSourceStatus(Song song) {
-    return song.isRemote ? AudioSourceStatus.streaming : AudioSourceStatus.local;
+    return song.isRemote
+        ? AudioSourceStatus.streaming
+        : AudioSourceStatus.local;
   }
 
   /// The history after the playback moved to [nextUri].

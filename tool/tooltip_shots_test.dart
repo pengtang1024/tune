@@ -31,16 +31,23 @@ void main() {
 /// Without them every word is drawn as a box, and a picture of the app says
 /// nothing about how the app looks.
 Future<void> _loadFaces() async {
-  await _load('Instrument Sans', 'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf');
-  await _load('Noto Sans SC', 'assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf');
+  await _load(
+    'Instrument Sans',
+    'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf',
+  );
+  await _load('Noto Sans SC', 'assets/fonts/NotoSansSC/NotoSansSC-VF.ttf');
   await _load('Fraunces', 'assets/fonts/Fraunces/Fraunces-Variable.ttf');
   await _loadIcons();
 }
 
 Future<void> _load(String family, String path) async {
-  final loader = FontLoader(family);
-  loader.addFont(rootBundle.load(path));
-  await loader.load();
+  try {
+    final loader = FontLoader(family);
+    loader.addFont(rootBundle.load(path));
+    await loader.load();
+  } catch (_) {
+    // A face that is not there is drawn as a box, but the tool still works.
+  }
 }
 
 /// Puts the icons of the framework into the test renderer.
@@ -78,8 +85,9 @@ Future<void> _shoot(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
-  final theme =
-      brightness == Brightness.dark ? CompactTheme.dark : CompactTheme.light;
+  final theme = brightness == Brightness.dark
+      ? CompactTheme.dark
+      : CompactTheme.light;
   final isDark = brightness == Brightness.dark;
 
   await tester.pumpWidget(
@@ -93,9 +101,7 @@ Future<void> _shoot(
             width: 500,
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF191713)
-                  : const Color(0xFFFBF7F0),
+              color: isDark ? const Color(0xFF191713) : const Color(0xFFFBF7F0),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
@@ -123,10 +129,7 @@ Future<void> _shoot(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '夜曲',
-                            style: theme.textTheme.titleLarge,
-                          ),
+                          Text('夜曲', style: theme.textTheme.titleLarge),
                           Text(
                             '某歌手 · 2026',
                             style: theme.textTheme.bodySmall?.copyWith(
@@ -138,10 +141,12 @@ Future<void> _shoot(
                         ],
                       ),
                     ),
-                    IconButton(
-                      tooltip: '播放队列',
-                      icon: const Icon(Icons.queue_music_rounded),
-                      onPressed: () {},
+                    TuneTooltip(
+                      message: '播放队列',
+                      child: IconButton(
+                        icon: const Icon(Icons.queue_music_rounded),
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),
@@ -149,10 +154,12 @@ Future<void> _shoot(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: '上一首',
-                      icon: const Icon(Icons.skip_previous_rounded),
-                      onPressed: () {},
+                    TuneTooltip(
+                      message: '上一首',
+                      child: IconButton(
+                        icon: const Icon(Icons.skip_previous_rounded),
+                        onPressed: () {},
+                      ),
                     ),
                     const SizedBox(width: 8),
                     TuneTooltip(
@@ -163,10 +170,12 @@ Future<void> _shoot(
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      tooltip: '下一首',
-                      icon: const Icon(Icons.skip_next_rounded),
-                      onPressed: () {},
+                    TuneTooltip(
+                      message: '下一首',
+                      child: IconButton(
+                        icon: const Icon(Icons.skip_next_rounded),
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),

@@ -13,6 +13,15 @@ class SettingsState {
   /// Whether the player shows up in the media controls of the system.
   final bool mediaControlsEnabled;
 
+  /// The folder the app writes the files it fetches into.
+  ///
+  /// It is the music library of the machine, unless the user picked another
+  /// folder.
+  final String? libraryFolder;
+
+  /// The music library of the machine.
+  final String defaultLibraryFolder;
+
   const SettingsState({
     this.themeMode = ThemeMode.system,
     this.locale = const Locale('en'),
@@ -21,6 +30,8 @@ class SettingsState {
     this.autoScanOnStartup = true,
     this.closeToTray = true,
     this.mediaControlsEnabled = true,
+    this.libraryFolder,
+    this.defaultLibraryFolder = '',
   });
 
   /// Default music folders plus user folders, de-duplicated.
@@ -36,6 +47,8 @@ class SettingsState {
     bool? autoScanOnStartup,
     bool? closeToTray,
     bool? mediaControlsEnabled,
+    Object? libraryFolder = _unset,
+    String? defaultLibraryFolder,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
@@ -45,6 +58,13 @@ class SettingsState {
       autoScanOnStartup: autoScanOnStartup ?? this.autoScanOnStartup,
       closeToTray: closeToTray ?? this.closeToTray,
       mediaControlsEnabled: mediaControlsEnabled ?? this.mediaControlsEnabled,
+      libraryFolder: identical(libraryFolder, _unset)
+          ? this.libraryFolder
+          : libraryFolder as String?,
+      defaultLibraryFolder: defaultLibraryFolder ?? this.defaultLibraryFolder,
     );
   }
 }
+
+/// The marker that tells a value apart from one that was not given.
+const _unset = Object();

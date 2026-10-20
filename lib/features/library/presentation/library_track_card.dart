@@ -4,6 +4,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/track_meta.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// A track of the library list.
 ///
@@ -89,16 +90,21 @@ class _AddToQueueButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return IconButton(
-      tooltip: context.loc.libraryAddToQueue,
-      onPressed: onPressed,
-      icon: const Icon(Icons.playlist_add_rounded, size: CompactTokens.icon18),
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-      style: IconButton.styleFrom(
-        foregroundColor: theme.colorScheme.onSurfaceVariant,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
+    return TuneTooltip(
+      message: context.loc.libraryAddToQueue,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: const Icon(
+          Icons.playlist_add_rounded,
+          size: CompactTokens.icon18,
+        ),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+        style: IconButton.styleFrom(
+          foregroundColor: theme.colorScheme.onSurfaceVariant,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
       ),
     );
   }

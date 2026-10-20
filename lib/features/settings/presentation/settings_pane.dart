@@ -81,6 +81,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onRemoveFolder: settingsController.removeScanPath,
                   onScan: _scan,
                   onClear: libraryReady && !busy ? _clearLibrary : null,
+                  onChooseLibraryFolder: _pickLibraryFolder,
+                  onResetLibraryFolder: _resetLibraryFolder,
                 ),
                 const SizedBox(height: 14),
                 SettingsDesktopCard(
@@ -89,8 +91,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   isDefaultPlayer: _isDefaultPlayer ?? false,
                   desktopEntryInstalled: _desktopEntryInstalled,
                   onCloseToTrayChanged: settingsController.setCloseToTray,
-                  onMediaControlsChanged: settingsController
-                      .setMediaControlsEnabled,
+                  onMediaControlsChanged:
+                      settingsController.setMediaControlsEnabled,
                   onSetDefaultPlayer: _canSetDefaultPlayer
                       ? _setDefaultPlayer
                       : null,
@@ -114,6 +116,21 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     await ref.read(settingsControllerProvider.notifier).addScanPath(path);
     if (!mounted) return;
     _showMessage(context.loc.settingsFolderAdded);
+  }
+
+  /// Picks the folder the app writes the files it fetches into.
+  Future<void> _pickLibraryFolder() async {
+    final path = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: context.loc.settingsChangeLibraryFolder,
+    );
+    if (path == null || !mounted) return;
+
+    await ref.read(settingsControllerProvider.notifier).setLibraryFolder(path);
+  }
+
+  /// Puts the files back into the music library of the machine.
+  Future<void> _resetLibraryFolder() async {
+    await ref.read(settingsControllerProvider.notifier).setLibraryFolder(null);
   }
 
   Future<void> _scan() async {

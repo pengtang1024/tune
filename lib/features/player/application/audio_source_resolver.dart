@@ -34,9 +34,6 @@ class AudioSourceResolver {
     }
 
     // The track plays from the network while the copy is fetched in parallel.
-    return PlaybackSource(
-      status: AudioSourceStatus.caching,
-      cacheTarget: song,
-    );
+    return PlaybackSource(status: AudioSourceStatus.caching, cacheTarget: song);
   }
 }
