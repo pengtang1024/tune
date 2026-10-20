@@ -23,6 +23,9 @@ class HttpSongDownloadService implements SongDownloadService {
   Future<String?> storedFileFor(Song song) async => null;
 
   @override
+  Future<void> markCopiesOf(Iterable<Song> songs) async {}
+
+  @override
   Future<String> download(
     Song song, {
     void Function(double progress)? onProgress,

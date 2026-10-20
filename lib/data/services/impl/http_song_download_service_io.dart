@@ -72,6 +72,52 @@ class HttpSongDownloadService implements SongDownloadService {
   }
 
   @override
+  Future<void> markCopiesOf(Iterable<Song> songs) async {
+    for (final song in songs) {
+      // Only a track of a source can own a copy, and a track that knows its
+      // copy is marked already.
+      if (!song.hasRemoteSource || song.localPath != null) continue;
+
+      final file = await _storedCopy(song);
+      if (file == null) continue;
+
+      await _storeMarker(song, file);
+    }
+  }
+
+  /// The copy of the track in the folder of the track.
+  ///
+  /// The folder holds the audio, the cover, the lyrics and the marker of one
+  /// track, so the copy is the audio file among them. The format is read
+  /// from the file itself, so a copy that was fetched in another format is
+  /// found as well.
+  Future<File?> _storedCopy(Song song) async {
+    final folder = await _paths.folderFor(song);
+    if (!await folder.exists()) return null;
+
+    final name = _paths.nameFor(song);
+    final List<FileSystemEntity> entries;
+    try {
+      entries = await folder.list().toList();
+    } catch (error, stackTrace) {
+      Log.error('读取曲目目录失败: ${folder.path}\n$stackTrace');
+      return null;
+    }
+
+    for (final entry in entries) {
+      if (entry is! File) continue;
+      if (path.basenameWithoutExtension(entry.path) != name) continue;
+      final extension = path
+          .extension(entry.path)
+          .replaceFirst('.', '')
+          .toLowerCase();
+      if (!_audioExtensions.contains(extension)) continue;
+      return entry;
+    }
+    return null;
+  }
+
+  @override
   Future<String> download(
     Song song, {
     void Function(double progress)? onProgress,

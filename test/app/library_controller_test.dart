@@ -6,6 +6,7 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
+import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -15,6 +16,7 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 
 import '../services/fake_persistence.dart';
+import 'fake_song_download_service.dart';
 
 void main() {
   const songA = Song(
@@ -42,17 +44,20 @@ void main() {
   late FakeLibraryStorage storage;
   late FakeMusicScanner scanner;
   late FakeMusicSourceStore sourceStore;
+  late FakeSongDownloadService downloads;
   late ProviderContainer container;
 
   setUp(() {
     storage = FakeLibraryStorage([songA]);
     scanner = FakeMusicScanner();
     sourceStore = FakeMusicSourceStore();
+    downloads = FakeSongDownloadService();
     container = ProviderContainer(
       overrides: [
         libraryStorageProvider.overrideWithValue(storage),
         crossPlatformMusicScannerProvider.overrideWithValue(scanner),
         musicSourceStoreProvider.overrideWithValue(sourceStore),
+        songDownloadServiceProvider.overrideWithValue(downloads),
         musicSourcesControllerProvider.overrideWith(
           FakeMusicSourcesController.new,
         ),

@@ -3,6 +3,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
+import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/data/library_storage.dart';
@@ -50,6 +51,24 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   }
 
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
+
+  /// Marks the copies of the tracks in the library that are on this machine.
+  ///
+  /// A copy that was fetched before the app kept markers is marked now. The
+  /// music library is then read with the markers in place, and the copy and
+  /// the track it belongs to become one row.
+  Future<void> _markCopies() async {
+    final songs = state.valueOrNull?.songs ?? const <Song>[];
+    if (songs.isEmpty) return;
+
+    try {
+      await ref.read(songDownloadServiceProvider).markCopiesOf(songs);
+    } catch (error, stackTrace) {
+      // A copy that cannot be marked stays a track of its own; the library
+      // still works.
+      Log.error('标记已下载的副本失败: $error\n$stackTrace');
+    }
+  }
 
   /// Runs once after startup, after the cached library is available.
   Future<void> autoScan(List<String> localPaths) async {
@@ -121,6 +140,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         for (final source in enabled) source.id: 0,
       };
       var lastPercent = -1;
+
+      // Copies that were fetched before the app kept markers are marked
+      // before the music library is read, so the scan knows the file is a
+      // copy of a track and not a track of its own.
+      await _markCopies();
 
       void reportProgress(String sourceId, double progress) {
         if (_disposed || generation != _scanGeneration) return;

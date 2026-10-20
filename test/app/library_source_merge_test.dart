@@ -5,6 +5,7 @@ import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
+import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -14,6 +15,7 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 
 import '../services/fake_persistence.dart';
+import 'fake_song_download_service.dart';
 
 void main() {
   const localSong = Song(
@@ -54,10 +56,12 @@ void main() {
 
   late FakeSourceService service;
   late FakeLibraryStorage storage;
+  late FakeSongDownloadService downloads;
 
   setUp(() {
     service = FakeSourceService();
     storage = FakeLibraryStorage([localSong, oldRemoteSong]);
+    downloads = FakeSongDownloadService();
   });
 
   ProviderContainer createContainer({
@@ -70,6 +74,7 @@ void main() {
         libraryStorageProvider.overrideWithValue(storage),
         crossPlatformMusicScannerProvider.overrideWithValue(FakeScanner()),
         musicSourceServiceProvider.overrideWithValue(service),
+        songDownloadServiceProvider.overrideWithValue(downloads),
         musicSourcesControllerProvider.overrideWith(
           () => FakeSourcesController(MusicSourcesState(sources: sources)),
         ),
@@ -152,8 +157,7 @@ void main() {
     await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
     final state = container.read(libraryControllerProvider).requireValue;
-    expect(state.songs.map((song) => song.uri), [localSong.uri]);
-    expect(state.sourceSummaries.containsKey('openverse'), isFalse);
+    expect(state.songs.map((song) => song.uri), [localSong.uri]);    expect(state.sourceSummaries.containsKey('openverse'), isFalse);
   });
 
   test('a copy and the track of its source are one track', () async {
@@ -204,6 +208,31 @@ void main() {
     // What only one side knows is kept.
     expect(merged.streamUrl, oldRemoteSong.streamUrl);
     expect(merged.size, copy.size);
+  });
+
+  test('the copies of the library are marked before it is read', () async {
+    // A copy that was fetched before the app kept markers is marked now, so
+    // the scan of the music library finds it as a copy of its track.
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.success,
+          songs: [localSong],
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.success,
+          songs: [oldRemoteSong],
+        ),
+      },
+    );
+
+    await container.read(libraryControllerProvider.future);
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
+
+    expect(downloads.markedUris, contains(oldRemoteSong.uri));
   });
 }
 

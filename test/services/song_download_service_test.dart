@@ -88,6 +88,47 @@ void main() {
     expect(await CopyMarker.readUri(File(file)), canonicalSong.uri);
   });
 
+  test('a copy that was fetched before is marked', () async {
+    // The copy sits where the app puts it, but nothing names the track it
+    // belongs to: the store marks it now.
+    final file = File(path.join(store.path, 'Artist', 'Two', 'Two.mp3'))
+      ..createSync(recursive: true);
+
+    await service.markCopiesOf([canonicalSong]);
+
+    expect(await CopyMarker.readUri(file), canonicalSong.uri);
+  });
+
+  test('a copy in another format is marked too', () async {
+    // The folder of the track holds the copy; the format of the file is read
+    // from the file itself.
+    final file = File(path.join(store.path, 'Artist', 'Two', 'Two.flac'))
+      ..createSync(recursive: true);
+
+    await service.markCopiesOf([canonicalSong]);
+
+    expect(await CopyMarker.readUri(file), canonicalSong.uri);
+  });
+
+  test('a track that owns no copy is left alone', () async {
+    await service.markCopiesOf([canonicalSong]);
+
+    expect(
+      File(path.join(store.path, 'Artist', 'Two', 'Two.mp3')).existsSync(),
+      isFalse,
+    );
+  });
+
+  test('a track that knows its copy is marked already', () async {
+    final file = File(path.join(store.path, 'Artist', 'Two', 'Two.mp3'))
+      ..createSync(recursive: true);
+    final known = canonicalSong.copyWith(localPath: file.path);
+
+    await service.markCopiesOf([known]);
+
+    expect(await CopyMarker.readUri(file), isNull);
+  });
+
   test('two callers share one transfer', () async {
     adapter.gate = Completer<void>();
     final progress = <double>[];

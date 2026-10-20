@@ -17,6 +17,9 @@ class FakeSongDownloadService implements SongDownloadService {
   /// Uris of the tracks that were fetched during the test run.
   final List<String> downloadedUris = [];
 
+  /// Uris of the tracks whose copies were marked during the test run.
+  final List<String> markedUris = [];
+
   /// Uris of the tracks whose transfer was stopped.
   final List<String> cancelledUris = [];
 
@@ -43,6 +46,11 @@ class FakeSongDownloadService implements SongDownloadService {
 
   @override
   Future<String?> storedFileFor(Song song) async => storedFiles[song.uri];
+
+  @override
+  Future<void> markCopiesOf(Iterable<Song> songs) async {
+    markedUris.addAll(songs.map((song) => song.uri));
+  }
 
   @override
   Future<String> download(

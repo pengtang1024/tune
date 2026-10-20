@@ -15,6 +15,13 @@ abstract class SongDownloadService {
   /// Returns the stored copy of [song] when it was fetched before.
   Future<String?> storedFileFor(Song song);
 
+  /// Marks the copies of [songs] that are on this machine.
+  ///
+  /// A copy that was fetched before the app kept markers is marked now, so
+  /// the library knows that the file is a copy of a track and not a track of
+  /// its own. The tracks that own no copy are left alone.
+  Future<void> markCopiesOf(Iterable<Song> songs);
+
   /// Fetches [song] into the local store and returns the file path.
   ///
   /// [onProgress] reports a value between 0 and 1 while the transfer runs.
