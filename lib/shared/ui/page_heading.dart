@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 
@@ -46,7 +45,7 @@ class PageHeading extends StatelessWidget {
                 title,
                 style: CompactTypography.asDisplay(
                   theme.textTheme.displayMedium,
-                  size: CompactTokens.pageTitleSize,
+                  size: CompactTypeScale.displayLarge,
                   height: 0.95,
                 ),
               ),

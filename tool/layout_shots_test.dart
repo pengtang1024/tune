@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show ImageByteFormat;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show FontLoader;
@@ -78,8 +79,8 @@ Future<void> _loadFonts() async {
     'Fraunces': 'assets/fonts/Fraunces/Fraunces-Variable.ttf',
     'Instrument Sans': 'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf',
     'JetBrains Mono': 'assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf',
-    'Noto Sans SC': 'assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf',
-    'Noto Serif SC': 'assets/fonts/NotoSerifSC/NotoSerifSC-Regular.ttf',
+    'Noto Sans SC': 'assets/fonts/NotoSansSC/NotoSansSC-VF.ttf',
+    'Noto Serif SC': 'assets/fonts/NotoSerifSC/NotoSerifSC-VF.ttf',
   };
   for (final entry in families.entries) {
     final loader = FontLoader(entry.key)
@@ -133,6 +134,14 @@ void main() {
     persistence = FakePersistenceService();
     await _loadFonts();
   });
+
+  // The shots have to show the app as it runs, and the app runs on Linux.
+  // The test suite pretends to be Android, and Android draws with another
+  // density and a padded tap target, so a shot taken without this line
+  // shows buttons that are eight pixels taller than the ones a user sees.
+  //
+  // The override has to be undone inside the body of the test, because the
+  // framework checks its own debug variables before the tear down runs.
 
   Widget app({
     required Widget home,
@@ -267,28 +276,38 @@ void main() {
   }
 
   testWidgets('capture pages', (tester) async {
-    await surface(tester, const Size(1280, 800));
-    await capture(tester, '');
+    await onLinux(() async {
+      await surface(tester, const Size(1280, 800));
+      await capture(tester, '');
+    });
   });
 
   testWidgets('capture pages in the compact width', (tester) async {
-    await surface(tester, const Size(680, 520));
-    await capture(tester, '_narrow');
+    await onLinux(() async {
+      await surface(tester, const Size(680, 520));
+      await capture(tester, '_narrow');
+    });
   });
 
   testWidgets('capture pages in the smallest window', (tester) async {
-    await surface(tester, const Size(900, 563));
-    await capture(tester, '_small');
+    await onLinux(() async {
+      await surface(tester, const Size(900, 563));
+      await capture(tester, '_small');
+    });
   });
 
   testWidgets('capture the search sheet', (tester) async {
-    await surface(tester, const Size(1280, 800));
-    await captureSheets(tester, '');
+    await onLinux(() async {
+      await surface(tester, const Size(1280, 800));
+      await captureSheets(tester, '');
+    });
   });
 
   testWidgets('capture the sheet of a track', (tester) async {
-    await surface(tester, const Size(1280, 800));
-    await captureTrackSheet(tester, '');
+    await onLinux(() async {
+      await surface(tester, const Size(1280, 800));
+      await captureTrackSheet(tester, '');
+    });
   });
 }
 
@@ -306,5 +325,19 @@ class _FakeLibraryController extends LibraryController {
   @override
   void setQuery(String query) {
     state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+  }
+}
+
+/// Runs [body] as if the app ran on the desktop.
+///
+/// The test suite pretends to be Android, and Android draws with another
+/// density and a padded tap target, so the numbers taken without this are
+/// not the numbers the app paints.
+Future<void> onLinux(Future<void> Function() body) async {
+  debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+  try {
+    await body();
+  } finally {
+    debugDefaultTargetPlatformOverride = null;
   }
 }

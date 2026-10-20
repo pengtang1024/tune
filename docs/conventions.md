@@ -15,6 +15,9 @@
 - 改外观先找现成 token，不要在 widget 里现编尺寸。
 - 图标走 `icon12 / icon14 / icon16 / icon18 / icon20 / icon24 / icon28` 这一条两像素一级的梯子：跟正文（`body`）并排的图标取 `icon16`，大按钮里的取 `icon18` 或 `icon20`。
 - 按钮高度走 `controlTiny / controlCompact / controlSmall / controlDefault / controlMedium / controlLarge`。空画面上的插图（`illustration*`）是画不是控件的图标，它有自己的尺寸。
+- **三种按钮共用一个高度**：主题里 `FilledButton` / `OutlinedButton` / `TextButton` 都是 `controlDefault`（34）。它们总是挨着出现（对话框里的取消与确定、卡片里的扫描与清空），高度差一档就会看成失误；主次靠填充色和字重分，不靠高度分。
+- 主题给按钮钉了 `VisualDensity.standard`：桌面的紧凑密度会把按钮的最小高度再减 8 像素，那样 `controlDefault` 34 画出来只有 26，token 就说了假话。
+- 列表行的高度是 `listRowHeight`（56），行内留白由 `listRowPadding` 推出来，别在行里另写 `space8`。
 
 ## 字体
 
@@ -35,7 +38,9 @@
   - `strong` 13.5：曲目标题、卡片标题、主要按钮。
   - `title` 15：一组内容的标题。
   - `heading` 16：浮层与对话框的标题。
+  - 展示体是另一条梯子：`displaySmall` 17 / `displayMedium` 24 / `displayLarge` 38。它比无衬线那一条高一像素起——同样大小的一个宋体和一个黑体读起来就是两种字，所以不用把两条梯子合成一条。
 - **调用点不许写 `fontSize:` 数字**。要某个角色就挑主题里对应的 `textTheme` 角色（`bodySmall`、`labelMedium`、`bodyMedium`……），主题已经把它们接到梯度上。
+- 主题里的 15 个 `textTheme` 角色全部接到梯度上，没有一个角色自己带字号：写死一个数字就等于开了第二条梯度。
 - 要加新档位先想清楚：每多一档就多半个像素要让人记住，而这个界面一次要显示很多字。
 
 ## 加载指示

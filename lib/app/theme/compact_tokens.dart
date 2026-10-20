@@ -54,6 +54,10 @@ abstract final class CompactTokens {
   ///
   /// The shell keeps its buttons dense, so the ladder runs in steps of two
   /// pixels up to the default and then jumps to the roomy ones.
+  ///
+  /// The three kinds of button share [controlDefault]: they stand next to
+  /// each other, and a row that is one step taller on one side reads as a
+  /// mistake.
   static const double controlTiny = 28;
   static const double controlCompact = 30;
   static const double controlSmall = 32;
@@ -76,12 +80,6 @@ abstract final class CompactTokens {
 
   /// Space below the heading of a page, before the toolbar or the list.
   static const double pageHeadingGap = 16;
-
-  /// Size of the title of a page.
-  ///
-  /// Every page of the shell writes its title with this size, so the
-  /// headings of the shell keep one weight.
-  static const double pageTitleSize = 38;
 
   /// Width of the navigation rail, and of its narrow form.
   static const double sidebarWidth = 196;
@@ -124,6 +122,12 @@ abstract final class CompactTokens {
   /// The library and the queue show the same track the same way, so both
   /// rows are this tall and their columns line up with each other.
   static const double listRowHeight = 56;
+
+  /// Space above and below the artwork of a row of a track list.
+  ///
+  /// The row is [listRowHeight] tall and the artwork is [artworkRow], so
+  /// the room around the artwork is what is left of the row.
+  static const double listRowPadding = (listRowHeight - artworkRow) / 2;
 
   /// Width of the column that carries the position of a track.
   static const double positionColumnWidth = 22;

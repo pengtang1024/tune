@@ -15,6 +15,14 @@
 /// The scale is deliberately short. Every extra step is another half pixel
 /// that the eye has to learn, and the shell puts a lot of text on screen at
 /// once.
+///
+/// The scale has two ladders. The lower one is the sans text of the
+/// interface and runs from [markDense] to [heading] in steps of one to one
+/// and a half pixels. The upper one is the serif voice of the shell and
+/// starts a pixel above the top of the lower one: [displaySmall] is a
+/// serif, and a serif next to a sans of the same size reads as a different
+/// kind of text even when the two numbers are equal. A page that needs a
+/// big heading asks the display ladder for it.
 abstract final class CompactTypeScale {
   /// The size of a mark in a place that has little room for it.
   ///
@@ -65,7 +73,8 @@ abstract final class CompactTypeScale {
   ///
   /// The display face is the big serif voice of the shell: it writes the
   /// title of a page, the name of the app and the title of the track that
-  /// plays now. It sits above the scale of the interface text.
+  /// plays now. It sits above the scale of the interface text, so the
+  /// smallest step of it is already a pixel above the biggest sans.
   static const double displaySmall = 17;
   static const double displayMedium = 24;
   static const double displayLarge = 38;

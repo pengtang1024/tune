@@ -55,7 +55,7 @@ class LibraryTrackCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: CompactTokens.space8,
-              vertical: CompactTokens.space8,
+              vertical: CompactTokens.listRowPadding,
             ),
             child: Row(
               children: [

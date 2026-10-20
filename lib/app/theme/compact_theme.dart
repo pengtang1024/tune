@@ -85,14 +85,21 @@ abstract final class CompactTheme {
     // The interface text follows the scale, so a word keeps its size
     // wherever it appears. The display family sits above the scale: it is
     // the big serif voice of the shell and it has a size of its own.
+    //
+    // Every role below points at a step of the scale, including the roles
+    // the shell does not use yet: a number that lives only in this file is
+    // a second scale, and the day somebody picks that role the text of the
+    // app stops belonging to the ladder. The sans ladder ends at [heading],
+    // so the three headline roles share that one size and tell themselves
+    // apart by their weight.
     final textTheme = baseText.copyWith(
-      displayLarge: _display(text, 40, -1.4),
-      displayMedium: _display(text, 34, -1.0),
-      displaySmall: _display(text, 28, -0.6),
-      headlineLarge: _sans(text, 24, FontWeight.w700, -0.5),
-      headlineMedium: _sans(text, 20, FontWeight.w700, -0.3),
+      displayLarge: _display(text, CompactTypeScale.displayLarge, -1.4),
+      displayMedium: _display(text, CompactTypeScale.displayMedium, -1.0),
+      displaySmall: _display(text, CompactTypeScale.displaySmall, -0.6),
+      headlineLarge: _sans(text, CompactTypeScale.heading, FontWeight.w700),
+      headlineMedium: _sans(text, CompactTypeScale.heading, FontWeight.w700),
       headlineSmall: _sans(text, CompactTypeScale.heading, FontWeight.w600),
-      titleLarge: _sans(text, 18, FontWeight.w600, -0.2),
+      titleLarge: _sans(text, CompactTypeScale.title, FontWeight.w600),
       titleMedium: _sans(text, CompactTypeScale.title, FontWeight.w600),
       titleSmall: _sans(text, CompactTypeScale.strong, FontWeight.w600),
       bodyLarge: _sans(text, CompactTypeScale.title, FontWeight.w400),
@@ -123,12 +130,24 @@ abstract final class CompactTheme {
       ),
       dividerTheme: DividerThemeData(color: border, thickness: 1, space: 1),
       iconTheme: IconThemeData(color: muted, size: CompactTokens.icon20),
+      // The three kinds of button share one height.
+      //
+      // They stand next to each other: a cancel and a confirm in a dialog,
+      // a scan and a clear in a card. A row of buttons that is one step
+      // taller on one side reads as a mistake, so the height is a token and
+      // not a number of each kind.
+      //
+      // The density is pinned to the standard one because the compact
+      // density of the desktop takes eight pixels off the height of a
+      // button, and then a token of thirty four paints a button of twenty
+      // six. The token has to mean the size on screen.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: onPrimary,
-          minimumSize: const Size(0, CompactTokens.controlMedium),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          minimumSize: const Size(0, CompactTokens.controlDefault),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          visualDensity: VisualDensity.standard,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
@@ -140,6 +159,7 @@ abstract final class CompactTheme {
           foregroundColor: text,
           minimumSize: const Size(0, CompactTokens.controlDefault),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          visualDensity: VisualDensity.standard,
           side: BorderSide(color: border),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -150,8 +170,9 @@ abstract final class CompactTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: text,
-          minimumSize: const Size(0, CompactTokens.controlSmall),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          minimumSize: const Size(0, CompactTokens.controlDefault),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          visualDensity: VisualDensity.standard,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(9)),
           ),
@@ -207,7 +228,7 @@ abstract final class CompactTheme {
             : const Color(0xFF171512),
         contentTextStyle: _sans(
           isDark ? const Color(0xFF171512) : const Color(0xFFF2EBDD),
-          12.5,
+          CompactTypeScale.body,
           FontWeight.w500,
         ),
         shape: const RoundedRectangleBorder(
@@ -252,7 +273,7 @@ abstract final class CompactTheme {
           borderRadius: BorderRadius.circular(14),
           side: BorderSide(color: border),
         ),
-        textStyle: _sans(text, 13, FontWeight.w500),
+        textStyle: _sans(text, CompactTypeScale.strong, FontWeight.w500),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: primary,
@@ -299,7 +320,7 @@ abstract final class CompactTheme {
           ),
         ],
       ),
-      textStyle: _sans(words, 12, FontWeight.w500),
+      textStyle: _sans(words, CompactTypeScale.label, FontWeight.w500),
     );
   }
 

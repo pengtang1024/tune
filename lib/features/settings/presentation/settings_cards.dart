@@ -37,7 +37,7 @@ class SettingsPageHeader extends StatelessWidget {
                 context.loc.settingsTitle,
                 style: CompactTypography.asDisplay(
                   theme.textTheme.displayMedium,
-                  size: CompactTokens.pageTitleSize,
+                  size: CompactTypeScale.displayLarge,
                   height: 0.95,
                 ),
               ),
