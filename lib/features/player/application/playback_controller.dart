@@ -58,9 +58,18 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   /// How many times a failing track may get a fresh address.
   static const _maxRefreshAttempts = 1;
 
+  /// How many tracks the playback remembers as its past.
+  static const _maxHistory = 50;
+
   String? _loadedSongUri;
   bool _handlingCompletion = false;
   int _loadRequest = 0;
+
+  /// The order the queue had before it was shuffled.
+  ///
+  /// It is dropped as soon as the queue is edited, because the order then
+  /// describes a queue that no longer exists.
+  List<String>? _orderBeforeShuffle;
 
   /// Number of refresh attempts spent on the current track.
   int _refreshAttempts = 0;
@@ -171,29 +180,37 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   // Public playback API
   // ---------------------------------------------------------------------------
 
+  /// Replaces the queue and starts playing [startIndex].
+  ///
+  /// The queue holds every track only once: the cursor is the identity of a
+  /// track, so a track that appears twice would make it ambiguous.
   Future<void> playQueue(List<Song> songs, {int startIndex = 0}) async {
     final playable = <Song>[];
-    var index = 0;
+    final seen = <String>{};
+    var startUri = '';
     var foundStart = false;
     for (var i = 0; i < songs.length; i++) {
       final song = songs[i];
       if (song.uri.isEmpty) continue;
+      if (!seen.add(song.uri)) continue;
       if (!foundStart && i >= startIndex) {
-        index = playable.length;
+        startUri = song.uri;
         foundStart = true;
       }
       playable.add(song);
     }
     if (playable.isEmpty) return;
+    if (!foundStart) startUri = playable.last.uri;
 
     final queue = List<Song>.unmodifiable(playable);
-    if (!foundStart) index = queue.length - 1;
-    index = index.clamp(0, queue.length - 1);
+    final index = queue.indexWhere((song) => song.uri == startUri);
     final song = queue[index];
+
+    _orderBeforeShuffle = null;
     state = state.copyWith(
       queue: queue,
-      currentIndex: index,
-      currentSong: song,
+      currentUri: startUri,
+      history: const [],
       status: PlaybackStatus.loading,
       position: Duration.zero,
       duration: _knownDuration(song),
@@ -202,7 +219,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       downloadProgress: 0,
     );
 
-    await _startAt(index);
+    await _startAt(index, recordHistory: false);
   }
 
   Future<void> playSong(Song song) => playQueue([song]);
@@ -245,22 +262,42 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
   }
 
+  /// Plays the track after the current one.
+  ///
+  /// The queue holds the play order, so a shuffled queue simply plays on.
+  /// The next track is the one the queue hands over to, whatever the mode is.
   Future<void> next() async {
-    if (state.queue.isEmpty) return;
-
-    final index = state.playMode == PlayMode.shuffle
-        ? _randomIndex(excluding: state.currentIndex)
-        : (state.currentIndex + 1) % state.queue.length;
-    await _startAt(index);
+    final queue = state.queue;
+    if (queue.isEmpty) return;
+    final index = state.currentIndex;
+    if (index < 0) {
+      await _startAt(0);
+      return;
+    }
+    await _startAt((index + 1) % queue.length);
   }
 
+  /// Goes back to the track that played before.
+  ///
+  /// The history holds where the playback came from, so a jump is undone
+  /// first. Without history the queue decides, which is what a listener
+  /// expects while the queue plays in order.
   Future<void> previous() async {
     if (state.queue.isEmpty) return;
-
-    final index = state.playMode == PlayMode.shuffle
-        ? _randomIndex(excluding: state.currentIndex)
-        : (state.currentIndex - 1 + state.queue.length) % state.queue.length;
-    await _startAt(index);
+    final target = _popHistory();
+    if (target != null) {
+      await _startAt(target, recordHistory: false);
+      return;
+    }
+    final index = state.currentIndex;
+    if (index < 0) {
+      await _startAt(0);
+      return;
+    }
+    await _startAt(
+      (index - 1 + state.queue.length) % state.queue.length,
+      recordHistory: false,
+    );
   }
 
   Future<void> seekTo(Duration position) async {
@@ -303,10 +340,21 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
   }
 
+  /// Switches to the next play mode.
+  ///
+  /// Switching to shuffle rearranges the queue once, so the list the user
+  /// sees is the order that plays. Switching back restores the order the
+  /// queue had before, unless the queue was edited in the meantime.
   void cyclePlayMode() {
     final nextMode =
         PlayMode.values[(state.playMode.index + 1) % PlayMode.values.length];
-    state = state.copyWith(playMode: nextMode);
+    var queue = state.queue;
+    if (nextMode == PlayMode.shuffle) {
+      queue = _shuffledQueue();
+    } else if (state.playMode == PlayMode.shuffle) {
+      queue = _restoredQueue();
+    }
+    state = state.copyWith(queue: queue, playMode: nextMode);
   }
 
   // ---------------------------------------------------------------------------
@@ -318,13 +366,13 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     if (state.queue.any((item) => item.uri == song.uri)) return;
 
     final queue = List<Song>.unmodifiable([...state.queue, song]);
+    _orderBeforeShuffle = null;
     if (!state.hasTrack) {
       state = state.copyWith(
         queue: queue,
-        currentIndex: 0,
-        currentSong: queue.first,
+        currentUri: song.uri,
         status: PlaybackStatus.paused,
-        duration: _knownDuration(queue.first),
+        duration: _knownDuration(song),
         errorMessage: null,
       );
       return;
@@ -340,19 +388,23 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     final removingCurrent = index == state.currentIndex;
     final removed = state.queue[index];
     final queue = List<Song>.of(state.queue)..removeAt(index);
+    _orderBeforeShuffle = null;
     if (queue.isEmpty) {
       await clearQueue();
       return;
     }
+
+    // A removed track must not come back through the history.
+    final history = state.history
+        .where((uri) => uri != removed.uri)
+        .toList(growable: false);
 
     if (!removingCurrent) {
       // The prefetch of a track that left the queue is not needed anymore.
       _prefetcher.stopIf(removed);
       state = state.copyWith(
         queue: List<Song>.unmodifiable(queue),
-        currentIndex: index < state.currentIndex
-            ? state.currentIndex - 1
-            : state.currentIndex,
+        history: history,
       );
       return;
     }
@@ -361,8 +413,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     final nextSong = queue[nextIndex];
     state = state.copyWith(
       queue: List<Song>.unmodifiable(queue),
-      currentIndex: nextIndex,
-      currentSong: nextSong,
+      history: history,
+      currentUri: nextSong.uri,
       status: PlaybackStatus.paused,
       position: Duration.zero,
       duration: _knownDuration(nextSong),
@@ -371,7 +423,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     _loadedSongUri = null;
 
     if (wasPlaying) {
-      await _startAt(nextIndex);
+      await _startAt(nextIndex, recordHistory: false);
     }
   }
 
@@ -386,24 +438,18 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
     if (targetIndex == oldIndex) return;
 
-    final currentUri = state.currentSong?.uri;
     final queue = List<Song>.of(state.queue);
     final moved = queue.removeAt(oldIndex);
     queue.insert(targetIndex, moved);
+    _orderBeforeShuffle = null;
 
-    final newCurrentIndex = currentUri == null
-        ? state.currentIndex
-        : queue.indexWhere((song) => song.uri == currentUri);
-
-    state = state.copyWith(
-      queue: List<Song>.unmodifiable(queue),
-      currentIndex: newCurrentIndex >= 0 ? newCurrentIndex : state.currentIndex,
-    );
+    state = state.copyWith(queue: List<Song>.unmodifiable(queue));
   }
 
   Future<void> clearQueue() async {
     _loadRequest++;
     _prefetcher.stop();
+    _orderBeforeShuffle = null;
     try {
       await _audio.stop();
     } catch (error, stackTrace) {
@@ -412,12 +458,12 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
     _loadedSongUri = null;
     state = state.copyWith(
-      currentSong: null,
       status: PlaybackStatus.idle,
       position: Duration.zero,
       duration: Duration.zero,
       queue: const [],
-      currentIndex: -1,
+      currentUri: null,
+      history: const [],
       errorMessage: null,
       audioSourceStatus: AudioSourceStatus.local,
       downloadProgress: 0,
@@ -436,9 +482,13 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   ///
   /// [startPosition] is where the playback continues, which matters when a
   /// broken stream is replaced by a fresh address.
+  ///
+  /// [recordHistory] tells whether the track the playback came from belongs
+  /// into the history. A track that is left behind on purpose does not.
   Future<void> _startAt(
     int index, {
     bool isRetry = false,
+    bool recordHistory = true,
     Duration startPosition = Duration.zero,
   }) async {
     if (index < 0 || index >= state.queue.length) return;
@@ -453,14 +503,14 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     );
 
     state = state.copyWith(
-      currentIndex: index,
-      currentSong: song,
+      currentUri: song.uri,
       status: PlaybackStatus.loading,
       position: startPosition,
       duration: _knownDuration(song),
       errorMessage: null,
       audioSourceStatus: _initialSourceStatus(song),
       downloadProgress: 0,
+      history: _historyAfterSwitch(song.uri, recordHistory),
     );
 
     try {
@@ -642,13 +692,71 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     return song.isRemote ? AudioSourceStatus.streaming : AudioSourceStatus.local;
   }
 
-  int _randomIndex({required int excluding}) {
-    if (state.queue.length <= 1) return state.currentIndex;
-    var index = _random.nextInt(state.queue.length);
-    while (index == excluding) {
-      index = _random.nextInt(state.queue.length);
+  /// The history after the playback moved to [nextUri].
+  ///
+  /// The track the playback came from is remembered, so the previous button
+  /// can lead back to it. A track that stays the same is not a switch.
+  List<String> _historyAfterSwitch(String nextUri, bool record) {
+    final previousUri = state.currentUri;
+    if (!record || previousUri == null || previousUri == nextUri) {
+      return state.history;
     }
-    return index;
+    final history = [...state.history, previousUri];
+    if (history.length > _maxHistory) {
+      history.removeRange(0, history.length - _maxHistory);
+    }
+    return List<String>.unmodifiable(history);
+  }
+
+  /// The track the previous button leads back to.
+  ///
+  /// Entries whose track left the queue are dropped: a deleted track must
+  /// not come back.
+  int? _popHistory() {
+    final remaining = List<String>.of(state.history);
+    var target = -1;
+    while (target < 0 && remaining.isNotEmpty) {
+      final uri = remaining.removeLast();
+      final index = state.queue.indexWhere((song) => song.uri == uri);
+      if (index >= 0) target = index;
+    }
+    state = state.copyWith(history: List<String>.unmodifiable(remaining));
+    return target < 0 ? null : target;
+  }
+
+  /// The queue with a new random order, so the list the user sees is the
+  /// order that plays.
+  List<Song> _shuffledQueue() {
+    final queue = List<Song>.of(state.queue);
+    if (queue.length < 2) return List<Song>.unmodifiable(queue);
+
+    _orderBeforeShuffle = queue.map((song) => song.uri).toList();
+    for (var i = queue.length - 1; i > 0; i--) {
+      final j = _random.nextInt(i + 1);
+      final moved = queue[i];
+      queue[i] = queue[j];
+      queue[j] = moved;
+    }
+    return List<Song>.unmodifiable(queue);
+  }
+
+  /// The queue in the order it had before the shuffle.
+  ///
+  /// The order is only restored when the queue still holds the same tracks:
+  /// an edited queue keeps the order the user gave it.
+  List<Song> _restoredQueue() {
+    final order = _orderBeforeShuffle;
+    _orderBeforeShuffle = null;
+    if (order == null) return state.queue;
+
+    final byUri = {for (final song in state.queue) song.uri: song};
+    final restored = <Song>[];
+    for (final uri in order) {
+      final song = byUri[uri];
+      if (song == null) return state.queue;
+      restored.add(song);
+    }
+    return List<Song>.unmodifiable(restored);
   }
 
   Duration _knownDuration(Song song) {

@@ -8,15 +8,27 @@ const Object _keep = Object();
 
 /// Single source of truth for playback, including the queue.
 class PlaybackState {
-  final Song? currentSong;
   final PlaybackStatus status;
   final Duration position;
   final Duration duration;
   final double volume;
   final double speed;
   final PlayMode playMode;
+
+  /// The queue, in the order it plays.
+  ///
+  /// The list order is the play order: a shuffled queue is a queue that was
+  /// rearranged once, so the user sees which track plays next.
   final List<Song> queue;
-  final int currentIndex;
+
+  /// The cursor: the identity of the track that plays, not its position.
+  ///
+  /// The position follows from the queue, so adding, removing or moving a
+  /// track never leaves the cursor pointing at the wrong entry.
+  final String? currentUri;
+
+  /// The tracks that played before, most recent last.
+  final List<String> history;
   final String? errorMessage;
 
   /// Where the audio of [currentSong] is read from.
@@ -26,7 +38,6 @@ class PlaybackState {
   final double downloadProgress;
 
   const PlaybackState({
-    this.currentSong,
     this.status = PlaybackStatus.idle,
     this.position = Duration.zero,
     this.duration = Duration.zero,
@@ -34,13 +45,27 @@ class PlaybackState {
     this.speed = 1.0,
     this.playMode = PlayMode.sequential,
     this.queue = const [],
-    this.currentIndex = -1,
+    this.currentUri,
+    this.history = const [],
     this.errorMessage,
     this.audioSourceStatus = AudioSourceStatus.local,
     this.downloadProgress = 0,
   });
 
   static const PlaybackState initial = PlaybackState();
+
+  /// The track that plays.
+  Song? get currentSong {
+    final index = currentIndex;
+    return index < 0 ? null : queue[index];
+  }
+
+  /// The position of the playing track in the queue.
+  ///
+  /// It is -1 when the track is not part of the queue, which happens while the
+  /// queue is replaced.
+  int get currentIndex =>
+      currentUri == null ? -1 : queue.indexWhere((song) => song.uri == currentUri);
 
   bool get isPlaying => status == PlaybackStatus.playing;
   bool get isLoading => status == PlaybackStatus.loading;
@@ -60,7 +85,6 @@ class PlaybackState {
   }
 
   PlaybackState copyWith({
-    Object? currentSong = _keep,
     PlaybackStatus? status,
     Duration? position,
     Duration? duration,
@@ -68,15 +92,13 @@ class PlaybackState {
     double? speed,
     PlayMode? playMode,
     List<Song>? queue,
-    int? currentIndex,
+    Object? currentUri = _keep,
+    List<String>? history,
     Object? errorMessage = _keep,
     AudioSourceStatus? audioSourceStatus,
     double? downloadProgress,
   }) {
     return PlaybackState(
-      currentSong: identical(currentSong, _keep)
-          ? this.currentSong
-          : currentSong as Song?,
       status: status ?? this.status,
       position: position ?? this.position,
       duration: duration ?? this.duration,
@@ -84,7 +106,10 @@ class PlaybackState {
       speed: speed ?? this.speed,
       playMode: playMode ?? this.playMode,
       queue: queue ?? this.queue,
-      currentIndex: currentIndex ?? this.currentIndex,
+      currentUri: identical(currentUri, _keep)
+          ? this.currentUri
+          : currentUri as String?,
+      history: history ?? this.history,
       errorMessage: identical(errorMessage, _keep)
           ? this.errorMessage
           : errorMessage as String?,

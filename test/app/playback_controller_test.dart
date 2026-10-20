@@ -42,6 +42,15 @@ void main() {
     uri: '/music/c.mp3',
   );
 
+  const songD = Song(
+    id: 4,
+    title: 'Delta',
+    artist: 'Artist D',
+    album: 'Album D',
+    duration: 80000,
+    uri: '/music/d.mp3',
+  );
+
   const remoteSong = Song(
     id: 5,
     title: 'Remote',
@@ -225,6 +234,125 @@ void main() {
       expect(audio.playedSong, songA);
     },
   );
+
+  group('queue model', () {
+    test('the current track is kept by identity', () async {
+      await controller.playQueue([songA, songB, songC]);
+      await controller.playAt(2);
+
+      await controller.removeFromQueue(0);
+
+      expect(controller.state.currentSong, songC);
+      expect(controller.state.currentIndex, 1);
+    });
+
+    test('the current track follows a reorder', () async {
+      await controller.playQueue([songA, songB, songC]);
+      await controller.playAt(1);
+
+      controller.reorderQueue(2, 0);
+
+      expect(controller.state.currentSong, songB);
+      expect(controller.state.currentIndex, 2);
+    });
+
+    test('removing the last track switches to the new last one', () async {
+      await controller.playQueue([songA, songB, songC]);
+      await controller.playAt(2);
+
+      await controller.removeFromQueue(2);
+
+      expect(controller.state.currentSong, songB);
+      expect(controller.state.currentIndex, 1);
+      expect(audio.playedSong, songB);
+    });
+
+    test('shuffle rearranges the queue and keeps the current track', () async {
+      await controller.playQueue([songA, songB, songC]);
+
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+
+      expect(controller.state.playMode, PlayMode.shuffle);
+      expect(controller.state.queue.toSet(), {songA, songB, songC});
+      expect(controller.state.currentSong, songA);
+    });
+
+    test('switching back to sequential restores the order', () async {
+      await controller.playQueue([songA, songB, songC]);
+      final order = controller.state.queue;
+
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+
+      expect(controller.state.playMode, PlayMode.sequential);
+      expect(controller.state.queue, order);
+    });
+
+    test('an edited queue keeps the order the user gave it', () async {
+      await controller.playQueue([songA, songB, songC]);
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+      controller.reorderQueue(0, 2);
+      final edited = controller.state.queue;
+
+      controller.cyclePlayMode();
+
+      expect(controller.state.queue, edited);
+    });
+
+    test('the previous button leads back to the track before', () async {
+      await controller.playQueue([songA, songB, songC, songD]);
+      await controller.playAt(3);
+
+      await controller.previous();
+
+      expect(audio.playedSong, songA);
+      expect(controller.state.currentSong, songA);
+    });
+
+    test('without history the previous button walks the queue', () async {
+      await controller.playQueue([songA, songB, songC], startIndex: 1);
+
+      await controller.previous();
+
+      expect(audio.playedSong, songA);
+    });
+
+    test('a new queue clears the history', () async {
+      await controller.playQueue([songA, songB, songC, songD]);
+      await controller.playAt(3);
+      expect(controller.state.history, isNotEmpty);
+
+      await controller.playQueue([songA, songB]);
+
+      expect(controller.state.history, isEmpty);
+    });
+
+    test('a track appears in the queue only once', () async {
+      await controller.playQueue([songA, songB, songA]);
+
+      expect(controller.state.queue, [songA, songB]);
+      expect(controller.state.currentSong, songA);
+    });
+
+    test('the prefetch follows the queue order', () async {
+      await controller.playQueue([remoteSong, remoteSongB, remoteSongC]);
+      await pumpEventQueue();
+      expect(downloads.downloadedUris, contains(remoteSongB.uri));
+
+      controller.cyclePlayMode();
+      controller.cyclePlayMode();
+      await controller.next();
+      await pumpEventQueue();
+
+      final queue = controller.state.queue;
+      final successor = queue[
+          (controller.state.currentIndex + 1) % queue.length];
+      expect(downloads.downloadedUris, contains(successor.uri));
+    });
+  });
 
   group('local sources', () {
     test('a local track plays straight from disk', () async {
