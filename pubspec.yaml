@@ -131,6 +131,12 @@ flutter:
     - family: Instrument Sans
       fonts:
         - asset: assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf
+    - family: Noto Sans SC
+      fonts:
+        - asset: assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf
+    - family: Noto Serif SC
+      fonts:
+        - asset: assets/fonts/NotoSerifSC/NotoSerifSC-Regular.ttf
     - family: JetBrains Mono
       fonts:
         - asset: assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf

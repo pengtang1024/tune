@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 
 /// The visual language for Tune.
 ///
 /// Warm paper and ink in light mode, almost-black espresso in dark mode, and a
 /// single vermilion accent. Display type is Fraunces; UI text is Instrument
 /// Sans; timestamps and metadata use JetBrains Mono.
+///
+/// Those three faces carry Latin glyphs only, so every style also names a CJK
+/// family to fall back on. See [CompactTypography].
 abstract final class CompactTheme {
   static const Color accent = Color(0xFFE6532F);
   static const Color accentDark = Color(0xFFFF6B48);
@@ -72,7 +76,8 @@ abstract final class CompactTheme {
         .apply(
           bodyColor: text,
           displayColor: text,
-          fontFamily: 'Instrument Sans',
+          fontFamily: CompactTypography.sansFamily,
+          fontFamilyFallback: CompactTypography.sansFallback,
         );
 
     final textTheme = baseText.copyWith(
@@ -99,7 +104,8 @@ abstract final class CompactTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
       canvasColor: background,
-      fontFamily: 'Instrument Sans',
+      fontFamily: CompactTypography.sansFamily,
+      fontFamilyFallback: CompactTypography.sansFallback,
       textTheme: textTheme,
       dividerColor: border,
       splashFactory: InkSparkle.splashFactory,
@@ -269,23 +275,20 @@ abstract final class CompactTheme {
     FontWeight weight, [
     double letterSpacing = 0,
   ]) {
-    return TextStyle(
-      fontFamily: 'Instrument Sans',
-      fontSize: size,
-      fontWeight: weight,
+    return CompactTypography.sans(
+      color,
+      size: size,
+      weight: weight,
       letterSpacing: letterSpacing,
-      color: color,
       height: 1.3,
     );
   }
 
   static TextStyle _display(Color color, double size, double letterSpacing) {
-    return TextStyle(
-      fontFamily: 'Fraunces',
-      fontSize: size,
-      fontWeight: FontWeight.w600,
+    return CompactTypography.display(
+      color,
+      size: size,
       letterSpacing: letterSpacing,
-      color: color,
       height: 0.98,
     );
   }

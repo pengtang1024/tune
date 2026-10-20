@@ -14,6 +14,12 @@
 - 颜色走 `Theme.of(context)` 或 `CompactTheme`（`lib/app/theme/compact_theme.dart`），不写裸色值与魔法数。
 - 改外观先找现成 token，不要在 widget 里现编尺寸。
 
+## 字体
+
+- 字体的唯一入口是 `CompactTypography`（`lib/app/theme/compact_typography.dart`）：拉丁三个脸 Fraunces / Instrument Sans / JetBrains Mono 只带拉丁字形，中文靠回退家族接上。
+- 中文用随包发布的思源黑体（`Noto Sans SC`）与思源宋体（`Noto Serif SC`），标题走宋体、正文走黑体；不要依赖系统装了什么字体，也不要在 widget 里写 `fontFamily`。
+- 需要新样式就调 `CompactTypography.sans` / `display` / `mono` / `asDisplay`，不要在调用点直接 `TextStyle(fontFamily: ...)`。
+
 ## 常量
 
 - 偏好键名等放 `lib/core/constants/app_preferences_constants.dart`。
