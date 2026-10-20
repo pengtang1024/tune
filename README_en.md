@@ -1,6 +1,6 @@
 # Tune
 
-[中文](README.md) · [English](README_en.md) · [日本語](README_ja.md) · [한국어](README_ko.md) · [Русский](README_ru.md)
+[中文](README.md) · [English](README_en.md)
 
 Tune is a compact local and online music player built with Flutter. A persistent player occupies the left pane, while the right pane switches between library, queue, and settings.
 

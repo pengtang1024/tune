@@ -1,6 +1,6 @@
 # Tune
 
-[中文](README.md) · [English](README_en.md) · [日本語](README_ja.md) · [한국어](README_ko.md) · [Русский](README_ru.md)
+[中文](README.md) · [English](README_en.md)
 
 Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。界面采用双栏布局：左侧常驻播放器，右侧在音乐库、播放队列和设置之间切换。
 
