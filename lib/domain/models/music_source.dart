@@ -70,9 +70,13 @@ class MusicSourceField {
 
 /// The id and the name of a new instance of [type].
 ///
-/// Instances of one type are told apart by a number: the first is `type:1`,
-/// the next is `type:2`. The number is the smallest one not in use, so
+/// Instances of one type are told apart by a number: the first is `type-1`,
+/// the next is `type-2`. The number is the smallest one not in use, so
 /// deleting an instance does not push the others around.
+///
+/// The number is joined with a dash and not with a colon: the id of an
+/// instance is the host of the `tune://` address of its tracks, and a colon
+/// in a host reads as the port.
 ///
 /// The name is what the reader sees. An empty name falls back to the name of
 /// the type and the number of the instance, so two instances of one type
@@ -97,14 +101,14 @@ class MusicSourceField {
 
   final trimmed = name.trim();
   return (
-    id: '$type:$number',
+    id: '$type-$number',
     name: trimmed.isEmpty ? '$typeName $number' : trimmed,
   );
 }
 
 /// The number in the id of an instance, when the id carries one.
 int? _instanceNumber(String id) {
-  final separator = id.indexOf(':');
+  final separator = id.lastIndexOf('-');
   if (separator < 0) return null;
   return int.tryParse(id.substring(separator + 1));
 }

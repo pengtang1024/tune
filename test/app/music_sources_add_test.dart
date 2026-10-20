@@ -84,7 +84,7 @@ void main() {
     expect(find.text('我添加的'), findsOneWidget);
     expect(find.text('深夜爵士'), findsOneWidget);
     expect(
-      find.byKey(const ValueKey('source-switch-openverse:1')),
+      find.byKey(const ValueKey('source-switch-openverse-1')),
       findsOneWidget,
     );
   });
@@ -92,7 +92,7 @@ void main() {
   testWidgets('the reader removes an instance and its tracks', (tester) async {
     persistence.values['music_sources_v1'] = jsonEncode([
       {
-        'id': 'openverse:1',
+        'id': 'openverse-1',
         'type': 'openverse',
         'name': '深夜爵士',
         'kind': 'custom',
@@ -106,7 +106,7 @@ void main() {
 
     expect(find.text('深夜爵士'), findsOneWidget);
 
-    final menu = find.byKey(const ValueKey('source-menu-openverse:1'));
+    final menu = find.byKey(const ValueKey('source-menu-openverse-1'));
     await tester.ensureVisible(menu);
     await tester.pumpAndSettle();
     await tester.tap(menu);
@@ -118,7 +118,7 @@ void main() {
 
     // The source is gone, and the tracks it brought in went with it.
     expect(find.text('深夜爵士'), findsNothing);
-    expect(library.dropped, ['openverse:1']);
+    expect(library.dropped, ['openverse-1']);
   });
 
   group('the id of a new instance', () {
@@ -130,13 +130,13 @@ void main() {
         sources: const [],
       );
 
-      expect(instance.id, 'subsonic:1');
+      expect(instance.id, 'subsonic-1');
       expect(instance.name, 'Subsonic 1');
     });
 
     test('the next instance of a type takes the next number', () {
       const first = MusicSourceConfig(
-        id: 'subsonic:1',
+        id: 'subsonic-1',
         type: 'subsonic',
         name: '家',
         kind: MusicSourceKind.custom,
@@ -149,12 +149,12 @@ void main() {
         sources: const [first],
       );
 
-      expect(instance.id, 'subsonic:2');
+      expect(instance.id, 'subsonic-2');
     });
 
     test('another type does not take a number', () {
       const other = MusicSourceConfig(
-        id: 'podcast_rss:1',
+        id: 'podcast_rss-1',
         type: 'podcast_rss',
         name: '播客',
         kind: MusicSourceKind.custom,
@@ -167,7 +167,7 @@ void main() {
         sources: const [other],
       );
 
-      expect(instance.id, 'subsonic:1');
+      expect(instance.id, 'subsonic-1');
     });
 
     test('the name the reader gives is kept', () {

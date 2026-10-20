@@ -33,7 +33,7 @@ MusicSourceType（类型 · 代码）
         │
         ▼
 MusicSourceConfig（实例 · 数据）
-  ├─ id: 'rss:1'                  实例唯一 id
+  ├─ id: 'rss-1'                  实例唯一 id
   ├─ type: 'rss'                  指向类型
   ├─ name / description
   ├─ kind
@@ -172,17 +172,20 @@ Jamendo 可以有一个走排行的、一个走检索「ambient」的；Subsonic
 | 来源 | id 规则 | 例子 |
 | --- | --- | --- |
 | 内置实例 | 沿用现有 id | `local`、`subsonic` |
-| 用户实例 | `<type>:<序号>`，同类型内递增 | `rss:1`、`subsonic:1` |
+| 用户实例 | `<type>-<序号>`，同类型内递增 | `rss-1`、`subsonic-1` |
 
 id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因此歌曲的 `sourceId`
 与 `tune://<sourceId>/<externalId>` 身份标识不受影响。
+
+序号用短横线跟类型分开，不��冒号：实例 id 是曲目 `tune://` 地址的主机名，
+主机名里的冒号读起来是端口号，地址就散了。
 
 ### 4.2 持久化
 
 `music_sources_v1` 的每条配置增加两个字段：
 
 ```json
-{ "id": "rss:1", "type": "rss", "builtIn": false, "kind": "openApi", ... }
+{ "id": "rss-1", "type": "rss", "builtIn": false, "kind": "openApi", ... }
 ```
 
 读取规则：
