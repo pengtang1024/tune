@@ -742,6 +742,48 @@ abstract class AppLocalizations {
   /// **'填写音频地址，一行一条'**
   String get directUrlHint;
 
+  /// No description provided for @sourceM3uName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表'**
+  String get sourceM3uName;
+
+  /// No description provided for @sourceM3uDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读一个 .m3u 或 .pls 播放列表，条目变成曲目'**
+  String get sourceM3uDescription;
+
+  /// No description provided for @m3uFieldPlaylist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表地址'**
+  String get m3uFieldPlaylist;
+
+  /// No description provided for @m3uFieldPlaylistHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://example.com/list.m3u'**
+  String get m3uFieldPlaylistHint;
+
+  /// No description provided for @m3uHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写播放列表地址'**
+  String get m3uHint;
+
+  /// No description provided for @m3uEmptyPlaylist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表是空的'**
+  String get m3uEmptyPlaylist;
+
+  /// No description provided for @m3uNoEntries.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放列表里没有条目'**
+  String get m3uNoEntries;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

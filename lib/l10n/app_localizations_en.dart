@@ -392,6 +392,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get directUrlHint => 'Fill in the audio addresses, one per line';
 
   @override
+  String get sourceM3uName => 'Playlist';
+
+  @override
+  String get sourceM3uDescription =>
+      'Read an .m3u or .pls playlist; every entry becomes a track';
+
+  @override
+  String get m3uFieldPlaylist => 'Playlist address';
+
+  @override
+  String get m3uFieldPlaylistHint => 'e.g. https://example.com/list.m3u';
+
+  @override
+  String get m3uHint => 'Fill in the address of the playlist';
+
+  @override
+  String get m3uEmptyPlaylist => 'The playlist is empty';
+
+  @override
+  String get m3uNoEntries => 'The playlist has no entries';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

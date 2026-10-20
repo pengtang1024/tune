@@ -368,6 +368,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get directUrlHint => '填写音频地址，一行一条';
 
   @override
+  String get sourceM3uName => '播放列表';
+
+  @override
+  String get sourceM3uDescription => '读一个 .m3u 或 .pls 播放列表，条目变成曲目';
+
+  @override
+  String get m3uFieldPlaylist => '播放列表地址';
+
+  @override
+  String get m3uFieldPlaylistHint => '例如 https://example.com/list.m3u';
+
+  @override
+  String get m3uHint => '填写播放列表地址';
+
+  @override
+  String get m3uEmptyPlaylist => '播放列表是空的';
+
+  @override
+  String get m3uNoEntries => '播放列表里没有条目';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -1795,6 +1816,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get directUrlHint => '填写音频地址，一行一条';
 
   @override
+  String get sourceM3uName => '播放列表';
+
+  @override
+  String get sourceM3uDescription => '读一个 .m3u 或 .pls 播放列表，条目变成曲目';
+
+  @override
+  String get m3uFieldPlaylist => '播放列表地址';
+
+  @override
+  String get m3uFieldPlaylistHint => '例如 https://example.com/list.m3u';
+
+  @override
+  String get m3uHint => '填写播放列表地址';
+
+  @override
+  String get m3uEmptyPlaylist => '播放列表是空的';
+
+  @override
+  String get m3uNoEntries => '播放列表里没有条目';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3220,6 +3262,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get directUrlHint => '填寫音訊位址，一行一條';
+
+  @override
+  String get sourceM3uName => '播放清單';
+
+  @override
+  String get sourceM3uDescription => '讀一個 .m3u 或 .pls 播放清單，條目變成曲目';
+
+  @override
+  String get m3uFieldPlaylist => '播放清單網址';
+
+  @override
+  String get m3uFieldPlaylistHint => '例如 https://example.com/list.m3u';
+
+  @override
+  String get m3uHint => '填寫播放清單網址';
+
+  @override
+  String get m3uEmptyPlaylist => '播放清單是空的';
+
+  @override
+  String get m3uNoEntries => '播放清單裡沒有條目';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

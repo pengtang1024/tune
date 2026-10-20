@@ -71,6 +71,28 @@ class SourceSongFactory {
     );
   }
 
+  /// The name of the file an address points at.
+  ///
+  /// The name without its extension: a track list reads better with "Song"
+  /// than with "Song.mp3". An address without a file name is named after
+  /// the host it points at.
+  static String titleFromUrl(String url) {
+    final parsed = Uri.tryParse(url);
+    if (parsed == null) return url;
+
+    final segments = parsed.pathSegments
+        .where((segment) => segment.isNotEmpty)
+        .toList(growable: false);
+    if (segments.isEmpty) {
+      return parsed.host.isEmpty ? url : parsed.host;
+    }
+
+    final name = segments.last;
+    final dot = name.lastIndexOf('.');
+    if (dot <= 0) return name;
+    return name.substring(0, dot);
+  }
+
   /// Deterministic 31-bit hash so persisted ids survive restarts.
   static int stableId(String value) {
     var hash = 0x811c9dc5;

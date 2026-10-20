@@ -203,6 +203,10 @@ void main() {
         addable.where((type) => type.type == 'direct_url'),
         hasLength(1),
       );
+      expect(
+        addable.where((type) => type.type == 'm3u'),
+        hasLength(1),
+      );
     });
   });
 

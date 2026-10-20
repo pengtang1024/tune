@@ -143,6 +143,12 @@ class SourceTypeCatalogue {
         description: strings.sourceDirectUrlDescription,
         kind: MusicSourceKind.custom,
       ),
+      SourceTypeDescriptor(
+        type: 'm3u',
+        name: strings.sourceM3uName,
+        description: strings.sourceM3uDescription,
+        kind: MusicSourceKind.custom,
+      ),
     ];
   }
 

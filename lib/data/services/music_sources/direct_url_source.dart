@@ -78,30 +78,9 @@ class DirectUrlSourceAdapter extends MusicSourceAdapter {
         SourceSongFactory.create(
           sourceId: sourceId,
           externalId: address,
-          title: titleOf(address),
+          title: SourceSongFactory.titleFromUrl(address),
           streamUrl: address,
         ),
     ];
-  }
-
-  /// The name of the track an address points at.
-  ///
-  /// The name of the file without its extension: a track list reads better
-  /// with "Song" than with "Song.mp3".
-  static String titleOf(String address) {
-    final parsed = Uri.tryParse(address);
-    if (parsed == null) return address;
-
-    final segments = parsed.pathSegments
-        .where((segment) => segment.isNotEmpty)
-        .toList(growable: false);
-    if (segments.isEmpty) {
-      return parsed.host.isEmpty ? address : parsed.host;
-    }
-
-    final name = segments.last;
-    final dot = name.lastIndexOf('.');
-    if (dot <= 0) return name;
-    return name.substring(0, dot);
   }
 }

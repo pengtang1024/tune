@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/direct_url_source.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 
 /// The reader brings the tracks along by their address.
@@ -67,25 +68,25 @@ ftp://example.com/c.mp3
 
     test('the title of an address without a file name is the host', () {
       expect(
-        DirectUrlSourceAdapter.titleOf('https://example.com'),
+        SourceSongFactory.titleFromUrl('https://example.com'),
         'example.com',
       );
       expect(
-        DirectUrlSourceAdapter.titleOf('https://example.com/'),
+        SourceSongFactory.titleFromUrl('https://example.com/'),
         'example.com',
       );
     });
 
     test('the title of an address with a path is the last name in it', () {
       expect(
-        DirectUrlSourceAdapter.titleOf('https://example.com/stream?id=1'),
+        SourceSongFactory.titleFromUrl('https://example.com/stream?id=1'),
         'stream',
       );
     });
 
     test('the title keeps the name of the file without its extension', () {
       expect(
-        DirectUrlSourceAdapter.titleOf('https://example.com/music/01%20Song.mp3'),
+        SourceSongFactory.titleFromUrl('https://example.com/music/01%20Song.mp3'),
         '01 Song',
       );
     });
