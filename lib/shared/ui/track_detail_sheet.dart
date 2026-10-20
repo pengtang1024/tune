@@ -8,8 +8,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/track_address_row.dart';
 import 'package:tune/shared/ui/track_facts.dart';
-import 'package:tune/shared/ui/track_path_row.dart';
 
 /// Shows everything that is known about a track.
 ///
@@ -69,13 +69,50 @@ class _TrackDetailSheet extends StatelessWidget {
                   ),
               ],
             ),
-            if (song.uri.isNotEmpty) ...[
-              const SizedBox(height: 18),
-              TrackPathRow(uri: song.uri),
-            ],
+            const SizedBox(height: 18),
+            _Addresses(song: song),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The addresses of the track: the file it lives in and the address it is
+/// played from.
+///
+/// A track that was fetched has both: the copy on this machine and the
+/// address of the source it came from.
+class _Addresses extends StatelessWidget {
+  final Song song;
+
+  const _Addresses({required this.song});
+
+  @override
+  Widget build(BuildContext context) {
+    final file = song.localFile;
+    final online = song.onlineAddress;
+    if (file == null && online == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (file != null) ...[
+          TrackAddressRow(
+            address: file,
+            label: context.loc.trackFactPath,
+            copyHint: context.loc.trackDetailsCopyPath,
+          ),
+          if (online != null) const SizedBox(height: 14),
+        ],
+        if (online != null)
+          TrackAddressRow(
+            address: online,
+            label: context.loc.trackFactAddress,
+            copyHint: context.loc.trackDetailsCopyAddress,
+          ),
+      ],
     );
   }
 }

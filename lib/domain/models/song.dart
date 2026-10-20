@@ -253,17 +253,36 @@ class Song {
     return scheme == 'file';
   }
 
-  /// Whether the audio of this track is on this machine.
+  /// The file that holds the audio of this track, when there is one.
   ///
   /// A local track is its own file. A remote track owns a file once it was
   /// fetched to the disk, and that file is remembered in [localPath].
-  bool get hasLocalFile => localPath != null || isLocalFile;
+  String? get localFile {
+    final file = localPath;
+    if (file != null && file.isNotEmpty) return file;
+    return isLocalFile ? uri : null;
+  }
+
+  /// Whether the audio of this track is on this machine.
+  bool get hasLocalFile => localFile != null;
 
   /// Whether the track comes from a remote source.
   ///
   /// A track that was fetched keeps the identity of its source, so it stays a
   /// remote track even when a copy of it is on this machine.
   bool get hasRemoteSource => uri.isNotEmpty && !isLocalFile;
+
+  /// The address the track is played from over the network.
+  ///
+  /// A track that lives on this machine as its own file has no address: it is
+  /// played from the file. A track from a source is played from the address
+  /// that source gives it.
+  String? get onlineAddress {
+    if (isLocalFile) return null;
+    final url = streamUrl;
+    if (url != null && url.isNotEmpty) return url;
+    return uri.isEmpty ? null : uri;
+  }
 
   /// Combines two entries of the same track.
   ///

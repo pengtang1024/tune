@@ -1526,10 +1526,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackFactPath => 'File path';
 
   @override
+  String get trackFactAddress => 'Address';
+
+  @override
   String get trackDetailsTooltip => 'Details';
 
   @override
   String get trackDetailsCopyPath => 'Copy path';
+
+  @override
+  String get trackDetailsCopyAddress => 'Copy address';
 
   @override
   String get trackDetailsCopied => 'Copied to the clipboard';

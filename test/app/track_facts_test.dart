@@ -14,6 +14,7 @@ import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
 import '../services/fake_persistence.dart';
@@ -215,6 +216,72 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the details of a fetched track name the file and the address', (
+    tester,
+  ) async {
+    // The track knows the file of its copy and the address of its source, so
+    // the details sheet writes both down.
+    const copy = Song(
+      id: 2,
+      title: '远方的歌',
+      artist: '远方歌手',
+      uri: 'tune://openverse/abc',
+      sourceId: 'openverse',
+      externalId: 'abc',
+      streamUrl: 'https://example.com/a.mp3',
+      localPath: '/music/远方歌手/远方的歌/远方的歌.mp3',
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: copy, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('文件路径'), findsOneWidget);
+    expect(find.text('/music/远方歌手/远方的歌/远方的歌.mp3'), findsOneWidget);
+    expect(find.text('地址'), findsOneWidget);
+    expect(find.text('https://example.com/a.mp3'), findsOneWidget);
+    // The identity of the track is not a path of a file.
+    expect(find.text('tune://openverse/abc'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details of a fetched track know the format of the file', (
+    tester,
+  ) async {
+    // The file on this machine knows its own format, even when the identity
+    // of the track is the address of a source.
+    const copy = Song(
+      id: 2,
+      title: '远方的歌',
+      artist: '远方歌手',
+      uri: 'tune://openverse/abc',
+      sourceId: 'openverse',
+      externalId: 'abc',
+      streamUrl: 'https://example.com/a.mp3',
+      localPath: '/music/远方歌手/远方的歌/远方的歌.mp3',
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: copy, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('格式'), findsOneWidget);
+    expect(find.text('MP3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the details sheet closes when the reader taps outside it', (
     tester,
   ) async {
@@ -343,5 +410,26 @@ void main() {
     expect(find.text('曲目'), findsNothing);
     expect(find.text('已扫描'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  test('the format of a track is the format of its file', () {
+    // A scanned file says only that it is audio; the name of the file says
+    // what it is.
+    const scanned = Song(
+      id: 1,
+      uri: '/music/night.flac',
+      type: 'audio',
+    );
+    const fetched = Song(
+      id: 2,
+      uri: 'tune://openverse/abc',
+      streamUrl: 'https://example.com/a.mp3',
+      localPath: '/music/远方歌手/远方的歌/远方的歌.mp3',
+    );
+
+    expect(formatOf(scanned), 'FLAC');
+    expect(formatOf(fetched), 'MP3');
+    // A track of a source without a file has no format of its own.
+    expect(formatOf(remote), isNull);
   });
 }

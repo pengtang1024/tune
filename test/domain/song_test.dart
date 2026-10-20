@@ -156,4 +156,42 @@ void main() {
       expect(other.uri, one.uri);
     });
   });
+
+  group('the addresses of a track', () {
+    test('a track of the library is its own file', () {
+      const local = Song(id: 1, uri: '/music/one.flac');
+
+      expect(local.localFile, '/music/one.flac');
+      expect(local.onlineAddress, isNull);
+    });
+
+    test('a track that was fetched knows its copy', () {
+      const copy = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        streamUrl: 'https://cdn.test/one.mp3',
+        localPath: '/music/Artist/One/One.mp3',
+      );
+
+      expect(copy.localFile, '/music/Artist/One/One.mp3');
+      expect(copy.onlineAddress, 'https://cdn.test/one.mp3');
+    });
+
+    test('a track of a source is played from its address', () {
+      const remote = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        streamUrl: 'https://cdn.test/one.mp3',
+      );
+
+      expect(remote.localFile, isNull);
+      expect(remote.onlineAddress, 'https://cdn.test/one.mp3');
+    });
+
+    test('an older track keeps the address it was found under', () {
+      const older = Song(id: 1, uri: 'https://cdn.test/one.mp3');
+
+      expect(older.onlineAddress, 'https://cdn.test/one.mp3');
+    });
+  });
 }

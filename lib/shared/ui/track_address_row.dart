@@ -6,14 +6,27 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
-/// The address of the file, with a way to take it away.
+/// An address of the track, with a way to take it away.
 ///
-/// The path is the one fact no icon can stand for, so it is written out and
-/// can be copied to the clipboard.
-class TrackPathRow extends StatelessWidget {
-  final String uri;
+/// The file on this machine and the address of the source are the two facts
+/// no icon can stand for, so they are written out and can be copied to the
+/// clipboard.
+class TrackAddressRow extends StatelessWidget {
+  /// The address itself: a path on this machine or an address of a source.
+  final String address;
 
-  const TrackPathRow({super.key, required this.uri});
+  /// The name of the address, written above it.
+  final String label;
+
+  /// The name of the button that copies the address.
+  final String copyHint;
+
+  const TrackAddressRow({
+    super.key,
+    required this.address,
+    required this.label,
+    required this.copyHint,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +41,7 @@ class TrackPathRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                context.loc.trackFactPath,
+                label,
                 style: CompactTypography.mono(
                   theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   size: CompactTypeScale.mark,
@@ -38,7 +51,7 @@ class TrackPathRow extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               SelectableText(
-                uri,
+                address,
                 maxLines: 3,
                 style: CompactTypography.mono(
                   theme.colorScheme.onSurfaceVariant,
@@ -50,7 +63,7 @@ class TrackPathRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         TuneTooltip(
-          message: context.loc.trackDetailsCopyPath,
+          message: copyHint,
           child: IconButton(
             onPressed: () => _copy(context),
             icon: const Icon(Icons.copy_rounded, size: CompactTokens.icon16),
@@ -66,7 +79,7 @@ class TrackPathRow extends StatelessWidget {
   }
 
   Future<void> _copy(BuildContext context) async {
-    await Clipboard.setData(ClipboardData(text: uri));
+    await Clipboard.setData(ClipboardData(text: address));
     if (!context.mounted) return;
 
     ScaffoldMessenger.of(context)

@@ -2524,6 +2524,12 @@ abstract class AppLocalizations {
   /// **'文件路径'**
   String get trackFactPath;
 
+  /// No description provided for @trackFactAddress.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'地址'**
+  String get trackFactAddress;
+
   /// No description provided for @trackDetailsTooltip.
   ///
   /// In zh_CN, this message translates to:
@@ -2535,6 +2541,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'复制路径'**
   String get trackDetailsCopyPath;
+
+  /// No description provided for @trackDetailsCopyAddress.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'复制地址'**
+  String get trackDetailsCopyAddress;
 
   /// No description provided for @trackDetailsCopied.
   ///

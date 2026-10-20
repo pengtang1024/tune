@@ -1385,10 +1385,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackFactPath => '文件路径';
 
   @override
+  String get trackFactAddress => '地址';
+
+  @override
   String get trackDetailsTooltip => '查看详情';
 
   @override
   String get trackDetailsCopyPath => '复制路径';
+
+  @override
+  String get trackDetailsCopyAddress => '复制地址';
 
   @override
   String get trackDetailsCopied => '已复制到剪贴板';
@@ -2906,10 +2912,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackFactPath => '文件路径';
 
   @override
+  String get trackFactAddress => '地址';
+
+  @override
   String get trackDetailsTooltip => '查看详情';
 
   @override
   String get trackDetailsCopyPath => '复制路径';
+
+  @override
+  String get trackDetailsCopyAddress => '复制地址';
 
   @override
   String get trackDetailsCopied => '已复制到剪贴板';
@@ -4427,10 +4439,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get trackFactPath => '檔案路徑';
 
   @override
+  String get trackFactAddress => '位址';
+
+  @override
   String get trackDetailsTooltip => '查看詳情';
 
   @override
   String get trackDetailsCopyPath => '複製路徑';
+
+  @override
+  String get trackDetailsCopyAddress => '複製位址';
 
   @override
   String get trackDetailsCopied => '已複製到剪貼簿';

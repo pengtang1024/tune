@@ -176,16 +176,32 @@ TrackFact? _sizeFact(BuildContext context, Song song) {
   );
 }
 
-/// The format of the file, read from the type or from the address.
+/// The format of the file, read from the type or from the name of the file.
 String? formatOf(Song song) {
   final type = song.type?.trim();
-  if (type != null && type.isNotEmpty) return type.toUpperCase();
+  // The type of a scanned file only says that it is audio; the name of the
+  // file says what it is.
+  if (type != null && type.isNotEmpty && type.toLowerCase() != 'audio') {
+    return type.toUpperCase();
+  }
 
-  final uri = song.uri;
-  final dot = uri.lastIndexOf('.');
-  if (dot < 0 || dot == uri.length - 1) return null;
+  // The file on this machine knows its own format, even when the identity of
+  // the track is the address of a source.
+  final file = song.localFile;
+  if (file != null) {
+    final format = _formatOfName(file);
+    if (format != null) return format;
+  }
 
-  final extension = uri.substring(dot + 1);
+  return _formatOfName(song.uri);
+}
+
+/// The format that the name of a file carries.
+String? _formatOfName(String name) {
+  final dot = name.lastIndexOf('.');
+  if (dot < 0 || dot == name.length - 1) return null;
+
+  final extension = name.substring(dot + 1);
   if (extension.length > 5) return null;
   return extension.toUpperCase();
 }
