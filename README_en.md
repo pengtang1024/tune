@@ -49,6 +49,18 @@ flutter run -d linux
 flutter build linux --debug
 ```
 
+## Desktop icon
+
+- The master image is `assets/icons/app_icon.png`; run `dart run flutter_launcher_icons` to regenerate the platform icons after changing it.
+- On Linux the dock and the taskbar icon come from the desktop entry, and the program carries a window icon of its own.
+- The desktop entry has to be installed into the XDG directories of the machine, otherwise the dock falls back to a generic icon (install it once per machine):
+
+```bash
+cp -r build/linux/x64/*/bundle/share/* ~/.local/share/
+update-desktop-database ~/.local/share/applications
+gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
+```
+
 ## Known limitations
 
 - Linux desktop is the primary target for the current release.

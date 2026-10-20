@@ -49,6 +49,18 @@ flutter run -d linux
 flutter build linux --debug
 ```
 
+## 桌面图标
+
+- 原图是 `assets/icons/app_icon.png`；改完原图后跑 `dart run flutter_launcher_icons` 重新生成各平台图标。
+- Linux 的 dock 与任务栏图标来自桌面项，程序自身也带一份窗口图标。
+- 桌面项要装进本机的 XDG 目录，dock 才会显示 Tune 的图标（每次换机器装一次）：
+
+```bash
+cp -r build/linux/x64/*/bundle/share/* ~/.local/share/
+update-desktop-database ~/.local/share/applications
+gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
+```
+
 ## 已知限制
 
 - 当前主要验收平台为 Linux 桌面端。
