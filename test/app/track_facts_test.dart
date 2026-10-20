@@ -13,7 +13,6 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -491,29 +490,6 @@ void main() {
 
     expect(find.byType(BottomSheet), findsOneWidget);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('a chip that shows a value keeps the name of the fact away', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      app(const MetaChip(value: 'FLAC', tooltip: '格式 · FLAC')),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('FLAC'), findsOneWidget);
-    expect(find.text('格式'), findsNothing);
-    expect(find.byTooltip('格式 · FLAC'), findsOneWidget);
-  });
-
-  testWidgets('a chip that names a fact shows the name and the value', (
-    tester,
-  ) async {
-    await tester.pumpWidget(app(const MetaChip(label: '格式', value: 'FLAC')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('格式'), findsOneWidget);
-    expect(find.text('FLAC'), findsOneWidget);
   });
 
   testWidgets('the state of a source is a chip and its numbers wait in the tip', (

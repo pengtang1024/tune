@@ -6,7 +6,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_detail_heading.dart';
 import 'package:tune/shared/ui/track_detail_row.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';

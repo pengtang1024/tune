@@ -16,7 +16,8 @@ chip 只有两样东西：
 - **图标**说"是哪一个"；
 - **颜色**说"是哪一类"。
 
-字在 tooltip 里（走 `TuneTooltip`），细节在详情面板里（`track_detail_sheet.dart`）。
+字在 tooltip 里（走 `TuneTooltip`），细节在详情面板里（`track_detail_sheet.dart`）——
+详情面板写的是一张属性表（图标 + 名字 | 值），它不是 chip。
 
 为什么：chip 的宽度跟着字走，同一行里就会因为名字、状态、值的不同而忽宽忽窄——列对不齐，读者也要多扫一眼才知道哪个是哪个。固定大小 + 颜色分类 + 悬停出名字，读起来更快，也更好看。
 
@@ -61,7 +62,7 @@ chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯�
 
 ## 谁守着这条线
 
-- `test/app/chip_style_test.dart`：扫源码，`MetaChip`（带文字的 chip）只许出现在详情面板里；带框的标记不许自带文字。
+- `test/app/chip_style_test.dart`：扫源码，chip 与 badge 都不许带一个字（字只能进 tooltip）；带框的标记不许自带文字。
 - `test/app/source_badge_test.dart`：标识是图标、名字只在 tooltip、大小不随名字变、13 个图标互不重复、颜色跟着类别走。
 - `test/app/track_facts_test.dart`：事实的图标与 tooltip。
 - `test/app/localization_render_test.dart`：两种语言 × 两种窗口都画得下，没有溢出。
