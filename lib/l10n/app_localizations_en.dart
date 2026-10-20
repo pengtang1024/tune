@@ -1526,7 +1526,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackFactPath => 'File path';
 
   @override
-  String get trackFactAddress => 'Address';
+  String get trackFactAddress => 'Online address';
 
   @override
   String get trackDetailsTooltip => 'Details';
@@ -1566,6 +1566,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackDetailsCopyIdentity => 'Copy identity';
+
+  @override
+  String get trackDetailsAddresses => 'Addresses';
 
   @override
   String get sourceStatusEnabled => 'Enabled';

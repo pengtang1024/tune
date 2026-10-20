@@ -132,14 +132,16 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/track_fact.dart` | 事实模型：名字、值、图标、色调 |
+| `lib/shared/ui/track_fact.dart` | 事实模型：名字、值、图标、色调、谁写的、是不是一段话 |
 | `lib/shared/ui/track_facts.dart` | 文件类事实：位置、时长、格式、音质、码率、采样率、大小、媒体类型；来源编号 |
 | `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、演奏者、添加时间、简介、正在播放 |
 | `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
-| `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：事实、地址与写出来的正文 |
-| `lib/shared/ui/track_address_row.dart` | 详情面板里的一行地址与复制 |
+| `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：属性表、地址与写出来的正文 |
+| `lib/shared/ui/track_detail_table.dart` | 详情面板的属性表：名字一列，值一列 |
+| `lib/shared/ui/track_detail_row.dart` | 属性表里的一行：名字、图标、值 |
+| `lib/shared/ui/track_detail_heading.dart` | 一组内容的名字 |
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四行地址：本机文件路径、在线地址、封面地址、规范身份 |
-| `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：歌词、原始数据、请求头 |
+| `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |
 | `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字）与 `MetaBadge`（纯图标 + tooltip） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 每个音源一个图标；用户自带的音源按种类兜底 |
@@ -149,14 +151,25 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
 2. 正在播放页：画图标 + 值，名字留给 tooltip。
-3. 详情面板：画图标 + 名字 + 值，并写出地址与正文——本机文件路径、在线地址、封面地址与规范身份各一行，歌词、原始数据与请求头各写一块。
+3. 详情面板：画图标 + 名字 + 值，并写出地址与正文——本机文件路径、在线地址、封面地址与规范身份各一行，简介、歌词、原始数据与请求头各写一块。
+
+详情面板里的事实是一张**两列的属性表**：左边一列是图标和名字，右边一列是值，
+值都从同一条竖线开始，名字共用同一列，所以眼睛可以竖着扫。四行地址与事实共用
+这条名字列，地址与正文各自成组（组有名字、组之间留白），不与事实混成一片。
+
+值的**脸**说这话是谁写的：机器写的（路径、地址、编号、时长、码率、原始数据、
+请求头）用等宽体，人写的（专辑、流派、简介、歌词）用正文体。值的大小一律是
+正文号（13），名字是次要色，值是正文色。
+
+一段话不是一行：简介太长，挤进一行会拉成一条，所以事实上给它一个标记
+（`TrackFact.paragraph`），详情面板把它写成一整段，和歌词一样。
 
 地址只有四处来源，都在 `Song` 上：`Song.localFile` 是本机的文件（没有就是空），
 `Song.onlineAddress` 是播放用的网络地址（本地曲子没有），`Song.coverAddress` 是封面的地址
 （远端是网络地址，本地是封面文件），`Song.identity` 是 app 认识这首曲目的名字（本地曲目的名字
 就是它的路径，不另写一行）。详情面板不自己拼路径。
 
-写出来的正文只有三处，也都在 `Song` 上：歌词、原始数据（音源给的整包数据）与请求头
+写出来的正文只有四处：简介、歌词、原始数据（音源给的整包数据）与请求头
 （播放时带的头，带密钥的那一个只写三个点）。
 
 **音源也一样**：行里只画一个固定大小的图标（`SourceBadge`），品牌名与本地化名都在 tooltip 里，详情面板的「来源」那条事实把它们写全。图标不随名字长短变形，一行曲子的宽窄不再被音源名字牵着走。
