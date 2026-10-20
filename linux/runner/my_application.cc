@@ -23,20 +23,26 @@ G_DEFINE_TYPE(TuneApplication, my_application, GTK_TYPE_APPLICATION)
 static void set_window_icon(GtkWindow* window) {
   GdkPixbuf* icon = nullptr;
 
+  // The directory of the program, so the icon is found no matter where the
+  // program is started from.
   char* executable = g_file_read_link("/proc/self/exe", nullptr);
-  if (executable != nullptr) {
-    char* directory = g_path_get_dirname(executable);
-    g_free(executable);
+  if (executable == nullptr) return;
+  char* directory = g_path_get_dirname(executable);
+  g_free(executable);
 
-    char* path = g_build_filename(directory, "resources", "app_icon.png", nullptr);
-    g_free(directory);
+  // Next to the program, where the bundle keeps the icon.
+  char* path = g_build_filename(directory, "resources", "app_icon.png", nullptr);
+  icon = gdk_pixbuf_new_from_file(path, nullptr);
+  g_free(path);
+
+  // The assets of the program, for the case the bundle has no icon.
+  if (icon == nullptr) {
+    path = g_build_filename(directory, "data", "flutter_assets", "assets", "icons", "app_icon.png", nullptr);
     icon = gdk_pixbuf_new_from_file(path, nullptr);
     g_free(path);
   }
 
-  if (icon == nullptr) {
-    icon = gdk_pixbuf_new_from_file("data/flutter_assets/assets/icons/app_icon.png", nullptr);
-  }
+  g_free(directory);
 
   if (icon == nullptr) return;
   gtk_window_set_icon(window, icon);
