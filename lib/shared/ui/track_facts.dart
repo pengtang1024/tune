@@ -5,6 +5,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/track_metadata_facts.dart';
+import 'package:tune/shared/utils/duration_format.dart';
 
 /// Every fact known about a track, ordered by how much it is worth reading.
 ///
@@ -19,6 +20,7 @@ List<TrackFact> trackFactsOf(
 }) {
   final facts = <TrackFact?>[
     if (source != null) _sourceFact(context, source),
+    _sourceIdFact(context, song),
     _liveFact(context, song),
     ...fileFactsOf(context, song),
     ...metadataFactsOf(context, song),
@@ -51,6 +53,22 @@ TrackFact? _sourceFact(BuildContext context, SourceLabel source) {
   );
 }
 
+/// The number the track has in its own source.
+///
+/// The name of a source says who published the track; the number says which
+/// track of that source it is, so the reader can look it up where it came
+/// from.
+TrackFact? _sourceIdFact(BuildContext context, Song song) {
+  final id = song.externalId;
+  if (id == null || id.trim().isEmpty) return null;
+
+  return TrackFact(
+    label: context.loc.trackFactSourceId,
+    value: id,
+    icon: Icons.tag_rounded,
+  );
+}
+
 TrackFact? _liveFact(BuildContext context, Song song) {
   if (!song.isLiveStream) return null;
 
@@ -68,12 +86,44 @@ TrackFact? _liveFact(BuildContext context, Song song) {
 List<TrackFact?> fileFactsOf(BuildContext context, Song song) {
   return [
     _storageFact(context, song),
+    _durationFact(context, song),
     _formatFact(context, song),
     _qualityFact(context, song),
     _bitrateFact(context, song),
     _sampleRateFact(context, song),
     _sizeFact(context, song),
+    _mediaTypeFact(context, song),
   ];
+}
+
+/// How long the track lasts.
+TrackFact? _durationFact(BuildContext context, Song song) {
+  final duration = song.durationInMillis;
+  if (duration <= 0) return null;
+
+  return TrackFact(
+    label: context.loc.trackFactDuration,
+    value: formatDuration(Duration(milliseconds: duration)),
+    icon: Icons.timelapse_rounded,
+  );
+}
+
+/// The kind of media the track is.
+///
+/// A scanned file says only that it is audio and a track of a source says
+/// that it is remote: both repeat what the place of the track already says,
+/// so they stay quiet. Any other kind says something new and is written
+/// down.
+TrackFact? _mediaTypeFact(BuildContext context, Song song) {
+  final type = song.type?.trim();
+  if (type == null || type.isEmpty) return null;
+  if (type == 'audio' || type == 'remote') return null;
+
+  return TrackFact(
+    label: context.loc.trackFactMediaType,
+    value: type,
+    icon: Icons.category_rounded,
+  );
 }
 
 TrackFact? _storageFact(BuildContext context, Song song) {

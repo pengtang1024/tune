@@ -246,8 +246,174 @@ void main() {
     expect(find.text('/music/远方歌手/远方的歌/远方的歌.mp3'), findsOneWidget);
     expect(find.text('地址'), findsOneWidget);
     expect(find.text('https://example.com/a.mp3'), findsOneWidget);
-    // The identity of the track is not a path of a file.
-    expect(find.text('tune://openverse/abc'), findsNothing);
+    // The identity of the track names the track, it is not a path of a file,
+    // so it gets a row of its own.
+    expect(find.text('身份'), findsOneWidget);
+    expect(find.text('tune://openverse/abc'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet name how long a track lasts', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: lossless, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    final sheet = find.byType(BottomSheet);
+    expect(
+      find.descendant(of: sheet, matching: find.text('时长')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('4:05')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet name the number of a track in its source', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: remote, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    final sheet = find.byType(BottomSheet);
+    expect(
+      find.descendant(of: sheet, matching: find.text('来源编号')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('abc')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet write the cover of a track out', (
+    tester,
+  ) async {
+    const withCover = Song(
+      id: 4,
+      title: '有封面的歌',
+      artist: '某歌手',
+      uri: 'tune://openverse/cover',
+      sourceId: 'openverse',
+      externalId: 'cover',
+      streamUrl: 'https://example.com/cover.mp3',
+      artworkUrl: 'https://example.com/cover.jpg',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: app(
+          const TrackMeta(song: withCover, index: 0),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('封面'), findsOneWidget);
+    expect(find.text('https://example.com/cover.jpg'), findsOneWidget);
+    expect(find.text('身份'), findsOneWidget);
+    expect(find.text('tune://openverse/cover'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet write the words of the lyrics out', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: lossless, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    // The mark says that the lyrics are there, the words are written out.
+    expect(find.text('已包含'), findsOneWidget);
+    expect(find.text('[00:00.00] 歌词'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet write the payload of the source out', (
+    tester,
+  ) async {
+    const withPayload = Song(
+      id: 5,
+      title: '带数据的歌',
+      artist: '某歌手',
+      uri: 'tune://subsonic/one',
+      sourceId: 'subsonic',
+      externalId: 'one',
+      streamUrl: 'https://example.com/one.mp3',
+      sourceData: {'id': 'one', 'suffix': 'mp3'},
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: withPayload, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('原始数据'), findsOneWidget);
+    expect(find.text('id: one\nsuffix: mp3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the details sheet keep a secret header out of sight', (
+    tester,
+  ) async {
+    const withHeaders = Song(
+      id: 6,
+      title: '带请求头的歌',
+      artist: '某歌手',
+      uri: 'tune://jellyfin/one',
+      sourceId: 'jellyfin',
+      externalId: 'one',
+      streamUrl: 'https://example.com/one.mp3',
+      httpHeaders: {'Referer': 'https://example.com/', 'X-Emby-Token': 'secret'},
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: withHeaders, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('请求头'), findsOneWidget);
+    expect(
+      find.text('Referer: https://example.com/\nX-Emby-Token: •••'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('secret'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

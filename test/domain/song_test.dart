@@ -193,5 +193,43 @@ void main() {
 
       expect(older.onlineAddress, 'https://cdn.test/one.mp3');
     });
+
+    test('a track of a source is named by its identity', () {
+      const remote = Song(id: 1, uri: 'tune://openverse/one');
+
+      expect(remote.identity, 'tune://openverse/one');
+    });
+
+    test('a track of the library is named by its path', () {
+      const local = Song(id: 1, uri: '/music/one.flac');
+
+      expect(local.identity, isNull);
+    });
+
+    test('the cover of a track of a source is its address', () {
+      const remote = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        artworkUrl: 'https://cdn.test/one.jpg',
+      );
+
+      expect(remote.coverAddress, 'https://cdn.test/one.jpg');
+    });
+
+    test('the cover of a local track is the file it was written to', () {
+      const local = Song(
+        id: 1,
+        uri: '/music/one.flac',
+        albumArtPath: '/music/one.jpg',
+      );
+
+      expect(local.coverAddress, '/music/one.jpg');
+    });
+
+    test('a track without a cover has no address for it', () {
+      const remote = Song(id: 1, uri: 'tune://openverse/one');
+
+      expect(remote.coverAddress, isNull);
+    });
   });
 }

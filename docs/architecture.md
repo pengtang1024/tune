@@ -133,11 +133,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | 文件 | 职责 |
 | --- | --- |
 | `lib/shared/ui/track_fact.dart` | 事实模型：名字、值、图标、色调 |
-| `lib/shared/ui/track_facts.dart` | 文件类事实：位置、格式、音质、码率、采样率、大小 |
+| `lib/shared/ui/track_facts.dart` | 文件类事实：位置、时长、格式、音质、码率、采样率、大小、媒体类型；来源编号 |
 | `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、演奏者、添加时间、简介、正在播放 |
 | `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
-| `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板 |
-| `lib/shared/ui/track_address_row.dart` | 详情面板里的地址与复制：本机文件路径、在线地址 |
+| `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：事实、地址与写出来的正文 |
+| `lib/shared/ui/track_address_row.dart` | 详情面板里的一行地址与复制 |
+| `lib/shared/ui/track_addresses.dart` | 详情面板里的四行地址：本机文件路径、在线地址、封面地址、规范身份 |
+| `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：歌词、原始数据、请求头 |
 | `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字）与 `MetaBadge`（纯图标 + tooltip） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 每个音源一个图标；用户自带的音源按种类兜底 |
@@ -147,14 +149,19 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
 2. 正在播放页：画图标 + 值，名字留给 tooltip。
-3. 详情面板：画图标 + 名字 + 值，并写出地址——本机的文件路径与在线的地址，各一行。
+3. 详情面板：画图标 + 名字 + 值，并写出地址与正文——本机文件路径、在线地址、封面地址与规范身份各一行，歌词、原始数据与请求头各写一块。
 
-地址只有两处来源，都在 `Song` 上：`Song.localFile` 是本机的文件（没有就是空），
-`Song.onlineAddress` 是播放用的网络地址（本地曲子没有）。详情面板不自己拼路径。
+地址只有四处来源，都在 `Song` 上：`Song.localFile` 是本机的文件（没有就是空），
+`Song.onlineAddress` 是播放用的网络地址（本地曲子没有），`Song.coverAddress` 是封面的地址
+（远端是网络地址，本地是封面文件），`Song.identity` 是 app 认识这首曲目的名字（本地曲目的名字
+就是它的路径，不另写一行）。详情面板不自己拼路径。
+
+写出来的正文只有三处，也都在 `Song` 上：歌词、原始数据（音源给的整包数据）与请求头
+（播放时带的头，带密钥的那一个只写三个点）。
 
 **音源也一样**：行里只画一个固定大小的图标（`SourceBadge`），品牌名与本地化名都在 tooltip 里，详情面板的「来源」那条事实把它们写全。图标不随名字长短变形，一行曲子的宽窄不再被音源名字牵着走。
 
-**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列与正在播放页的顶栏，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。
+**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列、正在播放页的顶栏与底栏的播放卡片上，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。
 
 ## chip 的样子
 

@@ -284,6 +284,24 @@ class Song {
     return uri.isEmpty ? null : uri;
   }
 
+  /// The address that names this track inside the app.
+  ///
+  /// A track of a source is named by its canonical URI; a local file is named
+  /// by its path, and that path is the file path already.
+  String? get identity => hasRemoteSource ? uri : null;
+
+  /// The address of the cover of the track.
+  ///
+  /// A track of a source has the address of the cover; a local track has the
+  /// file the cover was written to.
+  String? get coverAddress {
+    final url = artworkUrl;
+    if (url != null && url.isNotEmpty) return url;
+    final path = albumArtPath;
+    if (path != null && path.isNotEmpty) return path;
+    return null;
+  }
+
   /// Combines two entries of the same track.
   ///
   /// The entry that owns a file knows the file: where it is, how big it is.

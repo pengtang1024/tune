@@ -8,7 +8,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/meta_chip.dart';
-import 'package:tune/shared/ui/track_address_row.dart';
+import 'package:tune/shared/ui/track_addresses.dart';
+import 'package:tune/shared/ui/track_detail_block.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
 /// Shows everything that is known about a track.
@@ -36,6 +37,7 @@ class _TrackDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final facts = trackFactsOf(context, song, source: source);
+    final blocks = trackDetailBlocksOf(context, song);
 
     return Material(
       color: theme.colorScheme.surface,
@@ -70,49 +72,14 @@ class _TrackDetailSheet extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 18),
-            _Addresses(song: song),
+            TrackAddresses(song: song),
+            for (final block in blocks) ...[
+              const SizedBox(height: 18),
+              TrackDetailBlockView(block: block),
+            ],
           ],
         ),
       ),
-    );
-  }
-}
-
-/// The addresses of the track: the file it lives in and the address it is
-/// played from.
-///
-/// A track that was fetched has both: the copy on this machine and the
-/// address of the source it came from.
-class _Addresses extends StatelessWidget {
-  final Song song;
-
-  const _Addresses({required this.song});
-
-  @override
-  Widget build(BuildContext context) {
-    final file = song.localFile;
-    final online = song.onlineAddress;
-    if (file == null && online == null) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (file != null) ...[
-          TrackAddressRow(
-            address: file,
-            label: context.loc.trackFactPath,
-            copyHint: context.loc.trackDetailsCopyPath,
-          ),
-          if (online != null) const SizedBox(height: 14),
-        ],
-        if (online != null)
-          TrackAddressRow(
-            address: online,
-            label: context.loc.trackFactAddress,
-            copyHint: context.loc.trackDetailsCopyAddress,
-          ),
-      ],
     );
   }
 }

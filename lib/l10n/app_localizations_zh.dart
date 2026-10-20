@@ -1400,6 +1400,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackDetailsCopied => '已复制到剪贴板';
 
   @override
+  String get trackFactDuration => '时长';
+
+  @override
+  String get trackFactSourceId => '来源编号';
+
+  @override
+  String get trackFactMediaType => '媒体类型';
+
+  @override
+  String get trackFactCover => '封面';
+
+  @override
+  String get trackFactIdentity => '身份';
+
+  @override
+  String get trackFactHeaders => '请求头';
+
+  @override
+  String get trackFactRawData => '原始数据';
+
+  @override
+  String get trackDetailsCopyCover => '复制封面';
+
+  @override
+  String get trackDetailsCopyIdentity => '复制身份';
+
+  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -2948,6 +2975,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackDetailsCopied => '已复制到剪贴板';
 
   @override
+  String get trackFactDuration => '时长';
+
+  @override
+  String get trackFactSourceId => '来源编号';
+
+  @override
+  String get trackFactMediaType => '媒体类型';
+
+  @override
+  String get trackFactCover => '封面';
+
+  @override
+  String get trackFactIdentity => '身份';
+
+  @override
+  String get trackFactHeaders => '请求头';
+
+  @override
+  String get trackFactRawData => '原始数据';
+
+  @override
+  String get trackDetailsCopyCover => '复制封面';
+
+  @override
+  String get trackDetailsCopyIdentity => '复制身份';
+
+  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -4494,6 +4548,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackDetailsCopied => '已複製到剪貼簿';
+
+  @override
+  String get trackFactDuration => '時長';
+
+  @override
+  String get trackFactSourceId => '來源編號';
+
+  @override
+  String get trackFactMediaType => '媒體類型';
+
+  @override
+  String get trackFactCover => '封面';
+
+  @override
+  String get trackFactIdentity => '身分';
+
+  @override
+  String get trackFactHeaders => '請求標頭';
+
+  @override
+  String get trackFactRawData => '原始資料';
+
+  @override
+  String get trackDetailsCopyCover => '複製封面';
+
+  @override
+  String get trackDetailsCopyIdentity => '複製身分';
 
   @override
   String get sourceStatusEnabled => '已啟用';
