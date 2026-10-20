@@ -71,6 +71,22 @@ abstract final class CompactTypography {
     );
   }
 
+  /// The axis values the display face is drawn with.
+  ///
+  /// Fraunces is a variable font, and its default instance is the plain one:
+  /// `SOFT=0` on a 9pt optical size, which is why the packaged face reads
+  /// stiffer than the round cut the design is after. `SOFT=100` rounds the
+  /// strokes and opens up the curves, `WONK=1` keeps the wonky alternates,
+  /// and `opsz` follows the text size so a 38px heading gets display
+  /// proportions instead of text ones.
+  static List<FontVariation> displayVariations(double size) {
+    return <FontVariation>[
+      FontVariation('opsz', size.clamp(9, 144)),
+      FontVariation('SOFT', 100),
+      FontVariation('WONK', 1),
+    ];
+  }
+
   /// Display text.
   static TextStyle display(
     Color color, {
@@ -82,6 +98,7 @@ abstract final class CompactTypography {
     return TextStyle(
       fontFamily: displayFamily,
       fontFamilyFallback: serifFallback,
+      fontVariations: displayVariations(size),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
@@ -123,6 +140,7 @@ abstract final class CompactTypography {
     return base?.copyWith(
       fontFamily: displayFamily,
       fontFamilyFallback: serifFallback,
+      fontVariations: displayVariations(size ?? base.fontSize ?? 20),
       fontSize: size,
       fontWeight: weight,
       letterSpacing: letterSpacing,
