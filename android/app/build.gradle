@@ -24,9 +24,9 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace 'com.twtstudio.tune'
-    compileSdk 35
-    ndkVersion "27.0.12077973"
+    namespace 'cn.iouf.tune'
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -43,8 +43,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.twtstudio.tune"
-        minSdk 21
+        applicationId "cn.iouf.tune"
+        minSdkVersion flutter.minSdkVersion
         targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
