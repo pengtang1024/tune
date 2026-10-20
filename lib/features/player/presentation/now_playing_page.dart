@@ -12,15 +12,12 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
-import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
+import 'package:tune/features/player/presentation/now_playing_track_info.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
-import 'package:tune/shared/ui/source_chip.dart';
 import 'package:tune/shared/ui/source_label.dart';
-import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
@@ -262,25 +259,14 @@ class _TrackLayout extends StatelessWidget {
                       Expanded(child: LyricsPanel(song: song)),
                       const SizedBox(height: CompactTokens.space12),
                     ] else ...[
-                      Row(
-                        children: [
-                          SourceChip(label: source),
-                          const SizedBox(width: CompactTokens.space8),
-                          // The badge tells where the sound comes from, so it
-                          // belongs next to the name of the source instead of
-                          // floating at the far end of the seek bar.
-                          AudioSourceBadge(
-                            status: state.audioSourceStatus,
-                            progress: state.downloadProgress,
-                          ),
-                        ],
+                      Flexible(
+                        child: NowPlayingTrackInfo(
+                          song: song,
+                          source: source,
+                          status: state.audioSourceStatus,
+                          progress: state.downloadProgress,
+                        ),
                       ),
-                      const SizedBox(height: CompactTokens.space16),
-                      _Title(song: song),
-                      const SizedBox(height: CompactTokens.space8),
-                      _Artist(song: song),
-                      const SizedBox(height: CompactTokens.space14),
-                      _TrackDetails(song: song),
                       const SizedBox(height: CompactTokens.space18),
                     ],
                     _ProgressRow(state: state, onSeek: onSeek),
@@ -336,123 +322,7 @@ class _Artwork extends StatelessWidget {
   }
 }
 
-/// The track title.
-class _Title extends StatelessWidget {
-  const _Title({required this.song});
 
-  final Song song;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      song.title.isEmpty ? context.loc.nowPlayingUnnamedTrack : song.title,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: CompactTypography.asDisplay(
-        theme.textTheme.displayMedium,
-        size: CompactTypeScale.displayLarge,
-        height: 1.06,
-      ),
-    );
-  }
-}
-
-/// The artist line with the album and the year.
-class _Artist extends StatelessWidget {
-  const _Artist({required this.song});
-
-  final Song song;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final artist = song.artist.isEmpty
-        ? context.loc.playerUnknownArtist
-        : song.artist;
-    final details = <String>[
-      if (song.album.isNotEmpty) song.album,
-      if (song.year != null) song.year.toString(),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          artist,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        if (details.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text(
-            details.join('  ·  '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: CompactTypography.mono(
-              theme.colorScheme.onSurfaceVariant,
-              size: CompactTypeScale.mark,
-              letterSpacing: 0.4,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-/// The facts the source published about the track.
-///
-/// Every source knows different things about a track, so the panel shows
-/// whatever is known: the album, the year, the style, the quality of the
-/// file, the licence and the station that plays it.
-///
-/// The panel shows the value of a fact and keeps its name for the tooltip, so
-/// the eye reads the values and the mouse names them.
-class _TrackDetails extends StatelessWidget {
-  const _TrackDetails({required this.song});
-
-  final Song song;
-
-  @override
-  Widget build(BuildContext context) {
-    final facts = trackFactsOf(context, song);
-    if (facts.isEmpty) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.loc.nowPlayingDetails,
-          style: CompactTypography.mono(
-            theme.colorScheme.onSurfaceVariant,
-            size: CompactTypeScale.mark,
-            weight: FontWeight.w500,
-            letterSpacing: 1.4,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            for (final fact in facts)
-              MetaChip(
-                icon: fact.icon,
-                value: fact.value,
-                tooltip: fact.sentence,
-                tone: fact.tone,
-              ),
-          ],
-        ),
-      ],
-    );
-  }
-}
 
 /// The seek bar with the elapsed and the total time.
 class _ProgressRow extends StatelessWidget {

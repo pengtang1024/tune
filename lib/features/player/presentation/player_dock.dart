@@ -26,7 +26,13 @@ class PlayerDock extends ConsumerWidget {
     final song = state.currentSong;
 
     return Container(
-      height: CompactTokens.dockHeight,
+      // The bar keeps the height of the token, but it grows when the text
+      // of the clock asks for more room. The desktop has a text scale of
+      // its own, and a user who raises it gets a taller bar rather than a
+      // clock that runs over the edge of it.
+      constraints: const BoxConstraints(
+        minHeight: CompactTokens.dockHeight,
+      ),
       margin: const EdgeInsets.fromLTRB(
         CompactTokens.dockMargin,
         0,

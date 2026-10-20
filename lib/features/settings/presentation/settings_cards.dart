@@ -512,7 +512,11 @@ class _MiniCanvas extends StatelessWidget {
                   color: panel,
                   child: Column(
                     children: [
-                      const SizedBox(height: 5),
+                      // The picture of a window keeps its shape, but the
+                      // gaps in it give way when the room is short: the
+                      // desktop raises the text scale, the label of the
+                      // preview grows, and the picture has less height.
+                      const Flexible(child: SizedBox(height: 5)),
                       Container(
                         width: 7,
                         height: 7,
@@ -521,7 +525,7 @@ class _MiniCanvas extends StatelessWidget {
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(height: 7),
+                      const Flexible(child: SizedBox(height: 7)),
                       for (var i = 0; i < 3; i++) ...[
                         Container(
                           width: 9,
@@ -531,7 +535,7 @@ class _MiniCanvas extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const Flexible(child: SizedBox(height: 4)),
                       ],
                     ],
                   ),
@@ -550,7 +554,7 @@ class _MiniCanvas extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        const Flexible(child: SizedBox(height: 5)),
                         for (var i = 0; i < 2; i++) ...[
                           Container(
                             height: 5,
@@ -560,7 +564,7 @@ class _MiniCanvas extends StatelessWidget {
                               border: Border.all(color: border, width: 0.5),
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          const Flexible(child: SizedBox(height: 3)),
                         ],
                       ],
                     ),
