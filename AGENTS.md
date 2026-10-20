@@ -11,8 +11,11 @@
 | 判断改动优先级、要不要先动架构 | 本页 §1 |
 | 加文件、放哪一层、能不能跨 feature 引用 | [`docs/architecture.md`](docs/architecture.md) |
 | 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
+| 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
+| 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
+| 继续查本地化覆盖、接着做审计 | [`docs/localization-audit.md`](docs/localization-audit.md) |
 | 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
@@ -20,7 +23,7 @@
 ## 0. 项目快照
 
 - 产品：紧凑的桌面音乐播放器（Flutter）。双栏布局：左栏常驻播放器，右栏在音乐库 / 队列 / 音源 / 设置之间切换。
-- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences · flex_color_scheme · gen-l10n。
+- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅 Web 存储与旧数据迁移）· gen-l10n。
 - 验收平台：Linux 桌面优先；Android / iOS / Windows / macOS / Web 保留工程入口，但不是 v1 验收目标。
 - 需求文档：`需求/README.md` 是入口。`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`多语言设计.md`（文案规则）是当前权威；`架构需求.md`、`框架.md`、`ai架构需求.md` 属早期规划，已被取代，不要照着实现。
 - `.trae/documents/` 是历史迭代计划，其中还引用 `lib/ui`、`PlaylistService` 等已删除的结构——只当历史读，不当规范。

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 
 /// The visual language for Tune.
@@ -80,22 +81,25 @@ abstract final class CompactTheme {
           fontFamilyFallback: CompactTypography.sansFallback,
         );
 
+    // The interface text follows the scale, so a word keeps its size
+    // wherever it appears. The display family sits above the scale: it is
+    // the big serif voice of the shell and it has a size of its own.
     final textTheme = baseText.copyWith(
       displayLarge: _display(text, 40, -1.4),
       displayMedium: _display(text, 34, -1.0),
       displaySmall: _display(text, 28, -0.6),
       headlineLarge: _sans(text, 24, FontWeight.w700, -0.5),
       headlineMedium: _sans(text, 20, FontWeight.w700, -0.3),
-      headlineSmall: _sans(text, 17, FontWeight.w600),
+      headlineSmall: _sans(text, CompactTypeScale.heading, FontWeight.w600),
       titleLarge: _sans(text, 18, FontWeight.w600, -0.2),
-      titleMedium: _sans(text, 15, FontWeight.w600),
-      titleSmall: _sans(text, 13, FontWeight.w600),
-      bodyLarge: _sans(text, 15, FontWeight.w400),
-      bodyMedium: _sans(text, 13.5, FontWeight.w400),
-      bodySmall: _sans(text, 12, FontWeight.w400),
-      labelLarge: _sans(text, 13, FontWeight.w600, 0.1),
-      labelMedium: _sans(text, 11.5, FontWeight.w600, 0.2),
-      labelSmall: _sans(text, 10.5, FontWeight.w600, 0.4),
+      titleMedium: _sans(text, CompactTypeScale.title, FontWeight.w600),
+      titleSmall: _sans(text, CompactTypeScale.strong, FontWeight.w600),
+      bodyLarge: _sans(text, CompactTypeScale.title, FontWeight.w400),
+      bodyMedium: _sans(text, CompactTypeScale.strong, FontWeight.w400),
+      bodySmall: _sans(text, CompactTypeScale.body, FontWeight.w400),
+      labelLarge: _sans(text, CompactTypeScale.strong, FontWeight.w600, 0.1),
+      labelMedium: _sans(text, CompactTypeScale.label, FontWeight.w600, 0.2),
+      labelSmall: _sans(text, CompactTypeScale.micro, FontWeight.w600, 0.4),
     );
 
     return ThemeData(
@@ -127,7 +131,7 @@ abstract final class CompactTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
-          textStyle: _sans(onPrimary, 13, FontWeight.w600),
+          textStyle: _sans(onPrimary, CompactTypeScale.body, FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -139,7 +143,7 @@ abstract final class CompactTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          textStyle: _sans(text, 12, FontWeight.w600),
+          textStyle: _sans(text, CompactTypeScale.body, FontWeight.w600),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -150,7 +154,7 @@ abstract final class CompactTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(9)),
           ),
-          textStyle: _sans(text, 12, FontWeight.w600),
+          textStyle: _sans(text, CompactTypeScale.body, FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -161,7 +165,7 @@ abstract final class CompactTheme {
           horizontal: 14,
           vertical: 11,
         ),
-        hintStyle: _sans(muted, 13, FontWeight.w400),
+        hintStyle: _sans(muted, CompactTypeScale.body, FontWeight.w400),
         prefixIconColor: muted,
         suffixIconColor: muted,
         border: OutlineInputBorder(
@@ -182,8 +186,8 @@ abstract final class CompactTheme {
         selectedColor: primary.withValues(alpha: isDark ? 0.22 : 0.13),
         side: BorderSide(color: border),
         shape: const StadiumBorder(),
-        labelStyle: _sans(muted, 12, FontWeight.w600),
-        secondaryLabelStyle: _sans(primary, 12, FontWeight.w600),
+        labelStyle: _sans(muted, CompactTypeScale.body, FontWeight.w600),
+        secondaryLabelStyle: _sans(primary, CompactTypeScale.body, FontWeight.w600),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
       dialogTheme: DialogThemeData(
@@ -192,8 +196,8 @@ abstract final class CompactTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(22)),
         ),
-        titleTextStyle: _sans(text, 18, FontWeight.w700),
-        contentTextStyle: _sans(muted, 13, FontWeight.w400),
+        titleTextStyle: _sans(text, CompactTypeScale.heading, FontWeight.w700),
+        contentTextStyle: _sans(muted, CompactTypeScale.body, FontWeight.w400),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
@@ -211,19 +215,7 @@ abstract final class CompactTheme {
         insetPadding: const EdgeInsets.all(16),
         elevation: 0,
       ),
-      tooltipTheme: TooltipThemeData(
-        waitDuration: const Duration(milliseconds: 450),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFFF2EBDD) : const Color(0xFF171512),
-          borderRadius: BorderRadius.circular(7),
-        ),
-        textStyle: _sans(
-          isDark ? const Color(0xFF171512) : const Color(0xFFF2EBDD),
-          11,
-          FontWeight.w500,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      ),
+      tooltipTheme: _tooltipTheme(isDark),
       sliderTheme: SliderThemeData(
         trackHeight: 3,
         activeTrackColor: primary,
@@ -266,6 +258,47 @@ abstract final class CompactTheme {
         linearTrackColor: border,
         circularTrackColor: border,
       ),
+    );
+  }
+
+  /// The look of every hint of the app.
+  ///
+  /// A hint is a drop of ink: a dark card with paper words, in the light theme
+  /// and in the dark one. In the light theme it is deep ink on the paper of
+  /// the page. In the dark theme it is a panel of the app, lifted by a rim of
+  /// a warmer tone and by a shadow, so that it stays a card and never becomes
+  /// a white box on a dark desk.
+  ///
+  /// The hint opens above the thing it belongs to, because a pointer that
+  /// rests on a button would cover a hint below it, and it stays long enough
+  /// to be read.
+  static TooltipThemeData _tooltipTheme(bool isDark) {
+    final card = isDark ? const Color(0xFF211E19) : const Color(0xFF171512);
+    final rim = isDark ? const Color(0xFF4A443B) : const Color(0xFF3B332A);
+    final words = const Color(0xFFF2EBDD);
+
+    return TooltipThemeData(
+      waitDuration: const Duration(milliseconds: 400),
+      showDuration: const Duration(seconds: 4),
+      exitDuration: const Duration(milliseconds: 120),
+      preferBelow: false,
+      verticalOffset: 12,
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      constraints: const BoxConstraints(minHeight: 26, maxWidth: 320),
+      decoration: BoxDecoration(
+        color: card,
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: rim),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.55 : 0.28),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      textStyle: _sans(words, 12, FontWeight.w500),
     );
   }
 

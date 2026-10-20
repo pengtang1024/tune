@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/app/theme/compact_theme.dart';
-import 'package:tune/data/services/impl/shared_preferences_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -17,6 +15,8 @@ import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import '../services/fake_persistence.dart';
+
 
 import 'fake_audio_player_service.dart';
 import 'fake_song_download_service.dart';
@@ -55,12 +55,10 @@ void main() {
     streamUrl: 'https://example.com/a.mp3',
   );
 
-  late SharedPreferencesService persistence;
+  late FakePersistenceService persistence;
 
   setUpAll(() async {
-    SharedPreferences.setMockInitialValues({});
-    persistence = SharedPreferencesService();
-    await persistence.init();
+    persistence = FakePersistenceService();
   });
 
   Future<void> setSurface(WidgetTester tester, Size size) async {
@@ -73,7 +71,7 @@ void main() {
   Widget app({required Widget home, required List<Override> overrides}) {
     return ProviderScope(
       overrides: [
-        sharedPreferencesServiceProvider.overrideWithValue(persistence),
+        persistenceServiceProvider.overrideWithValue(persistence),
         ...overrides,
       ],
       child: MaterialApp(
@@ -287,7 +285,8 @@ void main() {
 
     expect(find.text(songA.title), findsOneWidget);
     expect(find.text(remoteSong.title), findsOneWidget);
-    expect(find.byTooltip('Openverse'), findsOneWidget);
+    expect(find.byTooltip('Openverse · 开放版权聚合'), findsOneWidget);
+    expect(find.textContaining('开放版权聚合', findRichText: true), findsOneWidget);
 
     await tester.tap(find.byTooltip('筛选来源'));
     await tester.pumpAndSettle();
@@ -393,7 +392,8 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.byTooltip('Openverse'), findsOneWidget);
+    expect(find.byTooltip('Openverse · 开放版权聚合'), findsOneWidget);
+    expect(find.textContaining('开放版权聚合', findRichText: true), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -451,7 +451,10 @@ void main() {
     // heading and the entry of the sidebar carry the same word.
     expect(find.text('设置'), findsNWidgets(2));
     expect(find.text('偏好'), findsOneWidget);
-    expect(find.text('音乐库'), findsNWidgets(3));
+    // The card names the library once: the eyebrow names the section the
+    // card belongs to, so only the sidebar and the title carry the word.
+    expect(find.text('音乐库'), findsNWidgets(2));
+    expect(find.text('收藏'), findsNWidgets(2));
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {

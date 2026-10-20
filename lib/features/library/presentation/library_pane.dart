@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/utils/text_order.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -16,6 +17,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 import 'package:tune/shared/ui/page_heading.dart';
 import 'package:tune/shared/ui/source_label.dart';
@@ -55,7 +57,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
 
     if (library.isLoading && !library.hasValue) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CompactSpinner.large());
     }
 
     final state = library.valueOrNull;
@@ -77,7 +79,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         (value) => (value.currentSong?.uri, value.isPlaying),
       ),
     );
-    final sourceNames = sourceNamesOf(
+    final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
         musicSourcesControllerProvider.select(
@@ -93,7 +95,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
+          padding: const EdgeInsets.fromLTRB(
+            CompactTokens.pageGutter,
+            CompactTokens.pageTopPadding,
+            CompactTokens.pageGutter,
+            CompactTokens.pageHeadingGap,
+          ),
           child: PageHeading(
             eyebrow: context.loc.libraryEyebrow,
             title: context.loc.libraryTitle,
@@ -114,7 +121,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                     ),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: VisualDensity.compact,
-                    textStyle: const TextStyle(fontSize: 11),
                     side: BorderSide(
                       color: Theme.of(context).colorScheme.outlineVariant,
                     ),
@@ -127,13 +133,18 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(28, 0, 28, 10),
+          padding: const EdgeInsets.fromLTRB(
+            CompactTokens.pageGutter,
+            0,
+            CompactTokens.pageGutter,
+            CompactTokens.space12,
+          ),
           child: LibraryToolbar(
             controller: _searchController,
             query: state.query,
             filteredCount: songs.length,
-            sources: _availableSources(state, sourceNames),
-            sourceNames: sourceNames,
+            sources: _availableSources(state, sourceLabels),
+            sourceLabels: sourceLabels,
             sourceFilter: state.sourceFilter,
             scanning: state.isScanning,
             onQueryChanged: (value) {
@@ -152,15 +163,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           LibraryScanStatusBar(state: state),
         Expanded(
           child: state.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _body(state, songs, playback.$1, playback.$2, sourceNames),
+              ? const Center(child: CompactSpinner.large())
+              : _body(state, songs, playback.$1, playback.$2, sourceLabels),
         ),
         if (!state.hasSongs && !state.isScanning && state.errorMessage == null)
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              CompactTokens.space16,
+              CompactTokens.pageGutter,
               0,
-              CompactTokens.space16,
+              CompactTokens.pageGutter,
               CompactTokens.space12,
             ),
             child: Text(
@@ -168,7 +179,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 settings.effectiveScanPaths.join('  ·  '),
               ),
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               maxLines: 1,
@@ -182,7 +192,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// Sources that own at least one track of the library.
   List<String> _availableSources(
     LibraryState state,
-    Map<String, String> sourceNames,
+    Map<String, SourceLabel> sourceLabels,
   ) {
     final sources =
         state.songs
@@ -190,7 +200,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             .toSet()
             .toList(growable: false)
           ..sort(
-            (a, b) => compareText(sourceNames[a] ?? a, sourceNames[b] ?? b),
+            (a, b) =>
+                compareText(sourceLabels[a]?.name ?? a, sourceLabels[b]?.name ?? b),
           );
     return sources;
   }
@@ -200,7 +211,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     List<Song> songs,
     String? currentUri,
     bool isPlaying,
-    Map<String, String> sourceNames,
+    Map<String, SourceLabel> sourceLabels,
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
@@ -214,7 +225,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(28, 0, 28, CompactTokens.space8),
+      padding: const EdgeInsets.fromLTRB(
+        CompactTokens.pageGutter,
+        0,
+        CompactTokens.pageGutter,
+        CompactTokens.space8,
+      ),
       itemCount: songs.length,
       itemBuilder: (context, index) {
         final song = songs[index];
@@ -223,7 +239,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           index: index,
           selected: song.uri == currentUri,
           playing: isPlaying,
-          sourceName: sourceLabel(song, sourceNames),
+          source: sourceLabel(song, sourceLabels),
           onTap: () {
             // A track is played on its own: the queue holds what the user
             // puts into it, not the list that happens to be on screen.

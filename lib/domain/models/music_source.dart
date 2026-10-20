@@ -76,6 +76,22 @@ enum MusicSourceKind {
   plugin,
 }
 
+/// What the interface shows about a source.
+///
+/// The name is the name the source writes its own name with (a brand keeps
+/// its own spelling in every language); the localized name is what the source
+/// is called in the language of the reader. The two travel together, so a
+/// source is never named in one place and named differently in another.
+class SourceLabel {
+  final String name;
+  final String localizedName;
+
+  const SourceLabel({required this.name, this.localizedName = ''});
+
+  @override
+  String toString() => 'SourceLabel($name, $localizedName)';
+}
+
 /// User-editable configuration for one music source.
 ///
 /// Sources are identified by a stable [id]. The [settings] map keeps adapter
@@ -84,6 +100,13 @@ enum MusicSourceKind {
 class MusicSourceConfig {
   final String id;
   final String name;
+
+  /// The name of the source in the language of the reader.
+  ///
+  /// A source whose name is already in that language (a folder of local
+  /// music, a podcast feed) has no second name; a source named after a brand
+  /// has one, so the reader knows what the brand is.
+  final String localizedName;
   final String description;
   final MusicSourceKind kind;
   final bool enabled;
@@ -95,6 +118,7 @@ class MusicSourceConfig {
   const MusicSourceConfig({
     required this.id,
     required this.name,
+    this.localizedName = '',
     this.description = '',
     required this.kind,
     this.enabled = true,
@@ -123,6 +147,7 @@ class MusicSourceConfig {
   MusicSourceConfig copyWith({
     String? id,
     String? name,
+    String? localizedName,
     String? description,
     MusicSourceKind? kind,
     bool? enabled,
@@ -132,6 +157,7 @@ class MusicSourceConfig {
     return MusicSourceConfig(
       id: id ?? this.id,
       name: name ?? this.name,
+      localizedName: localizedName ?? this.localizedName,
       description: description ?? this.description,
       kind: kind ?? this.kind,
       enabled: enabled ?? this.enabled,
@@ -176,6 +202,7 @@ class MusicSourceConfig {
     return MusicSourceConfig(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
+      localizedName: json['localizedName']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       kind: _kindFromName(json['kind']?.toString()),
       enabled: rawEnabled is bool ? rawEnabled : true,
@@ -187,6 +214,7 @@ class MusicSourceConfig {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    'localizedName': localizedName,
     'description': description,
     'kind': kind.name,
     'enabled': enabled,

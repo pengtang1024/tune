@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'localization_words.dart';
+
 /// Guards the localisation of the app.
 ///
 /// Six rules are checked:
@@ -18,6 +20,9 @@ import 'package:flutter_test/flutter_test.dart';
 ///   reintroduce a single language,
 /// * the interface writes no text of a language of its own, so a new page
 ///   cannot bring back a single English label.
+///
+/// The names of the bus of the desktop are not part of that last rule: they
+/// belong to a protocol and stay the same in every language.
 void main() {
   const arbDirectory = 'lib/l10n';
   const generatedCatalogue = 'lib/l10n/app_localizations.dart';
@@ -256,23 +261,17 @@ final _latinWord = RegExp(r'[A-Za-z]{2,}');
 /// The app and the services it talks to carry a name of their own, so those
 /// names stay the same in every language.
 const _properNames = {
-  'Tune',
-  'TUNE',
-  'Openverse',
-  'Jamendo',
-  'Internet Archive',
-  'ccMixter',
-  'iTunes',
-  'Subsonic',
-  'Audius',
-  'Wikimedia Commons',
-  'Jellyfin',
-  'Radio Paradise Main',
-  'Radio Paradise Mellow',
-  'Radio Paradise Eclectic',
-  'Radio Paradise Rock',
-  'Radio Paradise World',
+  ...properNames,
 };
+
+/// The calls that speak to the bus of the desktop.
+///
+/// The names of the methods, the arguments and the properties belong to a
+/// protocol of the desktop, not to the interface of the app, so they stay the
+/// same in every language.
+final _busCall = RegExp(
+  r'\b(?:DBusIntrospect\w*|DBusMethod\w*|callMethod|requestName)\s*\(',
+);
 
 /// The text a reader can see at a line, if the line holds one.
 ///
@@ -296,7 +295,29 @@ String? _visibleLiteral(List<String> lines, int index) {
     return null;
   }
 
+  // A name that belongs to the bus of the desktop is part of a protocol and
+  // never reaches a reader.
+  if (_insideBusCall(lines, index)) return null;
+
   return _literalAfter(lines, index, line.substring(slot.end));
+}
+
+/// Whether the line sits inside a call that speaks to the bus.
+///
+/// The scan walks back to the call that holds the line and stops as soon as
+/// the block of that call is over.
+bool _insideBusCall(List<String> lines, int index) {
+  for (var step = 1; step <= 10 && index - step >= 0; step++) {
+    final line = index - step;
+    final trimmed = lines[line].trim();
+
+    if (_busCall.hasMatch(trimmed)) return true;
+
+    // The block of the call ends before the line, so the line belongs to
+    // something else.
+    if (trimmed == '),' || trimmed == ');' || trimmed == '];') return false;
+  }
+  return false;
 }
 
 /// The literal that follows a place, on the line or on the next one.

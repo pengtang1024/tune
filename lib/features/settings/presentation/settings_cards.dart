@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/locale_labels.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
+import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
 
 class SettingsPageHeader extends StatelessWidget {
   final String version;
@@ -21,19 +26,18 @@ class SettingsPageHeader extends StatelessWidget {
             children: [
               Text(
                 context.loc.settingsEyebrow,
-                style: TextStyle(
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: 9,
+                style: CompactTypography.mono(
+                  theme.colorScheme.primary,
+                  size: CompactTypeScale.mark,
                   letterSpacing: 2,
-                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 context.loc.settingsTitle,
-                style: theme.textTheme.displayMedium?.copyWith(
-                  fontFamily: 'Fraunces',
-                  fontSize: 40,
+                style: CompactTypography.asDisplay(
+                  theme.textTheme.displayMedium,
+                  size: CompactTokens.pageTitleSize,
                   height: 0.95,
                 ),
               ),
@@ -69,11 +73,10 @@ class SettingsPageHeader extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'v$version',
-                style: TextStyle(
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: 9,
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurfaceVariant,
+                  size: CompactTypeScale.mark,
                   letterSpacing: 0.4,
-                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -102,7 +105,7 @@ class SettingsInterfaceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return _SettingsCard(
+    return SettingsCard(
       index: '01',
       eyebrow: context.loc.settingsSectionInterface,
       title: context.loc.theme,
@@ -145,16 +148,14 @@ class SettingsInterfaceCard extends StatelessWidget {
                   children: [
                     Text(
                       context.loc.language,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 12.5,
+                      style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       context.loc.settingsLanguageDescription,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 10.5,
+                      style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -197,9 +198,10 @@ class SettingsLibraryCard extends StatelessWidget {
     final pathCount =
         settings.defaultScanPaths.length + settings.customScanPaths.length;
 
-    return _SettingsCard(
+    return SettingsCard(
       index: '02',
-      eyebrow: context.loc.libraryTitle,
+      // The eyebrow names the section, the title names the card.
+      eyebrow: context.loc.libraryEyebrow,
       title: context.loc.libraryTitle,
       description: context.loc.settingsLibraryDescription,
       trailing: Container(
@@ -211,11 +213,10 @@ class SettingsLibraryCard extends StatelessWidget {
         ),
         child: Text(
           context.loc.settingsPathsCount(pathCount),
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 8,
+          style: CompactTypography.mono(
+            theme.colorScheme.onSurfaceVariant,
+            size: CompactTypeScale.markDense,
             letterSpacing: 0.6,
-            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ),
@@ -251,17 +252,12 @@ class SettingsLibraryCard extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
-                  textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
               OutlinedButton.icon(
                 onPressed: canScan ? onScan : null,
                 icon: scanning
-                    ? const SizedBox(
-                        width: 13,
-                        height: 13,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const CompactSpinner.small()
                     : const Icon(Icons.refresh_rounded, size: 15),
                 label: Text(
                   scanning ? context.loc.scanning : context.loc.scanNow,
@@ -269,7 +265,6 @@ class SettingsLibraryCard extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
-                  textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
               TextButton.icon(
@@ -280,7 +275,6 @@ class SettingsLibraryCard extends StatelessWidget {
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 9),
                   foregroundColor: theme.colorScheme.error,
-                  textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
             ],
@@ -297,8 +291,7 @@ class SettingsLibraryCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   context.loc.settingsScanSafetyNote,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 10.5,
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -320,11 +313,11 @@ class SettingsAboutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return _SettingsCard(
-      index: '03',
+    return SettingsCard(
+      index: '04',
       eyebrow: context.loc.about,
-      title: context.loc.settingsAboutTitle,
-      description: context.loc.about,
+      title: context.loc.appName,
+      description: context.loc.appTagline,
       child: Row(
         children: [
           Container(
@@ -342,39 +335,12 @@ class SettingsAboutCard extends StatelessWidget {
           ),
           const SizedBox(width: 13),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      context.loc.appName,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontFamily: 'Fraunces',
-                        fontSize: 21,
-                        height: 1,
-                      ),
-                    ),
-                    const SizedBox(width: 7),
-                    Text(
-                      'v$version',
-                      style: TextStyle(
-                        fontFamily: 'JetBrains Mono',
-                        fontSize: 9,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  context.loc.appTagline,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            child: Text(
+              'v$version',
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.micro,
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -386,109 +352,13 @@ class SettingsAboutCard extends StatelessWidget {
             ),
             child: Text(
               context.loc.settingsLocalFirst,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 7.5,
+              style: CompactTypography.mono(
+                theme.colorScheme.primary,
+                size: CompactTypeScale.markDense,
                 letterSpacing: 0.8,
-                color: theme.colorScheme.primary,
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingsCard extends StatelessWidget {
-  final String index;
-  final String eyebrow;
-  final String title;
-  final String description;
-  final Widget child;
-  final Widget? trailing;
-
-  const _SettingsCard({
-    required this.index,
-    required this.eyebrow,
-    required this.title,
-    required this.description,
-    required this.child,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                index,
-                style: TextStyle(
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: 9,
-                  letterSpacing: 0.5,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 9),
-              Container(
-                width: 1,
-                height: 32,
-                color: theme.colorScheme.outlineVariant,
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      eyebrow,
-                      style: TextStyle(
-                        fontFamily: 'JetBrains Mono',
-                        fontSize: 8,
-                        letterSpacing: 1.5,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.65,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (trailing != null) ...[const SizedBox(width: 10), trailing!],
-            ],
-          ),
-          const SizedBox(height: 18),
-          child,
         ],
       ),
     );
@@ -559,7 +429,7 @@ class _ThemePreview extends StatelessWidget {
                     child: selected
                         ? Icon(
                             Icons.check_rounded,
-                            size: 10,
+                            size: CompactTypeScale.micro,
                             color: theme.colorScheme.onPrimary,
                           )
                         : null,
@@ -570,8 +440,7 @@ class _ThemePreview extends StatelessWidget {
                       label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 11.5,
+                      style: theme.textTheme.labelMedium?.copyWith(
                         fontWeight: selected
                             ? FontWeight.w600
                             : FontWeight.w500,
@@ -775,7 +644,6 @@ class _LanguageDropdown extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
           style: theme.textTheme.bodySmall?.copyWith(
-            fontSize: 12,
             color: theme.colorScheme.onSurface,
           ),
           dropdownColor: theme.colorScheme.surfaceContainerHigh,
@@ -844,10 +712,9 @@ class _PathRow extends StatelessWidget {
               path,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 10.5,
-                color: theme.colorScheme.onSurface,
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurface,
+                size: CompactTypeScale.micro,
               ),
             ),
           ),
@@ -862,13 +729,12 @@ class _PathRow extends StatelessWidget {
             ),
             child: Text(
               label,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 8,
-                letterSpacing: 0.3,
-                color: isDefault
+              style: CompactTypography.mono(
+                isDefault
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.markDense,
+                letterSpacing: 0.3,
               ),
             ),
           ),

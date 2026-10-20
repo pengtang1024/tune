@@ -16,9 +16,9 @@ class LibraryScanStatusBar extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-        CompactTokens.space16,
+        CompactTokens.pageGutter,
         0,
-        CompactTokens.space16,
+        CompactTokens.pageGutter,
         CompactTokens.space8,
       ),
       child: Column(
@@ -39,7 +39,6 @@ class LibraryScanStatusBar extends StatelessWidget {
             Text(
               message,
               style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 color: isError
                     ? theme.colorScheme.error
                     : theme.colorScheme.onSurfaceVariant,

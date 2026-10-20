@@ -33,25 +33,30 @@ List<MusicSourceConfig> localizedSources(
         if (entry == null) return source;
         return source.copyWith(
           name: entry.name,
+          localizedName: entry.localizedName,
           description: entry.description,
         );
       })
       .toList(growable: false);
 }
 
-/// Display names of every configured source, keyed by source id.
+/// Label of every configured source, keyed by source id.
 ///
-/// Track lists resolve the name of the source a track came from through this
+/// Track lists resolve the label of the source a track came from through this
 /// map, so the same source is never named differently in two places. The
-/// names are written in the language the interface draws in.
-Map<String, String> sourceNamesOf(
+/// name is the name the source writes itself with; the localized name is what
+/// the source is called in the language the interface draws in.
+Map<String, SourceLabel> sourceLabelsOf(
   AppLocalizations strings,
   List<MusicSourceConfig> sources,
 ) {
   final catalogue = BuiltInMusicSources.catalogueOf(strings);
   return {
     for (final source in sources)
-      source.id: catalogue[source.id]?.name ?? source.name,
+      source.id: SourceLabel(
+        name: catalogue[source.id]?.name ?? source.name,
+        localizedName: catalogue[source.id]?.localizedName ?? '',
+      ),
   };
 }
 

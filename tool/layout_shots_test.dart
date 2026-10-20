@@ -1,0 +1,310 @@
+// Layout screenshot harness (development tool, not part of the test suite).
+//
+// Run with:
+//   flutter test tool/layout_shots_test.dart
+//
+// Writes one PNG per page to `build/layout-shots/` so the layout can be
+// compared before and after a change.
+import 'dart:async';
+import 'dart:io';
+import 'dart:ui' show ImageByteFormat;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart' show FontLoader;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/presentation/now_playing_page.dart';
+import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/search/presentation/online_search_sheet.dart';
+import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/shell/presentation/compact_shell.dart';
+import 'package:tune/features/sources/presentation/sources_pane.dart';
+import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/providers/persistence_providers.dart';
+import '../test/services/fake_persistence.dart';
+import 'package:tune/shared/ui/track_detail_sheet.dart';
+
+import '../test/app/fake_audio_player_service.dart';
+import '../test/app/fake_song_download_service.dart';
+import '../test/app/fake_stream_url_resolver.dart';
+
+const _songs = [
+  Song(
+    id: 1,
+    title: 'Nocturne in E-flat major, Op. 9 No. 2',
+    artist: 'A rather long artist name that keeps going',
+    album: 'Nocturnes',
+    duration: 245000,
+    uri: '/music/a.mp3',
+  ),
+  Song(
+    id: 2,
+    title: 'Beta',
+    artist: 'Artist B',
+    duration: 120000,
+    uri: '/music/b.mp3',
+  ),
+  Song(
+    id: 3,
+    title: 'Gamma',
+    artist: 'Artist C',
+    duration: 90000,
+    uri: '/music/c.mp3',
+  ),
+  Song(
+    id: 4,
+    title: 'Delta',
+    artist: 'Artist D',
+    duration: 300000,
+    uri: '/music/d.mp3',
+  ),
+];
+
+final _rootKey = GlobalKey();
+List<Override> _overrides = const [];
+
+/// Loads the bundled fonts so the shots show the real type instead of the
+/// fallback boxes the test environment would use.
+Future<void> _loadFonts() async {
+  const families = {
+    'Fraunces': 'assets/fonts/Fraunces/Fraunces-Variable.ttf',
+    'Instrument Sans': 'assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf',
+    'JetBrains Mono': 'assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf',
+    'Noto Sans SC': 'assets/fonts/NotoSansSC/NotoSansSC-Regular.ttf',
+    'Noto Serif SC': 'assets/fonts/NotoSerifSC/NotoSerifSC-Regular.ttf',
+  };
+  for (final entry in families.entries) {
+    final loader = FontLoader(entry.key)
+      ..addFont(
+        Future.value(
+          File(entry.value).readAsBytesSync().buffer.asByteData(),
+        ),
+      );
+    await loader.load();
+  }
+  // The icon font lives in the Flutter cache, not in the project, so the
+  // shots show the real glyphs instead of a box for every icon.
+  final icons = File(
+    '${Platform.environment['FLUTTER_ROOT'] ?? '/opt/flutter'}'
+    '/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+  );
+  if (icons.existsSync()) {
+    final loader = FontLoader('MaterialIcons')
+      ..addFont(Future.value(icons.readAsBytesSync().buffer.asByteData()));
+    await loader.load();
+  }
+}
+
+Future<void> _shot(WidgetTester tester, String name) async {
+  // The first pump builds whatever was just pushed, the second one lets the
+  // animation of a sheet settle.
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+  // `toImage` and the file write are real async work: inside the fake async
+  // zone of `testWidgets` they would never complete, so they run outside it.
+  await tester.runAsync(() async {
+    final boundary =
+        _rootKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 1.0);
+    final bytes = (await image.toByteData(format: ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+    final file = File('build/layout-shots/$name.png');
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(bytes);
+  });
+}
+
+void main() {
+  late FakePersistenceService persistence;
+
+  setUpAll(() async {
+    // The harness lives outside `test/`, so the analyzer does not treat this
+    // file as a test and refuses the test-only mock. It is a mock here too.
+    // ignore: invalid_use_of_visible_for_testing_member
+    persistence = FakePersistenceService();
+    await _loadFonts();
+  });
+
+  Widget app({
+    required Widget home,
+    Brightness brightness = Brightness.light,
+  }) {
+    return ProviderScope(
+      overrides: _overrides,
+      child: RepaintBoundary(
+        key: _rootKey,
+        child: MaterialApp(
+          theme: brightness == Brightness.dark
+              ? CompactTheme.dark
+              : CompactTheme.light,
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: home,
+        ),
+      ),
+    );
+  }
+
+  Future<void> surface(WidgetTester tester, Size size) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
+  Future<void> capture(WidgetTester tester, String suffix) async {
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final playback = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
+    await playback.playQueue(_songs);
+    // The override set stays the same for every page: Riverpod refuses to
+    // add or remove overrides while the scope is alive.
+    _overrides = [
+      persistenceServiceProvider.overrideWithValue(persistence),
+      audioPlayerServiceProvider.overrideWithValue(audio),
+      playbackControllerProvider.overrideWith((ref) => playback),
+      libraryControllerProvider.overrideWith(
+        () => _FakeLibraryController(
+          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+        ),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+    );
+    await _shot(tester, 'library$suffix');
+
+    await tester.pumpWidget(
+      app(home: const CompactShell(currentPath: '/queue', child: QueuePane())),
+    );
+    await _shot(tester, 'queue$suffix');
+
+    await tester.pumpWidget(
+      app(home: const CompactShell(currentPath: '/settings', child: SettingsPane())),
+    );
+    await _shot(tester, 'settings$suffix');
+
+    await tester.pumpWidget(
+      app(home: const CompactShell(currentPath: '/sources', child: SourcesPane())),
+    );
+    await _shot(tester, 'sources$suffix');
+
+    await tester.pumpWidget(app(home: const NowPlayingPage()));
+    await _shot(tester, 'now_playing$suffix');
+  }
+
+  /// Captures the sheets that float over the pages.
+  Future<void> captureSheets(WidgetTester tester, String suffix) async {
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final playback = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
+    await playback.playQueue(_songs);
+    _overrides = [
+      persistenceServiceProvider.overrideWithValue(persistence),
+      audioPlayerServiceProvider.overrideWithValue(audio),
+      playbackControllerProvider.overrideWith((ref) => playback),
+      libraryControllerProvider.overrideWith(
+        () => _FakeLibraryController(
+          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+        ),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+    );
+    await tester.pump();
+    unawaited(showOnlineSearchSheet(tester.element(find.byType(LibraryPane))));
+    await _shot(tester, 'search_sheet$suffix');
+  }
+
+  /// Captures the sheet of a track, on its own tree.
+  Future<void> captureTrackSheet(WidgetTester tester, String suffix) async {
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final playback = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
+    await playback.playQueue(_songs);
+    _overrides = [
+      persistenceServiceProvider.overrideWithValue(persistence),
+      audioPlayerServiceProvider.overrideWithValue(audio),
+      playbackControllerProvider.overrideWith((ref) => playback),
+      libraryControllerProvider.overrideWith(
+        () => _FakeLibraryController(
+          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+        ),
+      ),
+    ];
+
+    await tester.pumpWidget(app(home: const NowPlayingPage()));
+    await tester.pump();
+    unawaited(
+      showTrackDetailSheet(tester.element(find.byType(NowPlayingPage)), _songs.first),
+    );
+    await _shot(tester, 'track_sheet$suffix');
+  }
+
+  testWidgets('capture pages', (tester) async {
+    await surface(tester, const Size(1280, 800));
+    await capture(tester, '');
+  });
+
+  testWidgets('capture pages in the compact width', (tester) async {
+    await surface(tester, const Size(680, 520));
+    await capture(tester, '_narrow');
+  });
+
+  testWidgets('capture pages in the smallest window', (tester) async {
+    await surface(tester, const Size(900, 563));
+    await capture(tester, '_small');
+  });
+
+  testWidgets('capture the search sheet', (tester) async {
+    await surface(tester, const Size(1280, 800));
+    await captureSheets(tester, '');
+  });
+
+  testWidgets('capture the sheet of a track', (tester) async {
+    await surface(tester, const Size(1280, 800));
+    await captureTrackSheet(tester, '');
+  });
+}
+
+class _FakeLibraryController extends LibraryController {
+  _FakeLibraryController(this.seed);
+
+  final LibraryState seed;
+
+  @override
+  Future<LibraryState> build() async => seed;
+
+  @override
+  Future<void> scan(List<String> paths, {bool auto = false}) async {}
+
+  @override
+  void setQuery(String query) {
+    state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+  }
+}

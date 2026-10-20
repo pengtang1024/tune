@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 
@@ -39,14 +41,19 @@ class AudioSourceBadge extends StatelessWidget {
         children: [
           Icon(_icon, size: dense ? 10 : 12, color: color),
           SizedBox(width: dense ? 4 : 5),
-          Text(
-            _label(context, percent),
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: dense ? 8 : 9,
-              letterSpacing: 0.6,
-              fontWeight: FontWeight.w600,
-              color: color,
+          // The label of a language can be longer than the room the badge
+          // gets, so the text gives way instead of overflowing the row.
+          Flexible(
+            child: Text(
+              _label(context, percent),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CompactTypography.mono(
+                color,
+                size: dense ? CompactTypeScale.markDense : CompactTypeScale.mark,
+                weight: FontWeight.w600,
+                letterSpacing: 0.6,
+              ),
             ),
           ),
         ],

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/source_chip.dart';
+import 'package:tune/shared/ui/track_detail_sheet.dart';
+import 'package:tune/shared/ui/track_fact_strip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// Identity of a track inside a list: position, artwork, metadata, source.
@@ -13,7 +18,7 @@ import 'package:tune/shared/utils/duration_format.dart';
 class TrackMeta extends StatelessWidget {
   final Song song;
   final int index;
-  final String? sourceName;
+  final SourceLabel? source;
   final bool selected;
   final bool playing;
   final double artworkSize;
@@ -22,10 +27,10 @@ class TrackMeta extends StatelessWidget {
     super.key,
     required this.song,
     required this.index,
-    this.sourceName,
+    this.source,
     this.selected = false,
     this.playing = false,
-    this.artworkSize = 40,
+    this.artworkSize = CompactTokens.artworkRow,
   });
 
   @override
@@ -53,7 +58,6 @@ class TrackMeta extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   color: selected ? theme.colorScheme.primary : null,
                 ),
@@ -65,60 +69,60 @@ class TrackMeta extends StatelessWidget {
                     : song.artist,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 11,
+                style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
           ),
         ),
-        if (sourceName != null) ...[
-          const SizedBox(width: CompactTokens.space8),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 96),
-            child: SourceChip(label: sourceName!, dense: true),
-          ),
-        ],
         const SizedBox(width: CompactTokens.space8),
-        if (song.isLiveStream)
-          _LiveMark()
-        else
+        TrackFactStrip(song: song),
+        const SizedBox(width: CompactTokens.space8),
+        if (source != null) ...[
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 168),
+            child: SourceChip(label: source!, dense: true),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+        ],
+        if (!song.isLiveStream)
           Text(
             formatDuration(Duration(milliseconds: song.durationInMillis)),
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 10,
-              color: theme.colorScheme.onSurfaceVariant,
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurfaceVariant,
+              size: CompactTypeScale.micro,
             ),
           ),
+        const SizedBox(width: CompactTokens.space4),
+        _DetailsButton(song: song, sourceName: source?.name),
       ],
     );
   }
 }
 
-/// The mark that tells the user the track is a live stream.
-class _LiveMark extends StatelessWidget {
+/// The action that opens everything that is known about a track.
+class _DetailsButton extends StatelessWidget {
+  final Song song;
+  final String? sourceName;
+
+  const _DetailsButton({required this.song, this.sourceName});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = theme.colorScheme.tertiary;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        context.loc.playerLiveBadge,
-        style: TextStyle(
-          fontFamily: 'JetBrains Mono',
-          fontSize: 8,
-          letterSpacing: 0.6,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+    return IconButton(
+      tooltip: context.loc.trackDetailsTooltip,
+      onPressed: () =>
+          showTrackDetailSheet(context, song, sourceName: sourceName),
+      icon: const Icon(Icons.info_outline_rounded, size: 15),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+      style: IconButton.styleFrom(
+        foregroundColor: theme.colorScheme.onSurfaceVariant,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
       ),
     );
   }
@@ -144,7 +148,7 @@ class _Position extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 22,
+      width: CompactTokens.positionColumnWidth,
       child: Center(
         child: selected
             ? Icon(
@@ -154,12 +158,9 @@ class _Position extends StatelessWidget {
               )
             : Text(
                 '${index + 1}',
-                style: TextStyle(
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: 10,
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.75,
-                  ),
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                  size: CompactTypeScale.micro,
                 ),
               ),
       ),

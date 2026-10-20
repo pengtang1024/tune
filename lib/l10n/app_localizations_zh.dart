@@ -167,6 +167,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerNowPlaying => '正在播放';
 
   @override
+  String get playerExpandNowPlaying => '展开正在播放';
+
+  @override
   String get playerCollapse => '收起';
 
   @override
@@ -212,6 +215,15 @@ class AppLocalizationsZh extends AppLocalizations {
     final String countString = countNumberFormat.format(count);
 
     return '队列 $countString 首';
+  }
+
+  @override
+  String playerQueuePosition(int index) {
+    final intl.NumberFormat indexNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String indexString = indexNumberFormat.format(index);
+
+    return '队列第 $indexString 首';
   }
 
   @override
@@ -515,9 +527,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
-
-  @override
-  String get settingsAboutTitle => '关于 Tune';
 
   @override
   String get settingsChooseFolder => '选择音乐文件夹';
@@ -849,10 +858,19 @@ class AppLocalizationsZh extends AppLocalizations {
       '开放版权音频聚合：Jamendo、Freesound、Wikimedia 等';
 
   @override
+  String get sourceOpenverseName => '开放版权聚合';
+
+  @override
   String get sourceJamendoDescription => '独立音乐开放曲库，需要免费 Client ID';
 
   @override
+  String get sourceJamendoName => '独立音乐曲库';
+
+  @override
   String get sourceInternetArchiveDescription => '互联网档案馆的开放音频收藏';
+
+  @override
+  String get sourceInternetArchiveName => '互联网档案馆';
 
   @override
   String get sourceNeteaseName => '网易云音乐 API';
@@ -1028,7 +1046,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceCcmixterDescription => 'Creative Commons 混音与开放音乐曲库';
 
   @override
+  String get sourceCcmixterName => '共享音乐混音';
+
+  @override
   String get sourceItunesDescription => 'Apple Music 目录的 30 秒试听片段';
+
+  @override
+  String get sourceItunesName => '苹果音乐试听';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -1038,6 +1062,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
+
+  @override
+  String get sourceSubsonicName => '自建音乐库';
 
   @override
   String get subsonicAuthFailed => '无法连接音乐服务器，请检查地址与账号';
@@ -1070,6 +1097,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+
+  @override
+  String get sourceAudiusName => '开放音乐网络';
 
   @override
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
@@ -1112,6 +1142,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceWikimediaDescription => '维基共享资源的开放音频';
 
   @override
+  String get sourceWikimediaName => '维基共享资源';
+
+  @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
@@ -1125,6 +1158,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
+
+  @override
+  String get sourceJellyfinName => '自建媒体库';
 
   @override
   String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
@@ -1187,6 +1223,180 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
+  String get genreRock => '摇滚';
+
+  @override
+  String get genrePop => '流行';
+
+  @override
+  String get genreJazz => '爵士';
+
+  @override
+  String get genreClassical => '古典';
+
+  @override
+  String get genreElectronic => '电子';
+
+  @override
+  String get genreHipHop => '说唱';
+
+  @override
+  String get genreBlues => '蓝调';
+
+  @override
+  String get genreCountry => '乡村';
+
+  @override
+  String get genreFolk => '民谣';
+
+  @override
+  String get genreMetal => '金属';
+
+  @override
+  String get genrePunk => '朋克';
+
+  @override
+  String get genreReggae => '雷鬼';
+
+  @override
+  String get genreLatin => '拉丁';
+
+  @override
+  String get genreDance => '舞曲';
+
+  @override
+  String get genreAlternative => '另类';
+
+  @override
+  String get genreIndie => '独立';
+
+  @override
+  String get genreAmbient => '环境音乐';
+
+  @override
+  String get genreHouse => '浩室';
+
+  @override
+  String get genreFunk => '放克';
+
+  @override
+  String get genreGospel => '福音';
+
+  @override
+  String get genreWorld => '世界音乐';
+
+  @override
+  String get genreNewAge => '新世纪';
+
+  @override
+  String get genreSoundtrack => '原声';
+
+  @override
+  String get genreOpera => '歌剧';
+
+  @override
+  String get genreExperimental => '实验';
+
+  @override
+  String get genreMusicWord => '音乐';
+
+  @override
+  String get genreMusicWordShort => '乐';
+
+  @override
+  String get trackFactSource => '来源';
+
+  @override
+  String get trackFactStorage => '位置';
+
+  @override
+  String get trackFactStorageLocal => '本地';
+
+  @override
+  String get trackFactStorageRemote => '在线';
+
+  @override
+  String get trackFactFormat => '格式';
+
+  @override
+  String get trackFactQuality => '音质';
+
+  @override
+  String get trackFactQualityLossless => '无损';
+
+  @override
+  String get trackFactQualityHiRes => '高解析';
+
+  @override
+  String get trackFactSize => '大小';
+
+  @override
+  String get trackFactLyrics => '歌词';
+
+  @override
+  String get trackFactLyricsIncluded => '已包含';
+
+  @override
+  String get trackFactFavorite => '收藏';
+
+  @override
+  String get trackFactFavorited => '已收藏';
+
+  @override
+  String get trackFactPerformers => '演奏者';
+
+  @override
+  String get trackFactAdded => '添加时间';
+
+  @override
+  String get trackFactDescription => '简介';
+
+  @override
+  String get trackFactLive => '直播';
+
+  @override
+  String get trackFactPath => '文件路径';
+
+  @override
+  String get trackDetailsTooltip => '查看详情';
+
+  @override
+  String get trackDetailsCopyPath => '复制路径';
+
+  @override
+  String get trackDetailsCopied => '已复制到剪贴板';
+
+  @override
+  String get sourceStatusEnabled => '已启用';
+
+  @override
+  String get sourceStatusOff => '已关闭';
+
+  @override
+  String get sourceStatusNeedsSetup => '待配置';
+
+  @override
+  String get sourceStatusFailed => '失败';
+
+  @override
+  String get sourceStatusSkipped => '已跳过';
+
+  @override
+  String get sourceStatusScanned => '已扫描';
+
+  @override
+  String get sourceStatusTracks => '曲目';
+
+  @override
+  String get sourceStatusLastScan => '上次扫描';
+
+  @override
+  String get sourceStatusUnsupported => '不支持';
+
+  @override
+  String get sourceStatusWaiting => '待扫描';
+
+  @override
   String get jamendoFieldFormatHint => '默认 192 kbps';
 
   @override
@@ -1209,9 +1419,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryEyebrow => '收藏';
-
-  @override
-  String get queueEyebrow => '队列';
 
   @override
   String get sourcesEyebrow => '连接';
@@ -1454,6 +1661,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get playerNowPlaying => '正在播放';
 
   @override
+  String get playerExpandNowPlaying => '展开正在播放';
+
+  @override
   String get playerCollapse => '收起';
 
   @override
@@ -1499,6 +1709,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '队列 $countString 首';
+  }
+
+  @override
+  String playerQueuePosition(int index) {
+    final intl.NumberFormat indexNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String indexString = indexNumberFormat.format(index);
+
+    return '队列第 $indexString 首';
   }
 
   @override
@@ -1802,9 +2021,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
-
-  @override
-  String get settingsAboutTitle => '关于 Tune';
 
   @override
   String get settingsChooseFolder => '选择音乐文件夹';
@@ -2136,10 +2352,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '开放版权音频聚合：Jamendo、Freesound、Wikimedia 等';
 
   @override
+  String get sourceOpenverseName => '开放版权聚合';
+
+  @override
   String get sourceJamendoDescription => '独立音乐开放曲库，需要免费 Client ID';
 
   @override
+  String get sourceJamendoName => '独立音乐曲库';
+
+  @override
   String get sourceInternetArchiveDescription => '互联网档案馆的开放音频收藏';
+
+  @override
+  String get sourceInternetArchiveName => '互联网档案馆';
 
   @override
   String get sourceNeteaseName => '网易云音乐 API';
@@ -2315,7 +2540,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceCcmixterDescription => 'Creative Commons 混音与开放音乐曲库';
 
   @override
+  String get sourceCcmixterName => '共享音乐混音';
+
+  @override
   String get sourceItunesDescription => 'Apple Music 目录的 30 秒试听片段';
+
+  @override
+  String get sourceItunesName => '苹果音乐试听';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -2325,6 +2556,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
+
+  @override
+  String get sourceSubsonicName => '自建音乐库';
 
   @override
   String get subsonicAuthFailed => '无法连接音乐服务器，请检查地址与账号';
@@ -2357,6 +2591,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourceAudiusDescription => 'Audius 开放音乐网络的完整曲目';
+
+  @override
+  String get sourceAudiusName => '开放音乐网络';
 
   @override
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
@@ -2399,6 +2636,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceWikimediaDescription => '维基共享资源的开放音频';
 
   @override
+  String get sourceWikimediaName => '维基共享资源';
+
+  @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
@@ -2412,6 +2652,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
+
+  @override
+  String get sourceJellyfinName => '自建媒体库';
 
   @override
   String get jellyfinHint => '填写自建 Jellyfin 的地址与账号';
@@ -2474,6 +2717,180 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
+  String get genreRock => '摇滚';
+
+  @override
+  String get genrePop => '流行';
+
+  @override
+  String get genreJazz => '爵士';
+
+  @override
+  String get genreClassical => '古典';
+
+  @override
+  String get genreElectronic => '电子';
+
+  @override
+  String get genreHipHop => '说唱';
+
+  @override
+  String get genreBlues => '蓝调';
+
+  @override
+  String get genreCountry => '乡村';
+
+  @override
+  String get genreFolk => '民谣';
+
+  @override
+  String get genreMetal => '金属';
+
+  @override
+  String get genrePunk => '朋克';
+
+  @override
+  String get genreReggae => '雷鬼';
+
+  @override
+  String get genreLatin => '拉丁';
+
+  @override
+  String get genreDance => '舞曲';
+
+  @override
+  String get genreAlternative => '另类';
+
+  @override
+  String get genreIndie => '独立';
+
+  @override
+  String get genreAmbient => '环境音乐';
+
+  @override
+  String get genreHouse => '浩室';
+
+  @override
+  String get genreFunk => '放克';
+
+  @override
+  String get genreGospel => '福音';
+
+  @override
+  String get genreWorld => '世界音乐';
+
+  @override
+  String get genreNewAge => '新世纪';
+
+  @override
+  String get genreSoundtrack => '原声';
+
+  @override
+  String get genreOpera => '歌剧';
+
+  @override
+  String get genreExperimental => '实验';
+
+  @override
+  String get genreMusicWord => '音乐';
+
+  @override
+  String get genreMusicWordShort => '乐';
+
+  @override
+  String get trackFactSource => '来源';
+
+  @override
+  String get trackFactStorage => '位置';
+
+  @override
+  String get trackFactStorageLocal => '本地';
+
+  @override
+  String get trackFactStorageRemote => '在线';
+
+  @override
+  String get trackFactFormat => '格式';
+
+  @override
+  String get trackFactQuality => '音质';
+
+  @override
+  String get trackFactQualityLossless => '无损';
+
+  @override
+  String get trackFactQualityHiRes => '高解析';
+
+  @override
+  String get trackFactSize => '大小';
+
+  @override
+  String get trackFactLyrics => '歌词';
+
+  @override
+  String get trackFactLyricsIncluded => '已包含';
+
+  @override
+  String get trackFactFavorite => '收藏';
+
+  @override
+  String get trackFactFavorited => '已收藏';
+
+  @override
+  String get trackFactPerformers => '演奏者';
+
+  @override
+  String get trackFactAdded => '添加时间';
+
+  @override
+  String get trackFactDescription => '简介';
+
+  @override
+  String get trackFactLive => '直播';
+
+  @override
+  String get trackFactPath => '文件路径';
+
+  @override
+  String get trackDetailsTooltip => '查看详情';
+
+  @override
+  String get trackDetailsCopyPath => '复制路径';
+
+  @override
+  String get trackDetailsCopied => '已复制到剪贴板';
+
+  @override
+  String get sourceStatusEnabled => '已启用';
+
+  @override
+  String get sourceStatusOff => '已关闭';
+
+  @override
+  String get sourceStatusNeedsSetup => '待配置';
+
+  @override
+  String get sourceStatusFailed => '失败';
+
+  @override
+  String get sourceStatusSkipped => '已跳过';
+
+  @override
+  String get sourceStatusScanned => '已扫描';
+
+  @override
+  String get sourceStatusTracks => '曲目';
+
+  @override
+  String get sourceStatusLastScan => '上次扫描';
+
+  @override
+  String get sourceStatusUnsupported => '不支持';
+
+  @override
+  String get sourceStatusWaiting => '待扫描';
+
+  @override
   String get jamendoFieldFormatHint => '默认 192 kbps';
 
   @override
@@ -2496,9 +2913,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryEyebrow => '收藏';
-
-  @override
-  String get queueEyebrow => '队列';
 
   @override
   String get sourcesEyebrow => '连接';
@@ -2741,6 +3155,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get playerNowPlaying => '正在播放';
 
   @override
+  String get playerExpandNowPlaying => '展開正在播放';
+
+  @override
   String get playerCollapse => '收起';
 
   @override
@@ -2786,6 +3203,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '佇列 $countString 首';
+  }
+
+  @override
+  String playerQueuePosition(int index) {
+    final intl.NumberFormat indexNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String indexString = indexNumberFormat.format(index);
+
+    return '佇列第 $indexString 首';
   }
 
   @override
@@ -3089,9 +3515,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsScanSafetyNote => '掃描只讀取音訊檔案，不會修改或刪除磁碟內容。';
-
-  @override
-  String get settingsAboutTitle => '關於 Tune';
 
   @override
   String get settingsChooseFolder => '選擇音樂資料夾';
@@ -3423,10 +3846,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       '開放版權音頻聚合：Jamendo、Freesound、Wikimedia 等';
 
   @override
+  String get sourceOpenverseName => '開放版權聚合';
+
+  @override
   String get sourceJamendoDescription => '獨立音樂開放曲庫，需要免費 Client ID';
 
   @override
+  String get sourceJamendoName => '獨立音樂曲庫';
+
+  @override
   String get sourceInternetArchiveDescription => '互聯網檔案館的開放音頻收藏';
+
+  @override
+  String get sourceInternetArchiveName => '網際網路檔案館';
 
   @override
   String get sourceNeteaseName => '網易雲音樂 API';
@@ -3602,7 +4034,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceCcmixterDescription => 'Creative Commons 混音與開放音樂曲庫';
 
   @override
+  String get sourceCcmixterName => '共享音樂混音';
+
+  @override
   String get sourceItunesDescription => 'Apple Music 目錄的 30 秒試聽片段';
+
+  @override
+  String get sourceItunesName => '蘋果音樂試聽';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
@@ -3612,6 +4050,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceSubsonicDescription => '連線自建的 Navidrome / Subsonic 音樂庫';
+
+  @override
+  String get sourceSubsonicName => '自建音樂庫';
 
   @override
   String get subsonicAuthFailed => '無法連線音樂伺服器，請檢查位址與帳號';
@@ -3644,6 +4085,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceAudiusDescription => 'Audius 開放音樂網路的完整曲目';
+
+  @override
+  String get sourceAudiusName => '開放音樂網路';
 
   @override
   String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
@@ -3686,6 +4130,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceWikimediaDescription => '維基共享資源的開放音訊';
 
   @override
+  String get sourceWikimediaName => '維基共享資源';
+
+  @override
   String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
 
   @override
@@ -3699,6 +4146,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceJellyfinDescription => '連接自建的 Jellyfin 媒體庫';
+
+  @override
+  String get sourceJellyfinName => '自建媒體庫';
 
   @override
   String get jellyfinHint => '填寫自建 Jellyfin 的位址與帳號';
@@ -3761,6 +4211,180 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get nowPlayingDetailNowPlaying => '正在播放';
 
   @override
+  String get genreRock => '搖滾';
+
+  @override
+  String get genrePop => '流行';
+
+  @override
+  String get genreJazz => '爵士';
+
+  @override
+  String get genreClassical => '古典';
+
+  @override
+  String get genreElectronic => '電子';
+
+  @override
+  String get genreHipHop => '說唱';
+
+  @override
+  String get genreBlues => '藍調';
+
+  @override
+  String get genreCountry => '鄉村';
+
+  @override
+  String get genreFolk => '民謠';
+
+  @override
+  String get genreMetal => '金屬';
+
+  @override
+  String get genrePunk => '朋克';
+
+  @override
+  String get genreReggae => '雷鬼';
+
+  @override
+  String get genreLatin => '拉丁';
+
+  @override
+  String get genreDance => '舞曲';
+
+  @override
+  String get genreAlternative => '另類';
+
+  @override
+  String get genreIndie => '獨立';
+
+  @override
+  String get genreAmbient => '環境音樂';
+
+  @override
+  String get genreHouse => '浩室';
+
+  @override
+  String get genreFunk => '放克';
+
+  @override
+  String get genreGospel => '福音';
+
+  @override
+  String get genreWorld => '世界音樂';
+
+  @override
+  String get genreNewAge => '新世紀';
+
+  @override
+  String get genreSoundtrack => '原聲';
+
+  @override
+  String get genreOpera => '歌劇';
+
+  @override
+  String get genreExperimental => '實驗';
+
+  @override
+  String get genreMusicWord => '音樂';
+
+  @override
+  String get genreMusicWordShort => '樂';
+
+  @override
+  String get trackFactSource => '來源';
+
+  @override
+  String get trackFactStorage => '位置';
+
+  @override
+  String get trackFactStorageLocal => '本機';
+
+  @override
+  String get trackFactStorageRemote => '線上';
+
+  @override
+  String get trackFactFormat => '格式';
+
+  @override
+  String get trackFactQuality => '音質';
+
+  @override
+  String get trackFactQualityLossless => '無損';
+
+  @override
+  String get trackFactQualityHiRes => '高解析';
+
+  @override
+  String get trackFactSize => '大小';
+
+  @override
+  String get trackFactLyrics => '歌詞';
+
+  @override
+  String get trackFactLyricsIncluded => '已包含';
+
+  @override
+  String get trackFactFavorite => '收藏';
+
+  @override
+  String get trackFactFavorited => '已收藏';
+
+  @override
+  String get trackFactPerformers => '演奏者';
+
+  @override
+  String get trackFactAdded => '加入時間';
+
+  @override
+  String get trackFactDescription => '簡介';
+
+  @override
+  String get trackFactLive => '直播';
+
+  @override
+  String get trackFactPath => '檔案路徑';
+
+  @override
+  String get trackDetailsTooltip => '查看詳情';
+
+  @override
+  String get trackDetailsCopyPath => '複製路徑';
+
+  @override
+  String get trackDetailsCopied => '已複製到剪貼簿';
+
+  @override
+  String get sourceStatusEnabled => '已啟用';
+
+  @override
+  String get sourceStatusOff => '已關閉';
+
+  @override
+  String get sourceStatusNeedsSetup => '待設定';
+
+  @override
+  String get sourceStatusFailed => '失敗';
+
+  @override
+  String get sourceStatusSkipped => '已略過';
+
+  @override
+  String get sourceStatusScanned => '已掃描';
+
+  @override
+  String get sourceStatusTracks => '曲目';
+
+  @override
+  String get sourceStatusLastScan => '上次掃描';
+
+  @override
+  String get sourceStatusUnsupported => '不支援';
+
+  @override
+  String get sourceStatusWaiting => '待掃描';
+
+  @override
   String get jamendoFieldFormatHint => '預設 192 kbps';
 
   @override
@@ -3783,9 +4407,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryEyebrow => '收藏';
-
-  @override
-  String get queueEyebrow => '佇列';
 
   @override
   String get sourcesEyebrow => '連線';

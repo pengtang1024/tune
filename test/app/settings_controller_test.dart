@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tune/data/services/impl/shared_preferences_service.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+
+import '../services/fake_persistence.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('theme, locale and scan paths survive a controller rebuild', () async {
-    SharedPreferences.setMockInitialValues({});
-    final persistence = SharedPreferencesService();
-    await persistence.init();
+    final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
     await controller.setThemeMode(ThemeMode.dark);
@@ -29,9 +27,7 @@ void main() {
   });
 
   test('custom scan paths are deduplicated', () async {
-    SharedPreferences.setMockInitialValues({});
-    final persistence = SharedPreferencesService();
-    await persistence.init();
+    final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
     addTearDown(controller.dispose);

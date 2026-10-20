@@ -5,7 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
@@ -13,8 +16,12 @@ import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/meta_chip.dart';
 import 'package:tune/shared/ui/source_chip.dart';
 import 'package:tune/shared/ui/source_label.dart';
+import 'package:tune/shared/ui/track_facts.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// Full window view of the track that is playing right now.
@@ -37,7 +44,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     final theme = Theme.of(context);
     final state = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
-    final sourceNames = sourceNamesOf(
+    final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
         musicSourcesControllerProvider.select(
@@ -54,24 +61,34 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: theme.colorScheme.surface,
           body: DecoratedBox(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: const Alignment(0.72, -0.85),
-                radius: 1.1,
+                // The glow sits behind the middle of the page, where the
+                // cover and the text are, instead of washing over one
+                // corner of it. It fades to nothing, so the title keeps a
+                // calm background to read on.
+                center: const Alignment(0, -0.25),
+                radius: 0.9,
                 colors: [
                   theme.colorScheme.primary.withValues(alpha: 0.16),
-                  theme.colorScheme.surface,
+                  theme.colorScheme.primary.withValues(alpha: 0),
                 ],
               ),
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(28, 16, 28, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  CompactTokens.pageGutter,
+                  CompactTokens.space16,
+                  CompactTokens.pageGutter,
+                  CompactTokens.space20,
+                ),
                 child: Column(
                   children: [
                     _TopBar(
+                      state: state,
                       showLyrics: _showLyrics,
                       onToggleLyrics: () =>
                           setState(() => _showLyrics = !_showLyrics),
@@ -84,12 +101,12 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                               state: state,
                               song: state.currentSong!,
                               showLyrics: _showLyrics,
-                              sourceName:
+                              source:
                                   sourceLabel(
                                     state.currentSong!,
-                                    sourceNames,
+                                    sourceLabels,
                                   ) ??
-                                  context.loc.sourceLocalName,
+                                  SourceLabel(name: context.loc.sourceLocalName),
                               onPrevious: controller.previous,
                               onNext: controller.next,
                               onTogglePlay: controller.togglePlayPause,
@@ -117,8 +134,13 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
 
 /// Header with the back action and the page title.
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.showLyrics, required this.onToggleLyrics});
+  const _TopBar({
+    required this.state,
+    required this.showLyrics,
+    required this.onToggleLyrics,
+  });
 
+  final PlaybackState state;
   final bool showLyrics;
   final VoidCallback onToggleLyrics;
 
@@ -143,16 +165,17 @@ class _TopBar extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              context.loc.playerNowPlaying,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 9,
-                letterSpacing: 1.6,
-                color: theme.colorScheme.onSurfaceVariant,
+            if (_position > 0) ...[
+              const SizedBox(height: 2),
+              Text(
+                context.loc.playerQueuePosition(_position),
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurfaceVariant,
+                  size: CompactTypeScale.mark,
+                  letterSpacing: 1.6,
+                ),
               ),
-            ),
+            ],
           ],
         ),
         const Spacer(),
@@ -170,6 +193,15 @@ class _TopBar extends StatelessWidget {
       ],
     );
   }
+
+  /// Where the track sits in the queue, or zero when the queue holds nothing
+  /// to point at.
+  int get _position {
+    final total = state.queue.length;
+    if (!state.hasTrack || total < 2) return 0;
+    final position = state.currentIndex + 1;
+    return position > 0 && position <= total ? position : 0;
+  }
 }
 
 /// Artwork and track information side by side.
@@ -178,7 +210,7 @@ class _TrackLayout extends StatelessWidget {
     required this.state,
     required this.song,
     required this.showLyrics,
-    required this.sourceName,
+    required this.source,
     required this.onPrevious,
     required this.onNext,
     required this.onTogglePlay,
@@ -188,7 +220,7 @@ class _TrackLayout extends StatelessWidget {
   final PlaybackState state;
   final Song song;
   final bool showLyrics;
-  final String sourceName;
+  final SourceLabel source;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final VoidCallback onTogglePlay;
@@ -198,46 +230,72 @@ class _TrackLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // The cover and the text are one block that sits in the middle of the
+        // page. The empty room falls on both sides of it instead of piling
+        // up on the right, and the text keeps the width it needs to read.
+        final infoWidth = math.min(
+          CompactTokens.nowPlayingInfoWidth,
+          constraints.maxWidth * 0.46,
+        );
         final artworkSize = math
-            .min(constraints.maxHeight * 0.98, constraints.maxWidth * 0.44)
-            .clamp(150.0, 360.0);
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _Artwork(song: song, size: artworkSize),
-            const SizedBox(width: 36),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: showLyrics
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.center,
-                children: [
-                  if (showLyrics) ...[
-                    Expanded(child: LyricsPanel(song: song)),
-                    const SizedBox(height: 12),
-                  ] else ...[
-                    SourceChip(label: sourceName),
-                    const SizedBox(height: 16),
-                    _Title(song: song),
-                    const SizedBox(height: 8),
-                    _Artist(song: song),
-                    const SizedBox(height: 14),
-                    _TrackDetails(song: song, sourceName: sourceName),
-                    const SizedBox(height: 18),
+            .min(
+              constraints.maxHeight * 0.94,
+              constraints.maxWidth * 0.40,
+            )
+            .clamp(120.0, CompactTokens.artworkNowPlaying);
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _Artwork(song: song, size: artworkSize),
+              const SizedBox(width: CompactTokens.nowPlayingGap),
+              SizedBox(
+                width: infoWidth,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: showLyrics
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    if (showLyrics) ...[
+                      Expanded(child: LyricsPanel(song: song)),
+                      const SizedBox(height: CompactTokens.space12),
+                    ] else ...[
+                      Row(
+                        children: [
+                          SourceChip(label: source),
+                          const SizedBox(width: CompactTokens.space8),
+                          // The badge tells where the sound comes from, so it
+                          // belongs next to the name of the source instead of
+                          // floating at the far end of the seek bar.
+                          AudioSourceBadge(
+                            status: state.audioSourceStatus,
+                            progress: state.downloadProgress,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: CompactTokens.space16),
+                      _Title(song: song),
+                      const SizedBox(height: CompactTokens.space8),
+                      _Artist(song: song),
+                      const SizedBox(height: CompactTokens.space14),
+                      _TrackDetails(song: song),
+                      const SizedBox(height: CompactTokens.space18),
+                    ],
+                    _ProgressRow(state: state, onSeek: onSeek),
+                    const SizedBox(height: CompactTokens.space18),
+                    _Transport(
+                      state: state,
+                      onPrevious: onPrevious,
+                      onNext: onNext,
+                      onTogglePlay: onTogglePlay,
+                    ),
                   ],
-                  _ProgressRow(state: state, onSeek: onSeek),
-                  const SizedBox(height: 18),
-                  _Transport(
-                    state: state,
-                    onPrevious: onPrevious,
-                    onNext: onNext,
-                    onTogglePlay: onTogglePlay,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -259,10 +317,12 @@ class _Artwork extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
+          // The shadow stays wide and pale: a small dark one reads as a
+          // second sheet of paper under the cover instead of as depth.
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
-            blurRadius: 36,
-            offset: const Offset(0, 16),
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 44,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -289,9 +349,9 @@ class _Title extends StatelessWidget {
       song.title.isEmpty ? context.loc.nowPlayingUnnamedTrack : song.title,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
-      style: theme.textTheme.displayMedium?.copyWith(
-        fontFamily: 'Fraunces',
-        fontSize: 36,
+      style: CompactTypography.asDisplay(
+        theme.textTheme.displayMedium,
+        size: 36,
         height: 1.06,
       ),
     );
@@ -332,11 +392,10 @@ class _Artist extends StatelessWidget {
             details.join('  ·  '),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 9.5,
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+              size: CompactTypeScale.micro,
               letterSpacing: 0.4,
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -350,16 +409,18 @@ class _Artist extends StatelessWidget {
 /// Every source knows different things about a track, so the panel shows
 /// whatever is known: the album, the year, the style, the quality of the
 /// file, the licence and the station that plays it.
+///
+/// The panel shows the value of a fact and keeps its name for the tooltip, so
+/// the eye reads the values and the mouse names them.
 class _TrackDetails extends StatelessWidget {
-  const _TrackDetails({required this.song, required this.sourceName});
+  const _TrackDetails({required this.song});
 
   final Song song;
-  final String sourceName;
 
   @override
   Widget build(BuildContext context) {
-    final entries = _entries(context);
-    if (entries.isEmpty) return const SizedBox.shrink();
+    final facts = trackFactsOf(context, song);
+    if (facts.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
 
     return Column(
@@ -367,131 +428,28 @@ class _TrackDetails extends StatelessWidget {
       children: [
         Text(
           context.loc.nowPlayingDetails,
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 8.5,
+          style: CompactTypography.mono(
+            theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            size: CompactTypeScale.mark,
+            weight: FontWeight.w500,
             letterSpacing: 1.4,
-            fontWeight: FontWeight.w500,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 8),
         Wrap(
-          spacing: 14,
+          spacing: 6,
           runSpacing: 6,
           children: [
-            for (final entry in entries)
-              _DetailItem(label: entry.$1, value: entry.$2),
+            for (final fact in facts)
+              MetaChip(
+                icon: fact.icon,
+                value: fact.value,
+                tooltip: fact.sentence,
+                tone: fact.tone,
+              ),
           ],
         ),
       ],
-    );
-  }
-
-  /// The facts that are known about the track.
-  List<(String, String)> _entries(BuildContext context) {
-    final entries = <(String, String)>[];
-
-    void add(String label, String? value) {
-      final text = value?.trim() ?? '';
-      if (text.isEmpty) return;
-      entries.add((label, text));
-    }
-
-    add(context.loc.nowPlayingDetailAlbum, song.album);
-    add(context.loc.nowPlayingDetailYear, song.year?.toString());
-    add(context.loc.nowPlayingDetailGenre, _genre());
-    add(context.loc.nowPlayingDetailBitrate, _bitrate());
-    add(context.loc.nowPlayingDetailSampleRate, _sampleRate());
-    add(context.loc.nowPlayingDetailTrack, _track());
-    add(context.loc.nowPlayingDetailDisc, _disc());
-    add(context.loc.language, song.language);
-    add(context.loc.nowPlayingDetailLicense, song.license);
-    add(context.loc.nowPlayingDetailNowPlaying, _onAir());
-    add(context.loc.nowPlayingDetailSource, sourceName);
-
-    return entries;
-  }
-
-  String? _genre() {
-    final genres = song.genres;
-    if (genres != null && genres.isNotEmpty) return genres.join(' / ');
-    return song.genre;
-  }
-
-  String? _bitrate() {
-    final bitrate = song.bitrate;
-    if (bitrate == null || bitrate <= 0) return null;
-    return '$bitrate kbps';
-  }
-
-  String? _sampleRate() {
-    final rate = song.sampleRate;
-    if (rate == null || rate <= 0) return null;
-    final kilohertz = rate / 1000;
-    return kilohertz == kilohertz.roundToDouble()
-        ? '${kilohertz.toInt()} kHz'
-        : '${kilohertz.toStringAsFixed(1)} kHz';
-  }
-
-  String? _track() {
-    final number = song.trackNumber;
-    if (number == null || number <= 0) return null;
-    final total = song.trackTotal;
-    return total != null && total > 0 ? '$number / $total' : '$number';
-  }
-
-  String? _disc() {
-    final number = song.discNumber;
-    if (number == null || number <= 0) return null;
-    final total = song.totalDisc;
-    return total != null && total > 0 ? '$number / $total' : '$number';
-  }
-
-  /// The track a station is playing right now.
-  String? _onAir() {
-    final nowPlaying = song.sourceData?['nowPlaying']?.toString() ?? '';
-    return nowPlaying.isEmpty ? null : nowPlaying;
-  }
-}
-
-/// One fact of the track, written as `label value`.
-class _DetailItem extends StatelessWidget {
-  const _DetailItem({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
-
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(
-            text: '$label ',
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 9.5,
-              letterSpacing: 0.3,
-              color: muted.withValues(alpha: 0.75),
-            ),
-          ),
-          TextSpan(
-            text: value,
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 9.5,
-              letterSpacing: 0.3,
-              color: muted,
-            ),
-          ),
-        ],
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -518,19 +476,9 @@ class _ProgressRow extends StatelessWidget {
       return Row(
         children: [
           _TimeLabel(value: state.position),
-          const SizedBox(width: 10),
+          const SizedBox(width: CompactTokens.space12),
           const _LiveBadge(),
           const Spacer(),
-          SizedBox(
-            width: 92,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: AudioSourceBadge(
-                status: state.audioSourceStatus,
-                progress: state.downloadProgress,
-              ),
-            ),
-          ),
         ],
       );
     }
@@ -552,17 +500,6 @@ class _ProgressRow extends StatelessWidget {
           ),
         ),
         _TimeLabel(value: state.duration),
-        const SizedBox(width: 4),
-        SizedBox(
-          width: 92,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: AudioSourceBadge(
-              status: state.audioSourceStatus,
-              progress: state.downloadProgress,
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -577,7 +514,7 @@ class _LiveBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme.tertiary;
 
-    return Tooltip(
+    return TuneTooltip(
       message: context.loc.nowPlayingLiveStream,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -593,12 +530,11 @@ class _LiveBadge extends StatelessWidget {
             const SizedBox(width: 5),
             Text(
               context.loc.playerLiveBadge,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 9,
+              style: CompactTypography.mono(
+                color,
+                size: CompactTypeScale.mark,
+                weight: FontWeight.w600,
                 letterSpacing: 0.8,
-                fontWeight: FontWeight.w600,
-                color: color,
               ),
             ),
           ],
@@ -620,10 +556,9 @@ class _TimeLabel extends StatelessWidget {
       width: 46,
       child: Text(
         formatDuration(value),
-        style: TextStyle(
-          fontFamily: 'JetBrains Mono',
-          fontSize: 10,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        style: CompactTypography.mono(
+          Theme.of(context).colorScheme.onSurfaceVariant,
+          size: CompactTypeScale.micro,
         ),
       ),
     );
@@ -648,6 +583,9 @@ class _Transport extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(
+      // The buttons sit in the middle of the column, under the middle of
+      // the seek bar, so the eye finds the play button right away.
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _RoundButton(
           icon: Icons.skip_previous_rounded,
@@ -655,7 +593,7 @@ class _Transport extends StatelessWidget {
           size: 24,
           onPressed: state.hasTrack ? onPrevious : null,
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: CompactTokens.space10),
         SizedBox(
           width: 56,
           height: 56,
@@ -674,14 +612,7 @@ class _Transport extends StatelessWidget {
               shape: const CircleBorder(),
             ),
             icon: state.isLoading
-                ? SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                  )
+                ? CompactSpinner.medium(color: theme.colorScheme.onPrimary)
                 : Icon(
                     state.isPlaying
                         ? Icons.pause_rounded
@@ -690,7 +621,7 @@ class _Transport extends StatelessWidget {
                   ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: CompactTokens.space10),
         _RoundButton(
           icon: Icons.skip_next_rounded,
           tooltip: context.loc.playerNext,
@@ -716,12 +647,11 @@ class _Footer extends StatelessWidget {
       children: [
         Text(
           'TUNE',
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 9,
+          style: CompactTypography.mono(
+            muted,
+            size: CompactTypeScale.mark,
+            weight: FontWeight.w600,
             letterSpacing: 1.6,
-            fontWeight: FontWeight.w600,
-            color: muted,
           ),
         ),
         const SizedBox(width: 10),
@@ -736,11 +666,10 @@ class _Footer extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           context.loc.playerQueueSummary(state.queue.length),
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 9,
+          style: CompactTypography.mono(
+            muted,
+            size: CompactTypeScale.mark,
             letterSpacing: 0.8,
-            color: muted,
           ),
         ),
         const Spacer(),
@@ -750,10 +679,9 @@ class _Footer extends StatelessWidget {
               state.errorMessage!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'JetBrains Mono',
-                fontSize: 9.5,
-                color: theme.colorScheme.error,
+              style: CompactTypography.mono(
+                theme.colorScheme.error,
+                size: CompactTypeScale.micro,
               ),
             ),
           ),
@@ -781,9 +709,9 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             context.loc.nowPlayingEmptyTitle,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontFamily: 'Fraunces',
-              fontSize: 22,
+            style: CompactTypography.asDisplay(
+              theme.textTheme.titleMedium,
+              size: 22,
             ),
           ),
           const SizedBox(height: 6),
@@ -816,7 +744,7 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Tooltip(
+    return TuneTooltip(
       message: tooltip,
       child: InkWell(
         onTap: onPressed,

@@ -20,6 +20,41 @@
 - 中文用随包发布的思源黑体（`Noto Sans SC`）与思源宋体（`Noto Serif SC`），标题走宋体、正文走黑体；不要依赖系统装了什么字体，也不要在 widget 里写 `fontFamily`。
 - 需要新样式就调 `CompactTypography.sans` / `display` / `mono` / `asDisplay`，不要在调用点直接 `TextStyle(fontFamily: ...)`。
 
+### 字号梯度
+
+- 字号按「角色」取，不按调用点取。唯一的梯度是 `CompactTypeScale`（`lib/app/theme/compact_type_scale.dart`）：
+  - `markDense` 8 / `mark` 9：标记类文字——页面眉标、药丸标签、品牌角标。这类字是符号不是句子，才允许小于正文。
+  - `micro` 10.5：机器写出来的数字与名字——时长、序号、版本号、路径。
+  - `label` 11.5：控件上的标签与次要说明。
+  - `body` 12.5：输入框、列表项、段落正文。
+  - `strong` 13.5：曲目标题、卡片标题、主要按钮。
+  - `title` 15：一组内容的标题。
+  - `heading` 16：浮层与对话框的标题。
+- **调用点不许写 `fontSize:` 数字**。要某个角色就挑主题里对应的 `textTheme` 角色（`bodySmall`、`labelMedium`、`bodyMedium`……），主题已经把它们接到梯度上。
+- 要加新档位先想清楚：每多一档就多半个像素要让人记住，而这个界面一次要显示很多字。
+
+## 加载指示
+
+- 加载圈只用 `CompactSpinner`（`lib/shared/ui/compact_spinner.dart`），尺寸和线宽都从 `CompactTokens` 出。
+- 不要直接用 `CircularProgressIndicator`：Material 的现行样式把描边画在路径中央，一半落在自己的框外被裁掉，圈在四个正方向上会变细，转起来像锯齿。`CompactSpinner` 用 `strokeAlignInside` 把整条描边收进框里，并换成圆头、把底圈去掉。
+- 牌子式的小圈（按钮里那个）不要加底圈，两圈挨在一起会互相干扰。
+
+## 布局对齐
+
+- 页面左右留白统一用 `CompactTokens.pageGutter`；标题、工具条和列表共用同一条左边缘。
+- 列表里的一行曲目统一走 `TrackMeta`（`lib/shared/ui/track_meta.dart`）：封面、序号、时长都从同一份 token 出发，音乐库和播放队列的列才会对齐。
+- 走带控件（播放按钮、进度条）要落在中线上：播放按钮的中心与容器的中线重合，而不是让整组按钮居中。
+- 输入框不要拉成细长条：`CompactTokens.searchFieldMaxWidth` 给了上限，右侧留给页面自己的动作。
+- 悬浮元素（徽标、状态标签）跟着它描述的对象走，不要漂在行尾。
+
+## 提示（tooltip）
+
+- 界面上没写出来的说明一律走 `TuneTooltip`（`lib/shared/ui/tune_tooltip.dart`），不要直接用 `Tooltip`。
+- 外观只有一处：`CompactTheme.tooltipTheme`（`lib/app/theme/compact_theme.dart`）。改动外观改主题，不要在调用点写 `decoration`。
+- 提示是**一滴墨**：明暗两套主题都是深色卡片 + 纸色文字。深色主题下不要换成纸色卡片，否则深色桌面上会浮起一个白盒子。
+- 图标按钮用 `IconButton(tooltip: ...)`，它跟 `TuneTooltip` 走同一份主题。
+- 提示没有文案就不该存在：`TuneTooltip` 会直接把子组件原样返回，不要用空字符串凑一个空框。
+
 ## 常量
 
 - 偏好键名等放 `lib/core/constants/app_preferences_constants.dart`。
@@ -56,6 +91,7 @@
 
 - `tool/` 放开发脚本（`generate_linux_icons.dart`、`layout_shots_test.dart`），不放业务代码。
 - **测试专用 API 只能在 `test/` 下用**：`SharedPreferences.setMockInitialValues` 这类成员在 `tool/` 里会触发 `invalid_use_of_visible_for_testing_member`。
+  - app 自己的持久化在测试里用 `FakePersistenceService` 隔离，不去碰真的插件存储。
   - 脚本要留在 `tool/`（不进常规 `flutter test`）就在调用处加 `// ignore: invalid_use_of_visible_for_testing_member` 并写明原因。
   - 脚本要进常规测试运行就挪到 `test/` 下。
 - 详见 [verification.md](verification.md)。

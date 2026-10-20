@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -13,7 +14,7 @@ class QueueTrackRow extends StatelessWidget {
   final int index;
   final bool selected;
   final bool playing;
-  final String? sourceName;
+  final SourceLabel? source;
   final VoidCallback onTap;
   final VoidCallback onRemove;
 
@@ -23,7 +24,7 @@ class QueueTrackRow extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.playing,
-    this.sourceName,
+    this.source,
     required this.onTap,
     required this.onRemove,
   });
@@ -39,7 +40,6 @@ class QueueTrackRow extends StatelessWidget {
         onTap: onTap,
         hoverColor: accent.withValues(alpha: 0.04),
         child: Container(
-          height: 48,
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -47,44 +47,60 @@ class QueueTrackRow extends StatelessWidget {
               ),
             ),
           ),
-          child: Row(
+          child: Stack(
             children: [
-              Container(
-                width: 2,
-                height: double.infinity,
-                color: selected ? accent : Colors.transparent,
-              ),
-              const SizedBox(width: CompactTokens.space8),
-              Expanded(
-                child: TrackMeta(
-                  song: song,
-                  index: index,
-                  sourceName: sourceName,
-                  selected: selected,
-                  playing: playing,
-                  artworkSize: 32,
-                ),
-              ),
-              const SizedBox(width: CompactTokens.space4),
-              ReorderableDragStartListener(
-                index: index,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.grab,
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: Icon(
-                      Icons.drag_indicator_rounded,
-                      size: CompactTokens.icon16,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.7,
-                      ),
-                    ),
+              // The mark of the track that plays sits on the edge of the row
+              // instead of taking room, so the columns of the queue line up
+              // with the columns of the library.
+              if (selected)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 2,
+                    color: accent,
                   ),
                 ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space8,
+                  vertical: CompactTokens.space8,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TrackMeta(
+                        song: song,
+                        index: index,
+                        source: source,
+                        selected: selected,
+                        playing: playing,
+                      ),
+                    ),
+                    const SizedBox(width: CompactTokens.space4),
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.grab,
+                        child: SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: Icon(
+                            Icons.drag_indicator_rounded,
+                            size: CompactTokens.icon16,
+                            color: theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.7,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    _RemoveButton(onPressed: onRemove),
+                    const SizedBox(width: CompactTokens.space4),
+                  ],
+                ),
               ),
-              _RemoveButton(onPressed: onRemove),
-              const SizedBox(width: CompactTokens.space4),
             ],
           ),
         ),

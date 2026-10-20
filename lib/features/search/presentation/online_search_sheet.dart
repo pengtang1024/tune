@@ -9,7 +9,10 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/shared/ui/source_chip.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/track_detail_sheet.dart';
+import 'package:tune/shared/ui/track_fact_strip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 Future<void> showOnlineSearchSheet(BuildContext context) {
@@ -56,7 +59,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
       ref.watch(musicSourcesControllerProvider).valueOrNull?.sources ??
           const <MusicSourceConfig>[],
     );
-    final sourceNames = {for (final source in sources) source.id: source.name};
+    final sourceLabels = sourceLabelsOf(context.loc, sources);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final height = MediaQuery.sizeOf(context).height * 0.86;
 
@@ -65,10 +68,14 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
       child: Align(
         alignment: Alignment.bottomCenter,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 760),
+          constraints: const BoxConstraints(
+            maxWidth: CompactTokens.sheetWidth,
+          ),
           child: Material(
             color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(CompactTokens.sheetRadius),
+            ),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
               height: height,
@@ -80,9 +87,9 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
-                      CompactTokens.space16,
+                      CompactTokens.space20,
                       0,
-                      CompactTokens.space16,
+                      CompactTokens.space20,
                       CompactTokens.space12,
                     ),
                     child: Row(
@@ -95,7 +102,6 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                             textInputAction: TextInputAction.search,
                             onSubmitted: (_) => _search(),
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 13,
                             ),
                             decoration: InputDecoration(
                               isDense: true,
@@ -103,7 +109,6 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                               fillColor: theme.colorScheme.surfaceContainer,
                               hintText: context.loc.searchOnlineHint,
                               hintStyle: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 12,
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
                               prefixIcon: const Icon(
@@ -163,7 +168,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   Expanded(
                     child: _Body(
                       search: search,
-                      sourceNames: sourceNames,
+                      sourceLabels: sourceLabels,
                       onPlay: _play,
                       onAddToQueue: _addToQueue,
                     ),
@@ -212,7 +217,7 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(
         CompactTokens.space20,
         CompactTokens.space16,
-        CompactTokens.space8,
+        CompactTokens.space20,
         CompactTokens.space12,
       ),
       child: Row(
@@ -237,15 +242,13 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   context.loc.searchOnlineTitle,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontSize: 16,
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   context.loc.searchOnlineDescription,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
                     color: colors.onSurfaceVariant,
                   ),
                 ),
@@ -270,13 +273,13 @@ class _Header extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   final OnlineSearchState? search;
-  final Map<String, String> sourceNames;
+  final Map<String, SourceLabel> sourceLabels;
   final Future<void> Function(SourceScanResult result, int index) onPlay;
   final ValueChanged<Song> onAddToQueue;
 
   const _Body({
     required this.search,
-    required this.sourceNames,
+    required this.sourceLabels,
     required this.onPlay,
     required this.onAddToQueue,
   });
@@ -285,7 +288,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = search ?? const OnlineSearchState();
     if (state.isSearching) {
-      return _SearchingView(state: state, sourceNames: sourceNames);
+      return _SearchingView(state: state, sourceLabels: sourceLabels);
     }
     if (!state.hasQuery) {
       return _EmptyView(
@@ -316,16 +319,17 @@ class _Body extends StatelessWidget {
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        CompactTokens.space12,
+        CompactTokens.space20,
         CompactTokens.space8,
-        CompactTokens.space12,
+        CompactTokens.space20,
         CompactTokens.space24,
       ),
       children: [
         for (final result in visibleGroups)
           _SourceGroup(
             result: result,
-            sourceName: sourceNames[result.sourceId] ?? result.sourceId,
+            sourceLabel: sourceLabels[result.sourceId] ??
+                SourceLabel(name: result.sourceId),
             onPlay: onPlay,
             onAddToQueue: onAddToQueue,
           ),
@@ -336,9 +340,9 @@ class _Body extends StatelessWidget {
 
 class _SearchingView extends StatelessWidget {
   final OnlineSearchState state;
-  final Map<String, String> sourceNames;
+  final Map<String, SourceLabel> sourceLabels;
 
-  const _SearchingView({required this.state, required this.sourceNames});
+  const _SearchingView({required this.state, required this.sourceLabels});
 
   @override
   Widget build(BuildContext context) {
@@ -349,7 +353,7 @@ class _SearchingView extends StatelessWidget {
       children: [
         Text(
           context.loc.searchSearching(state.query),
-          style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13),
+          style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: CompactTokens.space12),
         if (entries.isEmpty)
@@ -360,9 +364,8 @@ class _SearchingView extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    sourceNames[entry.key] ?? entry.key,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 11,
+                    sourceLabels[entry.key]?.name ?? entry.key,
+                    style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -370,7 +373,6 @@ class _SearchingView extends StatelessWidget {
                 Text(
                   '${(entry.value * 100).round()}%',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -394,13 +396,13 @@ class _SearchingView extends StatelessWidget {
 
 class _SourceGroup extends StatelessWidget {
   final SourceScanResult result;
-  final String sourceName;
+  final SourceLabel sourceLabel;
   final Future<void> Function(SourceScanResult result, int index) onPlay;
   final ValueChanged<Song> onAddToQueue;
 
   const _SourceGroup({
     required this.result,
-    required this.sourceName,
+    required this.sourceLabel,
     required this.onPlay,
     required this.onAddToQueue,
   });
@@ -427,11 +429,10 @@ class _SourceGroup extends StatelessWidget {
             Expanded(
               child: Text(
                 context.loc.searchSourceError(
-                  sourceName,
+                  sourceLabel.name,
                   result.message ?? context.loc.searchFailedShort,
                 ),
                 style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -446,25 +447,18 @@ class _SourceGroup extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(
+            0,
             CompactTokens.space8,
-            CompactTokens.space8,
-            CompactTokens.space8,
+            0,
             CompactTokens.space4,
           ),
           child: Row(
             children: [
-              Text(
-                sourceName,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              SourceChip(label: sourceLabel, dense: true),
               const SizedBox(width: CompactTokens.space8),
               Text(
                 context.loc.libraryTrackCount(result.songs.length),
                 style: theme.textTheme.labelSmall?.copyWith(
-                  fontSize: 10,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -478,7 +472,6 @@ class _SourceGroup extends StatelessWidget {
                   ),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
-                  textStyle: const TextStyle(fontSize: 11),
                 ),
                 icon: const Icon(Icons.play_arrow_rounded, size: 16),
                 label: Text(context.loc.searchPlayAll),
@@ -542,8 +535,7 @@ class _SongRow extends StatelessWidget {
                     song.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 12,
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -553,20 +545,31 @@ class _SongRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                 ],
               ),
             ),
+            const SizedBox(width: CompactTokens.space8),
+            TrackFactStrip(song: song),
+            const SizedBox(width: CompactTokens.space8),
             Text(
               song.duration > 0
                   ? formatDuration(Duration(milliseconds: song.duration))
                   : '--:--',
               style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            IconButton(
+              tooltip: context.loc.trackDetailsTooltip,
+              onPressed: () => showTrackDetailSheet(context, song),
+              icon: const Icon(Icons.info_outline_rounded, size: 16),
+              style: IconButton.styleFrom(
+                foregroundColor: theme.colorScheme.onSurfaceVariant,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
             ),
             IconButton(
@@ -611,7 +614,6 @@ class _EmptyView extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -620,7 +622,6 @@ class _EmptyView extends StatelessWidget {
               subtitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
@@ -50,7 +51,12 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
     return Scrollbar(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(28, 26, 28, 28),
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.pageGutter,
+          CompactTokens.pageTopPadding,
+          CompactTokens.pageGutter,
+          CompactTokens.pageGutter,
+        ),
         child: Align(
           alignment: Alignment.topLeft,
           child: ConstrainedBox(
@@ -59,7 +65,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SettingsPageHeader(version: AppVersion.version),
-                const SizedBox(height: 20),
+                const SizedBox(height: CompactTokens.space20),
                 SettingsInterfaceCard(
                   themeMode: settings.themeMode,
                   locale: settings.locale,

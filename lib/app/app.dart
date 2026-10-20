@@ -8,6 +8,7 @@ import 'package:tune/core/l10n/localization_bridge.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/utils/logger.dart';
 
 final appInitializationProvider = FutureProvider<void>((ref) async {
@@ -88,7 +89,7 @@ class _StartupScreen extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: CompactTheme.light,
       darkTheme: CompactTheme.dark,
-      home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+      home: const Scaffold(body: Center(child: CompactSpinner.large())),
     );
   }
 }

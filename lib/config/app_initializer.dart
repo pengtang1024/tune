@@ -31,7 +31,7 @@ class AppInitializer {
 
   static Future<void> _initPersistenceService(Ref ref) async {
     try {
-      final persistenceService = ref.read(sharedPreferencesServiceProvider);
+      final persistenceService = ref.read(persistenceServiceProvider);
       await persistenceService.init();
       Log.info('持久化服务初始化成功');
     } catch (error, stackTrace) {

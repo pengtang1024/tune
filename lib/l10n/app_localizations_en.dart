@@ -179,6 +179,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerNowPlaying => 'Now playing';
 
   @override
+  String get playerExpandNowPlaying => 'Open now playing';
+
+  @override
   String get playerCollapse => 'Collapse';
 
   @override
@@ -230,6 +233,15 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 track in queue',
     );
     return '$_temp0';
+  }
+
+  @override
+  String playerQueuePosition(int index) {
+    final intl.NumberFormat indexNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String indexString = indexNumberFormat.format(index);
+
+    return 'Queue track $indexString';
   }
 
   @override
@@ -549,9 +561,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsScanSafetyNote =>
       'Scanning only reads audio files. Nothing on disk is changed or deleted.';
-
-  @override
-  String get settingsAboutTitle => 'About Tune';
 
   @override
   String get settingsChooseFolder => 'Choose a music folder';
@@ -960,12 +969,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open audio from Jamendo, Freesound, Wikimedia and more';
 
   @override
+  String get sourceOpenverseName => 'Open audio';
+
+  @override
   String get sourceJamendoDescription =>
       'An open catalog of independent music. Needs a free Client ID.';
 
   @override
+  String get sourceJamendoName => 'Indie music';
+
+  @override
   String get sourceInternetArchiveDescription =>
       'The open audio collection of the Internet Archive';
+
+  @override
+  String get sourceInternetArchiveName => 'Web archive';
 
   @override
   String get sourceNeteaseName => 'NetEase Cloud Music API';
@@ -1153,8 +1171,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Creative Commons remixes and open music';
 
   @override
+  String get sourceCcmixterName => 'Shared mixes';
+
+  @override
   String get sourceItunesDescription =>
       '30 second previews from the Apple Music catalog';
+
+  @override
+  String get sourceItunesName => 'Apple previews';
 
   @override
   String get sourcePodcastRssDescription =>
@@ -1166,6 +1190,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sourceSubsonicDescription =>
       'Connects to a self-hosted Navidrome or Subsonic library';
+
+  @override
+  String get sourceSubsonicName => 'Self-hosted';
 
   @override
   String get subsonicAuthFailed =>
@@ -1203,6 +1230,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sourceAudiusDescription =>
       'Complete tracks from the open Audius network';
+
+  @override
+  String get sourceAudiusName => 'Artist network';
 
   @override
   String get audiusHint =>
@@ -1247,6 +1277,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceWikimediaDescription => 'Open audio from Wikimedia Commons';
 
   @override
+  String get sourceWikimediaName => 'Shared media';
+
+  @override
   String get wikimediaHint =>
       'Type a search keyword, e.g. piano, lecture or birdsong';
 
@@ -1263,6 +1296,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sourceJellyfinDescription =>
       'Connect to a self-hosted Jellyfin library';
+
+  @override
+  String get sourceJellyfinName => 'Media server';
 
   @override
   String get jellyfinHint =>
@@ -1327,6 +1363,180 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nowPlayingDetailNowPlaying => 'On air';
 
   @override
+  String get genreRock => 'Rock';
+
+  @override
+  String get genrePop => 'Pop';
+
+  @override
+  String get genreJazz => 'Jazz';
+
+  @override
+  String get genreClassical => 'Classical';
+
+  @override
+  String get genreElectronic => 'Electronic';
+
+  @override
+  String get genreHipHop => 'Hip-Hop';
+
+  @override
+  String get genreBlues => 'Blues';
+
+  @override
+  String get genreCountry => 'Country';
+
+  @override
+  String get genreFolk => 'Folk';
+
+  @override
+  String get genreMetal => 'Metal';
+
+  @override
+  String get genrePunk => 'Punk';
+
+  @override
+  String get genreReggae => 'Reggae';
+
+  @override
+  String get genreLatin => 'Latin';
+
+  @override
+  String get genreDance => 'Dance';
+
+  @override
+  String get genreAlternative => 'Alternative';
+
+  @override
+  String get genreIndie => 'Indie';
+
+  @override
+  String get genreAmbient => 'Ambient';
+
+  @override
+  String get genreHouse => 'House';
+
+  @override
+  String get genreFunk => 'Funk';
+
+  @override
+  String get genreGospel => 'Gospel';
+
+  @override
+  String get genreWorld => 'World Music';
+
+  @override
+  String get genreNewAge => 'New Age';
+
+  @override
+  String get genreSoundtrack => 'Soundtrack';
+
+  @override
+  String get genreOpera => 'Opera';
+
+  @override
+  String get genreExperimental => 'Experimental';
+
+  @override
+  String get genreMusicWord => 'music';
+
+  @override
+  String get genreMusicWordShort => 'music';
+
+  @override
+  String get trackFactSource => 'Source';
+
+  @override
+  String get trackFactStorage => 'Location';
+
+  @override
+  String get trackFactStorageLocal => 'Local';
+
+  @override
+  String get trackFactStorageRemote => 'Remote';
+
+  @override
+  String get trackFactFormat => 'Format';
+
+  @override
+  String get trackFactQuality => 'Quality';
+
+  @override
+  String get trackFactQualityLossless => 'Lossless';
+
+  @override
+  String get trackFactQualityHiRes => 'Hi-Res';
+
+  @override
+  String get trackFactSize => 'Size';
+
+  @override
+  String get trackFactLyrics => 'Lyrics';
+
+  @override
+  String get trackFactLyricsIncluded => 'Included';
+
+  @override
+  String get trackFactFavorite => 'Favorite';
+
+  @override
+  String get trackFactFavorited => 'Favorited';
+
+  @override
+  String get trackFactPerformers => 'Performers';
+
+  @override
+  String get trackFactAdded => 'Added';
+
+  @override
+  String get trackFactDescription => 'Description';
+
+  @override
+  String get trackFactLive => 'Live';
+
+  @override
+  String get trackFactPath => 'File path';
+
+  @override
+  String get trackDetailsTooltip => 'Details';
+
+  @override
+  String get trackDetailsCopyPath => 'Copy path';
+
+  @override
+  String get trackDetailsCopied => 'Copied to the clipboard';
+
+  @override
+  String get sourceStatusEnabled => 'Enabled';
+
+  @override
+  String get sourceStatusOff => 'Off';
+
+  @override
+  String get sourceStatusNeedsSetup => 'Setup needed';
+
+  @override
+  String get sourceStatusFailed => 'Failed';
+
+  @override
+  String get sourceStatusSkipped => 'Skipped';
+
+  @override
+  String get sourceStatusScanned => 'Scanned';
+
+  @override
+  String get sourceStatusTracks => 'Tracks';
+
+  @override
+  String get sourceStatusLastScan => 'Last scan';
+
+  @override
+  String get sourceStatusUnsupported => 'Unsupported';
+
+  @override
+  String get sourceStatusWaiting => 'Not scanned';
+
+  @override
   String get jamendoFieldFormatHint => '192 kbps by default';
 
   @override
@@ -1349,9 +1559,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryEyebrow => 'Collection';
-
-  @override
-  String get queueEyebrow => 'Queue';
 
   @override
   String get sourcesEyebrow => 'Connections';

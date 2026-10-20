@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/shared/ui/page_heading.dart';
@@ -14,7 +15,12 @@ class SourcesPane extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scrollbar(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.pageGutter,
+          CompactTokens.pageTopPadding,
+          CompactTokens.pageGutter,
+          CompactTokens.pageGutter,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

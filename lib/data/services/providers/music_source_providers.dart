@@ -10,7 +10,7 @@ import 'package:tune/providers/persistence_providers.dart';
 final musicSourceDioProvider = Provider<Dio?>((ref) => null);
 
 final musicSourceStoreProvider = Provider<MusicSourceStore>((ref) {
-  return MusicSourceStore(ref.watch(sharedPreferencesServiceProvider));
+  return MusicSourceStore(ref.watch(persistenceServiceProvider));
 });
 
 final musicPluginRepositoryProvider = Provider<MusicPluginRepository>((ref) {

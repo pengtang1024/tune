@@ -64,10 +64,25 @@ void main() {
 
   group('source names of the interface', () {
     test('every source is named after the catalogue of the app', () {
-      final names = sourceNamesOf(english, BuiltInMusicSources.defaults);
+      final labels = sourceLabelsOf(english, BuiltInMusicSources.defaults);
 
-      expect(names['local'], 'Local music');
-      expect(names['radio'], 'Internet radio');
+      expect(labels['local']?.name, 'Local music');
+      expect(labels['radio']?.name, 'Internet radio');
+    });
+
+    test('a source named after a brand also says what it is', () {
+      final labels = sourceLabelsOf(english, BuiltInMusicSources.defaults);
+
+      expect(labels['openverse']?.name, 'Openverse');
+      expect(labels['openverse']?.localizedName, 'Open audio');
+      expect(labels['subsonic']?.localizedName, 'Self-hosted');
+    });
+
+    test('a source named in the language of the reader has no second name', () {
+      final labels = sourceLabelsOf(english, BuiltInMusicSources.defaults);
+
+      expect(labels['local']?.name, 'Local music');
+      expect(labels['local']?.localizedName, isEmpty);
     });
 
     test('the list of the sources carries the names of the app', () {

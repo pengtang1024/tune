@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 
 /// Heading of a page in the compact desktop shell.
 ///
@@ -32,19 +35,18 @@ class PageHeading extends StatelessWidget {
             children: [
               Text(
                 eyebrow,
-                style: TextStyle(
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: 9,
+                style: CompactTypography.mono(
+                  theme.colorScheme.primary,
+                  size: CompactTypeScale.mark,
                   letterSpacing: 2,
-                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 title,
-                style: theme.textTheme.displayMedium?.copyWith(
-                  fontFamily: 'Fraunces',
-                  fontSize: 38,
+                style: CompactTypography.asDisplay(
+                  theme.textTheme.displayMedium,
+                  size: CompactTokens.pageTitleSize,
                   height: 0.95,
                 ),
               ),

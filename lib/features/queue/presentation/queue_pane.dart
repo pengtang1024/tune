@@ -34,7 +34,7 @@ class QueuePane extends ConsumerWidget {
     final currentUri = view.$3;
     final isPlaying = view.$4;
     final controller = ref.read(playbackControllerProvider.notifier);
-    final sourceNames = sourceNamesOf(
+    final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
         musicSourcesControllerProvider.select(
@@ -46,9 +46,16 @@ class QueuePane extends ConsumerWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(28, 24, 28, 14),
+          padding: const EdgeInsets.fromLTRB(
+            CompactTokens.pageGutter,
+            CompactTokens.pageTopPadding,
+            CompactTokens.pageGutter,
+            CompactTokens.pageHeadingGap,
+          ),
           child: PageHeading(
-            eyebrow: context.loc.queueEyebrow,
+            // The queue belongs to the collection, so it names the same
+            // section as the library instead of repeating its own title.
+            eyebrow: context.loc.libraryEyebrow,
             title: context.loc.queueTitle,
             subtitle: context.loc.queueSubtitle,
             trailing: _QueueActions(
@@ -71,17 +78,18 @@ class QueuePane extends ConsumerWidget {
                 )
               : ReorderableListView.builder(
                   padding: const EdgeInsets.fromLTRB(
-                    28,
+                    CompactTokens.pageGutter,
                     0,
-                    28,
+                    CompactTokens.pageGutter,
                     CompactTokens.space8,
                   ),
                   buildDefaultDragHandles: false,
                   itemCount: queue.length,
                   onReorderItem: (oldIndex, newIndex) {
-                    // The list names the place without the moved track, so
-                    // the number goes back to the shape the controller
-                    // counts in.
+                    // The list takes the moved track out before it names the
+                    // place, so the number it hands over is the place in the
+                    // list without it. The controller counts the place in the
+                    // list with it, so the number goes back to that shape.
                     final drop = newIndex >= oldIndex ? newIndex + 1 : newIndex;
                     controller.reorderQueue(oldIndex, drop);
                   },
@@ -100,7 +108,7 @@ class QueuePane extends ConsumerWidget {
                       index: index,
                       selected: index == currentIndex,
                       playing: isPlaying && song.uri == currentUri,
-                      sourceName: sourceLabel(song, sourceNames),
+                      source: sourceLabel(song, sourceLabels),
                       onTap: () => controller.playAt(index),
                       onRemove: () => controller.removeFromQueue(index),
                     );
@@ -152,8 +160,7 @@ class _QueueActions extends StatelessWidget {
       children: [
         Text(
           context.loc.libraryTrackCount(count),
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontSize: 11,
+          style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
@@ -169,7 +176,7 @@ class _QueueActions extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             foregroundColor: theme.colorScheme.onSurfaceVariant,
           ),
-          child: Text(context.loc.clear, style: const TextStyle(fontSize: 11)),
+          child: Text(context.loc.clear, style: theme.textTheme.labelMedium),
         ),
       ],
     );

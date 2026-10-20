@@ -11,7 +11,7 @@ import 'package:tune/utils/logger.dart';
 
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, SettingsState>((ref) {
-      final persistence = ref.watch(sharedPreferencesServiceProvider);
+      final persistence = ref.watch(persistenceServiceProvider);
       return SettingsController(persistence);
     });
 
@@ -39,7 +39,12 @@ class SettingsController extends StateNotifier<SettingsState> {
           mediaControlsEnabled:
               _persistence.getBool('media_controls_enabled') ?? true,
         ),
-      );
+      ) {
+    // The string table follows the language of the settings right away, so a
+    // service that reads a translated text answers in the language of the
+    // user even before the first frame is drawn.
+    AppStrings.use(state.locale);
+  }
 
   final PersistenceService _persistence;
   final ThemeService _themeService;

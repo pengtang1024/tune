@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 class AppSidebar extends StatelessWidget {
   final String currentPath;
@@ -17,7 +20,9 @@ class AppSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final width = compact ? 76.0 : 196.0;
+    final width = compact
+        ? CompactTokens.sidebarWidthCompact
+        : CompactTokens.sidebarWidth;
     final short = MediaQuery.sizeOf(context).height < 560;
 
     return Container(
@@ -33,10 +38,10 @@ class AppSidebar extends StatelessWidget {
         bottom: false,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            compact ? 12 : 20,
-            22,
-            compact ? 12 : 16,
-            16,
+            compact ? CompactTokens.space12 : CompactTokens.sidebarPadding,
+            CompactTokens.space20,
+            compact ? CompactTokens.space12 : CompactTokens.sidebarPadding,
+            CompactTokens.space16,
           ),
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
@@ -95,12 +100,12 @@ class AppSidebar extends StatelessWidget {
                         const SizedBox(height: 18),
                         Text(
                           context.loc.sidebarLocalOnline,
-                          style: TextStyle(
-                            fontFamily: 'JetBrains Mono',
-                            fontSize: 8,
+                          style: CompactTypography.mono(
+                            theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
+                            size: CompactTypeScale.markDense,
                             letterSpacing: 1.1,
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.6),
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -109,12 +114,12 @@ class AppSidebar extends StatelessWidget {
                             context.loc.appName,
                             AppVersion.version,
                           ),
-                          style: TextStyle(
-                            fontFamily: 'JetBrains Mono',
-                            fontSize: 8,
+                          style: CompactTypography.mono(
+                            theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.45,
+                            ),
+                            size: CompactTypeScale.markDense,
                             letterSpacing: 0.8,
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.45),
                           ),
                         ),
                       ],
@@ -162,10 +167,10 @@ class _Brand extends StatelessWidget {
             context.loc.appName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontFamily: 'Fraunces',
-              fontSize: 25,
-              fontWeight: FontWeight.w600,
+            style: CompactTypography.asDisplay(
+              theme.textTheme.headlineSmall,
+              size: 25,
+              weight: FontWeight.w600,
               letterSpacing: -0.6,
               height: 1,
             ),
@@ -194,14 +199,13 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 10),
       child: Text(
         text,
-        style: TextStyle(
-          fontFamily: 'JetBrains Mono',
-          fontSize: 8.5,
-          letterSpacing: 1.4,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(
+        style: CompactTypography.mono(
+          Theme.of(
             context,
           ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+          size: CompactTypeScale.mark,
+          weight: FontWeight.w500,
+          letterSpacing: 1.4,
         ),
       ),
     );
@@ -228,21 +232,22 @@ class _NavItem extends StatelessWidget {
     final theme = Theme.of(context);
     final selected = currentPath == path;
 
-    return Tooltip(
+    return TuneTooltip(
+      // The wide sidebar writes the name of the page, so it says nothing more.
       message: compact ? label : '',
       child: InkWell(
         onTap: () => context.go(path),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(CompactTokens.radius12),
         child: AnimatedContainer(
           duration: CompactTokens.fastMotion,
-          height: 40,
+          height: CompactTokens.navItemHeight,
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: compact ? 0 : 10),
           decoration: BoxDecoration(
             color: selected
                 ? theme.colorScheme.primary.withValues(alpha: 0.12)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(CompactTokens.radius12),
           ),
           child: Row(
             mainAxisAlignment: compact
@@ -251,17 +256,16 @@ class _NavItem extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 18,
+                size: CompactTokens.icon18,
                 color: selected
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
               ),
               if (!compact) ...[
-                const SizedBox(width: 11),
+                const SizedBox(width: CompactTokens.space12),
                 Text(
                   label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 12.5,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                     color: selected
                         ? theme.colorScheme.primary

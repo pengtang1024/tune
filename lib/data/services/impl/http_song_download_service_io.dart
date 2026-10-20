@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
+import 'package:tune/utils/stable_key.dart';
 
 /// Fetches remote tracks over HTTP and keeps them in the app support folder.
 ///
@@ -60,7 +61,7 @@ class HttpSongDownloadService implements SongDownloadService {
     Song song, {
     void Function(double progress)? onProgress,
   }) {
-    final key = _stableKey(song.uri);
+    final key = stableKey(song.uri);
     final url = song.playbackUri;
 
     final running = _transfers[key];
@@ -84,7 +85,7 @@ class HttpSongDownloadService implements SongDownloadService {
 
   @override
   void cancel(Song song) {
-    _transfers[_stableKey(song.uri)]?.cancel();
+    _transfers[stableKey(song.uri)]?.cancel();
   }
 
   @override
@@ -157,7 +158,7 @@ class HttpSongDownloadService implements SongDownloadService {
   /// Resolves the file a track is stored in.
   Future<File> _targetFile(Song song) async {
     final directory = await _store();
-    final name = '${_stableKey(song.uri)}.${_extensionFor(song.playbackUri)}';
+    final name = '${stableKey(song.uri)}.${_extensionFor(song.playbackUri)}';
     return File(path.join(directory.path, name));
   }
 
@@ -190,23 +191,6 @@ class HttpSongDownloadService implements SongDownloadService {
     } catch (error, stackTrace) {
       Log.error('清理未完成的下载文件失败: $error\n$stackTrace');
     }
-  }
-
-  /// 64 bit hash rendered as hex.
-  ///
-  /// The hash has to stay identical between runs, so the randomised
-  /// `Object.hashCode` cannot be used. Two independent 31 bit djb2 rounds are
-  /// used instead of one 64 bit FNV-1a round: every intermediate value stays
-  /// below 2^53, so the web build computes the same name as the native one.
-  static String _stableKey(String value) {
-    var first = 5381;
-    var second = 52711;
-    for (final unit in value.codeUnits) {
-      first = (first * 33 + unit) & 0x7fffffff;
-      second = (second * 31 + unit) & 0x7fffffff;
-    }
-    return '${first.toRadixString(16).padLeft(8, '0')}'
-        '${second.toRadixString(16).padLeft(8, '0')}';
   }
 
   static const _audioExtensions = {

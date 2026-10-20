@@ -1,106 +1,113 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/data/services/persistence_service.dart';
 
-/// SharedPreferences持久化服务实现
-class SharedPreferencesService implements PersistenceService {
-  SharedPreferences? _prefs;
+/// The preference store of a build that has no file system.
+PersistenceService createPersistenceService() => BrowserPreferenceService();
 
-  SharedPreferencesService();
+/// Keeps the preferences in the browser, for the build without a file system.
+///
+/// The web build has no application support folder, so the preferences live
+/// in the browser store instead. Only one tab of the app is open at a time,
+/// so the browser store never has two writers on one document.
+class BrowserPreferenceService implements PersistenceService {
+  SharedPreferences? _preferences;
+
+  BrowserPreferenceService();
 
   @override
   Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    _preferences = await SharedPreferences.getInstance();
   }
 
   @override
   Future<bool> setString(String key, String value) async {
     _ensureInitialized();
-    return await _prefs!.setString(key, value);
+    return await _preferences!.setString(key, value);
   }
 
   @override
   String? getString(String key) {
     _ensureInitialized();
-    return _prefs!.getString(key);
+    return _preferences!.getString(key);
   }
 
   @override
   Future<bool> setInt(String key, int value) async {
     _ensureInitialized();
-    return await _prefs!.setInt(key, value);
+    return await _preferences!.setInt(key, value);
   }
 
   @override
   int? getInt(String key) {
     _ensureInitialized();
-    return _prefs!.getInt(key);
+    return _preferences!.getInt(key);
   }
 
   @override
   Future<bool> setBool(String key, bool value) async {
     _ensureInitialized();
-    return await _prefs!.setBool(key, value);
+    return await _preferences!.setBool(key, value);
   }
 
   @override
   bool? getBool(String key) {
     _ensureInitialized();
-    return _prefs!.getBool(key);
+    return _preferences!.getBool(key);
   }
 
   @override
   Future<bool> setDouble(String key, double value) async {
     _ensureInitialized();
-    return await _prefs!.setDouble(key, value);
+    return await _preferences!.setDouble(key, value);
   }
 
   @override
   double? getDouble(String key) {
     _ensureInitialized();
-    return _prefs!.getDouble(key);
+    return _preferences!.getDouble(key);
   }
 
   @override
   Future<bool> setStringList(String key, List<String> value) async {
     _ensureInitialized();
-    return await _prefs!.setStringList(key, value);
+    return await _preferences!.setStringList(key, value);
   }
 
   @override
   List<String>? getStringList(String key) {
     _ensureInitialized();
-    return _prefs!.getStringList(key);
+    return _preferences!.getStringList(key);
   }
 
   @override
   bool containsKey(String key) {
     _ensureInitialized();
-    return _prefs!.containsKey(key);
+    return _preferences!.containsKey(key);
   }
 
   @override
   Future<bool> remove(String key) async {
     _ensureInitialized();
-    return await _prefs!.remove(key);
+    return await _preferences!.remove(key);
   }
 
   @override
   Future<bool> clear() async {
     _ensureInitialized();
-    return await _prefs!.clear();
+    return await _preferences!.clear();
   }
 
   @override
   Set<String> getKeys() {
     _ensureInitialized();
-    return _prefs!.getKeys();
+    return _preferences!.getKeys();
   }
 
   /// 确保服务已初始化
   void _ensureInitialized() {
-    if (_prefs == null) {
+    if (_preferences == null) {
       throw StateError(
-        'SharedPreferencesService not initialized. '
+        'BrowserPreferenceService not initialized. '
         'Please call init() before using any methods.',
       );
     }

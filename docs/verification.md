@@ -13,6 +13,26 @@ flutter run -d linux     # 需要看界面时
 
 只写测试不算验证：`flutter analyze` 干净 + `flutter test` 全绿 + 亲手跑过界面，三者都要有。
 
+### 门禁的前提：SDK 补丁
+
+工程路径里有中文（`文档`），Flutter 3.47.x 的 `flutter analyze` 在这种路径下会炸：
+它给分析服务发的 LSP 报文把 `Content-Length` 写成了**字符数**，而实际发出去的是
+**UTF-8 字节数**，少 4 个字节，服务端读到截断的 JSON，报
+`FormatException: Unexpected end of input`。
+
+这是 SDK 自己的 bug（上游 `packages/flutter_tools/lib/src/dart/analysis.dart` 的
+`_writeMessage` 用 `message.length`），本地已经改掉：
+
+```bash
+# 改这一行：${message.length} -> ${utf8.encode(message).length}
+# 然后让工具重建快照：
+rm -f /opt/flutter/bin/cache/flutter_tools.stamp
+flutter --version
+```
+
+**注意**：`flutter upgrade` 会把这个补丁冲掉，届时 `flutter analyze` 又会在中文路径下报错。
+临时兜底是 `dart analyze`（不走 LSP，结果一样）。
+
 ## 测试目录
 
 镜像 lib 结构：
@@ -27,13 +47,13 @@ flutter run -d linux     # 需要看界面时
 ## 替身与隔离
 
 - service / controller 的替身写成 `test/app/fake_*.dart`（`FakeAudioPlayerService`、`FakeSongDownloadService`、`FakeStreamUrlResolver`）。
-- 持久化用 `SharedPreferences.setMockInitialValues({})` 隔离；该 API 只能在 `test/` 下调用。
+- 持久化用 `FakePersistenceService`（`test/services/fake_persistence.dart`）隔离；要测真的文件存储，用 `FilePersistenceService(directory: ...)` 指向临时目录。
 - controller 的替身继承原类并覆盖 `build()`（见 `layout_shots_test.dart` 里的 `_FakeLibraryController`）。
 
 ## 语言守卫
 
 - `test/app/localization_test.dart`：扫源码，比对各 locale 的目录、查硬编码文案、查漏出的其它语言。
-- `test/app/localization_render_test.dart`：真正渲染每个页面读树，抓硬编码文案、跨语言漏出和超长标签。
+- `test/app/localization_render_test.dart`：真正渲染每个页面读树，抓硬编码文案、跨语言漏出和超长标签；页面上的浮层、对话框与搜索结果也一起画。
 - `test/app/localization_words.dart`：专有名词与格式名的白名单，新增音源名要加进去。
 - `test/app/localization_numbers_test.dart`：数字分组格式。
 
@@ -42,9 +62,16 @@ flutter run -d linux     # 需要看界面时
 ## 截图对比
 
 - `tool/layout_shots_test.dart` 是开发用的截图工具，不是测试套件的一部分。
-- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`。
+- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`（宽屏与窄屏各一套）。
 - 它在 `tool/` 下，常规 `flutter test` 不会跑到它。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。
+- `tool/tooltip_shots_test.dart` 同理，写提示的两张图到 `build/tooltip-shots/`；改了提示样式后跑它。
+
+## 对齐守卫
+
+- `test/app/layout_alignment_test.dart`：盯住容易漂的几处——播放按钮落在底栏中线、音乐库与队列的封面列同位、标题与列表同一条左边缘、正在播放页的整块居中、搜索框不越宽上限。
+- `test/app/compact_spinner_test.dart`：盯住加载圈的描边没有被自己的框裁掉（Material 的现行样式会裁），以及字号梯度里没有两档共用一个尺寸。
+- 改了 `CompactTokens`、`CompactTypeScale` 或动了上面几处布局，要连这两个文件一起跑。
 
 ## 联网测试
 

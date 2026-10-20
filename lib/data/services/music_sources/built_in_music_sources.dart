@@ -28,6 +28,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'openverse',
         name: 'Openverse',
+        localizedName: strings.sourceOpenverseName,
         description: strings.sourceOpenverseDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'piano'},
@@ -35,6 +36,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'jamendo',
         name: 'Jamendo',
+        localizedName: strings.sourceJamendoName,
         description: strings.sourceJamendoDescription,
         kind: MusicSourceKind.openCatalog,
         enabled: false,
@@ -43,6 +45,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'internet_archive',
         name: 'Internet Archive',
+        localizedName: strings.sourceInternetArchiveName,
         description: strings.sourceInternetArchiveDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'collection:netlabels AND mediatype:audio'},
@@ -58,6 +61,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'ccmixter',
         name: 'ccMixter',
+        localizedName: strings.sourceCcmixterName,
         description: strings.sourceCcmixterDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'jazz'},
@@ -65,6 +69,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'itunes',
         name: 'iTunes',
+        localizedName: strings.sourceItunesName,
         description: strings.sourceItunesDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'jazz'},
@@ -80,6 +85,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'subsonic',
         name: 'Subsonic',
+        localizedName: strings.sourceSubsonicName,
         description: strings.sourceSubsonicDescription,
         kind: MusicSourceKind.openApi,
         enabled: false,
@@ -93,6 +99,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'audius',
         name: 'Audius',
+        localizedName: strings.sourceAudiusName,
         description: strings.sourceAudiusDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'ambient'},
@@ -107,6 +114,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'wikimedia',
         name: 'Wikimedia Commons',
+        localizedName: strings.sourceWikimediaName,
         description: strings.sourceWikimediaDescription,
         kind: MusicSourceKind.openCatalog,
         settings: {'query': 'piano'},
@@ -114,6 +122,7 @@ class BuiltInMusicSources {
       MusicSourceConfig(
         id: 'jellyfin',
         name: 'Jellyfin',
+        localizedName: strings.sourceJellyfinName,
         description: strings.sourceJellyfinDescription,
         kind: MusicSourceKind.openApi,
         enabled: false,

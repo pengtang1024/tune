@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
@@ -8,6 +11,8 @@ import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 class PlayerDock extends ConsumerWidget {
@@ -21,12 +26,19 @@ class PlayerDock extends ConsumerWidget {
     final song = state.currentSong;
 
     return Container(
-      height: 88,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      height: CompactTokens.dockHeight,
+      margin: const EdgeInsets.fromLTRB(
+        CompactTokens.dockMargin,
+        0,
+        CompactTokens.dockMargin,
+        CompactTokens.space12,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: CompactTokens.dockPadding,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(CompactTokens.dockRadius),
         border: Border.all(color: theme.colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
@@ -41,22 +53,24 @@ class PlayerDock extends ConsumerWidget {
           final narrow = constraints.maxWidth < 720;
           return Row(
             children: [
+              // The two sides share the room evenly, so the transport in the
+              // middle sits on the centre of the dock and not in the middle
+              // of whatever the song title leaves free.
               Expanded(
-                flex: 3,
                 child: InkWell(
                   onTap: song == null
                       ? null
                       : () => context.push('/now-playing'),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(CompactTokens.radius12),
                   child: Row(
                     children: [
                       ArtworkThumb(
                         path: song?.albumArtPath,
                         imageUrl: song?.artworkUrl,
-                        size: 54,
-                        radius: 12,
+                        size: CompactTokens.artworkDock,
+                        radius: CompactTokens.radius12,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: CompactTokens.space12),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -68,8 +82,7 @@ class PlayerDock extends ConsumerWidget {
                                   : context.loc.playerNoSongTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontSize: 13.5,
+                              style: theme.textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -85,11 +98,10 @@ class PlayerDock extends ConsumerWidget {
                                               : song.artist),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontFamily: 'JetBrains Mono',
-                                      fontSize: 9,
+                                    style: CompactTypography.mono(
+                                      theme.colorScheme.onSurfaceVariant,
+                                      size: CompactTypeScale.micro,
                                       letterSpacing: 0.5,
-                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -112,7 +124,9 @@ class PlayerDock extends ConsumerWidget {
                 ),
               ),
               SizedBox(
-                width: narrow ? 220 : 300,
+                width: narrow
+                    ? CompactTokens.dockTransportWidthNarrow
+                    : CompactTokens.dockTransportWidth,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -123,7 +137,7 @@ class PlayerDock extends ConsumerWidget {
                           state: state,
                           onPressed: controller.cyclePlayMode,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: CompactTokens.space8),
                         _DockIcon(
                           icon: Icons.skip_previous_rounded,
                           tooltip: context.loc.playerPrevious,
@@ -132,23 +146,31 @@ class PlayerDock extends ConsumerWidget {
                               ? controller.previous
                               : null,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: CompactTokens.space4),
                         _PlayButton(
                           state: state,
                           onPressed: state.hasTrack && !state.isLoading
                               ? controller.togglePlayPause
                               : null,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: CompactTokens.space4),
                         _DockIcon(
                           icon: Icons.skip_next_rounded,
                           tooltip: context.loc.playerNext,
                           size: 20,
                           onPressed: state.hasTrack ? controller.next : null,
                         ),
+                        // The empty twin of the mode button keeps the play
+                        // button on the centre of the dock: without it the
+                        // group of buttons would lean to the left.
+                        const SizedBox(
+                          width:
+                              CompactTokens.modeButtonSize +
+                              CompactTokens.space8,
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: CompactTokens.space4),
                     Row(
                       children: [
                         _time(context, state.position),
@@ -191,7 +213,6 @@ class PlayerDock extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                flex: narrow ? 1 : 2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -228,7 +249,7 @@ class PlayerDock extends ConsumerWidget {
                     ),
                     _DockIcon(
                       icon: Icons.open_in_full_rounded,
-                      tooltip: context.loc.playerNowPlaying,
+                      tooltip: context.loc.playerExpandNowPlaying,
                       size: 17,
                       onPressed: song == null
                           ? null
@@ -256,10 +277,9 @@ class PlayerDock extends ConsumerWidget {
       child: Text(
         formatDuration(value),
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'JetBrains Mono',
-          fontSize: 8.5,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        style: CompactTypography.mono(
+          Theme.of(context).colorScheme.onSurfaceVariant,
+          size: CompactTypeScale.micro,
         ),
       ),
     );
@@ -285,12 +305,11 @@ class _LiveMark extends StatelessWidget {
         ),
         child: Text(
           context.loc.playerLiveBadge,
-          style: TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 8,
+          style: CompactTypography.mono(
+            color,
+            size: CompactTypeScale.markDense,
+            weight: FontWeight.w600,
             letterSpacing: 0.8,
-            fontWeight: FontWeight.w600,
-            color: color,
           ),
         ),
       ),
@@ -324,14 +343,7 @@ class _PlayButton extends StatelessWidget {
           shape: const CircleBorder(),
         ),
         icon: state.isLoading
-            ? SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: theme.colorScheme.onPrimary,
-                ),
-              )
+            ? CompactSpinner.small(color: theme.colorScheme.onPrimary)
             : Icon(
                 state.isPlaying
                     ? Icons.pause_rounded
@@ -383,7 +395,7 @@ class _ModeButton extends StatelessWidget {
       PlayMode.repeatOne => Icons.repeat_one_rounded,
       PlayMode.shuffle => Icons.shuffle_rounded,
     };
-    return Tooltip(
+    return TuneTooltip(
       message: switch (state.playMode) {
         PlayMode.sequential => context.loc.playerPlayModeSequential,
         PlayMode.repeatOne => context.loc.playerPlayModeRepeatOne,
@@ -393,8 +405,8 @@ class _ModeButton extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
         child: SizedBox(
-          width: 26,
-          height: 26,
+          width: CompactTokens.modeButtonSize,
+          height: CompactTokens.modeButtonSize,
           child: Icon(
             icon,
             size: 16,

@@ -67,7 +67,6 @@ class SettingsDesktopCard extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 13),
-                  textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
               if (isDefaultPlayer) ...[
@@ -80,8 +79,7 @@ class SettingsDesktopCard extends StatelessWidget {
                 const SizedBox(width: 5),
                 Text(
                   context.loc.settingsDefaultPlayerActive,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 10.5,
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -92,8 +90,7 @@ class SettingsDesktopCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               context.loc.settingsDefaultPlayerMissingEntry,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 10.5,
+              style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
@@ -130,16 +127,14 @@ class _SwitchRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 12.5,
+                style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 description,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 10.5,
+                style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),

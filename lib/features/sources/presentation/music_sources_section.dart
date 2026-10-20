@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/l10n/source_kind_label.dart';
 import 'package:tune/data/services/music_sources/plugins/music_plugin_runtime_factory.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -13,6 +14,10 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/track_fact.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Settings section that owns the visible source list.
 ///
@@ -61,15 +66,8 @@ class MusicSourcesSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.loc.sourcesTitle,
-            style: theme.textTheme.labelLarge?.copyWith(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: muted,
-            ),
-          ),
-          const SizedBox(height: CompactTokens.space8),
+          // The page heading already names the section, so the list below it
+          // does not repeat the name.
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: CompactTokens.space12,
@@ -91,8 +89,7 @@ class MusicSourcesSection extends ConsumerWidget {
                         children: [
                           Text(
                             context.loc.sourcesAutoScan,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 12,
+                            style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -100,7 +97,6 @@ class MusicSourcesSection extends ConsumerWidget {
                           Text(
                             context.loc.sourcesAutoScanDescription,
                             style: theme.textTheme.labelSmall?.copyWith(
-                              fontSize: 10,
                               color: muted,
                             ),
                           ),
@@ -153,15 +149,10 @@ class MusicSourcesSection extends ConsumerWidget {
                   ),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
-                  textStyle: const TextStyle(fontSize: 11),
                   side: BorderSide(color: theme.colorScheme.outlineVariant),
                 ),
                 icon: scanning
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                    ? const CompactSpinner.small()
                     : const Icon(Icons.sync_rounded, size: 15),
                 label: Text(context.loc.libraryScanAllSources),
               ),
@@ -176,7 +167,6 @@ class MusicSourcesSection extends ConsumerWidget {
                     ),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: VisualDensity.compact,
-                    textStyle: const TextStyle(fontSize: 11),
                     side: BorderSide(color: theme.colorScheme.outlineVariant),
                   ),
                   icon: const Icon(Icons.extension_outlined, size: 15),
@@ -188,7 +178,6 @@ class MusicSourcesSection extends ConsumerWidget {
                 child: Text(
                   context.loc.sourcesScanMayTakeSeconds,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
                     color: muted,
                   ),
                   maxLines: 1,
@@ -374,7 +363,7 @@ class _SourceTile extends ConsumerWidget {
       fields,
       supported: supported,
     );
-    final statusColor = _statusColor(
+    final mark = _statusMark(
       context,
       configured: configured,
       supported: supported,
@@ -402,12 +391,11 @@ class _SourceTile extends ConsumerWidget {
                 Row(
                   children: [
                     Flexible(
-                      child: Tooltip(
+                      child: TuneTooltip(
                         message: source.description,
                         child: Text(
                           source.name,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 12,
+                          style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 1,
@@ -421,18 +409,32 @@ class _SourceTile extends ConsumerWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
-                Tooltip(
-                  message: status,
-                  child: Text(
-                    status,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
-                      color: statusColor,
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    MetaChip(
+                      icon: mark.icon,
+                      label: mark.label,
+                      tooltip: status,
+                      tone: mark.tone,
+                      dense: true,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    if (summary != null)
+                      MetaBadge(
+                        icon: Icons.library_music_rounded,
+                        tooltip:
+                            '${context.loc.sourceStatusTracks} · ${summary!.songCount}',
+                      ),
+                    if (lastScanAt != null)
+                      MetaBadge(
+                        icon: Icons.schedule_rounded,
+                        tooltip:
+                            '${context.loc.sourceStatusLastScan} · ${_formatTime(context, lastScanAt!)}',
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -565,19 +567,61 @@ class _SourceTile extends ConsumerWidget {
     }
   }
 
-  Color _statusColor(
+  /// The state of the source, as the tile shows it.
+  _SourceMark _statusMark(
     BuildContext context, {
     required bool configured,
     required bool supported,
   }) {
-    final theme = Theme.of(context);
-    if (!supported) return theme.colorScheme.error;
-    if (!source.enabled) return theme.colorScheme.onSurfaceVariant;
-    if (!configured) return theme.colorScheme.tertiary;
-    if (summary?.status == SourceScanStatus.failed) {
-      return theme.colorScheme.error;
+    if (!supported) {
+      return _SourceMark(
+        icon: Icons.block_rounded,
+        label: context.loc.sourceStatusUnsupported,
+        tone: FactTone.error,
+      );
     }
-    return theme.colorScheme.onSurfaceVariant;
+    if (!source.enabled) {
+      return _SourceMark(
+        icon: Icons.toggle_off_rounded,
+        label: context.loc.sourceStatusOff,
+        tone: FactTone.neutral,
+      );
+    }
+    if (!configured) {
+      return _SourceMark(
+        icon: Icons.tune_rounded,
+        label: context.loc.sourceStatusNeedsSetup,
+        tone: FactTone.tertiary,
+      );
+    }
+
+    return switch (summary?.status) {
+      SourceScanStatus.success => _SourceMark(
+        icon: Icons.check_circle_outline_rounded,
+        label: context.loc.sourceStatusScanned,
+        tone: FactTone.secondary,
+      ),
+      SourceScanStatus.needsConfiguration => _SourceMark(
+        icon: Icons.tune_rounded,
+        label: context.loc.sourceStatusNeedsSetup,
+        tone: FactTone.tertiary,
+      ),
+      SourceScanStatus.skipped => _SourceMark(
+        icon: Icons.skip_next_rounded,
+        label: context.loc.sourceStatusSkipped,
+        tone: FactTone.neutral,
+      ),
+      SourceScanStatus.failed => _SourceMark(
+        icon: Icons.error_outline_rounded,
+        label: context.loc.sourceStatusFailed,
+        tone: FactTone.error,
+      ),
+      null => _SourceMark(
+        icon: Icons.hourglass_empty_rounded,
+        label: context.loc.sourceStatusWaiting,
+        tone: FactTone.neutral,
+      ),
+    };
   }
 
   Future<bool> _openSettings(
@@ -658,6 +702,19 @@ class _SourceTile extends ConsumerWidget {
   }
 }
 
+/// The state of a source, drawn as a chip.
+class _SourceMark {
+  final IconData icon;
+  final String label;
+  final FactTone tone;
+
+  const _SourceMark({
+    required this.icon,
+    required this.label,
+    required this.tone,
+  });
+}
+
 class _KindBadge extends StatelessWidget {
   final MusicSourceKind kind;
 
@@ -665,27 +722,10 @@ class _KindBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final label = switch (kind) {
-      MusicSourceKind.localDirectory => context.loc.sourceKindLocal,
-      MusicSourceKind.openCatalog => context.loc.sourceKindOpenCatalog,
-      MusicSourceKind.openApi => context.loc.sourceKindOpenApi,
-      MusicSourceKind.plugin => context.loc.sourceKindPlugin,
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelSmall?.copyWith(
-          fontSize: 9,
-          color: theme.colorScheme.primary,
-        ),
-      ),
+    return MetaChip(
+      label: kind.label(context.loc),
+      tone: FactTone.primary,
+      dense: true,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -13,7 +14,7 @@ class LibraryTrackCard extends StatelessWidget {
   final int index;
   final bool selected;
   final bool playing;
-  final String? sourceName;
+  final SourceLabel? source;
   final VoidCallback onTap;
   final VoidCallback onAddToQueue;
 
@@ -23,7 +24,7 @@ class LibraryTrackCard extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.playing,
-    this.sourceName,
+    this.source,
     required this.onTap,
     required this.onAddToQueue,
   });
@@ -62,7 +63,7 @@ class LibraryTrackCard extends StatelessWidget {
                   child: TrackMeta(
                     song: song,
                     index: index,
-                    sourceName: sourceName,
+                    source: source,
                     selected: selected,
                     playing: playing,
                   ),

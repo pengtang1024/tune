@@ -49,7 +49,7 @@ void main() {
     await tester.tap(find.text('搜索'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Demo Source'), findsOneWidget);
+    expect(find.text('DEMO SOURCE', findRichText: true), findsOneWidget);
     expect(find.text('Song hello'), findsOneWidget);
     expect(find.text('播放全部'), findsOneWidget);
     expect(tester.takeException(), isNull);

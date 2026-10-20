@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 
 /// The frame every group of settings sits in.
@@ -44,7 +45,7 @@ class SettingsCard extends StatelessWidget {
                 index,
                 style: CompactTypography.mono(
                   theme.colorScheme.primary,
-                  size: 9,
+                  size: CompactTypeScale.mark,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -65,23 +66,21 @@ class SettingsCard extends StatelessWidget {
                         theme.colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.65,
                         ),
-                        size: 8,
+                        size: CompactTypeScale.markDense,
                         letterSpacing: 1.5,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 16,
+                      style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 11,
+                      style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),

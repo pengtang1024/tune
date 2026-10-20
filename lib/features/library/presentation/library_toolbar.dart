@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
 
 /// Value of the source filter that stands for "every source".
 const String allSourcesFilterValue = '__all_sources__';
@@ -11,7 +13,7 @@ class LibraryToolbar extends StatelessWidget {
   final String query;
   final int filteredCount;
   final List<String> sources;
-  final Map<String, String> sourceNames;
+  final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
   final bool scanning;
   final ValueChanged<String> onQueryChanged;
@@ -25,7 +27,7 @@ class LibraryToolbar extends StatelessWidget {
     required this.query,
     required this.filteredCount,
     required this.sources,
-    required this.sourceNames,
+    required this.sourceLabels,
     required this.sourceFilter,
     required this.scanning,
     required this.onQueryChanged,
@@ -43,59 +45,74 @@ class LibraryToolbar extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: controller,
-              onChanged: onQueryChanged,
-              style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                fillColor: theme.colorScheme.surfaceContainer,
-                hintText: context.loc.search,
-                hintStyle: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 12,
-                  color: theme.colorScheme.onSurfaceVariant,
+            // The field keeps a readable width instead of stretching into a
+            // thin ribbon, and the actions of the row keep the far end of
+            // the page.
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: CompactTokens.searchFieldMaxWidth,
                 ),
-                prefixIcon: Icon(
-                  Icons.search_rounded,
-                  size: CompactTokens.icon16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
-                suffixIcon: query.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: context.loc.libraryClearSearch,
-                        onPressed: onClearQuery,
-                        icon: const Icon(Icons.close_rounded, size: 14),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints.tightFor(
-                          width: 28,
-                          height: 28,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextField(
+                    controller: controller,
+                    onChanged: onQueryChanged,
+                    style: theme.textTheme.bodySmall,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainer,
+                      hintText: context.loc.search,
+                      hintStyle: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        size: CompactTokens.icon16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      prefixIconConstraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      suffixIcon: query.isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: context.loc.libraryClearSearch,
+                              onPressed: onClearQuery,
+                              icon: const Icon(Icons.close_rounded, size: 14),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints.tightFor(
+                                width: 28,
+                                height: 28,
+                              ),
+                            ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: CompactTokens.space8,
+                        vertical: CompactTokens.space8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: CompactTokens.borderRadius8,
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.outlineVariant,
                         ),
                       ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: CompactTokens.space8,
-                  vertical: CompactTokens.space8,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: CompactTokens.borderRadius8,
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: CompactTokens.borderRadius8,
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(color: theme.colorScheme.primary),
                 ),
               ),
             ),
@@ -104,20 +121,19 @@ class LibraryToolbar extends StatelessWidget {
             const SizedBox(width: CompactTokens.space8),
             _SourceFilter(
               sources: sources,
-              sourceNames: sourceNames,
+              sourceLabels: sourceLabels,
               sourceFilter: sourceFilter,
               onSourceFilter: onSourceFilter,
             ),
           ],
-          const SizedBox(width: CompactTokens.space8),
+          const SizedBox(width: CompactTokens.space12),
           Text(
             context.loc.libraryTrackCount(filteredCount),
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 11,
+            style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: CompactTokens.space4),
+          const SizedBox(width: CompactTokens.space8),
           _ScanButton(scanning: scanning, onPressed: onScan),
         ],
       ),
@@ -128,13 +144,13 @@ class LibraryToolbar extends StatelessWidget {
 /// Chip that opens the source filter menu.
 class _SourceFilter extends StatelessWidget {
   final List<String> sources;
-  final Map<String, String> sourceNames;
+  final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
   final ValueChanged<String?> onSourceFilter;
 
   const _SourceFilter({
     required this.sources,
-    required this.sourceNames,
+    required this.sourceLabels,
     required this.sourceFilter,
     required this.onSourceFilter,
   });
@@ -145,7 +161,7 @@ class _SourceFilter extends StatelessWidget {
     final active = sourceFilter != null;
     final label = sourceFilter == null
         ? context.loc.libraryAllSources
-        : (sourceNames[sourceFilter] ?? sourceFilter!);
+        : (sourceLabels[sourceFilter]?.name ?? sourceFilter!);
 
     return PopupMenuButton<String>(
       tooltip: context.loc.libraryFilterSources,
@@ -164,7 +180,7 @@ class _SourceFilter extends StatelessWidget {
           PopupMenuItem<String>(
             value: sourceId,
             height: 36,
-            child: Text(sourceNames[sourceId] ?? sourceId),
+            child: Text(sourceLabels[sourceId]?.name ?? sourceId),
           ),
       ],
       child: Container(
@@ -194,8 +210,7 @@ class _SourceFilter extends StatelessWidget {
             const SizedBox(width: CompactTokens.space4),
             Text(
               label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 11,
+              style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: active
                     ? theme.colorScheme.primary
@@ -225,11 +240,7 @@ class _ScanButton extends StatelessWidget {
       tooltip: context.loc.libraryScanAllSources,
       onPressed: onPressed,
       icon: scanning
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
+          ? const CompactSpinner.small()
           : const Icon(Icons.refresh_rounded, size: 18),
       style: IconButton.styleFrom(
         fixedSize: const Size.square(CompactTokens.controlSmall),

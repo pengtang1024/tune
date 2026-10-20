@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tune/app/theme/compact_theme.dart';
-import 'package:tune/data/services/impl/shared_preferences_service.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -11,20 +9,22 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import '../services/fake_persistence.dart';
+
 
 void main() {
-  late SharedPreferencesService persistence;
+  late FakePersistenceService persistence;
 
   setUpAll(() async {
-    SharedPreferences.setMockInitialValues({});
-    persistence = SharedPreferencesService();
-    await persistence.init();
+    // The page renders in Chinese, so the settings that drive the language
+    // of the app have to be in Chinese too.
+    persistence = FakePersistenceService()..values['language_code'] = 'zh';
   });
 
   Widget app(FakeMusicSourcesController controller) {
     return ProviderScope(
       overrides: [
-        sharedPreferencesServiceProvider.overrideWithValue(persistence),
+        persistenceServiceProvider.overrideWithValue(persistence),
         musicSourcesControllerProvider.overrideWith(() => controller),
       ],
       child: MaterialApp(

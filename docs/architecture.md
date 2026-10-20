@@ -80,6 +80,56 @@ presentation → application → domain
 - MPRIS、托盘、单实例都走**会话总线**（`DBusClient.session()`），不是系统总线。
 - 详细的协议与验收见 [桌面集成方案](../需求/桌面集成方案.md)。
 
+## 持久化
+
+偏好与本地数据各有各的地方，同一份数据只有一份。
+
+| 数据 | 落在哪 | 谁写 |
+| --- | --- | --- |
+| 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
+| 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
+| 下载的曲目 | `<应用支持目录>/downloads/` | `HttpSongDownloadService` |
+| 封面图 | `<应用支持目录>/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
+| 插件脚本 | `<应用支持目录>/music_plugins/` | `MusicPluginStore` |
+
+- **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
+- **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
+- Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
+- **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
+- 音乐库是 app 对磁盘上音乐的索引，属于 app 的数据；用户的音乐文件从不搬动。
+
+## 曲目事实（track facts）
+
+一首歌的已知信息只有一处来源，别处要标识就从这里取，不要自己拼一份。
+
+| 文件 | 职责 |
+| --- | --- |
+| `lib/shared/ui/track_fact.dart` | 事实模型：名字、值、图标、色调 |
+| `lib/shared/ui/track_facts.dart` | 文件类事实：位置、格式、音质、码率、采样率、大小 |
+| `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、收藏、演奏者、添加时间、简介、正在播放 |
+| `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
+| `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板 |
+| `lib/shared/ui/track_path_row.dart` | 详情面板里的文件路径与复制 |
+| `lib/shared/ui/meta_chip.dart` | `MetaChip`（带文字）与 `MetaBadge`（纯图标 + tooltip） |
+
+同一份事实按三档呈现，读者想要多少信息就看到多少：
+
+1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
+2. 正在播放页：画图标 + 值，名字留给 tooltip。
+3. 详情面板：画图标 + 名字 + 值，并给出文件路径。
+
+## 提示（tooltip）
+
+界面上没写出来的说明只有一条路走，样子也只有一处定义。
+
+| 文件 | 职责 |
+| --- | --- |
+| `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：唯一的提示 widget，没有文案就不显示 |
+| `lib/app/theme/compact_theme.dart` | `tooltipTheme`：提示的样子——一滴墨（深色卡片 + 纸色文字，明暗主题一致）、圆角、投影、停留时间 |
+
+- widget 不直接用 `Tooltip`；图标按钮用 `IconButton(tooltip: ...)`，两者走同一份主题。
+- 提示文案走 l10n，不要写死。
+
 ## 扩展路径
 
 ### 加一个音源

@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/providers/artwork_providers.dart';
 
 /// Square album artwork with a quiet fallback.
-class ArtworkThumb extends StatelessWidget {
+class ArtworkThumb extends ConsumerWidget {
   final String? path;
   final String? imageUrl;
   final double size;
@@ -14,11 +17,11 @@ class ArtworkThumb extends StatelessWidget {
     required this.path,
     required this.size,
     this.imageUrl,
-    this.radius = 10,
+    this.radius = CompactTokens.radius10,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final borderRadius = BorderRadius.circular(radius);
 
@@ -30,16 +33,16 @@ class ArtworkThumb extends StatelessWidget {
         borderRadius: borderRadius,
       ),
       clipBehavior: Clip.antiAlias,
-      child: _image(context),
+      child: _image(context, ref),
     );
   }
 
-  Widget _image(BuildContext context) {
+  Widget _image(BuildContext context, WidgetRef ref) {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return Image.network(
-        imageUrl!,
+      final picture = ref.watch(artworkImageProvider(imageUrl!));
+      return Image(
+        image: ResizeImage.resizeIfNeeded((size * 2).round(), null, picture),
         fit: BoxFit.cover,
-        cacheWidth: (size * 2).round(),
         errorBuilder: (context, error, stackTrace) => _fallback(context),
       );
     }
