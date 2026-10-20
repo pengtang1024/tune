@@ -64,7 +64,7 @@ flutter build linux --debug
 ## Known limitations
 
 - Linux desktop is the primary target for the current release.
-- Remote playback requires a network connection; the desktop app caches tracks locally first, the web build streams them.
+- Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download, and the web build streams tracks.
 - Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
 - Internet radio is a live stream: it is never cached and shows no progress bar.
 - Legacy mobile notifications, lyrics, equalizer, history, and account features are no longer part of the main path.

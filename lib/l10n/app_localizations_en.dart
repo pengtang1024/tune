@@ -275,15 +275,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audioSourceLocal => 'Local file';
 
   @override
-  String audioSourceDownloading(int percent) {
-    return 'Downloading $percent%';
+  String audioSourceCaching(int percent) {
+    return 'Caching $percent%';
   }
 
   @override
   String get audioSourceCached => 'Offline ready';
 
   @override
-  String get audioSourceFailed => 'Download failed';
+  String get audioSourceFailed => 'Playback failed';
 
   @override
   String get routerNotFoundTitle => 'Page not found';
@@ -1282,7 +1282,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot reach the Jellyfin server, check the address and the account';
 
   @override
-  String get audioSourceStreaming => 'Live';
+  String get audioSourceStreaming => 'Network';
 
   @override
   String get playerLiveBadge => 'LIVE';

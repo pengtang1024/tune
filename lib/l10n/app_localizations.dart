@@ -544,11 +544,11 @@ abstract class AppLocalizations {
   /// **'本地文件'**
   String get audioSourceLocal;
 
-  /// No description provided for @audioSourceDownloading.
+  /// No description provided for @audioSourceCaching.
   ///
   /// In zh_CN, this message translates to:
-  /// **'下载中 {percent}%'**
-  String audioSourceDownloading(int percent);
+  /// **'缓存中 {percent}%'**
+  String audioSourceCaching(int percent);
 
   /// No description provided for @audioSourceCached.
   ///
@@ -559,7 +559,7 @@ abstract class AppLocalizations {
   /// No description provided for @audioSourceFailed.
   ///
   /// In zh_CN, this message translates to:
-  /// **'下载失败'**
+  /// **'播放失败'**
   String get audioSourceFailed;
 
   /// No description provided for @routerNotFoundTitle.
@@ -2053,7 +2053,7 @@ abstract class AppLocalizations {
   /// No description provided for @audioSourceStreaming.
   ///
   /// In zh_CN, this message translates to:
-  /// **'直播'**
+  /// **'网络'**
   String get audioSourceStreaming;
 
   /// No description provided for @playerLiveBadge.

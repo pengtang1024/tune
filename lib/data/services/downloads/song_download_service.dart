@@ -19,10 +19,23 @@ abstract class SongDownloadService {
   ///
   /// [onProgress] reports a value between 0 and 1 while the transfer runs.
   /// The call throws when the track cannot be fetched.
+  ///
+  /// The transfer is a background job: the caller may keep playing the track
+  /// from the network while it runs, and it may ignore the returned future.
+  /// Asking for a track whose transfer is still running joins that transfer
+  /// instead of fetching the same bytes a second time, and the progress of
+  /// the running transfer is reported to the new caller as well.
   Future<String> download(
     Song song, {
     void Function(double progress)? onProgress,
   });
+
+  /// Stops the transfer of [song] when one is still running.
+  ///
+  /// The copy of a cancelled transfer is not written, so the track has to be
+  /// fetched again when it is played. A track without a running transfer is
+  /// left alone.
+  void cancel(Song song);
 
   /// Releases the network client.
   void dispose();

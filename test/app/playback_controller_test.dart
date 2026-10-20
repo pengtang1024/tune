@@ -52,6 +52,26 @@ void main() {
     streamUrl: 'https://cdn.example.com/remote-1.mp3',
   );
 
+  const remoteSongB = Song(
+    id: 8,
+    title: 'Remote Two',
+    artist: 'Artist R',
+    album: 'Album R',
+    duration: 160000,
+    uri: 'tune://openverse/remote-2',
+    streamUrl: 'https://cdn.example.com/remote-2.mp3',
+  );
+
+  const remoteSongC = Song(
+    id: 9,
+    title: 'Remote Three',
+    artist: 'Artist R',
+    album: 'Album R',
+    duration: 170000,
+    uri: 'tune://openverse/remote-3',
+    streamUrl: 'https://cdn.example.com/remote-3.mp3',
+  );
+
   const expiringSong = Song(
     id: 6,
     title: 'Expiring',
@@ -217,11 +237,22 @@ void main() {
   });
 
   group('remote sources', () {
-    test('a remote track is fetched before it plays', () async {
+    test('a remote track plays while the copy is fetched', () async {
+      final gate = Completer<void>();
+      downloads.downloadGate = gate;
+
       await controller.playQueue([remoteSong]);
 
+      // The playback does not wait for the transfer.
+      expect(audio.playedSong, remoteSong);
+      expect(audio.playedLocalFilePath, isNull);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.caching);
       expect(downloads.downloadedUris, [remoteSong.uri]);
-      expect(audio.playedLocalFilePath, isNotNull);
+
+      gate.complete();
+      await pumpEventQueue();
+
       expect(controller.state.audioSourceStatus, AudioSourceStatus.cached);
       expect(controller.state.downloadProgress, 1);
       expect(controller.state.status, PlaybackStatus.playing);
@@ -237,6 +268,21 @@ void main() {
       expect(controller.state.audioSourceStatus, AudioSourceStatus.cached);
     });
 
+    test('the copy the transfer stored is used on the next play', () async {
+      await controller.playQueue([remoteSong]);
+      await pumpEventQueue();
+
+      expect(downloads.storedFiles.containsKey(remoteSong.uri), isTrue);
+
+      await controller.playQueue([remoteSong]);
+      await pumpEventQueue();
+
+      expect(audio.playedLocalFilePath, isNotNull);
+      expect(audio.playedLocalFilePath, downloads.storedFiles[remoteSong.uri]);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.cached);
+      expect(downloads.downloadedUris, [remoteSong.uri]);
+    });
+
     test('the transfer progress reaches the playback state', () async {
       final observed = <double>[];
       downloads.progressObserver = (_) {
@@ -244,18 +290,21 @@ void main() {
       };
 
       await controller.playQueue([remoteSong]);
+      await pumpEventQueue();
 
       expect(observed, [0.5, 1.0]);
     });
 
-    test('a failed transfer marks the source as failed', () async {
+    test('a failed transfer keeps the track playing', () async {
       downloads.failDownloads = true;
 
       await controller.playQueue([remoteSong]);
+      await pumpEventQueue();
 
-      expect(controller.state.status, PlaybackStatus.error);
-      expect(controller.state.audioSourceStatus, AudioSourceStatus.failed);
-      expect(audio.playedSong, isNull);
+      expect(audio.playedSong, remoteSong);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.streaming);
+      expect(controller.state.downloadProgress, 0);
     });
 
     test('a platform without a file system streams the track', () async {
@@ -267,6 +316,75 @@ void main() {
       expect(audio.playedLocalFilePath, isNull);
       expect(audio.playedSong, remoteSong);
       expect(controller.state.status, PlaybackStatus.playing);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.streaming);
+    });
+  });
+
+  group('prefetch', () {
+    test('the copy of the following track is fetched ahead', () async {
+      await controller.playQueue([remoteSong, remoteSongB]);
+      await pumpEventQueue();
+
+      expect(downloads.downloadedUris, [
+        remoteSong.uri,
+        remoteSongB.uri,
+      ]);
+    });
+
+    test('the prefetched copy is used when the track plays', () async {
+      await controller.playQueue([remoteSong, remoteSongB]);
+      await pumpEventQueue();
+
+      await controller.next();
+      await pumpEventQueue();
+
+      expect(audio.playedSong, remoteSongB);
+      expect(audio.playedLocalFilePath, downloads.storedFiles[remoteSongB.uri]);
+    });
+
+    test('a live stream is never prefetched', () async {
+      await controller.playQueue([remoteSong, liveSong]);
+      await pumpEventQueue();
+
+      expect(downloads.downloadedUris, [remoteSong.uri]);
+    });
+
+    test('a repeated track is not prefetched', () async {
+      controller.cyclePlayMode();
+
+      await controller.playQueue([remoteSong, remoteSongB]);
+      await pumpEventQueue();
+
+      expect(controller.state.playMode, PlayMode.repeatOne);
+      expect(downloads.downloadedUris, [remoteSong.uri]);
+    });
+
+    test('a prefetch the queue left behind is stopped', () async {
+      // The transfers stay unfinished, so the prefetch is still running when
+      // the queue leaves the track behind.
+      final gate = Completer<void>();
+      downloads.downloadGate = gate;
+
+      await controller.playQueue([remoteSong, remoteSongB, remoteSongC]);
+      await pumpEventQueue();
+      expect(downloads.downloadedUris, contains(remoteSongB.uri));
+
+      await controller.playAt(2);
+      await pumpEventQueue();
+
+      expect(downloads.cancelledUris, [remoteSongB.uri]);
+
+      gate.complete();
+      await pumpEventQueue();
+    });
+
+    test('a track that is already stored is not fetched again', () async {
+      downloads.storedFiles[remoteSongB.uri] = '/store/remote-2.mp3';
+
+      await controller.playQueue([remoteSong, remoteSongB]);
+      await pumpEventQueue();
+
+      expect(downloads.downloadedUris, [remoteSong.uri]);
     });
   });
 
@@ -354,5 +472,40 @@ void main() {
         );
       },
     );
+
+    test('a stream that breaks while playing is refreshed', () async {
+      resolver.responses[expiringSong.uri] = expiringSong.copyWith(
+        streamUrl: 'https://cdn.example.com/expiring-1.mp3?token=new',
+      );
+
+      await controller.playQueue([expiringSong]);
+      audio.emitPosition(const Duration(seconds: 30));
+      expect(controller.state.status, PlaybackStatus.playing);
+
+      audio.emitError('the stream broke');
+      await pumpEventQueue();
+
+      expect(resolver.refreshedUris, [expiringSong.uri]);
+      expect(controller.state.status, PlaybackStatus.playing);
+      expect(
+        controller.state.queue.first.streamUrl,
+        'https://cdn.example.com/expiring-1.mp3?token=new',
+      );
+      // The track continues where it stopped.
+      expect(controller.state.position, const Duration(seconds: 30));
+    });
+
+    test('a stream that breaks and cannot be refreshed ends in the error state',
+        () async {
+      await controller.playQueue([expiringSong]);
+      expect(controller.state.status, PlaybackStatus.playing);
+
+      audio.emitError('the stream broke');
+      await pumpEventQueue();
+
+      expect(resolver.refreshedUris, [expiringSong.uri]);
+      expect(controller.state.status, PlaybackStatus.error);
+      expect(controller.state.audioSourceStatus, AudioSourceStatus.failed);
+    });
   });
 }

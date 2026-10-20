@@ -139,8 +139,8 @@
     }
   },
   "audioSourceLocal": "本地文件",
-  "audioSourceDownloading": "下载中 {percent}%",
-  "@audioSourceDownloading": {
+  "audioSourceCaching": "缓存中 {percent}%",
+  "@audioSourceCaching": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -148,7 +148,7 @@
     }
   },
   "audioSourceCached": "已缓存",
-  "audioSourceFailed": "下载失败",
+  "audioSourceFailed": "播放失败",
   "routerNotFoundTitle": "页面不存在",
   "routerBackToLibrary": "返回音乐库",
   "sourcesTitle": "音源",
@@ -739,7 +739,7 @@
   "jellyfinFieldPasswordHint": "用于换取访问令牌",
   "jellyfinEmptyResponse": "Jellyfin 返回了空响应",
   "jellyfinAuthFailed": "无法连接 Jellyfin 服务器，请检查地址与账号",
-  "audioSourceStreaming": "直播",
+  "audioSourceStreaming": "网络",
   "playerLiveBadge": "直播中",
   "nowPlayingLiveStream": "直播流，没有固定时长",
   "nowPlayingDetails": "曲目信息",

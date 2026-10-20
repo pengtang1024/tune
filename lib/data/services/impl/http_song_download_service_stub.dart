@@ -23,5 +23,8 @@ class HttpSongDownloadService implements SongDownloadService {
   }
 
   @override
+  void cancel(Song song) {}
+
+  @override
   void dispose() {}
 }

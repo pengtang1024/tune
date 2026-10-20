@@ -257,15 +257,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audioSourceLocal => '本地文件';
 
   @override
-  String audioSourceDownloading(int percent) {
-    return '下载中 $percent%';
+  String audioSourceCaching(int percent) {
+    return '缓存中 $percent%';
   }
 
   @override
   String get audioSourceCached => '已缓存';
 
   @override
-  String get audioSourceFailed => '下载失败';
+  String get audioSourceFailed => '播放失败';
 
   @override
   String get routerNotFoundTitle => '页面不存在';
@@ -1142,7 +1142,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
 
   @override
-  String get audioSourceStreaming => '直播';
+  String get audioSourceStreaming => '网络';
 
   @override
   String get playerLiveBadge => '直播中';
@@ -1489,15 +1489,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audioSourceLocal => '本地文件';
 
   @override
-  String audioSourceDownloading(int percent) {
-    return '下载中 $percent%';
+  String audioSourceCaching(int percent) {
+    return '缓存中 $percent%';
   }
 
   @override
   String get audioSourceCached => '已缓存';
 
   @override
-  String get audioSourceFailed => '下载失败';
+  String get audioSourceFailed => '播放失败';
 
   @override
   String get routerNotFoundTitle => '页面不存在';
@@ -2374,7 +2374,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
 
   @override
-  String get audioSourceStreaming => '直播';
+  String get audioSourceStreaming => '网络';
 
   @override
   String get playerLiveBadge => '直播中';
@@ -2721,15 +2721,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get audioSourceLocal => '本機檔案';
 
   @override
-  String audioSourceDownloading(int percent) {
-    return '下載中 $percent%';
+  String audioSourceCaching(int percent) {
+    return '快取中 $percent%';
   }
 
   @override
   String get audioSourceCached => '已快取';
 
   @override
-  String get audioSourceFailed => '下載失敗';
+  String get audioSourceFailed => '播放失敗';
 
   @override
   String get routerNotFoundTitle => '頁面不存在';
@@ -3606,7 +3606,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jellyfinAuthFailed => '無法連線 Jellyfin 伺服器，請檢查位址與帳號';
 
   @override
-  String get audioSourceStreaming => '直播';
+  String get audioSourceStreaming => '網路';
 
   @override
   String get playerLiveBadge => '直播中';

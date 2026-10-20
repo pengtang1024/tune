@@ -139,8 +139,8 @@
     }
   },
   "audioSourceLocal": "本機檔案",
-  "audioSourceDownloading": "下載中 {percent}%",
-  "@audioSourceDownloading": {
+  "audioSourceCaching": "快取中 {percent}%",
+  "@audioSourceCaching": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -148,7 +148,7 @@
     }
   },
   "audioSourceCached": "已快取",
-  "audioSourceFailed": "下載失敗",
+  "audioSourceFailed": "播放失敗",
   "routerNotFoundTitle": "頁面不存在",
   "routerBackToLibrary": "返回音樂庫",
   "sourcesTitle": "音源",
@@ -739,7 +739,7 @@
   "jellyfinFieldPasswordHint": "用於換取存取權杖",
   "jellyfinEmptyResponse": "Jellyfin 回傳了空回應",
   "jellyfinAuthFailed": "無法連線 Jellyfin 伺服器，請檢查位址與帳號",
-  "audioSourceStreaming": "直播",
+  "audioSourceStreaming": "網路",
   "playerLiveBadge": "直播中",
   "nowPlayingLiveStream": "直播串流，沒有固定時長",
   "nowPlayingDetails": "曲目資訊",

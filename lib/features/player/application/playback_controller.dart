@@ -10,8 +10,11 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/player/application/audio_source_resolver.dart';
+import 'package:tune/features/player/application/track_prefetcher.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
+import 'package:tune/features/player/domain/playback_source.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -30,7 +33,9 @@ final playbackControllerProvider =
 /// history belong in listeners outside this class.
 class PlaybackController extends StateNotifier<PlaybackState> {
   PlaybackController(this._audio, this._downloads, this._resolver)
-    : super(PlaybackState.initial) {
+    : _audioSources = AudioSourceResolver(_downloads),
+      _prefetcher = TrackPrefetcher(_downloads),
+      super(PlaybackState.initial) {
     _subscriptions.add(_audio.positionStream.listen(_handlePosition));
     _subscriptions.add(_audio.durationStream.listen(_handleDuration));
     _subscriptions.add(_audio.playingStream.listen(_handlePlaying));
@@ -45,6 +50,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   final AudioPlayerService _audio;
   final SongDownloadService _downloads;
   final StreamUrlResolver _resolver;
+  final AudioSourceResolver _audioSources;
+  final TrackPrefetcher _prefetcher;
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   final Random _random = Random();
 
@@ -126,22 +133,38 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   ///
   /// The backend may report a broken address long after the load future
   /// returned, so the track can sit in "loading" forever without this hook.
+  /// A stream that breaks while the track plays is recovered the same way:
+  /// the address is refreshed and the track continues where it stopped.
   Future<void> _handlePlayerError(AudioPlayerError error) async {
     if (!mounted || state.hasError || !state.hasTrack) return;
-    if (state.status != PlaybackStatus.loading) return;
     if (_retryInProgress) return;
 
     final song = state.currentSong;
     if (song == null) return;
 
-    await _handleLoadFailure(
-      index: state.currentIndex,
-      song: song,
-      request: _loadRequest,
-      // The backend already reported the failure in the language of the
-      // interface, so the message is shown as it is.
-      message: error.message,
-    );
+    if (state.status == PlaybackStatus.loading) {
+      await _handleLoadFailure(
+        index: state.currentIndex,
+        song: song,
+        request: _loadRequest,
+        // The backend already reported the failure in the language of the
+        // interface, so the message is shown as it is.
+        message: error.message,
+      );
+      return;
+    }
+
+    if (state.status == PlaybackStatus.playing) {
+      // The stream broke while the track played: the address is refreshed and
+      // the track continues where it stopped.
+      await _handleLoadFailure(
+        index: state.currentIndex,
+        song: song,
+        request: _loadRequest,
+        message: error.message,
+        resumeAt: _audio.currentPosition,
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -315,6 +338,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
     final wasPlaying = state.isPlaying;
     final removingCurrent = index == state.currentIndex;
+    final removed = state.queue[index];
     final queue = List<Song>.of(state.queue)..removeAt(index);
     if (queue.isEmpty) {
       await clearQueue();
@@ -322,6 +346,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
 
     if (!removingCurrent) {
+      // The prefetch of a track that left the queue is not needed anymore.
+      _prefetcher.stopIf(removed);
       state = state.copyWith(
         queue: List<Song>.unmodifiable(queue),
         currentIndex: index < state.currentIndex
@@ -377,6 +403,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   Future<void> clearQueue() async {
     _loadRequest++;
+    _prefetcher.stop();
     try {
       await _audio.stop();
     } catch (error, stackTrace) {
@@ -406,17 +433,30 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   /// [isRetry] marks the attempt that follows a successful address refresh;
   /// only that attempt keeps the refresh budget, every fresh selection starts
   /// over with a full budget.
-  Future<void> _startAt(int index, {bool isRetry = false}) async {
+  ///
+  /// [startPosition] is where the playback continues, which matters when a
+  /// broken stream is replaced by a fresh address.
+  Future<void> _startAt(
+    int index, {
+    bool isRetry = false,
+    Duration startPosition = Duration.zero,
+  }) async {
     if (index < 0 || index >= state.queue.length) return;
     final song = state.queue[index];
     final request = ++_loadRequest;
     if (!isRetry) _refreshAttempts = 0;
+    _prefetcher.release(
+      keep: song,
+      index: index,
+      queue: state.queue,
+      playMode: state.playMode,
+    );
 
     state = state.copyWith(
       currentIndex: index,
       currentSong: song,
       status: PlaybackStatus.loading,
-      position: Duration.zero,
+      position: startPosition,
       duration: _knownDuration(song),
       errorMessage: null,
       audioSourceStatus: _initialSourceStatus(song),
@@ -424,21 +464,11 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     );
 
     try {
-      final localFile = await _resolveLocalFile(song, request);
+      final source = await _resolveSource(song, request);
       if (!mounted || request != _loadRequest) return;
 
-      await _audio.play(song, localFilePath: localFile);
+      await _playSong(song, source, request, startPosition);
       if (!mounted || request != _loadRequest) return;
-      _loadedSongUri = song.uri;
-
-      final duration = _audio.duration;
-      state = state.copyWith(
-        status: _audio.isPlaying
-            ? PlaybackStatus.playing
-            : PlaybackStatus.paused,
-        position: _audio.currentPosition,
-        duration: duration.inMilliseconds > 0 ? duration : _knownDuration(song),
-      );
     } catch (error, stackTrace) {
       if (!mounted || request != _loadRequest) return;
       await _handleLoadFailure(
@@ -451,15 +481,74 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     }
   }
 
+  /// Answers where the audio of [song] comes from and starts its cache.
+  Future<PlaybackSource> _resolveSource(Song song, int request) async {
+    final source = await _audioSources.sourceFor(song);
+    if (!mounted || request != _loadRequest) return source;
+    state = state.copyWith(audioSourceStatus: source.status);
+
+    final cacheTarget = source.cacheTarget;
+    if (cacheTarget != null) {
+      unawaited(_cacheInBackground(cacheTarget, request));
+    }
+    return source;
+  }
+
+  /// Plays the track and reports where the playback stands.
+  Future<void> _playSong(
+    Song song,
+    PlaybackSource source,
+    int request,
+    Duration startPosition,
+  ) async {
+    await _audio.play(song, localFilePath: source.file);
+    if (!mounted || request != _loadRequest) return;
+    _loadedSongUri = song.uri;
+
+    unawaited(
+      _prefetcher.prefetch(
+        index: state.currentIndex,
+        queue: state.queue,
+        playMode: state.playMode,
+      ),
+    );
+
+    if (startPosition > Duration.zero) {
+      await _restorePosition(startPosition);
+      if (!mounted || request != _loadRequest) return;
+    }
+
+    final duration = _audio.duration;
+    state = state.copyWith(
+      status: _audio.isPlaying
+          ? PlaybackStatus.playing
+          : PlaybackStatus.paused,
+      position: _audio.currentPosition,
+      duration: duration.inMilliseconds > 0 ? duration : _knownDuration(song),
+    );
+  }
+
+  /// Moves the playback back to the position it reached before a stream broke.
+  Future<void> _restorePosition(Duration position) async {
+    try {
+      await _audio.seekTo(position);
+    } catch (error, stackTrace) {
+      Log.error('恢复播放位置失败: $error\n$stackTrace');
+    }
+  }
+
   /// Single entry point for every playback failure.
   ///
   /// A remote track whose address expired gets one fresh address and one
   /// retry; everything else fails right away so the user sees the error.
+  /// [resumeAt] is where the playback continues, which matters when a stream
+  /// that broke while playing is replaced by a fresh address.
   Future<void> _handleLoadFailure({
     required int index,
     required Song song,
     required int request,
     required String message,
+    Duration resumeAt = Duration.zero,
     StackTrace? stackTrace,
   }) async {
     if (!mounted || request != _loadRequest) return;
@@ -472,7 +561,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
     if (refreshed != null) {
       _replaceQueueEntry(index, refreshed);
-      await _startAt(index, isRetry: true);
+      await _startAt(index, isRetry: true, startPosition: resumeAt);
       return;
     }
 
@@ -518,60 +607,39 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     state = state.copyWith(queue: List<Song>.unmodifiable(queue));
   }
 
-  /// Makes sure a remote track is stored on disk before it is played.
+  /// Fetches the local copy of [song] while the track plays.
   ///
-  /// Local tracks are returned as `null` so the backend keeps using their own
-  /// path. Remote tracks are downloaded once and replayed from the store
-  /// afterwards. Platforms without a file system stream the track directly.
-  /// A live stream is never stored: it has no end, so it is always played
-  /// straight from the network.
-  Future<String?> _resolveLocalFile(Song song, int request) async {
-    if (!song.isRemote || !_downloads.isSupported) return null;
-    if (song.isLiveStream) {
+  /// The transfer never decides the playback: when it fails, the track keeps
+  /// playing from the network and only the offline copy is missing.
+  Future<void> _cacheInBackground(Song song, int request) async {
+    try {
+      await _downloads.download(
+        song,
+        onProgress: (progress) {
+          if (!mounted || request != _loadRequest) return;
+          state = state.copyWith(downloadProgress: progress);
+        },
+      );
+    } catch (error, stackTrace) {
+      Log.error('缓存音源失败: $error\n$stackTrace');
+      if (!mounted || request != _loadRequest) return;
       state = state.copyWith(
         audioSourceStatus: AudioSourceStatus.streaming,
         downloadProgress: 0,
       );
-      return null;
+      return;
     }
 
-    final stored = await _downloads.storedFileFor(song);
-    if (!mounted || request != _loadRequest) return null;
-    if (stored != null) {
-      state = state.copyWith(
-        audioSourceStatus: AudioSourceStatus.cached,
-        downloadProgress: 1,
-      );
-      return stored;
-    }
-
-    state = state.copyWith(
-      audioSourceStatus: AudioSourceStatus.downloading,
-      downloadProgress: 0,
-    );
-
-    final downloaded = await _downloads.download(
-      song,
-      onProgress: (progress) {
-        if (!mounted || request != _loadRequest) return;
-        state = state.copyWith(downloadProgress: progress);
-      },
-    );
-    if (!mounted || request != _loadRequest) return null;
-
+    if (!mounted || request != _loadRequest) return;
     state = state.copyWith(
       audioSourceStatus: AudioSourceStatus.cached,
       downloadProgress: 1,
     );
-    return downloaded;
   }
 
   /// The source status a track starts in before it is resolved.
   AudioSourceStatus _initialSourceStatus(Song song) {
-    if (!song.isRemote) return AudioSourceStatus.local;
-    return song.isLiveStream
-        ? AudioSourceStatus.streaming
-        : AudioSourceStatus.downloading;
+    return song.isRemote ? AudioSourceStatus.streaming : AudioSourceStatus.local;
   }
 
   int _randomIndex({required int excluding}) {

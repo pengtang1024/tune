@@ -57,9 +57,7 @@ class AudioSourceBadge extends StatelessWidget {
   String _label(BuildContext context, int percent) {
     return switch (status) {
       AudioSourceStatus.local => context.loc.audioSourceLocal,
-      AudioSourceStatus.downloading => context.loc.audioSourceDownloading(
-        percent,
-      ),
+      AudioSourceStatus.caching => context.loc.audioSourceCaching(percent),
       AudioSourceStatus.cached => context.loc.audioSourceCached,
       AudioSourceStatus.streaming => context.loc.audioSourceStreaming,
       AudioSourceStatus.failed => context.loc.audioSourceFailed,
@@ -69,7 +67,7 @@ class AudioSourceBadge extends StatelessWidget {
   IconData get _icon {
     return switch (status) {
       AudioSourceStatus.local => Icons.sd_storage_rounded,
-      AudioSourceStatus.downloading => Icons.downloading_rounded,
+      AudioSourceStatus.caching => Icons.downloading_rounded,
       AudioSourceStatus.cached => Icons.offline_pin_rounded,
       AudioSourceStatus.streaming => Icons.podcasts_rounded,
       AudioSourceStatus.failed => Icons.error_outline_rounded,
@@ -79,7 +77,7 @@ class AudioSourceBadge extends StatelessWidget {
   Color _color(ThemeData theme) {
     return switch (status) {
       AudioSourceStatus.local => theme.colorScheme.onSurfaceVariant,
-      AudioSourceStatus.downloading => theme.colorScheme.primary,
+      AudioSourceStatus.caching => theme.colorScheme.primary,
       AudioSourceStatus.cached => theme.colorScheme.secondary,
       AudioSourceStatus.streaming => theme.colorScheme.tertiary,
       AudioSourceStatus.failed => theme.colorScheme.error,

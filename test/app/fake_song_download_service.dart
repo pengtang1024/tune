@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -15,6 +17,9 @@ class FakeSongDownloadService implements SongDownloadService {
   /// Uris of the tracks that were fetched during the test run.
   final List<String> downloadedUris = [];
 
+  /// Uris of the tracks whose transfer was stopped.
+  final List<String> cancelledUris = [];
+
   /// When true every transfer throws instead of completing.
   bool failDownloads = false;
 
@@ -25,6 +30,12 @@ class FakeSongDownloadService implements SongDownloadService {
 
   /// Progress values reported during the last transfer.
   final List<double> reportedProgress = [];
+
+  /// Holds every transfer until the test completes it.
+  ///
+  /// The gate makes the difference between "the copy is on its way" and "the
+  /// copy is stored" visible to the test.
+  Completer<void>? downloadGate;
 
   /// Called for every progress value so tests can inspect the app state while
   /// the transfer is still running.
@@ -39,6 +50,8 @@ class FakeSongDownloadService implements SongDownloadService {
     void Function(double progress)? onProgress,
   }) async {
     downloadedUris.add(song.uri);
+    final gate = downloadGate;
+    if (gate != null) await gate.future;
     _report(0.5, onProgress);
     if (failDownloads) {
       throw StateError('download failed');
@@ -53,6 +66,11 @@ class FakeSongDownloadService implements SongDownloadService {
     reportedProgress.add(progress);
     onProgress?.call(progress);
     progressObserver?.call(progress);
+  }
+
+  @override
+  void cancel(Song song) {
+    cancelledUris.add(song.uri);
   }
 
   @override

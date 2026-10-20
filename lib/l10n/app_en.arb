@@ -139,8 +139,8 @@
     }
   },
   "audioSourceLocal": "Local file",
-  "audioSourceDownloading": "Downloading {percent}%",
-  "@audioSourceDownloading": {
+  "audioSourceCaching": "Caching {percent}%",
+  "@audioSourceCaching": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -148,7 +148,7 @@
     }
   },
   "audioSourceCached": "Offline ready",
-  "audioSourceFailed": "Download failed",
+  "audioSourceFailed": "Playback failed",
   "routerNotFoundTitle": "Page not found",
   "routerBackToLibrary": "Back to library",
   "sourcesTitle": "Sources",
@@ -739,7 +739,7 @@
   "jellyfinFieldPasswordHint": "Used to obtain an access token",
   "jellyfinEmptyResponse": "Jellyfin returned an empty response",
   "jellyfinAuthFailed": "Cannot reach the Jellyfin server, check the address and the account",
-  "audioSourceStreaming": "Live",
+  "audioSourceStreaming": "Network",
   "playerLiveBadge": "LIVE",
   "nowPlayingLiveStream": "Live stream, no fixed length",
   "nowPlayingDetails": "Track details",

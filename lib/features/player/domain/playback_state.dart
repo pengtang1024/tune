@@ -22,7 +22,7 @@ class PlaybackState {
   /// Where the audio of [currentSong] is read from.
   final AudioSourceStatus audioSourceStatus;
 
-  /// Progress of the running download, between 0 and 1.
+  /// Progress of the running cache transfer, between 0 and 1.
   final double downloadProgress;
 
   const PlaybackState({
@@ -49,7 +49,8 @@ class PlaybackState {
   bool get canGoNext => queue.length > 1;
   bool get canGoPrevious => queue.length > 1;
 
-  bool get isDownloading => audioSourceStatus == AudioSourceStatus.downloading;
+  /// Whether the local copy of the current track is being fetched.
+  bool get isCaching => audioSourceStatus == AudioSourceStatus.caching;
 
   double get progress {
     if (duration.inMilliseconds <= 0) return 0;
