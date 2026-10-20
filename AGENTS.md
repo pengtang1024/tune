@@ -1,39 +1,76 @@
 # Tune 工程规范
 
-## 最高优先级：架构优化优先于代码优化
+> 给 AI 协作代理的**文档地图**：先读本页，再按表跳到需要的那份文档，最后才动手改。
+> 规则只维护一份（本页 + `docs/`）；`.lingma/rules/project_rule.md` 与 `.trae/rules/project_rules.md` 只指向这里。
+> 与代码冲突时以代码为准，并顺手修正对应文档。
 
-任何改动都必须先检查架构，再检查代码细节。架构优化不是「有空再做」的附加项，而是所有实现工作的前置条件。
+## 文档地图
 
-### 必须遵守的顺序
+| 要做的事 | 读哪份 |
+| --- | --- |
+| 判断改动优先级、要不要先动架构 | 本页 §1 |
+| 加文件、放哪一层、能不能跨 feature 引用 | [`docs/architecture.md`](docs/architecture.md) |
+| 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
+| 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
+| 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
+| 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
+| 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
+| 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
+
+## 0. 项目快照
+
+- 产品：紧凑的桌面音乐播放器（Flutter）。双栏布局：左栏常驻播放器，右栏在音乐库 / 队列 / 音源 / 设置之间切换。
+- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences · flex_color_scheme · gen-l10n。
+- 验收平台：Linux 桌面优先；Android / iOS / Windows / macOS / Web 保留工程入口，但不是 v1 验收目标。
+- 需求文档：`需求/README.md` 是入口。`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`多语言设计.md`（文案规则）是当前权威；`架构需求.md`、`框架.md`、`ai架构需求.md` 属早期规划，已被取代，不要照着实现。
+- `.trae/documents/` 是历史迭代计划，其中还引用 `lib/ui`、`PlaylistService` 等已删除的结构——只当历史读，不当规范。
+
+## 1. 最高优先级：架构优化优先于代码优化
+
+任何改动都先查架构，再查代码细节。架构优化不是「有空再做」的附加项，而是所有实现工作的前置条件。
+
+### 1.1 动手顺序（不可跳步）
 
 1. **边界**：谁拥有状态？谁负责持久化？谁负责 UI 编排？
-2. **依赖方向**：UI → controller → service → data，禁止反向依赖和跨 feature 的 UI 依赖。
+2. **依赖方向**：presentation → application → domain / data；禁止反向依赖，禁止跨 feature 的 UI 依赖。
 3. **单一事实来源**：同一份数据只能有一个权威状态源。
-4. **生命周期**：provider 不持有 `BuildContext`；不在 build 中写 provider；不用 post-frame 补状态。
-5. **接口**：先定义稳定的 service/controller 接口，再写实现。
-6. **代码细节**：命名、拆分、`const`、缓存、`RepaintBoundary` 等性能优化放在最后。
+4. **生命周期**：provider 与 controller 不持有 `BuildContext`；不在 build 中写 provider；不用 post-frame 补状态。
+5. **接口**：先定义稳定的 service / controller 接口，再写实现。
+6. **代码细节**：命名、拆分、常量、缓存、`RepaintBoundary` 等性能优化放在最后。
 
-### 明确禁止
+### 1.2 明确禁止
 
 - 用 `Future.delayed`、`addPostFrameCallback`、`setState` 掩盖状态同步问题。
 - 同一个业务状态在两个 provider 或两个 service 中各存一份。
-- `data/`、`domain/` 反向依赖 `features/` 或 `ui/`。
+- `data/`、`domain/` 反向依赖 `features/`、`app/`、`shared/ui/`。
 - `features/library` 依赖 `features/player` 的 UI；`features/player` 依赖 `features/library` 的 UI。
 - 为了兼容错误结构而不断增加判空、兼容分支和重复同步代码。
 - 在没有定义清楚状态归属前，先做局部性能优化。
 
-### 改动前自检
+### 1.3 改动前自检（三问）
 
 - 这次改动是否让职责更单一？
 - 是否减少了跨层依赖或重复状态？
-- 新增一个页面/平台时，是否只需接一个新入口，而不是修改一圈旧代码？
+- 新增一个页面 / 平台时，是否只需接一个新入口，而不是修改一圈旧代码？
 
 三个问题中有两个以上回答「否」，应先调整方案，而不是继续写代码。
 
-## 当前迁移约定
+## 2. 验证门禁
 
-- 新 UI 位于 `lib/app` 与 `lib/features`。
-- 旧 `lib/ui` 在迁移期保留，新链路验收后再清理。
-- 播放状态唯一来源：`PlaybackController`。
-- 队列是 `PlaybackState` 的一部分，不再使用 `PlaylistService` 的私有可变列表。
-- 现有未提交修改不回退、不覆盖；清理旧代码前先确认引用关系。
+```bash
+flutter analyze          # 必须 No issues found
+flutter test             # 全绿
+```
+
+改过文案还要 `flutter gen-l10n` 并提交产物。细节与测试布局见 [`docs/verification.md`](docs/verification.md)。
+
+## 3. Git
+
+- 主线分支是 `develop`；提交信息用 `feat|fix|refactor|docs|chore(scope): 中文说明`，一次提交只做一件事。
+- 工作区里别人未提交的修改不回退、不覆盖；清理旧代码前先确认引用关系（先 grep 再删）。
+- 新约定写进本页或 `docs/`，不要改 `需求/` 里已标注为「早期规划」的文档来表达新规则。
+
+## 4. 不在当前范围
+
+- 移动端通知栏 / 锁屏控制、均衡器、播放历史、账号系统已移出主链路，不要顺手加回来。
+- 主要验收平台是 Linux 桌面端；其它平台行为可以不同，但差异要写进 README 的「已知限制」。

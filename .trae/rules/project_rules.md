@@ -1,24 +1,32 @@
-AI相关：优先使用mcp的插件将复杂问题分解为步骤
-日志使用Log类
-日志级别：info、warn、error
-日志格式：[时间] [级别] [消息]
-日志级别：
-info：普通信息，用于记录应用运行状态
-warn：警告信息，用于记录潜在问题
-error：错误信息，用于记录运行时错误
-本地化参数的添加，应该根据l10n.yaml获取模板文件，zh_CN.arb为核心模板，根据模板文件添加参数，然后同等更新其他语言文件，最后通过flutter gen-l10n生成各个语言的AppLocalizations类
-启动默认使用flutter run -d windows
-优先使用flutter analyze命令检查代码，修复代码中的问题
-使用flutter test命令运行测试
-文件尽量不要超过200行，超过200行的文件应该考虑拆分
-ui层代码应该放到lib/ui目录下
-所有widget都应该尽量的小
-状态管理：使用flutter_riverpod管理状态
-路由管理：使用go_router管理路由
-网络请求：使用dio管理网络请求
-主题：使用flex_color_scheme
-颜色都应该和主题相关
-尽量不使用硬编码,所有的字符串,数字等都应该有专门的constants类来管理
-所有的widget都应该有对应的测试文件
-代码要尽量的简短，每个函数的行数不要超过50行
-重复代码应该被提取到单独的函数或类中，避免重复编写相同的代码
+# 项目规则（唯一来源：根目录 AGENTS.md）
+
+本工程的全部规则写在仓库根目录的 **`AGENTS.md`** 与 **`docs/`**。本文件只做入口，不复制条目——规则只维护一份，避免多处文档互相漂移。
+
+## 速查
+
+| 想知道 | 去读 |
+| --- | --- |
+| 改动的优先级与红线 | `AGENTS.md` §1 |
+| 目录分层、依赖方向、状态归属 | `docs/architecture.md` |
+| 加音源 / 加页面 | `docs/architecture.md` 的「扩展路径」 |
+| 加文案 / 改文案 | `docs/i18n.md` |
+| 日志、主题令牌、体积、注释、脚本目录 | `docs/conventions.md` |
+| 提交前必须跑什么、测试怎么写 | `docs/verification.md` |
+| 分支与提交信息 | `AGENTS.md` §3 |
+
+## 本工具的补充
+
+- 启动应用默认 `flutter run -d linux`（Linux 桌面是当前唯一主验收平台）。
+- 复杂任务先用 MCP 把问题拆成步骤，再逐步执行。
+- 改完必须跑 `flutter analyze` 与 `flutter test`，两者都干净才算完成。
+
+## 已从本文件移除的条目（别再捡回来）
+
+| 旧条目 | 现在在哪 / 为什么删 |
+| --- | --- |
+| 「ui 层代码放到 `lib/ui` 目录」 | `lib/ui` 已删除，新 UI 在 `lib/app` 与 `lib/features` |
+| 日志级别含 `warn` | `Log`（`lib/utils/logger.dart`）只有 `debug` / `info` / `error`，见 `docs/conventions.md` |
+| 「文件尽量不要超过 200 行」 | 见 `docs/conventions.md`，并注明哪些大文件不得继续膨胀 |
+| 「所有 widget 都要有测试文件」 | 收敛为 `docs/verification.md`：新增逻辑必须有对应测试 |
+| 「颜色/数字不要硬编码」 | 收敛为 `docs/conventions.md`：走 `CompactTokens` 与主题 |
+| 本地化参数添加流程 | 见 `docs/i18n.md`，步骤更完整（含两个会抓硬编码文案的测试） |
