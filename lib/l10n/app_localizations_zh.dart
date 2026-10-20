@@ -389,6 +389,90 @@ class AppLocalizationsZh extends AppLocalizations {
   String get m3uNoEntries => '播放列表里没有条目';
 
   @override
+  String get jsonFieldListPath => '列表路径';
+
+  @override
+  String get jsonFieldIdPath => '曲目 id 路径';
+
+  @override
+  String get jsonFieldTitlePath => '标题路径';
+
+  @override
+  String get jsonFieldArtistPath => '歌手路径';
+
+  @override
+  String get jsonFieldAlbumPath => '专辑路径';
+
+  @override
+  String get jsonFieldCoverPath => '封面路径';
+
+  @override
+  String get jsonFieldUrlPath => '播放地址路径';
+
+  @override
+  String get jsonFieldDurationPath => '时长路径';
+
+  @override
+  String get jsonFieldGenrePath => '流派路径';
+
+  @override
+  String get jsonFieldUrlTemplate => '播放地址模板';
+
+  @override
+  String get jsonFieldPathHint => '响应里的路径，逐段用点分开，如 data.title';
+
+  @override
+  String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
+
+  @override
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+
+  @override
+  String get jsonFieldUrl => '接口地址';
+
+  @override
+  String get jsonFieldUrlHint => '例如 https://example.com/api/search';
+
+  @override
+  String get jsonFieldHeaders => '请求头';
+
+  @override
+  String get jsonFieldHeadersHint => 'JSON 对象，一行一个键和值';
+
+  @override
+  String get jsonInvalidObject => '这段文字不是 JSON 对象';
+
+  @override
+  String get jsonInvalidResponse => '接口返回的不是 JSON';
+
+  @override
+  String get jsonNoTracks => '接口没有返回曲目';
+
+  @override
+  String get jsonNoAddressPath => '没有填写播放地址的路径或模板';
+
+  @override
+  String get sourceJsonApiName => 'JSON 接口';
+
+  @override
+  String get sourceJsonApiDescription => '把任意 JSON 接口映射成曲目';
+
+  @override
+  String get jsonApiHint => '填写接口地址与各字段的路径';
+
+  @override
+  String get jsonApiFieldMethod => '请求方式';
+
+  @override
+  String get jsonApiFieldMethodHint => '默认 GET；写了请求体就用 POST';
+
+  @override
+  String get jsonApiFieldBody => '请求体';
+
+  @override
+  String get jsonApiFieldBodyHint => 'POST 时的 JSON 对象；关键词会填进占位符';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -1837,6 +1921,90 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get m3uNoEntries => '播放列表里没有条目';
 
   @override
+  String get jsonFieldListPath => '列表路径';
+
+  @override
+  String get jsonFieldIdPath => '曲目 id 路径';
+
+  @override
+  String get jsonFieldTitlePath => '标题路径';
+
+  @override
+  String get jsonFieldArtistPath => '歌手路径';
+
+  @override
+  String get jsonFieldAlbumPath => '专辑路径';
+
+  @override
+  String get jsonFieldCoverPath => '封面路径';
+
+  @override
+  String get jsonFieldUrlPath => '播放地址路径';
+
+  @override
+  String get jsonFieldDurationPath => '时长路径';
+
+  @override
+  String get jsonFieldGenrePath => '流派路径';
+
+  @override
+  String get jsonFieldUrlTemplate => '播放地址模板';
+
+  @override
+  String get jsonFieldPathHint => '响应里的路径，逐段用点分开，如 data.title';
+
+  @override
+  String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
+
+  @override
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+
+  @override
+  String get jsonFieldUrl => '接口地址';
+
+  @override
+  String get jsonFieldUrlHint => '例如 https://example.com/api/search';
+
+  @override
+  String get jsonFieldHeaders => '请求头';
+
+  @override
+  String get jsonFieldHeadersHint => 'JSON 对象，一行一个键和值';
+
+  @override
+  String get jsonInvalidObject => '这段文字不是 JSON 对象';
+
+  @override
+  String get jsonInvalidResponse => '接口返回的不是 JSON';
+
+  @override
+  String get jsonNoTracks => '接口没有返回曲目';
+
+  @override
+  String get jsonNoAddressPath => '没有填写播放地址的路径或模板';
+
+  @override
+  String get sourceJsonApiName => 'JSON 接口';
+
+  @override
+  String get sourceJsonApiDescription => '把任意 JSON 接口映射成曲目';
+
+  @override
+  String get jsonApiHint => '填写接口地址与各字段的路径';
+
+  @override
+  String get jsonApiFieldMethod => '请求方式';
+
+  @override
+  String get jsonApiFieldMethodHint => '默认 GET；写了请求体就用 POST';
+
+  @override
+  String get jsonApiFieldBody => '请求体';
+
+  @override
+  String get jsonApiFieldBodyHint => 'POST 时的 JSON 对象；关键词会填进占位符';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3283,6 +3451,90 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get m3uNoEntries => '播放清單裡沒有條目';
+
+  @override
+  String get jsonFieldListPath => '清單路徑';
+
+  @override
+  String get jsonFieldIdPath => '曲目 id 路徑';
+
+  @override
+  String get jsonFieldTitlePath => '標題路徑';
+
+  @override
+  String get jsonFieldArtistPath => '歌手路徑';
+
+  @override
+  String get jsonFieldAlbumPath => '專輯路徑';
+
+  @override
+  String get jsonFieldCoverPath => '封面路徑';
+
+  @override
+  String get jsonFieldUrlPath => '播放網址路徑';
+
+  @override
+  String get jsonFieldDurationPath => '時長路徑';
+
+  @override
+  String get jsonFieldGenrePath => '類型路徑';
+
+  @override
+  String get jsonFieldUrlTemplate => '播放網址範本';
+
+  @override
+  String get jsonFieldPathHint => '回應裡的路徑，逐段用點分開，如 data.title';
+
+  @override
+  String get jsonFieldUrlTemplateHint => '播放網址的範本，曲目 id 會填進佔位處';
+
+  @override
+  String get jsonFieldQueryHint => '搜尋用的關鍵字，會替換請求裡的佔位符';
+
+  @override
+  String get jsonFieldUrl => '介面網址';
+
+  @override
+  String get jsonFieldUrlHint => '例如 https://example.com/api/search';
+
+  @override
+  String get jsonFieldHeaders => '請求標頭';
+
+  @override
+  String get jsonFieldHeadersHint => 'JSON 物件，一行一個鍵和值';
+
+  @override
+  String get jsonInvalidObject => '這段文字不是 JSON 物件';
+
+  @override
+  String get jsonInvalidResponse => '介面回應的不是 JSON';
+
+  @override
+  String get jsonNoTracks => '介面沒有回傳曲目';
+
+  @override
+  String get jsonNoAddressPath => '沒有填寫播放網址的路徑或範本';
+
+  @override
+  String get sourceJsonApiName => 'JSON 介面';
+
+  @override
+  String get sourceJsonApiDescription => '把任意 JSON 介面對應成曲目';
+
+  @override
+  String get jsonApiHint => '填寫介面網址與各欄位的路徑';
+
+  @override
+  String get jsonApiFieldMethod => '請求方式';
+
+  @override
+  String get jsonApiFieldMethodHint => '預設 GET；寫了請求體就用 POST';
+
+  @override
+  String get jsonApiFieldBody => '請求體';
+
+  @override
+  String get jsonApiFieldBodyHint => 'POST 時的 JSON 物件；關鍵字會填進佔位符';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

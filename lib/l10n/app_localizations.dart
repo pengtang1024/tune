@@ -784,6 +784,174 @@ abstract class AppLocalizations {
   /// **'播放列表里没有条目'**
   String get m3uNoEntries;
 
+  /// No description provided for @jsonFieldListPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'列表路径'**
+  String get jsonFieldListPath;
+
+  /// No description provided for @jsonFieldIdPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'曲目 id 路径'**
+  String get jsonFieldIdPath;
+
+  /// No description provided for @jsonFieldTitlePath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标题路径'**
+  String get jsonFieldTitlePath;
+
+  /// No description provided for @jsonFieldArtistPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌手路径'**
+  String get jsonFieldArtistPath;
+
+  /// No description provided for @jsonFieldAlbumPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑路径'**
+  String get jsonFieldAlbumPath;
+
+  /// No description provided for @jsonFieldCoverPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'封面路径'**
+  String get jsonFieldCoverPath;
+
+  /// No description provided for @jsonFieldUrlPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放地址路径'**
+  String get jsonFieldUrlPath;
+
+  /// No description provided for @jsonFieldDurationPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长路径'**
+  String get jsonFieldDurationPath;
+
+  /// No description provided for @jsonFieldGenrePath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流派路径'**
+  String get jsonFieldGenrePath;
+
+  /// No description provided for @jsonFieldUrlTemplate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放地址模板'**
+  String get jsonFieldUrlTemplate;
+
+  /// No description provided for @jsonFieldPathHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'响应里的路径，逐段用点分开，如 data.title'**
+  String get jsonFieldPathHint;
+
+  /// No description provided for @jsonFieldUrlTemplateHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放地址的模板，曲目 id 会填进占位处'**
+  String get jsonFieldUrlTemplateHint;
+
+  /// No description provided for @jsonFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索用的关键词，会替换请求里的占位符'**
+  String get jsonFieldQueryHint;
+
+  /// No description provided for @jsonFieldUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口地址'**
+  String get jsonFieldUrl;
+
+  /// No description provided for @jsonFieldUrlHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://example.com/api/search'**
+  String get jsonFieldUrlHint;
+
+  /// No description provided for @jsonFieldHeaders.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求头'**
+  String get jsonFieldHeaders;
+
+  /// No description provided for @jsonFieldHeadersHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'JSON 对象，一行一个键和值'**
+  String get jsonFieldHeadersHint;
+
+  /// No description provided for @jsonInvalidObject.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这段文字不是 JSON 对象'**
+  String get jsonInvalidObject;
+
+  /// No description provided for @jsonInvalidResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口返回的不是 JSON'**
+  String get jsonInvalidResponse;
+
+  /// No description provided for @jsonNoTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口没有返回曲目'**
+  String get jsonNoTracks;
+
+  /// No description provided for @jsonNoAddressPath.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有填写播放地址的路径或模板'**
+  String get jsonNoAddressPath;
+
+  /// No description provided for @sourceJsonApiName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'JSON 接口'**
+  String get sourceJsonApiName;
+
+  /// No description provided for @sourceJsonApiDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把任意 JSON 接口映射成曲目'**
+  String get sourceJsonApiDescription;
+
+  /// No description provided for @jsonApiHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写接口地址与各字段的路径'**
+  String get jsonApiHint;
+
+  /// No description provided for @jsonApiFieldMethod.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求方式'**
+  String get jsonApiFieldMethod;
+
+  /// No description provided for @jsonApiFieldMethodHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认 GET；写了请求体就用 POST'**
+  String get jsonApiFieldMethodHint;
+
+  /// No description provided for @jsonApiFieldBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请求体'**
+  String get jsonApiFieldBody;
+
+  /// No description provided for @jsonApiFieldBodyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'POST 时的 JSON 对象；关键词会填进占位符'**
+  String get jsonApiFieldBodyHint;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

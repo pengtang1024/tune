@@ -414,6 +414,98 @@ class AppLocalizationsEn extends AppLocalizations {
   String get m3uNoEntries => 'The playlist has no entries';
 
   @override
+  String get jsonFieldListPath => 'List path';
+
+  @override
+  String get jsonFieldIdPath => 'Track id path';
+
+  @override
+  String get jsonFieldTitlePath => 'Title path';
+
+  @override
+  String get jsonFieldArtistPath => 'Artist path';
+
+  @override
+  String get jsonFieldAlbumPath => 'Album path';
+
+  @override
+  String get jsonFieldCoverPath => 'Cover path';
+
+  @override
+  String get jsonFieldUrlPath => 'Stream address path';
+
+  @override
+  String get jsonFieldDurationPath => 'Duration path';
+
+  @override
+  String get jsonFieldGenrePath => 'Genre path';
+
+  @override
+  String get jsonFieldUrlTemplate => 'Stream address template';
+
+  @override
+  String get jsonFieldPathHint =>
+      'The path in the answer, steps separated by dots, e.g. data.title';
+
+  @override
+  String get jsonFieldUrlTemplateHint =>
+      'The template of the stream address; the track id is written into the placeholder';
+
+  @override
+  String get jsonFieldQueryHint =>
+      'The keyword to search with; it replaces the placeholder in the request';
+
+  @override
+  String get jsonFieldUrl => 'API address';
+
+  @override
+  String get jsonFieldUrlHint => 'e.g. https://example.com/api/search';
+
+  @override
+  String get jsonFieldHeaders => 'Headers';
+
+  @override
+  String get jsonFieldHeadersHint =>
+      'A JSON object, one key and value per line';
+
+  @override
+  String get jsonInvalidObject => 'This text is not a JSON object';
+
+  @override
+  String get jsonInvalidResponse => 'The answer of the interface is not JSON';
+
+  @override
+  String get jsonNoTracks => 'The interface returned no tracks';
+
+  @override
+  String get jsonNoAddressPath =>
+      'No path or template for the stream address was filled in';
+
+  @override
+  String get sourceJsonApiName => 'JSON API';
+
+  @override
+  String get sourceJsonApiDescription => 'Map any JSON API onto tracks';
+
+  @override
+  String get jsonApiHint =>
+      'Fill in the address of the interface and the paths of the fields';
+
+  @override
+  String get jsonApiFieldMethod => 'Method';
+
+  @override
+  String get jsonApiFieldMethodHint =>
+      'GET by default; POST when a body is written';
+
+  @override
+  String get jsonApiFieldBody => 'Body';
+
+  @override
+  String get jsonApiFieldBodyHint =>
+      'The JSON object of a POST; the keyword is written into the placeholder';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

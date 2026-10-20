@@ -29,6 +29,7 @@ IconData sourceIconOf(String type, MusicSourceKind kind) {
     'jellyfin' => Icons.tv_rounded,
     'direct_url' => Icons.link_rounded,
     'm3u' => Icons.playlist_play_rounded,
+    'json_api' => Icons.data_object_rounded,
     _ => switch (kind) {
       MusicSourceKind.localDirectory => Icons.folder_rounded,
       MusicSourceKind.openCatalog => Icons.public_rounded,

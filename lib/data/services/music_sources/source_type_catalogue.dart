@@ -149,6 +149,12 @@ class SourceTypeCatalogue {
         description: strings.sourceM3uDescription,
         kind: MusicSourceKind.custom,
       ),
+      SourceTypeDescriptor(
+        type: 'json_api',
+        name: strings.sourceJsonApiName,
+        description: strings.sourceJsonApiDescription,
+        kind: MusicSourceKind.custom,
+      ),
     ];
   }
 

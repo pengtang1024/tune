@@ -207,6 +207,10 @@ void main() {
         addable.where((type) => type.type == 'm3u'),
         hasLength(1),
       );
+      expect(
+        addable.where((type) => type.type == 'json_api'),
+        hasLength(1),
+      );
     });
   });
 

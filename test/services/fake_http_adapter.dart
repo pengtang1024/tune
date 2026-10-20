@@ -11,8 +11,16 @@ class FakeHttpAdapter implements HttpClientAdapter {
   /// When set the request fails with this error.
   Object? failure;
 
+  /// The body every answer carries.
+  ///
+  /// When it is null the answer is a filler of the same size.
+  String? body;
+
   /// The addresses that were requested.
   final List<String> requestedUrls = [];
+
+  /// The requests that were made, with their headers and their data.
+  final List<RequestOptions> requests = [];
 
   final List<void Function()> _arrivals = [];
 
@@ -31,6 +39,7 @@ class FakeHttpAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     requestedUrls.add(options.uri.toString());
+    requests.add(options);
     for (final arrival in List.of(_arrivals)) {
       arrival();
     }
@@ -44,7 +53,10 @@ class FakeHttpAdapter implements HttpClientAdapter {
     if (failure != null) {
       throw failure;
     }
-    final bytes = Uint8List.fromList(List<int>.filled(1024, 7));
+    final body = this.body;
+    final bytes = body == null
+        ? Uint8List.fromList(List<int>.filled(1024, 7))
+        : Uint8List.fromList(body.codeUnits);
     return ResponseBody(
       Stream<Uint8List>.value(bytes),
       200,
