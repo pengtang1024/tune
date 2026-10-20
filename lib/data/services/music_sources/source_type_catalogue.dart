@@ -137,6 +137,12 @@ class SourceTypeCatalogue {
         description: strings.sourceJellyfinDescription,
         kind: MusicSourceKind.openApi,
       ),
+      SourceTypeDescriptor(
+        type: 'direct_url',
+        name: strings.sourceDirectUrlName,
+        description: strings.sourceDirectUrlDescription,
+        kind: MusicSourceKind.custom,
+      ),
     ];
   }
 

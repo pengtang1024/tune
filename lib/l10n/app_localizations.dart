@@ -712,6 +712,36 @@ abstract class AppLocalizations {
   /// **'更多操作'**
   String get sourcesMenu;
 
+  /// No description provided for @sourceDirectUrlName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'直链音频'**
+  String get sourceDirectUrlName;
+
+  /// No description provided for @sourceDirectUrlDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'一行一条地址，每条变成一首曲目'**
+  String get sourceDirectUrlDescription;
+
+  /// No description provided for @directUrlFieldUrls.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频地址'**
+  String get directUrlFieldUrls;
+
+  /// No description provided for @directUrlFieldUrlsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'一行一条地址，例如 https://example.com/song.mp3'**
+  String get directUrlFieldUrlsHint;
+
+  /// No description provided for @directUrlHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写音频地址，一行一条'**
+  String get directUrlHint;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

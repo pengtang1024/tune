@@ -375,6 +375,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesMenu => 'More actions';
 
   @override
+  String get sourceDirectUrlName => 'Direct audio';
+
+  @override
+  String get sourceDirectUrlDescription =>
+      'One address per line; every line becomes a track';
+
+  @override
+  String get directUrlFieldUrls => 'Audio addresses';
+
+  @override
+  String get directUrlFieldUrlsHint =>
+      'One address per line, e.g. https://example.com/song.mp3';
+
+  @override
+  String get directUrlHint => 'Fill in the audio addresses, one per line';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

@@ -6,6 +6,7 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
+import 'package:tune/data/services/music_sources/direct_url_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
@@ -69,6 +70,7 @@ class MusicSourceService implements StreamUrlResolver {
       'radio': RadioSourceAdapter(dio: dio),
       'wikimedia': WikimediaSourceAdapter(dio: dio),
       'jellyfin': JellyfinSourceAdapter(dio: dio),
+      'direct_url': DirectUrlSourceAdapter(),
     };
   }
 

@@ -353,6 +353,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesMenu => '更多操作';
 
   @override
+  String get sourceDirectUrlName => '直链音频';
+
+  @override
+  String get sourceDirectUrlDescription => '一行一条地址，每条变成一首曲目';
+
+  @override
+  String get directUrlFieldUrls => '音频地址';
+
+  @override
+  String get directUrlFieldUrlsHint => '一行一条地址，例如 https://example.com/song.mp3';
+
+  @override
+  String get directUrlHint => '填写音频地址，一行一条';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -1765,6 +1780,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesMenu => '更多操作';
 
   @override
+  String get sourceDirectUrlName => '直链音频';
+
+  @override
+  String get sourceDirectUrlDescription => '一行一条地址，每条变成一首曲目';
+
+  @override
+  String get directUrlFieldUrls => '音频地址';
+
+  @override
+  String get directUrlFieldUrlsHint => '一行一条地址，例如 https://example.com/song.mp3';
+
+  @override
+  String get directUrlHint => '填写音频地址，一行一条';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3175,6 +3205,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesMenu => '更多操作';
+
+  @override
+  String get sourceDirectUrlName => '直鏈音訊';
+
+  @override
+  String get sourceDirectUrlDescription => '一行一條位址，每條變成一首曲目';
+
+  @override
+  String get directUrlFieldUrls => '音訊位址';
+
+  @override
+  String get directUrlFieldUrlsHint => '一行一條位址，例如 https://example.com/song.mp3';
+
+  @override
+  String get directUrlHint => '填寫音訊位址，一行一條';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

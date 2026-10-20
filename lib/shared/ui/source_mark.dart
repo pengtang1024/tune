@@ -27,6 +27,7 @@ IconData sourceIconOf(String type, MusicSourceKind kind) {
     'radio' => Icons.radio_rounded,
     'wikimedia' => Icons.perm_media_rounded,
     'jellyfin' => Icons.tv_rounded,
+    'direct_url' => Icons.link_rounded,
     _ => switch (kind) {
       MusicSourceKind.localDirectory => Icons.folder_rounded,
       MusicSourceKind.openCatalog => Icons.public_rounded,
