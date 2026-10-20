@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/data/services/artwork/artwork_cache.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
+import 'package:tune/data/services/library/copy_marker.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
@@ -58,6 +59,14 @@ class HttpSongDownloadService implements SongDownloadService {
 
   @override
   Future<String?> storedFileFor(Song song) async {
+    // The track may know the file of its copy: a track that was fetched and
+    // scanned again carries the path it was written to.
+    final known = song.localPath;
+    if (known != null && known.isNotEmpty) {
+      final file = File(known);
+      if (await file.exists()) return file.path;
+    }
+
     final file = await _targetFile(song);
     return await file.exists() ? file.path : null;
   }
@@ -133,6 +142,9 @@ class HttpSongDownloadService implements SongDownloadService {
       }
 
       await _replaceFile(partial, target);
+      // The marker belongs to the copy, so it is written before the copy is
+      // announced: whoever waits for the transfer finds a marked file.
+      await _storeMarker(song, target);
       transfer.report(1);
       transfer.complete(target.path);
       unawaited(_storeCover(song));
@@ -144,6 +156,20 @@ class HttpSongDownloadService implements SongDownloadService {
       if (identical(_transfers[key], transfer)) {
         _transfers.remove(key);
       }
+    }
+  }
+
+  /// Puts the marker of the track next to its copy.
+  ///
+  /// The marker names the track the copy belongs to, so the library knows
+  /// that the file is the copy of a track and not a track of its own. A
+  /// marker that cannot be written does not fail the download: the track is
+  /// there, and the marker comes with the next run.
+  Future<void> _storeMarker(Song song, File target) async {
+    try {
+      await CopyMarker.write(target, song);
+    } catch (error, stackTrace) {
+      Log.error('保存副本标记失败: ${song.title}\n$stackTrace');
     }
   }
 

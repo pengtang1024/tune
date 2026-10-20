@@ -86,4 +86,75 @@ void main() {
       expect(song.isLocalFile, isFalse);
     });
   });
+
+  group('where a track lives', () {
+    const remote = Song(
+      id: 1,
+      uri: 'tune://openverse/one',
+      streamUrl: 'https://cdn.example.com/one.mp3',
+    );
+
+    const copy = Song(
+      id: 1,
+      uri: 'tune://openverse/one',
+      localPath: '/music/Artist/One/One.mp3',
+    );
+
+    test('a remote track is remote and has no file', () {
+      expect(remote.hasRemoteSource, isTrue);
+      expect(remote.hasLocalFile, isFalse);
+    });
+
+    test('a track that was fetched keeps its source and owns a file', () {
+      expect(copy.hasRemoteSource, isTrue);
+      expect(copy.hasLocalFile, isTrue);
+    });
+
+    test('a track of the library is local and has no source', () {
+      const local = Song(id: 2, uri: '/music/two.mp3');
+
+      expect(local.hasLocalFile, isTrue);
+      expect(local.hasRemoteSource, isFalse);
+    });
+
+    test('the copy and the track of the source are one track', () {
+      final merged = remote.mergeWith(copy);
+
+      expect(merged.uri, remote.uri);
+      expect(merged.localPath, copy.localPath);
+      expect(merged.streamUrl, remote.streamUrl);
+      expect(merged.hasLocalFile, isTrue);
+      expect(merged.hasRemoteSource, isTrue);
+    });
+
+    test('the merged track keeps what only the file knows', () {
+      const file = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        localPath: '/music/Artist/One/One.mp3',
+        albumArtPath: '/music/Artist/One/One.jpg',
+        size: 4096,
+        bitrate: 320,
+        sampleRate: 44100,
+      );
+
+      final merged = remote.mergeWith(file);
+
+      expect(merged.albumArtPath, file.albumArtPath);
+      expect(merged.size, file.size);
+      expect(merged.bitrate, file.bitrate);
+      expect(merged.sampleRate, file.sampleRate);
+      // The source knows the name of the track, the file keeps its own.
+      expect(merged.title, remote.title);
+    });
+
+    test('the merge does not depend on the order of the entries', () {
+      final one = remote.mergeWith(copy);
+      final other = copy.mergeWith(remote);
+
+      expect(other.localPath, one.localPath);
+      expect(other.streamUrl, one.streamUrl);
+      expect(other.uri, one.uri);
+    });
+  });
 }

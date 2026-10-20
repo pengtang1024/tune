@@ -753,6 +753,10 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   /// The source status a track starts in before it is resolved.
   AudioSourceStatus _initialSourceStatus(Song song) {
+    if (song.localPath != null) {
+      // The track was fetched, so its copy on this machine is what plays.
+      return AudioSourceStatus.cached;
+    }
     return song.isRemote
         ? AudioSourceStatus.streaming
         : AudioSourceStatus.local;

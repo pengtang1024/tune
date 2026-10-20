@@ -18,6 +18,18 @@ class AudioSourceResolver {
   /// The answer never waits for a transfer: a track whose copy is missing
   /// plays from the network and reports the copy as the cache target.
   Future<PlaybackSource> sourceFor(Song song) async {
+    // A track that was fetched knows the file of its copy, so it plays from
+    // the disk without asking the store where the file is.
+    final copy = song.localPath;
+    if (copy != null && copy.isNotEmpty) {
+      return PlaybackSource(
+        file: copy,
+        status: song.hasRemoteSource
+            ? AudioSourceStatus.cached
+            : AudioSourceStatus.local,
+      );
+    }
+
     if (!song.isRemote) {
       return const PlaybackSource(status: AudioSourceStatus.local);
     }

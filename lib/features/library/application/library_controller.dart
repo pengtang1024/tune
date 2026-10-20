@@ -353,7 +353,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   }
 
   List<Song> _dedupe(List<Song> songs) {
-    final seen = <String>{};
-    return songs.where((song) => seen.add(song.uri)).toList();
+    final merged = <String, Song>{};
+    for (final song in songs) {
+      final known = merged[song.uri];
+      // A track that is on the disk and a track that comes from a source are
+      // one track: the copy keeps the identity of the source, so the two
+      // entries meet and become one row that knows both.
+      merged[song.uri] = known == null ? song : known.mergeWith(song);
+    }
+    return merged.values.toList();
   }
 }

@@ -200,6 +200,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('a track that was fetched is marked local and remote', (
+    tester,
+  ) async {
+    // The copy on the disk keeps the identity of the track it belongs to, so
+    // the row says both: the track comes from a source and it is here.
+    const copy = Song(
+      id: 2,
+      title: '远方的歌',
+      artist: '远方歌手',
+      uri: 'tune://openverse/abc',
+      sourceId: 'openverse',
+      externalId: 'abc',
+      streamUrl: 'https://example.com/a.mp3',
+      localPath: '/music/远方歌手/远方的歌/远方的歌.mp3',
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: copy, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('位置 · 本地 · 在线'), findsOneWidget);
+    expect(find.byIcon(Icons.sd_storage_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the details sheet closes when the reader taps outside it', (
     tester,
   ) async {

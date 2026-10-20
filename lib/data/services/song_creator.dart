@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:tune/data/services/library/copy_marker.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
@@ -11,6 +13,10 @@ class SongCreator {
     final filePath = file.path;
     final fileName = path.basenameWithoutExtension(filePath);
 
+    // A file the app fetched carries a marker: it is the copy of a track
+    // that also comes from a source, not a track of its own.
+    final copyUri = await CopyMarker.readUri(file);
+
     try {
       final metadata = audio_meta.readMetadata(file);
 
@@ -21,7 +27,12 @@ class SongCreator {
         'album': metadata.album ?? '',
         'duration': metadata.duration?.inMilliseconds ?? 0,
         'data': filePath,
-        'uri': filePath,
+        'uri': copyUri ?? filePath,
+        'localPath': copyUri == null ? null : filePath,
+        'sourceId': copyUri == null ? null : SourceSongFactory.sourceIdOf(copyUri),
+        'externalId': copyUri == null
+            ? null
+            : SourceSongFactory.externalIdOf(copyUri),
         'dateAdded': DateTime.now().millisecondsSinceEpoch,
         'year': metadata.year?.year,
         'genre': metadata.genres.isNotEmpty == true
@@ -45,22 +56,28 @@ class SongCreator {
       return Song.fromMap(songData);
     } catch (e) {
       Log.info('SongCreator: Failed to read metadata for $filePath: $e');
-      return await createBasicSong(file, fileName, filePath);
+      return await createBasicSong(file, fileName, filePath, copyUri: copyUri);
     }
   }
 
   static Future<Song> createBasicSong(
     File file,
     String fileName,
-    String filePath,
-  ) async {
+    String filePath, {
+    String? copyUri,
+  }) async {
     final songData = <String, dynamic>{
       'id': filePath.hashCode,
       'title': fileName,
       'artist': '',
       'album': '',
       'duration': 0,
-      'uri': filePath,
+      'uri': copyUri ?? filePath,
+      'localPath': copyUri == null ? null : filePath,
+      'sourceId': copyUri == null ? null : SourceSongFactory.sourceIdOf(copyUri),
+      'externalId': copyUri == null
+          ? null
+          : SourceSongFactory.externalIdOf(copyUri),
       'dateAdded': DateTime.now().millisecondsSinceEpoch,
       'year': 0,
       'size': await file.length(),

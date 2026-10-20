@@ -155,6 +155,56 @@ void main() {
     expect(state.songs.map((song) => song.uri), [localSong.uri]);
     expect(state.sourceSummaries.containsKey('openverse'), isFalse);
   });
+
+  test('a copy and the track of its source are one track', () async {
+    // The copy on the disk carries the identity of the track it belongs to,
+    // so the library knows the two are the same song.
+    const copy = Song(
+      id: 2,
+      title: 'Old Remote',
+      artist: 'Remote',
+      uri: 'tune://openverse/old',
+      sourceId: 'openverse',
+      externalId: 'old',
+      localPath: '/music/Remote/Old Remote/Old Remote.mp3',
+      size: 4096,
+    );
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.success,
+          songs: [localSong, copy],
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.success,
+          songs: [oldRemoteSong],
+        ),
+      },
+    );
+
+    await container.read(libraryControllerProvider.future);
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.songs.map((song) => song.uri), [
+      localSong.uri,
+      oldRemoteSong.uri,
+    ]);
+
+    final merged = state.songs.firstWhere(
+      (song) => song.uri == oldRemoteSong.uri,
+    );
+    // The track knows both: it comes from a source and it is on this machine.
+    expect(merged.hasRemoteSource, isTrue);
+    expect(merged.hasLocalFile, isTrue);
+    expect(merged.localPath, copy.localPath);
+    // What only one side knows is kept.
+    expect(merged.streamUrl, oldRemoteSong.streamUrl);
+    expect(merged.size, copy.size);
+  });
 }
 
 class FakeScanner extends CrossPlatformMusicScannerImpl {

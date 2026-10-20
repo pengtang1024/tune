@@ -89,6 +89,7 @@ presentation → application → domain
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
+| 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
 | 歌词 | 曲目所在目录，`<歌名>.lrc` | `LyricsController` → `LibraryPaths` |
 | 插件脚本 | `<应用支持目录>/music_plugins/` | `MusicPluginStore` |
@@ -110,11 +111,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 ├── <歌手>/<专辑>/<歌名>/
 │   ├── <歌名>.mp3                          # 下载的音频
 │   ├── <歌名>.jpg                          # 封面
-│   └── <歌名>.lrc                          # 匹配到的歌词
+│   ├── <歌名>.lrc                          # 匹配到的歌词
+│   └── <歌名>.tune                         # 副本标记：这首歌来自哪个音源
 └── ...
 ```
 
 - **一首歌一个目录**：音频、封面、歌词放在同一个目录里，别的播放器打开这个目录就知道这是一首歌。
+- **副本标记**：app 下载的音频旁边放一个 `<歌名>.tune`，里面是这首歌的规范地址（`tune://<音源>/<曲目 id>`）。扫描时读到它，就知道这个文件是某首远程曲目的副本，而不是一首独立的曲子——于是音乐库里那首歌只有一条，同时标着「本地」和「在线」。
 - 用户磁盘上已有的曲子不动，app 只把歌词写在它旁边（`<歌名>.lrc`），封面和音频不覆盖用户自己的文件。
 - 目录名经过 `safeFileName`（`lib/utils/file_name.dart`）：路径分隔符和 Windows 不允许的字符被换掉，名字短到任何文件系统都收得下。
 - 单个目录不放太多东西：曲目按歌手 / 专辑 / 歌名分层，封面缓存按哈希前两位分桶。

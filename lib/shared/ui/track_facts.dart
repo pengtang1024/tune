@@ -71,16 +71,35 @@ List<TrackFact?> fileFactsOf(BuildContext context, Song song) {
 }
 
 TrackFact? _storageFact(BuildContext context, Song song) {
-  final remote = song.isRemote;
+  final local = song.hasLocalFile;
+  final remote = song.hasRemoteSource;
+
+  final String value;
+  final IconData icon;
+  final FactTone tone;
+  if (local && remote) {
+    // The track is on this machine and comes from a source: both are true,
+    // so both are written down.
+    value =
+        '${context.loc.trackFactStorageLocal} · ${context.loc.trackFactStorageRemote}';
+    icon = Icons.sd_storage_rounded;
+    tone = FactTone.secondary;
+  } else if (local) {
+    value = context.loc.trackFactStorageLocal;
+    icon = Icons.folder_rounded;
+    tone = FactTone.neutral;
+  } else {
+    value = context.loc.trackFactStorageRemote;
+    icon = Icons.cloud_rounded;
+    tone = FactTone.secondary;
+  }
 
   return TrackFact(
     label: context.loc.trackFactStorage,
-    value: remote
-        ? context.loc.trackFactStorageRemote
-        : context.loc.trackFactStorageLocal,
-    icon: remote ? Icons.cloud_rounded : Icons.folder_rounded,
-    tone: remote ? FactTone.secondary : FactTone.neutral,
-    compact: !remote,
+    value: value,
+    icon: icon,
+    tone: tone,
+    compact: local,
   );
 }
 

@@ -60,6 +60,14 @@ class Song {
   /// A short description of the track, when the source provides one.
   final String? description;
 
+  /// The file that holds the audio of this track, when the track has one.
+  ///
+  /// A local track is its own file and keeps that in [uri]. A remote track
+  /// owns a file once it was fetched to the disk, and the file is remembered
+  /// here: the track keeps the identity of its source and the path of its
+  /// copy at the same time.
+  final String? localPath;
+
   const Song({
     required this.id,
     this.title = '',
@@ -93,6 +101,7 @@ class Song {
     this.isLiveStream = false,
     this.license,
     this.description,
+    this.localPath,
   });
 
   factory Song.fromMap(Map<String, dynamic> data) {
@@ -137,6 +146,7 @@ class Song {
       isLiveStream: data['isLiveStream'] == true,
       license: data['license'],
       description: data['description'],
+      localPath: data['localPath'],
     );
   }
 
@@ -173,6 +183,7 @@ class Song {
     bool? isLiveStream,
     String? license,
     String? description,
+    String? localPath,
   }) {
     return Song(
       id: id ?? this.id,
@@ -207,6 +218,7 @@ class Song {
       isLiveStream: isLiveStream ?? this.isLiveStream,
       license: license ?? this.license,
       description: description ?? this.description,
+      localPath: localPath ?? this.localPath,
     );
   }
 
@@ -246,6 +258,52 @@ class Song {
     return scheme == 'file';
   }
 
+  /// Whether the audio of this track is on this machine.
+  ///
+  /// A local track is its own file. A remote track owns a file once it was
+  /// fetched to the disk, and that file is remembered in [localPath].
+  bool get hasLocalFile => localPath != null || isLocalFile;
+
+  /// Whether the track comes from a remote source.
+  ///
+  /// A track that was fetched keeps the identity of its source, so it stays a
+  /// remote track even when a copy of it is on this machine.
+  bool get hasRemoteSource => uri.isNotEmpty && !isLocalFile;
+
+  /// Combines two entries of the same track.
+  ///
+  /// The entry that owns a file knows the file: where it is, how big it is.
+  /// The other entry knows the track: its name, its cover, its address. The
+  /// result keeps both, so one row in the library says everything that is
+  /// known about the track.
+  Song mergeWith(Song other) {
+    final file = hasLocalFile ? this : other;
+    final track = identical(file, this) ? other : this;
+
+    return track.copyWith(
+      title: track.title.isEmpty ? file.title : track.title,
+      artist: track.artist.isEmpty ? file.artist : track.artist,
+      album: track.album.isEmpty ? file.album : track.album,
+      duration: track.duration > 0 ? track.duration : file.duration,
+      genre: track.genre ?? file.genre,
+      year: track.year ?? file.year,
+      bitrate: file.bitrate ?? track.bitrate,
+      sampleRate: file.sampleRate ?? track.sampleRate,
+      trackNumber: track.trackNumber ?? file.trackNumber,
+      trackTotal: track.trackTotal ?? file.trackTotal,
+      discNumber: track.discNumber ?? file.discNumber,
+      totalDisc: track.totalDisc ?? file.totalDisc,
+      lyrics: track.lyrics ?? file.lyrics,
+      genres: track.genres ?? file.genres,
+      performers: track.performers ?? file.performers,
+      language: track.language ?? file.language,
+      size: file.size ?? track.size,
+      albumArtPath: track.albumArtPath ?? file.albumArtPath,
+      localPath: file.localPath ?? (file.isLocalFile ? file.uri : null),
+      isFavorite: track.isFavorite || file.isFavorite,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
@@ -279,6 +337,7 @@ class Song {
     'isLiveStream': isLiveStream,
     'license': license,
     'description': description,
+    'localPath': localPath,
   };
 
   @override

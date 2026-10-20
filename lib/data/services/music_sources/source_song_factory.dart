@@ -81,6 +81,25 @@ class SourceSongFactory {
     return hash == 0 ? 1 : hash;
   }
 
+  /// The source of the track a canonical URI names.
+  ///
+  /// Returns `null` when the URI does not name a track of a source.
+  static String? sourceIdOf(String uri) {
+    final parsed = Uri.tryParse(uri);
+    if (parsed == null || parsed.scheme != 'tune') return null;
+    return parsed.host.isEmpty ? null : parsed.host;
+  }
+
+  /// The id of the track a canonical URI names.
+  ///
+  /// Returns `null` when the URI does not name a track of a source.
+  static String? externalIdOf(String uri) {
+    final parsed = Uri.tryParse(uri);
+    if (parsed == null || parsed.scheme != 'tune') return null;
+    final segments = parsed.pathSegments;
+    return segments.isEmpty ? null : segments.last;
+  }
+
   static String? normalizeUrl(String? value) {
     final trimmed = value?.trim();
     if (trimmed == null || trimmed.isEmpty) return null;

@@ -68,4 +68,16 @@ void main() {
       expect(address.path, endsWith('/Artist/Two/Two.mp3'));
     },
   );
+
+  test('a track that knows its copy plays from that copy', () async {
+    // A track that was fetched and scanned again carries the file it was
+    // written to, so the playback reads that file and asks nobody.
+    final file = File(path.join(library.path, 'Artist', 'Two', 'Two.mp3'))
+      ..createSync(recursive: true);
+
+    final source = await resolver.sourceFor(song.copyWith(localPath: file.path));
+
+    expect(source.status, AudioSourceStatus.cached);
+    expect(source.file, file.path);
+  });
 }

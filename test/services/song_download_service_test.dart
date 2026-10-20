@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/data/services/impl/http_song_download_service_io.dart';
+import 'package:tune/data/services/library/copy_marker.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/impl/library_paths_io.dart';
 import 'package:tune/domain/models/song.dart';
@@ -77,6 +78,14 @@ void main() {
     );
     // The copy never leaves the folder the app put it in.
     expect(path.isWithin(store.path, file), isTrue);
+  });
+
+  test('the copy says which track it belongs to', () async {
+    final file = await service.download(canonicalSong);
+
+    // The marker sits next to the copy, so the library knows that the file is
+    // the copy of a track and not a track of its own.
+    expect(await CopyMarker.readUri(File(file)), canonicalSong.uri);
   });
 
   test('two callers share one transfer', () async {
