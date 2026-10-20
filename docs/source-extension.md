@@ -232,7 +232,7 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
 
 每种类型，用户填的都是**数据**，不是代码。没有表达式、没有函数、没有求值器。
 
-### 6.1 JSON 接口（`json_api`，最后做）
+### 6.1 JSON 接口（`json_api`，已落地）
 
 | 参数 | 说明 |
 | --- | --- |
@@ -240,6 +240,7 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
 | `method` | `GET`（默认）或 `POST` |
 | `headers` | JSON 对象字符串，如 `{"Authorization":"Bearer …"}` |
 | `body` | POST 时的 JSON 对象字符串，`${query}` 同样替换 |
+| `query` | 搜索关键词；写进地址与请求体里的占位处 |
 | `listPath` | 列表在响应里的路径，如 `data.songs`；留空表示根就是数组 |
 | `idPath` | 曲目唯一 id；留空则用数组下标 |
 | `titlePath` / `artistPath` / `albumPath` / `coverPath` / `urlPath` | 各字段的取值路径 |
@@ -250,21 +251,29 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
 路径语法只有一条规则：`a.b.c` 逐段取 map 的键或数组的下标，取不到就当空值。
 没有通配、没有过滤、没有拼接表达式 —— 复杂接口的展开交给别的类型。
 
+播放地址有两个写法，填一个就够：`urlPath` 取回应里的地址，`urlTemplate` 自己写
+模板（曲目 id 填进模板里）；两个都填时以模板为准。没有地址的条目不进音乐库。
+
 安全边界：只允许 `http(s)` 地址；请求头只是字符串键值；不执行任何用户内容。
 
-### 6.2 GraphQL 接口（`graphql`，与 JSON 接口同批做）
+### 6.2 GraphQL 接口（`graphql`，已落地）
 
 | 参数 | 说明 |
 | --- | --- |
 | `url` | 接口地址 |
-| `query` | GraphQL 查询文档（声明式查询，不是表达式） |
-| `variables` | JSON 对象字符串，`${query}` 会被搜索关键词替换 |
+| `document` | GraphQL 查询文档（声明式查询，不是表达式） |
+| `variables` | JSON 对象字符串，关键词写进变量里的占位处 |
 | `headers` | JSON 对象字符串 |
+| `query` | 搜索关键词；写进变量里的占位处 |
 | `listPath` | 列表在响应里的路径，如 `data.tracks` |
 | `idPath` / `titlePath` / `artistPath` / `albumPath` / `coverPath` / `urlPath` / `durationPath` / `genrePath` | 与 JSON 接口同一套取值路径 |
+| `limit` | 取前多少条 |
 
 与 JSON 接口的区别只有一个：**筛选条件写在查询文档里**，而不是写在映射里。
 其余（路径取值、请求头、曲目字段）完全共用同一份实现。
+
+查询文档放在 `document` 而不是 `query`：`query` 是所有音源都有的搜索关键词
+（在线搜索也写在这一处），不能被占着。
 
 安全边界与 JSON 接口相同：只允许 `http(s)`；查询文档是 GraphQL，不是通用脚本；
 应用不执行任何用户内容，只把变量填进请求。
@@ -314,7 +323,7 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
 10. `direct_url` 适配器。
 11. `m3u` 适配器。
 
-### 阶段 C · JSON 接口与 GraphQL（下一步）
+### 阶段 C · JSON 接口与 GraphQL（已落地）
 
 12. 映射语法、`json_api` 适配器、表单 UI、测试。
 13. `graphql` 适配器：复用同一套路径取值，只多一份查询文档与变量。
