@@ -22,7 +22,7 @@ version: 1.0.0+1
 environment:
   sdk: ^3.8.1
 
-flutter_icons:  # 与插件名称保持一致，消除警告
+flutter_launcher_icons:
   android: "launcher_icon"
   ios: true               # 启用 iOS 图标生成
   image_path: "assets/icons/app_icon.png"  # 原图路径
@@ -31,6 +31,7 @@ flutter_icons:  # 与插件名称保持一致，消除警告
     generate: true          # 启用 Web 图标生成
   windows:
     generate: true          # 启用 Windows 图标生成
+    icon_size: 256          # 任务栏按 256 取图，缩小时才不会糊
   macos:
     generate: true          # 启用 macOS 图标生成
 # Dependencies specify other packages that your package needs in order to work.
