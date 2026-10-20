@@ -56,9 +56,8 @@ flutter build linux --debug
 - The desktop entry has to be installed into the XDG directories of the machine, otherwise the dock falls back to a generic icon (install it once per machine):
 
 ```bash
-cp -r build/linux/x64/*/bundle/share/* ~/.local/share/
-update-desktop-database ~/.local/share/applications
-gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
+flutter build linux --debug
+./linux/install-desktop-entry.sh
 ```
 
 ## Known limitations

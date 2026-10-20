@@ -56,9 +56,8 @@ flutter build linux --debug
 - 桌面项要装进本机的 XDG 目录，dock 才会显示 Tune 的图标（每次换机器装一次）：
 
 ```bash
-cp -r build/linux/x64/*/bundle/share/* ~/.local/share/
-update-desktop-database ~/.local/share/applications
-gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
+flutter build linux --debug
+./linux/install-desktop-entry.sh
 ```
 
 ## 已知限制
