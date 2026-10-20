@@ -36,8 +36,10 @@ static void set_window_icon(GtkWindow* window) {
   g_free(path);
 
   // The assets of the program, for the case the bundle has no icon.
+  // It is the Linux icon, already inset like the theme icons, so the window
+  // never shows up bigger than the other programs.
   if (icon == nullptr) {
-    path = g_build_filename(directory, "data", "flutter_assets", "assets", "icons", "app_icon.png", nullptr);
+    path = g_build_filename(directory, "data", "flutter_assets", "assets", "icons", "app_icon_linux.png", nullptr);
     icon = gdk_pixbuf_new_from_file(path, nullptr);
     g_free(path);
   }

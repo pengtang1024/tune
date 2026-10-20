@@ -25,7 +25,7 @@ environment:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true               # 启用 iOS 图标生成
-  image_path: "assets/icons/app_icon.png"  # 原图路径
+  image_path: "branding/app_icon.png"  # 原图路径
   min_sdk_android: 21       # Android 最低支持版本（可选）
   web:
     generate: true          # 启用 Web 图标生成
@@ -101,6 +101,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
+  # 生成 Linux 主题图标
+  image: ^4.12.0
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

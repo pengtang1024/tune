@@ -51,7 +51,8 @@ flutter build linux --debug
 
 ## 桌面图标
 
-- 原图是 `assets/icons/app_icon.png`；改完原图后跑 `dart run flutter_launcher_icons` 重新生成各平台图标。
+- 原图是 `branding/app_icon.png`；改完原图后跑 `dart run flutter_launcher_icons` 重新生成各平台图标。原图不进包，`assets/` 里只放运行时要用的素材。
+- Linux 的主题图标另有一条规则：图形缩到画布的 13/16 留出透明边，跟别的应用一样大。改完原图再跑 `dart run tool/generate_linux_icons.dart`。
 - Linux 的 dock 与任务栏图标来自桌面项，程序自身也带一份窗口图标。
 - 桌面项要装进本机的 XDG 目录，dock 才会显示 Tune 的图标（每次换机器装一次）：
 

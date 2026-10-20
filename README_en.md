@@ -51,7 +51,8 @@ flutter build linux --debug
 
 ## Desktop icon
 
-- The master image is `assets/icons/app_icon.png`; run `dart run flutter_launcher_icons` to regenerate the platform icons after changing it.
+- The master image is `branding/app_icon.png`; run `dart run flutter_launcher_icons` to regenerate the platform icons after changing it. The master is not packaged; `assets/` only holds what the app needs at runtime.
+- The Linux theme icons follow one extra rule: the art is inset to 13/16 of the canvas so the icon ends up the same size as the other applications. Run `dart run tool/generate_linux_icons.dart` after changing the master.
 - On Linux the dock and the taskbar icon come from the desktop entry, and the program carries a window icon of its own.
 - The desktop entry has to be installed into the XDG directories of the machine, otherwise the dock falls back to a generic icon (install it once per machine):
 
