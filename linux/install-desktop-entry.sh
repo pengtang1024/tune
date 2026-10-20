@@ -26,15 +26,21 @@ fi
 data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
 cp -r "$bundle/share/." "$data_home/"
 
+# 仓库里的桌面项写的是 Exec=tune，那是给系统安装用的。
+# 这里装的是构建产物，要改成构建产物的路径，dock 才能把它启动起来。
+binary="$(cd "$bundle" && pwd)/tune"
+for entry in "$data_home"/applications/*.desktop; do
+  case "$(basename "$entry")" in
+    *iouf.tune*)
+      sed -i "s|^Exec=.*|Exec=$binary|" "$entry"
+      echo "装好了：$entry"
+      ;;
+  esac
+done
+
 if command -v update-desktop-database >/dev/null; then
   update-desktop-database "$data_home/applications"
 fi
 if command -v gtk-update-icon-cache >/dev/null; then
   gtk-update-icon-cache -f -t "$data_home/icons/hicolor"
 fi
-
-for entry in "$data_home"/applications/*.desktop; do
-  case "$(basename "$entry")" in
-    *iouf.tune*) echo "装好了：$entry" ;;
-  esac
-done
