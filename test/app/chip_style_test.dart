@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Guards the rule of the chip system: a chip carries an icon and a colour,
-/// never a word.
+/// Guards the rule of the chip system: a chip carries an icon, a colour and
+/// the main of the fact, and it writes those words in the details panel only.
 ///
 /// The rules live in [docs/chips.md]. This test reads the source, the way
 /// the localization guard reads it, because the leftovers of the old chip

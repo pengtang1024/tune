@@ -19,7 +19,9 @@ import 'package:tune/shared/ui/track_facts.dart';
 /// so a reader can look a track up instead of guessing what it is.
 ///
 /// The facts stand in chips, one chip per fact: the icon says which fact it
-/// is and the words of the fact wait in the tooltip. The addresses are the
+/// is and the chip writes the main of the fact, the name of the fact waiting
+/// in the tooltip. The chips take the room they need, so they stand in
+/// several rows when the language writes long words. The addresses are the
 /// one thing a chip cannot carry in writing — they are longer than a line —
 /// so each of them names itself and hands its address to a chip of its own.
 ///

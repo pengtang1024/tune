@@ -8,12 +8,14 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
-/// The details panel is a row of chips.
+/// The details panel is a strip of chips.
 ///
-/// Every fact of a track is a chip: the icon says which fact it is, the chip
-/// writes the name of the fact and its value. The addresses are the one thing
-/// a chip cannot write out — they are longer than a line — so each of them
-/// names itself and hands the address to a chip of its own.
+/// Every fact of a track is a chip: the icon says which fact it is and the
+/// chip writes the main of the fact, the name of the fact waiting in the
+/// tooltip. The chips take the room their words need, so they stand in
+/// several rows when the language writes long words. The addresses are the
+/// one thing a chip cannot write out — they are longer than a line — so each
+/// of them names itself and hands the address to a chip of its own.
 void main() {
   const song = Song(
     id: 1,
@@ -109,15 +111,16 @@ void main() {
     );
 
     expect(chips, findsWidgets);
-    // A chip carries no words: the icon says which fact it is and the words
-    // of the fact wait in the tooltip.
+    // A chip writes the main of the fact next to its icon: the reader sees
+    // the format of the file without a hover. The name of the fact waits in
+    // the tooltip.
     expect(
       find.descendant(of: chips, matching: find.text('格式')),
       findsNothing,
     );
     expect(
       find.descendant(of: chips, matching: find.text('FLAC')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(
       find.descendant(
@@ -145,6 +148,34 @@ void main() {
     // The chips stand in rows and not in a column: a chip strip that takes
     // one row per fact is a list in another name.
     expect(rows.length, lessThan(chips.evaluate().length));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a value too long for a line is cut short', (tester) async {
+    // A name of an album can be longer than a line, and a chip that grows
+    // with it would push the other chips out of the panel.
+    const longAlbum = Song(
+      id: 3,
+      title: '长名字的歌',
+      artist: '某歌手',
+      album: '一张名字长得写不完的专辑，写了很长很长，长到一行里放不下为止。',
+      uri: '/music/night.flac',
+    );
+
+    await openSheet(tester, track: longAlbum);
+    final sheet = find.byType(BottomSheet);
+
+    final chip = find.descendant(
+      of: sheet,
+      matching: find.byType(MetaChip),
+    );
+    final album = tester.getRect(
+      find.descendant(of: chip, matching: find.textContaining('一张名字长得')),
+    );
+
+    // The chip keeps its place in the row and the whole of the value waits
+    // in the tip.
+    expect(album.width, lessThan(tester.getSize(sheet).width));
     expect(tester.takeException(), isNull);
   });
 

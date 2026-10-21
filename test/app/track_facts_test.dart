@@ -120,7 +120,7 @@ void main() {
     expect(find.byIcon(Icons.podcasts_rounded), findsOneWidget);
   });
 
-  testWidgets('the details sheet keeps the words of a fact in the tip', (
+  testWidgets('the details sheet keeps the name of a fact in the tip', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -134,16 +134,15 @@ void main() {
     await tester.pumpAndSettle();
 
     final sheet = find.byType(BottomSheet);
-    // A chip carries no words: the icon says which fact it is and the words
-    // of the fact wait in the tooltip. A panel of facts would turn into a
-    // table of words otherwise.
+    // The chip writes the main of the fact: the reader sees the format of
+    // the file without a hover. The name of the fact waits in the tooltip.
     expect(
       find.descendant(of: sheet, matching: find.text('格式')),
       findsNothing,
     );
     expect(
       find.descendant(of: sheet, matching: find.text('FLAC')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(
       find.descendant(of: sheet, matching: find.byTooltip('格式 · FLAC')),
@@ -226,7 +225,9 @@ void main() {
     await tester.tap(find.byTooltip('查看详情'));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线'), findsNothing);
+    // The chip writes where the track lives: the reader sees that it is
+    // online without a hover, and the name of the fact waits in the tooltip.
+    expect(find.text('在线'), findsOneWidget);
     expect(
       find.descendant(
         of: find.byType(BottomSheet),
@@ -326,9 +327,10 @@ void main() {
       find.descendant(of: sheet, matching: find.text('时长')),
       findsNothing,
     );
+    // The chip writes how long the track lasts.
     expect(
       find.descendant(of: sheet, matching: find.text('4:05')),
-      findsNothing,
+      findsOneWidget,
     );
     expect(
       find.descendant(of: sheet, matching: find.byTooltip('时长 · 4:05')),
@@ -355,6 +357,8 @@ void main() {
       find.descendant(of: sheet, matching: find.text('来源编号')),
       findsNothing,
     );
+    // The key of the track in its source is looked up, not read: the chip
+    // stays a mark of its own and the tip keeps the words.
     expect(
       find.descendant(of: sheet, matching: find.text('abc')),
       findsNothing,
@@ -419,8 +423,8 @@ void main() {
     await tester.tap(find.byTooltip('查看详情'));
     await tester.pumpAndSettle();
 
-    // The mark says that the lyrics are there, the words are written out.
-    expect(find.text('已包含'), findsNothing);
+    // The chip says that the lyrics are there, the words are written out.
+    expect(find.text('已包含'), findsOneWidget);
     expect(find.byTooltip('歌词 · 已包含'), findsWidgets);
     expect(find.text('[00:00.00] 歌词'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -515,7 +519,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('格式'), findsNothing);
-    expect(find.text('MP3'), findsNothing);
+    // The chip writes the format of the file.
+    expect(find.text('MP3'), findsOneWidget);
     expect(find.byTooltip('格式 · MP3'), findsWidgets);
     expect(tester.takeException(), isNull);
   });

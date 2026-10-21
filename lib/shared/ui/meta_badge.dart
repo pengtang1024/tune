@@ -19,14 +19,14 @@ Color factToneColor(FactTone tone, ColorScheme colors) {
 /// A chip that carries one fact.
 ///
 /// The chip is the mark of the fact: the icon says which fact it is and the
-/// colour says which class it belongs to. The words of the fact wait in the
-/// tooltip, the way they wait in every other chip of the app — a chip that
-/// writes its words grows with them, and a panel full of facts would turn
-/// into a table of words.
+/// colour says which class it belongs to. Next to the icon the chip writes
+/// the main of the fact — the length of a track, the size of its file, the
+/// day it was added — because the main is the fact itself, and a reader
+/// should not have to hover to learn it.
 ///
-/// A fact that has a main and a second half is the one exception: the chip
-/// shows the main next to the icon, because the main is the name of the
-/// thing itself. The second half waits in the tooltip.
+/// The name of the fact and its second half wait in the tooltip. A fact
+/// whose value is a key writes nothing: a key is looked up, not read at a
+/// glance.
 class MetaChip extends StatelessWidget {
   /// The icon that lets a reader recognise the fact at a glance.
   final IconData icon;
@@ -55,11 +55,9 @@ class MetaChip extends StatelessWidget {
     final words = value;
 
     final chip = Container(
-      height: CompactTokens.chipBox,
       // A chip without words is a small square of its own; a chip that
       // carries a word takes the room the word needs and no more.
       width: words == null ? CompactTokens.chipBox : null,
-      alignment: words == null ? Alignment.center : null,
       padding: words == null
           ? EdgeInsets.zero
           : const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
@@ -68,22 +66,33 @@ class MetaChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(CompactTokens.radius6),
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: CompactTokens.icon14, color: color),
-          if (words != null) ...[
-            const SizedBox(width: CompactTokens.space4),
-            Text(
-              words,
-              style: CompactTypography.mono(
-                theme.colorScheme.onSurface,
-                size: CompactTypeScale.mark,
-                letterSpacing: 0.3,
+      child: SizedBox(
+        height: CompactTokens.chipBox,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, size: CompactTokens.icon14, color: color),
+            if (words != null) ...[
+              const SizedBox(width: CompactTokens.space4),
+              // A value that does not fit the line is cut short: the chip
+              // keeps its place in the row and the tip keeps the whole
+              // value.
+              Flexible(
+                child: Text(
+                  words,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CompactTypography.mono(
+                    theme.colorScheme.onSurface,
+                    size: CompactTypeScale.mark,
+                    letterSpacing: 0.3,
+                  ),
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
 

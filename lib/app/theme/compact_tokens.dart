@@ -41,8 +41,10 @@ abstract final class CompactTokens {
 
   /// Side of the square a chip sits in.
   ///
-  /// A chip is a mark and not a control: its box does not grow with the word
-  /// next to it, so a column of chips keeps the same width in every row.
+  /// A chip is a mark and not a control: its height does not grow with the
+  /// word next to it, so a row of chips keeps the same rhythm in every
+  /// language. Its width follows the words of the fact, because the main of
+  /// a fact is worth reading.
   static const double chipBox = 22;
 
   /// Size of the drawings that stand for a screen with nothing in it.

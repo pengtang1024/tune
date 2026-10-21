@@ -13,8 +13,8 @@ enum FactTone { neutral, primary, secondary, tertiary, error }
 ///
 /// The same fact is read in three ways: a list row shows the icon alone, the
 /// now playing page shows the icon with the value, and the details sheet
-/// shows the icon with the value as well, the name of the fact waiting in
-/// the tooltip.
+/// shows the icon with the main of the fact, the name of the fact waiting
+/// in the tooltip.
 class TrackFact {
   final String label;
   final String value;
@@ -37,6 +37,13 @@ class TrackFact {
   /// its own name instead of putting it in a chip.
   final bool paragraph;
 
+  /// Whether the value is a key instead of a name.
+  ///
+  /// A key says which track of a source this is. A reader does not read a
+  /// key, they look it up, so the chip stays a mark of its own and the tip
+  /// keeps the words.
+  final bool identifier;
+
   final String? _sentence;
 
   const TrackFact({
@@ -47,6 +54,7 @@ class TrackFact {
     this.secondary,
     this.compact = false,
     this.paragraph = false,
+    this.identifier = false,
     String? sentence,
   }) : _sentence = sentence;
 
@@ -62,9 +70,12 @@ class TrackFact {
 
   /// The words the chip itself carries, when it carries any.
   ///
-  /// A fact with one piece of content keeps it in the tooltip: the icon
-  /// already says which fact it is, and a chip that writes its words grows
-  /// with them. A fact with a main and a second half shows its main, because
-  /// the main is the name of the thing itself.
-  String? get chipValue => secondary == null ? null : value;
+  /// The chip writes the main of the fact, because the main is the fact
+  /// itself: the reader sees the length of a track, the size of its file or
+  /// the day it was added without a hover. The name of the fact waits in the
+  /// tooltip, and so does the second half of the content.
+  ///
+  /// A fact whose value is a key writes nothing: a key is looked up, not
+  /// read at a glance.
+  String? get chipValue => identifier ? null : value;
 }

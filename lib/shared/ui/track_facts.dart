@@ -68,6 +68,10 @@ TrackFact? _sourceIdFact(BuildContext context, Song song) {
     label: context.loc.trackFactSourceId,
     value: id,
     icon: Icons.tag_rounded,
+    // The key of the track in its source is looked up, not read: some
+    // sources name their files with a whole sentence, so the chip stays a
+    // mark of its own and the tip keeps the words.
+    identifier: true,
   );
 }
 
