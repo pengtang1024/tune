@@ -137,13 +137,13 @@ void main() {
       findsNothing,
     );
     expect(
-      find.descendant(of: sheet, matching: find.byType(CopyChip)),
+      find.descendant(of: sheet, matching: find.byType(CopyChipGroup)),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the name of an address stands in front of its chip', (
+  testWidgets('the name of an address stands in front of its copy', (
     tester,
   ) async {
     await openSheet(tester);
@@ -152,18 +152,24 @@ void main() {
     final name = tester.getTopLeft(
       find.descendant(of: sheet, matching: find.text('文件路径')),
     );
-    final chip = tester.getTopLeft(
-      find.descendant(of: sheet, matching: find.byType(CopyChip)),
+    final copy = tester.getTopLeft(
+      find.descendant(
+        of: sheet,
+        matching: find.byIcon(Icons.copy_rounded),
+      ),
     );
 
-    expect(chip.dx, greaterThan(name.dx));
+    // The chip is two halves: the name takes the room and the square that
+    // copies takes the rest.
+    expect(copy.dx, greaterThan(name.dx));
+    expect(copy.dy, name.dy);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('the pointer on the chip shows the address', (tester) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
-    final chip = find.descendant(of: sheet, matching: find.byType(CopyChip));
+    final chip = find.descendant(of: sheet, matching: find.byType(CopyChipGroup));
 
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
@@ -195,9 +201,12 @@ void main() {
 
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
-    final chip = find.descendant(of: sheet, matching: find.byType(CopyChip));
+    final copy = find.descendant(
+      of: sheet,
+      matching: find.byIcon(Icons.copy_rounded),
+    );
 
-    await tester.tap(chip);
+    await tester.tap(copy);
     // The toast stays for a moment and the pump waits for the timer of the
     // toast as well, so the sheets are pumped one frame at a time.
     await tester.pump();

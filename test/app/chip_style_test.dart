@@ -20,6 +20,7 @@ void main() {
       if (file.path.endsWith('shared/ui/meta_badge.dart')) continue;
       if (file.path.endsWith('shared/ui/track_detail_sheet.dart')) continue;
       if (file.path.contains('MetaChip(')) offenders.add(file.path);
+      if (file.path.contains('CopyChipGroup(')) offenders.add(file.path);
     }
 
     expect(

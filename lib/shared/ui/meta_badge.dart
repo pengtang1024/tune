@@ -140,12 +140,19 @@ class MetaBadge extends StatelessWidget {
 
 /// A chip that carries a value too long for the line it stands in.
 ///
-/// The icon says which value it is, the colour says that the value can be
-/// taken away, and the value itself stands in the tooltip: a path and an
-/// address are longer than a line, so they are not written out. The line
-/// says what the thing is, and the chip hands the whole value over when the
-/// pointer rests on it.
-class CopyChip extends StatelessWidget {
+/// The chip is two halves that belong together, the way the buttons of a
+/// button group are one control: the wide half names the thing and the small
+/// square half takes the value away. The value itself stands in the tooltip:
+/// a path and an address are longer than a line, so they are not written out.
+/// The reader reads the whole value where the pointer rests on the chip, and
+/// takes it away with a click on the square half.
+class CopyChipGroup extends StatelessWidget {
+  /// The icon that lets a reader recognise the thing at a glance.
+  final IconData icon;
+
+  /// The name of the thing, such as the path of the file.
+  final String label;
+
   /// The value that the chip carries, and takes away with a click.
   final String address;
 
@@ -155,36 +162,75 @@ class CopyChip extends StatelessWidget {
   /// chip does, because a value on its own does not say that it can be taken.
   final String hint;
 
-  const CopyChip({super.key, required this.address, required this.hint});
+  const CopyChipGroup({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.address,
+    required this.hint,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final quiet = theme.colorScheme.onSurfaceVariant;
     final radius = BorderRadius.circular(CompactTokens.radius6);
 
-    final mark = Container(
-      width: CompactTokens.chipBox,
+    // The name takes the room and the square takes the rest: the chip is
+    // read as the name of the thing, and the copy is the action on it.
+    final name = Container(
       height: CompactTokens.chipBox,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer,
-        borderRadius: radius,
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: CompactTokens.icon14, color: quiet),
+          const SizedBox(width: CompactTokens.space4),
+          Text(
+            label,
+            style: CompactTypography.mono(
+              quiet,
+              size: CompactTypeScale.mark,
+              weight: FontWeight.w500,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
       ),
-      child: Icon(
-        Icons.copy_rounded,
-        size: CompactTokens.icon14,
-        color: theme.colorScheme.primary,
+    );
+
+    final copy = InkWell(
+      onTap: () => _copy(context),
+      child: Container(
+        width: CompactTokens.chipBox,
+        height: CompactTokens.chipBox,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primaryContainer,
+          border: Border(
+            left: BorderSide(color: theme.colorScheme.outlineVariant),
+          ),
+        ),
+        child: Icon(
+          Icons.copy_rounded,
+          size: CompactTokens.icon14,
+          color: theme.colorScheme.primary,
+        ),
       ),
     );
 
     return TuneTooltip(
       message: address,
       label: hint,
-      child: InkWell(
-        onTap: () => _copy(context),
-        borderRadius: radius,
-        child: mark,
+      child: Container(
+        decoration: BoxDecoration(
+          color: quiet.withValues(alpha: 0.1),
+          borderRadius: radius,
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [name, copy]),
       ),
     );
   }
