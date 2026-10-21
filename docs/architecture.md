@@ -156,7 +156,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：事实、地址与写出来的正文 |
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四条地址：本机文件路径、在线地址、封面地址、规范身份；各自的语气色与动作 |
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |
-| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带框的图标 chip，事实的字在 tooltip 里）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
+| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带框的图标 chip，写着事实的主，名字在 tooltip 里）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
@@ -165,14 +165,15 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
 2. 正在播放页：画图标 + 值，名字留给 tooltip。
-3. 详情面板：事实排成图标 chip（字在提示气泡里），地址是 chip 组，简介、歌词、原始数据与请求头各写一块。
+3. 详情面板：事实排成 chip（chip 上写着事实的主，名字在提示气泡里），地址是 chip 组，简介、歌词、原始数据与请求头各写一块。
 
-详情面板里的事实是一排 **chip**：一个事实一个 chip，图标说这是哪一个，事实的名字和
-值都在提示气泡里——chip 里再写一遍，panel 就成了一张字表。chip 排成几行，不排成
-一列——排成一列就是一张表，读起来比 chip 慢。
+详情面板里的事实是一排 **chip**：一个事实一个 chip，图标说这是哪一个，颜色说它属于哪
+一类，chip 上写着事实的**主**（时长、大小、格式、日期、位置），事实的名字在提示气泡
+里。chip 排成几行，不排成一列——排成一列就是一张表，读起来比 chip 慢；语言写出来的词
+有长有短，chip 的宽跟着主走，两三行是正常的。
 
-有主副内容的事实是例外：音源的主是它叫自己的名字（`Wikimedia Commons`），副是应用
-叫它什么（`自由授权媒体`）。主跟着图标写进 chip，副等在提示气泡里。
+有主副内容的事实，副也等在提示气泡里：音源的主是它叫自己的名字（`Wikimedia Commons`），
+副是应用叫它什么（`自由授权媒体`）。
 
 四条地址不写出来：地址比一行长，写出来就拉成一条。每条地址是一个 **chip 组**
 （`ChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字
@@ -183,8 +184,9 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 址。地址写成读者写的样子：`file://` 与 `%20` 这类符号换成正常的写法
 （`lib/shared/utils/readable_address.dart`）。
 
-一段话不是 chip：简介太长，挤进一个 chip 里会把整排 chip 撑变形，所以事实上给它
-一个标记（`TrackFact.paragraph`），详情面板把它写成一整段，和歌词一样。
+两样东西不是 chip：简介那样的一段话（`TrackFact.paragraph`）写出来，不进 chip——挤进
+一个 chip 里会把整排 chip 撑变形；来源编号那样的**键**（`TrackFact.identifier`）只留一
+个图标，键在提示气泡里——有的音源拿一整句话当键，它是查的东西，不是读的东西。
 
 地址只有四处来源，都在 `Song` 上：`Song.localFile` 是本机的文件（没有就是空），
 `Song.onlineAddress` 是播放用的网络地址（本地曲子没有），`Song.coverAddress` 是封面的地址
@@ -200,11 +202,11 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 ## chip 的样子
 
-全应用的 chip 只有一种写法：**图标说话，颜色说类别，文字进 tooltip，细节进详情面板**。规范在 [chips.md](chips.md)，这里只列谁拥有什么。
+全应用的 chip 只有一种写法：**图标说话，颜色说类别，主写在 chip 上，名字进 tooltip，细节进详情面板**。规范在 [chips.md](chips.md)，这里只列谁拥有什么。
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`MetaChip`（带框的图标 chip）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
+| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`MetaChip`（带框的图标 chip，写着主）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_mark.dart` | 图标按类型查；颜色按音源的类别（`sourceToneOf`） |
 | `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
