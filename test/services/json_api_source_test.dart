@@ -301,6 +301,23 @@ void main() {
       expect(request.data, isNull);
     });
 
+    test('an address that is not http(s) is not asked', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'songs': []});
+
+      final result = await JsonApiSourceAdapter(dio: dioOf(adapter)).scan(
+        MusicSourceScanRequest(
+          config: config({
+            'url': 'file:///etc/passwd',
+            'titlePath': 'title',
+            'urlPath': 'url',
+          }),
+        ),
+      );
+
+      expect(result.status.name, 'failed');
+      expect(adapter.requestedUrls, isEmpty);
+    });
+
     test('an answer that is not JSON is a failure', () async {
       final adapter = FakeHttpAdapter()..body = 'not json at all';
 

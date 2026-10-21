@@ -514,6 +514,7 @@
     }
   },
   "sourceErrorUnsupported": "This source is not supported yet",
+  "sourceAddressNotHttp": "Only http(s) addresses are asked",
   "sourceErrorScanInterval": "The last scan is less than {interval} ago",
   "@sourceErrorScanInterval": {
     "placeholders": {

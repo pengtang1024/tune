@@ -93,6 +93,16 @@ abstract class MusicSourceAdapter {
   }
 }
 
+/// Whether the address is one the app may ask.
+///
+/// Only http(s) is asked: a file address or another protocol is not a
+/// request the app makes. The reader writes the address, so the check is
+/// here, in one place, for every type that asks an address of its own.
+bool isHttpAddress(String address) {
+  final lower = address.trim().toLowerCase();
+  return lower.startsWith('http://') || lower.startsWith('https://');
+}
+
 /// A failure a source reports in the language of the interface.
 ///
 /// The message is already written for the reader, so the failure is shown as

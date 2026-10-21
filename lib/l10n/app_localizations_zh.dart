@@ -878,6 +878,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceErrorUnsupported => '暂不支持该音源';
 
   @override
+  String get sourceAddressNotHttp => '只支持 http(s) 地址';
+
+  @override
   String sourceErrorScanInterval(String interval) {
     return '距上次扫描不足 $interval';
   }
@@ -2434,6 +2437,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceErrorUnsupported => '暂不支持该音源';
 
   @override
+  String get sourceAddressNotHttp => '只支持 http(s) 地址';
+
+  @override
   String sourceErrorScanInterval(String interval) {
     return '距上次扫描不足 $interval';
   }
@@ -3988,6 +3994,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceErrorUnsupported => '暫不支援該音源';
+
+  @override
+  String get sourceAddressNotHttp => '只支援 http(s) 網址';
 
   @override
   String sourceErrorScanInterval(String interval) {

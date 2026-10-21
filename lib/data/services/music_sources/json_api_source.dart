@@ -107,6 +107,13 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
       );
     }
 
+    if (!isHttpAddress(url)) {
+      return failedResult(
+        config.id,
+        AppStrings.instance.sourceAddressNotHttp,
+      );
+    }
+
     final keyword = config.setting('query') ?? '';
     final post = _isPost(config);
     try {

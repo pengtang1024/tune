@@ -979,6 +979,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceErrorUnsupported => 'This source is not supported yet';
 
   @override
+  String get sourceAddressNotHttp => 'Only http(s) addresses are asked';
+
+  @override
   String sourceErrorScanInterval(String interval) {
     return 'The last scan is less than $interval ago';
   }

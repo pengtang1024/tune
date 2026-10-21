@@ -107,6 +107,13 @@ class GraphqlSourceAdapter extends MusicSourceAdapter {
       );
     }
 
+    if (!isHttpAddress(url)) {
+      return failedResult(
+        config.id,
+        AppStrings.instance.sourceAddressNotHttp,
+      );
+    }
+
     final keyword = config.setting('query') ?? '';
     try {
       final headers = parseJsonHeaders(config.setting('headers') ?? '');

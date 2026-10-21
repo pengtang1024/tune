@@ -140,6 +140,24 @@ void main() {
       expect(result.status.name, 'failed');
     });
 
+    test('an address that is not http(s) is not asked', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'data': {}});
+
+      final result = await GraphqlSourceAdapter(dio: dioOf(adapter)).scan(
+        MusicSourceScanRequest(
+          config: config({
+            'url': 'file:///etc/passwd',
+            'document': 'query { tracks { id } }',
+            'titlePath': 'title',
+            'urlPath': 'url',
+          }),
+        ),
+      );
+
+      expect(result.status.name, 'failed');
+      expect(adapter.requestedUrls, isEmpty);
+    });
+
     test('a source without a document asks for one', () async {
       final result = await GraphqlSourceAdapter(dio: Dio()).scan(
         MusicSourceScanRequest(

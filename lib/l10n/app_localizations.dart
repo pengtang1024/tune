@@ -1618,6 +1618,12 @@ abstract class AppLocalizations {
   /// **'暂不支持该音源'**
   String get sourceErrorUnsupported;
 
+  /// No description provided for @sourceAddressNotHttp.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只支持 http(s) 地址'**
+  String get sourceAddressNotHttp;
+
   /// No description provided for @sourceErrorScanInterval.
   ///
   /// In zh_CN, this message translates to:

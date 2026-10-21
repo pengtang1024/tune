@@ -71,6 +71,13 @@ class M3uSourceAdapter extends MusicSourceAdapter {
       );
     }
 
+    if (!isHttpAddress(playlist)) {
+      return failedResult(
+        request.config.id,
+        AppStrings.instance.sourceAddressNotHttp,
+      );
+    }
+
     try {
       final response = await _dio.get<String>(playlist);
       final body = response.data;
