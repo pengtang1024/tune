@@ -154,9 +154,9 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_metadata_facts.dart` | 元数据事实：专辑、年份、流派、音轨、碟片、语言、许可、歌词、演奏者、添加时间、简介、正在播放 |
 | `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：事实、地址与写出来的正文 |
-| `lib/shared/ui/track_addresses.dart` | 详情面板里的四行地址：本机文件路径、在线地址、封面地址、规范身份 |
+| `lib/shared/ui/track_addresses.dart` | 详情面板里的四条地址：本机文件路径、在线地址、封面地址、规范身份；各自的语气色与动作 |
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |
-| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带文字，只在详情面板里用）、`MetaBadge`（纯图标 + tooltip）与 `CopyChipGroup`（带着长值的 chip 组） |
+| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带文字，只在详情面板里用）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
@@ -171,11 +171,14 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 写出事实的名字和它的值，chip 排成几行，不排成一列——排成一列就是一张表，读起来
 比 chip 慢。
 
-四行地址不写出来：地址比一行长，写出来就拉成一条。每条地址是一个 **chip 组**
-（`CopyChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字
-（文件路径、在线地址、封面地址、规范身份），小的一半是复制。鼠标移上去才看见真
-正的地址，点一下就复制走。地址写成读者写的样子：`file://` 与 `%20` 这类符号换成
-正常的写法（`lib/shared/utils/readable_address.dart`）。
+四条地址不写出来：地址比一行长，写出来就拉成一条。每条地址是一个 **chip 组**
+（`ChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字
+（文件路径、在线地址、封面地址、规范身份），小的一半是动作。名字半穿它所属那一
+类的语气色（文件路径是本机的，中性；两条远端地址是次色；规范身份是应用自己给它
+的名字，三色），动作半穿外壳的强调色。动作按地址的种类来：本机的文件是**打开**
+（桌面知道用什么程序打开它），远端的地址是**复制**。鼠标移上去才看见真正的地
+址。地址写成读者写的样子：`file://` 与 `%20` 这类符号换成正常的写法
+（`lib/shared/utils/readable_address.dart`）。
 
 一段话不是 chip：简介太长，挤进一个 chip 里会把整排 chip 撑变形，所以事实上给它
 一个标记（`TrackFact.paragraph`），详情面板把它写成一整段，和歌词一样。
@@ -198,7 +201,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`CopyChipGroup`（带着长值的 chip 组）与事实的语气色 |
+| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_mark.dart` | 图标按类型查；颜色按音源的类别（`sourceToneOf`） |
 | `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
