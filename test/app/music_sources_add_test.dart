@@ -122,7 +122,7 @@ void main() {
   });
 
   group('the id of a new instance', () {
-    test('the first instance of a type is type:1', () {
+    test('the first instance of a type is type-1', () {
       final instance = newSourceInstance(
         type: 'subsonic',
         typeName: 'Subsonic',

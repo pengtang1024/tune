@@ -237,6 +237,23 @@ void main() {
 
       expect(openverse.setting('query'), 'piano');
     });
+
+    test('a keyword the app wrote in another language is lost as well', () {
+      final persistence = FakePersistenceService();
+      persistence.values[MusicSourceStore.configsKey] = jsonEncode([
+        {
+          'id': 'netease',
+          'name': 'Netease',
+          'kind': 'openApi',
+          'settings': {'keywords': 'trending'},
+        },
+      ]);
+
+      final sources = MusicSourceStore(persistence).loadConfigs();
+      final netease = sources.firstWhere((source) => source.id == 'netease');
+
+      expect(netease.setting('keywords'), isNull);
+    });
   });
 
   group('the form of a source', () {

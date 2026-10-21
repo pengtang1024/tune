@@ -233,7 +233,7 @@
   "sourceJsonApiDescription": "把任意 JSON 介面對應成曲目",
   "jsonApiHint": "填寫介面網址與各欄位的路徑",
   "jsonApiFieldMethod": "請求方式",
-  "jsonApiFieldMethodHint": "預設 GET；寫了請求體就用 POST",
+  "jsonApiFieldMethodHint": "GET 或 POST；只有 POST 帶請求體",
   "jsonApiFieldBody": "請求體",
   "jsonApiFieldBodyHint": "POST 時的 JSON 物件；關鍵字會填進佔位符",
   "sourceGraphqlName": "GraphQL 介面",
@@ -514,6 +514,7 @@
     }
   },
   "sourceErrorUnsupported": "暫不支援該音源",
+  "sourceAddressNotHttp": "只支援 http(s) 網址",
   "sourceErrorScanInterval": "距上次掃描不足 {interval}",
   "@sourceErrorScanInterval": {
     "placeholders": {
