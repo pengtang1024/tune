@@ -4,11 +4,15 @@ import 'package:tune/data/services/artwork/artwork_cache.dart';
 
 /// An artwork cache that answers with the same bytes, for the tests.
 class FakeArtworkCache implements ArtworkCache {
-  FakeArtworkCache({List<int>? bytes})
-      : bytes = Uint8List.fromList(bytes ?? defaultImageBytes);
+  FakeArtworkCache({List<int>? bytes, Map<String, String>? cachedFiles})
+      : bytes = Uint8List.fromList(bytes ?? defaultImageBytes),
+        cachedFiles = cachedFiles ?? const <String, String>{};
 
   /// The bytes every cover is answered with.
   final Uint8List bytes;
+
+  /// The files the covers are kept in, by address.
+  final Map<String, String> cachedFiles;
 
   /// The addresses that were asked for, in order.
   final List<String> asked = [];
@@ -18,6 +22,9 @@ class FakeArtworkCache implements ArtworkCache {
     asked.add(url);
     return CoverImage(bytes, 'png');
   }
+
+  @override
+  String? coverFileFor(String url) => cachedFiles[url];
 
   @override
   void dispose() {}

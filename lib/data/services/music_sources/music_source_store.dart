@@ -86,7 +86,7 @@ class MusicSourceStore {
   ) {
     final settings = {...builtIn.settings, ...saved.settings};
     final retired = BuiltInMusicSources.retiredSettingsOf(builtIn.sourceType);
-    if (retired.isEmpty || !_sameSettings(saved.settings, retired)) {
+    if (retired.isEmpty || !_isUntouched(saved.settings, retired)) {
       return settings;
     }
     final merged = {...settings};
@@ -96,11 +96,18 @@ class MusicSourceStore {
     return merged;
   }
 
-  /// Whether two sets of settings say the same thing.
-  bool _sameSettings(Map<String, String> left, Map<String, String> right) {
-    if (left.length != right.length) return false;
-    for (final entry in right.entries) {
-      if (left[entry.key] != entry.value) return false;
+  /// Whether the settings are exactly the ones the app wrote.
+  ///
+  /// A keyword may have been written in any language the app speaks, so the
+  /// value is looked up in the set of the keywords of that language.
+  bool _isUntouched(
+    Map<String, String> saved,
+    Map<String, Set<String>> retired,
+  ) {
+    if (saved.length != retired.length) return false;
+    for (final entry in retired.entries) {
+      final value = saved[entry.key];
+      if (value == null || !entry.value.contains(value)) return false;
     }
     return true;
   }

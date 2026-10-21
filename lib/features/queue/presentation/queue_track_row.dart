@@ -91,6 +91,8 @@ class QueueTrackRow extends StatelessWidget {
                         source: source,
                         selected: selected,
                         playing: playing,
+                        isFavorite: isFavorite,
+                        onToggleFavorite: onToggleFavorite,
                       ),
                     ),
                     const SizedBox(width: CompactTokens.space4),

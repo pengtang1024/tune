@@ -96,17 +96,36 @@ class BuiltInMusicSources {
   /// carries exactly these settings was never touched by the reader, so they
   /// are taken away when the instance is read back and the platform's own
   /// list takes its place. Settings the reader changed are kept.
-  static Map<String, String> retiredSettingsOf(String type) {
+  ///
+  /// A keyword is written in the language the app was in when it wrote it, so
+  /// the value of a key is a set: the keyword is recognized in every language
+  /// the app speaks.
+  static Map<String, Set<String>> retiredSettingsOf(String type) {
     return switch (type) {
-      'openverse' => const {'query': 'piano'},
-      'internet_archive' => const {
-        'query': 'collection:netlabels AND mediatype:audio',
+      'openverse' => const {
+        'query': {'piano'},
       },
-      'ccmixter' => const {'query': 'jazz'},
-      'itunes' => const {'query': 'jazz'},
-      'audius' => const {'query': 'ambient'},
-      'wikimedia' => const {'query': 'piano'},
-      'netease' => {'keywords': AppStrings.instance.neteaseHotKeyword},
+      'internet_archive' => const {
+        'query': {'collection:netlabels AND mediatype:audio'},
+      },
+      'ccmixter' => const {
+        'query': {'jazz'},
+      },
+      'itunes' => const {
+        'query': {'jazz'},
+      },
+      'audius' => const {
+        'query': {'ambient'},
+      },
+      'wikimedia' => const {
+        'query': {'piano'},
+      },
+      'netease' => {
+        'keywords': {
+          for (final locale in AppLocalizations.supportedLocales)
+            AppStrings.of(locale).neteaseHotKeyword,
+        },
+      },
       _ => const {},
     };
   }

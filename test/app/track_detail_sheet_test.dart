@@ -67,6 +67,38 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('the sheet carries a heart that marks the track', (tester) async {
+    var marked = false;
+    await tester.pumpWidget(
+      app(
+        TrackMeta(
+          song: song,
+          index: 0,
+          isFavorite: true,
+          onToggleFavorite: () => marked = true,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    final heart = find.byIcon(Icons.favorite_rounded);
+    expect(heart, findsOneWidget);
+    await tester.tap(heart);
+    expect(marked, isTrue);
+  });
+
+  testWidgets('the sheet has no heart when the track cannot be marked', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    expect(find.byIcon(Icons.favorite_rounded), findsNothing);
+    expect(find.byIcon(Icons.favorite_border_rounded), findsNothing);
+  });
+
   testWidgets('the names of the facts stand in one column', (tester) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);

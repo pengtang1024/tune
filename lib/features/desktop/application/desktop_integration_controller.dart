@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:tune/data/services/artwork/artwork_cache.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/desktop/single_instance_service.dart';
 import 'package:tune/data/services/mpris/mpris_service.dart';
@@ -31,6 +32,7 @@ class DesktopIntegrationController {
     required this.settings,
     required this.scanner,
     required this.addToLibrary,
+    required this.artwork,
   });
 
   final PlaybackController playback;
@@ -42,6 +44,9 @@ class DesktopIntegrationController {
   final CrossPlatformMusicScanner scanner;
   final Future<void> Function(List<Song> songs) addToLibrary;
 
+  /// The covers that were fetched, so the media controls can show them.
+  final ArtworkCache artwork;
+
   StreamSubscription<PlaybackState>? _playbackSubscription;
   StreamSubscription<List<String>>? _filesSubscription;
   StreamSubscription<void>? _activationSubscription;
@@ -50,7 +55,7 @@ class DesktopIntegrationController {
   bool _trayRunning = false;
 
   final PlaybackTrackTracker _tracker = PlaybackTrackTracker();
-  late final MprisStateMapper _mpris = MprisStateMapper(_tracker);
+  late final MprisStateMapper _mpris = MprisStateMapper(_tracker, artwork);
   late final DesktopWindow _window = DesktopWindow(
     closeToTray: () => settings.snapshot.closeToTray,
     hasTray: () => _trayRunning,

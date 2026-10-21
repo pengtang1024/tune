@@ -154,6 +154,27 @@ https://example.com/one.mp3
       expect(result.songs, isEmpty);
     });
 
+    test('an address that is not http(s) is not asked', () async {
+      final adapter = _PlaylistAdapter('https://example.com/one.mp3\n');
+      final dio = Dio(BaseOptions(responseType: ResponseType.plain))
+        ..httpClientAdapter = adapter;
+
+      final result = await M3uSourceAdapter(dio: dio).scan(
+        MusicSourceScanRequest(
+          config: const MusicSourceConfig(
+            id: 'm3u-1',
+            type: 'm3u',
+            name: '播放列表',
+            kind: MusicSourceKind.custom,
+            settings: {'playlist': 'file:///etc/passwd'},
+          ),
+        ),
+      );
+
+      expect(result.status.name, 'failed');
+      expect(adapter.requested, isEmpty);
+    });
+
     test('an empty playlist is a failure', () async {
       final dio = Dio(BaseOptions(responseType: ResponseType.plain))
         ..httpClientAdapter = _PlaylistAdapter('   \n');

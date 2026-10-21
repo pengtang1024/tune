@@ -233,7 +233,7 @@
   "sourceJsonApiDescription": "把任意 JSON 接口映射成曲目",
   "jsonApiHint": "填写接口地址与各字段的路径",
   "jsonApiFieldMethod": "请求方式",
-  "jsonApiFieldMethodHint": "默认 GET；写了请求体就用 POST",
+  "jsonApiFieldMethodHint": "GET 或 POST；只有 POST 带请求体",
   "jsonApiFieldBody": "请求体",
   "jsonApiFieldBodyHint": "POST 时的 JSON 对象；关键词会填进占位符",
   "sourceGraphqlName": "GraphQL 接口",
@@ -514,6 +514,7 @@
     }
   },
   "sourceErrorUnsupported": "暂不支持该音源",
+  "sourceAddressNotHttp": "只支持 http(s) 地址",
   "sourceErrorScanInterval": "距上次扫描不足 {interval}",
   "@sourceErrorScanInterval": {
     "placeholders": {
