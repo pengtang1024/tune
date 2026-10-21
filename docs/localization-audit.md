@@ -58,6 +58,6 @@
   | Jellyfin | 自建媒体库 | 自建媒體庫 | Media server |
 
 - **英文那列压到了 14 个字符以内**，因为英文比中文长一倍；名字现在只出现在提示气泡与详情面板里，还是短一点好。想要更准确的英文说法，得先放宽提示气泡的宽度。
-- **带字的 chip 已经没有了**：事实的标识只剩 `shared/ui/meta_badge.dart`（只有图标，文字进提示气泡），`shared/ui/source_badge.dart` 写音源（也只有图标）；详情面板写事实的地方是一张属性表，不是 chip。
+- **带字的 chip 已经没有了**：事实的标识只剩 `shared/ui/meta_badge.dart`（只有图标，文字进提示气泡），`shared/ui/source_badge.dart` 写音源（也只有图标）；详情面板写事实的地方是一张属性表，不是 chip。属性表里的地址更长，值不写出来，由 `CopyChip` 带着：chip 只有图标，地址在提示气泡里。
 - **门禁还没画到的界面**：深色主题（现在只画浅色）、播放器的溢出菜单、添加音源对话框、音源页上除 jamendo 以外的每一种配置对话框。
 - `test/services/music_source_live_test.dart` 偶尔因为 TLS 握手失败而红，那是网络问题，与本地化无关。
