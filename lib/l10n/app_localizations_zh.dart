@@ -464,7 +464,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jsonApiFieldMethod => '请求方式';
 
   @override
-  String get jsonApiFieldMethodHint => '默认 GET；写了请求体就用 POST';
+  String get jsonApiFieldMethodHint => 'GET 或 POST；只有 POST 带请求体';
 
   @override
   String get jsonApiFieldBody => '请求体';
@@ -2020,7 +2020,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jsonApiFieldMethod => '请求方式';
 
   @override
-  String get jsonApiFieldMethodHint => '默认 GET；写了请求体就用 POST';
+  String get jsonApiFieldMethodHint => 'GET 或 POST；只有 POST 带请求体';
 
   @override
   String get jsonApiFieldBody => '请求体';
@@ -3576,7 +3576,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jsonApiFieldMethod => '請求方式';
 
   @override
-  String get jsonApiFieldMethodHint => '預設 GET；寫了請求體就用 POST';
+  String get jsonApiFieldMethodHint => 'GET 或 POST；只有 POST 帶請求體';
 
   @override
   String get jsonApiFieldBody => '請求體';

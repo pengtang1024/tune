@@ -108,10 +108,11 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
     }
 
     final keyword = config.setting('query') ?? '';
+    final post = _isPost(config);
     try {
       final headers = parseJsonHeaders(config.setting('headers') ?? '');
       final body = _body(config, keyword);
-      final answer = _decode(await _send(url, keyword, headers, body));
+      final answer = _decode(await _send(url, keyword, headers, body, post));
 
       final songs = mapping.songs(
         answer,
@@ -137,19 +138,38 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The request, in the way the reader asked for it.
+  ///
+  /// The way the request goes out is the one the form says: a reader who
+  /// picked POST gets a POST, with or without a body. A GET carries no body.
   Future<Response<String>> _send(
     String url,
     String keyword,
     Map<String, String> headers,
     Map<String, dynamic>? body,
+    bool post,
   ) {
     final address = url.replaceAll('\${query}', Uri.encodeComponent(keyword));
-    final options = Options(headers: headers, responseType: ResponseType.plain);
+    final options = Options(
+      headers: {
+        if (post) 'content-type': 'application/json',
+        ...headers,
+      },
+      responseType: ResponseType.plain,
+    );
 
-    if ((body ?? const {}).isEmpty) {
+    if (!post) {
       return _dio.get<String>(address, options: options);
     }
     return _dio.post<String>(address, data: body, options: options);
+  }
+
+  /// Whether the request goes out as a POST.
+  ///
+  /// The form says which way the request goes; a reader who wrote nothing
+  /// gets a GET.
+  bool _isPost(MusicSourceConfig config) {
+    final method = (config.setting('method') ?? 'GET').toUpperCase();
+    return method == 'POST';
   }
 
   /// The body of the request, with the keyword written into it.

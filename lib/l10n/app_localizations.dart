@@ -937,7 +937,7 @@ abstract class AppLocalizations {
   /// No description provided for @jsonApiFieldMethodHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'默认 GET；写了请求体就用 POST'**
+  /// **'GET 或 POST；只有 POST 带请求体'**
   String get jsonApiFieldMethodHint;
 
   /// No description provided for @jsonApiFieldBody.

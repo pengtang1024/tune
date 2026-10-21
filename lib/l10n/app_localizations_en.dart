@@ -496,7 +496,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jsonApiFieldMethodHint =>
-      'GET by default; POST when a body is written';
+      'GET or POST; only a POST carries a body';
 
   @override
   String get jsonApiFieldBody => 'Body';

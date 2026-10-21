@@ -250,6 +250,7 @@ void main() {
         MusicSourceScanRequest(
           config: config({
             'url': 'https://example.com/search',
+            'method': 'POST',
             'body': '{"q":"\${query}"}',
             'query': 'night drive',
             'titlePath': 'title',
@@ -261,6 +262,43 @@ void main() {
       final request = adapter.requests.single;
       expect(request.method, 'POST');
       expect(request.data, {'q': 'night drive'});
+    });
+
+    test('the method the reader picked is the method that goes out', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'songs': []});
+
+      await JsonApiSourceAdapter(dio: dioOf(adapter)).scan(
+        MusicSourceScanRequest(
+          config: config({
+            'url': 'https://example.com/search',
+            'method': 'POST',
+            'titlePath': 'title',
+            'urlPath': 'url',
+          }),
+        ),
+      );
+
+      expect(adapter.requests.single.method, 'POST');
+    });
+
+    test('a GET carries no body', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'songs': []});
+
+      await JsonApiSourceAdapter(dio: dioOf(adapter)).scan(
+        MusicSourceScanRequest(
+          config: config({
+            'url': 'https://example.com/search',
+            'method': 'GET',
+            'body': '{"q":"\${query}"}',
+            'titlePath': 'title',
+            'urlPath': 'url',
+          }),
+        ),
+      );
+
+      final request = adapter.requests.single;
+      expect(request.method, 'GET');
+      expect(request.data, isNull);
     });
 
     test('an answer that is not JSON is a failure', () async {

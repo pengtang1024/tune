@@ -233,7 +233,7 @@
   "sourceJsonApiDescription": "Map any JSON API onto tracks",
   "jsonApiHint": "Fill in the address of the interface and the paths of the fields",
   "jsonApiFieldMethod": "Method",
-  "jsonApiFieldMethodHint": "GET by default; POST when a body is written",
+  "jsonApiFieldMethodHint": "GET or POST; only a POST carries a body",
   "jsonApiFieldBody": "Body",
   "jsonApiFieldBodyHint": "The JSON object of a POST; the keyword is written into the placeholder",
   "sourceGraphqlName": "GraphQL API",
