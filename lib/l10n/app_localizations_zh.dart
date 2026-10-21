@@ -494,6 +494,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
 
   @override
+  String get jsonPreviewNoTracks => '返回里没有认出曲目';
+
+  @override
+  String get sourcePreviewTry => '试一下';
+
+  @override
+  String get sourcePreviewRunning => '正在试…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '认出 $count 首';
+  }
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -2053,6 +2067,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
 
   @override
+  String get jsonPreviewNoTracks => '返回里没有认出曲目';
+
+  @override
+  String get sourcePreviewTry => '试一下';
+
+  @override
+  String get sourcePreviewRunning => '正在试…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '认出 $count 首';
+  }
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3610,6 +3638,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get graphqlFieldVariablesHint => 'JSON 物件；關鍵字會填進佔位符';
+
+  @override
+  String get jsonPreviewNoTracks => '回傳裡沒有認出曲目';
+
+  @override
+  String get sourcePreviewTry => '試一下';
+
+  @override
+  String get sourcePreviewRunning => '正在試…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '認出 $count 首';
+  }
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';

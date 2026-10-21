@@ -345,4 +345,88 @@ void main() {
       expect(result.status.name, 'needsConfiguration');
     });
   });
+
+  group('trying a mapping out', () {
+    MusicSourceConfig config(Map<String, String> settings) {
+      return MusicSourceConfig(
+        id: 'json_api-1',
+        type: 'json_api',
+        name: 'JSON',
+        kind: MusicSourceKind.custom,
+        settings: settings,
+      );
+    }
+
+    Dio dioOf(FakeHttpAdapter adapter) {
+      return Dio(BaseOptions(responseType: ResponseType.plain))
+        ..httpClientAdapter = adapter;
+    }
+
+    test('the paths the answer suggests are offered to the reader', () async {
+      final adapter = FakeHttpAdapter()
+        ..body = jsonEncode({
+          'data': {
+            'songs': [
+              {
+                'id': '1',
+                'title': 'Night Drive',
+                'artist': 'Nova',
+                'url': 'https://example.com/1.mp3',
+              },
+            ],
+          },
+        });
+
+      final preview = await JsonApiSourceAdapter(dio: dioOf(adapter)).preview(
+        config({'url': 'https://example.com/api'}),
+      );
+
+      expect(preview, isNotNull);
+      expect(preview!.suggestions['listPath'], 'data.songs');
+      expect(preview.suggestions['titlePath'], 'title');
+      expect(preview.suggestions['urlPath'], 'url');
+      expect(preview.songs.map((song) => song.title), ['Night Drive']);
+    });
+
+    test('a path the reader wrote is not offered again', () async {
+      final adapter = FakeHttpAdapter()
+        ..body = jsonEncode({
+          'songs': [
+            {'title': 'Night Drive', 'url': 'https://example.com/1.mp3'},
+          ],
+        });
+
+      final preview = await JsonApiSourceAdapter(dio: dioOf(adapter)).preview(
+        config({
+          'url': 'https://example.com/api',
+          'titlePath': 'my_title',
+        }),
+      );
+
+      expect(preview!.suggestions.containsKey('titlePath'), isFalse);
+      expect(preview.suggestions['urlPath'], 'url');
+    });
+
+    test('an answer without tracks says so', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'songs': <Object>[]});
+
+      final preview = await JsonApiSourceAdapter(dio: dioOf(adapter)).preview(
+        config({'url': 'https://example.com/api'}),
+      );
+
+      expect(preview!.songs, isEmpty);
+      expect(preview.message, isNotNull);
+    });
+
+    test('an interface that fails is told to the reader', () async {
+      final adapter = FakeHttpAdapter()..failure = 'no way';
+
+      final preview = await JsonApiSourceAdapter(dio: dioOf(adapter)).preview(
+        config({'url': 'https://example.com/api'}),
+      );
+
+      expect(preview!.songs, isEmpty);
+      expect(preview.message, isNotNull);
+    });
+  });
 }

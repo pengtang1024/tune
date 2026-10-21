@@ -52,6 +52,12 @@ abstract class MusicSourceAdapter {
     return browseModes.first;
   }
 
+  /// Whether the source can be tried out before it is kept.
+  ///
+  /// A source that reads an answer the reader wrote the paths for can show
+  /// what it would make of it.
+  bool get supportsPreview => false;
+
   /// Whether the source belongs to the top of the list.
   ///
   /// The sources that ask nothing of the reader are the ones met first; the
@@ -75,6 +81,14 @@ abstract class MusicSourceAdapter {
   Duration get scanTimeout => const Duration(seconds: 45);
 
   Future<SourceScanResult> scan(MusicSourceScanRequest request);
+
+  /// Asks the source what it would make of a configuration, without keeping it.
+  ///
+  /// The reader tries a mapping out before it saves it: the interface is
+  /// asked once, the tracks it holds are shown, and the paths the app could
+  /// read are offered to fill the form in. A source with nothing to show says
+  /// nothing.
+  Future<SourcePreview?> preview(MusicSourceConfig config) async => null;
 
   /// Rebuilds the playable address of [song] when the stored one expired.
   ///

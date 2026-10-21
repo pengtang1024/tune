@@ -1,15 +1,18 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import '../services/fake_http_adapter.dart';
 import '../services/fake_persistence.dart';
 
 /// The reader adds the sources of their own.
@@ -26,11 +29,12 @@ void main() {
     library = FakeLibraryController(const LibraryState());
   });
 
-  Widget app() {
+  Widget app({Dio? dio}) {
     return ProviderScope(
       overrides: [
         persistenceServiceProvider.overrideWithValue(persistence),
         libraryControllerProvider.overrideWith(() => library),
+        musicSourceDioProvider.overrideWithValue(dio),
       ],
       child: MaterialApp(
         theme: CompactTheme.light,
@@ -119,6 +123,55 @@ void main() {
     // The source is gone, and the tracks it brought in went with it.
     expect(find.text('深夜爵士'), findsNothing);
     expect(library.dropped, ['openverse-1']);
+  });
+
+  testWidgets('the reader tries a mapping out before keeping it', (
+    tester,
+  ) async {
+    final http = FakeHttpAdapter()
+      ..body = jsonEncode({
+        'data': {
+          'songs': [
+            {
+              'id': '1',
+              'title': 'Night Drive',
+              'url': 'https://example.com/1.mp3',
+            },
+          ],
+        },
+      });
+    final dio = Dio(BaseOptions(responseType: ResponseType.plain))
+      ..httpClientAdapter = http;
+
+    await tester.pumpWidget(app(dio: dio));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('sources-add')));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('source-type-json_api')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.tap(find.byKey(const ValueKey('source-type-json_api')));
+    await tester.pumpAndSettle();
+
+    // The type that reads an answer can be tried out before it is kept.
+    expect(find.byKey(const ValueKey('source-form-try')), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('source-field-url')),
+      'https://example.com/api',
+    );
+    await tester.tap(find.byKey(const ValueKey('source-form-try')));
+    await tester.pumpAndSettle();
+
+    // The app read the paths off the answer and shows the tracks it holds.
+    final title = tester.widget<TextField>(
+      find.byKey(const ValueKey('source-field-titlePath')),
+    );
+    expect(title.controller?.text, 'title');
+    expect(find.text('Night Drive'), findsOneWidget);
   });
 
   group('the id of a new instance', () {

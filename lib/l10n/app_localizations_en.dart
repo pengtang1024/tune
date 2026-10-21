@@ -531,6 +531,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'A JSON object; the keyword is written into the placeholder';
 
   @override
+  String get jsonPreviewNoTracks => 'No tracks found in the answer';
+
+  @override
+  String get sourcePreviewTry => 'Try it';
+
+  @override
+  String get sourcePreviewRunning => 'Trying…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '$count tracks found';
+  }
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

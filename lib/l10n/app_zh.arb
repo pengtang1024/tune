@@ -243,6 +243,17 @@
   "graphqlFieldQueryHint": "GraphQL 查询文档，筛选条件写在里面",
   "graphqlFieldVariables": "变量",
   "graphqlFieldVariablesHint": "JSON 对象；关键词会填进占位符",
+  "jsonPreviewNoTracks": "返回里没有认出曲目",
+  "sourcePreviewTry": "试一下",
+  "sourcePreviewRunning": "正在试…",
+  "sourcePreviewTracks": "认出 {count} 首",
+  "@sourcePreviewTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sourcesAutoScan": "启动时自动扫描",
   "sourcesAutoScanDescription": "所有已启用音源都会在启动后自动刷新，失败不会影响本地库。",
   "sourcesScanMayTakeSeconds": "含远程音源时可能需要数秒",

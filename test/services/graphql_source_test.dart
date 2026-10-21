@@ -168,4 +168,48 @@ void main() {
       expect(result.status.name, 'needsConfiguration');
     });
   });
+
+  group('trying a mapping out', () {
+    MusicSourceConfig config(Map<String, String> settings) {
+      return MusicSourceConfig(
+        id: 'graphql-1',
+        type: 'graphql',
+        name: 'GraphQL',
+        kind: MusicSourceKind.custom,
+        settings: settings,
+      );
+    }
+
+    Dio dioOf(FakeHttpAdapter adapter) {
+      return Dio(BaseOptions(responseType: ResponseType.plain))
+        ..httpClientAdapter = adapter;
+    }
+
+    test('the paths the answer suggests are offered to the reader', () async {
+      final adapter = FakeHttpAdapter()
+        ..body = jsonEncode({
+          'data': {
+            'tracks': [
+              {
+                'id': '1',
+                'title': 'Night Drive',
+                'url': 'https://example.com/1.mp3',
+              },
+            ],
+          },
+        });
+
+      final preview = await GraphqlSourceAdapter(dio: dioOf(adapter)).preview(
+        config({
+          'url': 'https://example.com/graphql',
+          'document': 'query { tracks { id title url } }',
+        }),
+      );
+
+      expect(preview, isNotNull);
+      expect(preview!.suggestions['listPath'], 'data.tracks');
+      expect(preview.suggestions['titlePath'], 'title');
+      expect(preview.songs.map((song) => song.title), ['Night Drive']);
+    });
+  });
 }

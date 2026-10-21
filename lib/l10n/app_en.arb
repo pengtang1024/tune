@@ -243,6 +243,17 @@
   "graphqlFieldQueryHint": "A GraphQL query document; the conditions live in it",
   "graphqlFieldVariables": "Variables",
   "graphqlFieldVariablesHint": "A JSON object; the keyword is written into the placeholder",
+  "jsonPreviewNoTracks": "No tracks found in the answer",
+  "sourcePreviewTry": "Try it",
+  "sourcePreviewRunning": "Trying…",
+  "sourcePreviewTracks": "{count} tracks found",
+  "@sourcePreviewTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
   "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",

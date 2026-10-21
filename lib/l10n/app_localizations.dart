@@ -994,6 +994,30 @@ abstract class AppLocalizations {
   /// **'JSON 对象；关键词会填进占位符'**
   String get graphqlFieldVariablesHint;
 
+  /// No description provided for @jsonPreviewNoTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'返回里没有认出曲目'**
+  String get jsonPreviewNoTracks;
+
+  /// No description provided for @sourcePreviewTry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'试一下'**
+  String get sourcePreviewTry;
+
+  /// No description provided for @sourcePreviewRunning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在试…'**
+  String get sourcePreviewRunning;
+
+  /// No description provided for @sourcePreviewTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'认出 {count} 首'**
+  String sourcePreviewTracks(int count);
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:
