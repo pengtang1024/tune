@@ -7,6 +7,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
+import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_addresses.dart';
 import 'package:tune/shared/ui/track_detail_block.dart';
 import 'package:tune/shared/ui/track_detail_row.dart';
@@ -17,22 +18,40 @@ import 'package:tune/shared/ui/track_facts.dart';
 ///
 /// The sheet is the one place where all the facts of a track stand together,
 /// so a reader can look a track up instead of guessing what it is.
+///
+/// The heart marks the track as one of the favorites. The sheet is a shared
+/// piece of the interface and knows nothing about the favorites, so the
+/// caller says whether the track is one of them and what a click does.
 Future<void> showTrackDetailSheet(
   BuildContext context,
   Song song, {
   SourceLabel? source,
+  bool isFavorite = false,
+  VoidCallback? onToggleFavorite,
 }) {
   return showCompactSheet<void>(
     context,
-    (context) => _TrackDetailSheet(song: song, source: source),
+    (context) => _TrackDetailSheet(
+      song: song,
+      source: source,
+      isFavorite: isFavorite,
+      onToggleFavorite: onToggleFavorite,
+    ),
   );
 }
 
 class _TrackDetailSheet extends StatelessWidget {
   final Song song;
   final SourceLabel? source;
+  final bool isFavorite;
+  final VoidCallback? onToggleFavorite;
 
-  const _TrackDetailSheet({required this.song, this.source});
+  const _TrackDetailSheet({
+    required this.song,
+    this.source,
+    this.isFavorite = false,
+    this.onToggleFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +94,11 @@ class _TrackDetailSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            _Header(song: song),
+            _Header(
+              song: song,
+              isFavorite: isFavorite,
+              onToggleFavorite: onToggleFavorite,
+            ),
             if (rows.isNotEmpty || addresses.isNotEmpty) ...[
               const SizedBox(height: CompactTokens.space20),
               TrackDetailTable(
@@ -103,7 +126,17 @@ class _TrackDetailSheet extends StatelessWidget {
 class _Header extends StatelessWidget {
   final Song song;
 
-  const _Header({required this.song});
+  /// Whether the track is one of the favorites.
+  final bool isFavorite;
+
+  /// What the click on the heart does.
+  final VoidCallback? onToggleFavorite;
+
+  const _Header({
+    required this.song,
+    this.isFavorite = false,
+    this.onToggleFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +181,12 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(width: 8),
+        // The heart only shows when there is something to mark: the sheet is
+        // a shared piece of the interface, and the caller decides whether the
+        // track can be marked here.
+        if (onToggleFavorite case final action?)
+          FavoriteButton(isFavorite: isFavorite, onPressed: action),
       ],
     );
   }

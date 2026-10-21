@@ -19,7 +19,10 @@ abstract class LibraryPaths {
   ///
   /// It is the music library of the machine, unless the user picked another
   /// folder in the settings.
-  Future<Directory> root();
+  ///
+  /// The folder is known without waiting: the choice of the user is a
+  /// preference that is already read, so the answer is there right away.
+  Directory root();
 
   /// The folder that holds the files of [song].
   ///
@@ -43,7 +46,7 @@ abstract class LibraryPaths {
   ///
   /// The covers live in one place, split over subfolders, so a single folder
   /// never holds more than a handful of pictures.
-  Future<Directory> coverCacheFolder();
+  Directory coverCacheFolder();
 
   /// The lyrics of [song], when they were written down before.
   Future<String?> readLyrics(Song song);

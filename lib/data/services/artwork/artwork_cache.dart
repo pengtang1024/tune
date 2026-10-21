@@ -13,6 +13,14 @@ abstract class ArtworkCache {
   /// the cover cannot be fetched.
   Future<CoverImage> imageFor(String url);
 
+  /// The file the cover at [url] is kept in, when it was fetched before.
+  ///
+  /// The answer is the path of the file on this machine, or nothing when the
+  /// cover was never fetched. The caller that shows the cover to somebody
+  /// else needs a place it can point at, and a file is the one thing the
+  /// desktop can open without asking the network.
+  String? coverFileFor(String url);
+
   /// Releases the resources of the cache.
   void dispose();
 }

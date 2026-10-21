@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/artwork_cache_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/data/services/providers/mpris_service_provider.dart';
@@ -23,6 +24,7 @@ final desktopIntegrationProvider = Provider<DesktopIntegrationController>((
     instance: ref.read(singleInstanceServiceProvider),
     settings: ref.read(settingsControllerProvider.notifier),
     scanner: ref.read(crossPlatformMusicScannerProvider),
+    artwork: ref.read(artworkCacheProvider),
     addToLibrary: (songs) async {
       await ref.read(libraryControllerProvider.notifier).addSongs(songs);
     },

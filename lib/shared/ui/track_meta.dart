@@ -24,6 +24,15 @@ class TrackMeta extends StatelessWidget {
   final bool playing;
   final double artworkSize;
 
+  /// Whether the track is one of the favorites.
+  ///
+  /// The details panel marks the track with a heart, so the row has to say
+  /// whether the track is liked. The row itself keeps no copy of the answer.
+  final bool isFavorite;
+
+  /// What the heart in the details panel does.
+  final VoidCallback? onToggleFavorite;
+
   const TrackMeta({
     super.key,
     required this.song,
@@ -32,6 +41,8 @@ class TrackMeta extends StatelessWidget {
     this.selected = false,
     this.playing = false,
     this.artworkSize = CompactTokens.artworkRow,
+    this.isFavorite = false,
+    this.onToggleFavorite,
   });
 
   @override
@@ -93,7 +104,12 @@ class TrackMeta extends StatelessWidget {
             ),
           ),
         const SizedBox(width: CompactTokens.space4),
-        _DetailsButton(song: song, source: source),
+        _DetailsButton(
+          song: song,
+          source: source,
+          isFavorite: isFavorite,
+          onToggleFavorite: onToggleFavorite,
+        ),
       ],
     );
   }
@@ -103,8 +119,15 @@ class TrackMeta extends StatelessWidget {
 class _DetailsButton extends StatelessWidget {
   final Song song;
   final SourceLabel? source;
+  final bool isFavorite;
+  final VoidCallback? onToggleFavorite;
 
-  const _DetailsButton({required this.song, this.source});
+  const _DetailsButton({
+    required this.song,
+    this.source,
+    this.isFavorite = false,
+    this.onToggleFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +136,13 @@ class _DetailsButton extends StatelessWidget {
     return TuneTooltip(
       message: context.loc.trackDetailsTooltip,
       child: IconButton(
-        onPressed: () => showTrackDetailSheet(context, song, source: source),
+        onPressed: () => showTrackDetailSheet(
+          context,
+          song,
+          source: source,
+          isFavorite: isFavorite,
+          onToggleFavorite: onToggleFavorite,
+        ),
         icon: const Icon(
           Icons.info_outline_rounded,
           size: CompactTokens.icon16,

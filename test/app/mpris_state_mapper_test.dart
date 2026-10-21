@@ -6,10 +6,12 @@ import 'package:tune/features/desktop/application/playback_track_tracker.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 
+import '../services/fake_artwork_cache.dart';
+
 void main() {
   group('the state the system controls show', () {
     test('names the state of the player', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       expect(
         mapper.snapshotFor(_state(status: PlaybackStatus.playing)).status,
@@ -26,7 +28,7 @@ void main() {
     });
 
     test('carries the volume, the speed and the order of the queue', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       final snapshot = mapper.snapshotFor(
         _state(volume: 0.4, speed: 1.5, playMode: PlayMode.shuffle),
@@ -39,7 +41,7 @@ void main() {
     });
 
     test('names the repeat of one track', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       final snapshot = mapper.snapshotFor(_state(playMode: PlayMode.repeatOne));
 
@@ -47,7 +49,7 @@ void main() {
     });
 
     test('offers no position in a live stream', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       final live = _state().copyWith(
         queue: [song.copyWith(isLiveStream: true)],
@@ -58,7 +60,7 @@ void main() {
     });
 
     test('has no track when the queue is empty', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       final empty = _state().copyWith(queue: const [], currentUri: null);
 
@@ -69,7 +71,7 @@ void main() {
   group('the number of the track', () {
     test('grows when another track starts', () {
       final tracker = PlaybackTrackTracker();
-      final mapper = MprisStateMapper(tracker);
+      final mapper = MprisStateMapper(tracker, FakeArtworkCache());
 
       final first = mapper.snapshotFor(_state());
       final second = mapper.snapshotFor(
@@ -84,7 +86,7 @@ void main() {
 
     test('stays the same while the same track plays', () {
       final tracker = PlaybackTrackTracker();
-      final mapper = MprisStateMapper(tracker);
+      final mapper = MprisStateMapper(tracker, FakeArtworkCache());
 
       final first = mapper.snapshotFor(_state());
       final second = mapper.snapshotFor(
@@ -104,7 +106,7 @@ void main() {
 
   group('the cover of the track', () {
     test('prefers the file next to the music', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), FakeArtworkCache());
 
       final snapshot = mapper.snapshotFor(
         _state().copyWith(
@@ -117,7 +119,10 @@ void main() {
     });
 
     test('falls back to the address of the network', () {
-      final mapper = MprisStateMapper(PlaybackTrackTracker());
+      final mapper = MprisStateMapper(
+        PlaybackTrackTracker(),
+        FakeArtworkCache(),
+      );
 
       final snapshot = mapper.snapshotFor(
         _state().copyWith(
@@ -127,6 +132,29 @@ void main() {
       );
 
       expect(snapshot.track!.artUrl, 'https://host/cover.png');
+    });
+
+    test('points at the file of the cover that was fetched', () {
+      final mapper = MprisStateMapper(
+        PlaybackTrackTracker(),
+        FakeArtworkCache(
+          cachedFiles: const {
+            'https://host/cover.png': '/library/.tune/artwork/ab/cover.img',
+          },
+        ),
+      );
+
+      final snapshot = mapper.snapshotFor(
+        _state().copyWith(
+          queue: [song.copyWith(artworkUrl: 'https://host/cover.png')],
+          currentUri: song.uri,
+        ),
+      );
+
+      expect(
+        snapshot.track!.artUrl,
+        Uri.file('/library/.tune/artwork/ab/cover.img').toString(),
+      );
     });
   });
 }
