@@ -28,6 +28,28 @@ class SourceScanResult {
   int get songCount => songs.length;
 }
 
+/// What a source would make of a configuration, before it is kept.
+///
+/// The reader tries a mapping out: the interface is asked once, the tracks it
+/// holds are shown, and the paths the app could read are offered to fill the
+/// form in. Nothing is saved, so a wrong guess costs nothing.
+class SourcePreview {
+  /// The tracks the answer holds, as the mapping reads them.
+  final List<Song> songs;
+
+  /// The settings the app would fill in, keyed by the setting they belong to.
+  final Map<String, String> suggestions;
+
+  /// The reason the answer brought nothing, when it brought nothing.
+  final String? message;
+
+  const SourcePreview({
+    this.songs = const [],
+    this.suggestions = const {},
+    this.message,
+  });
+}
+
 /// Compact, UI-friendly summary of a source scan.
 class SourceScanSummary {
   final String sourceId;

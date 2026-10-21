@@ -32,6 +32,12 @@ Object? readJsonPath(Object? root, String path) {
   return current;
 }
 
+/// The hint of the keyword of a custom interface.
+///
+/// The placeholder is a literal the reader copies into the address, so it is
+/// written in code: a translated sentence cannot hold a brace.
+String jsonKeywordHint(String text) => '$text \${query}';
+
 /// The text of a value, when it is one.
 String jsonText(Object? value) {
   if (value == null) return '';

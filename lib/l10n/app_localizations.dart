@@ -859,7 +859,7 @@ abstract class AppLocalizations {
   /// No description provided for @jsonFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'搜索用的关键词，会替换请求里的占位符'**
+  /// **'搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次'**
   String get jsonFieldQueryHint;
 
   /// No description provided for @jsonFieldUrl.
@@ -979,7 +979,7 @@ abstract class AppLocalizations {
   /// No description provided for @graphqlFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'GraphQL 查询文档，筛选条件写在里面'**
+  /// **'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的'**
   String get graphqlFieldQueryHint;
 
   /// No description provided for @graphqlFieldVariables.
@@ -993,6 +993,42 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'JSON 对象；关键词会填进占位符'**
   String get graphqlFieldVariablesHint;
+
+  /// No description provided for @jsonPreviewNoTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'返回里没有认出曲目'**
+  String get jsonPreviewNoTracks;
+
+  /// No description provided for @sourcePreviewTry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'试一下'**
+  String get sourcePreviewTry;
+
+  /// No description provided for @sourcePreviewRunning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在试…'**
+  String get sourcePreviewRunning;
+
+  /// No description provided for @sourcePreviewTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'认出 {count} 首'**
+  String sourcePreviewTracks(int count);
+
+  /// No description provided for @sourceFormShowAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多选项'**
+  String get sourceFormShowAdvanced;
+
+  /// No description provided for @sourceFormHideAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起选项'**
+  String get sourceFormHideAdvanced;
 
   /// No description provided for @sourcesAutoScan.
   ///

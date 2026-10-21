@@ -42,7 +42,15 @@ class JsonSourceMapping {
 
   /// The mapping an instance declares.
   factory JsonSourceMapping.of(MusicSourceConfig config) {
-    String read(String key) => config.setting(key) ?? '';
+    return JsonSourceMapping.fromSettings(config.settings);
+  }
+
+  /// The mapping written as the settings of an instance.
+  ///
+  /// The settings and the mapping say the same thing, so one is written from
+  /// the other instead of both naming the fields on their own.
+  factory JsonSourceMapping.fromSettings(Map<String, String> settings) {
+    String read(String key) => settings[key]?.trim() ?? '';
     return JsonSourceMapping(
       listPath: read('listPath'),
       idPath: read('idPath'),
@@ -56,6 +64,20 @@ class JsonSourceMapping {
       urlTemplate: read('urlTemplate'),
     );
   }
+
+  /// The mapping as the settings of an instance.
+  Map<String, String> toSettings() => {
+    'listPath': listPath,
+    'idPath': idPath,
+    'titlePath': titlePath,
+    'artistPath': artistPath,
+    'albumPath': albumPath,
+    'coverPath': coverPath,
+    'urlPath': urlPath,
+    'durationPath': durationPath,
+    'genrePath': genrePath,
+    'urlTemplate': urlTemplate,
+  };
 
   /// The tracks of a decoded answer.
   ///
@@ -147,19 +169,61 @@ List<MusicSourceField> jsonMappingFields() {
       'listPath',
       strings.jsonFieldListPath,
       pathHint,
+      advanced: true,
     ),
-    MusicSourceField('idPath', strings.jsonFieldIdPath, pathHint),
-    MusicSourceField('titlePath', strings.jsonFieldTitlePath, pathHint),
-    MusicSourceField('artistPath', strings.jsonFieldArtistPath, pathHint),
-    MusicSourceField('albumPath', strings.jsonFieldAlbumPath, pathHint),
-    MusicSourceField('coverPath', strings.jsonFieldCoverPath, pathHint),
-    MusicSourceField('urlPath', strings.jsonFieldUrlPath, pathHint),
-    MusicSourceField('durationPath', strings.jsonFieldDurationPath, pathHint),
-    MusicSourceField('genrePath', strings.jsonFieldGenrePath, pathHint),
+    MusicSourceField(
+      'idPath',
+      strings.jsonFieldIdPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'titlePath',
+      strings.jsonFieldTitlePath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'artistPath',
+      strings.jsonFieldArtistPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'albumPath',
+      strings.jsonFieldAlbumPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'coverPath',
+      strings.jsonFieldCoverPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'urlPath',
+      strings.jsonFieldUrlPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'durationPath',
+      strings.jsonFieldDurationPath,
+      pathHint,
+      advanced: true,
+    ),
+    MusicSourceField(
+      'genrePath',
+      strings.jsonFieldGenrePath,
+      pathHint,
+      advanced: true,
+    ),
     MusicSourceField(
       'urlTemplate',
       strings.jsonFieldUrlTemplate,
       strings.jsonFieldUrlTemplateHint,
+      advanced: true,
     ),
   ];
 }

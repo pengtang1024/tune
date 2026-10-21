@@ -425,7 +425,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
 
   @override
-  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次';
 
   @override
   String get jsonFieldUrl => '接口地址';
@@ -485,13 +485,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get graphqlFieldQuery => '查询文档';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的';
 
   @override
   String get graphqlFieldVariables => '变量';
 
   @override
   String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
+
+  @override
+  String get jsonPreviewNoTracks => '返回里没有认出曲目';
+
+  @override
+  String get sourcePreviewTry => '试一下';
+
+  @override
+  String get sourcePreviewRunning => '正在试…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '认出 $count 首';
+  }
+
+  @override
+  String get sourceFormShowAdvanced => '更多选项';
+
+  @override
+  String get sourceFormHideAdvanced => '收起选项';
 
   @override
   String get sourcesAutoScan => '启动时自动扫描';
@@ -1984,7 +2005,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
 
   @override
-  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次';
 
   @override
   String get jsonFieldUrl => '接口地址';
@@ -2044,13 +2065,34 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get graphqlFieldQuery => '查询文档';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的';
 
   @override
   String get graphqlFieldVariables => '变量';
 
   @override
   String get graphqlFieldVariablesHint => 'JSON 对象；关键词会填进占位符';
+
+  @override
+  String get jsonPreviewNoTracks => '返回里没有认出曲目';
+
+  @override
+  String get sourcePreviewTry => '试一下';
+
+  @override
+  String get sourcePreviewRunning => '正在试…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '认出 $count 首';
+  }
+
+  @override
+  String get sourceFormShowAdvanced => '更多选项';
+
+  @override
+  String get sourceFormHideAdvanced => '收起选项';
 
   @override
   String get sourcesAutoScan => '启动时自动扫描';
@@ -3543,7 +3585,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jsonFieldUrlTemplateHint => '播放網址的範本，曲目 id 會填進佔位處';
 
   @override
-  String get jsonFieldQueryHint => '搜尋用的關鍵字，會替換請求裡的佔位符';
+  String get jsonFieldQueryHint => '搜尋用的關鍵字，會替換請求裡的佔位符；留空就按網址原樣問一次';
 
   @override
   String get jsonFieldUrl => '介面網址';
@@ -3603,13 +3645,34 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get graphqlFieldQuery => '查詢文件';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查詢文件，篩選條件寫在裡面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查詢文件，篩選條件寫在裡面；模板只是個起點，欄位要改成介面裡有的';
 
   @override
   String get graphqlFieldVariables => '變數';
 
   @override
   String get graphqlFieldVariablesHint => 'JSON 物件；關鍵字會填進佔位符';
+
+  @override
+  String get jsonPreviewNoTracks => '回傳裡沒有認出曲目';
+
+  @override
+  String get sourcePreviewTry => '試一下';
+
+  @override
+  String get sourcePreviewRunning => '正在試…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '認出 $count 首';
+  }
+
+  @override
+  String get sourceFormShowAdvanced => '更多選項';
+
+  @override
+  String get sourceFormHideAdvanced => '收起選項';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';
