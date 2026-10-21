@@ -26,10 +26,12 @@ chip 只有两样东西：
 - **图标**说"是哪一个"；
 - **颜色**说"是哪一类"。
 
-字在 tooltip 里（走 `TuneTooltip`），细节在详情面板里（`track_detail_sheet.dart`）——
-详情面板是唯一的例外：那里的 chip 写出事实的值。名字不写——图标已经说了"是哪一个"，
-再写一遍名字，panel 里每个 chip 的字就多一倍；名字放在提示气泡里，读者要找的时候
-找得到。
+字在 tooltip 里（走 `TuneTooltip`）——详情面板也一样：事实的 chip 只有图标，名字和值
+都在提示气泡里。面板里一首歌有十几条事实，chip 一写名字和值，panel 就成了一张字表，
+读起来比 chip 慢。
+
+唯一的例外是地址的 chip 组（`ChipGroup`）：四个地址长得都差不多，宽的一半要写自己的
+名字，读者才分得出哪个是哪个。
 
 为什么：chip 的宽度跟着字走，同一行里就会因为名字、状态、值的不同而忽宽忽窄——列对不齐，读者也要多扫一眼才知道哪个是哪个。固定大小 + 颜色分类 + 悬停出名字，读起来更快，也更好看。
 
@@ -72,25 +74,25 @@ chip 只有两样东西：
 
 ## 尺寸
 
-chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯子，装在固定边长的小方块里（行内 18、正在播放页 22、chip 组里那半个动作按钮 `chipBox`）。尺寸取 `CompactTokens`，不要在调用点写数字，也不要按文字长度撑开。
+chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯子，装在固定边长的小方块里（行内 18、详情面板里的事实 chip 22、chip 组里那半个动作按钮 `chipBox`）。尺寸取 `CompactTokens`，不要在调用点写数字，也不要按文字长度撑开。
 
 ## 例外只有两处
 
-1. **详情面板**（`track_detail_sheet.dart`）：唯一把事实写全的地方——`MetaChip` 写出图标 + 值（名字在提示气泡里），再写出地址与正文。地址太长，写不进一行，就由 `ChipGroup` 带着：两半连成一个 chip，宽的一半写名字，小的一半是动作，值在 chip 的提示气泡里。
+1. **地址的 chip 组**（`ChipGroup`，`track_addresses.dart`）：宽的一半写名字（文件路径 / 在线地址 / 封面 / 身份），小的一半是动作（本机的文件是打开，远端的地址是复制）。地址比一行长，值在 chip 的提示气泡里。
 2. **控件**：下拉框、开关、按钮显示自己的值。
 
-想在 chip 里写字，先想是不是该进 tooltip，或者进详情面板。
+想在 chip 里写字，先想是不是该进 tooltip。
 
 ## 加东西的时候
 
 - **加一个音源**：在 `source_mark.dart` 给它一个自己的图标；类别变了就改 `sourceToneOf` 的映射，不要在调用点写颜色。名字与本地化名照旧只改 ARB。
 - **加一个事实**：在 `track_facts.dart` / `track_metadata_facts.dart` 给它一个图标和一句话（tooltip 用）；行内自动变成一个纯图标，详情面板自动多一条。
-- **加一个 chip**：用 `MetaBadge`（纯图标 + tooltip）或 `SourceBadge`（音源标识），不要自己拼一个带文字的方块。
+- **加一个 chip**：用 `MetaBadge`（纯图标 + tooltip）、`MetaChip`（带框的图标 chip）或 `SourceBadge`（音源标识），不要自己拼一个带文字的方块。
 - **带一个长值的 chip**：用 `ChipGroup`（`shared/ui/meta_badge.dart`）。地址比一行长，不写出来，由 chip 带着：宽的一半写名字（穿类别的颜色），小的一半是动作（穿强调色），值在提示气泡里。
 
 ## 谁守着这条线
 
-- `test/app/chip_style_test.dart`：扫源码，带文字的 `MetaChip` 只许出现在详情面板里；带框的标记不许自带文字。
+- `test/app/chip_style_test.dart`：扫源码，带文字的 `MetaChip` 与 `ChipGroup` 只许出现在详情面板里；chip 的类只住在 `meta_badge.dart` 一个文件里；药丸不许自带文字。
 - `test/app/source_badge_test.dart`：标识是图标、名字只在 tooltip、大小不随名字变、13 个图标互不重复、颜色跟着类别走。
 - `test/app/track_facts_test.dart`：事实的图标与 tooltip。
 - `test/app/localization_render_test.dart`：两种语言 × 两种窗口都画得下，没有溢出。

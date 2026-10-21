@@ -156,7 +156,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：事实、地址与写出来的正文 |
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四条地址：本机文件路径、在线地址、封面地址、规范身份；各自的语气色与动作 |
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |
-| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带文字，只在详情面板里用）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
+| `lib/shared/ui/meta_badge.dart` | `MetaChip`（带框的图标 chip，事实的字在 tooltip 里）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
@@ -165,11 +165,11 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 1. 列表行（曲库 / 队列 / 搜索结果）：只画图标，文字留给 tooltip。
 2. 正在播放页：画图标 + 值，名字留给 tooltip。
-3. 详情面板：画图标 + 值（名字在提示气泡里），并写出地址与正文——本机文件路径、在线地址、封面地址与规范身份各一条，简介、歌词、原始数据与请求头各写一块。
+3. 详情面板：事实排成图标 chip（字在提示气泡里），地址是 chip 组，简介、歌词、原始数据与请求头各写一块。
 
-详情面板里的事实是一排 **chip**：一个事实一个 chip，图标说这是哪一个，chip 自己
-只写出事实的值——名字在提示气泡里，chip 里再写一遍，panel 的字就多一倍。chip 排
-成几行，不排成一列——排成一列就是一张表，读起来比 chip 慢。
+详情面板里的事实是一排 **chip**：一个事实一个 chip，图标说这是哪一个，事实的名字和
+值都在提示气泡里——chip 里再写一遍，panel 就成了一张字表。chip 排成几行，不排成
+一列——排成一列就是一张表，读起来比 chip 慢。
 
 四条地址不写出来：地址比一行长，写出来就拉成一条。每条地址是一个 **chip 组**
 （`ChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字
@@ -201,7 +201,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
+| `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`MetaChip`（带框的图标 chip）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_mark.dart` | 图标按类型查；颜色按音源的类别（`sourceToneOf`） |
 | `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
