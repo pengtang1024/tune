@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
@@ -35,23 +36,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/library',
-            builder: (context, state) => const LibraryPane(),
+            pageBuilder: (context, state) =>
+                sectionPage(state, const LibraryPane()),
           ),
           GoRoute(
             path: '/queue',
-            builder: (context, state) => const QueuePane(),
+            pageBuilder: (context, state) =>
+                sectionPage(state, const QueuePane()),
           ),
           GoRoute(
             path: '/favorites',
-            builder: (context, state) => const FavoritesPane(),
+            pageBuilder: (context, state) =>
+                sectionPage(state, const FavoritesPane()),
           ),
           GoRoute(
             path: '/sources',
-            builder: (context, state) => const SourcesPane(),
+            pageBuilder: (context, state) =>
+                sectionPage(state, const SourcesPane()),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsPane(),
+            pageBuilder: (context, state) =>
+                sectionPage(state, const SettingsPane()),
           ),
         ],
       ),
@@ -105,3 +111,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+/// The page of a section of the shell.
+///
+/// The sections fade into each other, and the fade belongs to the route. The
+/// shell must not keep two pages of the router in the tree at the same time:
+/// the navigator of the router carries a global key, and two of them in one
+/// tree is a duplicate key — Flutter tears the tree apart for a frame, and
+/// the page on the screen at that moment loses a piece of itself.
+Page<void> sectionPage(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    transitionDuration: CompactTokens.standardMotion,
+    reverseTransitionDuration: CompactTokens.fastMotion,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+  );
+}

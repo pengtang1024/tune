@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/shell/presentation/app_sidebar.dart';
 
@@ -46,15 +45,7 @@ class CompactShell extends StatelessWidget {
                               stops: const [0, 0.7],
                             ),
                           ),
-                          child: AnimatedSwitcher(
-                            duration: CompactTokens.standardMotion,
-                            switchInCurve: Curves.easeOutCubic,
-                            switchOutCurve: Curves.easeInCubic,
-                            child: KeyedSubtree(
-                              key: ValueKey(currentPath),
-                              child: child,
-                            ),
-                          ),
+                          child: child,
                         ),
                       ),
                     ],
