@@ -138,4 +138,35 @@ void main() {
     final file = await paths.lyricsFileFor(song);
     expect(await file.exists(), isTrue);
   });
+
+  test('the lyrics the reader brought are written when the file is free', () async {
+    const song = Song(
+      id: 1,
+      title: 'So What',
+      artist: 'Miles Davis',
+      uri: 'https://source.test/so-what',
+    );
+
+    await paths.saveChosenLyrics(song, '[00:00] chosen');
+
+    expect(await paths.readLyrics(song), '[00:00] chosen');
+    final file = await paths.lyricsFileFor(song);
+    expect(await file.readAsString(), '[00:00] chosen');
+  });
+
+  test('the lyrics the reader brought do not overwrite the file that is there', () async {
+    const song = Song(
+      id: 1,
+      title: 'So What',
+      artist: 'Miles Davis',
+      uri: 'https://source.test/so-what',
+    );
+
+    await paths.saveLyrics(song, '[00:00] matched');
+    await paths.saveChosenLyrics(song, '[00:00] chosen');
+
+    expect(await paths.readLyrics(song), '[00:00] chosen');
+    final matched = await paths.lyricsFileFor(song);
+    expect(await matched.readAsString(), '[00:00] matched');
+  });
 }

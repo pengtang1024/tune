@@ -729,6 +729,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Scanning only reads audio files. Nothing on disk is changed or deleted.';
 
   @override
+  String get lyricsNothingPlaying => 'Nothing is playing yet';
+
+  @override
+  String get lyricsInvalidFile => 'This file holds no lyrics';
+
+  @override
+  String get lyricsRetry => 'Try again';
+
+  @override
+  String get lyricsSearchAgain => 'Look again';
+
+  @override
+  String get lyricsChooseFile => 'Choose file';
+
+  @override
+  String get lyricsAttached => 'The lyrics are attached';
+
+  @override
+  String get lyricsSubtitle => 'The words of the track that plays';
+
+  @override
   String get settingsChooseFolder => 'Choose a music folder';
 
   @override

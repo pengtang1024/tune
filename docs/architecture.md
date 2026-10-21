@@ -47,6 +47,7 @@ presentation → application → domain
 | 播放 + 队列 | `PlaybackController` / `PlaybackState`（`features/player`） | 队列是 `PlaybackState` 的一部分，仓库里没有第二个队列容器 |
 | 音乐库 | `LibraryController` / `LibraryState`（`features/library`） | 加载、扫描、过滤；不负责播放 |
 | 喜欢 | `FavoritesController` / `FavoritesState`（`features/favorites`） | 标了心的曲目；曲目本身还是音乐库里的那一首 |
+| 歌词 | `LyricsController` / `LyricsState`（`features/player`） | 当前曲目的歌词与解析结果；控制器自己 `watch` 播放器的当前曲目来取词，页面只读不改；播放位置仍由 `PlaybackController` 独家持有，歌词只读它 |
 | 设置 | `SettingsController` / `SettingsState`（`features/settings`） | 主题、语言、扫描目录、自动扫描、单曲与双击行为、桌面集成 |
 | 音源 | `MusicSourcesController` / `MusicSourcesState`（`features/sources`） | 音源开关与配置 |
 
@@ -110,7 +111,7 @@ presentation → application → domain
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
-| 歌词 | 曲目所在目录，`<歌名>.lrc` | `LyricsController` → `LibraryPaths` |
+| 歌词 | 曲目所在目录，`<歌名>.lrc`（读者指定的写 `<歌名>.manual.lrc`） | `LyricsController` → `LibraryPaths` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
@@ -131,6 +132,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 │   ├── <歌名>.jpg                          # 封面
 │   ├── <歌名>.lrc                          # 匹配到的歌词
 │   └── <歌名>.tune                         # 副本标记：这首歌来自哪个音源
+│   ├── <歌名>.manual.lrc                   # 读者自己指定的歌词
 └── ...
 ```
 
@@ -139,6 +141,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 - **老副本要补标记**：app 是后来才写标记的，之前下载的副本旁边是空的。扫描之前，存储按曲目自己的目录找一遍这些副本，找到就补上标记（`SongDownloadService.markCopiesOf`），下一次扫描就能合成一条。
 - 用户磁盘上已有的曲子不动，app 只把歌词写在它旁边（`<歌名>.lrc`），封面和音频不覆盖用户自己的文件。
 - 目录名经过 `safeFileName`（`lib/utils/file_name.dart`）：路径分隔符和 Windows 不允许的字符被换掉，名字短到任何文件系统都收得下。
+  - 读者自己指定的歌词写进 `<歌名>.manual.lrc`，不覆盖读者已有的 `<歌名>.lrc`；读的时候先读读者指定的那一份。
 - 单个目录不放太多东西：曲目按歌手 / 专辑 / 歌名分层，封面缓存按哈希前两位分桶。
 - 音乐库是 app 对磁盘上音乐的索引，属于 app 的数据；用户的音乐文件从不搬动。
 

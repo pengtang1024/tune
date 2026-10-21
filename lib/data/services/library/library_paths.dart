@@ -46,8 +46,19 @@ abstract class LibraryPaths {
   Future<Directory> coverCacheFolder();
 
   /// The lyrics of [song], when they were written down before.
+  ///
+  /// The file the reader brought comes first: an explicit choice is stronger
+  /// than a file the app matched.
   Future<String?> readLyrics(Song song);
 
   /// Writes the lyrics of [song] next to its other files.
+  ///
+  /// These are the lyrics the app matched, so they go to `<歌名>.lrc`.
   Future<void> saveLyrics(Song song, String lyrics);
+
+  /// Writes the lyrics the reader brought for [song].
+  ///
+  /// The file the app matched is not overwritten: the reader's lyrics go to
+  /// `<歌名>.manual.lrc` when `<歌名>.lrc` is taken.
+  Future<void> saveChosenLyrics(Song song, String lyrics);
 }

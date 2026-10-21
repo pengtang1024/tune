@@ -1,83 +1,106 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/library/lyrics_text.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/utils/logger.dart';
 
+/// The lyrics of the track that plays.
+///
+/// The controller watches the player on its own: the page only shows what is
+/// known, so no widget has to change a provider while the tree is built.
 final lyricsControllerProvider =
-    NotifierProvider<LyricsController, LyricsState>(LyricsController.new);
+    AsyncNotifierProvider.autoDispose<LyricsController, LyricsState>(
+      LyricsController.new,
+    );
 
-/// Lyrics of the track the user is looking at.
+/// The lyrics this run has already asked about.
+///
+/// The memory outlives the panel, so a track without lyrics is not asked
+/// about again every time the reader opens the page.
+final lyricsMemoryProvider = Provider<LyricsMemory>((ref) => LyricsMemory());
+
+/// The line of the lyric sheet that is sung right now.
+///
+/// The panel watches this instead of the playback position, so it is rebuilt
+/// when the line changes and not on every tick of the clock.
+final activeLyricLineProvider = Provider<int>((ref) {
+  final document = ref.watch(
+    lyricsControllerProvider.select((state) => state.valueOrNull?.document),
+  );
+  if (document == null) return -1;
+
+  final position = ref.watch(
+    playbackControllerProvider.select((state) => state.position),
+  );
+  return document.indexAt(position);
+});
+
+/// What is known about the lyrics of the track that plays.
 class LyricsState {
-  /// Track the lyrics belong to.
+  /// The track the lyrics belong to.
   final int? songId;
 
-  /// Parsed lyric sheet, `null` while the lyrics are still unknown.
+  /// The parsed sheet, `null` when the track has no lyrics.
   final LyricsDocument? document;
 
-  /// Whether the lyrics are being fetched right now.
-  final bool loading;
+  /// Whether the file the reader brought cannot be read as a sheet.
+  final bool invalid;
 
-  /// Whether the source knows lyrics for this track.
-  final bool missing;
-
-  /// Whether the request failed.
-  ///
-  /// The state carries the fact and not the wording, so the interface writes
-  /// the reason of the failure in the language the app renders in.
-  final bool failed;
-
-  const LyricsState({
-    this.songId,
-    this.document,
-    this.loading = false,
-    this.missing = false,
-    this.failed = false,
-  });
+  const LyricsState({this.songId, this.document, this.invalid = false});
 
   /// Whether there is something to show.
   bool get hasLyrics => document != null && document!.lines.isNotEmpty;
 }
 
-/// Loads the lyrics of a track on demand.
+/// Loads the lyrics of the track that plays.
 ///
-/// Lyrics are fetched only when the user opens them, so a scan never pays
-/// for them. The text of a track is kept for the session, because a source
-/// answers the same question with the same sheet.
-class LyricsController extends Notifier<LyricsState> {
-  final Map<int, LyricsDocument> _cache = {};
+/// The lyrics are fetched only when the reader opens them, so a scan never
+/// pays for them. The text of a track is kept for the session, because a
+/// plugin answers the same question with the same sheet.
+class LyricsController extends AutoDisposeAsyncNotifier<LyricsState> {
+  /// Every answer the reader brings in gets a new number.
+  ///
+  /// A request that is still on its way sees the number change and drops its
+  /// own answer, so the lyrics of the reader are the ones on screen.
+  int _generation = 0;
 
   @override
-  LyricsState build() => const LyricsState();
+  Future<LyricsState> build() async {
+    final song = ref.watch(
+      playbackControllerProvider.select((state) => state.currentSong),
+    );
+    if (song == null) return const LyricsState();
+    return _load(song);
+  }
 
-  /// Fetches the lyrics of [song] unless they are already known.
-  Future<void> load(Song song) async {
-    if (state.songId == song.id && (state.loading || state.hasLyrics)) return;
+  /// Asks for the lyrics of [song] again, ignoring what is known.
+  Future<void> reload(Song song) async {
+    ref.read(lyricsMemoryProvider).forget(song);
+    ref.invalidateSelf();
+  }
 
-    final cached = _cache[song.id];
-    if (cached != null) {
-      state = LyricsState(songId: song.id, document: cached);
-      return;
+  /// Uses the lyrics the reader brought for [song].
+  ///
+  /// The text is written next to the track, so it is still there the next
+  /// time the track is played.
+  ///
+  /// Returns whether the file held a sheet.
+  Future<bool> attach(Song song, List<int> bytes) async {
+    final text = decodeLyricsText(bytes);
+    final document = text == null ? null : LyricsDocument.parse(text);
+    if (document == null || document.lines.isEmpty) {
+      _remember(song, LyricsState(songId: song.id, invalid: true));
+      return false;
     }
 
-    state = LyricsState(songId: song.id, loading: true);
-    try {
-      final raw = await _lyricsFor(song);
-      if (raw == null || raw.trim().isEmpty) {
-        state = LyricsState(songId: song.id, missing: true);
-        return;
-      }
-
-      final document = LyricsDocument.parse(raw);
-      _cache[song.id] = document;
-      state = LyricsState(songId: song.id, document: document);
-    } catch (error, stackTrace) {
-      Log.error('歌词加载失败: $error', stackTrace);
-      state = LyricsState(songId: song.id, failed: true);
-    }
+    await _write(ref.read(libraryPathsProvider).saveChosenLyrics(song, text!));
+    _remember(song, LyricsState(songId: song.id, document: document));
+    return true;
   }
 
   /// The lyrics of [song], from the file next to it or from the source.
@@ -85,6 +108,27 @@ class LyricsController extends Notifier<LyricsState> {
   /// The file next to the track is read first, so a sheet that was matched
   /// once is used without asking the network again. A sheet that came from
   /// the source is written next to the track, so the next run finds it there.
+  Future<LyricsState> _load(Song song) async {
+    final memory = ref.read(lyricsMemoryProvider);
+    if (memory.knows(song)) return memory.answerOf(song);
+
+    final generation = _generation;
+    final raw = await _lyricsFor(song);
+
+    // While the request was on its way the reader may have brought lyrics
+    // of their own; those are the ones that count.
+    if (generation != _generation || memory.knows(song)) {
+      return memory.answerOf(song);
+    }
+
+    final answer = raw == null || raw.trim().isEmpty
+        ? LyricsState(songId: song.id)
+        : LyricsState(songId: song.id, document: LyricsDocument.parse(raw));
+    memory.remember(song, answer);
+    return answer;
+  }
+
+  /// The raw lyrics of [song], from the file next to it or from the source.
   Future<String?> _lyricsFor(Song song) async {
     final paths = ref.read(libraryPathsProvider);
 
@@ -94,7 +138,50 @@ class LyricsController extends Notifier<LyricsState> {
     final raw = await ref.read(musicSourceServiceProvider).fetchLyrics(song);
     if (raw == null || raw.trim().isEmpty) return raw;
 
-    unawaited(paths.saveLyrics(song, raw));
+    unawaited(_write(paths.saveLyrics(song, raw)));
     return raw;
+  }
+
+  /// Remembers an answer and shows it.
+  void _remember(Song song, LyricsState answer) {
+    _generation++;
+    ref.read(lyricsMemoryProvider).remember(song, answer);
+    state = AsyncData(answer);
+  }
+
+  /// Writes a file, without letting a failure reach the reader.
+  ///
+  /// A folder that cannot be written is not a reason to hide the lyrics.
+  Future<void> _write(Future<void> write) async {
+    try {
+      await write;
+    } catch (error, stackTrace) {
+      Log.error('写入歌词失败: $error', stackTrace);
+    }
+  }
+}
+
+/// The lyrics this run has already asked about.
+///
+/// The memory holds more than the sheets: it also holds the tracks that have
+/// no lyrics and the ones whose file could not be read, so the same question
+/// is not asked twice.
+class LyricsMemory {
+  final Map<int, LyricsState> _answers = {};
+
+  /// Whether [song] has been asked about.
+  bool knows(Song song) => _answers.containsKey(song.id);
+
+  /// The answer for [song].
+  LyricsState answerOf(Song song) => _answers[song.id]!;
+
+  /// Remembers the answer for [song].
+  void remember(Song song, LyricsState answer) {
+    _answers[song.id] = answer;
+  }
+
+  /// Forgets [song], so the next question is asked from scratch.
+  void forget(Song song) {
+    _answers.remove(song.id);
   }
 }

@@ -1,7 +1,9 @@
+import 'dart:async';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
@@ -10,14 +12,12 @@ import 'package:tune/features/player/application/playback_controller.dart';
 /// Height of one lyric line.
 const _lineExtent = 30.0;
 
-/// Shows the lyrics of a track and follows the playback.
+/// Shows the lyrics of the track that plays and follows the playback.
 ///
 /// The lyrics are only fetched when the panel is opened, so a scan never pays
 /// for them.
 class LyricsPanel extends ConsumerStatefulWidget {
-  const LyricsPanel({required this.song, super.key});
-
-  final Song song;
+  const LyricsPanel({super.key});
 
   @override
   ConsumerState<LyricsPanel> createState() => _LyricsPanelState();
@@ -25,22 +25,6 @@ class LyricsPanel extends ConsumerStatefulWidget {
 
 class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   final ScrollController _scroll = ScrollController();
-  int _activeIndex = -1;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void didUpdateWidget(covariant LyricsPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.song.id != widget.song.id) {
-      _activeIndex = -1;
-      _load();
-    }
-  }
 
   @override
   void dispose() {
@@ -48,56 +32,88 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     super.dispose();
   }
 
-  void _load() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      ref.read(lyricsControllerProvider.notifier).load(widget.song);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final lyrics = ref.watch(lyricsControllerProvider);
-    final position = ref.watch(
-      playbackControllerProvider.select((state) => state.position),
+    final song = ref.watch(
+      playbackControllerProvider.select((state) => state.currentSong),
     );
+    final active = ref.watch(activeLyricLineProvider);
 
-    if (lyrics.loading) {
+    // The line that is sung changed: the panel follows it.
+    ref.listen<int>(activeLyricLineProvider, (previous, next) {
+      if (next != previous) _scrollTo(next);
+    });
+
+    if (song == null) {
+      return _Message(
+        text: context.loc.lyricsNothingPlaying,
+        icon: Icons.music_note_rounded,
+      );
+    }
+
+    if (lyrics.hasError) {
+      return _Message(
+        text: context.loc.lyricsFailed,
+        icon: Icons.error_outline_rounded,
+        actions: [
+          _Action(label: context.loc.lyricsRetry, onPressed: () => _reload(song)),
+          _Action(
+            label: context.loc.lyricsChooseFile,
+            onPressed: () => _chooseFile(song),
+          ),
+        ],
+      );
+    }
+
+    final answer = lyrics.valueOrNull;
+    // The answer of the track that plays, not the one of the track before it.
+    final current = answer != null && answer.songId == song.id ? answer : null;
+
+    if (current != null && current.hasLyrics) {
+      final document = current.document!;
+      return ListView.builder(
+        controller: _scroll,
+        padding: const EdgeInsets.symmetric(vertical: CompactTokens.space8),
+        itemExtent: _lineExtent,
+        itemCount: document.lines.length,
+        itemBuilder: (context, index) {
+          final line = document.lines[index];
+          return _LyricLine(line: line.text, active: index == active);
+        },
+      );
+    }
+
+    if (current != null && current.invalid) {
+      return _Message(
+        text: context.loc.lyricsInvalidFile,
+        icon: Icons.description_outlined,
+        actions: [
+          _Action(
+            label: context.loc.lyricsChooseFile,
+            onPressed: () => _chooseFile(song),
+          ),
+        ],
+      );
+    }
+
+    if (current == null && lyrics.isLoading) {
       return _Message(
         text: context.loc.lyricsLoading,
         icon: Icons.hourglass_empty_rounded,
       );
     }
-    if (lyrics.failed) {
-      return _Message(
-        text: context.loc.lyricsFailed,
-        icon: Icons.error_outline_rounded,
-      );
-    }
-    if (!lyrics.hasLyrics) {
-      return _Message(
-        text: context.loc.lyricsMissing,
-        icon: Icons.lyrics_outlined,
-      );
-    }
 
-    final document = lyrics.document!;
-    final active = document.indexAt(position);
-    if (active != _activeIndex) {
-      _activeIndex = active;
-      _scrollTo(active);
-    }
-
-    return ListView.builder(
-      controller: _scroll,
-      padding: const EdgeInsets.symmetric(vertical: CompactTokens.space8),
-      itemExtent: _lineExtent,
-      itemCount: document.lines.length,
-      itemBuilder: (context, index) {
-        final line = document.lines[index];
-        final isActive = index == active;
-        return _LyricLine(line: line.text, active: isActive);
-      },
+    return _Message(
+      text: context.loc.lyricsMissing,
+      icon: Icons.lyrics_outlined,
+      actions: [
+        _Action(label: context.loc.lyricsSearchAgain, onPressed: () => _reload(song)),
+        _Action(
+          label: context.loc.lyricsChooseFile,
+          onPressed: () => _chooseFile(song),
+        ),
+      ],
     );
   }
 
@@ -115,6 +131,33 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       curve: Curves.easeOut,
     );
   }
+
+  /// Asks for the lyrics of the track again.
+  void _reload(Song song) {
+    unawaited(ref.read(lyricsControllerProvider.notifier).reload(song));
+  }
+
+  /// Lets the reader bring the lyrics of the track from a file.
+  Future<void> _chooseFile(Song song) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['lrc', 'txt'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+
+    final bytes = result.files.single.bytes;
+    if (bytes == null) return;
+
+    final attached = await ref
+        .read(lyricsControllerProvider.notifier)
+        .attach(song, bytes);
+    if (!attached || !mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.loc.lyricsAttached)),
+    );
+  }
 }
 
 /// One line of the lyric sheet.
@@ -127,28 +170,41 @@ class _LyricLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // The sung line takes the step above the others, so the eye finds it
+    // without reading the words first.
+    final style = active
+        ? theme.textTheme.titleMedium
+        : theme.textTheme.bodyMedium;
+
     return Text(
       line,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        fontSize: active ? CompactTypeScale.heading : CompactTypeScale.strong,
+      style: style?.copyWith(
         height: 1.2,
-        fontWeight: active ? FontWeight.w600 : FontWeight.w400,
         color: active
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.85),
+            : theme.colorScheme.onSurfaceVariant,
       ),
     );
   }
 }
 
+/// One thing the reader can do when there are no lyrics to show.
+class _Action {
+  const _Action({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+}
+
 /// Placeholder shown while there is nothing to read.
 class _Message extends StatelessWidget {
-  const _Message({required this.text, required this.icon});
+  const _Message({required this.text, required this.icon, this.actions = const []});
 
   final String text;
   final IconData icon;
+  final List<_Action> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +226,10 @@ class _Message extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
+          for (final action in actions) ...[
+            const SizedBox(height: CompactTokens.space8),
+            TextButton(onPressed: action.onPressed, child: Text(action.label)),
+          ],
         ],
       ),
     );

@@ -281,7 +281,7 @@ class _TrackLayout extends StatelessWidget {
                       : MainAxisAlignment.center,
                   children: [
                     if (showLyrics) ...[
-                      Expanded(child: LyricsPanel(song: song)),
+                      Expanded(child: const LyricsPanel()),
                       const SizedBox(height: CompactTokens.space12),
                     ] else ...[
                       Flexible(

@@ -1324,6 +1324,48 @@ abstract class AppLocalizations {
   /// **'扫描只读取音频文件，不会修改或删除磁盘内容。'**
   String get settingsScanSafetyNote;
 
+  /// No description provided for @lyricsNothingPlaying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有正在播放的曲目'**
+  String get lyricsNothingPlaying;
+
+  /// No description provided for @lyricsInvalidFile.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个文件里没有歌词'**
+  String get lyricsInvalidFile;
+
+  /// No description provided for @lyricsRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重试'**
+  String get lyricsRetry;
+
+  /// No description provided for @lyricsSearchAgain.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重新查找'**
+  String get lyricsSearchAgain;
+
+  /// No description provided for @lyricsChooseFile.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择歌词文件'**
+  String get lyricsChooseFile;
+
+  /// No description provided for @lyricsAttached.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词已关联'**
+  String get lyricsAttached;
+
+  /// No description provided for @lyricsSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放的那首歌的词'**
+  String get lyricsSubtitle;
+
   /// No description provided for @settingsChooseFolder.
   ///
   /// In zh_CN, this message translates to:

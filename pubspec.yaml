@@ -62,6 +62,9 @@ dependencies:
   # Path package for path manipulation
   path: ^1.9.0
 
+  # Reads the lyrics files that were written in another encoding
+  charset: ^2.0.1
+
   # Local storage
   shared_preferences: ^2.5.3
 

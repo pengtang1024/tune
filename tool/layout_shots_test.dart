@@ -22,7 +22,9 @@ import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_pane.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
@@ -190,6 +192,7 @@ void main() {
           const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
         ),
       ),
+      lyricsControllerProvider.overrideWith(() => _FakeLyricsController()),
     ];
 
     await tester.pumpWidget(
@@ -235,6 +238,13 @@ void main() {
 
     await tester.pumpWidget(app(home: const NowPlayingPage()));
     await _shot(tester, 'now_playing$suffix');
+
+    // The lyrics are a capability of the playing view, not a page of their
+    // own: the shot shows what the reader sees after pressing the button.
+    await tester.tap(find.byTooltip('歌词'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await _shot(tester, 'now_playing_lyrics$suffix');
   }
 
   /// Captures the sheets that float over the pages.
@@ -350,6 +360,25 @@ class _FakeLibraryController extends LibraryController {
   @override
   void setQuery(String query) {
     state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+  }
+}
+
+/// A lyrics controller that holds a sheet, so the shot shows the lyrics.
+class _FakeLyricsController extends LyricsController {
+  @override
+  Future<LyricsState> build() async {
+    return LyricsState(
+      songId: 1,
+      document: LyricsDocument.parse('''
+[ti:Nocturne in E-flat major]
+[ar:A rather long artist name that keeps going]
+[00:04.00]The night is quiet and the city sleeps
+[00:09.50]A melody wanders through the open window
+[00:15.00]And the hours pass without a sound
+[00:21.25]Until the first light finds the room
+[00:27.00]A nocturne in E-flat major, Op. 9 No. 2
+'''),
+    );
   }
 }
 

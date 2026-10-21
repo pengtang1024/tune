@@ -677,6 +677,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
 
   @override
+  String get lyricsNothingPlaying => '还没有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '这个文件里没有歌词';
+
+  @override
+  String get lyricsRetry => '重试';
+
+  @override
+  String get lyricsSearchAgain => '重新查找';
+
+  @override
+  String get lyricsChooseFile => '选择歌词文件';
+
+  @override
+  String get lyricsAttached => '歌词已关联';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的词';
+
+  @override
   String get settingsChooseFolder => '选择音乐文件夹';
 
   @override
@@ -2230,6 +2251,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
 
   @override
+  String get lyricsNothingPlaying => '还没有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '这个文件里没有歌词';
+
+  @override
+  String get lyricsRetry => '重试';
+
+  @override
+  String get lyricsSearchAgain => '重新查找';
+
+  @override
+  String get lyricsChooseFile => '选择歌词文件';
+
+  @override
+  String get lyricsAttached => '歌词已关联';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的词';
+
+  @override
   String get settingsChooseFolder => '选择音乐文件夹';
 
   @override
@@ -3781,6 +3823,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsScanSafetyNote => '掃描只讀取音訊檔案，不會修改或刪除磁碟內容。';
+
+  @override
+  String get lyricsNothingPlaying => '還沒有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '這個檔案裡沒有歌詞';
+
+  @override
+  String get lyricsRetry => '重試';
+
+  @override
+  String get lyricsSearchAgain => '重新尋找';
+
+  @override
+  String get lyricsChooseFile => '選擇歌詞檔案';
+
+  @override
+  String get lyricsAttached => '歌詞已連結';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的詞';
 
   @override
   String get settingsChooseFolder => '選擇音樂資料夾';
