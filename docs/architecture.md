@@ -249,8 +249,14 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 ### 加一个页面 / 页签
 
 1. 在 `features/` 下建包，按 domain → application → presentation 的顺序。
-2. 在 `lib/app/router/app_router.dart` 注册路由。
+2. 在 `lib/app/router/app_router.dart` 注册路由；页签用 `sectionPage`，过渡由路由自己管。
 3. 只接这一处新入口，不要顺着别人的页面改一圈。
+
+**页签的过渡属于路由，不属于 shell。** `go_router` 的导航器带着一个全局 key，
+shell 里如果同时留着旧页签和新页签（`AnimatedSwitcher` + `KeyedSubtree`），
+一棵树里就有两个同 key 的导航器：Flutter 会把树拆开一帧，屏幕上那一页当场少一块。
+所以 shell 直接放路由给的 `child`，淡入淡出走 `CustomTransitionPage`。
+`test/app/shell_page_switch_test.dart` 守着这条线。
 
 ### 加一条文案
 
