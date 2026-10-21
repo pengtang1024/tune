@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/shared/ui/track_detail_heading.dart';
 
 /// One part of a track that is written out under a name.
 ///
@@ -18,18 +16,7 @@ class TrackDetailBlock {
   /// The words of the part.
   final String text;
 
-  /// Whether the words were written by a machine.
-  ///
-  /// The payload of a source and the headers of a request are written by a
-  /// program, so they keep the machine face; the words of a person are
-  /// written in the body face.
-  final bool machine;
-
-  const TrackDetailBlock({
-    required this.label,
-    required this.text,
-    this.machine = false,
-  });
+  const TrackDetailBlock({required this.label, required this.text});
 }
 
 /// The parts of a track that no mark can hold.
@@ -46,22 +33,14 @@ List<TrackDetailBlock> trackDetailBlocksOf(BuildContext context, Song song) {
   final raw = _rawDataOf(song);
   if (raw != null) {
     blocks.add(
-      TrackDetailBlock(
-        label: context.loc.trackFactRawData,
-        text: raw,
-        machine: true,
-      ),
+      TrackDetailBlock(label: context.loc.trackFactRawData, text: raw),
     );
   }
 
   final headers = _headersOf(song);
   if (headers != null) {
     blocks.add(
-      TrackDetailBlock(
-        label: context.loc.trackFactHeaders,
-        text: headers,
-        machine: true,
-      ),
+      TrackDetailBlock(label: context.loc.trackFactHeaders, text: headers),
     );
   }
 
@@ -102,7 +81,7 @@ String _headerValueOf(String name, String value) {
 /// Writes one part of a track out.
 ///
 /// The name of the part stands above the words, the way the names of the
-/// table stand beside their values.
+/// addresses stand above theirs.
 class TrackDetailBlockView extends StatelessWidget {
   final TrackDetailBlock block;
 
@@ -111,20 +90,27 @@ class TrackDetailBlockView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = theme.colorScheme.onSurface;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        TrackDetailHeading(block.label),
-        const SizedBox(height: CompactTokens.space8),
+        Text(
+          block.label,
+          style: CompactTypography.mono(
+            theme.colorScheme.onSurfaceVariant,
+            size: CompactTypeScale.mark,
+            weight: FontWeight.w500,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 4),
         SelectableText(
           block.text,
-          style: block.machine
-              ? CompactTypography.mono(color, size: CompactTypeScale.body)
-              : theme.textTheme.bodySmall?.copyWith(color: color) ??
-                    CompactTypography.sans(color, size: CompactTypeScale.body),
+          style: CompactTypography.mono(
+            theme.colorScheme.onSurfaceVariant,
+            size: CompactTypeScale.mark,
+          ),
         ),
       ],
     );

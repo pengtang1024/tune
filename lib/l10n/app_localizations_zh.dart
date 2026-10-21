@@ -1428,9 +1428,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackDetailsCopyIdentity => '复制身份';
 
   @override
-  String get trackDetailsAddresses => '地址';
-
-  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -3008,9 +3005,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackDetailsCopyIdentity => '复制身份';
 
   @override
-  String get trackDetailsAddresses => '地址';
-
-  @override
   String get sourceStatusEnabled => '已启用';
 
   @override
@@ -4586,9 +4580,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackDetailsCopyIdentity => '複製身分';
-
-  @override
-  String get trackDetailsAddresses => '位址';
 
   @override
   String get sourceStatusEnabled => '已啟用';

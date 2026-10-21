@@ -1,36 +1,27 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
+import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_addresses.dart';
 import 'package:tune/shared/ui/track_detail_block.dart';
-import 'package:tune/shared/ui/track_detail_columns.dart';
-import 'package:tune/shared/ui/track_detail_header.dart';
-import 'package:tune/shared/ui/track_detail_row.dart';
-import 'package:tune/shared/ui/track_detail_table.dart';
 import 'package:tune/shared/ui/track_facts.dart';
-
-/// The room the panel keeps inside its edges.
-const EdgeInsets _panelPadding = EdgeInsets.fromLTRB(
-  CompactTokens.space20,
-  CompactTokens.space16,
-  CompactTokens.space20,
-  CompactTokens.space24,
-);
 
 /// Shows everything that is known about a track.
 ///
 /// The sheet is the one place where all the facts of a track stand together,
 /// so a reader can look a track up instead of guessing what it is.
 ///
-/// The panel is as wide as its own words: the table of the facts is measured
-/// from the words that go in it, and the panel stops growing there. A panel
-/// that reaches for the whole width of the window leaves a stretch of nothing
-/// beside the values, and that emptiness is what makes a panel look thin.
+/// The facts stand in chips, one chip per fact: the icon says which fact it
+/// is and the chip writes its name and its value. The addresses are the one
+/// thing a chip cannot carry in writing — they are longer than a line — so
+/// each of them names itself and hands its address to a chip of its own.
 ///
 /// The heart marks the track as one of the favorites. The sheet is a shared
 /// piece of the interface and knows nothing about the favorites, so the
@@ -71,99 +62,132 @@ class _TrackDetailSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final facts = trackFactsOf(context, song, source: source);
 
-    // A text too long for a line is written out as a paragraph of its own,
+    // A text too long for a chip is written out as a paragraph of its own,
     // under the name it has in the facts.
     final paragraphs = [
       for (final fact in facts.where((fact) => fact.paragraph))
         TrackDetailBlock(label: fact.label, text: fact.value),
     ];
-    final rows = [
+    final chips = [
       for (final fact in facts.where((fact) => !fact.paragraph))
-        TrackDetailRow(
-          label: fact.label,
+        MetaChip(
           icon: fact.icon,
+          label: fact.label,
           value: fact.value,
           tone: fact.tone,
-          machine: fact.machine,
         ),
     ];
-    final addresses = trackAddressRows(context, song);
     final blocks = [...paragraphs, ...trackDetailBlocksOf(context, song)];
 
-    // The columns are measured from the words that go in them, so the table
-    // is exactly as wide as the words need and not a pixel more.
-    final columns = TrackDetailColumns.of(
-      context,
-      [...rows, ...addresses],
-      maxWidth: CompactTokens.detailPanelWidth - _panelPadding.horizontal,
-    );
-
-    return SizedBox(
-      key: const ValueKey('track-detail-panel'),
-      width: _panelWidth(context, columns),
-      child: Material(
-        color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(CompactTokens.sheetRadius),
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(CompactTokens.sheetRadius),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.space20,
+          CompactTokens.space16,
+          CompactTokens.space20,
+          CompactTokens.space24,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: SingleChildScrollView(
-          padding: _panelPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TrackDetailHeader(
-                song: song,
-                isFavorite: isFavorite,
-                onToggleFavorite: onToggleFavorite,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _Header(
+              song: song,
+              isFavorite: isFavorite,
+              onToggleFavorite: onToggleFavorite,
+            ),
+            if (chips.isNotEmpty) ...[
+              const SizedBox(height: CompactTokens.space16),
+              Wrap(
+                spacing: CompactTokens.space6,
+                runSpacing: CompactTokens.space6,
+                children: chips,
               ),
-              if (rows.isNotEmpty || addresses.isNotEmpty) ...[
-                const SizedBox(height: CompactTokens.space14),
-                TrackDetailTable(
-                  columns: columns,
-                  sections: [
-                    TrackDetailSection(rows: rows),
-                    TrackDetailSection(
-                      heading: context.loc.trackDetailsAddresses,
-                      rows: addresses,
-                    ),
-                  ],
-                ),
-              ],
-              for (final block in blocks) ...[
-                const SizedBox(height: CompactTokens.space14),
-                TrackDetailBlockView(block: block),
-              ],
             ],
-          ),
+            const SizedBox(height: CompactTokens.space18),
+            TrackAddresses(song: song),
+            for (final block in blocks) ...[
+              const SizedBox(height: CompactTokens.space18),
+              TrackDetailBlockView(block: block),
+            ],
+          ],
         ),
       ),
     );
   }
+}
 
-  /// The width of the panel.
-  ///
-  /// The panel is as wide as the table of the facts or as the head above it,
-  /// whichever is wider, and never wider than the window allows.
-  double _panelWidth(BuildContext context, TrackDetailColumns columns) {
-    final table = columns.name + CompactTokens.space12 + columns.value;
-    final title = song.title.isEmpty
-        ? context.loc.trackUnknownTitle
-        : song.title;
-    final artist = song.artist.isEmpty
-        ? context.loc.playerUnknownArtist
-        : song.artist;
-    final head = trackDetailHeaderWidth(
-      context,
-      title,
-      artist,
-      hasHeart: onToggleFavorite != null,
-    );
+/// The track the sheet belongs to.
+class _Header extends StatelessWidget {
+  final Song song;
 
-    return math.min(
-      math.max(table, head) + _panelPadding.horizontal,
-      CompactTokens.detailPanelWidth,
+  /// Whether the track is one of the favorites.
+  final bool isFavorite;
+
+  /// What the click on the heart does.
+  final VoidCallback? onToggleFavorite;
+
+  const _Header({
+    required this.song,
+    this.isFavorite = false,
+    this.onToggleFavorite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ArtworkThumb(
+          path: song.albumArtPath,
+          imageUrl: song.artworkUrl,
+          size: CompactTokens.artworkHero,
+          radius: 12,
+        ),
+        const SizedBox(width: CompactTokens.space12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                song.title.isEmpty ? context.loc.trackUnknownTitle : song.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: CompactTypography.asDisplay(
+                  theme.textTheme.titleMedium,
+                  size: CompactTypeScale.displaySmall,
+                  height: 1.15,
+                ),
+              ),
+              const SizedBox(height: CompactTokens.space4),
+              Text(
+                song.artist.isEmpty
+                    ? context.loc.playerUnknownArtist
+                    : song.artist,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: CompactTokens.space8),
+        // The heart only shows when there is something to mark: the sheet is
+        // a shared piece of the interface, and the caller decides whether the
+        // track can be marked here.
+        if (onToggleFavorite case final action?)
+          FavoriteButton(isFavorite: isFavorite, onPressed: action),
+      ],
     );
   }
 }

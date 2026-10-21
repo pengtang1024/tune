@@ -1,21 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
-import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
-import 'package:tune/shared/ui/track_detail_table.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
-/// The details sheet is a table of properties.
+/// The details panel is a row of chips.
 ///
-/// The names of the facts stand in one column and their values in another
-/// one, so the eye can run down the names and find the value it wants. The
-/// values keep the face of their kind: a path, a number and an identifier in
-/// the machine face, the words of a person in the body face.
+/// Every fact of a track is a chip: the icon says which fact it is, the chip
+/// writes the name of the fact and its value. The addresses are the one thing
+/// a chip cannot write out — they are longer than a line — so each of them
+/// names itself and hands the address to a chip of its own.
 void main() {
   const song = Song(
     id: 1,
@@ -47,29 +45,6 @@ void main() {
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: home),
     );
-  }
-
-  /// The face a value of the sheet is written in.
-  TextStyle styleOf(WidgetTester tester, Finder sheet, String value) {
-    final found = find.descendant(of: sheet, matching: find.text(value));
-
-    // A value of the table is written out as plain text; a part of a track
-    // that is longer than a line is selectable text.
-    for (final element in found.evaluate()) {
-      final widget = element.widget;
-      if (widget is Text) return widget.style ?? const TextStyle();
-    }
-
-    final selectable = find.ancestor(
-      of: found,
-      matching: find.byType(SelectableText),
-    );
-    if (selectable.evaluate().isNotEmpty) {
-      return tester.widget<SelectableText>(selectable.first).style ??
-          const TextStyle();
-    }
-
-    return const TextStyle();
   }
 
   /// Opens the details of a track and hands back the tree of the sheet.
@@ -113,75 +88,43 @@ void main() {
     expect(find.byIcon(Icons.favorite_border_rounded), findsNothing);
   });
 
-  testWidgets('the panel is as wide as its words and not as wide as the sheet', (
-    tester,
-  ) async {
-    await openSheet(tester);
-
-    final panel = tester.getSize(
-      find.byKey(const ValueKey('track-detail-panel')),
-    );
-
-    expect(panel.width, lessThan(CompactTokens.sheetWidth));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('a value that fits in the column stays on one line', (
-    tester,
-  ) async {
+  testWidgets('every fact of the track is a chip', (tester) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
 
-    final value = tester.getSize(
-      find.descendant(of: sheet, matching: find.text('夜曲专辑')),
+    final chips = find.descendant(
+      of: sheet,
+      matching: find.byType(MetaChip),
     );
 
-    expect(value.height, lessThan(30));
+    expect(chips, findsWidgets);
+    expect(
+      find.descendant(of: chips, matching: find.text('格式')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: chips, matching: find.text('FLAC')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the names of the facts stand in one column', (tester) async {
+  testWidgets('the facts share the rows of a chip strip', (tester) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
 
-    final names = ['格式', '码率', '专辑', '年份'];
-    final lefts = <double>{};
-    for (final name in names) {
-      lefts.add(tester.getTopLeft(find.descendant(of: sheet, matching: find.text(name))).dx);
+    final chips = find.descendant(
+      of: sheet,
+      matching: find.byType(MetaChip),
+    );
+    final rows = <double>{};
+    for (final chip in chips.evaluate()) {
+      rows.add(tester.getTopLeft(find.byWidget(chip.widget)).dy);
     }
 
-    expect(lefts, hasLength(1));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('the values of the facts stand in one column', (tester) async {
-    await openSheet(tester);
-    final sheet = find.byType(BottomSheet);
-
-    final values = ['FLAC', '980 kbps', '夜曲专辑', '2024'];
-    final lefts = <double>{};
-    for (final value in values) {
-      lefts.add(
-        tester.getTopLeft(find.descendant(of: sheet, matching: find.text(value))).dx,
-      );
-    }
-
-    expect(lefts, hasLength(1));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('the addresses share the column of the names', (tester) async {
-    await openSheet(tester);
-    final sheet = find.byType(BottomSheet);
-
-    final name = tester.getTopLeft(
-      find.descendant(of: sheet, matching: find.text('格式')),
-    );
-    final path = tester.getTopLeft(
-      find.descendant(of: sheet, matching: find.text('文件路径')),
-    );
-
-    expect(path.dx, name.dx);
+    // The chips stand in rows and not in a column: a chip strip that takes
+    // one row per fact is a list in another name.
+    expect(rows.length, lessThan(chips.evaluate().length));
     expect(tester.takeException(), isNull);
   });
 
@@ -200,20 +143,20 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the chip of an address stands in the column of the values', (
+  testWidgets('the name of an address stands in front of its chip', (
     tester,
   ) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
 
-    final value = tester.getTopLeft(
-      find.descendant(of: sheet, matching: find.text('FLAC')),
+    final name = tester.getTopLeft(
+      find.descendant(of: sheet, matching: find.text('文件路径')),
     );
     final chip = tester.getTopLeft(
       find.descendant(of: sheet, matching: find.byType(CopyChip)),
     );
 
-    expect(chip.dx, value.dx);
+    expect(chip.dx, greaterThan(name.dx));
     expect(tester.takeException(), isNull);
   });
 
@@ -232,22 +175,40 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a value a machine wrote keeps the machine face', (tester) async {
+  testWidgets('a click on the chip takes the address away', (tester) async {
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
+    final chip = find.descendant(of: sheet, matching: find.byType(CopyChip));
 
-    expect(
-      styleOf(tester, sheet, 'FLAC').fontFamily,
-      CompactTypography.monoFamily,
-    );
-    expect(
-      styleOf(tester, sheet, '夜曲专辑').fontFamily,
-      CompactTypography.sansFamily,
-    );
+    await tester.tap(chip);
+    // The toast stays for a moment and the pump waits for the timer of the
+    // toast as well, so the sheets are pumped one frame at a time.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(copied, '/music/night.flac');
+    expect(find.text('已复制到剪贴板'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a long description is a paragraph and not a line', (
+  testWidgets('a long description is a paragraph and not a chip', (
     tester,
   ) async {
     await openSheet(tester);
@@ -255,27 +216,10 @@ void main() {
     expect(find.text(song.description!), findsOneWidget);
     expect(
       find.descendant(
-        of: find.byType(TrackDetailLine),
+        of: find.byType(MetaChip),
         matching: find.text(song.description!),
       ),
       findsNothing,
-    );
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('the words of a person are written in the body face', (
-    tester,
-  ) async {
-    await openSheet(tester);
-    final sheet = find.byType(BottomSheet);
-
-    expect(
-      styleOf(tester, sheet, '[00:00.00] 歌词').fontFamily,
-      CompactTypography.sansFamily,
-    );
-    expect(
-      styleOf(tester, sheet, 'id: one\nsuffix: mp3').fontFamily,
-      CompactTypography.monoFamily,
     );
     expect(tester.takeException(), isNull);
   });

@@ -45,7 +45,6 @@ TrackFact? _yearFact(BuildContext context, Song song) {
     label: context.loc.nowPlayingDetailYear,
     value: '$year',
     icon: Icons.calendar_today_rounded,
-    machine: true,
   );
 }
 
@@ -73,7 +72,6 @@ TrackFact? _trackFact(BuildContext context, Song song) {
     label: context.loc.nowPlayingDetailTrack,
     value: total != null && total > 0 ? '$number / $total' : '$number',
     icon: Icons.music_note_rounded,
-    machine: true,
   );
 }
 
@@ -87,7 +85,6 @@ TrackFact? _discFact(BuildContext context, Song song) {
     label: context.loc.nowPlayingDetailDisc,
     value: total != null && total > 0 ? '$number / $total' : '$number',
     icon: Icons.layers_rounded,
-    machine: true,
   );
 }
 
@@ -99,7 +96,6 @@ TrackFact? _languageFact(BuildContext context, Song song) {
     label: context.loc.language,
     value: language,
     icon: Icons.translate_rounded,
-    machine: true,
   );
 }
 
@@ -111,7 +107,6 @@ TrackFact? _licenseFact(BuildContext context, Song song) {
     label: context.loc.nowPlayingDetailLicense,
     value: license,
     icon: Icons.policy_rounded,
-    machine: true,
   );
 }
 
@@ -148,7 +143,6 @@ TrackFact? _addedFact(BuildContext context, Song song) {
     label: context.loc.trackFactAdded,
     value: DateFormat.yMMMd(locale).format(date),
     icon: Icons.schedule_rounded,
-    machine: true,
   );
 }
 

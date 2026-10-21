@@ -2680,12 +2680,6 @@ abstract class AppLocalizations {
   /// **'复制身份'**
   String get trackDetailsCopyIdentity;
 
-  /// No description provided for @trackDetailsAddresses.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'地址'**
-  String get trackDetailsAddresses;
-
   /// No description provided for @sourceStatusEnabled.
   ///
   /// In zh_CN, this message translates to:

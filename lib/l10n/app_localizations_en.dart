@@ -1568,9 +1568,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackDetailsCopyIdentity => 'Copy identity';
 
   @override
-  String get trackDetailsAddresses => 'Addresses';
-
-  @override
   String get sourceStatusEnabled => 'Enabled';
 
   @override

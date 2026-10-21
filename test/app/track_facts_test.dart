@@ -249,7 +249,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('文件路径'), findsOneWidget);
-    expect(find.text('地址'), findsOneWidget);
     // The identity of the track names the track, it is not a path of a file,
     // so it gets a row of its own.
     expect(find.text('身份'), findsOneWidget);

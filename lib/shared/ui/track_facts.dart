@@ -66,7 +66,6 @@ TrackFact? _sourceIdFact(BuildContext context, Song song) {
     label: context.loc.trackFactSourceId,
     value: id,
     icon: Icons.tag_rounded,
-    machine: true,
   );
 }
 
@@ -106,7 +105,6 @@ TrackFact? _durationFact(BuildContext context, Song song) {
     label: context.loc.trackFactDuration,
     value: formatDuration(Duration(milliseconds: duration)),
     icon: Icons.timelapse_rounded,
-    machine: true,
   );
 }
 
@@ -125,7 +123,6 @@ TrackFact? _mediaTypeFact(BuildContext context, Song song) {
     label: context.loc.trackFactMediaType,
     value: type,
     icon: Icons.category_rounded,
-    machine: true,
   );
 }
 
@@ -171,7 +168,6 @@ TrackFact? _formatFact(BuildContext context, Song song) {
     value: format,
     icon: Icons.audio_file_rounded,
     compact: true,
-    machine: true,
   );
 }
 
@@ -201,7 +197,6 @@ TrackFact? _bitrateFact(BuildContext context, Song song) {
     value: '$bitrate kbps',
     icon: Icons.speed_rounded,
     compact: true,
-    machine: true,
   );
 }
 
@@ -217,7 +212,6 @@ TrackFact? _sampleRateFact(BuildContext context, Song song) {
     label: context.loc.nowPlayingDetailSampleRate,
     value: '$value kHz',
     icon: Icons.graphic_eq_rounded,
-    machine: true,
   );
 }
 
@@ -229,7 +223,6 @@ TrackFact? _sizeFact(BuildContext context, Song song) {
     label: context.loc.trackFactSize,
     value: formatSize(size),
     icon: Icons.data_usage_rounded,
-    machine: true,
   );
 }
 

@@ -23,19 +23,10 @@ class TrackFact {
   /// Whether the fact is worth a place in a list row.
   final bool compact;
 
-  /// Whether the value was written by a machine.
-  ///
-  /// A number, a path, an identifier and a format name come out of a file or
-  /// out of a source; an album, a style and a description come out of a
-  /// person. The details panel writes the two kinds in two faces: the
-  /// machine face for the first and the body face for the second, so the
-  /// reader sees at once which words a machine wrote.
-  final bool machine;
-
-  /// Whether the value is a text too long for a row.
+  /// Whether the value is a text too long for a chip.
   ///
   /// A description is a paragraph, so the details panel writes it out under
-  /// its own name instead of putting it in a line of the table.
+  /// its own name instead of putting it in a chip.
   final bool paragraph;
 
   final String? _sentence;
@@ -46,7 +37,6 @@ class TrackFact {
     required this.icon,
     this.tone = FactTone.neutral,
     this.compact = false,
-    this.machine = false,
     this.paragraph = false,
     String? sentence,
   }) : _sentence = sentence;
