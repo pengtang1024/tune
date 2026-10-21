@@ -5,7 +5,6 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
-import 'package:tune/shared/ui/track_detail_copy_button.dart';
 import 'package:tune/shared/ui/track_detail_heading.dart';
 import 'package:tune/shared/ui/track_detail_row.dart';
 
@@ -154,16 +153,21 @@ class _ValueCell extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme.onSurface;
 
+    // A value too long for a line is not written out: the chip carries it,
+    // and the reader reads it where the pointer rests.
+    if (row.inChip) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: CopyChip(address: row.value, hint: row.copyHint ?? row.label),
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: SelectableText(row.value, style: _valueStyle(context, color)),
         ),
-        if (row.copyHint != null) ...[
-          const SizedBox(width: CompactTokens.space8),
-          TrackDetailCopyButton(hint: row.copyHint!, value: row.value),
-        ],
       ],
     );
   }

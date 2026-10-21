@@ -39,6 +39,12 @@ abstract final class CompactTokens {
   static const double icon24 = 24;
   static const double icon28 = 28;
 
+  /// Side of the square a chip sits in.
+  ///
+  /// A chip is a mark and not a control: its box does not grow with the word
+  /// next to it, so a column of chips keeps the same width in every row.
+  static const double chipBox = 22;
+
   /// Size of the drawings that stand for a screen with nothing in it.
   ///
   /// They are pictures and not the icon of a control, so they are allowed a

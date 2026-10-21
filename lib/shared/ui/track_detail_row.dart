@@ -26,9 +26,19 @@ class TrackDetailRow {
   /// machine face; the words of a person are written in the body face.
   final bool machine;
 
-  /// The name of the button that takes the value away, when the value can be
-  /// taken away.
+  /// The words that name the action of taking the value away.
+  ///
+  /// The card of the chip shows the value itself; these words say what the
+  /// chip does, for the screen reader.
   final String? copyHint;
+
+  /// Whether the value is carried by a chip instead of being written out.
+  ///
+  /// A path and an address are longer than a line. Such a value is not
+  /// written out: the line says what the thing is, and the chip beside it
+  /// carries the whole value, which the reader reads when the pointer rests
+  /// on the chip and takes away with a click.
+  final bool inChip;
 
   const TrackDetailRow({
     required this.label,
@@ -37,5 +47,6 @@ class TrackDetailRow {
     this.tone = FactTone.neutral,
     this.machine = false,
     this.copyHint,
+    this.inChip = false,
   });
 }

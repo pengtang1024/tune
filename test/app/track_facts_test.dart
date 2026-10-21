@@ -13,6 +13,7 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -159,11 +160,17 @@ void main() {
       find.descendant(of: sheet, matching: find.text('96 kHz')),
       findsOneWidget,
     );
+    // The path of the file is longer than a line, so it is not written out:
+    // a chip carries it, and the reader reads it where the pointer rests.
     expect(
       find.descendant(
         of: sheet,
         matching: find.text('/music/night.flac'),
       ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byType(CopyChip)),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
@@ -242,13 +249,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('文件路径'), findsOneWidget);
-    expect(find.text('/music/远方歌手/远方的歌/远方的歌.mp3'), findsOneWidget);
     expect(find.text('地址'), findsOneWidget);
-    expect(find.text('https://example.com/a.mp3'), findsOneWidget);
     // The identity of the track names the track, it is not a path of a file,
     // so it gets a row of its own.
     expect(find.text('身份'), findsOneWidget);
-    expect(find.text('tune://openverse/abc'), findsOneWidget);
+
+    // An address is longer than a line, so it is not written out: the chips
+    // carry the file, the address and the identity of the track.
+    final addresses = tester
+        .widgetList<CopyChip>(find.byType(CopyChip))
+        .map((chip) => chip.address)
+        .toList();
+    expect(addresses, contains('/music/远方歌手/远方的歌/远方的歌.mp3'));
+    expect(addresses, contains('https://example.com/a.mp3'));
+    expect(addresses, contains('tune://openverse/abc'));
     expect(tester.takeException(), isNull);
   });
 
@@ -329,9 +343,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('封面'), findsOneWidget);
-    expect(find.text('https://example.com/cover.jpg'), findsOneWidget);
     expect(find.text('身份'), findsOneWidget);
-    expect(find.text('tune://openverse/cover'), findsOneWidget);
+
+    // The address of the cover and the identity of the track are longer than
+    // a line, so the chips carry them.
+    final addresses = tester
+        .widgetList<CopyChip>(find.byType(CopyChip))
+        .map((chip) => chip.address)
+        .toList();
+    expect(addresses, contains('https://example.com/cover.jpg'));
+    expect(addresses, contains('tune://openverse/cover'));
     expect(tester.takeException(), isNull);
   });
 

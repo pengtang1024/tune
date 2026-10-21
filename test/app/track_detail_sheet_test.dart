@@ -1,9 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_detail_table.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
@@ -107,6 +109,53 @@ void main() {
     );
 
     expect(path.dx, name.dx);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an address is not written out in the line', (tester) async {
+    await openSheet(tester);
+    final sheet = find.byType(BottomSheet);
+
+    expect(
+      find.descendant(of: sheet, matching: find.text('/music/night.flac')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byType(CopyChip)),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the chip of an address stands in the column of the values', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    final sheet = find.byType(BottomSheet);
+
+    final value = tester.getTopLeft(
+      find.descendant(of: sheet, matching: find.text('FLAC')),
+    );
+    final chip = tester.getTopLeft(
+      find.descendant(of: sheet, matching: find.byType(CopyChip)),
+    );
+
+    expect(chip.dx, value.dx);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the pointer on the chip shows the address', (tester) async {
+    await openSheet(tester);
+    final sheet = find.byType(BottomSheet);
+    final chip = find.descendant(of: sheet, matching: find.byType(CopyChip));
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(chip));
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.text('/music/night.flac'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

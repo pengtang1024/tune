@@ -24,7 +24,20 @@ class TuneTooltip extends StatelessWidget {
   /// The thing the hint belongs to.
   final Widget child;
 
-  const TuneTooltip({super.key, required this.message, required this.child});
+  /// The words the screen reader says for the hint.
+  ///
+  /// The card of the hint can say something else than the screen reader: a
+  /// chip that carries an address shows the address on the card, while the
+  /// screen reader says what the chip does. Without these words the card
+  /// says both.
+  final String? label;
+
+  const TuneTooltip({
+    super.key,
+    required this.message,
+    required this.child,
+    this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +46,8 @@ class TuneTooltip extends StatelessWidget {
     final theme = TooltipTheme.of(context);
 
     return RawTooltip(
-      semanticsTooltip: theme.excludeFromSemantics == true ? null : message,
+      semanticsTooltip:
+          theme.excludeFromSemantics == true ? null : (label ?? message),
       hoverDelay: theme.waitDuration ?? Duration.zero,
       touchDelay: theme.showDuration ?? const Duration(milliseconds: 1500),
       dismissDelay: theme.exitDuration ?? const Duration(milliseconds: 100),
