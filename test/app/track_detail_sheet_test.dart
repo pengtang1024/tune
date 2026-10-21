@@ -109,12 +109,21 @@ void main() {
     );
 
     expect(chips, findsWidgets);
+    // A chip carries no words: the icon says which fact it is and the words
+    // of the fact wait in the tooltip.
     expect(
       find.descendant(of: chips, matching: find.text('格式')),
       findsNothing,
     );
     expect(
       find.descendant(of: chips, matching: find.text('FLAC')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: sheet,
+        matching: find.byTooltip('格式 · FLAC'),
+      ),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);

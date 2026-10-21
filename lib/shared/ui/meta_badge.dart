@@ -16,37 +16,29 @@ Color factToneColor(FactTone tone, ColorScheme colors) {
   };
 }
 
-/// A chip that carries one fact and writes its value.
+/// A chip that carries one fact.
 ///
-/// This is the one chip in the app that writes words: the details panel
-/// gives the value of every fact of a track, because that is the one place
-/// where a reader comes to look a track up. Everywhere else a chip keeps the
-/// words in the tooltip and shows the icon alone.
-///
-/// The chip does not write the name of the fact: the icon already says which
-/// fact this is, and the name of the fact would double the words of every
-/// chip in the panel. The name waits in the tooltip, where a reader who
-/// wants it can find it.
+/// The chip is the mark of the fact: the icon says which fact it is and the
+/// colour says which class it belongs to. The words of the fact wait in the
+/// tooltip, the way they wait in every other chip of the app — a chip that
+/// writes its words grows with them, and a panel full of facts would turn
+/// into a table of words.
 class MetaChip extends StatelessWidget {
   /// The icon that lets a reader recognise the fact at a glance.
-  final IconData? icon;
+  final IconData icon;
 
-  /// What the fact says, such as the name of the format.
-  final String? value;
-
-  /// The words the tooltip adds, for the reader who wants to know more.
-  final String? tooltip;
+  /// The words of the fact, for the reader who wants to know more.
+  final String tooltip;
 
   /// The colour of the chip, which tells the reader what kind of fact it is.
   final FactTone tone;
 
   const MetaChip({
     super.key,
-    this.icon,
-    this.value,
-    this.tooltip,
+    required this.icon,
+    required this.tooltip,
     this.tone = FactTone.neutral,
-  }) : assert(value != null);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,38 +46,18 @@ class MetaChip extends StatelessWidget {
     final color = factToneColor(tone, theme.colorScheme);
 
     final chip = Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: CompactTokens.space8,
-        vertical: CompactTokens.space4,
-      ),
+      width: CompactTokens.chipBox,
+      height: CompactTokens.chipBox,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(CompactTokens.radius6),
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: CompactTokens.icon12, color: color),
-            const SizedBox(width: CompactTokens.space4),
-          ],
-          if (value != null)
-            Text(
-              value!,
-              style: CompactTypography.mono(
-                theme.colorScheme.onSurface,
-                size: CompactTypeScale.mark,
-                letterSpacing: 0.3,
-              ),
-            ),
-        ],
-      ),
+      child: Icon(icon, size: CompactTokens.icon14, color: color),
     );
 
-    final message = tooltip;
-    if (message == null) return chip;
-    return TuneTooltip(message: message, child: chip);
+    return TuneTooltip(message: tooltip, child: chip);
   }
 }
 

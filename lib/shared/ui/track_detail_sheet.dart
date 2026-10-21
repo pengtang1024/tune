@@ -19,9 +19,9 @@ import 'package:tune/shared/ui/track_facts.dart';
 /// so a reader can look a track up instead of guessing what it is.
 ///
 /// The facts stand in chips, one chip per fact: the icon says which fact it
-/// is and the chip writes its value. The addresses are the one thing a chip
-/// cannot carry in writing — they are longer than a line — so each of them
-/// names itself and hands its address to a chip of its own.
+/// is and the words of the fact wait in the tooltip. The addresses are the
+/// one thing a chip cannot carry in writing — they are longer than a line —
+/// so each of them names itself and hands its address to a chip of its own.
 ///
 /// The heart marks the track as one of the favorites. The sheet is a shared
 /// piece of the interface and knows nothing about the favorites, so the
@@ -70,12 +70,7 @@ class _TrackDetailSheet extends StatelessWidget {
     ];
     final chips = [
       for (final fact in facts.where((fact) => !fact.paragraph))
-        MetaChip(
-          icon: fact.icon,
-          value: fact.value,
-          tooltip: fact.sentence,
-          tone: fact.tone,
-        ),
+        MetaChip(icon: fact.icon, tooltip: fact.sentence, tone: fact.tone),
     ];
     final blocks = [...paragraphs, ...trackDetailBlocksOf(context, song)];
 

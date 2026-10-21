@@ -19,8 +19,12 @@ void main() {
       // place where a chip writes the words of a fact.
       if (file.path.endsWith('shared/ui/meta_badge.dart')) continue;
       if (file.path.endsWith('shared/ui/track_detail_sheet.dart')) continue;
-      if (file.path.contains('MetaChip(')) offenders.add(file.path);
-      if (file.path.contains('ChipGroup(')) offenders.add(file.path);
+      if (file.path.endsWith('shared/ui/track_addresses.dart')) continue;
+      // The guard has to read the words of the file: a path never carries the
+      // name of a widget.
+      final words = file.readAsStringSync();
+      if (words.contains('MetaChip(')) offenders.add(file.path);
+      if (words.contains('ChipGroup(')) offenders.add(file.path);
     }
 
     expect(

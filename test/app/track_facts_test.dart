@@ -119,7 +119,7 @@ void main() {
     expect(find.byIcon(Icons.podcasts_rounded), findsOneWidget);
   });
 
-  testWidgets('the details sheet writes the value of every fact', (
+  testWidgets('the details sheet keeps the words of a fact in the tip', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -133,12 +133,15 @@ void main() {
     await tester.pumpAndSettle();
 
     final sheet = find.byType(BottomSheet);
-    // The chip writes the value of the fact and nothing else: the icon
-    // already says which fact it is, so writing the name of the fact again
-    // would double the words of the whole panel. The name waits in the
-    // tooltip, where the reader goes looking for it.
+    // A chip carries no words: the icon says which fact it is and the words
+    // of the fact wait in the tooltip. A panel of facts would turn into a
+    // table of words otherwise.
     expect(
       find.descendant(of: sheet, matching: find.text('格式')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('FLAC')),
       findsNothing,
     );
     expect(
@@ -151,18 +154,6 @@ void main() {
     );
     expect(
       find.descendant(of: sheet, matching: find.byTooltip('采样率 · 96 kHz')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: sheet, matching: find.text('FLAC')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: sheet, matching: find.text('980 kbps')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: sheet, matching: find.text('96 kHz')),
       findsOneWidget,
     );
     // The path of the file is longer than a line, so it is not written out:
@@ -194,8 +185,14 @@ void main() {
     await tester.tap(find.byTooltip('查看详情'));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线'), findsOneWidget);
-    expect(find.byTooltip('位置 · 在线'), findsOneWidget);
+    expect(find.text('在线'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byTooltip('位置 · 在线'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -288,9 +285,12 @@ void main() {
       find.descendant(of: sheet, matching: find.text('时长')),
       findsNothing,
     );
-    expect(find.byTooltip('时长 · 4:05'), findsOneWidget);
     expect(
       find.descendant(of: sheet, matching: find.text('4:05')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byTooltip('时长 · 4:05')),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
@@ -314,9 +314,12 @@ void main() {
       find.descendant(of: sheet, matching: find.text('来源编号')),
       findsNothing,
     );
-    expect(find.byTooltip('来源编号 · abc'), findsOneWidget);
     expect(
       find.descendant(of: sheet, matching: find.text('abc')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byTooltip('来源编号 · abc')),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
@@ -376,7 +379,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // The mark says that the lyrics are there, the words are written out.
-    expect(find.text('已包含'), findsOneWidget);
+    expect(find.text('已包含'), findsNothing);
+    expect(find.byTooltip('歌词 · 已包含'), findsWidgets);
     expect(find.text('[00:00.00] 歌词'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -470,8 +474,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('格式'), findsNothing);
+    expect(find.text('MP3'), findsNothing);
     expect(find.byTooltip('格式 · MP3'), findsWidgets);
-    expect(find.text('MP3'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
