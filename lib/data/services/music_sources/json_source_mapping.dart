@@ -42,7 +42,15 @@ class JsonSourceMapping {
 
   /// The mapping an instance declares.
   factory JsonSourceMapping.of(MusicSourceConfig config) {
-    String read(String key) => config.setting(key) ?? '';
+    return JsonSourceMapping.fromSettings(config.settings);
+  }
+
+  /// The mapping written as the settings of an instance.
+  ///
+  /// The settings and the mapping say the same thing, so one is written from
+  /// the other instead of both naming the fields on their own.
+  factory JsonSourceMapping.fromSettings(Map<String, String> settings) {
+    String read(String key) => settings[key]?.trim() ?? '';
     return JsonSourceMapping(
       listPath: read('listPath'),
       idPath: read('idPath'),
@@ -56,6 +64,20 @@ class JsonSourceMapping {
       urlTemplate: read('urlTemplate'),
     );
   }
+
+  /// The mapping as the settings of an instance.
+  Map<String, String> toSettings() => {
+    'listPath': listPath,
+    'idPath': idPath,
+    'titlePath': titlePath,
+    'artistPath': artistPath,
+    'albumPath': albumPath,
+    'coverPath': coverPath,
+    'urlPath': urlPath,
+    'durationPath': durationPath,
+    'genrePath': genrePath,
+    'urlTemplate': urlTemplate,
+  };
 
   /// The tracks of a decoded answer.
   ///
