@@ -45,11 +45,11 @@ chip 只有两样东西：
 
 ## 尺寸
 
-chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯子，装在固定边长的小方块里（行内 18、正在播放页 22、详情面板里的 `chipBox`）。尺寸取 `CompactTokens`，不要在调用点写数字，也不要按文字长度撑开。
+chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯子，装在固定边长的小方块里（行内 18、正在播放页 22、chip 组里那半个复制按钮 `chipBox`）。尺寸取 `CompactTokens`，不要在调用点写数字，也不要按文字长度撑开。
 
 ## 例外只有两处
 
-1. **详情面板**（`track_detail_sheet.dart`）：唯一把事实写全的地方——`MetaChip` 写出图标 + 名字 + 值，再写出地址与正文。地址太长，写不进一行，就由 `CopyChip` 带着：行里只写名字，后面跟着 chip，值在 chip 的提示气泡里，点一下就复制走。
+1. **详情面板**（`track_detail_sheet.dart`）：唯一把事实写全的地方——`MetaChip` 写出图标 + 名字 + 值，再写出地址与正文。地址太长，写不进一行，就由 `CopyChipGroup` 带着：两半连成一个 chip，宽的一半写名字，小的一半是复制，值在 chip 的提示气泡里，点一下就复制走。
 2. **控件**：下拉框、开关、按钮显示自己的值。
 
 想在 chip 里写字，先想是不是该进 tooltip，或者进详情面板。
@@ -59,7 +59,7 @@ chip 的盒子是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯�
 - **加一个音源**：在 `source_mark.dart` 给它一个自己的图标；类别变了就改 `sourceToneOf` 的映射，不要在调用点写颜色。名字与本地化名照旧只改 ARB。
 - **加一个事实**：在 `track_facts.dart` / `track_metadata_facts.dart` 给它一个图标和一句话（tooltip 用）；行内自动变成一个纯图标，详情面板自动多一条。
 - **加一个 chip**：用 `MetaBadge`（纯图标 + tooltip）或 `SourceBadge`（音源标识），不要自己拼一个带文字的方块。
-- **带一个长值的 chip**：用 `CopyChip`（`shared/ui/meta_badge.dart`）。地址比一行长，不写出来，由 chip 带着：图标说"是哪一个"，颜色说"可以拿走"，值在提示气泡里。
+- **带一个长值的 chip**：用 `CopyChipGroup`（`shared/ui/meta_badge.dart`）。地址比一行长，不写出来，由 chip 带着：宽的一半写名字，小的一半是复制，值在提示气泡里。
 
 ## 谁守着这条线
 
