@@ -7,7 +7,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_facts.dart';

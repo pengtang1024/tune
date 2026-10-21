@@ -11,13 +11,20 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final sources = _dartFilesOf('lib');
 
-  test('the chip that writes words stays in the details panel', () {
+  test('a chip does not write a word', () {
     final offenders = <String>[];
 
     for (final file in sources) {
-      if (file.path.endsWith('shared/ui/meta_chip.dart')) continue;
-      if (file.path.endsWith('shared/ui/track_detail_sheet.dart')) continue;
-      if (file.path.contains('MetaChip(')) offenders.add(file.path);
+      final source = file.readAsStringSync();
+      if (!RegExp(r'class \w*(Chip|Badge)\b').hasMatch(source)) continue;
+      // A chip carries an icon and a colour. The words of a fact belong to
+      // the tooltip, and the details of a fact to the details panel.
+      final words = RegExp(
+        r'final String\??\s+(label|value|title|text)\b',
+      ).allMatches(source);
+      for (final word in words) {
+        offenders.add('${file.path}: ${word.group(0)}');
+      }
     }
 
     expect(
@@ -33,7 +40,7 @@ void main() {
     final offenders = <String>[];
 
     for (final file in sources) {
-      if (file.path.endsWith('shared/ui/meta_chip.dart')) continue;
+      if (file.path.endsWith('shared/ui/meta_badge.dart')) continue;
       if (RegExp(r'class \w*Chip\b').hasMatch(file.readAsStringSync())) {
         offenders.add(file.path);
       }

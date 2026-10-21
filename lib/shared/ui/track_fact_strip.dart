@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
 /// The facts of a track that fit into a list row.

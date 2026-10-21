@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 

@@ -1190,7 +1190,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackFactPath => '文件路径';
 
   @override
-  String get trackFactAddress => '地址';
+  String get trackFactAddress => '在线地址';
 
   @override
   String get trackDetailsTooltip => '查看详情';
@@ -1230,6 +1230,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trackDetailsCopyIdentity => '复制身份';
+
+  @override
+  String get trackDetailsAddresses => '地址';
 
   @override
   String get sourceStatusEnabled => '已启用';
@@ -2571,7 +2574,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackFactPath => '文件路径';
 
   @override
-  String get trackFactAddress => '地址';
+  String get trackFactAddress => '在线地址';
 
   @override
   String get trackDetailsTooltip => '查看详情';
@@ -2611,6 +2614,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get trackDetailsCopyIdentity => '复制身份';
+
+  @override
+  String get trackDetailsAddresses => '地址';
 
   @override
   String get sourceStatusEnabled => '已启用';
@@ -3952,7 +3958,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get trackFactPath => '檔案路徑';
 
   @override
-  String get trackFactAddress => '位址';
+  String get trackFactAddress => '線上位址';
 
   @override
   String get trackDetailsTooltip => '查看詳情';
@@ -3992,6 +3998,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackDetailsCopyIdentity => '複製身分';
+
+  @override
+  String get trackDetailsAddresses => '位址';
 
   @override
   String get sourceStatusEnabled => '已啟用';

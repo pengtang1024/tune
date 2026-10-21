@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/shared/ui/track_address_row.dart';
+import 'package:tune/shared/ui/track_detail_row.dart';
 
 /// The addresses of a track, one row each.
 ///
@@ -9,55 +9,47 @@ import 'package:tune/shared/ui/track_address_row.dart';
 /// machine, through the address of the source it comes from, through the
 /// address of its cover and through the name the app knows it by. No icon
 /// can stand for any of them, so they are written out and can be copied.
-class TrackAddresses extends StatelessWidget {
-  final Song song;
+///
+/// The rows share the column of the names with the facts of the track, so the
+/// addresses do not look like a table of their own.
+List<TrackDetailRow> trackAddressRows(BuildContext context, Song song) {
+  final file = song.localFile;
+  final online = song.onlineAddress;
+  final cover = song.coverAddress;
+  final identity = song.identity;
 
-  const TrackAddresses({super.key, required this.song});
-
-  @override
-  Widget build(BuildContext context) {
-    final file = song.localFile;
-    final online = song.onlineAddress;
-    final cover = song.coverAddress;
-    final identity = song.identity;
-
-    final rows = <Widget>[
-      if (file != null)
-        TrackAddressRow(
-          address: file,
-          label: context.loc.trackFactPath,
-          copyHint: context.loc.trackDetailsCopyPath,
-        ),
-      if (online != null)
-        TrackAddressRow(
-          address: online,
-          label: context.loc.trackFactAddress,
-          copyHint: context.loc.trackDetailsCopyAddress,
-        ),
-      if (cover != null)
-        TrackAddressRow(
-          address: cover,
-          label: context.loc.trackFactCover,
-          copyHint: context.loc.trackDetailsCopyCover,
-        ),
-      if (identity != null)
-        TrackAddressRow(
-          address: identity,
-          label: context.loc.trackFactIdentity,
-          copyHint: context.loc.trackDetailsCopyIdentity,
-        ),
-    ];
-    if (rows.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var index = 0; index < rows.length; index++) ...[
-          if (index > 0) const SizedBox(height: 14),
-          rows[index],
-        ],
-      ],
-    );
-  }
+  return [
+    if (file != null)
+      TrackDetailRow(
+        label: context.loc.trackFactPath,
+        icon: Icons.folder_rounded,
+        value: file,
+        machine: true,
+        copyHint: context.loc.trackDetailsCopyPath,
+      ),
+    if (online != null)
+      TrackDetailRow(
+        label: context.loc.trackFactAddress,
+        icon: Icons.link_rounded,
+        value: online,
+        machine: true,
+        copyHint: context.loc.trackDetailsCopyAddress,
+      ),
+    if (cover != null)
+      TrackDetailRow(
+        label: context.loc.trackFactCover,
+        icon: Icons.image_rounded,
+        value: cover,
+        machine: true,
+        copyHint: context.loc.trackDetailsCopyCover,
+      ),
+    if (identity != null)
+      TrackDetailRow(
+        label: context.loc.trackFactIdentity,
+        icon: Icons.fingerprint_rounded,
+        value: identity,
+        machine: true,
+        copyHint: context.loc.trackDetailsCopyIdentity,
+      ),
+  ];
 }

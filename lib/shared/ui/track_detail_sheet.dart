@@ -7,9 +7,10 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
 import 'package:tune/shared/ui/track_addresses.dart';
 import 'package:tune/shared/ui/track_detail_block.dart';
+import 'package:tune/shared/ui/track_detail_row.dart';
+import 'package:tune/shared/ui/track_detail_table.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
 /// Shows everything that is known about a track.
@@ -37,7 +38,25 @@ class _TrackDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final facts = trackFactsOf(context, song, source: source);
-    final blocks = trackDetailBlocksOf(context, song);
+
+    // A text too long for a line is written out as a paragraph of its own,
+    // under the name it has in the facts.
+    final paragraphs = [
+      for (final fact in facts.where((fact) => fact.paragraph))
+        TrackDetailBlock(label: fact.label, text: fact.value),
+    ];
+    final rows = [
+      for (final fact in facts.where((fact) => !fact.paragraph))
+        TrackDetailRow(
+          label: fact.label,
+          icon: fact.icon,
+          value: fact.value,
+          tone: fact.tone,
+          machine: fact.machine,
+        ),
+    ];
+    final addresses = trackAddressRows(context, song);
+    final blocks = [...paragraphs, ...trackDetailBlocksOf(context, song)];
 
     return Material(
       color: theme.colorScheme.surface,
@@ -57,24 +76,20 @@ class _TrackDetailSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _Header(song: song),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (final fact in facts)
-                  MetaChip(
-                    icon: fact.icon,
-                    label: fact.label,
-                    value: fact.value,
-                    tone: fact.tone,
+            if (rows.isNotEmpty || addresses.isNotEmpty) ...[
+              const SizedBox(height: CompactTokens.space20),
+              TrackDetailTable(
+                sections: [
+                  TrackDetailSection(rows: rows),
+                  TrackDetailSection(
+                    heading: context.loc.trackDetailsAddresses,
+                    rows: addresses,
                   ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            TrackAddresses(song: song),
+                ],
+              ),
+            ],
             for (final block in blocks) ...[
-              const SizedBox(height: 18),
+              const SizedBox(height: CompactTokens.space20),
               TrackDetailBlockView(block: block),
             ],
           ],

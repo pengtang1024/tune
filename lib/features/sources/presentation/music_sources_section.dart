@@ -14,7 +14,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
-import 'package:tune/shared/ui/meta_chip.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
