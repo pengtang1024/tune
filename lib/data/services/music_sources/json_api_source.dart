@@ -81,7 +81,7 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
-      AppStrings.instance.jsonFieldQueryHint,
+      jsonKeywordHint(AppStrings.instance.jsonFieldQueryHint),
     ),
     MusicSourceField(
       'limit',
