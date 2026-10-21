@@ -42,14 +42,16 @@ TrackFact? _sourceFact(BuildContext context, SourceLabel source) {
   final name = source.name.trim();
   if (name.isEmpty) return null;
   final localized = source.localizedName.trim();
-  final value = localized.isEmpty ? name : '$name · $localized';
 
   return TrackFact(
     label: context.loc.trackFactSource,
-    value: value,
+    value: name,
     icon: sourceIconOf(source.type, source.kind),
     tone: FactTone.primary,
-    sentence: value,
+    // The name the source calls itself is the main; the name the app knows
+    // it by is the extra, and the extra waits in the tooltip.
+    secondary: localized.isEmpty ? null : localized,
+    sentence: name,
   );
 }
 

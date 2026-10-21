@@ -21,6 +21,13 @@ class TrackFact {
   final IconData icon;
   final FactTone tone;
 
+  /// The second half of the content, when the fact has one.
+  ///
+  /// A source says two things: the name it calls itself and the name the
+  /// app knows it by. The first is the main, the second is the extra, so the
+  /// chip shows the main and the extra waits in the tooltip.
+  final String? secondary;
+
   /// Whether the fact is worth a place in a list row.
   final bool compact;
 
@@ -37,6 +44,7 @@ class TrackFact {
     required this.value,
     required this.icon,
     this.tone = FactTone.neutral,
+    this.secondary,
     this.compact = false,
     this.paragraph = false,
     String? sentence,
@@ -45,6 +53,18 @@ class TrackFact {
   /// The words of the fact, for a tooltip.
   ///
   /// A state that repeats its own name, such as a favourite that is already a
-  /// favourite, says it once.
-  String get sentence => _sentence ?? '$label · $value';
+  /// favourite, says it once. The second half of the content waits here too.
+  String get sentence {
+    final base = _sentence ?? '$label · $value';
+    final tail = secondary;
+    return tail == null ? base : '$base · $tail';
+  }
+
+  /// The words the chip itself carries, when it carries any.
+  ///
+  /// A fact with one piece of content keeps it in the tooltip: the icon
+  /// already says which fact it is, and a chip that writes its words grows
+  /// with them. A fact with a main and a second half shows its main, because
+  /// the main is the name of the thing itself.
+  String? get chipValue => secondary == null ? null : value;
 }

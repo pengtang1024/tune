@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -167,6 +168,46 @@ void main() {
     );
     expect(
       find.descendant(of: sheet, matching: find.byType(ChipGroup)),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the chip of a source shows the name the source calls itself', (
+    tester,
+  ) async {
+    // A source says two things: the name it calls itself and the name the
+    // app knows it by. The chip shows the first — it is the name of the
+    // thing — and the tip carries the second.
+    const label = SourceLabel(
+      name: 'Wikimedia Commons',
+      localizedName: '自由授权媒体',
+    );
+
+    await tester.pumpWidget(
+      app(
+        const TrackMeta(song: lossless, index: 0, source: label),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('查看详情'));
+    await tester.pumpAndSettle();
+
+    final sheet = find.byType(BottomSheet);
+    expect(
+      find.descendant(of: sheet, matching: find.text('Wikimedia Commons')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('自由授权媒体')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: sheet,
+        matching: find.byTooltip('Wikimedia Commons · 自由授权媒体'),
+      ),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);

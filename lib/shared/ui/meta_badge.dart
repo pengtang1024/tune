@@ -23,9 +23,16 @@ Color factToneColor(FactTone tone, ColorScheme colors) {
 /// tooltip, the way they wait in every other chip of the app — a chip that
 /// writes its words grows with them, and a panel full of facts would turn
 /// into a table of words.
+///
+/// A fact that has a main and a second half is the one exception: the chip
+/// shows the main next to the icon, because the main is the name of the
+/// thing itself. The second half waits in the tooltip.
 class MetaChip extends StatelessWidget {
   /// The icon that lets a reader recognise the fact at a glance.
   final IconData icon;
+
+  /// The main of the fact, when the chip carries it.
+  final String? value;
 
   /// The words of the fact, for the reader who wants to know more.
   final String tooltip;
@@ -37,6 +44,7 @@ class MetaChip extends StatelessWidget {
     super.key,
     required this.icon,
     required this.tooltip,
+    this.value,
     this.tone = FactTone.neutral,
   });
 
@@ -44,17 +52,39 @@ class MetaChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = factToneColor(tone, theme.colorScheme);
+    final words = value;
 
     final chip = Container(
-      width: CompactTokens.chipBox,
       height: CompactTokens.chipBox,
-      alignment: Alignment.center,
+      // A chip without words is a small square of its own; a chip that
+      // carries a word takes the room the word needs and no more.
+      width: words == null ? CompactTokens.chipBox : null,
+      alignment: words == null ? Alignment.center : null,
+      padding: words == null
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(CompactTokens.radius6),
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
-      child: Icon(icon, size: CompactTokens.icon14, color: color),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: CompactTokens.icon14, color: color),
+          if (words != null) ...[
+            const SizedBox(width: CompactTokens.space4),
+            Text(
+              words,
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurface,
+                size: CompactTypeScale.mark,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
 
     return TuneTooltip(message: tooltip, child: chip);

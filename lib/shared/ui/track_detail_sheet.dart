@@ -70,7 +70,12 @@ class _TrackDetailSheet extends StatelessWidget {
     ];
     final chips = [
       for (final fact in facts.where((fact) => !fact.paragraph))
-        MetaChip(icon: fact.icon, tooltip: fact.sentence, tone: fact.tone),
+        MetaChip(
+          icon: fact.icon,
+          value: fact.chipValue,
+          tooltip: fact.sentence,
+          tone: fact.tone,
+        ),
     ];
     final blocks = [...paragraphs, ...trackDetailBlocksOf(context, song)];
 
