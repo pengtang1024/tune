@@ -76,6 +76,15 @@ void main() {
     await tester.pumpAndSettle();
     router.pop();
     await tester.pumpAndSettle();
+
+    // A deep link to a page that is gone lands on the library.
+    router.go('/a-page-that-is-gone');
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routerDelegate.currentConfiguration.uri.path,
+      '/library',
+    );
   });
 }
 
