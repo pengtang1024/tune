@@ -155,6 +155,8 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_fact_strip.dart` | 行内标识条 |
 | `lib/shared/ui/track_detail_sheet.dart` | 点击后的详情面板：属性表、地址与写出来的正文 |
 | `lib/shared/ui/track_detail_table.dart` | 详情面板的属性表：名字一列，值一列 |
+| `lib/shared/ui/track_detail_columns.dart` | 属性表两列的宽度：照着字量出来的 |
+| `lib/shared/ui/track_detail_header.dart` | 详情面板的头：封面、曲名、歌手与红心 |
 | `lib/shared/ui/track_detail_row.dart` | 属性表里的一行：名字、图标、值（值可以交给 chip 带着） |
 | `lib/shared/ui/track_detail_heading.dart` | 一组内容的名字 |
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四行地址：本机文件路径、在线地址、封面地址、规范身份 |
@@ -163,6 +165,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
+| `lib/shared/utils/text_width.dart` | 量一段字有多宽：画字的画笔报多少，再留一点余量 |
 
 同一份事实按三档呈现，读者想要多少信息就看到多少：
 
@@ -177,6 +180,17 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 值的**脸**说这话是谁写的：机器写的（路径、地址、编号、时长、码率、原始数据、
 请求头）用等宽体，人写的（专辑、流派、简介、歌词）用正文体。值的大小一律是
 正文号（13），名字是次要色，值是正文色。
+
+这张表是**照着字量出来的**：两列的宽度都按字量（`TrackDetailColumns`），面板的
+宽度也就跟着表走——表有多宽，面板就有多宽，最多到 `detailPanelWidth`（440）。
+面板不去撑满浮层那 640：值都是短词，撑满只会在右边空出一大片，信息密度就掉
+下去了（`需求/紧凑播放器重构方案.md` 第 84 行骂的就是这个）。量出来的宽度要留
+一点余量（`measureTextWidth`）：画笔报的宽度比画字要的少一丝，列正好等于报的
+宽度时，最后一个字会被甩到下一行。
+
+值写的是普通的 `Text`，不是 `SelectableText`：可选中的字自己留四十像素的滚动
+余量，字只写在剩下的地方，列就得胖上那四十像素，面板也跟着宽一圈。长块的
+正文（歌词、原始数据、请求头）仍然是可选中的，那里的宽度不由列决定。
 
 一段话不是一行：简介太长，挤进一行会拉成一条，所以事实上给它一个标记
 （`TrackFact.paragraph`），详情面板把它写成一整段，和歌词一样。
