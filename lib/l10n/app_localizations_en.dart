@@ -545,6 +545,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sourceFormShowAdvanced => 'More options';
+
+  @override
+  String get sourceFormHideAdvanced => 'Fewer options';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override

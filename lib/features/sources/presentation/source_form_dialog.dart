@@ -55,6 +55,9 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
   late final TextEditingController _name;
   final Map<String, String> _errors = {};
 
+  /// Whether the settings that are rarely needed are shown.
+  bool _advanced = false;
+
   /// Whether a trial of the settings is running.
   bool _previewing = false;
 
@@ -91,6 +94,16 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
     return source == null || !source.builtIn;
   }
 
+  /// The settings the reader filled in first.
+  List<MusicSourceField> get _basicFields => widget.fields
+      .where((field) => !field.advanced)
+      .toList(growable: false);
+
+  /// The settings that are rarely needed.
+  List<MusicSourceField> get _advancedFields => widget.fields
+      .where((field) => field.advanced)
+      .toList(growable: false);
+
   /// Whether the type of the source can be tried out before it is kept.
   bool get _canPreview {
     final type = widget.type?.type ?? widget.source?.sourceType;
@@ -123,32 +136,28 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
                 ),
                 const SizedBox(height: 10),
               ],
-              for (final field in widget.fields) ...[
-                if (field.choices.isNotEmpty)
-                  _ChoiceField(
-                    field: field,
-                    value: _choiceValue(field),
-                    onChanged: (value) => _selectChoice(field, value),
-                  )
-                else
-                  TextField(
-                    key: ValueKey('source-field-${field.key}'),
-                    controller: _controllers[field.key],
-                    obscureText: field.secret,
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      hintText: field.hint,
-                      errorText: _errors[field.key],
-                      isDense: true,
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: field.numeric
-                        ? const TextInputType.numberWithOptions(decimal: false)
-                        : TextInputType.text,
-                    maxLines: field.multiline ? 4 : 1,
-                    minLines: field.multiline ? 3 : 1,
-                  ),
+              for (final field in _basicFields) ...[
+                _field(field),
                 const SizedBox(height: 10),
+              ],
+              if (_advancedFields.isNotEmpty) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    key: const ValueKey('source-form-advanced'),
+                    onPressed: () => setState(() => _advanced = !_advanced),
+                    child: Text(
+                      _advanced
+                          ? context.loc.sourceFormHideAdvanced
+                          : context.loc.sourceFormShowAdvanced,
+                    ),
+                  ),
+                ),
+                if (_advanced)
+                  for (final field in _advancedFields) ...[
+                    _field(field),
+                    const SizedBox(height: 10),
+                  ],
               ],
               if (_previewing || _preview != null) ...[
                 const SizedBox(height: CompactTokens.space8),
@@ -175,6 +184,35 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
           child: Text(context.loc.save),
         ),
       ],
+    );
+  }
+
+  /// The field of a setting.
+  Widget _field(MusicSourceField field) {
+    if (field.choices.isNotEmpty) {
+      return _ChoiceField(
+        field: field,
+        value: _choiceValue(field),
+        onChanged: (value) => _selectChoice(field, value),
+      );
+    }
+
+    return TextField(
+      key: ValueKey('source-field-${field.key}'),
+      controller: _controllers[field.key],
+      obscureText: field.secret,
+      decoration: InputDecoration(
+        labelText: field.label,
+        hintText: field.hint,
+        errorText: _errors[field.key],
+        isDense: true,
+        border: const OutlineInputBorder(),
+      ),
+      keyboardType: field.numeric
+          ? const TextInputType.numberWithOptions(decimal: false)
+          : TextInputType.text,
+      maxLines: field.multiline ? 4 : 1,
+      minLines: field.multiline ? 3 : 1,
     );
   }
 
@@ -205,6 +243,7 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
         if (controller.text.trim().isNotEmpty) continue;
         controller.text = entry.value;
       }
+      if (suggestions.isNotEmpty) _advanced = true;
     });
   }
 

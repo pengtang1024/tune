@@ -156,8 +156,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('source-type-json_api')));
     await tester.pumpAndSettle();
 
-    // The type that reads an answer can be tried out before it is kept.
+    // The type that reads an answer can be tried out before it is kept. The
+    // paths are folded away: the reader meets the address first.
     expect(find.byKey(const ValueKey('source-form-try')), findsOneWidget);
+    expect(find.byKey(const ValueKey('source-field-titlePath')), findsNothing);
 
     await tester.enterText(
       find.byKey(const ValueKey('source-field-url')),

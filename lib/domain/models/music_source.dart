@@ -50,6 +50,12 @@ class MusicSourceField {
   /// An empty list leaves the setting a free text field.
   final List<MusicSourceChoice> choices;
 
+  /// Whether the setting is one that is rarely needed.
+  ///
+  /// The form keeps these out of the way until the reader asks for them: a
+  /// type with a dozen settings is a wall of boxes otherwise.
+  final bool advanced;
+
   /// The value the form starts with when nothing is filled in yet.
   ///
   /// A setting the reader has to write from scratch can start from a shape
@@ -70,6 +76,7 @@ class MusicSourceField {
     this.numeric = false,
     this.secret = false,
     this.multiline = false,
+    this.advanced = false,
     this.defaultValue = '',
     this.choices = const [],
   });

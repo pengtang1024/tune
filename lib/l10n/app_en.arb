@@ -247,6 +247,8 @@
   "sourcePreviewTry": "Try it",
   "sourcePreviewRunning": "Trying…",
   "sourcePreviewTracks": "{count} tracks found",
+  "sourceFormShowAdvanced": "More options",
+  "sourceFormHideAdvanced": "Fewer options",
   "@sourcePreviewTracks": {
     "placeholders": {
       "count": {

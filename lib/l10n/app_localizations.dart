@@ -1018,6 +1018,18 @@ abstract class AppLocalizations {
   /// **'认出 {count} 首'**
   String sourcePreviewTracks(int count);
 
+  /// No description provided for @sourceFormShowAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多选项'**
+  String get sourceFormShowAdvanced;
+
+  /// No description provided for @sourceFormHideAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起选项'**
+  String get sourceFormHideAdvanced;
+
   /// No description provided for @sourcesAutoScan.
   ///
   /// In zh_CN, this message translates to:

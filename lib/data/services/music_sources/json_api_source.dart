@@ -62,18 +62,21 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
         MusicSourceChoice('GET', 'GET'),
         MusicSourceChoice('POST', 'POST'),
       ],
+      advanced: true,
     ),
     MusicSourceField(
       'headers',
       AppStrings.instance.jsonFieldHeaders,
       AppStrings.instance.jsonFieldHeadersHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'body',
       AppStrings.instance.jsonApiFieldBody,
       AppStrings.instance.jsonApiFieldBodyHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'query',
@@ -85,6 +88,7 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
+      advanced: true,
     ),
     ...jsonMappingFields(),
   ];

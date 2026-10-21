@@ -84,12 +84,14 @@ query Tracks(\$q: String) {
       AppStrings.instance.graphqlFieldVariables,
       AppStrings.instance.graphqlFieldVariablesHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'headers',
       AppStrings.instance.jsonFieldHeaders,
       AppStrings.instance.jsonFieldHeadersHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'query',
@@ -101,6 +103,7 @@ query Tracks(\$q: String) {
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
+      advanced: true,
     ),
     ...jsonMappingFields(),
   ];

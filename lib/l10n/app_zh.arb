@@ -247,6 +247,8 @@
   "sourcePreviewTry": "试一下",
   "sourcePreviewRunning": "正在试…",
   "sourcePreviewTracks": "认出 {count} 首",
+  "sourceFormShowAdvanced": "更多选项",
+  "sourceFormHideAdvanced": "收起选项",
   "@sourcePreviewTracks": {
     "placeholders": {
       "count": {

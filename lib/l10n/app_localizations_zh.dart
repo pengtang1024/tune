@@ -509,6 +509,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get sourceFormShowAdvanced => '更多选项';
+
+  @override
+  String get sourceFormHideAdvanced => '收起选项';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -2083,6 +2089,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get sourceFormShowAdvanced => '更多选项';
+
+  @override
+  String get sourceFormHideAdvanced => '收起选项';
+
+  @override
   String get sourcesAutoScan => '启动时自动扫描';
 
   @override
@@ -3655,6 +3667,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String sourcePreviewTracks(int count) {
     return '認出 $count 首';
   }
+
+  @override
+  String get sourceFormShowAdvanced => '更多選項';
+
+  @override
+  String get sourceFormHideAdvanced => '收起選項';
 
   @override
   String get sourcesAutoScan => '啟動時自動掃描';
