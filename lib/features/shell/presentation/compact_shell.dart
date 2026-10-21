@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/shell/presentation/app_sidebar.dart';
 
@@ -46,15 +45,13 @@ class CompactShell extends StatelessWidget {
                               stops: const [0, 0.7],
                             ),
                           ),
-                          child: AnimatedSwitcher(
-                            duration: CompactTokens.standardMotion,
-                            switchInCurve: Curves.easeOutCubic,
-                            switchOutCurve: Curves.easeInCubic,
-                            child: KeyedSubtree(
-                              key: ValueKey(currentPath),
-                              child: child,
-                            ),
-                          ),
+                          // The page is not switched here. The shell hands the
+                          // navigator of the router to the page area, and the
+                          // router moves between the pages with a motion of
+                          // its own. A second switch in this place would keep
+                          // two navigators alive at the same time, and the
+                          // key of the router belongs to only one of them.
+                          child: child,
                         ),
                       ),
                     ],

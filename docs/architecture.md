@@ -39,6 +39,7 @@ presentation → application → domain
 3. `features/x/application` 可以 import 别的 feature 的 `application` / `domain`（library 调 playback 就是这样），但不 import 别人的 `presentation`。
 4. widget 只通过 provider 取状态、触发动作，不直接持有 service。
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。
+6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。
 
 ## 状态归属
 
@@ -238,6 +239,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 1. 在 `features/` 下建包，按 domain → application → presentation 的顺序。
 2. 在 `lib/app/router/app_router.dart` 注册路由。
 3. 只接这一处新入口，不要顺着别人的页面改一圈。
+4. 页面切换的动作交给路由：页面区不再另做一套切换（见「硬约束」第 6 条）。
 
 ### 加一条文案
 
