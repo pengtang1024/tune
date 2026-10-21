@@ -119,7 +119,9 @@ void main() {
     expect(find.byIcon(Icons.podcasts_rounded), findsOneWidget);
   });
 
-  testWidgets('the details sheet names every fact of a track', (tester) async {
+  testWidgets('the details sheet writes the value of every fact', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       app(
         const TrackMeta(song: lossless, index: 0),
@@ -131,21 +133,24 @@ void main() {
     await tester.pumpAndSettle();
 
     final sheet = find.byType(BottomSheet);
-    expect(find.descendant(of: sheet, matching: find.text('格式')), findsOneWidget);
+    // The chip writes the value of the fact and nothing else: the icon
+    // already says which fact it is, so writing the name of the fact again
+    // would double the words of the whole panel. The name waits in the
+    // tooltip, where the reader goes looking for it.
     expect(
-      find.descendant(of: sheet, matching: find.text('码率')),
+      find.descendant(of: sheet, matching: find.text('格式')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byTooltip('格式 · FLAC')),
       findsOneWidget,
     );
     expect(
-      find.descendant(of: sheet, matching: find.text('采样率')),
+      find.descendant(of: sheet, matching: find.byTooltip('码率 · 980 kbps')),
       findsOneWidget,
     );
     expect(
-      find.descendant(of: sheet, matching: find.text('专辑')),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: sheet, matching: find.text('许可')),
+      find.descendant(of: sheet, matching: find.byTooltip('采样率 · 96 kHz')),
       findsOneWidget,
     );
     expect(
@@ -190,7 +195,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('在线'), findsOneWidget);
-    expect(find.text('位置'), findsOneWidget);
+    expect(find.byTooltip('位置 · 在线'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -281,8 +286,9 @@ void main() {
     final sheet = find.byType(BottomSheet);
     expect(
       find.descendant(of: sheet, matching: find.text('时长')),
-      findsOneWidget,
+      findsNothing,
     );
+    expect(find.byTooltip('时长 · 4:05'), findsOneWidget);
     expect(
       find.descendant(of: sheet, matching: find.text('4:05')),
       findsOneWidget,
@@ -306,8 +312,9 @@ void main() {
     final sheet = find.byType(BottomSheet);
     expect(
       find.descendant(of: sheet, matching: find.text('来源编号')),
-      findsOneWidget,
+      findsNothing,
     );
+    expect(find.byTooltip('来源编号 · abc'), findsOneWidget);
     expect(
       find.descendant(of: sheet, matching: find.text('abc')),
       findsOneWidget,
@@ -462,7 +469,8 @@ void main() {
     await tester.tap(find.byTooltip('查看详情'));
     await tester.pumpAndSettle();
 
-    expect(find.text('格式'), findsOneWidget);
+    expect(find.text('格式'), findsNothing);
+    expect(find.byTooltip('格式 · MP3'), findsWidgets);
     expect(find.text('MP3'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

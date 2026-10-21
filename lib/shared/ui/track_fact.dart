@@ -13,7 +13,8 @@ enum FactTone { neutral, primary, secondary, tertiary, error }
 ///
 /// The same fact is read in three ways: a list row shows the icon alone, the
 /// now playing page shows the icon with the value, and the details sheet
-/// shows the icon with the name and the value.
+/// shows the icon with the value as well, the name of the fact waiting in
+/// the tooltip.
 class TrackFact {
   final String label;
   final String value;

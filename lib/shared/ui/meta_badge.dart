@@ -16,18 +16,20 @@ Color factToneColor(FactTone tone, ColorScheme colors) {
   };
 }
 
-/// A chip that carries one fact and writes its words.
+/// A chip that carries one fact and writes its value.
 ///
-/// This is the one chip in the app that writes words: the details panel names
-/// every fact of a track and gives its value, because that is the one place
+/// This is the one chip in the app that writes words: the details panel
+/// gives the value of every fact of a track, because that is the one place
 /// where a reader comes to look a track up. Everywhere else a chip keeps the
 /// words in the tooltip and shows the icon alone.
+///
+/// The chip does not write the name of the fact: the icon already says which
+/// fact this is, and the name of the fact would double the words of every
+/// chip in the panel. The name waits in the tooltip, where a reader who
+/// wants it can find it.
 class MetaChip extends StatelessWidget {
   /// The icon that lets a reader recognise the fact at a glance.
   final IconData? icon;
-
-  /// The name of the fact, such as the format of a track.
-  final String? label;
 
   /// What the fact says, such as the name of the format.
   final String? value;
@@ -41,11 +43,10 @@ class MetaChip extends StatelessWidget {
   const MetaChip({
     super.key,
     this.icon,
-    this.label,
     this.value,
     this.tooltip,
     this.tone = FactTone.neutral,
-  }) : assert(label != null || value != null);
+  }) : assert(value != null);
 
   @override
   Widget build(BuildContext context) {
@@ -69,18 +70,6 @@ class MetaChip extends StatelessWidget {
             Icon(icon, size: CompactTokens.icon12, color: color),
             const SizedBox(width: CompactTokens.space4),
           ],
-          if (label != null)
-            Text(
-              label!,
-              style: CompactTypography.mono(
-                color,
-                size: CompactTypeScale.mark,
-                weight: FontWeight.w600,
-                letterSpacing: 0.4,
-              ),
-            ),
-          if (label != null && value != null)
-            const SizedBox(width: CompactTokens.space4),
           if (value != null)
             Text(
               value!,

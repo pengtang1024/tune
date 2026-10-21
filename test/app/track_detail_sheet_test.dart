@@ -111,7 +111,7 @@ void main() {
     expect(chips, findsWidgets);
     expect(
       find.descendant(of: chips, matching: find.text('格式')),
-      findsOneWidget,
+      findsNothing,
     );
     expect(
       find.descendant(of: chips, matching: find.text('FLAC')),
