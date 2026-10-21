@@ -102,8 +102,8 @@ void main() {
     expect(cover.parent.path, lyrics.parent.path);
   });
 
-  test('the covers of the tracks that were not fetched go into one place', () async {
-    final folder = await paths.coverCacheFolder();
+  test('the covers of the tracks that were not fetched go into one place', () {
+    final folder = paths.coverCacheFolder();
 
     expect(folder.path, path.join(root.path, '.tune', 'artwork'));
   });

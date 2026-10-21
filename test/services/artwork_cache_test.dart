@@ -90,6 +90,18 @@ void main() {
     expect(adapter.calls, 1);
   });
 
+  test('the file of a cover that was fetched is known', () async {
+    final cache = cacheWith(FakeAdapter());
+
+    expect(cache.coverFileFor('https://example.com/cover.png'), isNull);
+
+    await cache.imageFor('https://example.com/cover.png');
+
+    final file = cache.coverFileFor('https://example.com/cover.png');
+    expect(file, isNotNull);
+    expect(File(file!).existsSync(), isTrue);
+  });
+
   test('a cover that cannot be fetched is not stored', () async {
     final adapter = FakeAdapter(missing: true);
     final cache = cacheWith(adapter);
