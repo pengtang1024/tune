@@ -220,7 +220,7 @@
   "jsonFieldUrlTemplate": "播放地址模板",
   "jsonFieldPathHint": "响应里的路径，逐段用点分开，如 data.title",
   "jsonFieldUrlTemplateHint": "播放地址的模板，曲目 id 会填进占位处",
-  "jsonFieldQueryHint": "搜索用的关键词，会替换请求里的占位符",
+  "jsonFieldQueryHint": "搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次",
   "jsonFieldUrl": "接口地址",
   "jsonFieldUrlHint": "例如 https://example.com/api/search",
   "jsonFieldHeaders": "请求头",

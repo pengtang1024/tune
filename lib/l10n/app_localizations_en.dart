@@ -453,7 +453,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jsonFieldQueryHint =>
-      'The keyword to search with; it replaces the placeholder in the request';
+      'The keyword to search with; it replaces the placeholder in the request. Leave it empty to ask the address as it is written';
 
   @override
   String get jsonFieldUrl => 'API address';

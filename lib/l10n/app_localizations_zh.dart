@@ -425,7 +425,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
 
   @override
-  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次';
 
   @override
   String get jsonFieldUrl => '接口地址';
@@ -1998,7 +1998,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jsonFieldUrlTemplateHint => '播放地址的模板，曲目 id 会填进占位处';
 
   @override
-  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符';
+  String get jsonFieldQueryHint => '搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次';
 
   @override
   String get jsonFieldUrl => '接口地址';
@@ -3571,7 +3571,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jsonFieldUrlTemplateHint => '播放網址的範本，曲目 id 會填進佔位處';
 
   @override
-  String get jsonFieldQueryHint => '搜尋用的關鍵字，會替換請求裡的佔位符';
+  String get jsonFieldQueryHint => '搜尋用的關鍵字，會替換請求裡的佔位符；留空就按網址原樣問一次';
 
   @override
   String get jsonFieldUrl => '介面網址';

@@ -335,6 +335,22 @@ void main() {
       expect(result.message, isNotNull);
     });
 
+    test('a source without a keyword asks the address as it is written', () async {
+      final adapter = FakeHttpAdapter()..body = jsonEncode({'songs': []});
+
+      await JsonApiSourceAdapter(dio: dioOf(adapter)).scan(
+        MusicSourceScanRequest(
+          config: config({
+            'url': 'https://example.com/search?q=\${query}',
+            'titlePath': 'title',
+            'urlPath': 'url',
+          }),
+        ),
+      );
+
+      expect(adapter.requestedUrls.single, 'https://example.com/search?q=');
+    });
+
     test('a source without an address path asks for one', () async {
       final result = await JsonApiSourceAdapter(dio: Dio()).scan(
         MusicSourceScanRequest(

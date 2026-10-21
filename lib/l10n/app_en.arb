@@ -220,7 +220,7 @@
   "jsonFieldUrlTemplate": "Stream address template",
   "jsonFieldPathHint": "The path in the answer, steps separated by dots, e.g. data.title",
   "jsonFieldUrlTemplateHint": "The template of the stream address; the track id is written into the placeholder",
-  "jsonFieldQueryHint": "The keyword to search with; it replaces the placeholder in the request",
+  "jsonFieldQueryHint": "The keyword to search with; it replaces the placeholder in the request. Leave it empty to ask the address as it is written",
   "jsonFieldUrl": "API address",
   "jsonFieldUrlHint": "e.g. https://example.com/api/search",
   "jsonFieldHeaders": "Headers",

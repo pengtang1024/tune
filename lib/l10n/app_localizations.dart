@@ -859,7 +859,7 @@ abstract class AppLocalizations {
   /// No description provided for @jsonFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'搜索用的关键词，会替换请求里的占位符'**
+  /// **'搜索用的关键词，会替换请求里的占位符；留空就按地址原样问一次'**
   String get jsonFieldQueryHint;
 
   /// No description provided for @jsonFieldUrl.
