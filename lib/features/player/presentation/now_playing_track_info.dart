@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
@@ -23,7 +25,7 @@ import 'package:tune/shared/ui/track_facts.dart';
 /// than the window was built for. The page keeps its progress bar and its
 /// buttons in sight and lets the words give way, instead of running them
 /// over the edge of the window.
-class NowPlayingTrackInfo extends StatelessWidget {
+class NowPlayingTrackInfo extends ConsumerWidget {
   const NowPlayingTrackInfo({
     super.key,
     required this.song,
@@ -38,7 +40,14 @@ class NowPlayingTrackInfo extends StatelessWidget {
   final double progress;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorites = ref.watch(favoritesControllerProvider);
+    final isFavorite = favorites.contains(song.uri);
+
+    void toggleFavorite() {
+      ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+    }
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,8 +58,13 @@ class NowPlayingTrackInfo extends StatelessWidget {
               SourceBadge(
                 label: source,
                 dense: false,
-                onTap: () =>
-                    showTrackDetailSheet(context, song, source: source),
+                onTap: () => showTrackDetailSheet(
+                  context,
+                  song,
+                  source: source,
+                  isFavorite: isFavorite,
+                  onToggleFavorite: toggleFavorite,
+                ),
               ),
               const SizedBox(width: CompactTokens.space8),
               // The badge tells where the sound comes from, so it belongs
@@ -64,7 +78,12 @@ class NowPlayingTrackInfo extends StatelessWidget {
           const SizedBox(height: CompactTokens.space8),
           _Artist(song: song),
           const SizedBox(height: CompactTokens.space14),
-          _TrackDetails(song: song, source: source),
+          _TrackDetails(
+            song: song,
+            source: source,
+            isFavorite: isFavorite,
+            onToggleFavorite: toggleFavorite,
+          ),
         ],
       ),
     );
@@ -149,10 +168,17 @@ class _Artist extends StatelessWidget {
 /// whatever the values are. The mouse names a fact and the details panel
 /// writes all of them down.
 class _TrackDetails extends StatelessWidget {
-  const _TrackDetails({required this.song, required this.source});
+  const _TrackDetails({
+    required this.song,
+    required this.source,
+    required this.isFavorite,
+    required this.onToggleFavorite,
+  });
 
   final Song song;
   final SourceLabel? source;
+  final bool isFavorite;
+  final VoidCallback? onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -183,8 +209,13 @@ class _TrackDetails extends StatelessWidget {
                 tooltip: fact.sentence,
                 tone: fact.tone,
                 size: 15,
-                onTap: () =>
-                    showTrackDetailSheet(context, song, source: source),
+                onTap: () => showTrackDetailSheet(
+                  context,
+                  song,
+                  source: source,
+                  isFavorite: isFavorite,
+                  onToggleFavorite: onToggleFavorite,
+                ),
               ),
           ],
         ),
