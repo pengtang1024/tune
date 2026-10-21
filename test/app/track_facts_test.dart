@@ -516,6 +516,23 @@ void main() {
     expect(find.text('FLAC'), findsOneWidget);
   });
 
+  testWidgets('a chip with a long value gives up its room', (tester) async {
+    await tester.pumpWidget(
+      app(
+        const SizedBox(
+          width: 180,
+          child: MetaChip(
+            label: '来源',
+            value: '一个名字很长的音源，它比这个 chip 本身宽得多',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the state of a source is a chip and its numbers wait in the tip', (
     tester,
   ) async {

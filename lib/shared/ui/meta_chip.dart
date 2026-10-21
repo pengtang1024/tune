@@ -77,12 +77,19 @@ class MetaChip extends StatelessWidget {
             ),
           if (label != null && value != null) const SizedBox(width: 4),
           if (value != null)
-            Text(
-              value!,
-              style: CompactTypography.mono(
-                theme.colorScheme.onSurface,
-                size: CompactTypeScale.mark,
-                letterSpacing: 0.3,
+            // The value is the part that can run long (the name of a source, a
+            // genre list), so it is the part that gives up its room when the
+            // chip does not fit. The name of the fact stays whole.
+            Flexible(
+              child: Text(
+                value!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurface,
+                  size: CompactTypeScale.mark,
+                  letterSpacing: 0.3,
+                ),
               ),
             ),
         ],
