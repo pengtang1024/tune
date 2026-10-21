@@ -166,6 +166,22 @@ class MusicSourceService implements StreamUrlResolver {
     );
   }
 
+  /// Asks a source what it would make of a configuration, without keeping it.
+  ///
+  /// The reader tries a mapping out before it saves it. Nothing is stored and
+  /// no scan timestamp moves: the answer is asked for once and thrown away.
+  Future<SourcePreview?> preview(MusicSourceConfig config) async {
+    final adapter = _adapters[config.sourceType];
+    if (adapter == null) return null;
+
+    try {
+      return await adapter.preview(config);
+    } catch (error, stackTrace) {
+      Log.error('试音源配置失败: $error\n$stackTrace');
+      return null;
+    }
+  }
+
   bool isConfigured(MusicSourceConfig config) {
     return _adapters[config.sourceType]?.isConfigured(config) ?? false;
   }

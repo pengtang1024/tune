@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
+import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/presentation/source_preview_panel.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 /// The form of a source: the fields its type declares.
@@ -51,13 +55,22 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
   late final TextEditingController _name;
   final Map<String, String> _errors = {};
 
+  /// Whether the settings that are rarely needed are shown.
+  bool _advanced = false;
+
+  /// Whether a trial of the settings is running.
+  bool _previewing = false;
+
+  /// What the last trial brought.
+  SourcePreview? _preview;
+
   @override
   void initState() {
     super.initState();
     _controllers = {
       for (final field in widget.fields)
         field.key: TextEditingController(
-          text: widget.source?.setting(field.key) ?? '',
+          text: widget.source?.setting(field.key) ?? field.defaultValue,
         ),
     };
     _name = TextEditingController(text: widget.source?.name ?? '');
@@ -79,6 +92,25 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
   bool get _editsName {
     final source = widget.source;
     return source == null || !source.builtIn;
+  }
+
+  /// The settings the reader filled in first.
+  List<MusicSourceField> get _basicFields => widget.fields
+      .where((field) => !field.advanced)
+      .toList(growable: false);
+
+  /// The settings that are rarely needed.
+  List<MusicSourceField> get _advancedFields => widget.fields
+      .where((field) => field.advanced)
+      .toList(growable: false);
+
+  /// Whether the type of the source can be tried out before it is kept.
+  bool get _canPreview {
+    final type = widget.type?.type ?? widget.source?.sourceType;
+    if (type == null) return false;
+
+    final service = ref.read(musicSourceServiceProvider);
+    return service.adapterFor(type)?.supportsPreview ?? false;
   }
 
   @override
@@ -104,32 +136,32 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
                 ),
                 const SizedBox(height: 10),
               ],
-              for (final field in widget.fields) ...[
-                if (field.choices.isNotEmpty)
-                  _ChoiceField(
-                    field: field,
-                    value: _choiceValue(field),
-                    onChanged: (value) => _selectChoice(field, value),
-                  )
-                else
-                  TextField(
-                    key: ValueKey('source-field-${field.key}'),
-                    controller: _controllers[field.key],
-                    obscureText: field.secret,
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      hintText: field.hint,
-                      errorText: _errors[field.key],
-                      isDense: true,
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: field.numeric
-                        ? const TextInputType.numberWithOptions(decimal: false)
-                        : TextInputType.text,
-                    maxLines: field.multiline ? 4 : 1,
-                    minLines: field.multiline ? 3 : 1,
-                  ),
+              for (final field in _basicFields) ...[
+                _field(field),
                 const SizedBox(height: 10),
+              ],
+              if (_advancedFields.isNotEmpty) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    key: const ValueKey('source-form-advanced'),
+                    onPressed: () => setState(() => _advanced = !_advanced),
+                    child: Text(
+                      _advanced
+                          ? context.loc.sourceFormHideAdvanced
+                          : context.loc.sourceFormShowAdvanced,
+                    ),
+                  ),
+                ),
+                if (_advanced)
+                  for (final field in _advancedFields) ...[
+                    _field(field),
+                    const SizedBox(height: 10),
+                  ],
+              ],
+              if (_previewing || _preview != null) ...[
+                const SizedBox(height: CompactTokens.space8),
+                SourcePreviewPanel(running: _previewing, preview: _preview),
               ],
             ],
           ),
@@ -140,6 +172,12 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(context.loc.cancel),
         ),
+        if (_canPreview)
+          TextButton(
+            key: const ValueKey('source-form-try'),
+            onPressed: _previewing ? null : _try,
+            child: Text(context.loc.sourcePreviewTry),
+          ),
         FilledButton(
           key: const ValueKey('source-form-save'),
           onPressed: _save,
@@ -149,14 +187,99 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
     );
   }
 
+  /// The field of a setting.
+  Widget _field(MusicSourceField field) {
+    if (field.choices.isNotEmpty) {
+      return _ChoiceField(
+        field: field,
+        value: _choiceValue(field),
+        onChanged: (value) => _selectChoice(field, value),
+      );
+    }
+
+    return TextField(
+      key: ValueKey('source-field-${field.key}'),
+      controller: _controllers[field.key],
+      obscureText: field.secret,
+      decoration: InputDecoration(
+        labelText: field.label,
+        hintText: field.hint,
+        errorText: _errors[field.key],
+        isDense: true,
+        border: const OutlineInputBorder(),
+      ),
+      keyboardType: field.numeric
+          ? const TextInputType.numberWithOptions(decimal: false)
+          : TextInputType.text,
+      maxLines: field.multiline ? 4 : 1,
+      minLines: field.multiline ? 3 : 1,
+    );
+  }
+
+  /// Asks the source what it would make of the settings the reader wrote.
+  ///
+  /// The paths the app could read are written into the form, and the tracks
+  /// the answer holds are shown. Nothing is saved: a wrong guess costs the
+  /// reader a click and nothing else.
+  Future<void> _try() async {
+    setState(() {
+      _previewing = true;
+      _preview = null;
+    });
+
+    final preview = await ref
+        .read(musicSourcesControllerProvider.notifier)
+        .previewMapping(_configOfTheForm());
+
+    if (!mounted) return;
+
+    final suggestions = preview?.suggestions ?? const <String, String>{};
+    setState(() {
+      _previewing = false;
+      _preview = preview;
+      for (final entry in suggestions.entries) {
+        final controller = _controllers[entry.key];
+        if (controller == null) continue;
+        if (controller.text.trim().isNotEmpty) continue;
+        controller.text = entry.value;
+      }
+      if (suggestions.isNotEmpty) _advanced = true;
+    });
+  }
+
+  /// The configuration the form writes right now.
+  ///
+  /// The trial runs on what is written, not on what is saved: the reader
+  /// tries a mapping out before it keeps it.
+  MusicSourceConfig _configOfTheForm() {
+    final source = widget.source;
+    final type = widget.type?.type ?? source!.sourceType;
+
+    return MusicSourceConfig(
+      id: source?.id ?? '$type-preview',
+      type: type,
+      name: _name.text,
+      kind: source?.kind ?? widget.type!.kind,
+      settings: _settings(),
+    );
+  }
+
+  /// The settings the form holds right now.
+  Map<String, String> _settings() {
+    return {
+      for (final field in widget.fields)
+        field.key: field.choices.isEmpty
+            ? (_controllers[field.key]?.text.trim() ?? '')
+            : _choiceValue(field),
+    };
+  }
+
   Future<void> _save() async {
     _errors.clear();
-    final settings = <String, String>{};
+    final settings = _settings();
 
     for (final field in widget.fields) {
-      final value = field.choices.isEmpty
-          ? (_controllers[field.key]?.text.trim() ?? '')
-          : _choiceValue(field);
+      final value = settings[field.key] ?? '';
       if (field.required && value.isEmpty) {
         _errors[field.key] = context.loc.sourcesFieldRequired(field.label);
       }

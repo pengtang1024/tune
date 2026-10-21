@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/json_mapping_guess.dart';
 import 'package:tune/data/services/music_sources/json_source_mapping.dart';
 import 'package:tune/data/services/music_sources/json_values.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -31,6 +32,9 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
   String get sourceType => 'json_api';
 
   @override
+  bool get supportsPreview => true;
+
+  @override
   bool isConfigured(MusicSourceConfig config) {
     return config.setting('url') != null &&
         JsonSourceMapping.of(config).hasAddress;
@@ -58,30 +62,33 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
         MusicSourceChoice('GET', 'GET'),
         MusicSourceChoice('POST', 'POST'),
       ],
+      advanced: true,
     ),
     MusicSourceField(
       'headers',
       AppStrings.instance.jsonFieldHeaders,
       AppStrings.instance.jsonFieldHeadersHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'body',
       AppStrings.instance.jsonApiFieldBody,
       AppStrings.instance.jsonApiFieldBodyHint,
       multiline: true,
+      advanced: true,
     ),
     MusicSourceField(
       'query',
-      AppStrings.instance.fieldQuery,
+      AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.jsonFieldQueryHint,
-      required: true,
     ),
     MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
+      advanced: true,
     ),
     ...jsonMappingFields(),
   ];
@@ -117,9 +124,7 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
     final keyword = config.setting('query') ?? '';
     final post = _isPost(config);
     try {
-      final headers = parseJsonHeaders(config.setting('headers') ?? '');
-      final body = _body(config, keyword);
-      final answer = _decode(await _send(url, keyword, headers, body, post));
+      final answer = await _answer(config, keyword, post);
 
       final songs = mapping.songs(
         answer,
@@ -142,6 +147,41 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(config.id, error);
     }
+  }
+
+  @override
+  Future<SourcePreview?> preview(MusicSourceConfig config) async {
+    final url = config.setting('url');
+    if (url == null) return null;
+
+    try {
+      final keyword = config.setting('query') ?? '';
+      final answer = await _answer(config, keyword, _isPost(config));
+
+      final current = JsonSourceMapping.of(config);
+      final guessed = guessJsonMapping(answer, current: current);
+      final songs = guessed.songs(answer, sourceId: config.id, limit: 5);
+
+      return SourcePreview(
+        songs: songs,
+        suggestions: jsonPathSuggestions(current: current, guessed: guessed),
+        message: songs.isEmpty ? AppStrings.instance.jsonPreviewNoTracks : null,
+      );
+    } catch (error) {
+      return SourcePreview(message: describeSourceError(error));
+    }
+  }
+
+  /// The answer of the interface, decoded.
+  Future<Object?> _answer(
+    MusicSourceConfig config,
+    String keyword,
+    bool post,
+  ) async {
+    final url = config.setting('url')!;
+    final headers = parseJsonHeaders(config.setting('headers') ?? '');
+    final body = _body(config, keyword);
+    return _decode(await _send(url, keyword, headers, body, post));
   }
 
   /// The request, in the way the reader asked for it.

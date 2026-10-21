@@ -453,7 +453,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jsonFieldQueryHint =>
-      'The keyword to search with; it replaces the placeholder in the request';
+      'The keyword to search with; it replaces the placeholder in the request. Leave it empty to ask the address as it is written';
 
   @override
   String get jsonFieldUrl => 'API address';
@@ -521,7 +521,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get graphqlFieldQueryHint =>
-      'A GraphQL query document; the conditions live in it';
+      'A GraphQL query document; the conditions live in it. The template is only a starting point: change the fields to the ones the interface has';
 
   @override
   String get graphqlFieldVariables => 'Variables';
@@ -529,6 +529,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get graphqlFieldVariablesHint =>
       'A JSON object; the keyword is written into the placeholder';
+
+  @override
+  String get jsonPreviewNoTracks => 'No tracks found in the answer';
+
+  @override
+  String get sourcePreviewTry => 'Try it';
+
+  @override
+  String get sourcePreviewRunning => 'Trying…';
+
+  @override
+  String sourcePreviewTracks(int count) {
+    return '$count tracks found';
+  }
+
+  @override
+  String get sourceFormShowAdvanced => 'More options';
+
+  @override
+  String get sourceFormHideAdvanced => 'Fewer options';
 
   @override
   String get sourcesAutoScan => 'Scan on startup';

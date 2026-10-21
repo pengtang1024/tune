@@ -4,6 +4,7 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/utils/logger.dart';
@@ -155,6 +156,17 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
     ]);
     state = AsyncData(_current.copyWith(sources: updated));
     await _save(updated);
+  }
+
+  /// Asks the type of a configuration what it would make of it.
+  ///
+  /// The reader tries a mapping out before it keeps it: the interface is
+  /// asked once, nothing is saved and no track is added.
+  Future<SourcePreview?> previewMapping(MusicSourceConfig config) async {
+    if (_disposed) return null;
+
+    final service = ref.read(musicSourceServiceProvider);
+    return service.preview(config);
   }
 
   /// Removes an instance the reader added.

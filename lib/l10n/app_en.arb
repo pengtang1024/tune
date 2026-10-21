@@ -220,7 +220,7 @@
   "jsonFieldUrlTemplate": "Stream address template",
   "jsonFieldPathHint": "The path in the answer, steps separated by dots, e.g. data.title",
   "jsonFieldUrlTemplateHint": "The template of the stream address; the track id is written into the placeholder",
-  "jsonFieldQueryHint": "The keyword to search with; it replaces the placeholder in the request",
+  "jsonFieldQueryHint": "The keyword to search with; it replaces the placeholder in the request. Leave it empty to ask the address as it is written",
   "jsonFieldUrl": "API address",
   "jsonFieldUrlHint": "e.g. https://example.com/api/search",
   "jsonFieldHeaders": "Headers",
@@ -240,9 +240,22 @@
   "sourceGraphqlDescription": "Ask the interface with a query document; the conditions live in the document",
   "graphqlHint": "Fill in the address, the query document and the paths of the fields",
   "graphqlFieldQuery": "Query document",
-  "graphqlFieldQueryHint": "A GraphQL query document; the conditions live in it",
+  "graphqlFieldQueryHint": "A GraphQL query document; the conditions live in it. The template is only a starting point: change the fields to the ones the interface has",
   "graphqlFieldVariables": "Variables",
   "graphqlFieldVariablesHint": "A JSON object; the keyword is written into the placeholder",
+  "jsonPreviewNoTracks": "No tracks found in the answer",
+  "sourcePreviewTry": "Try it",
+  "sourcePreviewRunning": "Trying…",
+  "sourcePreviewTracks": "{count} tracks found",
+  "sourceFormShowAdvanced": "More options",
+  "sourceFormHideAdvanced": "Fewer options",
+  "@sourcePreviewTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sourcesAutoScan": "Scan on startup",
   "sourcesAutoScanDescription": "Every enabled source refreshes on startup. A failure never touches your local library.",
   "sourcesScanMayTakeSeconds": "Remote sources can take a few seconds",
