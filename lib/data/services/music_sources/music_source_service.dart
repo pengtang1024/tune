@@ -6,11 +6,15 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
+import 'package:tune/data/services/music_sources/direct_url_source.dart';
+import 'package:tune/data/services/music_sources/graphql_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
+import 'package:tune/data/services/music_sources/json_api_source.dart';
 import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/jellyfin_source.dart';
 import 'package:tune/data/services/music_sources/local_directory_source.dart';
+import 'package:tune/data/services/music_sources/m3u_source.dart';
 import 'package:tune/data/services/music_sources/lrclib_lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -18,6 +22,7 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
+import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
@@ -68,6 +73,10 @@ class MusicSourceService implements StreamUrlResolver {
       'radio': RadioSourceAdapter(dio: dio),
       'wikimedia': WikimediaSourceAdapter(dio: dio),
       'jellyfin': JellyfinSourceAdapter(dio: dio),
+      'direct_url': DirectUrlSourceAdapter(),
+      'm3u': M3uSourceAdapter(dio: dio),
+      'json_api': JsonApiSourceAdapter(dio: dio),
+      'graphql': GraphqlSourceAdapter(dio: dio),
     };
   }
 
@@ -107,13 +116,37 @@ class MusicSourceService implements StreamUrlResolver {
     }
   }
 
-  List<MusicSourceField> fieldsFor(MusicSourceConfig config) {
-    final adapter = _adapters[config.sourceType];
+  /// The fields the form of a type renders.
+  ///
+  /// The fields come from the type, so the interface knows no setting of any
+  /// source: it only shows what the type declares.
+  List<MusicSourceField> fieldsForType(String type) {
+    final adapter = _adapters[type];
     if (adapter == null) return const [];
     return [
       if (adapter.browseModes.isNotEmpty) _browseField(adapter),
       ...adapter.configurationFields,
     ];
+  }
+
+  List<MusicSourceField> fieldsFor(MusicSourceConfig config) {
+    return fieldsForType(config.sourceType);
+  }
+
+  /// The types the reader can add an instance of.
+  ///
+  /// The registry says which types are served; the catalogue says how they
+  /// are named and whether they can be repeated. The local music folder is
+  /// not among them: it is a setting of the app, not an instance.
+  List<SourceTypeDescriptor> get addableTypes {
+    final catalogue = SourceTypeCatalogue.byType(AppStrings.instance);
+    final result = <SourceTypeDescriptor>[];
+    for (final adapter in _adapters.values) {
+      final descriptor = catalogue[adapter.sourceType];
+      if (descriptor == null || !descriptor.addable) continue;
+      result.add(descriptor);
+    }
+    return result;
   }
 
   /// The field that picks the browse stream of an instance.

@@ -1,8 +1,13 @@
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
-/// Built-in source definitions.
+/// Built-in source instances.
+///
+/// An instance is a configuration that came with the app: it can be switched
+/// off and configured, but not deleted. The type it belongs to says how it
+/// fetches its tracks, and the catalogue of the types says how it is named.
 ///
 /// Sources that need credentials start disabled; sources that work without a
 /// key are enabled so startup auto-scan can pick them up immediately.
@@ -13,94 +18,24 @@ import 'package:tune/l10n/app_localizations.dart';
 class BuiltInMusicSources {
   const BuiltInMusicSources._();
 
-  /// The catalogue of the built-in sources in the language of the app.
+  /// The catalogue of the built-in instances in the language of the app.
   static List<MusicSourceConfig> get defaults => of(AppStrings.instance);
 
-  /// The catalogue of the built-in sources in a language.
+  /// The catalogue of the built-in instances in a language.
   static List<MusicSourceConfig> of(AppLocalizations strings) {
+    final types = SourceTypeCatalogue.byType(strings);
     return [
-      MusicSourceConfig(
-        id: 'local',
-        type: 'local',
-        builtIn: true,
-        name: strings.sourceLocalName,
-        description: strings.sourceLocalDescription,
-        kind: MusicSourceKind.localDirectory,
-      ),
-      MusicSourceConfig(
-        id: 'openverse',
-        type: 'openverse',
-        builtIn: true,
-        name: 'Openverse',
-        localizedName: strings.sourceOpenverseName,
-        description: strings.sourceOpenverseDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'jamendo',
-        type: 'jamendo',
-        builtIn: true,
-        name: 'Jamendo',
-        localizedName: strings.sourceJamendoName,
-        description: strings.sourceJamendoDescription,
-        kind: MusicSourceKind.openCatalog,
-        enabled: false,
-        settings: {'format': 'mp32'},
-      ),
-      MusicSourceConfig(
-        id: 'internet_archive',
-        type: 'internet_archive',
-        builtIn: true,
-        name: 'Internet Archive',
-        localizedName: strings.sourceInternetArchiveName,
-        description: strings.sourceInternetArchiveDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'netease',
-        type: 'netease',
-        builtIn: true,
-        name: strings.sourceNeteaseName,
-        description: strings.sourceNeteaseDescription,
-        kind: MusicSourceKind.openApi,
-        enabled: false,
-      ),
-      MusicSourceConfig(
-        id: 'ccmixter',
-        type: 'ccmixter',
-        builtIn: true,
-        name: 'ccMixter',
-        localizedName: strings.sourceCcmixterName,
-        description: strings.sourceCcmixterDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'itunes',
-        type: 'itunes',
-        builtIn: true,
-        name: 'iTunes',
-        localizedName: strings.sourceItunesName,
-        description: strings.sourceItunesDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'podcast_rss',
-        type: 'podcast_rss',
-        builtIn: true,
-        name: strings.sourcePodcastRssName,
-        description: strings.sourcePodcastRssDescription,
-        kind: MusicSourceKind.openApi,
-        enabled: false,
-        settings: {'feed': ''},
-      ),
-      MusicSourceConfig(
-        id: 'subsonic',
-        type: 'subsonic',
-        builtIn: true,
-        name: 'Subsonic',
-        localizedName: strings.sourceSubsonicName,
-        description: strings.sourceSubsonicDescription,
-        kind: MusicSourceKind.openApi,
+      _instance(types, 'local'),
+      _instance(types, 'openverse'),
+      _instance(types, 'jamendo', enabled: false, settings: {'format': 'mp32'}),
+      _instance(types, 'internet_archive'),
+      _instance(types, 'netease', enabled: false),
+      _instance(types, 'ccmixter'),
+      _instance(types, 'itunes'),
+      _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
+      _instance(
+        types,
+        'subsonic',
         enabled: false,
         settings: {
           'server': '',
@@ -109,57 +44,47 @@ class BuiltInMusicSources {
           'format': 'original',
         },
       ),
-      MusicSourceConfig(
-        id: 'audius',
-        type: 'audius',
-        builtIn: true,
-        name: 'Audius',
-        localizedName: strings.sourceAudiusName,
-        description: strings.sourceAudiusDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'radio',
-        type: 'radio',
-        builtIn: true,
-        name: strings.sourceRadioName,
-        description: strings.sourceRadioDescription,
-        kind: MusicSourceKind.openCatalog,
-        settings: {'provider': 'all', 'query': ''},
-      ),
-      MusicSourceConfig(
-        id: 'wikimedia',
-        type: 'wikimedia',
-        builtIn: true,
-        name: 'Wikimedia Commons',
-        localizedName: strings.sourceWikimediaName,
-        description: strings.sourceWikimediaDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      MusicSourceConfig(
-        id: 'jellyfin',
-        type: 'jellyfin',
-        builtIn: true,
-        name: 'Jellyfin',
-        localizedName: strings.sourceJellyfinName,
-        description: strings.sourceJellyfinDescription,
-        kind: MusicSourceKind.openApi,
+      _instance(types, 'audius'),
+      _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
+      _instance(types, 'wikimedia'),
+      _instance(
+        types,
+        'jellyfin',
         enabled: false,
         settings: {'server': '', 'user': '', 'password': ''},
       ),
     ];
   }
 
-  /// The catalogue of the built-in sources in a language, keyed by its type.
+  /// The built-in instance of a type.
   ///
-  /// A built-in source and its type share the same key, so the catalogue
-  /// answers for the type: an instance the user added of a built-in type
-  /// borrows the same name and the same icon.
+  /// The id of a built-in instance is its type, so the two are one key.
+  static MusicSourceConfig _instance(
+    Map<String, SourceTypeDescriptor> types,
+    String type, {
+    bool enabled = true,
+    Map<String, String> settings = const {},
+  }) {
+    final descriptor = types[type]!;
+    return MusicSourceConfig(
+      id: type,
+      type: type,
+      builtIn: true,
+      name: descriptor.name,
+      localizedName: descriptor.localizedName,
+      description: descriptor.description,
+      kind: descriptor.kind,
+      enabled: enabled,
+      settings: settings,
+    );
+  }
+
+  /// The catalogue of the built-in instances in a language, keyed by its id.
   static Map<String, MusicSourceConfig> catalogueOf(AppLocalizations strings) {
     return {for (final config in of(strings)) config.id: config};
   }
 
-  /// The catalogue entry of a built-in source in the language of the app.
+  /// The catalogue entry of a built-in instance in the language of the app.
   static MusicSourceConfig? descriptorOf(String id) {
     return catalogueOf(AppStrings.instance)[id];
   }
@@ -188,9 +113,10 @@ class BuiltInMusicSources {
 
   /// The name of a source in a language.
   ///
-  /// A source the user imported keeps the name it was given; only the
-  /// built-in ones are named by the catalogue.
+  /// A source the reader added keeps the name it was given; only the built-in
+  /// ones are named by the catalogue.
   static String nameOf(MusicSourceConfig config, AppLocalizations strings) {
+    if (!config.builtIn) return config.name;
     return catalogueOf(strings)[config.sourceType]?.name ?? config.name;
   }
 
@@ -199,6 +125,7 @@ class BuiltInMusicSources {
     MusicSourceConfig config,
     AppLocalizations strings,
   ) {
+    if (!config.builtIn) return config.description;
     return catalogueOf(strings)[config.sourceType]?.description ?? config.description;
   }
 
@@ -241,7 +168,7 @@ class BuiltInMusicSources {
   /// The source of a self-hosted media library.
   static MusicSourceConfig get jellyfin => _entry('jellyfin');
 
-  /// The catalogue entry of a built-in source.
+  /// The catalogue entry of a built-in instance.
   static MusicSourceConfig _entry(String id) {
     final entry = descriptorOf(id);
     if (entry == null) throw StateError('unknown built-in source: $id');

@@ -5,6 +5,7 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
+import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/source_mark.dart';
@@ -163,6 +164,56 @@ void main() {
       expect(
         sourceIconOf(instance.sourceType, instance.kind),
         sourceIconOf('jamendo', MusicSourceKind.openCatalog),
+      );
+    });
+  });
+
+  group('the catalogue of the types', () {
+    test('every type the app serves is named', () {
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final catalogue = SourceTypeCatalogue.byType(english);
+
+      for (final adapter in service.adapters) {
+        expect(
+          catalogue.containsKey(adapter.sourceType),
+          isTrue,
+          reason: '${adapter.sourceType} is served but the catalogue does not name it',
+        );
+      }
+    });
+
+    test('the type the reader adds is the one the type says', () {
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final addable = service.addableTypes;
+
+      // The local folder is a setting of the app, not an instance the reader
+      // adds.
+      expect(
+        addable.where((type) => type.type == 'local'),
+        isEmpty,
+      );
+      expect(
+        addable.where((type) => type.type == 'direct_url'),
+        hasLength(1),
+      );
+      expect(
+        addable.where((type) => type.type == 'm3u'),
+        hasLength(1),
+      );
+      expect(
+        addable.where((type) => type.type == 'json_api'),
+        hasLength(1),
+      );
+      expect(
+        addable.where((type) => type.type == 'graphql'),
+        hasLength(1),
       );
     });
   });

@@ -352,8 +352,9 @@ class FakeMusicSourcesController extends MusicSourcesController {
   @override
   Future<void> updateSettings(
     String sourceId,
-    Map<String, String> settings,
-  ) async {
+    Map<String, String> settings, {
+    String? name,
+  }) async {
     settingsChanges[sourceId] = Map.of(settings);
     final current = state.valueOrNull ?? seed;
     state = AsyncData(

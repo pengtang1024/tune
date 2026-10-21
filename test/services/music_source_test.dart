@@ -79,9 +79,19 @@ void main() {
         store: MusicSourceStore(FakePersistenceService()),
       );
 
+      // Every built-in instance is served by an adapter. A type the reader
+      // adds comes without an instance, so the two are not the same set.
+      final builtIn = BuiltInMusicSources.defaults;
+      for (final source in builtIn) {
+        expect(
+          service.supports(source.sourceType),
+          isTrue,
+          reason: '${source.sourceType} has no adapter',
+        );
+      }
       expect(
         service.adapters.map((adapter) => adapter.sourceType).toSet(),
-        BuiltInMusicSources.defaults.map((source) => source.id).toSet(),
+        containsAll(builtIn.map((source) => source.sourceType).toSet()),
       );
       expect(service.supports('openverse'), isTrue);
       expect(service.supports('missing_source'), isFalse);

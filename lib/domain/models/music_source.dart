@@ -50,6 +50,12 @@ class MusicSourceField {
   /// An empty list leaves the setting a free text field.
   final List<MusicSourceChoice> choices;
 
+  /// Whether the value spans several lines.
+  ///
+  /// A setting that holds a list — a line of addresses, a header — is read
+  /// better in a box than in a single line.
+  final bool multiline;
+
   const MusicSourceField(
     this.key,
     this.label,
@@ -57,8 +63,54 @@ class MusicSourceField {
     this.required = false,
     this.numeric = false,
     this.secret = false,
+    this.multiline = false,
     this.choices = const [],
   });
+}
+
+/// The id and the name of a new instance of [type].
+///
+/// Instances of one type are told apart by a number: the first is `type-1`,
+/// the next is `type-2`. The number is the smallest one not in use, so
+/// deleting an instance does not push the others around.
+///
+/// The number is joined with a dash and not with a colon: the id of an
+/// instance is the host of the `tune://` address of its tracks, and a colon
+/// in a host reads as the port.
+///
+/// The name is what the reader sees. An empty name falls back to the name of
+/// the type and the number of the instance, so two instances of one type
+/// never carry the same name.
+({String id, String name}) newSourceInstance({
+  required String type,
+  required String typeName,
+  required String name,
+  required Iterable<MusicSourceConfig> sources,
+}) {
+  final used = <int>{};
+  for (final source in sources) {
+    if (source.sourceType != type) continue;
+    final index = _instanceNumber(source.id);
+    if (index != null) used.add(index);
+  }
+
+  var number = 1;
+  while (used.contains(number)) {
+    number++;
+  }
+
+  final trimmed = name.trim();
+  return (
+    id: '$type-$number',
+    name: trimmed.isEmpty ? '$typeName $number' : trimmed,
+  );
+}
+
+/// The number in the id of an instance, when the id carries one.
+int? _instanceNumber(String id) {
+  final separator = id.lastIndexOf('-');
+  if (separator < 0) return null;
+  return int.tryParse(id.substring(separator + 1));
 }
 
 /// The type of the sources the app used to run as scripts.

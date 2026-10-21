@@ -342,6 +342,195 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesGroupAdded => 'Added by me';
 
   @override
+  String get sourcesAdd => 'Add source';
+
+  @override
+  String get sourcesAddChooseType => 'Choose a source type';
+
+  @override
+  String sourcesAddTitle(String name) {
+    return 'Add $name';
+  }
+
+  @override
+  String get sourcesFieldName => 'Name';
+
+  @override
+  String get sourcesFieldNameHint =>
+      'Leave empty to use the type name and a number';
+
+  @override
+  String get sourcesDelete => 'Delete';
+
+  @override
+  String sourcesDeleteTitle(String name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get sourcesDeleteHint =>
+      'The tracks this source brought in are removed with it.';
+
+  @override
+  String get sourcesMenu => 'More actions';
+
+  @override
+  String get sourceDirectUrlName => 'Direct audio';
+
+  @override
+  String get sourceDirectUrlDescription =>
+      'One address per line; every line becomes a track';
+
+  @override
+  String get directUrlFieldUrls => 'Audio addresses';
+
+  @override
+  String get directUrlFieldUrlsHint =>
+      'One address per line, e.g. https://example.com/song.mp3';
+
+  @override
+  String get directUrlHint => 'Fill in the audio addresses, one per line';
+
+  @override
+  String get sourceM3uName => 'Playlist';
+
+  @override
+  String get sourceM3uDescription =>
+      'Read an .m3u or .pls playlist; every entry becomes a track';
+
+  @override
+  String get m3uFieldPlaylist => 'Playlist address';
+
+  @override
+  String get m3uFieldPlaylistHint => 'e.g. https://example.com/list.m3u';
+
+  @override
+  String get m3uHint => 'Fill in the address of the playlist';
+
+  @override
+  String get m3uEmptyPlaylist => 'The playlist is empty';
+
+  @override
+  String get m3uNoEntries => 'The playlist has no entries';
+
+  @override
+  String get jsonFieldListPath => 'List path';
+
+  @override
+  String get jsonFieldIdPath => 'Track id path';
+
+  @override
+  String get jsonFieldTitlePath => 'Title path';
+
+  @override
+  String get jsonFieldArtistPath => 'Artist path';
+
+  @override
+  String get jsonFieldAlbumPath => 'Album path';
+
+  @override
+  String get jsonFieldCoverPath => 'Cover path';
+
+  @override
+  String get jsonFieldUrlPath => 'Stream address path';
+
+  @override
+  String get jsonFieldDurationPath => 'Duration path';
+
+  @override
+  String get jsonFieldGenrePath => 'Genre path';
+
+  @override
+  String get jsonFieldUrlTemplate => 'Stream address template';
+
+  @override
+  String get jsonFieldPathHint =>
+      'The path in the answer, steps separated by dots, e.g. data.title';
+
+  @override
+  String get jsonFieldUrlTemplateHint =>
+      'The template of the stream address; the track id is written into the placeholder';
+
+  @override
+  String get jsonFieldQueryHint =>
+      'The keyword to search with; it replaces the placeholder in the request';
+
+  @override
+  String get jsonFieldUrl => 'API address';
+
+  @override
+  String get jsonFieldUrlHint => 'e.g. https://example.com/api/search';
+
+  @override
+  String get jsonFieldHeaders => 'Headers';
+
+  @override
+  String get jsonFieldHeadersHint =>
+      'A JSON object, one key and value per line';
+
+  @override
+  String get jsonInvalidObject => 'This text is not a JSON object';
+
+  @override
+  String get jsonInvalidResponse => 'The answer of the interface is not JSON';
+
+  @override
+  String get jsonNoTracks => 'The interface returned no tracks';
+
+  @override
+  String get jsonNoAddressPath =>
+      'No path or template for the stream address was filled in';
+
+  @override
+  String get sourceJsonApiName => 'JSON API';
+
+  @override
+  String get sourceJsonApiDescription => 'Map any JSON API onto tracks';
+
+  @override
+  String get jsonApiHint =>
+      'Fill in the address of the interface and the paths of the fields';
+
+  @override
+  String get jsonApiFieldMethod => 'Method';
+
+  @override
+  String get jsonApiFieldMethodHint =>
+      'GET by default; POST when a body is written';
+
+  @override
+  String get jsonApiFieldBody => 'Body';
+
+  @override
+  String get jsonApiFieldBodyHint =>
+      'The JSON object of a POST; the keyword is written into the placeholder';
+
+  @override
+  String get sourceGraphqlName => 'GraphQL API';
+
+  @override
+  String get sourceGraphqlDescription =>
+      'Ask the interface with a query document; the conditions live in the document';
+
+  @override
+  String get graphqlHint =>
+      'Fill in the address, the query document and the paths of the fields';
+
+  @override
+  String get graphqlFieldQuery => 'Query document';
+
+  @override
+  String get graphqlFieldQueryHint =>
+      'A GraphQL query document; the conditions live in it';
+
+  @override
+  String get graphqlFieldVariables => 'Variables';
+
+  @override
+  String get graphqlFieldVariablesHint =>
+      'A JSON object; the keyword is written into the placeholder';
+
+  @override
   String get sourcesAutoScan => 'Scan on startup';
 
   @override
