@@ -67,7 +67,7 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
     _controllers = {
       for (final field in widget.fields)
         field.key: TextEditingController(
-          text: widget.source?.setting(field.key) ?? '',
+          text: widget.source?.setting(field.key) ?? field.defaultValue,
         ),
     };
     _name = TextEditingController(text: widget.source?.name ?? '');

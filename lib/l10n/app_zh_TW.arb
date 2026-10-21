@@ -240,7 +240,7 @@
   "sourceGraphqlDescription": "用一份查詢文件問介面，篩選條件寫在文件裡",
   "graphqlHint": "填寫介面網址、查詢文件與各欄位的路徑",
   "graphqlFieldQuery": "查詢文件",
-  "graphqlFieldQueryHint": "GraphQL 查詢文件，篩選條件寫在裡面",
+  "graphqlFieldQueryHint": "GraphQL 查詢文件，篩選條件寫在裡面；模板只是個起點，欄位要改成介面裡有的",
   "graphqlFieldVariables": "變數",
   "graphqlFieldVariablesHint": "JSON 物件；關鍵字會填進佔位符",
   "jsonPreviewNoTracks": "回傳裡沒有認出曲目",

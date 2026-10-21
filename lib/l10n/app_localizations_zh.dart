@@ -485,7 +485,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get graphqlFieldQuery => '查询文档';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的';
 
   @override
   String get graphqlFieldVariables => '变量';
@@ -2058,7 +2059,8 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get graphqlFieldQuery => '查询文档';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查询文档，筛选条件写在里面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的';
 
   @override
   String get graphqlFieldVariables => '变量';
@@ -3631,7 +3633,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get graphqlFieldQuery => '查詢文件';
 
   @override
-  String get graphqlFieldQueryHint => 'GraphQL 查詢文件，篩選條件寫在裡面';
+  String get graphqlFieldQueryHint =>
+      'GraphQL 查詢文件，篩選條件寫在裡面；模板只是個起點，欄位要改成介面裡有的';
 
   @override
   String get graphqlFieldVariables => '變數';

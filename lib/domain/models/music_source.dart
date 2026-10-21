@@ -50,6 +50,12 @@ class MusicSourceField {
   /// An empty list leaves the setting a free text field.
   final List<MusicSourceChoice> choices;
 
+  /// The value the form starts with when nothing is filled in yet.
+  ///
+  /// A setting the reader has to write from scratch can start from a shape
+  /// that is already right: a document to change, not to invent.
+  final String defaultValue;
+
   /// Whether the value spans several lines.
   ///
   /// A setting that holds a list — a line of addresses, a header — is read
@@ -64,6 +70,7 @@ class MusicSourceField {
     this.numeric = false,
     this.secret = false,
     this.multiline = false,
+    this.defaultValue = '',
     this.choices = const [],
   });
 }

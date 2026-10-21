@@ -521,7 +521,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get graphqlFieldQueryHint =>
-      'A GraphQL query document; the conditions live in it';
+      'A GraphQL query document; the conditions live in it. The template is only a starting point: change the fields to the ones the interface has';
 
   @override
   String get graphqlFieldVariables => 'Variables';

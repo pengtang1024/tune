@@ -979,7 +979,7 @@ abstract class AppLocalizations {
   /// No description provided for @graphqlFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'GraphQL 查询文档，筛选条件写在里面'**
+  /// **'GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的'**
   String get graphqlFieldQueryHint;
 
   /// No description provided for @graphqlFieldVariables.

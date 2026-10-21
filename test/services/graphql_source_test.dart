@@ -169,6 +169,17 @@ void main() {
     });
   });
 
+  group('the document a reader starts from', () {
+    test('the form offers a shape to change', () {
+      final field = GraphqlSourceAdapter().configurationFields.firstWhere(
+        (field) => field.key == 'document',
+      );
+
+      expect(field.defaultValue, contains('query'));
+      expect(field.defaultValue, contains('tracks'));
+    });
+  });
+
   group('trying a mapping out', () {
     MusicSourceConfig config(Map<String, String> settings) {
       return MusicSourceConfig(

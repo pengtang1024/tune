@@ -240,7 +240,7 @@
   "sourceGraphqlDescription": "Ask the interface with a query document; the conditions live in the document",
   "graphqlHint": "Fill in the address, the query document and the paths of the fields",
   "graphqlFieldQuery": "Query document",
-  "graphqlFieldQueryHint": "A GraphQL query document; the conditions live in it",
+  "graphqlFieldQueryHint": "A GraphQL query document; the conditions live in it. The template is only a starting point: change the fields to the ones the interface has",
   "graphqlFieldVariables": "Variables",
   "graphqlFieldVariablesHint": "A JSON object; the keyword is written into the placeholder",
   "jsonPreviewNoTracks": "No tracks found in the answer",

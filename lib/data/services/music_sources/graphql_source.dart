@@ -15,6 +15,22 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// live in the document, not in the mapping. The document is a query, not a
 /// script: the app sends it as it is and never runs it.
 class GraphqlSourceAdapter extends MusicSourceAdapter {
+  /// The document a reader starts from.
+  ///
+  /// A query document cannot be written without knowing the shape of the
+  /// interface, so the app offers one to change: it shows how a query, a
+  /// variable and the fields of a track fit together.
+  static const String documentTemplate = '''
+query Tracks(\$q: String) {
+  tracks(query: \$q) {
+    id
+    title
+    artist
+    url
+  }
+}
+''';
+
   final Dio _dio;
 
   GraphqlSourceAdapter({Dio? dio})
@@ -61,6 +77,7 @@ class GraphqlSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.graphqlFieldQueryHint,
       required: true,
       multiline: true,
+      defaultValue: documentTemplate,
     ),
     MusicSourceField(
       'variables',

@@ -240,7 +240,7 @@
   "sourceGraphqlDescription": "用一份查询文档问接口，筛选条件写在文档里",
   "graphqlHint": "填写接口地址、查询文档与各字段的路径",
   "graphqlFieldQuery": "查询文档",
-  "graphqlFieldQueryHint": "GraphQL 查询文档，筛选条件写在里面",
+  "graphqlFieldQueryHint": "GraphQL 查询文档，筛选条件写在里面；模板只是个起点，字段要改成接口里有的",
   "graphqlFieldVariables": "变量",
   "graphqlFieldVariablesHint": "JSON 对象；关键词会填进占位符",
   "jsonPreviewNoTracks": "返回里没有认出曲目",
