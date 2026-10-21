@@ -1,10 +1,7 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/app/theme/compact_type_scale.dart';
-import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
+import 'package:tune/shared/ui/track_detail_columns.dart';
 import 'package:tune/shared/ui/track_detail_heading.dart';
 import 'package:tune/shared/ui/track_detail_row.dart';
 
@@ -27,12 +24,22 @@ class TrackDetailSection {
 /// reading every line. The names of the whole table share one column, so a
 /// group that follows another one keeps the same left edge.
 ///
-/// The values are written in the face of their kind: a path, a number and an
-/// identifier in the machine face, the words of a person in the body face.
+/// The table is exactly as wide as its words: the columns are measured from
+/// the words that go in them, and the panel that holds the table is as wide
+/// as the table. A table that reaches for the width of the window leaves a
+/// stretch of nothing beside the values, and that emptiness is what makes a
+/// panel look thin.
 class TrackDetailTable extends StatelessWidget {
   final List<TrackDetailSection> sections;
 
-  const TrackDetailTable({super.key, required this.sections});
+  /// The widths of the two columns, shared by every group of the table.
+  final TrackDetailColumns columns;
+
+  const TrackDetailTable({
+    super.key,
+    required this.sections,
+    required this.columns,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +49,6 @@ class TrackDetailTable extends StatelessWidget {
     ];
     if (rows.isEmpty) return const SizedBox.shrink();
 
-    final nameWidth = _nameWidth(context, rows);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -51,43 +56,15 @@ class TrackDetailTable extends StatelessWidget {
         for (final section in sections)
           if (section.rows.isNotEmpty) ...[
             if (section.heading != null) ...[
-              const SizedBox(height: CompactTokens.space20),
+              const SizedBox(height: CompactTokens.space14),
               TrackDetailHeading(section.heading!),
-              const SizedBox(height: CompactTokens.space10),
+              const SizedBox(height: CompactTokens.space8),
             ],
             for (final row in section.rows)
-              TrackDetailLine(row: row, nameWidth: nameWidth),
+              TrackDetailLine(row: row, columns: columns),
           ],
       ],
     );
-  }
-
-  /// The width of the column of the names.
-  ///
-  /// The column is as wide as the longest name of the table, so the values
-  /// all start at the same place and the names are never cut off.
-  double _nameWidth(BuildContext context, List<TrackDetailRow> rows) {
-    final style = Theme.of(context).textTheme.labelMedium;
-    final scaler = MediaQuery.textScalerOf(context);
-    var widest = 0.0;
-
-    for (final row in rows) {
-      final painter = TextPainter(
-        text: TextSpan(text: row.label, style: style),
-        textDirection: Directionality.of(context),
-        textScaler: scaler,
-        maxLines: 1,
-      )..layout();
-      widest = math.max(widest, painter.width);
-      painter.dispose();
-    }
-
-    // The icon and the room next to it stand in front of every name, and a
-    // little room is left over so the longest name is never cut off.
-    return widest +
-        CompactTokens.icon16 +
-        CompactTokens.space8 +
-        CompactTokens.space4;
   }
 }
 
@@ -95,13 +72,13 @@ class TrackDetailTable extends StatelessWidget {
 class TrackDetailLine extends StatelessWidget {
   final TrackDetailRow row;
 
-  /// The width of the column of the names, shared by the whole table.
-  final double nameWidth;
+  /// The widths of the two columns, shared by the whole table.
+  final TrackDetailColumns columns;
 
   const TrackDetailLine({
     super.key,
     required this.row,
-    required this.nameWidth,
+    required this.columns,
   });
 
   @override
@@ -110,12 +87,12 @@ class TrackDetailLine extends StatelessWidget {
     final tone = factToneColor(row.tone, theme.colorScheme);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: CompactTokens.space8),
+      padding: const EdgeInsets.only(bottom: CompactTokens.space6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: nameWidth,
+            width: columns.name,
             child: Row(
               children: [
                 Icon(row.icon, size: CompactTokens.icon16, color: tone),
@@ -134,12 +111,11 @@ class TrackDetailLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: CompactTokens.space12),
-          Expanded(child: _ValueCell(row: row)),
+          SizedBox(width: columns.value, child: _ValueCell(row: row)),
         ],
       ),
     );
   }
-
 }
 
 /// The value of a line, and the button that takes it away.
@@ -150,9 +126,6 @@ class _ValueCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.onSurface;
-
     // A value too long for a line is not written out: the chip carries it,
     // and the reader reads it where the pointer rests.
     if (row.inChip) {
@@ -162,28 +135,13 @@ class _ValueCell extends StatelessWidget {
       );
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: SelectableText(row.value, style: _valueStyle(context, color)),
-        ),
-      ],
+    // The value is written out as plain text and not as selectable text: a
+    // selectable text keeps a scroll room of forty pixels around itself and
+    // writes its words in what is left, so the column would have to be that
+    // much wider than the words need and the panel would grow with it.
+    return Text(
+      row.value,
+      style: trackDetailValueStyle(context, row),
     );
-  }
-
-  /// The face of the value.
-  ///
-  /// A value that a machine wrote keeps the machine face, so the reader can
-  /// tell the words of a person from the words of a program at a glance.
-  TextStyle _valueStyle(BuildContext context, Color color) {
-    final theme = Theme.of(context);
-
-    if (row.machine) {
-      return CompactTypography.mono(color, size: CompactTypeScale.body);
-    }
-
-    return theme.textTheme.bodySmall?.copyWith(color: color) ??
-        CompactTypography.sans(color, size: CompactTypeScale.body);
   }
 }

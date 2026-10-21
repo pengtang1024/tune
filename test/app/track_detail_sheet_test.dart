@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -50,12 +51,25 @@ void main() {
 
   /// The face a value of the sheet is written in.
   TextStyle styleOf(WidgetTester tester, Finder sheet, String value) {
+    final found = find.descendant(of: sheet, matching: find.text(value));
+
+    // A value of the table is written out as plain text; a part of a track
+    // that is longer than a line is selectable text.
+    for (final element in found.evaluate()) {
+      final widget = element.widget;
+      if (widget is Text) return widget.style ?? const TextStyle();
+    }
+
     final selectable = find.ancestor(
-      of: find.descendant(of: sheet, matching: find.text(value)),
+      of: found,
       matching: find.byType(SelectableText),
     );
+    if (selectable.evaluate().isNotEmpty) {
+      return tester.widget<SelectableText>(selectable.first).style ??
+          const TextStyle();
+    }
 
-    return tester.widget<SelectableText>(selectable).style ?? const TextStyle();
+    return const TextStyle();
   }
 
   /// Opens the details of a track and hands back the tree of the sheet.
@@ -97,6 +111,33 @@ void main() {
 
     expect(find.byIcon(Icons.favorite_rounded), findsNothing);
     expect(find.byIcon(Icons.favorite_border_rounded), findsNothing);
+  });
+
+  testWidgets('the panel is as wide as its words and not as wide as the sheet', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    final panel = tester.getSize(
+      find.byKey(const ValueKey('track-detail-panel')),
+    );
+
+    expect(panel.width, lessThan(CompactTokens.sheetWidth));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a value that fits in the column stays on one line', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    final sheet = find.byType(BottomSheet);
+
+    final value = tester.getSize(
+      find.descendant(of: sheet, matching: find.text('夜曲专辑')),
+    );
+
+    expect(value.height, lessThan(30));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('the names of the facts stand in one column', (tester) async {

@@ -154,6 +154,20 @@ abstract final class CompactTokens {
   /// would only hide the request.
   static const double sheetWidth = 640;
 
+  /// Longest width of the panel that shows the details of a track.
+  ///
+  /// The panel is as wide as the table of the facts or as the head above it,
+  /// whichever is wider, and it stops growing at this width: a track with a
+  /// very long name must not push the panel out of the window.
+  static const double detailPanelWidth = 440;
+
+  /// Longest width of the name of a track in the panel of its details.
+  ///
+  /// A name that is longer than this is cut off with an ellipsis. The panel
+  /// is as wide as the table of the facts, and a long name must not widen
+  /// the whole panel for the sake of one line.
+  static const double detailPanelTitleWidth = 280;
+
   /// The room a sheet keeps above it.
   ///
   /// A sheet that reaches the top of the window leaves the reader no way to
