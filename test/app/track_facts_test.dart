@@ -170,7 +170,7 @@ void main() {
       findsNothing,
     );
     expect(
-      find.descendant(of: sheet, matching: find.byType(CopyChipGroup)),
+      find.descendant(of: sheet, matching: find.byType(ChipGroup)),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
@@ -256,8 +256,8 @@ void main() {
     // An address is longer than a line, so it is not written out: the chips
     // carry the file, the address and the identity of the track.
     final addresses = tester
-        .widgetList<CopyChipGroup>(find.byType(CopyChipGroup))
-        .map((chip) => chip.address)
+        .widgetList<ChipGroup>(find.byType(ChipGroup))
+        .map((chip) => chip.value)
         .toList();
     expect(addresses, contains('/music/远方歌手/远方的歌/远方的歌.mp3'));
     expect(addresses, contains('https://example.com/a.mp3'));
@@ -347,8 +347,8 @@ void main() {
     // The address of the cover and the identity of the track are longer than
     // a line, so the chips carry them.
     final addresses = tester
-        .widgetList<CopyChipGroup>(find.byType(CopyChipGroup))
-        .map((chip) => chip.address)
+        .widgetList<ChipGroup>(find.byType(ChipGroup))
+        .map((chip) => chip.value)
         .toList();
     expect(addresses, contains('https://example.com/cover.jpg'));
     expect(addresses, contains('tune://openverse/cover'));

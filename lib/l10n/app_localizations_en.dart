@@ -1532,7 +1532,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackDetailsTooltip => 'Details';
 
   @override
-  String get trackDetailsCopyPath => 'Copy path';
+  String get trackDetailsOpenPath => 'Open the file';
+
+  @override
+  String get trackDetailsOpenFailed => 'The file could not be opened';
 
   @override
   String get trackDetailsCopyAddress => 'Copy address';

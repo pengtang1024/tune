@@ -2608,11 +2608,17 @@ abstract class AppLocalizations {
   /// **'查看详情'**
   String get trackDetailsTooltip;
 
-  /// No description provided for @trackDetailsCopyPath.
+  /// No description provided for @trackDetailsOpenPath.
   ///
   /// In zh_CN, this message translates to:
-  /// **'复制路径'**
-  String get trackDetailsCopyPath;
+  /// **'打开文件'**
+  String get trackDetailsOpenPath;
+
+  /// No description provided for @trackDetailsOpenFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打不开这个文件'**
+  String get trackDetailsOpenFailed;
 
   /// No description provided for @trackDetailsCopyAddress.
   ///

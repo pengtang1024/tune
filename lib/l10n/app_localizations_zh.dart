@@ -1392,7 +1392,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackDetailsTooltip => '查看详情';
 
   @override
-  String get trackDetailsCopyPath => '复制路径';
+  String get trackDetailsOpenPath => '打开文件';
+
+  @override
+  String get trackDetailsOpenFailed => '打不开这个文件';
 
   @override
   String get trackDetailsCopyAddress => '复制地址';
@@ -2969,7 +2972,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackDetailsTooltip => '查看详情';
 
   @override
-  String get trackDetailsCopyPath => '复制路径';
+  String get trackDetailsOpenPath => '打开文件';
+
+  @override
+  String get trackDetailsOpenFailed => '打不开这个文件';
 
   @override
   String get trackDetailsCopyAddress => '复制地址';
@@ -4546,7 +4552,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get trackDetailsTooltip => '查看詳情';
 
   @override
-  String get trackDetailsCopyPath => '複製路徑';
+  String get trackDetailsOpenPath => '打開檔案';
+
+  @override
+  String get trackDetailsOpenFailed => '打不開這個檔案';
 
   @override
   String get trackDetailsCopyAddress => '複製位址';

@@ -37,6 +37,17 @@ void main() {
     dateAdded: 1700000000000,
   );
 
+  /// A track of a source: it has an address that can be taken away, and an
+  /// identity that names it inside the app.
+  const remoteSong = Song(
+    id: 2,
+    title: '远方的歌',
+    artist: '某歌手',
+    duration: 245000,
+    uri: 'tune://openverse/abc',
+    streamUrl: 'https://example.com/a.mp3',
+  );
+
   Widget app(Widget home) {
     return MaterialApp(
       theme: CompactTheme.light,
@@ -48,8 +59,8 @@ void main() {
   }
 
   /// Opens the details of a track and hands back the tree of the sheet.
-  Future<void> openSheet(WidgetTester tester) async {
-    await tester.pumpWidget(app(const TrackMeta(song: song, index: 0)));
+  Future<void> openSheet(WidgetTester tester, {Song track = song}) async {
+    await tester.pumpWidget(app(TrackMeta(song: track, index: 0)));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('查看详情'));
@@ -137,13 +148,13 @@ void main() {
       findsNothing,
     );
     expect(
-      find.descendant(of: sheet, matching: find.byType(CopyChipGroup)),
+      find.descendant(of: sheet, matching: find.byType(ChipGroup)),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the name of an address stands in front of its copy', (
+  testWidgets('the name of an address stands in front of its action', (
     tester,
   ) async {
     await openSheet(tester);
@@ -152,24 +163,45 @@ void main() {
     final name = tester.getTopLeft(
       find.descendant(of: sheet, matching: find.text('文件路径')),
     );
-    final copy = tester.getTopLeft(
+    final action = tester.getTopLeft(
       find.descendant(
         of: sheet,
-        matching: find.byIcon(Icons.copy_rounded),
+        matching: find.byIcon(Icons.open_in_new_rounded),
       ),
     );
 
     // The chip is two halves: the name takes the room and the square that
-    // copies takes the rest.
-    expect(copy.dx, greaterThan(name.dx));
-    expect(copy.dy, name.dy);
+    // acts takes the rest.
+    expect(action.dx, greaterThan(name.dx));
+    expect(action.dy, name.dy);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a file of this machine is opened and not copied', (
+    tester,
+  ) async {
+    await openSheet(tester);
+    final sheet = find.byType(BottomSheet);
+
+    // The desktop knows how to open a file, so the file is not copied.
+    expect(
+      find.descendant(
+        of: sheet,
+        matching: find.byIcon(Icons.open_in_new_rounded),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.byIcon(Icons.copy_rounded)),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('the pointer on the chip shows the address', (tester) async {
     await openSheet(tester);
     final sheet = find.byType(BottomSheet);
-    final chip = find.descendant(of: sheet, matching: find.byType(CopyChipGroup));
+    final chip = find.descendant(of: sheet, matching: find.byType(ChipGroup));
 
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
@@ -181,7 +213,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('a click on the chip takes the address away', (tester) async {
+  testWidgets('a click on the copy takes the address away', (tester) async {
     String? copied;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -199,10 +231,13 @@ void main() {
       ),
     );
 
-    await openSheet(tester);
-    final sheet = find.byType(BottomSheet);
+    await openSheet(tester, track: remoteSong);
+    final chip = find.ancestor(
+      of: find.text('在线地址'),
+      matching: find.byType(ChipGroup),
+    );
     final copy = find.descendant(
-      of: sheet,
+      of: chip,
       matching: find.byIcon(Icons.copy_rounded),
     );
 
@@ -212,7 +247,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(copied, '/music/night.flac');
+    expect(copied, 'https://example.com/a.mp3');
     expect(find.text('已复制到剪贴板'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
