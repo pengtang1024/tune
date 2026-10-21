@@ -42,6 +42,13 @@ void main() {
     test('an empty path is the whole answer', () {
       expect(readJsonPath({'a': 1}, ''), {'a': 1});
     });
+
+    test('the hint of the keyword shows the placeholder the reader copies', () {
+      expect(
+        jsonKeywordHint('the keyword'),
+        'the keyword \${query}',
+      );
+    });
   });
 
   group('the mapping of an answer', () {

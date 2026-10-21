@@ -85,6 +85,7 @@ query Tracks(\$q: String) {
       AppStrings.instance.graphqlFieldVariablesHint,
       multiline: true,
       advanced: true,
+      defaultValue: '{"q": "\${query}"}',
     ),
     MusicSourceField(
       'headers',
@@ -96,7 +97,7 @@ query Tracks(\$q: String) {
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
-      AppStrings.instance.jsonFieldQueryHint,
+      jsonKeywordHint(AppStrings.instance.jsonFieldQueryHint),
     ),
     MusicSourceField(
       'limit',
