@@ -6,6 +6,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/core/l10n/localization_bridge.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
@@ -25,6 +26,7 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 import 'fake_audio_player_service.dart';
 import 'fake_song_download_service.dart';
@@ -388,6 +390,12 @@ Widget _app(
         (ref) => SettingsController(localeStore),
       ),
       audioPlayerServiceProvider.overrideWithValue(audio),
+      // The settings ask the desktop whether Tune is the default player;
+      // the real service would shell out to the desktop of the machine the
+      // tests run on.
+      defaultPlayerServiceProvider.overrideWithValue(
+        FakeDefaultPlayerService(),
+      ),
       playbackControllerProvider.overrideWith((ref) => playback),
       libraryControllerProvider.overrideWith(
         () => FakeLibraryController(

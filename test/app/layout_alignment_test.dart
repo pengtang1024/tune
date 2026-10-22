@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -20,6 +21,7 @@ import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 
 import 'package:tune/shared/ui/artwork_thumb.dart';
@@ -79,6 +81,12 @@ void main() {
       overrides: [
         persistenceServiceProvider.overrideWithValue(persistence),
         audioPlayerServiceProvider.overrideWithValue(audio),
+        // The settings ask the desktop whether Tune is the default player;
+        // the real service would shell out to the desktop of the machine
+        // the tests run on.
+        defaultPlayerServiceProvider.overrideWithValue(
+          FakeDefaultPlayerService(),
+        ),
         playbackControllerProvider.overrideWith((ref) => playback),
         libraryControllerProvider.overrideWith(
           () => FakeLibraryController(

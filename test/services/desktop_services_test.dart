@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/desktop/startup_files.dart';
+import 'package:tune/data/services/impl/desktop/default_player_service_io.dart';
 
 void main() {
   group('the files of the command line', () {
@@ -58,6 +59,48 @@ void main() {
       );
 
       expect(execLine, contains('%U'));
+    });
+  });
+
+  group('the place the desktop entry is looked for', () {
+    test('is the applications directory of the user', () {
+      final paths = DefaultPlayerServiceImpl.desktopEntryPaths(
+        home: '/home/pt',
+        dataHome: '',
+        dataDirectories: '',
+      );
+
+      expect(
+        paths,
+        contains('/home/pt/.local/share/applications/$tuneDesktopEntryName'),
+      );
+    });
+
+    test('is the applications directory of the data home', () {
+      final paths = DefaultPlayerServiceImpl.desktopEntryPaths(
+        home: '/home/pt',
+        dataHome: '/home/pt/share',
+        dataDirectories: '',
+      );
+
+      expect(
+        paths,
+        contains('/home/pt/share/applications/$tuneDesktopEntryName'),
+      );
+    });
+
+    test('is the applications directory of the system', () {
+      final paths = DefaultPlayerServiceImpl.desktopEntryPaths(
+        home: '/home/pt',
+        dataHome: '',
+        dataDirectories: '/opt/share',
+      );
+
+      expect(paths, contains('/opt/share/applications/$tuneDesktopEntryName'));
+      expect(
+        paths,
+        isNot(contains('/usr/share/applications/$tuneDesktopEntryName')),
+      );
     });
   });
 }
