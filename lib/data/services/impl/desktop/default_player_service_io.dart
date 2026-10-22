@@ -1,5 +1,6 @@
 import 'dart:io' show File, Platform, Process;
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/desktop/default_player_service.dart';
 import 'package:tune/utils/logger.dart';
@@ -14,9 +15,8 @@ class DefaultPlayerServiceImpl implements DefaultPlayerService {
 
   @override
   Future<bool> isDesktopEntryInstalled() async {
-    for (final directory in _applicationDirectories()) {
-      final entry = File('$directory/$tuneDesktopEntryName');
-      if (entry.existsSync()) return true;
+    for (final path in desktopEntryPaths()) {
+      if (File(path).existsSync()) return true;
     }
     return false;
   }
@@ -34,15 +34,40 @@ class DefaultPlayerServiceImpl implements DefaultPlayerService {
     return result != null;
   }
 
-  /// The directories the desktop looks for desktop entries in.
-  List<String> _applicationDirectories() {
-    final home = Platform.environment['HOME'] ?? '';
-    final dataHome = Platform.environment['XDG_DATA_HOME'];
+  /// The files the desktop entry of Tune may live in.
+  ///
+  /// The desktop looks for the entries of the installed programs in the
+  /// `applications` subdirectory of every data directory, so that is where
+  /// they are looked for: the entry of a program that is installed for one
+  /// user lives in `~/.local/share/applications`, the entry of a program
+  /// that is installed for everybody lives in `/usr/share/applications`.
+  @visibleForTesting
+  static List<String> desktopEntryPaths({
+    String? home,
+    String? dataHome,
+    String? dataDirectories,
+  }) {
+    final userHome = home ?? Platform.environment['HOME'] ?? '';
+    final userDataHome = dataHome ?? Platform.environment['XDG_DATA_HOME'] ?? '';
+    final systemDataDirectories =
+        dataDirectories ?? Platform.environment['XDG_DATA_DIRS'] ?? '';
+
+    final userDirectories = <String>[
+      if (userDataHome.isNotEmpty) userDataHome,
+      if (userHome.isNotEmpty) '$userHome/.local/share',
+    ];
+    // The desktop reads the system directories from XDG_DATA_DIRS and falls
+    // back to the two places every desktop keeps them.
+    final systemDirectories =
+        systemDataDirectories.isNotEmpty
+            ? systemDataDirectories
+                .split(':')
+                .where((directory) => directory.isNotEmpty)
+            : const ['/usr/local/share', '/usr/share'];
+
     return [
-      if (dataHome != null && dataHome.isNotEmpty) dataHome,
-      if (home.isNotEmpty) '$home/.local/share',
-      '/usr/local/share',
-      '/usr/share',
+      for (final directory in [...userDirectories, ...systemDirectories])
+        '$directory/applications/$tuneDesktopEntryName',
     ];
   }
 
