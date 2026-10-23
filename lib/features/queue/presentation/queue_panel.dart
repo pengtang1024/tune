@@ -238,6 +238,7 @@ class _Header extends StatelessWidget {
           TuneTooltip(
             message: context.loc.close,
             child: IconButton(
+              autofocus: true,
               onPressed: onClose,
               icon: const Icon(Icons.close_rounded, size: CompactTokens.icon18),
               padding: EdgeInsets.zero,

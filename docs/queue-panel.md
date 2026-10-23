@@ -200,7 +200,7 @@
 - Esc、点遮罩、关闭按钮都能关；Android 返回键先关面板。
 - 正在播放页打开：关闭后仍在正在播放页，不退出全屏。
 - 空队列：显示空状态；「去音乐库」关闭面板并落到 `/library`。
-- 非空队列：点播、拖拽重排、移除、清空、标心仍然生效。
+- 非空队列：点播、移除、清空、标心由 UI 测试覆盖；拖拽重排沿用原 `ReorderableListView`，数据由 `PlaybackController` 测试覆盖。
 - 760×520 与 900×600 无 overflow；1.3 倍文字缩放无 overflow。
 - `/queue` 深链接落到 `/library`，且不会打开面板。
 
@@ -285,7 +285,7 @@ flutter run -d linux
 - `lib/features/queue/presentation/queue_panel.dart`：紧凑头部、列表、空状态、清空确认；`QueuePane` 已删除。
 - `TrackMeta` / `QueueTrackRow`：`dense` 两行信息；事实条与详情按钮只在整页行显示。
 - `CompactShell`：本地 `_queueOpen`，`SidePanelHost` 包住内容区，底栏和侧栏留在遮罩外；Esc 与 `PopScope` 关闭。
-- `NowPlayingPage`：本地 `_showQueue`，`queuePanelBuilder` 由 `app_router` 注入；Esc 先关侧栏。
+- `NowPlayingPage`：本地 `_showQueue`，`queuePanelBuilder` 由 `app_router` 注入；Esc 与系统返回都先关侧栏。
 - `app_router`：删除 `/queue` 路由与白名单；深链接落到 `/library`。
 - 测试：`test/app/compact_layout_test.dart` 覆盖面板开关、底栏可用、侧栏切页、Esc/遮罩/返回、空队列、1.3 倍英文与正在播放页；`layout_alignment_test` 覆盖面板宽度与行边界；`localization_render_test` 渲染面板；`router_navigation_test` 覆盖深链接。
 - 门禁：`flutter gen-l10n`、`flutter analyze`、`flutter test`、`flutter test tool/layout_shots_test.dart` 均通过。

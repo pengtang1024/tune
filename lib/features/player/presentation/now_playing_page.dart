@@ -97,87 +97,96 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
       },
       child: Focus(
         autofocus: true,
-        child: Scaffold(
-          backgroundColor: theme.colorScheme.surface,
-          body: SidePanelHost(
-            open: _showQueue && widget.queuePanelBuilder != null,
-            onClose: _closeQueue,
-            barrierLabel: context.loc.close,
-            panelBuilder: (context) =>
-                widget.queuePanelBuilder!(context, _closeQueue),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  // The glow sits behind the middle of the page, where the
-                  // cover and the text are, instead of washing over one
-                  // corner of it. It fades to nothing, so the title keeps a
-                  // calm background to read on.
-                  center: const Alignment(0, -0.25),
-                  radius: 0.9,
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.16),
-                    theme.colorScheme.primary.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    CompactTokens.pageGutter,
-                    CompactTokens.space16,
-                    CompactTokens.pageGutter,
-                    CompactTokens.space20,
+        child: PopScope(
+          // The panel is not a route, so a system back action closes it
+          // before it leaves the full view.
+          canPop: !_showQueue,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) _closeQueue();
+          },
+          child: Scaffold(
+            backgroundColor: theme.colorScheme.surface,
+            body: SidePanelHost(
+              open: _showQueue && widget.queuePanelBuilder != null,
+              onClose: _closeQueue,
+              barrierLabel: context.loc.close,
+              panelBuilder: (context) =>
+                  widget.queuePanelBuilder!(context, _closeQueue),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    // The glow sits behind the middle of the page, where the
+                    // cover and the text are, instead of washing over one
+                    // corner of it. It fades to nothing, so the title keeps a
+                    // calm background to read on.
+                    center: const Alignment(0, -0.25),
+                    radius: 0.9,
+                    colors: [
+                      theme.colorScheme.primary.withValues(alpha: 0.16),
+                      theme.colorScheme.primary.withValues(alpha: 0),
+                    ],
                   ),
-                  child: Column(
-                    children: [
-                      _TopBar(
-                        state: state,
-                        showLyrics: _showLyrics,
-                        onToggleLyrics: () =>
-                            setState(() => _showLyrics = !_showLyrics),
-                        onToggleQueue: widget.queuePanelBuilder == null
-                            ? null
-                            : _toggleQueue,
-                        isFavorite:
-                            currentUri != null &&
-                            favorites.contains(currentUri),
-                        onToggleFavorite: currentUri == null
-                            ? null
-                            : () => ref
-                                  .read(favoritesControllerProvider.notifier)
-                                  .toggle(currentUri),
-                      ),
-                      const SizedBox(height: CompactTokens.space12),
-                      Expanded(
-                        child: state.currentSong == null
-                            ? const _EmptyState()
-                            : _TrackLayout(
-                                state: state,
-                                song: state.currentSong!,
-                                showLyrics: _showLyrics,
-                                source:
-                                    sourceLabel(
-                                      state.currentSong!,
-                                      sourceLabels,
-                                    ) ??
-                                    SourceLabel(
-                                      name: context.loc.sourceLocalName,
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      CompactTokens.pageGutter,
+                      CompactTokens.space16,
+                      CompactTokens.pageGutter,
+                      CompactTokens.space20,
+                    ),
+                    child: Column(
+                      children: [
+                        _TopBar(
+                          state: state,
+                          showLyrics: _showLyrics,
+                          onToggleLyrics: () =>
+                              setState(() => _showLyrics = !_showLyrics),
+                          onToggleQueue: widget.queuePanelBuilder == null
+                              ? null
+                              : _toggleQueue,
+                          isFavorite:
+                              currentUri != null &&
+                              favorites.contains(currentUri),
+                          onToggleFavorite: currentUri == null
+                              ? null
+                              : () => ref
+                                    .read(favoritesControllerProvider.notifier)
+                                    .toggle(currentUri),
+                        ),
+                        const SizedBox(height: CompactTokens.space12),
+                        Expanded(
+                          child: state.currentSong == null
+                              ? const _EmptyState()
+                              : _TrackLayout(
+                                  state: state,
+                                  song: state.currentSong!,
+                                  showLyrics: _showLyrics,
+                                  source:
+                                      sourceLabel(
+                                        state.currentSong!,
+                                        sourceLabels,
+                                      ) ??
+                                      SourceLabel(
+                                        name: context.loc.sourceLocalName,
+                                      ),
+                                  onPrevious: controller.previous,
+                                  onNext: controller.next,
+                                  onTogglePlay: controller.togglePlayPause,
+                                  onSeek: (value) => controller.seekTo(
+                                    Duration(
+                                      milliseconds:
+                                          (state.duration.inMilliseconds *
+                                                  value)
+                                              .round(),
                                     ),
-                                onPrevious: controller.previous,
-                                onNext: controller.next,
-                                onTogglePlay: controller.togglePlayPause,
-                                onSeek: (value) => controller.seekTo(
-                                  Duration(
-                                    milliseconds:
-                                        (state.duration.inMilliseconds * value)
-                                            .round(),
                                   ),
                                 ),
-                              ),
-                      ),
-                      const SizedBox(height: CompactTokens.space12),
-                      _Footer(state: state),
-                    ],
+                        ),
+                        const SizedBox(height: CompactTokens.space12),
+                        _Footer(state: state),
+                      ],
+                    ),
                   ),
                 ),
               ),

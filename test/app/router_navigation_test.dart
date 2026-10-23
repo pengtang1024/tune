@@ -83,6 +83,7 @@ void main() {
     router.go('/queue');
     await tester.pumpAndSettle();
     expect(router.routerDelegate.currentConfiguration.uri.path, '/library');
+    expect(find.byType(QueuePanel), findsNothing);
 
     // A deep link to a page that is gone lands on the library too.
     router.go('/a-page-that-is-gone');
@@ -139,6 +140,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(router.routerDelegate.currentConfiguration.uri.path, '/favorites');
+    expect(find.byType(QueuePanel), findsNothing);
+
+    // The empty panel offers the way to the library, and that action closes
+    // the panel before it moves.
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(of: find.byType(QueuePanel), matching: find.text('去音乐库')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(router.routerDelegate.currentConfiguration.uri.path, '/library');
     expect(find.byType(QueuePanel), findsNothing);
   });
 }

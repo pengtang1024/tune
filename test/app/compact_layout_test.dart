@@ -15,6 +15,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
+import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
@@ -710,6 +711,75 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('queue panel keeps the queue operations', (tester) async {
+    final controller = await pumpQueuePanel(tester, size: const Size(900, 563));
+
+    // Play a row from the panel.
+    await tester.tap(
+      find.descendant(of: find.byType(QueuePanel), matching: find.text('Beta')),
+    );
+    await tester.pumpAndSettle();
+    expect(controller.state.currentSong?.uri, songB.uri);
+
+    final betaRow = find.ancestor(
+      of: find.descendant(
+        of: find.byType(QueuePanel),
+        matching: find.text('Beta'),
+      ),
+      matching: find.byType(QueueTrackRow),
+    );
+
+    // Mark a row. Another test may have marked this track already, so the
+    // direction of the mark is read from the state instead of assumed.
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(QueuePanel)),
+    );
+    final wasFavorite = container
+        .read(favoritesControllerProvider)
+        .contains(songB.uri);
+    await tester.tap(
+      find.descendant(
+        of: betaRow,
+        matching: find.byTooltip(wasFavorite ? '取消收藏' : '加入收藏'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      container.read(favoritesControllerProvider).contains(songB.uri),
+      isNot(wasFavorite),
+    );
+
+    // Remove a row.
+    final gammaRow = find.ancestor(
+      of: find.descendant(
+        of: find.byType(QueuePanel),
+        matching: find.text('Gamma'),
+      ),
+      matching: find.byType(QueueTrackRow),
+    );
+    await tester.tap(
+      find.descendant(of: gammaRow, matching: find.byTooltip('移除')),
+    );
+    await tester.pumpAndSettle();
+    expect(controller.state.queue.map((song) => song.uri), [
+      songA.uri,
+      songB.uri,
+    ]);
+
+    // Empty the queue through the confirmation of the header.
+    await tester.tap(
+      find.descendant(of: find.byType(QueuePanel), matching: find.text('清空')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, '清空'));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.queue, isEmpty);
+    expect(find.text('播放队列是空的'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('the queue panel of the now playing page closes back to it', (
     tester,
   ) async {
@@ -752,6 +822,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(QueuePanel), findsOneWidget);
     await tester.tap(find.byTooltip('关闭'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(find.byType(NowPlayingPage), findsOneWidget);
+
+    // The system back action closes the panel first as well.
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsOneWidget);
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(QueuePanel), findsNothing);
     expect(find.byType(NowPlayingPage), findsOneWidget);
