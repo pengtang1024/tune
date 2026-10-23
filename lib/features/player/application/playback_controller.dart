@@ -11,11 +11,15 @@ import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/audio_source_resolver.dart';
+import 'package:tune/features/player/application/playback_session_recorder.dart';
+import 'package:tune/features/player/data/playback_session_store.dart';
 import 'package:tune/features/player/application/track_prefetcher.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_source.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 final playbackControllerProvider =
@@ -23,7 +27,19 @@ final playbackControllerProvider =
       final audio = ref.watch(audioPlayerServiceProvider);
       final downloads = ref.watch(songDownloadServiceProvider);
       final resolver = ref.watch(streamUrlResolverProvider);
-      return PlaybackController(audio, downloads, resolver);
+      final store = PlaybackSessionStore(ref.watch(persistenceServiceProvider));
+      // The switch decides what a start reads, not what the running player
+      // writes, so it is read once when the controller is built.
+      final restore = ref
+          .read(settingsControllerProvider)
+          .restorePlaybackOnStartup;
+      return PlaybackController(
+        audio,
+        downloads,
+        resolver,
+        sessionStore: store,
+        restoreSession: restore,
+      );
     });
 
 /// Owns playback and queue state.
@@ -32,10 +48,18 @@ final playbackControllerProvider =
 /// notifications, or library widgets. Side effects such as statistics or
 /// history belong in listeners outside this class.
 class PlaybackController extends StateNotifier<PlaybackState> {
-  PlaybackController(this._audio, this._downloads, this._resolver)
-    : _audioSources = AudioSourceResolver(_downloads),
-      _prefetcher = TrackPrefetcher(_downloads),
-      super(PlaybackState.initial) {
+  PlaybackController(
+    this._audio,
+    this._downloads,
+    this._resolver, {
+    PlaybackSessionStore? sessionStore,
+    bool restoreSession = true,
+  }) : _audioSources = AudioSourceResolver(_downloads),
+       _prefetcher = TrackPrefetcher(_downloads),
+       _sessionRecorder = sessionStore == null
+           ? null
+           : PlaybackSessionRecorder(sessionStore),
+       super(PlaybackState.initial) {
     _subscriptions.add(_audio.positionStream.listen(_handlePosition));
     _subscriptions.add(_audio.durationStream.listen(_handleDuration));
     _subscriptions.add(_audio.playingStream.listen(_handlePlaying));
@@ -45,6 +69,13 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       }),
     );
     _subscriptions.add(_audio.errorStream.listen(_handlePlayerError));
+    _restoreSession(restoreSession);
+
+    final recorder = _sessionRecorder;
+    if (recorder != null) {
+      recorder.start(state);
+      _removeSessionListener = addListener((_) => recorder.record(state));
+    }
   }
 
   final AudioPlayerService _audio;
@@ -84,6 +115,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   /// the same handler, but only once.
   int? _failureHandledForRequest;
 
+  final PlaybackSessionRecorder? _sessionRecorder;
+  void Function()? _removeSessionListener;
+
   /// The state of the player right now.
   ///
   /// The state of a state holder is protected, so callers outside of the
@@ -94,8 +128,17 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   // Audio event handlers
   // ---------------------------------------------------------------------------
 
+  /// Whether the audio backend holds the track the state speaks about.
+  ///
+  /// A restored session has a track and a position but no audio yet. The
+  /// backend reports zero for a track it never loaded, so its early events
+  /// must not overwrite the position the session brought back.
+  bool get _audioHoldsCurrentSong =>
+      state.hasTrack && _loadedSongUri == state.currentSong!.uri;
+
   void _handlePosition(Duration position) {
     if (!mounted || !state.hasTrack || state.hasError) return;
+    if (!_audioHoldsCurrentSong) return;
     if (position == state.position) return;
 
     state = state.copyWith(
@@ -111,11 +154,13 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   void _handleDuration(Duration? duration) {
     if (!mounted || duration == null || duration == state.duration) return;
+    if (!_audioHoldsCurrentSong) return;
     state = state.copyWith(duration: duration);
   }
 
   void _handlePlaying(bool isPlaying) {
     if (!mounted || !state.hasTrack || state.hasError) return;
+    if (!_audioHoldsCurrentSong) return;
     if (state.status == PlaybackStatus.loading) {
       if (isPlaying) {
         state = state.copyWith(status: PlaybackStatus.playing);
@@ -131,6 +176,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     if (!mounted || _handlingCompletion || !state.hasTrack || state.hasError) {
       return;
     }
+    if (!_audioHoldsCurrentSong) return;
 
     _handlingCompletion = true;
     try {
@@ -284,8 +330,10 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     if (!state.hasTrack) return;
 
     // A queued track may not have been loaded into the audio backend yet.
+    // The saved session is exactly this case: carry its position into the
+    // first real load instead of starting the track from zero.
     if (_loadedSongUri != state.currentSong!.uri) {
-      await _startAt(state.currentIndex);
+      await _startAt(state.currentIndex, startPosition: state.position);
       return;
     }
 
@@ -350,6 +398,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     try {
       await _audio.seekTo(clamped);
       state = state.copyWith(position: clamped);
+      _sessionRecorder?.flushPosition();
     } catch (error, stackTrace) {
       _setError(AppStrings.instance.playbackSeekFailed('$error'), stackTrace);
     }
@@ -546,6 +595,48 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       audioSourceStatus: AudioSourceStatus.local,
       downloadProgress: 0,
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Session persistence
+  // ---------------------------------------------------------------------------
+
+  /// Loads the queue the last run left behind, paused at its position.
+  void _restoreSession(bool restore) {
+    final recorder = _sessionRecorder;
+    if (recorder == null) return;
+
+    if (restore) {
+      final session = recorder.read();
+      if (session != null) {
+        final song = session.currentSong;
+        state = PlaybackState(
+          status: PlaybackStatus.paused,
+          position: song.isLiveStream ? Duration.zero : session.position,
+          duration: _knownDuration(song),
+          volume: state.volume,
+          playMode: session.playMode,
+          queue: session.queue,
+          currentUri: session.currentUri,
+          history: session.history,
+          audioSourceStatus: _initialSourceStatus(song),
+        );
+      }
+    }
+
+    final volume = recorder.readVolume();
+    if (volume != state.volume) {
+      state = state.copyWith(volume: volume);
+    }
+    unawaited(_applyVolume(volume));
+  }
+
+  Future<void> _applyVolume(double volume) async {
+    try {
+      await _audio.setVolume(volume);
+    } catch (error, stackTrace) {
+      Log.error('恢复音量失败: $error\n$stackTrace');
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -854,6 +945,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
   @override
   void dispose() {
+    _removeSessionListener?.call();
+    _removeSessionListener = null;
+    _sessionRecorder?.close();
     for (final subscription in _subscriptions) {
       subscription.cancel();
     }
