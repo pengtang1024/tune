@@ -170,6 +170,7 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   favorites: favorites,
                   onPlay: _play,
                   onToggleFavorite: _like,
+                  onDoubleTapFavorite: _mark,
                   onAddToQueue: _addToQueue,
                   waitsForDoubleClick: settings.onlyLikeOnDoubleClick,
                 ),
@@ -192,6 +193,11 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   /// Marks the track, or takes the mark away when it is already there.
   void _like(Song song) {
     ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+  }
+
+  /// A double click adds a mark; it never takes one away.
+  void _mark(Song song) {
+    ref.read(favoritesControllerProvider.notifier).mark(song.uri);
   }
 
   void _addToQueue(Song song) {
@@ -284,6 +290,9 @@ class _Body extends StatelessWidget {
 
   /// Marks the track, or takes the mark away when it is already there.
   final ValueChanged<Song> onToggleFavorite;
+
+  /// A double click adds a mark; it never takes one away.
+  final ValueChanged<Song> onDoubleTapFavorite;
   final ValueChanged<Song> onAddToQueue;
 
   /// Whether a click waits for a possible second click before it plays.
@@ -298,6 +307,7 @@ class _Body extends StatelessWidget {
     required this.favorites,
     required this.onPlay,
     required this.onToggleFavorite,
+    required this.onDoubleTapFavorite,
     required this.onAddToQueue,
     required this.waitsForDoubleClick,
   });
@@ -352,6 +362,7 @@ class _Body extends StatelessWidget {
             favorites: favorites,
             onPlay: onPlay,
             onToggleFavorite: onToggleFavorite,
+            onDoubleTapFavorite: onDoubleTapFavorite,
             onAddToQueue: onAddToQueue,
             waitsForDoubleClick: waitsForDoubleClick,
           ),
@@ -424,6 +435,9 @@ class _SourceGroup extends StatelessWidget {
 
   /// Marks the track, or takes the mark away when it is already there.
   final ValueChanged<Song> onToggleFavorite;
+
+  /// A double click adds a mark; it never takes one away.
+  final ValueChanged<Song> onDoubleTapFavorite;
   final ValueChanged<Song> onAddToQueue;
 
   /// Whether a click waits for a possible second click before it plays.
@@ -438,6 +452,7 @@ class _SourceGroup extends StatelessWidget {
     required this.favorites,
     required this.onPlay,
     required this.onToggleFavorite,
+    required this.onDoubleTapFavorite,
     required this.onAddToQueue,
     required this.waitsForDoubleClick,
   });
@@ -524,6 +539,7 @@ class _SourceGroup extends StatelessWidget {
             isFavorite: favorites.contains(result.songs[index].uri),
             onPlay: () => onPlay(result, index),
             onToggleFavorite: () => onToggleFavorite(result.songs[index]),
+            onDoubleTapFavorite: () => onDoubleTapFavorite(result.songs[index]),
             onAddToQueue: () => onAddToQueue(result.songs[index]),
             waitsForDoubleClick: waitsForDoubleClick,
           ),
@@ -541,6 +557,9 @@ class _SongRow extends StatelessWidget {
 
   /// Marks the track, or takes the mark away when it is already there.
   final VoidCallback onToggleFavorite;
+
+  /// A double click adds a mark; it never takes one away.
+  final VoidCallback onDoubleTapFavorite;
   final VoidCallback onAddToQueue;
 
   /// Whether a click waits for a possible second click before it plays.
@@ -555,6 +574,7 @@ class _SongRow extends StatelessWidget {
     required this.isFavorite,
     required this.onPlay,
     required this.onToggleFavorite,
+    required this.onDoubleTapFavorite,
     required this.onAddToQueue,
     required this.waitsForDoubleClick,
   });
@@ -569,7 +589,7 @@ class _SongRow extends StatelessWidget {
 
     return TrackClickArea(
       onClick: onPlay,
-      onDoubleClick: onToggleFavorite,
+      onDoubleClick: onDoubleTapFavorite,
       waitsForDoubleClick: waitsForDoubleClick,
       borderRadius: CompactTokens.borderRadius8,
       child: Padding(

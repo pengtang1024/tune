@@ -188,6 +188,68 @@ void main() {
     expect(find.text('Alpha'), findsNothing);
   });
 
+  testWidgets('a double click on a favorite keeps the mark', (tester) async {
+    await tester.pumpWidget(
+      app(home: const FavoritesPane(), songs: const [songA]),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FavoritesPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .toggle(songA.uri);
+    await tester.pumpAndSettle();
+    expect(find.text('Alpha'), findsOneWidget);
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(favoritesControllerProvider).contains(songA.uri),
+      isTrue,
+      reason: 'a double click may add a mark but never takes one away',
+    );
+    expect(find.text('Alpha'), findsOneWidget);
+  });
+
+  testWidgets('a double click on a heart does not take two marks away', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      app(home: const FavoritesPane(), songs: const [songA, songB]),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FavoritesPane)),
+    );
+    final controller = container.read(favoritesControllerProvider.notifier);
+    await controller.toggle(songA.uri);
+    await controller.toggle(songB.uri);
+    await tester.pumpAndSettle();
+    expect(find.byType(FavoriteButton), findsNWidgets(2));
+
+    final heart = tester.getCenter(find.byType(FavoriteButton).first);
+    await tester.tapAt(heart);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(heart);
+    await tester.pumpAndSettle();
+
+    final favorites = container.read(favoritesControllerProvider);
+    // The first click takes Alpha away; the second click must not land on
+    // Beta, which moved up under the pointer.
+    expect(favorites.contains(songA.uri), isFalse);
+    expect(
+      favorites.contains(songB.uri),
+      isTrue,
+      reason: 'a double click on one heart may not remove the next track',
+    );
+  });
+
   test('two marks in a row both reach the store', () async {
     final store = _LateFirstWritePersistence();
     final container = ProviderContainer(

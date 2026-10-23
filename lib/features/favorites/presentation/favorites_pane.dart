@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,11 +26,39 @@ import 'package:tune/shared/ui/source_label.dart';
 /// The page is a view of the library: a favorite is a track of the library
 /// the user kept, so the page names the tracks the library knows and the
 /// controller says which of them are marked.
-class FavoritesPane extends ConsumerWidget {
+class FavoritesPane extends ConsumerStatefulWidget {
   const FavoritesPane({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavoritesPane> createState() => _FavoritesPaneState();
+}
+
+class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
+  Timer? _clickGuard;
+  bool _ignoreClicks = false;
+
+  @override
+  void dispose() {
+    _clickGuard?.cancel();
+    super.dispose();
+  }
+
+  /// Blocks the second click of a double click on a heart.
+  ///
+  /// Taking a mark away removes the row, so the next row slides under the
+  /// pointer. Without this guard the second click would take the mark of the
+  /// next track instead of being part of the same gesture.
+  void _guardClicks() {
+    _clickGuard?.cancel();
+    if (!_ignoreClicks) setState(() => _ignoreClicks = true);
+    _clickGuard = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      setState(() => _ignoreClicks = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final library = ref.watch(libraryControllerProvider);
     final favorites = ref.watch(favoritesControllerProvider);
     final settings = ref.watch(settingsControllerProvider);
@@ -71,10 +101,9 @@ class FavoritesPane extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               PageHeading(
-                // The favorites belong to the collection, so the page names
-                // the same section as the library instead of repeating its
-                // own.
-                eyebrow: context.loc.libraryEyebrow,
+                // Favorites are a collection of their own, so the page
+                // names that section instead of borrowing the library's.
+                eyebrow: context.loc.favoritesEyebrow,
                 title: context.loc.favoritesTitle,
                 subtitle: context.loc.favoritesSubtitle,
                 trailing: Text(
@@ -162,39 +191,49 @@ class FavoritesPane extends ConsumerWidget {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(
-        CompactTokens.pageGutter,
-        0,
-        CompactTokens.pageGutter,
-        CompactTokens.space8,
+    return IgnorePointer(
+      ignoring: _ignoreClicks,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.pageGutter,
+          0,
+          CompactTokens.pageGutter,
+          CompactTokens.space8,
+        ),
+        itemCount: songs.length,
+        itemBuilder: (context, index) {
+          final song = songs[index];
+          return FavoritesTrackRow(
+            key: ValueKey(song.uri),
+            song: song,
+            index: index,
+            selected: song.uri == playback.$1,
+            playing: playback.$2,
+            source: sourceLabel(song, sourceLabels),
+            onTap: () {
+              // The list the user clicks in decides what happens to the queue;
+              // by default the track joins the queue and plays right away.
+              ref.read(listPlaybackProvider).play(song);
+            },
+            onDoubleTap: () => _markFavorite(ref, song),
+            waitsForDoubleClick: onlyLikeOnDoubleClick,
+            onToggleFavorite: () => _toggleFavorite(ref, song),
+          );
+        },
       ),
-      itemCount: songs.length,
-      itemBuilder: (context, index) {
-        final song = songs[index];
-        return FavoritesTrackRow(
-          key: ValueKey(song.uri),
-          song: song,
-          index: index,
-          selected: song.uri == playback.$1,
-          playing: playback.$2,
-          source: sourceLabel(song, sourceLabels),
-          onTap: () {
-            // The list the user clicks in decides what happens to the queue;
-            // by default the track joins the queue and plays right away.
-            ref.read(listPlaybackProvider).play(song);
-          },
-          onDoubleTap: () => _toggleFavorite(ref, song),
-          waitsForDoubleClick: onlyLikeOnDoubleClick,
-          onToggleFavorite: () => _toggleFavorite(ref, song),
-        );
-      },
     );
   }
 
   /// Marks the track, or takes the mark away when it is already there.
   void _toggleFavorite(WidgetRef ref, Song song) {
     ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+    // A double click on the heart must not reach the row that slides up.
+    _guardClicks();
+  }
+
+  /// A double click adds a mark; it never takes one away.
+  void _markFavorite(WidgetRef ref, Song song) {
+    ref.read(favoritesControllerProvider.notifier).mark(song.uri);
   }
 }
 

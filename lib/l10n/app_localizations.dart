@@ -388,6 +388,12 @@ abstract class AppLocalizations {
   /// **'当前播放会停止，队列中的歌曲不会从音乐库删除。'**
   String get queueClearMessage;
 
+  /// No description provided for @queueReorderTooltip.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'拖动排序'**
+  String get queueReorderTooltip;
+
   /// No description provided for @favoritesTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -399,6 +405,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'标了心的曲子都在这里'**
   String get favoritesSubtitle;
+
+  /// No description provided for @favoritesEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏'**
+  String get favoritesEyebrow;
 
   /// No description provided for @favoritesEmptyTitle.
   ///
@@ -664,12 +676,6 @@ abstract class AppLocalizations {
   /// **'更多音源'**
   String get sourcesGroupMore;
 
-  /// No description provided for @sourcesGroupAdded.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'我添加的'**
-  String get sourcesGroupAdded;
-
   /// No description provided for @sourcesAdd.
   ///
   /// In zh_CN, this message translates to:
@@ -723,6 +729,161 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'更多操作'**
   String get sourcesMenu;
+
+  /// No description provided for @sourcesMoveUp.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'上移'**
+  String get sourcesMoveUp;
+
+  /// No description provided for @sourcesMoveDown.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下移'**
+  String get sourcesMoveDown;
+
+  /// No description provided for @sourcesMoveToMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'移到更多音源'**
+  String get sourcesMoveToMore;
+
+  /// No description provided for @sourcesMoveToMain.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'移回主列表'**
+  String get sourcesMoveToMain;
+
+  /// No description provided for @sourcesMovedToMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已移到更多音源'**
+  String get sourcesMovedToMore;
+
+  /// No description provided for @sourcesMovedToMain.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已移回主列表'**
+  String get sourcesMovedToMain;
+
+  /// No description provided for @sourcesHealthScore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'健康度 {score}/100'**
+  String sourcesHealthScore(int score);
+
+  /// No description provided for @sourcesHealthBreakdown.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 覆盖 {coverage}% · 活跃 {activity}%'**
+  String sourcesHealthBreakdown(
+    int availability,
+    int configuration,
+    int scan,
+    int freshness,
+    int output,
+    int speed,
+    int reliability,
+    int stability,
+    int coverage,
+    int activity,
+  );
+
+  /// No description provided for @sourcesHealthWeightsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'健康度权重'**
+  String get sourcesHealthWeightsTitle;
+
+  /// No description provided for @sourcesHealthWeightsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'调高某个维度，它在健康度里的分量更大；总权重会自动归一化。'**
+  String get sourcesHealthWeightsHint;
+
+  /// No description provided for @sourcesHealthWeightsTotal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'总权重 {total} · 自动归一化'**
+  String sourcesHealthWeightsTotal(int total);
+
+  /// No description provided for @settingsSourceHealthDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。'**
+  String get settingsSourceHealthDescription;
+
+  /// No description provided for @settingsAdjustSourceHealthWeights.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'调整权重'**
+  String get settingsAdjustSourceHealthWeights;
+
+  /// No description provided for @sourcesHealthWeightsReset.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复默认'**
+  String get sourcesHealthWeightsReset;
+
+  /// No description provided for @sourcesHealthAvailability.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用'**
+  String get sourcesHealthAvailability;
+
+  /// No description provided for @sourcesHealthConfiguration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'配置'**
+  String get sourcesHealthConfiguration;
+
+  /// No description provided for @sourcesHealthScan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描'**
+  String get sourcesHealthScan;
+
+  /// No description provided for @sourcesHealthFreshness.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜'**
+  String get sourcesHealthFreshness;
+
+  /// No description provided for @sourcesHealthOutput.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'产出'**
+  String get sourcesHealthOutput;
+
+  /// No description provided for @sourcesHealthSpeed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'速度'**
+  String get sourcesHealthSpeed;
+
+  /// No description provided for @sourcesHealthReliability.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可靠'**
+  String get sourcesHealthReliability;
+
+  /// No description provided for @sourcesHealthStability.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'稳定'**
+  String get sourcesHealthStability;
+
+  /// No description provided for @sourcesHealthCoverage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'覆盖'**
+  String get sourcesHealthCoverage;
+
+  /// No description provided for @sourcesHealthActivity.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'活跃'**
+  String get sourcesHealthActivity;
 
   /// No description provided for @sourceDirectUrlName.
   ///
@@ -1321,7 +1482,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSubtitle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'调整外观、语言和本地音乐库。'**
+  /// **'调整外观、语言、音乐库与音源健康度。'**
   String get settingsSubtitle;
 
   /// No description provided for @settingsThemeDescription.
@@ -2797,7 +2958,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryEyebrow.
   ///
   /// In zh_CN, this message translates to:
-  /// **'收藏'**
+  /// **'资料库'**
   String get libraryEyebrow;
 
   /// No description provided for @sourcesEyebrow.
@@ -2806,11 +2967,11 @@ abstract class AppLocalizations {
   /// **'连接'**
   String get sourcesEyebrow;
 
-  /// No description provided for @sidebarCollect.
+  /// No description provided for @sidebarBrowse.
   ///
   /// In zh_CN, this message translates to:
-  /// **'收藏'**
-  String get sidebarCollect;
+  /// **'浏览'**
+  String get sidebarBrowse;
 
   /// No description provided for @sidebarConnect.
   ///
@@ -2959,8 +3120,20 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPlaybackDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'决定单击与双击歌曲时会发生什么'**
+  /// **'决定启动时的播放行为，以及单击、双击歌曲时会发生什么'**
   String get settingsPlaybackDescription;
+
+  /// No description provided for @settingsResumePlaybackOnStartup.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启动时继续上次播放'**
+  String get settingsResumePlaybackOnStartup;
+
+  /// No description provided for @settingsResumePlaybackOnStartupHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始'**
+  String get settingsResumePlaybackOnStartupHint;
 
   /// No description provided for @settingsReplaceQueueOnClick.
   ///

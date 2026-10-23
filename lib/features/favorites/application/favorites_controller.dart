@@ -34,7 +34,25 @@ class FavoritesController extends Notifier<FavoritesState> {
   /// Whether the track with this address is one of the favorites.
   bool contains(String id) => state.contains(id);
 
+  /// Marks the track.
+  ///
+  /// A double click uses this: it may add a mark but never takes one away.
+  /// A track that is already marked stays exactly as it is, so a double click
+  /// on a favorite in the favorites page does not remove it.
+  Future<void> mark(String id) async {
+    if (id.isEmpty || state.contains(id)) return;
+
+    final ids = {...state.ids, id};
+    state = FavoritesState(ids: Set.unmodifiable(ids));
+    final store = ref.read(favoritesStoreProvider);
+    _writing = _writing.then((_) => _write(store, ids));
+    await _writing;
+  }
+
   /// Marks the track, or takes the mark away when it is already there.
+  ///
+  /// The heart is a single click and uses this: it is the only action that
+  /// takes a mark away.
   Future<void> toggle(String id) async {
     if (id.isEmpty) return;
 

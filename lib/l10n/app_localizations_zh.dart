@@ -161,10 +161,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get queueClearMessage => '当前播放会停止，队列中的歌曲不会从音乐库删除。';
 
   @override
+  String get queueReorderTooltip => '拖动排序';
+
+  @override
   String get favoritesTitle => '喜欢';
 
   @override
   String get favoritesSubtitle => '标了心的曲子都在这里';
+
+  @override
+  String get favoritesEyebrow => '收藏';
 
   @override
   String get favoritesEmptyTitle => '还没有喜欢的曲子';
@@ -331,9 +337,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesGroupMore => '更多音源';
 
   @override
-  String get sourcesGroupAdded => '我添加的';
-
-  @override
   String get sourcesAdd => '添加音源';
 
   @override
@@ -363,6 +366,96 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourcesMenu => '更多操作';
+
+  @override
+  String get sourcesMoveUp => '上移';
+
+  @override
+  String get sourcesMoveDown => '下移';
+
+  @override
+  String get sourcesMoveToMore => '移到更多音源';
+
+  @override
+  String get sourcesMoveToMain => '移回主列表';
+
+  @override
+  String get sourcesMovedToMore => '已移到更多音源';
+
+  @override
+  String get sourcesMovedToMain => '已移回主列表';
+
+  @override
+  String sourcesHealthScore(int score) {
+    return '健康度 $score/100';
+  }
+
+  @override
+  String sourcesHealthBreakdown(
+    int availability,
+    int configuration,
+    int scan,
+    int freshness,
+    int output,
+    int speed,
+    int reliability,
+    int stability,
+    int coverage,
+    int activity,
+  ) {
+    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 覆盖 $coverage% · 活跃 $activity%';
+  }
+
+  @override
+  String get sourcesHealthWeightsTitle => '健康度权重';
+
+  @override
+  String get sourcesHealthWeightsHint => '调高某个维度，它在健康度里的分量更大；总权重会自动归一化。';
+
+  @override
+  String sourcesHealthWeightsTotal(int total) {
+    return '总权重 $total · 自动归一化';
+  }
+
+  @override
+  String get settingsSourceHealthDescription =>
+      '十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
+
+  @override
+  String get settingsAdjustSourceHealthWeights => '调整权重';
+
+  @override
+  String get sourcesHealthWeightsReset => '恢复默认';
+
+  @override
+  String get sourcesHealthAvailability => '可用';
+
+  @override
+  String get sourcesHealthConfiguration => '配置';
+
+  @override
+  String get sourcesHealthScan => '扫描';
+
+  @override
+  String get sourcesHealthFreshness => '新鲜';
+
+  @override
+  String get sourcesHealthOutput => '产出';
+
+  @override
+  String get sourcesHealthSpeed => '速度';
+
+  @override
+  String get sourcesHealthReliability => '可靠';
+
+  @override
+  String get sourcesHealthStability => '稳定';
+
+  @override
+  String get sourcesHealthCoverage => '覆盖';
+
+  @override
+  String get sourcesHealthActivity => '活跃';
 
   @override
   String get sourceDirectUrlName => '直链音频';
@@ -680,7 +773,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsTitle => '设置';
 
   @override
-  String get settingsSubtitle => '调整外观、语言和本地音乐库。';
+  String get settingsSubtitle => '调整外观、语言、音乐库与音源健康度。';
 
   @override
   String get settingsThemeDescription => '选择界面的明暗气质和显示语言。';
@@ -1488,13 +1581,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalFirst => '本地优先';
 
   @override
-  String get libraryEyebrow => '收藏';
+  String get libraryEyebrow => '资料库';
 
   @override
   String get sourcesEyebrow => '连接';
 
   @override
-  String get sidebarCollect => '收藏';
+  String get sidebarBrowse => '浏览';
 
   @override
   String get sidebarConnect => '连接';
@@ -1574,7 +1667,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPlaybackTitle => '播放行为';
 
   @override
-  String get settingsPlaybackDescription => '决定单击与双击歌曲时会发生什么';
+  String get settingsPlaybackDescription => '决定启动时的播放行为，以及单击、双击歌曲时会发生什么';
+
+  @override
+  String get settingsResumePlaybackOnStartup => '启动时继续上次播放';
+
+  @override
+  String get settingsResumePlaybackOnStartupHint =>
+      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -1747,10 +1847,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get queueClearMessage => '当前播放会停止，队列中的歌曲不会从音乐库删除。';
 
   @override
+  String get queueReorderTooltip => '拖动排序';
+
+  @override
   String get favoritesTitle => '喜欢';
 
   @override
   String get favoritesSubtitle => '标了心的曲子都在这里';
+
+  @override
+  String get favoritesEyebrow => '收藏';
 
   @override
   String get favoritesEmptyTitle => '还没有喜欢的曲子';
@@ -1917,9 +2023,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesGroupMore => '更多音源';
 
   @override
-  String get sourcesGroupAdded => '我添加的';
-
-  @override
   String get sourcesAdd => '添加音源';
 
   @override
@@ -1949,6 +2052,96 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourcesMenu => '更多操作';
+
+  @override
+  String get sourcesMoveUp => '上移';
+
+  @override
+  String get sourcesMoveDown => '下移';
+
+  @override
+  String get sourcesMoveToMore => '移到更多音源';
+
+  @override
+  String get sourcesMoveToMain => '移回主列表';
+
+  @override
+  String get sourcesMovedToMore => '已移到更多音源';
+
+  @override
+  String get sourcesMovedToMain => '已移回主列表';
+
+  @override
+  String sourcesHealthScore(int score) {
+    return '健康度 $score/100';
+  }
+
+  @override
+  String sourcesHealthBreakdown(
+    int availability,
+    int configuration,
+    int scan,
+    int freshness,
+    int output,
+    int speed,
+    int reliability,
+    int stability,
+    int coverage,
+    int activity,
+  ) {
+    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 覆盖 $coverage% · 活跃 $activity%';
+  }
+
+  @override
+  String get sourcesHealthWeightsTitle => '健康度权重';
+
+  @override
+  String get sourcesHealthWeightsHint => '调高某个维度，它在健康度里的分量更大；总权重会自动归一化。';
+
+  @override
+  String sourcesHealthWeightsTotal(int total) {
+    return '总权重 $total · 自动归一化';
+  }
+
+  @override
+  String get settingsSourceHealthDescription =>
+      '十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
+
+  @override
+  String get settingsAdjustSourceHealthWeights => '调整权重';
+
+  @override
+  String get sourcesHealthWeightsReset => '恢复默认';
+
+  @override
+  String get sourcesHealthAvailability => '可用';
+
+  @override
+  String get sourcesHealthConfiguration => '配置';
+
+  @override
+  String get sourcesHealthScan => '扫描';
+
+  @override
+  String get sourcesHealthFreshness => '新鲜';
+
+  @override
+  String get sourcesHealthOutput => '产出';
+
+  @override
+  String get sourcesHealthSpeed => '速度';
+
+  @override
+  String get sourcesHealthReliability => '可靠';
+
+  @override
+  String get sourcesHealthStability => '稳定';
+
+  @override
+  String get sourcesHealthCoverage => '覆盖';
+
+  @override
+  String get sourcesHealthActivity => '活跃';
 
   @override
   String get sourceDirectUrlName => '直链音频';
@@ -2266,7 +2459,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsTitle => '设置';
 
   @override
-  String get settingsSubtitle => '调整外观、语言和本地音乐库。';
+  String get settingsSubtitle => '调整外观、语言、音乐库与音源健康度。';
 
   @override
   String get settingsThemeDescription => '选择界面的明暗气质和显示语言。';
@@ -3074,13 +3267,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsLocalFirst => '本地优先';
 
   @override
-  String get libraryEyebrow => '收藏';
+  String get libraryEyebrow => '资料库';
 
   @override
   String get sourcesEyebrow => '连接';
 
   @override
-  String get sidebarCollect => '收藏';
+  String get sidebarBrowse => '浏览';
 
   @override
   String get sidebarConnect => '连接';
@@ -3160,7 +3353,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsPlaybackTitle => '播放行为';
 
   @override
-  String get settingsPlaybackDescription => '决定单击与双击歌曲时会发生什么';
+  String get settingsPlaybackDescription => '决定启动时的播放行为，以及单击、双击歌曲时会发生什么';
+
+  @override
+  String get settingsResumePlaybackOnStartup => '启动时继续上次播放';
+
+  @override
+  String get settingsResumePlaybackOnStartupHint =>
+      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -3333,10 +3533,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get queueClearMessage => '目前播放會停止，佇列中的歌曲不會從音樂庫刪除。';
 
   @override
+  String get queueReorderTooltip => '拖曳排序';
+
+  @override
   String get favoritesTitle => '喜歡';
 
   @override
   String get favoritesSubtitle => '標了心的曲子都在這裡';
+
+  @override
+  String get favoritesEyebrow => '收藏';
 
   @override
   String get favoritesEmptyTitle => '還沒有喜歡的曲子';
@@ -3503,9 +3709,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesGroupMore => '更多音源';
 
   @override
-  String get sourcesGroupAdded => '我新增的';
-
-  @override
   String get sourcesAdd => '新增音源';
 
   @override
@@ -3535,6 +3738,96 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesMenu => '更多操作';
+
+  @override
+  String get sourcesMoveUp => '上移';
+
+  @override
+  String get sourcesMoveDown => '下移';
+
+  @override
+  String get sourcesMoveToMore => '移到更多音源';
+
+  @override
+  String get sourcesMoveToMain => '移回主清單';
+
+  @override
+  String get sourcesMovedToMore => '已移到更多音源';
+
+  @override
+  String get sourcesMovedToMain => '已移回主清單';
+
+  @override
+  String sourcesHealthScore(int score) {
+    return '健康度 $score/100';
+  }
+
+  @override
+  String sourcesHealthBreakdown(
+    int availability,
+    int configuration,
+    int scan,
+    int freshness,
+    int output,
+    int speed,
+    int reliability,
+    int stability,
+    int coverage,
+    int activity,
+  ) {
+    return '可用 $availability% · 設定 $configuration% · 掃描 $scan% · 新鮮 $freshness% · 產出 $output% · 速度 $speed% · 可靠 $reliability% · 穩定 $stability% · 覆蓋 $coverage% · 活躍 $activity%';
+  }
+
+  @override
+  String get sourcesHealthWeightsTitle => '健康度權重';
+
+  @override
+  String get sourcesHealthWeightsHint => '調高某個維度，它在健康度裡的分量更大；總權重會自動歸一化。';
+
+  @override
+  String sourcesHealthWeightsTotal(int total) {
+    return '總權重 $total · 自動歸一化';
+  }
+
+  @override
+  String get settingsSourceHealthDescription =>
+      '十個維度目前的分量；調高一個維度，它在健康度裡的佔比就更大。';
+
+  @override
+  String get settingsAdjustSourceHealthWeights => '調整權重';
+
+  @override
+  String get sourcesHealthWeightsReset => '恢復預設';
+
+  @override
+  String get sourcesHealthAvailability => '可用';
+
+  @override
+  String get sourcesHealthConfiguration => '設定';
+
+  @override
+  String get sourcesHealthScan => '掃描';
+
+  @override
+  String get sourcesHealthFreshness => '新鮮';
+
+  @override
+  String get sourcesHealthOutput => '產出';
+
+  @override
+  String get sourcesHealthSpeed => '速度';
+
+  @override
+  String get sourcesHealthReliability => '可靠';
+
+  @override
+  String get sourcesHealthStability => '穩定';
+
+  @override
+  String get sourcesHealthCoverage => '覆蓋';
+
+  @override
+  String get sourcesHealthActivity => '活躍';
 
   @override
   String get sourceDirectUrlName => '直鏈音訊';
@@ -3852,7 +4145,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsTitle => '設定';
 
   @override
-  String get settingsSubtitle => '調整外觀、語言和本機音樂庫。';
+  String get settingsSubtitle => '調整外觀、語言、音樂庫與音源健康度。';
 
   @override
   String get settingsThemeDescription => '選擇介面的明暗風格和顯示語言。';
@@ -4660,13 +4953,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsLocalFirst => '本機優先';
 
   @override
-  String get libraryEyebrow => '收藏';
+  String get libraryEyebrow => '資料庫';
 
   @override
   String get sourcesEyebrow => '連線';
 
   @override
-  String get sidebarCollect => '收藏';
+  String get sidebarBrowse => '瀏覽';
 
   @override
   String get sidebarConnect => '連線';
@@ -4746,7 +5039,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsPlaybackTitle => '播放行為';
 
   @override
-  String get settingsPlaybackDescription => '決定單擊與雙擊歌曲時會發生什麼';
+  String get settingsPlaybackDescription => '決定啟動時的播放行為，以及單擊、雙擊歌曲時會發生什麼';
+
+  @override
+  String get settingsResumePlaybackOnStartup => '啟動時繼續上次播放';
+
+  @override
+  String get settingsResumePlaybackOnStartupHint =>
+      '開啟 Tune 時恢復佇列和播放進度，停在暫停狀態；關掉後從空白佇列開始';
 
   @override
   String get settingsReplaceQueueOnClick => '單擊歌曲時取代播放佇列';
@@ -4759,5 +5059,5 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
-      '打開時雙擊只標成喜歡，不打斷正在放的曲子；關掉時雙擊照常播放並標成喜歡';
+      '開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡';
 }
