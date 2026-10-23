@@ -78,7 +78,7 @@
 - 面板是圆角卡片，和底栏同一套视觉：
   - 宽度规则：内容区宽度小于 640 时，面板占满内容区（左右各留 12）；
     否则宽度为 `min(440, max(360, 内容区宽度 - 240))`，给后面的页面留一点边缘。
-  - 上、右、下各留 12；圆角 18，边框 `outlineVariant`，阴影与底栏一致。
+  - 上、右、下各留 12；圆角 18，边框 `outlineVariant`，阴影与底栏同一层次。
 - 遮罩：`scrim` 约 28% 不透明度，只盖内容区；点遮罩关闭。
 - 打开时内容区不可交互（遮罩挡住），但侧栏和底栏不受影响。
 
@@ -276,3 +276,17 @@ flutter run -d linux
 - 队列的点播、重排、移除、清空、标心全部保留。
 - 760×520 / 900×600 / 1280×800、浅色/深色、中英文、1.3 倍文字缩放都不溢出。
 - `flutter analyze` 无问题，`flutter test` 全绿，截图与实机走查通过。
+
+---
+
+## 11. 实施记录
+
+- `lib/shared/ui/side_panel_host.dart`：遮罩、宽度规则、12px 边距、焦点排除、180ms 滑入。
+- `lib/features/queue/presentation/queue_panel.dart`：紧凑头部、列表、空状态、清空确认；`QueuePane` 已删除。
+- `TrackMeta` / `QueueTrackRow`：`dense` 两行信息；事实条与详情按钮只在整页行显示。
+- `CompactShell`：本地 `_queueOpen`，`SidePanelHost` 包住内容区，底栏和侧栏留在遮罩外；Esc 与 `PopScope` 关闭。
+- `NowPlayingPage`：本地 `_showQueue`，`queuePanelBuilder` 由 `app_router` 注入；Esc 先关侧栏。
+- `app_router`：删除 `/queue` 路由与白名单；深链接落到 `/library`。
+- 测试：`test/app/compact_layout_test.dart` 覆盖面板开关、底栏可用、侧栏切页、Esc/遮罩/返回、空队列、1.3 倍英文与正在播放页；`layout_alignment_test` 覆盖面板宽度与行边界；`localization_render_test` 渲染面板；`router_navigation_test` 覆盖深链接。
+- 门禁：`flutter gen-l10n`、`flutter analyze`、`flutter test`、`flutter test tool/layout_shots_test.dart` 均通过。
+- 截图：`build/layout-shots/queue_panel*.png`、`now_playing_queue*.png`。
