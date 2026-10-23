@@ -170,6 +170,17 @@ class MusicSourceService implements StreamUrlResolver {
     return _adapters[config.sourceType]?.isConfigured(config) ?? false;
   }
 
+  /// How often the type wants to be refreshed.
+  Duration autoScanIntervalFor(MusicSourceConfig config) {
+    return _adapters[config.sourceType]?.autoScanInterval ?? Duration.zero;
+  }
+
+  /// How long a scan of the type may take before it times out.
+  Duration scanTimeoutFor(MusicSourceConfig config) {
+    return _adapters[config.sourceType]?.scanTimeout ??
+        const Duration(seconds: 45);
+  }
+
   String configurationHint(MusicSourceConfig config) {
     return _adapters[config.sourceType]?.configurationHint ??
         AppStrings.instance.sourceErrorUnsupported;

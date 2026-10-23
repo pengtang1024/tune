@@ -196,6 +196,15 @@ class MusicSourceConfig {
   /// user added can be deleted with its tracks.
   final bool builtIn;
 
+  /// Where the source stands in the reader's order.
+  ///
+  /// A higher number stands earlier. The local music is pinned at
+  /// [SourceWeights.local]; the other sources may be moved, and a source
+  /// below [SourceWeights.mainThreshold] waits in the folded "More sources"
+  /// group. A configuration written before the weight existed has no number
+  /// and receives a default when the controller reads it.
+  final int? weight;
+
   const MusicSourceConfig({
     required this.id,
     this.type = '',
@@ -206,6 +215,7 @@ class MusicSourceConfig {
     this.enabled = true,
     this.settings = const {},
     this.builtIn = false,
+    this.weight,
   });
 
   /// The type the adapter registry is asked for.
@@ -237,6 +247,7 @@ class MusicSourceConfig {
     bool? enabled,
     Map<String, String>? settings,
     bool? builtIn,
+    int? weight,
   }) {
     return MusicSourceConfig(
       id: id ?? this.id,
@@ -248,6 +259,7 @@ class MusicSourceConfig {
       enabled: enabled ?? this.enabled,
       settings: settings ?? this.settings,
       builtIn: builtIn ?? this.builtIn,
+      weight: weight ?? this.weight,
     );
   }
 
@@ -263,6 +275,7 @@ class MusicSourceConfig {
     }
 
     final rawEnabled = json['enabled'];
+    final rawWeight = json['weight'];
 
     final id = json['id']?.toString() ?? '';
     return MusicSourceConfig(
@@ -275,6 +288,7 @@ class MusicSourceConfig {
       enabled: rawEnabled is bool ? rawEnabled : true,
       settings: Map.unmodifiable(settings),
       builtIn: json['builtIn'] == true,
+      weight: rawWeight is num ? rawWeight.toInt() : null,
     );
   }
 
@@ -287,6 +301,7 @@ class MusicSourceConfig {
     'kind': kind.name,
     'enabled': enabled,
     'settings': settings,
+    if (weight != null) 'weight': weight,
   };
 
   static MusicSourceKind _kindFromName(String? name) {

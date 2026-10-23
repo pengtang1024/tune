@@ -36,12 +36,17 @@ class SourceScanSummary {
   final String? message;
   final DateTime scannedAt;
 
+  /// How long the last scan took. Zero when the summary came from a cache or
+  /// from a test that did not care.
+  final Duration elapsed;
+
   const SourceScanSummary({
     required this.sourceId,
     required this.status,
     required this.songCount,
     required this.scannedAt,
     this.message,
+    this.elapsed = Duration.zero,
   });
 
   factory SourceScanSummary.fromResult(SourceScanResult result) {
@@ -51,6 +56,7 @@ class SourceScanSummary {
       songCount: result.songCount,
       scannedAt: result.scannedAt,
       message: result.message,
+      elapsed: result.elapsed,
     );
   }
 }

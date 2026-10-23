@@ -1,7 +1,7 @@
 import 'dart:math' as math;
-
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
+import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// Reads lyrics from LRCLIB, an open database of song lyrics.
@@ -34,10 +34,9 @@ class LrclibLyricsProvider implements LyricsProvider {
             BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 15),
-              headers: const {
-                'Accept': 'application/json',
-                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
-              },
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
             ),
           );
 

@@ -51,10 +51,7 @@ void main() {
 
     // The types the app serves are offered. The local folder is a setting of
     // the app, not an instance the reader adds.
-    expect(
-      find.byKey(const ValueKey('source-type-openverse')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('source-type-openverse')), findsOneWidget);
     expect(find.byKey(const ValueKey('source-type-local')), findsNothing);
   });
 
@@ -80,8 +77,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('source-form-save')));
     await tester.pumpAndSettle();
 
-    // The source joins the group of the ones the reader added.
-    expect(find.text('我添加的'), findsOneWidget);
+    // The source joins the weighted list; it is not a separate group.
+    expect(find.text('我添加的'), findsNothing);
     expect(find.text('深夜爵士'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('source-switch-openverse-1')),

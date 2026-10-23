@@ -12,6 +12,7 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
+import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -27,10 +28,18 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   /// Whether the desktop entry of Tune is in place.
   bool _desktopEntryInstalled = false;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _loadDefaultPlayerState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -57,7 +66,9 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         ref.watch(defaultPlayerServiceProvider).isSupported;
 
     return Scrollbar(
+      controller: _scrollController,
       child: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(
           CompactTokens.pageGutter,
           CompactTokens.pageTopPadding,
@@ -93,13 +104,18 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 ),
                 const SizedBox(height: 14),
                 SettingsPlaybackCard(
+                  restorePlaybackOnStartup: settings.restorePlaybackOnStartup,
                   replaceQueueOnClick: settings.replaceQueueOnClick,
                   onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
+                  onRestorePlaybackOnStartup:
+                      settingsController.setRestorePlaybackOnStartup,
                   onReplaceQueueOnClick:
                       settingsController.setReplaceQueueOnClick,
                   onOnlyLikeOnDoubleClick:
                       settingsController.setOnlyLikeOnDoubleClick,
                 ),
+                const SizedBox(height: 14),
+                const SettingsSourceHealthCard(),
                 if (hasDesktopIntegration) ...[
                   const SizedBox(height: 14),
                   SettingsDesktopCard(

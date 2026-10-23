@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/sources/domain/source_scan_health.dart';
 
 class MusicSourcesState {
   final List<MusicSourceConfig> sources;
@@ -7,9 +8,13 @@ class MusicSourcesState {
   /// useful status before the first scan of this session finishes.
   final Map<String, DateTime> lastScanAt;
 
+  /// The recent scan outcomes that feed the stability dimension.
+  final Map<String, SourceScanHealthHistory> healthHistory;
+
   const MusicSourcesState({
     this.sources = const [],
     this.lastScanAt = const {},
+    this.healthHistory = const {},
   });
 
   MusicSourceConfig? byId(String id) {
@@ -27,10 +32,12 @@ class MusicSourcesState {
   MusicSourcesState copyWith({
     List<MusicSourceConfig>? sources,
     Map<String, DateTime>? lastScanAt,
+    Map<String, SourceScanHealthHistory>? healthHistory,
   }) {
     return MusicSourcesState(
       sources: sources ?? this.sources,
       lastScanAt: lastScanAt ?? this.lastScanAt,
+      healthHistory: healthHistory ?? this.healthHistory,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/sources/domain/source_scan_health.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Persists source configuration and auto-scan timestamps.
@@ -11,6 +12,7 @@ import 'package:tune/utils/logger.dart';
 class MusicSourceStore {
   static const configsKey = 'music_sources_v1';
   static const lastScanKey = 'music_source_last_scan_v1';
+  static const healthKey = 'music_source_health_v1';
 
   final PersistenceService _persistence;
 
@@ -60,15 +62,14 @@ class MusicSourceStore {
         builtIn.copyWith(
           enabled: saved.enabled,
           settings: _mergedSettings(builtIn, saved),
+          weight: saved.weight,
         ),
       );
     }
 
     // Preserve future user-imported sources instead of silently dropping them.
     merged.addAll(
-      stored.values.where(
-        (config) => config.sourceType != retiredPluginType,
-      ),
+      stored.values.where((config) => config.sourceType != retiredPluginType),
     );
     return List.unmodifiable(merged);
   }
@@ -110,6 +111,38 @@ class MusicSourceStore {
       configs.map((config) => config.toJson()).toList(growable: false),
     );
     await _persistence.setString(configsKey, data);
+  }
+
+  /// The recent scan outcomes of every source, newest last.
+  Map<String, SourceScanHealthHistory> loadHealthHistory() {
+    final raw = _readSafely(healthKey);
+    if (raw == null || raw.trim().isEmpty) {
+      return const {};
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return const {};
+      final result = <String, SourceScanHealthHistory>{};
+      decoded.forEach((key, value) {
+        if (key is String && value is List) {
+          result[key] = SourceScanHealthHistory.fromJson(value);
+        }
+      });
+      return result;
+    } catch (error, stackTrace) {
+      Log.error('读取音源健康历史失败: $error\n$stackTrace');
+      return const {};
+    }
+  }
+
+  Future<void> saveHealthHistory(
+    Map<String, SourceScanHealthHistory> history,
+  ) async {
+    final data = jsonEncode({
+      for (final entry in history.entries) entry.key: entry.value.toJson(),
+    });
+    await _persistence.setString(healthKey, data);
   }
 
   DateTime? lastScanAt(String sourceId) {
