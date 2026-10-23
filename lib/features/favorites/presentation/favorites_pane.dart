@@ -51,6 +51,13 @@ class FavoritesPane extends ConsumerWidget {
       favorites,
     );
 
+    // The marks the library cannot name: a track that was marked from the
+    // online search and never scanned, or a track whose source is off now.
+    // The marks are kept, so the page has to say that they are not here.
+    // A library that did not load yet knows no track at all, so it may not
+    // say that the marks are outside of it.
+    final outside = library.hasValue ? favorites.count - songs.length : 0;
+
     return Column(
       children: [
         Padding(
@@ -60,18 +67,28 @@ class FavoritesPane extends ConsumerWidget {
             CompactTokens.pageGutter,
             CompactTokens.pageHeadingGap,
           ),
-          child: PageHeading(
-            // The favorites belong to the collection, so the page names the
-            // same section as the library instead of repeating its own.
-            eyebrow: context.loc.libraryEyebrow,
-            title: context.loc.favoritesTitle,
-            subtitle: context.loc.favoritesSubtitle,
-            trailing: Text(
-              context.loc.libraryTrackCount(songs.length),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PageHeading(
+                // The favorites belong to the collection, so the page names
+                // the same section as the library instead of repeating its
+                // own.
+                eyebrow: context.loc.libraryEyebrow,
+                title: context.loc.favoritesTitle,
+                subtitle: context.loc.favoritesSubtitle,
+                trailing: Text(
+                  context.loc.libraryTrackCount(favorites.count),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
-            ),
+              if (outside > 0) ...[
+                const SizedBox(height: CompactTokens.space8),
+                _OutsideNote(count: outside),
+              ],
+            ],
           ),
         ),
         Expanded(
@@ -80,6 +97,7 @@ class FavoritesPane extends ConsumerWidget {
             ref,
             library,
             songs,
+            favorites,
             playback,
             sourceLabels,
             settings.onlyLikeOnDoubleClick,
@@ -101,6 +119,7 @@ class FavoritesPane extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue<LibraryState> library,
     List<Song> songs,
+    FavoritesState favorites,
     (String?, bool) playback,
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick,
@@ -122,10 +141,20 @@ class FavoritesPane extends ConsumerWidget {
     }
 
     if (songs.isEmpty) {
+      // An empty page with marks in the store is not an empty collection:
+      // the library simply does not hold the tracks that were marked.
+      final markedOutside = favorites.count > 0;
+
       return EmptyStateView(
-        icon: Icons.favorite_border_rounded,
-        title: context.loc.favoritesEmptyTitle,
-        subtitle: context.loc.favoritesEmptySubtitle,
+        icon: markedOutside
+            ? Icons.help_outline_rounded
+            : Icons.favorite_border_rounded,
+        title: markedOutside
+            ? context.loc.favoritesEmptyOutsideTitle
+            : context.loc.favoritesEmptyTitle,
+        subtitle: markedOutside
+            ? context.loc.favoritesEmptyOutsideSubtitle
+            : context.loc.favoritesEmptySubtitle,
         action: FilledButton(
           onPressed: () => context.go('/library'),
           child: Text(context.loc.favoritesGoToLibrary),
@@ -166,5 +195,37 @@ class FavoritesPane extends ConsumerWidget {
   /// Marks the track, or takes the mark away when it is already there.
   void _toggleFavorite(WidgetRef ref, Song song) {
     ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+  }
+}
+
+/// The line that says how many marks the library cannot name.
+class _OutsideNote extends StatelessWidget {
+  final int count;
+
+  const _OutsideNote({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.info_outline_rounded,
+          size: CompactTokens.icon16,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: CompactTokens.space8),
+        Expanded(
+          child: Text(
+            context.loc.favoritesOutsideLibrary(count),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
