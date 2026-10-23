@@ -358,12 +358,6 @@ abstract class AppLocalizations {
   /// **'播放队列'**
   String get queueTitle;
 
-  /// No description provided for @queueSubtitle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'当前播放顺序'**
-  String get queueSubtitle;
-
   /// No description provided for @queueEmptyTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -435,6 +429,24 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'取消收藏'**
   String get favoriteRemove;
+
+  /// No description provided for @favoritesOutsideLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'另有 {count} 首标过，但不在音乐库里'**
+  String favoritesOutsideLibrary(int count);
+
+  /// No description provided for @favoritesEmptyOutsideTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标过的歌不在音乐库里'**
+  String get favoritesEmptyOutsideTitle;
+
+  /// No description provided for @favoritesEmptyOutsideSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库里找不到它们，标记还留着'**
+  String get favoritesEmptyOutsideSubtitle;
 
   /// No description provided for @playerNowPlaying.
   ///
@@ -1258,6 +1270,48 @@ abstract class AppLocalizations {
   /// **'这首歌没有歌词'**
   String get lyricsMissing;
 
+  /// No description provided for @lyricsNothingPlaying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有正在播放的曲目'**
+  String get lyricsNothingPlaying;
+
+  /// No description provided for @lyricsInvalidFile.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个文件里没有歌词'**
+  String get lyricsInvalidFile;
+
+  /// No description provided for @lyricsRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重试'**
+  String get lyricsRetry;
+
+  /// No description provided for @lyricsSearchAgain.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重新查找'**
+  String get lyricsSearchAgain;
+
+  /// No description provided for @lyricsChooseFile.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'选择歌词文件'**
+  String get lyricsChooseFile;
+
+  /// No description provided for @lyricsAttached.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词已关联'**
+  String get lyricsAttached;
+
+  /// No description provided for @lyricsSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在播放的那首歌的词'**
+  String get lyricsSubtitle;
+
   /// No description provided for @settingsTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -1323,48 +1377,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'扫描只读取音频文件，不会修改或删除磁盘内容。'**
   String get settingsScanSafetyNote;
-
-  /// No description provided for @lyricsNothingPlaying.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'还没有正在播放的曲目'**
-  String get lyricsNothingPlaying;
-
-  /// No description provided for @lyricsInvalidFile.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'这个文件里没有歌词'**
-  String get lyricsInvalidFile;
-
-  /// No description provided for @lyricsRetry.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重试'**
-  String get lyricsRetry;
-
-  /// No description provided for @lyricsSearchAgain.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'重新查找'**
-  String get lyricsSearchAgain;
-
-  /// No description provided for @lyricsChooseFile.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'选择歌词文件'**
-  String get lyricsChooseFile;
-
-  /// No description provided for @lyricsAttached.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'歌词已关联'**
-  String get lyricsAttached;
-
-  /// No description provided for @lyricsSubtitle.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'正在播放的那首歌的词'**
-  String get lyricsSubtitle;
 
   /// No description provided for @settingsChooseFolder.
   ///

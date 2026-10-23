@@ -39,13 +39,14 @@ presentation → application → domain
 3. `features/x/application` 可以 import 别的 feature 的 `application` / `domain`（library 调 playback 就是这样），但不 import 别人的 `presentation`。
 4. widget 只通过 provider 取状态、触发动作，不直接持有 service。
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。
-6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。
+6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。侧栏不是页面：播放队列由 `SidePanelHost` 在页面区内组合，不注册路由；详见 [queue-panel.md](queue-panel.md)。
 
 ## 状态归属
 
 | 状态 | 唯一来源 | 职责 |
 | --- | --- | --- |
 | 播放 + 队列 | `PlaybackController` / `PlaybackState`（`features/player`） | 队列是 `PlaybackState` 的一部分，仓库里没有第二个队列容器 |
+| 队列侧栏的显隐 | `CompactShell` 的本地 state / `NowPlayingPage` 的本地 state | 只是呈现状态，不持久化、不进 provider；队列内容仍归 `PlaybackController` |
 | 音乐库 | `LibraryController` / `LibraryState`（`features/library`） | 加载、扫描、过滤；不负责播放 |
 | 喜欢 | `FavoritesController` / `FavoritesState`（`features/favorites`） | 标了心的曲目；曲目本身还是音乐库里的那一首 |
 | 歌词 | `LyricsController` / `LyricsState`（`features/player`） | 当前曲目的歌词与解析结果；控制器自己 `watch` 播放器的当前曲目来取词，页面只读不改；播放位置仍由 `PlaybackController` 独家持有，歌词只读它 |
@@ -116,6 +117,7 @@ presentation → application → domain
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
+- **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
 - **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
 
@@ -181,7 +183,11 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 **音源也一样**：行里只画一个固定大小的图标（`SourceBadge`），品牌名与本地化名都在 tooltip 里，详情面板的「来源」那条事实把它们写全。图标不随名字长短变形，一行曲子的宽窄不再被音源名字牵着走。
 
-**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列、正在播放页的顶栏与底栏的播放卡片上，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。
+**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列、在线搜索的结果行、正在播放页的顶栏与底栏的播放卡片上，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。
+
+曲目的身份是它的地址（`Song.uri`）：本地曲子就是文件路径，在线曲目是 `tune://<音源>/<编号>`。重新扫描之后地址不变，所以标不会丢。
+
+喜欢页是音乐库的一层视图：它列出库里被标过的曲子。标在库外的曲子——在线搜索里标了但还没扫进来的，或者音源关掉了——记在存储里，页面上列不出来。这种时候页头报的是标过的总数，页面上另起一行说明有几首不在库里，空状态也不会再说「还没有喜欢的曲子」。
 
 ## chip 的样子
 
@@ -240,6 +246,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 2. 在 `lib/app/router/app_router.dart` 注册路由。
 3. 只接这一处新入口，不要顺着别人的页面改一圈。
 4. 页面切换的动作交给路由：页面区不再另做一套切换（见「硬约束」第 6 条）。
+5. 如果只是播放器的附属面板（例如播放队列），不要注册路由；用 `shared/ui/side_panel_host.dart` 在页面区内组合，见 [queue-panel.md](queue-panel.md)。
 
 ### 加一条文案
 

@@ -98,6 +98,24 @@ abstract final class CompactTokens {
   static const double dockPadding = 14;
   static const double dockRadius = 18;
 
+  /// Width of the side panel that floats over the content area.
+  ///
+  /// A panel keeps a readable measure instead of following the page: it grows
+  /// to [sidePanelWidthMax] and no further, and it stops growing when the page
+  /// needs the room it would take. Below [sidePanelFullWidthBreakpoint] it
+  /// fills the page, because a floating card with no page left beside it reads
+  /// as a page that forgot its heading.
+  static const double sidePanelWidthMin = 360;
+  static const double sidePanelWidthMax = 440;
+  static const double sidePanelContentReserve = 240;
+  static const double sidePanelFullWidthBreakpoint = 640;
+
+  /// Space between the edge of the content area and the floating panel.
+  static const double sidePanelGutter = 12;
+
+  /// Radius of the floating panel, shared with the player dock.
+  static const double sidePanelRadius = dockRadius;
+
   /// Width of the transport column of the dock, and of its narrow form.
   ///
   /// The column holds the buttons and the seek bar, and it sits between two

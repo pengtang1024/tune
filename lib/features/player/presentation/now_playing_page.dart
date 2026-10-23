@@ -18,17 +18,33 @@ import 'package:tune/features/player/presentation/now_playing_track_info.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/side_panel_host.dart';
 import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/live_badge.dart';
+
+/// Builds the queue panel for the now playing page.
+///
+/// The page owns the open state, so it hands the close action to the builder.
+/// The builder comes from the router, which keeps the queue presentation out
+/// of this file and lets the page stay a player-only page.
+typedef QueuePanelBuilder =
+    Widget Function(BuildContext context, VoidCallback onClose);
 
 /// Full window view of the track that is playing right now.
 ///
 /// The page is a route of its own instead of an overlay so it can be reached
 /// from the dock, kept by the navigator and closed with the escape key.
 class NowPlayingPage extends ConsumerStatefulWidget {
-  const NowPlayingPage({super.key});
+  /// Builds the queue panel when the reader opens it.
+  ///
+  /// The router supplies this so the page does not import the queue feature.
+  /// A null builder leaves the queue button disabled, which is what a page
+  /// drawn on its own in a test wants.
+  final QueuePanelBuilder? queuePanelBuilder;
+
+  const NowPlayingPage({super.key, this.queuePanelBuilder});
 
   @override
   ConsumerState<NowPlayingPage> createState() => _NowPlayingPageState();
@@ -37,6 +53,19 @@ class NowPlayingPage extends ConsumerStatefulWidget {
 class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
   /// Whether the lyrics of the track are shown instead of its information.
   bool _showLyrics = false;
+
+  /// Whether the queue panel covers the page.
+  bool _showQueue = false;
+
+  void _toggleQueue() {
+    if (widget.queuePanelBuilder == null) return;
+    setState(() => _showQueue = !_showQueue);
+  }
+
+  void _closeQueue() {
+    if (!_showQueue) return;
+    setState(() => _showQueue = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,82 +85,100 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
 
     return CallbackShortcuts(
       bindings: {
-        const SingleActivator(LogicalKeyboardKey.escape): () =>
-            context.canPop() ? context.pop() : null,
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          // The panel is the innermost layer, so escape closes it first. Only
+          // the next escape leaves the page.
+          if (_showQueue) {
+            _closeQueue();
+            return;
+          }
+          if (context.canPop()) context.pop();
+        },
       },
       child: Focus(
         autofocus: true,
         child: Scaffold(
           backgroundColor: theme.colorScheme.surface,
-          body: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                // The glow sits behind the middle of the page, where the
-                // cover and the text are, instead of washing over one
-                // corner of it. It fades to nothing, so the title keeps a
-                // calm background to read on.
-                center: const Alignment(0, -0.25),
-                radius: 0.9,
-                colors: [
-                  theme.colorScheme.primary.withValues(alpha: 0.16),
-                  theme.colorScheme.primary.withValues(alpha: 0),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  CompactTokens.pageGutter,
-                  CompactTokens.space16,
-                  CompactTokens.pageGutter,
-                  CompactTokens.space20,
+          body: SidePanelHost(
+            open: _showQueue && widget.queuePanelBuilder != null,
+            onClose: _closeQueue,
+            barrierLabel: context.loc.close,
+            panelBuilder: (context) =>
+                widget.queuePanelBuilder!(context, _closeQueue),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  // The glow sits behind the middle of the page, where the
+                  // cover and the text are, instead of washing over one
+                  // corner of it. It fades to nothing, so the title keeps a
+                  // calm background to read on.
+                  center: const Alignment(0, -0.25),
+                  radius: 0.9,
+                  colors: [
+                    theme.colorScheme.primary.withValues(alpha: 0.16),
+                    theme.colorScheme.primary.withValues(alpha: 0),
+                  ],
                 ),
-                child: Column(
-                  children: [
-                    _TopBar(
-                      state: state,
-                      showLyrics: _showLyrics,
-                      onToggleLyrics: () =>
-                          setState(() => _showLyrics = !_showLyrics),
-                      isFavorite:
-                          currentUri != null && favorites.contains(currentUri),
-                      onToggleFavorite: currentUri == null
-                          ? null
-                          : () => ref
-                                .read(favoritesControllerProvider.notifier)
-                                .toggle(currentUri),
-                    ),
-                    const SizedBox(height: CompactTokens.space12),
-                    Expanded(
-                      child: state.currentSong == null
-                          ? const _EmptyState()
-                          : _TrackLayout(
-                              state: state,
-                              song: state.currentSong!,
-                              showLyrics: _showLyrics,
-                              source:
-                                  sourceLabel(
-                                    state.currentSong!,
-                                    sourceLabels,
-                                  ) ??
-                                  SourceLabel(
-                                    name: context.loc.sourceLocalName,
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CompactTokens.pageGutter,
+                    CompactTokens.space16,
+                    CompactTokens.pageGutter,
+                    CompactTokens.space20,
+                  ),
+                  child: Column(
+                    children: [
+                      _TopBar(
+                        state: state,
+                        showLyrics: _showLyrics,
+                        onToggleLyrics: () =>
+                            setState(() => _showLyrics = !_showLyrics),
+                        onToggleQueue: widget.queuePanelBuilder == null
+                            ? null
+                            : _toggleQueue,
+                        isFavorite:
+                            currentUri != null &&
+                            favorites.contains(currentUri),
+                        onToggleFavorite: currentUri == null
+                            ? null
+                            : () => ref
+                                  .read(favoritesControllerProvider.notifier)
+                                  .toggle(currentUri),
+                      ),
+                      const SizedBox(height: CompactTokens.space12),
+                      Expanded(
+                        child: state.currentSong == null
+                            ? const _EmptyState()
+                            : _TrackLayout(
+                                state: state,
+                                song: state.currentSong!,
+                                showLyrics: _showLyrics,
+                                source:
+                                    sourceLabel(
+                                      state.currentSong!,
+                                      sourceLabels,
+                                    ) ??
+                                    SourceLabel(
+                                      name: context.loc.sourceLocalName,
+                                    ),
+                                onPrevious: controller.previous,
+                                onNext: controller.next,
+                                onTogglePlay: controller.togglePlayPause,
+                                onSeek: (value) => controller.seekTo(
+                                  Duration(
+                                    milliseconds:
+                                        (state.duration.inMilliseconds * value)
+                                            .round(),
                                   ),
-                              onPrevious: controller.previous,
-                              onNext: controller.next,
-                              onTogglePlay: controller.togglePlayPause,
-                              onSeek: (value) => controller.seekTo(
-                                Duration(
-                                  milliseconds:
-                                      (state.duration.inMilliseconds * value)
-                                          .round(),
                                 ),
                               ),
-                            ),
-                    ),
-                    const SizedBox(height: CompactTokens.space12),
-                    _Footer(state: state),
-                  ],
+                      ),
+                      const SizedBox(height: CompactTokens.space12),
+                      _Footer(state: state),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -148,6 +195,7 @@ class _TopBar extends StatelessWidget {
     required this.state,
     required this.showLyrics,
     required this.onToggleLyrics,
+    required this.onToggleQueue,
     required this.isFavorite,
     required this.onToggleFavorite,
   });
@@ -155,6 +203,7 @@ class _TopBar extends StatelessWidget {
   final PlaybackState state;
   final bool showLyrics;
   final VoidCallback onToggleLyrics;
+  final VoidCallback? onToggleQueue;
   final bool isFavorite;
   final VoidCallback? onToggleFavorite;
 
@@ -213,7 +262,7 @@ class _TopBar extends StatelessWidget {
         _RoundButton(
           icon: Icons.queue_music_rounded,
           tooltip: context.loc.queueTitle,
-          onPressed: () => context.go('/queue'),
+          onPressed: onToggleQueue,
         ),
       ],
     );
@@ -617,7 +666,8 @@ class _RoundButton extends StatelessWidget {
           child: Icon(
             icon,
             size: size,
-            color: color ??
+            color:
+                color ??
                 (onPressed == null
                     ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
                     : theme.colorScheme.onSurfaceVariant),

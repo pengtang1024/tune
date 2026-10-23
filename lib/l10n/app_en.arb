@@ -58,7 +58,6 @@
   "libraryAddToQueue": "Add to queue",
   "libraryAddAllToQueue": "Add the whole list to the queue",
   "queueTitle": "Queue",
-  "queueSubtitle": "Current play order",
   "queueEmptyTitle": "The queue is empty",
   "queueEmptySubtitle": "Pick a song in the library or add songs to the queue",
   "queueGoToLibrary": "Go to library",
@@ -71,6 +70,17 @@
   "favoritesGoToLibrary": "Go to library",
   "favoriteAdd": "Add to favorites",
   "favoriteRemove": "Remove from favorites",
+  "favoritesOutsideLibrary": "{count} more are marked but not in the library",
+  "favoritesEmptyOutsideTitle": "The marked tracks are not in the library",
+  "favoritesEmptyOutsideSubtitle": "The library does not hold them; the marks are kept",
+  "@favoritesOutsideLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "playerNowPlaying": "Now playing",
   "playerExpandNowPlaying": "Open now playing",
   "playerCollapse": "Collapse",
@@ -343,6 +353,13 @@
   "lyricsLoading": "Loading lyrics",
   "lyricsFailed": "Could not load the lyrics",
   "lyricsMissing": "This song has no lyrics",
+  "lyricsNothingPlaying": "Nothing is playing yet",
+  "lyricsInvalidFile": "This file holds no lyrics",
+  "lyricsRetry": "Try again",
+  "lyricsSearchAgain": "Look again",
+  "lyricsChooseFile": "Choose file",
+  "lyricsAttached": "The lyrics are attached",
+  "lyricsSubtitle": "The words of the track that plays",
   "settingsTitle": "Settings",
   "settingsSubtitle": "Adjust the look, the language and your local library.",
   "settingsThemeDescription": "Choose how the interface looks and which language it speaks.",
@@ -354,13 +371,6 @@
   "settingsAddFolder": "Add folder",
   "settingsClearLibrary": "Clear library",
   "settingsScanSafetyNote": "Scanning only reads audio files. Nothing on disk is changed or deleted.",
-  "lyricsNothingPlaying": "Nothing is playing yet",
-  "lyricsInvalidFile": "This file holds no lyrics",
-  "lyricsRetry": "Try again",
-  "lyricsSearchAgain": "Look again",
-  "lyricsChooseFile": "Choose file",
-  "lyricsAttached": "The lyrics are attached",
-  "lyricsSubtitle": "The words of the track that plays",
   "settingsChooseFolder": "Choose a music folder",
   "settingsFolderAdded": "Scan folder added",
   "settingsLibraryFolder": "Where the files are kept",

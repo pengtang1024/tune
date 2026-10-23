@@ -146,9 +146,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get queueTitle => '播放队列';
 
   @override
-  String get queueSubtitle => '当前播放顺序';
-
-  @override
   String get queueEmptyTitle => '播放队列是空的';
 
   @override
@@ -183,6 +180,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get favoriteRemove => '取消收藏';
+
+  @override
+  String favoritesOutsideLibrary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '另有 $countString 首标过，但不在音乐库里';
+  }
+
+  @override
+  String get favoritesEmptyOutsideTitle => '标过的歌不在音乐库里';
+
+  @override
+  String get favoritesEmptyOutsideSubtitle => '音乐库里找不到它们，标记还留着';
 
   @override
   String get playerNowPlaying => '正在播放';
@@ -644,6 +656,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsMissing => '这首歌没有歌词';
 
   @override
+  String get lyricsNothingPlaying => '还没有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '这个文件里没有歌词';
+
+  @override
+  String get lyricsRetry => '重试';
+
+  @override
+  String get lyricsSearchAgain => '重新查找';
+
+  @override
+  String get lyricsChooseFile => '选择歌词文件';
+
+  @override
+  String get lyricsAttached => '歌词已关联';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的词';
+
+  @override
   String get settingsTitle => '设置';
 
   @override
@@ -675,27 +708,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
-
-  @override
-  String get lyricsNothingPlaying => '还没有正在播放的曲目';
-
-  @override
-  String get lyricsInvalidFile => '这个文件里没有歌词';
-
-  @override
-  String get lyricsRetry => '重试';
-
-  @override
-  String get lyricsSearchAgain => '重新查找';
-
-  @override
-  String get lyricsChooseFile => '选择歌词文件';
-
-  @override
-  String get lyricsAttached => '歌词已关联';
-
-  @override
-  String get lyricsSubtitle => '正在播放的那首歌的词';
 
   @override
   String get settingsChooseFolder => '选择音乐文件夹';
@@ -1720,9 +1732,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get queueTitle => '播放队列';
 
   @override
-  String get queueSubtitle => '当前播放顺序';
-
-  @override
   String get queueEmptyTitle => '播放队列是空的';
 
   @override
@@ -1757,6 +1766,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get favoriteRemove => '取消收藏';
+
+  @override
+  String favoritesOutsideLibrary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '另有 $countString 首标过，但不在音乐库里';
+  }
+
+  @override
+  String get favoritesEmptyOutsideTitle => '标过的歌不在音乐库里';
+
+  @override
+  String get favoritesEmptyOutsideSubtitle => '音乐库里找不到它们，标记还留着';
 
   @override
   String get playerNowPlaying => '正在播放';
@@ -2218,6 +2242,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsMissing => '这首歌没有歌词';
 
   @override
+  String get lyricsNothingPlaying => '还没有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '这个文件里没有歌词';
+
+  @override
+  String get lyricsRetry => '重试';
+
+  @override
+  String get lyricsSearchAgain => '重新查找';
+
+  @override
+  String get lyricsChooseFile => '选择歌词文件';
+
+  @override
+  String get lyricsAttached => '歌词已关联';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的词';
+
+  @override
   String get settingsTitle => '设置';
 
   @override
@@ -2249,27 +2294,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsScanSafetyNote => '扫描只读取音频文件，不会修改或删除磁盘内容。';
-
-  @override
-  String get lyricsNothingPlaying => '还没有正在播放的曲目';
-
-  @override
-  String get lyricsInvalidFile => '这个文件里没有歌词';
-
-  @override
-  String get lyricsRetry => '重试';
-
-  @override
-  String get lyricsSearchAgain => '重新查找';
-
-  @override
-  String get lyricsChooseFile => '选择歌词文件';
-
-  @override
-  String get lyricsAttached => '歌词已关联';
-
-  @override
-  String get lyricsSubtitle => '正在播放的那首歌的词';
 
   @override
   String get settingsChooseFolder => '选择音乐文件夹';
@@ -3294,9 +3318,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get queueTitle => '播放佇列';
 
   @override
-  String get queueSubtitle => '目前播放順序';
-
-  @override
   String get queueEmptyTitle => '播放佇列是空的';
 
   @override
@@ -3331,6 +3352,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get favoriteRemove => '取消收藏';
+
+  @override
+  String favoritesOutsideLibrary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '另有 $countString 首標過，但不在音樂庫裡';
+  }
+
+  @override
+  String get favoritesEmptyOutsideTitle => '標過的歌不在音樂庫裡';
+
+  @override
+  String get favoritesEmptyOutsideSubtitle => '音樂庫裡找不到它們，標記還留著';
 
   @override
   String get playerNowPlaying => '正在播放';
@@ -3792,6 +3828,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get lyricsMissing => '這首歌沒有歌詞';
 
   @override
+  String get lyricsNothingPlaying => '還沒有正在播放的曲目';
+
+  @override
+  String get lyricsInvalidFile => '這個檔案裡沒有歌詞';
+
+  @override
+  String get lyricsRetry => '重試';
+
+  @override
+  String get lyricsSearchAgain => '重新尋找';
+
+  @override
+  String get lyricsChooseFile => '選擇歌詞檔案';
+
+  @override
+  String get lyricsAttached => '歌詞已連結';
+
+  @override
+  String get lyricsSubtitle => '正在播放的那首歌的詞';
+
+  @override
   String get settingsTitle => '設定';
 
   @override
@@ -3823,27 +3880,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsScanSafetyNote => '掃描只讀取音訊檔案，不會修改或刪除磁碟內容。';
-
-  @override
-  String get lyricsNothingPlaying => '還沒有正在播放的曲目';
-
-  @override
-  String get lyricsInvalidFile => '這個檔案裡沒有歌詞';
-
-  @override
-  String get lyricsRetry => '重試';
-
-  @override
-  String get lyricsSearchAgain => '重新尋找';
-
-  @override
-  String get lyricsChooseFile => '選擇歌詞檔案';
-
-  @override
-  String get lyricsAttached => '歌詞已連結';
-
-  @override
-  String get lyricsSubtitle => '正在播放的那首歌的詞';
 
   @override
   String get settingsChooseFolder => '選擇音樂資料夾';

@@ -58,7 +58,6 @@
   "libraryAddToQueue": "加入播放队列",
   "libraryAddAllToQueue": "将整个列表加入队列",
   "queueTitle": "播放队列",
-  "queueSubtitle": "当前播放顺序",
   "queueEmptyTitle": "播放队列是空的",
   "queueEmptySubtitle": "从音乐库选择歌曲，或把歌曲加入队列",
   "queueGoToLibrary": "去音乐库",
@@ -71,6 +70,17 @@
   "favoritesGoToLibrary": "去音乐库",
   "favoriteAdd": "加入收藏",
   "favoriteRemove": "取消收藏",
+  "favoritesOutsideLibrary": "另有 {count} 首标过，但不在音乐库里",
+  "favoritesEmptyOutsideTitle": "标过的歌不在音乐库里",
+  "favoritesEmptyOutsideSubtitle": "音乐库里找不到它们，标记还留着",
+  "@favoritesOutsideLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "playerNowPlaying": "正在播放",
   "playerExpandNowPlaying": "展开正在播放",
   "playerCollapse": "收起",
@@ -343,6 +353,13 @@
   "lyricsLoading": "正在加载歌词",
   "lyricsFailed": "歌词加载失败",
   "lyricsMissing": "这首歌没有歌词",
+  "lyricsNothingPlaying": "还没有正在播放的曲目",
+  "lyricsInvalidFile": "这个文件里没有歌词",
+  "lyricsRetry": "重试",
+  "lyricsSearchAgain": "重新查找",
+  "lyricsChooseFile": "选择歌词文件",
+  "lyricsAttached": "歌词已关联",
+  "lyricsSubtitle": "正在播放的那首歌的词",
   "settingsTitle": "设置",
   "settingsSubtitle": "调整外观、语言和本地音乐库。",
   "settingsThemeDescription": "选择界面的明暗气质和显示语言。",
@@ -354,13 +371,6 @@
   "settingsAddFolder": "添加文件夹",
   "settingsClearLibrary": "清空音乐库",
   "settingsScanSafetyNote": "扫描只读取音频文件，不会修改或删除磁盘内容。",
-  "lyricsNothingPlaying": "还没有正在播放的曲目",
-  "lyricsInvalidFile": "这个文件里没有歌词",
-  "lyricsRetry": "重试",
-  "lyricsSearchAgain": "重新查找",
-  "lyricsChooseFile": "选择歌词文件",
-  "lyricsAttached": "歌词已关联",
-  "lyricsSubtitle": "正在播放的那首歌的词",
   "settingsChooseFolder": "选择音乐文件夹",
   "settingsFolderAdded": "已添加扫描目录",
   "settingsLibraryFolder": "文件存放位置",

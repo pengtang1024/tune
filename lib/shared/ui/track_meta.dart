@@ -24,6 +24,13 @@ class TrackMeta extends StatelessWidget {
   final bool playing;
   final double artworkSize;
 
+  /// Whether the row sits in a panel rather than a full page.
+  ///
+  /// The dense form keeps the title on one line and moves the artist, the
+  /// source and the duration to the next. It leaves the fact strip and the
+  /// details action to the pages that have room for them.
+  final bool dense;
+
   const TrackMeta({
     super.key,
     required this.song,
@@ -32,6 +39,7 @@ class TrackMeta extends StatelessWidget {
     this.selected = false,
     this.playing = false,
     this.artworkSize = CompactTokens.artworkRow,
+    this.dense = false,
   });
 
   @override
@@ -64,36 +72,72 @@ class TrackMeta extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                song.artist.isEmpty
-                    ? context.loc.playerUnknownArtist
-                    : song.artist,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              if (dense)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        song.artist.isEmpty
+                            ? context.loc.playerUnknownArtist
+                            : song.artist,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    if (source != null) ...[
+                      const SizedBox(width: CompactTokens.space4),
+                      SourceBadge(label: source!, dense: true),
+                    ],
+                    if (!song.isLiveStream) ...[
+                      const SizedBox(width: CompactTokens.space6),
+                      Text(
+                        formatDuration(
+                          Duration(milliseconds: song.durationInMillis),
+                        ),
+                        style: CompactTypography.mono(
+                          theme.colorScheme.onSurfaceVariant,
+                          size: CompactTypeScale.mark,
+                        ),
+                      ),
+                    ],
+                  ],
+                )
+              else
+                Text(
+                  song.artist.isEmpty
+                      ? context.loc.playerUnknownArtist
+                      : song.artist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
             ],
           ),
         ),
-        const SizedBox(width: CompactTokens.space8),
-        TrackFactStrip(song: song),
-        const SizedBox(width: CompactTokens.space8),
-        if (source != null) ...[
-          SourceBadge(label: source!, dense: true),
+        if (!dense) ...[
           const SizedBox(width: CompactTokens.space8),
-        ],
-        if (!song.isLiveStream)
-          Text(
-            formatDuration(Duration(milliseconds: song.durationInMillis)),
-            style: CompactTypography.mono(
-              theme.colorScheme.onSurfaceVariant,
-              size: CompactTypeScale.mark,
+          TrackFactStrip(song: song),
+          const SizedBox(width: CompactTokens.space8),
+          if (source != null) ...[
+            SourceBadge(label: source!, dense: true),
+            const SizedBox(width: CompactTokens.space8),
+          ],
+          if (!song.isLiveStream)
+            Text(
+              formatDuration(Duration(milliseconds: song.durationInMillis)),
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.mark,
+              ),
             ),
-          ),
-        const SizedBox(width: CompactTokens.space4),
-        _DetailsButton(song: song, source: source),
+          const SizedBox(width: CompactTokens.space4),
+          _DetailsButton(song: song, source: source),
+        ],
       ],
     );
   }

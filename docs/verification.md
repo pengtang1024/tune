@@ -62,7 +62,7 @@ flutter --version
 ## 截图对比
 
 - `tool/layout_shots_test.dart` 是开发用的截图工具，不是测试套件的一部分。
-- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`（宽屏与窄屏各一套）。
+- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`（宽屏与窄屏各一套）。队列侧栏写 `queue_panel*.png`，正在播放页的队列侧栏写 `now_playing_queue*.png`；旧的 `queue*.png` 整页截图不再生成。
 - 它在 `tool/` 下，常规 `flutter test` 不会跑到它。
 - 它把平台钉成 Linux：测试套件默认假装是 Android，而 Android 用另一套密度和更大的点击区，不钉的话截图里的按钮比用户看到的矮 8 像素。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。
@@ -70,7 +70,7 @@ flutter --version
 
 ## 对齐守卫
 
-- `test/app/layout_alignment_test.dart`：盯住容易漂的几处——播放按钮落在底栏中线、音乐库与队列的封面列同位、标题与列表同一条左边缘、正在播放页的整块居中、搜索框不越宽上限。
+- `test/app/layout_alignment_test.dart`：盯住容易漂的几处——播放按钮落在底栏中线、队列面板的行不越出卡片且宽度守规则、标题与列表同一条左边缘、正在播放页的整块居中、搜索框不越宽上限。
 - `test/app/compact_spinner_test.dart`：盯住加载圈的描边没有被自己的框裁掉（Material 的现行样式会裁），以及字号梯度里没有两档共用一个尺寸。
 - `test/app/compact_control_metrics_test.dart`：盯住 token 说的是真话——三种按钮画出来一样高且等于 `controlDefault`，列表行等于 `listRowHeight`，主题里的每个字号角色都是梯度上的一档。
 - `test/app/theme_contrast_test.dart`：盯住纸上的字看得见——明暗两套主题里，正文色、次要色、强调色与错误色在每一层底色上都要过 4.5:1，白字压在强调色和错误色上也要过 4.5:1。改了 `CompactTheme` 的颜色就要跑它。

@@ -156,9 +156,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get queueTitle => 'Queue';
 
   @override
-  String get queueSubtitle => 'Current play order';
-
-  @override
   String get queueEmptyTitle => 'The queue is empty';
 
   @override
@@ -196,6 +193,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteRemove => 'Remove from favorites';
+
+  @override
+  String favoritesOutsideLibrary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString more are marked but not in the library';
+  }
+
+  @override
+  String get favoritesEmptyOutsideTitle =>
+      'The marked tracks are not in the library';
+
+  @override
+  String get favoritesEmptyOutsideSubtitle =>
+      'The library does not hold them; the marks are kept';
 
   @override
   String get playerNowPlaying => 'Now playing';
@@ -691,6 +705,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsMissing => 'This song has no lyrics';
 
   @override
+  String get lyricsNothingPlaying => 'Nothing is playing yet';
+
+  @override
+  String get lyricsInvalidFile => 'This file holds no lyrics';
+
+  @override
+  String get lyricsRetry => 'Try again';
+
+  @override
+  String get lyricsSearchAgain => 'Look again';
+
+  @override
+  String get lyricsChooseFile => 'Choose file';
+
+  @override
+  String get lyricsAttached => 'The lyrics are attached';
+
+  @override
+  String get lyricsSubtitle => 'The words of the track that plays';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -727,27 +762,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsScanSafetyNote =>
       'Scanning only reads audio files. Nothing on disk is changed or deleted.';
-
-  @override
-  String get lyricsNothingPlaying => 'Nothing is playing yet';
-
-  @override
-  String get lyricsInvalidFile => 'This file holds no lyrics';
-
-  @override
-  String get lyricsRetry => 'Try again';
-
-  @override
-  String get lyricsSearchAgain => 'Look again';
-
-  @override
-  String get lyricsChooseFile => 'Choose file';
-
-  @override
-  String get lyricsAttached => 'The lyrics are attached';
-
-  @override
-  String get lyricsSubtitle => 'The words of the track that plays';
 
   @override
   String get settingsChooseFolder => 'Choose a music folder';

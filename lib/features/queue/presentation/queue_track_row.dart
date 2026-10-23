@@ -30,6 +30,13 @@ class QueueTrackRow extends StatelessWidget {
   final VoidCallback onRemove;
   final VoidCallback onToggleFavorite;
 
+  /// Whether the row sits in a panel rather than a full page.
+  ///
+  /// The panel row keeps the title on one line and the artist, the source and
+  /// the duration on the next, so the panel stays readable without the fact
+  /// strip and the details action of a page row.
+  final bool dense;
+
   const QueueTrackRow({
     super.key,
     required this.song,
@@ -43,6 +50,7 @@ class QueueTrackRow extends StatelessWidget {
     required this.waitsForDoubleClick,
     required this.onRemove,
     required this.onToggleFavorite,
+    this.dense = false,
   });
 
   @override
@@ -91,6 +99,7 @@ class QueueTrackRow extends StatelessWidget {
                         source: source,
                         selected: selected,
                         playing: playing,
+                        dense: dense,
                       ),
                     ),
                     const SizedBox(width: CompactTokens.space4),

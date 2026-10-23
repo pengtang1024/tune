@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
@@ -11,7 +12,9 @@ import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/player/presentation/now_playing_page.dart';
+import 'package:tune/features/player/presentation/player_dock.dart';
+import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
@@ -19,7 +22,6 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import '../services/fake_persistence.dart';
-
 
 import 'fake_audio_player_service.dart';
 import 'fake_song_download_service.dart';
@@ -82,7 +84,11 @@ void main() {
     );
   }
 
-  Widget app({required Widget home, required List<Override> overrides}) {
+  Widget app({
+    required Widget home,
+    required List<Override> overrides,
+    Locale locale = const Locale('zh', 'CN'),
+  }) {
     return ProviderScope(
       overrides: [
         persistenceServiceProvider.overrideWithValue(persistence),
@@ -90,12 +96,54 @@ void main() {
       ],
       child: MaterialApp(
         theme: CompactTheme.light,
-        locale: const Locale('zh', 'CN'),
+        locale: locale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: home,
       ),
     );
+  }
+
+  /// Pumps the shell, fills the queue and opens the queue panel from the dock.
+  Future<PlaybackController> pumpQueuePanel(
+    WidgetTester tester, {
+    required Size size,
+    List<Song> songs = const [songA, songB, songC],
+    Widget child = const SizedBox.shrink(),
+    Locale locale = const Locale('zh', 'CN'),
+  }) async {
+    await setSurface(tester, size);
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final controller = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
+    if (songs.isNotEmpty) {
+      await controller.playQueue(songs);
+    }
+
+    await tester.pumpWidget(
+      app(
+        home: CompactShell(currentPath: '/library', child: child),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          playbackControllerProvider.overrideWith((ref) => controller),
+        ],
+        locale: locale,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PlayerDock),
+        matching: find.byIcon(Icons.queue_music_rounded),
+      ),
+    );
+    await tester.pumpAndSettle();
+    return controller;
   }
 
   testWidgets('compact shell has no overflow at 900x563', (tester) async {
@@ -127,7 +175,7 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(
-          currentPath: '/queue',
+          currentPath: '/library',
           child: SizedBox.shrink(),
         ),
         overrides: [audioPlayerServiceProvider.overrideWithValue(audio)],
@@ -136,7 +184,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('播放队列'), findsOneWidget);
+    expect(find.text('音乐库'), findsOneWidget);
   });
 
   testWidgets('compact shell has no overflow at 1100x663', (tester) async {
@@ -508,65 +556,205 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('queue pane lays out rows at 760x483', (tester) async {
-    await setSurface(tester, const Size(760, 483));
-    final audio = FakeAudioPlayerService();
-    addTearDown(audio.dispose);
-    final controller = PlaybackController(
-      audio,
-      FakeSongDownloadService(),
-      FakeStreamUrlResolver(),
+  testWidgets('queue panel opens from the dock and leaves the dock usable', (
+    tester,
+  ) async {
+    final controller = await pumpQueuePanel(
+      tester,
+      size: const Size(900, 563),
+      child: const Center(child: Text('library page')),
     );
-    await controller.playQueue([songA, songB, songC]);
 
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/queue', child: QueuePane()),
-        overrides: [
-          audioPlayerServiceProvider.overrideWithValue(audio),
-          playbackControllerProvider.overrideWith((ref) => controller),
-        ],
+    expect(find.byType(QueuePanel), findsOneWidget);
+    expect(find.text('library page'), findsOneWidget);
+
+    // The panel covers the page but not the dock. A reader can pause while
+    // looking at the queue, which is the reason the panel is not a route.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PlayerDock),
+        matching: find.byIcon(Icons.pause_rounded),
       ),
     );
     await tester.pumpAndSettle();
+
+    expect(controller.state.isPlaying, isFalse);
+    expect(find.byType(QueuePanel), findsOneWidget);
+
+    // The same button closes the panel.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PlayerDock),
+        matching: find.byIcon(Icons.queue_music_rounded),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queue panel lays out its rows at 760x483', (tester) async {
+    await pumpQueuePanel(tester, size: const Size(760, 483));
 
     expect(tester.takeException(), isNull);
     expect(find.text('Beta'), findsOneWidget);
     expect(find.text('Gamma'), findsOneWidget);
-    expect(find.text('播放队列'), findsNWidgets(2));
+    expect(find.text('播放队列'), findsOneWidget);
+    // The content area is 564 wide, so the panel fills it and keeps the same
+    // gutter on both sides.
+    expect(
+      tester.getRect(find.byType(QueuePanel)).width,
+      moreOrLessEquals(540),
+    );
   });
 
-  testWidgets('queue rows show the remote source name', (tester) async {
-    await setSurface(tester, const Size(760, 483));
-    final audio = FakeAudioPlayerService();
-    addTearDown(audio.dispose);
-    final controller = PlaybackController(
-      audio,
-      FakeSongDownloadService(),
-      FakeStreamUrlResolver(),
+  testWidgets('queue panel rows show the remote source name', (tester) async {
+    await pumpQueuePanel(
+      tester,
+      size: const Size(760, 483),
+      songs: const [remoteSong],
     );
-    await controller.playQueue([remoteSong]);
-
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/queue', child: QueuePane()),
-        overrides: [
-          audioPlayerServiceProvider.overrideWithValue(audio),
-          playbackControllerProvider.overrideWith((ref) => controller),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
 
     expect(
       find.descendant(
-        of: find.byType(QueuePane),
+        of: find.byType(QueuePanel),
         matching: find.text(remoteSong.title),
       ),
       findsOneWidget,
     );
     expect(find.byTooltip('Openverse · 开放版权聚合'), findsOneWidget);
-    expect(find.byType(SourceBadge), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(QueuePanel),
+        matching: find.byType(SourceBadge),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queue panel shows its empty state', (tester) async {
+    await pumpQueuePanel(tester, size: const Size(760, 483), songs: const []);
+
+    expect(find.byType(QueuePanel), findsOneWidget);
+    expect(find.text('播放队列是空的'), findsOneWidget);
+    expect(find.text('去音乐库'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queue panel tolerates 1.3 text scaling at 760x483', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await pumpQueuePanel(tester, size: const Size(760, 483));
+
+    expect(find.byType(QueuePanel), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queue panel tolerates 1.3 text scaling in English at 900x600', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await pumpQueuePanel(
+      tester,
+      size: const Size(900, 600),
+      locale: const Locale('en'),
+    );
+
+    expect(find.byType(QueuePanel), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('queue panel closes with escape, the page or back', (
+    tester,
+  ) async {
+    await pumpQueuePanel(tester, size: const Size(900, 563));
+    expect(find.byType(QueuePanel), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PlayerDock),
+        matching: find.byIcon(Icons.queue_music_rounded),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsOneWidget);
+
+    // The scrim covers the page but not the sidebar or the dock.
+    await tester.tapAt(const Offset(300, 300));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+
+    // The system back action closes the panel before it leaves the shell.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PlayerDock),
+        matching: find.byIcon(Icons.queue_music_rounded),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the queue panel of the now playing page closes back to it', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(900, 600));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final controller = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
+    await controller.playQueue([songA, songB]);
+
+    await tester.pumpWidget(
+      app(
+        home: NowPlayingPage(
+          queuePanelBuilder: (context, onClose) => QueuePanel(onClose: onClose),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          playbackControllerProvider.overrideWith((ref) => controller),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsOneWidget);
+    expect(find.byType(NowPlayingPage), findsOneWidget);
+
+    // Escape closes the panel, not the full view.
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(find.byType(NowPlayingPage), findsOneWidget);
+
+    // The close action of the panel does the same.
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsOneWidget);
+    await tester.tap(find.byTooltip('关闭'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(find.byType(NowPlayingPage), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -678,7 +866,10 @@ void main() {
 
     await tester.pumpWidget(
       app(
-        home: const CompactShell(currentPath: '/settings', child: SettingsPane()),
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
         overrides: [
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
@@ -699,10 +890,7 @@ void main() {
     expect(find.text('单击歌曲时替换播放队列'), findsOneWidget);
 
     final row = find
-        .ancestor(
-          of: find.text('单击歌曲时替换播放队列'),
-          matching: find.byType(Row),
-        )
+        .ancestor(of: find.text('单击歌曲时替换播放队列'), matching: find.byType(Row))
         .first;
     await tester.ensureVisible(row);
     await tester.pumpAndSettle();

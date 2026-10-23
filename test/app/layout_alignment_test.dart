@@ -12,7 +12,7 @@ import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
-import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
@@ -44,8 +44,20 @@ void main() {
     duration: 245000,
     uri: '/music/a.mp3',
   );
-  const songB = Song(id: 2, title: 'Beta', artist: 'Artist B', duration: 120000, uri: '/music/b.mp3');
-  const songC = Song(id: 3, title: 'Gamma', artist: 'Artist C', duration: 90000, uri: '/music/c.mp3');
+  const songB = Song(
+    id: 2,
+    title: 'Beta',
+    artist: 'Artist B',
+    duration: 120000,
+    uri: '/music/b.mp3',
+  );
+  const songC = Song(
+    id: 3,
+    title: 'Gamma',
+    artist: 'Artist C',
+    duration: 90000,
+    uri: '/music/c.mp3',
+  );
 
   late FakePersistenceService persistence;
   late FakeAudioPlayerService audio;
@@ -101,7 +113,12 @@ void main() {
   ) async {
     await surface(tester, const Size(1280, 800));
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: SizedBox.shrink())),
+      app(
+        home: const CompactShell(
+          currentPath: '/library',
+          child: SizedBox.shrink(),
+        ),
+      ),
     );
     await tester.pump();
 
@@ -125,43 +142,46 @@ void main() {
     );
   });
 
-  testWidgets('the library and the queue write a track in the same columns', (
-    tester,
-  ) async {
+  testWidgets('the queue panel keeps its rows inside its card', (tester) async {
     await surface(tester, const Size(1280, 800));
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
-    );
-    await tester.pump();
-    final libraryArt = tester.getRect(
-      find.descendant(
-        of: find.byType(LibraryTrackCard).first,
-        matching: find.byType(ArtworkThumb),
+      app(
+        home: const CompactShell(
+          currentPath: '/library',
+          child: SizedBox.shrink(),
+        ),
       ),
     );
-
-    await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/queue', child: QueuePane())),
-    );
     await tester.pump();
-    final queueArt = tester.getRect(
-      find.descendant(
-        of: find.byType(QueueTrackRow).first,
-        matching: find.byType(ArtworkThumb),
-      ),
-    );
+    await tester.tap(find.byIcon(Icons.queue_music_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final panel = tester.getRect(find.byType(QueuePanel));
+    final row = tester.getRect(find.byType(QueueTrackRow).first);
 
     expect(
-      queueArt.left,
-      moreOrLessEquals(libraryArt.left, epsilon: 0.5),
-      reason: 'the cover of a track has to start at the same place in both lists',
+      panel.width,
+      moreOrLessEquals(CompactTokens.sidePanelWidthMax),
+      reason: 'the panel keeps its readable measure on a wide page',
     );
     expect(
-      queueArt.width,
-      moreOrLessEquals(libraryArt.width, epsilon: 0.5),
-      reason: 'both lists show the cover of a track at the same size',
+      panel.right,
+      moreOrLessEquals(1280 - CompactTokens.sidePanelGutter),
+      reason: 'the panel keeps the same gutter from the window edge',
     );
+    expect(
+      row.left,
+      greaterThanOrEqualTo(panel.left),
+      reason: 'a row may not run out of the card',
+    );
+    expect(
+      row.right,
+      lessThanOrEqualTo(panel.right),
+      reason: 'a row may not run out of the card',
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('the heading and the list of a page share one left edge', (
@@ -170,7 +190,9 @@ void main() {
     await surface(tester, const Size(1280, 800));
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
     );
     await tester.pump();
     final libraryHeading = tester.getRect(
@@ -184,24 +206,6 @@ void main() {
     expect(
       libraryCard.left,
       moreOrLessEquals(libraryHeading.left, epsilon: 0.5),
-      reason: 'the list has to start where the heading starts',
-    );
-
-    await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/queue', child: QueuePane())),
-    );
-    await tester.pump();
-    final queueHeading = tester.getRect(
-      find.descendant(
-        of: find.byType(QueuePane),
-        matching: find.byType(PageHeading),
-      ),
-    );
-    final queueRow = tester.getRect(find.byType(QueueTrackRow).first);
-
-    expect(
-      queueRow.left,
-      moreOrLessEquals(queueHeading.left, epsilon: 0.5),
       reason: 'the list has to start where the heading starts',
     );
   });
@@ -218,10 +222,7 @@ void main() {
     // in the middle of the page.
     final block = tester.getRect(
       find
-          .descendant(
-            of: find.byType(Center),
-            matching: find.byType(Row),
-          )
+          .descendant(of: find.byType(Center), matching: find.byType(Row))
           .first,
     );
     final artwork = tester.getRect(find.byType(ArtworkThumb).first);
@@ -245,7 +246,9 @@ void main() {
     final lefts = <double>[];
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
     );
     await tester.pump();
     lefts.add(
@@ -262,24 +265,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/queue', child: QueuePane())),
-    );
-    await tester.pump();
-    lefts.add(
-      tester
-          .getRect(
-            find
-                .descendant(
-                  of: find.byType(QueuePane),
-                  matching: find.byType(PageHeading),
-                )
-                .first,
-          )
-          .left,
-    );
-
-    await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/sources', child: SourcesPane())),
+      app(
+        home: const CompactShell(currentPath: '/sources', child: SourcesPane()),
+      ),
     );
     await tester.pump();
     lefts.add(
@@ -296,12 +284,15 @@ void main() {
     );
 
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/settings', child: SettingsPane())),
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+      ),
     );
     await tester.pump();
-    lefts.add(
-      tester.getRect(find.byType(SettingsPageHeader).first).left,
-    );
+    lefts.add(tester.getRect(find.byType(SettingsPageHeader).first).left);
 
     for (final left in lefts) {
       expect(
@@ -320,7 +311,9 @@ void main() {
   ) async {
     await surface(tester, const Size(1280, 800));
     await tester.pumpWidget(
-      app(home: const CompactShell(currentPath: '/library', child: LibraryPane())),
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
     );
     await tester.pump();
 
@@ -337,7 +330,8 @@ void main() {
         CompactTokens.sidebarWidth + CompactTokens.pageGutter,
         epsilon: 1,
       ),
-      reason: 'the field of the search starts where the heading of the page starts',
+      reason:
+          'the field of the search starts where the heading of the page starts',
     );
   });
 }

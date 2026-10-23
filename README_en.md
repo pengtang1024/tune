@@ -2,7 +2,7 @@
 
 [中文](README.md) · [English](README_en.md)
 
-Tune is a compact local and online music player built with Flutter. A persistent player occupies the left pane, while the right pane switches between library, queue, and settings.
+Tune is a compact local and online music player built with Flutter. The shell has a navigation rail (library, liked, sources, settings), a content area, and a player dock at the bottom; the play queue is a side panel opened from the dock or the now playing page, not a navigation destination.
 
 ## Features
 
