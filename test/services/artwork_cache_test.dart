@@ -43,13 +43,16 @@ void main() {
     expect(adapter.calls, 1, reason: 'the second time comes from the disk');
   });
 
-  test('the cover is kept in the artwork folder of the music library', () async {
-    await cacheWith(FakeAdapter()).imageFor('https://example.com/cover.png');
+  test(
+    'the cover is kept in the artwork folder of the music library',
+    () async {
+      await cacheWith(FakeAdapter()).imageFor('https://example.com/cover.png');
 
-    final artwork = Directory(path.join(folder.path, '.tune', 'artwork'));
-    expect(await artwork.exists(), isTrue);
-    expect(_filesIn(artwork), hasLength(1));
-  });
+      final artwork = Directory(path.join(folder.path, '.tune', 'artwork'));
+      expect(await artwork.exists(), isTrue);
+      expect(_filesIn(artwork), hasLength(1));
+    },
+  );
 
   test('the covers are spread over subfolders', () async {
     final adapter = FakeAdapter();
@@ -90,6 +93,18 @@ void main() {
     expect(adapter.calls, 1);
   });
 
+  test('the file of a cover that was fetched is known', () async {
+    final cache = cacheWith(FakeAdapter());
+
+    expect(cache.coverFileFor('https://example.com/cover.png'), isNull);
+
+    await cache.imageFor('https://example.com/cover.png');
+
+    final file = cache.coverFileFor('https://example.com/cover.png');
+    expect(file, isNotNull);
+    expect(File(file!).existsSync(), isTrue);
+  });
+
   test('a cover that cannot be fetched is not stored', () async {
     final adapter = FakeAdapter(missing: true);
     final cache = cacheWith(adapter);
@@ -103,6 +118,7 @@ void main() {
     final stored = await artwork.exists() ? _filesIn(artwork) : <File>[];
     expect(stored, isEmpty);
   });
+
 }
 
 /// The files in a folder and in the folders below it.
@@ -135,7 +151,9 @@ class FakeAdapter implements HttpClientAdapter {
     return ResponseBody.fromBytes(
       bytes,
       200,
-      headers: {Headers.contentTypeHeader: ['image/png']},
+      headers: {
+        Headers.contentTypeHeader: ['image/png'],
+      },
     );
   }
 

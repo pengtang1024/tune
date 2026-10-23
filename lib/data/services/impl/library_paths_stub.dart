@@ -18,7 +18,7 @@ class BrowserLibraryPaths implements LibraryPaths {
   BrowserLibraryPaths(PersistenceService persistence);
 
   @override
-  Future<Directory> root() async {
+  Directory root() {
     throw UnsupportedError('the web build has no music library');
   }
 
@@ -41,7 +41,7 @@ class BrowserLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Future<Directory> coverCacheFolder() async {
+  Directory coverCacheFolder() {
     throw UnsupportedError('the web build has no music library');
   }
 

@@ -24,22 +24,25 @@ void main() {
     if (await root.exists()) await root.delete(recursive: true);
   });
 
-  test('the folder of a track is named after artist, album and title', () async {
-    const song = Song(
-      id: 1,
-      title: 'So What',
-      artist: 'Miles Davis',
-      album: 'Kind of Blue',
-      uri: 'https://source.test/so-what',
-    );
+  test(
+    'the folder of a track is named after artist, album and title',
+    () async {
+      const song = Song(
+        id: 1,
+        title: 'So What',
+        artist: 'Miles Davis',
+        album: 'Kind of Blue',
+        uri: 'https://source.test/so-what',
+      );
 
-    final folder = await paths.folderFor(song);
+      final folder = await paths.folderFor(song);
 
-    expect(
-      folder.path,
-      path.join(root.path, 'Miles Davis', 'Kind of Blue', 'So What'),
-    );
-  });
+      expect(
+        folder.path,
+        path.join(root.path, 'Miles Davis', 'Kind of Blue', 'So What'),
+      );
+    },
+  );
 
   test('a track without an album keeps the folder short', () async {
     const song = Song(
@@ -102,8 +105,8 @@ void main() {
     expect(cover.parent.path, lyrics.parent.path);
   });
 
-  test('the covers of the tracks that were not fetched go into one place', () async {
-    final folder = await paths.coverCacheFolder();
+  test('the covers of the tracks that were not fetched go into one place', () {
+    final folder = paths.coverCacheFolder();
 
     expect(folder.path, path.join(root.path, '.tune', 'artwork'));
   });

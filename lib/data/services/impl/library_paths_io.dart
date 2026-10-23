@@ -39,7 +39,7 @@ class FileLibraryPaths implements LibraryPaths {
   final PersistenceService _persistence;
 
   @override
-  Future<Directory> root() async {
+  Directory root() {
     final picked = _persistence.getString(LibraryPaths.rootKey);
     if (picked != null && picked.trim().isNotEmpty) {
       return Directory(picked.trim());
@@ -61,7 +61,7 @@ class FileLibraryPaths implements LibraryPaths {
     final local = _localFolderOf(song);
     if (local != null) return local;
 
-    final root = await this.root();
+    final root = this.root();
     final segments = [
       song.artist,
       song.album,
@@ -99,9 +99,10 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Future<Directory> coverCacheFolder() async {
-    final root = await this.root();
-    return Directory(path.join(root.path, cacheFolderName, artworkFolderName));
+  Directory coverCacheFolder() {
+    return Directory(
+      path.join(root().path, cacheFolderName, artworkFolderName),
+    );
   }
 
   @override

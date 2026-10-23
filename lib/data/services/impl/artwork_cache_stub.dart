@@ -37,6 +37,9 @@ class BrowserArtworkCache implements ArtworkCache {
   }
 
   @override
+  String? coverFileFor(String url) => null;
+
+  @override
   void dispose() {
     _client.close(force: true);
   }

@@ -1,3 +1,4 @@
+import 'package:tune/data/services/artwork/artwork_cache.dart';
 import 'package:tune/data/services/mpris/mpris_snapshot.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/desktop/application/playback_track_tracker.dart';
@@ -9,9 +10,12 @@ import 'package:tune/features/player/domain/playback_state.dart';
 /// The controls live outside of the app, so the state of the player has to be
 /// translated into the shape the specification asks for.
 class MprisStateMapper {
-  MprisStateMapper(this._tracker);
+  MprisStateMapper(this._tracker, this._artwork);
 
   final PlaybackTrackTracker _tracker;
+
+  /// The covers that were fetched, so the desktop can be pointed at a file.
+  final ArtworkCache _artwork;
 
   /// The state of the player in the words of the media controls.
   MprisSnapshot snapshotFor(PlaybackState state) {
@@ -56,11 +60,18 @@ class MprisStateMapper {
   }
 
   /// The address of the cover of a track.
-  static String? _artUrlOf(Song song) {
+  ///
+  /// The desktop shows the cover by itself, so it is given a place it can
+  /// open without asking the network: the file of the cover that was fetched
+  /// before. A track whose cover was never fetched keeps the address of the
+  /// picture on the network, because that is all there is to point at.
+  String? _artUrlOf(Song song) {
     final local = song.albumArtPath;
     if (local != null && local.isNotEmpty) return Uri.file(local).toString();
     final remote = song.artworkUrl;
-    if (remote != null && remote.isNotEmpty) return remote;
-    return null;
+    if (remote == null || remote.isEmpty) return null;
+    final cached = _artwork.coverFileFor(remote);
+    if (cached != null) return Uri.file(cached).toString();
+    return remote;
   }
 }

@@ -37,7 +37,7 @@ class FileArtworkCache implements ArtworkCache {
 
   @override
   Future<CoverImage> imageFor(String url) async {
-    final file = await _fileFor(url);
+    final file = _fileFor(url);
     if (await file.exists()) {
       final bytes = await file.readAsBytes();
       return CoverImage(bytes, imageExtension(bytes));
@@ -82,8 +82,14 @@ class FileArtworkCache implements ArtworkCache {
     }
   }
 
-  Future<File> _fileFor(String url) async {
-    final folder = await _paths.coverCacheFolder();
+  @override
+  String? coverFileFor(String url) {
+    final file = _fileFor(url);
+    return file.existsSync() ? file.path : null;
+  }
+
+  File _fileFor(String url) {
+    final folder = _paths.coverCacheFolder();
     final key = stableKey(url);
     final bucket = key.substring(0, 2);
     return File(path.join(folder.path, bucket, '$key.img'));
