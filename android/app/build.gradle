@@ -35,7 +35,8 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace 'cn.iouf.tune'
     compileSdk 36
-    ndkVersion flutter.ndkVersion
+    // No plugin of this app compiles native code, so the build needs no NDK.
+    // Naming one would make AGP download a few hundred megabytes for nothing.
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
