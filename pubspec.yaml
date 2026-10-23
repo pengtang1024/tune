@@ -43,6 +43,7 @@ flutter_launcher_icons:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
 
   # 日志
   logger: ^2.6.1

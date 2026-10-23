@@ -31,8 +31,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
             ::GetProcAddress(shell32, "SetCurrentProcessExplicitAppUserModelID"));
     
     if (setAppIDFunc != nullptr) {
-      // Set AppUserModelID required for Windows notifications
-      setAppIDFunc(L"dev.dexterx.tune");
+      // The AppUserModelID groups the taskbar button and the notifications
+      // under this app, so it has to match the application id.
+      setAppIDFunc(L"cn.iouf.tune");
     }
     
     ::FreeLibrary(shell32);
@@ -45,8 +46,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1280, 720);
-  if (!window.Create(L"tune", origin, size)) {
+  Win32Window::Size size(900, 600);
+  if (!window.Create(L"Tune", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

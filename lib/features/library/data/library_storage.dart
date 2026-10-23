@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/domain/models/song.dart';
@@ -42,6 +43,10 @@ class LibraryStorage {
   }
 
   Future<List<Song>> load() async {
+    // The web build has no application support folder. Its library is what the
+    // online sources bring in this session, so there is nothing to read.
+    if (kIsWeb) return const [];
+
     try {
       await _adoptLibraryOfOlderVersion();
 
@@ -66,6 +71,10 @@ class LibraryStorage {
   }
 
   Future<void> save(List<Song> songs) async {
+    // The web build keeps no file, so the library of this session is the one
+    // the controllers already hold.
+    if (kIsWeb) return;
+
     try {
       final file = await _file();
       final data = songs.map((song) => song.toJson()).toList(growable: false);
@@ -78,6 +87,8 @@ class LibraryStorage {
   }
 
   Future<void> clear() async {
+    if (kIsWeb) return;
+
     try {
       final file = await _file();
       if (await file.exists()) {

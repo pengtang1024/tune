@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
@@ -27,8 +28,9 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> init() async {
     try {
-      // Linux 上 just_audio 没有官方实现，使用 media_kit（libmpv）作为后端
-      if (Platform.isLinux) {
+      // Linux 上 just_audio 没有官方实现，使用 media_kit（libmpv）作为后端。
+      // The web build uses just_audio_web, and touching Platform there throws.
+      if (!kIsWeb && Platform.isLinux) {
         JustAudioMediaKit.title = 'Tune';
         JustAudioMediaKit.ensureInitialized(linux: true, windows: false);
         Log.info('已注册 Linux 音频后端 (just_audio_media_kit)');

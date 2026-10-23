@@ -139,6 +139,10 @@ class SingleInstanceServiceImpl implements SingleInstanceService {
   /// The framework does not hand them over on Linux, so the command line of
   /// the process is read instead.
   static List<String> _commandLineArguments() {
+    // Only Linux reads the command line out of /proc; elsewhere this file is
+    // never the one that forwards a start.
+    if (!Platform.isLinux) return const [];
+
     try {
       return startup.commandLineArguments(
         File('/proc/self/cmdline').readAsBytesSync(),

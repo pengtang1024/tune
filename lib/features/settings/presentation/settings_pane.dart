@@ -6,6 +6,7 @@ import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/data/services/providers/tray_service_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
@@ -49,6 +50,11 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     final clearing = library.$3;
     final busy = scanning || clearing;
     final settingsController = ref.read(settingsControllerProvider.notifier);
+    // The tray and the default player are Linux-only for now. Other platforms
+    // get no card of switches that could not do anything.
+    final hasDesktopIntegration =
+        ref.watch(trayServiceProvider).isSupported ||
+        ref.watch(defaultPlayerServiceProvider).isSupported;
 
     return Scrollbar(
       child: SingleChildScrollView(
@@ -94,19 +100,21 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onOnlyLikeOnDoubleClick:
                       settingsController.setOnlyLikeOnDoubleClick,
                 ),
-                const SizedBox(height: 14),
-                SettingsDesktopCard(
-                  closeToTray: settings.closeToTray,
-                  mediaControlsEnabled: settings.mediaControlsEnabled,
-                  isDefaultPlayer: _isDefaultPlayer ?? false,
-                  desktopEntryInstalled: _desktopEntryInstalled,
-                  onCloseToTrayChanged: settingsController.setCloseToTray,
-                  onMediaControlsChanged:
-                      settingsController.setMediaControlsEnabled,
-                  onSetDefaultPlayer: _canSetDefaultPlayer
-                      ? _setDefaultPlayer
-                      : null,
-                ),
+                if (hasDesktopIntegration) ...[
+                  const SizedBox(height: 14),
+                  SettingsDesktopCard(
+                    closeToTray: settings.closeToTray,
+                    mediaControlsEnabled: settings.mediaControlsEnabled,
+                    isDefaultPlayer: _isDefaultPlayer ?? false,
+                    desktopEntryInstalled: _desktopEntryInstalled,
+                    onCloseToTrayChanged: settingsController.setCloseToTray,
+                    onMediaControlsChanged:
+                        settingsController.setMediaControlsEnabled,
+                    onSetDefaultPlayer: _canSetDefaultPlayer
+                        ? _setDefaultPlayer
+                        : null,
+                  ),
+                ],
                 const SizedBox(height: 14),
                 SettingsAboutCard(version: AppVersion.version),
               ],

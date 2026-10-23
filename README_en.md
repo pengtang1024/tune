@@ -49,9 +49,23 @@ flutter run -d linux
 
 ## Build
 
+Linux is the target of the current release:
+
 ```bash
 flutter build linux --debug
 ```
+
+The other platforms keep an entry point and are built on their own system:
+
+| Platform | Command | Prerequisite |
+| --- | --- | --- |
+| Linux | `flutter build linux --release` | libmpv (`libmpv2`) installed on the system |
+| Windows | `flutter build windows --release` | The C++ desktop workload of Visual Studio |
+| macOS | `flutter build macos --release` | Xcode command line tools |
+| Android | `flutter build apk --release` | Optional `android/key.properties`, see below |
+| Web | `flutter build web --release` | — |
+
+Android reads the release keys from `android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`). Without that file the build falls back to the debug keys: the artifact is fine for a local install but cannot be published.
 
 ## Desktop icon
 
@@ -69,6 +83,10 @@ flutter build linux --debug
 
 - Linux desktop is the primary target for the current release.
 - Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download, and the web build streams tracks.
+- The web build has no local library, tray, MPRIS, or default-player settings; it only plays online sources.
+- Windows plays through just_audio_windows, which ignores custom request headers: sources that need them (Jellyfin, ccMixter) may not play, and there is no tray or MPRIS control.
+- macOS has no tray or MPRIS control; the sandbox only grants `~/Music` and the folders the user picked. Pick the music folder again if access is denied after a restart.
+- Local scanning on Android and iOS needs a runtime storage permission that the app does not request yet, so the mobile library can stay empty; online sources are unaffected.
 - Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
 - Internet radio is a live stream: it is never cached and shows no progress bar.
 - Legacy mobile notifications, lyrics, equalizer, history, and account features are no longer part of the main path.
