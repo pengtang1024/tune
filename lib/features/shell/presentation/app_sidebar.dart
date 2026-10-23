@@ -63,7 +63,7 @@ class AppSidebar extends StatelessWidget {
                       _Brand(compact: compact),
                       SizedBox(height: short ? 24 : 34),
                       _SectionLabel(
-                        context.loc.sidebarCollect,
+                        context.loc.sidebarBrowse,
                         compact: compact,
                       ),
                       const SizedBox(height: 8),

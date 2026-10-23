@@ -86,6 +86,12 @@ abstract final class CompactTokens {
   static const double sidebarWidth = 196;
   static const double sidebarWidthCompact = 76;
 
+  /// Width below which the navigation rail drops its labels.
+  ///
+  /// The minimum window is 760 wide, so the threshold has to sit above it:
+  /// a narrow form that the window cannot reach is a form nobody sees.
+  static const double sidebarCompactBreakpoint = 800;
+
   /// Inner padding of the navigation rail.
   static const double sidebarPadding = 20;
 
@@ -101,14 +107,13 @@ abstract final class CompactTokens {
   /// Width of the side panel that floats over the content area.
   ///
   /// A panel keeps a readable measure instead of following the page: it grows
-  /// to [sidePanelWidthMax] and no further, and it stops growing when the page
-  /// needs the room it would take. Below [sidePanelFullWidthBreakpoint] it
-  /// fills the page, because a floating card with no page left beside it reads
-  /// as a page that forgot its heading.
+  /// to [sidePanelWidthMax] and no further. It also leaves the page a strip of
+  /// at least [sidePanelContentReserve] pixels, so the panel reads as a side
+  /// panel rather than a page that lost its heading. A very narrow window
+  /// clamps the panel to the room it has, gutters included.
   static const double sidePanelWidthMin = 360;
   static const double sidePanelWidthMax = 440;
-  static const double sidePanelContentReserve = 240;
-  static const double sidePanelFullWidthBreakpoint = 640;
+  static const double sidePanelContentReserve = 160;
 
   /// Space between the edge of the content area and the floating panel.
   static const double sidePanelGutter = 12;

@@ -60,7 +60,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           reverseTransitionDuration: const Duration(milliseconds: 200),
           child: NowPlayingPage(
             queuePanelBuilder: (context, onClose) =>
-                QueuePanel(onClose: onClose),
+                QueuePanel(onClose: onClose, showTransport: true),
           ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             final curved = CurvedAnimation(

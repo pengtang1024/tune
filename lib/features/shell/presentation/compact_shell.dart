@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/shell/presentation/app_sidebar.dart';
@@ -63,7 +64,9 @@ class _CompactShellState extends State<CompactShell> {
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final compact = constraints.maxWidth < 700;
+                      final compact =
+                          constraints.maxWidth <
+                          CompactTokens.sidebarCompactBreakpoint;
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [

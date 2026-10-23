@@ -391,11 +391,12 @@ class _DockIcon extends StatelessWidget {
         color: color,
         style: selected
             ? IconButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary.withValues(
-                  alpha: 0.12,
-                ),
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(CompactTokens.radius8),
+                  side: BorderSide(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                  ),
                 ),
               )
             : null,

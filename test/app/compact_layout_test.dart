@@ -63,7 +63,7 @@ void main() {
 
   late FakePersistenceService persistence;
 
-  setUpAll(() async {
+  setUp(() {
     persistence = FakePersistenceService();
   });
 
@@ -110,6 +110,7 @@ void main() {
     WidgetTester tester, {
     required Size size,
     List<Song> songs = const [songA, songB, songC],
+    int startIndex = 0,
     Widget child = const SizedBox.shrink(),
     Locale locale = const Locale('zh', 'CN'),
   }) async {
@@ -122,7 +123,7 @@ void main() {
       FakeStreamUrlResolver(),
     );
     if (songs.isNotEmpty) {
-      await controller.playQueue(songs);
+      await controller.playQueue(songs, startIndex: startIndex);
     }
 
     await tester.pumpWidget(
@@ -185,7 +186,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.text('音乐库'), findsOneWidget);
+    // At 760 the rail is compact: the page names wait in tooltips.
+    expect(find.byTooltip('音乐库'), findsOneWidget);
   });
 
   testWidgets('compact shell has no overflow at 1100x663', (tester) async {
@@ -361,6 +363,17 @@ void main() {
     final playback = container.read(playbackControllerProvider);
     expect(playback.queue.map((song) => song.uri), [songB.uri]);
     expect(playback.currentSong?.uri, songB.uri);
+
+    // A second double click keeps the mark: a double click may add a mark,
+    // never take one away.
+    await tester.tap(libraryRowOf(songB.title));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(libraryRowOf(songB.title));
+    await tester.pumpAndSettle();
+    expect(
+      container.read(favoritesControllerProvider).contains(songB.uri),
+      isTrue,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -434,6 +447,17 @@ void main() {
     await tester.tap(libraryRowOf(songC.title));
     await tester.pumpAndSettle();
 
+    expect(
+      container.read(favoritesControllerProvider).contains(songC.uri),
+      isTrue,
+    );
+    expect(container.read(playbackControllerProvider).queue, isEmpty);
+
+    // The same double click keeps the mark when the track is already marked.
+    await tester.tap(libraryRowOf(songC.title));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(libraryRowOf(songC.title));
+    await tester.pumpAndSettle();
     expect(
       container.read(favoritesControllerProvider).contains(songC.uri),
       isTrue,
@@ -602,12 +626,45 @@ void main() {
     expect(find.text('Beta'), findsOneWidget);
     expect(find.text('Gamma'), findsOneWidget);
     expect(find.text('播放队列'), findsOneWidget);
-    // The content area is 564 wide, so the panel fills it and keeps the same
-    // gutter on both sides.
+    // The compact rail leaves 684 for the page, so the panel keeps its
+    // 440 cap and leaves the page a strip.
     expect(
       tester.getRect(find.byType(QueuePanel)).width,
-      moreOrLessEquals(540),
+      moreOrLessEquals(440),
     );
+  });
+
+  testWidgets('queue panel opens at the current track in a long queue', (
+    tester,
+  ) async {
+    final songs = List.generate(
+      30,
+      (index) => Song(
+        id: 100 + index,
+        title: 'Queue song ${index + 1}',
+        artist: 'Artist ${index + 1}',
+        duration: 60000,
+        uri: '/music/queue-${index + 1}.mp3',
+      ),
+    );
+
+    await pumpQueuePanel(
+      tester,
+      size: const Size(900, 563),
+      songs: songs,
+      startIndex: 20,
+    );
+
+    // The list opens at the twentieth track, not at the top. Without the
+    // initial offset the lazily built list would not hold this row at all.
+    expect(
+      find.descendant(
+        of: find.byType(QueuePanel),
+        matching: find.text('Queue song 21'),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('queue panel rows show the remote source name', (tester) async {
@@ -711,6 +768,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the page is blocked while the queue panel is open', (
+    tester,
+  ) async {
+    var clicks = 0;
+    await pumpQueuePanel(
+      tester,
+      size: const Size(900, 563),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton(
+          onPressed: () => clicks++,
+          child: const Text('page action'),
+        ),
+      ),
+    );
+
+    expect(find.byType(QueuePanel), findsOneWidget);
+    await tester.tap(find.text('page action'));
+    await tester.pumpAndSettle();
+
+    // The click lands on the scrim, which closes the panel; it never reaches
+    // the page behind.
+    expect(clicks, 0);
+    expect(find.byType(QueuePanel), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('queue panel keeps the queue operations', (tester) async {
     final controller = await pumpQueuePanel(tester, size: const Size(900, 563));
 
@@ -796,7 +880,8 @@ void main() {
     await tester.pumpWidget(
       app(
         home: NowPlayingPage(
-          queuePanelBuilder: (context, onClose) => QueuePanel(onClose: onClose),
+          queuePanelBuilder: (context, onClose) =>
+              QueuePanel(onClose: onClose, showTransport: true),
         ),
         overrides: [
           audioPlayerServiceProvider.overrideWithValue(audio),
@@ -810,6 +895,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(QueuePanel), findsOneWidget);
     expect(find.byType(NowPlayingPage), findsOneWidget);
+
+    // The panel carries its own transport on the full view: the page's
+    // transport sits behind the panel, so this is the one the reader uses.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(QueuePanel),
+        matching: find.byTooltip('暂停'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(controller.state.isPlaying, isFalse);
+    expect(find.byType(QueuePanel), findsOneWidget);
 
     // Escape closes the panel, not the full view.
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -887,14 +984,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    // The page writes its title in the language of the interface, so the
-    // heading and the entry of the sidebar carry the same word.
-    expect(find.text('设置'), findsNWidgets(2));
+    // At 760 the rail is compact: its page names wait in tooltips, so only
+    // the texts of the page itself are on screen.
+    expect(find.text('设置'), findsOneWidget);
     expect(find.text('偏好'), findsOneWidget);
-    // The card names the library once: the eyebrow names the section the
-    // card belongs to, so only the sidebar and the title carry the word.
-    expect(find.text('音乐库'), findsNWidgets(2));
-    expect(find.text('收藏'), findsNWidgets(2));
+    expect(find.text('音乐库'), findsOneWidget);
+    expect(find.text('资料库'), findsOneWidget);
+  });
+
+  testWidgets('settings page exposes the health weights and opens them', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(760, 520));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final adjust = find.byKey(const ValueKey('settings-source-health-adjust'));
+    await tester.scrollUntilVisible(
+      adjust,
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byType(SettingsPane),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(adjust, findsOneWidget);
+    expect(find.text('健康度权重'), findsOneWidget);
+
+    await tester.tap(adjust);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(Slider),
+      ),
+      findsNWidgets(10),
+    );
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {
@@ -979,6 +1123,50 @@ void main() {
     expect(
       container.read(settingsControllerProvider).replaceQueueOnClick,
       isTrue,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('settings can turn off the resumed session', (tester) async {
+    await setSurface(tester, const Size(760, 483));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsPane)),
+    );
+    expect(
+      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      isTrue,
+    );
+
+    final row = find
+        .ancestor(of: find.text('启动时继续上次播放'), matching: find.byType(Row))
+        .first;
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: row, matching: find.byType(Switch)));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      isFalse,
     );
     expect(tester.takeException(), isNull);
   });

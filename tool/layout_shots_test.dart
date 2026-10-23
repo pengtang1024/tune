@@ -240,6 +240,28 @@ void main() {
     );
     await _shot(tester, 'settings$suffix');
 
+    // The playback rules are the first card below the first screen.
+    final settingsScroll = find.descendant(
+      of: find.byType(SettingsPane),
+      matching: find.byType(SingleChildScrollView),
+    );
+    await tester.drag(settingsScroll, const Offset(0, -480));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_playback$suffix');
+
+    // The health weights live below the playback card.
+    await tester.drag(settingsScroll, const Offset(0, -420));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_health$suffix');
+
+    await tester.tap(
+      find.byKey(const ValueKey('settings-source-health-adjust')),
+    );
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_health_dialog$suffix');
+    await tester.tap(find.text('取消'));
+    await tester.pumpAndSettle();
+
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/sources', child: SourcesPane()),
@@ -250,7 +272,8 @@ void main() {
     await tester.pumpWidget(
       app(
         home: NowPlayingPage(
-          queuePanelBuilder: (context, onClose) => QueuePanel(onClose: onClose),
+          queuePanelBuilder: (context, onClose) =>
+              QueuePanel(onClose: onClose, showTransport: true),
         ),
       ),
     );
@@ -345,14 +368,14 @@ void main() {
     });
   });
 
-  testWidgets('capture pages in the compact width', (tester) async {
+  testWidgets('capture pages in the smallest window', (tester) async {
     await onLinux(() async {
-      await surface(tester, const Size(680, 520));
+      await surface(tester, const Size(760, 520));
       await capture(tester, '_narrow');
     });
   });
 
-  testWidgets('capture pages in the smallest window', (tester) async {
+  testWidgets('capture pages in the small window', (tester) async {
     await onLinux(() async {
       await surface(tester, const Size(900, 563));
       await capture(tester, '_small');
