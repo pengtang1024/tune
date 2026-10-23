@@ -39,7 +39,7 @@ presentation → application → domain
 3. `features/x/application` 可以 import 别的 feature 的 `application` / `domain`（library 调 playback 就是这样），但不 import 别人的 `presentation`。
 4. widget 只通过 provider 取状态、触发动作，不直接持有 service。
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。
-6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。侧栏不是页面：播放队列由 `SidePanelHost` 在页面区内组合，不注册路由；详见 [queue-panel.md](queue-panel.md)。
+6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。侧栏不是页面：播放队列由 `SidePanelHost` 在页面区内组合，不注册路由。内容区用遮罩挡住并移出焦点，壳层的底栏和侧栏在宿主外仍可操作；关闭走面板按钮、Esc、内容区遮罩、返回键或侧栏切页。详见 [queue-panel.md](queue-panel.md)。
 
 ## 状态归属
 
@@ -64,13 +64,18 @@ presentation → application → domain
 | | 类型 | 实例 |
 | --- | --- | --- |
 | 是什么 | 适配器（`lib/data/services/music_sources/`） | `MusicSourceConfig`（一条配置） |
-| 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关 |
+| 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关、权重 |
 | 标识 | `type` | `id`（内置沿用旧 id，用户实例是 `<type>-<序号>`） |
 
 - 注册表是 `type → adapter` 的数据（`MusicSourceService`），可以注入，测试因此不用改全局状态。
 - 名称、品牌图标与浏览流都按类型查，界面不按 id 硬编码。
-- 列表分三段：顶层、「更多音源」（折叠）、读者自己加的（永远显示）。分区依据是
-  `builtIn` 与类型声明的 `featured`。
+- 每个实例有一个 `weight`：越大越靠前。本地音乐固定 `1000`；其他实例默认
+  `featured` 为 `800`、读者添加为 `700`、需要凭据的为 `400`。`weight >= 500`
+  在主列表，低于 `500` 折叠进「更多音源」；行尾菜单可以上移、下移、移入或移出
+  更多音源。健康度再守一道门：它由可用、配置、扫描、新鲜、产出、速度、可靠、
+  稳定、覆盖、活跃十个维度合成 0–100 分，维度权重可在设置页的「音源 / 健康度权重」
+  里调整；不支持、已关闭、配置不完整或最近扫描失败（低于 `60` 分）也进更多音源，
+  恢复后自动回来。排序与分组只认 `weight`、健康度和本地标记，不按 id 硬编码。
 - 内置实例的检索词一律留空：平台自己有浏览流（最新、排行、每日推荐），应用不替读者挑口味。
 - 不执行读者带来的任何脚本：自定义音源只接受声明式的参数，没有表达式，也没有求值器。
 
@@ -109,6 +114,8 @@ presentation → application → domain
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
 | 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
+| 播放会话（队列、游标、模式、历史） | `<应用支持目录>/settings/`，键 `playback_queue_v1` | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
+| 播放进度 | `<应用支持目录>/settings/`，键 `playback_position_v1` | `PlaybackSessionStore` |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
@@ -116,6 +123,7 @@ presentation → application → domain
 | 歌词 | 曲目所在目录，`<歌名>.lrc`（读者指定的写 `<歌名>.manual.lrc`） | `LyricsController` → `LibraryPaths` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
+- **播放会话与进度分开存**：队列只在切歌/编辑时写，进度每 5 秒单独写，避免为了几秒钟的进度反复重写整条队列。恢复时一律停在暂停态，规则见 [playback-session.md](playback-session.md)。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
