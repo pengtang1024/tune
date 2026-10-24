@@ -11,6 +11,7 @@ import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
 import 'package:tune/shared/ui/track_position.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// A track of the library table.
@@ -118,19 +119,24 @@ class LibraryTrackCard extends StatelessWidget {
                         const SizedBox(width: CompactTokens.space10),
                         Expanded(
                           flex: 5,
-                          child: Text(
-                            song.title.isEmpty
+                          child: TuneTooltip(
+                            message: song.title.isEmpty
                                 ? context.loc.trackUnknownTitle
                                 : song.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: selected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                              color: selected
-                                  ? theme.colorScheme.primary
-                                  : null,
+                            child: Text(
+                              song.title.isEmpty
+                                  ? context.loc.trackUnknownTitle
+                                  : song.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: selected
+                                    ? theme.colorScheme.primary
+                                    : null,
+                              ),
                             ),
                           ),
                         ),
@@ -138,14 +144,19 @@ class LibraryTrackCard extends StatelessWidget {
                           const SizedBox(width: CompactTokens.space8),
                           Expanded(
                             flex: 2,
-                            child: Text(
-                              song.artist.trim().isEmpty
+                            child: TuneTooltip(
+                              message: song.artist.trim().isEmpty
                                   ? context.loc.playerUnknownArtist
                                   : song.artist,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                              child: Text(
+                                song.artist.trim().isEmpty
+                                    ? context.loc.playerUnknownArtist
+                                    : song.artist,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
                               ),
                             ),
                           ),
@@ -154,12 +165,15 @@ class LibraryTrackCard extends StatelessWidget {
                           const SizedBox(width: CompactTokens.space8),
                           Expanded(
                             flex: 3,
-                            child: Text(
-                              song.album.trim(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            child: TuneTooltip(
+                              message: song.album.trim(),
+                              child: Text(
+                                song.album.trim(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
                               ),
                             ),
                           ),

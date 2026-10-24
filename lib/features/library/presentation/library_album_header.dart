@@ -6,6 +6,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/presentation/library_queue_all_button.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The heading of one album.
@@ -98,7 +99,8 @@ class LibraryAlbumHeader extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              '$artist · ${context.loc.libraryTrackCount(album.trackCount)}',
+              '$artist · ${context.loc.libraryTrackCount(album.trackCount)}'
+              ' · ${formatDuration(Duration(milliseconds: album.durationInMillis))}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(

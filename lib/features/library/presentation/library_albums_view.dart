@@ -14,6 +14,9 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 class LibraryAlbumsView extends StatelessWidget {
   final List<LibraryAlbum> albums;
 
+  /// Keeps the place of the grid while an album is open.
+  final ScrollController? controller;
+
   /// The album that holds the track that plays right now, if any.
   final String? currentAlbumKey;
 
@@ -40,6 +43,7 @@ class LibraryAlbumsView extends StatelessWidget {
     required this.onOpen,
     required this.onPlay,
     this.currentAlbumKey,
+    this.controller,
   });
 
   @override
@@ -60,6 +64,7 @@ class LibraryAlbumsView extends StatelessWidget {
             _captionHeight * MediaQuery.textScalerOf(context).scale(1);
 
         return GridView.builder(
+          controller: controller,
           padding: const EdgeInsets.fromLTRB(
             gutter,
             0,

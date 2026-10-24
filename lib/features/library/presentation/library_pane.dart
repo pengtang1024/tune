@@ -44,6 +44,14 @@ class LibraryPane extends ConsumerStatefulWidget {
 class _LibraryPaneState extends ConsumerState<LibraryPane> {
   final TextEditingController _searchController = TextEditingController();
 
+  /// The scroll positions of the two views.
+  ///
+  /// A view is disposed when the other one is shown; the controller keeps
+  /// the place, so a reader who looked at an album and came back lands on
+  /// the same covers instead of the top of the page.
+  final ScrollController _songsScrollController = ScrollController();
+  final ScrollController _albumsScrollController = ScrollController();
+
   /// How the list below the toolbar is read.
   LibraryViewMode _view = LibraryViewMode.songs;
 
@@ -56,6 +64,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   @override
   void dispose() {
     _searchController.dispose();
+    _songsScrollController.dispose();
+    _albumsScrollController.dispose();
     super.dispose();
   }
 
@@ -285,6 +295,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       return LibraryAlbumsView(
         albums: albums,
         currentAlbumKey: currentAlbumKey,
+        controller: _albumsScrollController,
         onOpen: (album) => setState(() => _openAlbumKey = album.key),
         onPlay: _playAlbum,
       );
@@ -297,6 +308,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       sourceLabels,
       favorites,
       onlyLikeOnDoubleClick,
+      controller: _songsScrollController,
     );
   }
 
@@ -306,9 +318,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
     FavoritesState favorites,
-    bool onlyLikeOnDoubleClick,
-  ) {
+    bool onlyLikeOnDoubleClick, {
+    ScrollController? controller,
+  }) {
     return ListView.builder(
+      controller: controller,
       padding: const EdgeInsets.fromLTRB(
         CompactTokens.pageGutter,
         0,
