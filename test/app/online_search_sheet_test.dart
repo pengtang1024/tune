@@ -4,12 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/favorite_button.dart';
+
+import '../services/fake_persistence.dart';
 
 void main() {
   testWidgets('online search sheet renders grouped results', (tester) async {
@@ -54,6 +59,58 @@ void main() {
     expect(find.byTooltip('Demo Source'), findsOneWidget);
     expect(find.text('Song hello'), findsOneWidget);
     expect(find.text('播放全部'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the result row shows and keeps the heart of a track', (
+    tester,
+  ) async {
+    final persistence = FakePersistenceService();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          persistenceServiceProvider.overrideWithValue(persistence),
+          musicSourcesControllerProvider.overrideWith(
+            () => _FakeSourcesController(),
+          ),
+          onlineSearchControllerProvider.overrideWith(
+            () => _FakeOnlineSearchController(),
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('zh', 'CN'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showOnlineSearchSheet(context),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'hello');
+    await tester.tap(find.text('搜索'));
+    await tester.pumpAndSettle();
+
+    // The mark that a double click makes has to be visible in the same row.
+    expect(find.byType(FavoriteButton), findsOneWidget);
+    expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
+
+    await tester.tap(find.byType(FavoriteButton));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FavoriteButton)),
+    );
+    expect(container.read(favoritesControllerProvider).count, 1);
     expect(tester.takeException(), isNull);
   });
 

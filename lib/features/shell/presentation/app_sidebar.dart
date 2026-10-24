@@ -11,10 +11,17 @@ class AppSidebar extends StatelessWidget {
   final String currentPath;
   final bool compact;
 
+  /// Called before the sidebar goes to [path].
+  ///
+  /// The shell closes the queue panel here, so the page the reader chose is
+  /// not left hidden behind the scrim.
+  final VoidCallback? onNavigate;
+
   const AppSidebar({
     super.key,
     required this.currentPath,
     this.compact = false,
+    this.onNavigate,
   });
 
   @override
@@ -56,7 +63,7 @@ class AppSidebar extends StatelessWidget {
                       _Brand(compact: compact),
                       SizedBox(height: short ? 24 : 34),
                       _SectionLabel(
-                        context.loc.sidebarCollect,
+                        context.loc.sidebarBrowse,
                         compact: compact,
                       ),
                       const SizedBox(height: 8),
@@ -66,14 +73,7 @@ class AppSidebar extends StatelessWidget {
                         path: '/library',
                         currentPath: currentPath,
                         compact: compact,
-                      ),
-                      const SizedBox(height: 4),
-                      _NavItem(
-                        icon: Icons.queue_music_rounded,
-                        label: context.loc.queueTitle,
-                        path: '/queue',
-                        currentPath: currentPath,
-                        compact: compact,
+                        onNavigate: onNavigate,
                       ),
                       const SizedBox(height: 4),
                       _NavItem(
@@ -82,6 +82,7 @@ class AppSidebar extends StatelessWidget {
                         path: '/favorites',
                         currentPath: currentPath,
                         compact: compact,
+                        onNavigate: onNavigate,
                       ),
                       const SizedBox(height: 24),
                       _SectionLabel(
@@ -95,6 +96,7 @@ class AppSidebar extends StatelessWidget {
                         path: '/sources',
                         currentPath: currentPath,
                         compact: compact,
+                        onNavigate: onNavigate,
                       ),
                       const Spacer(),
                       _NavItem(
@@ -103,6 +105,7 @@ class AppSidebar extends StatelessWidget {
                         path: '/settings',
                         currentPath: currentPath,
                         compact: compact,
+                        onNavigate: onNavigate,
                       ),
                       if (!compact && !short) ...[
                         const SizedBox(height: 18),
@@ -220,6 +223,7 @@ class _NavItem extends StatelessWidget {
   final String path;
   final String currentPath;
   final bool compact;
+  final VoidCallback? onNavigate;
 
   const _NavItem({
     required this.icon,
@@ -227,6 +231,7 @@ class _NavItem extends StatelessWidget {
     required this.path,
     required this.currentPath,
     required this.compact,
+    this.onNavigate,
   });
 
   @override
@@ -238,7 +243,10 @@ class _NavItem extends StatelessWidget {
       // The wide sidebar writes the name of the page, so it says nothing more.
       message: compact ? label : '',
       child: InkWell(
-        onTap: () => context.go(path),
+        onTap: () {
+          onNavigate?.call();
+          context.go(path);
+        },
         borderRadius: BorderRadius.circular(CompactTokens.radius12),
         child: AnimatedContainer(
           duration: CompactTokens.fastMotion,
@@ -265,13 +273,17 @@ class _NavItem extends StatelessWidget {
               ),
               if (!compact) ...[
                 const SizedBox(width: CompactTokens.space12),
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface,
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      color: selected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface,
+                    ),
                   ),
                 ),
               ],

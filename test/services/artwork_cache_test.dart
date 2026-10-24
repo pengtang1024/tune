@@ -43,13 +43,16 @@ void main() {
     expect(adapter.calls, 1, reason: 'the second time comes from the disk');
   });
 
-  test('the cover is kept in the artwork folder of the music library', () async {
-    await cacheWith(FakeAdapter()).imageFor('https://example.com/cover.png');
+  test(
+    'the cover is kept in the artwork folder of the music library',
+    () async {
+      await cacheWith(FakeAdapter()).imageFor('https://example.com/cover.png');
 
-    final artwork = Directory(path.join(folder.path, '.tune', 'artwork'));
-    expect(await artwork.exists(), isTrue);
-    expect(_filesIn(artwork), hasLength(1));
-  });
+      final artwork = Directory(path.join(folder.path, '.tune', 'artwork'));
+      expect(await artwork.exists(), isTrue);
+      expect(_filesIn(artwork), hasLength(1));
+    },
+  );
 
   test('the covers are spread over subfolders', () async {
     final adapter = FakeAdapter();
@@ -115,6 +118,7 @@ void main() {
     final stored = await artwork.exists() ? _filesIn(artwork) : <File>[];
     expect(stored, isEmpty);
   });
+
 }
 
 /// The files in a folder and in the folders below it.
@@ -147,7 +151,9 @@ class FakeAdapter implements HttpClientAdapter {
     return ResponseBody.fromBytes(
       bytes,
       200,
-      headers: {Headers.contentTypeHeader: ['image/png']},
+      headers: {
+        Headers.contentTypeHeader: ['image/png'],
+      },
     );
   }
 

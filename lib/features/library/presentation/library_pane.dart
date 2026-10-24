@@ -83,14 +83,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         (value) => (value.currentSong?.uri, value.isPlaying),
       ),
     );
-    final sourceLabels = sourceLabelsOf(
-      context.loc,
-      ref.watch(
-        musicSourcesControllerProvider.select(
-          (value) => value.valueOrNull?.sources ?? const [],
-        ),
+    final sourceConfigs = ref.watch(
+      musicSourcesControllerProvider.select(
+        (value) => value.valueOrNull?.sources ?? const [],
       ),
     );
+    final sourceLabels = sourceLabelsOf(context.loc, sourceConfigs);
     final songs = state.filteredSongs;
     final hasSourceIssues = state.sourceSummaries.values.any(
       (summary) => summary.status != SourceScanStatus.success,
@@ -150,7 +148,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             controller: _searchController,
             query: state.query,
             filteredCount: songs.length,
-            sources: _availableSources(state, sourceLabels),
+            sources: _availableSources(state, sourceLabels, sourceConfigs),
             sourceLabels: sourceLabels,
             sourceFilter: state.sourceFilter,
             scanning: state.isScanning,
@@ -204,23 +202,29 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
-  /// Sources that own at least one track of the library.
+  /// Sources that own at least one track of the library, in weight order.
+  ///
+  /// The configured sources already stand in the reader's order. A source
+  /// that only exists in old songs has no configuration any more; it goes to
+  /// the end, named by the label the library still knows.
   List<String> _availableSources(
     LibraryState state,
     Map<String, SourceLabel> sourceLabels,
+    List<MusicSourceConfig> configs,
   ) {
-    final sources =
-        state.songs
-            .map((song) => song.sourceId ?? 'local')
-            .toSet()
-            .toList(growable: false)
-          ..sort(
-            (a, b) => compareText(
-              sourceLabels[a]?.name ?? a,
-              sourceLabels[b]?.name ?? b,
-            ),
-          );
-    return sources;
+    final ids = state.songs.map((song) => song.sourceId ?? 'local').toSet();
+    final ordered = <String>[
+      for (final source in configs)
+        if (ids.remove(source.id)) source.id,
+    ];
+    final leftovers = ids.toList()
+      ..sort(
+        (left, right) => compareText(
+          sourceLabels[left]?.name ?? left,
+          sourceLabels[right]?.name ?? right,
+        ),
+      );
+    return [...ordered, ...leftovers];
   }
 
   Widget _body(
@@ -265,7 +269,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             // by default the track joins the queue and plays right away.
             ref.read(listPlaybackProvider).play(song);
           },
-          onDoubleTap: () => _toggleFavorite(song),
+          onDoubleTap: () => _markFavorite(song),
           waitsForDoubleClick: onlyLikeOnDoubleClick,
           onAddToQueue: () => _addToQueue(song),
           onToggleFavorite: () => _toggleFavorite(song),
@@ -289,6 +293,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// Marks the track, or takes the mark away when it is already there.
   void _toggleFavorite(Song song) {
     ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+  }
+
+  /// A double click may add a mark, never take one away.
+  void _markFavorite(Song song) {
+    ref.read(favoritesControllerProvider.notifier).mark(song.uri);
   }
 
   /// Puts the whole visible list into the queue.

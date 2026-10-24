@@ -112,7 +112,8 @@ MusicSourceConfig（实例 · 数据）
   （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
 - **「更多音源」（折叠）**：iTunes（30 秒试听）、播客 RSS、网易云 API、
   Subsonic、Jellyfin —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
-- **「我添加的」**：用户自己添加的实例，永远显示，不折叠。
+- **用户添加的实例**：默认权重 `700`，进主列表；它和其他实例一样可以被后移，
+  也可以折叠到「更多音源」，不再是永远显示的一段。
 
 折叠状态存进设置偏好（`SettingsController` 里的 `sources_more_expanded`，与
 `auto_scan_on_startup` 同一套偏好存储），用户展开过一次就不再打扰。
@@ -229,10 +230,16 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
 - 内置实例：没有删除项，只能禁用。本地目录固定启用。
 - 插件删除入口随插件一起下线。
 
-### 5.3 顶级 / 更多音源 / 我添加的
+### 5.3 主列表 / 更多音源
 
-三段都由 `MusicSourcesSection` 渲染，音源页用它，不写第二份列表逻辑。
-分区依据是 `builtIn` 与类型元数据里的 `featured` 标记，不按 id 硬编码。
+三段都由 `MusicSourcesSection` 渲染，音源页与设置页共用它，不写第二份列表逻辑。
+每个实例有 `weight`：本地音乐固定 `1000`，其他实例按默认权重起步；行尾菜单的
+「上移/下移」在组内调整顺序，「移到更多音源/移回主列表」换组；低于 `500` 的实例
+进入可折叠的「更多音源」。健康度再守一道门：它由可用、配置、扫描、新鲜、产出、
+速度、可靠、稳定、覆盖、活跃十个维度合成 0–100 分，维度权重可以在设置页的
+「音源 / 健康度权重」里调整；不支持、已关闭、配置不完整或最近扫描失败（低于 `60`
+分）的实例进更多音源，配置/启用/扫描成功后自动回来。排序与折叠只看 `weight`、
+健康度和本地标记，不按 id 硬编码。
 
 ## 6. 声明式参数
 
@@ -327,7 +334,8 @@ id 可读、稳定、不会因为加实例而变动。老配置 id 不动，因�
    `flutter_js` 依赖、导入入口、相关文案（约 60 键 × 4 语言）、5 个测试文件。
    `Song.sourceData` **保留** —— Subsonic 的文件后缀、电台的正在播出、ccMixter 的
    来源都还在用它，它不是插件专用字段。
-8. 界面分区：顶层 / 更多音源 / 我添加的。
+8. 界面排序：每个实例一个 `weight`；本地固定，其余可上移/下移、移入或移出
+   「更多音源」；阈值 `500`。
 
 ### 阶段 B · 添加流程与新类型（已落地）
 
@@ -351,8 +359,13 @@ flutter test
 
 - `test/services/music_source_type_test.dart`：类型解析、`type` 回退、内置判定、
   类型是否属于顶层。
-- `test/app/music_sources_section_test.dart`：三分区的顺序、「更多音源」的折叠与
-  记住展开状态。
+- `test/app/music_sources_section_test.dart`：`weight` 的分组、主列表/更多音源的
+  顺序与折叠、记住展开状态。
+- `test/app/source_weight_test.dart` 与 `music_sources_controller_test.dart`：
+  `weight` 的 JSON、默认值、本地固定、移动/折叠、健康度维度/权重、扫描历史与
+  重建后的持久化。
+- `test/app/source_health_weights_dialog_test.dart`：十个维度滑杆、保存与最小窗口
+  1.3 倍字号。
 - `test/services/music_source_browse_test.dart`：各浏览流的请求形态（排行走 trending、
   最新走无词列表）、以及「有浏览流即已配置」的判定。
 - `test/app/music_sources_add_test.dart`：添加实例、id 分配、删除实例与歌曲。

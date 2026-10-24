@@ -94,6 +94,12 @@ abstract final class CompactTokens {
   static const double sidebarWidth = 196;
   static const double sidebarWidthCompact = 76;
 
+  /// Width below which the navigation rail drops its labels.
+  ///
+  /// The minimum window is 760 wide, so the threshold has to sit above it:
+  /// a narrow form that the window cannot reach is a form nobody sees.
+  static const double sidebarCompactBreakpoint = 800;
+
   /// Inner padding of the navigation rail.
   static const double sidebarPadding = 20;
 
@@ -105,6 +111,23 @@ abstract final class CompactTokens {
   static const double dockMargin = 16;
   static const double dockPadding = 14;
   static const double dockRadius = 18;
+
+  /// Width of the side panel that floats over the content area.
+  ///
+  /// A panel keeps a readable measure instead of following the page: it grows
+  /// to [sidePanelWidthMax] and no further. It also leaves the page a strip of
+  /// at least [sidePanelContentReserve] pixels, so the panel reads as a side
+  /// panel rather than a page that lost its heading. A very narrow window
+  /// clamps the panel to the room it has, gutters included.
+  static const double sidePanelWidthMin = 360;
+  static const double sidePanelWidthMax = 440;
+  static const double sidePanelContentReserve = 160;
+
+  /// Space between the edge of the content area and the floating panel.
+  static const double sidePanelGutter = 12;
+
+  /// Radius of the floating panel, shared with the player dock.
+  static const double sidePanelRadius = dockRadius;
 
   /// Width of the transport column of the dock, and of its narrow form.
   ///

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tune/domain/models/source_health_weights.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
@@ -13,6 +14,12 @@ class SettingsState {
   /// Whether the player shows up in the media controls of the system.
   final bool mediaControlsEnabled;
 
+  /// Whether a start restores the queue and the position of the last run.
+  ///
+  /// The session always opens paused; the switch only decides whether the
+  /// saved queue is read at all.
+  final bool restorePlaybackOnStartup;
+
   /// Whether a single click on a track replaces the play queue.
   ///
   /// When it is off, a click queues the track and plays it right away, so the
@@ -23,7 +30,8 @@ class SettingsState {
   ///
   /// A double click plays the track as well, because the first click of it
   /// plays the track already. When this is on the double click leaves the
-  /// music alone and only changes the heart.
+  /// music alone and only adds the heart: a double click never takes a mark
+  /// away, that is the single click on the heart.
   final bool onlyLikeOnDoubleClick;
 
   /// The folder the app writes the files it fetches into.
@@ -39,6 +47,9 @@ class SettingsState {
   /// the section once and it stays open.
   final bool sourcesMoreExpanded;
 
+  /// The weights of the dimensions of the source health score.
+  final SourceHealthWeights sourceHealthWeights;
+
   /// The music library of the machine.
   final String defaultLibraryFolder;
 
@@ -52,7 +63,9 @@ class SettingsState {
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
     this.onlyLikeOnDoubleClick = false,
+    this.restorePlaybackOnStartup = true,
     this.sourcesMoreExpanded = false,
+    this.sourceHealthWeights = SourceHealthWeights.defaults,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
   });
@@ -72,7 +85,9 @@ class SettingsState {
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
     bool? onlyLikeOnDoubleClick,
+    bool? restorePlaybackOnStartup,
     bool? sourcesMoreExpanded,
+    SourceHealthWeights? sourceHealthWeights,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
   }) {
@@ -87,8 +102,10 @@ class SettingsState {
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
       onlyLikeOnDoubleClick:
           onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
-      sourcesMoreExpanded:
-          sourcesMoreExpanded ?? this.sourcesMoreExpanded,
+      restorePlaybackOnStartup:
+          restorePlaybackOnStartup ?? this.restorePlaybackOnStartup,
+      sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
+      sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
           : libraryFolder as String?,

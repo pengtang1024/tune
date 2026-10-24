@@ -30,6 +30,13 @@ class QueueTrackRow extends StatelessWidget {
   final VoidCallback onRemove;
   final VoidCallback onToggleFavorite;
 
+  /// Whether the row sits in a panel rather than a full page.
+  ///
+  /// The panel row keeps the title on one line and the artist, the source and
+  /// the duration on the next, so the panel stays readable without the fact
+  /// strip and the details action of a page row.
+  final bool dense;
+
   const QueueTrackRow({
     super.key,
     required this.song,
@@ -43,6 +50,7 @@ class QueueTrackRow extends StatelessWidget {
     required this.waitsForDoubleClick,
     required this.onRemove,
     required this.onToggleFavorite,
+    this.dense = false,
   });
 
   @override
@@ -93,6 +101,7 @@ class QueueTrackRow extends StatelessWidget {
                         playing: playing,
                         isFavorite: isFavorite,
                         onToggleFavorite: onToggleFavorite,
+                        dense: dense,
                       ),
                     ),
                     const SizedBox(width: CompactTokens.space4),
@@ -101,28 +110,60 @@ class QueueTrackRow extends StatelessWidget {
                       onPressed: onToggleFavorite,
                     ),
                     const SizedBox(width: CompactTokens.space4),
-                    ReorderableDragStartListener(
-                      index: index,
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.grab,
-                        child: SizedBox(
-                          width: 28,
-                          height: 28,
-                          child: Icon(
-                            Icons.drag_indicator_rounded,
-                            size: CompactTokens.icon16,
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ),
-                    ),
+                    _DragHandle(index: index),
                     _RemoveButton(onPressed: onRemove),
                     const SizedBox(width: CompactTokens.space4),
                   ],
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The handle that starts a reorder, with a hint and a hover state.
+class _DragHandle extends StatefulWidget {
+  final int index;
+
+  const _DragHandle({required this.index});
+
+  @override
+  State<_DragHandle> createState() => _DragHandleState();
+}
+
+class _DragHandleState extends State<_DragHandle> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return TuneTooltip(
+      message: context.loc.queueReorderTooltip,
+      child: ReorderableDragStartListener(
+        index: widget.index,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.grab,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: AnimatedContainer(
+            duration: CompactTokens.fastMotion,
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.08)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(CompactTokens.radius6),
+            ),
+            child: Icon(
+              Icons.drag_indicator_rounded,
+              size: CompactTokens.icon16,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            ),
           ),
         ),
       ),
@@ -147,7 +188,7 @@ class _RemoveButton extends StatelessWidget {
         message: context.loc.remove,
         child: IconButton(
           onPressed: onPressed,
-          icon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
+          icon: const Icon(Icons.remove_rounded, size: CompactTokens.icon14),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints.tightFor(width: 28, height: 28),
           style: IconButton.styleFrom(

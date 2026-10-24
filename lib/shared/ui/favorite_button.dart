@@ -10,7 +10,10 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 /// carries an empty one, and the mouse says what a click will do.
 class FavoriteButton extends StatelessWidget {
   final bool isFavorite;
-  final VoidCallback onPressed;
+
+  /// What the click does. A null button says "there is nothing to mark here",
+  /// the way the other controls of the app say it.
+  final VoidCallback? onPressed;
 
   const FavoriteButton({
     super.key,

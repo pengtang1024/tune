@@ -186,6 +186,17 @@ class MusicSourceService implements StreamUrlResolver {
     return _adapters[config.sourceType]?.isConfigured(config) ?? false;
   }
 
+  /// How often the type wants to be refreshed.
+  Duration autoScanIntervalFor(MusicSourceConfig config) {
+    return _adapters[config.sourceType]?.autoScanInterval ?? Duration.zero;
+  }
+
+  /// How long a scan of the type may take before it times out.
+  Duration scanTimeoutFor(MusicSourceConfig config) {
+    return _adapters[config.sourceType]?.scanTimeout ??
+        const Duration(seconds: 45);
+  }
+
   String configurationHint(MusicSourceConfig config) {
     return _adapters[config.sourceType]?.configurationHint ??
         AppStrings.instance.sourceErrorUnsupported;
@@ -231,12 +242,28 @@ class MusicSourceService implements StreamUrlResolver {
   /// The lyrics of a track are only needed when the user asks for them, so
   /// they are fetched on demand instead of during a scan. A song that already
   /// carries lyrics keeps them. A source without lyrics falls back to the
-  /// shared lyrics database, so an open catalogue can be read along with its
-  /// words.
+  /// shared lyrics database, so a track of the local music folder can be read
+  /// along with its words.
+  ///
+  /// A source that fails is not the end of the road: the shared database is
+  /// asked anyway. The failure of the shared database reaches the caller,
+  /// because a network that is down is not the same as a track without
+  /// lyrics.
   Future<String?> fetchLyrics(Song song) async {
     final stored = song.lyrics;
     if (stored != null && stored.trim().isNotEmpty) return stored;
 
+    final fromSource = await _lyricsFromSource(song);
+    if (fromSource != null) return fromSource;
+
+    return _lyricsProvider.lookup(song);
+  }
+
+  /// The lyrics the source that owns [song] publishes.
+  ///
+  /// A source without lyrics answers with `null`, and a source that fails
+  /// answers with `null` as well, so the shared database still gets its turn.
+  Future<String?> _lyricsFromSource(Song song) async {
     final sourceId = song.sourceId;
     if (sourceId == null || sourceId.isEmpty) return null;
 
@@ -246,12 +273,11 @@ class MusicSourceService implements StreamUrlResolver {
       final adapter = await _adapterFor(config);
       if (adapter == null) return null;
 
-      final fromSource = await adapter.fetchLyrics(config, song);
-      if (fromSource != null && fromSource.trim().isNotEmpty) return fromSource;
-
-      return await _lyricsProvider.lookup(song);
+      final text = await adapter.fetchLyrics(config, song);
+      if (text == null || text.trim().isEmpty) return null;
+      return text;
     } catch (error, stackTrace) {
-      Log.error('获取歌词失败: $error\n$stackTrace');
+      Log.error('读取音源歌词失败: $error', stackTrace);
       return null;
     }
   }

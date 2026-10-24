@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/radio_station.dart';
+import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 
 /// The open directory of internet radio stations.
@@ -21,10 +22,9 @@ class RadioBrowserProvider extends RadioStationProvider {
             BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
-              headers: const {
-                'Accept': 'application/json',
-                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
-              },
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
             ),
           );
 
@@ -156,10 +156,9 @@ class SomaFmProvider extends RadioStationProvider {
             BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
-              headers: const {
-                'Accept': 'application/json',
-                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
-              },
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
             ),
           );
 
@@ -290,10 +289,9 @@ class RadioParadiseProvider extends RadioStationProvider {
             BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
-              headers: const {
-                'Accept': 'application/json',
-                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
-              },
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
             ),
           );
 

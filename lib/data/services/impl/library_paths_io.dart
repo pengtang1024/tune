@@ -85,26 +85,31 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Future<File> lyricsFileFor(Song song) async {
+  Future<File> lyricsFileFor(Song song) => _lyricsFileFor(song, manual: false);
+
+  /// The file the lyrics of [song] are written to.
+  ///
+  /// The lyrics the reader brought have a name of their own, so the file the
+  /// app matched is never overwritten.
+  Future<File> _lyricsFileFor(Song song, {required bool manual}) async {
     final folder = await folderFor(song);
-    return File(path.join(folder.path, '${nameFor(song)}.lrc'));
+    final name = nameFor(song);
+    final file = manual ? '$name.manual.lrc' : '$name.lrc';
+    return File(path.join(folder.path, file));
   }
 
   @override
   Directory coverCacheFolder() {
-    final root = this.root();
-    return Directory(path.join(root.path, cacheFolderName, artworkFolderName));
+    return Directory(
+      path.join(root().path, cacheFolderName, artworkFolderName),
+    );
   }
 
   @override
   Future<String?> readLyrics(Song song) async {
-    try {
-      final file = await lyricsFileFor(song);
-      if (!await file.exists()) return null;
-      return await file.readAsString();
-    } catch (error) {
-      return null;
-    }
+    final chosen = await _readLyricsFile(_lyricsFileFor(song, manual: true));
+    if (chosen != null) return chosen;
+    return _readLyricsFile(_lyricsFileFor(song, manual: false));
   }
 
   @override
@@ -112,6 +117,27 @@ class FileLibraryPaths implements LibraryPaths {
     final file = await lyricsFileFor(song);
     await file.parent.create(recursive: true);
     await file.writeAsString(lyrics, flush: true);
+  }
+
+  @override
+  Future<void> saveChosenLyrics(Song song, String lyrics) async {
+    final matched = await lyricsFileFor(song);
+    final target = await matched.exists()
+        ? await _lyricsFileFor(song, manual: true)
+        : matched;
+    await target.parent.create(recursive: true);
+    await target.writeAsString(lyrics, flush: true);
+  }
+
+  /// Reads a lyrics file, when it is there and can be read.
+  Future<String?> _readLyricsFile(Future<File> file) async {
+    try {
+      final target = await file;
+      if (!await target.exists()) return null;
+      return await target.readAsString();
+    } catch (error) {
+      return null;
+    }
   }
 
   /// The file of a track that is on the disk, when the track is one.

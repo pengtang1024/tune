@@ -39,14 +39,17 @@ presentation → application → domain
 3. `features/x/application` 可以 import 别的 feature 的 `application` / `domain`（library 调 playback 就是这样），但不 import 别人的 `presentation`。
 4. widget 只通过 provider 取状态、触发动作，不直接持有 service。
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。
+6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。侧栏不是页面：播放队列由 `SidePanelHost` 在页面区内组合，不注册路由。内容区用遮罩挡住并移出焦点，壳层的底栏和侧栏在宿主外仍可操作；关闭走面板按钮、Esc、内容区遮罩、返回键或侧栏切页。详见 [queue-panel.md](queue-panel.md)。
 
 ## 状态归属
 
 | 状态 | 唯一来源 | 职责 |
 | --- | --- | --- |
 | 播放 + 队列 | `PlaybackController` / `PlaybackState`（`features/player`） | 队列是 `PlaybackState` 的一部分，仓库里没有第二个队列容器 |
+| 队列侧栏的显隐 | `CompactShell` 的本地 state / `NowPlayingPage` 的本地 state | 只是呈现状态，不持久化、不进 provider；队列内容仍归 `PlaybackController` |
 | 音乐库 | `LibraryController` / `LibraryState`（`features/library`） | 加载、扫描、过滤；不负责播放 |
 | 喜欢 | `FavoritesController` / `FavoritesState`（`features/favorites`） | 标了心的曲目；曲目本身还是音乐库里的那一首 |
+| 歌词 | `LyricsController` / `LyricsState`（`features/player`） | 当前曲目的歌词与解析结果；控制器自己 `watch` 播放器的当前曲目来取词，页面只读不改；播放位置仍由 `PlaybackController` 独家持有，歌词只读它 |
 | 设置 | `SettingsController` / `SettingsState`（`features/settings`） | 主题、语言、扫描目录、自动扫描、单曲与双击行为、桌面集成 |
 | 音源 | `MusicSourcesController` / `MusicSourcesState`（`features/sources`） | 音源开关与配置 |
 
@@ -61,13 +64,18 @@ presentation → application → domain
 | | 类型 | 实例 |
 | --- | --- | --- |
 | 是什么 | 适配器（`lib/data/services/music_sources/`） | `MusicSourceConfig`（一条配置） |
-| 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关 |
+| 决定 | 怎么取歌、品牌名与图标、浏览流、要读者填哪些参数 | 取哪一个：名字、参数、开关、权重 |
 | 标识 | `type` | `id`（内置沿用旧 id，用户实例是 `<type>-<序号>`） |
 
 - 注册表是 `type → adapter` 的数据（`MusicSourceService`），可以注入，测试因此不用改全局状态。
 - 名称、品牌图标与浏览流都按类型查，界面不按 id 硬编码。
-- 列表分三段：顶层、「更多音源」（折叠）、读者自己加的（永远显示）。分区依据是
-  `builtIn` 与类型声明的 `featured`。
+- 每个实例有一个 `weight`：越大越靠前。本地音乐固定 `1000`；其他实例默认
+  `featured` 为 `800`、读者添加为 `700`、需要凭据的为 `400`。`weight >= 500`
+  在主列表，低于 `500` 折叠进「更多音源」；行尾菜单可以上移、下移、移入或移出
+  更多音源。健康度再守一道门：它由可用、配置、扫描、新鲜、产出、速度、可靠、
+  稳定、覆盖、活跃十个维度合成 0–100 分，维度权重可在设置页的「音源 / 健康度权重」
+  里调整；不支持、已关闭、配置不完整或最近扫描失败（低于 `60` 分）也进更多音源，
+  恢复后自动回来。排序与分组只认 `weight`、健康度和本地标记，不按 id 硬编码。
 - 内置实例的检索词一律留空：平台自己有浏览流（最新、排行、每日推荐），应用不替读者挑口味。
 - 不执行读者带来的任何脚本：自定义音源只接受声明式的参数，没有表达式，也没有求值器。
 
@@ -106,13 +114,16 @@ presentation → application → domain
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
 | 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
+| 播放会话（队列、游标、模式、历史） | `<应用支持目录>/settings/`，键 `playback_queue_v1` | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
+| 播放进度 | `<应用支持目录>/settings/`，键 `playback_position_v1` | `PlaybackSessionStore` |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
-| 歌词 | 曲目所在目录，`<歌名>.lrc` | `LyricsController` → `LibraryPaths` |
+| 歌词 | 曲目所在目录，`<歌名>.lrc`（读者指定的写 `<歌名>.manual.lrc`） | `LyricsController` → `LibraryPaths` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
+- **播放会话与进度分开存**：队列只在切歌/编辑时写，进度每 5 秒单独写，避免为了几秒钟的进度反复重写整条队列。恢复时一律停在暂停态，规则见 [playback-session.md](playback-session.md)。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
@@ -131,6 +142,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 │   ├── <歌名>.mp3                          # 下载的音频
 │   ├── <歌名>.jpg                          # 封面
 │   ├── <歌名>.lrc                          # 匹配到的歌词
+│   ├── <歌名>.manual.lrc                   # 读者自己指定的歌词
 │   └── <歌名>.tune                         # 副本标记：这首歌来自哪个音源
 └── ...
 ```
@@ -139,6 +151,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 - **副本标记**：app 下载的音频旁边放一个 `<歌名>.tune`，里面是这首歌的规范地址（`tune://<音源>/<曲目 id>`）。扫描时读到它，就知道这个文件是某首远程曲目的副本，而不是一首独立的曲子——于是音乐库里那首歌只有一条，同时标着「本地」和「在线」。
 - **老副本要补标记**：app 是后来才写标记的，之前下载的副本旁边是空的。扫描之前，存储按曲目自己的目录找一遍这些副本，找到就补上标记（`SongDownloadService.markCopiesOf`），下一次扫描就能合成一条。
 - 用户磁盘上已有的曲子不动，app 只把歌词写在它旁边（`<歌名>.lrc`），封面和音频不覆盖用户自己的文件。
+  - 读者自己指定的歌词写进 `<歌名>.manual.lrc`，不覆盖读者已有的 `<歌名>.lrc`；读的时候先读读者指定的那一份。
 - 目录名经过 `safeFileName`（`lib/utils/file_name.dart`）：路径分隔符和 Windows 不允许的字符被换掉，名字短到任何文件系统都收得下。
 - 单个目录不放太多东西：曲目按歌手 / 专辑 / 歌名分层，封面缓存按哈希前两位分桶。
 - 音乐库是 app 对磁盘上音乐的索引，属于 app 的数据；用户的音乐文件从不搬动。
@@ -198,7 +211,11 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 **音源也一样**：行里只画一个固定大小的图标（`SourceBadge`），品牌名与本地化名都在 tooltip 里，详情面板的「来源」那条事实把它们写全。图标不随名字长短变形，一行曲子的宽窄不再被音源名字牵着走。
 
-**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列、正在播放页的顶栏与底栏的播放卡片上，以及曲目详情面板的右上角，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。详情面板是共用的一段界面，它不认识「喜欢」这个概念，所以由调用它的人把状态和动作告诉它。
+**喜欢不是事实，是控件**：红心（`FavoriteButton`）在行尾、队列、在线搜索的结果行、正在播放页的顶栏与底栏的播放卡片上，以及曲目详情面板的右上角，它自己就是那个动作，所以它不写进事实条。喜欢的状态只有一处来源——`FavoritesController`（`features/favorites`）——曲目模型里没有这一项。详情面板是共用的一段界面，它不认识「喜欢」这个概念，所以由调用它的人把状态和动作告诉它。
+
+曲目的身份是它的地址（`Song.uri`）：本地曲子就是文件路径，在线曲目是 `tune://<音源>/<编号>`。重新扫描之后地址不变，所以标不会丢。
+
+喜欢页是音乐库的一层视图：它列出库里被标过的曲子。标在库外的曲子——在线搜索里标了但还没扫进来的，或者音源关掉了——记在存储里，页面上列不出来。这种时候页头报的是标过的总数，页面上另起一行说明有几首不在库里，空状态也不会再说「还没有喜欢的曲子」。
 
 ## chip 的样子
 
@@ -258,6 +275,8 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 1. 在 `features/` 下建包，按 domain → application → presentation 的顺序。
 2. 在 `lib/app/router/app_router.dart` 注册路由；页签用 `sectionPage`，过渡由路由自己管。
 3. 只接这一处新入口，不要顺着别人的页面改一圈。
+4. 页面切换的动作交给路由：页面区不再另做一套切换（见「硬约束」第 6 条）。
+5. 如果只是播放器的附属面板（例如播放队列），不要注册路由；用 `shared/ui/side_panel_host.dart` 在页面区内组合，见 [queue-panel.md](queue-panel.md)。
 
 **页签的过渡属于路由，不属于 shell。** `go_router` 的导航器带着一个全局 key，
 shell 里如果同时留着旧页签和新页签（`AnimatedSwitcher` + `KeyedSubtree`），

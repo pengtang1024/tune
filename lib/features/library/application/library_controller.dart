@@ -187,6 +187,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         await _sourceService.commitSuccessfulScans(results);
         if (_disposed || generation != _scanGeneration) return;
       }
+      await ref
+          .read(musicSourcesControllerProvider.notifier)
+          .recordScanResults(results);
+      if (_disposed || generation != _scanGeneration) return;
 
       final successCount = results.where((result) => result.isSuccess).length;
       final failedCount = results

@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
@@ -12,12 +13,23 @@ import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/live_badge.dart';
 
 class PlayerDock extends ConsumerWidget {
-  const PlayerDock({super.key});
+  /// Toggles the queue panel of the shell.
+  ///
+  /// The dock does not own the panel: the shell does. A null callback leaves
+  /// the button disabled, which keeps a dock drawn on its own in tests and in
+  /// previews from reaching for a panel that is not there.
+  final VoidCallback? onToggleQueue;
+
+  /// Whether the queue panel that the button toggles is open.
+  final bool queueOpen;
+
+  const PlayerDock({super.key, this.onToggleQueue, this.queueOpen = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,6 +37,7 @@ class PlayerDock extends ConsumerWidget {
     final state = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
     final song = state.currentSong;
+    final favorites = ref.watch(favoritesControllerProvider);
 
     return Container(
       // The bar keeps the height of the token, but it grows when the text
@@ -248,11 +261,25 @@ class PlayerDock extends ConsumerWidget {
                       ),
                       const SizedBox(width: 6),
                     ],
+                    // The heart of the track that is playing. The card at the
+                    // bottom of the window is the one surface that is always
+                    // there, so the mark is one click away from wherever the
+                    // reader is.
+                    FavoriteButton(
+                      isFavorite: song != null && favorites.contains(song.uri),
+                      onPressed: song == null
+                          ? null
+                          : () => ref
+                                .read(favoritesControllerProvider.notifier)
+                                .toggle(song.uri),
+                    ),
+                    const SizedBox(width: CompactTokens.space4),
                     _DockIcon(
                       icon: Icons.queue_music_rounded,
                       tooltip: context.loc.queueTitle,
                       size: CompactTokens.icon20,
-                      onPressed: () => context.go('/queue'),
+                      onPressed: onToggleQueue,
+                      selected: queueOpen,
                     ),
                     _DockIcon(
                       icon: Icons.open_in_full_rounded,
@@ -338,21 +365,41 @@ class _DockIcon extends StatelessWidget {
   final String tooltip;
   final double size;
   final VoidCallback? onPressed;
+  final bool selected;
   const _DockIcon({
     required this.icon,
     required this.tooltip,
     required this.size,
     required this.onPressed,
+    this.selected = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = selected
+        ? theme.colorScheme.primary
+        : onPressed == null
+        ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
+        : theme.colorScheme.onSurfaceVariant;
+
     return TuneTooltip(
       message: tooltip,
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, size: size),
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        color: color,
+        style: selected
+            ? IconButton.styleFrom(
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(CompactTokens.radius8),
+                  side: BorderSide(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                  ),
+                ),
+              )
+            : null,
         visualDensity: VisualDensity.compact,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(width: 30, height: 30),

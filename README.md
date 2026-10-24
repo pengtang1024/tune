@@ -2,7 +2,7 @@
 
 [中文](README.md) · [English](README_en.md)
 
-Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。界面采用双栏布局：左侧常驻播放器，右侧在音乐库、播放队列和设置之间切换。
+Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。界面由左侧导航（音乐库 / 喜欢 / 音源 / 设置）、右侧内容区和底部播放条组成；播放队列是底栏或正在播放页打开的非模态侧栏，不占用导航位；它只遮住内容区，底栏和侧栏仍可用。
 
 ## 功能
 
@@ -13,7 +13,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 - 播放/暂停、上一首/下一首、进度拖拽、音量与循环模式
 - 按来源筛选音乐库，远程歌曲显示来源与封面
 - 曲目行用图标标识格式、音质、码率等，悬停看说明，点开看完整曲目信息与文件路径
-- 喜欢：曲目行、播放队列与正在播放页都有红心，标过的曲子收在「喜欢」页里
+- 喜欢：曲目行、播放队列、在线搜索结果、正在播放页与底栏的播放卡片都有红心，标过的曲子收在「喜欢」页里
 - 浅色 / 深色 / 系统主题，扫描目录与音源配置持久化
 - 界面语言：简体中文、繁體中文、中文（通用）、English；切换语言后音源名、日期与数字格式一起跟随
 - 900×600 默认窗口，最小 760×520
@@ -49,9 +49,23 @@ flutter run -d linux
 
 ## 构建
 
+Linux 是当前验收平台：
+
 ```bash
 flutter build linux --debug
 ```
+
+其它平台保留工程入口，要在对应系统上构建：
+
+| 平台 | 命令 | 前置条件 |
+| --- | --- | --- |
+| Linux | `flutter build linux --release` | 系统装有 libmpv（`libmpv2`） |
+| Windows | `flutter build windows --release` | Visual Studio 的 C++ 桌面工作负载 |
+| macOS | `flutter build macos --release` | Xcode 命令行工具 |
+| Android | `flutter build apk --release` | 可选 `android/key.properties`，见下 |
+| Web | `flutter build web --release` | — |
+
+Android 的 release 签名从 `android/key.properties` 读取 `storeFile`、`storePassword`、`keyAlias`、`keyPassword`。没有该文件时回落到 debug 签名，产物只能本机试装，不能发布。
 
 ## 桌面图标
 
@@ -69,6 +83,12 @@ flutter build linux --debug
 
 - 当前主要验收平台为 Linux 桌面端。
 - 远程播放依赖网络；桌面端边播边缓存，播放不等待下载，Web 端只能流式播放。
+- Web 端没有本地音乐库，也没有托盘、MPRIS 与默认播放器设置，只能播放在线音源。
+- 浏览器不允许脚本自定义 `User-Agent` 与 `Referer`，Web 端也带不了请求头；需要请求头的音源（Jellyfin、ccMixter）在 Web 端可能无法播放。
+- 浏览器的同源策略会拦掉没有返回 CORS 头的接口（Wikimedia、ccMixter 等），这些音源在 Web 端扫描失败；能否播完取决于对方接口是否放行浏览器。
+- Windows 使用 just_audio_windows 播放，不支持自定义请求头；需要请求头的音源（Jellyfin、ccMixter）可能无法播放，且没有托盘与 MPRIS 媒体控制。
+- macOS 没有托盘与 MPRIS 媒体控制；沙盒只放行 `~/Music` 和用户亲手选过的目录，重开应用后若目录访问被拒，需要重新选择一次。
+- Android / iOS 的本地扫描需要运行时存储权限，当前没有实现申请流程，移动端本地库可能为空；在线音源不受影响。
 - 远程播放地址可能过期；网易云、Subsonic、播客订阅与 Jellyfin 支持单曲刷新，其余音源需重新扫描。
 - 网络电台是直播流，不缓存、不显示进度条。
 - 旧版移动端通知、歌词、均衡器、播放历史与账户功能已移出主链路。

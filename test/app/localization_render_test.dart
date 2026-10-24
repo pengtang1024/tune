@@ -17,7 +17,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
-import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
@@ -241,13 +241,23 @@ Future<void> _drawEveryScreen(
   _collect(tester, collect);
   await _closeWindow(tester);
 
-  // The queue.
+  // The queue panel. It floats over a page, so the test gives it the room
+  // the side panel host would give it.
   await _draw(
     tester,
     locale,
     size,
-    'queue',
-    const CompactShell(currentPath: '/queue', child: QueuePane()),
+    'queue-panel',
+    Scaffold(
+      body: Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+          width: 380,
+          height: size.height - 24,
+          child: QueuePanel(onClose: () {}),
+        ),
+      ),
+    ),
   );
   _collect(tester, collect);
 

@@ -58,19 +58,31 @@
   "libraryAddToQueue": "Add to queue",
   "libraryAddAllToQueue": "Add the whole list to the queue",
   "queueTitle": "Queue",
-  "queueSubtitle": "Current play order",
   "queueEmptyTitle": "The queue is empty",
   "queueEmptySubtitle": "Pick a song in the library or add songs to the queue",
   "queueGoToLibrary": "Go to library",
   "queueClearTitle": "Clear the queue?",
   "queueClearMessage": "Playback stops. The songs stay in your library.",
+  "queueReorderTooltip": "Drag to reorder",
   "favoritesTitle": "Liked",
   "favoritesSubtitle": "The tracks you marked with a heart",
+  "favoritesEyebrow": "Collection",
   "favoritesEmptyTitle": "No favorites yet",
   "favoritesEmptySubtitle": "Tap the heart in the library and the track lands here",
   "favoritesGoToLibrary": "Go to library",
   "favoriteAdd": "Add to favorites",
   "favoriteRemove": "Remove from favorites",
+  "favoritesOutsideLibrary": "{count} more are marked but not in the library",
+  "favoritesEmptyOutsideTitle": "The marked tracks are not in the library",
+  "favoritesEmptyOutsideSubtitle": "The library does not hold them; the marks are kept",
+  "@favoritesOutsideLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "playerNowPlaying": "Now playing",
   "playerExpandNowPlaying": "Open now playing",
   "playerCollapse": "Collapse",
@@ -172,7 +184,6 @@
   "sourcesTitle": "Sources",
   "sourcesSubtitle": "Online catalogs, self-hosted services and scan folders",
   "sourcesGroupMore": "More sources",
-  "sourcesGroupAdded": "Added by me",
   "sourcesAdd": "Add source",
   "sourcesAddChooseType": "Choose a source type",
   "sourcesAddTitle": "Add {name}",
@@ -196,6 +207,78 @@
   },
   "sourcesDeleteHint": "The tracks this source brought in are removed with it.",
   "sourcesMenu": "More actions",
+  "sourcesMoveUp": "Move up",
+  "sourcesMoveDown": "Move down",
+  "sourcesMoveToMore": "Move to More sources",
+  "sourcesMoveToMain": "Move to main list",
+  "sourcesMovedToMore": "Moved to More sources",
+  "sourcesMovedToMain": "Moved to main list",
+  "sourcesHealthScore": "Health {score}/100",
+  "@sourcesHealthScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesHealthBreakdown": "Available {availability}% · Configured {configuration}% · Scan {scan}% · Fresh {freshness}% · Output {output}% · Speed {speed}% · Reliable {reliability}% · Stable {stability}% · Coverage {coverage}% · Active {activity}%",
+  "@sourcesHealthBreakdown": {
+    "placeholders": {
+      "availability": {
+        "type": "int"
+      },
+      "configuration": {
+        "type": "int"
+      },
+      "scan": {
+        "type": "int"
+      },
+      "freshness": {
+        "type": "int"
+      },
+      "output": {
+        "type": "int"
+      },
+      "speed": {
+        "type": "int"
+      },
+      "reliability": {
+        "type": "int"
+      },
+      "stability": {
+        "type": "int"
+      },
+      "coverage": {
+        "type": "int"
+      },
+      "activity": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesHealthWeightsTitle": "Health weights",
+  "sourcesHealthWeightsHint": "Raise a dimension to give it more say in the health score; the total is normalized.",
+  "sourcesHealthWeightsTotal": "Total {total} · normalized",
+  "@sourcesHealthWeightsTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSourceHealthDescription": "The current share of the ten dimensions; raise one to give it more of the score.",
+  "settingsAdjustSourceHealthWeights": "Adjust weights",
+  "sourcesHealthWeightsReset": "Reset",
+  "sourcesHealthAvailability": "Available",
+  "sourcesHealthConfiguration": "Configured",
+  "sourcesHealthScan": "Scan",
+  "sourcesHealthFreshness": "Fresh",
+  "sourcesHealthOutput": "Output",
+  "sourcesHealthSpeed": "Speed",
+  "sourcesHealthReliability": "Reliable",
+  "sourcesHealthStability": "Stable",
+  "sourcesHealthCoverage": "Coverage",
+  "sourcesHealthActivity": "Active",
   "sourceDirectUrlName": "Direct audio",
   "sourceDirectUrlDescription": "One address per line; every line becomes a track",
   "directUrlFieldUrls": "Audio addresses",
@@ -356,8 +439,15 @@
   "lyricsLoading": "Loading lyrics",
   "lyricsFailed": "Could not load the lyrics",
   "lyricsMissing": "This song has no lyrics",
+  "lyricsNothingPlaying": "Nothing is playing yet",
+  "lyricsInvalidFile": "This file holds no lyrics",
+  "lyricsRetry": "Try again",
+  "lyricsSearchAgain": "Look again",
+  "lyricsChooseFile": "Choose file",
+  "lyricsAttached": "The lyrics are attached",
+  "lyricsSubtitle": "The words of the track that plays",
   "settingsTitle": "Settings",
-  "settingsSubtitle": "Adjust the look, the language and your local library.",
+  "settingsSubtitle": "Adjust the look, the language, your library and source health.",
   "settingsThemeDescription": "Choose how the interface looks and which language it speaks.",
   "settingsLanguageDescription": "Language of the interface and the system menus",
   "settingsLibraryDescription": "Tune looks for audio files in these folders only.",
@@ -758,9 +848,9 @@
   "settingsEyebrow": "Preferences",
   "settingsSectionInterface": "Interface",
   "settingsLocalFirst": "Local first",
-  "libraryEyebrow": "Collection",
+  "libraryEyebrow": "Library",
   "sourcesEyebrow": "Connections",
-  "sidebarCollect": "Collect",
+  "sidebarBrowse": "Browse",
   "sidebarConnect": "Connect",
   "sidebarLocalOnline": "Local + online",
   "sidebarVersionLine": "{name} desktop · {version}",
@@ -805,7 +895,9 @@
   "settingsDefaultPlayerMissingEntry": "The desktop entry is not installed yet, run linux/install-desktop-entry.sh",
   "settingsSectionPlayback": "Playback",
   "settingsPlaybackTitle": "Playback behavior",
-  "settingsPlaybackDescription": "What a single click and a double click on a track do",
+  "settingsPlaybackDescription": "Startup behavior and what a single click and a double click on a track do",
+  "settingsResumePlaybackOnStartup": "Resume the last session at launch",
+  "settingsResumePlaybackOnStartupHint": "Restore the queue and playback position when Tune opens, paused. Turn off to start with an empty queue",
   "settingsReplaceQueueOnClick": "Replace the play queue when a track is clicked",
   "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays",
   "settingsOnlyLikeOnDoubleClick": "Only like the track on a double click",

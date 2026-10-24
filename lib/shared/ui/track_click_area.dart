@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// The clickable area of a track row.
 ///
 /// A single click and a double click mean different things in the lists of
-/// the app: a single click plays the track, a double click likes it. A
+/// the app: a single click plays the track, a double click marks it. A
 /// double click plays as well, because the first click of it plays the
 /// track already.
 ///
@@ -22,7 +22,7 @@ class TrackClickArea extends StatefulWidget {
 
   /// Whether a click waits for a possible second click before it plays.
   ///
-  /// A double click that only likes the track may not play it, so the click
+  /// A double click that only marks the track may not play it, so the click
   /// has to wait to see whether a second click follows.
   final bool waitsForDoubleClick;
 
@@ -55,7 +55,7 @@ class _TrackClickAreaState extends State<TrackClickArea> {
 
   void _handleClick() {
     if (_window?.isActive ?? false) {
-      // The second click of a double click: the track is liked.
+      // The second click of a double click: the track is marked.
       _window!.cancel();
       _window = null;
       widget.onDoubleClick();

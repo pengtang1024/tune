@@ -1,4 +1,6 @@
 import 'dart:io' show Directory, Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as path;
 
 /// 音乐扫描配置类
@@ -15,6 +17,9 @@ class MusicScannerConfig {
 
   // 获取默认音乐路径
   static List<String> getDefaultMusicPaths() {
+    // The web build has no file system, and reading Platform there throws.
+    if (kIsWeb) return const [];
+
     final paths = <String>[];
 
     if (Platform.isWindows) {

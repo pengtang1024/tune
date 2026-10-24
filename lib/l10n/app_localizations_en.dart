@@ -156,9 +156,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get queueTitle => 'Queue';
 
   @override
-  String get queueSubtitle => 'Current play order';
-
-  @override
   String get queueEmptyTitle => 'The queue is empty';
 
   @override
@@ -176,10 +173,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Playback stops. The songs stay in your library.';
 
   @override
+  String get queueReorderTooltip => 'Drag to reorder';
+
+  @override
   String get favoritesTitle => 'Liked';
 
   @override
   String get favoritesSubtitle => 'The tracks you marked with a heart';
+
+  @override
+  String get favoritesEyebrow => 'Collection';
 
   @override
   String get favoritesEmptyTitle => 'No favorites yet';
@@ -196,6 +199,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteRemove => 'Remove from favorites';
+
+  @override
+  String favoritesOutsideLibrary(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString more are marked but not in the library';
+  }
+
+  @override
+  String get favoritesEmptyOutsideTitle =>
+      'The marked tracks are not in the library';
+
+  @override
+  String get favoritesEmptyOutsideSubtitle =>
+      'The library does not hold them; the marks are kept';
 
   @override
   String get playerNowPlaying => 'Now playing';
@@ -339,9 +359,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesGroupMore => 'More sources';
 
   @override
-  String get sourcesGroupAdded => 'Added by me';
-
-  @override
   String get sourcesAdd => 'Add source';
 
   @override
@@ -373,6 +390,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesMenu => 'More actions';
+
+  @override
+  String get sourcesMoveUp => 'Move up';
+
+  @override
+  String get sourcesMoveDown => 'Move down';
+
+  @override
+  String get sourcesMoveToMore => 'Move to More sources';
+
+  @override
+  String get sourcesMoveToMain => 'Move to main list';
+
+  @override
+  String get sourcesMovedToMore => 'Moved to More sources';
+
+  @override
+  String get sourcesMovedToMain => 'Moved to main list';
+
+  @override
+  String sourcesHealthScore(int score) {
+    return 'Health $score/100';
+  }
+
+  @override
+  String sourcesHealthBreakdown(
+    int availability,
+    int configuration,
+    int scan,
+    int freshness,
+    int output,
+    int speed,
+    int reliability,
+    int stability,
+    int coverage,
+    int activity,
+  ) {
+    return 'Available $availability% · Configured $configuration% · Scan $scan% · Fresh $freshness% · Output $output% · Speed $speed% · Reliable $reliability% · Stable $stability% · Coverage $coverage% · Active $activity%';
+  }
+
+  @override
+  String get sourcesHealthWeightsTitle => 'Health weights';
+
+  @override
+  String get sourcesHealthWeightsHint =>
+      'Raise a dimension to give it more say in the health score; the total is normalized.';
+
+  @override
+  String sourcesHealthWeightsTotal(int total) {
+    return 'Total $total · normalized';
+  }
+
+  @override
+  String get settingsSourceHealthDescription =>
+      'The current share of the ten dimensions; raise one to give it more of the score.';
+
+  @override
+  String get settingsAdjustSourceHealthWeights => 'Adjust weights';
+
+  @override
+  String get sourcesHealthWeightsReset => 'Reset';
+
+  @override
+  String get sourcesHealthAvailability => 'Available';
+
+  @override
+  String get sourcesHealthConfiguration => 'Configured';
+
+  @override
+  String get sourcesHealthScan => 'Scan';
+
+  @override
+  String get sourcesHealthFreshness => 'Fresh';
+
+  @override
+  String get sourcesHealthOutput => 'Output';
+
+  @override
+  String get sourcesHealthSpeed => 'Speed';
+
+  @override
+  String get sourcesHealthReliability => 'Reliable';
+
+  @override
+  String get sourcesHealthStability => 'Stable';
+
+  @override
+  String get sourcesHealthCoverage => 'Coverage';
+
+  @override
+  String get sourcesHealthActivity => 'Active';
 
   @override
   String get sourceDirectUrlName => 'Direct audio';
@@ -711,11 +819,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsMissing => 'This song has no lyrics';
 
   @override
+  String get lyricsNothingPlaying => 'Nothing is playing yet';
+
+  @override
+  String get lyricsInvalidFile => 'This file holds no lyrics';
+
+  @override
+  String get lyricsRetry => 'Try again';
+
+  @override
+  String get lyricsSearchAgain => 'Look again';
+
+  @override
+  String get lyricsChooseFile => 'Choose file';
+
+  @override
+  String get lyricsAttached => 'The lyrics are attached';
+
+  @override
+  String get lyricsSubtitle => 'The words of the track that plays';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
   String get settingsSubtitle =>
-      'Adjust the look, the language and your local library.';
+      'Adjust the look, the language, your library and source health.';
 
   @override
   String get settingsThemeDescription =>
@@ -1622,13 +1751,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalFirst => 'Local first';
 
   @override
-  String get libraryEyebrow => 'Collection';
+  String get libraryEyebrow => 'Library';
 
   @override
   String get sourcesEyebrow => 'Connections';
 
   @override
-  String get sidebarCollect => 'Collect';
+  String get sidebarBrowse => 'Browse';
 
   @override
   String get sidebarConnect => 'Connect';
@@ -1714,7 +1843,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPlaybackDescription =>
-      'What a single click and a double click on a track do';
+      'Startup behavior and what a single click and a double click on a track do';
+
+  @override
+  String get settingsResumePlaybackOnStartup =>
+      'Resume the last session at launch';
+
+  @override
+  String get settingsResumePlaybackOnStartupHint =>
+      'Restore the queue and playback position when Tune opens, paused. Turn off to start with an empty queue';
 
   @override
   String get settingsReplaceQueueOnClick =>

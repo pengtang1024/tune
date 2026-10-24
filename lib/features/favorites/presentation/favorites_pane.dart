@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,11 +26,39 @@ import 'package:tune/shared/ui/source_label.dart';
 /// The page is a view of the library: a favorite is a track of the library
 /// the user kept, so the page names the tracks the library knows and the
 /// controller says which of them are marked.
-class FavoritesPane extends ConsumerWidget {
+class FavoritesPane extends ConsumerStatefulWidget {
   const FavoritesPane({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavoritesPane> createState() => _FavoritesPaneState();
+}
+
+class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
+  Timer? _clickGuard;
+  bool _ignoreClicks = false;
+
+  @override
+  void dispose() {
+    _clickGuard?.cancel();
+    super.dispose();
+  }
+
+  /// Blocks the second click of a double click on a heart.
+  ///
+  /// Taking a mark away removes the row, so the next row slides under the
+  /// pointer. Without this guard the second click would take the mark of the
+  /// next track instead of being part of the same gesture.
+  void _guardClicks() {
+    _clickGuard?.cancel();
+    if (!_ignoreClicks) setState(() => _ignoreClicks = true);
+    _clickGuard = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      setState(() => _ignoreClicks = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final library = ref.watch(libraryControllerProvider);
     final favorites = ref.watch(favoritesControllerProvider);
     final settings = ref.watch(settingsControllerProvider);
@@ -51,6 +81,13 @@ class FavoritesPane extends ConsumerWidget {
       favorites,
     );
 
+    // The marks the library cannot name: a track that was marked from the
+    // online search and never scanned, or a track whose source is off now.
+    // The marks are kept, so the page has to say that they are not here.
+    // A library that did not load yet knows no track at all, so it may not
+    // say that the marks are outside of it.
+    final outside = library.hasValue ? favorites.count - songs.length : 0;
+
     return Column(
       children: [
         Padding(
@@ -60,18 +97,27 @@ class FavoritesPane extends ConsumerWidget {
             CompactTokens.pageGutter,
             CompactTokens.pageHeadingGap,
           ),
-          child: PageHeading(
-            // The favorites belong to the collection, so the page names the
-            // same section as the library instead of repeating its own.
-            eyebrow: context.loc.libraryEyebrow,
-            title: context.loc.favoritesTitle,
-            subtitle: context.loc.favoritesSubtitle,
-            trailing: Text(
-              context.loc.libraryTrackCount(songs.length),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PageHeading(
+                // Favorites are a collection of their own, so the page
+                // names that section instead of borrowing the library's.
+                eyebrow: context.loc.favoritesEyebrow,
+                title: context.loc.favoritesTitle,
+                subtitle: context.loc.favoritesSubtitle,
+                trailing: Text(
+                  context.loc.libraryTrackCount(favorites.count),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
-            ),
+              if (outside > 0) ...[
+                const SizedBox(height: CompactTokens.space8),
+                _OutsideNote(count: outside),
+              ],
+            ],
           ),
         ),
         Expanded(
@@ -80,6 +126,7 @@ class FavoritesPane extends ConsumerWidget {
             ref,
             library,
             songs,
+            favorites,
             playback,
             sourceLabels,
             settings.onlyLikeOnDoubleClick,
@@ -101,6 +148,7 @@ class FavoritesPane extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue<LibraryState> library,
     List<Song> songs,
+    FavoritesState favorites,
     (String?, bool) playback,
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick,
@@ -122,10 +170,20 @@ class FavoritesPane extends ConsumerWidget {
     }
 
     if (songs.isEmpty) {
+      // An empty page with marks in the store is not an empty collection:
+      // the library simply does not hold the tracks that were marked.
+      final markedOutside = favorites.count > 0;
+
       return EmptyStateView(
-        icon: Icons.favorite_border_rounded,
-        title: context.loc.favoritesEmptyTitle,
-        subtitle: context.loc.favoritesEmptySubtitle,
+        icon: markedOutside
+            ? Icons.help_outline_rounded
+            : Icons.favorite_border_rounded,
+        title: markedOutside
+            ? context.loc.favoritesEmptyOutsideTitle
+            : context.loc.favoritesEmptyTitle,
+        subtitle: markedOutside
+            ? context.loc.favoritesEmptyOutsideSubtitle
+            : context.loc.favoritesEmptySubtitle,
         action: FilledButton(
           onPressed: () => context.go('/library'),
           child: Text(context.loc.favoritesGoToLibrary),
@@ -133,38 +191,80 @@ class FavoritesPane extends ConsumerWidget {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(
-        CompactTokens.pageGutter,
-        0,
-        CompactTokens.pageGutter,
-        CompactTokens.space8,
+    return IgnorePointer(
+      ignoring: _ignoreClicks,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.pageGutter,
+          0,
+          CompactTokens.pageGutter,
+          CompactTokens.space8,
+        ),
+        itemCount: songs.length,
+        itemBuilder: (context, index) {
+          final song = songs[index];
+          return FavoritesTrackRow(
+            key: ValueKey(song.uri),
+            song: song,
+            index: index,
+            selected: song.uri == playback.$1,
+            playing: playback.$2,
+            source: sourceLabel(song, sourceLabels),
+            onTap: () {
+              // The list the user clicks in decides what happens to the queue;
+              // by default the track joins the queue and plays right away.
+              ref.read(listPlaybackProvider).play(song);
+            },
+            onDoubleTap: () => _markFavorite(ref, song),
+            waitsForDoubleClick: onlyLikeOnDoubleClick,
+            onToggleFavorite: () => _toggleFavorite(ref, song),
+          );
+        },
       ),
-      itemCount: songs.length,
-      itemBuilder: (context, index) {
-        final song = songs[index];
-        return FavoritesTrackRow(
-          key: ValueKey(song.uri),
-          song: song,
-          index: index,
-          selected: song.uri == playback.$1,
-          playing: playback.$2,
-          source: sourceLabel(song, sourceLabels),
-          onTap: () {
-            // The list the user clicks in decides what happens to the queue;
-            // by default the track joins the queue and plays right away.
-            ref.read(listPlaybackProvider).play(song);
-          },
-          onDoubleTap: () => _toggleFavorite(ref, song),
-          waitsForDoubleClick: onlyLikeOnDoubleClick,
-          onToggleFavorite: () => _toggleFavorite(ref, song),
-        );
-      },
     );
   }
 
   /// Marks the track, or takes the mark away when it is already there.
   void _toggleFavorite(WidgetRef ref, Song song) {
     ref.read(favoritesControllerProvider.notifier).toggle(song.uri);
+    // A double click on the heart must not reach the row that slides up.
+    _guardClicks();
+  }
+
+  /// A double click adds a mark; it never takes one away.
+  void _markFavorite(WidgetRef ref, Song song) {
+    ref.read(favoritesControllerProvider.notifier).mark(song.uri);
+  }
+}
+
+/// The line that says how many marks the library cannot name.
+class _OutsideNote extends StatelessWidget {
+  final int count;
+
+  const _OutsideNote({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.info_outline_rounded,
+          size: CompactTokens.icon16,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: CompactTokens.space8),
+        Expanded(
+          child: Text(
+            context.loc.favoritesOutsideLibrary(count),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

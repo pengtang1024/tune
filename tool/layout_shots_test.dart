@@ -18,13 +18,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
-import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/queue/presentation/queue_panel.dart';
+import 'package:tune/features/search/application/online_search_controller.dart';
+import 'package:tune/features/search/domain/online_search_state.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
@@ -132,8 +137,14 @@ void main() {
     // file as a test and refuses the test-only mock. It is a mock here too.
     // ignore: invalid_use_of_visible_for_testing_member
     persistence = FakePersistenceService();
-    // The shot of the favorites needs tracks that are marked.
-    persistence.values['favorite_tracks'] = ['/music/a.mp3', '/music/c.mp3'];
+    // The shot of the favorites needs tracks that are marked. One of them is
+    // not in the library, so the shot shows what the page says about a mark
+    // it cannot name.
+    persistence.values['favorite_tracks'] = [
+      '/music/a.mp3',
+      '/music/c.mp3',
+      'tune://demo:1/9',
+    ];
     await _loadFonts();
   });
 
@@ -190,6 +201,7 @@ void main() {
           const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
         ),
       ),
+      lyricsControllerProvider.overrideWith(() => _FakeLyricsController()),
     ];
 
     await tester.pumpWidget(
@@ -199,12 +211,14 @@ void main() {
     );
     await _shot(tester, 'library$suffix');
 
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/queue', child: QueuePane()),
-      ),
-    );
-    await _shot(tester, 'queue$suffix');
+    // The queue is a panel over the library now. The library itself is the
+    // page behind it, so the shot shows the reader's context as well.
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await _shot(tester, 'queue_panel$suffix');
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pumpAndSettle();
 
     await tester.pumpWidget(
       app(
@@ -226,6 +240,28 @@ void main() {
     );
     await _shot(tester, 'settings$suffix');
 
+    // The playback rules are the first card below the first screen.
+    final settingsScroll = find.descendant(
+      of: find.byType(SettingsPane),
+      matching: find.byType(SingleChildScrollView),
+    );
+    await tester.drag(settingsScroll, const Offset(0, -480));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_playback$suffix');
+
+    // The health weights live below the playback card.
+    await tester.drag(settingsScroll, const Offset(0, -420));
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_health$suffix');
+
+    await tester.tap(
+      find.byKey(const ValueKey('settings-source-health-adjust')),
+    );
+    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_health_dialog$suffix');
+    await tester.tap(find.text('取消'));
+    await tester.pumpAndSettle();
+
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/sources', child: SourcesPane()),
@@ -233,8 +269,30 @@ void main() {
     );
     await _shot(tester, 'sources$suffix');
 
-    await tester.pumpWidget(app(home: const NowPlayingPage()));
+    await tester.pumpWidget(
+      app(
+        home: NowPlayingPage(
+          queuePanelBuilder: (context, onClose) =>
+              QueuePanel(onClose: onClose, showTransport: true),
+        ),
+      ),
+    );
     await _shot(tester, 'now_playing$suffix');
+
+    // The queue panel is part of the player, so the full view has one too.
+    await tester.tap(find.byTooltip('播放队列'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await _shot(tester, 'now_playing_queue$suffix');
+    await tester.tap(find.byTooltip('关闭'));
+    await tester.pumpAndSettle();
+
+    // The lyrics are a capability of the playing view, not a page of their
+    // own: the shot shows what the reader sees after pressing the button.
+    await tester.tap(find.byTooltip('歌词'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await _shot(tester, 'now_playing_lyrics$suffix');
   }
 
   /// Captures the sheets that float over the pages.
@@ -255,6 +313,9 @@ void main() {
         () => _FakeLibraryController(
           const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
         ),
+      ),
+      onlineSearchControllerProvider.overrideWith(
+        () => _FakeOnlineSearchController(),
       ),
     ];
 
@@ -307,14 +368,14 @@ void main() {
     });
   });
 
-  testWidgets('capture pages in the compact width', (tester) async {
+  testWidgets('capture pages in the smallest window', (tester) async {
     await onLinux(() async {
-      await surface(tester, const Size(680, 520));
+      await surface(tester, const Size(760, 520));
       await capture(tester, '_narrow');
     });
   });
 
-  testWidgets('capture pages in the smallest window', (tester) async {
+  testWidgets('capture pages in the small window', (tester) async {
     await onLinux(() async {
       await surface(tester, const Size(900, 563));
       await capture(tester, '_small');
@@ -350,6 +411,59 @@ class _FakeLibraryController extends LibraryController {
   @override
   void setQuery(String query) {
     state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+  }
+}
+
+/// A lyrics controller that holds a sheet, so the shot shows the lyrics.
+class _FakeLyricsController extends LyricsController {
+  @override
+  Future<LyricsState> build() async {
+    return LyricsState(
+      songId: 1,
+      document: LyricsDocument.parse('''
+[ti:Nocturne in E-flat major]
+[ar:A rather long artist name that keeps going]
+[00:04.00]The night is quiet and the city sleeps
+[00:09.50]A melody wanders through the open window
+[00:15.00]And the hours pass without a sound
+[00:21.25]Until the first light finds the room
+[00:27.00]A nocturne in E-flat major, Op. 9 No. 2
+'''),
+    );
+  }
+}
+
+/// A search that already found something, so the shot shows a result row.
+class _FakeOnlineSearchController extends OnlineSearchController {
+  @override
+  Future<OnlineSearchState> build() async {
+    return OnlineSearchState(
+      query: 'jazz',
+      results: {
+        'demo:1': SourceScanResult(
+          sourceId: 'demo:1',
+          status: SourceScanStatus.success,
+          songs: const [
+            Song(
+              id: 91,
+              title: 'Nocturne in E-flat major, Op. 9 No. 2',
+              artist: 'A rather long artist name that keeps going',
+              album: 'Nocturnes',
+              duration: 245000,
+              uri: 'tune://demo:1/91',
+            ),
+            Song(
+              id: 92,
+              title: 'Gamma',
+              artist: 'Artist C',
+              album: 'Night Pieces',
+              duration: 90000,
+              uri: 'tune://demo:1/92',
+            ),
+          ],
+        ),
+      },
+    );
   }
 }
 

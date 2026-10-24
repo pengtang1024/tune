@@ -6,7 +6,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
-import 'package:tune/features/queue/presentation/queue_pane.dart';
+import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
@@ -17,7 +17,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final path = state.uri.path;
       if (path == '/library' ||
-          path == '/queue' ||
           path == '/favorites' ||
           path == '/sources' ||
           path == '/settings' ||
@@ -40,11 +39,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 sectionPage(state, const LibraryPane()),
           ),
           GoRoute(
-            path: '/queue',
-            pageBuilder: (context, state) =>
-                sectionPage(state, const QueuePane()),
-          ),
-          GoRoute(
+
             path: '/favorites',
             pageBuilder: (context, state) =>
                 sectionPage(state, const FavoritesPane()),
@@ -69,7 +64,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           transitionDuration: const Duration(milliseconds: 280),
           reverseTransitionDuration: const Duration(milliseconds: 200),
-          child: const NowPlayingPage(),
+          child: NowPlayingPage(
+            queuePanelBuilder: (context, onClose) =>
+                QueuePanel(onClose: onClose, showTransport: true),
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             final curved = CurvedAnimation(
               parent: animation,

@@ -61,7 +61,10 @@ class SettingsPageHeader extends StatelessWidget {
             border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: TuneTooltip(
-            message: context.loc.sidebarVersionLine(context.loc.appName, version),
+            message: context.loc.sidebarVersionLine(
+              context.loc.appName,
+              version,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -335,7 +338,7 @@ class SettingsAboutCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '05',
+      index: '06',
       eyebrow: context.loc.about,
       title: context.loc.appName,
       description: context.loc.appTagline,

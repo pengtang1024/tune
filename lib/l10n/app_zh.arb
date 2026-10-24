@@ -58,19 +58,31 @@
   "libraryAddToQueue": "加入播放队列",
   "libraryAddAllToQueue": "将整个列表加入队列",
   "queueTitle": "播放队列",
-  "queueSubtitle": "当前播放顺序",
   "queueEmptyTitle": "播放队列是空的",
   "queueEmptySubtitle": "从音乐库选择歌曲，或把歌曲加入队列",
   "queueGoToLibrary": "去音乐库",
   "queueClearTitle": "清空播放队列？",
   "queueClearMessage": "当前播放会停止，队列中的歌曲不会从音乐库删除。",
+  "queueReorderTooltip": "拖动排序",
   "favoritesTitle": "喜欢",
   "favoritesSubtitle": "标了心的曲子都在这里",
+  "favoritesEyebrow": "收藏",
   "favoritesEmptyTitle": "还没有喜欢的曲子",
   "favoritesEmptySubtitle": "在音乐库里点一下红心，喜欢的曲子就会收在这里",
   "favoritesGoToLibrary": "去音乐库",
   "favoriteAdd": "加入收藏",
   "favoriteRemove": "取消收藏",
+  "favoritesOutsideLibrary": "另有 {count} 首标过，但不在音乐库里",
+  "favoritesEmptyOutsideTitle": "标过的歌不在音乐库里",
+  "favoritesEmptyOutsideSubtitle": "音乐库里找不到它们，标记还留着",
+  "@favoritesOutsideLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "playerNowPlaying": "正在播放",
   "playerExpandNowPlaying": "展开正在播放",
   "playerCollapse": "收起",
@@ -172,7 +184,6 @@
   "sourcesTitle": "音源",
   "sourcesSubtitle": "在线曲库、自建服务与扫描目录",
   "sourcesGroupMore": "更多音源",
-  "sourcesGroupAdded": "我添加的",
   "sourcesAdd": "添加音源",
   "sourcesAddChooseType": "选择音源类型",
   "sourcesAddTitle": "添加 {name}",
@@ -196,6 +207,78 @@
   },
   "sourcesDeleteHint": "这个音源带来的曲目也会一并移除。",
   "sourcesMenu": "更多操作",
+  "sourcesMoveUp": "上移",
+  "sourcesMoveDown": "下移",
+  "sourcesMoveToMore": "移到更多音源",
+  "sourcesMoveToMain": "移回主列表",
+  "sourcesMovedToMore": "已移到更多音源",
+  "sourcesMovedToMain": "已移回主列表",
+  "sourcesHealthScore": "健康度 {score}/100",
+  "@sourcesHealthScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesHealthBreakdown": "可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 覆盖 {coverage}% · 活跃 {activity}%",
+  "@sourcesHealthBreakdown": {
+    "placeholders": {
+      "availability": {
+        "type": "int"
+      },
+      "configuration": {
+        "type": "int"
+      },
+      "scan": {
+        "type": "int"
+      },
+      "freshness": {
+        "type": "int"
+      },
+      "output": {
+        "type": "int"
+      },
+      "speed": {
+        "type": "int"
+      },
+      "reliability": {
+        "type": "int"
+      },
+      "stability": {
+        "type": "int"
+      },
+      "coverage": {
+        "type": "int"
+      },
+      "activity": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesHealthWeightsTitle": "健康度权重",
+  "sourcesHealthWeightsHint": "调高某个维度，它在健康度里的分量更大；总权重会自动归一化。",
+  "sourcesHealthWeightsTotal": "总权重 {total} · 自动归一化",
+  "@sourcesHealthWeightsTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSourceHealthDescription": "十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。",
+  "settingsAdjustSourceHealthWeights": "调整权重",
+  "sourcesHealthWeightsReset": "恢复默认",
+  "sourcesHealthAvailability": "可用",
+  "sourcesHealthConfiguration": "配置",
+  "sourcesHealthScan": "扫描",
+  "sourcesHealthFreshness": "新鲜",
+  "sourcesHealthOutput": "产出",
+  "sourcesHealthSpeed": "速度",
+  "sourcesHealthReliability": "可靠",
+  "sourcesHealthStability": "稳定",
+  "sourcesHealthCoverage": "覆盖",
+  "sourcesHealthActivity": "活跃",
   "sourceDirectUrlName": "直链音频",
   "sourceDirectUrlDescription": "一行一条地址，每条变成一首曲目",
   "directUrlFieldUrls": "音频地址",
@@ -356,8 +439,15 @@
   "lyricsLoading": "正在加载歌词",
   "lyricsFailed": "歌词加载失败",
   "lyricsMissing": "这首歌没有歌词",
+  "lyricsNothingPlaying": "还没有正在播放的曲目",
+  "lyricsInvalidFile": "这个文件里没有歌词",
+  "lyricsRetry": "重试",
+  "lyricsSearchAgain": "重新查找",
+  "lyricsChooseFile": "选择歌词文件",
+  "lyricsAttached": "歌词已关联",
+  "lyricsSubtitle": "正在播放的那首歌的词",
   "settingsTitle": "设置",
-  "settingsSubtitle": "调整外观、语言和本地音乐库。",
+  "settingsSubtitle": "调整外观、语言、音乐库与音源健康度。",
   "settingsThemeDescription": "选择界面的明暗气质和显示语言。",
   "settingsLanguageDescription": "界面文字和系统菜单语言",
   "settingsLibraryDescription": "Tune 只会在这些目录中查找音频文件。",
@@ -758,9 +848,9 @@
   "settingsEyebrow": "偏好",
   "settingsSectionInterface": "界面",
   "settingsLocalFirst": "本地优先",
-  "libraryEyebrow": "收藏",
+  "libraryEyebrow": "资料库",
   "sourcesEyebrow": "连接",
-  "sidebarCollect": "收藏",
+  "sidebarBrowse": "浏览",
   "sidebarConnect": "连接",
   "sidebarLocalOnline": "本地 + 在线",
   "sidebarVersionLine": "{name} 桌面版 · {version}",
@@ -805,7 +895,9 @@
   "settingsDefaultPlayerMissingEntry": "还没有安装桌面项，先运行 linux/install-desktop-entry.sh",
   "settingsSectionPlayback": "播放",
   "settingsPlaybackTitle": "播放行为",
-  "settingsPlaybackDescription": "决定单击与双击歌曲时会发生什么",
+  "settingsPlaybackDescription": "决定启动时的播放行为，以及单击、双击歌曲时会发生什么",
+  "settingsResumePlaybackOnStartup": "启动时继续上次播放",
+  "settingsResumePlaybackOnStartupHint": "打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始",
   "settingsReplaceQueueOnClick": "单击歌曲时替换播放队列",
   "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留",
   "settingsOnlyLikeOnDoubleClick": "双击时只标成喜欢",

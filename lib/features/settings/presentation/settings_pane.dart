@@ -6,11 +6,13 @@ import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/data/services/providers/tray_service_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
+import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -26,10 +28,18 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   /// Whether the desktop entry of Tune is in place.
   bool _desktopEntryInstalled = false;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _loadDefaultPlayerState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,9 +59,16 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     final clearing = library.$3;
     final busy = scanning || clearing;
     final settingsController = ref.read(settingsControllerProvider.notifier);
+    // The tray and the default player are Linux-only for now. Other platforms
+    // get no card of switches that could not do anything.
+    final hasDesktopIntegration =
+        ref.watch(trayServiceProvider).isSupported ||
+        ref.watch(defaultPlayerServiceProvider).isSupported;
 
     return Scrollbar(
+      controller: _scrollController,
       child: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(
           CompactTokens.pageGutter,
           CompactTokens.pageTopPadding,
@@ -87,26 +104,33 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 ),
                 const SizedBox(height: 14),
                 SettingsPlaybackCard(
+                  restorePlaybackOnStartup: settings.restorePlaybackOnStartup,
                   replaceQueueOnClick: settings.replaceQueueOnClick,
                   onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
+                  onRestorePlaybackOnStartup:
+                      settingsController.setRestorePlaybackOnStartup,
                   onReplaceQueueOnClick:
                       settingsController.setReplaceQueueOnClick,
                   onOnlyLikeOnDoubleClick:
                       settingsController.setOnlyLikeOnDoubleClick,
                 ),
                 const SizedBox(height: 14),
-                SettingsDesktopCard(
-                  closeToTray: settings.closeToTray,
-                  mediaControlsEnabled: settings.mediaControlsEnabled,
-                  isDefaultPlayer: _isDefaultPlayer ?? false,
-                  desktopEntryInstalled: _desktopEntryInstalled,
-                  onCloseToTrayChanged: settingsController.setCloseToTray,
-                  onMediaControlsChanged:
-                      settingsController.setMediaControlsEnabled,
-                  onSetDefaultPlayer: _canSetDefaultPlayer
-                      ? _setDefaultPlayer
-                      : null,
-                ),
+                const SettingsSourceHealthCard(),
+                if (hasDesktopIntegration) ...[
+                  const SizedBox(height: 14),
+                  SettingsDesktopCard(
+                    closeToTray: settings.closeToTray,
+                    mediaControlsEnabled: settings.mediaControlsEnabled,
+                    isDefaultPlayer: _isDefaultPlayer ?? false,
+                    desktopEntryInstalled: _desktopEntryInstalled,
+                    onCloseToTrayChanged: settingsController.setCloseToTray,
+                    onMediaControlsChanged:
+                        settingsController.setMediaControlsEnabled,
+                    onSetDefaultPlayer: _canSetDefaultPlayer
+                        ? _setDefaultPlayer
+                        : null,
+                  ),
+                ],
                 const SizedBox(height: 14),
                 SettingsAboutCard(version: AppVersion.version),
               ],

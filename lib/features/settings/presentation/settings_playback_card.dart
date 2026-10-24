@@ -9,15 +9,19 @@ import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 /// click decides whether the play queue survives, a double click decides
 /// whether the track is only liked or played as well.
 class SettingsPlaybackCard extends StatelessWidget {
+  final bool restorePlaybackOnStartup;
   final bool replaceQueueOnClick;
   final bool onlyLikeOnDoubleClick;
+  final ValueChanged<bool> onRestorePlaybackOnStartup;
   final ValueChanged<bool> onReplaceQueueOnClick;
   final ValueChanged<bool> onOnlyLikeOnDoubleClick;
 
   const SettingsPlaybackCard({
     super.key,
+    required this.restorePlaybackOnStartup,
     required this.replaceQueueOnClick,
     required this.onlyLikeOnDoubleClick,
+    required this.onRestorePlaybackOnStartup,
     required this.onReplaceQueueOnClick,
     required this.onOnlyLikeOnDoubleClick,
   });
@@ -32,6 +36,13 @@ class SettingsPlaybackCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SettingsSwitchRow(
+            title: context.loc.settingsResumePlaybackOnStartup,
+            description: context.loc.settingsResumePlaybackOnStartupHint,
+            value: restorePlaybackOnStartup,
+            onChanged: onRestorePlaybackOnStartup,
+          ),
+          const SizedBox(height: 8),
           SettingsSwitchRow(
             title: context.loc.settingsReplaceQueueOnClick,
             description: context.loc.settingsReplaceQueueOnClickHint,

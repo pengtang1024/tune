@@ -11,7 +11,6 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import '../services/fake_persistence.dart';
 
-
 void main() {
   late FakePersistenceService persistence;
 
@@ -55,6 +54,9 @@ void main() {
 
     await tester.pumpWidget(app(controller));
     await tester.pumpAndSettle();
+
+    // An unconfigured source is unhealthy, so it waits in the folded group.
+    await openMoreSources(tester);
 
     final sourceSwitch = find.byKey(const ValueKey('source-switch-jamendo'));
     expect(tester.widget<Switch>(sourceSwitch).value, isFalse);
@@ -254,9 +256,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the sources that need no key stand at the top', (
-    tester,
-  ) async {
+  testWidgets('the sources that need no key stand at the top', (tester) async {
     final controller = FakeMusicSourcesController(
       MusicSourcesState(
         sources: [
@@ -294,11 +294,16 @@ void main() {
 
     await openMoreSources(tester);
 
-    expect(find.byKey(const ValueKey('source-switch-itunes')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('source-switch-ccmixter')),
+      findsOneWidget,
+    );
     expect(persistence.getBool('sources_more_expanded'), isTrue);
   });
 
-  testWidgets('the sources the reader added are theirs', (tester) async {
+  testWidgets('a source the reader added joins the weighted list', (
+    tester,
+  ) async {
     final controller = FakeMusicSourcesController(
       MusicSourcesState(
         sources: [
@@ -308,6 +313,7 @@ void main() {
             type: 'podcast_rss',
             name: '我的播客',
             kind: MusicSourceKind.custom,
+            settings: {'feed': 'https://example.com/feed'},
           ),
         ],
       ),
@@ -316,12 +322,48 @@ void main() {
     await tester.pumpWidget(app(controller));
     await tester.pumpAndSettle();
 
-    expect(find.text('我添加的'), findsOneWidget);
+    expect(find.text('我添加的'), findsNothing);
     expect(find.text('我的播客'), findsOneWidget);
 
     // The source of the reader is not folded away with the ones that need
     // a key.
     expect(find.text('更多音源'), findsNothing);
+  });
+
+  testWidgets('the weight decides which group a source joins', (tester) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [
+          BuiltInMusicSources.openverse.copyWith(weight: 400),
+          BuiltInMusicSources.ccmixter.copyWith(weight: 800),
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(app(controller));
+    await tester.pumpAndSettle();
+
+    // The high weight stands in the main list, the low one waits folded.
+    expect(
+      find.byKey(const ValueKey('source-switch-ccmixter')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('source-switch-openverse')), findsNothing);
+    expect(find.text('更多音源'), findsOneWidget);
+
+    await openMoreSources(tester);
+    expect(
+      find.byKey(const ValueKey('source-switch-openverse')),
+      findsOneWidget,
+    );
+
+    // The menu of a built-in source offers the order actions, but no delete.
+    await tester.tap(find.byKey(const ValueKey('source-menu-ccmixter')));
+    await tester.pumpAndSettle();
+    expect(find.text('上移'), findsOneWidget);
+    expect(find.text('下移'), findsOneWidget);
+    expect(find.text('移到更多音源'), findsOneWidget);
+    expect(find.text('删除'), findsNothing);
   });
 }
 

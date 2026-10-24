@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -22,10 +23,9 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
             BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
-              headers: const {
-                'User-Agent': 'Tune/1.1 (Flutter open-source music player)',
-                'Accept': 'application/json',
-              },
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
             ),
           );
 

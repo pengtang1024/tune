@@ -13,7 +13,12 @@
 | 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
+| 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（设计稿，未实施） |
+| 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
+| 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |
+| 查队列的呈现（浮层、入口、关闭） | [`docs/queue-panel.md`](docs/queue-panel.md) |
+| 改歌词（取词、解析、高亮、落盘） | [`docs/lyrics.md`](docs/lyrics.md) |
 | 查桌面集成（MPRIS、托盘、默认播放器） | [`需求/桌面集成方案.md`](需求/桌面集成方案.md) |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
@@ -25,7 +30,7 @@
 
 ## 0. 项目快照
 
-- 产品：紧凑的桌面音乐播放器（Flutter）。双栏布局：左栏常驻播放器，右栏在音乐库 / 队列 / 音源 / 设置之间切换。
+- 产品：紧凑的桌面音乐播放器（Flutter）。壳层是左侧导航（音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是底栏和正在播放页打开的非模态侧栏，不是一级导航页；它只遮住内容区，底栏和侧栏仍可用。
 - 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅 Web 存储与旧数据迁移）· gen-l10n。
 - 验收平台：Linux 桌面优先；Android / iOS / Windows / macOS / Web 保留工程入口，但不是 v1 验收目标。
 - 需求文档：`需求/README.md` 是入口，那里列的四份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。

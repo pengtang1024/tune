@@ -9,10 +9,16 @@ import 'package:tune/core/l10n/source_kind_label.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/domain/source_health.dart';
+import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/features/sources/domain/source_weights.dart';
 import 'package:tune/features/sources/presentation/source_form_dialog.dart';
 import 'package:tune/features/sources/presentation/source_menu_button.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
@@ -43,10 +49,12 @@ class MusicSourcesSection extends ConsumerWidget {
           progress: state?.scanProgress ?? 0.0,
           summaries:
               state?.sourceSummaries ?? const <String, SourceScanSummary>{},
+          songs: state?.songs ?? const <Song>[],
         );
       }),
     );
     final settings = ref.watch(settingsControllerProvider);
+    final favorites = ref.watch(favoritesControllerProvider);
     final scanning = library.scanning;
     final busy = scanning || library.loading;
 
@@ -56,8 +64,30 @@ class MusicSourcesSection extends ConsumerWidget {
     );
     final lastScanAt =
         sourcesAsync.valueOrNull?.lastScanAt ?? const <String, DateTime>{};
+    final healthHistory =
+        sourcesAsync.valueOrNull?.healthHistory ??
+        const <String, SourceScanHealthHistory>{};
     final sourceService = ref.watch(musicSourceServiceProvider);
-    final groups = _groupSources(sources, sourceService);
+    final coverage = _coverageBySource(library.songs);
+    final activity = _activityBySource(library.songs, favorites);
+    final health = {
+      for (final source in sources)
+        source.id: SourceHealth.report(
+          isLocal: source.isLocal,
+          enabled: source.enabled,
+          supported: sourceService.supportsConfig(source),
+          configured: sourceService.isConfigured(source),
+          summary: library.summaries[source.id],
+          lastScanAt: lastScanAt[source.id],
+          autoScanInterval: sourceService.autoScanIntervalFor(source),
+          scanTimeout: sourceService.scanTimeoutFor(source),
+          weights: settings.sourceHealthWeights,
+          history: healthHistory[source.id],
+          coverage: coverage[source.id] ?? 0.5,
+          activity: activity[source.id] ?? 0.5,
+        ),
+    };
+    final groups = _groupSources(sources, sourceService, health);
     final canScan =
         !busy &&
         sources.any(
@@ -133,12 +163,21 @@ class MusicSourcesSection extends ConsumerWidget {
               child: LinearProgressIndicator(minHeight: 2),
             )
           else ...[
-            for (final source in groups.featured)
+            for (final source in groups.main)
               _SourceTile(
                 source: source,
                 summary: library.summaries[source.id],
-                lastScanAt: lastScanAt[source.id],
+                lastScanAt:
+                    library.summaries[source.id]?.scannedAt ??
+                    lastScanAt[source.id],
+                health: health[source.id]!,
                 busy: busy,
+                inMore: false,
+                canMoveToMain: false,
+                canMoveUp: _groupIndex(groups, source) > 0,
+                canMoveDown:
+                    _groupIndex(groups, source) <
+                    _groupCount(groups, source) - 1,
               ),
             if (groups.more.isNotEmpty) ...[
               const SizedBox(height: CompactTokens.space6),
@@ -154,20 +193,18 @@ class MusicSourcesSection extends ConsumerWidget {
                   _SourceTile(
                     source: source,
                     summary: library.summaries[source.id],
-                    lastScanAt: lastScanAt[source.id],
+                    lastScanAt:
+                        library.summaries[source.id]?.scannedAt ??
+                        lastScanAt[source.id],
+                    health: health[source.id]!,
                     busy: busy,
+                    inMore: true,
+                    canMoveToMain: health[source.id]?.healthy ?? false,
+                    canMoveUp: _groupIndex(groups, source) > 0,
+                    canMoveDown:
+                        _groupIndex(groups, source) <
+                        _groupCount(groups, source) - 1,
                   ),
-            ],
-            if (groups.added.isNotEmpty) ...[
-              const SizedBox(height: CompactTokens.space6),
-              _GroupHeader(title: context.loc.sourcesGroupAdded),
-              for (final source in groups.added)
-                _SourceTile(
-                  source: source,
-                  summary: library.summaries[source.id],
-                  lastScanAt: lastScanAt[source.id],
-                  busy: busy,
-                ),
             ],
           ],
           const SizedBox(height: CompactTokens.space8),
@@ -228,45 +265,137 @@ class MusicSourcesSection extends ConsumerWidget {
   }
 }
 
+/// The share of a source's tracks that has a playable address, artwork and
+/// an artist. A source with no tracks yet is neutral.
+Map<String, double> _coverageBySource(List<Song> songs) {
+  final total = <String, int>{};
+  final playable = <String, int>{};
+  final artwork = <String, int>{};
+  final metadata = <String, int>{};
+
+  for (final song in songs) {
+    final id = song.sourceId ?? 'local';
+    total[id] = (total[id] ?? 0) + 1;
+    final hasPlayable =
+        song.hasLocalFile || (song.streamUrl?.isNotEmpty ?? false);
+    if (hasPlayable) playable[id] = (playable[id] ?? 0) + 1;
+    final hasArtwork =
+        (song.albumArtPath?.isNotEmpty ?? false) ||
+        (song.artworkUrl?.isNotEmpty ?? false);
+    if (hasArtwork) artwork[id] = (artwork[id] ?? 0) + 1;
+    if (song.artist.trim().isNotEmpty) {
+      metadata[id] = (metadata[id] ?? 0) + 1;
+    }
+  }
+
+  return {
+    for (final entry in total.entries)
+      entry.key: entry.value == 0
+          ? 0.5
+          : 0.6 * (playable[entry.key] ?? 0) / entry.value +
+                0.2 * (artwork[entry.key] ?? 0) / entry.value +
+                0.2 * (metadata[entry.key] ?? 0) / entry.value,
+  };
+}
+
+/// The share of a source's tracks the reader has marked with a heart.
+Map<String, double> _activityBySource(
+  List<Song> songs,
+  FavoritesState favorites,
+) {
+  final total = <String, int>{};
+  final liked = <String, int>{};
+  for (final song in songs) {
+    final id = song.sourceId ?? 'local';
+    total[id] = (total[id] ?? 0) + 1;
+    if (favorites.contains(song.uri)) {
+      liked[id] = (liked[id] ?? 0) + 1;
+    }
+  }
+  return {
+    for (final entry in total.entries)
+      entry.key: entry.value == 0 ? 0.5 : (liked[entry.key] ?? 0) / entry.value,
+  };
+}
+
 /// The sources of the list, split into the groups the reader sees.
 ///
 /// The sources that work right away stand at the top, the ones that need a
 /// key wait in a folded group, and the ones the reader added are theirs.
 class _SourceGroups {
-  final List<MusicSourceConfig> featured;
+  final List<MusicSourceConfig> main;
   final List<MusicSourceConfig> more;
-  final List<MusicSourceConfig> added;
 
-  const _SourceGroups({
-    required this.featured,
-    required this.more,
-    required this.added,
-  });
+  const _SourceGroups({required this.main, required this.more});
 }
 
 /// Splits the sources of the list into the groups the reader sees.
 ///
-/// Which group a source belongs to is said by the type, not by its id, so a
-/// new type lands in the right place without the interface knowing it.
+/// The weight says where a source belongs; the local music is always in the
+/// main list, and a source below the threshold waits in the folded group.
 _SourceGroups _groupSources(
   List<MusicSourceConfig> sources,
   MusicSourceService service,
+  Map<String, SourceHealthReport> health,
 ) {
-  final featured = <MusicSourceConfig>[];
-  final more = <MusicSourceConfig>[];
-  final added = <MusicSourceConfig>[];
+  final ordered = [...sources]
+    ..sort((left, right) {
+      final leftWeight = SourceWeights.of(
+        left,
+        isFeatured: service.isFeatured(left),
+      );
+      final rightWeight = SourceWeights.of(
+        right,
+        isFeatured: service.isFeatured(right),
+      );
+      final byWeight = rightWeight.compareTo(leftWeight);
+      if (byWeight != 0) return byWeight;
+      return sources.indexOf(left).compareTo(sources.indexOf(right));
+    });
 
-  for (final source in sources) {
-    if (!source.builtIn) {
-      added.add(source);
-    } else if (service.isFeatured(source)) {
-      featured.add(source);
+  final main = <MusicSourceConfig>[];
+  final more = <MusicSourceConfig>[];
+  for (final source in ordered) {
+    final weight = SourceWeights.of(
+      source,
+      isFeatured: service.isFeatured(source),
+    );
+    final healthy = health[source.id]?.healthy ?? false;
+    if (source.isLocal || (!SourceWeights.inMore(weight) && healthy)) {
+      main.add(source);
     } else {
       more.add(source);
     }
   }
 
-  return _SourceGroups(featured: featured, more: more, added: added);
+  return _SourceGroups(main: main, more: more);
+}
+
+/// The non-local sources of the main group.
+List<MusicSourceConfig> _mainSources(_SourceGroups groups) {
+  return [
+    for (final source in groups.main)
+      if (!source.isLocal) source,
+  ];
+}
+
+/// The sources of the group a source stands in, in display order.
+List<MusicSourceConfig> _groupSourcesOf(
+  _SourceGroups groups,
+  MusicSourceConfig source,
+) {
+  return groups.main.contains(source) ? _mainSources(groups) : groups.more;
+}
+
+int _groupIndex(_SourceGroups groups, MusicSourceConfig source) {
+  return _groupSourcesOf(
+    groups,
+    source,
+  ).indexWhere((item) => item.id == source.id);
+}
+
+int _groupCount(_SourceGroups groups, MusicSourceConfig source) {
+  return _groupSourcesOf(groups, source).length;
 }
 
 /// The name of a group of sources.
@@ -327,13 +456,23 @@ class _SourceTile extends ConsumerWidget {
   final MusicSourceConfig source;
   final SourceScanSummary? summary;
   final DateTime? lastScanAt;
+  final SourceHealthReport health;
   final bool busy;
+  final bool inMore;
+  final bool canMoveToMain;
+  final bool canMoveUp;
+  final bool canMoveDown;
 
   const _SourceTile({
     required this.source,
     required this.summary,
     required this.lastScanAt,
+    required this.health,
     required this.busy,
+    required this.inMore,
+    required this.canMoveToMain,
+    required this.canMoveUp,
+    required this.canMoveDown,
   });
 
   @override
@@ -412,7 +551,10 @@ class _SourceTile extends ConsumerWidget {
                   children: [
                     MetaBadge(
                       icon: mark.icon,
-                      tooltip: status,
+                      tooltip:
+                          '$status\n'
+                          '${context.loc.sourcesHealthScore(health.score)}\n'
+                          '${context.loc.sourcesHealthBreakdown(health.availability, health.configuration, health.scan, health.freshness, health.output, health.speed, health.reliability, health.stability, health.coverage, health.activity)}',
                       tone: mark.tone,
                       size: CompactTokens.icon14,
                     ),
@@ -433,36 +575,43 @@ class _SourceTile extends ConsumerWidget {
               ],
             ),
           ),
-          if (!source.builtIn)
-            SourceMenuButton(source: source, enabled: !busy),
+          if (!source.isLocal)
+            SourceMenuButton(
+              source: source,
+              enabled: !busy,
+              inMore: inMore,
+              canMoveToMain: canMoveToMain,
+              canMoveUp: canMoveUp,
+              canMoveDown: canMoveDown,
+            ),
           if (fields.isNotEmpty && supported)
             SizedBox(
-                width: 28,
-                height: 28,
-                child: TuneTooltip(
-                  message: context.loc.sourcesConfigure,
-                  child: IconButton(
-                    key: ValueKey('source-config-${source.id}'),
-                    onPressed: busy
-                        ? null
-                        : () => _openSettings(context, source, fields),
-                    icon: const Icon(
-                      Icons.tune_rounded,
-                      size: CompactTokens.icon16,
-                    ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints.tightFor(
-                      width: 28,
-                      height: 28,
-                    ),
-                    style: IconButton.styleFrom(
-                      foregroundColor: muted,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                    ),
+              width: 28,
+              height: 28,
+              child: TuneTooltip(
+                message: context.loc.sourcesConfigure,
+                child: IconButton(
+                  key: ValueKey('source-config-${source.id}'),
+                  onPressed: busy
+                      ? null
+                      : () => _openSettings(context, source, fields),
+                  icon: const Icon(
+                    Icons.tune_rounded,
+                    size: CompactTokens.icon16,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 28,
+                    height: 28,
+                  ),
+                  style: IconButton.styleFrom(
+                    foregroundColor: muted,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
                   ),
                 ),
               ),
+            ),
           Switch(
             key: ValueKey('source-switch-${source.id}'),
             value: source.enabled,
@@ -598,7 +747,6 @@ class _SourceTile extends ConsumerWidget {
     );
     return saved == true;
   }
-
 }
 
 /// The state of a source, drawn as a chip.

@@ -20,7 +20,10 @@ class LibraryQueueAllButton extends StatelessWidget {
       message: context.loc.libraryAddAllToQueue,
       child: IconButton(
         onPressed: onPressed,
-        icon: const Icon(Icons.queue_music_rounded, size: CompactTokens.icon18),
+        icon: const Icon(
+          Icons.playlist_add_rounded,
+          size: CompactTokens.icon18,
+        ),
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(width: 28, height: 28),
         style: IconButton.styleFrom(

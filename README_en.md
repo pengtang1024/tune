@@ -2,7 +2,7 @@
 
 [中文](README.md) · [English](README_en.md)
 
-Tune is a compact local and online music player built with Flutter. A persistent player occupies the left pane, while the right pane switches between library, queue, and settings.
+Tune is a compact local and online music player built with Flutter. The shell has a navigation rail (library, liked, sources, settings), a content area, and a player dock at the bottom; the play queue is a non-modal side panel opened from the dock or the now playing page, not a navigation destination; it dims the page content while the dock and sidebar stay usable.
 
 ## Features
 
@@ -13,7 +13,7 @@ Tune is a compact local and online music player built with Flutter. A persistent
 - Play/pause, previous/next, seek, volume, and repeat modes
 - Filter the library by source; remote tracks show source and artwork
 - Track rows mark format, quality and bitrate with icons; hover to read them, open a track for all of its facts and its path
-- Likes: a heart in the track rows, the queue and the now playing page; the tracks you mark wait in the Liked page
+- Likes: a heart in the track rows, the queue, the online search results, the now playing page and the player card at the bottom; the tracks you mark wait in the Liked page
 - Light / dark / system themes; persistent scan paths and source settings
 - Interface languages: 简体中文, 繁體中文, 中文（通用）, English — source names, dates and number formats follow the choice
 - 900×600 default window, 760×520 minimum
@@ -49,9 +49,23 @@ flutter run -d linux
 
 ## Build
 
+Linux is the target of the current release:
+
 ```bash
 flutter build linux --debug
 ```
+
+The other platforms keep an entry point and are built on their own system:
+
+| Platform | Command | Prerequisite |
+| --- | --- | --- |
+| Linux | `flutter build linux --release` | libmpv (`libmpv2`) installed on the system |
+| Windows | `flutter build windows --release` | The C++ desktop workload of Visual Studio |
+| macOS | `flutter build macos --release` | Xcode command line tools |
+| Android | `flutter build apk --release` | Optional `android/key.properties`, see below |
+| Web | `flutter build web --release` | — |
+
+Android reads the release keys from `android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`). Without that file the build falls back to the debug keys: the artifact is fine for a local install but cannot be published.
 
 ## Desktop icon
 
@@ -69,6 +83,12 @@ flutter build linux --debug
 
 - Linux desktop is the primary target for the current release.
 - Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download, and the web build streams tracks.
+- The web build has no local library, tray, MPRIS, or default-player settings; it only plays online sources.
+- A browser does not let a script set `User-Agent` or `Referer`, and the web build carries no request headers at all: sources that need them (Jellyfin, ccMixter) may not play in the browser.
+- The same-origin policy of the browser blocks the APIs that answer without a CORS header (Wikimedia, ccMixter, and others), so those sources fail to scan in the browser; whether a source works depends on the API allowing browsers.
+- Windows plays through just_audio_windows, which ignores custom request headers: sources that need them (Jellyfin, ccMixter) may not play, and there is no tray or MPRIS control.
+- macOS has no tray or MPRIS control; the sandbox only grants `~/Music` and the folders the user picked. Pick the music folder again if access is denied after a restart.
+- Local scanning on Android and iOS needs a runtime storage permission that the app does not request yet, so the mobile library can stay empty; online sources are unaffected.
 - Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
 - Internet radio is a live stream: it is never cached and shows no progress bar.
 - Legacy mobile notifications, lyrics, equalizer, history, and account features are no longer part of the main path.

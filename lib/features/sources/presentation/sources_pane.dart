@@ -9,13 +9,28 @@ import 'package:tune/shared/ui/page_heading.dart';
 ///
 /// The page lists the configured music sources; the list itself is owned by
 /// [MusicSourcesSection].
-class SourcesPane extends StatelessWidget {
+class SourcesPane extends StatefulWidget {
   const SourcesPane({super.key});
+
+  @override
+  State<SourcesPane> createState() => _SourcesPaneState();
+}
+
+class _SourcesPaneState extends State<SourcesPane> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
+      controller: _scrollController,
       child: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(
           CompactTokens.pageGutter,
           CompactTokens.pageTopPadding,

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -6,6 +8,7 @@ import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
+import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
@@ -43,8 +46,11 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('replace_queue_on_click') ?? false,
           onlyLikeOnDoubleClick:
               _persistence.getBool('only_like_on_double_click') ?? false,
+          restorePlaybackOnStartup:
+              _persistence.getBool('restore_playback_on_startup') ?? true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
+          sourceHealthWeights: _readSourceHealthWeights(_persistence),
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -113,11 +119,43 @@ class SettingsController extends StateNotifier<SettingsState> {
     await _persistence.setBool('only_like_on_double_click', value);
   }
 
+  /// Sets whether a start restores the queue of the last run.
+  Future<void> setRestorePlaybackOnStartup(bool value) async {
+    if (state.restorePlaybackOnStartup == value) return;
+    state = state.copyWith(restorePlaybackOnStartup: value);
+    await _persistence.setBool('restore_playback_on_startup', value);
+  }
+
   /// Opens or folds the group of the sources that need a key.
   Future<void> setSourcesMoreExpanded(bool value) async {
     if (state.sourcesMoreExpanded == value) return;
     state = state.copyWith(sourcesMoreExpanded: value);
     await _persistence.setBool('sources_more_expanded', value);
+  }
+
+  Future<void> setSourceHealthWeights(SourceHealthWeights weights) async {
+    if (state.sourceHealthWeights == weights) return;
+    state = state.copyWith(sourceHealthWeights: weights);
+    await _persistence.setString(
+      'source_health_weights_v1',
+      jsonEncode(weights.toJson()),
+    );
+  }
+
+  static SourceHealthWeights _readSourceHealthWeights(
+    PersistenceService persistence,
+  ) {
+    final raw = persistence.getString('source_health_weights_v1');
+    if (raw == null || raw.trim().isEmpty) return SourceHealthWeights.defaults;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        return SourceHealthWeights.fromJson(Map<String, dynamic>.from(decoded));
+      }
+    } catch (error, stackTrace) {
+      Log.error('读取健康度权重失败: $error\n$stackTrace');
+    }
+    return SourceHealthWeights.defaults;
   }
 
   /// Sets the folder the app writes the files it fetches into.
