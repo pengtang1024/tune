@@ -77,6 +77,7 @@ abstract final class SourceHealth {
     required Duration scanTimeout,
     SourceHealthWeights weights = SourceHealthWeights.defaults,
     SourceScanHealthHistory? history,
+    DateTime? now,
     double playable = 0.5,
     double artwork = 0.5,
     double metadata = 0.5,
@@ -117,10 +118,11 @@ abstract final class SourceHealth {
 
     // A successful scan that just finished is the freshest fact; a failed
     // one leaves the last success as the timestamp that matters.
+    final clock = now ?? DateTime.now();
     final freshnessAt = summary?.status == SourceScanStatus.success
         ? summary!.scannedAt
         : lastScanAt;
-    final freshness = _freshness(freshnessAt, autoScanInterval);
+    final freshness = _freshness(freshnessAt, autoScanInterval, clock);
     final output = _output(summary);
     final speed = _speed(summary, scanTimeout);
     final reliability = switch (summary?.status) {
@@ -178,11 +180,15 @@ abstract final class SourceHealth {
 
   static int _percent(double rate) => (rate * 100).round();
 
-  static double _freshness(DateTime? lastScanAt, Duration interval) {
+  static double _freshness(
+    DateTime? lastScanAt,
+    Duration interval,
+    DateTime now,
+  ) {
     if (lastScanAt == null) return 0.5;
     if (interval <= Duration.zero) return 1;
 
-    final age = DateTime.now().difference(lastScanAt);
+    final age = now.difference(lastScanAt);
     if (age <= interval) return 1;
     if (age <= interval * 2) return 0.66;
     if (age <= interval * 4) return 0.33;

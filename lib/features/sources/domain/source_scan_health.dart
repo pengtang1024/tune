@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:tune/domain/models/source_scan_result.dart';
 
 /// One scan outcome kept for the stability dimension.
@@ -69,19 +71,32 @@ class SourceScanHealthHistory {
   }
 
   /// A 0..1 stability rate: success is full, skipped is mostly stable,
-  /// failure is not. No history is neutral.
+  /// failure is not. Newer records weigh more: a scan 30 days older counts
+  /// half as much, so one bad month does not keep a working source down.
+  /// No history is neutral.
   double get stabilityRate {
     if (records.isEmpty) return 0.5;
-    var sum = 0.0;
+    final newest = records
+        .map((record) => record.at)
+        .reduce((left, right) => left.isAfter(right) ? left : right);
+    var weighted = 0.0;
+    var total = 0.0;
     for (final record in records) {
-      sum += switch (record.status) {
-        SourceScanStatus.success => 1.0,
-        SourceScanStatus.skipped => 0.75,
-        SourceScanStatus.failed => 0.0,
-        SourceScanStatus.needsConfiguration => 0.0,
-      };
+      final ageDays = newest.difference(record.at).inHours / 24;
+      final weight = math.pow(0.5, math.max(0, ageDays) / 30).toDouble();
+      weighted += _stabilityOf(record.status) * weight;
+      total += weight;
     }
-    return sum / records.length;
+    return total == 0 ? 0.5 : weighted / total;
+  }
+
+  static double _stabilityOf(SourceScanStatus status) {
+    return switch (status) {
+      SourceScanStatus.success => 1.0,
+      SourceScanStatus.skipped => 0.75,
+      SourceScanStatus.failed => 0.0,
+      SourceScanStatus.needsConfiguration => 0.0,
+    };
   }
 
   factory SourceScanHealthHistory.fromJson(List<dynamic> json) {

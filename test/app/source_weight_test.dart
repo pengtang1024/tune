@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/sources/domain/source_health.dart';
+import 'package:tune/features/sources/domain/source_health_facts.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/features/sources/domain/source_scan_health.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
@@ -353,5 +355,59 @@ void main() {
     expect(restored.playable, 3);
     expect(restored.artwork, 7);
     expect(restored.metadata, 1);
+  });
+
+  test('a recent success outweighs an old failure', () {
+    final now = DateTime(2026, 10, 24);
+    final history = SourceScanHealthHistory(
+      records: [
+        SourceScanHealthRecord(
+          status: SourceScanStatus.failed,
+          songCount: 0,
+          elapsed: Duration.zero,
+          at: now.subtract(const Duration(days: 90)),
+        ),
+        SourceScanHealthRecord(
+          status: SourceScanStatus.success,
+          songCount: 3,
+          elapsed: const Duration(seconds: 1),
+          at: now,
+        ),
+      ],
+    );
+
+    expect(history.stabilityRate, greaterThan(0.5));
+    expect(history.stabilityRate, lessThan(1.0));
+  });
+
+  test('source facts are counted in one pass', () {
+    const songs = [
+      Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        sourceId: 'openverse',
+        externalId: 'one',
+        streamUrl: 'https://example.com/one.mp3',
+        artworkUrl: 'https://example.com/one.jpg',
+        artist: 'Artist',
+      ),
+      Song(
+        id: 2,
+        uri: 'tune://openverse/two',
+        sourceId: 'openverse',
+        externalId: 'two',
+        streamUrl: 'https://example.com/two.mp3',
+      ),
+    ];
+    final facts = sourceHealthFactsOf(
+      songs,
+      favoriteUris: {'tune://openverse/one'},
+    );
+    final openverse = facts['openverse']!;
+
+    expect(openverse.playable, 1);
+    expect(openverse.artwork, 0.5);
+    expect(openverse.metadata, 0.5);
+    expect(openverse.activity, 0.5);
   });
 }

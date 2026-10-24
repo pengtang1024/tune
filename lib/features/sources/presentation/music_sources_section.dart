@@ -9,15 +9,12 @@ import 'package:tune/core/l10n/source_kind_label.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
-import 'package:tune/features/favorites/application/favorites_controller.dart';
-import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/application/source_health_reports.dart';
 import 'package:tune/features/sources/domain/source_health.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
 import 'package:tune/features/sources/presentation/source_form_dialog.dart';
 import 'package:tune/features/sources/presentation/source_menu_button.dart';
@@ -49,12 +46,10 @@ class MusicSourcesSection extends ConsumerWidget {
           progress: state?.scanProgress ?? 0.0,
           summaries:
               state?.sourceSummaries ?? const <String, SourceScanSummary>{},
-          songs: state?.songs ?? const <Song>[],
         );
       }),
     );
     final settings = ref.watch(settingsControllerProvider);
-    final favorites = ref.watch(favoritesControllerProvider);
     final scanning = library.scanning;
     final busy = scanning || library.loading;
 
@@ -64,31 +59,8 @@ class MusicSourcesSection extends ConsumerWidget {
     );
     final lastScanAt =
         sourcesAsync.valueOrNull?.lastScanAt ?? const <String, DateTime>{};
-    final healthHistory =
-        sourcesAsync.valueOrNull?.healthHistory ??
-        const <String, SourceScanHealthHistory>{};
     final sourceService = ref.watch(musicSourceServiceProvider);
-    final coverage = _coverageBySource(library.songs);
-    final activity = _activityBySource(library.songs, favorites);
-    final health = {
-      for (final source in sources)
-        source.id: SourceHealth.report(
-          isLocal: source.isLocal,
-          enabled: source.enabled,
-          supported: sourceService.supportsConfig(source),
-          configured: sourceService.isConfigured(source),
-          summary: library.summaries[source.id],
-          lastScanAt: lastScanAt[source.id],
-          autoScanInterval: sourceService.autoScanIntervalFor(source),
-          scanTimeout: sourceService.scanTimeoutFor(source),
-          weights: settings.sourceHealthWeights,
-          history: healthHistory[source.id],
-          playable: coverage[source.id]?.playableRate ?? 0.5,
-          artwork: coverage[source.id]?.artworkRate ?? 0.5,
-          metadata: coverage[source.id]?.metadataRate ?? 0.5,
-          activity: activity[source.id] ?? 0.5,
-        ),
-    };
+    final health = ref.watch(sourceHealthReportsProvider);
     final groups = _groupSources(sources, sourceService, health);
     final canScan =
         !busy &&
@@ -265,60 +237,6 @@ class MusicSourcesSection extends ConsumerWidget {
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
   }
-}
-
-/// The facts of a source's tracks that the health score looks at.
-///
-/// A source with no tracks yet stays neutral: the three rates are 0.5 so an
-/// unscanned source is neither rewarded nor punished for data it has not
-/// produced.
-class _SourceCoverage {
-  int total = 0;
-  int playable = 0;
-  int artwork = 0;
-  int metadata = 0;
-
-  double get playableRate => total == 0 ? 0.5 : playable / total;
-  double get artworkRate => total == 0 ? 0.5 : artwork / total;
-  double get metadataRate => total == 0 ? 0.5 : metadata / total;
-}
-
-/// Counts the three coverage facts per source in one pass.
-Map<String, _SourceCoverage> _coverageBySource(List<Song> songs) {
-  final coverage = <String, _SourceCoverage>{};
-
-  for (final song in songs) {
-    final id = song.sourceId ?? 'local';
-    final item = coverage.putIfAbsent(id, _SourceCoverage.new);
-    item.total++;
-    final hasPlayable =
-        song.hasLocalFile || (song.streamUrl?.isNotEmpty ?? false);
-    if (hasPlayable) item.playable++;
-    if (song.hasArtwork) item.artwork++;
-    if (song.artist.trim().isNotEmpty) item.metadata++;
-  }
-
-  return coverage;
-}
-
-/// The share of a source's tracks the reader has marked with a heart.
-Map<String, double> _activityBySource(
-  List<Song> songs,
-  FavoritesState favorites,
-) {
-  final total = <String, int>{};
-  final liked = <String, int>{};
-  for (final song in songs) {
-    final id = song.sourceId ?? 'local';
-    total[id] = (total[id] ?? 0) + 1;
-    if (favorites.contains(song.uri)) {
-      liked[id] = (liked[id] ?? 0) + 1;
-    }
-  }
-  return {
-    for (final entry in total.entries)
-      entry.key: entry.value == 0 ? 0.5 : (liked[entry.key] ?? 0) / entry.value,
-  };
 }
 
 /// The sources of the list, split into the groups the reader sees.
