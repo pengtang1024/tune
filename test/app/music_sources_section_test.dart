@@ -5,7 +5,9 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/application/source_health_reports.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
+import 'package:tune/features/sources/domain/source_health.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -21,11 +23,16 @@ void main() {
     persistence = FakePersistenceService()..values['language_code'] = 'zh';
   });
 
-  Widget app(FakeMusicSourcesController controller) {
+  Widget app(
+    FakeMusicSourcesController controller, {
+    Map<String, SourceHealthReport>? health,
+  }) {
     return ProviderScope(
       overrides: [
         persistenceServiceProvider.overrideWithValue(persistence),
         musicSourcesControllerProvider.overrideWith(() => controller),
+        if (health != null)
+          sourceHealthReportsProvider.overrideWithValue(health),
       ],
       child: MaterialApp(
         theme: CompactTheme.light,
@@ -328,6 +335,53 @@ void main() {
     // The source of the reader is not folded away with the ones that need
     // a key.
     expect(find.text('更多音源'), findsNothing);
+  });
+
+  testWidgets('a higher health band stands before a higher weight', (
+    tester,
+  ) async {
+    final controller = FakeMusicSourcesController(
+      MusicSourcesState(
+        sources: [
+          BuiltInMusicSources.ccmixter.copyWith(weight: 800),
+          BuiltInMusicSources.openverse.copyWith(weight: 700),
+        ],
+      ),
+    );
+    SourceHealthReport report(int score) => SourceHealthReport(
+      availability: 100,
+      configuration: 100,
+      scan: 100,
+      freshness: 100,
+      output: 100,
+      speed: 100,
+      reliability: 100,
+      stability: 100,
+      playable: 100,
+      artwork: 100,
+      metadata: 100,
+      activity: 100,
+      score: score,
+      healthy: score >= SourceHealth.threshold,
+    );
+
+    await tester.pumpWidget(
+      app(
+        controller,
+        health: {'ccmixter': report(65), 'openverse': report(90)},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final high = tester
+        .getTopLeft(find.byKey(const ValueKey('source-switch-openverse')))
+        .dy;
+    final low = tester
+        .getTopLeft(find.byKey(const ValueKey('source-switch-ccmixter')))
+        .dy;
+
+    // openverse has the lower weight but the higher health band.
+    expect(high, lessThan(low));
   });
 
   testWidgets('the weight decides which group a source joins', (tester) async {

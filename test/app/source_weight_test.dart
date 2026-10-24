@@ -310,6 +310,7 @@ void main() {
         lastScanAt: DateTime.now(),
         autoScanInterval: const Duration(hours: 6),
         scanTimeout: const Duration(seconds: 45),
+        hasTracks: true,
         playable: 1,
         artwork: artwork,
         metadata: 1,
@@ -323,6 +324,47 @@ void main() {
     expect(covered.artwork, 100);
     expect(bare.artwork, 0);
     expect(covered.score - bare.score, greaterThanOrEqualTo(7));
+    expect(bare.score, lessThanOrEqualTo(55));
+    expect(bare.healthy, isFalse);
+  });
+
+  test('an empty source is not capped for missing covers', () {
+    final summary = SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.success,
+      songCount: 3,
+      scannedAt: DateTime.now(),
+      elapsed: const Duration(seconds: 1),
+    );
+    final weights = SourceHealthWeights.defaults.copyWith(
+      freshness: 0,
+      output: 0,
+      speed: 0,
+      reliability: 0,
+      stability: 0,
+      playable: 0,
+      artwork: 0,
+      metadata: 0,
+      activity: 0,
+    );
+    final report = SourceHealth.report(
+      isLocal: false,
+      enabled: true,
+      supported: true,
+      configured: true,
+      summary: summary,
+      lastScanAt: summary.scannedAt,
+      autoScanInterval: const Duration(hours: 6),
+      scanTimeout: const Duration(seconds: 45),
+      weights: weights,
+      hasTracks: false,
+      playable: 0,
+      artwork: 0,
+      metadata: 0,
+      activity: 0,
+    );
+
+    expect(report.score, greaterThan(55));
   });
 
   test('an old coverage weight is split into the three facts', () {
@@ -409,5 +451,13 @@ void main() {
     expect(openverse.artwork, 0.5);
     expect(openverse.metadata, 0.5);
     expect(openverse.activity, 0.5);
+  });
+
+  test('health bands separate the main list', () {
+    expect(SourceHealth.bandOf(100), 2);
+    expect(SourceHealth.bandOf(85), 2);
+    expect(SourceHealth.bandOf(84), 1);
+    expect(SourceHealth.bandOf(70), 1);
+    expect(SourceHealth.bandOf(69), 0);
   });
 }

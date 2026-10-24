@@ -44,7 +44,7 @@ final sourceHealthReportsProvider = Provider<Map<String, SourceHealthReport>>((
   final now = DateTime.now();
 
   SourceHealthReport reportFor(MusicSourceConfig source) {
-    final fact = facts[source.id] ?? SourceHealthFacts.neutral;
+    final fact = facts[source.id];
     return SourceHealth.report(
       isLocal: source.isLocal,
       enabled: source.enabled,
@@ -57,10 +57,11 @@ final sourceHealthReportsProvider = Provider<Map<String, SourceHealthReport>>((
       weights: weights,
       history: sources.healthHistory[source.id],
       now: now,
-      playable: fact.playable,
-      artwork: fact.artwork,
-      metadata: fact.metadata,
-      activity: fact.activity,
+      hasTracks: fact != null,
+      playable: fact?.playable ?? SourceHealthFacts.neutral.playable,
+      artwork: fact?.artwork ?? SourceHealthFacts.neutral.artwork,
+      metadata: fact?.metadata ?? SourceHealthFacts.neutral.metadata,
+      activity: fact?.activity ?? SourceHealthFacts.neutral.activity,
     );
   }
 

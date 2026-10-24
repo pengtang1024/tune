@@ -82,12 +82,29 @@ void main() {
     await container.read(musicSourcesControllerProvider.future);
     final controller = container.read(musicSourcesControllerProvider.notifier);
 
-    await controller.moveSourceUp('local');
+    await controller.swapSources('local', 'openverse');
     await controller.setSourceInMore('local', true);
 
     final state = container.read(musicSourcesControllerProvider).requireValue;
     expect(state.sources.first.id, 'local');
     expect(state.byId('local')!.weight, SourceWeights.local);
+  });
+
+  test('swapping two sources trades their weights', () async {
+    final container = containerFor(FakePersistenceService());
+    addTearDown(container.dispose);
+
+    await container.read(musicSourcesControllerProvider.future);
+    final controller = container.read(musicSourcesControllerProvider.notifier);
+    final state = container.read(musicSourcesControllerProvider).requireValue;
+    final first = state.sources[1];
+    final second = state.sources[2];
+
+    await controller.swapSources(first.id, second.id);
+
+    final updated = container.read(musicSourcesControllerProvider).requireValue;
+    expect(updated.byId(first.id)!.weight, second.weight);
+    expect(updated.byId(second.id)!.weight, first.weight);
   });
 
   test('the weight survives a controller rebuild', () async {

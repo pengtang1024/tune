@@ -198,29 +198,34 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
     await _save(unmodifiable);
   }
 
-  /// Moves a source one place earlier, across the More boundary if needed.
-  Future<void> moveSourceUp(String sourceId) => _moveSource(sourceId, -1);
-
-  /// Moves a source one place later, across the More boundary if needed.
-  Future<void> moveSourceDown(String sourceId) => _moveSource(sourceId, 1);
-
-  Future<void> _moveSource(String sourceId, int delta) async {
-    if (_disposed || !state.hasValue) return;
+  /// Trades the weights of two sources.
+  ///
+  /// The caller passes the two sources that are adjacent in the list the
+  /// reader sees, not the two adjacent in storage: health bands decide the
+  /// coarse order, so the visible neighbours are not always the raw-weight
+  /// neighbours. A pair that sits on different sides of the More boundary is
+  /// left alone; use [setSourceInMore] for that move.
+  Future<void> swapSources(String firstId, String secondId) async {
+    if (_disposed || !state.hasValue || firstId == secondId) return;
 
     final sources = [..._current.sources];
-    final index = sources.indexWhere((source) => source.id == sourceId);
-    if (index < 0 || sources[index].isLocal) return;
+    final firstIndex = sources.indexWhere((source) => source.id == firstId);
+    final secondIndex = sources.indexWhere((source) => source.id == secondId);
+    if (firstIndex < 0 || secondIndex < 0) return;
 
-    final target = index + delta;
-    if (target < 0 || target >= sources.length) return;
-    if (sources[target].isLocal) return;
+    final first = sources[firstIndex];
+    final second = sources[secondIndex];
+    if (first.isLocal || second.isLocal) return;
 
-    final source = sources[index];
-    final neighbour = sources[target];
-    if (source.weight == null || neighbour.weight == null) return;
+    final firstWeight = first.weight ?? _defaultWeight(first);
+    final secondWeight = second.weight ?? _defaultWeight(second);
+    if (SourceWeights.inMore(firstWeight) !=
+        SourceWeights.inMore(secondWeight)) {
+      return;
+    }
 
-    sources[index] = source.copyWith(weight: neighbour.weight);
-    sources[target] = neighbour.copyWith(weight: source.weight);
+    sources[firstIndex] = first.copyWith(weight: secondWeight);
+    sources[secondIndex] = second.copyWith(weight: firstWeight);
     await _saveOrdered(sources);
   }
 

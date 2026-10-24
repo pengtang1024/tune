@@ -24,6 +24,13 @@ class SourceHealthReport {
   final int score;
   final bool healthy;
 
+  /// The coarse health band that decides the order of the source list.
+  ///
+  /// A higher band stands before a lower one; the manual weight decides the
+  /// order inside a band. The bands are deliberately coarse so a small health
+  /// difference does not override the reader's own order.
+  int get band => SourceHealth.bandOf(score);
+
   const SourceHealthReport({
     required this.availability,
     required this.configuration,
@@ -66,6 +73,21 @@ class SourceHealthReport {
 abstract final class SourceHealth {
   static const int threshold = 60;
 
+  /// The lower edge of the top band: sources at or above it stand before
+  /// the middle band regardless of their manual weight.
+  static const int highBand = 85;
+
+  /// The lower edge of the middle band.
+  static const int mediumBand = 70;
+
+  /// The band of a score: 2 for [highBand] and above, 1 for [mediumBand] and
+  /// above, 0 for the rest of the main list.
+  static int bandOf(int score) {
+    if (score >= highBand) return 2;
+    if (score >= mediumBand) return 1;
+    return 0;
+  }
+
   static SourceHealthReport report({
     required bool isLocal,
     required bool enabled,
@@ -78,6 +100,7 @@ abstract final class SourceHealth {
     SourceHealthWeights weights = SourceHealthWeights.defaults,
     SourceScanHealthHistory? history,
     DateTime? now,
+    bool hasTracks = false,
     double playable = 0.5,
     double artwork = 0.5,
     double metadata = 0.5,
@@ -157,6 +180,12 @@ abstract final class SourceHealth {
     if (!configured) score = score.clamp(0, 40);
     if (summary?.status == SourceScanStatus.failed ||
         summary?.status == SourceScanStatus.needsConfiguration) {
+      score = score.clamp(0, 55);
+    }
+    // A source with tracks but no cover at all waits in More: the main list
+    // is a visual list, and a whole row of grey cards is worse than one more
+    // fold. One cover is enough to lift the cap.
+    if (hasTracks && artworkRate <= 0) {
       score = score.clamp(0, 55);
     }
 

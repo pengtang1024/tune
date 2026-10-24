@@ -148,10 +148,8 @@ class MusicSourcesSection extends ConsumerWidget {
                 busy: busy,
                 inMore: false,
                 canMoveToMain: false,
-                canMoveUp: _groupIndex(groups, source) > 0,
-                canMoveDown:
-                    _groupIndex(groups, source) <
-                    _groupCount(groups, source) - 1,
+                previousSourceId: _previousSourceId(groups, source, health),
+                nextSourceId: _nextSourceId(groups, source, health),
               ),
             if (groups.more.isNotEmpty) ...[
               const SizedBox(height: CompactTokens.space6),
@@ -174,10 +172,8 @@ class MusicSourcesSection extends ConsumerWidget {
                     busy: busy,
                     inMore: true,
                     canMoveToMain: health[source.id]?.healthy ?? false,
-                    canMoveUp: _groupIndex(groups, source) > 0,
-                    canMoveDown:
-                        _groupIndex(groups, source) <
-                        _groupCount(groups, source) - 1,
+                    previousSourceId: _previousSourceId(groups, source, health),
+                    nextSourceId: _nextSourceId(groups, source, health),
                   ),
             ],
           ],
@@ -261,6 +257,10 @@ _SourceGroups _groupSources(
 ) {
   final ordered = [...sources]
     ..sort((left, right) {
+      final byBand = (health[right.id]?.band ?? 0).compareTo(
+        health[left.id]?.band ?? 0,
+      );
+      if (byBand != 0) return byBand;
       final leftWeight = SourceWeights.of(
         left,
         isFeatured: service.isFeatured(left),
@@ -308,15 +308,42 @@ List<MusicSourceConfig> _groupSourcesOf(
   return groups.main.contains(source) ? _mainSources(groups) : groups.more;
 }
 
-int _groupIndex(_SourceGroups groups, MusicSourceConfig source) {
-  return _groupSourcesOf(
-    groups,
-    source,
-  ).indexWhere((item) => item.id == source.id);
+/// The source above [source] when a move is allowed.
+///
+/// The list is ordered by health band first, then by weight. A move can only
+/// trade places inside one band; at a band boundary the menu entry is
+/// disabled, because swapping two weights would not change the order.
+String? _previousSourceId(
+  _SourceGroups groups,
+  MusicSourceConfig source,
+  Map<String, SourceHealthReport> health,
+) {
+  return _neighbourId(groups, source, health, -1);
 }
 
-int _groupCount(_SourceGroups groups, MusicSourceConfig source) {
-  return _groupSourcesOf(groups, source).length;
+/// The source below [source] when a move is allowed.
+String? _nextSourceId(
+  _SourceGroups groups,
+  MusicSourceConfig source,
+  Map<String, SourceHealthReport> health,
+) {
+  return _neighbourId(groups, source, health, 1);
+}
+
+String? _neighbourId(
+  _SourceGroups groups,
+  MusicSourceConfig source,
+  Map<String, SourceHealthReport> health,
+  int delta,
+) {
+  final list = _groupSourcesOf(groups, source);
+  final index = list.indexWhere((item) => item.id == source.id);
+  final target = index + delta;
+  if (index < 0 || target < 0 || target >= list.length) return null;
+  final other = list[target];
+  final band = health[source.id]?.band ?? 0;
+  if ((health[other.id]?.band ?? 0) != band) return null;
+  return other.id;
 }
 
 /// The name of a group of sources.
@@ -381,8 +408,8 @@ class _SourceTile extends ConsumerWidget {
   final bool busy;
   final bool inMore;
   final bool canMoveToMain;
-  final bool canMoveUp;
-  final bool canMoveDown;
+  final String? previousSourceId;
+  final String? nextSourceId;
 
   const _SourceTile({
     required this.source,
@@ -392,8 +419,8 @@ class _SourceTile extends ConsumerWidget {
     required this.busy,
     required this.inMore,
     required this.canMoveToMain,
-    required this.canMoveUp,
-    required this.canMoveDown,
+    required this.previousSourceId,
+    required this.nextSourceId,
   });
 
   @override
@@ -502,8 +529,8 @@ class _SourceTile extends ConsumerWidget {
               enabled: !busy,
               inMore: inMore,
               canMoveToMain: canMoveToMain,
-              canMoveUp: canMoveUp,
-              canMoveDown: canMoveDown,
+              previousSourceId: previousSourceId,
+              nextSourceId: nextSourceId,
             ),
           if (fields.isNotEmpty && supported)
             SizedBox(

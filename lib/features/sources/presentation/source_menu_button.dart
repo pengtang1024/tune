@@ -23,11 +23,11 @@ class SourceMenuButton extends ConsumerWidget {
   /// Whether the source is healthy enough to come back to the main list.
   final bool canMoveToMain;
 
-  /// Whether there is a previous non-local source to trade places with.
-  final bool canMoveUp;
+  /// The source above this one, when a move is allowed.
+  final String? previousSourceId;
 
-  /// Whether there is a next non-local source to trade places with.
-  final bool canMoveDown;
+  /// The source below this one, when a move is allowed.
+  final String? nextSourceId;
 
   const SourceMenuButton({
     super.key,
@@ -35,8 +35,8 @@ class SourceMenuButton extends ConsumerWidget {
     this.enabled = true,
     this.inMore = false,
     this.canMoveToMain = true,
-    this.canMoveUp = true,
-    this.canMoveDown = true,
+    this.previousSourceId,
+    this.nextSourceId,
   });
 
   @override
@@ -52,16 +52,17 @@ class SourceMenuButton extends ConsumerWidget {
         itemBuilder: (context) => [
           PopupMenuItem(
             value: _SourceAction.moveUp,
-            enabled: canMoveUp,
+            enabled: previousSourceId != null,
             child: Text(context.loc.sourcesMoveUp),
           ),
           PopupMenuItem(
             value: _SourceAction.moveDown,
-            enabled: canMoveDown,
+            enabled: nextSourceId != null,
             child: Text(context.loc.sourcesMoveDown),
           ),
           PopupMenuItem(
             value: inMore ? _SourceAction.moveToMain : _SourceAction.moveToMore,
+            enabled: !inMore || canMoveToMain,
             child: Text(
               inMore
                   ? context.loc.sourcesMoveToMain
@@ -85,14 +86,18 @@ class SourceMenuButton extends ConsumerWidget {
   ) async {
     switch (action) {
       case _SourceAction.moveUp:
+        final previous = previousSourceId;
+        if (previous == null) return;
         await ref
             .read(musicSourcesControllerProvider.notifier)
-            .moveSourceUp(source.id);
+            .swapSources(source.id, previous);
         break;
       case _SourceAction.moveDown:
+        final next = nextSourceId;
+        if (next == null) return;
         await ref
             .read(musicSourcesControllerProvider.notifier)
-            .moveSourceDown(source.id);
+            .swapSources(source.id, next);
         break;
       case _SourceAction.moveToMore:
         await ref
