@@ -243,11 +243,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：唯一的提示 widget，没有文案就不显示 |
+| `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：唯一的提示入口（门面），没有文案就不显示 |
+| `lib/shared/ui/hint_layer.dart` | `HintLayer` / `HintTrigger`：全应用只有一张提示卡片；触发器只说关键词、矩形与等待时间 |
 | `lib/app/theme/compact_theme.dart` | `tooltipTheme`：提示的样子——主题自己的一张卡片（`surfaceContainerHighest` + `onSurface` + `outline`，亮色是纸色卡片，暗色是深色卡片）、圆角、投影、停留时间 |
 
 - widget 不直接用 `Tooltip`；图标按钮用 `TuneTooltip(message: ..., child: IconButton(...))`，两者走同一份主题。
-- 提示站在 `RawTooltip` 上，卡片在 overlay 里读主题，所以主题切换时**还开着的提示也会当场换成新主题的卡片**。
+- `HintLayer` 挂在 navigator 上面（`lib/app/app.dart`），卡片在 overlay 里读主题，所以主题切换时**还开着的提示也会当场换成新主题的卡片**；行里只装触发器，不装 `OverlayPortal`。
+- 没有 `HintLayer` 的独立 widget 测试：`TuneTooltip` 退回 `RawTooltip`，行为一样。
 - 提示文案走 l10n，不要写死。
 
 ## 底部浮层（sheet）
