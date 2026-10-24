@@ -227,6 +227,9 @@ abstract final class SourceHealth {
 
   static double _output(SourceScanSummary? summary, int? expectedCount) {
     if (summary == null) return 0.5;
+    // A skipped scan means "not due yet", not "returned nothing". Treating
+    // it as zero would punish every source that is not refreshed this run.
+    if (summary.status == SourceScanStatus.skipped) return 0.5;
     final count = summary.songCount;
     if (count <= 0) return 0;
     // A source that asks for fifteen tracks and returns fifteen is at full

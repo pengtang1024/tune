@@ -480,6 +480,29 @@ void main() {
     expect(outputOf(10), 66);
   });
 
+  test('a skipped scan keeps output neutral', () {
+    final summary = SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.skipped,
+      songCount: 0,
+      scannedAt: DateTime.now(),
+      elapsed: Duration.zero,
+    );
+    final report = SourceHealth.report(
+      isLocal: false,
+      enabled: true,
+      supported: true,
+      configured: true,
+      summary: summary,
+      lastScanAt: summary.scannedAt,
+      autoScanInterval: const Duration(hours: 6),
+      scanTimeout: const Duration(seconds: 45),
+      expectedCount: 20,
+    );
+
+    expect(report.output, 50);
+  });
+
   test('activity stays neutral before the first heart', () {
     const songs = [
       Song(
