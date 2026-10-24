@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/discovery/presentation/discovery_pane.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
@@ -17,6 +18,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final path = state.uri.path;
       if (path == '/library' ||
+          path == '/discover' ||
           path == '/favorites' ||
           path == '/sources' ||
           path == '/settings' ||
@@ -39,7 +41,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 sectionPage(state, const LibraryPane()),
           ),
           GoRoute(
-
+            path: '/discover',
+            pageBuilder: (context, state) =>
+                sectionPage(state, const DiscoveryPane()),
+          ),
+          GoRoute(
             path: '/favorites',
             pageBuilder: (context, state) =>
                 sectionPage(state, const FavoritesPane()),

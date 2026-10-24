@@ -25,7 +25,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '04',
+      index: '05',
       eyebrow: context.loc.sourcesTitle,
       title: context.loc.sourcesHealthWeightsTitle,
       description: context.loc.settingsSourceHealthDescription,

@@ -901,5 +901,141 @@
   "settingsReplaceQueueOnClick": "單擊歌曲時取代播放佇列",
   "settingsReplaceQueueOnClickHint": "關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留",
   "settingsOnlyLikeOnDoubleClick": "雙擊時只標成喜歡",
-  "settingsOnlyLikeOnDoubleClickHint": "開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡"
+  "settingsOnlyLikeOnDoubleClickHint": "開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡",
+  "sidebarDiscover": "發現",
+  "discoverEyebrow": "發現",
+  "discoverTitle": "今天聽什麼",
+  "discoverSubtitle": "從你的音樂庫和喜歡的曲目裡挑的 · 只在本機計算",
+  "discoverRefresh": "換一批",
+  "discoverWhy": "怎麼推薦",
+  "discoverWhyTitle": "推薦怎麼來的",
+  "discoverWhyBody": "發現頁只用你的音樂庫、標心的曲目和不感興趣標記，在本機計算。不會上傳，也不會替你搜尋線上音源。",
+  "discoverWhyLibrary": "音樂庫裡的曲目和中繼資料",
+  "discoverWhyHearts": "你標了心的曲目",
+  "discoverWhyPrivacy": "只在你的電腦上計算，隨時可以清除",
+  "discoverWhyClose": "知道了",
+  "discoverSectionDailyMix": "今日混音",
+  "discoverSectionArtist": "因為你喜歡 {artist}",
+  "discoverSectionExplore": "換個口味：{genre}",
+  "discoverSectionExploreEra": "回到 {decade} 年代",
+  "discoverSectionExploreEars": "換換耳朵",
+  "discoverSectionFresh": "剛入庫",
+  "discoverSectionSource": "來自 {source}",
+  "discoverSectionFallback": "從你的音樂庫挑的",
+  "discoverDailyMixSubtitle": "熟悉的曲目 + 新發現 · {count} 首",
+  "discoverPlay": "播放",
+  "discoverAddAllShort": "加入佇列",
+  "discoverPlayAll": "播放全部",
+  "discoverAddAllToQueue": "全部加入佇列",
+  "discoverMoreActions": "更多操作",
+  "discoverDismiss": "不感興趣",
+  "discoverDismissed": "已減少「{title}」的推薦",
+  "discoverUndo": "復原",
+  "discoverAddedToQueue": "已加入 {count} 首",
+  "discoverAlreadyQueued": "這些歌已經在佇列裡了",
+  "discoverReasonFavorite": "你標了心",
+  "discoverReasonArtist": "因為你喜歡 {artist}",
+  "discoverReasonGenre": "你喜歡 {genre}",
+  "discoverReasonEra": "回到 {decade} 年代",
+  "discoverReasonFresh": "剛入庫",
+  "discoverReasonUnheard": "還沒聽過",
+  "discoverReasonSource": "來自 {source}",
+  "discoverReasonFallback": "從你的音樂庫挑的",
+  "discoverEmptyLibraryTitle": "音樂庫還是空的",
+  "discoverEmptyLibrarySubtitle": "掃描本機音樂或連接一個音源，發現頁才有東西可挑",
+  "discoverScanMusic": "掃描音樂",
+  "discoverConnectSources": "連接音源",
+  "discoverNoCandidatesTitle": "能推薦的都聽過了",
+  "discoverNoCandidatesSubtitle": "去音樂庫逛逛，或清掉不感興趣標記",
+  "discoverGoToLibrary": "去音樂庫",
+  "discoverClearFeedback": "清除不感興趣",
+  "discoverLoadFailed": "發現頁載入失敗",
+  "discoverLoadFailedHint": "音樂庫暫時讀不出來，稍後再試",
+  "discoverClearTitle": "清除推薦記錄？",
+  "discoverClearMessage": "會刪除不感興趣標記；喜歡、音樂庫和播放佇列不受影響。",
+  "discoverCleared": "推薦記錄已清除",
+  "@discoverSectionArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExplore": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExploreEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverSectionSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverDailyMixSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverDismissed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverAddedToQueue": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverReasonArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonGenre": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverReasonSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSectionDiscovery": "發現",
+  "settingsDiscoveryTitle": "發現頁",
+  "settingsDiscoveryDescription": "推薦只在本機計算，不上傳你的音樂庫",
+  "settingsDiscoveryPrivacy": "推薦只使用音樂庫、標心的曲目和不感興趣標記。",
+  "discoverFavoriteHint": "標幾首喜歡的歌，推薦會更準"
 }

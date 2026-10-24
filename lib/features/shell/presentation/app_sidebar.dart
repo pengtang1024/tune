@@ -68,6 +68,15 @@ class AppSidebar extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       _NavItem(
+                        icon: Icons.explore_rounded,
+                        label: context.loc.sidebarDiscover,
+                        path: '/discover',
+                        currentPath: currentPath,
+                        compact: compact,
+                        onNavigate: onNavigate,
+                      ),
+                      const SizedBox(height: 4),
+                      _NavItem(
                         icon: Icons.library_music_rounded,
                         label: context.loc.libraryTitle,
                         path: '/library',

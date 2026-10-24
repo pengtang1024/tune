@@ -166,7 +166,7 @@ void main() {
   ) async {
     await tester.pumpWidget(sidebar(compact: true));
 
-    expect(find.byType(RawTooltip), findsNWidgets(4));
+    expect(find.byType(RawTooltip), findsNWidgets(5));
   });
 
   testWidgets('the hint follows the theme of the app', (tester) async {

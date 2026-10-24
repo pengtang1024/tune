@@ -1715,6 +1715,208 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
+
+  @override
+  String get sidebarDiscover => '发现';
+
+  @override
+  String get discoverEyebrow => '发现';
+
+  @override
+  String get discoverTitle => '今天听什么';
+
+  @override
+  String get discoverSubtitle => '从你的音乐库和喜欢的曲目里挑的 · 只在本机计算';
+
+  @override
+  String get discoverRefresh => '换一批';
+
+  @override
+  String get discoverWhy => '怎么推荐';
+
+  @override
+  String get discoverWhyTitle => '推荐怎么来的';
+
+  @override
+  String get discoverWhyBody =>
+      '发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。';
+
+  @override
+  String get discoverWhyLibrary => '音乐库里的曲目和元数据';
+
+  @override
+  String get discoverWhyHearts => '你标了心的曲目';
+
+  @override
+  String get discoverWhyPrivacy => '只在你的电脑上计算，随时可以清除';
+
+  @override
+  String get discoverWhyClose => '知道了';
+
+  @override
+  String get discoverSectionDailyMix => '今日混音';
+
+  @override
+  String discoverSectionArtist(String artist) {
+    return '因为你喜欢 $artist';
+  }
+
+  @override
+  String discoverSectionExplore(String genre) {
+    return '换个口味：$genre';
+  }
+
+  @override
+  String discoverSectionExploreEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverSectionExploreEars => '换换耳朵';
+
+  @override
+  String get discoverSectionFresh => '刚入库';
+
+  @override
+  String discoverSectionSource(String source) {
+    return '来自 $source';
+  }
+
+  @override
+  String get discoverSectionFallback => '从你的音乐库挑的';
+
+  @override
+  String discoverDailyMixSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '熟悉的曲目 + 新发现 · $countString 首';
+  }
+
+  @override
+  String get discoverPlay => '播放';
+
+  @override
+  String get discoverAddAllShort => '加入队列';
+
+  @override
+  String get discoverPlayAll => '播放全部';
+
+  @override
+  String get discoverAddAllToQueue => '全部加入队列';
+
+  @override
+  String get discoverMoreActions => '更多操作';
+
+  @override
+  String get discoverDismiss => '不感兴趣';
+
+  @override
+  String discoverDismissed(String title) {
+    return '已减少「$title」的推荐';
+  }
+
+  @override
+  String get discoverUndo => '撤销';
+
+  @override
+  String discoverAddedToQueue(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首';
+  }
+
+  @override
+  String get discoverAlreadyQueued => '这些歌已经在队列里了';
+
+  @override
+  String get discoverReasonFavorite => '你标了心';
+
+  @override
+  String discoverReasonArtist(String artist) {
+    return '因为你喜欢 $artist';
+  }
+
+  @override
+  String discoverReasonGenre(String genre) {
+    return '你喜欢 $genre';
+  }
+
+  @override
+  String discoverReasonEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverReasonFresh => '刚入库';
+
+  @override
+  String get discoverReasonUnheard => '还没听过';
+
+  @override
+  String discoverReasonSource(String source) {
+    return '来自 $source';
+  }
+
+  @override
+  String get discoverReasonFallback => '从你的音乐库挑的';
+
+  @override
+  String get discoverEmptyLibraryTitle => '音乐库还是空的';
+
+  @override
+  String get discoverEmptyLibrarySubtitle => '扫描本地音乐或连接一个音源，发现页才有东西可挑';
+
+  @override
+  String get discoverScanMusic => '扫描音乐';
+
+  @override
+  String get discoverConnectSources => '连接音源';
+
+  @override
+  String get discoverNoCandidatesTitle => '能推荐的都听过了';
+
+  @override
+  String get discoverNoCandidatesSubtitle => '去音乐库逛逛，或清掉不感兴趣标记';
+
+  @override
+  String get discoverGoToLibrary => '去音乐库';
+
+  @override
+  String get discoverClearFeedback => '清除不感兴趣';
+
+  @override
+  String get discoverLoadFailed => '发现页加载失败';
+
+  @override
+  String get discoverLoadFailedHint => '音乐库暂时读不出来，稍后再试';
+
+  @override
+  String get discoverClearTitle => '清除推荐记录？';
+
+  @override
+  String get discoverClearMessage => '会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。';
+
+  @override
+  String get discoverCleared => '推荐记录已清除';
+
+  @override
+  String get settingsSectionDiscovery => '发现';
+
+  @override
+  String get settingsDiscoveryTitle => '发现页';
+
+  @override
+  String get settingsDiscoveryDescription => '推荐只在本机计算，不上传你的音乐库';
+
+  @override
+  String get settingsDiscoveryPrivacy => '推荐只使用音乐库、标心的曲目和不感兴趣标记。';
+
+  @override
+  String get discoverFavoriteHint => '标几首喜欢的歌，推荐会更准';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3428,6 +3630,208 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
+
+  @override
+  String get sidebarDiscover => '发现';
+
+  @override
+  String get discoverEyebrow => '发现';
+
+  @override
+  String get discoverTitle => '今天听什么';
+
+  @override
+  String get discoverSubtitle => '从你的音乐库和喜欢的曲目里挑的 · 只在本机计算';
+
+  @override
+  String get discoverRefresh => '换一批';
+
+  @override
+  String get discoverWhy => '怎么推荐';
+
+  @override
+  String get discoverWhyTitle => '推荐怎么来的';
+
+  @override
+  String get discoverWhyBody =>
+      '发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。';
+
+  @override
+  String get discoverWhyLibrary => '音乐库里的曲目和元数据';
+
+  @override
+  String get discoverWhyHearts => '你标了心的曲目';
+
+  @override
+  String get discoverWhyPrivacy => '只在你的电脑上计算，随时可以清除';
+
+  @override
+  String get discoverWhyClose => '知道了';
+
+  @override
+  String get discoverSectionDailyMix => '今日混音';
+
+  @override
+  String discoverSectionArtist(String artist) {
+    return '因为你喜欢 $artist';
+  }
+
+  @override
+  String discoverSectionExplore(String genre) {
+    return '换个口味：$genre';
+  }
+
+  @override
+  String discoverSectionExploreEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverSectionExploreEars => '换换耳朵';
+
+  @override
+  String get discoverSectionFresh => '刚入库';
+
+  @override
+  String discoverSectionSource(String source) {
+    return '来自 $source';
+  }
+
+  @override
+  String get discoverSectionFallback => '从你的音乐库挑的';
+
+  @override
+  String discoverDailyMixSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '熟悉的曲目 + 新发现 · $countString 首';
+  }
+
+  @override
+  String get discoverPlay => '播放';
+
+  @override
+  String get discoverAddAllShort => '加入队列';
+
+  @override
+  String get discoverPlayAll => '播放全部';
+
+  @override
+  String get discoverAddAllToQueue => '全部加入队列';
+
+  @override
+  String get discoverMoreActions => '更多操作';
+
+  @override
+  String get discoverDismiss => '不感兴趣';
+
+  @override
+  String discoverDismissed(String title) {
+    return '已减少「$title」的推荐';
+  }
+
+  @override
+  String get discoverUndo => '撤销';
+
+  @override
+  String discoverAddedToQueue(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首';
+  }
+
+  @override
+  String get discoverAlreadyQueued => '这些歌已经在队列里了';
+
+  @override
+  String get discoverReasonFavorite => '你标了心';
+
+  @override
+  String discoverReasonArtist(String artist) {
+    return '因为你喜欢 $artist';
+  }
+
+  @override
+  String discoverReasonGenre(String genre) {
+    return '你喜欢 $genre';
+  }
+
+  @override
+  String discoverReasonEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverReasonFresh => '刚入库';
+
+  @override
+  String get discoverReasonUnheard => '还没听过';
+
+  @override
+  String discoverReasonSource(String source) {
+    return '来自 $source';
+  }
+
+  @override
+  String get discoverReasonFallback => '从你的音乐库挑的';
+
+  @override
+  String get discoverEmptyLibraryTitle => '音乐库还是空的';
+
+  @override
+  String get discoverEmptyLibrarySubtitle => '扫描本地音乐或连接一个音源，发现页才有东西可挑';
+
+  @override
+  String get discoverScanMusic => '扫描音乐';
+
+  @override
+  String get discoverConnectSources => '连接音源';
+
+  @override
+  String get discoverNoCandidatesTitle => '能推荐的都听过了';
+
+  @override
+  String get discoverNoCandidatesSubtitle => '去音乐库逛逛，或清掉不感兴趣标记';
+
+  @override
+  String get discoverGoToLibrary => '去音乐库';
+
+  @override
+  String get discoverClearFeedback => '清除不感兴趣';
+
+  @override
+  String get discoverLoadFailed => '发现页加载失败';
+
+  @override
+  String get discoverLoadFailedHint => '音乐库暂时读不出来，稍后再试';
+
+  @override
+  String get discoverClearTitle => '清除推荐记录？';
+
+  @override
+  String get discoverClearMessage => '会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。';
+
+  @override
+  String get discoverCleared => '推荐记录已清除';
+
+  @override
+  String get settingsSectionDiscovery => '发现';
+
+  @override
+  String get settingsDiscoveryTitle => '发现页';
+
+  @override
+  String get settingsDiscoveryDescription => '推荐只在本机计算，不上传你的音乐库';
+
+  @override
+  String get settingsDiscoveryPrivacy => '推荐只使用音乐库、标心的曲目和不感兴趣标记。';
+
+  @override
+  String get discoverFavoriteHint => '标几首喜欢的歌，推荐会更准';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5141,4 +5545,206 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡';
+
+  @override
+  String get sidebarDiscover => '發現';
+
+  @override
+  String get discoverEyebrow => '發現';
+
+  @override
+  String get discoverTitle => '今天聽什麼';
+
+  @override
+  String get discoverSubtitle => '從你的音樂庫和喜歡的曲目裡挑的 · 只在本機計算';
+
+  @override
+  String get discoverRefresh => '換一批';
+
+  @override
+  String get discoverWhy => '怎麼推薦';
+
+  @override
+  String get discoverWhyTitle => '推薦怎麼來的';
+
+  @override
+  String get discoverWhyBody =>
+      '發現頁只用你的音樂庫、標心的曲目和不感興趣標記，在本機計算。不會上傳，也不會替你搜尋線上音源。';
+
+  @override
+  String get discoverWhyLibrary => '音樂庫裡的曲目和中繼資料';
+
+  @override
+  String get discoverWhyHearts => '你標了心的曲目';
+
+  @override
+  String get discoverWhyPrivacy => '只在你的電腦上計算，隨時可以清除';
+
+  @override
+  String get discoverWhyClose => '知道了';
+
+  @override
+  String get discoverSectionDailyMix => '今日混音';
+
+  @override
+  String discoverSectionArtist(String artist) {
+    return '因為你喜歡 $artist';
+  }
+
+  @override
+  String discoverSectionExplore(String genre) {
+    return '換個口味：$genre';
+  }
+
+  @override
+  String discoverSectionExploreEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverSectionExploreEars => '換換耳朵';
+
+  @override
+  String get discoverSectionFresh => '剛入庫';
+
+  @override
+  String discoverSectionSource(String source) {
+    return '來自 $source';
+  }
+
+  @override
+  String get discoverSectionFallback => '從你的音樂庫挑的';
+
+  @override
+  String discoverDailyMixSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '熟悉的曲目 + 新發現 · $countString 首';
+  }
+
+  @override
+  String get discoverPlay => '播放';
+
+  @override
+  String get discoverAddAllShort => '加入佇列';
+
+  @override
+  String get discoverPlayAll => '播放全部';
+
+  @override
+  String get discoverAddAllToQueue => '全部加入佇列';
+
+  @override
+  String get discoverMoreActions => '更多操作';
+
+  @override
+  String get discoverDismiss => '不感興趣';
+
+  @override
+  String discoverDismissed(String title) {
+    return '已減少「$title」的推薦';
+  }
+
+  @override
+  String get discoverUndo => '復原';
+
+  @override
+  String discoverAddedToQueue(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首';
+  }
+
+  @override
+  String get discoverAlreadyQueued => '這些歌已經在佇列裡了';
+
+  @override
+  String get discoverReasonFavorite => '你標了心';
+
+  @override
+  String discoverReasonArtist(String artist) {
+    return '因為你喜歡 $artist';
+  }
+
+  @override
+  String discoverReasonGenre(String genre) {
+    return '你喜歡 $genre';
+  }
+
+  @override
+  String discoverReasonEra(int decade) {
+    return '回到 $decade 年代';
+  }
+
+  @override
+  String get discoverReasonFresh => '剛入庫';
+
+  @override
+  String get discoverReasonUnheard => '還沒聽過';
+
+  @override
+  String discoverReasonSource(String source) {
+    return '來自 $source';
+  }
+
+  @override
+  String get discoverReasonFallback => '從你的音樂庫挑的';
+
+  @override
+  String get discoverEmptyLibraryTitle => '音樂庫還是空的';
+
+  @override
+  String get discoverEmptyLibrarySubtitle => '掃描本機音樂或連接一個音源，發現頁才有東西可挑';
+
+  @override
+  String get discoverScanMusic => '掃描音樂';
+
+  @override
+  String get discoverConnectSources => '連接音源';
+
+  @override
+  String get discoverNoCandidatesTitle => '能推薦的都聽過了';
+
+  @override
+  String get discoverNoCandidatesSubtitle => '去音樂庫逛逛，或清掉不感興趣標記';
+
+  @override
+  String get discoverGoToLibrary => '去音樂庫';
+
+  @override
+  String get discoverClearFeedback => '清除不感興趣';
+
+  @override
+  String get discoverLoadFailed => '發現頁載入失敗';
+
+  @override
+  String get discoverLoadFailedHint => '音樂庫暫時讀不出來，稍後再試';
+
+  @override
+  String get discoverClearTitle => '清除推薦記錄？';
+
+  @override
+  String get discoverClearMessage => '會刪除不感興趣標記；喜歡、音樂庫和播放佇列不受影響。';
+
+  @override
+  String get discoverCleared => '推薦記錄已清除';
+
+  @override
+  String get settingsSectionDiscovery => '發現';
+
+  @override
+  String get settingsDiscoveryTitle => '發現頁';
+
+  @override
+  String get settingsDiscoveryDescription => '推薦只在本機計算，不上傳你的音樂庫';
+
+  @override
+  String get settingsDiscoveryPrivacy => '推薦只使用音樂庫、標心的曲目和不感興趣標記。';
+
+  @override
+  String get discoverFavoriteHint => '標幾首喜歡的歌，推薦會更準';
 }

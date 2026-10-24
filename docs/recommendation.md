@@ -1,6 +1,7 @@
 # 发现与推荐功能设计
 
-> 设计稿，未实施。评审通过后再按第 9 节分阶段落地。
+> 实施状态（2026-10-24）：M1–M3 已落地——纯领域层、发现页、反馈与清除；
+> M4 的播放记录与设置开关尚未实现。
 > 最后更新：2026-10-24。
 >
 > 上位文档：[架构契约](architecture.md)、[音源设计](../需求/音源设计.md)、
@@ -250,7 +251,7 @@
 
 | 项 | 类型 | 默认 | 说明 |
 | --- | --- | --- | --- |
-| 本地播放记录 | 开关 | 关 | 只保存在本机，用来改善推荐；关闭后不再记录，推荐仍可用 |
+| 本地播放记录 | 开关 | 关 | M4 才实现；只保存在本机，用来改善推荐 |
 | 清除推荐记录 | 按钮 | — | 删除播放记录和「不感兴趣」标记；不影响喜欢、音乐库、播放队列 |
 
 - 开关文案必须写清「只在本机」「不影响喜欢」。
@@ -296,7 +297,7 @@
 | 喜欢的曲目中的年代 | `Song.year` | 由喜欢推导，1.0 |
 | 不感兴趣 | `DiscoveryFeedbackStore` | 强负，直接排除 30 天 |
 
-#### 可选信号（默认关闭）
+#### 可选信号（默认关闭，M4 才实现）
 
 | 信号 | 来源 | 强度 |
 | --- | --- | --- |
@@ -528,27 +529,40 @@ class RecommendationReason {
 ```text
 lib/features/discovery/
 ├── domain/
-│   ├── discovery_state.dart          # 页面状态：加载 / 分段 / 错误
-│   ├── discovery_section.dart        # 分段模型
-│   ├── recommended_track.dart        # 曲目 + 分数 + 理由
-│   ├── recommendation_reason.dart    # 结构化理由
-│   ├── taste_profile.dart            # 画像构建（纯函数）
-│   ├── recommendation_engine.dart    # 打分、选曲、去重（纯函数）
-│   └── track_listening.dart          # 聚合播放信号模型
+│   ├── discovery_state.dart             # 页面状态：加载 / 分段 / 错误
+│   ├── discovery_section.dart           # 分段模型
+│   ├── recommended_track.dart           # 曲目 + 分数 + 理由
+│   ├── recommendation_reason.dart       # 结构化理由
+│   ├── recommendation_candidate.dart    # 候选与过滤
+│   ├── recommendation_scoring.dart      # 打分、画像权重、稳定哈希
+│   ├── recommendation_selection.dart    # 去重、歌手/专辑上限、排序
+│   ├── recommendation_engine.dart       # 总装，一次排序后交给各段
+│   ├── recommendation_daily_mix.dart    # 今日混音 + 歌手分段
+│   ├── recommendation_explore_section.dart
+│   ├── recommendation_extra_sections.dart # 刚入库 / 来源 / 兜底
+│   └── taste_profile.dart               # 画像构建（纯函数）
 ├── application/
-│   ├── discovery_controller.dart     # 编排输入、调用引擎、状态
-│   └── discovery_signal_observer.dart# 应用级播放观察器（可选）
+│   ├── discovery_controller.dart        # 编排输入、调用引擎、状态
+│   └── discovery_providers.dart         # 反馈存储与引擎的 provider
 ├── data/
-│   ├── listening_signal_store.dart   # 播放记录 JSON
-│   └── discovery_feedback_store.dart # 不感兴趣 JSON
+│   └── discovery_feedback_store.dart    # 不感兴趣 JSON
 └── presentation/
-    ├── discovery_pane.dart           # 页面骨架与输入装配
-    ├── discovery_section_view.dart   # 分段标题 + 横向列表
-    ├── daily_mix_card.dart           # 今日混音大卡
-    ├── recommendation_card.dart      # 方形曲目卡
-    ├── discovery_reason_label.dart   # 理由 → 文案
-    └── discovery_empty_state.dart    # 空 / 无候选 / 失败
+    ├── discovery_pane.dart              # 页面骨架与输入装配
+    ├── discovery_header.dart            # 页头
+    ├── discovery_actions.dart           # 播放 / 入队 / 反馈 / 清除
+    ├── discovery_empty_state.dart       # 空状态外壳
+    ├── discovery_empty_views.dart       # 空库 / 无候选 / 失败
+    ├── discovery_info_sheet.dart        # 「怎么推荐」浮层
+    ├── discovery_section_view.dart      # 分段标题 + 横向列表
+    ├── daily_mix_card.dart              # 今日混音大卡
+    ├── recommendation_card.dart         # 方形曲目卡
+    ├── recommendation_card_menu.dart    # 卡片菜单与理由图标
+    └── discovery_reason_label.dart      # 理由 → 文案
 ```
+
+M4 的 `discovery_signal_observer.dart`、`listening_signal_store.dart` 与
+`track_listening.dart` 尚未创建；等 M4 再按本节的目录补上。
+
 
 新增文件都控制在 200 行内；`discovery_pane.dart` 只做装配，分段和卡片各自
 拆文件。`settings_discovery_card.dart` 放在设置 feature 下，避免设置页
@@ -558,14 +572,14 @@ import 发现页的 presentation。
 
 ```text
 DiscoveryPane
-  └── DiscoveryController
-        ├── LibraryController        （只读）
-        ├── FavoritesController      （只读）
-        ├── SettingsController       （只读）
-        ├── MusicSourcesController   （只读来源 id 顺序）
-        ├── ListeningSignalStore     （可选，只读）
-        ├── DiscoveryFeedbackStore   （读写反馈）
-        └── RecommendationEngine     （纯函数）
+  ├── DiscoveryController
+  │     ├── LibraryController        （只读）
+  │     ├── FavoritesController      （只读）
+  │     ├── MusicSourcesController   （只读来源 id 顺序）
+  │     ├── DiscoveryFeedbackStore   （读写反馈）
+  │     └── RecommendationEngine     （纯函数）
+  ├── SettingsController             （双击只标心）
+  └── ListPlayback / PlaybackController（播放与入队）
 
 DiscoverySignalObserver
   ├── PlaybackController             （只读公开状态）
@@ -595,8 +609,8 @@ RecommendationEngine
 | 喜欢 | `FavoritesController` | 不变 |
 | 音乐库 | `LibraryController` | 不变 |
 | 播放 / 队列 | `PlaybackController` | 不变 |
-| 发现开关 | `SettingsController` | 持久化 |
 | 来源顺序 | `MusicSourcesController` | 不变，只读 |
+| 发现页开关 | 无 | 发现页始终在导航里；M4 只加播放记录开关 |
 
 发现页不把 `Song` 列表另存一份到磁盘；分段是派生视图，不是事实来源。
 
@@ -606,7 +620,7 @@ RecommendationEngine
 与在线搜索的临时面板同一模式：
 
 - `build` 读取 `LibraryController` 的 `(isLoading, hasValue, songs)`、
-  `FavoritesState.ids`、来源 id 顺序、设置开关和反馈存储，构建画像并计算分段。
+  `FavoritesState.ids`、来源 id 顺序和反馈存储，构建画像并计算分段。
 - 用 `select` 只订阅需要的切片，避免扫描进度每变一次就重算：
   `ref.watch(libraryControllerProvider.select((v) => (v.isLoading, v.valueOrNull?.songs)))`。
 - 不 watch 整个 `MusicSourcesController`；只 select 来源 id 的当前顺序
@@ -619,7 +633,7 @@ RecommendationEngine
 - 不持有 `BuildContext`，不读 `context.loc`；错误用 `DiscoveryFailure`
   枚举，推荐理由用结构化模型，翻译全部留给 presentation。
 
-### 7.5 播放观察器
+### 7.5 播放观察器（M4，未实现）
 
 - `AppInitializer` 在持久化、播放器初始化后启动
   `discoverySignalObserverProvider`；它内部 `ref.listen` 设置开关，
@@ -634,7 +648,7 @@ RecommendationEngine
 
 | Key | 内容 | 谁写 | 何时 |
 | --- | --- | --- | --- |
-| `discovery_listening_v1` | 聚合播放记录（可选） | `ListeningSignalStore` | 观察器结算后 |
+| `discovery_listening_v1` | 聚合播放记录（M4，未实现） | `ListeningSignalStore` | 观察器结算后 |
 | `discovery_feedback_v1` | 不感兴趣标记 | `DiscoveryFeedbackStore` | 读者点「不感兴趣」/ 撤销 |
 | `discovery_use_listening_history` | 开关 | `SettingsController` | 设置页 |
 | `discovery_hint_dismissed` | 是否关掉「开启记录」提示 | `SettingsController` | 读者点关闭 |
@@ -646,8 +660,7 @@ RecommendationEngine
 ### 7.7 前置修正：`dateAdded` 的语义
 
 当前 `dateAdded` 每次扫描都会变成 `DateTime.now()`，所以它不能表达
-「首次入库」。推荐里的「刚入库」依赖这个语义。建议在实现发现页之前做一次
-小修正：
+「首次入库」。推荐里的「刚入库」依赖这个语义。已在发现页实现时一并修正：
 
 - 在 `LibraryController` 把扫描结果写回库时，按 `uri` 取上一版曲目：
   同一个 `uri` 保留**较早**的 `dateAdded`；新曲目才用本次扫描的时间。
@@ -660,14 +673,14 @@ RecommendationEngine
 开始保留；不会凭空补出几年前的入库时间。这比继续每天重置要准确，文档和
 详情面板都不承诺更早的时间。
 
-如果评审不想动音乐库，发现页 v1 就**不出现「刚入库」分段**，其余分段不受影响。
-这是一个可单独决策的前置项，不阻塞发现页主体。
+如果以后有人想撤回这次修正，发现页可以关掉「刚入库」分段，其余分段不受影响。
 
 ### 7.8 性能
 
-- 打分是 O(n) 一次遍历 + 每段 O(k·n) 的贪心选择；k 是分段数量，n 是库大小。
-  目标：1 万首曲目在桌面端 100ms 内算完；先用同步计算，实测超限再考虑
-  `Isolate.run`，不提前引入并发。
+- 打分是 O(n) 一次遍历 + 一次全量排序 + 每段的线性筛选；k 是分段数量，
+  n 是库大小。当前测试 VM 的合成基准：1 千首约 33ms、2 万首约 240ms、
+  5 万首约 640ms；桌面 release 构建会更快。先用同步计算，超过 2 万首的库
+  再考虑 `Isolate.run`，不提前引入并发。
 - 页面只在打开时计算；离开后 `AutoDispose` 释放。
 - 不做后台轮询，不监听扫描进度，不为推荐单独触发网络。
 - 卡片封面走现有 `ArtworkThumb` 的缓存；横向列表用 `ListView.builder`。
@@ -733,41 +746,21 @@ class RecommendationEngine {
 
 ### 9.1 新增文件
 
-```text
-lib/features/discovery/domain/discovery_state.dart
-lib/features/discovery/domain/discovery_section.dart
-lib/features/discovery/domain/recommended_track.dart
-lib/features/discovery/domain/recommendation_reason.dart
-lib/features/discovery/domain/taste_profile.dart
-lib/features/discovery/domain/recommendation_engine.dart
-lib/features/discovery/domain/track_listening.dart
-lib/features/discovery/application/discovery_controller.dart
-lib/features/discovery/application/discovery_signal_observer.dart
-lib/features/discovery/data/listening_signal_store.dart
-lib/features/discovery/data/discovery_feedback_store.dart
-lib/features/discovery/presentation/discovery_pane.dart
-lib/features/discovery/presentation/discovery_section_view.dart
-lib/features/discovery/presentation/daily_mix_card.dart
-lib/features/discovery/presentation/recommendation_card.dart
-lib/features/discovery/presentation/discovery_reason_label.dart
-lib/features/discovery/presentation/discovery_empty_state.dart
-lib/features/settings/presentation/settings_discovery_card.dart
-```
-
+实现文件以第 7.1 节的目录为准。M1–M3 新增了领域层、页面、反馈存储与设置卡；
+M4 的播放记录观察器、存储与设置开关尚未创建。
 ### 9.2 修改文件
 
 | 文件 | 改动 |
 | --- | --- |
 | `lib/app/router/app_router.dart` | 注册 `/discover`，加入合法路径 |
 | `lib/features/shell/presentation/app_sidebar.dart` | 「浏览」分组加「发现」 |
-| `lib/features/settings/domain/settings_state.dart` | 发现相关偏好（播放记录开关、提示是否关闭） |
-| `lib/features/settings/application/settings_controller.dart` | 读写开关 |
+| `lib/features/settings/presentation/settings_discovery_card.dart` | 新增「发现」设置卡：清除反馈 |
 | `lib/features/settings/presentation/settings_pane.dart` | 插入发现设置卡 |
-| `lib/config/app_initializer.dart` | 启动可选播放观察器 |
-| `lib/l10n/app_zh_CN.arb` 等四份 + 生成产物 | 发现页文案 |
-| `lib/features/library/...`（可选） | 第 7.7 节 `dateAdded` 修正 |
-| `docs/architecture.md`（实现后） | 状态归属与持久化表补一行 |
-| `README.md` / `README_en.md`（实现后） | 功能列表补「发现」 |
+| `lib/features/settings/presentation/settings_cards.dart` 等 | 设置卡序号 01–07 顺延 |
+| `lib/l10n/app_zh_CN.arb` 等四份 + 生成产物 | 发现页与设置卡文案 |
+| `lib/features/library/application/library_controller.dart` | 第 7.7 节 `dateAdded` 修正 |
+| `docs/architecture.md` | 状态归属与持久化表补行 |
+| `README.md` / `README_en.md` / `CHANGELOG.md` | 功能列表与更新记录 |
 
 `PlaybackController`、`LibraryController`、`FavoritesController`、
 `MusicSourceService` 在 v1 不需要改（`dateAdded` 修正除外）。
@@ -776,11 +769,11 @@ lib/features/settings/presentation/settings_discovery_card.dart
 
 | 阶段 | 内容 | 可验证结果 |
 | --- | --- | --- |
-| M0 | 前置决策 + `dateAdded` 修正（可选） | 连扫两次时间不变；测试通过 |
-| M1 | 纯领域层：画像、打分、分段、理由、去重 | 引擎单测全绿，不依赖 Flutter |
-| M2 | 发现页只读版：路由、侧栏、卡片、空状态、播放/入队 | 能看、能播、能加入队列；900/760 布局不溢出 |
-| M3 | 反馈：不感兴趣、撤销、清除 | 反馈落盘，重启后仍生效 |
-| M4 | 可选播放记录 + 设置卡 + 提示 | 关闭时不写；开启后理由出现「常听」 |
+| M0 ✅ | `dateAdded` 修正 | 连扫两次时间不变；测试通过 |
+| M1 ✅ | 纯领域层：画像、打分、分段、理由、去重 | 引擎单测全绿，不依赖 Flutter |
+| M2 ✅ | 发现页只读版：路由、侧栏、卡片、空状态、播放/入队 | 能看、能播、能加入队列；900/760 布局不溢出 |
+| M3 ✅ | 反馈：不感兴趣、撤销、清除 | 反馈落盘，重启后仍生效 |
+| M4 ⏳ | 可选播放记录 + 设置开关 | 关闭时不写；开启后理由出现「常听」 |
 | M5（后续） | 显式「在线找更多这位歌手」 | 只在读者点按钮时联网；不自动 |
 
 M1/M2 是可运行的骨架；M3 是推荐可用的必要条件（否则无法纠正），
@@ -807,11 +800,12 @@ M1/M2 是可运行的骨架；M3 是推荐可用的必要条件（否则无法�
 - 归一化、空信号、负分夹到 0；
 - 喜欢但不在库里的 uri 不参与。
 
-**存储** `test/services/listening_signal_store_test.dart` /
-`discovery_feedback_store_test.dart`：
+**存储** `test/services/discovery_feedback_store_test.dart`：
 
-- 读写往返、版本、损坏 JSON、过期清理、2000 条上限；
-- 开关关闭时观察器不写；清除后为空。
+- 读写往返、版本、损坏 JSON、过期清理；
+- 撤销与清除后为空。
+
+M4 再补 `listening_signal_store_test.dart` 的 2000 条上限与观察器开关测试。
 
 **控制器** `test/app/discovery_controller_test.dart`：
 
@@ -846,7 +840,8 @@ M1/M2 是可运行的骨架；M3 是推荐可用的必要条件（否则无法�
 5. 关闭播放记录后不产生新记录；清除后推荐回到只依据喜欢和元数据。
 6. 打开发现页不额外请求音源接口（v1）；远程封面仍按现有缓存策略加载，
    点击远程曲目播放时才会用到网络。
-7. 1 万首库的推荐计算在桌面端 100ms 量级；页面滚动不卡顿。
+7. 1 万首库的推荐计算在桌面端保持百毫秒量级；页面滚动不卡顿。超过 2 万首
+   再考虑 isolate，不在 v1 提前引入并发。
 8. `flutter analyze` + `flutter test` 全绿，四个语言环境文案齐全。
 
 ## 10. 风险与回退

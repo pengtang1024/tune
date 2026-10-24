@@ -1,0 +1,271 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/discovery_section.dart';
+import 'package:tune/features/discovery/domain/recommendation_engine.dart';
+import 'package:tune/features/discovery/domain/recommendation_reason.dart';
+import 'package:tune/features/discovery/domain/taste_profile.dart';
+
+void main() {
+  final now = DateTime(2026, 10, 24, 12);
+  final freshStamp = now.millisecondsSinceEpoch;
+  final oldStamp = now
+      .subtract(const Duration(days: 90))
+      .millisecondsSinceEpoch;
+
+  Song song(
+    int id, {
+    String artist = 'Artist',
+    String album = 'Album',
+    String? genre,
+    List<String>? genres,
+    int? year,
+    String? sourceId,
+    int dateAdded = 0,
+  }) {
+    return Song(
+      id: id,
+      title: 'Song $id',
+      artist: artist,
+      album: album,
+      genre: genre,
+      genres: genres,
+      year: year,
+      uri: sourceId == null ? '/music/$id.mp3' : 'tune://$sourceId/$id',
+      sourceId: sourceId,
+      externalId: sourceId == null ? null : '$id',
+      streamUrl: sourceId == null ? null : 'https://example.com/$id.mp3',
+      dateAdded: dateAdded,
+    );
+  }
+
+  DiscoveryOutput recommend({
+    required List<Song> library,
+    Set<String> favorites = const {},
+    Set<String> dismissed = const {},
+    List<String> sourceOrder = const [],
+    bool allowFresh = false,
+    int salt = 0,
+  }) {
+    return const RecommendationEngine().recommend(
+      library: library,
+      favoriteUris: favorites,
+      profile: TasteProfile.from(library: library, favoriteUris: favorites),
+      dismissedUris: dismissed,
+      sourceOrder: sourceOrder,
+      dateKey: '2026-10-24',
+      refreshSalt: salt,
+      allowFresh: allowFresh,
+      now: now,
+    );
+  }
+
+  test('an empty library has no sections', () {
+    final output = recommend(library: const []);
+    expect(output.sections, isEmpty);
+  });
+
+  test('a library without hearts has a mix but no artist shelf', () {
+    final library = [
+      for (var index = 0; index < 30; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final output = recommend(library: library);
+
+    expect(output.sections.first.kind, DiscoverySectionKind.dailyMix);
+    expect(
+      output.sections.any(
+        (section) => section.kind == DiscoverySectionKind.artist,
+      ),
+      isFalse,
+    );
+    expect(
+      output.sections.any(
+        (section) => section.kind == DiscoverySectionKind.explore,
+      ),
+      isTrue,
+    );
+  });
+
+  test('a strong artist gets a shelf of their own', () {
+    final library = [
+      for (var index = 0; index < 2; index++)
+        song(index, artist: 'Nujabes', album: 'Favorite $index'),
+      for (var index = 2; index < 7; index++)
+        song(index, artist: 'Nujabes', album: 'Album $index'),
+    ];
+    final output = recommend(
+      library: library,
+      favorites: {'/music/0.mp3', '/music/1.mp3'},
+    );
+
+    final artistSection = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.artist,
+    );
+    expect(artistSection.reason.kind, RecommendationReasonKind.artist);
+    expect(artistSection.reason.artist, 'Nujabes');
+    expect(artistSection.tracks.length, greaterThanOrEqualTo(3));
+    expect(
+      artistSection.tracks.every((track) => track.song.artist == 'Nujabes'),
+      isTrue,
+    );
+    expect(artistSection.tracks.any((track) => track.fromFavorites), isFalse);
+  });
+
+  test('a library of only hearts still gives a mix', () {
+    final library = [
+      for (var index = 0; index < 6; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final favorites = {for (final item in library) item.uri};
+    final output = recommend(library: library, favorites: favorites);
+
+    final daily = output.sections.first;
+    expect(daily.kind, DiscoverySectionKind.dailyMix);
+    expect(daily.reason.kind, RecommendationReasonKind.favorite);
+    expect(daily.tracks.every((track) => track.fromFavorites), isTrue);
+  });
+
+  test('dismissed and live tracks are left out', () {
+    final library = [
+      for (var index = 0; index < 6; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+      const Song(
+        id: 99,
+        title: 'Live',
+        artist: 'Live Artist',
+        uri: '/music/live.mp3',
+        isLiveStream: true,
+      ),
+    ];
+    final output = recommend(library: library, dismissed: {'/music/0.mp3'});
+    final uris = {
+      for (final section in output.sections)
+        for (final track in section.tracks) track.song.uri,
+    };
+
+    expect(uris, isNot(contains('/music/0.mp3')));
+    expect(uris, isNot(contains('/music/live.mp3')));
+  });
+
+  test('the same day and the same input keep the order', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final first = recommend(library: library);
+    final second = recommend(library: library);
+
+    expect(
+      first.sections.first.tracks.map((track) => track.song.uri),
+      second.sections.first.tracks.map((track) => track.song.uri),
+    );
+
+    final refreshed = recommend(library: library, salt: 1);
+    expect(
+      first.sections.first.tracks.map((track) => track.song.uri),
+      isNot(refreshed.sections.first.tracks.map((track) => track.song.uri)),
+    );
+  });
+
+  test('a fresh shelf uses the first-seen time', () {
+    final library = [
+      for (var index = 0; index < 30; index++)
+        song(
+          index,
+          artist: index < 6 ? 'Fresh Artist' : 'Artist $index',
+          album: 'Album $index',
+          dateAdded: index < 6 ? freshStamp : oldStamp,
+        ),
+    ];
+    final output = recommend(library: library, allowFresh: true);
+
+    final fresh = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.fresh,
+    );
+    expect(fresh.tracks, isNotEmpty);
+    expect(
+      fresh.tracks.every(
+        (track) => DateTime.fromMillisecondsSinceEpoch(
+          track.song.dateAdded,
+        ).isAfter(now.subtract(const Duration(days: 30))),
+      ),
+      isTrue,
+    );
+  });
+
+  test('genres and decades can explain a pick', () {
+    final library = [
+      for (var index = 0; index < 3; index++)
+        song(
+          index,
+          artist: 'Jazz Artist',
+          album: 'Jazz $index',
+          genre: 'Jazz',
+          year: 1990,
+        ),
+      for (var index = 3; index < 8; index++)
+        song(
+          index,
+          artist: 'Other $index',
+          album: 'Other $index',
+          genre: 'Jazz',
+          year: 1990,
+        ),
+    ];
+    final output = recommend(library: library, favorites: {'/music/0.mp3'});
+    final reasons = {
+      for (final section in output.sections)
+        for (final track in section.tracks) track.reason.kind,
+    };
+
+    expect(
+      reasons.any(
+        (kind) =>
+            kind == RecommendationReasonKind.artist ||
+            kind == RecommendationReasonKind.genre ||
+            kind == RecommendationReasonKind.era,
+      ),
+      isTrue,
+    );
+  });
+
+  test('every track appears at most once on the page', () {
+    final library = [
+      for (var index = 0; index < 40; index++)
+        song(
+          index,
+          artist: 'Artist ${index % 6}',
+          album: 'Album ${index % 12}',
+          sourceId: index >= 30 ? 'openverse' : null,
+        ),
+    ];
+    final output = recommend(
+      library: library,
+      favorites: {'/music/0.mp3'},
+      sourceOrder: ['openverse'],
+      allowFresh: true,
+    );
+    final uris = <String>[];
+    for (final section in output.sections) {
+      for (final track in section.tracks) {
+        uris.add(track.song.uri);
+      }
+    }
+
+    expect(uris.length, uris.toSet().length);
+  });
+
+  test('an artist never fills a whole mix', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(index, artist: 'Same Artist', album: 'Album $index'),
+    ];
+    final output = recommend(library: library);
+    final uris = {
+      for (final section in output.sections)
+        for (final track in section.tracks) track.song.uri,
+    };
+
+    expect(uris.length, lessThanOrEqualTo(3));
+  });
+}

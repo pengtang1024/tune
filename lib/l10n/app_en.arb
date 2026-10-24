@@ -901,5 +901,141 @@
   "settingsReplaceQueueOnClick": "Replace the play queue when a track is clicked",
   "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays",
   "settingsOnlyLikeOnDoubleClick": "Only like the track on a double click",
-  "settingsOnlyLikeOnDoubleClickHint": "When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well"
+  "settingsOnlyLikeOnDoubleClickHint": "When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well",
+  "sidebarDiscover": "Discover",
+  "discoverEyebrow": "DISCOVER",
+  "discoverTitle": "What to play",
+  "discoverSubtitle": "Picked from your library and favorites · computed on this machine",
+  "discoverRefresh": "Shuffle picks",
+  "discoverWhy": "How picks work",
+  "discoverWhyTitle": "How these picks are made",
+  "discoverWhyBody": "Discover uses only your library, the tracks you liked and the tracks you dismissed, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.",
+  "discoverWhyLibrary": "Tracks and metadata in your library",
+  "discoverWhyHearts": "Tracks you marked with a heart",
+  "discoverWhyPrivacy": "Computed locally, cleared whenever you want",
+  "discoverWhyClose": "Got it",
+  "discoverSectionDailyMix": "Today's mix",
+  "discoverSectionArtist": "Because you like {artist}",
+  "discoverSectionExplore": "A different taste: {genre}",
+  "discoverSectionExploreEra": "Back to the {decade}s",
+  "discoverSectionExploreEars": "Something else",
+  "discoverSectionFresh": "Just added",
+  "discoverSectionSource": "From {source}",
+  "discoverSectionFallback": "Picked from your library",
+  "discoverDailyMixSubtitle": "Familiar tracks + new finds · {count} tracks",
+  "discoverPlay": "Play",
+  "discoverAddAllShort": "Queue",
+  "discoverPlayAll": "Play all",
+  "discoverAddAllToQueue": "Queue all",
+  "discoverMoreActions": "More actions",
+  "discoverDismiss": "Not interested",
+  "discoverDismissed": "Fewer picks like “{title}”",
+  "discoverUndo": "Undo",
+  "discoverAddedToQueue": "Queued {count} tracks",
+  "discoverAlreadyQueued": "Those tracks are already in the queue",
+  "discoverReasonFavorite": "You marked it",
+  "discoverReasonArtist": "Because you like {artist}",
+  "discoverReasonGenre": "You like {genre}",
+  "discoverReasonEra": "Back to the {decade}s",
+  "discoverReasonFresh": "Just added",
+  "discoverReasonUnheard": "Not played yet",
+  "discoverReasonSource": "From {source}",
+  "discoverReasonFallback": "Picked from your library",
+  "discoverEmptyLibraryTitle": "Your library is empty",
+  "discoverEmptyLibrarySubtitle": "Scan local music or connect a source, and the discover page will have something to pick",
+  "discoverScanMusic": "Scan music",
+  "discoverConnectSources": "Connect sources",
+  "discoverNoCandidatesTitle": "Nothing left to recommend",
+  "discoverNoCandidatesSubtitle": "Browse the library, or clear the not-interested marks",
+  "discoverGoToLibrary": "Go to library",
+  "discoverClearFeedback": "Clear not interested",
+  "discoverLoadFailed": "Discover could not load",
+  "discoverLoadFailedHint": "The library is not readable right now. Try again in a moment.",
+  "discoverClearTitle": "Clear discover history?",
+  "discoverClearMessage": "This removes the not-interested marks. Favorites, the library and the queue are not touched.",
+  "discoverCleared": "Discover history cleared",
+  "@discoverSectionArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExplore": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExploreEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverSectionSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverDailyMixSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverDismissed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverAddedToQueue": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverReasonArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonGenre": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverReasonSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSectionDiscovery": "Discover",
+  "settingsDiscoveryTitle": "Discover page",
+  "settingsDiscoveryDescription": "Picks are computed on this machine; your library is not uploaded",
+  "settingsDiscoveryPrivacy": "Picks use only the library, the tracks you liked and the not-interested marks.",
+  "discoverFavoriteHint": "Mark a few tracks with a heart and the picks get closer"
 }

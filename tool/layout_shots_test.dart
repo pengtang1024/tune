@@ -19,6 +19,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/discovery/presentation/discovery_pane.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -223,6 +224,16 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(
+          currentPath: '/discover',
+          child: DiscoveryPane(),
+        ),
+      ),
+    );
+    await _shot(tester, 'discover$suffix');
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
           currentPath: '/favorites',
           child: FavoritesPane(),
         ),
@@ -249,14 +260,15 @@ void main() {
     await tester.pumpAndSettle();
     await _shot(tester, 'settings_playback$suffix');
 
-    // The health weights live below the playback card.
-    await tester.drag(settingsScroll, const Offset(0, -420));
+    // The health weights live below the discovery and playback cards.
+    final healthAdjust = find.byKey(
+      const ValueKey('settings-source-health-adjust'),
+    );
+    await tester.ensureVisible(healthAdjust);
     await tester.pumpAndSettle();
     await _shot(tester, 'settings_health$suffix');
 
-    await tester.tap(
-      find.byKey(const ValueKey('settings-source-health-adjust')),
-    );
+    await tester.tap(healthAdjust);
     await tester.pumpAndSettle();
     await _shot(tester, 'settings_health_dialog$suffix');
     await tester.tap(find.text('取消'));

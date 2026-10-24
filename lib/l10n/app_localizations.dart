@@ -3206,6 +3206,348 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢'**
   String get settingsOnlyLikeOnDoubleClickHint;
+
+  /// No description provided for @sidebarDiscover.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现'**
+  String get sidebarDiscover;
+
+  /// No description provided for @discoverEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现'**
+  String get discoverEyebrow;
+
+  /// No description provided for @discoverTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'今天听什么'**
+  String get discoverTitle;
+
+  /// No description provided for @discoverSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'从你的音乐库和喜欢的曲目里挑的 · 只在本机计算'**
+  String get discoverSubtitle;
+
+  /// No description provided for @discoverRefresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'换一批'**
+  String get discoverRefresh;
+
+  /// No description provided for @discoverWhy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'怎么推荐'**
+  String get discoverWhy;
+
+  /// No description provided for @discoverWhyTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐怎么来的'**
+  String get discoverWhyTitle;
+
+  /// No description provided for @discoverWhyBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。'**
+  String get discoverWhyBody;
+
+  /// No description provided for @discoverWhyLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库里的曲目和元数据'**
+  String get discoverWhyLibrary;
+
+  /// No description provided for @discoverWhyHearts.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'你标了心的曲目'**
+  String get discoverWhyHearts;
+
+  /// No description provided for @discoverWhyPrivacy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只在你的电脑上计算，随时可以清除'**
+  String get discoverWhyPrivacy;
+
+  /// No description provided for @discoverWhyClose.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'知道了'**
+  String get discoverWhyClose;
+
+  /// No description provided for @discoverSectionDailyMix.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'今日混音'**
+  String get discoverSectionDailyMix;
+
+  /// No description provided for @discoverSectionArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'因为你喜欢 {artist}'**
+  String discoverSectionArtist(String artist);
+
+  /// No description provided for @discoverSectionExplore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'换个口味：{genre}'**
+  String discoverSectionExplore(String genre);
+
+  /// No description provided for @discoverSectionExploreEra.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'回到 {decade} 年代'**
+  String discoverSectionExploreEra(int decade);
+
+  /// No description provided for @discoverSectionExploreEars.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'换换耳朵'**
+  String get discoverSectionExploreEars;
+
+  /// No description provided for @discoverSectionFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'刚入库'**
+  String get discoverSectionFresh;
+
+  /// No description provided for @discoverSectionSource.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来自 {source}'**
+  String discoverSectionSource(String source);
+
+  /// No description provided for @discoverSectionFallback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'从你的音乐库挑的'**
+  String get discoverSectionFallback;
+
+  /// No description provided for @discoverDailyMixSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'熟悉的曲目 + 新发现 · {count} 首'**
+  String discoverDailyMixSubtitle(int count);
+
+  /// No description provided for @discoverPlay.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放'**
+  String get discoverPlay;
+
+  /// No description provided for @discoverAddAllShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入队列'**
+  String get discoverAddAllShort;
+
+  /// No description provided for @discoverPlayAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放全部'**
+  String get discoverPlayAll;
+
+  /// No description provided for @discoverAddAllToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部加入队列'**
+  String get discoverAddAllToQueue;
+
+  /// No description provided for @discoverMoreActions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多操作'**
+  String get discoverMoreActions;
+
+  /// No description provided for @discoverDismiss.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不感兴趣'**
+  String get discoverDismiss;
+
+  /// No description provided for @discoverDismissed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已减少「{title}」的推荐'**
+  String discoverDismissed(String title);
+
+  /// No description provided for @discoverUndo.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销'**
+  String get discoverUndo;
+
+  /// No description provided for @discoverAddedToQueue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入 {count} 首'**
+  String discoverAddedToQueue(int count);
+
+  /// No description provided for @discoverAlreadyQueued.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这些歌已经在队列里了'**
+  String get discoverAlreadyQueued;
+
+  /// No description provided for @discoverReasonFavorite.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'你标了心'**
+  String get discoverReasonFavorite;
+
+  /// No description provided for @discoverReasonArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'因为你喜欢 {artist}'**
+  String discoverReasonArtist(String artist);
+
+  /// No description provided for @discoverReasonGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'你喜欢 {genre}'**
+  String discoverReasonGenre(String genre);
+
+  /// No description provided for @discoverReasonEra.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'回到 {decade} 年代'**
+  String discoverReasonEra(int decade);
+
+  /// No description provided for @discoverReasonFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'刚入库'**
+  String get discoverReasonFresh;
+
+  /// No description provided for @discoverReasonUnheard.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没听过'**
+  String get discoverReasonUnheard;
+
+  /// No description provided for @discoverReasonSource.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来自 {source}'**
+  String discoverReasonSource(String source);
+
+  /// No description provided for @discoverReasonFallback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'从你的音乐库挑的'**
+  String get discoverReasonFallback;
+
+  /// No description provided for @discoverEmptyLibraryTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库还是空的'**
+  String get discoverEmptyLibraryTitle;
+
+  /// No description provided for @discoverEmptyLibrarySubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描本地音乐或连接一个音源，发现页才有东西可挑'**
+  String get discoverEmptyLibrarySubtitle;
+
+  /// No description provided for @discoverScanMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描音乐'**
+  String get discoverScanMusic;
+
+  /// No description provided for @discoverConnectSources.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接音源'**
+  String get discoverConnectSources;
+
+  /// No description provided for @discoverNoCandidatesTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'能推荐的都听过了'**
+  String get discoverNoCandidatesTitle;
+
+  /// No description provided for @discoverNoCandidatesSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'去音乐库逛逛，或清掉不感兴趣标记'**
+  String get discoverNoCandidatesSubtitle;
+
+  /// No description provided for @discoverGoToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'去音乐库'**
+  String get discoverGoToLibrary;
+
+  /// No description provided for @discoverClearFeedback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清除不感兴趣'**
+  String get discoverClearFeedback;
+
+  /// No description provided for @discoverLoadFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现页加载失败'**
+  String get discoverLoadFailed;
+
+  /// No description provided for @discoverLoadFailedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐库暂时读不出来，稍后再试'**
+  String get discoverLoadFailedHint;
+
+  /// No description provided for @discoverClearTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清除推荐记录？'**
+  String get discoverClearTitle;
+
+  /// No description provided for @discoverClearMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。'**
+  String get discoverClearMessage;
+
+  /// No description provided for @discoverCleared.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐记录已清除'**
+  String get discoverCleared;
+
+  /// No description provided for @settingsSectionDiscovery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现'**
+  String get settingsSectionDiscovery;
+
+  /// No description provided for @settingsDiscoveryTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发现页'**
+  String get settingsDiscoveryTitle;
+
+  /// No description provided for @settingsDiscoveryDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐只在本机计算，不上传你的音乐库'**
+  String get settingsDiscoveryDescription;
+
+  /// No description provided for @settingsDiscoveryPrivacy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐只使用音乐库、标心的曲目和不感兴趣标记。'**
+  String get settingsDiscoveryPrivacy;
+
+  /// No description provided for @discoverFavoriteHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标几首喜欢的歌，推荐会更准'**
+  String get discoverFavoriteHint;
 }
 
 class _AppLocalizationsDelegate

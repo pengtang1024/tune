@@ -52,6 +52,8 @@ presentation → application → domain
 | 歌词 | `LyricsController` / `LyricsState`（`features/player`） | 当前曲目的歌词与解析结果；控制器自己 `watch` 播放器的当前曲目来取词，页面只读不改；播放位置仍由 `PlaybackController` 独家持有，歌词只读它 |
 | 设置 | `SettingsController` / `SettingsState`（`features/settings`） | 主题、语言、扫描目录、自动扫描、单曲与双击行为、桌面集成 |
 | 音源 | `MusicSourcesController` / `MusicSourcesState`（`features/sources`） | 音源开关与配置 |
+| 发现页 | `DiscoveryController` / `DiscoveryState`（`features/discovery`） | 音乐库、喜欢与反馈的派生视图；分段只在内存，不落盘 |
+| 推荐反馈 | `DiscoveryFeedbackStore`（`features/discovery`） | 「不感兴趣」标记，30 天过期；收藏与音乐库不受影响 |
 
 - 状态只在 application 层修改；presentation 层只 `ref.watch` 读、`ref.read(...notifier)` 写。
 - 纯逻辑下沉到 domain，I/O 下沉到 `data/services`；service 不依赖 Riverpod——`MusicSourceService` 是范例：它只编排 I/O，状态由 controller 持有。
@@ -114,6 +116,7 @@ presentation → application → domain
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
 | 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
+| 推荐反馈 | `<应用支持目录>/settings/`，键 `discovery_feedback_v1` | `DiscoveryFeedbackStore`（`lib/features/discovery/data/discovery_feedback_store.dart`） |
 | 播放会话（队列、游标、模式、历史） | `<应用支持目录>/settings/`，键 `playback_queue_v1` | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
 | 播放进度 | `<应用支持目录>/settings/`，键 `playback_position_v1` | `PlaybackSessionStore` |
 | 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `FileLibraryStorage`（`lib/features/library/data/impl/library_storage_io.dart`） |

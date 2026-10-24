@@ -12,6 +12,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/discovery/presentation/discovery_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
@@ -258,6 +259,16 @@ Future<void> _drawEveryScreen(
         ),
       ),
     ),
+  );
+  _collect(tester, collect);
+
+  // The discover page.
+  await _draw(
+    tester,
+    locale,
+    size,
+    'discover',
+    const CompactShell(currentPath: '/discover', child: DiscoveryPane()),
   );
   _collect(tester, collect);
 

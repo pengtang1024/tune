@@ -13,7 +13,7 @@
 | 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
-| 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（设计稿，未实施） |
+| 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M3 已实施；M4 待做） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
 | 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |

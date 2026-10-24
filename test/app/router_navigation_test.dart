@@ -62,7 +62,7 @@ void main() {
 
     final router = GoRouter.of(tester.element(find.byType(Scaffold).first));
 
-    for (final path in ['/favorites', '/library', '/sources']) {
+    for (final path in ['/discover', '/favorites', '/library', '/sources']) {
       router.go(path);
       await tester.pumpAndSettle();
 

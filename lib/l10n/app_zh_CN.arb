@@ -901,5 +901,141 @@
   "settingsReplaceQueueOnClick": "单击歌曲时替换播放队列",
   "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留",
   "settingsOnlyLikeOnDoubleClick": "双击时只标成喜欢",
-  "settingsOnlyLikeOnDoubleClickHint": "打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢"
+  "settingsOnlyLikeOnDoubleClickHint": "打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢",
+  "sidebarDiscover": "发现",
+  "discoverEyebrow": "发现",
+  "discoverTitle": "今天听什么",
+  "discoverSubtitle": "从你的音乐库和喜欢的曲目里挑的 · 只在本机计算",
+  "discoverRefresh": "换一批",
+  "discoverWhy": "怎么推荐",
+  "discoverWhyTitle": "推荐怎么来的",
+  "discoverWhyBody": "发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。",
+  "discoverWhyLibrary": "音乐库里的曲目和元数据",
+  "discoverWhyHearts": "你标了心的曲目",
+  "discoverWhyPrivacy": "只在你的电脑上计算，随时可以清除",
+  "discoverWhyClose": "知道了",
+  "discoverSectionDailyMix": "今日混音",
+  "discoverSectionArtist": "因为你喜欢 {artist}",
+  "discoverSectionExplore": "换个口味：{genre}",
+  "discoverSectionExploreEra": "回到 {decade} 年代",
+  "discoverSectionExploreEars": "换换耳朵",
+  "discoverSectionFresh": "刚入库",
+  "discoverSectionSource": "来自 {source}",
+  "discoverSectionFallback": "从你的音乐库挑的",
+  "discoverDailyMixSubtitle": "熟悉的曲目 + 新发现 · {count} 首",
+  "discoverPlay": "播放",
+  "discoverAddAllShort": "加入队列",
+  "discoverPlayAll": "播放全部",
+  "discoverAddAllToQueue": "全部加入队列",
+  "discoverMoreActions": "更多操作",
+  "discoverDismiss": "不感兴趣",
+  "discoverDismissed": "已减少「{title}」的推荐",
+  "discoverUndo": "撤销",
+  "discoverAddedToQueue": "已加入 {count} 首",
+  "discoverAlreadyQueued": "这些歌已经在队列里了",
+  "discoverReasonFavorite": "你标了心",
+  "discoverReasonArtist": "因为你喜欢 {artist}",
+  "discoverReasonGenre": "你喜欢 {genre}",
+  "discoverReasonEra": "回到 {decade} 年代",
+  "discoverReasonFresh": "刚入库",
+  "discoverReasonUnheard": "还没听过",
+  "discoverReasonSource": "来自 {source}",
+  "discoverReasonFallback": "从你的音乐库挑的",
+  "discoverEmptyLibraryTitle": "音乐库还是空的",
+  "discoverEmptyLibrarySubtitle": "扫描本地音乐或连接一个音源，发现页才有东西可挑",
+  "discoverScanMusic": "扫描音乐",
+  "discoverConnectSources": "连接音源",
+  "discoverNoCandidatesTitle": "能推荐的都听过了",
+  "discoverNoCandidatesSubtitle": "去音乐库逛逛，或清掉不感兴趣标记",
+  "discoverGoToLibrary": "去音乐库",
+  "discoverClearFeedback": "清除不感兴趣",
+  "discoverLoadFailed": "发现页加载失败",
+  "discoverLoadFailedHint": "音乐库暂时读不出来，稍后再试",
+  "discoverClearTitle": "清除推荐记录？",
+  "discoverClearMessage": "会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。",
+  "discoverCleared": "推荐记录已清除",
+  "@discoverSectionArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExplore": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverSectionExploreEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverSectionSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverDailyMixSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverDismissed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverAddedToQueue": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "@discoverReasonArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonGenre": {
+    "placeholders": {
+      "genre": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverReasonEra": {
+    "placeholders": {
+      "decade": {
+        "type": "int"
+      }
+    }
+  },
+  "@discoverReasonSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSectionDiscovery": "发现",
+  "settingsDiscoveryTitle": "发现页",
+  "settingsDiscoveryDescription": "推荐只在本机计算，不上传你的音乐库",
+  "settingsDiscoveryPrivacy": "推荐只使用音乐库、标心的曲目和不感兴趣标记。",
+  "discoverFavoriteHint": "标几首喜欢的歌，推荐会更准"
 }

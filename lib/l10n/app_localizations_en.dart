@@ -1868,4 +1868,215 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       'When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well';
+
+  @override
+  String get sidebarDiscover => 'Discover';
+
+  @override
+  String get discoverEyebrow => 'DISCOVER';
+
+  @override
+  String get discoverTitle => 'What to play';
+
+  @override
+  String get discoverSubtitle =>
+      'Picked from your library and favorites · computed on this machine';
+
+  @override
+  String get discoverRefresh => 'Shuffle picks';
+
+  @override
+  String get discoverWhy => 'How picks work';
+
+  @override
+  String get discoverWhyTitle => 'How these picks are made';
+
+  @override
+  String get discoverWhyBody =>
+      'Discover uses only your library, the tracks you liked and the tracks you dismissed, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.';
+
+  @override
+  String get discoverWhyLibrary => 'Tracks and metadata in your library';
+
+  @override
+  String get discoverWhyHearts => 'Tracks you marked with a heart';
+
+  @override
+  String get discoverWhyPrivacy =>
+      'Computed locally, cleared whenever you want';
+
+  @override
+  String get discoverWhyClose => 'Got it';
+
+  @override
+  String get discoverSectionDailyMix => 'Today\'s mix';
+
+  @override
+  String discoverSectionArtist(String artist) {
+    return 'Because you like $artist';
+  }
+
+  @override
+  String discoverSectionExplore(String genre) {
+    return 'A different taste: $genre';
+  }
+
+  @override
+  String discoverSectionExploreEra(int decade) {
+    return 'Back to the ${decade}s';
+  }
+
+  @override
+  String get discoverSectionExploreEars => 'Something else';
+
+  @override
+  String get discoverSectionFresh => 'Just added';
+
+  @override
+  String discoverSectionSource(String source) {
+    return 'From $source';
+  }
+
+  @override
+  String get discoverSectionFallback => 'Picked from your library';
+
+  @override
+  String discoverDailyMixSubtitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Familiar tracks + new finds · $countString tracks';
+  }
+
+  @override
+  String get discoverPlay => 'Play';
+
+  @override
+  String get discoverAddAllShort => 'Queue';
+
+  @override
+  String get discoverPlayAll => 'Play all';
+
+  @override
+  String get discoverAddAllToQueue => 'Queue all';
+
+  @override
+  String get discoverMoreActions => 'More actions';
+
+  @override
+  String get discoverDismiss => 'Not interested';
+
+  @override
+  String discoverDismissed(String title) {
+    return 'Fewer picks like “$title”';
+  }
+
+  @override
+  String get discoverUndo => 'Undo';
+
+  @override
+  String discoverAddedToQueue(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Queued $countString tracks';
+  }
+
+  @override
+  String get discoverAlreadyQueued => 'Those tracks are already in the queue';
+
+  @override
+  String get discoverReasonFavorite => 'You marked it';
+
+  @override
+  String discoverReasonArtist(String artist) {
+    return 'Because you like $artist';
+  }
+
+  @override
+  String discoverReasonGenre(String genre) {
+    return 'You like $genre';
+  }
+
+  @override
+  String discoverReasonEra(int decade) {
+    return 'Back to the ${decade}s';
+  }
+
+  @override
+  String get discoverReasonFresh => 'Just added';
+
+  @override
+  String get discoverReasonUnheard => 'Not played yet';
+
+  @override
+  String discoverReasonSource(String source) {
+    return 'From $source';
+  }
+
+  @override
+  String get discoverReasonFallback => 'Picked from your library';
+
+  @override
+  String get discoverEmptyLibraryTitle => 'Your library is empty';
+
+  @override
+  String get discoverEmptyLibrarySubtitle =>
+      'Scan local music or connect a source, and the discover page will have something to pick';
+
+  @override
+  String get discoverScanMusic => 'Scan music';
+
+  @override
+  String get discoverConnectSources => 'Connect sources';
+
+  @override
+  String get discoverNoCandidatesTitle => 'Nothing left to recommend';
+
+  @override
+  String get discoverNoCandidatesSubtitle =>
+      'Browse the library, or clear the not-interested marks';
+
+  @override
+  String get discoverGoToLibrary => 'Go to library';
+
+  @override
+  String get discoverClearFeedback => 'Clear not interested';
+
+  @override
+  String get discoverLoadFailed => 'Discover could not load';
+
+  @override
+  String get discoverLoadFailedHint =>
+      'The library is not readable right now. Try again in a moment.';
+
+  @override
+  String get discoverClearTitle => 'Clear discover history?';
+
+  @override
+  String get discoverClearMessage =>
+      'This removes the not-interested marks. Favorites, the library and the queue are not touched.';
+
+  @override
+  String get discoverCleared => 'Discover history cleared';
+
+  @override
+  String get settingsSectionDiscovery => 'Discover';
+
+  @override
+  String get settingsDiscoveryTitle => 'Discover page';
+
+  @override
+  String get settingsDiscoveryDescription =>
+      'Picks are computed on this machine; your library is not uploaded';
+
+  @override
+  String get settingsDiscoveryPrivacy =>
+      'Picks use only the library, the tracks you liked and the not-interested marks.';
+
+  @override
+  String get discoverFavoriteHint =>
+      'Mark a few tracks with a heart and the picks get closer';
 }

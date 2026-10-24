@@ -11,6 +11,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
+import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 
@@ -114,6 +115,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onOnlyLikeOnDoubleClick:
                       settingsController.setOnlyLikeOnDoubleClick,
                 ),
+                const SizedBox(height: 14),
+                const SettingsDiscoveryCard(),
                 const SizedBox(height: 14),
                 const SettingsSourceHealthCard(),
                 if (hasDesktopIntegration) ...[
