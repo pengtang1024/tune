@@ -246,6 +246,63 @@ void main() {
     expect(merged.size, copy.size);
   });
 
+  test('a rescan keeps the first time a track entered the library', () async {
+    const firstSeen = Song(
+      id: 10,
+      title: 'Already Here',
+      uri: 'tune://openverse/old',
+      sourceId: 'openverse',
+      externalId: 'old',
+      dateAdded: 1000,
+    );
+    const rescanned = Song(
+      id: 10,
+      title: 'Already Here',
+      uri: 'tune://openverse/old',
+      sourceId: 'openverse',
+      externalId: 'old',
+      dateAdded: 9000,
+    );
+    const brandNew = Song(
+      id: 11,
+      title: 'Brand New',
+      uri: 'tune://openverse/new',
+      sourceId: 'openverse',
+      externalId: 'new',
+      dateAdded: 8000,
+    );
+    storage.songs = [firstSeen];
+
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.success,
+          songs: [],
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.success,
+          songs: [rescanned, brandNew],
+        ),
+      },
+    );
+
+    await container.read(libraryControllerProvider.future);
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(
+      state.songs.firstWhere((song) => song.uri == rescanned.uri).dateAdded,
+      1000,
+    );
+    expect(
+      state.songs.firstWhere((song) => song.uri == brandNew.uri).dateAdded,
+      8000,
+    );
+  });
+
   test('the copies of the library are marked before it is read', () async {
     // A copy that was fetched before the app kept markers is marked now, so
     // the scan of the music library finds it as a copy of its track.

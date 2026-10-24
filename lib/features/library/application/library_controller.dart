@@ -250,7 +250,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await future;
     if (_disposed || !state.hasValue) return;
 
-    final merged = _dedupe([..._current.songs, ...songs]);
+    final previousByUri = {for (final song in _current.songs) song.uri: song};
+    final incoming = [
+      for (final song in songs) _keepFirstSeen(song, previousByUri[song.uri]),
+    ];
+    final merged = _dedupe([..._current.songs, ...incoming]);
     state = AsyncData(
       _current.copyWith(songs: List<Song>.unmodifiable(merged)),
     );
@@ -321,9 +325,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// sources keep their cached songs instead of disappearing from the library.
   List<Song> _mergeResults(List<SourceScanResult> results) {
     final previousBySource = <String, List<Song>>{};
+    final previousByUri = <String, Song>{};
     for (final song in _current.songs) {
       final sourceId = song.sourceId ?? 'local';
       previousBySource.putIfAbsent(sourceId, () => []).add(song);
+      previousByUri[song.uri] = song;
     }
 
     final merged = <Song>[];
@@ -331,13 +337,35 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       if (result.shouldKeepPreviousSongs) {
         merged.addAll(previousBySource[result.sourceId] ?? const []);
       } else {
-        merged.addAll(result.songs);
+        merged.addAll(
+          result.songs.map(
+            (song) => _keepFirstSeen(song, previousByUri[song.uri]),
+          ),
+        );
       }
     }
 
     // Sources that are disabled have no result, so their cached songs are
     // intentionally dropped from the active library.
     return _dedupe(merged)..sort((a, b) => compareText(a.title, b.title));
+  }
+
+  /// Keeps the first time a track entered the library.
+  ///
+  /// The scanner creates a new [Song] on every scan and stamps it with the
+  /// time of that scan. The library is an index, not a new collection, so a
+  /// track that was already here keeps the earlier stamp: "added" means when
+  /// the reader first had the track, not when the app last looked at it.
+  Song _keepFirstSeen(Song song, Song? previous) {
+    if (previous == null || previous.dateAdded <= 0) return song;
+    if (song.dateAdded > 0 && song.dateAdded <= previous.dateAdded) return song;
+    return song.copyWith(dateAdded: previous.dateAdded);
+  }
+
+  int _earlierDate(int left, int right) {
+    if (left <= 0) return right;
+    if (right <= 0) return left;
+    return left < right ? left : right;
   }
 
   String _statusMessage({
@@ -393,7 +421,15 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       // A track that is on the disk and a track that comes from a source are
       // one track: the copy keeps the identity of the source, so the two
       // entries meet and become one row that knows both.
-      merged[song.uri] = known == null ? song : known.mergeWith(song);
+      if (known == null) {
+        merged[song.uri] = song;
+        continue;
+      }
+      final next = known.mergeWith(song);
+      final firstSeen = _earlierDate(known.dateAdded, song.dateAdded);
+      merged[song.uri] = next.dateAdded == firstSeen
+          ? next
+          : next.copyWith(dateAdded: firstSeen);
     }
     return merged.values.toList();
   }
