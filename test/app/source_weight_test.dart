@@ -453,6 +453,49 @@ void main() {
     expect(openverse.activity, 0.5);
   });
 
+  test('output is measured against the requested count', () {
+    SourceScanSummary summary(int count) => SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.success,
+      songCount: count,
+      scannedAt: DateTime.now(),
+      elapsed: const Duration(seconds: 1),
+    );
+    int outputOf(int count, {int? expected}) {
+      return SourceHealth.report(
+        isLocal: false,
+        enabled: true,
+        supported: true,
+        configured: true,
+        summary: summary(count),
+        lastScanAt: DateTime.now(),
+        autoScanInterval: const Duration(hours: 6),
+        scanTimeout: const Duration(seconds: 45),
+        expectedCount: expected,
+      ).output;
+    }
+
+    expect(outputOf(10, expected: 20), 50);
+    expect(outputOf(20, expected: 20), 100);
+    expect(outputOf(10), 66);
+  });
+
+  test('activity stays neutral before the first heart', () {
+    const songs = [
+      Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        sourceId: 'openverse',
+        externalId: 'one',
+        streamUrl: 'https://example.com/one.mp3',
+      ),
+    ];
+
+    final facts = sourceHealthFactsOf(songs);
+
+    expect(facts['openverse']!.activity, 0.5);
+  });
+
   test('health bands separate the main list', () {
     expect(SourceHealth.bandOf(100), 2);
     expect(SourceHealth.bandOf(85), 2);

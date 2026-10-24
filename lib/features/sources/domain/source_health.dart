@@ -101,6 +101,7 @@ abstract final class SourceHealth {
     SourceScanHealthHistory? history,
     DateTime? now,
     bool hasTracks = false,
+    int? expectedCount,
     double playable = 0.5,
     double artwork = 0.5,
     double metadata = 0.5,
@@ -146,7 +147,7 @@ abstract final class SourceHealth {
         ? summary!.scannedAt
         : lastScanAt;
     final freshness = _freshness(freshnessAt, autoScanInterval, clock);
-    final output = _output(summary);
+    final output = _output(summary, expectedCount);
     final speed = _speed(summary, scanTimeout);
     final reliability = switch (summary?.status) {
       SourceScanStatus.success => 1.0,
@@ -224,10 +225,15 @@ abstract final class SourceHealth {
     return 0;
   }
 
-  static double _output(SourceScanSummary? summary) {
+  static double _output(SourceScanSummary? summary, int? expectedCount) {
     if (summary == null) return 0.5;
     final count = summary.songCount;
     if (count <= 0) return 0;
+    // A source that asks for fifteen tracks and returns fifteen is at full
+    // output even though fifteen is below the old fixed threshold of twenty.
+    if (expectedCount != null && expectedCount > 0) {
+      return (count / expectedCount).clamp(0.0, 1.0).toDouble();
+    }
     if (count < 5) return 0.4;
     if (count < 20) return 0.66;
     return 1;

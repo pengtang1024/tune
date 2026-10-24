@@ -54,6 +54,7 @@ final sourceHealthReportsProvider = Provider<Map<String, SourceHealthReport>>((
       lastScanAt: sources.lastScanAt[source.id],
       autoScanInterval: service.autoScanIntervalFor(source),
       scanTimeout: service.scanTimeoutFor(source),
+      expectedCount: service.scanLimitFor(source),
       weights: weights,
       history: sources.healthHistory[source.id],
       now: now,

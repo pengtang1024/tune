@@ -40,6 +40,7 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
   final artwork = <String, int>{};
   final metadata = <String, int>{};
   final liked = <String, int>{};
+  final hasFavorites = favoriteUris.isNotEmpty;
 
   for (final song in songs) {
     final id = song.sourceId ?? 'local';
@@ -58,7 +59,9 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
         playable: (playable[entry.key] ?? 0) / entry.value,
         artwork: (artwork[entry.key] ?? 0) / entry.value,
         metadata: (metadata[entry.key] ?? 0) / entry.value,
-        activity: (liked[entry.key] ?? 0) / entry.value,
+        // Before the first heart every source would score zero here; that is
+        // not a signal about the source, so the dimension stays neutral.
+        activity: hasFavorites ? (liked[entry.key] ?? 0) / entry.value : 0.5,
       ),
   };
 }

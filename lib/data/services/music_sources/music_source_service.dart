@@ -197,6 +197,13 @@ class MusicSourceService implements StreamUrlResolver {
         const Duration(seconds: 45);
   }
 
+  /// How many tracks a scan of [config] asks for, when the type declares a
+  /// limit. A type with no limit keeps the health score's fallback bands.
+  int? scanLimitFor(MusicSourceConfig config) {
+    final limit = _adapters[config.sourceType]?.scanLimit;
+    return limit?.read(config.setting('limit'));
+  }
+
   String configurationHint(MusicSourceConfig config) {
     return _adapters[config.sourceType]?.configurationHint ??
         AppStrings.instance.sourceErrorUnsupported;
