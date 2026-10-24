@@ -200,4 +200,34 @@ void main() {
     expect(profile.artists.keys, ['real artist']);
     expect(profile.genres.keys, ['jazz']);
   });
+
+  test('a finished play weighs more than an abandoned one', () {
+    final now = DateTime(2026, 10, 24, 12);
+    final library = [
+      song(1, artist: 'Finished', genre: 'Rock'),
+      song(2, artist: 'Abandoned', genre: 'Rock'),
+    ];
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: const {},
+      listening: {
+        '/music/1.mp3': TrackListening(
+          listens: 2,
+          completions: 2,
+          lastPlayedAt: now,
+        ),
+        '/music/2.mp3': TrackListening(
+          listens: 2,
+          completions: 0,
+          lastPlayedAt: now,
+        ),
+      },
+      now: now,
+    );
+
+    expect(
+      profile.artistWeight('Finished'),
+      greaterThan(profile.artistWeight('Abandoned')),
+    );
+  });
 }

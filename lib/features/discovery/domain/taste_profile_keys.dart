@@ -9,7 +9,10 @@ double listenWeight(TrackListening signal, DateTime now) {
       ? 0.0
       : now.difference(playedAt).inHours / 24;
   final decay = math.pow(0.5, ageDays.clamp(0.0, double.infinity) / 45);
-  final positive = signal.listens.clamp(0, 5).toDouble();
+  // A finished play says more than a play that was abandoned; a skip says
+  // less. The counts are capped so one obsessive week cannot drown the rest.
+  final positive =
+      signal.listens.clamp(0, 5) + signal.completions.clamp(0, 5) * 0.5;
   final negative = signal.skips.clamp(0, 3) * 0.5;
   return ((positive - negative) * decay).clamp(0.0, 5.0).toDouble();
 }
