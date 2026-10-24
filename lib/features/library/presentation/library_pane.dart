@@ -16,6 +16,7 @@ import 'package:tune/features/library/presentation/library_album_header.dart';
 import 'package:tune/features/library/presentation/library_albums_view.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
@@ -321,33 +322,48 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     bool onlyLikeOnDoubleClick, {
     ScrollController? controller,
   }) {
-    return ListView.builder(
-      controller: controller,
-      padding: const EdgeInsets.fromLTRB(
-        CompactTokens.pageGutter,
-        0,
-        CompactTokens.pageGutter,
-        CompactTokens.space8,
-      ),
-      itemCount: songs.length,
-      itemBuilder: (context, index) {
-        final song = songs[index];
-        return LibraryTrackCard(
-          song: song,
-          index: index,
-          selected: song.uri == currentUri,
-          playing: isPlaying,
-          isFavorite: favorites.contains(song.uri),
-          source: sourceLabel(song, sourceLabels),
-          onTap: () {
-            // The list the user clicks in decides what happens to the queue;
-            // by default the track joins the queue and plays right away.
-            ref.read(listPlaybackProvider).play(song);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // The width of a row is the width of the list without its gutter.
+        // It is resolved once here, so a row does not run a layout callback
+        // of its own to discover the same number.
+        final metrics = LibraryRowMetrics.of(
+          context,
+          constraints.maxWidth - CompactTokens.pageGutter * 2,
+        );
+
+        return ListView.builder(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(
+            CompactTokens.pageGutter,
+            0,
+            CompactTokens.pageGutter,
+            CompactTokens.space8,
+          ),
+          itemExtent: metrics.extent,
+          itemCount: songs.length,
+          itemBuilder: (context, index) {
+            final song = songs[index];
+            return LibraryTrackCard(
+              song: song,
+              index: index,
+              selected: song.uri == currentUri,
+              playing: isPlaying,
+              isFavorite: favorites.contains(song.uri),
+              source: sourceLabel(song, sourceLabels),
+              metrics: metrics,
+              onTap: () {
+                // The list the user clicks in decides what happens to the
+                // queue; by default the track joins the queue and plays
+                // right away.
+                ref.read(listPlaybackProvider).play(song);
+              },
+              onDoubleTap: () => _markFavorite(song),
+              waitsForDoubleClick: onlyLikeOnDoubleClick,
+              onAddToQueue: () => _addToQueue(song),
+              onToggleFavorite: () => _toggleFavorite(song),
+            );
           },
-          onDoubleTap: () => _markFavorite(song),
-          waitsForDoubleClick: onlyLikeOnDoubleClick,
-          onAddToQueue: () => _addToQueue(song),
-          onToggleFavorite: () => _toggleFavorite(song),
         );
       },
     );

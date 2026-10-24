@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
@@ -60,7 +61,7 @@ void main() {
           theme: CompactTheme.light,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const Scaffold(
+          home: Scaffold(
             body: SingleChildScrollView(
               child: LibraryTrackCard(
                 song: Song(
@@ -74,6 +75,7 @@ void main() {
                 selected: false,
                 playing: false,
                 isFavorite: false,
+                metrics: LibraryRowMetrics.at(width: 800, textScale: 1),
                 onTap: _noop,
                 onDoubleTap: _noop,
                 waitsForDoubleClick: false,

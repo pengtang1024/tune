@@ -7,6 +7,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/features/library/presentation/library_row_actions.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
@@ -21,6 +22,10 @@ import 'package:tune/shared/utils/duration_format.dart';
 /// second line of every row pushing the next track out of the window. The
 /// columns that do not fit the window drop out one by one: the album first,
 /// then the facts, then the artist. The title always stays.
+///
+/// The row is a pure composition. The viewport hands it the columns and the
+/// height it resolved once, the hint layer owns every card, and the dense
+/// actions keep their ink without the box of a page button.
 class LibraryTrackCard extends StatelessWidget {
   final Song song;
   final int index;
@@ -28,6 +33,13 @@ class LibraryTrackCard extends StatelessWidget {
   final bool playing;
   final bool isFavorite;
   final SourceLabel? source;
+
+  /// What the viewport resolved for this row.
+  ///
+  /// The row does not measure itself: the list knows its width and its text
+  /// scale, and every row reads the same answer.
+  final LibraryRowMetrics metrics;
+
   final VoidCallback onTap;
   final VoidCallback onDoubleTap;
 
@@ -47,6 +59,7 @@ class LibraryTrackCard extends StatelessWidget {
     required this.playing,
     required this.isFavorite,
     this.source,
+    required this.metrics,
     required this.onTap,
     required this.onDoubleTap,
     required this.waitsForDoubleClick,
@@ -58,162 +71,143 @@ class LibraryTrackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
+    final unknownTitle = context.loc.trackUnknownTitle;
+    final artist = song.artist.trim().isEmpty
+        ? context.loc.playerUnknownArtist
+        : song.artist;
+    final album = song.album.trim();
 
-    return Material(
-      color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
-      child: Stack(
-        children: [
-          // The mark of the track that plays sits on the edge of the row
-          // instead of taking room, so the columns stay on one grid.
-          if (selected)
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(width: 2, color: accent),
+    Widget row = TrackClickArea(
+      onClick: onTap,
+      onDoubleClick: onDoubleTap,
+      waitsForDoubleClick: waitsForDoubleClick,
+      hoverColor: accent.withValues(alpha: 0.04),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
-          TrackClickArea(
-            onClick: onTap,
-            onDoubleClick: onDoubleTap,
-            waitsForDoubleClick: waitsForDoubleClick,
-            hoverColor: accent.withValues(alpha: 0.04),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withValues(
-                      alpha: 0.5,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: CompactTokens.space8,
+            vertical: CompactTokens.libraryRowPadding,
+          ),
+          child: Row(
+            children: [
+              TrackPosition(index: index, selected: selected, playing: playing),
+              const SizedBox(width: CompactTokens.space8),
+              ArtworkThumb(
+                path: song.albumArtPath,
+                imageUrl: song.artworkUrl,
+                size: CompactTokens.libraryArtwork,
+                radius: CompactTokens.radius6,
+              ),
+              const SizedBox(width: CompactTokens.space10),
+              Expanded(
+                flex: 5,
+                child: TuneTooltip(
+                  message: song.title.isEmpty ? unknownTitle : song.title,
+                  child: Text(
+                    song.title.isEmpty ? unknownTitle : song.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      color: selected ? theme.colorScheme.primary : null,
                     ),
                   ),
                 ),
               ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  // The album is the first column to go, then the facts of
-                  // the file. A narrow window keeps the artist and the time,
-                  // because those are what tell two tracks apart.
-                  final width = constraints.maxWidth;
-                  final showArtist = width >= 480;
-                  final showFacts = width >= 600;
-                  final showAlbum = width >= 820;
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CompactTokens.space8,
-                      vertical: CompactTokens.libraryRowPadding,
+              if (metrics.showArtist) ...[
+                const SizedBox(width: CompactTokens.space8),
+                Expanded(
+                  flex: 2,
+                  child: TuneTooltip(
+                    message: artist,
+                    child: Text(
+                      artist,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        TrackPosition(
-                          index: index,
-                          selected: selected,
-                          playing: playing,
-                        ),
-                        const SizedBox(width: CompactTokens.space8),
-                        ArtworkThumb(
-                          path: song.albumArtPath,
-                          imageUrl: song.artworkUrl,
-                          size: CompactTokens.libraryArtwork,
-                          radius: CompactTokens.radius6,
-                        ),
-                        const SizedBox(width: CompactTokens.space10),
-                        Expanded(
-                          flex: 5,
-                          child: TuneTooltip(
-                            message: song.title.isEmpty
-                                ? context.loc.trackUnknownTitle
-                                : song.title,
-                            child: Text(
-                              song.title.isEmpty
-                                  ? context.loc.trackUnknownTitle
-                                  : song.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: selected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                                color: selected
-                                    ? theme.colorScheme.primary
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (showArtist) ...[
-                          const SizedBox(width: CompactTokens.space8),
-                          Expanded(
-                            flex: 2,
-                            child: TuneTooltip(
-                              message: song.artist.trim().isEmpty
-                                  ? context.loc.playerUnknownArtist
-                                  : song.artist,
-                              child: Text(
-                                song.artist.trim().isEmpty
-                                    ? context.loc.playerUnknownArtist
-                                    : song.artist,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (showAlbum) ...[
-                          const SizedBox(width: CompactTokens.space8),
-                          Expanded(
-                            flex: 3,
-                            child: TuneTooltip(
-                              message: song.album.trim(),
-                              child: Text(
-                                song.album.trim(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        if (showFacts) ...[
-                          const SizedBox(width: CompactTokens.space8),
-                          TrackFactStrip(song: song),
-                        ],
-                        if (source != null) ...[
-                          const SizedBox(width: CompactTokens.space8),
-                          SourceBadge(label: source!, dense: true),
-                        ],
-                        const SizedBox(width: CompactTokens.space8),
-                        if (!song.isLiveStream)
-                          Text(
-                            formatDuration(
-                              Duration(milliseconds: song.durationInMillis),
-                            ),
-                            style: CompactTypography.mono(
-                              theme.colorScheme.onSurfaceVariant,
-                              size: CompactTypeScale.mark,
-                            ),
-                          ),
-                        const SizedBox(width: CompactTokens.space4),
-                        LibraryRowActions(
-                          song: song,
-                          source: source,
-                          isFavorite: isFavorite,
-                          onToggleFavorite: onToggleFavorite,
-                          onAddToQueue: onAddToQueue,
-                        ),
-                      ],
+                  ),
+                ),
+              ],
+              if (metrics.showAlbum) ...[
+                const SizedBox(width: CompactTokens.space8),
+                Expanded(
+                  flex: 3,
+                  child: TuneTooltip(
+                    message: album,
+                    child: Text(
+                      album,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  );
-                },
+                  ),
+                ),
+              ],
+              if (metrics.showFacts) ...[
+                const SizedBox(width: CompactTokens.space8),
+                TrackFactStrip(song: song),
+              ],
+              if (source != null) ...[
+                const SizedBox(width: CompactTokens.space8),
+                SourceBadge(label: source!, dense: true),
+              ],
+              const SizedBox(width: CompactTokens.space8),
+              if (!song.isLiveStream)
+                Text(
+                  formatDuration(Duration(milliseconds: song.durationInMillis)),
+                  style: CompactTypography.mono(
+                    theme.colorScheme.onSurfaceVariant,
+                    size: CompactTypeScale.mark,
+                  ),
+                ),
+              const SizedBox(width: CompactTokens.space4),
+              LibraryRowActions(
+                song: song,
+                source: source,
+                isFavorite: isFavorite,
+                onToggleFavorite: onToggleFavorite,
+                onAddToQueue: onAddToQueue,
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+
+    // The mark of the track that plays sits on the edge of the row instead
+    // of taking room, so the columns stay on one grid. The stack is always
+    // there, the way the queue row does it: a row that gains the mark must
+    // not change shape, or the second click of a double click lands in a
+    // new click area and the track is played instead of marked.
+    row = Stack(
+      fit: StackFit.passthrough,
+      children: [
+        if (selected)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 2, color: accent),
+          ),
+        row,
+      ],
+    );
+
+    return Material(
+      color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,
+      child: row,
     );
   }
 }
