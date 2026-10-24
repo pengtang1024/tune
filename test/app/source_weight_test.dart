@@ -400,6 +400,32 @@ void main() {
     expect(restored.metadata, 1);
   });
 
+  test('metadata counts artist, album and year', () {
+    const songs = [
+      Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        sourceId: 'openverse',
+        externalId: 'one',
+        artist: 'Artist',
+        album: 'Album',
+        year: 2001,
+      ),
+      Song(
+        id: 2,
+        uri: 'tune://openverse/two',
+        sourceId: 'openverse',
+        externalId: 'two',
+        artist: 'Artist',
+      ),
+    ];
+
+    final facts = sourceHealthFactsOf(songs);
+
+    // One fully tagged track (1.0) and one with only an artist (0.6).
+    expect(facts['openverse']!.metadata, closeTo(0.8, 1e-9));
+  });
+
   test('a recent success outweighs an old failure', () {
     final now = DateTime(2026, 10, 24);
     final history = SourceScanHealthHistory(
@@ -450,7 +476,7 @@ void main() {
 
     expect(openverse.playable, 1);
     expect(openverse.artwork, 0.5);
-    expect(openverse.metadata, 0.5);
+    expect(openverse.metadata, 0.3);
     expect(openverse.activity, 0.5);
   });
 

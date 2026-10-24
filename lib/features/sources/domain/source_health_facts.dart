@@ -28,9 +28,9 @@ class SourceHealthFacts {
 /// Counts the four source facts in one pass over the library.
 ///
 /// A track is playable when it has a local file or a stream address, has
-/// artwork when it has a cover, and has metadata when it has an artist name.
-/// Activity is the share of the source's tracks the reader marked with a
-/// heart.
+/// artwork when it has a cover, and its metadata is the weighted share of
+/// artist, album and year. Activity is the share of the source's tracks the
+/// reader marked with a heart.
 Map<String, SourceHealthFacts> sourceHealthFactsOf(
   List<Song> songs, {
   Set<String> favoriteUris = const {},
@@ -38,7 +38,9 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
   final totals = <String, int>{};
   final playable = <String, int>{};
   final artwork = <String, int>{};
-  final metadata = <String, int>{};
+  final artist = <String, int>{};
+  final album = <String, int>{};
+  final year = <String, int>{};
   final liked = <String, int>{};
   final hasFavorites = favoriteUris.isNotEmpty;
 
@@ -49,7 +51,9 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
       playable[id] = (playable[id] ?? 0) + 1;
     }
     if (song.hasArtwork) artwork[id] = (artwork[id] ?? 0) + 1;
-    if (song.artist.trim().isNotEmpty) metadata[id] = (metadata[id] ?? 0) + 1;
+    if (song.artist.trim().isNotEmpty) artist[id] = (artist[id] ?? 0) + 1;
+    if (song.album.trim().isNotEmpty) album[id] = (album[id] ?? 0) + 1;
+    if ((song.year ?? 0) > 0) year[id] = (year[id] ?? 0) + 1;
     if (favoriteUris.contains(song.uri)) liked[id] = (liked[id] ?? 0) + 1;
   }
 
@@ -58,7 +62,13 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
       entry.key: SourceHealthFacts(
         playable: (playable[entry.key] ?? 0) / entry.value,
         artwork: (artwork[entry.key] ?? 0) / entry.value,
-        metadata: (metadata[entry.key] ?? 0) / entry.value,
+        // Artist is the one fact every playable card needs; album and year
+        // make a source nicer to browse but are often missing from open
+        // catalogs, so they only fill in the rest.
+        metadata:
+            0.6 * (artist[entry.key] ?? 0) / entry.value +
+            0.25 * (album[entry.key] ?? 0) / entry.value +
+            0.15 * (year[entry.key] ?? 0) / entry.value,
         // Before the first heart every source would score zero here; that is
         // not a signal about the source, so the dimension stays neutral.
         activity: hasFavorites ? (liked[entry.key] ?? 0) / entry.value : 0.5,
