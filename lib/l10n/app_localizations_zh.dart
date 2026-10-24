@@ -400,10 +400,12 @@ class AppLocalizationsZh extends AppLocalizations {
     int speed,
     int reliability,
     int stability,
-    int coverage,
+    int playable,
+    int artwork,
+    int metadata,
     int activity,
   ) {
-    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 覆盖 $coverage% · 活跃 $activity%';
+    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 可播放 $playable% · 封面 $artwork% · 元数据 $metadata% · 活跃 $activity%';
   }
 
   @override
@@ -419,7 +421,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSourceHealthDescription =>
-      '十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
+      '十二个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
 
   @override
   String get settingsAdjustSourceHealthWeights => '调整权重';
@@ -452,7 +454,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesHealthStability => '稳定';
 
   @override
-  String get sourcesHealthCoverage => '覆盖';
+  String get sourcesHealthPlayable => '可播放';
+
+  @override
+  String get sourcesHealthArtwork => '封面';
+
+  @override
+  String get sourcesHealthMetadata => '元数据';
 
   @override
   String get sourcesHealthActivity => '活跃';
@@ -2372,10 +2380,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
     int speed,
     int reliability,
     int stability,
-    int coverage,
+    int playable,
+    int artwork,
+    int metadata,
     int activity,
   ) {
-    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 覆盖 $coverage% · 活跃 $activity%';
+    return '可用 $availability% · 配置 $configuration% · 扫描 $scan% · 新鲜 $freshness% · 产出 $output% · 速度 $speed% · 可靠 $reliability% · 稳定 $stability% · 可播放 $playable% · 封面 $artwork% · 元数据 $metadata% · 活跃 $activity%';
   }
 
   @override
@@ -2391,7 +2401,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSourceHealthDescription =>
-      '十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
+      '十二个维度当前的分量；调高一个维度，它在健康度里的占比就更大。';
 
   @override
   String get settingsAdjustSourceHealthWeights => '调整权重';
@@ -2424,7 +2434,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesHealthStability => '稳定';
 
   @override
-  String get sourcesHealthCoverage => '覆盖';
+  String get sourcesHealthPlayable => '可播放';
+
+  @override
+  String get sourcesHealthArtwork => '封面';
+
+  @override
+  String get sourcesHealthMetadata => '元数据';
 
   @override
   String get sourcesHealthActivity => '活跃';
@@ -4344,10 +4360,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     int speed,
     int reliability,
     int stability,
-    int coverage,
+    int playable,
+    int artwork,
+    int metadata,
     int activity,
   ) {
-    return '可用 $availability% · 設定 $configuration% · 掃描 $scan% · 新鮮 $freshness% · 產出 $output% · 速度 $speed% · 可靠 $reliability% · 穩定 $stability% · 覆蓋 $coverage% · 活躍 $activity%';
+    return '可用 $availability% · 設定 $configuration% · 掃描 $scan% · 新鮮 $freshness% · 產出 $output% · 速度 $speed% · 可靠 $reliability% · 穩定 $stability% · 可播放 $playable% · 封面 $artwork% · 中繼資料 $metadata% · 活躍 $activity%';
   }
 
   @override
@@ -4363,7 +4381,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSourceHealthDescription =>
-      '十個維度目前的分量；調高一個維度，它在健康度裡的佔比就更大。';
+      '十二個維度目前的分量；調高一個維度，它在健康度裡的佔比就更大。';
 
   @override
   String get settingsAdjustSourceHealthWeights => '調整權重';
@@ -4396,7 +4414,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesHealthStability => '穩定';
 
   @override
-  String get sourcesHealthCoverage => '覆蓋';
+  String get sourcesHealthPlayable => '可播放';
+
+  @override
+  String get sourcesHealthArtwork => '封面';
+
+  @override
+  String get sourcesHealthMetadata => '中繼資料';
 
   @override
   String get sourcesHealthActivity => '活躍';

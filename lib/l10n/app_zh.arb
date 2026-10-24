@@ -221,7 +221,7 @@
       }
     }
   },
-  "sourcesHealthBreakdown": "可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 覆盖 {coverage}% · 活跃 {activity}%",
+  "sourcesHealthBreakdown": "可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 可播放 {playable}% · 封面 {artwork}% · 元数据 {metadata}% · 活跃 {activity}%",
   "@sourcesHealthBreakdown": {
     "placeholders": {
       "availability": {
@@ -248,7 +248,13 @@
       "stability": {
         "type": "int"
       },
-      "coverage": {
+      "playable": {
+        "type": "int"
+      },
+      "artwork": {
+        "type": "int"
+      },
+      "metadata": {
         "type": "int"
       },
       "activity": {
@@ -266,7 +272,7 @@
       }
     }
   },
-  "settingsSourceHealthDescription": "十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。",
+  "settingsSourceHealthDescription": "十二个维度当前的分量；调高一个维度，它在健康度里的占比就更大。",
   "settingsAdjustSourceHealthWeights": "调整权重",
   "sourcesHealthWeightsReset": "恢复默认",
   "sourcesHealthAvailability": "可用",
@@ -277,7 +283,9 @@
   "sourcesHealthSpeed": "速度",
   "sourcesHealthReliability": "可靠",
   "sourcesHealthStability": "稳定",
-  "sourcesHealthCoverage": "覆盖",
+  "sourcesHealthPlayable": "可播放",
+  "sourcesHealthArtwork": "封面",
+  "sourcesHealthMetadata": "元数据",
   "sourcesHealthActivity": "活跃",
   "sourceDirectUrlName": "直链音频",
   "sourceDirectUrlDescription": "一行一条地址，每条变成一首曲目",

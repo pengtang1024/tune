@@ -424,10 +424,12 @@ class AppLocalizationsEn extends AppLocalizations {
     int speed,
     int reliability,
     int stability,
-    int coverage,
+    int playable,
+    int artwork,
+    int metadata,
     int activity,
   ) {
-    return 'Available $availability% · Configured $configuration% · Scan $scan% · Fresh $freshness% · Output $output% · Speed $speed% · Reliable $reliability% · Stable $stability% · Coverage $coverage% · Active $activity%';
+    return 'Available $availability% · Configured $configuration% · Scan $scan% · Fresh $freshness% · Output $output% · Speed $speed% · Reliable $reliability% · Stable $stability% · Playable $playable% · Artwork $artwork% · Metadata $metadata% · Active $activity%';
   }
 
   @override
@@ -444,7 +446,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSourceHealthDescription =>
-      'The current share of the ten dimensions; raise one to give it more of the score.';
+      'The current share of the twelve dimensions; raise one to give it more of the score.';
 
   @override
   String get settingsAdjustSourceHealthWeights => 'Adjust weights';
@@ -477,7 +479,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesHealthStability => 'Stable';
 
   @override
-  String get sourcesHealthCoverage => 'Coverage';
+  String get sourcesHealthPlayable => 'Playable';
+
+  @override
+  String get sourcesHealthArtwork => 'Artwork';
+
+  @override
+  String get sourcesHealthMetadata => 'Metadata';
 
   @override
   String get sourcesHealthActivity => 'Active';

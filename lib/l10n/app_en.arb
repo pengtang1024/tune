@@ -221,7 +221,7 @@
       }
     }
   },
-  "sourcesHealthBreakdown": "Available {availability}% · Configured {configuration}% · Scan {scan}% · Fresh {freshness}% · Output {output}% · Speed {speed}% · Reliable {reliability}% · Stable {stability}% · Coverage {coverage}% · Active {activity}%",
+  "sourcesHealthBreakdown": "Available {availability}% · Configured {configuration}% · Scan {scan}% · Fresh {freshness}% · Output {output}% · Speed {speed}% · Reliable {reliability}% · Stable {stability}% · Playable {playable}% · Artwork {artwork}% · Metadata {metadata}% · Active {activity}%",
   "@sourcesHealthBreakdown": {
     "placeholders": {
       "availability": {
@@ -248,7 +248,13 @@
       "stability": {
         "type": "int"
       },
-      "coverage": {
+      "playable": {
+        "type": "int"
+      },
+      "artwork": {
+        "type": "int"
+      },
+      "metadata": {
         "type": "int"
       },
       "activity": {
@@ -266,7 +272,7 @@
       }
     }
   },
-  "settingsSourceHealthDescription": "The current share of the ten dimensions; raise one to give it more of the score.",
+  "settingsSourceHealthDescription": "The current share of the twelve dimensions; raise one to give it more of the score.",
   "settingsAdjustSourceHealthWeights": "Adjust weights",
   "sourcesHealthWeightsReset": "Reset",
   "sourcesHealthAvailability": "Available",
@@ -277,7 +283,9 @@
   "sourcesHealthSpeed": "Speed",
   "sourcesHealthReliability": "Reliable",
   "sourcesHealthStability": "Stable",
-  "sourcesHealthCoverage": "Coverage",
+  "sourcesHealthPlayable": "Playable",
+  "sourcesHealthArtwork": "Artwork",
+  "sourcesHealthMetadata": "Metadata",
   "sourcesHealthActivity": "Active",
   "sourceDirectUrlName": "Direct audio",
   "sourceDirectUrlDescription": "One address per line; every line becomes a track",

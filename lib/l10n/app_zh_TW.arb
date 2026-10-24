@@ -221,7 +221,7 @@
       }
     }
   },
-  "sourcesHealthBreakdown": "可用 {availability}% · 設定 {configuration}% · 掃描 {scan}% · 新鮮 {freshness}% · 產出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 穩定 {stability}% · 覆蓋 {coverage}% · 活躍 {activity}%",
+  "sourcesHealthBreakdown": "可用 {availability}% · 設定 {configuration}% · 掃描 {scan}% · 新鮮 {freshness}% · 產出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 穩定 {stability}% · 可播放 {playable}% · 封面 {artwork}% · 中繼資料 {metadata}% · 活躍 {activity}%",
   "@sourcesHealthBreakdown": {
     "placeholders": {
       "availability": {
@@ -248,7 +248,13 @@
       "stability": {
         "type": "int"
       },
-      "coverage": {
+      "playable": {
+        "type": "int"
+      },
+      "artwork": {
+        "type": "int"
+      },
+      "metadata": {
         "type": "int"
       },
       "activity": {
@@ -266,7 +272,7 @@
       }
     }
   },
-  "settingsSourceHealthDescription": "十個維度目前的分量；調高一個維度，它在健康度裡的佔比就更大。",
+  "settingsSourceHealthDescription": "十二個維度目前的分量；調高一個維度，它在健康度裡的佔比就更大。",
   "settingsAdjustSourceHealthWeights": "調整權重",
   "sourcesHealthWeightsReset": "恢復預設",
   "sourcesHealthAvailability": "可用",
@@ -277,7 +283,9 @@
   "sourcesHealthSpeed": "速度",
   "sourcesHealthReliability": "可靠",
   "sourcesHealthStability": "穩定",
-  "sourcesHealthCoverage": "覆蓋",
+  "sourcesHealthPlayable": "可播放",
+  "sourcesHealthArtwork": "封面",
+  "sourcesHealthMetadata": "中繼資料",
   "sourcesHealthActivity": "活躍",
   "sourceDirectUrlName": "直鏈音訊",
   "sourceDirectUrlDescription": "一行一條位址，每條變成一首曲目",

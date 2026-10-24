@@ -89,7 +89,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
   }
 }
 
-/// The ten dimensions as two aligned columns of label and value.
+/// The twelve dimensions as two aligned columns of label and value.
 class _WeightTable extends StatelessWidget {
   final SourceHealthWeights weights;
 
@@ -107,7 +107,9 @@ class _WeightTable extends StatelessWidget {
       (context.loc.sourcesHealthSpeed, weights.speed),
       (context.loc.sourcesHealthReliability, weights.reliability),
       (context.loc.sourcesHealthStability, weights.stability),
-      (context.loc.sourcesHealthCoverage, weights.coverage),
+      (context.loc.sourcesHealthPlayable, weights.playable),
+      (context.loc.sourcesHealthArtwork, weights.artwork),
+      (context.loc.sourcesHealthMetadata, weights.metadata),
       (context.loc.sourcesHealthActivity, weights.activity),
     ];
 
@@ -125,13 +127,13 @@ class _WeightTable extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: _WeightColumn(entries: entries.sublist(0, 5))),
+            Expanded(child: _WeightColumn(entries: entries.sublist(0, 6))),
             VerticalDivider(
               width: CompactTokens.space20,
               thickness: 1,
               color: theme.colorScheme.outlineVariant,
             ),
-            Expanded(child: _WeightColumn(entries: entries.sublist(5))),
+            Expanded(child: _WeightColumn(entries: entries.sublist(6))),
           ],
         ),
       ),

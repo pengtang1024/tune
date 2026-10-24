@@ -12,7 +12,9 @@ class SourceHealthWeights {
   final int speed;
   final int reliability;
   final int stability;
-  final int coverage;
+  final int playable;
+  final int artwork;
+  final int metadata;
   final int activity;
 
   static const SourceHealthWeights defaults = SourceHealthWeights(
@@ -24,7 +26,9 @@ class SourceHealthWeights {
     speed: 5,
     reliability: 10,
     stability: 10,
-    coverage: 10,
+    playable: 6,
+    artwork: 10,
+    metadata: 2,
     activity: 5,
   );
 
@@ -37,7 +41,9 @@ class SourceHealthWeights {
     required this.speed,
     required this.reliability,
     required this.stability,
-    required this.coverage,
+    required this.playable,
+    required this.artwork,
+    required this.metadata,
     required this.activity,
   });
 
@@ -50,7 +56,9 @@ class SourceHealthWeights {
       speed +
       reliability +
       stability +
-      coverage +
+      playable +
+      artwork +
+      metadata +
       activity;
 
   SourceHealthWeights copyWith({
@@ -62,7 +70,9 @@ class SourceHealthWeights {
     int? speed,
     int? reliability,
     int? stability,
-    int? coverage,
+    int? playable,
+    int? artwork,
+    int? metadata,
     int? activity,
   }) {
     return SourceHealthWeights(
@@ -74,7 +84,9 @@ class SourceHealthWeights {
       speed: speed ?? this.speed,
       reliability: reliability ?? this.reliability,
       stability: stability ?? this.stability,
-      coverage: coverage ?? this.coverage,
+      playable: playable ?? this.playable,
+      artwork: artwork ?? this.artwork,
+      metadata: metadata ?? this.metadata,
       activity: activity ?? this.activity,
     );
   }
@@ -87,6 +99,18 @@ class SourceHealthWeights {
     }
 
     const fallback = defaults;
+    // A configuration written before the split stored one `coverage` weight
+    // for playable + artwork + metadata together. Keep the old 6/2/2 split
+    // so a reader who had tuned it does not lose that tuning.
+    final legacyCoverage = json['coverage'];
+    int readFact(String key, int fallback, double share) {
+      if (json.containsKey(key)) return read(key, fallback);
+      if (legacyCoverage is num) {
+        return (legacyCoverage.toInt().clamp(0, 100) * share).round();
+      }
+      return fallback;
+    }
+
     return SourceHealthWeights(
       availability: read('availability', fallback.availability),
       configuration: read('configuration', fallback.configuration),
@@ -96,7 +120,9 @@ class SourceHealthWeights {
       speed: read('speed', fallback.speed),
       reliability: read('reliability', fallback.reliability),
       stability: read('stability', fallback.stability),
-      coverage: read('coverage', fallback.coverage),
+      playable: readFact('playable', fallback.playable, 0.6),
+      artwork: readFact('artwork', fallback.artwork, 0.2),
+      metadata: readFact('metadata', fallback.metadata, 0.2),
       activity: read('activity', fallback.activity),
     );
   }
@@ -110,7 +136,9 @@ class SourceHealthWeights {
     'speed': speed,
     'reliability': reliability,
     'stability': stability,
-    'coverage': coverage,
+    'playable': playable,
+    'artwork': artwork,
+    'metadata': metadata,
     'activity': activity,
   };
 }

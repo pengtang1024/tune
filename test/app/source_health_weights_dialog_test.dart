@@ -37,7 +37,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('健康度权重'), findsOneWidget);
-    expect(find.byType(Slider), findsNWidgets(10));
+    expect(find.byType(Slider), findsNWidgets(12));
     expect(find.text('恢复默认'), findsOneWidget);
 
     await tester.tap(find.text('保存'));

@@ -83,7 +83,9 @@ class MusicSourcesSection extends ConsumerWidget {
           scanTimeout: sourceService.scanTimeoutFor(source),
           weights: settings.sourceHealthWeights,
           history: healthHistory[source.id],
-          coverage: coverage[source.id] ?? 0.5,
+          playable: coverage[source.id]?.playableRate ?? 0.5,
+          artwork: coverage[source.id]?.artworkRate ?? 0.5,
+          metadata: coverage[source.id]?.metadataRate ?? 0.5,
           activity: activity[source.id] ?? 0.5,
         ),
     };
@@ -265,34 +267,38 @@ class MusicSourcesSection extends ConsumerWidget {
   }
 }
 
-/// The share of a source's tracks that has a playable address, artwork and
-/// an artist. A source with no tracks yet is neutral.
-Map<String, double> _coverageBySource(List<Song> songs) {
-  final total = <String, int>{};
-  final playable = <String, int>{};
-  final artwork = <String, int>{};
-  final metadata = <String, int>{};
+/// The facts of a source's tracks that the health score looks at.
+///
+/// A source with no tracks yet stays neutral: the three rates are 0.5 so an
+/// unscanned source is neither rewarded nor punished for data it has not
+/// produced.
+class _SourceCoverage {
+  int total = 0;
+  int playable = 0;
+  int artwork = 0;
+  int metadata = 0;
+
+  double get playableRate => total == 0 ? 0.5 : playable / total;
+  double get artworkRate => total == 0 ? 0.5 : artwork / total;
+  double get metadataRate => total == 0 ? 0.5 : metadata / total;
+}
+
+/// Counts the three coverage facts per source in one pass.
+Map<String, _SourceCoverage> _coverageBySource(List<Song> songs) {
+  final coverage = <String, _SourceCoverage>{};
 
   for (final song in songs) {
     final id = song.sourceId ?? 'local';
-    total[id] = (total[id] ?? 0) + 1;
+    final item = coverage.putIfAbsent(id, _SourceCoverage.new);
+    item.total++;
     final hasPlayable =
         song.hasLocalFile || (song.streamUrl?.isNotEmpty ?? false);
-    if (hasPlayable) playable[id] = (playable[id] ?? 0) + 1;
-    if (song.hasArtwork) artwork[id] = (artwork[id] ?? 0) + 1;
-    if (song.artist.trim().isNotEmpty) {
-      metadata[id] = (metadata[id] ?? 0) + 1;
-    }
+    if (hasPlayable) item.playable++;
+    if (song.hasArtwork) item.artwork++;
+    if (song.artist.trim().isNotEmpty) item.metadata++;
   }
 
-  return {
-    for (final entry in total.entries)
-      entry.key: entry.value == 0
-          ? 0.5
-          : 0.6 * (playable[entry.key] ?? 0) / entry.value +
-                0.2 * (artwork[entry.key] ?? 0) / entry.value +
-                0.2 * (metadata[entry.key] ?? 0) / entry.value,
-  };
+  return coverage;
 }
 
 /// The share of a source's tracks the reader has marked with a heart.
@@ -551,7 +557,7 @@ class _SourceTile extends ConsumerWidget {
                       tooltip:
                           '$status\n'
                           '${context.loc.sourcesHealthScore(health.score)}\n'
-                          '${context.loc.sourcesHealthBreakdown(health.availability, health.configuration, health.scan, health.freshness, health.output, health.speed, health.reliability, health.stability, health.coverage, health.activity)}',
+                          '${context.loc.sourcesHealthBreakdown(health.availability, health.configuration, health.scan, health.freshness, health.output, health.speed, health.reliability, health.stability, health.playable, health.artwork, health.metadata, health.activity)}',
                       tone: mark.tone,
                       size: CompactTokens.icon14,
                     ),

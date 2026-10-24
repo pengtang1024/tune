@@ -97,7 +97,7 @@ void main() {
       autoScanInterval: interval,
       scanTimeout: timeout,
     );
-    expect(noScan.score, 63);
+    expect(noScan.score, 62);
     expect(noScan.healthy, isTrue);
 
     final healthy = SourceHealth.report(
@@ -110,7 +110,7 @@ void main() {
       autoScanInterval: interval,
       scanTimeout: timeout,
     );
-    expect(healthy.score, greaterThanOrEqualTo(80));
+    expect(healthy.score, greaterThanOrEqualTo(75));
     expect(healthy.healthy, isTrue);
 
     final broken = SourceHealth.report(
@@ -213,7 +213,9 @@ void main() {
       speed: 0,
       reliability: 0,
       stability: 0,
-      coverage: 0,
+      playable: 0,
+      artwork: 0,
+      metadata: 0,
       activity: 0,
     );
     final report = SourceHealth.report(
@@ -230,10 +232,10 @@ void main() {
 
     expect(report.score, 100);
     expect(report.availability, 100);
-    expect(report.coverage, 50);
+    expect(report.artwork, 50);
   });
 
-  test('stability, coverage and activity move the score', () {
+  test('stability, coverage facts and activity move the score', () {
     final history = SourceScanHealthHistory(
       records: [
         SourceScanHealthRecord(
@@ -259,7 +261,9 @@ void main() {
       lastScanAt: null,
       autoScanInterval: const Duration(hours: 6),
       scanTimeout: const Duration(seconds: 45),
-      coverage: 1,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
       activity: 1,
     );
     final withHistory = SourceHealth.report(
@@ -272,13 +276,82 @@ void main() {
       autoScanInterval: const Duration(hours: 6),
       scanTimeout: const Duration(seconds: 45),
       history: history,
-      coverage: 1,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
       activity: 1,
     );
 
     expect(withHistory.stability, 50);
     expect(withHistory.score, lessThanOrEqualTo(base.score));
-    expect(withHistory.coverage, 100);
+    expect(withHistory.playable, 100);
+    expect(withHistory.artwork, 100);
+    expect(withHistory.metadata, 100);
     expect(withHistory.activity, 100);
+  });
+
+  test('a source without covers scores below one with covers', () {
+    final summary = SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.success,
+      songCount: 25,
+      scannedAt: DateTime.now(),
+      elapsed: const Duration(seconds: 1),
+    );
+    SourceHealthReport report({required double artwork}) {
+      return SourceHealth.report(
+        isLocal: false,
+        enabled: true,
+        supported: true,
+        configured: true,
+        summary: summary,
+        lastScanAt: DateTime.now(),
+        autoScanInterval: const Duration(hours: 6),
+        scanTimeout: const Duration(seconds: 45),
+        playable: 1,
+        artwork: artwork,
+        metadata: 1,
+        activity: 1,
+      );
+    }
+
+    final covered = report(artwork: 1);
+    final bare = report(artwork: 0);
+
+    expect(covered.artwork, 100);
+    expect(bare.artwork, 0);
+    expect(covered.score - bare.score, greaterThanOrEqualTo(7));
+  });
+
+  test('an old coverage weight is split into the three facts', () {
+    final restored = SourceHealthWeights.fromJson({
+      'availability': 10,
+      'configuration': 15,
+      'scan': 15,
+      'freshness': 10,
+      'output': 10,
+      'speed': 5,
+      'reliability': 10,
+      'stability': 10,
+      'coverage': 20,
+      'activity': 5,
+    });
+
+    expect(restored.playable, 12);
+    expect(restored.artwork, 4);
+    expect(restored.metadata, 4);
+  });
+
+  test('new coverage weights win over an old coverage value', () {
+    final restored = SourceHealthWeights.fromJson({
+      'coverage': 20,
+      'playable': 3,
+      'artwork': 7,
+      'metadata': 1,
+    });
+
+    expect(restored.playable, 3);
+    expect(restored.artwork, 7);
+    expect(restored.metadata, 1);
   });
 }

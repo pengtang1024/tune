@@ -84,7 +84,7 @@ class _SourceHealthWeightsDialogState extends State<SourceHealthWeightsDialog> {
     );
   }
 
-  /// The ten dimensions with the update that belongs to each one.
+  /// The twelve dimensions with the update that belongs to each one.
   List<(String, int, ValueChanged<int>)> _rows(BuildContext context) {
     final loc = context.loc;
     return [
@@ -129,9 +129,19 @@ class _SourceHealthWeightsDialogState extends State<SourceHealthWeightsDialog> {
         (value) => _set((w) => w.copyWith(stability: value)),
       ),
       (
-        loc.sourcesHealthCoverage,
-        _weights.coverage,
-        (value) => _set((w) => w.copyWith(coverage: value)),
+        loc.sourcesHealthPlayable,
+        _weights.playable,
+        (value) => _set((w) => w.copyWith(playable: value)),
+      ),
+      (
+        loc.sourcesHealthArtwork,
+        _weights.artwork,
+        (value) => _set((w) => w.copyWith(artwork: value)),
+      ),
+      (
+        loc.sourcesHealthMetadata,
+        _weights.metadata,
+        (value) => _set((w) => w.copyWith(metadata: value)),
       ),
       (
         loc.sourcesHealthActivity,

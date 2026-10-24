@@ -17,7 +17,9 @@ class SourceHealthReport {
   final int speed;
   final int reliability;
   final int stability;
-  final int coverage;
+  final int playable;
+  final int artwork;
+  final int metadata;
   final int activity;
   final int score;
   final bool healthy;
@@ -31,7 +33,9 @@ class SourceHealthReport {
     required this.speed,
     required this.reliability,
     required this.stability,
-    required this.coverage,
+    required this.playable,
+    required this.artwork,
+    required this.metadata,
     required this.activity,
     required this.score,
     required this.healthy,
@@ -46,7 +50,9 @@ class SourceHealthReport {
       speed = 0,
       reliability = 0,
       stability = 0,
-      coverage = 0,
+      playable = 0,
+      artwork = 0,
+      metadata = 0,
       activity = 0,
       score = 0,
       healthy = false;
@@ -54,7 +60,7 @@ class SourceHealthReport {
 
 /// Scores how usable a source is right now.
 ///
-/// Ten dimensions make the score; [SourceHealthWeights] says how much each
+/// Twelve dimensions make the score; [SourceHealthWeights] says how much each
 /// one matters. The hard gates (unavailable, unconfigured, failed, local) are
 /// independent of the weights.
 abstract final class SourceHealth {
@@ -71,7 +77,9 @@ abstract final class SourceHealth {
     required Duration scanTimeout,
     SourceHealthWeights weights = SourceHealthWeights.defaults,
     SourceScanHealthHistory? history,
-    double coverage = 0.5,
+    double playable = 0.5,
+    double artwork = 0.5,
+    double metadata = 0.5,
     double activity = 0.5,
   }) {
     if (isLocal) {
@@ -84,7 +92,9 @@ abstract final class SourceHealth {
         speed: 100,
         reliability: 100,
         stability: 100,
-        coverage: 100,
+        playable: 100,
+        artwork: 100,
+        metadata: 100,
         activity: 100,
         score: 100,
         healthy: true,
@@ -121,7 +131,9 @@ abstract final class SourceHealth {
       null => lastScanAt == null ? 0.5 : 0.66,
     };
     final stability = history?.stabilityRate ?? 0.5;
-    final coverageRate = coverage.clamp(0.0, 1.0);
+    final playableRate = playable.clamp(0.0, 1.0);
+    final artworkRate = artwork.clamp(0.0, 1.0);
+    final metadataRate = metadata.clamp(0.0, 1.0);
     final activityRate = activity.clamp(0.0, 1.0);
 
     final totalWeight = weights.total;
@@ -134,7 +146,9 @@ abstract final class SourceHealth {
         speed * weights.speed +
         reliability * weights.reliability +
         stability * weights.stability +
-        coverageRate * weights.coverage +
+        playableRate * weights.playable +
+        artworkRate * weights.artwork +
+        metadataRate * weights.metadata +
         activityRate * weights.activity;
 
     var score = totalWeight <= 0 ? 0 : (weighted / totalWeight * 100).round();
@@ -153,7 +167,9 @@ abstract final class SourceHealth {
       speed: _percent(speed),
       reliability: _percent(reliability),
       stability: _percent(stability),
-      coverage: _percent(coverageRate),
+      playable: _percent(playableRate),
+      artwork: _percent(artworkRate),
+      metadata: _percent(metadataRate),
       activity: _percent(activityRate),
       score: score,
       healthy: score >= threshold,

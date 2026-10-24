@@ -775,7 +775,7 @@ abstract class AppLocalizations {
   /// No description provided for @sourcesHealthBreakdown.
   ///
   /// In zh_CN, this message translates to:
-  /// **'可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 覆盖 {coverage}% · 活跃 {activity}%'**
+  /// **'可用 {availability}% · 配置 {configuration}% · 扫描 {scan}% · 新鲜 {freshness}% · 产出 {output}% · 速度 {speed}% · 可靠 {reliability}% · 稳定 {stability}% · 可播放 {playable}% · 封面 {artwork}% · 元数据 {metadata}% · 活跃 {activity}%'**
   String sourcesHealthBreakdown(
     int availability,
     int configuration,
@@ -785,7 +785,9 @@ abstract class AppLocalizations {
     int speed,
     int reliability,
     int stability,
-    int coverage,
+    int playable,
+    int artwork,
+    int metadata,
     int activity,
   );
 
@@ -810,7 +812,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSourceHealthDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'十个维度当前的分量；调高一个维度，它在健康度里的占比就更大。'**
+  /// **'十二个维度当前的分量；调高一个维度，它在健康度里的占比就更大。'**
   String get settingsSourceHealthDescription;
 
   /// No description provided for @settingsAdjustSourceHealthWeights.
@@ -873,11 +875,23 @@ abstract class AppLocalizations {
   /// **'稳定'**
   String get sourcesHealthStability;
 
-  /// No description provided for @sourcesHealthCoverage.
+  /// No description provided for @sourcesHealthPlayable.
   ///
   /// In zh_CN, this message translates to:
-  /// **'覆盖'**
-  String get sourcesHealthCoverage;
+  /// **'可播放'**
+  String get sourcesHealthPlayable;
+
+  /// No description provided for @sourcesHealthArtwork.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'封面'**
+  String get sourcesHealthArtwork;
+
+  /// No description provided for @sourcesHealthMetadata.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'元数据'**
+  String get sourcesHealthMetadata;
 
   /// No description provided for @sourcesHealthActivity.
   ///

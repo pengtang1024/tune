@@ -1045,7 +1045,7 @@ void main() {
         of: find.byType(AlertDialog),
         matching: find.byType(Slider),
       ),
-      findsNWidgets(10),
+      findsNWidgets(12),
     );
   });
 
