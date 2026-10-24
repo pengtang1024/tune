@@ -31,13 +31,11 @@ class NowPlayingTrackInfo extends ConsumerWidget {
     required this.song,
     required this.source,
     required this.status,
-    required this.progress,
   });
 
   final Song song;
   final SourceLabel source;
   final AudioSourceStatus status;
-  final double progress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,7 +68,7 @@ class NowPlayingTrackInfo extends ConsumerWidget {
               // The badge tells where the sound comes from, so it belongs
               // next to the name of the source instead of floating at the
               // far end of the seek bar.
-              AudioSourceBadge(status: status, progress: progress),
+              AudioSourceBadge(status: status),
             ],
           ),
           const SizedBox(height: CompactTokens.space16),

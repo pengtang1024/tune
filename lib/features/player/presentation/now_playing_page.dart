@@ -12,6 +12,8 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/application/playback_overview_provider.dart';
+import 'package:tune/features/player/domain/playback_overview.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/player/presentation/now_playing_track_info.dart';
@@ -70,10 +72,13 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final state = ref.watch(playbackControllerProvider);
+    // The page watches the slow half of the playback. The position moves
+    // several times a second, and the cover, the facts and the buttons
+    // around the seek bar must not be rebuilt by the clock.
+    final overview = ref.watch(playbackOverviewProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
     final favorites = ref.watch(favoritesControllerProvider);
-    final currentUri = state.currentSong?.uri;
+    final currentUri = overview.currentSong?.uri;
     final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
@@ -138,7 +143,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                     child: Column(
                       children: [
                         _TopBar(
-                          state: state,
+                          overview: overview,
                           showLyrics: _showLyrics,
                           onToggleLyrics: () =>
                               setState(() => _showLyrics = !_showLyrics),
@@ -156,15 +161,15 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                         ),
                         const SizedBox(height: CompactTokens.space12),
                         Expanded(
-                          child: state.currentSong == null
+                          child: overview.currentSong == null
                               ? const _EmptyState()
                               : _TrackLayout(
-                                  state: state,
-                                  song: state.currentSong!,
+                                  overview: overview,
+                                  song: overview.currentSong!,
                                   showLyrics: _showLyrics,
                                   source:
                                       sourceLabel(
-                                        state.currentSong!,
+                                        overview.currentSong!,
                                         sourceLabels,
                                       ) ??
                                       SourceLabel(
@@ -176,7 +181,10 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                                   onSeek: (value) => controller.seekTo(
                                     Duration(
                                       milliseconds:
-                                          (state.duration.inMilliseconds *
+                                          (controller
+                                                  .snapshot
+                                                  .duration
+                                                  .inMilliseconds *
                                                   value)
                                               .round(),
                                     ),
@@ -184,7 +192,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                                 ),
                         ),
                         const SizedBox(height: CompactTokens.space12),
-                        _Footer(state: state),
+                        _Footer(overview: overview),
                       ],
                     ),
                   ),
@@ -201,7 +209,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
 /// Header with the back action and the page title.
 class _TopBar extends StatelessWidget {
   const _TopBar({
-    required this.state,
+    required this.overview,
     required this.showLyrics,
     required this.onToggleLyrics,
     required this.onToggleQueue,
@@ -209,7 +217,7 @@ class _TopBar extends StatelessWidget {
     required this.onToggleFavorite,
   });
 
-  final PlaybackState state;
+  final PlaybackOverview overview;
   final bool showLyrics;
   final VoidCallback onToggleLyrics;
   final VoidCallback? onToggleQueue;
@@ -237,10 +245,10 @@ class _TopBar extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            if (_position > 0) ...[
+            if (overview.queuePosition > 0) ...[
               const SizedBox(height: 2),
               Text(
-                context.loc.playerQueuePosition(_position),
+                context.loc.playerQueuePosition(overview.queuePosition),
                 style: CompactTypography.mono(
                   theme.colorScheme.onSurfaceVariant,
                   size: CompactTypeScale.mark,
@@ -277,20 +285,12 @@ class _TopBar extends StatelessWidget {
     );
   }
 
-  /// Where the track sits in the queue, or zero when the queue holds nothing
-  /// to point at.
-  int get _position {
-    final total = state.queue.length;
-    if (!state.hasTrack || total < 2) return 0;
-    final position = state.currentIndex + 1;
-    return position > 0 && position <= total ? position : 0;
-  }
 }
 
 /// Artwork and track information side by side.
 class _TrackLayout extends StatelessWidget {
   const _TrackLayout({
-    required this.state,
+    required this.overview,
     required this.song,
     required this.showLyrics,
     required this.source,
@@ -300,7 +300,7 @@ class _TrackLayout extends StatelessWidget {
     required this.onSeek,
   });
 
-  final PlaybackState state;
+  final PlaybackOverview overview;
   final Song song;
   final bool showLyrics;
   final SourceLabel source;
@@ -346,16 +346,15 @@ class _TrackLayout extends StatelessWidget {
                         child: NowPlayingTrackInfo(
                           song: song,
                           source: source,
-                          status: state.audioSourceStatus,
-                          progress: state.downloadProgress,
+                          status: overview.audioSourceStatus,
                         ),
                       ),
                       const SizedBox(height: CompactTokens.space18),
                     ],
-                    _ProgressRow(state: state, onSeek: onSeek),
+                    _ProgressRow(onSeek: onSeek),
                     const SizedBox(height: CompactTokens.space18),
                     _Transport(
-                      state: state,
+                      status: overview.status,
                       onPrevious: onPrevious,
                       onNext: onNext,
                       onTogglePlay: onTogglePlay,
@@ -406,27 +405,33 @@ class _Artwork extends StatelessWidget {
 }
 
 /// The seek bar with the elapsed and the total time.
-class _ProgressRow extends StatelessWidget {
-  const _ProgressRow({required this.state, required this.onSeek});
+///
+/// The position is the one value that moves several times a second, so this
+/// row watches it on its own: the cover, the facts and the buttons around it
+/// must not be rebuilt by the clock.
+class _ProgressRow extends ConsumerWidget {
+  const _ProgressRow({required this.onSeek});
 
-  final PlaybackState state;
   final ValueChanged<double> onSeek;
 
   @override
-  Widget build(BuildContext context) {
-    final value = state.duration.inMilliseconds <= 0
+  Widget build(BuildContext context, WidgetRef ref) {
+    final overview = ref.watch(playbackOverviewProvider);
+    final clock = ref.watch(
+      playbackControllerProvider.select(
+        (state) => (state.position, state.duration),
+      ),
+    );
+    final value = clock.$2.inMilliseconds <= 0
         ? 0.0
-        : (state.position.inMilliseconds / state.duration.inMilliseconds).clamp(
-            0.0,
-            1.0,
-          );
+        : (clock.$1.inMilliseconds / clock.$2.inMilliseconds).clamp(0.0, 1.0);
 
-    final isLive = state.currentSong?.isLiveStream ?? false;
+    final isLive = overview.currentSong?.isLiveStream ?? false;
 
     if (isLive) {
       return Row(
         children: [
-          _TimeLabel(value: state.position),
+          _TimeLabel(value: clock.$1),
           const SizedBox(width: CompactTokens.space12),
           const LiveBadge(),
           const Spacer(),
@@ -436,7 +441,7 @@ class _ProgressRow extends StatelessWidget {
 
     return Row(
       children: [
-        _TimeLabel(value: state.position),
+        _TimeLabel(value: clock.$1),
         Expanded(
           child: SliderTheme(
             data: SliderTheme.of(context).copyWith(
@@ -446,11 +451,11 @@ class _ProgressRow extends StatelessWidget {
             ),
             child: Slider(
               value: value,
-              onChanged: state.hasTrack ? onSeek : null,
+              onChanged: overview.hasTrack ? onSeek : null,
             ),
           ),
         ),
-        _TimeLabel(value: state.duration),
+        _TimeLabel(value: clock.$2),
       ],
     );
   }
@@ -480,13 +485,13 @@ class _TimeLabel extends StatelessWidget {
 /// The play, previous and next actions.
 class _Transport extends StatelessWidget {
   const _Transport({
-    required this.state,
+    required this.status,
     required this.onPrevious,
     required this.onNext,
     required this.onTogglePlay,
   });
 
-  final PlaybackState state;
+  final PlaybackStatus status;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final VoidCallback onTogglePlay;
@@ -494,6 +499,9 @@ class _Transport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasTrack = status != PlaybackStatus.idle;
+    final isPlaying = status == PlaybackStatus.playing;
+    final isLoading = status == PlaybackStatus.loading;
     return Row(
       // The buttons sit in the middle of the column, under the middle of
       // the seek bar, so the eye finds the play button right away.
@@ -503,20 +511,18 @@ class _Transport extends StatelessWidget {
           icon: Icons.skip_previous_rounded,
           tooltip: context.loc.playerPrevious,
           size: CompactTokens.icon24,
-          onPressed: state.hasTrack ? onPrevious : null,
+          onPressed: hasTrack ? onPrevious : null,
         ),
         const SizedBox(width: CompactTokens.space10),
         SizedBox(
           width: 56,
           height: 56,
           child: TuneTooltip(
-            message: state.isPlaying
+            message: isPlaying
                 ? context.loc.playerPause
                 : context.loc.playerPlay,
             child: IconButton.filled(
-              onPressed: state.hasTrack && !state.isLoading
-                  ? onTogglePlay
-                  : null,
+              onPressed: hasTrack && !isLoading ? onTogglePlay : null,
               padding: EdgeInsets.zero,
               style: IconButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
@@ -526,10 +532,10 @@ class _Transport extends StatelessWidget {
                 ),
                 shape: const CircleBorder(),
               ),
-              icon: state.isLoading
+              icon: isLoading
                   ? CompactSpinner.medium(color: theme.colorScheme.onPrimary)
                   : Icon(
-                      state.isPlaying
+                      isPlaying
                           ? Icons.pause_rounded
                           : Icons.play_arrow_rounded,
                       size: CompactTokens.icon28,
@@ -542,7 +548,7 @@ class _Transport extends StatelessWidget {
           icon: Icons.skip_next_rounded,
           tooltip: context.loc.playerNext,
           size: CompactTokens.icon24,
-          onPressed: state.hasTrack ? onNext : null,
+          onPressed: hasTrack ? onNext : null,
         ),
       ],
     );
@@ -551,9 +557,9 @@ class _Transport extends StatelessWidget {
 
 /// Bottom line with the queue summary.
 class _Footer extends StatelessWidget {
-  const _Footer({required this.state});
+  const _Footer({required this.overview});
 
-  final PlaybackState state;
+  final PlaybackOverview overview;
 
   @override
   Widget build(BuildContext context) {
@@ -581,7 +587,7 @@ class _Footer extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          context.loc.playerQueueSummary(state.queue.length),
+          context.loc.playerQueueSummary(overview.queue.length),
           style: CompactTypography.mono(
             muted,
             size: CompactTypeScale.mark,
@@ -589,10 +595,10 @@ class _Footer extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        if (state.hasError && state.errorMessage != null)
+        if (overview.hasError && overview.errorMessage != null)
           Flexible(
             child: Text(
-              state.errorMessage!,
+              overview.errorMessage!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: CompactTypography.mono(

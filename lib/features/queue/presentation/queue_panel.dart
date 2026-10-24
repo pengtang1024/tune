@@ -8,6 +8,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/application/playback_overview_provider.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -71,20 +72,20 @@ class _QueuePanelState extends ConsumerState<QueuePanel> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // The cursor is taken by its address, not by its place in the queue:
+    // looking a track up in the queue costs a walk through it, and this
+    // selector runs on every tick of the clock.
     final view = ref.watch(
       playbackControllerProvider.select(
-        (state) => (
-          state.queue,
-          state.currentIndex,
-          state.currentSong?.uri,
-          state.isPlaying,
-        ),
+        (state) => (state.queue, state.currentUri, state.isPlaying),
       ),
     );
     final queue = view.$1;
-    final currentIndex = view.$2;
-    final currentUri = view.$3;
-    final isPlaying = view.$4;
+    final currentUri = view.$2;
+    final isPlaying = view.$3;
+    final currentIndex = currentUri == null
+        ? -1
+        : queue.indexWhere((song) => song.uri == currentUri);
     final controller = ref.read(playbackControllerProvider.notifier);
     final favorites = ref.watch(favoritesControllerProvider);
     final settings = ref.watch(settingsControllerProvider);
@@ -242,26 +243,20 @@ class _MiniTransport extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final view = ref.watch(
+    final overview = ref.watch(playbackOverviewProvider);
+    final clock = ref.watch(
       playbackControllerProvider.select(
-        (state) => (
-          state.hasTrack,
-          state.isPlaying,
-          state.isLoading,
-          state.position,
-          state.duration,
-          state.currentSong?.isLiveStream ?? false,
-        ),
+        (state) => (state.position, state.duration),
       ),
     );
     final controller = ref.read(playbackControllerProvider.notifier);
     final theme = Theme.of(context);
-    final hasTrack = view.$1;
-    final isPlaying = view.$2;
-    final isLoading = view.$3;
-    final position = view.$4;
-    final duration = view.$5;
-    final isLive = view.$6;
+    final hasTrack = overview.hasTrack;
+    final isPlaying = overview.isPlaying;
+    final isLoading = overview.isLoading;
+    final position = clock.$1;
+    final duration = clock.$2;
+    final isLive = overview.currentSong?.isLiveStream ?? false;
     final progress = duration.inMilliseconds <= 0
         ? 0.0
         : (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);

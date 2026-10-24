@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -11,20 +13,25 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 /// The badge is an icon, not a word: the dock is the tightest place in the
 /// app, and a badge that grows with its words would push the title around.
 /// The mouse says what the badge means, and the colour says how it goes.
-class AudioSourceBadge extends StatelessWidget {
+///
+/// The badge watches the download progress itself. The progress moves on its
+/// own rhythm while a track is fetched, and a surface that showed the badge
+/// should not be rebuilt by it.
+class AudioSourceBadge extends ConsumerWidget {
   final AudioSourceStatus status;
-  final double progress;
   final bool dense;
 
   const AudioSourceBadge({
     super.key,
     required this.status,
-    this.progress = 0,
     this.dense = false,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(
+      playbackControllerProvider.select((state) => state.downloadProgress),
+    );
     final theme = Theme.of(context);
     final color = _color(theme);
     final percent = (progress.clamp(0.0, 1.0) * 100).round();

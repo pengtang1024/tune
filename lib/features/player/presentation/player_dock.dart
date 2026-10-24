@@ -7,6 +7,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/player/application/playback_overview_provider.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
@@ -34,9 +35,12 @@ class PlayerDock extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final state = ref.watch(playbackControllerProvider);
+    // The dock watches the slow half of the playback. The position moves
+    // several times a second, and a dock that draws the title of the track
+    // must not be rebuilt by the clock.
+    final overview = ref.watch(playbackOverviewProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
-    final song = state.currentSong;
+    final song = overview.currentSong;
     final favorites = ref.watch(favoritesControllerProvider);
 
     return Container(
@@ -123,12 +127,11 @@ class PlayerDock extends ConsumerWidget {
                                     ),
                                   ),
                                 ),
-                                if (state.audioSourceStatus !=
+                                if (overview.audioSourceStatus !=
                                     AudioSourceStatus.local) ...[
                                   const SizedBox(width: 8),
                                   AudioSourceBadge(
-                                    status: state.audioSourceStatus,
-                                    progress: state.downloadProgress,
+                                    status: overview.audioSourceStatus,
                                     dense: true,
                                   ),
                                 ],
@@ -152,7 +155,7 @@ class PlayerDock extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _ModeButton(
-                          state: state,
+                          mode: overview.playMode,
                           onPressed: controller.cyclePlayMode,
                         ),
                         const SizedBox(width: CompactTokens.space8),
@@ -160,14 +163,15 @@ class PlayerDock extends ConsumerWidget {
                           icon: Icons.skip_previous_rounded,
                           tooltip: context.loc.playerPrevious,
                           size: CompactTokens.icon20,
-                          onPressed: state.hasTrack
+                          onPressed: overview.hasTrack
                               ? controller.previous
                               : null,
                         ),
                         const SizedBox(width: CompactTokens.space4),
                         _PlayButton(
-                          state: state,
-                          onPressed: state.hasTrack && !state.isLoading
+                          status: overview.status,
+                          onPressed:
+                              overview.hasTrack && !overview.isLoading
                               ? controller.togglePlayPause
                               : null,
                         ),
@@ -176,7 +180,7 @@ class PlayerDock extends ConsumerWidget {
                           icon: Icons.skip_next_rounded,
                           tooltip: context.loc.playerNext,
                           size: CompactTokens.icon20,
-                          onPressed: state.hasTrack ? controller.next : null,
+                          onPressed: overview.hasTrack ? controller.next : null,
                         ),
                         // The empty twin of the mode button keeps the play
                         // button on the centre of the dock: without it the
@@ -189,44 +193,7 @@ class PlayerDock extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: CompactTokens.space4),
-                    Row(
-                      children: [
-                        _time(context, state.position),
-                        Expanded(
-                          child: state.currentSong?.isLiveStream ?? false
-                              ? const LiveBadge()
-                              : SliderTheme(
-                                  data: SliderTheme.of(context).copyWith(
-                                    trackHeight: 2,
-                                    thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 4,
-                                    ),
-                                    overlayShape:
-                                        SliderComponentShape.noOverlay,
-                                  ),
-                                  child: SizedBox(
-                                    height: 18,
-                                    child: Slider(
-                                      value: _progress(state),
-                                      onChanged: state.hasTrack
-                                          ? (value) => controller.seekTo(
-                                              Duration(
-                                                milliseconds:
-                                                    (state
-                                                                .duration
-                                                                .inMilliseconds *
-                                                            value)
-                                                        .round(),
-                                              ),
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                        _time(context, state.duration),
-                      ],
-                    ),
+                    const _DockProgress(),
                   ],
                 ),
               ),
@@ -236,14 +203,15 @@ class PlayerDock extends ConsumerWidget {
                   children: [
                     if (!narrow) ...[
                       TuneTooltip(
-                        message: state.volume > 0
+                        message: overview.volume > 0
                             ? context.loc.playerMute
                             : context.loc.playerUnmute,
                         child: IconButton(
-                          onPressed: () =>
-                              controller.setVolume(state.volume > 0 ? 0 : 1),
+                          onPressed: () => controller.setVolume(
+                            overview.volume > 0 ? 0 : 1,
+                          ),
                           icon: Icon(
-                            state.volume == 0
+                            overview.volume == 0
                                 ? Icons.volume_off_rounded
                                 : Icons.volume_up_rounded,
                             size: CompactTokens.icon18,
@@ -255,7 +223,7 @@ class PlayerDock extends ConsumerWidget {
                       SizedBox(
                         width: 74,
                         child: Slider(
-                          value: state.volume,
+                          value: overview.volume,
                           onChanged: controller.setVolume,
                         ),
                       ),
@@ -298,43 +266,97 @@ class PlayerDock extends ConsumerWidget {
       ),
     );
   }
+}
 
-  double _progress(PlaybackState state) {
-    if (state.duration.inMilliseconds <= 0) return 0;
-    return (state.position.inMilliseconds / state.duration.inMilliseconds)
-        .clamp(0.0, 1.0);
-  }
+/// The elapsed time, the seek bar and the total time.
+///
+/// The position is the one value that moves several times a second, so this
+/// row watches it on its own: the rest of the dock shows the title of the
+/// track and must not be rebuilt by the clock.
+class _DockProgress extends ConsumerWidget {
+  const _DockProgress();
 
-  Widget _time(BuildContext context, Duration value) {
-    return SizedBox(
-      width: 38,
-      child: Text(
-        formatDuration(value),
-        textAlign: TextAlign.center,
-        style: CompactTypography.mono(
-          Theme.of(context).colorScheme.onSurfaceVariant,
-          size: CompactTypeScale.mark,
-        ),
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final overview = ref.watch(playbackOverviewProvider);
+    final clock = ref.watch(
+      playbackControllerProvider.select(
+        (state) => (state.position, state.duration),
       ),
+    );
+    final controller = ref.read(playbackControllerProvider.notifier);
+    final isLive = overview.currentSong?.isLiveStream ?? false;
+
+    return Row(
+      children: [
+        _timeLabel(context, clock.$1),
+        Expanded(
+          child: isLive
+              ? const LiveBadge()
+              : SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 2,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 4,
+                    ),
+                    overlayShape: SliderComponentShape.noOverlay,
+                  ),
+                  child: SizedBox(
+                    height: 18,
+                    child: Slider(
+                      value: _progressOf(clock.$1, clock.$2),
+                      onChanged: overview.hasTrack
+                          ? (value) => controller.seekTo(
+                              Duration(
+                                milliseconds:
+                                    (clock.$2.inMilliseconds * value).round(),
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+        ),
+        _timeLabel(context, clock.$2),
+      ],
     );
   }
 }
 
+double _progressOf(Duration position, Duration duration) {
+  if (duration.inMilliseconds <= 0) return 0;
+  return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
+}
+
+Widget _timeLabel(BuildContext context, Duration value) {
+  return SizedBox(
+    width: 38,
+    child: Text(
+      formatDuration(value),
+      textAlign: TextAlign.center,
+      style: CompactTypography.mono(
+        Theme.of(context).colorScheme.onSurfaceVariant,
+        size: CompactTypeScale.mark,
+      ),
+    ),
+  );
+}
+
 class _PlayButton extends StatelessWidget {
-  final PlaybackState state;
+  final PlaybackStatus status;
   final VoidCallback? onPressed;
-  const _PlayButton({required this.state, required this.onPressed});
+  const _PlayButton({required this.status, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isPlaying = status == PlaybackStatus.playing;
+    final isLoading = status == PlaybackStatus.loading;
     return SizedBox(
       width: 34,
       height: 34,
       child: TuneTooltip(
-        message: state.isPlaying
-            ? context.loc.playerPause
-            : context.loc.playerPlay,
+        message: isPlaying ? context.loc.playerPause : context.loc.playerPlay,
         child: IconButton.filled(
           onPressed: onPressed,
           padding: EdgeInsets.zero,
@@ -346,10 +368,10 @@ class _PlayButton extends StatelessWidget {
             ),
             shape: const CircleBorder(),
           ),
-          icon: state.isLoading
+          icon: isLoading
               ? CompactSpinner.small(color: theme.colorScheme.onPrimary)
               : Icon(
-                  state.isPlaying
+                  isPlaying
                       ? Icons.pause_rounded
                       : Icons.play_arrow_rounded,
                   size: CompactTokens.icon20,
@@ -409,21 +431,21 @@ class _DockIcon extends StatelessWidget {
 }
 
 class _ModeButton extends StatelessWidget {
-  final PlaybackState state;
+  final PlayMode mode;
   final VoidCallback onPressed;
-  const _ModeButton({required this.state, required this.onPressed});
+  const _ModeButton({required this.mode, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final active = state.playMode != PlayMode.sequential;
-    final icon = switch (state.playMode) {
+    final active = mode != PlayMode.sequential;
+    final icon = switch (mode) {
       PlayMode.sequential => Icons.repeat_rounded,
       PlayMode.repeatOne => Icons.repeat_one_rounded,
       PlayMode.shuffle => Icons.shuffle_rounded,
     };
     return TuneTooltip(
-      message: switch (state.playMode) {
+      message: switch (mode) {
         PlayMode.sequential => context.loc.playerPlayModeSequential,
         PlayMode.repeatOne => context.loc.playerPlayModeRepeatOne,
         PlayMode.shuffle => context.loc.playerPlayModeShuffle,
