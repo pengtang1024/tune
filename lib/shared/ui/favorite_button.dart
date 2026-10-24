@@ -15,15 +15,25 @@ class FavoriteButton extends StatelessWidget {
   /// the way the other controls of the app say it.
   final VoidCallback? onPressed;
 
+  /// Whether the button sits in a compact row.
+  ///
+  /// The library table is shorter than a full page row, so its heart is one
+  /// step smaller and keeps the same icon and tooltip.
+  final bool dense;
+
   const FavoriteButton({
     super.key,
     required this.isFavorite,
     required this.onPressed,
+    this.dense = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final size = dense
+        ? CompactTokens.libraryRowAction
+        : CompactTokens.controlTiny;
 
     return TuneTooltip(
       message: isFavorite
@@ -33,10 +43,10 @@ class FavoriteButton extends StatelessWidget {
         onPressed: onPressed,
         icon: Icon(
           isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-          size: CompactTokens.icon18,
+          size: dense ? CompactTokens.icon16 : CompactTokens.icon18,
         ),
         padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+        constraints: BoxConstraints.tightFor(width: size, height: size),
         style: IconButton.styleFrom(
           foregroundColor: isFavorite
               ? theme.colorScheme.primary

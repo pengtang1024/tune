@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/features/library/presentation/library_row_actions.dart';
+import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
-import 'package:tune/shared/ui/track_meta.dart';
-import 'package:tune/shared/ui/tune_tooltip.dart';
+import 'package:tune/shared/ui/track_fact_strip.dart';
+import 'package:tune/shared/ui/track_position.dart';
+import 'package:tune/shared/utils/duration_format.dart';
 
-/// A track of the library list.
+/// A track of the library table.
 ///
-/// The row owns the whole presentation of a library entry; the page only
-/// decides what happens when it is tapped or when a track is queued.
-///
-/// The rows stand next to each other and share one hairline, the way the
-/// favorites and the queue read: a card around every track costs a gutter
-/// above and below each row, and a library is a column of names before it is
-/// a stack of cards.
+/// A library is read as a table: the title, the artist and the album sit in
+/// columns of their own, so a reader can scan a hundred names without the
+/// second line of every row pushing the next track out of the window. The
+/// columns that do not fit the window drop out one by one: the album first,
+/// then the facts, then the artist. The title always stays.
 class LibraryTrackCard extends StatelessWidget {
   final Song song;
   final int index;
@@ -60,8 +63,7 @@ class LibraryTrackCard extends StatelessWidget {
       child: Stack(
         children: [
           // The mark of the track that plays sits on the edge of the row
-          // instead of taking room, so the columns of the library line up
-          // with the columns of the queue.
+          // instead of taking room, so the columns stay on one grid.
           if (selected)
             Positioned(
               left: 0,
@@ -84,64 +86,119 @@ class LibraryTrackCard extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: CompactTokens.space8,
-                  vertical: CompactTokens.listRowPadding,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TrackMeta(
-                        song: song,
-                        index: index,
-                        source: source,
-                        selected: selected,
-                        playing: playing,
-                        isFavorite: isFavorite,
-                        onToggleFavorite: onToggleFavorite,
-                      ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // The album is the first column to go, then the facts of
+                  // the file. A narrow window keeps the artist and the time,
+                  // because those are what tell two tracks apart.
+                  final width = constraints.maxWidth;
+                  final showArtist = width >= 480;
+                  final showFacts = width >= 600;
+                  final showAlbum = width >= 820;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: CompactTokens.space8,
+                      vertical: CompactTokens.libraryRowPadding,
                     ),
-                    const SizedBox(width: CompactTokens.space4),
-                    FavoriteButton(
-                      isFavorite: isFavorite,
-                      onPressed: onToggleFavorite,
+                    child: Row(
+                      children: [
+                        TrackPosition(
+                          index: index,
+                          selected: selected,
+                          playing: playing,
+                        ),
+                        const SizedBox(width: CompactTokens.space8),
+                        ArtworkThumb(
+                          path: song.albumArtPath,
+                          imageUrl: song.artworkUrl,
+                          size: CompactTokens.libraryArtwork,
+                          radius: CompactTokens.radius6,
+                        ),
+                        const SizedBox(width: CompactTokens.space10),
+                        Expanded(
+                          flex: 5,
+                          child: Text(
+                            song.title.isEmpty
+                                ? context.loc.trackUnknownTitle
+                                : song.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: selected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                              color: selected
+                                  ? theme.colorScheme.primary
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        if (showArtist) ...[
+                          const SizedBox(width: CompactTokens.space8),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              song.artist.trim().isEmpty
+                                  ? context.loc.playerUnknownArtist
+                                  : song.artist,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (showAlbum) ...[
+                          const SizedBox(width: CompactTokens.space8),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              song.album.trim(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (showFacts) ...[
+                          const SizedBox(width: CompactTokens.space8),
+                          TrackFactStrip(song: song),
+                        ],
+                        if (source != null) ...[
+                          const SizedBox(width: CompactTokens.space8),
+                          SourceBadge(label: source!, dense: true),
+                        ],
+                        const SizedBox(width: CompactTokens.space8),
+                        if (!song.isLiveStream)
+                          Text(
+                            formatDuration(
+                              Duration(milliseconds: song.durationInMillis),
+                            ),
+                            style: CompactTypography.mono(
+                              theme.colorScheme.onSurfaceVariant,
+                              size: CompactTypeScale.mark,
+                            ),
+                          ),
+                        const SizedBox(width: CompactTokens.space4),
+                        LibraryRowActions(
+                          song: song,
+                          source: source,
+                          isFavorite: isFavorite,
+                          onToggleFavorite: onToggleFavorite,
+                          onAddToQueue: onAddToQueue,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: CompactTokens.space4),
-                    _AddToQueueButton(onPressed: onAddToQueue),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Action that appends the track to the play queue.
-class _AddToQueueButton extends StatelessWidget {
-  final VoidCallback onPressed;
-
-  const _AddToQueueButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return TuneTooltip(
-      message: context.loc.libraryAddToQueue,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: const Icon(Icons.add_rounded, size: CompactTokens.icon18),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-        style: IconButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
       ),
     );
   }

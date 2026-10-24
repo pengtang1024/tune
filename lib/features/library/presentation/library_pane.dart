@@ -11,7 +11,7 @@ import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
-import 'package:tune/features/library/presentation/library_queue_all_button.dart';
+import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
@@ -22,7 +22,6 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
-import 'package:tune/shared/ui/page_heading.dart';
 import 'package:tune/shared/ui/source_label.dart';
 
 /// The library page.
@@ -126,46 +125,18 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         Padding(
           padding: const EdgeInsets.fromLTRB(
             CompactTokens.pageGutter,
-            CompactTokens.pageTopPadding,
+            CompactTokens.space8,
             CompactTokens.pageGutter,
-            CompactTokens.pageHeadingGap,
+            CompactTokens.space4,
           ),
-          child: PageHeading(
-            eyebrow: context.loc.libraryEyebrow,
-            title: context.loc.libraryTitle,
-            subtitle: context.loc.librarySummary(
+          child: LibraryHeader(
+            summary: context.loc.librarySummary(
               library.songs.length,
               albumCount,
               availableSources.length,
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LibraryQueueAllButton(
-                  onPressed: songs.isEmpty ? null : () => _addAllToQueue(songs),
-                ),
-                const SizedBox(width: CompactTokens.space8),
-                OutlinedButton.icon(
-                  onPressed: () => showOnlineSearchSheet(context),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, CompactTokens.controlDefault),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CompactTokens.space12,
-                    ),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                  ),
-                  icon: const Icon(
-                    Icons.travel_explore_rounded,
-                    size: CompactTokens.icon16,
-                  ),
-                  label: Text(context.loc.searchOnlineTitle),
-                ),
-              ],
-            ),
+            onAddAll: songs.isEmpty ? null : () => _addAllToQueue(songs),
+            onSearchOnline: () => showOnlineSearchSheet(context),
           ),
         ),
         Padding(
@@ -173,7 +144,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             CompactTokens.pageGutter,
             0,
             CompactTokens.pageGutter,
-            CompactTokens.space12,
+            CompactTokens.space8,
           ),
           child: LibraryToolbar(
             controller: _searchController,

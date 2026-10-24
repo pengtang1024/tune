@@ -163,6 +163,29 @@ abstract final class CompactTokens {
   /// the room around the artwork is what is left of the row.
   static const double listRowPadding = (listRowHeight - artworkRow) / 2;
 
+  /// Height of a row of the library table.
+  ///
+  /// The library is where a reader looks for one track among hundreds, so
+  /// it is a table and not a stack of cards: one line per track, and the
+  /// columns carry the artist, the album and the facts beside the title.
+  /// The row is shorter than [listRowHeight] because a table row says
+  /// everything it has to say in one line.
+  static const double libraryRowHeight = 32;
+
+  /// Artwork of a track in the library table.
+  static const double libraryArtwork = 24;
+
+  /// Space above and below the artwork of a row of the library table.
+  static const double libraryRowPadding =
+      (libraryRowHeight - libraryArtwork) / 2;
+
+  /// Size of the action of a library row.
+  ///
+  /// The heart, the details and the queue action sit in a row that is
+  /// [libraryRowHeight] tall, so they are one step smaller than the action
+  /// of a full page row.
+  static const double libraryRowAction = 24;
+
   /// Width of the column that carries the position of a track.
   static const double positionColumnWidth = 22;
 

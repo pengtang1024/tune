@@ -17,9 +17,10 @@ import 'package:tune/l10n/app_localizations.dart';
 ///
 /// The sizes of the scale are logical pixels, so a floor of eleven pixels
 /// is a floor at a hundred percent and lifts with the setting. What the
-/// setting does not lift is the room the text is given: a row of fifty six
-/// pixels holds a title of fourteen pixels and an artist of twelve, and a
-/// quarter more of both asks for more room than the row has.
+/// setting does not lift is the room the text is given: a library row of
+/// thirty two pixels holds a title of fourteen pixels, an artist of twelve
+/// and the time, and a quarter more of all three asks for more room than
+/// the row has.
 ///
 /// A row grows with its text, so the height is never the problem. The width
 /// is: the row of a track keeps the number of the position, the name, the

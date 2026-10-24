@@ -7,15 +7,17 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/source_badge.dart';
-import 'package:tune/shared/ui/track_detail_sheet.dart';
+import 'package:tune/shared/ui/track_details_button.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
-import 'package:tune/shared/ui/tune_tooltip.dart';
+import 'package:tune/shared/ui/track_position.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// Identity of a track inside a list: position, artwork, metadata, source.
 ///
-/// The library card and the queue row are built on this widget, so a track
-/// always reads the same way wherever it is listed.
+/// The favorites and the queue are built on this widget, so a track reads
+/// the same way in every stacked list of the shell. The library is a table
+/// and writes its own row, but it takes the position and the details action
+/// from the same shared widgets.
 class TrackMeta extends StatelessWidget {
   final Song song;
   final int index;
@@ -59,7 +61,7 @@ class TrackMeta extends StatelessWidget {
 
     return Row(
       children: [
-        _Position(index: index, selected: selected, playing: playing),
+        TrackPosition(index: index, selected: selected, playing: playing),
         const SizedBox(width: CompactTokens.space8),
         ArtworkThumb(
           path: song.albumArtPath,
@@ -145,7 +147,7 @@ class TrackMeta extends StatelessWidget {
               ),
             ),
           const SizedBox(width: CompactTokens.space4),
-          _DetailsButton(
+          TrackDetailsButton(
             song: song,
             source: source,
             isFavorite: isFavorite,
@@ -171,88 +173,4 @@ String _byline(BuildContext context, Song song) {
   final album = song.album.trim();
   if (album.isEmpty) return artist;
   return '$artist · $album';
-}
-
-/// The action that opens everything that is known about a track.
-class _DetailsButton extends StatelessWidget {
-  final Song song;
-  final SourceLabel? source;
-  final bool isFavorite;
-  final VoidCallback? onToggleFavorite;
-
-  const _DetailsButton({
-    required this.song,
-    this.source,
-    this.isFavorite = false,
-    this.onToggleFavorite,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return TuneTooltip(
-      message: context.loc.trackDetailsTooltip,
-      child: IconButton(
-        onPressed: () => showTrackDetailSheet(
-          context,
-          song,
-          source: source,
-          isFavorite: isFavorite,
-          onToggleFavorite: onToggleFavorite,
-        ),
-        icon: const Icon(
-          Icons.info_outline_rounded,
-          size: CompactTokens.icon16,
-        ),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-        style: IconButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
-    );
-  }
-}
-
-/// Position of a track in its list.
-///
-/// The current track replaces its number with the playback indicator so the
-/// list always shows where the music is.
-class _Position extends StatelessWidget {
-  final int index;
-  final bool selected;
-  final bool playing;
-
-  const _Position({
-    required this.index,
-    required this.selected,
-    required this.playing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      width: CompactTokens.positionColumnWidth,
-      child: Center(
-        child: selected
-            ? Icon(
-                playing ? Icons.equalizer_rounded : Icons.play_arrow_rounded,
-                size: CompactTokens.icon16,
-                color: theme.colorScheme.primary,
-              )
-            : Text(
-                '${index + 1}',
-                style: CompactTypography.mono(
-                  theme.colorScheme.onSurfaceVariant,
-                  size: CompactTypeScale.mark,
-                ),
-              ),
-      ),
-    );
-  }
 }

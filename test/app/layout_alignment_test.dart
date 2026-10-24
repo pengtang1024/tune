@@ -8,6 +8,7 @@ import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
@@ -206,7 +207,7 @@ void main() {
     final libraryHeading = tester.getRect(
       find.descendant(
         of: find.byType(LibraryPane),
-        matching: find.byType(PageHeading),
+        matching: find.byType(LibraryHeader),
       ),
     );
     final libraryCard = tester.getRect(find.byType(LibraryTrackCard).first);
@@ -289,7 +290,7 @@ void main() {
             find
                 .descendant(
                   of: find.byType(LibraryPane),
-                  matching: find.byType(PageHeading),
+                  matching: find.byType(LibraryHeader),
                 )
                 .first,
           )

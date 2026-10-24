@@ -87,16 +87,19 @@ void main() {
       await tester.pumpAndSettle();
 
       final card = find.byType(LibraryTrackCard);
-      expect(tester.getSize(card.first).height, CompactTokens.listRowHeight);
+      expect(tester.getSize(card.first).height, CompactTokens.libraryRowHeight);
       expect(
         tester.getSize(card.first).height,
-        CompactTokens.artworkRow + 2 * CompactTokens.listRowPadding,
+        CompactTokens.libraryArtwork + 2 * CompactTokens.libraryRowPadding,
         reason:
             'the row is the artwork plus the room the token keeps around it',
       );
 
       final artwork = find.byType(ArtworkThumb);
-      expect(tester.getSize(artwork.first).height, CompactTokens.artworkRow);
+      expect(
+        tester.getSize(artwork.first).height,
+        CompactTokens.libraryArtwork,
+      );
     });
   });
 

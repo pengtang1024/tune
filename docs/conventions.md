@@ -17,7 +17,11 @@
 - 按钮高度走 `controlTiny / controlCompact / controlSmall / controlDefault / controlMedium / controlLarge`。空画面上的插图（`illustration*`）是画不是控件的图标，它有自己的尺寸。
 - **三种按钮共用一个高度**：主题里 `FilledButton` / `OutlinedButton` / `TextButton` 都是 `controlDefault`（34）。它们总是挨着出现（对话框里的取消与确定、卡片里的扫描与清空），高度差一档就会看成失误；主次靠填充色和字重分，不靠高度分。
 - 主题给按钮钉了 `VisualDensity.standard`：桌面的紧凑密度会把按钮的最小高度再减 8 像素，那样 `controlDefault` 34 画出来只有 26，token 就说了假话。
-- 列表行的高度是 `listRowHeight`（48），行内留白由 `listRowPadding` 推出来，别在行里另写 `space8`。行与行之间不留空隙、不套卡片框：一条 1px 的发丝线就够把两首曲子分开，卡片四周的留白会吃掉本来能放下一首歌的高度。
+- 列表行有两种密度，各自取自己的 token：
+  - 音乐库是单行表格：`libraryRowHeight`（32），封面 `libraryArtwork`（24），留白 `libraryRowPadding`；标题、歌手、专辑各占一列，窗口变窄时从专辑开始逐列收起。
+  - 喜欢与播放队列是双行列表：`listRowHeight`（48），封面 `artworkRow`（36），留白 `listRowPadding`。
+  - 两种行都不留行间空隙、不套卡片框：一条 1px 的发丝线就够把两首曲子分开，卡片四周的留白会吃掉本来能放下一首歌的高度。
+- 音乐库的页头是紧凑的一条：`LibraryHeader`（眉标 + 标题 + 统计 + 动作）加一行 `LibraryToolbar`。曲库是找歌的页面，页头不摆三行大字；默认窗口（900×600）首屏至少要放得下十首歌。
 - **正文颜色要过对比度**：浅色主题里的次要色（`muted`）与强调色（`accent`）至少要能和纸面拉开 4.5:1，白字压在强调色上也要 4.5:1。强调色不只是块，它还写页面眉标、节号和正在播放的曲名；亮朱红（`E6532F`）压白字只有 3.72:1，压纸面只有 3.16:1，纸上那排小红字就是「看不清」的来源。浅色主题现在用 `A83616`，`muted` 用 `635B50`，错误色用 `A82C1D`。
 - 颜色的 alpha 只留给装饰。写着字的行不要用 `onSurfaceVariant.withValues(alpha: 0.6)` 这类半透明：在纸色上再叠 40% 透明度，最高也只能到 4.4:1，笔画本来就更细，等于没有对比度。
 - `test/app/theme_contrast_test.dart` 守着这条线：明暗两套主题的正文色、次要色、强调色与错误色在每一层底色上都要过 4.5:1。
@@ -59,7 +63,7 @@
 ## 布局对齐
 
 - 页面左右留白统一用 `CompactTokens.pageGutter`；标题、工具条和列表共用同一条左边缘。
-- 列表里的一行曲目统一走 `TrackMeta`（`lib/shared/ui/track_meta.dart`）：封面、序号、时长都从同一份 token 出发，音乐库和播放队列的列才会对齐。
+- 列表里的一行曲目按密度分两条实现：音乐库走 `LibraryTrackCard` 的单行表格，喜欢与队列走 `TrackMeta` 的双行列表。序号（`TrackPosition`）、详情按钮（`TrackDetailsButton`）、封面与音源徽标从共享 widget 出，避免两种行各画一套。
 - 走带控件（播放按钮、进度条）要落在中线上：播放按钮的中心与容器的中线重合，而不是让整组按钮居中。
 - 输入框不要拉成细长条：`CompactTokens.searchFieldMaxWidth` 给了上限，右侧留给页面自己的动作。
 - 悬浮元素（徽标、状态标签）跟着它描述的对象走，不要漂在行尾。

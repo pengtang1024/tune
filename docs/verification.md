@@ -71,7 +71,7 @@ flutter --version
 ## 对齐守卫
 
 - `test/app/layout_alignment_test.dart`：盯住容易漂的几处——播放按钮落在底栏中线、队列面板的行不越出卡片且宽度守规则、标题与列表同一条左边缘、正在播放页的整块居中、搜索框不越宽上限。
-- `test/app/compact_layout_test.dart`：盯住 760 的紧凑导航与 440 面板、面板打开时内容区不可点而底栏/侧栏可用、长队列打开时定位当前曲目、正在播放页的迷你播放条，以及 1.3 倍中英文不溢出。
+- `test/app/compact_layout_test.dart`：盯住 760 的紧凑导航与 440 面板、面板打开时内容区不可点而底栏/侧栏可用、长队列打开时定位当前曲目、正在播放页的迷你播放条，以及 1.3 倍中英文不溢出；还盯住默认 900×563 窗口的曲库首屏至少放下十首歌。
 - `test/app/playback_session_store_test.dart` / `playback_session_test.dart` / `playback_session_provider_test.dart`：盯住启动恢复的队列、进度、音量与开关；详见 [playback-session.md](playback-session.md)。
 - `test/app/compact_spinner_test.dart`：盯住加载圈的描边没有被自己的框裁掉（Material 的现行样式会裁），以及字号梯度里没有两档共用一个尺寸。
 - `test/app/compact_control_metrics_test.dart`：盯住 token 说的是真话——三种按钮画出来一样高且等于 `controlDefault`，列表行等于 `listRowHeight`，主题里的每个字号角色都是梯度上的一档。

@@ -263,6 +263,66 @@ void main() {
     expect(audio.playedSong?.uri, songA.uri);
   });
 
+  testWidgets('the library shows a page of tracks at the default size', (
+    tester,
+  ) async {
+    // The window the app opens with is 900x600, which leaves about 560
+    // pixels of Flutter surface under the title bar of the desktop. A
+    // library that shows five tracks there is a library the reader has to
+    // scroll before they have looked at it.
+    await setSurface(tester, const Size(900, 563));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final songs = [
+      for (var i = 1; i <= 30; i++)
+        Song(
+          id: i,
+          title: 'Track $i',
+          artist: 'Artist $i',
+          duration: 180000,
+          uri: '/music/$i.mp3',
+        ),
+    ];
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(LibraryState(songs: songs)),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final viewport = tester.getRect(
+      find
+          .descendant(
+            of: find.byType(LibraryPane),
+            matching: find.byType(ListView),
+          )
+          .first,
+    );
+    final rows = find.byType(LibraryTrackCard);
+    var visible = 0;
+    for (var i = 0; i < rows.evaluate().length; i++) {
+      final rect = tester.getRect(rows.at(i));
+      if (rect.top >= viewport.top - 0.5 &&
+          rect.bottom <= viewport.bottom + 0.5) {
+        visible++;
+      }
+    }
+
+    expect(
+      visible,
+      greaterThanOrEqualTo(10),
+      reason: 'the default window has to show a page of tracks',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('library track click plays the track it picked', (tester) async {
     await setSurface(tester, const Size(760, 483));
     final audio = FakeAudioPlayerService();
