@@ -100,8 +100,8 @@ void main() {
       autoScanInterval: interval,
       scanTimeout: timeout,
     );
-    expect(noScan.score, 62);
-    expect(noScan.healthy, isTrue);
+    expect(noScan.score, 42);
+    expect(noScan.healthy, isFalse);
 
     final healthy = SourceHealth.report(
       isLocal: false,
@@ -112,6 +112,12 @@ void main() {
       lastScanAt: DateTime.now(),
       autoScanInterval: interval,
       scanTimeout: timeout,
+      hasTracks: true,
+      expectedCount: 3,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
+      activity: 1,
     );
     expect(healthy.score, greaterThanOrEqualTo(75));
     expect(healthy.healthy, isTrue);
@@ -176,6 +182,11 @@ void main() {
       lastScanAt: DateTime.now(),
       autoScanInterval: interval,
       scanTimeout: timeout,
+      hasTracks: true,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
+      activity: 1,
     );
     final freshMemory = SourceHealth.report(
       isLocal: false,
@@ -186,6 +197,11 @@ void main() {
       lastScanAt: DateTime.now(),
       autoScanInterval: interval,
       scanTimeout: timeout,
+      hasTracks: true,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
+      activity: 1,
     );
     final staleMemory = SourceHealth.report(
       isLocal: false,
@@ -196,6 +212,11 @@ void main() {
       lastScanAt: DateTime.now().subtract(const Duration(days: 3)),
       autoScanInterval: interval,
       scanTimeout: timeout,
+      hasTracks: true,
+      playable: 1,
+      artwork: 1,
+      metadata: 1,
+      activity: 1,
     );
 
     expect(freshScan.score, greaterThan(80));
@@ -235,7 +256,7 @@ void main() {
 
     expect(report.score, 100);
     expect(report.availability, 100);
-    expect(report.artwork, 50);
+    expect(report.artwork, 25);
   });
 
   test('stability, coverage facts and activity move the score', () {
@@ -286,7 +307,8 @@ void main() {
     );
 
     expect(withHistory.stability, 50);
-    expect(withHistory.score, lessThanOrEqualTo(base.score));
+    // A known 50% history is better than no history at all.
+    expect(withHistory.score, greaterThan(base.score));
     expect(withHistory.playable, 100);
     expect(withHistory.artwork, 100);
     expect(withHistory.metadata, 100);
@@ -530,7 +552,7 @@ void main() {
     expect(report.output, 50);
   });
 
-  test('activity stays neutral before the first heart', () {
+  test('activity is unknown before the first heart', () {
     const songs = [
       Song(
         id: 1,
@@ -543,7 +565,7 @@ void main() {
 
     final facts = sourceHealthFactsOf(songs);
 
-    expect(facts['openverse']!.activity, 0.5);
+    expect(facts['openverse']!.activity, 0.25);
   });
 
   test('band order keeps the weight order inside a band', () {
@@ -591,7 +613,7 @@ void main() {
     expect(sameBand.map((source) => source.id), ['heavier', 'lighter']);
   });
 
-  test('favorites outside the library keep activity neutral', () {
+  test('favorites outside the library keep activity unknown', () {
     const songs = [
       Song(
         id: 1,
@@ -607,7 +629,7 @@ void main() {
       favoriteUris: {'/music/not-in-the-library.mp3'},
     );
 
-    expect(facts['openverse']!.activity, 0.5);
+    expect(facts['openverse']!.activity, 0.25);
   });
 
   test('a source with tracks but no playable track is capped', () {

@@ -2,8 +2,9 @@ import 'package:tune/domain/models/song.dart';
 
 /// The per-source facts the health score reads from the library.
 ///
-/// A source with no tracks has no entry; callers use [neutral] so an empty
-/// source is neither rewarded nor punished for data it has not produced.
+/// A source with no tracks has no entry; callers use [unknown] so an empty
+/// source is not mistaken for a half-working one. Unknown sits below the
+/// neutral 0.5 on purpose.
 class SourceHealthFacts {
   final double playable;
   final double artwork;
@@ -17,11 +18,11 @@ class SourceHealthFacts {
     required this.activity,
   });
 
-  static const neutral = SourceHealthFacts(
-    playable: 0.5,
-    artwork: 0.5,
-    metadata: 0.5,
-    activity: 0.5,
+  static const unknown = SourceHealthFacts(
+    playable: 0.25,
+    artwork: 0.25,
+    metadata: 0.25,
+    activity: 0.25,
   );
 }
 
@@ -73,9 +74,9 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
             0.25 * (album[entry.key] ?? 0) / entry.value +
             0.15 * (year[entry.key] ?? 0) / entry.value,
         // Before an in-library heart every source would score zero here;
-        // that is not a signal about the source, so the dimension stays
-        // neutral. Favorites outside the library do not count either.
-        activity: hasLikedTrack ? (liked[entry.key] ?? 0) / entry.value : 0.5,
+        // that is not a signal about the source, so the dimension uses the
+        // unknown prior. Favorites outside the library do not count either.
+        activity: hasLikedTrack ? (liked[entry.key] ?? 0) / entry.value : 0.25,
       ),
   };
 }

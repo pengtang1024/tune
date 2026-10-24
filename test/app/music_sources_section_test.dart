@@ -13,6 +13,37 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import '../services/fake_persistence.dart';
 
+SourceHealthReport _healthReport(int score) => SourceHealthReport(
+  availability: 100,
+  configuration: 100,
+  scan: 100,
+  freshness: 100,
+  output: 100,
+  speed: 100,
+  reliability: 100,
+  stability: 100,
+  playable: 100,
+  artwork: 100,
+  metadata: 100,
+  activity: 100,
+  score: score,
+  healthy: score >= SourceHealth.threshold,
+);
+
+/// A health map for every source in [controller], with [fallback] for the
+/// ones the test does not name. The fallback is unhealthy, so unnamed
+/// sources stay in the folded group.
+Map<String, SourceHealthReport> _healthFor(
+  FakeMusicSourcesController controller, [
+  Map<String, int> scores = const {},
+  int fallback = 42,
+]) {
+  return {
+    for (final source in controller.seed.sources)
+      source.id: _healthReport(scores[source.id] ?? fallback),
+  };
+}
+
 void main() {
   late FakePersistenceService persistence;
 
@@ -216,7 +247,9 @@ void main() {
       MusicSourcesState(sources: [BuiltInMusicSources.radio]),
     );
 
-    await tester.pumpWidget(app(controller));
+    await tester.pumpWidget(
+      app(controller, health: _healthFor(controller, {'radio': 90})),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const ValueKey('source-config-radio')));
@@ -274,7 +307,9 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(app(controller));
+    await tester.pumpWidget(
+      app(controller, health: _healthFor(controller, {'ccmixter': 90})),
+    );
     await tester.pumpAndSettle();
 
     // The source that asks nothing of the reader is there; the ones that
@@ -326,7 +361,12 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(app(controller));
+    await tester.pumpWidget(
+      app(
+        controller,
+        health: _healthFor(controller, {'ccmixter': 90, 'podcast_rss:1': 90}),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('我添加的'), findsNothing);
@@ -348,27 +388,10 @@ void main() {
         ],
       ),
     );
-    SourceHealthReport report(int score) => SourceHealthReport(
-      availability: 100,
-      configuration: 100,
-      scan: 100,
-      freshness: 100,
-      output: 100,
-      speed: 100,
-      reliability: 100,
-      stability: 100,
-      playable: 100,
-      artwork: 100,
-      metadata: 100,
-      activity: 100,
-      score: score,
-      healthy: score >= SourceHealth.threshold,
-    );
-
     await tester.pumpWidget(
       app(
         controller,
-        health: {'ccmixter': report(65), 'openverse': report(90)},
+        health: _healthFor(controller, {'ccmixter': 65, 'openverse': 90}),
       ),
     );
     await tester.pumpAndSettle();
@@ -394,7 +417,12 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(app(controller));
+    await tester.pumpWidget(
+      app(
+        controller,
+        health: _healthFor(controller, {'openverse': 90, 'ccmixter': 90}),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // The high weight stands in the main list, the low one waits folded.

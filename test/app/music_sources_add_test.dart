@@ -46,6 +46,11 @@ void main() {
     );
   }
 
+  Future<void> openMoreSources(WidgetTester tester) async {
+    await tester.tap(find.byKey(const ValueKey('sources-more-toggle')));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('the reader picks a type to add', (tester) async {
     await tester.pumpWidget(app());
     await tester.pumpAndSettle();
@@ -81,7 +86,9 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('source-form-save')));
     await tester.pumpAndSettle();
 
-    // The source joins the weighted list; it is not a separate group.
+    // A source with no tracks yet is unknown, so it waits in More until the
+    // first scan. It is still one of the reader's instances, not a new group.
+    await openMoreSources(tester);
     expect(find.text('我添加的'), findsNothing);
     expect(find.text('深夜爵士'), findsOneWidget);
     expect(
@@ -105,6 +112,7 @@ void main() {
     await tester.pumpWidget(app());
     await tester.pumpAndSettle();
 
+    await openMoreSources(tester);
     expect(find.text('深夜爵士'), findsOneWidget);
 
     final menu = find.byKey(const ValueKey('source-menu-openverse-1'));

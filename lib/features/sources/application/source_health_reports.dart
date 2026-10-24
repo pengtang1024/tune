@@ -59,10 +59,10 @@ final sourceHealthReportsProvider = Provider<Map<String, SourceHealthReport>>((
       history: sources.healthHistory[source.id],
       now: now,
       hasTracks: fact != null,
-      playable: fact?.playable ?? SourceHealthFacts.neutral.playable,
-      artwork: fact?.artwork ?? SourceHealthFacts.neutral.artwork,
-      metadata: fact?.metadata ?? SourceHealthFacts.neutral.metadata,
-      activity: fact?.activity ?? SourceHealthFacts.neutral.activity,
+      playable: fact?.playable ?? SourceHealthFacts.unknown.playable,
+      artwork: fact?.artwork ?? SourceHealthFacts.unknown.artwork,
+      metadata: fact?.metadata ?? SourceHealthFacts.unknown.metadata,
+      activity: fact?.activity ?? SourceHealthFacts.unknown.activity,
     );
   }
 

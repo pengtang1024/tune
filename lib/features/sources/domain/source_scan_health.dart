@@ -73,9 +73,9 @@ class SourceScanHealthHistory {
   /// A 0..1 stability rate: success is full, skipped is mostly stable,
   /// failure is not. Newer records weigh more: a scan 30 days older counts
   /// half as much, so one bad month does not keep a working source down.
-  /// No history is neutral.
+  /// No history is an unknown below neutral, not a half-working source.
   double get stabilityRate {
-    if (records.isEmpty) return 0.5;
+    if (records.isEmpty) return 0.25;
     final newest = records
         .map((record) => record.at)
         .reduce((left, right) => left.isAfter(right) ? left : right);

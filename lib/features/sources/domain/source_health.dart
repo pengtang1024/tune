@@ -73,6 +73,14 @@ class SourceHealthReport {
 abstract final class SourceHealth {
   static const int threshold = 60;
 
+  /// What a dimension scores when the source has not told us anything yet.
+  ///
+  /// Unknown is not neutral: a source that was never scanned should not look
+  /// like a source that is half working. The value is deliberately below 0.5
+  /// so an unmeasured source stays under the threshold until it produces
+  /// facts.
+  static const double unknown = 0.25;
+
   /// The lower edge of the top band: sources at or above it stand before
   /// the middle band regardless of their manual weight.
   static const int highBand = 85;
@@ -102,10 +110,10 @@ abstract final class SourceHealth {
     DateTime? now,
     bool hasTracks = false,
     int? expectedCount,
-    double playable = 0.5,
-    double artwork = 0.5,
-    double metadata = 0.5,
-    double activity = 0.5,
+    double playable = unknown,
+    double artwork = unknown,
+    double metadata = unknown,
+    double activity = unknown,
   }) {
     if (isLocal) {
       return const SourceHealthReport(
@@ -137,7 +145,7 @@ abstract final class SourceHealth {
       SourceScanStatus.skipped => 0.75,
       SourceScanStatus.failed => 0.0,
       SourceScanStatus.needsConfiguration => 0.0,
-      null => 0.5,
+      null => unknown,
     };
 
     // A successful scan that just finished is the freshest fact; a failed
@@ -154,9 +162,9 @@ abstract final class SourceHealth {
       SourceScanStatus.skipped => 0.66,
       SourceScanStatus.failed => 0.0,
       SourceScanStatus.needsConfiguration => 0.0,
-      null => lastScanAt == null ? 0.5 : 0.66,
+      null => lastScanAt == null ? unknown : 0.66,
     };
-    final stability = history?.stabilityRate ?? 0.5;
+    final stability = history?.stabilityRate ?? unknown;
     final playableRate = playable.clamp(0.0, 1.0);
     final artworkRate = artwork.clamp(0.0, 1.0);
     final metadataRate = metadata.clamp(0.0, 1.0);
@@ -222,7 +230,7 @@ abstract final class SourceHealth {
     Duration interval,
     DateTime now,
   ) {
-    if (lastScanAt == null) return 0.5;
+    if (lastScanAt == null) return unknown;
     if (interval <= Duration.zero) return 1;
 
     final age = now.difference(lastScanAt);
@@ -233,7 +241,7 @@ abstract final class SourceHealth {
   }
 
   static double _output(SourceScanSummary? summary, int? expectedCount) {
-    if (summary == null) return 0.5;
+    if (summary == null) return unknown;
     // A skipped scan means "not due yet", not "returned nothing". Treating
     // it as zero would punish every source that is not refreshed this run.
     if (summary.status == SourceScanStatus.skipped) return 0.5;
@@ -250,8 +258,8 @@ abstract final class SourceHealth {
   }
 
   static double _speed(SourceScanSummary? summary, Duration timeout) {
-    if (summary == null || summary.elapsed <= Duration.zero) return 0.5;
-    if (timeout <= Duration.zero) return 0.5;
+    if (summary == null || summary.elapsed <= Duration.zero) return unknown;
+    if (timeout <= Duration.zero) return unknown;
 
     final ratio = summary.elapsed.inMilliseconds / timeout.inMilliseconds;
     if (ratio <= 0.25) return 1;
