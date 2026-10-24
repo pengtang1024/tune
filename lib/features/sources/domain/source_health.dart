@@ -185,8 +185,15 @@ abstract final class SourceHealth {
     }
     // A source with tracks but no cover at all waits in More: the main list
     // is a visual list, and a whole row of grey cards is worse than one more
-    // fold. One cover is enough to lift the cap.
-    if (hasTracks && artworkRate <= 0) {
+    // fold. One cover is enough to lift the cap. Setting the artwork weight
+    // to zero is the reader saying covers do not matter, so the cap goes too.
+    if (hasTracks && artworkRate <= 0 && weights.artwork > 0) {
+      score = score.clamp(0, 55);
+    }
+    // A source that brought in tracks but cannot play one of them is not
+    // healthy. The playable dimension alone would still leave a source with
+    // good scan numbers above the threshold.
+    if (hasTracks && playableRate <= 0) {
       score = score.clamp(0, 55);
     }
 

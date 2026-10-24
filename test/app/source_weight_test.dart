@@ -591,6 +591,85 @@ void main() {
     expect(sameBand.map((source) => source.id), ['heavier', 'lighter']);
   });
 
+  test('favorites outside the library keep activity neutral', () {
+    const songs = [
+      Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        sourceId: 'openverse',
+        externalId: 'one',
+        streamUrl: 'https://example.com/one.mp3',
+      ),
+    ];
+
+    final facts = sourceHealthFactsOf(
+      songs,
+      favoriteUris: {'/music/not-in-the-library.mp3'},
+    );
+
+    expect(facts['openverse']!.activity, 0.5);
+  });
+
+  test('a source with tracks but no playable track is capped', () {
+    final summary = SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.success,
+      songCount: 20,
+      scannedAt: DateTime.now(),
+      elapsed: const Duration(seconds: 1),
+    );
+    final report = SourceHealth.report(
+      isLocal: false,
+      enabled: true,
+      supported: true,
+      configured: true,
+      summary: summary,
+      lastScanAt: summary.scannedAt,
+      autoScanInterval: const Duration(hours: 6),
+      scanTimeout: const Duration(seconds: 45),
+      hasTracks: true,
+      expectedCount: 20,
+      playable: 0,
+      artwork: 1,
+      metadata: 1,
+      activity: 1,
+    );
+
+    expect(report.playable, 0);
+    expect(report.score, lessThanOrEqualTo(55));
+    expect(report.healthy, isFalse);
+  });
+
+  test('setting the artwork weight to zero removes the cover cap', () {
+    final summary = SourceScanSummary(
+      sourceId: 'openverse',
+      status: SourceScanStatus.success,
+      songCount: 20,
+      scannedAt: DateTime.now(),
+      elapsed: const Duration(seconds: 1),
+    );
+    final report = SourceHealth.report(
+      isLocal: false,
+      enabled: true,
+      supported: true,
+      configured: true,
+      summary: summary,
+      lastScanAt: summary.scannedAt,
+      autoScanInterval: const Duration(hours: 6),
+      scanTimeout: const Duration(seconds: 45),
+      weights: SourceHealthWeights.defaults.copyWith(artwork: 0),
+      hasTracks: true,
+      expectedCount: 20,
+      playable: 1,
+      artwork: 0,
+      metadata: 1,
+      activity: 1,
+    );
+
+    expect(report.artwork, 0);
+    expect(report.score, greaterThan(55));
+  });
+
   test('health bands separate the main list', () {
     expect(SourceHealth.bandOf(100), 2);
     expect(SourceHealth.bandOf(85), 2);

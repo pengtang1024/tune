@@ -38,6 +38,8 @@ void main() {
 
     expect(find.text('健康度权重'), findsOneWidget);
     expect(find.byType(Slider), findsNWidgets(12));
+    final sliders = tester.widgetList<Slider>(find.byType(Slider));
+    expect(sliders.every((slider) => slider.divisions == 100), isTrue);
     expect(find.text('恢复默认'), findsOneWidget);
 
     await tester.tap(find.text('保存'));

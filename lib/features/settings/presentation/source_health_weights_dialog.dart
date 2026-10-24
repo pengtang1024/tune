@@ -178,7 +178,7 @@ class _SourceHealthWeightsDialogState extends State<SourceHealthWeightsDialog> {
             value: value.toDouble(),
             min: 0,
             max: 100,
-            divisions: 20,
+            divisions: 100,
             label: '$value',
             onChanged: (next) => onChanged(next.round()),
           ),

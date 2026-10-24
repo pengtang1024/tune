@@ -42,7 +42,7 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
   final album = <String, int>{};
   final year = <String, int>{};
   final liked = <String, int>{};
-  final hasFavorites = favoriteUris.isNotEmpty;
+  var hasLikedTrack = false;
 
   for (final song in songs) {
     final id = song.sourceId ?? 'local';
@@ -54,7 +54,10 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
     if (song.artist.trim().isNotEmpty) artist[id] = (artist[id] ?? 0) + 1;
     if (song.album.trim().isNotEmpty) album[id] = (album[id] ?? 0) + 1;
     if ((song.year ?? 0) > 0) year[id] = (year[id] ?? 0) + 1;
-    if (favoriteUris.contains(song.uri)) liked[id] = (liked[id] ?? 0) + 1;
+    if (favoriteUris.contains(song.uri)) {
+      liked[id] = (liked[id] ?? 0) + 1;
+      hasLikedTrack = true;
+    }
   }
 
   return {
@@ -69,9 +72,10 @@ Map<String, SourceHealthFacts> sourceHealthFactsOf(
             0.6 * (artist[entry.key] ?? 0) / entry.value +
             0.25 * (album[entry.key] ?? 0) / entry.value +
             0.15 * (year[entry.key] ?? 0) / entry.value,
-        // Before the first heart every source would score zero here; that is
-        // not a signal about the source, so the dimension stays neutral.
-        activity: hasFavorites ? (liked[entry.key] ?? 0) / entry.value : 0.5,
+        // Before an in-library heart every source would score zero here;
+        // that is not a signal about the source, so the dimension stays
+        // neutral. Favorites outside the library do not count either.
+        activity: hasLikedTrack ? (liked[entry.key] ?? 0) / entry.value : 0.5,
       ),
   };
 }
