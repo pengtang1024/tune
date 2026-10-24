@@ -38,6 +38,9 @@ class RecommendationTuning {
   /// The lowest health a source needs before its own shelf is shown.
   final double sourceShelfMinHealth;
 
+  /// The most tracks one artist may occupy across the whole page.
+  final int artistPageBudget;
+
   /// How much a track without a cover is pushed down.
   ///
   /// This is a penalty rather than a base weight: the card is mostly cover,
@@ -69,6 +72,7 @@ class RecommendationTuning {
     this.queuePenalty = 0.20,
     this.sourceHealthWeight = 0.20,
     this.sourceShelfMinHealth = 0.60,
+    this.artistPageBudget = 10,
     this.artworkPenalty = 0.10,
     this.dailyMixSize = 25,
     this.favoriteAnchors = 2,

@@ -459,4 +459,39 @@ void main() {
       isTrue,
     );
   });
+
+  test('one artist does not fill the whole page', () {
+    final stamp = now.millisecondsSinceEpoch;
+    final library = [
+      for (var index = 0; index < 20; index++)
+        song(
+          index,
+          artist: 'Podcast',
+          album: 'Episode $index',
+          genre: 'Rock',
+          dateAdded: stamp,
+        ),
+      for (var index = 20; index < 40; index++)
+        song(
+          index,
+          artist: 'Other $index',
+          album: 'Other $index',
+          genre: 'Jazz',
+          dateAdded: stamp,
+        ),
+    ];
+    final output = recommend(
+      library: library,
+      favorites: {'/music/0.mp3', '/music/1.mp3'},
+      allowFresh: true,
+    );
+    final podcastTracks = [
+      for (final section in output.sections)
+        for (final track in section.tracks)
+          if (track.song.artist == 'Podcast') track,
+    ];
+
+    expect(podcastTracks.length, lessThanOrEqualTo(10));
+    expect(podcastTracks, isNotEmpty);
+  });
 }

@@ -5,6 +5,7 @@ import 'package:tune/features/discovery/domain/recommendation_daily_mix.dart';
 import 'package:tune/features/discovery/domain/recommendation_explore_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_extra_sections.dart';
 import 'package:tune/features/discovery/domain/recommendation_scoring.dart';
+import 'package:tune/features/discovery/domain/recommended_track.dart';
 import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/features/discovery/domain/recommendation_selection.dart';
@@ -127,6 +128,40 @@ class RecommendationEngine {
       if (fallback != null) sections.add(fallback);
     }
 
-    return DiscoveryOutput(sections: List.unmodifiable(sections));
+    return DiscoveryOutput(
+      sections: List.unmodifiable(
+        _limitArtistPage(sections, tuning.artistPageBudget),
+      ),
+    );
   }
+}
+
+List<DiscoverySection> _limitArtistPage(
+  List<DiscoverySection> sections,
+  int budget,
+) {
+  if (budget <= 0) return sections;
+  final counts = <String, int>{};
+  final result = <DiscoverySection>[];
+  for (final section in sections) {
+    final tracks = <RecommendedTrack>[];
+    for (final track in section.tracks) {
+      final artist = normalizeTasteKey(track.song.artist);
+      if (artist.isNotEmpty) {
+        final count = counts[artist] ?? 0;
+        if (count >= budget) continue;
+        counts[artist] = count + 1;
+      }
+      tracks.add(track);
+    }
+    if (tracks.isEmpty) continue;
+    result.add(
+      DiscoverySection(
+        kind: section.kind,
+        reason: section.reason,
+        tracks: List.unmodifiable(tracks),
+      ),
+    );
+  }
+  return result;
 }
