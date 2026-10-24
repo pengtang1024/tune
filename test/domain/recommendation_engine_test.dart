@@ -323,4 +323,22 @@ void main() {
 
     expect(output.sections, isNotEmpty);
   });
+
+  test('the daily mix does not put one artist next to itself', () {
+    final library = [
+      for (var index = 0; index < 9; index++)
+        song(index, artist: 'Artist ${index % 3}', album: 'Album $index'),
+    ];
+    final output = recommend(library: library);
+    final daily = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.dailyMix,
+    );
+
+    for (var index = 1; index < daily.tracks.length; index++) {
+      expect(
+        daily.tracks[index].song.artist,
+        isNot(daily.tracks[index - 1].song.artist),
+      );
+    }
+  });
 }

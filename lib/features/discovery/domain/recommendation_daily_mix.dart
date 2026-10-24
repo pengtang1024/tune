@@ -4,6 +4,7 @@ import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/recommendation_selection.dart';
+import 'package:tune/features/discovery/domain/recommendation_sequencer.dart';
 import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 
@@ -111,7 +112,9 @@ DiscoverySection? buildDailyMix({
     reason: allFavorites
         ? const RecommendationReason.favorite()
         : const RecommendationReason.fallback(),
-    tracks: RecommendationSelection.tracks(selected),
+    tracks: RecommendationSelection.tracks(
+      RecommendationSequencer.order(selected),
+    ),
   );
 }
 

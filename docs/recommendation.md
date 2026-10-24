@@ -435,9 +435,10 @@ score(s) =
 2. 放 3 首探索曲目：没播过、歌手不在头部。
 3. 放 3 首「相邻」曲目：歌手不在头部，但流派或年代属于读者。
 4. 其余名额按分数填满到 25 首；头部歌手的单独分段仍然预留最多 1 首。
-5. 用歌手/专辑上限做贪心选择；不够 5 首就不出这个分段，改用「从音乐库挑的」
+5. 选中的曲目再按「相邻不重复歌手、不重复专辑」排一次序；没有别的选择时才放宽。
+6. 用歌手/专辑上限做贪心选择；不够 5 首就不出这个分段，改用「从音乐库挑的」
    兜底分段。
-6. 种子：`fnv1a(dateKey + profileSignature + librarySize + refreshSalt)`。
+7. 种子：`fnv1a(dateKey + profileSignature + librarySize + refreshSalt)`。
    `dateKey` 是本地日期（`yyyy-MM-dd`）；`profileSignature` 是头部歌手/流派
    权重量化后的串；`refreshSalt` 只在本会话内递增，重启回到当天的稳定结果。
    同一天同一输入的结果稳定；喜欢变化、扫描、反馈变化时结果会跟着重算，
@@ -570,6 +571,7 @@ lib/features/discovery/
 │   ├── recommendation_scoring.dart      # 打分、画像权重、稳定哈希
 │   ├── recommendation_tuning.dart       # 权重、锚点/探索名额
 │   ├── recommendation_selection.dart    # 去重、歌手/专辑上限、排序
+│   ├── recommendation_sequencer.dart    # 今日混音的相邻歌手/专辑排序
 │   ├── recommendation_engine.dart       # 总装，一次排序后交给各段
 │   ├── recommendation_daily_mix.dart    # 今日混音 + 歌手分段
 │   ├── recommendation_explore_section.dart
@@ -849,6 +851,7 @@ M1–M5 已作为 v1 交付。
 - 同歌手/同专辑上限；全局去重；
 - 直播流被排除；
 - 队列里的曲目降权但不隐藏；全库都在队列时页面仍然有内容；
+- 今日混音相邻曲目不重复歌手；
 - 不感兴趣被排除，撤销后恢复；
 - 同一天同样输入结果稳定；不同日期或刷新盐值结果变化；
 - 缺流派、缺年份、空歌手不崩；
