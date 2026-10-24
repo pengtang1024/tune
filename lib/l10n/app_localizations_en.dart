@@ -2177,4 +2177,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String discoverDismissedArtist(String artist) {
     return 'Fewer picks from $artist';
   }
+
+  @override
+  String get discoverSectionFavoriteArtists => 'More from the artists you like';
 }

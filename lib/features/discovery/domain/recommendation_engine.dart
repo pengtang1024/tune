@@ -4,6 +4,7 @@ import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_daily_mix.dart';
 import 'package:tune/features/discovery/domain/recommendation_explore_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_extra_sections.dart';
+import 'package:tune/features/discovery/domain/recommendation_favorite_artists.dart';
 import 'package:tune/features/discovery/domain/recommendation_scoring.dart';
 import 'package:tune/features/discovery/domain/recommended_track.dart';
 import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
@@ -97,6 +98,13 @@ class RecommendationEngine {
         seen: seen,
       ),
     );
+
+    final favoriteArtists = buildFavoriteArtistSection(
+      candidates: sorted,
+      profile: profile,
+      seen: seen,
+    );
+    if (favoriteArtists != null) sections.add(favoriteArtists);
 
     final fresh = buildFreshSection(
       candidates: sorted,

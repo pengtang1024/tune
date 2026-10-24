@@ -5,6 +5,7 @@ import 'package:tune/features/discovery/domain/recommended_track.dart';
 enum DiscoverySectionKind {
   dailyMix,
   artist,
+  favoriteArtists,
   explore,
   fresh,
   source,

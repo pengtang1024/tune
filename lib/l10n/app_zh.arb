@@ -1105,5 +1105,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "discoverSectionFavoriteArtists": "更多来自你标心的歌手"
 }

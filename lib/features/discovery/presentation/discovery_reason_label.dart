@@ -55,6 +55,8 @@ String discoverySectionTitle(
         context.loc.discoverSectionExploreEars,
       _ => context.loc.discoverSectionExploreEars,
     },
+    DiscoverySectionKind.favoriteArtists =>
+      context.loc.discoverSectionFavoriteArtists,
     DiscoverySectionKind.fresh => context.loc.discoverSectionFresh,
     DiscoverySectionKind.onlineArtist =>
       context.loc.discoverSectionOnlineArtist(

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/discovery_section.dart';
+import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_engine.dart';
+import 'package:tune/features/discovery/domain/recommendation_favorite_artists.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
@@ -493,5 +495,48 @@ void main() {
 
     expect(podcastTracks.length, lessThanOrEqualTo(10));
     expect(podcastTracks, isNotEmpty);
+  });
+
+  test('small favorite artists share one shelf', () {
+    final library = [
+      for (var artist = 0; artist < 4; artist++)
+        for (var track = 0; track < 3; track++)
+          song(
+            artist * 3 + track,
+            artist: 'Artist $artist',
+            album: 'Album $artist-$track',
+            genre: 'Rock',
+          ),
+    ];
+    final favorites = {
+      '/music/0.mp3',
+      '/music/3.mp3',
+      '/music/6.mp3',
+      '/music/9.mp3',
+    };
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: favorites,
+    );
+    final candidates = buildCandidates(
+      library: library,
+      favoriteUris: favorites,
+      dismissedUris: const {},
+    );
+    final section = buildFavoriteArtistSection(
+      candidates: candidates,
+      profile: profile,
+      seen: <String>{},
+    );
+
+    expect(section, isNotNull);
+    expect(section!.tracks.length, 4);
+    expect(
+      section.tracks.every(
+        (track) =>
+            track.song.artist == 'Artist 2' || track.song.artist == 'Artist 3',
+      ),
+      isTrue,
+    );
   });
 }

@@ -3652,6 +3652,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'已减少「{artist}」的推荐'**
   String discoverDismissedArtist(String artist);
+
+  /// No description provided for @discoverSectionFavoriteArtists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多来自你标心的歌手'**
+  String get discoverSectionFavoriteArtists;
 }
 
 class _AppLocalizationsDelegate

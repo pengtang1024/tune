@@ -1994,6 +1994,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String discoverDismissedArtist(String artist) {
     return '已减少「$artist」的推荐';
   }
+
+  @override
+  String get discoverSectionFavoriteArtists => '更多来自你标心的歌手';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3986,6 +3989,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String discoverDismissedArtist(String artist) {
     return '已减少「$artist」的推荐';
   }
+
+  @override
+  String get discoverSectionFavoriteArtists => '更多来自你标心的歌手';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5978,4 +5984,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String discoverDismissedArtist(String artist) {
     return '已減少「$artist」的推薦';
   }
+
+  @override
+  String get discoverSectionFavoriteArtists => '更多來自你標心的歌手';
 }

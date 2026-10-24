@@ -1105,5 +1105,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "discoverSectionFavoriteArtists": "More from the artists you like"
 }
