@@ -119,4 +119,18 @@ void main() {
     addTearDown(reloaded.dispose);
     expect(reloaded.state.restorePlaybackOnStartup, isFalse);
   });
+
+  test('local listening history is off by default and survives', () async {
+    final persistence = FakePersistenceService();
+
+    final controller = SettingsController(persistence);
+    expect(controller.state.useListeningHistory, isFalse);
+
+    await controller.setUseListeningHistory(true);
+    controller.dispose();
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+    expect(reloaded.state.useListeningHistory, isTrue);
+  });
 }

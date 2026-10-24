@@ -3,6 +3,7 @@ import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
+import 'package:tune/features/discovery/application/discovery_signal_observer.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -21,6 +22,7 @@ class AppInitializer {
       await _initMusicScannerService(ref);
       await WindowManagerService.init();
       await _initDesktopIntegration(ref);
+      _initDiscoverySignals(ref);
 
       Log.info('应用核心服务初始化完成');
     } catch (error, stackTrace) {
@@ -60,6 +62,21 @@ class AppInitializer {
     } catch (error, stackTrace) {
       Log.error('初始化音乐扫描服务失败: $error', stackTrace);
       Log.info('音乐扫描服务初始化失败，但应用将继续运行');
+    }
+  }
+
+  /// Starts the optional listener of the discover page.
+  ///
+  /// The observer only reads the playback state and writes aggregates when
+  /// the reader turned local listening history on; a failure here must never
+  /// keep the player from starting.
+  static void _initDiscoverySignals(Ref ref) {
+    try {
+      ref.read(discoverySignalObserverProvider).start();
+      Log.info('推荐播放观察器初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('初始化推荐播放观察器失败: $error\n$stackTrace');
+      Log.info('推荐播放观察器初始化失败，但应用将继续运行');
     }
   }
 

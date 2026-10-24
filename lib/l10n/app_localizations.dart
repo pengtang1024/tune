@@ -3252,7 +3252,7 @@ abstract class AppLocalizations {
   /// No description provided for @discoverWhyBody.
   ///
   /// In zh_CN, this message translates to:
-  /// **'发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。'**
+  /// **'发现页只用你的音乐库、标心的曲目、不感兴趣标记和可选的本地播放记录，在本机计算。不会上传，也不会替你搜索在线音源。'**
   String get discoverWhyBody;
 
   /// No description provided for @discoverWhyLibrary.
@@ -3483,12 +3483,6 @@ abstract class AppLocalizations {
   /// **'去音乐库'**
   String get discoverGoToLibrary;
 
-  /// No description provided for @discoverClearFeedback.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'清除不感兴趣'**
-  String get discoverClearFeedback;
-
   /// No description provided for @discoverLoadFailed.
   ///
   /// In zh_CN, this message translates to:
@@ -3510,7 +3504,7 @@ abstract class AppLocalizations {
   /// No description provided for @discoverClearMessage.
   ///
   /// In zh_CN, this message translates to:
-  /// **'会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。'**
+  /// **'会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。'**
   String get discoverClearMessage;
 
   /// No description provided for @discoverCleared.
@@ -3548,6 +3542,42 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'标几首喜欢的歌，推荐会更准'**
   String get discoverFavoriteHint;
+
+  /// No description provided for @settingsDiscoveryUseHistory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地播放记录'**
+  String get settingsDiscoveryUseHistory;
+
+  /// No description provided for @settingsDiscoveryUseHistoryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只保存在本机，让推荐更贴近你；关闭后不再记录'**
+  String get settingsDiscoveryUseHistoryHint;
+
+  /// No description provided for @discoverHistoryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开启本地播放记录，推荐会更贴近你'**
+  String get discoverHistoryHint;
+
+  /// No description provided for @discoverHistoryEnable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开启'**
+  String get discoverHistoryEnable;
+
+  /// No description provided for @discoverClearAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清除推荐记录'**
+  String get discoverClearAll;
+
+  /// No description provided for @discoverWhyHistory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可选的本地播放记录（默认关闭）'**
+  String get discoverWhyHistory;
 }
 
 class _AppLocalizationsDelegate

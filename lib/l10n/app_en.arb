@@ -909,7 +909,7 @@
   "discoverRefresh": "Shuffle picks",
   "discoverWhy": "How picks work",
   "discoverWhyTitle": "How these picks are made",
-  "discoverWhyBody": "Discover uses only your library, the tracks you liked and the tracks you dismissed, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.",
+  "discoverWhyBody": "Discover uses only your library, the tracks you liked, the not-interested marks and the optional local listening history, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.",
   "discoverWhyLibrary": "Tracks and metadata in your library",
   "discoverWhyHearts": "Tracks you marked with a heart",
   "discoverWhyPrivacy": "Computed locally, cleared whenever you want",
@@ -948,11 +948,10 @@
   "discoverNoCandidatesTitle": "Nothing left to recommend",
   "discoverNoCandidatesSubtitle": "Browse the library, or clear the not-interested marks",
   "discoverGoToLibrary": "Go to library",
-  "discoverClearFeedback": "Clear not interested",
   "discoverLoadFailed": "Discover could not load",
   "discoverLoadFailedHint": "The library is not readable right now. Try again in a moment.",
   "discoverClearTitle": "Clear discover history?",
-  "discoverClearMessage": "This removes the not-interested marks. Favorites, the library and the queue are not touched.",
+  "discoverClearMessage": "This removes the not-interested marks and the local listening history. Favorites, the library and the queue are not touched.",
   "discoverCleared": "Discover history cleared",
   "@discoverSectionArtist": {
     "placeholders": {
@@ -1037,5 +1036,11 @@
   "settingsDiscoveryTitle": "Discover page",
   "settingsDiscoveryDescription": "Picks are computed on this machine; your library is not uploaded",
   "settingsDiscoveryPrivacy": "Picks use only the library, the tracks you liked and the not-interested marks.",
-  "discoverFavoriteHint": "Mark a few tracks with a heart and the picks get closer"
+  "discoverFavoriteHint": "Mark a few tracks with a heart and the picks get closer",
+  "settingsDiscoveryUseHistory": "Local listening history",
+  "settingsDiscoveryUseHistoryHint": "Stored on this machine to make picks closer to you; turning it off stops recording",
+  "discoverHistoryHint": "Turn on local listening history and the picks get closer",
+  "discoverHistoryEnable": "Turn on",
+  "discoverClearAll": "Clear discover history",
+  "discoverWhyHistory": "Optional local listening history (off by default)"
 }

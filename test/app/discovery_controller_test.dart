@@ -17,6 +17,8 @@ import 'compact_layout_test.dart' show FakeLibraryController;
 import 'music_sources_section_test.dart' show FakeMusicSourcesController;
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   Song song(int id, {String artist = 'Artist'}) {
     return Song(
       id: id,
@@ -108,18 +110,13 @@ void main() {
         for (final track in section.tracks) track.song.uri,
     };
     expect(uris, isNot(contains(uri)));
-    expect(
-      persistence.getString(DiscoveryFeedbackStore.key),
-      contains(uri),
-    );
+    expect(persistence.getString(DiscoveryFeedbackStore.key), contains(uri));
 
     final restarted = createContainer(persistence);
     await keepAlive(restarted);
     final restartedUris = {
-      for (final section in restarted
-          .read(discoveryControllerProvider)
-          .requireValue
-          .sections)
+      for (final section
+          in restarted.read(discoveryControllerProvider).requireValue.sections)
         for (final track in section.tracks) track.song.uri,
     };
     expect(restartedUris, isNot(contains(uri)));
@@ -143,10 +140,8 @@ void main() {
     await controller.forgetDismissal(uri);
 
     final uris = {
-      for (final section in container
-          .read(discoveryControllerProvider)
-          .requireValue
-          .sections)
+      for (final section
+          in container.read(discoveryControllerProvider).requireValue.sections)
         for (final track in section.tracks) track.song.uri,
     };
     expect(uris, contains(uri));
@@ -184,4 +179,3 @@ void main() {
     );
   });
 }
-

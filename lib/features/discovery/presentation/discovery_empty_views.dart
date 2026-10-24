@@ -37,7 +37,7 @@ Widget discoveryNoCandidates(BuildContext context, VoidCallback onClear) {
       ),
       OutlinedButton(
         onPressed: onClear,
-        child: Text(context.loc.discoverClearFeedback),
+        child: Text(context.loc.discoverClearAll),
       ),
     ],
   );

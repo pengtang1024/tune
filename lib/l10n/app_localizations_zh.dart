@@ -1739,7 +1739,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverWhyBody =>
-      '发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。';
+      '发现页只用你的音乐库、标心的曲目、不感兴趣标记和可选的本地播放记录，在本机计算。不会上传，也不会替你搜索在线音源。';
 
   @override
   String get discoverWhyLibrary => '音乐库里的曲目和元数据';
@@ -1886,9 +1886,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverGoToLibrary => '去音乐库';
 
   @override
-  String get discoverClearFeedback => '清除不感兴趣';
-
-  @override
   String get discoverLoadFailed => '发现页加载失败';
 
   @override
@@ -1898,7 +1895,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverClearTitle => '清除推荐记录？';
 
   @override
-  String get discoverClearMessage => '会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。';
+  String get discoverClearMessage => '会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
 
   @override
   String get discoverCleared => '推荐记录已清除';
@@ -1917,6 +1914,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverFavoriteHint => '标几首喜欢的歌，推荐会更准';
+
+  @override
+  String get settingsDiscoveryUseHistory => '本地播放记录';
+
+  @override
+  String get settingsDiscoveryUseHistoryHint => '只保存在本机，让推荐更贴近你；关闭后不再记录';
+
+  @override
+  String get discoverHistoryHint => '开启本地播放记录，推荐会更贴近你';
+
+  @override
+  String get discoverHistoryEnable => '开启';
+
+  @override
+  String get discoverClearAll => '清除推荐记录';
+
+  @override
+  String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3654,7 +3669,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverWhyBody =>
-      '发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。';
+      '发现页只用你的音乐库、标心的曲目、不感兴趣标记和可选的本地播放记录，在本机计算。不会上传，也不会替你搜索在线音源。';
 
   @override
   String get discoverWhyLibrary => '音乐库里的曲目和元数据';
@@ -3801,9 +3816,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverGoToLibrary => '去音乐库';
 
   @override
-  String get discoverClearFeedback => '清除不感兴趣';
-
-  @override
   String get discoverLoadFailed => '发现页加载失败';
 
   @override
@@ -3813,7 +3825,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverClearTitle => '清除推荐记录？';
 
   @override
-  String get discoverClearMessage => '会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。';
+  String get discoverClearMessage => '会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
 
   @override
   String get discoverCleared => '推荐记录已清除';
@@ -3832,6 +3844,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverFavoriteHint => '标几首喜欢的歌，推荐会更准';
+
+  @override
+  String get settingsDiscoveryUseHistory => '本地播放记录';
+
+  @override
+  String get settingsDiscoveryUseHistoryHint => '只保存在本机，让推荐更贴近你；关闭后不再记录';
+
+  @override
+  String get discoverHistoryHint => '开启本地播放记录，推荐会更贴近你';
+
+  @override
+  String get discoverHistoryEnable => '开启';
+
+  @override
+  String get discoverClearAll => '清除推荐记录';
+
+  @override
+  String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5569,7 +5599,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverWhyBody =>
-      '發現頁只用你的音樂庫、標心的曲目和不感興趣標記，在本機計算。不會上傳，也不會替你搜尋線上音源。';
+      '發現頁只用你的音樂庫、標心的曲目、不感興趣標記和可選的本機播放記錄，在本機計算。不會上傳，也不會替你搜尋線上音源。';
 
   @override
   String get discoverWhyLibrary => '音樂庫裡的曲目和中繼資料';
@@ -5716,9 +5746,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get discoverGoToLibrary => '去音樂庫';
 
   @override
-  String get discoverClearFeedback => '清除不感興趣';
-
-  @override
   String get discoverLoadFailed => '發現頁載入失敗';
 
   @override
@@ -5728,7 +5755,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get discoverClearTitle => '清除推薦記錄？';
 
   @override
-  String get discoverClearMessage => '會刪除不感興趣標記；喜歡、音樂庫和播放佇列不受影響。';
+  String get discoverClearMessage => '會刪除不感興趣標記和本機播放記錄；喜歡、音樂庫和播放佇列不受影響。';
 
   @override
   String get discoverCleared => '推薦記錄已清除';
@@ -5747,4 +5774,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverFavoriteHint => '標幾首喜歡的歌，推薦會更準';
+
+  @override
+  String get settingsDiscoveryUseHistory => '本機播放記錄';
+
+  @override
+  String get settingsDiscoveryUseHistoryHint => '只保存在本機，讓推薦更貼近你；關閉後不再記錄';
+
+  @override
+  String get discoverHistoryHint => '開啟本機播放記錄，推薦會更貼近你';
+
+  @override
+  String get discoverHistoryEnable => '開啟';
+
+  @override
+  String get discoverClearAll => '清除推薦記錄';
+
+  @override
+  String get discoverWhyHistory => '可選的本機播放記錄（預設關閉）';
 }

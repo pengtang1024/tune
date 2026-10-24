@@ -51,6 +51,8 @@ class SettingsController extends StateNotifier<SettingsState> {
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
+          useListeningHistory:
+              _persistence.getBool('discovery_use_listening_history') ?? false,
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -131,6 +133,13 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.sourcesMoreExpanded == value) return;
     state = state.copyWith(sourcesMoreExpanded: value);
     await _persistence.setBool('sources_more_expanded', value);
+  }
+
+  /// Sets whether the discover page may learn from what was played.
+  Future<void> setUseListeningHistory(bool value) async {
+    if (state.useListeningHistory == value) return;
+    state = state.copyWith(useListeningHistory: value);
+    await _persistence.setBool('discovery_use_listening_history', value);
   }
 
   Future<void> setSourceHealthWeights(SourceHealthWeights weights) async {

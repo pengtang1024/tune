@@ -3,10 +3,12 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/application/discovery_providers.dart';
 import 'package:tune/features/discovery/data/discovery_feedback_store.dart';
 import 'package:tune/features/discovery/domain/discovery_state.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/utils/logger.dart';
@@ -31,6 +33,7 @@ final discoveryControllerProvider =
 class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   DiscoveryFeedbackStore? _feedbackStore;
   Map<String, DateTime> _feedback = const {};
+  Map<String, TrackListening> _listening = const {};
   bool _feedbackLoaded = false;
   int _salt = 0;
   bool _disposed = false;
@@ -53,6 +56,12 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     final sourceOrderKey = ref.watch(
       musicSourcesControllerProvider.select(_sourceOrderKeyOf),
     );
+    final useListening = ref.watch(
+      settingsControllerProvider.select((state) => state.useListeningHistory),
+    );
+    _listening = useListening
+        ? ref.read(listeningSignalStoreProvider).read()
+        : const {};
 
     return _compute(
       library: library,
@@ -67,6 +76,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   /// back shows the stable mix of the day again.
   void refresh() {
     _salt++;
+    _refreshListening();
     _recompute();
   }
 
@@ -95,12 +105,22 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   /// Removes every mark and every listen the page kept.
   Future<void> clearFeedback() async {
     _feedback = const {};
+    _listening = const {};
     await _feedbackStore?.clear();
+    await ref.read(listeningSignalStoreProvider).clear();
     _recompute();
+  }
+
+  void _refreshListening() {
+    final enabled = ref.read(settingsControllerProvider).useListeningHistory;
+    _listening = enabled
+        ? ref.read(listeningSignalStoreProvider).read()
+        : const {};
   }
 
   void _recompute() {
     if (_disposed) return;
+    _refreshListening();
     state = AsyncData(
       _compute(
         library: _snapshotOf(ref.read(libraryControllerProvider)),
@@ -135,6 +155,8 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       final profile = TasteProfile.from(
         library: songs,
         favoriteUris: favoriteUris,
+        listening: _listening,
+        now: now,
       );
       final output = ref
           .read(recommendationEngineProvider)

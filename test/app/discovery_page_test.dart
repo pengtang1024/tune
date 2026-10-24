@@ -10,6 +10,7 @@ import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -125,9 +126,7 @@ void main() {
     await tester.pumpWidget(app(library: songs));
     await tester.pumpAndSettle();
 
-    final exploreCard = find.byKey(
-      const ValueKey('discovery-section-explore'),
-    );
+    final exploreCard = find.byKey(const ValueKey('discovery-section-explore'));
     expect(exploreCard, findsOneWidget);
     final menu = find.descendant(
       of: exploreCard,
@@ -181,5 +180,30 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const ValueKey('discovery-daily-mix')), findsOneWidget);
+  });
+
+  testWidgets('the page offers to turn on local listening history', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(library: songs));
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(DiscoveryPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .mark('/music/0.mp3');
+    await tester.pumpAndSettle();
+
+    expect(find.text('开启本地播放记录，推荐会更贴近你'), findsOneWidget);
+    await tester.tap(find.text('开启'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('开启本地播放记录，推荐会更贴近你'), findsNothing);
+    expect(
+      container.read(settingsControllerProvider).useListeningHistory,
+      isTrue,
+    );
   });
 }

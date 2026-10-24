@@ -909,7 +909,7 @@
   "discoverRefresh": "换一批",
   "discoverWhy": "怎么推荐",
   "discoverWhyTitle": "推荐怎么来的",
-  "discoverWhyBody": "发现页只用你的音乐库、标心的曲目和不感兴趣标记，在本机计算。不会上传，也不会替你搜索在线音源。",
+  "discoverWhyBody": "发现页只用你的音乐库、标心的曲目、不感兴趣标记和可选的本地播放记录，在本机计算。不会上传，也不会替你搜索在线音源。",
   "discoverWhyLibrary": "音乐库里的曲目和元数据",
   "discoverWhyHearts": "你标了心的曲目",
   "discoverWhyPrivacy": "只在你的电脑上计算，随时可以清除",
@@ -948,11 +948,10 @@
   "discoverNoCandidatesTitle": "能推荐的都听过了",
   "discoverNoCandidatesSubtitle": "去音乐库逛逛，或清掉不感兴趣标记",
   "discoverGoToLibrary": "去音乐库",
-  "discoverClearFeedback": "清除不感兴趣",
   "discoverLoadFailed": "发现页加载失败",
   "discoverLoadFailedHint": "音乐库暂时读不出来，稍后再试",
   "discoverClearTitle": "清除推荐记录？",
-  "discoverClearMessage": "会删除不感兴趣标记；喜欢、音乐库和播放队列不受影响。",
+  "discoverClearMessage": "会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。",
   "discoverCleared": "推荐记录已清除",
   "@discoverSectionArtist": {
     "placeholders": {
@@ -1037,5 +1036,11 @@
   "settingsDiscoveryTitle": "发现页",
   "settingsDiscoveryDescription": "推荐只在本机计算，不上传你的音乐库",
   "settingsDiscoveryPrivacy": "推荐只使用音乐库、标心的曲目和不感兴趣标记。",
-  "discoverFavoriteHint": "标几首喜欢的歌，推荐会更准"
+  "discoverFavoriteHint": "标几首喜欢的歌，推荐会更准",
+  "settingsDiscoveryUseHistory": "本地播放记录",
+  "settingsDiscoveryUseHistoryHint": "只保存在本机，让推荐更贴近你；关闭后不再记录",
+  "discoverHistoryHint": "开启本地播放记录，推荐会更贴近你",
+  "discoverHistoryEnable": "开启",
+  "discoverClearAll": "清除推荐记录",
+  "discoverWhyHistory": "可选的本地播放记录（默认关闭）"
 }

@@ -82,6 +82,12 @@ class DiscoveryInfoSheet extends ConsumerWidget {
               text: context.loc.discoverWhyHearts,
             ),
             const SizedBox(height: CompactTokens.space8),
+            const SizedBox(height: CompactTokens.space8),
+            _InfoLine(
+              icon: Icons.history_rounded,
+              text: context.loc.discoverWhyHistory,
+            ),
+            const SizedBox(height: CompactTokens.space8),
             _InfoLine(
               icon: Icons.lock_outline_rounded,
               text: context.loc.discoverWhyPrivacy,
@@ -101,7 +107,7 @@ class DiscoveryInfoSheet extends ConsumerWidget {
                       Icons.delete_outline_rounded,
                       size: CompactTokens.icon16,
                     ),
-                    label: Text(context.loc.discoverClearFeedback),
+                    label: Text(context.loc.discoverClearAll),
                   ),
                 ),
                 const SizedBox(width: CompactTokens.space12),

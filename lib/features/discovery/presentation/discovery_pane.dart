@@ -46,6 +46,9 @@ class DiscoveryPane extends ConsumerWidget {
     final onlyLike = ref.watch(
       settingsControllerProvider.select((value) => value.onlyLikeOnDoubleClick),
     );
+    final useListening = ref.watch(
+      settingsControllerProvider.select((value) => value.useListeningHistory),
+    );
     final sourceLabels = sourceLabelsOf(context.loc, sources);
     final state = discovery.valueOrNull;
     final actions = DiscoveryActions(ref);
@@ -57,32 +60,19 @@ class DiscoveryPane extends ConsumerWidget {
               ref.read(discoveryControllerProvider.notifier).refresh(),
           onInfo: () => showDiscoveryInfoSheet(context),
         ),
-        if (favorites.ids.isEmpty && librarySongs.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              CompactTokens.pageGutter,
-              0,
-              CompactTokens.pageGutter,
-              CompactTokens.space12,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.favorite_border_rounded,
-                  size: CompactTokens.icon14,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: CompactTokens.space6),
-                Expanded(
-                  child: Text(
-                    context.loc.discoverFavoriteHint,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        if (librarySongs.isNotEmpty && favorites.ids.isEmpty)
+          DiscoveryHint(
+            icon: Icons.favorite_border_rounded,
+            text: context.loc.discoverFavoriteHint,
+          )
+        else if (librarySongs.isNotEmpty && !useListening)
+          DiscoveryHint(
+            icon: Icons.history_rounded,
+            text: context.loc.discoverHistoryHint,
+            actionLabel: context.loc.discoverHistoryEnable,
+            onAction: () => ref
+                .read(settingsControllerProvider.notifier)
+                .setUseListeningHistory(true),
           ),
         Expanded(
           child: _body(

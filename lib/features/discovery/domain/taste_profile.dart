@@ -1,10 +1,15 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/taste_profile_keys.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
+
+export 'package:tune/features/discovery/domain/taste_profile_keys.dart';
 
 /// A normalized picture of what the reader likes.
 ///
-/// The profile is built from the tracks the reader marked with a heart. It is
-/// derived on every visit and never stored: a heart is the fact, the weights
-/// are only a reading of it.
+/// The profile is built from the tracks the reader marked with a heart and,
+/// when the reader asked for it, from the local listening aggregates. It is
+/// derived on every visit and never stored: the marks and the counters are
+/// the facts, the weights are only a reading of them.
 class TasteProfile {
   /// Normalized artist keys, between 0 and 1.
   final Map<String, double> artists;
@@ -18,11 +23,15 @@ class TasteProfile {
   /// How many tracks of the library are marked.
   final int favoriteCount;
 
+  /// How many plays the profile was allowed to learn from.
+  final int listenCount;
+
   const TasteProfile({
     this.artists = const {},
     this.genres = const {},
     this.decades = const {},
     this.favoriteCount = 0,
+    this.listenCount = 0,
   });
 
   static const empty = TasteProfile();
@@ -30,26 +39,58 @@ class TasteProfile {
   factory TasteProfile.from({
     required List<Song> library,
     required Set<String> favoriteUris,
+    Map<String, TrackListening> listening = const {},
+    DateTime? now,
   }) {
     final artists = <String, double>{};
     final genres = <String, double>{};
     final decades = <int, double>{};
+    final clock = now ?? DateTime.now();
     var favoriteCount = 0;
+    var listenCount = 0;
 
     for (final song in library) {
-      if (!favoriteUris.contains(song.uri)) continue;
-      favoriteCount++;
-
       final artist = normalizeTasteKey(song.artist);
+      final decade = decadeOf(song.year);
+
+      if (favoriteUris.contains(song.uri)) {
+        favoriteCount++;
+        if (artist.isNotEmpty) {
+          artists.update(artist, (value) => value + 3, ifAbsent: () => 3);
+        }
+        for (final genre in genreKeysOf(song)) {
+          genres.update(genre, (value) => value + 1.5, ifAbsent: () => 1.5);
+        }
+        if (decade != null) {
+          decades.update(decade, (value) => value + 1, ifAbsent: () => 1);
+        }
+      }
+
+      final signal = listening[song.uri];
+      if (signal == null) continue;
+      final weight = listenWeight(signal, clock);
+      listenCount += signal.listens;
+      if (weight <= 0) continue;
       if (artist.isNotEmpty) {
-        artists.update(artist, (value) => value + 3, ifAbsent: () => 3);
+        artists.update(
+          artist,
+          (value) => value + weight,
+          ifAbsent: () => weight,
+        );
       }
       for (final genre in genreKeysOf(song)) {
-        genres.update(genre, (value) => value + 1.5, ifAbsent: () => 1.5);
+        genres.update(
+          genre,
+          (value) => value + weight * 0.5,
+          ifAbsent: () => weight * 0.5,
+        );
       }
-      final decade = decadeOf(song.year);
       if (decade != null) {
-        decades.update(decade, (value) => value + 1, ifAbsent: () => 1);
+        decades.update(
+          decade,
+          (value) => value + weight * 0.5,
+          ifAbsent: () => weight * 0.5,
+        );
       }
     }
 
@@ -58,6 +99,7 @@ class TasteProfile {
       genres: _normalize(genres),
       decades: _normalizeDecades(decades),
       favoriteCount: favoriteCount,
+      listenCount: listenCount,
     );
   }
 
@@ -105,45 +147,6 @@ class TasteProfile {
     ];
     return parts.join('|');
   }
-}
-
-/// The lower-case form of an artist or genre used to compare names.
-final RegExp _whitespace = RegExp(r'\s+');
-final RegExp _genreSeparator = RegExp(r'\s*[/,;、]\s*');
-
-String normalizeTasteKey(String value) {
-  return value.trim().toLowerCase().replaceAll(_whitespace, ' ');
-}
-
-/// The genre keys of a track.
-///
-/// A source may write the genres as a list or as one line with separators.
-/// Both end up as one key per genre, because "Rock/Jazz" and ["Rock", "Jazz"]
-/// mean the same thing to the profile.
-Iterable<String> genreValuesOf(Song song) sync* {
-  final raw = song.genres?.isNotEmpty == true
-      ? song.genres!
-      : [if (song.genre != null) song.genre!];
-  for (final value in raw) {
-    for (final part in value.split(_genreSeparator)) {
-      final trimmed = part.trim();
-      if (trimmed.isNotEmpty) yield trimmed;
-    }
-  }
-}
-
-Iterable<String> genreKeysOf(Song song) sync* {
-  final seen = <String>{};
-  for (final value in genreValuesOf(song)) {
-    final key = normalizeTasteKey(value);
-    if (key.isNotEmpty && seen.add(key)) yield key;
-  }
-}
-
-/// The decade of a year, or null when the year is not usable.
-int? decadeOf(int? year) {
-  if (year == null || year < 1900 || year > 2100) return null;
-  return (year ~/ 10) * 10;
 }
 
 Map<int, double> _normalizeDecades(Map<int, double> weights) {

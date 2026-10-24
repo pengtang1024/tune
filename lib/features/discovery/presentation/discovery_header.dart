@@ -59,3 +59,64 @@ class DiscoveryHeader extends StatelessWidget {
     );
   }
 }
+
+/// A quiet line under the heading that offers one small step.
+class DiscoveryHint extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const DiscoveryHint({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        CompactTokens.pageGutter,
+        0,
+        CompactTokens.pageGutter,
+        CompactTokens.space12,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: CompactTokens.icon14,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: CompactTokens.space6),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(width: CompactTokens.space8),
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                minimumSize: const Size(0, CompactTokens.controlTiny),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space8,
+                ),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(actionLabel!),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

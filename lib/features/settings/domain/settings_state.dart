@@ -50,6 +50,12 @@ class SettingsState {
   /// The weights of the dimensions of the source health score.
   final SourceHealthWeights sourceHealthWeights;
 
+  /// Whether the discover page may learn from the tracks that were played.
+  ///
+  /// It is off by default: the page works from the hearts and the metadata
+  /// alone until the reader asks for the extra signal.
+  final bool useListeningHistory;
+
   /// The music library of the machine.
   final String defaultLibraryFolder;
 
@@ -66,6 +72,7 @@ class SettingsState {
     this.restorePlaybackOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
+    this.useListeningHistory = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
   });
@@ -88,6 +95,7 @@ class SettingsState {
     bool? restorePlaybackOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
+    bool? useListeningHistory,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
   }) {
@@ -106,6 +114,7 @@ class SettingsState {
           restorePlaybackOnStartup ?? this.restorePlaybackOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
+      useListeningHistory: useListeningHistory ?? this.useListeningHistory,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
           : libraryFolder as String?,

@@ -1893,7 +1893,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverWhyBody =>
-      'Discover uses only your library, the tracks you liked and the tracks you dismissed, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.';
+      'Discover uses only your library, the tracks you liked, the not-interested marks and the optional local listening history, and computes everything on this machine. Nothing is uploaded and no online source is searched for you.';
 
   @override
   String get discoverWhyLibrary => 'Tracks and metadata in your library';
@@ -2043,9 +2043,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverGoToLibrary => 'Go to library';
 
   @override
-  String get discoverClearFeedback => 'Clear not interested';
-
-  @override
   String get discoverLoadFailed => 'Discover could not load';
 
   @override
@@ -2057,7 +2054,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverClearMessage =>
-      'This removes the not-interested marks. Favorites, the library and the queue are not touched.';
+      'This removes the not-interested marks and the local listening history. Favorites, the library and the queue are not touched.';
 
   @override
   String get discoverCleared => 'Discover history cleared';
@@ -2079,4 +2076,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get discoverFavoriteHint =>
       'Mark a few tracks with a heart and the picks get closer';
+
+  @override
+  String get settingsDiscoveryUseHistory => 'Local listening history';
+
+  @override
+  String get settingsDiscoveryUseHistoryHint =>
+      'Stored on this machine to make picks closer to you; turning it off stops recording';
+
+  @override
+  String get discoverHistoryHint =>
+      'Turn on local listening history and the picks get closer';
+
+  @override
+  String get discoverHistoryEnable => 'Turn on';
+
+  @override
+  String get discoverClearAll => 'Clear discover history';
+
+  @override
+  String get discoverWhyHistory =>
+      'Optional local listening history (off by default)';
 }

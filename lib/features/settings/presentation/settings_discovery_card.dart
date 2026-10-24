@@ -4,6 +4,8 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/discovery/application/discovery_controller.dart';
 import 'package:tune/features/discovery/application/discovery_providers.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 
 /// The settings of the discover page.
@@ -17,6 +19,9 @@ class SettingsDiscoveryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final useHistory = ref.watch(
+      settingsControllerProvider.select((state) => state.useListeningHistory),
+    );
 
     return SettingsCard(
       index: '04',
@@ -26,6 +31,15 @@ class SettingsDiscoveryCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SettingsSwitchRow(
+            title: context.loc.settingsDiscoveryUseHistory,
+            description: context.loc.settingsDiscoveryUseHistoryHint,
+            value: useHistory,
+            onChanged: (value) => ref
+                .read(settingsControllerProvider.notifier)
+                .setUseListeningHistory(value),
+          ),
+          const SizedBox(height: CompactTokens.space12),
           Text(
             context.loc.settingsDiscoveryPrivacy,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -44,7 +58,7 @@ class SettingsDiscoveryCard extends ConsumerWidget {
               Icons.delete_outline_rounded,
               size: CompactTokens.icon16,
             ),
-            label: Text(context.loc.discoverClearFeedback),
+            label: Text(context.loc.discoverClearAll),
           ),
         ],
       ),
@@ -72,6 +86,7 @@ class SettingsDiscoveryCard extends ConsumerWidget {
     if (confirmed != true) return;
 
     await ref.read(discoveryFeedbackStoreProvider).clear();
+    await ref.read(listeningSignalStoreProvider).clear();
     ref.invalidate(discoveryControllerProvider);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context)

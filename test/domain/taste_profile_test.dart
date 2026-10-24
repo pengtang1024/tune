@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 
 void main() {
   Song song(
@@ -107,5 +108,45 @@ void main() {
     );
 
     expect(first.signature, isNot(second.signature));
+  });
+
+  test('listening signals shape the profile and decay with age', () {
+    final now = DateTime(2026, 10, 24, 12);
+    final library = [
+      song(1, artist: 'Recent', genre: 'Jazz', year: 2000),
+      song(2, artist: 'Old', genre: 'Jazz', year: 2000),
+    ];
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: const {},
+      listening: {
+        '/music/1.mp3': TrackListening(listens: 2, lastPlayedAt: now),
+        '/music/2.mp3': TrackListening(
+          listens: 2,
+          lastPlayedAt: now.subtract(const Duration(days: 90)),
+        ),
+      },
+      now: now,
+    );
+
+    expect(profile.listenCount, 4);
+    expect(profile.artistWeight('Recent'), 1);
+    expect(profile.artistWeight('Old'), closeTo(0.25, 0.001));
+    expect(profile.genreWeight('Jazz'), 1);
+  });
+
+  test('enough skips cancel the listens of a track', () {
+    final now = DateTime(2026, 10, 24, 12);
+    final library = [song(1, artist: 'Skipped', genre: 'Rock')];
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: const {},
+      listening: {
+        '/music/1.mp3': TrackListening(listens: 1, skips: 2, lastPlayedAt: now),
+      },
+      now: now,
+    );
+
+    expect(profile.isEmpty, isTrue);
   });
 }
