@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
@@ -7,7 +8,6 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
-import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -26,6 +26,7 @@ import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/application/source_health_reports.dart';
+import 'package:tune/features/sources/domain/source_health.dart';
 import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
@@ -61,6 +62,20 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// The key is kept instead of the album itself: the album is grouped
   /// again on every build, and a search can take a track out of it.
   String? _openAlbumKey;
+
+  /// The list widget of the last build, and what it was built from.
+  ///
+  /// The page rebuilds for its header and toolbar as well: a source changes
+  /// its place, a scan finishes, the window loses focus. None of that changes
+  /// a single row, and rebuilding the viewport for it costs about a third of
+  /// a second. The list is handed back unchanged when every input a row
+  /// paints is the same.
+  Widget? _cachedTracks;
+  List<Song>? _cachedTrackSongs;
+  Map<String, SourceLabel>? _cachedTrackLabels;
+  LibraryRowMetrics? _cachedTrackMetrics;
+  bool? _cachedTrackWaits;
+  ScrollController? _cachedTrackController;
 
   @override
   void dispose() {
@@ -111,19 +126,20 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     final settings = ref.watch(settingsControllerProvider);
-    final favorites = ref.watch(favoritesControllerProvider);
-    final playback = ref.watch(
-      playbackControllerProvider.select(
-        (value) => (value.currentSong?.uri, value.isPlaying),
-      ),
-    );
     final sourceConfigs = ref.watch(
       musicSourcesControllerProvider.select(
         (value) => value.valueOrNull?.sources ?? const [],
       ),
     );
-    final sourceHealth = ref.watch(sourceHealthReportsProvider);
-    final orderedConfigs = orderSourcesByBand(sourceConfigs, sourceHealth);
+    // The page needs the order of the sources, not the whole health report:
+    // a favorite changes the activity of a source without necessarily
+    // changing its place, and the page must not rebuild for that.
+    final sourceOrder = ref.watch(
+      sourceHealthReportsProvider.select(
+        (reports) => _sourceOrderKey(sourceConfigs, reports),
+      ),
+    );
+    final orderedConfigs = _orderedSources(sourceConfigs, sourceOrder);
     final sourceLabels = sourceLabelsOf(context.loc, orderedConfigs);
     final availableSources = _availableSources(
       library,
@@ -147,10 +163,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         ? libraryAlbumsOf(songs)
         : const <LibraryAlbum>[];
     final openAlbum = _albumOfKey(albums);
-    final currentAlbumKey = _currentAlbumKey(library.songs, playback.$1);
-    final hasSourceIssues = library.sourceSummaries.values.any(
-      (summary) => summary.status != SourceScanStatus.success,
-    );
+    final hasSourceIssues = library.hasSourceIssues;
 
     return Column(
       children: [
@@ -216,11 +229,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   songs,
                   albums,
                   openAlbum,
-                  currentAlbumKey,
-                  playback.$1,
-                  playback.$2,
                   sourceLabels,
-                  favorites,
                   settings.onlyLikeOnDoubleClick,
                 ),
         ),
@@ -228,6 +237,25 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           _LibraryPathsFooter(paths: settings.effectiveScanPaths),
       ],
     );
+  }
+
+  /// The order of the sources, as one value a `select` can compare.
+  static String _sourceOrderKey(
+    List<MusicSourceConfig> configs,
+    Map<String, SourceHealthReport> health,
+  ) {
+    return [
+      for (final source in orderSourcesByBand(configs, health)) source.id,
+    ].join('\u0000');
+  }
+
+  /// Puts the configured sources back into the order of [key].
+  static List<MusicSourceConfig> _orderedSources(
+    List<MusicSourceConfig> configs,
+    String key,
+  ) {
+    final byId = {for (final config in configs) config.id: config};
+    return [for (final id in key.split('\u0000')) ?byId[id]];
   }
 
   /// Sources that own at least one track of the library, in health band and
@@ -261,11 +289,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     List<Song> songs,
     List<LibraryAlbum> albums,
     LibraryAlbum? openAlbum,
-    String? currentAlbumKey,
-    String? currentUri,
-    bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
-    FavoritesState favorites,
     bool onlyLikeOnDoubleClick,
   ) {
     if (songs.isEmpty) {
@@ -282,32 +306,34 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     if (openAlbum != null) {
-      return _trackList(
-        openAlbum.songs,
-        currentUri,
-        isPlaying,
-        sourceLabels,
-        favorites,
-        onlyLikeOnDoubleClick,
-      );
+      return _trackList(openAlbum.songs, sourceLabels, onlyLikeOnDoubleClick);
     }
 
     if (_view == LibraryViewMode.albums) {
-      return LibraryAlbumsView(
-        albums: albums,
-        currentAlbumKey: currentAlbumKey,
-        controller: _albumsScrollController,
-        onOpen: (album) => setState(() => _openAlbumKey = album.key),
-        onPlay: _playAlbum,
+      // The album grid is the only place that needs to know which album
+      // plays. Listening here keeps a change of track from rebuilding the
+      // page and its list.
+      return Consumer(
+        builder: (context, ref, child) {
+          final currentUri = ref.watch(
+            playbackControllerProvider.select(
+              (value) => value.currentSong?.uri,
+            ),
+          );
+          return LibraryAlbumsView(
+            albums: albums,
+            currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
+            controller: _albumsScrollController,
+            onOpen: (album) => setState(() => _openAlbumKey = album.key),
+            onPlay: _playAlbum,
+          );
+        },
       );
     }
 
     return _trackList(
       songs,
-      currentUri,
-      isPlaying,
       sourceLabels,
-      favorites,
       onlyLikeOnDoubleClick,
       controller: _songsScrollController,
     );
@@ -315,10 +341,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
   Widget _trackList(
     List<Song> songs,
-    String? currentUri,
-    bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
-    FavoritesState favorites,
     bool onlyLikeOnDoubleClick, {
     ScrollController? controller,
   }) {
@@ -332,7 +355,17 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           constraints.maxWidth - CompactTokens.pageGutter * 2,
         );
 
-        return ListView.builder(
+        final cached = _cachedTracks;
+        if (cached != null &&
+            identical(controller, _cachedTrackController) &&
+            onlyLikeOnDoubleClick == _cachedTrackWaits &&
+            metrics == _cachedTrackMetrics &&
+            _sameRows(_cachedTrackSongs!, songs) &&
+            mapEquals(_cachedTrackLabels!, sourceLabels)) {
+          return cached;
+        }
+
+        final list = ListView.builder(
           controller: controller,
           padding: const EdgeInsets.fromLTRB(
             CompactTokens.pageGutter,
@@ -341,32 +374,70 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             CompactTokens.space8,
           ),
           itemExtent: metrics.extent,
+          // A row holds no state worth keeping alive: its timers die with
+          // it and the mark comes back from the controller. The default
+          // wrapper only adds a listener to every row.
+          addAutomaticKeepAlives: false,
           itemCount: songs.length,
           itemBuilder: (context, index) {
             final song = songs[index];
-            return LibraryTrackCard(
-              song: song,
-              index: index,
-              selected: song.uri == currentUri,
-              playing: isPlaying,
-              isFavorite: favorites.contains(song.uri),
-              source: sourceLabel(song, sourceLabels),
-              metrics: metrics,
-              onTap: () {
-                // The list the user clicks in decides what happens to the
-                // queue; by default the track joins the queue and plays
-                // right away.
-                ref.read(listPlaybackProvider).play(song);
+            // Each row listens to the three values it paints, not to the
+            // whole page state. Liking a track rebuilds one row; playing a
+            // track rebuilds the two rows whose mark changes.
+            return Consumer(
+              builder: (context, ref, child) {
+                final (selected, playing) = ref.watch(
+                  playbackControllerProvider.select((value) {
+                    final selected = value.currentSong?.uri == song.uri;
+                    return (selected, selected && value.isPlaying);
+                  }),
+                );
+                final isFavorite = ref.watch(
+                  favoritesControllerProvider.select(
+                    (value) => value.contains(song.uri),
+                  ),
+                );
+                return LibraryTrackCard(
+                  song: song,
+                  index: index,
+                  selected: selected,
+                  playing: playing,
+                  isFavorite: isFavorite,
+                  source: sourceLabel(song, sourceLabels),
+                  metrics: metrics,
+                  onTap: () {
+                    // The list the user clicks in decides what happens to
+                    // the queue; by default the track joins the queue and
+                    // plays right away.
+                    ref.read(listPlaybackProvider).play(song);
+                  },
+                  onDoubleTap: () => _markFavorite(song),
+                  waitsForDoubleClick: onlyLikeOnDoubleClick,
+                  onAddToQueue: () => _addToQueue(song),
+                  onToggleFavorite: () => _toggleFavorite(song),
+                );
               },
-              onDoubleTap: () => _markFavorite(song),
-              waitsForDoubleClick: onlyLikeOnDoubleClick,
-              onAddToQueue: () => _addToQueue(song),
-              onToggleFavorite: () => _toggleFavorite(song),
             );
           },
         );
+        _cachedTrackSongs = songs;
+        _cachedTrackLabels = sourceLabels;
+        _cachedTrackMetrics = metrics;
+        _cachedTrackWaits = onlyLikeOnDoubleClick;
+        _cachedTrackController = controller;
+        return _cachedTracks = list;
       },
     );
+  }
+
+  /// Whether two rows lists hold the same tracks in the same order.
+  static bool _sameRows(List<Song> left, List<Song> right) {
+    if (identical(left, right)) return true;
+    if (left.length != right.length) return false;
+    for (var i = 0; i < left.length; i++) {
+      if (!identical(left[i], right[i])) return false;
+    }
+    return true;
   }
 
   /// The key of the album that holds the track that plays.
@@ -464,7 +535,7 @@ typedef _LibrarySlice = ({
   List<Song> songs,
   String query,
   String? sourceFilter,
-  Map<String, SourceScanSummary> sourceSummaries,
+  bool hasSourceIssues,
   bool isLoading,
 });
 
@@ -475,7 +546,12 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     songs: state.songs,
     query: state.query,
     sourceFilter: state.sourceFilter,
-    sourceSummaries: state.sourceSummaries,
+    // The page only shows whether a source has a problem, not the whole
+    // report: a scan that finishes without changing the songs must not hand
+    // the page a new map and rebuild every visible row for it.
+    hasSourceIssues: state.sourceSummaries.values.any(
+      (summary) => summary.status != SourceScanStatus.success,
+    ),
     isLoading: state.isLoading,
   );
 }

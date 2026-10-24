@@ -32,6 +32,17 @@ class LibraryRowMetrics {
     this.extent,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      other is LibraryRowMetrics &&
+      other.showArtist == showArtist &&
+      other.showFacts == showFacts &&
+      other.showAlbum == showAlbum &&
+      other.extent == extent;
+
+  @override
+  int get hashCode => Object.hash(showArtist, showFacts, showAlbum, extent);
+
   /// The metrics of a row that is [width] wide at [textScale].
   factory LibraryRowMetrics.at({
     required double width,
