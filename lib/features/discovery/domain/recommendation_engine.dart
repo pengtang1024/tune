@@ -90,18 +90,23 @@ class RecommendationEngine {
     );
     if (daily != null) sections.add(daily);
 
-    sections.addAll(
-      buildArtistSections(
-        candidates: sorted,
-        profile: profile,
-        tuning: tuning,
-        seen: seen,
-      ),
+    final artistSections = buildArtistSections(
+      candidates: sorted,
+      profile: profile,
+      tuning: tuning,
+      seen: seen,
     );
+    sections.addAll(artistSections);
+    final shelfArtists = {
+      for (final section in artistSections)
+        if (section.reason.artist != null)
+          normalizeTasteKey(section.reason.artist!),
+    };
 
     final favoriteArtists = buildFavoriteArtistSection(
       candidates: sorted,
       profile: profile,
+      excludeArtists: shelfArtists,
       seen: seen,
     );
     if (favoriteArtists != null) sections.add(favoriteArtists);

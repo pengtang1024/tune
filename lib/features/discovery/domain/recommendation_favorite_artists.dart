@@ -12,17 +12,17 @@ import 'package:tune/features/discovery/domain/taste_profile.dart';
 DiscoverySection? buildFavoriteArtistSection({
   required List<RecommendationCandidate> candidates,
   required TasteProfile profile,
+  Set<String> excludeArtists = const {},
   required Set<String> seen,
 }) {
   if (profile.artists.isEmpty) return null;
 
-  final soloArtists = profile.topArtists(2).toSet();
   final pool = candidates
       .where(
         (item) =>
             !item.favorite &&
             item.artistKey.isNotEmpty &&
-            !soloArtists.contains(item.artistKey) &&
+            !excludeArtists.contains(item.artistKey) &&
             profile.artistWeightKey(item.artistKey) > 0,
       )
       .toList(growable: false);

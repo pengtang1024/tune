@@ -528,11 +528,25 @@ void main() {
       profile: profile,
       seen: <String>{},
     );
-
     expect(section, isNotNull);
-    expect(section!.tracks.length, 4);
+    expect(section!.tracks.length, 8);
+    expect(section.tracks.map((track) => track.song.artist).toSet(), {
+      'Artist 0',
+      'Artist 1',
+      'Artist 2',
+      'Artist 3',
+    });
+
+    final withoutShelves = buildFavoriteArtistSection(
+      candidates: candidates,
+      profile: profile,
+      excludeArtists: const {'artist 0', 'artist 1'},
+      seen: <String>{},
+    );
+    expect(withoutShelves, isNotNull);
+    expect(withoutShelves!.tracks.length, 4);
     expect(
-      section.tracks.every(
+      withoutShelves.tracks.every(
         (track) =>
             track.song.artist == 'Artist 2' || track.song.artist == 'Artist 3',
       ),
