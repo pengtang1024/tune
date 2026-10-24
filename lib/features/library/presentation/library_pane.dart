@@ -20,6 +20,8 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/application/source_health_reports.dart';
+import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 import 'package:tune/shared/ui/source_label.dart';
@@ -52,12 +54,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // it on their own.
     final load = ref.watch(
       libraryControllerProvider.select(
-        (value) => (
-          value.isLoading,
-          value.hasValue,
-          value.hasError,
-          value.error,
-        ),
+        (value) =>
+            (value.isLoading, value.hasValue, value.hasError, value.error),
       ),
     );
     final library = ref.watch(libraryControllerProvider.select(_librarySlice));
@@ -100,11 +98,13 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         (value) => value.valueOrNull?.sources ?? const [],
       ),
     );
-    final sourceLabels = sourceLabelsOf(context.loc, sourceConfigs);
+    final sourceHealth = ref.watch(sourceHealthReportsProvider);
+    final orderedConfigs = orderSourcesByBand(sourceConfigs, sourceHealth);
+    final sourceLabels = sourceLabelsOf(context.loc, orderedConfigs);
     final availableSources = _availableSources(
       library,
       sourceLabels,
-      sourceConfigs,
+      orderedConfigs,
     );
     final songs = filteredSongsOf(
       songs: library.songs,
@@ -185,7 +185,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
-  /// Sources that own at least one track of the library, in weight order.
+  /// Sources that own at least one track of the library, in health band and
+  /// weight order.
   ///
   /// The configured sources already stand in the reader's order. A source
   /// that only exists in old songs has no configuration any more; it goes to

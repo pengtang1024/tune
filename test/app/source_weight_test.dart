@@ -4,6 +4,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/sources/domain/source_health.dart';
 import 'package:tune/features/sources/domain/source_health_facts.dart';
+import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/features/sources/domain/source_scan_health.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
@@ -517,6 +518,51 @@ void main() {
     final facts = sourceHealthFactsOf(songs);
 
     expect(facts['openverse']!.activity, 0.5);
+  });
+
+  test('band order keeps the weight order inside a band', () {
+    SourceHealthReport report(int score) => SourceHealthReport(
+      availability: 100,
+      configuration: 100,
+      scan: 100,
+      freshness: 100,
+      output: 100,
+      speed: 100,
+      reliability: 100,
+      stability: 100,
+      playable: 100,
+      artwork: 100,
+      metadata: 100,
+      activity: 100,
+      score: score,
+      healthy: score >= SourceHealth.threshold,
+    );
+    const heavier = MusicSourceConfig(
+      id: 'heavier',
+      type: 'openverse',
+      name: 'Heavier',
+      kind: MusicSourceKind.openCatalog,
+      builtIn: true,
+    );
+    const lighter = MusicSourceConfig(
+      id: 'lighter',
+      type: 'openverse',
+      name: 'Lighter',
+      kind: MusicSourceKind.openCatalog,
+      builtIn: true,
+    );
+
+    final ordered = orderSourcesByBand(
+      [heavier, lighter],
+      {'heavier': report(65), 'lighter': report(90)},
+    );
+    expect(ordered.map((source) => source.id), ['lighter', 'heavier']);
+
+    final sameBand = orderSourcesByBand(
+      [heavier, lighter],
+      {'heavier': report(75), 'lighter': report(80)},
+    );
+    expect(sameBand.map((source) => source.id), ['heavier', 'lighter']);
   });
 
   test('health bands separate the main list', () {

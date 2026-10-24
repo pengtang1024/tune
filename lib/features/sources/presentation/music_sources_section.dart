@@ -15,6 +15,7 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/application/source_health_reports.dart';
 import 'package:tune/features/sources/domain/source_health.dart';
+import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
 import 'package:tune/features/sources/presentation/source_form_dialog.dart';
 import 'package:tune/features/sources/presentation/source_menu_button.dart';
@@ -255,24 +256,7 @@ _SourceGroups _groupSources(
   MusicSourceService service,
   Map<String, SourceHealthReport> health,
 ) {
-  final ordered = [...sources]
-    ..sort((left, right) {
-      final byBand = (health[right.id]?.band ?? 0).compareTo(
-        health[left.id]?.band ?? 0,
-      );
-      if (byBand != 0) return byBand;
-      final leftWeight = SourceWeights.of(
-        left,
-        isFeatured: service.isFeatured(left),
-      );
-      final rightWeight = SourceWeights.of(
-        right,
-        isFeatured: service.isFeatured(right),
-      );
-      final byWeight = rightWeight.compareTo(leftWeight);
-      if (byWeight != 0) return byWeight;
-      return sources.indexOf(left).compareTo(sources.indexOf(right));
-    });
+  final ordered = orderSourcesByBand(sources, health);
 
   final main = <MusicSourceConfig>[];
   final more = <MusicSourceConfig>[];
