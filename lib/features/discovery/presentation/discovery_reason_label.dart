@@ -13,6 +13,7 @@ String discoveryReasonText(
 ) {
   return switch (reason.kind) {
     RecommendationReasonKind.favorite => context.loc.discoverReasonFavorite,
+    RecommendationReasonKind.completed => context.loc.discoverReasonCompleted,
     RecommendationReasonKind.artist => context.loc.discoverReasonArtist(
       _nonEmpty(reason.artist, context.loc.discoverReasonFallback),
     ),

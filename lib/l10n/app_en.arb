@@ -1111,5 +1111,6 @@
       }
     }
   },
-  "discoverSectionFavoriteArtists": "More from the artists you like"
+  "discoverSectionFavoriteArtists": "More from the artists you like",
+  "discoverReasonCompleted": "You often finish this one"
 }

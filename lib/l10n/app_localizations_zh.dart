@@ -2012,6 +2012,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverSectionFavoriteArtists => '更多来自你标心的歌手';
+
+  @override
+  String get discoverReasonCompleted => '你常把这首听完';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -4022,6 +4025,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverSectionFavoriteArtists => '更多来自你标心的歌手';
+
+  @override
+  String get discoverReasonCompleted => '你常把这首听完';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6032,4 +6038,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverSectionFavoriteArtists => '更多來自你標心的歌手';
+
+  @override
+  String get discoverReasonCompleted => '你常把這首聽完';
 }

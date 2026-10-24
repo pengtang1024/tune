@@ -135,6 +135,14 @@ RecommendationReason _reasonFor(
   DateTime now,
 ) {
   if (candidate.favorite) return const RecommendationReason.favorite();
+  if (candidate.listening.completions >= 2 &&
+      candidate.listening.listens >= 3 &&
+      candidate.quality >= 0.6) {
+    return RecommendationReason(
+      kind: RecommendationReasonKind.completed,
+      confidence: candidate.quality,
+    );
+  }
   if (profile.isEmpty) {
     return candidate.listening.listens > 0
         ? const RecommendationReason.fallback()

@@ -2195,4 +2195,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverSectionFavoriteArtists => 'More from the artists you like';
+
+  @override
+  String get discoverReasonCompleted => 'You often finish this one';
 }

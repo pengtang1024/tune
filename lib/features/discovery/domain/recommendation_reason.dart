@@ -6,6 +6,7 @@
 /// one.
 enum RecommendationReasonKind {
   favorite,
+  completed,
   artist,
   genre,
   era,

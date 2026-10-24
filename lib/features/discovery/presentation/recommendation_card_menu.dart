@@ -70,6 +70,7 @@ class RecommendationCardMenu extends StatelessWidget {
 IconData recommendationReasonIcon(RecommendationReasonKind kind) {
   return switch (kind) {
     RecommendationReasonKind.favorite => Icons.favorite_rounded,
+    RecommendationReasonKind.completed => Icons.check_circle_outline_rounded,
     RecommendationReasonKind.artist => Icons.person_rounded,
     RecommendationReasonKind.genre => Icons.category_rounded,
     RecommendationReasonKind.era => Icons.history_rounded,

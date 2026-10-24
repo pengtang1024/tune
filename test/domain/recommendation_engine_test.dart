@@ -553,4 +553,29 @@ void main() {
       isTrue,
     );
   });
+
+  test('a track finished several times says so', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final output = recommend(
+      library: library,
+      listening: {
+        '/music/0.mp3': TrackListening(
+          listens: 3,
+          completions: 3,
+          lastPlayedAt: now.subtract(const Duration(days: 90)),
+        ),
+      },
+    );
+    final daily = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.dailyMix,
+    );
+    final track = daily.tracks.firstWhere(
+      (item) => item.song.uri == '/music/0.mp3',
+    );
+
+    expect(track.reason.kind, RecommendationReasonKind.completed);
+  });
 }

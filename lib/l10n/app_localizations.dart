@@ -3688,6 +3688,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'更多来自你标心的歌手'**
   String get discoverSectionFavoriteArtists;
+
+  /// No description provided for @discoverReasonCompleted.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'你常把这首听完'**
+  String get discoverReasonCompleted;
 }
 
 class _AppLocalizationsDelegate

@@ -1111,5 +1111,6 @@
       }
     }
   },
-  "discoverSectionFavoriteArtists": "更多来自你标心的歌手"
+  "discoverSectionFavoriteArtists": "更多来自你标心的歌手",
+  "discoverReasonCompleted": "你常把这首听完"
 }
