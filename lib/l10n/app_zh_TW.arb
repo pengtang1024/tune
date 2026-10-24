@@ -951,7 +951,7 @@
   "discoverLoadFailed": "發現頁載入失敗",
   "discoverLoadFailedHint": "音樂庫暫時讀不出來，稍後再試",
   "discoverClearTitle": "清除推薦記錄？",
-  "discoverClearMessage": "會刪除不感興趣標記和本機播放記錄；喜歡、音樂庫和播放佇列不受影響。",
+  "discoverClearMessage": "會刪除單曲與歌手的「少推薦」標記和本機播放記錄；喜歡、音樂庫和播放佇列不受影響。",
   "discoverCleared": "推薦記錄已清除",
   "@discoverSectionArtist": {
     "placeholders": {
@@ -1072,5 +1072,14 @@
       }
     }
   },
-  "discoverReasonAdjacent": "同一種口味，換個人"
+  "discoverReasonAdjacent": "同一種口味，換個人",
+  "discoverLessArtist": "少推薦這位歌手",
+  "discoverDismissedArtist": "已減少「{artist}」的推薦",
+  "@discoverDismissedArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

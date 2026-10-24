@@ -951,7 +951,7 @@
   "discoverLoadFailed": "发现页加载失败",
   "discoverLoadFailedHint": "音乐库暂时读不出来，稍后再试",
   "discoverClearTitle": "清除推荐记录？",
-  "discoverClearMessage": "会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。",
+  "discoverClearMessage": "会删除单曲与歌手的「少推荐」标记和本地播放记录；喜欢、音乐库和播放队列不受影响。",
   "discoverCleared": "推荐记录已清除",
   "@discoverSectionArtist": {
     "placeholders": {
@@ -1072,5 +1072,14 @@
       }
     }
   },
-  "discoverReasonAdjacent": "同一种口味，换个人"
+  "discoverReasonAdjacent": "同一种口味，换个人",
+  "discoverLessArtist": "少推荐这位歌手",
+  "discoverDismissedArtist": "已减少「{artist}」的推荐",
+  "@discoverDismissedArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

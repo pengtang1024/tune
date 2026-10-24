@@ -23,6 +23,7 @@ class DiscoverySectionView extends StatelessWidget {
   final ValueChanged<Song> onToggleFavorite;
   final ValueChanged<Song> onAddToQueue;
   final ValueChanged<Song> onDismiss;
+  final ValueChanged<Song> onDismissArtist;
   final ValueChanged<Song> onDetails;
   final VoidCallback onPlayAll;
   final VoidCallback onAddAll;
@@ -42,6 +43,7 @@ class DiscoverySectionView extends StatelessWidget {
     required this.onToggleFavorite,
     required this.onAddToQueue,
     required this.onDismiss,
+    required this.onDismissArtist,
     required this.onDetails,
     required this.onPlayAll,
     required this.onAddAll,
@@ -183,6 +185,7 @@ class DiscoverySectionView extends StatelessWidget {
                 onToggleFavorite: () => onToggleFavorite(song),
                 onAddToQueue: () => onAddToQueue(song),
                 onDismiss: () => onDismiss(song),
+                onDismissArtist: () => onDismissArtist(song),
                 onDetails: () => onDetails(song),
               );
             },

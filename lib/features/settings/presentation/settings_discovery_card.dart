@@ -86,6 +86,7 @@ class SettingsDiscoveryCard extends ConsumerWidget {
     if (confirmed != true) return;
 
     await ref.read(discoveryFeedbackStoreProvider).clear();
+    await ref.read(discoveryArtistFeedbackStoreProvider).clear();
     await ref.read(listeningSignalStoreProvider).clear();
     ref.invalidate(discoveryControllerProvider);
     if (!context.mounted) return;

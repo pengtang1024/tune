@@ -951,7 +951,7 @@
   "discoverLoadFailed": "Discover could not load",
   "discoverLoadFailedHint": "The library is not readable right now. Try again in a moment.",
   "discoverClearTitle": "Clear discover history?",
-  "discoverClearMessage": "This removes the not-interested marks and the local listening history. Favorites, the library and the queue are not touched.",
+  "discoverClearMessage": "This removes the not-interested marks, the artist marks and the local listening history. Favorites, the library and the queue are not touched.",
   "discoverCleared": "Discover history cleared",
   "@discoverSectionArtist": {
     "placeholders": {
@@ -1072,5 +1072,14 @@
       }
     }
   },
-  "discoverReasonAdjacent": "Same taste, a different artist"
+  "discoverReasonAdjacent": "Same taste, a different artist",
+  "discoverLessArtist": "Show less from this artist",
+  "discoverDismissedArtist": "Fewer picks from {artist}",
+  "@discoverDismissedArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

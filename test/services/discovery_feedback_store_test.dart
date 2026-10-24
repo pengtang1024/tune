@@ -56,4 +56,20 @@ void main() {
     expect(store.read(now: now), isEmpty);
     expect(persistence.containsKey(DiscoveryFeedbackStore.key), isFalse);
   });
+
+  test('an artist mark is kept apart from a track mark', () async {
+    final tracks = DiscoveryFeedbackStore(persistence);
+    final artists = DiscoveryArtistFeedbackStore(persistence);
+
+    await tracks.dismiss('/music/a.mp3', now: now);
+    await artists.dismiss('nujabes', now: now);
+
+    expect(tracks.read(now: now), contains('/music/a.mp3'));
+    expect(artists.read(now: now), contains('nujabes'));
+    expect(artists.read(now: now), isNot(contains('/music/a.mp3')));
+
+    await artists.clear();
+    expect(artists.read(now: now), isEmpty);
+    expect(tracks.read(now: now), contains('/music/a.mp3'));
+  });
 }

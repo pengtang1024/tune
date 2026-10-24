@@ -5,7 +5,7 @@ import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The actions of a recommendation card.
-enum RecommendationCardAction { queue, dismiss, details }
+enum RecommendationCardAction { queue, dismiss, lessArtist, details }
 
 class RoundCardControl extends StatelessWidget {
   final Widget child;
@@ -53,6 +53,10 @@ class RecommendationCardMenu extends StatelessWidget {
               value: RecommendationCardAction.dismiss,
               child: Text(context.loc.discoverDismiss),
             ),
+          PopupMenuItem(
+            value: RecommendationCardAction.lessArtist,
+            child: Text(context.loc.discoverLessArtist),
+          ),
           PopupMenuItem(
             value: RecommendationCardAction.details,
             child: Text(context.loc.trackDetailsTooltip),

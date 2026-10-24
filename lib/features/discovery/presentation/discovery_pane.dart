@@ -158,6 +158,7 @@ class DiscoveryPane extends ConsumerWidget {
             onToggleFavorite: actions.toggleFavorite,
             onAddToQueue: (song) => actions.addToQueue(context, song),
             onDismiss: (song) => actions.dismiss(context, song),
+            onDismissArtist: (song) => actions.dismissArtist(context, song),
             onDetails: (song) => actions.details(context, song, sourceLabels),
             onPlayAll: () => actions.playSection(section),
             onAddAll: () => actions.addSection(context, section),

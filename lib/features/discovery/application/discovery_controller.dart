@@ -36,7 +36,10 @@ final discoveryControllerProvider =
 /// rebuilds the projection, and leaving the page drops it.
 class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   DiscoveryFeedbackStore? _feedbackStore;
+  DiscoveryArtistFeedbackStore? _artistFeedbackStore;
   Map<String, DateTime> _feedback = const {};
+  Map<String, DateTime> _artistFeedback = const {};
+  bool _artistFeedbackLoaded = false;
   Map<String, TrackListening> _listening = const {};
   final List<DiscoverySection> _onlineSections = [];
   Set<String> _finding = const {};
@@ -53,6 +56,11 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     if (!_feedbackLoaded) {
       _feedback = _feedbackStore!.read();
       _feedbackLoaded = true;
+    }
+    _artistFeedbackStore = ref.watch(discoveryArtistFeedbackStoreProvider);
+    if (!_artistFeedbackLoaded) {
+      _artistFeedback = _artistFeedbackStore!.read();
+      _artistFeedbackLoaded = true;
     }
 
     final library = ref.watch(libraryControllerProvider.select(_snapshotOf));
@@ -109,12 +117,32 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     _recompute();
   }
 
+  /// Shows less of a whole artist for the same thirty days.
+  Future<void> dismissArtist(String artist) async {
+    final key = normalizeTasteKey(artist);
+    if (key.isEmpty) return;
+    if (_artistFeedback.containsKey(key)) return;
+    _artistFeedback = {..._artistFeedback, key: DateTime.now()};
+    await _artistFeedbackStore?.dismiss(key);
+    _recompute();
+  }
+
+  Future<void> forgetArtistDismissal(String artist) async {
+    final key = normalizeTasteKey(artist);
+    if (!_artistFeedback.containsKey(key)) return;
+    _artistFeedback = {..._artistFeedback}..remove(key);
+    await _artistFeedbackStore?.remove(key);
+    _recompute();
+  }
+
   /// Removes every mark and every listen the page kept.
   Future<void> clearFeedback() async {
     _feedback = const {};
+    _artistFeedback = const {};
     _listening = const {};
     _onlineSections.clear();
     await _feedbackStore?.clear();
+    await _artistFeedbackStore?.clear();
     await ref.read(listeningSignalStoreProvider).clear();
     _recompute();
   }
@@ -272,6 +300,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
             favoriteUris: favoriteUris,
             profile: profile,
             dismissedUris: _feedback.keys.toSet(),
+            dismissedArtists: _artistFeedback.keys.toSet(),
             listening: _listening,
             sourceOrder: sourceOrder,
             dateKey: dateKey,

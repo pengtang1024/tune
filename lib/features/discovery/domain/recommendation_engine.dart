@@ -32,6 +32,7 @@ class RecommendationEngine {
     required Set<String> favoriteUris,
     required TasteProfile profile,
     required Set<String> dismissedUris,
+    Set<String> dismissedArtists = const {},
     required List<String> sourceOrder,
     required String dateKey,
     Map<String, TrackListening> listening = const {},
@@ -47,6 +48,7 @@ class RecommendationEngine {
       library: library,
       favoriteUris: favoriteUris,
       dismissedUris: dismissedUris,
+      dismissedArtists: dismissedArtists,
       listening: listening,
     );
     scoreCandidates(

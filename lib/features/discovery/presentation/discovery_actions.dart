@@ -110,6 +110,29 @@ class DiscoveryActions {
       );
   }
 
+  Future<void> dismissArtist(BuildContext context, Song song) async {
+    final artist = song.artist.trim();
+    if (artist.isEmpty) return;
+    await ref.read(discoveryControllerProvider.notifier).dismissArtist(artist);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(context.loc.discoverDismissedArtist(artist)),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: context.loc.discoverUndo,
+            onPressed: () {
+              ref
+                  .read(discoveryControllerProvider.notifier)
+                  .forgetArtistDismissal(artist);
+            },
+          ),
+        ),
+      );
+  }
+
   void details(
     BuildContext context,
     Song song,

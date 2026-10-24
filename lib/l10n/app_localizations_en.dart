@@ -2054,7 +2054,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverClearMessage =>
-      'This removes the not-interested marks and the local listening history. Favorites, the library and the queue are not touched.';
+      'This removes the not-interested marks, the artist marks and the local listening history. Favorites, the library and the queue are not touched.';
 
   @override
   String get discoverCleared => 'Discover history cleared';
@@ -2132,4 +2132,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverReasonAdjacent => 'Same taste, a different artist';
+
+  @override
+  String get discoverLessArtist => 'Show less from this artist';
+
+  @override
+  String discoverDismissedArtist(String artist) {
+    return 'Fewer picks from $artist';
+  }
 }

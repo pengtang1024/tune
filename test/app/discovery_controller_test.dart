@@ -224,6 +224,28 @@ void main() {
     };
     expect(uris, isNot(contains(uri)));
   });
+
+  test('an artist can be shown less and brought back', () async {
+    final container = createContainer(FakePersistenceService());
+    await keepAlive(container);
+
+    final controller = container.read(discoveryControllerProvider.notifier);
+    await controller.dismissArtist('Nujabes');
+    var artists = {
+      for (final section
+          in container.read(discoveryControllerProvider).requireValue.sections)
+        for (final track in section.tracks) track.song.artist,
+    };
+    expect(artists, isNot(contains('Nujabes')));
+
+    await controller.forgetArtistDismissal('Nujabes');
+    artists = {
+      for (final section
+          in container.read(discoveryControllerProvider).requireValue.sections)
+        for (final track in section.tracks) track.song.artist,
+    };
+    expect(artists, contains('Nujabes'));
+  });
 }
 
 class FakeDiscoverySourceService extends MusicSourceService {

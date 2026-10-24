@@ -42,6 +42,7 @@ void main() {
     required List<Song> library,
     Set<String> favorites = const {},
     Set<String> dismissed = const {},
+    Set<String> dismissedArtists = const {},
     List<String> sourceOrder = const [],
     bool allowFresh = false,
     int salt = 0,
@@ -51,6 +52,7 @@ void main() {
       favoriteUris: favorites,
       profile: TasteProfile.from(library: library, favoriteUris: favorites),
       dismissedUris: dismissed,
+      dismissedArtists: dismissedArtists,
       sourceOrder: sourceOrder,
       dateKey: '2026-10-24',
       refreshSalt: salt,
@@ -267,5 +269,24 @@ void main() {
     };
 
     expect(uris.length, lessThanOrEqualTo(3));
+  });
+
+  test('a dismissed artist leaves the local page', () {
+    final library = [
+      for (var index = 0; index < 6; index++)
+        song(
+          index,
+          artist: index < 3 ? 'Nujabes' : 'Other $index',
+          album: 'Album $index',
+        ),
+    ];
+    final output = recommend(library: library, dismissedArtists: {'nujabes'});
+    final artists = {
+      for (final section in output.sections)
+        for (final track in section.tracks) track.song.artist,
+    };
+
+    expect(artists, isNot(contains('Nujabes')));
+    expect(artists, contains('Other 3'));
   });
 }

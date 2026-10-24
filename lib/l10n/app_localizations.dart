@@ -3504,7 +3504,7 @@ abstract class AppLocalizations {
   /// No description provided for @discoverClearMessage.
   ///
   /// In zh_CN, this message translates to:
-  /// **'会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。'**
+  /// **'会删除单曲与歌手的「少推荐」标记和本地播放记录；喜欢、音乐库和播放队列不受影响。'**
   String get discoverClearMessage;
 
   /// No description provided for @discoverCleared.
@@ -3626,6 +3626,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'同一种口味，换个人'**
   String get discoverReasonAdjacent;
+
+  /// No description provided for @discoverLessArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'少推荐这位歌手'**
+  String get discoverLessArtist;
+
+  /// No description provided for @discoverDismissedArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已减少「{artist}」的推荐'**
+  String discoverDismissedArtist(String artist);
 }
 
 class _AppLocalizationsDelegate

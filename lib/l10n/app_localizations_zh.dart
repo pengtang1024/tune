@@ -1895,7 +1895,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverClearTitle => '清除推荐记录？';
 
   @override
-  String get discoverClearMessage => '会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
+  String get discoverClearMessage => '会删除单曲与歌手的「少推荐」标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
 
   @override
   String get discoverCleared => '推荐记录已清除';
@@ -1966,6 +1966,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverReasonAdjacent => '同一种口味，换个人';
+
+  @override
+  String get discoverLessArtist => '少推荐这位歌手';
+
+  @override
+  String discoverDismissedArtist(String artist) {
+    return '已减少「$artist」的推荐';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3859,7 +3867,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverClearTitle => '清除推荐记录？';
 
   @override
-  String get discoverClearMessage => '会删除不感兴趣标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
+  String get discoverClearMessage => '会删除单曲与歌手的「少推荐」标记和本地播放记录；喜欢、音乐库和播放队列不受影响。';
 
   @override
   String get discoverCleared => '推荐记录已清除';
@@ -3930,6 +3938,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverReasonAdjacent => '同一种口味，换个人';
+
+  @override
+  String get discoverLessArtist => '少推荐这位歌手';
+
+  @override
+  String discoverDismissedArtist(String artist) {
+    return '已减少「$artist」的推荐';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5823,7 +5839,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get discoverClearTitle => '清除推薦記錄？';
 
   @override
-  String get discoverClearMessage => '會刪除不感興趣標記和本機播放記錄；喜歡、音樂庫和播放佇列不受影響。';
+  String get discoverClearMessage => '會刪除單曲與歌手的「少推薦」標記和本機播放記錄；喜歡、音樂庫和播放佇列不受影響。';
 
   @override
   String get discoverCleared => '推薦記錄已清除';
@@ -5894,4 +5910,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverReasonAdjacent => '同一種口味，換個人';
+
+  @override
+  String get discoverLessArtist => '少推薦這位歌手';
+
+  @override
+  String discoverDismissedArtist(String artist) {
+    return '已減少「$artist」的推薦';
+  }
 }

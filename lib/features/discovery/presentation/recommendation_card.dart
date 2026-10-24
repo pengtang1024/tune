@@ -24,6 +24,7 @@ class RecommendationCard extends StatelessWidget {
   final VoidCallback onToggleFavorite;
   final VoidCallback onAddToQueue;
   final VoidCallback onDismiss;
+  final VoidCallback onDismissArtist;
   final VoidCallback onDetails;
 
   const RecommendationCard({
@@ -40,6 +41,7 @@ class RecommendationCard extends StatelessWidget {
     required this.onToggleFavorite,
     required this.onAddToQueue,
     required this.onDismiss,
+    required this.onDismissArtist,
     required this.onDetails,
   });
 
@@ -187,6 +189,9 @@ class RecommendationCard extends StatelessWidget {
         break;
       case RecommendationCardAction.dismiss:
         onDismiss();
+        break;
+      case RecommendationCardAction.lessArtist:
+        onDismissArtist();
         break;
       case RecommendationCardAction.details:
         onDetails();

@@ -44,6 +44,7 @@ List<RecommendationCandidate> buildCandidates({
   required List<Song> library,
   required Set<String> favoriteUris,
   required Set<String> dismissedUris,
+  Set<String> dismissedArtists = const {},
   Map<String, TrackListening> listening = const {},
 }) {
   final result = <RecommendationCandidate>[];
@@ -52,6 +53,10 @@ List<RecommendationCandidate> buildCandidates({
     if (song.uri.isEmpty || song.isLiveStream) continue;
     if (dismissedUris.contains(song.uri)) continue;
     if (!seen.add(song.uri)) continue;
+    final artistKey = normalizeTasteKey(song.artist);
+    if (artistKey.isNotEmpty && dismissedArtists.contains(artistKey)) {
+      continue;
+    }
 
     final genres = <String, String>{};
     for (final value in genreValuesOf(song)) {
@@ -60,7 +65,7 @@ List<RecommendationCandidate> buildCandidates({
     result.add(
       RecommendationCandidate(
         song: song,
-        artistKey: normalizeTasteKey(song.artist),
+        artistKey: artistKey,
         genres: genres,
         albumKey: normalizeTasteKey(song.album),
         decade: decadeOf(song.year),

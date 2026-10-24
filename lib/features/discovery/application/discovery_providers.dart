@@ -8,6 +8,13 @@ final discoveryFeedbackStoreProvider = Provider<DiscoveryFeedbackStore>((ref) {
   return DiscoveryFeedbackStore(ref.watch(persistenceServiceProvider));
 });
 
+final discoveryArtistFeedbackStoreProvider =
+    Provider<DiscoveryArtistFeedbackStore>((ref) {
+      return DiscoveryArtistFeedbackStore(
+        ref.watch(persistenceServiceProvider),
+      );
+    });
+
 final listeningSignalStoreProvider = Provider<ListeningSignalStore>((ref) {
   return ListeningSignalStore(ref.watch(persistenceServiceProvider));
 });

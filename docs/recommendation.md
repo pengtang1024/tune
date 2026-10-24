@@ -222,7 +222,8 @@
 | 分段「播放」 | `PlaybackController.playQueue(该段曲目)`，显式替换队列 |
 | 分段「加入队列」 | `PlaybackController.addAllToQueue(该段曲目)`，已在队列里的跳过，提示新增条数 |
 | 卡片菜单「加入队列」 | 单曲 `addToQueue` |
-| 卡片菜单「不感兴趣」 | 从发现页移除，写入本地反馈；底部提示可撤销 |
+| 卡片菜单「不感兴趣」 | 从发现页移除这首，写入本地反馈；底部提示可撤销 |
+| 卡片菜单「少推荐这位歌手」 | 该歌手的本地推荐隐藏 30 天，可撤销；在线显式搜索不受影响 |
 | 卡片菜单「查看详情」 | `showTrackDetailSheet` |
 | 歌手分段「在线找更多」 | 用该歌手名搜索启用的在线音源；结果只在本页内存里，不进音乐库 |
 | 页头刷新 | 重算本地分段；今日混音换一个本会话的盐值 |
@@ -370,7 +371,8 @@ class TasteProfile {
 
 - 候选 = `LibraryState.songs`，不额外请求网络。显式在线查找的结果单独成段，
   不进入候选池，也不参与画像。
-- 过滤掉：`uri` 为空、直播流、已不感兴趣且未过期、以及本轮已经选过的 `uri`。
+- 过滤掉：`uri` 为空、直播流、已不感兴趣且未过期、已少推荐的歌手、以及本轮
+  已经选过的 `uri`。
 - 同一 `uri` 在库里已经由 `LibraryController` 合并成一条（本地副本 + 在线来源），
   发现页不再做第二次合并。
 - 跨来源的同一录音如果 `uri` 不同（例如同一首歌在两个音源各有一条），
@@ -394,10 +396,14 @@ score(s) =
   + 0.10 * favorite(s)
   - 0.35 * recentPenalty(s)
   - 0.30 * skipPenalty(s)
+  - 0.10 * missingArtwork(s)
 ```
 
-- 权重集中在 `RecommendationTuning`，基础权重加起来是 1；喜欢加分和两个惩罚
+- 权重集中在 `RecommendationTuning`，基础权重加起来是 1；喜欢加分和三个惩罚
   在基础分之后应用，最后夹到 0..1。
+- `missingArtwork`：曲目没有封面时为 1，有封面时为 0。它不是基础权重，而是
+  和最近播放、跳过一样的惩罚项：缺封面不会让曲目消失，但在同等口味下排在
+  后面；口味信号足够强时仍然可以靠前。
 - `quality`：没有播放记录时给 0.5（标心 0.7）；有记录时按
   `0.4 + 0.6 × 完成率 - 0.4 × 跳过率`。
 - `novelty`：没播过 1.0；超过 60 天没播 0.8；30–60 天 0.6；最近 30 天 0.3。
@@ -535,13 +541,13 @@ class RecommendationReason {
 ### 6.10 反馈与撤销
 
 - `DiscoveryFeedbackStore` 存 `uri → { kind, createdAt }`，默认 30 天过期。
-- v1 只有 `notInterested` 一种；「少推荐这位歌手」留到后续，避免一次做出
-  两级黑名单。
+- 单曲标记与歌手标记都保留 30 天；歌手标记只影响本地推荐，在线显式查找
+  仍然可用。
 - 「不感兴趣」只出现在未标心卡片上；已标心的曲目要先去红心，避免「标了心又拉黑」。
   如果读者之后又把某首标心，顺手清掉它的不感兴趣记录。
 - 读取时顺手清理过期记录；写入后立即从当前分段移除并重算该段。
 - 撤销删除对应记录并重算；不做「全局撤销栈」。
-- 清除推荐记录同时清空反馈和播放记录；不影响喜欢。
+- 清除推荐记录同时清空单曲反馈、歌手反馈和播放记录；不影响喜欢。
 
 ## 7. 架构设计
 
@@ -570,7 +576,8 @@ lib/features/discovery/
 │   ├── discovery_providers.dart         # 存储与引擎的 provider
 │   └── discovery_signal_observer.dart   # 应用级播放观察器（默认关闭）
 ├── data/
-│   ├── discovery_feedback_store.dart    # 不感兴趣 JSON
+│   ├── discovery_feedback_store.dart    # 单曲与歌手反馈
+│   ├── timed_feedback_store.dart        # 30 天反馈的通用存储
 │   └── listening_signal_store.dart      # 播放记录 JSON
 └── presentation/
     ├── discovery_pane.dart              # 页面骨架与输入装配
@@ -681,7 +688,8 @@ RecommendationEngine
 | Key | 内容 | 谁写 | 何时 |
 | --- | --- | --- | --- |
 | `discovery_listening_v1` | 聚合播放记录（默认关闭） | `ListeningSignalStore` | 观察器结算后 |
-| `discovery_feedback_v1` | 不感兴趣标记 | `DiscoveryFeedbackStore` | 读者点「不感兴趣」/ 撤销 |
+| `discovery_feedback_v1` | 单曲不感兴趣标记 | `DiscoveryFeedbackStore` | 读者点「不感兴趣」/ 撤销 |
+| `discovery_artist_feedback_v1` | 歌手少推荐标记 | `DiscoveryArtistFeedbackStore` | 读者点「少推荐这位歌手」/ 撤销 |
 | `discovery_use_listening_history` | 开关 | `SettingsController` | 设置页 |
 | `discovery_hint_dismissed` | 是否关掉「开启记录」提示 | `SettingsController` | 读者点关闭 |
 
@@ -842,6 +850,7 @@ M1–M5 已作为 v1 交付。
 - 留出标心曲目后，推荐仍能找回大部分；
 - 跳过比例高的曲目排在听完的曲目之后；
 - 最近播过的曲目被降权；
+- 缺封面的曲目比同样条件、有封面的曲目低 `artworkPenalty`；
 - 今日混音给相邻歌手留出名额。
 
 **画像** `test/domain/taste_profile_test.dart`：
@@ -855,12 +864,13 @@ M1–M5 已作为 v1 交付。
 
 - 读写往返、版本、损坏 JSON、过期清理；
 - 播放记录的听完/跳过聚合与 2000 条上限；
-- 撤销与清除后为空。
+- 单曲与歌手反馈互不影响；撤销与清除后为空。
 
 **控制器** `test/app/discovery_controller_test.dart`：
 
 - 显式在线查找会把结果追加成临时分段；
-- 结果不进入音乐库，重复的 uri 会被去重。
+- 结果不进入音乐库，重复的 uri 会被去重；
+- 少推荐某位歌手会隐藏该歌手的本地推荐，撤销后恢复。
 
 **播放观察器** `test/app/discovery_signal_observer_test.dart`：
 
