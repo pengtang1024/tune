@@ -14,6 +14,27 @@ double listenWeight(TrackListening signal, DateTime now) {
   return ((positive - negative) * decay).clamp(0.0, 5.0).toDouble();
 }
 
+const Set<String> _genericGenres = {
+  'music',
+  'other',
+  'unknown',
+  'misc',
+  'various',
+  'none',
+};
+
+const Set<String> _genericArtists = {
+  'various artists',
+  'unknown artist',
+  'unknown',
+};
+
+/// Whether a genre is only a container word and says nothing about taste.
+bool isGenericGenreKey(String key) => _genericGenres.contains(key);
+
+/// Whether an artist name is a placeholder rather than a name.
+bool isGenericArtistKey(String key) => _genericArtists.contains(key);
+
 /// The lower-case form of an artist or genre used to compare names.
 final RegExp _whitespace = RegExp(r'\s+');
 final RegExp _genreSeparator = RegExp(r'\s*[/,;、]\s*');
@@ -43,7 +64,8 @@ Iterable<String> genreKeysOf(Song song) sync* {
   final seen = <String>{};
   for (final value in genreValuesOf(song)) {
     final key = normalizeTasteKey(value);
-    if (key.isNotEmpty && seen.add(key)) yield key;
+    if (key.isEmpty || isGenericGenreKey(key)) continue;
+    if (seen.add(key)) yield key;
   }
 }
 

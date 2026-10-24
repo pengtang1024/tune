@@ -55,7 +55,8 @@ class TasteProfile {
     var listenCount = 0;
 
     for (final song in library) {
-      final artist = normalizeTasteKey(song.artist);
+      final rawArtist = normalizeTasteKey(song.artist);
+      final artist = isGenericArtistKey(rawArtist) ? '' : rawArtist;
       final decade = decadeOf(song.year);
       final album = normalizeTasteKey(song.album);
 

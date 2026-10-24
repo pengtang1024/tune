@@ -64,7 +64,9 @@ List<RecommendationCandidate> buildCandidates({
 
     final genres = <String, String>{};
     for (final value in genreValuesOf(song)) {
-      genres.putIfAbsent(normalizeTasteKey(value), () => value);
+      final key = normalizeTasteKey(value);
+      if (key.isEmpty || isGenericGenreKey(key)) continue;
+      genres.putIfAbsent(key, () => value);
     }
     result.add(
       RecommendationCandidate(

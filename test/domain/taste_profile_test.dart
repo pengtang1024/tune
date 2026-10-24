@@ -185,4 +185,19 @@ void main() {
     expect(one.confidence, closeTo(0.1, 0.001));
     expect(many.confidence, 1);
   });
+
+  test('container genres and placeholder artists say nothing about taste', () {
+    final library = [
+      song(1, artist: 'Various Artists', genre: 'music'),
+      song(2, artist: 'Unknown Artist', genre: 'unknown'),
+      song(3, artist: 'Real Artist', genre: 'Jazz'),
+    ];
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: {'/music/1.mp3', '/music/2.mp3', '/music/3.mp3'},
+    );
+
+    expect(profile.artists.keys, ['real artist']);
+    expect(profile.genres.keys, ['jazz']);
+  });
 }

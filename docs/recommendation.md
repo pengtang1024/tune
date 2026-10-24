@@ -360,7 +360,8 @@ class TasteProfile {
 }
 ```
 
-- 歌手名、流派名做 `trim().toLowerCase()` 后作为键；展示时用曲目里的原值，
+- 歌手名、流派名做 `trim().toLowerCase()` 后作为键；`music`、`other`、`unknown`、
+  `various artists` 这类容器词不进入画像，避免一个占位标签影响整页。展示时用曲目里的原值，
   流派再用 `genreLabel` / `genresLabel` 翻译（见 [流派本地化](genre-localization.md)）。
   流派优先读 `genres` 列表，为空时回退到 `genre`；`year` 为 0 或空时不参与年代。
 - 喜欢权重不衰减；播放权重按 45 天半衰；跳过只扣到 0 为止，不产生负分。
