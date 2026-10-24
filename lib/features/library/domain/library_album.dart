@@ -73,7 +73,7 @@ class LibraryAlbum {
 List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
   final groups = <String, List<Song>>{};
   for (final song in songs) {
-    groups.putIfAbsent(_keyOf(song), () => []).add(song);
+    groups.putIfAbsent(libraryAlbumKeyOf(song), () => []).add(song);
   }
 
   final albums = <LibraryAlbum>[
@@ -90,7 +90,11 @@ List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
   return albums;
 }
 
-String _keyOf(Song song) {
+/// The key the album of [song] is grouped by.
+///
+/// The library view uses it to tell which album holds the track that plays,
+/// and the grouping uses it to keep the tracks of one album together.
+String libraryAlbumKeyOf(Song song) {
   final album = song.album.trim().toLowerCase();
   if (album.isEmpty) return '\u0000unknown';
   return '$album\u0000${song.artist.trim().toLowerCase()}';
@@ -115,7 +119,7 @@ LibraryAlbum _albumOf(List<Song> songs) {
   }
 
   return LibraryAlbum(
-    key: _keyOf(first),
+    key: libraryAlbumKeyOf(first),
     name: first.album.trim(),
     artist: first.artist.trim(),
     coverPath: coverPath,

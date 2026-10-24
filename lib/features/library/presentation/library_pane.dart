@@ -136,6 +136,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         ? libraryAlbumsOf(songs)
         : const <LibraryAlbum>[];
     final openAlbum = _albumOfKey(albums);
+    final currentAlbumKey = _currentAlbumKey(library.songs, playback.$1);
     final hasSourceIssues = library.sourceSummaries.values.any(
       (summary) => summary.status != SourceScanStatus.success,
     );
@@ -168,32 +169,33 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onAddAll: () => _addAllToQueue(openAlbum.songs),
                 ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            CompactTokens.pageGutter,
-            0,
-            CompactTokens.pageGutter,
-            CompactTokens.space8,
+        if (openAlbum == null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              CompactTokens.pageGutter,
+              0,
+              CompactTokens.pageGutter,
+              CompactTokens.space8,
+            ),
+            child: LibraryToolbar(
+              controller: _searchController,
+              query: library.query,
+              filteredCount: songs.length,
+              sources: availableSources,
+              sourceLabels: sourceLabels,
+              sourceFilter: library.sourceFilter,
+              onQueryChanged: (value) {
+                ref.read(libraryControllerProvider.notifier).setQuery(value);
+              },
+              onClearQuery: _clearQuery,
+              onSourceFilter: (value) {
+                ref
+                    .read(libraryControllerProvider.notifier)
+                    .setSourceFilter(value);
+              },
+              onScan: _scan,
+            ),
           ),
-          child: LibraryToolbar(
-            controller: _searchController,
-            query: library.query,
-            filteredCount: openAlbum?.songs.length ?? songs.length,
-            sources: availableSources,
-            sourceLabels: sourceLabels,
-            sourceFilter: library.sourceFilter,
-            onQueryChanged: (value) {
-              ref.read(libraryControllerProvider.notifier).setQuery(value);
-            },
-            onClearQuery: _clearQuery,
-            onSourceFilter: (value) {
-              ref
-                  .read(libraryControllerProvider.notifier)
-                  .setSourceFilter(value);
-            },
-            onScan: _scan,
-          ),
-        ),
         LibraryScanStatusBar(sourceIssues: hasSourceIssues),
         Expanded(
           child: library.isLoading
@@ -203,6 +205,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   songs,
                   albums,
                   openAlbum,
+                  currentAlbumKey,
                   playback.$1,
                   playback.$2,
                   sourceLabels,
@@ -247,6 +250,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     List<Song> songs,
     List<LibraryAlbum> albums,
     LibraryAlbum? openAlbum,
+    String? currentAlbumKey,
     String? currentUri,
     bool isPlaying,
     Map<String, SourceLabel> sourceLabels,
@@ -280,7 +284,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     if (_view == LibraryViewMode.albums) {
       return LibraryAlbumsView(
         albums: albums,
+        currentAlbumKey: currentAlbumKey,
         onOpen: (album) => setState(() => _openAlbumKey = album.key),
+        onPlay: _playAlbum,
       );
     }
 
@@ -331,6 +337,19 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         );
       },
     );
+  }
+
+  /// The key of the album that holds the track that plays.
+  ///
+  /// The grid marks the album the reader is hearing; the track may be
+  /// outside the current search, so the key is looked up in the whole
+  /// library and not only in the list on screen.
+  String? _currentAlbumKey(List<Song> librarySongs, String? currentUri) {
+    if (currentUri == null) return null;
+    for (final song in librarySongs) {
+      if (song.uri == currentUri) return libraryAlbumKeyOf(song);
+    }
+    return null;
   }
 
   /// The album of [_openAlbumKey] in the albums that are on screen now.

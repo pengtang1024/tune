@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The albums of the library as a grid of covers.
 ///
@@ -12,7 +13,15 @@ import 'package:tune/shared/ui/artwork_thumb.dart';
 /// click away for the reader who does know the name.
 class LibraryAlbumsView extends StatelessWidget {
   final List<LibraryAlbum> albums;
+
+  /// The album that holds the track that plays right now, if any.
+  final String? currentAlbumKey;
+
+  /// Opens the album and shows its tracks.
   final ValueChanged<LibraryAlbum> onOpen;
+
+  /// Plays the whole album without opening it.
+  final ValueChanged<LibraryAlbum> onPlay;
 
   /// The longest side of a cover.
   ///
@@ -29,6 +38,8 @@ class LibraryAlbumsView extends StatelessWidget {
     super.key,
     required this.albums,
     required this.onOpen,
+    required this.onPlay,
+    this.currentAlbumKey,
   });
 
   @override
@@ -67,7 +78,9 @@ class LibraryAlbumsView extends StatelessWidget {
             return _AlbumCard(
               album: album,
               coverSize: cell,
-              onTap: () => onOpen(album),
+              current: album.key == currentAlbumKey,
+              onOpen: () => onOpen(album),
+              onPlay: () => onPlay(album),
             );
           },
         );
@@ -76,20 +89,32 @@ class LibraryAlbumsView extends StatelessWidget {
   }
 }
 
-class _AlbumCard extends StatelessWidget {
+class _AlbumCard extends StatefulWidget {
   final LibraryAlbum album;
   final double coverSize;
-  final VoidCallback onTap;
+  final bool current;
+  final VoidCallback onOpen;
+  final VoidCallback onPlay;
 
   const _AlbumCard({
     required this.album,
     required this.coverSize,
-    required this.onTap,
+    required this.current,
+    required this.onOpen,
+    required this.onPlay,
   });
+
+  @override
+  State<_AlbumCard> createState() => _AlbumCardState();
+}
+
+class _AlbumCardState extends State<_AlbumCard> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final album = widget.album;
     final name = album.name.isEmpty
         ? context.loc.libraryUnknownAlbum
         : album.name;
@@ -102,17 +127,45 @@ class _AlbumCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onOpen,
+        onHover: (hovered) => setState(() => _hovered = hovered),
         borderRadius: CompactTokens.borderRadius8,
         hoverColor: theme.colorScheme.primary.withValues(alpha: 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ArtworkThumb(
-              path: album.coverPath,
-              imageUrl: album.coverUrl,
-              size: coverSize,
-              radius: CompactTokens.radius8,
+            Stack(
+              children: [
+                DecoratedBox(
+                  position: DecorationPosition.foreground,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      CompactTokens.radius8 + 2,
+                    ),
+                    border: widget.current
+                        ? Border.all(color: theme.colorScheme.primary, width: 2)
+                        : null,
+                  ),
+                  child: ArtworkThumb(
+                    path: album.coverPath,
+                    imageUrl: album.coverUrl,
+                    size: widget.coverSize,
+                    radius: CompactTokens.radius8,
+                  ),
+                ),
+                if (widget.current)
+                  Positioned(
+                    left: CompactTokens.space6,
+                    bottom: CompactTokens.space6,
+                    child: _NowPlayingMark(),
+                  ),
+                if (_hovered)
+                  Positioned(
+                    right: CompactTokens.space6,
+                    bottom: CompactTokens.space6,
+                    child: _PlayButton(onPressed: widget.onPlay),
+                  ),
+              ],
             ),
             const SizedBox(height: CompactTokens.space6),
             Text(
@@ -120,7 +173,8 @@ class _AlbumCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
+                fontWeight: widget.current ? FontWeight.w600 : FontWeight.w500,
+                color: widget.current ? theme.colorScheme.primary : null,
               ),
             ),
             const SizedBox(height: 2),
@@ -140,6 +194,57 @@ class _AlbumCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The mark of the album that holds the track that plays.
+class _NowPlayingMark extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(CompactTokens.radius6),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Icon(
+        Icons.equalizer_rounded,
+        size: CompactTokens.icon14,
+        color: theme.colorScheme.primary,
+      ),
+    );
+  }
+}
+
+/// The action that plays the album from the cover.
+class _PlayButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _PlayButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return TuneTooltip(
+      message: context.loc.searchPlayAll,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: const Icon(Icons.play_arrow_rounded, size: CompactTokens.icon18),
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+        style: IconButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
         ),
       ),
     );

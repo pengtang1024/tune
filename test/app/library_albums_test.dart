@@ -8,6 +8,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -102,6 +103,36 @@ void main() {
 
     expect(find.text('Album B'), findsOneWidget);
     expect(find.text('Album A first'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the album of the playing track carries the playback mark', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 563);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+    await container
+        .read(playbackControllerProvider.notifier)
+        .playQueue([songs.first]);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.equalizer_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
