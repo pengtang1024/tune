@@ -32,10 +32,12 @@ class RecommendationSelection {
     required int maxPerAlbum,
     required Set<String> seen,
     Map<String, int> artistLimits = const {},
+    Map<String, int> initialArtists = const {},
+    Map<String, int> initialAlbums = const {},
   }) {
     final result = <RecommendationCandidate>[];
-    final artists = <String, int>{};
-    final albums = <String, int>{};
+    final artists = <String, int>{...initialArtists};
+    final albums = <String, int>{...initialAlbums};
     for (final item in sorted) {
       if (result.length >= limit) break;
       if (seen.contains(item.uri)) continue;

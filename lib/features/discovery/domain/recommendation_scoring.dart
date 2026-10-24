@@ -1,6 +1,7 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
+import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 
 /// Scores every candidate and gives it the reason that fits it best.
@@ -9,41 +10,45 @@ void scoreCandidates(
   required TasteProfile profile,
   required bool allowFresh,
   required DateTime now,
+  RecommendationTuning tuning = RecommendationTuning.defaults,
 }) {
   for (final candidate in candidates) {
-    final parts = <_ScorePart>[];
+    final artist = profile.artistWeightKey(candidate.artistKey);
+    final genre = _strongestGenreWeight(candidate, profile);
+    final era = profile.decadeWeight(candidate.decade);
+    final album = profile.albumWeightKey(candidate.albumKey);
+    final quality = _qualityOf(candidate);
+    final novelty = _noveltyOf(candidate, now);
+    final freshness = allowFresh ? freshnessOf(candidate.song, now) : 0.0;
+    final recent = _recentPenalty(candidate, now, tuning.recentDays);
+    final skip = _skipPenalty(candidate);
 
-    if (profile.artists.isNotEmpty) {
-      parts.add(_ScorePart(0.40, profile.artistWeightKey(candidate.artistKey)));
-    }
-    if (profile.genres.isNotEmpty) {
-      final strongest = _strongestGenreWeight(candidate, profile);
-      parts.add(_ScorePart(0.25, strongest));
-    }
-    if (profile.decades.isNotEmpty) {
-      parts.add(_ScorePart(0.15, profile.decadeWeight(candidate.decade)));
-    }
-    parts.add(_ScorePart(0.10, candidate.favorite ? 0.2 : 1.0));
-    if (allowFresh) {
-      parts.add(_ScorePart(0.10, freshnessOf(candidate.song, now)));
-    }
+    final base =
+        tuning.artistWeight * artist +
+        tuning.genreWeight * genre +
+        tuning.eraWeight * era +
+        tuning.albumWeight * album +
+        tuning.qualityWeight * quality +
+        tuning.noveltyWeight * novelty +
+        tuning.freshnessWeight * freshness;
+    final favorite = candidate.favorite ? tuning.favoriteBoost : 0.0;
 
-    final total = parts.fold<double>(0, (sum, part) => sum + part.weight);
-    candidate.score = total <= 0
-        ? 0
-        : parts.fold<double>(0, (sum, part) => sum + part.weight * part.value) /
-              total;
-    candidate.reason = _reasonFor(
-      candidate,
-      profile,
-      total,
-      allowFresh: allowFresh,
-      now: now,
-    );
+    candidate.quality = quality;
+    candidate.novelty = novelty;
+    candidate.recentPenalty = recent;
+    candidate.skipPenalty = skip;
+    candidate.score =
+        (base +
+                favorite -
+                tuning.recentPenalty * recent -
+                tuning.skipPenalty * skip)
+            .clamp(0.0, 1.0)
+            .toDouble();
+    candidate.reason = _reasonFor(candidate, profile, now);
   }
 }
 
-/// The fraction of a track's listen that makes it feel fresh, between 0 and 1.
+/// How much of a track feels fresh, between 0 and 1.
 double freshnessOf(Song song, DateTime now) {
   if (song.dateAdded <= 0) return 0;
   final added = DateTime.fromMillisecondsSinceEpoch(song.dateAdded);
@@ -62,30 +67,71 @@ int stableHashOf(String value) {
   return hash;
 }
 
+double _qualityOf(RecommendationCandidate candidate) {
+  final signal = candidate.listening;
+  if (signal.listens == 0 && signal.skips == 0) {
+    return candidate.favorite ? 0.7 : 0.5;
+  }
+  if (signal.listens == 0) return 0;
+  final completion = signal.completions / signal.listens;
+  final skipRate = signal.skips / (signal.listens + signal.skips);
+  return (0.4 + 0.6 * completion - 0.4 * skipRate).clamp(0.0, 1.0).toDouble();
+}
+
+double _noveltyOf(RecommendationCandidate candidate, DateTime now) {
+  final signal = candidate.listening;
+  if (signal.listens == 0 && signal.skips == 0) return 1;
+  final age = _daysSince(signal.lastPlayedAt, now);
+  if (age == null) return 0.7;
+  if (age > 60) return 0.8;
+  if (age > 30) return 0.6;
+  return 0.3;
+}
+
+double _recentPenalty(
+  RecommendationCandidate candidate,
+  DateTime now,
+  int recentDays,
+) {
+  final age = _daysSince(candidate.listening.lastPlayedAt, now);
+  if (age == null) return 0;
+  if (age <= 7) return 1;
+  if (age >= recentDays) return 0;
+  return (recentDays - age) / (recentDays - 7);
+}
+
+double _skipPenalty(RecommendationCandidate candidate) {
+  final signal = candidate.listening;
+  final total = signal.listens + signal.skips;
+  if (total == 0) return 0;
+  return (signal.skips / total).clamp(0.0, 1.0).toDouble();
+}
+
+double? _daysSince(DateTime? at, DateTime now) {
+  if (at == null) return null;
+  return now.difference(at).inHours / 24;
+}
+
 RecommendationReason _reasonFor(
   RecommendationCandidate candidate,
   TasteProfile profile,
-  double total, {
-  required bool allowFresh,
-  required DateTime now,
-}) {
+  DateTime now,
+) {
   if (candidate.favorite) return const RecommendationReason.favorite();
-  if (total <= 0) return const RecommendationReason.fallback();
+  if (profile.isEmpty) {
+    return candidate.listening.listens > 0
+        ? const RecommendationReason.fallback()
+        : const RecommendationReason(
+            kind: RecommendationReasonKind.unheard,
+            confidence: 1,
+          );
+  }
 
-  final artist = profile.artists.isEmpty
-      ? 0.0
-      : 0.40 * profile.artistWeightKey(candidate.artistKey) / total;
-  final genre = profile.genres.isEmpty
-      ? 0.0
-      : 0.25 * _strongestGenreWeight(candidate, profile) / total;
-  final era = profile.decades.isEmpty
-      ? 0.0
-      : 0.15 * profile.decadeWeight(candidate.decade) / total;
-  final fresh = allowFresh
-      ? 0.10 * freshnessOf(candidate.song, now) / total
-      : 0.0;
+  final artist = profile.artistWeightKey(candidate.artistKey);
+  final genre = _strongestGenreWeight(candidate, profile);
+  final era = profile.decadeWeight(candidate.decade);
 
-  if (artist >= 0.18 && candidate.artistKey.isNotEmpty) {
+  if (artist >= 0.20 && candidate.artistKey.isNotEmpty) {
     return RecommendationReason(
       kind: RecommendationReasonKind.artist,
       artist: candidate.song.artist,
@@ -100,21 +146,15 @@ RecommendationReason _reasonFor(
       confidence: genre,
     );
   }
-  if (era >= 0.10 && candidate.decade != null) {
+  if (era >= 0.08 && candidate.decade != null) {
     return RecommendationReason(
       kind: RecommendationReasonKind.era,
       decade: candidate.decade,
       confidence: era,
     );
   }
-  if (fresh >= 0.12) return const RecommendationReason.fresh();
-  if (profile.isEmpty) {
-    return fresh > 0
-        ? const RecommendationReason.fresh()
-        : const RecommendationReason(
-            kind: RecommendationReasonKind.unheard,
-            confidence: 1,
-          );
+  if (freshnessOf(candidate.song, now) >= 0.2) {
+    return const RecommendationReason.fresh();
   }
   return const RecommendationReason.fallback();
 }
@@ -146,11 +186,4 @@ String _strongestGenreKey(
     }
   }
   return best;
-}
-
-class _ScorePart {
-  final double weight;
-  final double value;
-
-  const _ScorePart(this.weight, this.value);
 }

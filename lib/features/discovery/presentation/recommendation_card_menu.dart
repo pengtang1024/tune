@@ -69,6 +69,7 @@ IconData recommendationReasonIcon(RecommendationReasonKind kind) {
     RecommendationReasonKind.artist => Icons.person_rounded,
     RecommendationReasonKind.genre => Icons.category_rounded,
     RecommendationReasonKind.era => Icons.history_rounded,
+    RecommendationReasonKind.adjacent => Icons.swap_horiz_rounded,
     RecommendationReasonKind.fresh => Icons.new_releases_rounded,
     RecommendationReasonKind.unheard => Icons.hearing_rounded,
     RecommendationReasonKind.source => Icons.podcasts_rounded,

@@ -1071,5 +1071,6 @@
         "format": "decimalPattern"
       }
     }
-  }
+  },
+  "discoverReasonAdjacent": "同一種口味，換個人"
 }

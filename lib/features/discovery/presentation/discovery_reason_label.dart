@@ -22,6 +22,7 @@ String discoveryReasonText(
     RecommendationReasonKind.era => context.loc.discoverReasonEra(
       reason.decade ?? 0,
     ),
+    RecommendationReasonKind.adjacent => context.loc.discoverReasonAdjacent,
     RecommendationReasonKind.fresh => context.loc.discoverReasonFresh,
     RecommendationReasonKind.unheard => context.loc.discoverReasonUnheard,
     RecommendationReasonKind.source => context.loc.discoverReasonSource(
@@ -50,6 +51,8 @@ String discoverySectionTitle(
       RecommendationReasonKind.era => context.loc.discoverSectionExploreEra(
         reason.decade ?? 0,
       ),
+      RecommendationReasonKind.adjacent =>
+        context.loc.discoverSectionExploreEars,
       _ => context.loc.discoverSectionExploreEars,
     },
     DiscoverySectionKind.fresh => context.loc.discoverSectionFresh,

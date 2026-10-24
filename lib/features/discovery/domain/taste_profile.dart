@@ -20,6 +20,9 @@ class TasteProfile {
   /// Normalized decades, between 0 and 1.
   final Map<int, double> decades;
 
+  /// Normalized album keys, between 0 and 1.
+  final Map<String, double> albums;
+
   /// How many tracks of the library are marked.
   final int favoriteCount;
 
@@ -30,6 +33,7 @@ class TasteProfile {
     this.artists = const {},
     this.genres = const {},
     this.decades = const {},
+    this.albums = const {},
     this.favoriteCount = 0,
     this.listenCount = 0,
   });
@@ -45,6 +49,7 @@ class TasteProfile {
     final artists = <String, double>{};
     final genres = <String, double>{};
     final decades = <int, double>{};
+    final albums = <String, double>{};
     final clock = now ?? DateTime.now();
     var favoriteCount = 0;
     var listenCount = 0;
@@ -52,6 +57,7 @@ class TasteProfile {
     for (final song in library) {
       final artist = normalizeTasteKey(song.artist);
       final decade = decadeOf(song.year);
+      final album = normalizeTasteKey(song.album);
 
       if (favoriteUris.contains(song.uri)) {
         favoriteCount++;
@@ -63,6 +69,9 @@ class TasteProfile {
         }
         if (decade != null) {
           decades.update(decade, (value) => value + 1, ifAbsent: () => 1);
+        }
+        if (album.isNotEmpty) {
+          albums.update(album, (value) => value + 1, ifAbsent: () => 1);
         }
       }
 
@@ -92,12 +101,20 @@ class TasteProfile {
           ifAbsent: () => weight * 0.5,
         );
       }
+      if (album.isNotEmpty) {
+        albums.update(
+          album,
+          (value) => value + weight * 0.3,
+          ifAbsent: () => weight * 0.3,
+        );
+      }
     }
 
     return TasteProfile(
       artists: _normalize(artists),
       genres: _normalize(genres),
       decades: _normalizeDecades(decades),
+      albums: _normalize(albums),
       favoriteCount: favoriteCount,
       listenCount: listenCount,
     );
@@ -124,13 +141,21 @@ class TasteProfile {
     return decades[decade] ?? 0;
   }
 
-  bool get isEmpty => artists.isEmpty && genres.isEmpty && decades.isEmpty;
+  double albumWeightKey(String key) {
+    return key.isEmpty ? 0 : albums[key] ?? 0;
+  }
+
+  bool get isEmpty =>
+      artists.isEmpty && genres.isEmpty && decades.isEmpty && albums.isEmpty;
 
   /// The strongest artists, strongest first.
   List<String> topArtists([int count = 2]) => _top(artists, count);
 
   /// The strongest genres, strongest first.
   List<String> topGenres([int count = 2]) => _top(genres, count);
+
+  /// The strongest decades, strongest first.
+  List<int> topDecades([int count = 2]) => _topDecades(decades, count);
 
   /// A short, stable reading of the profile.
   ///
@@ -140,6 +165,8 @@ class TasteProfile {
     final parts = <String>[
       for (final artist in _top(artists, 3))
         'a:$artist:${(artists[artist]! * 100).round()}',
+      for (final album in _top(albums, 3))
+        'al:$album:${(albums[album]! * 100).round()}',
       for (final genre in _top(genres, 3))
         'g:$genre:${(genres[genre]! * 100).round()}',
       for (final decade in _topDecades(decades, 3))

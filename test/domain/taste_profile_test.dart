@@ -7,6 +7,7 @@ void main() {
   Song song(
     int id, {
     String artist = 'Artist',
+    String album = '',
     String? genre,
     List<String>? genres,
     int? year,
@@ -15,6 +16,7 @@ void main() {
       id: id,
       title: 'Song $id',
       artist: artist,
+      album: album,
       genre: genre,
       genres: genres,
       year: year,
@@ -148,5 +150,21 @@ void main() {
     );
 
     expect(profile.isEmpty, isTrue);
+  });
+
+  test('albums and decades are part of the profile', () {
+    final library = [
+      song(1, artist: 'A', album: 'Shared', year: 1999),
+      song(2, artist: 'A', album: 'Shared', year: 2001),
+      song(3, artist: 'B', album: 'Other', year: 2020),
+    ];
+    final profile = TasteProfile.from(
+      library: library,
+      favoriteUris: {'/music/1.mp3'},
+    );
+
+    expect(profile.albumWeightKey('shared'), 1);
+    expect(profile.albumWeightKey('other'), 0);
+    expect(profile.topDecades(), [1990]);
   });
 }

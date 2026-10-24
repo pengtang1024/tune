@@ -272,6 +272,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
             favoriteUris: favoriteUris,
             profile: profile,
             dismissedUris: _feedback.keys.toSet(),
+            listening: _listening,
             sourceOrder: sourceOrder,
             dateKey: dateKey,
             refreshSalt: _salt,

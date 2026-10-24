@@ -126,10 +126,10 @@ void main() {
     await tester.pumpWidget(app(library: songs));
     await tester.pumpAndSettle();
 
-    final exploreCard = find.byKey(const ValueKey('discovery-section-explore'));
-    expect(exploreCard, findsOneWidget);
+    final cardSection = find.byKey(const ValueKey('discovery-section-fresh'));
+    expect(cardSection, findsOneWidget);
     final menu = find.descendant(
-      of: exploreCard,
+      of: cardSection,
       matching: find.byIcon(Icons.more_horiz_rounded),
     );
     await tester.tap(menu.first);

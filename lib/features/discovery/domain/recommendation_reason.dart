@@ -9,6 +9,7 @@ enum RecommendationReasonKind {
   artist,
   genre,
   era,
+  adjacent,
   fresh,
   unheard,
   source,

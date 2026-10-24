@@ -5,6 +5,8 @@ import 'package:tune/features/discovery/domain/recommendation_daily_mix.dart';
 import 'package:tune/features/discovery/domain/recommendation_explore_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_extra_sections.dart';
 import 'package:tune/features/discovery/domain/recommendation_scoring.dart';
+import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/features/discovery/domain/recommendation_selection.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 
@@ -21,7 +23,9 @@ class DiscoveryOutput {
 /// give the same sections, which keeps the page from reshuffling under the
 /// reader every time the library is read again.
 class RecommendationEngine {
-  const RecommendationEngine();
+  const RecommendationEngine({this.tuning = RecommendationTuning.defaults});
+
+  final RecommendationTuning tuning;
 
   DiscoveryOutput recommend({
     required List<Song> library,
@@ -30,6 +34,7 @@ class RecommendationEngine {
     required Set<String> dismissedUris,
     required List<String> sourceOrder,
     required String dateKey,
+    Map<String, TrackListening> listening = const {},
     int refreshSalt = 0,
     bool allowFresh = false,
     DateTime? now,
@@ -42,12 +47,14 @@ class RecommendationEngine {
       library: library,
       favoriteUris: favoriteUris,
       dismissedUris: dismissedUris,
+      listening: listening,
     );
     scoreCandidates(
       candidates,
       profile: profile,
       allowFresh: allowFresh,
       now: clock,
+      tuning: tuning,
     );
     for (final candidate in candidates) {
       candidate.tieBreak = stableHashOf('${candidate.uri}|$seed');
@@ -60,21 +67,20 @@ class RecommendationEngine {
     final daily = buildDailyMix(
       candidates: sorted,
       profile: profile,
+      tuning: tuning,
       seed: seed,
       seen: seen,
     );
     if (daily != null) sections.add(daily);
 
     sections.addAll(
-      buildArtistSections(candidates: sorted, profile: profile, seen: seen),
+      buildArtistSections(
+        candidates: sorted,
+        profile: profile,
+        tuning: tuning,
+        seen: seen,
+      ),
     );
-
-    final explore = buildExploreSection(
-      candidates: sorted,
-      profile: profile,
-      seen: seen,
-    );
-    if (explore != null) sections.add(explore);
 
     final fresh = buildFreshSection(
       candidates: sorted,
@@ -83,6 +89,13 @@ class RecommendationEngine {
       seen: seen,
     );
     if (fresh != null) sections.add(fresh);
+
+    final explore = buildExploreSection(
+      candidates: sorted,
+      profile: profile,
+      seen: seen,
+    );
+    if (explore != null) sections.add(explore);
 
     sections.addAll(
       buildSourceSections(

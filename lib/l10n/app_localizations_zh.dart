@@ -1963,6 +1963,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
     return '已加入 $countString 首在线结果';
   }
+
+  @override
+  String get discoverReasonAdjacent => '同一种口味，换个人';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3924,6 +3927,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
     return '已加入 $countString 首在线结果';
   }
+
+  @override
+  String get discoverReasonAdjacent => '同一种口味，换个人';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5885,4 +5891,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
     return '已加入 $countString 首線上結果';
   }
+
+  @override
+  String get discoverReasonAdjacent => '同一種口味，換個人';
 }

@@ -2129,4 +2129,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return 'Added $countString online tracks';
   }
+
+  @override
+  String get discoverReasonAdjacent => 'Same taste, a different artist';
 }

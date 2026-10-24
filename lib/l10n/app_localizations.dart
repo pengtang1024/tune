@@ -3620,6 +3620,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'已加入 {count} 首在线结果'**
   String discoverOnlineFound(int count);
+
+  /// No description provided for @discoverReasonAdjacent.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'同一种口味，换个人'**
+  String get discoverReasonAdjacent;
 }
 
 class _AppLocalizationsDelegate

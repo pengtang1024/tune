@@ -1,6 +1,7 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 
 /// A track of the library while the page is being built.
 class RecommendationCandidate {
@@ -10,8 +11,13 @@ class RecommendationCandidate {
   final String albumKey;
   final int? decade;
   final bool favorite;
+  final TrackListening listening;
 
   double score = 0;
+  double quality = 0;
+  double novelty = 0;
+  double recentPenalty = 0;
+  double skipPenalty = 0;
   int tieBreak = 0;
   RecommendationReason reason = const RecommendationReason.fallback();
 
@@ -22,6 +28,7 @@ class RecommendationCandidate {
     required this.albumKey,
     required this.decade,
     required this.favorite,
+    required this.listening,
   });
 
   String get uri => song.uri;
@@ -37,6 +44,7 @@ List<RecommendationCandidate> buildCandidates({
   required List<Song> library,
   required Set<String> favoriteUris,
   required Set<String> dismissedUris,
+  Map<String, TrackListening> listening = const {},
 }) {
   final result = <RecommendationCandidate>[];
   final seen = <String>{};
@@ -57,6 +65,7 @@ List<RecommendationCandidate> buildCandidates({
         albumKey: normalizeTasteKey(song.album),
         decade: decadeOf(song.year),
         favorite: favoriteUris.contains(song.uri),
+        listening: listening[song.uri] ?? const TrackListening(),
       ),
     );
   }
