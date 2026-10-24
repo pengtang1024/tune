@@ -148,6 +148,16 @@ class TasteProfile {
   bool get isEmpty =>
       artists.isEmpty && genres.isEmpty && decades.isEmpty && albums.isEmpty;
 
+  /// How much evidence the profile rests on, between 0 and 1.
+  ///
+  /// One favorite is a hint; ten favorites and a listening history are a
+  /// taste. A weak profile gets more exploration slots instead of letting a
+  /// single artist or decade fill the daily mix.
+  double get confidence {
+    final evidence = favoriteCount * 2 + listenCount / 3;
+    return (evidence / 20).clamp(0.0, 1.0).toDouble();
+  }
+
   /// The strongest artists, strongest first.
   List<String> topArtists([int count = 2]) => _top(artists, count);
 

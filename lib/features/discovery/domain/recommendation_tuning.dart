@@ -41,6 +41,13 @@ class RecommendationTuning {
   /// The most tracks one artist may occupy across the whole page.
   final int artistPageBudget;
 
+  /// A profile below this confidence is still a cold start.
+  final double weakProfileThreshold;
+
+  /// Extra exploration and adjacent slots for a cold-start profile.
+  final int weakExplorationBonus;
+  final int weakAdjacentBonus;
+
   /// How much a track without a cover is pushed down.
   ///
   /// This is a penalty rather than a base weight: the card is mostly cover,
@@ -73,6 +80,9 @@ class RecommendationTuning {
     this.sourceHealthWeight = 0.20,
     this.sourceShelfMinHealth = 0.60,
     this.artistPageBudget = 10,
+    this.weakProfileThreshold = 0.50,
+    this.weakExplorationBonus = 2,
+    this.weakAdjacentBonus = 1,
     this.artworkPenalty = 0.10,
     this.dailyMixSize = 25,
     this.favoriteAnchors = 2,

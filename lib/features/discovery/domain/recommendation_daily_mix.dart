@@ -22,10 +22,12 @@ DiscoverySection? buildDailyMix({
   final localSeen = <String>{};
   final selected = <RecommendationCandidate>[];
 
+  final weakProfile = profile.confidence < tuning.weakProfileThreshold;
   if (favorites.isNotEmpty) {
+    final anchorsWanted = weakProfile ? 1 : tuning.favoriteAnchors;
     final maxAnchors = nonFavorites.isEmpty
         ? math.min(tuning.dailyMixSize, favorites.length)
-        : math.min(tuning.favoriteAnchors, favorites.length);
+        : math.min(anchorsWanted, favorites.length);
     final anchors = [...favorites]
       ..sort((left, right) => _compareFavorites(left, right, seed));
     for (final anchor in anchors.take(maxAnchors)) {
@@ -49,7 +51,9 @@ DiscoverySection? buildDailyMix({
   selected.addAll(
     RecommendationSelection.take(
       exploration,
-      limit: tuning.explorationSlots,
+      limit:
+          tuning.explorationSlots +
+          (weakProfile ? tuning.weakExplorationBonus : 0),
       maxPerArtist: 2,
       maxPerAlbum: 2,
       seen: localSeen,
@@ -68,7 +72,8 @@ DiscoverySection? buildDailyMix({
   selected.addAll(
     RecommendationSelection.take(
       adjacent,
-      limit: tuning.adjacentSlots,
+      limit:
+          tuning.adjacentSlots + (weakProfile ? tuning.weakAdjacentBonus : 0),
       maxPerArtist: 2,
       maxPerAlbum: 2,
       seen: localSeen,

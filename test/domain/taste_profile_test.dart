@@ -167,4 +167,22 @@ void main() {
     expect(profile.albumWeightKey('other'), 0);
     expect(profile.topDecades(), [1990]);
   });
+
+  test('confidence grows with the evidence', () {
+    final one = TasteProfile.from(
+      library: [song(1, artist: 'A')],
+      favoriteUris: {'/music/1.mp3'},
+    );
+    final many = TasteProfile.from(
+      library: [
+        for (var index = 1; index <= 10; index++) song(index, artist: 'A'),
+      ],
+      favoriteUris: {
+        for (var index = 1; index <= 10; index++) '/music/$index.mp3',
+      },
+    );
+
+    expect(one.confidence, closeTo(0.1, 0.001));
+    expect(many.confidence, 1);
+  });
 }
