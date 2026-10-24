@@ -33,7 +33,7 @@ LyricsPanel (features/player/presentation)
 | D2 | 失败被显示成「没有」 | `music_source_service.dart:204` | service 内部吞掉异常返回 null → `LyricsState.failed` 是死代码，断网与「确实没有」分不开，也没有重试的地方 |
 | D3 | LRC 头部标签被当成歌词行 | `lyrics_document.dart:72` | `[ti:] [ar:] [al:] [by:] [length:] [offset:]` 全部排在歌词最前面显示；`[offset:]` 没生效，整体时间偏移 |
 | D4 | 快切歌时歌词串台 | `lyrics_controller.dart:57` | A 的请求后到会覆盖 B 的状态，B 的歌词显示不出来 |
-| D5 | 播放位置一跳就整块重建 | `lyrics_panel.dart:61` | `watch(position)` 让整个列表跟着重建；`indexAt` 还是 O(n) |
+| D5 | 播放位置一跳就整块重建 | `lyrics_panel.dart:61` | `watch(position)` 让整个列表跟着重建；`indexAt` 还是 O(n)（已修；底栏与播放页的同一毛病见 [performance.md](performance.md) §3） |
 | D6 | 用 `addPostFrameCallback` 触发加载 | `lyrics_panel.dart:52` | 违反 AGENTS.md §1.2 |
 | D7 | 歌词只在 `/now-playing` 独立路由 | `app_router.dart:61` | **不改**：歌词是播放页的能力，主窗口底栏点开播放页就够得着，不另开菜单项 |
 | D8 | 没有手动指定歌词文件的入口 | — | 用户手上有 `.lrc` 但命名对不上，只能干等 |
