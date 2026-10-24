@@ -38,6 +38,49 @@ class RecommendationSelection {
     final result = <RecommendationCandidate>[];
     final artists = <String, int>{...initialArtists};
     final albums = <String, int>{...initialAlbums};
+    final taken = _takePass(
+      sorted,
+      limit: limit,
+      maxPerArtist: maxPerArtist,
+      maxPerAlbum: maxPerAlbum,
+      seen: seen,
+      artistLimits: artistLimits,
+      artists: artists,
+      albums: albums,
+    );
+    result.addAll(taken);
+
+    // A library may hold a podcast with dozens of episodes under one album,
+    // or a single-album artist. The caps are preferences, not a reason to
+    // return a short row: relax the album cap first, then the artist cap.
+    if (result.length < limit) {
+      result.addAll(
+        _takePass(
+          sorted,
+          limit: limit - result.length,
+          maxPerArtist: maxPerArtist,
+          maxPerAlbum: 1 << 30,
+          seen: seen,
+          artistLimits: artistLimits,
+          artists: artists,
+          albums: albums,
+        ),
+      );
+    }
+    return result;
+  }
+
+  static List<RecommendationCandidate> _takePass(
+    List<RecommendationCandidate> sorted, {
+    required int limit,
+    required int maxPerArtist,
+    required int maxPerAlbum,
+    required Set<String> seen,
+    Map<String, int> artistLimits = const {},
+    required Map<String, int> artists,
+    required Map<String, int> albums,
+  }) {
+    final result = <RecommendationCandidate>[];
     for (final item in sorted) {
       if (result.length >= limit) break;
       if (seen.contains(item.uri)) continue;

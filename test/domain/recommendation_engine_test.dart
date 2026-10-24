@@ -421,4 +421,17 @@ void main() {
       isTrue,
     );
   });
+
+  test('one album does not starve the explore shelf', () {
+    final library = [
+      for (var index = 0; index < 40; index++)
+        song(index, artist: 'Artist $index', album: 'One Album', genre: 'Rock'),
+    ];
+    final output = recommend(library: library, favorites: {'/music/0.mp3'});
+    final explore = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.explore,
+    );
+
+    expect(explore.tracks.length, greaterThanOrEqualTo(3));
+  });
 }
