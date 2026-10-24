@@ -33,9 +33,7 @@ class ListeningSignalStore {
         final uri = entry.key;
         final value = entry.value;
         if (uri is! String || uri.isEmpty || value is! Map) continue;
-        result[uri] = TrackListening.fromJson(
-          Map<String, dynamic>.from(value),
-        );
+        result[uri] = TrackListening.fromJson(Map<String, dynamic>.from(value));
       }
       return Map.unmodifiable(result);
     } catch (error, stackTrace) {
@@ -87,9 +85,7 @@ class ListeningSignalStore {
     final uris = pruned.keys.toList()..sort();
     final data = jsonEncode({
       'version': version,
-      'tracks': {
-        for (final uri in uris) uri: pruned[uri]!.toJson(),
-      },
+      'tracks': {for (final uri in uris) uri: pruned[uri]!.toJson()},
     });
     try {
       await _persistence.setString(key, data);
@@ -107,6 +103,8 @@ class ListeningSignalStore {
         final rightAt = right.value.lastPlayedAt?.millisecondsSinceEpoch ?? 0;
         return rightAt.compareTo(leftAt);
       });
-    return {for (final entry in entries.take(maxTracks)) entry.key: entry.value};
+    return {
+      for (final entry in entries.take(maxTracks)) entry.key: entry.value,
+    };
   }
 }

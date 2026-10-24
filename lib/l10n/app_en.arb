@@ -1042,5 +1042,34 @@
   "discoverHistoryHint": "Turn on local listening history and the picks get closer",
   "discoverHistoryEnable": "Turn on",
   "discoverClearAll": "Clear discover history",
-  "discoverWhyHistory": "Optional local listening history (off by default)"
+  "discoverWhyHistory": "Optional local listening history (off by default)",
+  "discoverSectionOnlineArtist": "Found online: {artist}",
+  "discoverFindMoreOnline": "Find more online",
+  "discoverFindingMore": "Looking…",
+  "discoverNoOnlineSources": "No online source is enabled",
+  "discoverOnlineNoResults": "No more tracks by {artist} were found",
+  "discoverOnlineFailed": "The online lookup failed. Try again later.",
+  "discoverOnlineFound": "Added {count} online tracks",
+  "@discoverSectionOnlineArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineNoResults": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineFound": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

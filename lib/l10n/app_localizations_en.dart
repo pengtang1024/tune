@@ -2097,4 +2097,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get discoverWhyHistory =>
       'Optional local listening history (off by default)';
+
+  @override
+  String discoverSectionOnlineArtist(String artist) {
+    return 'Found online: $artist';
+  }
+
+  @override
+  String get discoverFindMoreOnline => 'Find more online';
+
+  @override
+  String get discoverFindingMore => 'Looking…';
+
+  @override
+  String get discoverNoOnlineSources => 'No online source is enabled';
+
+  @override
+  String discoverOnlineNoResults(String artist) {
+    return 'No more tracks by $artist were found';
+  }
+
+  @override
+  String get discoverOnlineFailed =>
+      'The online lookup failed. Try again later.';
+
+  @override
+  String discoverOnlineFound(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Added $countString online tracks';
+  }
 }

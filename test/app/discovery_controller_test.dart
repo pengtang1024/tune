@@ -1,10 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
+import 'package:tune/data/services/music_sources/music_source_service.dart';
+import 'package:tune/data/services/music_sources/music_source_store.dart';
+import 'package:tune/data/services/providers/music_source_providers.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/application/discovery_controller.dart';
 import 'package:tune/features/discovery/data/discovery_feedback_store.dart';
 import 'package:tune/features/discovery/domain/discovery_section.dart';
+import 'package:tune/features/discovery/domain/discovery_state.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -35,7 +42,10 @@ void main() {
       song(index, artist: index < 6 ? 'Nujabes' : 'Artist $index'),
   ];
 
-  ProviderContainer createContainer(FakePersistenceService persistence) {
+  ProviderContainer createContainer(
+    FakePersistenceService persistence, {
+    MusicSourceService? sourceService,
+  }) {
     final container = ProviderContainer(
       overrides: [
         persistenceServiceProvider.overrideWithValue(persistence),
@@ -47,6 +57,8 @@ void main() {
             MusicSourcesState(sources: BuiltInMusicSources.defaults),
           ),
         ),
+        if (sourceService != null)
+          musicSourceServiceProvider.overrideWithValue(sourceService),
       ],
     );
     addTearDown(container.dispose);
@@ -178,4 +190,99 @@ void main() {
       isTrue,
     );
   });
+
+  test('an explicit artist lookup adds a transient online section', () async {
+    final service = FakeDiscoverySourceService();
+    final container = createContainer(
+      FakePersistenceService(),
+      sourceService: service,
+    );
+    await keepAlive(container);
+
+    final result = await container
+        .read(discoveryControllerProvider.notifier)
+        .findMoreByArtist('Nujabes');
+    expect(result, DiscoveryOnlineResult.added);
+
+    final state = container.read(discoveryControllerProvider).requireValue;
+    final online = state.sections.where(
+      (section) => section.kind == DiscoverySectionKind.onlineArtist,
+    );
+    expect(online, isNotEmpty);
+    expect(online.first.tracks.length, 2);
+    expect(
+      online.first.tracks.every((track) => track.song.sourceId == 'openverse'),
+      isTrue,
+    );
+
+    final uri = online.first.tracks.first.song.uri;
+    await container.read(discoveryControllerProvider.notifier).dismiss(uri);
+    final after = container.read(discoveryControllerProvider).requireValue;
+    final uris = {
+      for (final section in after.sections)
+        for (final track in section.tracks) track.song.uri,
+    };
+    expect(uris, isNot(contains(uri)));
+  });
+}
+
+class FakeDiscoverySourceService extends MusicSourceService {
+  FakeDiscoverySourceService()
+    : super(
+        scanner: _EmptyScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+  @override
+  Future<List<SourceScanResult>> search({
+    required List<MusicSourceConfig> sources,
+    required String query,
+    void Function(String sourceId, double progress)? onProgress,
+  }) async {
+    return [
+      SourceScanResult(
+        sourceId: 'openverse',
+        status: SourceScanStatus.success,
+        songs: [
+          Song(
+            id: 1001,
+            title: 'Online One',
+            artist: 'Nujabes',
+            uri: 'tune://openverse/online-1',
+            sourceId: 'openverse',
+            externalId: 'online-1',
+            streamUrl: 'https://example.com/online-1.mp3',
+          ),
+          Song(
+            id: 1002,
+            title: 'Online Two',
+            artist: 'Nujabes feat. Someone',
+            uri: 'tune://openverse/online-2',
+            sourceId: 'openverse',
+            externalId: 'online-2',
+            streamUrl: 'https://example.com/online-2.mp3',
+          ),
+          Song(
+            id: 1003,
+            title: 'Other Artist',
+            artist: 'Someone Else',
+            uri: 'tune://openverse/online-3',
+            sourceId: 'openverse',
+            externalId: 'online-3',
+            streamUrl: 'https://example.com/online-3.mp3',
+          ),
+        ],
+      ),
+    ];
+  }
+}
+
+class _EmptyScanner extends CrossPlatformMusicScannerImpl {
+  @override
+  Future<List<Song>> scanMusicInDirectoriesWithProgress(
+    List<String> directoryPaths,
+    Function(double) onProgress,
+  ) async {
+    return const [];
+  }
 }

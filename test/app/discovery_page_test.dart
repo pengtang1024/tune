@@ -206,4 +206,55 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('an artist shelf offers an explicit online lookup', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(library: songs));
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(DiscoveryPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .mark('/music/0.mp3');
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .mark('/music/1.mp3');
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('discovery-find-more-artist')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('an artist shelf fits the compact window', (tester) async {
+    tester.view.physicalSize = const Size(760, 520);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(app(library: songs));
+    await tester.pumpAndSettle();
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(DiscoveryPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .mark('/music/0.mp3');
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .mark('/music/1.mp3');
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey('discovery-find-more-artist')),
+      findsOneWidget,
+    );
+  });
 }

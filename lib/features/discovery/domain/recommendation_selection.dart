@@ -8,11 +8,21 @@ import 'package:tune/features/discovery/domain/recommended_track.dart';
 class RecommendationSelection {
   const RecommendationSelection._();
 
+  /// Sorts a pool by score.
+  ///
+  /// The engine precomputes [RecommendationCandidate.tieBreak] once. A caller
+  /// that only has a raw pool may pass a seed and let this method fill it in.
   static List<RecommendationCandidate> sortByScore(
-    Iterable<RecommendationCandidate> pool,
-    int seed,
-  ) {
-    return [...pool]..sort((left, right) => compareByScore(left, right, seed));
+    Iterable<RecommendationCandidate> pool, [
+    int? seed,
+  ]) {
+    final result = [...pool];
+    if (seed != null) {
+      for (final item in result) {
+        item.tieBreak = stableHashOf('${item.uri}|$seed');
+      }
+    }
+    return result..sort(compareByScore);
   }
 
   static List<RecommendationCandidate> take(
@@ -49,21 +59,17 @@ class RecommendationSelection {
   static int compareByScore(
     RecommendationCandidate left,
     RecommendationCandidate right,
-    int seed,
   ) {
     final byScore = right.score.compareTo(left.score);
     if (byScore != 0) return byScore;
-    return compareAnchors(left, right, seed);
+    return compareAnchors(left, right);
   }
 
   static int compareAnchors(
     RecommendationCandidate left,
     RecommendationCandidate right,
-    int seed,
   ) {
-    final byHash = stableHashOf(
-      '${left.uri}|$seed',
-    ).compareTo(stableHashOf('${right.uri}|$seed'));
+    final byHash = left.tieBreak.compareTo(right.tieBreak);
     if (byHash != 0) return byHash;
     return left.song.title.compareTo(right.song.title);
   }

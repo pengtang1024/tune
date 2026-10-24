@@ -6,6 +6,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/presentation/discovery_reason_label.dart';
 import 'package:tune/features/discovery/presentation/recommendation_card.dart';
+import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -25,6 +26,8 @@ class DiscoverySectionView extends StatelessWidget {
   final ValueChanged<Song> onDetails;
   final VoidCallback onPlayAll;
   final VoidCallback onAddAll;
+  final VoidCallback? onFindMore;
+  final bool findingMore;
 
   const DiscoverySectionView({
     super.key,
@@ -42,6 +45,8 @@ class DiscoverySectionView extends StatelessWidget {
     required this.onDetails,
     required this.onPlayAll,
     required this.onAddAll,
+    this.onFindMore,
+    this.findingMore = false,
   });
 
   @override
@@ -77,6 +82,37 @@ class DiscoverySectionView extends StatelessWidget {
                 ],
               ),
             ),
+            if (onFindMore != null)
+              TuneTooltip(
+                message: findingMore
+                    ? context.loc.discoverFindingMore
+                    : context.loc.discoverFindMoreOnline,
+                child: findingMore
+                    ? const Padding(
+                        padding: EdgeInsets.all(6),
+                        child: CompactSpinner.small(),
+                      )
+                    : IconButton(
+                        key: ValueKey(
+                          'discovery-find-more-${section.kind.name}',
+                        ),
+                        onPressed: onFindMore,
+                        icon: const Icon(
+                          Icons.travel_explore_rounded,
+                          size: CompactTokens.icon18,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints.tightFor(
+                          width: 28,
+                          height: 28,
+                        ),
+                        style: IconButton.styleFrom(
+                          foregroundColor: theme.colorScheme.onSurfaceVariant,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+              ),
             TuneTooltip(
               message: context.loc.discoverPlayAll,
               child: IconButton(

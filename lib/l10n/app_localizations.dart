@@ -3578,6 +3578,48 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'可选的本地播放记录（默认关闭）'**
   String get discoverWhyHistory;
+
+  /// No description provided for @discoverSectionOnlineArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线找到的 {artist}'**
+  String discoverSectionOnlineArtist(String artist);
+
+  /// No description provided for @discoverFindMoreOnline.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线找更多'**
+  String get discoverFindMoreOnline;
+
+  /// No description provided for @discoverFindingMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在找…'**
+  String get discoverFindingMore;
+
+  /// No description provided for @discoverNoOnlineSources.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有启用的在线音源'**
+  String get discoverNoOnlineSources;
+
+  /// No description provided for @discoverOnlineNoResults.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到更多 {artist} 的歌'**
+  String discoverOnlineNoResults(String artist);
+
+  /// No description provided for @discoverOnlineFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在线查找失败，稍后再试'**
+  String get discoverOnlineFailed;
+
+  /// No description provided for @discoverOnlineFound.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入 {count} 首在线结果'**
+  String discoverOnlineFound(int count);
 }
 
 class _AppLocalizationsDelegate

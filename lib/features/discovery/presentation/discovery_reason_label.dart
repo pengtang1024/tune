@@ -53,6 +53,10 @@ String discoverySectionTitle(
       _ => context.loc.discoverSectionExploreEars,
     },
     DiscoverySectionKind.fresh => context.loc.discoverSectionFresh,
+    DiscoverySectionKind.onlineArtist =>
+      context.loc.discoverSectionOnlineArtist(
+        _nonEmpty(reason.artist, context.loc.discoverReasonFallback),
+      ),
     DiscoverySectionKind.source => context.loc.discoverSectionSource(
       _sourceName(reason.sourceId, sourceLabels, context),
     ),

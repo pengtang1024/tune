@@ -1042,5 +1042,34 @@
   "discoverHistoryHint": "开启本地播放记录，推荐会更贴近你",
   "discoverHistoryEnable": "开启",
   "discoverClearAll": "清除推荐记录",
-  "discoverWhyHistory": "可选的本地播放记录（默认关闭）"
+  "discoverWhyHistory": "可选的本地播放记录（默认关闭）",
+  "discoverSectionOnlineArtist": "在线找到的 {artist}",
+  "discoverFindMoreOnline": "在线找更多",
+  "discoverFindingMore": "正在找…",
+  "discoverNoOnlineSources": "没有启用的在线音源",
+  "discoverOnlineNoResults": "没有找到更多 {artist} 的歌",
+  "discoverOnlineFailed": "在线查找失败，稍后再试",
+  "discoverOnlineFound": "已加入 {count} 首在线结果",
+  "@discoverSectionOnlineArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineNoResults": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineFound": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

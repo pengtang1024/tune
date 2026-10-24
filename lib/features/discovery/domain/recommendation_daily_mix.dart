@@ -24,10 +24,7 @@ DiscoverySection? buildDailyMix({
         ? math.min(5, math.max(1, nonFavorites.length ~/ 4))
         : math.min(25, favorites.length);
     final anchors = [...favorites]
-      ..sort(
-        (left, right) =>
-            RecommendationSelection.compareAnchors(left, right, seed),
-      );
+      ..sort(RecommendationSelection.compareAnchors);
     for (final anchor in anchors.take(maxAnchors)) {
       selected.add(anchor);
       localSeen.add(anchor.uri);

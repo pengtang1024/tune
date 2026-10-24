@@ -161,6 +161,15 @@ class DiscoveryPane extends ConsumerWidget {
             onDetails: (song) => actions.details(context, song, sourceLabels),
             onPlayAll: () => actions.playSection(section),
             onAddAll: () => actions.addSection(context, section),
+            onFindMore:
+                section.kind == DiscoverySectionKind.artist &&
+                    (section.reason.artist?.isNotEmpty ?? false)
+                ? () =>
+                      actions.findMoreByArtist(context, section.reason.artist!)
+                : null,
+            findingMore: state.findingArtists.contains(
+              section.reason.artist ?? '',
+            ),
           ),
         );
       }

@@ -49,7 +49,10 @@ class RecommendationEngine {
       allowFresh: allowFresh,
       now: clock,
     );
-    final sorted = RecommendationSelection.sortByScore(candidates, seed);
+    for (final candidate in candidates) {
+      candidate.tieBreak = stableHashOf('${candidate.uri}|$seed');
+    }
+    final sorted = RecommendationSelection.sortByScore(candidates);
 
     final seen = <String>{};
     final sections = <DiscoverySection>[];

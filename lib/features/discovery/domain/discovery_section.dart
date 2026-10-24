@@ -2,7 +2,15 @@ import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/recommended_track.dart';
 
 /// The kinds of rows the discover page shows, in the order they appear.
-enum DiscoverySectionKind { dailyMix, artist, explore, fresh, source, fallback }
+enum DiscoverySectionKind {
+  dailyMix,
+  artist,
+  explore,
+  fresh,
+  source,
+  onlineArtist,
+  fallback,
+}
 
 class DiscoverySection {
   final DiscoverySectionKind kind;

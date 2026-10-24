@@ -12,6 +12,7 @@ class RecommendationCandidate {
   final bool favorite;
 
   double score = 0;
+  int tieBreak = 0;
   RecommendationReason reason = const RecommendationReason.fallback();
 
   RecommendationCandidate({

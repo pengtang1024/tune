@@ -4,6 +4,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/application/discovery_controller.dart';
+import 'package:tune/features/discovery/domain/discovery_state.dart';
 import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
@@ -45,6 +46,22 @@ class DiscoveryActions {
           .read(discoveryControllerProvider.notifier)
           .forgetDismissal(song.uri);
     }
+  }
+
+  Future<void> findMoreByArtist(BuildContext context, String artist) async {
+    final result = await ref
+        .read(discoveryControllerProvider.notifier)
+        .findMoreByArtist(artist);
+    if (!context.mounted) return;
+    final message = switch (result) {
+      DiscoveryOnlineResult.added => null,
+      DiscoveryOnlineResult.noSources => context.loc.discoverNoOnlineSources,
+      DiscoveryOnlineResult.noResults => context.loc.discoverOnlineNoResults(
+        artist,
+      ),
+      DiscoveryOnlineResult.failed => context.loc.discoverOnlineFailed,
+    };
+    if (message != null) say(context, message);
   }
 
   void addToQueue(BuildContext context, Song song) {

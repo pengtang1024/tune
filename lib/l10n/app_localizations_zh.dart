@@ -1932,6 +1932,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
+
+  @override
+  String discoverSectionOnlineArtist(String artist) {
+    return '在线找到的 $artist';
+  }
+
+  @override
+  String get discoverFindMoreOnline => '在线找更多';
+
+  @override
+  String get discoverFindingMore => '正在找…';
+
+  @override
+  String get discoverNoOnlineSources => '没有启用的在线音源';
+
+  @override
+  String discoverOnlineNoResults(String artist) {
+    return '没有找到更多 $artist 的歌';
+  }
+
+  @override
+  String get discoverOnlineFailed => '在线查找失败，稍后再试';
+
+  @override
+  String discoverOnlineFound(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首在线结果';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3862,6 +3893,37 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
+
+  @override
+  String discoverSectionOnlineArtist(String artist) {
+    return '在线找到的 $artist';
+  }
+
+  @override
+  String get discoverFindMoreOnline => '在线找更多';
+
+  @override
+  String get discoverFindingMore => '正在找…';
+
+  @override
+  String get discoverNoOnlineSources => '没有启用的在线音源';
+
+  @override
+  String discoverOnlineNoResults(String artist) {
+    return '没有找到更多 $artist 的歌';
+  }
+
+  @override
+  String get discoverOnlineFailed => '在线查找失败，稍后再试';
+
+  @override
+  String discoverOnlineFound(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首在线结果';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5792,4 +5854,35 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverWhyHistory => '可選的本機播放記錄（預設關閉）';
+
+  @override
+  String discoverSectionOnlineArtist(String artist) {
+    return '線上找到的 $artist';
+  }
+
+  @override
+  String get discoverFindMoreOnline => '線上找更多';
+
+  @override
+  String get discoverFindingMore => '正在找…';
+
+  @override
+  String get discoverNoOnlineSources => '沒有啟用的線上音源';
+
+  @override
+  String discoverOnlineNoResults(String artist) {
+    return '沒有找到更多 $artist 的歌';
+  }
+
+  @override
+  String get discoverOnlineFailed => '線上查找失敗，稍後再試';
+
+  @override
+  String discoverOnlineFound(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已加入 $countString 首線上結果';
+  }
 }

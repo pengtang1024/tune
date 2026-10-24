@@ -2,12 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/application/discovery_providers.dart';
 import 'package:tune/features/discovery/data/discovery_feedback_store.dart';
+import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/domain/discovery_state.dart';
+import 'package:tune/features/discovery/domain/recommendation_reason.dart';
+import 'package:tune/features/discovery/domain/recommended_track.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
@@ -34,6 +38,8 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   DiscoveryFeedbackStore? _feedbackStore;
   Map<String, DateTime> _feedback = const {};
   Map<String, TrackListening> _listening = const {};
+  final List<DiscoverySection> _onlineSections = [];
+  Set<String> _finding = const {};
   bool _feedbackLoaded = false;
   int _salt = 0;
   bool _disposed = false;
@@ -76,6 +82,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   /// back shows the stable mix of the day again.
   void refresh() {
     _salt++;
+    _onlineSections.clear();
     _refreshListening();
     _recompute();
   }
@@ -106,9 +113,105 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
   Future<void> clearFeedback() async {
     _feedback = const {};
     _listening = const {};
+    _onlineSections.clear();
     await _feedbackStore?.clear();
     await ref.read(listeningSignalStoreProvider).clear();
     _recompute();
+  }
+
+  /// Looks for more tracks of [artist] in the enabled online sources.
+  ///
+  /// Nothing is fetched until the reader presses the button. The results are
+  /// kept in memory for this visit only; they never enter the library.
+  Future<DiscoveryOnlineResult> findMoreByArtist(String rawArtist) async {
+    final artist = rawArtist.trim();
+    if (artist.isEmpty) return DiscoveryOnlineResult.noResults;
+    if (_finding.contains(artist)) return DiscoveryOnlineResult.added;
+    _setFinding({..._finding, artist});
+
+    try {
+      final sources =
+          ref.read(musicSourcesControllerProvider).valueOrNull?.sources ??
+          const [];
+      final remote = sources
+          .where((source) => source.enabled && !source.isLocal)
+          .toList(growable: false);
+      if (remote.isEmpty) return DiscoveryOnlineResult.noSources;
+
+      final results = await ref
+          .read(musicSourceServiceProvider)
+          .search(sources: remote, query: artist);
+      if (_disposed) return DiscoveryOnlineResult.noResults;
+
+      final known = {
+        for (final song
+            in ref.read(libraryControllerProvider).valueOrNull?.songs ??
+                const <Song>[])
+          song.uri,
+      };
+      final key = normalizeTasteKey(artist);
+      final seen = <String>{};
+      final tracks = <RecommendedTrack>[];
+      for (final result in results) {
+        if (!result.isSuccess) continue;
+        for (final song in result.songs) {
+          if (song.uri.isEmpty || song.isLiveStream) continue;
+          if (known.contains(song.uri) || !seen.add(song.uri)) continue;
+          if (!_matchesArtist(song, key)) continue;
+          tracks.add(
+            RecommendedTrack(
+              song: song,
+              score: 0,
+              reason: RecommendationReason(
+                kind: RecommendationReasonKind.artist,
+                artist: artist,
+                confidence: 1,
+              ),
+              fromFavorites: false,
+            ),
+          );
+          if (tracks.length >= 20) break;
+        }
+        if (tracks.length >= 20) break;
+      }
+      if (tracks.isEmpty) return DiscoveryOnlineResult.noResults;
+
+      final online = DiscoverySection(
+        kind: DiscoverySectionKind.onlineArtist,
+        reason: RecommendationReason(
+          kind: RecommendationReasonKind.artist,
+          artist: artist,
+          confidence: 1,
+        ),
+        tracks: List.unmodifiable(tracks),
+      );
+      _onlineSections.removeWhere(
+        (section) => normalizeTasteKey(section.reason.artist ?? '') == key,
+      );
+      _onlineSections.add(online);
+      return DiscoveryOnlineResult.added;
+    } catch (error, stackTrace) {
+      Log.error('在线查找歌手失败: $error\n$stackTrace');
+      return DiscoveryOnlineResult.failed;
+    } finally {
+      _setFinding({..._finding}..remove(artist));
+      if (!_disposed) _recompute();
+    }
+  }
+
+  bool _matchesArtist(Song song, String key) {
+    if (key.isEmpty) return true;
+    final artist = normalizeTasteKey(song.artist);
+    if (artist.isEmpty) return false;
+    return artist.contains(key) || key.contains(artist);
+  }
+
+  void _setFinding(Set<String> next) {
+    _finding = Set.unmodifiable(next);
+    final current = state.valueOrNull;
+    if (current != null && !_disposed) {
+      state = AsyncData(current.copyWith(findingArtists: _finding));
+    }
   }
 
   void _refreshListening() {
@@ -148,7 +251,11 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     final dateKey = _dateKey(now);
     final songs = library.songs;
     if (songs.isEmpty) {
-      return DiscoveryState(generatedAt: now, dateKey: dateKey);
+      return DiscoveryState(
+        generatedAt: now,
+        dateKey: dateKey,
+        findingArtists: _finding,
+      );
     }
 
     try {
@@ -172,9 +279,13 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
             now: now,
           );
       return DiscoveryState(
-        sections: output.sections,
+        sections: List.unmodifiable([
+          ...output.sections,
+          ..._visibleOnlineSections(),
+        ]),
         generatedAt: now,
         dateKey: dateKey,
+        findingArtists: _finding,
       );
     } catch (error, stackTrace) {
       Log.error('计算推荐失败: $error\n$stackTrace');
@@ -184,6 +295,25 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
         dateKey: dateKey,
       );
     }
+  }
+
+  List<DiscoverySection> _visibleOnlineSections() {
+    final visible = <DiscoverySection>[];
+    for (final section in _onlineSections) {
+      final tracks = [
+        for (final track in section.tracks)
+          if (!_feedback.containsKey(track.song.uri)) track,
+      ];
+      if (tracks.isEmpty) continue;
+      visible.add(
+        DiscoverySection(
+          kind: section.kind,
+          reason: section.reason,
+          tracks: List.unmodifiable(tracks),
+        ),
+      );
+    }
+    return visible;
   }
 
   static _LibrarySnapshot _snapshotOf(AsyncValue<LibraryState> value) {

@@ -1042,5 +1042,34 @@
   "discoverHistoryHint": "開啟本機播放記錄，推薦會更貼近你",
   "discoverHistoryEnable": "開啟",
   "discoverClearAll": "清除推薦記錄",
-  "discoverWhyHistory": "可選的本機播放記錄（預設關閉）"
+  "discoverWhyHistory": "可選的本機播放記錄（預設關閉）",
+  "discoverSectionOnlineArtist": "線上找到的 {artist}",
+  "discoverFindMoreOnline": "線上找更多",
+  "discoverFindingMore": "正在找…",
+  "discoverNoOnlineSources": "沒有啟用的線上音源",
+  "discoverOnlineNoResults": "沒有找到更多 {artist} 的歌",
+  "discoverOnlineFailed": "線上查找失敗，稍後再試",
+  "discoverOnlineFound": "已加入 {count} 首線上結果",
+  "@discoverSectionOnlineArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineNoResults": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "@discoverOnlineFound": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }
