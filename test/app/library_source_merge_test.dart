@@ -113,6 +113,41 @@ void main() {
     expect(state.statusMessage, contains('1 个音源失败'));
   });
 
+  test(
+    'a skipped source keeps its cached songs and no error is shown',
+    () async {
+      // The web build has no music folder, so every source is skipped when the
+      // last scan is still too recent. The library keeps the songs of that
+      // scan, so the player must not report a failure.
+      final container = createContainer(
+        sources: const [localSource, remoteSource],
+        results: {
+          'local': SourceScanResult(
+            sourceId: 'local',
+            status: SourceScanStatus.skipped,
+            message: '距上次扫描不足间隔',
+          ),
+          'openverse': SourceScanResult(
+            sourceId: 'openverse',
+            status: SourceScanStatus.skipped,
+            message: '距上次扫描不足间隔',
+          ),
+        },
+      );
+
+      await container.read(libraryControllerProvider.future);
+      await container.read(libraryControllerProvider.notifier).scan(['/music']);
+
+      final state = container.read(libraryControllerProvider).requireValue;
+      expect(state.songs.map((song) => song.uri), [
+        localSong.uri,
+        oldRemoteSong.uri,
+      ]);
+      expect(state.errorMessage, isNull);
+      expect(state.statusMessage, '已保留缓存，距上次扫描不足间隔');
+    },
+  );
+
   test('a successful source replaces its previous songs', () async {
     final container = createContainer(
       sources: const [localSource, remoteSource],
@@ -157,7 +192,8 @@ void main() {
     await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
     final state = container.read(libraryControllerProvider).requireValue;
-    expect(state.songs.map((song) => song.uri), [localSong.uri]);    expect(state.sourceSummaries.containsKey('openverse'), isFalse);
+    expect(state.songs.map((song) => song.uri), [localSong.uri]);
+    expect(state.sourceSummaries.containsKey('openverse'), isFalse);
   });
 
   test('a copy and the track of its source are one track', () async {

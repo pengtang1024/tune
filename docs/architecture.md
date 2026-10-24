@@ -116,7 +116,7 @@ presentation → application → domain
 | 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
 | 播放会话（队列、游标、模式、历史） | `<应用支持目录>/settings/`，键 `playback_queue_v1` | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
 | 播放进度 | `<应用支持目录>/settings/`，键 `playback_position_v1` | `PlaybackSessionStore` |
-| 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `LibraryStorage`（`lib/features/library/data/library_storage.dart`） |
+| 音乐库索引 | `<应用支持目录>/library/scanned_songs.json` | `FileLibraryStorage`（`lib/features/library/data/impl/library_storage_io.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
@@ -127,6 +127,7 @@ presentation → application → domain
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - Web 没有文件系统，偏好走浏览器存储（`preference_store_stub.dart`），封面每次现取。
+- **音乐库索引跟着平台走**：桌面把索引写成 `<应用支持目录>/library/scanned_songs.json`，Web 把同一份文档写进浏览器存储（`library_storage_stub.dart`，键 `scanned_songs_v1`）。索引和音源的扫描时间必须落在同一个存储里：只存扫描时间而不存索引，下次打开就会跳过所有音源，索引也就空了。
 - **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
 
 ## 音乐库的目录

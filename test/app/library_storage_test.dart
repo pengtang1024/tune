@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/data/library_storage.dart';
+import 'package:tune/features/library/data/impl/library_storage_io.dart';
+import 'package:tune/features/library/data/library_document.dart';
 
 /// The library of an older version wrote the words of that version when a
 /// file carried no name. The interface writes a missing name in the language
@@ -23,7 +24,7 @@ void main() {
     if (await documents.exists()) await documents.delete(recursive: true);
   });
 
-  LibraryStorage storage() => LibraryStorage(
+  FileLibraryStorage storage() => FileLibraryStorage(
     supportDirectory: () async => support,
     documentsDirectory: () async => documents,
   );
