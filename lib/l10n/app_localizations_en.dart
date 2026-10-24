@@ -182,6 +182,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryAddAllToQueue => 'Add the whole list to the queue';
 
   @override
+  String get libraryViewSongs => 'Songs view';
+
+  @override
+  String get libraryViewAlbums => 'Albums view';
+
+  @override
+  String get libraryUnknownAlbum => 'Unknown album';
+
+  @override
+  String get libraryVariousArtists => 'Various artists';
+
+  @override
+  String get libraryBackToAlbums => 'Back to albums';
+
+  @override
   String get queueTitle => 'Queue';
 
   @override

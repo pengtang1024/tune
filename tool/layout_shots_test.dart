@@ -212,6 +212,17 @@ void main() {
     );
     await _shot(tester, 'library$suffix');
 
+    // The albums view is the browsing side of the library; the songs view
+    // stays one click away.
+    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await _shot(tester, 'library_albums$suffix');
+    await tester.tap(find.text('Nocturnes'));
+    await _shot(tester, 'library_album$suffix');
+    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.view_list_rounded));
+    await tester.pumpAndSettle();
+
     // The queue is a panel over the library now. The library itself is the
     // page behind it, so the shot shows the reader's context as well.
     await tester.tap(find.byTooltip('播放队列'));

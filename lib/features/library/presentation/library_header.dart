@@ -4,6 +4,8 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/presentation/library_queue_all_button.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
+import 'package:tune/features/library/presentation/library_view_switch.dart';
 
 /// The compact heading of the library.
 ///
@@ -19,12 +21,16 @@ class LibraryHeader extends StatelessWidget {
   /// Puts the whole visible list into the queue.
   final VoidCallback? onAddAll;
   final VoidCallback onSearchOnline;
+  final LibraryViewMode view;
+  final ValueChanged<LibraryViewMode> onViewChanged;
 
   const LibraryHeader({
     super.key,
     required this.summary,
     required this.onAddAll,
     required this.onSearchOnline,
+    required this.view,
+    required this.onViewChanged,
   });
 
   @override
@@ -61,6 +67,8 @@ class LibraryHeader extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: CompactTokens.space12),
+          LibraryViewSwitch(view: view, onChanged: onViewChanged),
           const SizedBox(width: CompactTokens.space12),
           LibraryQueueAllButton(onPressed: onAddAll),
           const SizedBox(width: CompactTokens.space8),

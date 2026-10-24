@@ -74,6 +74,7 @@ flutter --version
 - `test/app/compact_layout_test.dart`：盯住 760 的紧凑导航与 440 面板、面板打开时内容区不可点而底栏/侧栏可用、长队列打开时定位当前曲目、正在播放页的迷你播放条，以及 1.3 倍中英文不溢出；还盯住默认 900×563 窗口的曲库首屏至少放下十首歌。
 - `test/app/playback_session_store_test.dart` / `playback_session_test.dart` / `playback_session_provider_test.dart`：盯住启动恢复的队列、进度、音量与开关；详见 [playback-session.md](playback-session.md)。
 - `test/app/compact_spinner_test.dart`：盯住加载圈的描边没有被自己的框裁掉（Material 的现行样式会裁），以及字号梯度里没有两档共用一个尺寸。
+- `test/app/library_albums_test.dart` / `test/domain/library_album_test.dart`：盯住曲库的专辑分组（同名片、未知专辑、封面与曲序）和「歌曲 → 专辑网格 → 专辑曲目 → 返回」的整条路径。
 - `test/app/compact_control_metrics_test.dart`：盯住 token 说的是真话——三种按钮画出来一样高且等于 `controlDefault`，列表行等于 `listRowHeight`，主题里的每个字号角色都是梯度上的一档。
 - `test/app/theme_contrast_test.dart`：盯住纸上的字看得见——明暗两套主题里，正文色、次要色、强调色与错误色在每一层底色上都要过 4.5:1，白字压在强调色和错误色上也要过 4.5:1。改了 `CompactTheme` 的颜色就要跑它。
 - `test/app/text_scale_test.dart`：盯住界面扛得住桌面的字号缩放——列表行和设置卡片在 1.25、1.5、2 倍的字号下、窗口窄到 420 像素时都不许溢出。改了装字的布局就要跑它。

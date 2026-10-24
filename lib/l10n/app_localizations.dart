@@ -352,6 +352,36 @@ abstract class AppLocalizations {
   /// **'将整个列表加入队列'**
   String get libraryAddAllToQueue;
 
+  /// No description provided for @libraryViewSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌曲视图'**
+  String get libraryViewSongs;
+
+  /// No description provided for @libraryViewAlbums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑视图'**
+  String get libraryViewAlbums;
+
+  /// No description provided for @libraryUnknownAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未知专辑'**
+  String get libraryUnknownAlbum;
+
+  /// No description provided for @libraryVariousArtists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'多位艺术家'**
+  String get libraryVariousArtists;
+
+  /// No description provided for @libraryBackToAlbums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'返回专辑'**
+  String get libraryBackToAlbums;
+
   /// No description provided for @queueTitle.
   ///
   /// In zh_CN, this message translates to:

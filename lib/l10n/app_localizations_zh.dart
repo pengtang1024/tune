@@ -155,6 +155,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryAddAllToQueue => '将整个列表加入队列';
 
   @override
+  String get libraryViewSongs => '歌曲视图';
+
+  @override
+  String get libraryViewAlbums => '专辑视图';
+
+  @override
+  String get libraryUnknownAlbum => '未知专辑';
+
+  @override
+  String get libraryVariousArtists => '多位艺术家';
+
+  @override
+  String get libraryBackToAlbums => '返回专辑';
+
+  @override
   String get queueTitle => '播放队列';
 
   @override
@@ -2150,6 +2165,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryAddAllToQueue => '将整个列表加入队列';
 
   @override
+  String get libraryViewSongs => '歌曲视图';
+
+  @override
+  String get libraryViewAlbums => '专辑视图';
+
+  @override
+  String get libraryUnknownAlbum => '未知专辑';
+
+  @override
+  String get libraryVariousArtists => '多位艺术家';
+
+  @override
+  String get libraryBackToAlbums => '返回专辑';
+
+  @override
   String get queueTitle => '播放队列';
 
   @override
@@ -4143,6 +4173,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryAddAllToQueue => '將整個清單加入佇列';
+
+  @override
+  String get libraryViewSongs => '歌曲檢視';
+
+  @override
+  String get libraryViewAlbums => '專輯檢視';
+
+  @override
+  String get libraryUnknownAlbum => '未知專輯';
+
+  @override
+  String get libraryVariousArtists => '多位藝術家';
+
+  @override
+  String get libraryBackToAlbums => '返回專輯';
 
   @override
   String get queueTitle => '播放佇列';
