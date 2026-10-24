@@ -6,13 +6,15 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 final libraryStorageProvider = Provider<LibraryStorage>(
-  (ref) => LibraryStorage(),
+  (ref) => createLibraryStorage(ref.watch(persistenceServiceProvider)),
 );
 
 final libraryControllerProvider =
@@ -219,7 +221,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             skippedCount: skippedCount,
             needsConfigCount: needsConfigCount,
           ),
-          errorMessage: successCount == 0 && failedCount > 0
+          errorMessage: successCount == 0 && failedCount > 0 && songs.isEmpty
               ? AppStrings.instance.scanAllSourcesFailed
               : null,
           sourceSummaries: Map.unmodifiable(summaries),
@@ -352,6 +354,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           : AppStrings.instance.scanSongCount(songCount);
     }
     if (successCount == 0) {
+      // A source that was skipped or that failed keeps the songs of the last
+      // scan, so the library still holds them. The scan did not fill the
+      // library again, but it did not empty it either.
+      if (songCount > 0) return AppStrings.instance.scanCachedTooSoon;
       if (failedCount > 0) return AppStrings.instance.scanAllSourcesFailed;
       if (needsConfigCount > 0) {
         return AppStrings.instance.scanSourceNotConfigured;

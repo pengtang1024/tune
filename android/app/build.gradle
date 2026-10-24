@@ -35,8 +35,11 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace 'cn.iouf.tune'
     compileSdk 36
-    // No plugin of this app compiles native code, so the build needs no NDK.
-    // Naming one would make AGP download a few hundred megabytes for nothing.
+    // The jni plugin (pulled in by shared_preferences and path_provider)
+    // compiles native code, so the build needs the NDK. The version is the
+    // one of the Flutter SDK, which keeps the plugin and the app on the same
+    // NDK instead of letting AGP pick a second one.
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

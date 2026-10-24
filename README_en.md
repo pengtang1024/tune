@@ -83,7 +83,7 @@ flutter build linux --debug
 
 - Linux desktop is the primary target for the current release.
 - Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download, and the web build streams tracks.
-- The web build has no local library, tray, MPRIS, or default-player settings; it only plays online sources.
+- The web build has no local music folder, tray, MPRIS, or default-player settings; the library index lives in the browser, so it survives a reload.
 - A browser does not let a script set `User-Agent` or `Referer`, and the web build carries no request headers at all: sources that need them (Jellyfin, ccMixter) may not play in the browser.
 - The same-origin policy of the browser blocks the APIs that answer without a CORS header (Wikimedia, ccMixter, and others), so those sources fail to scan in the browser; whether a source works depends on the API allowing browsers.
 - Windows plays through just_audio_windows, which ignores custom request headers: sources that need them (Jellyfin, ccMixter) may not play, and there is no tray or MPRIS control.
