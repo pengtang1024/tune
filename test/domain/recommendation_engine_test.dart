@@ -434,4 +434,29 @@ void main() {
 
     expect(explore.tracks.length, greaterThanOrEqualTo(3));
   });
+
+  test('explore moves on when the nearest pool is one artist', () {
+    final library = [
+      song(0, artist: 'Favorite', album: 'Favorite', genre: 'Rock'),
+      for (var index = 1; index <= 10; index++)
+        song(index, artist: 'Podcast', album: 'One Album', genre: 'Rock'),
+      for (var index = 11; index <= 40; index++)
+        song(
+          index,
+          artist: 'Other $index',
+          album: 'Other $index',
+          genre: 'Jazz',
+        ),
+    ];
+    final output = recommend(library: library, favorites: {'/music/0.mp3'});
+    final explore = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.explore,
+    );
+
+    expect(explore.tracks.length, greaterThanOrEqualTo(3));
+    expect(
+      explore.tracks.any((track) => track.song.artist.startsWith('Other ')),
+      isTrue,
+    );
+  });
 }

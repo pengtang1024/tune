@@ -15,61 +15,63 @@ DiscoverySection? buildExploreSection({
   final nonFavorites = candidates.where((item) => !item.favorite).toList();
   if (nonFavorites.isEmpty) return null;
 
-  // First try the same taste with another artist: the genre or the decade is
-  // one of the reader's, but the artist is not. That is a real change of
-  // voice without leaving the neighborhood.
-  var usedAdjacent = true;
-  var pool = nonFavorites
-      .where(
-        (item) =>
-            item.artistKey.isNotEmpty &&
-            !topArtists.contains(item.artistKey) &&
-            (item.genres.keys.any(topGenres.contains) ||
-                (item.decade != null && topDecades.contains(item.decade))),
-      )
-      .toList();
-  if (pool.length < 3) {
-    usedAdjacent = false;
-    pool = nonFavorites
+  // Try the closest neighbourhood first. A pool can have enough raw tracks
+  // and still yield fewer than three after the artist and album caps (one
+  // podcast, one album), so the selection is what decides whether to move on.
+  final pools = <List<RecommendationCandidate>>[
+    nonFavorites
+        .where(
+          (item) =>
+              item.artistKey.isNotEmpty &&
+              !topArtists.contains(item.artistKey) &&
+              (item.genres.keys.any(topGenres.contains) ||
+                  (item.decade != null && topDecades.contains(item.decade))),
+        )
+        .toList(growable: false),
+    nonFavorites
         .where(
           (item) =>
               item.artistKey.isNotEmpty && !topArtists.contains(item.artistKey),
         )
-        .toList();
-  }
-  if (pool.length < 3) {
-    pool = nonFavorites
+        .toList(growable: false),
+    nonFavorites
         .where(
           (item) =>
               item.genres.keys.any((key) => !topGenres.contains(key)) ||
               (item.decade != null && !topDecades.contains(item.decade)),
         )
-        .toList();
+        .toList(growable: false),
+    nonFavorites,
+  ];
+
+  for (var index = 0; index < pools.length; index++) {
+    final pool = pools[index];
+    if (pool.length < 3) continue;
+
+    final localSeen = {...seen};
+    final selected = RecommendationSelection.take(
+      pool,
+      limit: 8,
+      maxPerArtist: 2,
+      maxPerAlbum: 2,
+      seen: localSeen,
+    );
+    if (selected.length < 3) continue;
+
+    seen.addAll(localSeen);
+    final reason = index == 0
+        ? const RecommendationReason(
+            kind: RecommendationReasonKind.adjacent,
+            confidence: 1,
+          )
+        : _exploreReason(selected, profile, topGenres, topDecades);
+    return DiscoverySection(
+      kind: DiscoverySectionKind.explore,
+      reason: reason,
+      tracks: RecommendationSelection.tracks(selected, forced: reason),
+    );
   }
-  if (pool.length < 3) pool = nonFavorites;
-
-  final localSeen = {...seen};
-  final selected = RecommendationSelection.take(
-    pool,
-    limit: 8,
-    maxPerArtist: 2,
-    maxPerAlbum: 2,
-    seen: localSeen,
-  );
-  if (selected.length < 3) return null;
-
-  seen.addAll(localSeen);
-  final reason = usedAdjacent
-      ? const RecommendationReason(
-          kind: RecommendationReasonKind.adjacent,
-          confidence: 1,
-        )
-      : _exploreReason(selected, profile, topGenres, topDecades);
-  return DiscoverySection(
-    kind: DiscoverySectionKind.explore,
-    reason: reason,
-    tracks: RecommendationSelection.tracks(selected, forced: reason),
-  );
+  return null;
 }
 
 RecommendationReason _exploreReason(
