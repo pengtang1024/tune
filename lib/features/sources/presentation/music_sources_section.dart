@@ -279,10 +279,7 @@ Map<String, double> _coverageBySource(List<Song> songs) {
     final hasPlayable =
         song.hasLocalFile || (song.streamUrl?.isNotEmpty ?? false);
     if (hasPlayable) playable[id] = (playable[id] ?? 0) + 1;
-    final hasArtwork =
-        (song.albumArtPath?.isNotEmpty ?? false) ||
-        (song.artworkUrl?.isNotEmpty ?? false);
-    if (hasArtwork) artwork[id] = (artwork[id] ?? 0) + 1;
+    if (song.hasArtwork) artwork[id] = (artwork[id] ?? 0) + 1;
     if (song.artist.trim().isNotEmpty) {
       metadata[id] = (metadata[id] ?? 0) + 1;
     }

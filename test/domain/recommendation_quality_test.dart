@@ -1,7 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/discovery_section.dart';
+import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_engine.dart';
+import 'package:tune/features/discovery/domain/recommendation_extra_sections.dart';
+import 'package:tune/features/discovery/domain/recommendation_scoring.dart';
+import 'package:tune/features/discovery/domain/recommendation_selection.dart';
+import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 
@@ -202,5 +207,70 @@ void main() {
         .length;
 
     expect(adjacent, greaterThanOrEqualTo(2));
+  });
+
+  test('a track without a cover scores below the same track with one', () {
+    final base = Song(
+      id: 1,
+      title: 'Covered',
+      artist: 'Same Artist',
+      album: 'Same Album',
+      genre: 'Rock',
+      uri: '/music/covered.mp3',
+      dateAdded: now.millisecondsSinceEpoch,
+    );
+    final covered = base.copyWith(artworkUrl: 'https://cdn.test/covered.jpg');
+    final bare = base.copyWith(id: 2, uri: '/music/bare.mp3');
+
+    final candidates = buildCandidates(
+      library: [covered, bare],
+      favoriteUris: const {},
+      dismissedUris: const {},
+    );
+    scoreCandidates(
+      candidates,
+      profile: TasteProfile.empty,
+      allowFresh: true,
+      now: now,
+    );
+
+    final withCover = candidates.firstWhere((item) => item.song.hasArtwork);
+    final withoutCover = candidates.firstWhere((item) => !item.song.hasArtwork);
+    expect(
+      withCover.score - withoutCover.score,
+      closeTo(RecommendationTuning.defaults.artworkPenalty, 1e-9),
+    );
+  });
+
+  test('the fresh shelf prefers recent tracks with a cover', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index').copyWith(
+          artworkUrl: index >= 5 ? 'https://cdn.test/$index.jpg' : null,
+        ),
+    ];
+    final candidates = buildCandidates(
+      library: library,
+      favoriteUris: const {},
+      dismissedUris: const {},
+    );
+    scoreCandidates(
+      candidates,
+      profile: TasteProfile.empty,
+      allowFresh: true,
+      now: now,
+    );
+    final section = buildFreshSection(
+      candidates: RecommendationSelection.sortByScore(candidates),
+      allowFresh: true,
+      now: now,
+      seen: <String>{},
+    );
+
+    expect(section, isNotNull);
+    final tracks = section!.tracks;
+    expect(tracks, hasLength(8));
+    expect(tracks.take(5).every((track) => track.song.hasArtwork), isTrue);
+    expect(tracks.skip(5).every((track) => !track.song.hasArtwork), isTrue);
   });
 }

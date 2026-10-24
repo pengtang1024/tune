@@ -12,14 +12,16 @@ DiscoverySection? buildFreshSection({
 }) {
   if (!allowFresh) return null;
   final cutoff = now.subtract(const Duration(days: 30));
-  final pool =
-      candidates.where((item) {
-        if (item.song.dateAdded <= 0) return false;
-        final added = DateTime.fromMillisecondsSinceEpoch(item.song.dateAdded);
-        return added.isAfter(cutoff);
-      }).toList()..sort(
-        (left, right) => right.song.dateAdded.compareTo(left.song.dateAdded),
-      );
+  // The shelf is still made of new tracks, but among them the score decides
+  // who gets the eight slots. A month of scans can add a whole source without
+  // covers; date alone would fill the shelf with grey cards.
+  final pool = RecommendationSelection.sortByScore(
+    candidates.where((item) {
+      if (item.song.dateAdded <= 0) return false;
+      final added = DateTime.fromMillisecondsSinceEpoch(item.song.dateAdded);
+      return added.isAfter(cutoff);
+    }),
+  );
   if (pool.isEmpty) return null;
 
   final localSeen = {...seen};

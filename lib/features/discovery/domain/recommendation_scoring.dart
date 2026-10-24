@@ -22,6 +22,7 @@ void scoreCandidates(
     final freshness = allowFresh ? freshnessOf(candidate.song, now) : 0.0;
     final recent = _recentPenalty(candidate, now, tuning.recentDays);
     final skip = _skipPenalty(candidate);
+    final missingArtwork = candidate.song.hasArtwork ? 0.0 : 1.0;
 
     final base =
         tuning.artistWeight * artist +
@@ -41,7 +42,8 @@ void scoreCandidates(
         (base +
                 favorite -
                 tuning.recentPenalty * recent -
-                tuning.skipPenalty * skip)
+                tuning.skipPenalty * skip -
+                tuning.artworkPenalty * missingArtwork)
             .clamp(0.0, 1.0)
             .toDouble();
     candidate.reason = _reasonFor(candidate, profile, now);

@@ -232,4 +232,34 @@ void main() {
       expect(remote.coverAddress, isNull);
     });
   });
+
+  group('the artwork of a track', () {
+    test('a sidecar image counts as artwork', () {
+      const local = Song(
+        id: 1,
+        uri: '/music/one.flac',
+        albumArtPath: '/music/one.jpg',
+      );
+
+      expect(local.hasArtwork, isTrue);
+    });
+
+    test('a remote cover counts as artwork', () {
+      const remote = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        artworkUrl: 'https://cdn.test/one.jpg',
+      );
+
+      expect(remote.hasArtwork, isTrue);
+    });
+
+    test('missing and blank covers do not count', () {
+      const missing = Song(id: 1, uri: '/music/one.flac');
+      const blank = Song(id: 2, uri: 'tune://openverse/one', artworkUrl: '');
+
+      expect(missing.hasArtwork, isFalse);
+      expect(blank.hasArtwork, isFalse);
+    });
+  });
 }

@@ -272,6 +272,14 @@ class Song {
   /// remote track even when a copy of it is on this machine.
   bool get hasRemoteSource => uri.isNotEmpty && !isLocalFile;
 
+  /// Whether the track has artwork that a card can show.
+  ///
+  /// Local tracks keep the sidecar image path; remote sources give a URL.
+  /// A missing cover is not an error, but it is a visible gap on a card, so
+  /// the surfaces that rank tracks can treat it as one more fact.
+  bool get hasArtwork =>
+      (albumArtPath?.isNotEmpty ?? false) || (artworkUrl?.isNotEmpty ?? false);
+
   /// The address the track is played from over the network.
   ///
   /// A track that lives on this machine as its own file has no address: it is

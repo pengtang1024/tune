@@ -3,8 +3,8 @@
 /// The numbers are kept in one place so a change can be read, tested and
 /// compared with the performance budget instead of being spread through the
 /// scoring functions. The base weights add up to one; the favorite boost and
-/// the two penalties are applied after the base score and the result is
-/// clamped to 0..1.
+/// the penalties are applied after the base score and the result is clamped
+/// to 0..1.
 class RecommendationTuning {
   final double artistWeight;
   final double genreWeight;
@@ -22,6 +22,13 @@ class RecommendationTuning {
 
   /// How much a track with a high skip share is pushed down.
   final double skipPenalty;
+
+  /// How much a track without a cover is pushed down.
+  ///
+  /// This is a penalty rather than a base weight: the card is mostly cover,
+  /// so a missing one should never make a track win a tie, but taste signals
+  /// can still lift it when nothing better is available.
+  final double artworkPenalty;
 
   final int dailyMixSize;
   final int favoriteAnchors;
@@ -43,6 +50,7 @@ class RecommendationTuning {
     this.favoriteBoost = 0.10,
     this.recentPenalty = 0.35,
     this.skipPenalty = 0.30,
+    this.artworkPenalty = 0.10,
     this.dailyMixSize = 25,
     this.favoriteAnchors = 2,
     this.explorationSlots = 3,
