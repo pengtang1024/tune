@@ -238,11 +238,11 @@ abstract class AppLocalizations {
   /// **'音乐库'**
   String get libraryTitle;
 
-  /// No description provided for @librarySubtitle.
+  /// No description provided for @librarySummary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'本地与在线音源的全部曲目'**
-  String get librarySubtitle;
+  /// **'{tracks} 首歌曲 · {albums} 张专辑 · {sources} 个来源'**
+  String librarySummary(int tracks, int albums, int sources);
 
   /// No description provided for @libraryClearSearch.
   ///

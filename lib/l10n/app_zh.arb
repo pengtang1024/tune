@@ -23,7 +23,23 @@
   "darkMode": "深色模式",
   "systemMode": "跟随系统",
   "libraryTitle": "音乐库",
-  "librarySubtitle": "本地与在线音源的全部曲目",
+  "librarySummary": "{tracks} 首歌曲 · {albums} 张专辑 · {sources} 个来源",
+  "@librarySummary": {
+    "placeholders": {
+      "tracks": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "albums": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "sources": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryClearSearch": "清除搜索",
   "libraryFilterSources": "筛选来源",
   "libraryAllSources": "全部来源",

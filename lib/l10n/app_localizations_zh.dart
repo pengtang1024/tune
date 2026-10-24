@@ -78,7 +78,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryTitle => '音乐库';
 
   @override
-  String get librarySubtitle => '本地与在线音源的全部曲目';
+  String librarySummary(int tracks, int albums, int sources) {
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+    final intl.NumberFormat albumsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String albumsString = albumsNumberFormat.format(albums);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$tracksString 首歌曲 · $albumsString 张专辑 · $sourcesString 个来源';
+  }
 
   @override
   String get libraryClearSearch => '清除搜索';
@@ -2058,7 +2070,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryTitle => '音乐库';
 
   @override
-  String get librarySubtitle => '本地与在线音源的全部曲目';
+  String librarySummary(int tracks, int albums, int sources) {
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+    final intl.NumberFormat albumsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String albumsString = albumsNumberFormat.format(albums);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$tracksString 首歌曲 · $albumsString 张专辑 · $sourcesString 个来源';
+  }
 
   @override
   String get libraryClearSearch => '清除搜索';
@@ -4038,7 +4062,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get libraryTitle => '音樂庫';
 
   @override
-  String get librarySubtitle => '本地與線上音源的全部曲目';
+  String librarySummary(int tracks, int albums, int sources) {
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+    final intl.NumberFormat albumsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String albumsString = albumsNumberFormat.format(albums);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    return '$tracksString 首歌曲 · $albumsString 張專輯 · $sourcesString 個來源';
+  }
 
   @override
   String get libraryClearSearch => '清除搜尋';

@@ -218,6 +218,30 @@ void main() {
     );
   });
 
+  testWidgets('the rows of the library stand next to each other', (
+    tester,
+  ) async {
+    await surface(tester, const Size(1280, 800));
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
+    );
+    await tester.pump();
+
+    final first = tester.getRect(find.byType(LibraryTrackCard).at(0));
+    final second = tester.getRect(find.byType(LibraryTrackCard).at(1));
+
+    expect(
+      second.top,
+      moreOrLessEquals(first.bottom, epsilon: 0.5),
+      reason:
+          'a card around every track puts a gutter between two tracks, and the '
+          'gutter is a track the reader cannot see',
+    );
+  });
+
   testWidgets('the now playing page keeps its block in the middle', (
     tester,
   ) async {

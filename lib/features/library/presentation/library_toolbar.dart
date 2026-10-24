@@ -146,13 +146,18 @@ class LibraryToolbar extends ConsumerWidget {
             ),
           ],
           const SizedBox(width: CompactTokens.space12),
-          Text(
-            context.loc.libraryTrackCount(filteredCount),
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          // The page heading already counts the whole library. The field of
+          // the toolbar only speaks up when a search or a source narrows the
+          // list, so the same number is not written twice on the page.
+          if (query.trim().isNotEmpty || sourceFilter != null) ...[
+            Text(
+              context.loc.libraryTrackCount(filteredCount),
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(width: CompactTokens.space8),
+            const SizedBox(width: CompactTokens.space8),
+          ],
           _ScanButton(
             scanning: scanning,
             onPressed: scanning ? null : onScan,

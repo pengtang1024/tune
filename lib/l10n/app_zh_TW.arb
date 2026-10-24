@@ -23,7 +23,23 @@
   "darkMode": "深色模式",
   "systemMode": "跟隨系統",
   "libraryTitle": "音樂庫",
-  "librarySubtitle": "本地與線上音源的全部曲目",
+  "librarySummary": "{tracks} 首歌曲 · {albums} 張專輯 · {sources} 個來源",
+  "@librarySummary": {
+    "placeholders": {
+      "tracks": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "albums": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "sources": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryClearSearch": "清除搜尋",
   "libraryFilterSources": "篩選來源",
   "libraryAllSources": "全部來源",

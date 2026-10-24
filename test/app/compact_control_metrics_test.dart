@@ -86,11 +86,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final card = find.byWidgetPredicate(
-        (widget) =>
-            widget is Material && widget.shape is RoundedRectangleBorder,
-      );
+      final card = find.byType(LibraryTrackCard);
       expect(tester.getSize(card.first).height, CompactTokens.listRowHeight);
+      expect(
+        tester.getSize(card.first).height,
+        CompactTokens.artworkRow + 2 * CompactTokens.listRowPadding,
+        reason:
+            'the row is the artwork plus the room the token keeps around it',
+      );
 
       final artwork = find.byType(ArtworkThumb);
       expect(tester.getSize(artwork.first).height, CompactTokens.artworkRow);

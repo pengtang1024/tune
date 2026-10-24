@@ -23,7 +23,23 @@
   "darkMode": "Dark mode",
   "systemMode": "Follow system",
   "libraryTitle": "Library",
-  "librarySubtitle": "Every track from your local and online sources",
+  "librarySummary": "{tracks, plural, =1{1 track} other{{tracks} tracks}} · {albums, plural, =1{1 album} other{{albums} albums}} · {sources, plural, =1{1 source} other{{sources} sources}}",
+  "@librarySummary": {
+    "placeholders": {
+      "tracks": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "albums": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "sources": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryClearSearch": "Clear search",
   "libraryFilterSources": "Filter sources",
   "libraryAllSources": "All sources",

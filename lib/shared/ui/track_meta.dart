@@ -118,9 +118,7 @@ class TrackMeta extends StatelessWidget {
                 )
               else
                 Text(
-                  song.artist.isEmpty
-                      ? context.loc.playerUnknownArtist
-                      : song.artist,
+                  _byline(context, song),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium?.copyWith(
@@ -157,6 +155,22 @@ class TrackMeta extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The line under the title of a row: who made the track, and the album it
+/// belongs to.
+///
+/// The album was only written down in the details panel, which left a list
+/// of long names without the other half of what tells two tracks apart. The
+/// line keeps the artist first because that is what a reader looks for, and
+/// the album follows the same secondary voice.
+String _byline(BuildContext context, Song song) {
+  final artist = song.artist.trim().isEmpty
+      ? context.loc.playerUnknownArtist
+      : song.artist;
+  final album = song.album.trim();
+  if (album.isEmpty) return artist;
+  return '$artist · $album';
 }
 
 /// The action that opens everything that is known about a track.

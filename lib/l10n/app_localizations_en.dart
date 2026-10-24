@@ -78,8 +78,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryTitle => 'Library';
 
   @override
-  String get librarySubtitle =>
-      'Every track from your local and online sources';
+  String librarySummary(int tracks, int albums, int sources) {
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+    final intl.NumberFormat albumsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String albumsString = albumsNumberFormat.format(albums);
+    final intl.NumberFormat sourcesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sourcesString = sourcesNumberFormat.format(sources);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      tracks,
+      locale: localeName,
+      other: '$tracksString tracks',
+      one: '1 track',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      albums,
+      locale: localeName,
+      other: '$albumsString albums',
+      one: '1 album',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      sources,
+      locale: localeName,
+      other: '$sourcesString sources',
+      one: '1 source',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
+  }
 
   @override
   String get libraryClearSearch => 'Clear search';

@@ -144,7 +144,7 @@ abstract final class CompactTokens {
   static const double modeButtonSize = 26;
 
   /// Artwork of a track inside a list.
-  static const double artworkRow = 40;
+  static const double artworkRow = 36;
 
   /// Artwork of a track that a sheet shows on its own.
   static const double artworkHero = 56;
@@ -152,8 +152,10 @@ abstract final class CompactTokens {
   /// Height of a row of a track list.
   ///
   /// The library and the queue show the same track the same way, so both
-  /// rows are this tall and their columns line up with each other.
-  static const double listRowHeight = 56;
+  /// rows are this tall and their columns line up with each other. The row
+  /// is kept tight: a reader looking for a track scans a column of names,
+  /// and every pixel a row does not use is a track that is out of sight.
+  static const double listRowHeight = 48;
 
   /// Space above and below the artwork of a row of a track list.
   ///

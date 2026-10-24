@@ -17,7 +17,7 @@
 - 按钮高度走 `controlTiny / controlCompact / controlSmall / controlDefault / controlMedium / controlLarge`。空画面上的插图（`illustration*`）是画不是控件的图标，它有自己的尺寸。
 - **三种按钮共用一个高度**：主题里 `FilledButton` / `OutlinedButton` / `TextButton` 都是 `controlDefault`（34）。它们总是挨着出现（对话框里的取消与确定、卡片里的扫描与清空），高度差一档就会看成失误；主次靠填充色和字重分，不靠高度分。
 - 主题给按钮钉了 `VisualDensity.standard`：桌面的紧凑密度会把按钮的最小高度再减 8 像素，那样 `controlDefault` 34 画出来只有 26，token 就说了假话。
-- 列表行的高度是 `listRowHeight`（56），行内留白由 `listRowPadding` 推出来，别在行里另写 `space8`。
+- 列表行的高度是 `listRowHeight`（48），行内留白由 `listRowPadding` 推出来，别在行里另写 `space8`。行与行之间不留空隙、不套卡片框：一条 1px 的发丝线就够把两首曲子分开，卡片四周的留白会吃掉本来能放下一首歌的高度。
 - **正文颜色要过对比度**：浅色主题里的次要色（`muted`）与强调色（`accent`）至少要能和纸面拉开 4.5:1，白字压在强调色上也要 4.5:1。强调色不只是块，它还写页面眉标、节号和正在播放的曲名；亮朱红（`E6532F`）压白字只有 3.72:1，压纸面只有 3.16:1，纸上那排小红字就是「看不清」的来源。浅色主题现在用 `A83616`，`muted` 用 `635B50`，错误色用 `A82C1D`。
 - 颜色的 alpha 只留给装饰。写着字的行不要用 `onSurfaceVariant.withValues(alpha: 0.6)` 这类半透明：在纸色上再叠 40% 透明度，最高也只能到 4.4:1，笔画本来就更细，等于没有对比度。
 - `test/app/theme_contrast_test.dart` 守着这条线：明暗两套主题的正文色、次要色、强调色与错误色在每一层底色上都要过 4.5:1。

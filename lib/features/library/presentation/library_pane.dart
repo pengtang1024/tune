@@ -102,11 +102,21 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ),
     );
     final sourceLabels = sourceLabelsOf(context.loc, sourceConfigs);
+    final availableSources = _availableSources(
+      library,
+      sourceLabels,
+      sourceConfigs,
+    );
     final songs = filteredSongsOf(
       songs: library.songs,
       query: library.query,
       sourceFilter: library.sourceFilter,
     );
+    final albumCount = library.songs
+        .map((song) => song.album.trim())
+        .where((album) => album.isNotEmpty)
+        .toSet()
+        .length;
     final hasSourceIssues = library.sourceSummaries.values.any(
       (summary) => summary.status != SourceScanStatus.success,
     );
@@ -123,7 +133,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           child: PageHeading(
             eyebrow: context.loc.libraryEyebrow,
             title: context.loc.libraryTitle,
-            subtitle: context.loc.librarySubtitle,
+            subtitle: context.loc.librarySummary(
+              library.songs.length,
+              albumCount,
+              availableSources.length,
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -165,7 +179,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             controller: _searchController,
             query: library.query,
             filteredCount: songs.length,
-            sources: _availableSources(library, sourceLabels, sourceConfigs),
+            sources: availableSources,
             sourceLabels: sourceLabels,
             sourceFilter: library.sourceFilter,
             onQueryChanged: (value) {
