@@ -1,30 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 
 /// Empty state of the library page.
 ///
 /// The state names the reason the list is empty and offers the action that
 /// resolves it.
-class LibraryEmptyState extends StatelessWidget {
-  final LibraryState state;
+class LibraryEmptyState extends ConsumerWidget {
+  /// What the reader is searching for.
+  final String query;
+
+  /// Whether the library holds tracks at all.
+  final bool hasSongs;
+
+  /// The source the reader picked, if any.
+  final String? sourceFilter;
+
   final VoidCallback onClearQuery;
   final VoidCallback onClearSourceFilter;
   final VoidCallback onScan;
 
   const LibraryEmptyState({
     super.key,
-    required this.state,
+    required this.query,
+    required this.hasSongs,
+    required this.sourceFilter,
     required this.onClearQuery,
     required this.onClearSourceFilter,
     required this.onScan,
   });
 
   @override
-  Widget build(BuildContext context) {
-    if (state.query.trim().isNotEmpty && state.hasSongs) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // The scan is watched here: it reports its progress every percent, and
+    // the list of the library must not be rebuilt by it.
+    final scan = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          value.valueOrNull?.isScanning ?? false,
+          value.valueOrNull?.statusMessage,
+        ),
+      ),
+    );
+    final isScanning = scan.$1;
+
+    if (query.trim().isNotEmpty && hasSongs) {
       return EmptyStateView(
         icon: Icons.search_off_rounded,
         title: context.loc.libraryNoMatchTitle,
@@ -36,7 +59,7 @@ class LibraryEmptyState extends StatelessWidget {
       );
     }
 
-    if (state.sourceFilter != null && state.hasSongs) {
+    if (sourceFilter != null && hasSongs) {
       return EmptyStateView(
         icon: Icons.filter_alt_off_rounded,
         title: context.loc.librarySourceEmptyTitle,
@@ -50,13 +73,13 @@ class LibraryEmptyState extends StatelessWidget {
 
     return EmptyStateView(
       icon: Icons.library_music_outlined,
-      title: state.isScanning
+      title: isScanning
           ? context.loc.libraryScanningTitle
           : context.loc.libraryEmptyTitle,
-      subtitle: state.isScanning
-          ? state.statusMessage
+      subtitle: isScanning
+          ? scan.$2
           : context.loc.libraryEmptySubtitle,
-      action: state.isScanning
+      action: isScanning
           ? null
           : FilledButton.icon(
               onPressed: onScan,

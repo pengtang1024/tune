@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 
 /// Progress and message line of a running or failed library scan.
-class LibraryScanStatusBar extends StatelessWidget {
-  final LibraryState state;
+///
+/// The bar watches the scan on its own: a running scan reports its progress
+/// every percent, and the list of the library must not be rebuilt by it.
+class LibraryScanStatusBar extends ConsumerWidget {
+  /// Whether one of the sources did not come back with a clean scan.
+  final bool sourceIssues;
 
-  const LibraryScanStatusBar({super.key, required this.state});
+  const LibraryScanStatusBar({super.key, required this.sourceIssues});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final isError = state.errorMessage != null;
-    final message = isError ? state.errorMessage! : (state.statusMessage ?? '');
+    final scan = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          value.valueOrNull?.isScanning ?? false,
+          value.valueOrNull?.scanProgress ?? 0,
+          value.valueOrNull?.statusMessage,
+          value.valueOrNull?.errorMessage,
+        ),
+      ),
+    );
+
+    final isError = scan.$4 != null;
+    final message = isError ? scan.$4! : (scan.$3 ?? '');
+    final shows = scan.$1 || isError || sourceIssues;
+    if (!shows) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -24,11 +42,11 @@ class LibraryScanStatusBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (state.isScanning) ...[
+          if (scan.$1) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(1),
               child: LinearProgressIndicator(
-                value: state.scanProgress,
+                value: scan.$2,
                 minHeight: 2,
                 backgroundColor: theme.colorScheme.outlineVariant,
               ),

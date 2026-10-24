@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -9,18 +11,21 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 const String allSourcesFilterValue = '__all_sources__';
 
 /// Search field, source filter, result count and scan action of the library.
-class LibraryToolbar extends StatelessWidget {
+///
+/// The scan action watches the scan on its own: a running scan reports its
+/// progress every percent, and the list of the library must not be rebuilt
+/// by it.
+class LibraryToolbar extends ConsumerWidget {
   final TextEditingController controller;
   final String query;
   final int filteredCount;
   final List<String> sources;
   final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
-  final bool scanning;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClearQuery;
   final ValueChanged<String?> onSourceFilter;
-  final VoidCallback? onScan;
+  final VoidCallback onScan;
 
   const LibraryToolbar({
     super.key,
@@ -30,7 +35,6 @@ class LibraryToolbar extends StatelessWidget {
     required this.sources,
     required this.sourceLabels,
     required this.sourceFilter,
-    required this.scanning,
     required this.onQueryChanged,
     required this.onClearQuery,
     required this.onSourceFilter,
@@ -38,8 +42,17 @@ class LibraryToolbar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final scanning = ref.watch(
+      libraryControllerProvider.select(
+        (value) {
+          final state = value.valueOrNull;
+          if (state == null) return false;
+          return state.isScanning || state.isLoading;
+        },
+      ),
+    );
 
     return SizedBox(
       height: CompactTokens.inputHeight,
@@ -140,7 +153,10 @@ class LibraryToolbar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: CompactTokens.space8),
-          _ScanButton(scanning: scanning, onPressed: onScan),
+          _ScanButton(
+            scanning: scanning,
+            onPressed: scanning ? null : onScan,
+          ),
         ],
       ),
     );

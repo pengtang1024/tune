@@ -36,23 +36,11 @@ class LibraryState {
   bool get hasSongs => songs.isNotEmpty;
   bool get isScanning => scanStatus == LibraryScanStatus.scanning;
 
-  List<Song> get filteredSongs {
-    final sourceSongs = sourceFilter == null
-        ? songs
-        : songs
-              .where((song) => (song.sourceId ?? 'local') == sourceFilter)
-              .toList(growable: false);
-    final normalized = query.trim().toLowerCase();
-    if (normalized.isEmpty) return sourceSongs;
-
-    return sourceSongs
-        .where((song) {
-          return song.title.toLowerCase().contains(normalized) ||
-              song.artist.toLowerCase().contains(normalized) ||
-              song.album.toLowerCase().contains(normalized);
-        })
-        .toList(growable: false);
-  }
+  List<Song> get filteredSongs => filteredSongsOf(
+    songs: songs,
+    query: query,
+    sourceFilter: sourceFilter,
+  );
 
   LibraryState copyWith({
     List<Song>? songs,
@@ -86,3 +74,30 @@ class LibraryState {
 }
 
 const Object _unset = Object();
+
+/// The tracks the library page shows.
+///
+/// The tracks of the chosen source that match the search. The page reads it
+/// through this function instead of walking the library by itself, so there
+/// is one rule for what the page shows.
+List<Song> filteredSongsOf({
+  required List<Song> songs,
+  required String query,
+  required String? sourceFilter,
+}) {
+  final sourceSongs = sourceFilter == null
+      ? songs
+      : songs
+            .where((song) => (song.sourceId ?? 'local') == sourceFilter)
+            .toList(growable: false);
+  final normalized = query.trim().toLowerCase();
+  if (normalized.isEmpty) return sourceSongs;
+
+  return sourceSongs
+      .where((song) {
+        return song.title.toLowerCase().contains(normalized) ||
+            song.artist.toLowerCase().contains(normalized) ||
+            song.album.toLowerCase().contains(normalized);
+      })
+      .toList(growable: false);
+}

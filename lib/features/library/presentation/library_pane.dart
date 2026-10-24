@@ -47,7 +47,21 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
   @override
   Widget build(BuildContext context) {
-    final library = ref.watch(libraryControllerProvider);
+    // The page watches the tracks of the library and the state of the load.
+    // A running scan reports its progress every percent, and the rows of
+    // the list must not be rebuilt by it: the parts that show the scan watch
+    // it on their own.
+    final load = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          value.isLoading,
+          value.hasValue,
+          value.hasError,
+          value.error,
+        ),
+      ),
+    );
+    final library = ref.watch(libraryControllerProvider.select(_librarySlice));
     ref.listen<String?>(
       libraryControllerProvider.select((value) => value.valueOrNull?.query),
       (previous, next) {
@@ -59,16 +73,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       },
     );
 
-    if (library.isLoading && !library.hasValue) {
+    if (load.$1 && !load.$2) {
       return const Center(child: CompactSpinner.large());
     }
 
-    final state = library.valueOrNull;
-    if (state == null) {
+    if (library == null) {
       return EmptyStateView(
         icon: Icons.error_outline_rounded,
         title: context.loc.libraryLoadFailedTitle,
-        subtitle: '${library.error ?? context.loc.unknownError}',
+        subtitle: '${load.$4 ?? context.loc.unknownError}',
         action: FilledButton(
           onPressed: () => ref.invalidate(libraryControllerProvider),
           child: Text(context.loc.retry),
@@ -89,8 +102,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ),
     );
     final sourceLabels = sourceLabelsOf(context.loc, sourceConfigs);
-    final songs = state.filteredSongs;
-    final hasSourceIssues = state.sourceSummaries.values.any(
+    final songs = filteredSongsOf(
+      songs: library.songs,
+      query: library.query,
+      sourceFilter: library.sourceFilter,
+    );
+    final hasSourceIssues = library.sourceSummaries.values.any(
       (summary) => summary.status != SourceScanStatus.success,
     );
 
@@ -146,12 +163,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           ),
           child: LibraryToolbar(
             controller: _searchController,
-            query: state.query,
+            query: library.query,
             filteredCount: songs.length,
-            sources: _availableSources(state, sourceLabels, sourceConfigs),
+            sources: _availableSources(library, sourceLabels, sourceConfigs),
             sourceLabels: sourceLabels,
-            sourceFilter: state.sourceFilter,
-            scanning: state.isScanning,
+            sourceFilter: library.sourceFilter,
             onQueryChanged: (value) {
               ref.read(libraryControllerProvider.notifier).setQuery(value);
             },
@@ -161,16 +177,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   .read(libraryControllerProvider.notifier)
                   .setSourceFilter(value);
             },
-            onScan: state.isScanning || state.isLoading ? null : _scan,
+            onScan: _scan,
           ),
         ),
-        if (state.isScanning || state.errorMessage != null || hasSourceIssues)
-          LibraryScanStatusBar(state: state),
+        LibraryScanStatusBar(sourceIssues: hasSourceIssues),
         Expanded(
-          child: state.isLoading
+          child: library.isLoading
               ? const Center(child: CompactSpinner.large())
               : _body(
-                  state,
+                  library,
                   songs,
                   playback.$1,
                   playback.$2,
@@ -179,25 +194,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   settings.onlyLikeOnDoubleClick,
                 ),
         ),
-        if (!state.hasSongs && !state.isScanning && state.errorMessage == null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              CompactTokens.pageGutter,
-              0,
-              CompactTokens.pageGutter,
-              CompactTokens.space12,
-            ),
-            child: Text(
-              context.loc.libraryScanPaths(
-                settings.effectiveScanPaths.join('  ·  '),
-              ),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+        if (library.songs.isEmpty)
+          _LibraryPathsFooter(paths: settings.effectiveScanPaths),
       ],
     );
   }
@@ -208,11 +206,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// that only exists in old songs has no configuration any more; it goes to
   /// the end, named by the label the library still knows.
   List<String> _availableSources(
-    LibraryState state,
+    _LibrarySlice library,
     Map<String, SourceLabel> sourceLabels,
     List<MusicSourceConfig> configs,
   ) {
-    final ids = state.songs.map((song) => song.sourceId ?? 'local').toSet();
+    final ids = library.songs.map((song) => song.sourceId ?? 'local').toSet();
     final ordered = <String>[
       for (final source in configs)
         if (ids.remove(source.id)) source.id,
@@ -228,7 +226,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   }
 
   Widget _body(
-    LibraryState state,
+    _LibrarySlice library,
     List<Song> songs,
     String? currentUri,
     bool isPlaying,
@@ -238,7 +236,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
-        state: state,
+        query: library.query,
+        hasSongs: library.songs.isNotEmpty,
+        sourceFilter: library.sourceFilter,
         onClearQuery: _clearQuery,
         onClearSourceFilter: () {
           ref.read(libraryControllerProvider.notifier).setSourceFilter(null);
@@ -326,5 +326,70 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     ref
         .read(libraryControllerProvider.notifier)
         .scan(settings.effectiveScanPaths);
+  }
+}
+
+/// The part of the library the page shows.
+///
+/// The scan of the sources is not part of it: a running scan reports its
+/// progress every percent, and the rows of the list must not be rebuilt by
+/// it. The parts that show the scan watch it on their own.
+typedef _LibrarySlice = ({
+  List<Song> songs,
+  String query,
+  String? sourceFilter,
+  Map<String, SourceScanSummary> sourceSummaries,
+  bool isLoading,
+});
+
+_LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
+  final state = value.valueOrNull;
+  if (state == null) return null;
+  return (
+    songs: state.songs,
+    query: state.query,
+    sourceFilter: state.sourceFilter,
+    sourceSummaries: state.sourceSummaries,
+    isLoading: state.isLoading,
+  );
+}
+
+/// The line that tells where the library is read from.
+///
+/// It only shows while the library is still empty, so it watches the scan on
+/// its own: a running scan reports its progress every percent.
+class _LibraryPathsFooter extends ConsumerWidget {
+  final List<String> paths;
+
+  const _LibraryPathsFooter({required this.paths});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scan = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          value.valueOrNull?.isScanning ?? false,
+          value.valueOrNull?.errorMessage,
+        ),
+      ),
+    );
+    if (scan.$1 || scan.$2 != null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        CompactTokens.pageGutter,
+        0,
+        CompactTokens.pageGutter,
+        CompactTokens.space12,
+      ),
+      child: Text(
+        context.loc.libraryScanPaths(paths.join('  ·  ')),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }
