@@ -17,7 +17,9 @@ final sourceHealthScoresProvider = Provider<Map<String, double>>((ref) {
 /// The health score of one source, for a caller that already has the map.
 double sourceHealthOf(String? sourceId, Map<String, double> scores) {
   if (sourceId == null || sourceId.isEmpty || sourceId == 'local') return 1;
-  return scores[sourceId] ?? 0.5;
+  // Unknown is not neutral: a source missing from the health reports is
+  // treated as a negative signal, not as an average source.
+  return scores[sourceId] ?? 0.25;
 }
 
 /// The health score that belongs to a track.

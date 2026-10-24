@@ -81,7 +81,7 @@ List<DiscoverySection> buildSourceSections({
     if (sections.length >= 2) break;
     final pool = groups[sourceId]!;
     if (pool.length < 5) continue;
-    final health = sourceHealth[sourceId] ?? 0.5;
+    final health = sourceHealth[sourceId] ?? 0.25;
     if (health < tuning.sourceShelfMinHealth) continue;
 
     final localSeen = {...seen};

@@ -15,6 +15,7 @@
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
+| 查健康度里 unknown 的处理约定 | [`docs/health-unknown.md`](docs/health-unknown.md)（给健康度会话的提醒） |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
 | 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |
 | 查队列的呈现（浮层、入口、关闭） | [`docs/queue-panel.md`](docs/queue-panel.md) |

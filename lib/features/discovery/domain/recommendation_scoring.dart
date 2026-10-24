@@ -207,5 +207,5 @@ String _strongestGenreKey(
 
 double _sourceHealthOf(String? sourceId, Map<String, double> scores) {
   if (sourceId == null || sourceId.isEmpty || sourceId == 'local') return 1;
-  return (scores[sourceId] ?? 0.5).clamp(0.0, 1.0).toDouble();
+  return (scores[sourceId] ?? 0.25).clamp(0.0, 1.0).toDouble();
 }
