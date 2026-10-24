@@ -11,6 +11,7 @@ class RecommendationCandidate {
   final String albumKey;
   final int? decade;
   final bool favorite;
+  final bool queued;
   final TrackListening listening;
 
   double score = 0;
@@ -28,6 +29,7 @@ class RecommendationCandidate {
     required this.albumKey,
     required this.decade,
     required this.favorite,
+    required this.queued,
     required this.listening,
   });
 
@@ -45,6 +47,7 @@ List<RecommendationCandidate> buildCandidates({
   required Set<String> favoriteUris,
   required Set<String> dismissedUris,
   Set<String> dismissedArtists = const {},
+  Set<String> queuedUris = const {},
   Map<String, TrackListening> listening = const {},
 }) {
   final result = <RecommendationCandidate>[];
@@ -70,6 +73,7 @@ List<RecommendationCandidate> buildCandidates({
         albumKey: normalizeTasteKey(song.album),
         decade: decadeOf(song.year),
         favorite: favoriteUris.contains(song.uri),
+        queued: queuedUris.contains(song.uri),
         listening: listening[song.uri] ?? const TrackListening(),
       ),
     );

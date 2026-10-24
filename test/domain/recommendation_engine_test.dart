@@ -43,6 +43,7 @@ void main() {
     Set<String> favorites = const {},
     Set<String> dismissed = const {},
     Set<String> dismissedArtists = const {},
+    Set<String> queued = const {},
     List<String> sourceOrder = const [],
     bool allowFresh = false,
     int salt = 0,
@@ -53,6 +54,7 @@ void main() {
       profile: TasteProfile.from(library: library, favoriteUris: favorites),
       dismissedUris: dismissed,
       dismissedArtists: dismissedArtists,
+      queuedUris: queued,
       sourceOrder: sourceOrder,
       dateKey: '2026-10-24',
       refreshSalt: salt,
@@ -288,5 +290,37 @@ void main() {
 
     expect(artists, isNot(contains('Nujabes')));
     expect(artists, contains('Other 3'));
+  });
+
+  test('tracks already in the queue rank below the others', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final output = recommend(library: library, queued: {'/music/0.mp3'});
+    final daily = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.dailyMix,
+    );
+    final queued = daily.tracks.firstWhere(
+      (track) => track.song.uri == '/music/0.mp3',
+    );
+    final fresh = daily.tracks.firstWhere(
+      (track) => track.song.uri == '/music/2.mp3',
+    );
+
+    expect(queued.score, lessThan(fresh.score));
+  });
+
+  test('a queue that holds the whole library still leaves a page', () {
+    final library = [
+      for (var index = 0; index < 6; index++)
+        song(index, artist: 'Artist $index', album: 'Album $index'),
+    ];
+    final output = recommend(
+      library: library,
+      queued: {for (final item in library) item.uri},
+    );
+
+    expect(output.sections, isNotEmpty);
   });
 }

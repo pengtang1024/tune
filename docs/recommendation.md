@@ -373,6 +373,8 @@ class TasteProfile {
   不进入候选池，也不参与画像。
 - 过滤掉：`uri` 为空、直播流、已不感兴趣且未过期、已少推荐的歌手、以及本轮
   已经选过的 `uri`。
+- 已经在播放队列里的曲目**不隐藏**，只在最终分上减 0.20：队列是读者马上要
+  听的内容，页面不该因为队列恰好覆盖全库而变空。
 - 同一 `uri` 在库里已经由 `LibraryController` 合并成一条（本地副本 + 在线来源），
   发现页不再做第二次合并。
 - 跨来源的同一录音如果 `uri` 不同（例如同一首歌在两个音源各有一条），
@@ -396,6 +398,7 @@ score(s) =
   + 0.10 * favorite(s)
   - 0.35 * recentPenalty(s)
   - 0.30 * skipPenalty(s)
+  - 0.20 * queued(s)
   - 0.10 * missingArtwork(s)
 ```
 
@@ -409,6 +412,7 @@ score(s) =
 - `novelty`：没播过 1.0；超过 60 天没播 0.8；30–60 天 0.6；最近 30 天 0.3。
 - `recentPenalty`：7 天内 1.0，7–30 天线性衰减到 0。
 - `skipPenalty`：`skips / (listens + skips)`，没有记录时为 0。
+- `queued`：曲目已经在播放队列里时减 0.20，避免连续重复，但不隐藏。
 - `freshness`：30 天线性衰减到 0；没有可靠的首次入库时间时不参与。
 - 今日混音只留最多 2 个标心锚点，不再用固定的 20% 名额；其他分段排除
   已标心的曲目。
@@ -616,6 +620,7 @@ DiscoveryPane
   │     ├── ListeningSignalStore     （播放记录开启时只读）
   │     └── RecommendationEngine     （纯函数）
   ├── SettingsController             （双击只标心、播放记录开关）
+  ├── PlaybackController             （只读队列身份，用于队列感知）
   └── ListPlayback / PlaybackController（播放与入队）
 
 DiscoverySignalObserver
@@ -658,7 +663,8 @@ RecommendationEngine
 与在线搜索的临时面板同一模式：
 
 - `build` 读取 `LibraryController` 的 `(isLoading, hasValue, songs)`、
-  `FavoritesState.ids`、来源 id 顺序、播放记录开关与两个存储，构建画像并计算分段。
+  `FavoritesState.ids`、来源 id 顺序、播放队列身份、播放记录开关与两个存储，
+  构建画像并计算分段。
 - 用 `select` 只订阅需要的切片，避免扫描进度每变一次就重算：
   `ref.watch(libraryControllerProvider.select((v) => (v.isLoading, v.valueOrNull?.songs)))`。
 - 不 watch 整个 `MusicSourcesController`；只 select 来源 id 的当前顺序
@@ -842,6 +848,7 @@ M1–M5 已作为 v1 交付。
 - 喜欢的曲目不会进入歌手分段；未标心候选足够时，今日混音中标心的曲目不超过 20%；
 - 同歌手/同专辑上限；全局去重；
 - 直播流被排除；
+- 队列里的曲目降权但不隐藏；全库都在队列时页面仍然有内容；
 - 不感兴趣被排除，撤销后恢复；
 - 同一天同样输入结果稳定；不同日期或刷新盐值结果变化；
 - 缺流派、缺年份、空歌手不崩；

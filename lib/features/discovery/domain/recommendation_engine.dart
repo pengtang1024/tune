@@ -27,12 +27,16 @@ class RecommendationEngine {
 
   final RecommendationTuning tuning;
 
+  /// How much a track already in the queue is pushed down.
+  static const double _queuePenalty = 0.20;
+
   DiscoveryOutput recommend({
     required List<Song> library,
     required Set<String> favoriteUris,
     required TasteProfile profile,
     required Set<String> dismissedUris,
     Set<String> dismissedArtists = const {},
+    Set<String> queuedUris = const {},
     required List<String> sourceOrder,
     required String dateKey,
     Map<String, TrackListening> listening = const {},
@@ -49,6 +53,7 @@ class RecommendationEngine {
       favoriteUris: favoriteUris,
       dismissedUris: dismissedUris,
       dismissedArtists: dismissedArtists,
+      queuedUris: queuedUris,
       listening: listening,
     );
     scoreCandidates(
@@ -58,6 +63,15 @@ class RecommendationEngine {
       now: clock,
       tuning: tuning,
     );
+    // The queue is what the reader is already about to hear. Push its tracks
+    // down instead of hiding them: a queue that happens to hold the whole
+    // library must not leave an empty page.
+    for (final candidate in candidates) {
+      if (!candidate.queued) continue;
+      candidate.score = (candidate.score - _queuePenalty)
+          .clamp(0.0, 1.0)
+          .toDouble();
+    }
     for (final candidate in candidates) {
       candidate.tieBreak = stableHashOf('${candidate.uri}|$seed');
     }

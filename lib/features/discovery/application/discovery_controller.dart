@@ -11,6 +11,7 @@ import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -70,6 +71,9 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     final sourceOrderKey = ref.watch(
       musicSourcesControllerProvider.select(_sourceOrderKeyOf),
     );
+    final queue = ref.watch(
+      playbackControllerProvider.select((state) => state.queue),
+    );
     final useListening = ref.watch(
       settingsControllerProvider.select((state) => state.useListeningHistory),
     );
@@ -81,6 +85,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       library: library,
       favoriteUris: favoriteUris,
       sourceOrder: _sourceOrderOf(sourceOrderKey),
+      queuedUris: {for (final song in queue) song.uri},
     );
   }
 
@@ -259,6 +264,10 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
         sourceOrder: _sourceOrderOf(
           _sourceOrderKeyOf(ref.read(musicSourcesControllerProvider)),
         ),
+        queuedUris: {
+          for (final song in ref.read(playbackControllerProvider).queue)
+            song.uri,
+        },
       ),
     );
   }
@@ -267,6 +276,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     required _LibrarySnapshot library,
     required Set<String> favoriteUris,
     required List<String> sourceOrder,
+    required Set<String> queuedUris,
   }) {
     if (library.isLoading && !library.hasValue) {
       return const DiscoveryState(isLoading: true);
@@ -301,6 +311,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
             profile: profile,
             dismissedUris: _feedback.keys.toSet(),
             dismissedArtists: _artistFeedback.keys.toSet(),
+            queuedUris: queuedUris,
             listening: _listening,
             sourceOrder: sourceOrder,
             dateKey: dateKey,

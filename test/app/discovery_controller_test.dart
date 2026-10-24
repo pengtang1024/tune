@@ -4,6 +4,7 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
+import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -15,11 +16,15 @@ import 'package:tune/features/discovery/domain/discovery_state.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 import '../services/fake_persistence.dart';
+import 'fake_audio_player_service.dart';
+import 'fake_song_download_service.dart';
+import 'fake_stream_url_resolver.dart';
 import 'compact_layout_test.dart' show FakeLibraryController;
 import 'music_sources_section_test.dart' show FakeMusicSourcesController;
 
@@ -46,8 +51,17 @@ void main() {
     FakePersistenceService persistence, {
     MusicSourceService? sourceService,
   }) {
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final playback = PlaybackController(
+      audio,
+      FakeSongDownloadService(),
+      FakeStreamUrlResolver(),
+    );
     final container = ProviderContainer(
       overrides: [
+        audioPlayerServiceProvider.overrideWithValue(audio),
+        playbackControllerProvider.overrideWith((ref) => playback),
         persistenceServiceProvider.overrideWithValue(persistence),
         libraryControllerProvider.overrideWith(
           () => FakeLibraryController(LibraryState(songs: songs)),
