@@ -4,6 +4,7 @@ import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_engine.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 
 void main() {
   final now = DateTime(2026, 10, 24, 12);
@@ -44,6 +45,7 @@ void main() {
     Set<String> dismissed = const {},
     Set<String> dismissedArtists = const {},
     Set<String> queued = const {},
+    Map<String, TrackListening> listening = const {},
     List<String> sourceOrder = const [],
     bool allowFresh = false,
     int salt = 0,
@@ -51,10 +53,16 @@ void main() {
     return const RecommendationEngine().recommend(
       library: library,
       favoriteUris: favorites,
-      profile: TasteProfile.from(library: library, favoriteUris: favorites),
+      profile: TasteProfile.from(
+        library: library,
+        favoriteUris: favorites,
+        listening: listening,
+        now: now,
+      ),
       dismissedUris: dismissed,
       dismissedArtists: dismissedArtists,
       queuedUris: queued,
+      listening: listening,
       sourceOrder: sourceOrder,
       dateKey: '2026-10-24',
       refreshSalt: salt,
@@ -340,5 +348,40 @@ void main() {
         isNot(daily.tracks[index - 1].song.artist),
       );
     }
+  });
+
+  test('an old skip matters less than a recent one', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(
+          index,
+          artist: index < 2 ? 'Same Artist' : 'Artist $index',
+          album: 'Album $index',
+        ),
+    ];
+    final listening = {
+      '/music/0.mp3': TrackListening(
+        listens: 1,
+        skips: 1,
+        lastPlayedAt: now.subtract(const Duration(days: 180)),
+      ),
+      '/music/1.mp3': TrackListening(
+        listens: 1,
+        skips: 1,
+        lastPlayedAt: now.subtract(const Duration(days: 1)),
+      ),
+    };
+    final output = recommend(library: library, listening: listening);
+    final daily = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.dailyMix,
+    );
+    final old = daily.tracks.firstWhere(
+      (track) => track.song.uri == '/music/0.mp3',
+    );
+    final recent = daily.tracks.firstWhere(
+      (track) => track.song.uri == '/music/1.mp3',
+    );
+
+    expect(old.score, greaterThan(recent.score));
   });
 }

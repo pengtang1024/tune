@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
@@ -21,7 +23,7 @@ void scoreCandidates(
     final novelty = _noveltyOf(candidate, now);
     final freshness = allowFresh ? freshnessOf(candidate.song, now) : 0.0;
     final recent = _recentPenalty(candidate, now, tuning.recentDays);
-    final skip = _skipPenalty(candidate);
+    final skip = _skipPenalty(candidate, now, tuning.skipHalfLifeDays);
     final missingArtwork = candidate.song.hasArtwork ? 0.0 : 1.0;
 
     final base =
@@ -102,11 +104,19 @@ double _recentPenalty(
   return (recentDays - age) / (recentDays - 7);
 }
 
-double _skipPenalty(RecommendationCandidate candidate) {
+double _skipPenalty(
+  RecommendationCandidate candidate,
+  DateTime now,
+  int halfLifeDays,
+) {
   final signal = candidate.listening;
   final total = signal.listens + signal.skips;
   if (total == 0) return 0;
-  return (signal.skips / total).clamp(0.0, 1.0).toDouble();
+  final rate = (signal.skips / total).clamp(0.0, 1.0).toDouble();
+  final age = _daysSince(signal.lastPlayedAt, now);
+  if (age == null) return rate;
+  final decay = math.pow(0.5, age / halfLifeDays).toDouble();
+  return (rate * decay).clamp(0.0, 1.0).toDouble();
 }
 
 double? _daysSince(DateTime? at, DateTime now) {

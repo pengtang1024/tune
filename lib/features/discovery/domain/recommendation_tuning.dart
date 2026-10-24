@@ -23,6 +23,12 @@ class RecommendationTuning {
   /// How much a track with a high skip share is pushed down.
   final double skipPenalty;
 
+  /// The half-life of a skip: an old skip matters less than a recent one.
+  final int skipHalfLifeDays;
+
+  /// How much a track already in the queue is pushed down.
+  final double queuePenalty;
+
   /// How much a track without a cover is pushed down.
   ///
   /// This is a penalty rather than a base weight: the card is mostly cover,
@@ -50,6 +56,8 @@ class RecommendationTuning {
     this.favoriteBoost = 0.10,
     this.recentPenalty = 0.35,
     this.skipPenalty = 0.30,
+    this.skipHalfLifeDays = 90,
+    this.queuePenalty = 0.20,
     this.artworkPenalty = 0.10,
     this.dailyMixSize = 25,
     this.favoriteAnchors = 2,

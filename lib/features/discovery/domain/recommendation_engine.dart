@@ -27,9 +27,6 @@ class RecommendationEngine {
 
   final RecommendationTuning tuning;
 
-  /// How much a track already in the queue is pushed down.
-  static const double _queuePenalty = 0.20;
-
   DiscoveryOutput recommend({
     required List<Song> library,
     required Set<String> favoriteUris,
@@ -68,7 +65,7 @@ class RecommendationEngine {
     // library must not leave an empty page.
     for (final candidate in candidates) {
       if (!candidate.queued) continue;
-      candidate.score = (candidate.score - _queuePenalty)
+      candidate.score = (candidate.score - tuning.queuePenalty)
           .clamp(0.0, 1.0)
           .toDouble();
     }
