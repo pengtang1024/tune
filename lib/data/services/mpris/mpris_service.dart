@@ -65,6 +65,13 @@ abstract class MprisService {
   /// Publishes the current state of the player.
   Future<void> update(MprisSnapshot snapshot);
 
+  /// Keeps the place the playback reached up to date.
+  ///
+  /// The desktop polls the position, so the player answers it without
+  /// publishing anything: a signal per tick of the clock would flood the
+  /// bus.
+  void setPosition(Duration position);
+
   /// Releases the bus name and the registered object.
   Future<void> dispose();
 }

@@ -13,5 +13,8 @@ class MprisServiceImpl implements MprisService {
   Future<void> update(MprisSnapshot snapshot) async {}
 
   @override
+  void setPosition(Duration position) {}
+
+  @override
   Future<void> dispose() async {}
 }

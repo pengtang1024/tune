@@ -68,6 +68,12 @@ class MprisServiceImpl implements MprisService, MprisObjectDelegate {
   }
 
   @override
+  void setPosition(Duration position) {
+    if (_snapshot.position == position) return;
+    _snapshot = _snapshot.copyWith(position: position);
+  }
+
+  @override
   Future<void> update(MprisSnapshot snapshot) async {
     final object = _object;
     if (object == null) return;

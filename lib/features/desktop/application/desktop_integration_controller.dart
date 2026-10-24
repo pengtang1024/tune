@@ -54,6 +54,13 @@ class DesktopIntegrationController {
   bool _mediaControlsRunning = false;
   bool _trayRunning = false;
 
+  /// The state the media controls were last told about.
+  ///
+  /// The position is left out on purpose: it moves several times a second,
+  /// and the desktop polls it. Everything else changes every few seconds and
+  /// is worth a signal.
+  PlaybackState? _publishedState;
+
   final PlaybackTrackTracker _tracker = PlaybackTrackTracker();
   late final MprisStateMapper _mpris = MprisStateMapper(_tracker, artwork);
   late final DesktopWindow _window = DesktopWindow(
@@ -129,6 +136,9 @@ class DesktopIntegrationController {
     );
     _mediaControlsRunning = await mpris.start(backend);
     if (_mediaControlsRunning) {
+      // The controls are told everything once, so the next publication only
+      // carries what really changed.
+      _publishedState = playback.snapshot;
       await mpris.update(_mpris.snapshotFor(playback.snapshot));
     }
   }
@@ -138,11 +148,32 @@ class DesktopIntegrationController {
     final song = state.currentSong;
     final trackChanged = song != null && _tracker.remember(song);
     if (_mediaControlsRunning) {
-      await mpris.update(_mpris.snapshotFor(state));
+      if (_slowFieldsChanged(state)) {
+        _publishedState = state;
+        await mpris.update(_mpris.snapshotFor(state));
+      } else {
+        // Only the clock moved. The desktop asks the position for itself,
+        // so the player keeps it fresh and says nothing: a signal per tick
+        // would flood the bus.
+        mpris.setPosition(state.position);
+      }
     }
     if (_trayRunning && trackChanged) {
       await tray.setTooltip(trayTooltipFor(state));
     }
+  }
+
+  /// Whether anything but the position changed since the last publication.
+  bool _slowFieldsChanged(PlaybackState state) {
+    final previous = _publishedState;
+    if (previous == null) return true;
+    return previous.status != state.status ||
+        previous.currentUri != state.currentUri ||
+        previous.duration != state.duration ||
+        previous.volume != state.volume ||
+        previous.speed != state.speed ||
+        previous.playMode != state.playMode ||
+        !identical(previous.queue, state.queue);
   }
 
   // ---------------------------------------------------------------------------

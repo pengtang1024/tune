@@ -16,6 +16,9 @@ class FakeArtworkCache implements ArtworkCache {
   /// The addresses that were asked for, in order.
   final List<String> asked = [];
 
+  /// The addresses whose cover file was asked of the disk, in order.
+  final List<String> askedForFiles = [];
+
   @override
   Future<CoverImage> imageFor(String url) async {
     asked.add(url);
@@ -23,7 +26,10 @@ class FakeArtworkCache implements ArtworkCache {
   }
 
   @override
-  String? coverFileFor(String url) => cachedFiles[url];
+  String? coverFileFor(String url) {
+    askedForFiles.add(url);
+    return cachedFiles[url];
+  }
 
   @override
   void dispose() {}

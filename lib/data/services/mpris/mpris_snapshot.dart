@@ -123,4 +123,26 @@ class MprisSnapshot {
 
   /// Whether the position inside the track can be changed.
   final bool canSeek;
+
+  /// The same snapshot with the position replaced.
+  ///
+  /// The position is the one value that moves several times a second, and
+  /// the desktop polls it. The player keeps it fresh without rebuilding the
+  /// rest of the snapshot.
+  MprisSnapshot copyWith({Duration? position}) {
+    return MprisSnapshot(
+      status: status,
+      track: track,
+      position: position ?? this.position,
+      volume: volume,
+      rate: rate,
+      shuffle: shuffle,
+      loopStatus: loopStatus,
+      canPlay: canPlay,
+      canPause: canPause,
+      canGoNext: canGoNext,
+      canGoPrevious: canGoPrevious,
+      canSeek: canSeek,
+    );
+  }
 }

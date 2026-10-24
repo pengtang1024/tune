@@ -17,6 +17,14 @@ class MprisStateMapper {
   /// The covers that were fetched, so the desktop can be pointed at a file.
   final ArtworkCache _artwork;
 
+  /// The cover of the track that was asked for last.
+  ///
+  /// The address of the cover is asked of the disk, and the disk is slow
+  /// enough to be felt while the clock ticks. The mapper keeps the answer
+  /// of the current track instead of asking again on every tick.
+  String? _artUrl;
+  String? _artUrlKey;
+
   /// The state of the player in the words of the media controls.
   MprisSnapshot snapshotFor(PlaybackState state) {
     final song = state.currentSong;
@@ -65,7 +73,19 @@ class MprisStateMapper {
   /// open without asking the network: the file of the cover that was fetched
   /// before. A track whose cover was never fetched keeps the address of the
   /// picture on the network, because that is all there is to point at.
+  ///
+  /// The answer is kept for the track it belongs to: the file is asked of
+  /// the disk, and the mapper is called on every tick of the clock.
   String? _artUrlOf(Song song) {
+    final key = '${song.uri}|${song.artworkUrl}|${song.albumArtPath}';
+    if (key == _artUrlKey) return _artUrl;
+    _artUrlKey = key;
+    _artUrl = _resolveArtUrl(song);
+    return _artUrl;
+  }
+
+  /// Asks the disk where the cover of the track is.
+  String? _resolveArtUrl(Song song) {
     final local = song.albumArtPath;
     if (local != null && local.isNotEmpty) return Uri.file(local).toString();
     final remote = song.artworkUrl;

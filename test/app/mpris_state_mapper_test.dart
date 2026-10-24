@@ -134,6 +134,28 @@ void main() {
       expect(snapshot.track!.artUrl, 'https://host/cover.png');
     });
 
+    test('asks the disk for the cover once per track', () {
+      final cache = FakeArtworkCache(
+        cachedFiles: const {
+          'https://host/cover.png': '/library/.tune/artwork/ab/cover.img',
+        },
+      );
+      final mapper = MprisStateMapper(PlaybackTrackTracker(), cache);
+      final state = _state().copyWith(
+        queue: [song.copyWith(artworkUrl: 'https://host/cover.png')],
+        currentUri: song.uri,
+      );
+
+      // Ten ticks of the clock: the disk is asked once, not ten times.
+      for (var i = 0; i < 10; i++) {
+        mapper.snapshotFor(
+          state.copyWith(position: Duration(seconds: i)),
+        );
+      }
+
+      expect(cache.askedForFiles.length, 1);
+    });
+
     test('points at the file of the cover that was fetched', () {
       final mapper = MprisStateMapper(
         PlaybackTrackTracker(),
