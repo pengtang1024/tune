@@ -417,6 +417,8 @@ score(s) =
 - `freshness`：30 天线性衰减到 0；没有可靠的首次入库时间时不参与。
 - 今日混音只留最多 2 个标心锚点，不再用固定的 20% 名额；其他分段排除
   已标心的曲目。
+- 最后乘上健康度因子 `1 - 0.20 × (1 - health)`：健康来源不打折，故障来源最多
+  打八折；本地音乐按 1.0。
 - 分数相同用 `fnv1a(uri + 每日种子)` 稳定排序；哈希在排序前只算一次。
 
 ### 6.6 多样性与去重
@@ -484,7 +486,7 @@ score(s) =
 
 #### 来自 X
 
-- 按 `sourceId` 分组，保留候选 ≥ 5 首的来源，最多 2 段。
+- 按 `sourceId` 分组，保留候选 ≥ 5 首且健康度 ≥ 0.60 的来源，最多 2 段。
 - 每段 8 首，优先未标心、没听过的曲目；同歌手/专辑上限仍然生效。
 - 来源顺序沿用音源配置里的权重顺序；来源名从 `sourceLabelsOf` 取，
   不按 id 硬编码。
@@ -557,6 +559,31 @@ class RecommendationReason {
 - 撤销删除对应记录并重算；不做「全局撤销栈」。
 - 清除推荐记录同时清空单曲反馈、歌手反馈和播放记录；不影响喜欢。
 
+### 6.11 推荐权重与健康度权重是两套东西
+
+这两套数字很容易被看成一件事，但它们的归属和用途不同：
+
+| | 健康度权重 | 推荐权重 |
+| --- | --- | --- |
+| 类型 | `SourceHealthWeights` | `RecommendationTuning` |
+| 谁拥有 | 音源健康度（设置页「音源」） | 发现页推荐 |
+| 干什么 | 十二个维度怎么合成 0–100 的健康分 | 歌手、流派、质量、探索等怎么合成推荐分 |
+| 是否直接进推荐 | **不直接** | 是 |
+
+推荐只消费健康度系统的**输出** `SourceHealthReport.score`，由
+`sourceHealthScoresProvider` 归一化成 0–1。然后：
+
+```text
+healthFactor = 1 - 0.20 × (1 - sourceHealth)
+score = baseScore × healthFactor
+```
+
+- `sourceHealthWeight = 0.20` 是推荐自己的权重，不是健康度维度权重。
+- 本地音乐固定 1.0；未知来源按 0.5 处理；`healthy < 0.60` 的来源不单独
+  出「来自 X」分段。
+- 健康度权重继续由音源页管理，推荐不复制、不修改它。
+- 在线「找更多」是显式搜索，不受健康度降权影响。
+
 ## 7. 架构设计
 
 ### 7.1 目录
@@ -624,6 +651,7 @@ DiscoveryPane
   │     └── RecommendationEngine     （纯函数）
   ├── SettingsController             （双击只标心、播放记录开关）
   ├── PlaybackController             （只读队列身份，用于队列感知）
+  ├── sourceHealthScoresProvider     （只读健康度分数，不读健康度权重）
   └── ListPlayback / PlaybackController（播放与入队）
 
 DiscoverySignalObserver
@@ -822,6 +850,7 @@ class RecommendationEngine {
 | `lib/config/app_initializer.dart` | 启动播放观察器 |
 | `lib/l10n/app_zh_CN.arb` 等四份 + 生成产物 | 发现页与设置卡文案 |
 | `lib/features/library/application/library_controller.dart` | 第 7.7 节 `dateAdded` 修正 |
+| `lib/features/sources/application/source_health_scores.dart` | 健康度分数供推荐读取 |
 | `docs/architecture.md` | 状态归属与持久化表补行 |
 | `README.md` / `README_en.md` / `CHANGELOG.md` | 功能列表与更新记录 |
 
@@ -854,6 +883,7 @@ M1–M5 已作为 v1 交付。
 - 队列里的曲目降权但不隐藏；全库都在队列时页面仍然有内容；
 - 旧的跳过比最近的跳过扣分更少；
 - 今日混音相邻曲目不重复歌手；
+- 健康来源的曲目分数高于故障来源；故障来源不单独出分段；
 - 不感兴趣被排除，撤销后恢复；
 - 同一天同样输入结果稳定；不同日期或刷新盐值结果变化；
 - 缺流派、缺年份、空歌手不崩；

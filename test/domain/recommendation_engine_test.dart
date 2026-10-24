@@ -46,6 +46,7 @@ void main() {
     Set<String> dismissedArtists = const {},
     Set<String> queued = const {},
     Map<String, TrackListening> listening = const {},
+    Map<String, double> sourceHealth = const {},
     List<String> sourceOrder = const [],
     bool allowFresh = false,
     int salt = 0,
@@ -62,6 +63,7 @@ void main() {
       dismissedUris: dismissed,
       dismissedArtists: dismissedArtists,
       queuedUris: queued,
+      sourceHealth: sourceHealth,
       listening: listening,
       sourceOrder: sourceOrder,
       dateKey: '2026-10-24',
@@ -383,5 +385,40 @@ void main() {
     );
 
     expect(old.score, greaterThan(recent.score));
+  });
+
+  test('an unhealthy source loses recommendation weight', () {
+    final library = [
+      for (var index = 0; index < 10; index++)
+        song(
+          index,
+          artist: 'Artist $index',
+          album: 'Album $index',
+          sourceId: index < 5 ? 'healthy' : 'broken',
+        ),
+    ];
+    final output = recommend(
+      library: library,
+      sourceHealth: {'healthy': 1.0, 'broken': 0.0},
+      sourceOrder: ['healthy', 'broken'],
+    );
+    final daily = output.sections.firstWhere(
+      (section) => section.kind == DiscoverySectionKind.dailyMix,
+    );
+    final healthy = daily.tracks.firstWhere(
+      (track) => track.song.sourceId == 'healthy',
+    );
+    final broken = daily.tracks.firstWhere(
+      (track) => track.song.sourceId == 'broken',
+    );
+
+    expect(healthy.score, greaterThan(broken.score));
+    final sourceSections = output.sections.where(
+      (section) => section.kind == DiscoverySectionKind.source,
+    );
+    expect(
+      sourceSections.every((section) => section.reason.sourceId == 'healthy'),
+      isTrue,
+    );
   });
 }

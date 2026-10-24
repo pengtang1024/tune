@@ -29,6 +29,15 @@ class RecommendationTuning {
   /// How much a track already in the queue is pushed down.
   final double queuePenalty;
 
+  /// How much the health of a source can lower a track's score.
+  ///
+  /// This consumes the score produced by the source health system; it is not
+  /// a second copy of that system's dimension weights.
+  final double sourceHealthWeight;
+
+  /// The lowest health a source needs before its own shelf is shown.
+  final double sourceShelfMinHealth;
+
   /// How much a track without a cover is pushed down.
   ///
   /// This is a penalty rather than a base weight: the card is mostly cover,
@@ -58,6 +67,8 @@ class RecommendationTuning {
     this.skipPenalty = 0.30,
     this.skipHalfLifeDays = 90,
     this.queuePenalty = 0.20,
+    this.sourceHealthWeight = 0.20,
+    this.sourceShelfMinHealth = 0.60,
     this.artworkPenalty = 0.10,
     this.dailyMixSize = 25,
     this.favoriteAnchors = 2,

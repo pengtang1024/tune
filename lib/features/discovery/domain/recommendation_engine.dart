@@ -34,6 +34,7 @@ class RecommendationEngine {
     required Set<String> dismissedUris,
     Set<String> dismissedArtists = const {},
     Set<String> queuedUris = const {},
+    Map<String, double> sourceHealth = const {},
     required List<String> sourceOrder,
     required String dateKey,
     Map<String, TrackListening> listening = const {},
@@ -58,6 +59,7 @@ class RecommendationEngine {
       profile: profile,
       allowFresh: allowFresh,
       now: clock,
+      sourceHealth: sourceHealth,
       tuning: tuning,
     );
     // The queue is what the reader is already about to hear. Push its tracks
@@ -114,6 +116,8 @@ class RecommendationEngine {
       buildSourceSections(
         candidates: sorted,
         sourceOrder: sourceOrder,
+        sourceHealth: sourceHealth,
+        tuning: tuning,
         seen: seen,
       ),
     );

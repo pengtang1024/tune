@@ -2,6 +2,7 @@ import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/domain/recommendation_candidate.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/recommendation_scoring.dart';
+import 'package:tune/features/discovery/domain/recommendation_tuning.dart';
 import 'package:tune/features/discovery/domain/recommendation_selection.dart';
 
 DiscoverySection? buildFreshSection({
@@ -48,6 +49,8 @@ DiscoverySection? buildFreshSection({
 List<DiscoverySection> buildSourceSections({
   required List<RecommendationCandidate> candidates,
   required List<String> sourceOrder,
+  Map<String, double> sourceHealth = const {},
+  RecommendationTuning tuning = RecommendationTuning.defaults,
   required Set<String> seen,
 }) {
   final groups = <String, List<RecommendationCandidate>>{};
@@ -78,6 +81,8 @@ List<DiscoverySection> buildSourceSections({
     if (sections.length >= 2) break;
     final pool = groups[sourceId]!;
     if (pool.length < 5) continue;
+    final health = sourceHealth[sourceId] ?? 0.5;
+    if (health < tuning.sourceShelfMinHealth) continue;
 
     final localSeen = {...seen};
     final selected = RecommendationSelection.take(

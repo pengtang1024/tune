@@ -15,6 +15,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/application/source_health_scores.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -74,6 +75,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     final queue = ref.watch(
       playbackControllerProvider.select((state) => state.queue),
     );
+    final sourceHealth = ref.watch(sourceHealthScoresProvider);
     final useListening = ref.watch(
       settingsControllerProvider.select((state) => state.useListeningHistory),
     );
@@ -86,6 +88,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       favoriteUris: favoriteUris,
       sourceOrder: _sourceOrderOf(sourceOrderKey),
       queuedUris: {for (final song in queue) song.uri},
+      sourceHealth: sourceHealth,
     );
   }
 
@@ -268,6 +271,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
           for (final song in ref.read(playbackControllerProvider).queue)
             song.uri,
         },
+        sourceHealth: ref.read(sourceHealthScoresProvider),
       ),
     );
   }
@@ -277,6 +281,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     required Set<String> favoriteUris,
     required List<String> sourceOrder,
     required Set<String> queuedUris,
+    required Map<String, double> sourceHealth,
   }) {
     if (library.isLoading && !library.hasValue) {
       return const DiscoveryState(isLoading: true);
@@ -312,6 +317,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
             dismissedUris: _feedback.keys.toSet(),
             dismissedArtists: _artistFeedback.keys.toSet(),
             queuedUris: queuedUris,
+            sourceHealth: sourceHealth,
             listening: _listening,
             sourceOrder: sourceOrder,
             dateKey: dateKey,

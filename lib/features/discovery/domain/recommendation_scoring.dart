@@ -12,6 +12,7 @@ void scoreCandidates(
   required TasteProfile profile,
   required bool allowFresh,
   required DateTime now,
+  Map<String, double> sourceHealth = const {},
   RecommendationTuning tuning = RecommendationTuning.defaults,
 }) {
   for (final candidate in candidates) {
@@ -24,6 +25,8 @@ void scoreCandidates(
     final freshness = allowFresh ? freshnessOf(candidate.song, now) : 0.0;
     final recent = _recentPenalty(candidate, now, tuning.recentDays);
     final skip = _skipPenalty(candidate, now, tuning.skipHalfLifeDays);
+    final health = _sourceHealthOf(candidate.song.sourceId, sourceHealth);
+    final healthFactor = 1 - tuning.sourceHealthWeight * (1 - health);
     final missingArtwork = candidate.song.hasArtwork ? 0.0 : 1.0;
 
     final base =
@@ -40,7 +43,8 @@ void scoreCandidates(
     candidate.novelty = novelty;
     candidate.recentPenalty = recent;
     candidate.skipPenalty = skip;
-    candidate.score =
+    candidate.sourceHealth = health;
+    final baseScore =
         (base +
                 favorite -
                 tuning.recentPenalty * recent -
@@ -48,6 +52,7 @@ void scoreCandidates(
                 tuning.artworkPenalty * missingArtwork)
             .clamp(0.0, 1.0)
             .toDouble();
+    candidate.score = (baseScore * healthFactor).clamp(0.0, 1.0).toDouble();
     candidate.reason = _reasonFor(candidate, profile, now);
   }
 }
@@ -198,4 +203,9 @@ String _strongestGenreKey(
     }
   }
   return best;
+}
+
+double _sourceHealthOf(String? sourceId, Map<String, double> scores) {
+  if (sourceId == null || sourceId.isEmpty || sourceId == 'local') return 1;
+  return (scores[sourceId] ?? 0.5).clamp(0.0, 1.0).toDouble();
 }

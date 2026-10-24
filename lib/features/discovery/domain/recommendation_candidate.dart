@@ -19,6 +19,7 @@ class RecommendationCandidate {
   double novelty = 0;
   double recentPenalty = 0;
   double skipPenalty = 0;
+  double sourceHealth = 1;
   int tieBreak = 0;
   RecommendationReason reason = const RecommendationReason.fallback();
 
