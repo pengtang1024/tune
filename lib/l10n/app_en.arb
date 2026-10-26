@@ -956,6 +956,8 @@
   "discoverAddAllShort": "Queue",
   "discoverPlayAll": "Play all",
   "discoverAddAllToQueue": "Queue all",
+  "discoverShelfBack": "Previous",
+  "discoverShelfForward": "Next",
   "discoverMoreActions": "More actions",
   "discoverDismiss": "Not interested",
   "discoverDismissed": "Fewer picks like “{title}”",

@@ -956,6 +956,8 @@
   "discoverAddAllShort": "加入队列",
   "discoverPlayAll": "播放全部",
   "discoverAddAllToQueue": "全部加入队列",
+  "discoverShelfBack": "上一组",
+  "discoverShelfForward": "下一组",
   "discoverMoreActions": "更多操作",
   "discoverDismiss": "不感兴趣",
   "discoverDismissed": "已减少「{title}」的推荐",

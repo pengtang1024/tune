@@ -956,6 +956,8 @@
   "discoverAddAllShort": "加入佇列",
   "discoverPlayAll": "播放全部",
   "discoverAddAllToQueue": "全部加入佇列",
+  "discoverShelfBack": "上一組",
+  "discoverShelfForward": "下一組",
   "discoverMoreActions": "更多操作",
   "discoverDismiss": "不感興趣",
   "discoverDismissed": "已減少「{title}」的推薦",

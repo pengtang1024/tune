@@ -1842,6 +1842,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverAddAllToQueue => '全部加入队列';
 
   @override
+  String get discoverShelfBack => '上一组';
+
+  @override
+  String get discoverShelfForward => '下一组';
+
+  @override
   String get discoverMoreActions => '更多操作';
 
   @override
@@ -3855,6 +3861,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverAddAllToQueue => '全部加入队列';
 
   @override
+  String get discoverShelfBack => '上一组';
+
+  @override
+  String get discoverShelfForward => '下一组';
+
+  @override
   String get discoverMoreActions => '更多操作';
 
   @override
@@ -5866,6 +5878,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverAddAllToQueue => '全部加入佇列';
+
+  @override
+  String get discoverShelfBack => '上一組';
+
+  @override
+  String get discoverShelfForward => '下一組';
 
   @override
   String get discoverMoreActions => '更多操作';
