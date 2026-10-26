@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app.dart';
+import 'package:tune/app/licenses.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerThirdPartyLicenses();
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);

@@ -97,4 +97,7 @@ flutter build linux --debug
 
 ## 许可证
 
-[MIT License](LICENSE)
+Tune 的源代码采用 [MIT License](LICENSE)。内置字体采用 SIL OFL-1.1；Dart/Flutter
+依赖的许可证随安装包的 `NOTICES` 分发；Linux 播放依赖系统的 libmpv（Ubuntu 打包为
+GPL-3+，不随 Tune 分发）。完整的第三方声明见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

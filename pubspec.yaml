@@ -127,7 +127,13 @@ flutter:
   # 添加assets配置
   assets:
     - assets/icons/
-    - assets/js/
+    - LICENSE
+    - THIRD_PARTY_NOTICES.md
+    - assets/fonts/Fraunces/OFL.txt
+    - assets/fonts/InstrumentSans/OFL.txt
+    - assets/fonts/JetBrainsMono/OFL.txt
+    - assets/fonts/NotoSansSC/OFL.txt
+    - assets/fonts/NotoSerifSC/OFL.txt
   fonts:
     - family: Fraunces
       fonts:

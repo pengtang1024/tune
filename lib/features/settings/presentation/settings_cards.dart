@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/locale_labels.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
+import 'package:tune/features/settings/presentation/licenses_button.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -342,47 +343,57 @@ class SettingsAboutCard extends StatelessWidget {
       eyebrow: context.loc.about,
       title: context.loc.appName,
       description: context.loc.appTagline,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              Icons.graphic_eq_rounded,
-              size: CompactTokens.icon28,
-              color: theme.colorScheme.onPrimary,
-            ),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Text(
-              'v$version',
-              style: CompactTypography.mono(
-                theme.colorScheme.onSurfaceVariant,
-                size: CompactTypeScale.mark,
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.graphic_eq_rounded,
+                  size: CompactTokens.icon28,
+                  color: theme.colorScheme.onPrimary,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          TuneTooltip(
-            message: context.loc.settingsLocalFirst,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(999),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Text(
+                  'v$version',
+                  style: CompactTypography.mono(
+                    theme.colorScheme.onSurfaceVariant,
+                    size: CompactTypeScale.mark,
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.verified_rounded,
-                size: CompactTokens.icon14,
-                color: theme.colorScheme.primary,
+              const SizedBox(width: 10),
+              TuneTooltip(
+                message: context.loc.settingsLocalFirst,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Icon(
+                    Icons.verified_rounded,
+                    size: CompactTokens.icon14,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
+          const SizedBox(height: 10),
+          LicensesButton(version: version),
         ],
       ),
     );
