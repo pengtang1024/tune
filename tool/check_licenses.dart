@@ -74,6 +74,9 @@ void main() {
   }
 
   for (final line in _gitFiles()) {
+    // The checker itself lists the forbidden names; reading it would make the
+    // guard flag its own denylist.
+    if (line == 'tool/check_licenses.dart') continue;
     final file = File(line);
     if (!file.existsSync() || !_isSource(line)) continue;
     final text = file.readAsStringSync();
