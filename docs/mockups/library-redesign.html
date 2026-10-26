@@ -1,0 +1,1887 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Tune · 音乐库改版线框稿</title>
+<style>
+@font-face{font-family:Fraunces;src:url("../../assets/fonts/Fraunces/Fraunces-Variable.ttf") format("truetype");font-weight:100 900;}
+@font-face{font-family:Instrument;src:url("../../assets/fonts/InstrumentSans/InstrumentSans-Variable.ttf") format("truetype");font-weight:100 900;}
+@font-face{font-family:JetBrains;src:url("../../assets/fonts/JetBrainsMono/JetBrainsMono-Regular.ttf") format("truetype");font-weight:400;}
+@font-face{font-family:JetBrains;src:url("../../assets/fonts/JetBrainsMono/JetBrainsMono-Medium.ttf") format("truetype");font-weight:500;}
+@font-face{font-family:NotoSerifSC;src:url("../../assets/fonts/NotoSerifSC/NotoSerifSC-VF.ttf") format("truetype");font-weight:100 900;}
+@font-face{font-family:NotoSansSC;src:url("../../assets/fonts/NotoSansSC/NotoSansSC-VF.ttf") format("truetype");font-weight:100 900;}
+
+:root{
+  --bg:#11100e; --panel:#191713; --panel-high:#211e19; --text:#f2ebdd;
+  --muted:#a59b8c; --border:#2c2822; --primary:#ff6b48; --moss:#a9be93;
+  --surface-high:#2a2620; --on-primary:#1b0e0a;
+  --serif:Fraunces,"NotoSerifSC",serif;
+  --sans:Instrument,"NotoSansSC",sans-serif;
+  --mono:JetBrains,"NotoSansSC",monospace;
+}
+*{box-sizing:border-box}
+.i{width:16px;height:16px;display:block;fill:currentColor;flex:0 0 auto}
+body{margin:0;background:#0b0a09;color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.page-head{padding:44px 48px 8px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--primary)}
+.page-head h1{font-family:var(--serif);font-weight:600;font-size:34px;margin:6px 0 8px;font-variation-settings:"SOFT" 100,"WONK" 1}
+.page-head p{margin:0;max-width:760px;color:var(--muted);font-size:13px;line-height:1.7}
+.shot{padding:28px 48px 12px;overflow-x:auto}
+.shot h2{font-family:var(--mono);font-size:11px;letter-spacing:1.6px;color:var(--muted);font-weight:500;margin:0 0 10px;text-transform:uppercase}
+.shot .note{color:var(--muted);font-size:12px;margin:10px 0 0}
+.window{background:var(--bg);border:1px solid #33302a;border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45);display:flex;flex-direction:column}
+.titlebar{height:30px;flex:0 0 30px;background:#181614;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #23211d}
+.titlebar .name{font-size:12px;color:#d8d0c2;flex:1;text-align:center}
+.titlebar .lights{display:flex;gap:14px;color:#8c8478;font-family:var(--mono);font-size:12px;min-width:56px;justify-content:flex-end}
+.shell{display:flex;flex:1;min-height:0;position:relative}
+.sidebar{width:196px;flex:0 0 196px;background:#151310;border-right:1px solid var(--border);padding:20px 20px 16px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,#ff7a5a,#e04a28);display:grid;place-items:center;color:#240d07}
+.brand .word{font-family:var(--serif);font-size:23px;font-weight:600}
+.nav-label{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;color:#7c7468;margin:30px 0 8px}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:7px;font-size:13px;color:#d9d1c3;margin-bottom:2px}
+.nav .i{width:15px;height:15px;color:#a59b8c}
+.nav.on{background:rgba(255,107,72,.13);color:var(--primary)}
+.nav.on .i{color:var(--primary)}
+.sidebar .push{flex:1}
+.sidebar .foot{font-family:var(--mono);font-size:10px;line-height:1.6;color:#7c7468}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 24px 0}
+.header{height:40px;flex:0 0 40px;display:flex;align-items:center;gap:8px}
+.header h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0;line-height:1;font-variation-settings:"SOFT" 100,"WONK" 1;white-space:nowrap}
+.summary{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.summary b{font-weight:500;color:#d8d0c2}
+.header .spacer{flex:1}
+.hbtn{height:34px;display:inline-flex;align-items:center;gap:7px;padding:0 12px;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;background:transparent}
+.hbtn .i{width:16px;height:16px;color:#d8d0c2}
+.hbtn.icon{width:34px;padding:0;justify-content:center}
+.toolbar{height:34px;flex:0 0 34px;display:flex;align-items:center;gap:8px;margin:4px 0 8px}
+.search{flex:1 1 auto;max-width:680px;height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:#8c8478;font-size:12px}
+.search .i{width:15px;height:15px;color:var(--muted)}
+.chip{height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--panel);font-size:12px;color:#d8d0c2;white-space:nowrap}
+.chip .i{width:14px;height:14px;color:var(--muted)}
+.chip .val{color:var(--text)}
+.chip.sort{margin-left:0}
+.toolbar .filter{margin-left:auto}
+.seg{height:34px;display:flex;align-items:center;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--panel);gap:2px}
+.seg .b{width:34px;height:28px;display:grid;place-items:center;border-radius:6px;color:var(--muted)}
+.seg .b .i{width:15px;height:15px}
+.seg .b.on{background:rgba(255,107,72,.14);color:var(--primary)}
+.narrow .colhead{grid-template-columns:22px 24px minmax(0,5fr) minmax(0,3fr) 102px}
+.narrow .row{grid-template-columns:22px 24px minmax(0,5fr) minmax(0,3fr) 102px}
+.narrow .album,.narrow .added{display:none}
+.colhead{height:26px;flex:0 0 26px;display:grid;grid-template-columns:22px 24px minmax(0,5fr) minmax(0,3fr) minmax(0,3fr) 56px 102px;column-gap:10px;align-items:center;padding:0 8px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:.4px;color:#8c8478}
+.colhead .lbl{display:flex;align-items:center;gap:4px}
+.colhead .lbl.active{color:#e7dfd1}
+.colhead .lbl .i{width:11px;height:11px;color:var(--primary)}
+.colhead .num{justify-self:end}
+.tailhead{text-align:right;padding-right:34px}
+.rows{flex:1;min-height:0;overflow:hidden}
+.row{height:32px;display:grid;grid-template-columns:22px 24px minmax(0,5fr) minmax(0,3fr) minmax(0,3fr) 56px 102px;column-gap:10px;align-items:center;padding:0 8px;border-bottom:1px solid #221f1a;position:relative}
+.row .pos{font-family:var(--mono);font-size:10px;color:#7c7468;text-align:center}
+.row .art{width:24px;height:24px;border-radius:5px;background:linear-gradient(150deg,#2b2722,#1d1a16);border:1px solid #2f2b25}
+.row .title{font-size:13px;font-weight:500;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.row .artist,.row .album{font-size:11px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.row .added{font-family:var(--mono);font-size:10px;color:#8c8478;white-space:nowrap}
+.row .dur{font-family:var(--mono);font-size:10px;color:#a59b8c;text-align:right}
+.act{width:24px;height:24px;display:grid;place-items:center;border-radius:5px;color:#8c8478}
+.act .i{width:15px;height:15px}
+.act.liked{color:var(--primary)}
+.tail{position:relative;height:32px}
+.tail .rest,.tail .hoveracts{position:absolute;right:0;top:0;height:32px;display:flex;align-items:center}
+.tail .rest{gap:8px;opacity:1}
+.tail .hoveracts{gap:4px;opacity:0}
+.row:hover .tail .rest,.row.hovered .tail .rest,.row.playing .tail .rest{opacity:0}
+.row:hover .tail .hoveracts,.row.hovered .tail .hoveracts,.row.playing .tail .hoveracts{opacity:1}
+.row:hover{background:rgba(255,107,72,.04)}
+.row.playing{background:rgba(255,107,72,.06)}
+.row.playing:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--primary)}
+.row.playing .title{color:var(--primary);font-weight:600}
+.row.playing .pos{color:var(--primary)}
+.row .pos .i{width:14px;height:14px}
+.src{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;border:1px solid}
+.src .i{width:11px;height:11px}
+.src.local{color:#a59b8c;border-color:rgba(165,155,140,.28);background:rgba(165,155,140,.08)}
+.src.netease{color:var(--moss);border-color:rgba(169,190,147,.3);background:rgba(169,190,147,.08)}
+.src.archive{color:var(--primary);border-color:rgba(255,107,72,.3);background:rgba(255,107,72,.08)}
+.dock{flex:0 0 88px;height:88px;margin:0 0 12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;padding:0 16px;gap:16px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.dock .now{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+.dock .cover{width:54px;height:54px;border-radius:10px;background:linear-gradient(145deg,#4a2b20,#211512);border:1px solid #33291f;flex:0 0 54px}
+.dock .t{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock .a{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px}
+.dock .center{width:230px;flex:0 0 230px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.dock .transport{display:flex;align-items:center;gap:14px;color:#d8d0c2}
+.dock .transport .i{width:16px;height:16px}
+.dock .play{width:34px;height:34px;border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center}
+.dock .play .i{width:18px;height:18px}
+.dock .progress{display:flex;align-items:center;gap:8px;width:100%;font-family:var(--mono);font-size:9px;color:#8c8478}
+.dock .track{flex:1;height:3px;border-radius:2px;background:#332e27;position:relative}
+.dock .track:before{content:"";position:absolute;left:0;top:0;bottom:0;width:18%;background:var(--primary);border-radius:2px}
+.dock .track:after{content:"";position:absolute;left:18%;top:-3px;width:9px;height:9px;border-radius:50%;background:var(--primary)}
+.dock .right{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:14px;color:#8c8478}
+.dock .right .i{width:16px;height:16px}
+.dock .vol{width:64px;height:3px;border-radius:2px;background:#332e27;position:relative}
+.dock .vol:before{content:"";position:absolute;left:0;top:0;bottom:0;width:70%;background:var(--moss);border-radius:2px}
+.dock .vol:after{content:"";position:absolute;left:70%;top:-3px;width:9px;height:9px;border-radius:50%;background:var(--text)}
+.duo{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;grid-auto-rows:40px;align-items:start}
+.duo .row{grid-template-columns:18px 28px minmax(0,1fr) 72px;column-gap:8px;padding:0 6px;height:40px;align-items:center}
+.duo .row .art{width:28px;height:28px}
+.duo .row .celltext{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.duo .row .title{font-size:13px}
+.duo .row .line2{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.duo .row .line2 .dot{color:#5f574c}
+.duo .row .line2 .src{width:14px;height:14px;flex:0 0 14px}
+.duo .row .line2 .src .i{width:9px;height:9px}
+.duo .row .album{font-size:10px;color:#8c8478;overflow:hidden;text-overflow:ellipsis}
+.duo .row .end{height:100%;position:relative;display:flex;align-items:center;justify-content:flex-end}
+.duo .row .end .dur{position:absolute;right:26px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.duo .row .end .acts{position:absolute;right:0;top:50%;transform:translateY(-50%);opacity:0;display:flex;gap:4px}
+.duo .row:hover .end .acts,.duo .row.playing .end .acts{opacity:1}
+.duo .row:hover .end .dur,.duo .row.playing .end .dur{opacity:0}
+.duo .row .end .heart{position:absolute;right:0;top:50%;transform:translateY(-50%);opacity:1}
+.duo .row:hover .end .heart,.duo .row.playing .end .heart{opacity:0}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin:14px 0 0;color:var(--muted);font-size:12px}
+.legend b{color:var(--text);font-weight:500}
+.footer{padding:36px 48px 64px;color:#7c7468;font-family:var(--mono);font-size:11px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2zM7 5h14v2H7V5zm0 6h14v2H7v-2zm0 6h14v2H7v-2z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></symbol>
+  <symbol id="i-columns" viewBox="0 0 24 24"><path d="M3 3h4v18H3V3zm7 0h4v18h-4V3zm7 0h4v18h-4V3z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.93 6h-2.95a15.7 15.7 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a8.1 8.1 0 0 1 0-4h3.38a16.6 16.6 0 0 0 0 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 0 1 5.07 16zm2.95-8H5.07a8.03 8.03 0 0 1 4.33-3.56A15.7 15.7 0 0 0 8.02 8zM12 19.96a13.9 13.9 0 0 1-1.91-3.96h3.82a13.9 13.9 0 0 1-1.91 3.96zM14.34 14H9.66a14.7 14.7 0 0 1 0-4h4.68a14.7 14.7 0 0 1 0 4zm.64 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14a16.6 16.6 0 0 0 0-4h3.38a8.1 8.1 0 0 1 0 4h-3.38z"/></symbol>
+  <symbol id="i-heart-filled" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+  <symbol id="i-eq" viewBox="0 0 24 24"><path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></symbol>
+  <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.47 4.47 0 0 0 16.5 12zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></symbol>
+  <symbol id="i-queue" viewBox="0 0 24 24"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18A3 3 0 1 0 19 17V8h3V6h-5z"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19z"/></symbol>
+  <symbol id="i-library" viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 5h-3v5.5a2.5 2.5 0 1 1-2.5-2.5c.57 0 1.08.19 1.5.51V5h4v2zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"/></symbol>
+  <symbol id="i-podcast" viewBox="0 0 24 24"><path d="M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm-2-9a9 9 0 0 0-9 9H1a11 11 0 0 1 22 0h-2a9 9 0 0 0-9-9zm0 4a5 5 0 0 0-5 5H5a7 7 0 0 1 14 0h-2a5 5 0 0 0-5-5z"/></symbol>
+  <symbol id="i-tune" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></symbol>
+  <symbol id="i-sort-down" viewBox="0 0 24 24"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></symbol>
+  <symbol id="i-sort-up" viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></symbol>
+</svg>
+
+<div class="page-head">
+  <div class="kicker">TUNE / LIBRARY / PROPOSAL</div>
+  <h1>音乐库改版 · 线框稿</h1>
+  <p>只表达层级、列与密度，不表达最终像素。可把鼠标放到行上看动作如何出现。设计说明见 <code>docs/library-redesign.md</code>。</p>
+</div>
+<section class="shot"><h2>现在 · 900×600</h2><img src="library-before.png" alt="当前音乐库界面 900×600" style="width:900px;border-radius:10px;border:1px solid #33302a;display:block"><p class="note">每个行尾有三个常驻动作和 1–4 个无字事实图标；没有列头，没有排序，首屏 12.8 行。</p></section><section class="shot"><h2>提案 · 900×600 · 窄窗</h2>
+    <div class="window narrow" style="width:900px;height:630px">
+      <div class="titlebar"><div style="min-width:56px"></div><div class="name">Tune</div><div class="lights">− □ ✕</div></div>
+      <div class="shell">
+        
+      <div class="sidebar">
+        <div class="brand"><div class="mark"><svg class="i "><use href="#i-tune"/></svg></div><div class="word">Tune</div></div>
+        <div class="nav-label">浏览</div>
+        <div class="nav"><svg class="i "><use href="#i-compass"/></svg><span>发现</span></div>
+        <div class="nav on"><svg class="i "><use href="#i-library"/></svg><span>音乐库</span></div>
+        <div class="nav"><svg class="i "><use href="#i-heart"/></svg><span>喜欢</span></div>
+        <div class="nav-label">连接</div>
+        <div class="nav"><svg class="i "><use href="#i-podcast"/></svg><span>音源</span></div>
+        <div class="push"></div>
+        <div class="nav"><svg class="i "><use href="#i-tune"/></svg><span>设置</span></div>
+        <div class="foot">本地 + 在线<br>Tune 桌面版 · 1.2.0</div>
+      </div>
+        <div class="main">
+          
+      <div class="header">
+        <h2>音乐库</h2>
+        <div class="summary"><b>219</b> 首 · <b>64</b> 张专辑 · <b>9</b> 个来源</div>
+        <div class="spacer"></div>
+        <div class="hbtn"><svg class="i "><use href="#i-globe"/></svg><span>在线搜索</span></div>
+        <div class="hbtn icon"><svg class="i "><use href="#i-more"/></svg></div>
+      </div>
+          
+      <div class="toolbar">
+        <div class="search"><svg class="i "><use href="#i-search"/></svg><span>搜索</span></div>
+        <div class="chip filter"><svg class="i "><use href="#i-filter"/></svg><span class="val">全部来源</span><svg class="i "><use href="#i-chevron"/></svg></div>
+        <div class="chip sort"><span class="val">最近加入</span><svg class="i "><use href="#i-sort-down"/></svg></div>
+        
+        <div class="seg">
+          <div class="b on"><svg class="i "><use href="#i-list"/></svg></div>
+          
+          <div class="b"><svg class="i "><use href="#i-grid"/></svg></div>
+        </div>
+      </div>
+          <div class="colhead"><div class="lbl">#</div><div></div><div class="lbl">标题</div><div class="lbl">艺术家</div><div class="tailhead">时长</div></div>
+          <div class="rows">
+        <div class="row">
+          <div class="pos">1</div>
+          <div class="art"></div>
+          <div class="title">Anchors Aweigh</div>
+          <div class="artist">Charles A. Zimmerman</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:32</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row playing">
+          <div class="pos"><svg class="i "><use href="#i-eq"/></svg></div>
+          <div class="art"></div>
+          <div class="title">“Blow The Man Down” (sea chantey)</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:49</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">3</div>
+          <div class="art"></div>
+          <div class="title">“Call to Statesmanship” and “Presidential Proclamations”</div>
+          <div class="artist">U.S. Army Band</div>
+          <div class="album">Ceremonial Music</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">4</div>
+          <div class="art"></div>
+          <div class="title">Die Stem van Suid-Afrika</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">Volksliedere</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:03</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row hovered">
+          <div class="pos">5</div>
+          <div class="art"></div>
+          <div class="title">“Dunken Sailor” sung by the USNA’s Midshipmen</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">2:42</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">6</div>
+          <div class="art"></div>
+          <div class="title">Eternal Father Strong To Save</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Naval Hymns</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:07</div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">7</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">Disasterpeace</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:53</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">8</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:06</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">9</div>
+          <div class="art"></div>
+          <div class="title">London Town (You haunt me)</div>
+          <div class="artist">A. E. Illingworth</div>
+          <div class="album">British Folk</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">3:11</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">10</div>
+          <div class="art"></div>
+          <div class="title">Navy Blue and Gold</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">11</div>
+          <div class="art"></div>
+          <div class="title">“Nkosi Sikelel’ iAfrika”</div>
+          <div class="artist">Melodie: trad.; Satz: Enoch Sontonga</div>
+          <div class="album">Hymns of the World</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">12</div>
+          <div class="art"></div>
+          <div class="title">“O Tannenbaum”</div>
+          <div class="artist">Melodie: trad.; Satz: Ernst Anschütz</div>
+          <div class="album">Winter Songs</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">0:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">13</div>
+          <div class="art"></div>
+          <div class="title">The Star-Spangled Banner</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-03</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:28</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div></div>
+          
+      <div class="dock">
+        <div class="now">
+          <div class="cover"></div>
+          <div style="min-width:0">
+            <div class="t">DANGR (mx) - Alicia</div>
+            <div class="a">DANGR</div>
+          </div>
+        </div>
+        <div class="center">
+          <div class="transport">
+            <svg class="i "><use href="#i-shuffle"/></svg><svg class="i "><use href="#i-prev"/></svg>
+            <div class="play"><svg class="i "><use href="#i-play"/></svg></div>
+            <svg class="i "><use href="#i-next"/></svg>
+          </div>
+          <div class="progress"><span>0:00</span><div class="track"></div><span>5:20</span></div>
+        </div>
+        <div class="right"><svg class="i "><use href="#i-volume"/></svg><div class="vol"></div><svg class="i "><use href="#i-heart"/></svg><svg class="i "><use href="#i-queue"/></svg></div>
+      </div>
+        </div>
+      </div>
+    </div><p class="note">专辑与加入时间未到断点，自动收起；页头只剩标题、统计、在线搜索与 ⋯。</p></section><section class="shot"><h2>提案 · 1120×760 · 默认</h2>
+    <div class="window" style="width:1120px;height:790px">
+      <div class="titlebar"><div style="min-width:56px"></div><div class="name">Tune</div><div class="lights">− □ ✕</div></div>
+      <div class="shell">
+        
+      <div class="sidebar">
+        <div class="brand"><div class="mark"><svg class="i "><use href="#i-tune"/></svg></div><div class="word">Tune</div></div>
+        <div class="nav-label">浏览</div>
+        <div class="nav"><svg class="i "><use href="#i-compass"/></svg><span>发现</span></div>
+        <div class="nav on"><svg class="i "><use href="#i-library"/></svg><span>音乐库</span></div>
+        <div class="nav"><svg class="i "><use href="#i-heart"/></svg><span>喜欢</span></div>
+        <div class="nav-label">连接</div>
+        <div class="nav"><svg class="i "><use href="#i-podcast"/></svg><span>音源</span></div>
+        <div class="push"></div>
+        <div class="nav"><svg class="i "><use href="#i-tune"/></svg><span>设置</span></div>
+        <div class="foot">本地 + 在线<br>Tune 桌面版 · 1.2.0</div>
+      </div>
+        <div class="main">
+          
+      <div class="header">
+        <h2>音乐库</h2>
+        <div class="summary"><b>219</b> 首 · <b>64</b> 张专辑 · <b>9</b> 个来源</div>
+        <div class="spacer"></div>
+        <div class="hbtn"><svg class="i "><use href="#i-globe"/></svg><span>在线搜索</span></div>
+        <div class="hbtn icon"><svg class="i "><use href="#i-more"/></svg></div>
+      </div>
+          
+      <div class="toolbar">
+        <div class="search"><svg class="i "><use href="#i-search"/></svg><span>搜索</span></div>
+        <div class="chip filter"><svg class="i "><use href="#i-filter"/></svg><span class="val">全部来源</span><svg class="i "><use href="#i-chevron"/></svg></div>
+        <div class="chip sort"><span class="val">最近加入</span><svg class="i "><use href="#i-sort-down"/></svg></div>
+        
+        <div class="seg">
+          <div class="b on"><svg class="i "><use href="#i-list"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-columns"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-grid"/></svg></div>
+        </div>
+      </div>
+          <div class="colhead"><div class="lbl">#</div><div></div><div class="lbl">标题</div><div class="lbl">艺术家</div><div class="lbl">专辑</div><div class="lbl active">加入<svg class="i "><use href="#i-sort-down"/></svg></div><div class="tailhead">时长</div></div>
+          <div class="rows">
+        <div class="row">
+          <div class="pos">1</div>
+          <div class="art"></div>
+          <div class="title">Anchors Aweigh</div>
+          <div class="artist">Charles A. Zimmerman</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:32</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">2</div>
+          <div class="art"></div>
+          <div class="title">“Blow The Man Down” (sea chantey)</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:49</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row playing">
+          <div class="pos"><svg class="i "><use href="#i-eq"/></svg></div>
+          <div class="art"></div>
+          <div class="title">“Call to Statesmanship” and “Presidential Proclamations”</div>
+          <div class="artist">U.S. Army Band</div>
+          <div class="album">Ceremonial Music</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">4</div>
+          <div class="art"></div>
+          <div class="title">Die Stem van Suid-Afrika</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">Volksliedere</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:03</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row hovered">
+          <div class="pos">5</div>
+          <div class="art"></div>
+          <div class="title">“Dunken Sailor” sung by the USNA’s Midshipmen</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">2:42</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">6</div>
+          <div class="art"></div>
+          <div class="title">Eternal Father Strong To Save</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Naval Hymns</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:07</div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">7</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">Disasterpeace</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:53</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">8</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:06</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">9</div>
+          <div class="art"></div>
+          <div class="title">London Town (You haunt me)</div>
+          <div class="artist">A. E. Illingworth</div>
+          <div class="album">British Folk</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">3:11</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">10</div>
+          <div class="art"></div>
+          <div class="title">Navy Blue and Gold</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">11</div>
+          <div class="art"></div>
+          <div class="title">“Nkosi Sikelel’ iAfrika”</div>
+          <div class="artist">Melodie: trad.; Satz: Enoch Sontonga</div>
+          <div class="album">Hymns of the World</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">12</div>
+          <div class="art"></div>
+          <div class="title">“O Tannenbaum”</div>
+          <div class="artist">Melodie: trad.; Satz: Ernst Anschütz</div>
+          <div class="album">Winter Songs</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">0:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">13</div>
+          <div class="art"></div>
+          <div class="title">The Star-Spangled Banner</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-03</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:28</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">14</div>
+          <div class="art"></div>
+          <div class="title">Semper Paratus</div>
+          <div class="artist">U.S. Coast Guard Band</div>
+          <div class="album">Service Songs</div>
+          <div class="added">2024-03</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:12</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">15</div>
+          <div class="art"></div>
+          <div class="title">“Rule, Britannia!”</div>
+          <div class="artist">Royal Navy Band</div>
+          <div class="album">British Marches</div>
+          <div class="added">2023-11</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">3:24</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">16</div>
+          <div class="art"></div>
+          <div class="title">“La Marseillaise”</div>
+          <div class="artist">Orchestre de la Garde</div>
+          <div class="album">Hymnes</div>
+          <div class="added">2023-11</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:48</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">17</div>
+          <div class="art"></div>
+          <div class="title">“God Save the King”</div>
+          <div class="artist">Band of the Household Cavalry</div>
+          <div class="album">Royal Anthems</div>
+          <div class="added">2023-10</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:05</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div></div>
+          
+      <div class="dock">
+        <div class="now">
+          <div class="cover"></div>
+          <div style="min-width:0">
+            <div class="t">DANGR (mx) - Alicia</div>
+            <div class="a">DANGR</div>
+          </div>
+        </div>
+        <div class="center">
+          <div class="transport">
+            <svg class="i "><use href="#i-shuffle"/></svg><svg class="i "><use href="#i-prev"/></svg>
+            <div class="play"><svg class="i "><use href="#i-play"/></svg></div>
+            <svg class="i "><use href="#i-next"/></svg>
+          </div>
+          <div class="progress"><span>0:00</span><div class="track"></div><span>5:20</span></div>
+        </div>
+        <div class="right"><svg class="i "><use href="#i-volume"/></svg><div class="vol"></div><svg class="i "><use href="#i-heart"/></svg><svg class="i "><use href="#i-queue"/></svg></div>
+      </div>
+        </div>
+      </div>
+    </div><p class="note">默认窗口：标题 + 艺术家 + 专辑 + 加入 + 时长同时在场；红心常驻，详情与入队悬停出现（第 5 行）。页头 ⋯ 收着重新扫描与全部入队。</p></section><section class="shot"><h2>提案 · 1440×860 · 宽窗</h2>
+    <div class="window" style="width:1440px;height:890px">
+      <div class="titlebar"><div style="min-width:56px"></div><div class="name">Tune</div><div class="lights">− □ ✕</div></div>
+      <div class="shell">
+        
+      <div class="sidebar">
+        <div class="brand"><div class="mark"><svg class="i "><use href="#i-tune"/></svg></div><div class="word">Tune</div></div>
+        <div class="nav-label">浏览</div>
+        <div class="nav"><svg class="i "><use href="#i-compass"/></svg><span>发现</span></div>
+        <div class="nav on"><svg class="i "><use href="#i-library"/></svg><span>音乐库</span></div>
+        <div class="nav"><svg class="i "><use href="#i-heart"/></svg><span>喜欢</span></div>
+        <div class="nav-label">连接</div>
+        <div class="nav"><svg class="i "><use href="#i-podcast"/></svg><span>音源</span></div>
+        <div class="push"></div>
+        <div class="nav"><svg class="i "><use href="#i-tune"/></svg><span>设置</span></div>
+        <div class="foot">本地 + 在线<br>Tune 桌面版 · 1.2.0</div>
+      </div>
+        <div class="main">
+          
+      <div class="header">
+        <h2>音乐库</h2>
+        <div class="summary"><b>219</b> 首 · <b>64</b> 张专辑 · <b>9</b> 个来源</div>
+        <div class="spacer"></div>
+        <div class="hbtn"><svg class="i "><use href="#i-globe"/></svg><span>在线搜索</span></div>
+        <div class="hbtn icon"><svg class="i "><use href="#i-more"/></svg></div>
+      </div>
+          
+      <div class="toolbar">
+        <div class="search"><svg class="i "><use href="#i-search"/></svg><span>搜索</span></div>
+        <div class="chip filter"><svg class="i "><use href="#i-filter"/></svg><span class="val">全部来源</span><svg class="i "><use href="#i-chevron"/></svg></div>
+        <div class="chip sort"><span class="val">最近加入</span><svg class="i "><use href="#i-sort-down"/></svg></div>
+        
+        <div class="seg">
+          <div class="b on"><svg class="i "><use href="#i-list"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-columns"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-grid"/></svg></div>
+        </div>
+      </div>
+          <div class="colhead"><div class="lbl">#</div><div></div><div class="lbl">标题</div><div class="lbl">艺术家</div><div class="lbl">专辑</div><div class="lbl active">加入<svg class="i "><use href="#i-sort-down"/></svg></div><div class="tailhead">时长</div></div>
+          <div class="rows">
+        <div class="row">
+          <div class="pos">1</div>
+          <div class="art"></div>
+          <div class="title">Anchors Aweigh</div>
+          <div class="artist">Charles A. Zimmerman</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:32</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">2</div>
+          <div class="art"></div>
+          <div class="title">“Blow The Man Down” (sea chantey)</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">今天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:49</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">3</div>
+          <div class="art"></div>
+          <div class="title">“Call to Statesmanship” and “Presidential Proclamations”</div>
+          <div class="artist">U.S. Army Band</div>
+          <div class="album">Ceremonial Music</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">4</div>
+          <div class="art"></div>
+          <div class="title">Die Stem van Suid-Afrika</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">Volksliedere</div>
+          <div class="added">昨天</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">1:03</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row playing">
+          <div class="pos"><svg class="i "><use href="#i-eq"/></svg></div>
+          <div class="art"></div>
+          <div class="title">“Dunken Sailor” sung by the USNA’s Midshipmen</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Sea Chanties</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">2:42</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">6</div>
+          <div class="art"></div>
+          <div class="title">Eternal Father Strong To Save</div>
+          <div class="artist">Midshipmen Glee Club</div>
+          <div class="album">Naval Hymns</div>
+          <div class="added">3 天前</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:07</div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act liked"><svg class="i "><use href="#i-heart-filled"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">7</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">Disasterpeace</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:53</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">8</div>
+          <div class="art"></div>
+          <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+          <div class="artist">未知艺术家</div>
+          <div class="album">American Classics</div>
+          <div class="added">09-12</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:06</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">9</div>
+          <div class="art"></div>
+          <div class="title">London Town (You haunt me)</div>
+          <div class="artist">A. E. Illingworth</div>
+          <div class="album">British Folk</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">3:11</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row hovered">
+          <div class="pos">10</div>
+          <div class="art"></div>
+          <div class="title">Navy Blue and Gold</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-05</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:00</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">11</div>
+          <div class="art"></div>
+          <div class="title">“Nkosi Sikelel’ iAfrika”</div>
+          <div class="artist">Melodie: trad.; Satz: Enoch Sontonga</div>
+          <div class="album">Hymns of the World</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">1:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">12</div>
+          <div class="art"></div>
+          <div class="title">“O Tannenbaum”</div>
+          <div class="artist">Melodie: trad.; Satz: Ernst Anschütz</div>
+          <div class="album">Winter Songs</div>
+          <div class="added">2024-04</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">0:44</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">13</div>
+          <div class="art"></div>
+          <div class="title">The Star-Spangled Banner</div>
+          <div class="artist">USNA Band</div>
+          <div class="album">Songs of the Navy</div>
+          <div class="added">2024-03</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">1:28</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">14</div>
+          <div class="art"></div>
+          <div class="title">Semper Paratus</div>
+          <div class="artist">U.S. Coast Guard Band</div>
+          <div class="album">Service Songs</div>
+          <div class="added">2024-03</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:12</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">15</div>
+          <div class="art"></div>
+          <div class="title">“Rule, Britannia!”</div>
+          <div class="artist">Royal Navy Band</div>
+          <div class="album">British Marches</div>
+          <div class="added">2023-11</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">3:24</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">16</div>
+          <div class="art"></div>
+          <div class="title">“La Marseillaise”</div>
+          <div class="artist">Orchestre de la Garde</div>
+          <div class="album">Hymnes</div>
+          <div class="added">2023-11</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">3:48</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">17</div>
+          <div class="art"></div>
+          <div class="title">“God Save the King”</div>
+          <div class="artist">Band of the Household Cavalry</div>
+          <div class="album">Royal Anthems</div>
+          <div class="added">2023-10</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src local"><svg class="i "><use href="#i-folder"/></svg></div>
+              <div class="dur">2:05</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">18</div>
+          <div class="art"></div>
+          <div class="title">“Waltzing Matilda”</div>
+          <div class="artist">Slim Dusty</div>
+          <div class="album">Australian Ballads</div>
+          <div class="added">2023-10</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src netease"><svg class="i "><use href="#i-music"/></svg></div>
+              <div class="dur">2:38</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">19</div>
+          <div class="art"></div>
+          <div class="title">“Pokarekare Ana”</div>
+          <div class="artist">Kiri Te Kanawa</div>
+          <div class="album">Maori Songs</div>
+          <div class="added">2023-09</div>
+          <div class="tail">
+            <div class="rest">
+              <div class="src archive"><svg class="i "><use href="#i-globe"/></svg></div>
+              <div class="dur">3:12</div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+            <div class="hoveracts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div></div>
+          
+      <div class="dock">
+        <div class="now">
+          <div class="cover"></div>
+          <div style="min-width:0">
+            <div class="t">DANGR (mx) - Alicia</div>
+            <div class="a">DANGR</div>
+          </div>
+        </div>
+        <div class="center">
+          <div class="transport">
+            <svg class="i "><use href="#i-shuffle"/></svg><svg class="i "><use href="#i-prev"/></svg>
+            <div class="play"><svg class="i "><use href="#i-play"/></svg></div>
+            <svg class="i "><use href="#i-next"/></svg>
+          </div>
+          <div class="progress"><span>0:00</span><div class="track"></div><span>5:20</span></div>
+        </div>
+        <div class="right"><svg class="i "><use href="#i-volume"/></svg><div class="vol"></div><svg class="i "><use href="#i-heart"/></svg><svg class="i "><use href="#i-queue"/></svg></div>
+      </div>
+        </div>
+      </div>
+    </div><p class="note">宽度只用来让列喘气，不新增第四种层级；搜索吃掉剩余宽度，排序与视图切换贴右。</p></section><section class="shot"><h2>提案 · 1120×760 · 双列</h2>
+    <div class="window" style="width:1120px;height:790px">
+      <div class="titlebar"><div style="min-width:56px"></div><div class="name">Tune</div><div class="lights">− □ ✕</div></div>
+      <div class="shell">
+        
+      <div class="sidebar">
+        <div class="brand"><div class="mark"><svg class="i "><use href="#i-tune"/></svg></div><div class="word">Tune</div></div>
+        <div class="nav-label">浏览</div>
+        <div class="nav"><svg class="i "><use href="#i-compass"/></svg><span>发现</span></div>
+        <div class="nav on"><svg class="i "><use href="#i-library"/></svg><span>音乐库</span></div>
+        <div class="nav"><svg class="i "><use href="#i-heart"/></svg><span>喜欢</span></div>
+        <div class="nav-label">连接</div>
+        <div class="nav"><svg class="i "><use href="#i-podcast"/></svg><span>音源</span></div>
+        <div class="push"></div>
+        <div class="nav"><svg class="i "><use href="#i-tune"/></svg><span>设置</span></div>
+        <div class="foot">本地 + 在线<br>Tune 桌面版 · 1.2.0</div>
+      </div>
+        <div class="main">
+          
+      <div class="header">
+        <h2>音乐库</h2>
+        <div class="summary"><b>219</b> 首 · <b>64</b> 张专辑 · <b>9</b> 个来源</div>
+        <div class="spacer"></div>
+        <div class="hbtn"><svg class="i "><use href="#i-globe"/></svg><span>在线搜索</span></div>
+        <div class="hbtn icon"><svg class="i "><use href="#i-more"/></svg></div>
+      </div>
+          
+      <div class="toolbar">
+        <div class="search"><svg class="i "><use href="#i-search"/></svg><span>搜索</span></div>
+        <div class="chip filter"><svg class="i "><use href="#i-filter"/></svg><span class="val">全部来源</span><svg class="i "><use href="#i-chevron"/></svg></div>
+        <div class="chip sort"><span class="val">最近加入</span><svg class="i "><use href="#i-sort-down"/></svg></div>
+        
+        <div class="seg">
+          <div class="b on"><svg class="i "><use href="#i-list"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-columns"/></svg></div>
+          <div class="b"><svg class="i "><use href="#i-grid"/></svg></div>
+        </div>
+      </div>
+          
+          <div class="rows duo">
+        <div class="row">
+          <div class="pos">1</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">Anchors Aweigh</div>
+            <div class="line2"><span class="artist">Charles A. Zimmerman</span><span class="dot">·</span><span class="album">Songs of the Navy</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:32</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">2</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Blow The Man Down” (sea chantey)</div>
+            <div class="line2"><span class="artist">Midshipmen Glee Club</span><span class="dot">·</span><span class="album">Sea Chanties</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:49</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row playing">
+          <div class="pos"><svg class="i "><use href="#i-eq"/></svg></div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Call to Statesmanship” and “Presidential Proclamations”</div>
+            <div class="line2"><span class="artist">U.S. Army Band</span><span class="dot">·</span><span class="album">Ceremonial Music</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:00</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">4</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">Die Stem van Suid-Afrika</div>
+            <div class="line2"><span class="artist">未知艺术家</span><span class="dot">·</span><span class="album">Volksliedere</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:03</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">5</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Dunken Sailor” sung by the USNA’s Midshipmen</div>
+            <div class="line2"><span class="artist">Midshipmen Glee Club</span><span class="dot">·</span><span class="album">Sea Chanties</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:42</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">6</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">Eternal Father Strong To Save</div>
+            <div class="line2"><span class="artist">Midshipmen Glee Club</span><span class="dot">·</span><span class="album">Naval Hymns</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:07</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">7</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+            <div class="line2"><span class="artist">Disasterpeace</span><span class="dot">·</span><span class="album">American Classics</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:53</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">8</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Goin’ Home” (derived from Dvorak’s “Symphony No. 9”)</div>
+            <div class="line2"><span class="artist">未知艺术家</span><span class="dot">·</span><span class="album">American Classics</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:06</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">9</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">London Town (You haunt me)</div>
+            <div class="line2"><span class="artist">A. E. Illingworth</span><span class="dot">·</span><span class="album">British Folk</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:11</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">10</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">Navy Blue and Gold</div>
+            <div class="line2"><span class="artist">USNA Band</span><span class="dot">·</span><span class="album">Songs of the Navy</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:00</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">11</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Nkosi Sikelel’ iAfrika”</div>
+            <div class="line2"><span class="artist">Melodie: trad.; Satz: Enoch Sontonga</span><span class="dot">·</span><span class="album">Hymns of the World</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:44</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">12</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“O Tannenbaum”</div>
+            <div class="line2"><span class="artist">Melodie: trad.; Satz: Ernst Anschütz</span><span class="dot">·</span><span class="album">Winter Songs</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">0:44</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">13</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">The Star-Spangled Banner</div>
+            <div class="line2"><span class="artist">USNA Band</span><span class="dot">·</span><span class="album">Songs of the Navy</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">1:28</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">14</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">Semper Paratus</div>
+            <div class="line2"><span class="artist">U.S. Coast Guard Band</span><span class="dot">·</span><span class="album">Service Songs</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:12</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">15</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Rule, Britannia!”</div>
+            <div class="line2"><span class="artist">Royal Navy Band</span><span class="dot">·</span><span class="album">British Marches</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:24</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">16</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“La Marseillaise”</div>
+            <div class="line2"><span class="artist">Orchestre de la Garde</span><span class="dot">·</span><span class="album">Hymnes</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:48</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">17</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“God Save the King”</div>
+            <div class="line2"><span class="artist">Band of the Household Cavalry</span><span class="dot">·</span><span class="album">Royal Anthems</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:05</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">18</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Waltzing Matilda”</div>
+            <div class="line2"><span class="artist">Slim Dusty</span><span class="dot">·</span><span class="album">Australian Ballads</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:38</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">19</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Pokarekare Ana”</div>
+            <div class="line2"><span class="artist">Kiri Te Kanawa</span><span class="dot">·</span><span class="album">Maori Songs</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:12</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">20</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Sakura Sakura”</div>
+            <div class="line2"><span class="artist">Ensemble Nipponia</span><span class="dot">·</span><span class="album">Japanese Folk</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">4:02</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">21</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Arirang”</div>
+            <div class="line2"><span class="artist">National Gugak Center</span><span class="dot">·</span><span class="album">Korean Folk</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:21</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">22</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Mo Li Hua”</div>
+            <div class="line2"><span class="artist">Shanghai Philharmonic</span><span class="dot">·</span><span class="album">Chinese Folk</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:57</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">23</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Kalinka”</div>
+            <div class="line2"><span class="artist">Red Army Choir</span><span class="dot">·</span><span class="album">Russian Songs</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:05</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">24</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Loch Lomond”</div>
+            <div class="line2"><span class="artist">The Corries</span><span class="dot">·</span><span class="album">Scottish Ballads</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:44</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">25</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Greensleeves”</div>
+            <div class="line2"><span class="artist">Sting</span><span class="dot">·</span><span class="album">Songs from the Labyrinth</span><span class="src netease"><svg class="i "><use href="#i-music"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">4:12</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">26</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Danny Boy”</div>
+            <div class="line2"><span class="artist">John McCormack</span><span class="dot">·</span><span class="album">Irish Tenors</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">2:49</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">27</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Bella Ciao”</div>
+            <div class="line2"><span class="artist">Modena City Ramblers</span><span class="dot">·</span><span class="album">Italian Resistance</span><span class="src archive"><svg class="i "><use href="#i-globe"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:33</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="pos">28</div>
+          <div class="art"></div>
+          <div class="celltext">
+            <div class="title">“Fångarnas kör”</div>
+            <div class="line2"><span class="artist">Orphei Drängar</span><span class="dot">·</span><span class="album">Nordic Choirs</span><span class="src local"><svg class="i "><use href="#i-folder"/></svg></span></div>
+          </div>
+          <div class="end">
+            <span class="dur">3:02</span>
+            <div class="heart act"><svg class="i "><use href="#i-heart"/></svg></div>
+            <div class="acts">
+              <div class="act"><svg class="i "><use href="#i-info"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-plus"/></svg></div>
+              <div class="act"><svg class="i "><use href="#i-heart"/></svg></div>
+            </div>
+          </div>
+        </div></div>
+          
+      <div class="dock">
+        <div class="now">
+          <div class="cover"></div>
+          <div style="min-width:0">
+            <div class="t">DANGR (mx) - Alicia</div>
+            <div class="a">DANGR</div>
+          </div>
+        </div>
+        <div class="center">
+          <div class="transport">
+            <svg class="i "><use href="#i-shuffle"/></svg><svg class="i "><use href="#i-prev"/></svg>
+            <div class="play"><svg class="i "><use href="#i-play"/></svg></div>
+            <svg class="i "><use href="#i-next"/></svg>
+          </div>
+          <div class="progress"><span>0:00</span><div class="track"></div><span>5:20</span></div>
+        </div>
+        <div class="right"><svg class="i "><use href="#i-volume"/></svg><div class="vol"></div><svg class="i "><use href="#i-heart"/></svg><svg class="i "><use href="#i-queue"/></svg></div>
+      </div>
+        </div>
+      </div>
+    </div><p class="note">第三档视图：左→右、上→下，序号连续；每格两行，一屏 26 首。没有列头，排序只在工具条表达。</p></section>
+<div class="footer">1120×760 是提案的默认窗口；900×600 仍然可用，只是先收起专辑与加入时间。双列在 900 宽不可用。</div>
+</body>
+</html>

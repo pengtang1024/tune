@@ -65,6 +65,7 @@
 ## 布局对齐
 
 - 页面左右留白统一用 `CompactTokens.pageGutter`；标题、工具条和列表共用同一条左边缘。
+- 横向卡片行用 `HorizontalShelf`（`lib/shared/ui/horizontal_shelf.dart`），不要直接放横向 `ListView`：桌面鼠标够不到横排尽头，行要自带翻页箭头与可拖的滚动条。
 - 列表里的一行曲目按密度分两条实现：音乐库走 `LibraryTrackCard` 的单行表格，喜欢与队列走 `TrackMeta` 的双行列表。序号（`TrackPosition`）、详情按钮（`TrackDetailsButton`）、封面与音源徽标从共享 widget 出，避免两种行各画一套。
 - 走带控件（播放按钮、进度条）要落在中线上：播放按钮的中心与容器的中线重合，而不是让整组按钮居中。
 - 输入框不要拉成细长条：`CompactTokens.searchFieldMaxWidth` 给了上限，右侧留给页面自己的动作。
@@ -84,10 +85,11 @@
 - 提示是**主题自己的一张卡片**：卡片用主题的 `surfaceContainerHighest`，字用 `onSurface`，描边用 `outline`，投影跟主题一致。亮色主题下是纸色卡片配墨字，暗色主题下是深色卡片配纸字——暗色用暗色，明亮用明亮，主题里有现成的颜色就别另造。
 - **字永远跟卡片反色，用哪个令牌由主题说了算**：不要把纸色或墨色写死在提示里。亮色主题的提示是纸卡片配墨字，暗色主题的提示是墨卡片配纸字。
 - 提示的外观跟着应用主题走：**还开着的提示也会当场换成新主题的卡片**，不用等它关掉重开。
-- 提示的卡片**全应用只有一张**：`HintLayer`（`lib/shared/ui/hint_layer.dart`）挂在 navigator 上面，`TuneTooltip` 只装一个触发器（`HintTrigger`：`MouseRegion` + `Listener` + 读屏标签），把「谁、哪块矩形、等多久」交给层。**不要在 widget 里自己建 `RawTooltip` 或 `OverlayPortal`**：每多一个，滚动时就多一个 overlay。
+- 提示的卡片**全应用只有一张**：`HintLayer`（`lib/shared/ui/hint_layer.dart`）挂在 navigator 上面，`TuneTooltip` 本身就是触发器（`HintTrigger`，`lib/shared/ui/hint_trigger.dart`：`MouseRegion` + `Listener` + 读屏标签），把「谁、哪块矩形、等多久」交给层。**不要在 widget 里自己建 `RawTooltip` 或 `OverlayPortal`**：每多一个，滚动时就多一个 overlay。
 - 卡片在 overlay 里读主题——也就是它真正被画出来的地方——所以主题一变，还开着的提示当场跟着变。没有 `HintLayer` 的独立 widget 测试，`TuneTooltip` 退回 `RawTooltip`：行为一样，只是那张卡片归它自己。**不要**换成框架的 `Tooltip`：它只在打开时把卡片画一次，跟不了主题。
 - 图标按钮的提示也走 `TuneTooltip`：`TuneTooltip(message: ..., child: IconButton(...))`。不要用 `IconButton(tooltip: ...)` 或 `PopupMenuButton(tooltip: ...)`，那是框架自己的提示，跟不了主题。`test/app/tooltip_style_test.dart` 里有守卫拦着。
-- 密集的行用 `DenseIconAction`（`lib/shared/ui/dense_icon_action.dart`），不要用 `IconButton`：它保留墨迹、悬停、焦点、Enter/Space 与读屏的按钮语义，但不要页面按钮的盒子。一个行内动作 29 个 element，`IconButton` 一个就 52 个。
+- 密集的行用 `DenseIconAction`（`lib/shared/ui/dense_icon_action.dart`），不要用 `IconButton`：它保留墨迹、悬停、焦点、Enter/Space 与读屏的按钮语义，但不要页面按钮的盒子。一个行内动作 24 个 element（本体 19），`IconButton` 一个就 52 个。
+- 密集的行画图标用 `IconGlyph`（`lib/shared/ui/icon_glyph.dart`），不要用 `Icon`：同样是图标字体的字形，但只有一个 `RichText`，不带 `Icon` 的五层盒子。图标是装饰，名字由包住它的按钮或提示给出。
 - 提示没有文案就不该存在：`TuneTooltip` 会直接把子组件原样返回，不要用空字符串凑一个空框。
 
 ## 常量

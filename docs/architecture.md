@@ -178,6 +178,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/track_addresses.dart` | 详情面板里的四条地址：本机文件路径、在线地址、封面地址、规范身份；各自的语气色与动作 |
 | `lib/shared/ui/track_detail_block.dart` | 详情面板里写出来的正文：简介、歌词、原始数据、请求头 |
 | `lib/shared/ui/meta_badge.dart` | `MetaChip`（带框的图标 chip，写着事实的主，名字在 tooltip 里）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
+| `lib/shared/ui/icon_glyph.dart` | `IconGlyph`：密集行里的图标字形，只有一个 `RichText`，不带 `Icon` 的盒子；图标是装饰 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
 | `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
@@ -243,12 +244,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 | 文件 | 职责 |
 | --- | --- |
-| `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：唯一的提示入口（门面），没有文案就不显示 |
-| `lib/shared/ui/hint_layer.dart` | `HintLayer` / `HintTrigger`：全应用只有一张提示卡片；触发器只说关键词、矩形与等待时间 |
+| `lib/shared/ui/tune_tooltip.dart` | `TuneTooltip`：应用里用的提示名，等价于 `HintTrigger`（类型别名），没有文案就不显示 |
+| `lib/shared/ui/hint_layer.dart` | `HintLayer`：全应用只有一张提示卡片 |
+| `lib/shared/ui/hint_trigger.dart` | `HintTrigger`：提示的触发器，只说关键词、矩形与等待时间，不持有卡片 |
 | `lib/app/theme/compact_theme.dart` | `tooltipTheme`：提示的样子——主题自己的一张卡片（`surfaceContainerHighest` + `onSurface` + `outline`，亮色是纸色卡片，暗色是深色卡片）、圆角、投影、停留时间 |
 
 - widget 不直接用 `Tooltip`；图标按钮用 `TuneTooltip(message: ..., child: IconButton(...))`，两者走同一份主题。
-- `HintLayer` 挂在 navigator 上面（`lib/app/app.dart`），卡片在 overlay 里读主题，所以主题切换时**还开着的提示也会当场换成新主题的卡片**；行里只装触发器，不装 `OverlayPortal`。
+- `HintLayer` 挂在 navigator 上面（`lib/app/app.dart`），卡片在 overlay 里读主题，所以主题切换时**还开着的提示也会当场换成新主题的卡片**；行里只装触发器，不装 `OverlayPortal`。`TuneTooltip` 与 `HintTrigger` 是同一个元素，不再套两层。
 - 没有 `HintLayer` 的独立 widget 测试：`TuneTooltip` 退回 `RawTooltip`，行为一样。
 - 提示文案走 l10n，不要写死。
 

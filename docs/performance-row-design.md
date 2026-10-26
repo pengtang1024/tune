@@ -4,9 +4,10 @@
 > 一行 293 个 element、8 个提示各自带一个 `OverlayPortal`。
 > 这一页是设计与实施记录：提案在先，数字在落地后按实测改写。
 >
-> **实施记录**：D5 已落地，实测一行 199 个 element、空闲 0 个 overlay、
-> 滚动一步 85 → 24ms。最初写的 ≤150 是拿掉全部提示后的数字；在保留
-> 提示与三个动作时到不了，拆解与理由见 [`performance.md`](performance.md) §7。
+> **实施记录**：D5 已落地，实测一行 162 个 element、空闲 0 个 overlay、
+> 滚动一步 85 → 23ms；一次收藏重建 3751 → 87 个 element。最初写的
+> ≤150 是拿掉全部提示后的数字；在保留提示与三个动作时到不了，拆解与
+> 理由见 [`performance.md`](performance.md) §7。
 
 ## 1. 目标
 
@@ -98,7 +99,7 @@ HintLayer（应用壳层作用域，可嵌套）
 - 锚点用显示时的全局矩形，**不用每触发器一个 LayerLink**。
 - 隐藏时机：指针离开、滚动、路由切换、窗口尺寸变化、点击空白。
 - 延迟/淡入淡出沿用 `TooltipTheme`；触屏长按行为保持。
-- `TuneTooltip` 保留为门面，调用点不改；内部委托给 `HintLayer`。
+- `TuneTooltip` 是 `HintTrigger` 的类型别名，调用点不改；卡片归 `HintLayer`。
 
 **收益**：空闲时行里 0 个 overlay；每个触发器约 3 个 element（现在约 7 个）；
 一行省 40–50 个 element，且提示层可被队列、搜索复用。
@@ -111,7 +112,7 @@ HintLayer（应用壳层作用域，可嵌套）
 **选项**
 
 - A. 继续 `IconButton` 改 padding/style：否决，M3 按钮链仍是约 57 element/个。
-- B. `DenseIconAction`：`InkResponse` + `SizedBox.square(24)` + `Icon(16)`，
+- B. `DenseIconAction`：`InkResponse` + `SizedBox.square(24)` + `IconGlyph(16)`，
   **采用**；`InkResponse` 自带 `Focus / Actions / MouseRegion / ripple`。
 - C. 一个自绘的动作组：暂不采用；键盘与语义复杂度高，profile 证明必要再说。
 
@@ -123,7 +124,7 @@ HintLayer（应用壳层作用域，可嵌套）
 - 颜色由 `tone` 决定，不读页面按钮主题；无页面级 `ButtonStyle`。
 - 先只用于 `dense: true` 的列表行；页面上的 `IconButton` 不动。
 
-**收益**：3 个动作从约 170 个 element 降到约 95 个（实测变体），
+**收益**：3 个动作从约 170 个 element 降到 72 个（每个 24，含提示），
 ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golden + 键盘测试守。
 
 ## 7. ADR-3：行度量由视口解析一次
@@ -146,13 +147,15 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 
 | 对象 | 预算 | 怎么守 |
 | --- | --- | --- |
-| 一行（典型：8 条提示、2 个事实） | ≤200 element（实测 199） | `row_budget_test.dart` |
-| 一行（最重：10 条提示、4 个事实） | ≤230 element（实测 221） | 同上 |
+| 一行（典型：8 条提示、2 个事实） | ≤170 element（实测 162） | `row_budget_test.dart` |
+| 一行（带音源：10 条提示、3 个事实） | ≤190 element（实测 182） | 同上 |
+| 一行（多事实：10 条提示、4 个事实） | ≤190 element（实测 176） | 同上 |
 | 一行空闲 overlay | 0 | 同上，数 `OverlayPortal` |
-| 一个动作（含提示） | ≤30 element（实测 29） | `dense_action_test.dart` |
-| 一个动作（本体，不含提示） | ≤24 element（实测 23） | 同上 |
+| 一个动作（含提示） | ≤25 element（实测 24） | `dense_action_test.dart` |
+| 一个动作（本体，不含提示） | ≤20 element（实测 19） | 同上 |
+| 一次收藏重建 | ≤120 element（实测 87，一行） | `library_rebuild_test.dart` |
 | 一条提示 | 全局 1 张卡片、1 个 overlay | `hint_layer_test.dart` |
-| 20k 滚动 | profile p99 ≤16.7ms、jank <1%；debug 一步中位 ≤30ms（实测 24） | `library_scroll_bench_test.dart` + profile 时间线 |
+| 20k 滚动 | profile p99 ≤16.7ms、jank <1%；debug 一步中位 ≤30ms（实测 23） | `library_scroll_bench_test.dart` + profile 时间线 |
 | 回归 | D1 18/20、D3 53、D4 129ms | 现有测试 |
 
 行为测试：提示开/关/换主题、滚动隐藏、路由切换、长按、读屏标签；
@@ -165,9 +168,9 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 ## 9. 迁移顺序（每步独立、可回退）
 
 0. **设计与证据**：修基准、profile 20k、评审本文。不改产品代码。
-1. **提示层**：`HintLayer` + `TuneTooltip` 门面，先迁一个低风险界面，做行为矩阵。
-2. **密集动作 + 行度量**：库行先用；行目标 ≤210，profile 复测。（已完成）
-3. **行组合**：事实条/文本列改用 `HintTrigger`；视需要引入 `rowHintsOf`；行目标 ≤200。（已完成）
+1. **提示层**：`HintLayer` + `TuneTooltip` 入口，先迁一个低风险界面，做行为矩阵。
+2. **密集动作 + 行度量**：库行先用；行目标 ≤180，profile 复测。（已完成）
+3. **行组合**：事实条/文本列改用 `HintTrigger`；视需要引入 `rowHintsOf`；行目标 ≤170。（已完成）
 4. **复用与收尾**：队列的删除按钮已改用同一原语；搜索面板的动作仍是页面
    尺寸，留作它自己的布局决定；更新 `performance.md` §7、`conventions.md`、
    `AGENTS.md` 地图。（已完成）
@@ -178,7 +181,7 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 ## 10. 不做什么
 
 - 不为少重建给 `PlaybackState` 加第二份 position（违反 `architecture.md`）。
-- 不给每一行建 Riverpod provider，不把行状态搬进 widget 本地 state。
+- 不给每一行新建 Riverpod provider；行只订阅已有的 provider，不把行状态搬进 widget 本地 state。
 - 不为了 120 写自绘行；预算没到先看 profile 的桶。
 - 不加多余的 `RepaintBoundary`：`ListView.builder` 默认已经加了。
 - 不在没量到 raster/图片解码时做预取、缩略图 LRU 或 isolate。
@@ -186,7 +189,7 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 ## 11. 已定的事
 
 1. **滚动时提示**：滚动即隐藏；提示的锚点不跟着行跑。
-2. **预算**：150 撤回，判据按实测改为典型行 ≤200、最重行 ≤230。150 只有在
+2. **预算**：150 撤回，判据按实测改为典型行 ≤170、最重行 ≤190。150 只有在
    砍掉标题/艺人/专辑提示时才到得了，那是产品取舍，不是性能优化。
 3. **事实提示**：每个事实保留自己的一条；整条事实带共用一个提示会丢掉
    单个名字的含义。
