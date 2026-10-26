@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
+import 'package:tune/shared/ui/tooltip_card.dart';
 
 /// Says that a widget carries a hint, without painting the hint.
 ///
@@ -12,6 +13,10 @@ import 'package:tune/shared/ui/hint_layer.dart';
 /// pointer, a [Listener] for a long touch, and a semantic tooltip for the
 /// screen reader. The card belongs to [HintLayer], so a row can carry eight
 /// triggers and still hold no card until one of them asks for it.
+///
+/// TuneTooltip is an alias of this widget: the trigger is the whole hint,
+/// not a wrapper around another widget. A page without a [HintLayer] gets
+/// the old [RawTooltip] from the same element.
 class HintTrigger extends StatefulWidget {
   /// The words on the card.
   final String message;
@@ -23,22 +28,24 @@ class HintTrigger extends StatefulWidget {
   final Widget child;
 
   /// How long the pointer rests before the card opens.
-  final Duration waitDuration;
+  ///
+  /// Null takes the value of the [TooltipTheme].
+  final Duration? waitDuration;
 
   /// How long the card stays after a long touch ends.
-  final Duration visibleDuration;
+  final Duration? visibleDuration;
 
   /// How long the card takes to leave.
-  final Duration exitDuration;
+  final Duration? exitDuration;
 
   /// Whether the card prefers to stand below its anchor.
-  final bool preferBelow;
+  final bool? preferBelow;
 
   /// The room between the anchor and the card.
-  final double verticalOffset;
+  final double? verticalOffset;
 
   /// Whether a touch gives a little feedback when the hint opens.
-  final bool enableFeedback;
+  final bool? enableFeedback;
 
   /// Whether the trigger listens at all.
   final bool enabled;
@@ -48,12 +55,12 @@ class HintTrigger extends StatefulWidget {
     required this.message,
     required this.child,
     this.label,
-    this.waitDuration = const Duration(milliseconds: 400),
-    this.visibleDuration = const Duration(seconds: 4),
-    this.exitDuration = const Duration(milliseconds: 120),
-    this.preferBelow = false,
-    this.verticalOffset = 12,
-    this.enableFeedback = true,
+    this.waitDuration,
+    this.visibleDuration,
+    this.exitDuration,
+    this.preferBelow,
+    this.verticalOffset,
+    this.enableFeedback,
     this.enabled = true,
   });
 
@@ -80,6 +87,27 @@ class _HintTriggerState extends State<HintTrigger> {
   bool _hovering = false;
   bool _showing = false;
 
+  TooltipThemeData get _theme => TooltipTheme.of(context);
+  Duration get _wait =>
+      widget.waitDuration ??
+      _theme.waitDuration ??
+      const Duration(milliseconds: 400);
+  Duration get _visible =>
+      widget.visibleDuration ??
+      _theme.showDuration ??
+      const Duration(seconds: 4);
+  Duration get _exit =>
+      widget.exitDuration ??
+      _theme.exitDuration ??
+      const Duration(milliseconds: 120);
+  bool get _preferBelow => widget.preferBelow ?? _theme.preferBelow ?? false;
+  double get _verticalOffset =>
+      widget.verticalOffset ?? _theme.verticalOffset ?? 0;
+  bool get _feedback => widget.enableFeedback ?? _theme.enableFeedback ?? true;
+  String? get _label => _theme.excludeFromSemantics == true
+      ? null
+      : (widget.label ?? widget.message);
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -92,7 +120,7 @@ class _HintTriggerState extends State<HintTrigger> {
   @override
   void didUpdateWidget(HintTrigger oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.enabled) {
+    if (!widget.enabled || widget.message.trim().isEmpty) {
       _close();
       return;
     }
@@ -136,7 +164,7 @@ class _HintTriggerState extends State<HintTrigger> {
     _hovering = true;
     _hideTimer?.cancel();
     _showTimer?.cancel();
-    _showTimer = Timer(widget.waitDuration, () {
+    _showTimer = Timer(_wait, () {
       if (!mounted || !_hovering) return;
       _show();
     });
@@ -147,7 +175,7 @@ class _HintTriggerState extends State<HintTrigger> {
     _showTimer?.cancel();
     if (!_showing) return;
     _hideTimer?.cancel();
-    _hideTimer = Timer(widget.exitDuration, () {
+    _hideTimer = Timer(_exit, () {
       if (!mounted || _hovering) return;
       _hide();
     });
@@ -181,7 +209,7 @@ class _HintTriggerState extends State<HintTrigger> {
 
   void _handleLongPress() {
     if (!mounted || !widget.enabled) return;
-    if (widget.enableFeedback) Feedback.forLongPress(context);
+    if (_feedback) Feedback.forLongPress(context);
     _show();
   }
 
@@ -190,7 +218,7 @@ class _HintTriggerState extends State<HintTrigger> {
     _touchTimer?.cancel();
     // The card stays long enough to be read after the finger leaves, the
     // way a long touch has always behaved.
-    _touchTimer = Timer(widget.visibleDuration, () {
+    _touchTimer = Timer(_visible, () {
       if (!mounted) return;
       _hide();
     });
@@ -202,6 +230,10 @@ class _HintTriggerState extends State<HintTrigger> {
 
   /// Puts the card of this trigger on the layer.
   void _show() {
+    if (widget.message.trim().isEmpty) {
+      _hide();
+      return;
+    }
     final controller = _controller;
     if (controller == null || !mounted) return;
     final anchor = _anchorOf(context);
@@ -214,13 +246,13 @@ class _HintTriggerState extends State<HintTrigger> {
       HintIntent(
         owner: this,
         message: widget.message,
-        semanticsLabel: widget.label,
+        semanticsLabel: _label,
         anchor: anchor,
-        waitDuration: widget.waitDuration,
-        visibleDuration: widget.visibleDuration,
-        exitDuration: widget.exitDuration,
-        preferBelow: widget.preferBelow,
-        verticalOffset: widget.verticalOffset,
+        waitDuration: _wait,
+        visibleDuration: _visible,
+        exitDuration: _exit,
+        preferBelow: _preferBelow,
+        verticalOffset: _verticalOffset,
       ),
     );
   }
@@ -254,8 +286,42 @@ class _HintTriggerState extends State<HintTrigger> {
 
   @override
   Widget build(BuildContext context) {
-    final label = widget.label;
-    Widget child = label == null || label.isEmpty
+    // A tooltip without words is no trigger: the child is the whole widget.
+    if (widget.message.trim().isEmpty) return widget.child;
+
+    final theme = _theme;
+    final label = _label;
+
+    // A widget test or a page without the layer keeps the old behaviour:
+    // the card belongs to this widget and is painted in its own overlay.
+    if (HintLayer.maybeOf(context) == null) {
+      return RawTooltip(
+        semanticsTooltip: label,
+        hoverDelay: _wait,
+        touchDelay: _visible,
+        dismissDelay: _exit,
+        triggerMode: theme.triggerMode ?? TooltipTriggerMode.longPress,
+        enableFeedback: _feedback,
+        ignorePointer: true,
+        tooltipBuilder: (context, animation) {
+          final theme = TooltipTheme.of(context);
+          return FadeTransition(
+            opacity: animation,
+            child: buildTooltipCard(theme, widget.message),
+          );
+        },
+        positionDelegate: (context) => positionDependentBox(
+          size: context.overlaySize,
+          childSize: context.tooltipSize,
+          target: context.target,
+          verticalOffset: _verticalOffset,
+          preferBelow: _preferBelow,
+        ),
+        child: widget.child,
+      );
+    }
+
+    final triggerChild = label == null || label.isEmpty
         ? widget.child
         : Semantics(tooltip: label, child: widget.child);
 
@@ -267,7 +333,7 @@ class _HintTriggerState extends State<HintTrigger> {
         onPointerDown: _handlePointerDown,
         onPointerUp: _handlePointerUp,
         onPointerCancel: _handlePointerCancel,
-        child: child,
+        child: triggerChild,
       ),
     );
   }

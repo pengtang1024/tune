@@ -85,6 +85,16 @@ class LibraryTrackCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border(
+            // The mark of the track that plays sits on the edge instead of
+            // taking room, so the columns stay on one grid. The edge is
+            // always there and only changes colour: a row that gains the
+            // mark must not change shape, or the second click of a double
+            // click lands in a new click area and the track is played
+            // instead of marked.
+            left: BorderSide(
+              width: 2,
+              color: selected ? accent : Colors.transparent,
+            ),
             bottom: BorderSide(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
@@ -184,25 +194,6 @@ class LibraryTrackCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-
-    // The mark of the track that plays sits on the edge of the row instead
-    // of taking room, so the columns stay on one grid. The stack is always
-    // there, the way the queue row does it: a row that gains the mark must
-    // not change shape, or the second click of a double click lands in a
-    // new click area and the track is played instead of marked.
-    row = Stack(
-      fit: StackFit.passthrough,
-      children: [
-        if (selected)
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(width: 2, color: accent),
-          ),
-        row,
-      ],
     );
 
     return Material(

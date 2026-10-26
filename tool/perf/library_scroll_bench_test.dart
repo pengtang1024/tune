@@ -114,10 +114,9 @@ void main() {
     // scratch, so the weight of a row is the weight of a scroll step.
     final card = find.byType(LibraryTrackCard).first;
     final groups = <String, int>{};
-    var total = 0;
-    tester.element(card).visitChildren((child) {
-      total += _count(child, groups);
-    });
+    // The row itself is an element too: count it with its subtree, or the
+    // printed weight is one less than the one the test budget measures.
+    final total = _count(tester.element(card), groups);
     // ignore: avoid_print
     print('one row: $total elements');
     final summary = groups.entries.toList()

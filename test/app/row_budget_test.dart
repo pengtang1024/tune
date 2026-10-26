@@ -4,10 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
@@ -70,7 +72,7 @@ void main() {
 
     expect(
       elements,
-      lessThanOrEqualTo(200),
+      lessThanOrEqualTo(170),
       reason: 'one row holds $elements elements',
     );
     expect(
@@ -107,8 +109,40 @@ void main() {
 
     expect(
       elements,
-      lessThanOrEqualTo(230),
+      lessThanOrEqualTo(190),
       reason: 'a row with four facts and ten hints holds $elements elements',
+    );
+    expect(
+      find.descendant(of: row, matching: find.byType(HintTrigger)),
+      findsNWidgets(10),
+    );
+  });
+
+  testWidgets('a row with a source badge stays under the ceiling', (
+    tester,
+  ) async {
+    await _pumpRow(
+      tester,
+      const Song(
+        id: 7,
+        title: 'Track title',
+        artist: 'Artist',
+        album: 'Album',
+        duration: 200000,
+        uri: '/music/track.flac',
+        type: 'flac',
+        sourceId: 'itunes',
+      ),
+      source: const SourceLabel(name: 'iTunes', type: 'itunes'),
+    );
+
+    final row = find.byType(LibraryTrackCard).first;
+    final elements = _count(tester.element(row));
+
+    expect(
+      elements,
+      lessThanOrEqualTo(190),
+      reason: 'a row with a source badge holds $elements elements',
     );
     expect(
       find.descendant(of: row, matching: find.byType(HintTrigger)),
@@ -136,6 +170,41 @@ void main() {
       reason: 'a larger text needs a row that can grow',
     );
   });
+}
+
+Future<void> _pumpRow(
+  WidgetTester tester,
+  Song song, {
+  SourceLabel? source,
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        theme: CompactTheme.light,
+        locale: const Locale('zh', 'CN'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) => HintLayer(child: child!),
+        home: Scaffold(
+          body: LibraryTrackCard(
+            song: song,
+            index: 0,
+            selected: false,
+            playing: false,
+            isFavorite: false,
+            source: source,
+            metrics: LibraryRowMetrics.at(width: 1800, textScale: 1),
+            onTap: _noop,
+            onDoubleTap: _noop,
+            waitsForDoubleClick: false,
+            onAddToQueue: _noop,
+            onToggleFavorite: _noop,
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 Future<void> _pumpLibrary(
@@ -173,6 +242,8 @@ Future<void> _pumpLibrary(
   );
   await tester.pumpAndSettle();
 }
+
+void _noop() {}
 
 int _count(Element element) {
   var total = 1;

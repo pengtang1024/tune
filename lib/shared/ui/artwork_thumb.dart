@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/providers/artwork_providers.dart';
 
 /// Square album artwork with a quiet fallback.
@@ -25,15 +26,15 @@ class ArtworkThumb extends ConsumerWidget {
     final theme = Theme.of(context);
     final borderRadius = BorderRadius.circular(radius);
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
+    // A cover is a square with a quiet background and a rounded clip. The
+    // three pieces say exactly that, without the four boxes a `Container`
+    // adds around them; a row pays for this square once per track.
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: ColoredBox(
         color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: borderRadius,
+        child: SizedBox.square(dimension: size, child: _image(context, ref)),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: _image(context, ref),
     );
   }
 
@@ -62,7 +63,7 @@ class ArtworkThumb extends ConsumerWidget {
   Widget _fallback(BuildContext context) {
     final theme = Theme.of(context);
     return Center(
-      child: Icon(
+      child: IconGlyph(
         Icons.album_rounded,
         size: size * 0.42,
         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.55),

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 
 /// Guards the action of a dense row.
 ///
@@ -27,7 +28,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.add_rounded));
+    await tester.tap(_mark(Icons.add_rounded));
     expect(taps, 1);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
@@ -62,7 +63,10 @@ void main() {
         ),
       );
 
-      final node = tester.getSemantics(find.byIcon(Icons.add_rounded));
+      final button = find.byWidgetPredicate(
+        (widget) => widget is Semantics && widget.properties.button == true,
+      );
+      final node = tester.getSemantics(button);
       final flags = node.flagsCollection;
       expect(flags.isButton, isTrue);
       expect(
@@ -96,7 +100,7 @@ void main() {
     final bodyElements = _count(tester.element(body));
     expect(
       bodyElements,
-      lessThanOrEqualTo(24),
+      lessThanOrEqualTo(20),
       reason: 'the body of a dense action stays a primitive of a row',
     );
 
@@ -105,10 +109,16 @@ void main() {
     final elements = _count(tester.element(find.byType(DenseIconAction)));
     expect(
       elements,
-      lessThanOrEqualTo(30),
+      lessThanOrEqualTo(25),
       reason: 'a dense action with its hint stays small enough for a row',
     );
   });
+}
+
+Finder _mark(IconData icon) {
+  return find.byWidgetPredicate(
+    (widget) => widget is IconGlyph && widget.icon == icon,
+  );
 }
 
 Widget _app(Widget action) {

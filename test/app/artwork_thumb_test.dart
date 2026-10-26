@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/providers/artwork_cache_provider.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 
 import '../services/fake_artwork_cache.dart';
 
@@ -32,9 +33,7 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('a cover without an address shows the fallback', (
-    tester,
-  ) async {
+  testWidgets('a cover without an address shows the fallback', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: ArtworkThumb(path: null, imageUrl: null, size: 48),
@@ -42,7 +41,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.album_rounded), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is IconGlyph && widget.icon == Icons.album_rounded,
+      ),
+      findsOneWidget,
+    );
     expect(find.byType(Image), findsNothing);
   });
 
@@ -65,6 +69,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.album_rounded), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is IconGlyph && widget.icon == Icons.album_rounded,
+      ),
+      findsOneWidget,
+    );
   });
 }

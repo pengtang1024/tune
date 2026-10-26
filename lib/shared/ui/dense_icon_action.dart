@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// An action of a dense list row.
@@ -66,7 +67,7 @@ class DenseIconAction extends StatelessWidget {
           radius: size / 2,
           child: SizedBox.square(
             dimension: size,
-            child: Icon(icon, size: iconSize, color: markColor),
+            child: IconGlyph(icon, size: iconSize, color: markColor),
           ),
         ),
       ),

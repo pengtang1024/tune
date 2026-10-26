@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/source_mark.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -42,7 +43,7 @@ class SourceBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: color.withValues(alpha: 0.26)),
       ),
-      child: Icon(
+      child: IconGlyph(
         sourceIconOf(label.type, label.kind),
         size: dense ? 11 : 13,
         color: color,

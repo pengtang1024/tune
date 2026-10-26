@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -122,7 +123,7 @@ class MetaBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = factToneColor(tone, Theme.of(context).colorScheme);
-    final mark = Icon(icon, size: size, color: color);
+    final mark = IconGlyph(icon, size: size, color: color);
     return TuneTooltip(
       message: tooltip,
       child: onTap == null

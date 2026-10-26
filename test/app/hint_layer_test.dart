@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
-import 'package:tune/shared/ui/hint_trigger.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Guards the one hint layer of the app.
@@ -196,7 +195,15 @@ void main() {
       ),
     );
 
-    expect(find.byType(HintTrigger), findsNothing);
+    // The tooltip is the trigger itself, so the widget stays; what must not
+    // stand is the pointer area a trigger would add around the child.
+    expect(
+      find.descendant(
+        of: find.byType(TuneTooltip),
+        matching: find.byType(MouseRegion),
+      ),
+      findsNothing,
+    );
     expect(find.text('body'), findsOneWidget);
   });
 }
