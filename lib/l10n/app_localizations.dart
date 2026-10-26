@@ -3401,6 +3401,18 @@ abstract class AppLocalizations {
   /// **'全部加入队列'**
   String get discoverAddAllToQueue;
 
+  /// No description provided for @discoverShelfBack.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'上一组'**
+  String get discoverShelfBack;
+
+  /// No description provided for @discoverShelfForward.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下一组'**
+  String get discoverShelfForward;
+
   /// No description provided for @discoverMoreActions.
   ///
   /// In zh_CN, this message translates to:

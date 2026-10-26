@@ -182,6 +182,46 @@ void main() {
     expect(find.byKey(const ValueKey('discovery-daily-mix')), findsOneWidget);
   });
 
+  testWidgets('a shelf reaches its tail with the arrow at the compact width', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(760, 520);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final library = [
+      for (var index = 0; index < 80; index++)
+        Song(
+          id: index,
+          title: 'Song $index',
+          artist: index < 6 ? 'Nujabes' : 'Artist $index',
+          album: 'Album $index',
+          uri: '/music/$index.mp3',
+          dateAdded: now,
+        ),
+    ];
+    await tester.pumpWidget(app(library: library));
+    await tester.pumpAndSettle();
+
+    final section = find.byKey(const ValueKey('discovery-section-fresh'));
+    final shelf = find.byKey(const ValueKey('discovery-list-fresh'));
+    await tester.ensureVisible(shelf);
+    await tester.pumpAndSettle();
+
+    final scrollable = tester.state<ScrollableState>(
+      find.descendant(of: shelf, matching: find.byType(Scrollable)).first,
+    );
+    final forward = find.descendant(
+      of: section,
+      matching: find.byKey(const ValueKey('horizontal-shelf-forward')),
+    );
+    expect(forward, findsOneWidget);
+    await tester.tap(forward);
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, greaterThan(0));
+  });
+
   testWidgets('the page offers to turn on local listening history', (
     tester,
   ) async {

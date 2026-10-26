@@ -26,8 +26,13 @@ abstract final class CompactTheme {
   static const Color moss = Color(0xFF5D7050);
   static const Color mossDark = Color(0xFFA9BE93);
 
-  static ThemeData get light => _build(Brightness.light);
-  static ThemeData get dark => _build(Brightness.dark);
+  /// The theme is built once and handed out as the same object every time.
+  ///
+  /// It is immutable, and building it per access costs a few milliseconds and
+  /// hands `MaterialApp` a new theme on every rebuild, which starts the theme
+  /// animation over a screen that did not change.
+  static final ThemeData light = _build(Brightness.light);
+  static final ThemeData dark = _build(Brightness.dark);
 
   static ThemeData _build(Brightness brightness) {
     final isDark = brightness == Brightness.dark;

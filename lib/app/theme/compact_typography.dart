@@ -10,9 +10,16 @@ import 'package:flutter/material.dart';
 /// Noto Sans SC and Noto Serif SC ship with the app, so the Chinese text looks
 /// the same on every machine instead of depending on the fonts a user happens
 /// to have installed. Both are variable fonts: one file covers every weight,
-/// so a bold heading is a real bold and not a smeared synthetic one. The
-/// system CJK families stay in the list as a safety net for the rare glyph the
-/// bundled faces do not carry.
+/// so a bold heading is a real bold and not a smeared synthetic one.
+///
+/// **Only a face that ships with the app belongs in the fallback lists.** A
+/// family the engine does not have is looked up through the font system for
+/// every style that names it; on a Linux desktop with a few hundred fonts
+/// installed, five such names cost the first frame **1.7 seconds**
+/// (2026-10-25, measured: 1686ms → 288ms after the lists named only the
+/// bundled faces). The generic families stay as the last resort for a glyph
+/// the bundled face does not carry; they are asked for that glyph and not for
+/// the first line of every page.
 ///
 /// Every style built here keeps its Latin face first and names the CJK
 /// families after it: Latin text keeps the designed face, CJK text keeps a
@@ -28,22 +35,18 @@ abstract final class CompactTypography {
   static const String monoFamily = 'JetBrains Mono';
 
   /// Sans CJK families, tried in order.
+  ///
+  /// The bundled face first, one generic family last. Everything between them
+  /// would be a font the app does not ship, and the engine would ask the
+  /// desktop for it once per style on the first frame.
   static const List<String> sansFallback = <String>[
     'Noto Sans SC',
-    'Noto Sans CJK SC',
-    'Source Han Sans SC',
-    'PingFang SC',
-    'Microsoft YaHei',
     'sans-serif',
   ];
 
   /// Serif CJK families, tried in order.
   static const List<String> serifFallback = <String>[
     'Noto Serif SC',
-    'Noto Serif CJK SC',
-    'Source Han Serif SC',
-    'Songti SC',
-    'SimSun',
     'serif',
   ];
 
@@ -57,8 +60,6 @@ abstract final class CompactTypography {
   /// monospaced labels and the rest of the text look like one voice.
   static final List<String> monoFallback = <String>[
     'Noto Sans SC',
-    'Noto Sans Mono CJK SC',
-    'Noto Sans Mono CJK TC',
     ...sansFallback.skip(1),
   ];
 

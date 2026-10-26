@@ -119,6 +119,14 @@ foreach(icon_size 16 32 48 64 128)
     COMPONENT Runtime)
 endforeach()
 
+# The license and the third-party notices, so an installed copy keeps the
+# terms that came with the binaries.
+install(FILES
+  "${PROJECT_SOURCE_DIR}/../LICENSE"
+  "${PROJECT_SOURCE_DIR}/../THIRD_PARTY_NOTICES.md"
+  DESTINATION "share/licenses/tune"
+  COMPONENT Runtime)
+
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   COMPONENT Runtime)
 

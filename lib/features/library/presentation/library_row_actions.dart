@@ -3,14 +3,16 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_details_button.dart';
-import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The actions at the end of a library row.
 ///
 /// The three actions keep one size and one rhythm, so the columns of the
-/// table end on the same edge whatever the width of the window is.
+/// table end on the same edge whatever the width of the window is. They use
+/// the dense primitive of a row and not the button of a page: the ink, the
+/// focus and the keyboard stay, the page-sized box does not.
 class LibraryRowActions extends StatelessWidget {
   final Song song;
   final SourceLabel? source;
@@ -29,8 +31,11 @@ class LibraryRowActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The row of actions keeps its rhythm without a spacer between the
+    // buttons: the gap is part of the row, not an element of its own.
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: CompactTokens.space4,
       children: [
         TrackDetailsButton(
           song: song,
@@ -39,13 +44,11 @@ class LibraryRowActions extends StatelessWidget {
           onToggleFavorite: onToggleFavorite,
           dense: true,
         ),
-        const SizedBox(width: CompactTokens.space4),
         FavoriteButton(
           isFavorite: isFavorite,
           onPressed: onToggleFavorite,
           dense: true,
         ),
-        const SizedBox(width: CompactTokens.space4),
         _AddToQueueButton(onPressed: onAddToQueue),
       ],
     );
@@ -60,24 +63,10 @@ class _AddToQueueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return TuneTooltip(
-      message: context.loc.libraryAddToQueue,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: const Icon(Icons.add_rounded, size: CompactTokens.icon16),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(
-          width: CompactTokens.libraryRowAction,
-          height: CompactTokens.libraryRowAction,
-        ),
-        style: IconButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return DenseIconAction(
+      icon: Icons.add_rounded,
+      tooltip: context.loc.libraryAddToQueue,
+      onPressed: onPressed,
     );
   }
 }

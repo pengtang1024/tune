@@ -10,6 +10,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/hint_layer.dart';
 import 'package:tune/utils/logger.dart';
 
 final appInitializationProvider = FutureProvider<void>((ref) async {
@@ -63,7 +64,7 @@ class TuneApp extends ConsumerWidget {
               child: MediaQuery.withClampedTextScaling(
                 minScaleFactor: 1.0,
                 maxScaleFactor: 1.3,
-                child: child,
+                child: HintLayer(child: child),
               ),
             );
           },

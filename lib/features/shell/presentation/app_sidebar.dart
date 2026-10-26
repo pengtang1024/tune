@@ -32,6 +32,10 @@ class AppSidebar extends StatelessWidget {
         : CompactTokens.sidebarWidth;
     final short = MediaQuery.sizeOf(context).height < 560;
 
+    final cross = compact
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+
     return Container(
       width: width,
       decoration: BoxDecoration(
@@ -50,100 +54,111 @@ class AppSidebar extends StatelessWidget {
             compact ? CompactTokens.space12 : CompactTokens.sidebarPadding,
             CompactTokens.space16,
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: compact
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      _Brand(compact: compact),
-                      SizedBox(height: short ? 24 : 34),
-                      _SectionLabel(
-                        context.loc.sidebarBrowse,
-                        compact: compact,
-                      ),
-                      const SizedBox(height: 8),
-                      _NavItem(
-                        icon: Icons.explore_rounded,
-                        label: context.loc.sidebarDiscover,
-                        path: '/discover',
-                        currentPath: currentPath,
-                        compact: compact,
-                        onNavigate: onNavigate,
-                      ),
-                      const SizedBox(height: 4),
-                      _NavItem(
-                        icon: Icons.library_music_rounded,
-                        label: context.loc.libraryTitle,
-                        path: '/library',
-                        currentPath: currentPath,
-                        compact: compact,
-                        onNavigate: onNavigate,
-                      ),
-                      const SizedBox(height: 4),
-                      _NavItem(
-                        icon: Icons.favorite_rounded,
-                        label: context.loc.favoritesTitle,
-                        path: '/favorites',
-                        currentPath: currentPath,
-                        compact: compact,
-                        onNavigate: onNavigate,
-                      ),
-                      const SizedBox(height: 24),
-                      _SectionLabel(
-                        context.loc.sidebarConnect,
-                        compact: compact,
-                      ),
-                      const SizedBox(height: 8),
-                      _NavItem(
-                        icon: Icons.podcasts_rounded,
-                        label: context.loc.sourcesTitle,
-                        path: '/sources',
-                        currentPath: currentPath,
-                        compact: compact,
-                        onNavigate: onNavigate,
-                      ),
-                      const Spacer(),
-                      _NavItem(
-                        icon: Icons.tune_rounded,
-                        label: context.loc.settingsTitle,
-                        path: '/settings',
-                        currentPath: currentPath,
-                        compact: compact,
-                        onNavigate: onNavigate,
-                      ),
-                      if (!compact && !short) ...[
-                        const SizedBox(height: 18),
-                        Text(
-                          context.loc.sidebarLocalOnline,
-                          style: CompactTypography.mono(
-                            theme.colorScheme.onSurfaceVariant,
-                            size: CompactTypeScale.mark,
-                            letterSpacing: 1.1,
-                          ),
+          // The column takes at least the height of the window and pushes the
+          // settings to the bottom; a window that is too short scrolls it.
+          // `SliverFillRemaining` does that without asking the whole sidebar
+          // for its intrinsic height, which cost the first frame a second
+          // layout of every item.
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  crossAxisAlignment: cross,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: cross,
+                      children: [
+                        _Brand(compact: compact),
+                        SizedBox(height: short ? 24 : 34),
+                        _SectionLabel(
+                          context.loc.sidebarBrowse,
+                          compact: compact,
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          context.loc.sidebarVersionLine(
-                            context.loc.appName,
-                            AppVersion.version,
-                          ),
-                          style: CompactTypography.mono(
-                            theme.colorScheme.onSurfaceVariant,
-                            size: CompactTypeScale.mark,
-                            letterSpacing: 0.8,
-                          ),
+                        const SizedBox(height: 8),
+                        _NavItem(
+                          icon: Icons.explore_rounded,
+                          label: context.loc.sidebarDiscover,
+                          path: '/discover',
+                          currentPath: currentPath,
+                          compact: compact,
+                          onNavigate: onNavigate,
+                        ),
+                        const SizedBox(height: 4),
+                        _NavItem(
+                          icon: Icons.library_music_rounded,
+                          label: context.loc.libraryTitle,
+                          path: '/library',
+                          currentPath: currentPath,
+                          compact: compact,
+                          onNavigate: onNavigate,
+                        ),
+                        const SizedBox(height: 4),
+                        _NavItem(
+                          icon: Icons.favorite_rounded,
+                          label: context.loc.favoritesTitle,
+                          path: '/favorites',
+                          currentPath: currentPath,
+                          compact: compact,
+                          onNavigate: onNavigate,
+                        ),
+                        const SizedBox(height: 24),
+                        _SectionLabel(
+                          context.loc.sidebarConnect,
+                          compact: compact,
+                        ),
+                        const SizedBox(height: 8),
+                        _NavItem(
+                          icon: Icons.podcasts_rounded,
+                          label: context.loc.sourcesTitle,
+                          path: '/sources',
+                          currentPath: currentPath,
+                          compact: compact,
+                          onNavigate: onNavigate,
                         ),
                       ],
-                    ],
-                  ),
+                    ),
+                    Column(
+                      crossAxisAlignment: cross,
+                      children: [
+                        _NavItem(
+                          icon: Icons.tune_rounded,
+                          label: context.loc.settingsTitle,
+                          path: '/settings',
+                          currentPath: currentPath,
+                          compact: compact,
+                          onNavigate: onNavigate,
+                        ),
+                        if (!compact && !short) ...[
+                          const SizedBox(height: 18),
+                          Text(
+                            context.loc.sidebarLocalOnline,
+                            style: CompactTypography.mono(
+                              theme.colorScheme.onSurfaceVariant,
+                              size: CompactTypeScale.mark,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            context.loc.sidebarVersionLine(
+                              context.loc.appName,
+                              AppVersion.version,
+                            ),
+                            style: CompactTypography.mono(
+                              theme.colorScheme.onSurfaceVariant,
+                              size: CompactTypeScale.mark,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

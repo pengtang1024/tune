@@ -97,4 +97,9 @@ flutter build linux --debug
 
 ## License
 
-[MIT License](LICENSE)
+Tune's source code is licensed under the [MIT License](LICENSE). Bundled fonts
+are licensed under SIL OFL-1.1. Dart/Flutter dependency licenses are shipped in
+the application's `NOTICES`. On Linux, playback uses the system libmpv (GPL-3+
+as packaged by Ubuntu; not distributed with Tune). See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the full third-party
+notices.

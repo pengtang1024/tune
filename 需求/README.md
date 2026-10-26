@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.0+-blue.svg" alt="Flutter Version">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/License-MIT%20(code)-green.svg" alt="License: MIT (source code)">
   <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Web-brightgreen" alt="Supported Platforms">
 </p>
 
@@ -127,7 +127,9 @@
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](../LICENSE) 文件了解详情
+本项目源代码采用 MIT 许可证 - 查看 [LICENSE](../LICENSE) 文件了解详情。
+内置字体采用 SIL OFL-1.1；第三方组件与 Linux libmpv 依赖的声明见
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)。
 
 ## 👥 贡献
 

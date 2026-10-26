@@ -11,4 +11,4 @@ PRODUCT_NAME = tune
 PRODUCT_BUNDLE_IDENTIFIER = cn.iouf.tune
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 iouf.cn. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025-2026 pengtang1024. Licensed under the MIT License.

@@ -19,6 +19,7 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 
 import '../services/fake_persistence.dart';
 import 'compact_layout_test.dart' show FakeLibraryController;
@@ -145,13 +146,13 @@ void main() {
     await tester.pumpAndSettle();
 
     // Nothing is marked yet, so the hearts are empty.
-    expect(find.byIcon(Icons.favorite_border_rounded), findsNWidgets(2));
-    expect(find.byIcon(Icons.favorite_rounded), findsNothing);
+    expect(_mark(Icons.favorite_border_rounded), findsNWidgets(2));
+    expect(_mark(Icons.favorite_rounded), findsNothing);
 
     await tester.tap(find.byType(FavoriteButton).first);
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+    expect(_mark(Icons.favorite_rounded), findsOneWidget);
     expect(
       find.byTooltip('取消收藏'),
       findsOneWidget,
@@ -398,4 +399,10 @@ class _LateFirstWritePersistence extends FakePersistenceService {
     }
     return super.setStringList(key, value);
   }
+}
+
+Finder _mark(IconData icon) {
+  return find.byWidgetPredicate(
+    (widget) => widget is IconGlyph && widget.icon == icon,
+  );
 }

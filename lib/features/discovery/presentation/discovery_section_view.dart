@@ -7,6 +7,7 @@ import 'package:tune/features/discovery/domain/discovery_section.dart';
 import 'package:tune/features/discovery/presentation/discovery_reason_label.dart';
 import 'package:tune/features/discovery/presentation/recommendation_card.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/shared/ui/horizontal_shelf.dart';
 import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -162,12 +163,14 @@ class DiscoverySectionView extends StatelessWidget {
         const SizedBox(height: CompactTokens.space8),
         SizedBox(
           height: 236,
-          child: ListView.separated(
-            key: ValueKey('discovery-list-${section.kind.name}'),
-            scrollDirection: Axis.horizontal,
+          child: HorizontalShelf(
+            listKey: ValueKey('discovery-list-${section.kind.name}'),
             itemCount: section.tracks.length,
-            separatorBuilder: (context, index) =>
-                const SizedBox(width: CompactTokens.space10),
+            spacing: CompactTokens.space10,
+            previousLabel: context.loc.discoverShelfBack,
+            nextLabel: context.loc.discoverShelfForward,
+            arrowCenter:
+                CompactTokens.space6 + RecommendationCard.coverSize / 2,
             itemBuilder: (context, index) {
               final track = section.tracks[index];
               final song = track.song;

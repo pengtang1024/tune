@@ -174,6 +174,17 @@ class SourceLabel {
   });
 
   @override
+  bool operator ==(Object other) =>
+      other is SourceLabel &&
+      other.name == name &&
+      other.localizedName == localizedName &&
+      other.type == type &&
+      other.kind == kind;
+
+  @override
+  int get hashCode => Object.hash(name, localizedName, type, kind);
+
+  @override
   String toString() => 'SourceLabel($name, $localizedName)';
 }
 

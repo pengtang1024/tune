@@ -19,15 +19,16 @@ class TrackFactStrip extends StatelessWidget {
     final facts = rowFactsOf(context, song);
     if (facts.isEmpty) return const SizedBox.shrink();
 
+    // The badges stand next to each other with a hair of room, so the eye
+    // reads them as one row of marks. The gap belongs to the row and not to
+    // a spacer of its own: a dense strip of marks pays for no extra element
+    // between them.
     return Row(
       mainAxisSize: MainAxisSize.min,
+      spacing: CompactTokens.space4,
       children: [
-        // The badges stand next to each other with a hair of room, so the
-        // eye reads them as one row of marks.
-        for (final (index, fact) in facts.indexed) ...[
-          if (index > 0) const SizedBox(width: CompactTokens.space4),
+        for (final fact in facts)
           MetaBadge(icon: fact.icon, tooltip: fact.sentence, tone: fact.tone),
-        ],
       ],
     );
   }

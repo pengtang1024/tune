@@ -2014,6 +2014,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverAddAllToQueue => 'Queue all';
 
   @override
+  String get discoverShelfBack => 'Previous';
+
+  @override
+  String get discoverShelfForward => 'Next';
+
+  @override
   String get discoverMoreActions => 'More actions';
 
   @override

@@ -14,6 +14,7 @@
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
+| 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（提案，待评审） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
 | 查健康度里 unknown 的处理约定 | [`docs/health-unknown.md`](docs/health-unknown.md)（给健康度会话的提醒） |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
@@ -27,7 +28,8 @@
 | 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
 | 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
-| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（2026-10-24 诊断，代码未动） |
+| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D5 已修） |
+| 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
 
 ## 0. 项目快照
@@ -80,6 +82,8 @@
   整块重建。
 - **状态仍然只有一个主人。** 切片是从同一份状态派生的窄读法，不是第二份事实
   来源；不要为了少重建把位置复制到 widget 的本地 state 里。
+- **列表行的值由行自己订阅。** 行的收藏、当前曲与播放状态由行读；页面只订阅
+  结构、顺序与筛选。一次收藏不该重建整个视口，只该重建那一行。
 - **派生计算要么有预算，要么挪出 UI 线程。** 同步计算的耗时要写进文档（像
   `docs/recommendation.md` §7.8 那样），超预算就换算法或换线程。
 - **UI 线程不做同步 I/O。** `existsSync()`、`readAsBytesSync()` 这类调用不进

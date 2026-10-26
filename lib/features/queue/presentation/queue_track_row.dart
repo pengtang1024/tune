@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
@@ -179,25 +180,12 @@ class _RemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      width: 28,
-      height: 28,
-      child: TuneTooltip(
-        message: context.loc.remove,
-        child: IconButton(
-          onPressed: onPressed,
-          icon: const Icon(Icons.remove_rounded, size: CompactTokens.icon14),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-          style: IconButton.styleFrom(
-            foregroundColor: theme.colorScheme.onSurfaceVariant,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            visualDensity: VisualDensity.compact,
-          ),
-        ),
-      ),
+    return DenseIconAction(
+      icon: Icons.remove_rounded,
+      tooltip: context.loc.remove,
+      onPressed: onPressed,
+      size: 28,
+      iconSize: CompactTokens.icon14,
     );
   }
 }

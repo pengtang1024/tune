@@ -5,6 +5,22 @@ import 'package:tune/utils/logger.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/song_creator.dart';
 
+/// Reads the tags of one file off the UI isolate.
+///
+/// Reading tags is synchronous work: a single large or malformed tag can hold
+/// the thread for a second, and the scan runs while the reader is already
+/// looking at the library. The worker gets the path and hands the song back.
+/// One file per worker keeps the scan ordered and its progress honest; the
+/// cost of starting a worker is far below the cost of freezing the window.
+/// On the web the worker runs where the app runs, because a browser has no
+/// second thread for it.
+Future<Song?> _readSongWorker(String filePath) =>
+    compute(_songOfFile, filePath);
+
+/// The worker of [_readSongWorker]; [compute] wants a top-level function.
+Future<Song?> _songOfFile(String filePath) =>
+    SongCreator.createFromFile(File(filePath));
+
 /// 跨平台音乐扫描服务接口
 abstract class CrossPlatformMusicScanner {
   Future<void> init();
@@ -106,7 +122,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     try {
       final file = File(filePath);
       if (await file.exists()) {
-        return await SongCreator.createFromFile(file);
+        return await _readSongWorker(filePath);
       }
     } catch (e) {
       Log.info('CrossPlatformMusicScanner: Failed to scan file $filePath: $e');
@@ -170,7 +186,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
       for (int i = 0; i < files.length; i++) {
         final file = files[i];
         try {
-          final song = await SongCreator.createFromFile(file);
+          final song = await _readSongWorker(file.path);
           if (song != null) {
             songs.add(song);
           }
@@ -241,7 +257,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
                 }
 
                 if (MusicScannerConfig.isAudioFile(file.path)) {
-                  final song = await SongCreator.createFromFile(file);
+                  final song = await _readSongWorker(file.path);
                   if (song != null) {
                     allSongs.add(song);
                   }

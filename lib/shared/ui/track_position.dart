@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 
 /// Position of a track in its list.
 ///
@@ -33,7 +34,7 @@ class TrackPosition extends StatelessWidget {
       width: width,
       child: Center(
         child: selected
-            ? Icon(
+            ? IconGlyph(
                 playing ? Icons.equalizer_rounded : Icons.play_arrow_rounded,
                 size: CompactTokens.icon16,
                 color: theme.colorScheme.primary,

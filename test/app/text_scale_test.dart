@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -45,12 +46,13 @@ void main() {
           tester,
           scale,
           width,
-          const LibraryTrackCard(
+          LibraryTrackCard(
             song: song,
             index: 0,
             selected: false,
             playing: false,
             isFavorite: false,
+            metrics: LibraryRowMetrics.at(width: width, textScale: scale),
             onTap: _noop,
             onDoubleTap: _noop,
             waitsForDoubleClick: false,

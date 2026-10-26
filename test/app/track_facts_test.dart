@@ -14,6 +14,7 @@ import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 import 'package:tune/shared/ui/track_meta.dart';
@@ -95,8 +96,8 @@ void main() {
 
     expect(find.text('FLAC'), findsNothing);
     expect(find.text('980 kbps'), findsNothing);
-    expect(find.byIcon(Icons.audio_file_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.speed_rounded), findsOneWidget);
+    expect(_mark(Icons.audio_file_rounded), findsOneWidget);
+    expect(_mark(Icons.speed_rounded), findsOneWidget);
   });
 
   testWidgets('a row keeps the state of a live stream', (tester) async {
@@ -117,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('直播中'), findsOneWidget);
-    expect(find.byIcon(Icons.podcasts_rounded), findsOneWidget);
+    expect(_mark(Icons.podcasts_rounded), findsOneWidget);
   });
 
   testWidgets('the details sheet keeps the name of a fact in the tip', (
@@ -262,7 +263,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('位置 · 本地 · 在线'), findsOneWidget);
-    expect(find.byIcon(Icons.sd_storage_rounded), findsOneWidget);
+    expect(_mark(Icons.sd_storage_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -624,7 +625,7 @@ void main() {
 
     // The state is an icon like every other mark of a row; the words wait
     // in the tooltip.
-    expect(find.byIcon(Icons.check_circle_outline_rounded), findsOneWidget);
+    expect(_mark(Icons.check_circle_outline_rounded), findsOneWidget);
     expect(find.byTooltip(RegExp('已扫描')), findsOneWidget);
     expect(find.byTooltip('曲目 · 12'), findsOneWidget);
     expect(find.byTooltip('上次扫描 · $clock'), findsOneWidget);
@@ -653,4 +654,11 @@ void main() {
     // A track of a source without a file has no format of its own.
     expect(formatOf(remote), isNull);
   });
+}
+
+
+Finder _mark(IconData icon) {
+  return find.byWidgetPredicate(
+    (widget) => widget is IconGlyph && widget.icon == icon,
+  );
 }
