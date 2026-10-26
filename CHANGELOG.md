@@ -178,4 +178,5 @@
 ## 链接
 
 - [1.3.0](https://gitea.iouf.cn/pengtang1024/tune/releases/tag/v1.3.0)
-- [与 1.2.0 的差别](https://gitea.iouf.cn/pengtang1024/tune/compare/v1.2.0...v1.3.0)
+- [与 1.2.0 的差别](https://gitea.iouf.cn/pengtang1024/tune/compare/0d59f11d8c1aa48b5658b93fe8fae72030502766...v1.3.0)
+- 1.3.0 之前的 tag 已撤回，不再提供下载。

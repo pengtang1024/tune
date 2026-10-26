@@ -66,3 +66,16 @@ flutter test
 - [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md)
 - [`LICENSE`](../LICENSE)
 - [`docs/verification.md`](verification.md)
+
+## 6. 已撤回的版本
+
+2026-10-26 起，`v1.0.0`、`v1.1.0`、`v1.2.0` 的 tag 已从 `origin` 与 `github`
+删除，不再提供 tag 归档下载。它们对应的提交仍留在 git 历史中：
+
+| 版本 | 提交 |
+| --- | --- |
+| v1.0.0 | `9aea9dd` |
+| v1.1.0 | `0ebcccf` |
+| v1.2.0 | `0d59f11` |
+
+要连同历史一起移除，需要重写 git 历史并 force-push；本次没有做。
