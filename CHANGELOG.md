@@ -2,7 +2,7 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
-## [未发布]
+## [1.3.0] - 2026-10-26
 
 ### 性能
 
@@ -14,6 +14,9 @@
   与进度线那一小块。
 - **系统的媒体控制不再每一跳都发消息**：播放位置由桌面自己轮询，播放器只在状态、
   曲目、音量真的变了才发布；封面的地址每首只问一次磁盘，不再每一跳都去读。
+- **行与提示再瘦一圈**：一行 197 → 162 个 element，空闲提示 overlay 仍为 0；
+  一次收藏只重建一行（3751 → 87 个 element）。提示门面与触发器合成一个元素，
+  行内图标改用 `IconGlyph`，不再各带一层盒子。
 
 ### 新增
 
@@ -80,6 +83,24 @@
 - **健康度未知不再按中性算**：从未扫描、没有产出统计或没有稳定历史时，相关维度
   按 `0.25` 计；从未出过曲目的来源会低于 `60`，先待在「更多音源」。来源有曲目后，
   缺失的可播放/封面/元数据仍按 0 计。
+- **发现页横向分段可翻页**：分段自带左右箭头和悬停才出现的滚动条，鼠标也能
+  走到横排尽头；翻页按钮的文案随界面语言。
+- **选中标记并进已有的边框**：正在播放的曲目只换左边框颜色，不再常驻一个
+  `Stack`；双击收藏的行为不变。
+
+### 许可证
+
+- **补齐第三方声明**：新增 `THIRD_PARTY_NOTICES.md`，登记字体 OFL-1.1、
+  `dbus` 的 MPL-2.0、Apache-2.0 包、`just_audio_media_kit` 的 Unlicense，
+  以及 Linux 系统 libmpv/FFmpeg 的 GPL 说明（不随包分发）；设置页新增
+  “开源许可”入口。
+- **字体 OFL 原文随包分发**：Fraunces、Instrument Sans、JetBrains Mono、
+  Noto Sans SC、Noto Serif SC 的 `OFL.txt` 进入 assets；Linux 安装包附带
+  `LICENSE` 与 `THIRD_PARTY_NOTICES.md`。
+- **安装包元数据改为 MIT**：Windows 的 `LegalCopyright` 与 macOS 的
+  `PRODUCT_COPYRIGHT` 不再写 “All rights reserved”，与根 `LICENSE` 对齐。
+- **移除已下线的插件脚本**：删除 `assets/js/music_plugin_shims.js` 与
+  `music_plugin_bootstrap.js`，不再把第三方 JS bundle 打进安装包。
 
 ## [1.2.0] - 2026-10-22
 
@@ -156,5 +177,5 @@
 
 ## 链接
 
-- [1.2.0](https://gitea.iouf.cn/pengtang1024/tune/releases/tag/v1.2.0)
-- [与 1.1.0 的差别](https://gitea.iouf.cn/pengtang1024/tune/compare/v1.1.0...v1.2.0)
+- [1.3.0](https://gitea.iouf.cn/pengtang1024/tune/releases/tag/v1.3.0)
+- [与 1.2.0 的差别](https://gitea.iouf.cn/pengtang1024/tune/compare/v1.2.0...v1.3.0)
