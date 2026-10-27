@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/data/services/providers/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
 import 'package:tune/features/discovery/application/discovery_signal_observer.dart';
@@ -20,6 +21,7 @@ class AppInitializer {
 
       await _initPersistenceService(ref);
       await _initFavorites(ref);
+      await _initPlaybackSession(ref);
       await _initAudioPlayerService(ref);
       await _initMusicScannerService(ref);
       await WindowManagerService.init();
@@ -52,6 +54,16 @@ class AppInitializer {
     } catch (error, stackTrace) {
       Log.error('初始化收藏失败: $error', stackTrace);
       Log.info('收藏初始化失败，但应用将继续运行');
+    }
+  }
+
+  static Future<void> _initPlaybackSession(Ref ref) async {
+    try {
+      await ref.read(playbackSessionStoreProvider).init();
+      Log.info('播放会话初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('初始化播放会话失败: $error', stackTrace);
+      Log.info('播放会话初始化失败，但应用将继续运行');
     }
   }
 

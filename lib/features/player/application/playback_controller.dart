@@ -7,6 +7,7 @@ import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
+import 'package:tune/data/services/providers/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
@@ -20,7 +21,6 @@ import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_source.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
-import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 final playbackControllerProvider =
@@ -28,7 +28,7 @@ final playbackControllerProvider =
       final audio = ref.watch(audioPlayerServiceProvider);
       final downloads = ref.watch(songDownloadServiceProvider);
       final resolver = ref.watch(streamUrlResolverProvider);
-      final store = PlaybackSessionStore(ref.watch(persistenceServiceProvider));
+      final store = ref.watch(playbackSessionStoreProvider);
       // The switch decides what a start reads, not what the running player
       // writes, so it is read once when the controller is built.
       final restore = ref
