@@ -76,6 +76,9 @@ class AudiobookshelfSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 12);
 
   @override
@@ -112,6 +115,7 @@ class AudiobookshelfSourceAdapter extends MusicSourceAdapter {
             : '$server/api/libraries/${Uri.encodeComponent(library)}/search',
         queryParameters: {
           'limit': limit,
+          'page': request.offset ~/ limit,
           if (keyword == null) 'sort': 'addedAt',
           if (keyword == null) 'desc': '1',
           'q': ?keyword,

@@ -74,6 +74,9 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -104,6 +107,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
           'Recursive': 'true',
           'IncludeItemTypes': 'Audio',
           'Fields': 'Genres,MediaSources,Bitrate,SampleRate',
+          'StartIndex': request.offset,
           'Limit': limit,
         },
         options: Options(headers: {'X-Emby-Token': token}),

@@ -100,6 +100,9 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -126,6 +129,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
           'f': 'json',
           'query': query ?? '',
           'songCount': limit,
+          if (request.offset > 0) 'songOffset': request.offset,
           'artistCount': 0,
           'albumCount': 0,
         },

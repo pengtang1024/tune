@@ -2,6 +2,22 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
+## [1.10.0] - 2026-10-27
+
+### 新增
+
+- **分页扩展到 Wikimedia 与自建媒体库**：Wikimedia 的关键词流按 `gsroffset`
+  取下一窗；Jellyfin、Emby 用 `StartIndex`，Plex 用 `X-Plex-Container-Start`，
+  Subsonic 用 `songOffset`，Audiobookshelf 用 `page`。
+- 支持「加载更多」的音源现在共 13 个：Openverse、Audius、Internet Archive、
+  LibriVox、ccMixter、Funkwhale、Radio Browser、Wikimedia、Jellyfin、Emby、
+  Plex、Subsonic、Audiobookshelf。
+
+### 说明
+
+- Wikimedia 的浏览流（分类遍历）用 continuation token，数字 offset 无法命名，
+  点「加载更多」会直接提示「没有更多了」；关键词流可以正常翻页。
+
 ## [1.9.0] - 2026-10-27
 
 ### 新增

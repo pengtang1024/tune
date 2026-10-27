@@ -73,6 +73,9 @@ class PlexSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -95,8 +98,8 @@ class PlexSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(config.setting('limit'));
       final keyword = config.setting('query');
       final body = keyword == null
-          ? await _recentTracks(server, token, limit)
-          : await _searchTracks(server, token, keyword, limit);
+          ? await _recentTracks(server, token, limit, request.offset)
+          : await _searchTracks(server, token, keyword, limit, request.offset);
       if (body == null) {
         return SourceScanResult(
           sourceId: config.id,
@@ -132,7 +135,12 @@ class PlexSourceAdapter extends MusicSourceAdapter {
   ///
   /// The music of a Plex library lives in one section, so the section is
   /// looked up first; a server with no music section answers with nothing.
-  Future<String?> _recentTracks(String server, String token, int limit) async {
+  Future<String?> _recentTracks(
+    String server,
+    String token,
+    int limit,
+    int offset,
+  ) async {
     final sections = await _dio.get<String>(
       '$server/library/sections',
       queryParameters: {'X-Plex-Token': token},
@@ -145,6 +153,7 @@ class PlexSourceAdapter extends MusicSourceAdapter {
       queryParameters: {
         'type': '10',
         'X-Plex-Token': token,
+        'X-Plex-Container-Start': '$offset',
         'X-Plex-Container-Size': '$limit',
       },
     );
@@ -157,12 +166,14 @@ class PlexSourceAdapter extends MusicSourceAdapter {
     String token,
     String keyword,
     int limit,
+    int offset,
   ) async {
     final response = await _dio.get<String>(
       '$server/library/search',
       queryParameters: {
         'query': keyword,
         'limit': '$limit',
+        'X-Plex-Container-Start': '$offset',
         'X-Plex-Token': token,
       },
     );
