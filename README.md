@@ -79,6 +79,9 @@ flutter build linux --release
 ./tool/package_linux.sh    # dist/tune-linux-x64-<version>.tar.gz
 ```
 
+1.5.0 之前的版本没有更新入口，用 `./tool/upgrade_local.sh` 升级一次；之后由
+应用自己检查更新。
+
 ## 桌面图标
 
 - 原图是 `branding/app_icon.png`；改完原图后跑 `dart run flutter_launcher_icons` 重新生成各平台图标。原图不进包，`assets/` 里只放运行时要用的素材。

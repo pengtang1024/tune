@@ -45,6 +45,21 @@ flutter build linux --release
 Gitea 的 release 接口当前不可用，所以更新检查统一走 GitHub；Gitea 的
 release 只作为人工下载入口。
 
+## 从旧版本升级一次
+
+「检查更新」是 1.5.0 才加进去的，更早的版本里没有这段代码，所以它们无法自己
+发现新版本。装过一次 1.5.0 之后就不用再管：
+
+```bash
+# 默认升级 ~/.local/opt/tune，旧版本备份为 tune.previous
+./tool/upgrade_local.sh
+# 升级后重启应用
+./tool/upgrade_local.sh ~/.local/opt/tune --restart
+```
+
+脚本从 GitHub 的 latest release 下载 Linux 归档，解压前先备份；新包不完整时
+会把备份换回来。
+
 ## 安装行为
 
 - **Linux**：归档下载到临时目录，解压到 bundle 同级的 `.tune-update`，再把
