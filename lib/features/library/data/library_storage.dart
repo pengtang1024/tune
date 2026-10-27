@@ -18,6 +18,25 @@ abstract class LibraryStorage {
   /// pinned track (a favorite) is marked so a later prune never drops it.
   Future<void> save(List<Song> songs, {Set<String> pinned = const {}});
 
+  /// Merges one batch of scanned tracks into the library.
+  ///
+  /// A track that is already stored this way is not written again, so a scan
+  /// that brings a library back costs nothing. The batch travels to the disk
+  /// in windows, so a library of any size is ingested without the controller
+  /// ever holding more than a window of it. Answers how many rows were
+  /// written.
+  Future<int> ingest(List<Song> songs);
+
+  /// Marks the rows the scan does not cover as outside the library.
+  ///
+  /// The rows of sources that are off now, and the local files that no
+  /// longer sit under one of [localPaths], stay in the database but leave
+  /// the page. Answers how many rows were marked.
+  Future<int> deactivateUncovered({
+    required Set<String> enabledSourceIds,
+    required List<String> localPaths,
+  });
+
   /// How many tracks the library holds.
   Future<int> count();
 

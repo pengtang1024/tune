@@ -8,6 +8,12 @@ int compareText(String left, String right) {
   return _fold(left).compareTo(_fold(right));
 }
 
+/// The text as the library orders it: case and accents folded away.
+///
+/// The database orders the rows by this key, so a window read from the disk
+/// stands in the same order the page used to sort by itself.
+String foldText(String text) => _fold(text);
+
 /// The text without the case and the accent of its letters.
 String _fold(String text) {
   final buffer = StringBuffer();

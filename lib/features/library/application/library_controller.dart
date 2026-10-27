@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
-import 'package:tune/core/utils/text_order.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
@@ -77,6 +75,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
 
   /// Reads the next window of the library.
+  ///
+  /// The window is a slice of the same ordered table the first window came
+  /// from, so the next window is appended as it is read — no second sort, no
+  /// second copy of the tracks.
   Future<void> loadMore() async {
     if (_disposed || !state.hasValue || !_current.hasMore) return;
 
@@ -99,11 +101,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       state = AsyncData(_current.copyWith(hasMore: false));
       return;
     }
-    final merged = _dedupe([..._current.songs, ...next])
-      ..sort((a, b) => compareText(a.title, b.title));
     state = AsyncData(
       _current.copyWith(
-        songs: List.unmodifiable(merged),
+        songs: List.unmodifiable([..._current.songs, ...next]),
         hasMore: next.length == windowSize,
       ),
     );
@@ -246,25 +246,40 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
       if (_disposed || generation != _scanGeneration) return;
 
-      final songs = _mergeResults(results);
-      // A scan that brings the same library back keeps the list it had. The
-      // list is the input of the whole viewport: handing the page a new list
-      // rebuilds every visible row (about 0.4s for twenty rows) even though
-      // no track changed.
-      final songsUnchanged = _sameLibrary(_current.songs, songs);
       final summaries = <String, SourceScanSummary>{
         for (final result in results)
           result.sourceId: SourceScanSummary.fromResult(result),
       };
 
-      if (_disposed || generation != _scanGeneration) return;
-      final saved = await _saveQuietly(songs, pinned: _pinnedUris());
-      if (_disposed || generation != _scanGeneration) return;
-      if (saved) {
-        final removed = await _prune();
-        if (removed.isNotEmpty) {
-          songs.removeWhere((song) => removed.contains(song.uri));
+      // The scanned tracks travel to the database a window at a time; the
+      // controller never holds more than one window of the library. A source
+      // that failed or was skipped wrote nothing, so the rows it brought
+      // before are kept without any merging here.
+      var written = 0;
+      var saved = true;
+      for (final result in results) {
+        if (!result.isSuccess) continue;
+        try {
+          written += await _storage.ingest(result.songs);
+        } catch (error, stackTrace) {
+          // A scan whose rows cannot be written keeps the library it had and
+          // does not mark the source as scanned, so the next scan retries.
+          Log.error('保存音乐库失败: $error\n$stackTrace');
+          saved = false;
         }
+        if (_disposed || generation != _scanGeneration) return;
+      }
+      var deactivated = 0;
+      if (saved) {
+        // The rows the scan does not cover are the sources that are off now
+        // and the files that are gone from the folders the scan reads.
+        deactivated = await _deactivateUncovered(
+          enabled: enabled,
+          results: results,
+          localPaths: scanPaths,
+        );
+        if (_disposed || generation != _scanGeneration) return;
+        await _prune();
         if (_disposed || generation != _scanGeneration) return;
         await _sourceService.commitSuccessfulScans(results);
         if (_disposed || generation != _scanGeneration) return;
@@ -289,23 +304,30 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
       final total = await _storage.count();
       if (_disposed || generation != _scanGeneration) return;
+      // A scan that changed nothing keeps the window it had: the list is the
+      // input of the whole viewport, and a new list — even an equal one —
+      // rebuilds every visible row.
+      final songs = written > 0 || deactivated > 0
+          ? List<Song>.unmodifiable(await _window(query: '', sourceId: null))
+          : _current.songs;
       state = AsyncData(
         _current.copyWith(
-          songs: songsUnchanged ? _current.songs : List.unmodifiable(songs),
+          songs: songs,
           total: total,
           hasMore: songs.length < total,
+          albums: saved ? await _storage.albumSummaries() : null,
           scanStatus: LibraryScanStatus.completed,
           scanProgress: 1,
           isLoading: false,
           statusMessage: _statusMessage(
             results: results,
-            songCount: songs.length,
+            songCount: total,
             successCount: successCount,
             failedCount: failedCount,
             skippedCount: skippedCount,
             needsConfigCount: needsConfigCount,
           ),
-          errorMessage: successCount == 0 && failedCount > 0 && songs.isEmpty
+          errorMessage: successCount == 0 && failedCount > 0 && total == 0
               ? AppStrings.instance.scanAllSourcesFailed
               : null,
           sourceSummaries: Map.unmodifiable(summaries),
@@ -328,40 +350,32 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// Puts songs into the library.
   ///
   /// The files the desktop hands to the player belong in the library, and so
-  /// do the tracks the reader picks from an online search. A track that is
-  /// already here keeps the time it first entered, and the batch is written
-  /// once.
+  /// do the tracks the reader picks from an online search. The batch is
+  /// merged into the database a window at a time, and the page reads its
+  /// window from the library again — the batch itself is never held whole.
   Future<bool> addSongs(List<Song> songs) async {
     if (songs.isEmpty) return false;
     await future;
     if (_disposed || !state.hasValue) return false;
 
-    final previousByUri = {for (final song in _current.songs) song.uri: song};
-    final incoming = [
-      for (final song in songs) _keepFirstSeen(song, previousByUri[song.uri]),
-    ];
-    final merged = _dedupe([..._current.songs, ...incoming])
-      ..sort((a, b) => compareText(a.title, b.title));
-    final saved = await _saveQuietly(merged, pinned: _pinnedUris());
-    final removed = await _prune();
-    if (removed.isNotEmpty) {
-      merged.removeWhere((song) => removed.contains(song.uri));
+    var written = 0;
+    try {
+      written = await _storage.ingest(songs);
+    } catch (error, stackTrace) {
+      // A batch that cannot be written leaves the library as it was.
+      Log.error('保存音乐库失败: $error\n$stackTrace');
     }
     if (_disposed || !state.hasValue) return false;
-    if (_current.query.isNotEmpty || _current.sourceFilter != null) {
+
+    final filterActive = _current.query.isNotEmpty || _current.sourceFilter != null;
+    if (written > 0 || filterActive) {
       await _reloadForFilter();
-      return saved;
+      return written > 0;
     }
     final total = await _storage.count();
     if (_disposed || !state.hasValue) return false;
-    state = AsyncData(
-      _current.copyWith(
-        songs: List<Song>.unmodifiable(merged),
-        total: total,
-        hasMore: merged.length < total,
-      ),
-    );
-    return saved;
+    state = AsyncData(_current.copyWith(total: total));
+    return false;
   }
 
   /// Notes that a track played, so the prune keeps it over an untouched one.
@@ -385,16 +399,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   Future<void> dropSource(String sourceId) async {
     if (_disposed || !state.hasValue) return;
 
-    final songs = _current.songs
-        .where((song) => (song.sourceId ?? 'local') != sourceId)
-        .toList(growable: false);
     final summaries = Map<String, SourceScanSummary>.of(
       _current.sourceSummaries,
     )..remove(sourceId);
 
     state = AsyncData(
       _current.copyWith(
-        songs: List.unmodifiable(songs),
         sourceSummaries: Map.unmodifiable(summaries),
         sourceFilter: _current.sourceFilter == sourceId
             ? null
@@ -402,14 +412,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       ),
     );
     await _storage.removeSource(sourceId);
-    final total = await _storage.count();
     if (_disposed || !state.hasValue) return;
-    state = AsyncData(
-      _current.copyWith(
-        total: total,
-        hasMore: _current.songs.length < total,
-      ),
-    );
+    await _reloadForFilter();
   }
 
   Future<void> setSourceFilter(String? sourceId) async {
@@ -491,75 +495,53 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     }
   }
 
-  /// A successful scan adds its songs to the library instead of replacing
-  /// what the source brought before. A window of 8–50 tracks would otherwise
-  /// throw away every track the reader had already seen, and the library is
-  /// an index of what the reader has met, not a copy of the last answer.
-  /// Failed or skipped sources keep their cached songs as well.
-  /// Whether two libraries hold the same tracks with the same facts.
+  /// Marks the rows the scan does not cover as outside the library.
   ///
-  /// A scan builds new [Song] objects on every pass, so the objects cannot be
-  /// compared by identity. The document of a song is its facts, and comparing
-  /// the documents answers the only question the page cares about: would a
-  /// reader see anything different.
-  bool _sameLibrary(List<Song> left, List<Song> right) {
-    if (identical(left, right)) return true;
-    if (left.length != right.length) return false;
-    for (var i = 0; i < left.length; i++) {
-      if (jsonEncode(left[i].toJson()) != jsonEncode(right[i].toJson())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  List<Song> _mergeResults(List<SourceScanResult> results) {
-    final previousBySource = <String, List<Song>>{};
-    final previousByUri = <String, Song>{};
-    for (final song in _current.songs) {
-      final sourceId = song.sourceId ?? 'local';
-      previousBySource.putIfAbsent(sourceId, () => []).add(song);
-      previousByUri[song.uri] = song;
-    }
-
-    final merged = <Song>[];
-    for (final result in results) {
-      final previous = previousBySource[result.sourceId] ?? const <Song>[];
-      // The songs the source brought before stay, and the new window joins
-      // them. A track that is in both keeps the time it first entered.
-      merged.addAll(previous);
-      if (!result.shouldKeepPreviousSongs) {
-        merged.addAll(
-          result.songs.map(
-            (song) => _keepFirstSeen(song, previousByUri[song.uri]),
-          ),
-        );
-      }
-    }
-
-    // Sources that are disabled have no result, so their cached songs are
-    // intentionally dropped from the active library.
-    return _dedupe(merged)..sort((a, b) => compareText(a.title, b.title));
-  }
-
-
-
-  /// Keeps the first time a track entered the library.
+  /// Marks the rows the scan does not cover as outside the library.
   ///
-  /// The scanner creates a new [Song] on every scan and stamps it with the
-  /// time of that scan. The library is an index, not a new collection, so a
-  /// track that was already here keeps the earlier stamp: "added" means when
-  /// the reader first had the track, not when the app last looked at it.
-  Song _keepFirstSeen(Song song, Song? previous) {
-    if (previous == null || previous.dateAdded <= 0) return song;
-    if (song.dateAdded > 0 && song.dateAdded <= previous.dateAdded) return song;
-    return song.copyWith(dateAdded: previous.dateAdded);
+  /// The sources that are off now, and the local files that no longer sit
+  /// under one of the folders the scan reads, are not part of the library
+  /// any more. A local scan that failed (the drive is away) keeps every
+  /// local row — only a scan that reads its folders answers for them.
+  Future<int> _deactivateUncovered({
+    required List<MusicSourceConfig> enabled,
+    required List<SourceScanResult> results,
+    required List<String> localPaths,
+  }) {
+    final enabledIds = {for (final source in enabled) source.id};
+    final localSources = enabled.where((source) => source.isLocal);
+    final localSucceeded = results.any(
+      (result) =>
+          result.isSuccess &&
+          localSources.any((source) => source.id == result.sourceId),
+    );
+    return _storage.deactivateUncovered(
+      enabledSourceIds: enabledIds,
+      localPaths: localSucceeded ? localPaths : const [],
+    );
   }
 
-  int _earlierDate(int left, int right) {
-    if (left <= 0) return right;
-    if (right <= 0) return left;
-    return left < right ? left : right;
+  /// The window the page shows: what matches the query and the source filter,
+  /// read from the database.
+  ///
+  /// A small library is read whole; a larger one is read a window at a time,
+  /// so its size never decides the cost of the frame.
+  Future<List<Song>> _window({
+    required String query,
+    required String? sourceId,
+  }) async {
+    if (query.isEmpty && sourceId == null) {
+      final total = await _storage.count();
+      return total > windowSize
+          ? _storage.page(offset: 0, limit: windowSize)
+          : _storage.load();
+    }
+    return _storage.search(
+      query: query,
+      sourceId: sourceId,
+      offset: 0,
+      limit: windowSize,
+    );
   }
 
   String _statusMessage({
@@ -597,56 +579,19 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     return AppStrings.instance.scanUpdated(failedCount, songCount);
   }
 
+  /// Drops what the storage ranks lowest, and answers what it removed.
+  Future<void> _prune() async {
+    final limit = ref.read(libraryCacheLimitProvider);
+    if (limit <= 0) return;
+    // The window does not hold every marked track, so the pins are written
+    // to the whole table before a prune decides what to drop.
+    await _storage.syncPinned(_pinnedUris());
+    await _storage.prune(limit);
+  }
+
   /// The tracks a prune must never drop.
   ///
   /// A favorite stays. The queue is not read here: it lives in the player,
   /// and the library must not pull the player up to merge a scan.
-  Set<String> _pinnedUris() =>
-      ref.read(favoritesControllerProvider).ids;
-
-
-  /// Drops what the storage ranks lowest, and answers what it removed.
-  Future<Set<String>> _prune() async {
-    final limit = ref.read(libraryCacheLimitProvider);
-    if (limit <= 0) return const {};
-    // The window does not hold every marked track, so the pins are written
-    // to the whole table before a prune decides what to drop.
-    await _storage.syncPinned(_pinnedUris());
-    final removed = await _storage.prune(limit);
-    return removed.toSet();
-  }
-
-  Future<bool> _saveQuietly(
-    List<Song> songs, {
-    Set<String> pinned = const {},
-  }) async {
-    try {
-      await _storage.save(songs, pinned: pinned);
-      return true;
-    } catch (error, stackTrace) {
-      // A successful scan should still be usable even if persistence fails.
-      Log.error('保存音乐库失败: $error\n$stackTrace');
-      return false;
-    }
-  }
-
-  List<Song> _dedupe(List<Song> songs) {
-    final merged = <String, Song>{};
-    for (final song in songs) {
-      final known = merged[song.uri];
-      // A track that is on the disk and a track that comes from a source are
-      // one track: the copy keeps the identity of the source, so the two
-      // entries meet and become one row that knows both.
-      if (known == null) {
-        merged[song.uri] = song;
-        continue;
-      }
-      final next = known.mergeWith(song);
-      final firstSeen = _earlierDate(known.dateAdded, song.dateAdded);
-      merged[song.uri] = next.dateAdded == firstSeen
-          ? next
-          : next.copyWith(dateAdded: firstSeen);
-    }
-    return merged.values.toList();
-  }
+  Set<String> _pinnedUris() => ref.read(favoritesControllerProvider).ids;
 }
