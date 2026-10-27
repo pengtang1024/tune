@@ -4,6 +4,7 @@ import 'package:tune/data/services/providers/audio_player_service_provider.dart'
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
 import 'package:tune/features/discovery/application/discovery_signal_observer.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -18,6 +19,7 @@ class AppInitializer {
       Log.info('开始初始化应用核心服务');
 
       await _initPersistenceService(ref);
+      await _initFavorites(ref);
       await _initAudioPlayerService(ref);
       await _initMusicScannerService(ref);
       await WindowManagerService.init();
@@ -39,6 +41,17 @@ class AppInitializer {
     } catch (error, stackTrace) {
       Log.error('初始化持久化服务失败: $error', stackTrace);
       rethrow;
+    }
+  }
+
+  static Future<void> _initFavorites(Ref ref) async {
+    try {
+      await ref.read(favoritesStoreProvider).init();
+      ref.read(favoritesControllerProvider.notifier).reload();
+      Log.info('收藏初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('初始化收藏失败: $error', stackTrace);
+      Log.info('收藏初始化失败，但应用将继续运行');
     }
   }
 

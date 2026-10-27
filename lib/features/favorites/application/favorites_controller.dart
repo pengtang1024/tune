@@ -31,6 +31,11 @@ class FavoritesController extends Notifier<FavoritesState> {
     return FavoritesState(ids: ref.read(favoritesStoreProvider).read());
   }
 
+  /// Reads the marks again after the store finished opening the database.
+  void reload() {
+    state = FavoritesState(ids: ref.read(favoritesStoreProvider).read());
+  }
+
   /// Whether the track with this address is one of the favorites.
   bool contains(String id) => state.contains(id);
 

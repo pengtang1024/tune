@@ -4,7 +4,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/data/impl/library_database.dart';
+import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/library/data/library_document.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/utils/logger.dart';
@@ -162,7 +162,7 @@ class SqliteLibraryStorage implements LibraryStorage {
 
   final Future<Directory> Function()? _supportDirectory;
 
-  LibraryDatabase? _database;
+  AppDatabase? _database;
 
   Future<Directory> _directory() async {
     final base =
@@ -174,12 +174,12 @@ class SqliteLibraryStorage implements LibraryStorage {
     return directory;
   }
 
-  Future<LibraryDatabase> _db() async {
+  Future<AppDatabase> _db() async {
     final existing = _database;
     if (existing != null) return existing;
 
     final directory = await _directory();
-    final database = LibraryDatabase.open(path.join(directory.path, _fileName));
+    final database = AppDatabase.open(path.join(directory.path, _fileName));
     _database = database;
     await _adoptLegacyDocument(database, directory);
     return database;
@@ -190,7 +190,7 @@ class SqliteLibraryStorage implements LibraryStorage {
   /// The document is renamed after it is read, so a second start does not
   /// read it again, and the songs it held stay readable if the import fails.
   Future<void> _adoptLegacyDocument(
-    LibraryDatabase database,
+    AppDatabase database,
     Directory directory,
   ) async {
     if (database.count() > 0) return;

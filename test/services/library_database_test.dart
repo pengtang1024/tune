@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/data/impl/library_database.dart';
+import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/library/data/impl/library_storage_io.dart';
 
 /// The library lives in SQLite: rows are written one by one and a library of
@@ -22,7 +22,7 @@ void main() {
 
   group('library database', () {
     test('prune keeps the pinned and the newest tracks of a source', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
 
       database.save(
@@ -41,13 +41,9 @@ void main() {
     });
 
     test('prune never drops the local files', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
-      const local = Song(
-        id: 9,
-        title: 'Local',
-        uri: '/music/local.mp3',
-      );
+      const local = Song(id: 9, title: 'Local', uri: '/music/local.mp3');
       database.save([local, song(1), song(2)]);
 
       database.prune(1);
@@ -59,7 +55,7 @@ void main() {
     });
 
     test('a limit of zero keeps everything', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([song(1), song(2), song(3)]);
 
@@ -68,7 +64,7 @@ void main() {
     });
 
     test('saves and reads the tracks back', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
 
       database.save([song(1), song(2)]);
@@ -81,7 +77,7 @@ void main() {
     });
 
     test('a second save adds the new rows and keeps the old ones', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
 
       database.save([song(1), song(2)]);
@@ -101,7 +97,7 @@ void main() {
     });
 
     test('a source can be removed on its own', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([song(1), song(2)]);
 
@@ -111,7 +107,7 @@ void main() {
     });
 
     test('a page reads the library by title', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([song(1), song(2), song(3)]);
 
@@ -123,7 +119,7 @@ void main() {
     });
 
     test('clearing the database leaves no track', () {
-      final database = LibraryDatabase.inMemory();
+      final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([song(1)]);
 
