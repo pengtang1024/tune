@@ -65,6 +65,12 @@ class AppDatabase {
         value TEXT NOT NULL
       )
     ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS listening_signals (
+        uri TEXT PRIMARY KEY,
+        json TEXT NOT NULL
+      )
+    ''');
     _migrateColumns(db);
     return db;
   }
@@ -318,6 +324,40 @@ class AppDatabase {
   void clearQueue() {
     _db.execute('DELETE FROM queue');
     _db.execute('DELETE FROM queue_meta');
+  }
+
+  /// The aggregates the discover page learns from the player.
+  Map<String, Object?> loadListening() {
+    final rows = _db.select('SELECT uri, json FROM listening_signals');
+    return {
+      for (final row in rows)
+        row['uri'] as String: jsonDecode(row['json'] as String),
+    };
+  }
+
+  void saveListening(Map<String, Object?> tracks) {
+    _db.execute('BEGIN');
+    try {
+      _db.execute('DELETE FROM listening_signals');
+      final statement = _db.prepare(
+        'INSERT INTO listening_signals (uri, json) VALUES (?, ?)',
+      );
+      try {
+        for (final entry in tracks.entries) {
+          statement.execute([entry.key, jsonEncode(entry.value)]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  void clearListening() {
+    _db.execute('DELETE FROM listening_signals');
   }
 
   /// Empties the library.
