@@ -8,6 +8,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -403,6 +404,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   selected: selected,
                   playing: playing,
                   isFavorite: isFavorite,
+                  unavailable: ref.watch(deadSongsProvider).contains(song.uri),
                   source: sourceLabel(song, sourceLabels),
                   metrics: metrics,
                   onTap: () {

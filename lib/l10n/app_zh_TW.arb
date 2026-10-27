@@ -54,6 +54,7 @@
   "updateRetry": "重試",
   "updateRestart": "立即重新啟動",
   "updateNoArchive": "這個平台不支援自動安裝，請到發布頁手動下載",
+  "songMayBeUnavailable": "可能已失效",
   "about": "關於",
   "language": "語言",
   "theme": "主題",

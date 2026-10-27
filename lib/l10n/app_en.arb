@@ -54,6 +54,7 @@
   "updateRetry": "Try again",
   "updateRestart": "Restart now",
   "updateNoArchive": "This platform has no automatic install; download it from the release page",
+  "songMayBeUnavailable": "May be unavailable",
   "about": "About",
   "language": "Language",
   "theme": "Theme",

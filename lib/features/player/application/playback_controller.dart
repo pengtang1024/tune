@@ -10,6 +10,7 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/audio_source_resolver.dart';
 import 'package:tune/features/player/application/playback_session_recorder.dart';
 import 'package:tune/features/player/data/playback_session_store.dart';
@@ -39,6 +40,7 @@ final playbackControllerProvider =
         resolver,
         sessionStore: store,
         restoreSession: restore,
+        deadSongs: ref.watch(deadSongsProvider.notifier),
       );
     });
 
@@ -54,7 +56,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     this._resolver, {
     PlaybackSessionStore? sessionStore,
     bool restoreSession = true,
-  }) : _audioSources = AudioSourceResolver(_downloads),
+    DeadSongsController? deadSongs,
+  }) : _deadSongs = deadSongs,
+       _audioSources = AudioSourceResolver(_downloads),
        _prefetcher = TrackPrefetcher(_downloads),
        _sessionRecorder = sessionStore == null
            ? null
@@ -81,6 +85,9 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   final AudioPlayerService _audio;
   final SongDownloadService _downloads;
   final StreamUrlResolver _resolver;
+
+  /// The marks of the tracks whose playback failed, if the app keeps them.
+  final DeadSongsController? _deadSongs;
   final AudioSourceResolver _audioSources;
   final TrackPrefetcher _prefetcher;
   final List<StreamSubscription<dynamic>> _subscriptions = [];
@@ -164,6 +171,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     if (state.status == PlaybackStatus.loading) {
       if (isPlaying) {
         state = state.copyWith(status: PlaybackStatus.playing);
+        final song = state.currentSong;
+        if (song != null) unawaited(_deadSongs?.clear(song.uri));
       }
       return;
     }
@@ -784,6 +793,8 @@ class PlaybackController extends StateNotifier<PlaybackState> {
 
     if (song.isRemote) {
       state = state.copyWith(audioSourceStatus: AudioSourceStatus.failed);
+      // The track stays in the library; the row only carries a mark.
+      unawaited(_deadSongs?.markFailed(song.uri));
     }
     _setError(message, stackTrace);
   }

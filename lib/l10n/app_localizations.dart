@@ -298,6 +298,12 @@ abstract class AppLocalizations {
   /// **'这个平台不支持自动安装，请到发布页手动下载'**
   String get updateNoArchive;
 
+  /// No description provided for @songMayBeUnavailable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可能已失效'**
+  String get songMayBeUnavailable;
+
   /// No description provided for @about.
   ///
   /// In zh_CN, this message translates to:

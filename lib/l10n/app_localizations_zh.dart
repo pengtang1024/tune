@@ -114,6 +114,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateNoArchive => '这个平台不支持自动安装，请到发布页手动下载';
 
   @override
+  String get songMayBeUnavailable => '可能已失效';
+
+  @override
   String get about => '关于';
 
   @override
@@ -2382,6 +2385,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get updateNoArchive => '这个平台不支持自动安装，请到发布页手动下载';
 
   @override
+  String get songMayBeUnavailable => '可能已失效';
+
+  @override
   String get about => '关于';
 
   @override
@@ -4648,6 +4654,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get updateNoArchive => '這個平台不支援自動安裝，請到發布頁手動下載';
+
+  @override
+  String get songMayBeUnavailable => '可能已失效';
 
   @override
   String get about => '關於';
