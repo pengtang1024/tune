@@ -162,6 +162,38 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  CompactTokens.space20,
+                  0,
+                  CompactTokens.space20,
+                  CompactTokens.space8,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.save_alt_rounded,
+                      size: CompactTokens.icon14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: CompactTokens.space8),
+                    Expanded(
+                      child: Text(
+                        context.loc.searchAutoSave,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: search?.autoSave ?? false,
+                      onChanged: (value) => ref
+                          .read(onlineSearchControllerProvider.notifier)
+                          .setAutoSave(value),
+                    ),
+                  ],
+                ),
+              ),
               Divider(
                 height: 1,
                 thickness: 1,

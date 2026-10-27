@@ -1589,6 +1589,18 @@ abstract class AppLocalizations {
   /// **'每次扫描电台数'**
   String get fieldLimitStations;
 
+  /// No description provided for @fieldScanPages.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描页数'**
+  String get fieldScanPages;
+
+  /// No description provided for @fieldScanPagesHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'一次扫描翻几页，1–10；页数越多扫描越久'**
+  String get fieldScanPagesHint;
+
   /// No description provided for @fieldLimitHint.
   ///
   /// In zh_CN, this message translates to:
@@ -1817,6 +1829,18 @@ abstract class AppLocalizations {
   /// **'自定义'**
   String get settingsCustomPath;
 
+  /// No description provided for @settingsSourceCacheLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每来源最多保留'**
+  String get settingsSourceCacheLimit;
+
+  /// No description provided for @settingsNoLimit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不限'**
+  String get settingsNoLimit;
+
   /// No description provided for @settingsAddFolder.
   ///
   /// In zh_CN, this message translates to:
@@ -1990,6 +2014,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'没有更多了'**
   String get searchNoMore;
+
+  /// No description provided for @searchAutoSave.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索结果自动加入音乐库'**
+  String get searchAutoSave;
 
   /// No description provided for @searchAddToLibrary.
   ///

@@ -921,6 +921,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldLimitStations => 'Stations per scan';
 
   @override
+  String get fieldScanPages => 'Pages per scan';
+
+  @override
+  String get fieldScanPagesHint =>
+      'How many pages one scan reads, 1–10; more pages take longer';
+
+  @override
   String fieldLimitHint(int count, int max) {
     return '$count by default, $max at most';
   }
@@ -1041,6 +1048,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCustomPath => 'Custom';
 
   @override
+  String get settingsSourceCacheLimit => 'Tracks kept per source';
+
+  @override
+  String get settingsNoLimit => 'No limit';
+
+  @override
   String get settingsAddFolder => 'Add folder';
 
   @override
@@ -1148,6 +1161,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchNoMore => 'No more results';
+
+  @override
+  String get searchAutoSave => 'Auto-add results to the library';
 
   @override
   String get searchAddToLibrary => 'Add to library';

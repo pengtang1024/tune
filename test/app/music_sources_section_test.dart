@@ -167,7 +167,8 @@ void main() {
         .toList();
 
     // server, user, password, query, limit
-    expect(fields, hasLength(5));
+    // server, user, password, format, limit and pages.
+    expect(fields, hasLength(6));
 
     Finder fieldWithLabel(String label) => find.byWidgetPredicate(
       (widget) => widget is TextField && widget.decoration?.labelText == label,
@@ -236,7 +237,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('配置 Jellyfin'), findsOneWidget);
-    expect(find.byType(TextField), findsNWidgets(4));
+    // server, user, password, limit and pages.
+    expect(find.byType(TextField), findsNWidgets(5));
     expect(tester.takeException(), isNull);
   });
 

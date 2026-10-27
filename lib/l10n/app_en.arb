@@ -506,6 +506,8 @@
   "fieldLimitEpisodes": "Episodes per scan",
   "fieldLimitPodcasts": "Podcasts per scan",
   "fieldLimitStations": "Stations per scan",
+  "fieldScanPages": "Pages per scan",
+  "fieldScanPagesHint": "How many pages one scan reads, 1–10; more pages take longer",
   "fieldLimitHint": "{count} by default, {max} at most",
   "@fieldLimitHint": {
     "placeholders": {
@@ -554,6 +556,8 @@
   "settingsDefaultPath": "Default",
   "settingsNoDefaultFolder": "No default music folder found",
   "settingsCustomPath": "Custom",
+  "settingsSourceCacheLimit": "Tracks kept per source",
+  "settingsNoLimit": "No limit",
   "settingsAddFolder": "Add folder",
   "settingsClearLibrary": "Clear library",
   "settingsScanSafetyNote": "Scanning only reads audio files. Nothing on disk is changed or deleted.",
@@ -598,6 +602,7 @@
   "searchAddLibraryFailed": "Could not add the tracks to the library",
   "searchLoadMore": "Load more",
   "searchNoMore": "No more results",
+  "searchAutoSave": "Auto-add results to the library",
   "searchAddToLibrary": "Add to library",
   "searchAddAllToLibrary": "Add all",
   "searchAddedToLibrary": "Added",

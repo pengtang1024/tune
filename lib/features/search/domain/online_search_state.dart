@@ -17,6 +17,9 @@ class OnlineSearchState {
   /// Where the next window of a source starts, when it walks with a cursor.
   final Map<String, String> cursors;
 
+  /// Whether the results are put into the library as they arrive.
+  final bool autoSave;
+
   const OnlineSearchState({
     this.query = '',
     this.isSearching = false,
@@ -25,6 +28,7 @@ class OnlineSearchState {
     this.message,
     this.loadingMore,
     this.cursors = const {},
+    this.autoSave = false,
   });
 
   bool get hasQuery => query.isNotEmpty;
@@ -44,6 +48,7 @@ class OnlineSearchState {
     Object? message = _keep,
     Object? loadingMore = _keep,
     Map<String, String>? cursors,
+    bool? autoSave,
   }) {
     return OnlineSearchState(
       query: query ?? this.query,
@@ -55,6 +60,7 @@ class OnlineSearchState {
           ? this.loadingMore
           : loadingMore as String?,
       cursors: cursors ?? this.cursors,
+      autoSave: autoSave ?? this.autoSave,
     );
   }
 }

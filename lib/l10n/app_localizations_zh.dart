@@ -852,6 +852,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldLimitStations => '每次扫描电台数';
 
   @override
+  String get fieldScanPages => '每次扫描页数';
+
+  @override
+  String get fieldScanPagesHint => '一次扫描翻几页，1–10；页数越多扫描越久';
+
+  @override
   String fieldLimitHint(int count, int max) {
     return '默认 $count，最大 $max';
   }
@@ -968,6 +974,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsCustomPath => '自定义';
 
   @override
+  String get settingsSourceCacheLimit => '每来源最多保留';
+
+  @override
+  String get settingsNoLimit => '不限';
+
+  @override
   String get settingsAddFolder => '添加文件夹';
 
   @override
@@ -1063,6 +1075,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get searchNoMore => '没有更多了';
+
+  @override
+  String get searchAutoSave => '搜索结果自动加入音乐库';
 
   @override
   String get searchAddToLibrary => '加入音乐库';
@@ -3123,6 +3138,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldLimitStations => '每次扫描电台数';
 
   @override
+  String get fieldScanPages => '每次扫描页数';
+
+  @override
+  String get fieldScanPagesHint => '一次扫描翻几页，1–10；页数越多扫描越久';
+
+  @override
   String fieldLimitHint(int count, int max) {
     return '默认 $count，最大 $max';
   }
@@ -3239,6 +3260,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsCustomPath => '自定义';
 
   @override
+  String get settingsSourceCacheLimit => '每来源最多保留';
+
+  @override
+  String get settingsNoLimit => '不限';
+
+  @override
   String get settingsAddFolder => '添加文件夹';
 
   @override
@@ -3334,6 +3361,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get searchNoMore => '没有更多了';
+
+  @override
+  String get searchAutoSave => '搜索结果自动加入音乐库';
 
   @override
   String get searchAddToLibrary => '加入音乐库';
@@ -5394,6 +5424,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get fieldLimitStations => '每次掃描電台數';
 
   @override
+  String get fieldScanPages => '每次掃描頁數';
+
+  @override
+  String get fieldScanPagesHint => '一次掃描翻幾頁，1–10；頁數越多掃描越久';
+
+  @override
   String fieldLimitHint(int count, int max) {
     return '預設 $count，最多 $max';
   }
@@ -5510,6 +5546,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsCustomPath => '自訂';
 
   @override
+  String get settingsSourceCacheLimit => '每來源最多保留';
+
+  @override
+  String get settingsNoLimit => '不限';
+
+  @override
   String get settingsAddFolder => '新增資料夾';
 
   @override
@@ -5605,6 +5647,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get searchNoMore => '沒有更多了';
+
+  @override
+  String get searchAutoSave => '搜尋結果自動加入音樂庫';
 
   @override
   String get searchAddToLibrary => '加入音樂庫';

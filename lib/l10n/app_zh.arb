@@ -506,6 +506,8 @@
   "fieldLimitEpisodes": "每次扫描集数",
   "fieldLimitPodcasts": "每次扫描播客数",
   "fieldLimitStations": "每次扫描电台数",
+  "fieldScanPages": "每次扫描页数",
+  "fieldScanPagesHint": "一次扫描翻几页，1–10；页数越多扫描越久",
   "fieldLimitHint": "默认 {count}，最大 {max}",
   "@fieldLimitHint": {
     "placeholders": {
@@ -554,6 +556,8 @@
   "settingsDefaultPath": "默认",
   "settingsNoDefaultFolder": "未找到默认音乐目录",
   "settingsCustomPath": "自定义",
+  "settingsSourceCacheLimit": "每来源最多保留",
+  "settingsNoLimit": "不限",
   "settingsAddFolder": "添加文件夹",
   "settingsClearLibrary": "清空音乐库",
   "settingsScanSafetyNote": "扫描只读取音频文件，不会修改或删除磁盘内容。",
@@ -598,6 +602,7 @@
   "searchAddLibraryFailed": "加入音乐库失败",
   "searchLoadMore": "加载更多",
   "searchNoMore": "没有更多了",
+  "searchAutoSave": "搜索结果自动加入音乐库",
   "searchAddToLibrary": "加入音乐库",
   "searchAddAllToLibrary": "全部加入",
   "searchAddedToLibrary": "已加入",

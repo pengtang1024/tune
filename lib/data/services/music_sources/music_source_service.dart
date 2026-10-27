@@ -134,6 +134,13 @@ class MusicSourceService implements StreamUrlResolver {
     return [
       if (adapter.browseModes.isNotEmpty) _browseField(adapter),
       ...adapter.configurationFields,
+      if (adapter.supportsPaging)
+        MusicSourceField(
+          'pages',
+          AppStrings.instance.fieldScanPages,
+          AppStrings.instance.fieldScanPagesHint,
+          numeric: true,
+        ),
     ];
   }
 
@@ -450,24 +457,45 @@ class MusicSourceService implements StreamUrlResolver {
 
     final watch = Stopwatch()..start();
     try {
-      final result = await adapter
-          .scan(
-            MusicSourceScanRequest(
-              config: config,
-              localPaths: localPaths,
-              onProgress: (progress) => onProgress(progress.clamp(0.0, 1.0)),
-            ),
-          )
-          .timeout(adapter.scanTimeout);
+      final pages = _scanPagesOf(config);
+      final songs = <Song>[];
+      String? cursor;
+      SourceScanResult? last;
+      for (var page = 0; page < pages; page++) {
+        final result = await adapter
+            .scan(
+              MusicSourceScanRequest(
+                config: config,
+                localPaths: localPaths,
+                offset: songs.length,
+                cursor: cursor,
+                onProgress: (progress) {
+                  final overall = ((page + progress.clamp(0.0, 1.0)) / pages)
+                      .clamp(0.0, 1.0);
+                  onProgress(overall);
+                },
+              ),
+            )
+            .timeout(adapter.scanTimeout);
+        last = result;
+        songs.addAll(result.songs);
+        cursor = result.cursor;
+        if (!result.isSuccess ||
+            !adapter.supportsPaging ||
+            result.songs.isEmpty) {
+          break;
+        }
+      }
       watch.stop();
 
       return SourceScanResult(
         sourceId: config.id,
-        status: result.status,
-        songs: result.songs,
-        message: result.message,
-        scannedAt: result.scannedAt,
+        status: last?.status ?? SourceScanStatus.failed,
+        songs: songs,
+        message: last?.message,
+        scannedAt: last?.scannedAt ?? DateTime.now(),
         elapsed: watch.elapsed,
+        cursor: last?.cursor,
       );
     } on TimeoutException {
       watch.stop();
@@ -488,6 +516,15 @@ class MusicSourceService implements StreamUrlResolver {
         elapsed: watch.elapsed,
       );
     }
+  }
+
+  /// How many pages one scan of a source reads.
+  ///
+  /// The source field says 1 unless the reader asks for more; the ceiling
+  /// keeps a scan from running for minutes on a slow connection.
+  static int _scanPagesOf(MusicSourceConfig config) {
+    final raw = int.tryParse(config.setting('pages') ?? '') ?? 1;
+    return raw.clamp(1, 10);
   }
 
   String _intervalLabel(Duration interval) {

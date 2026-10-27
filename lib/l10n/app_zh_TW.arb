@@ -506,6 +506,8 @@
   "fieldLimitEpisodes": "每次掃描集數",
   "fieldLimitPodcasts": "每次掃描播客數",
   "fieldLimitStations": "每次掃描電台數",
+  "fieldScanPages": "每次掃描頁數",
+  "fieldScanPagesHint": "一次掃描翻幾頁，1–10；頁數越多掃描越久",
   "fieldLimitHint": "預設 {count}，最多 {max}",
   "@fieldLimitHint": {
     "placeholders": {
@@ -554,6 +556,8 @@
   "settingsDefaultPath": "預設",
   "settingsNoDefaultFolder": "找不到預設音樂目錄",
   "settingsCustomPath": "自訂",
+  "settingsSourceCacheLimit": "每來源最多保留",
+  "settingsNoLimit": "不限",
   "settingsAddFolder": "新增資料夾",
   "settingsClearLibrary": "清空音樂庫",
   "settingsScanSafetyNote": "掃描只讀取音訊檔案，不會修改或刪除磁碟內容。",
@@ -598,6 +602,7 @@
   "searchAddLibraryFailed": "加入音樂庫失敗",
   "searchLoadMore": "載入更多",
   "searchNoMore": "沒有更多了",
+  "searchAutoSave": "搜尋結果自動加入音樂庫",
   "searchAddToLibrary": "加入音樂庫",
   "searchAddAllToLibrary": "全部加入",
   "searchAddedToLibrary": "已加入",

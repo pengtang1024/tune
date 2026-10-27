@@ -10,6 +10,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
+import 'package:tune/features/library/application/library_cache_limit_provider.dart';
+import 'package:tune/features/library/domain/library_cache_limit.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -379,7 +381,17 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     // Sources that are disabled have no result, so their cached songs are
     // intentionally dropped from the active library.
-    return _dedupe(merged)..sort((a, b) => compareText(a.title, b.title));
+    final deduped = _dedupe(merged)
+      ..sort((a, b) => compareText(a.title, b.title));
+    return _applyCacheLimit(deduped);
+  }
+
+  /// Keeps the newest tracks of every remote source when a limit is set.
+  List<Song> _applyCacheLimit(List<Song> songs) {
+    final limit = ref.read(libraryCacheLimitProvider);
+    if (limit <= 0) return songs;
+    return applyCacheLimit(songs, limit)
+      ..sort((a, b) => compareText(a.title, b.title));
   }
 
   /// Keeps the first time a track entered the library.
