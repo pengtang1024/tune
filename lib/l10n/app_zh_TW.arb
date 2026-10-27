@@ -255,6 +255,24 @@
   },
   "sourcesFieldName": "名稱",
   "sourcesFieldNameHint": "留空則用類型名加序號",
+  "sourcesClearSongs": "清空曲目",
+  "sourcesClearSongsTitle": "清空「{name}」的曲目？",
+  "@sourcesClearSongsTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesClearSongsHint": "只移除這個來源帶來的曲目，來源本身保留",
+  "sourcesSongsCleared": "已清空「{name}」的曲目",
+  "@sourcesSongsCleared": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "sourcesDelete": "刪除",
   "sourcesDeleteTitle": "刪除「{name}」？",
   "@sourcesDeleteTitle": {

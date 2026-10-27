@@ -480,6 +480,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Leave empty to use the type name and a number';
 
   @override
+  String get sourcesClearSongs => 'Clear tracks';
+
+  @override
+  String sourcesClearSongsTitle(String name) {
+    return 'Clear the tracks of $name?';
+  }
+
+  @override
+  String get sourcesClearSongsHint =>
+      'Removes only the tracks this source brought; the source stays';
+
+  @override
+  String sourcesSongsCleared(String name) {
+    return 'Cleared the tracks of $name';
+  }
+
+  @override
   String get sourcesDelete => 'Delete';
 
   @override

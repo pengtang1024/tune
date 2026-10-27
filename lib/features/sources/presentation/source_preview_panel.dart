@@ -11,11 +11,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// The reader sees the tracks the answer holds before the source is kept, so
 /// a wrong path shows up here as a wrong title and not as an empty library.
 class SourcePreviewPanel extends StatelessWidget {
-  const SourcePreviewPanel({
-    super.key,
-    required this.running,
-    this.preview,
-  });
+  const SourcePreviewPanel({super.key, required this.running, this.preview});
 
   /// Whether a trial is running.
   final bool running;

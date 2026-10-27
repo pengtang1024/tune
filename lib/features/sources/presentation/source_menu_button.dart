@@ -69,6 +69,11 @@ class SourceMenuButton extends ConsumerWidget {
                   : context.loc.sourcesMoveToMore,
             ),
           ),
+          if (!source.isLocal)
+            PopupMenuItem(
+              value: _SourceAction.clearSongs,
+              child: Text(context.loc.sourcesClearSongs),
+            ),
           if (!source.builtIn)
             PopupMenuItem(
               value: _SourceAction.delete,
@@ -111,6 +116,9 @@ class SourceMenuButton extends ConsumerWidget {
             .setSourceInMore(source.id, false);
         if (context.mounted) _say(context, context.loc.sourcesMovedToMain);
         break;
+      case _SourceAction.clearSongs:
+        await _clearSongs(context, ref);
+        break;
       case _SourceAction.delete:
         await _delete(context, ref);
         break;
@@ -123,6 +131,35 @@ class SourceMenuButton extends ConsumerWidget {
       ..showSnackBar(
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
+  }
+
+  /// Removes the tracks a source brought in, keeping the source.
+  ///
+  /// A scan gathers more than its last window, so the reader needs a way to
+  /// start over without deleting the instance.
+  Future<void> _clearSongs(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.loc.sourcesClearSongsTitle(source.name)),
+        content: Text(context.loc.sourcesClearSongsHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.loc.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.loc.clear),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await ref.read(libraryControllerProvider.notifier).dropSource(source.id);
+    if (!context.mounted) return;
+    _say(context, context.loc.sourcesSongsCleared(source.name));
   }
 
   /// Removes the instance and the tracks it brought in.
@@ -168,4 +205,11 @@ class SourceMenuButton extends ConsumerWidget {
 }
 
 /// The actions the menu of a source offers.
-enum _SourceAction { moveUp, moveDown, moveToMore, moveToMain, delete }
+enum _SourceAction {
+  moveUp,
+  moveDown,
+  moveToMore,
+  moveToMain,
+  clearSongs,
+  delete,
+}

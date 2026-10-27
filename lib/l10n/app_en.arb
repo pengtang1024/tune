@@ -255,6 +255,24 @@
   },
   "sourcesFieldName": "Name",
   "sourcesFieldNameHint": "Leave empty to use the type name and a number",
+  "sourcesClearSongs": "Clear tracks",
+  "sourcesClearSongsTitle": "Clear the tracks of {name}?",
+  "@sourcesClearSongsTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesClearSongsHint": "Removes only the tracks this source brought; the source stays",
+  "sourcesSongsCleared": "Cleared the tracks of {name}",
+  "@sourcesSongsCleared": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "sourcesDelete": "Delete",
   "sourcesDeleteTitle": "Delete \"{name}\"?",
   "@sourcesDeleteTitle": {

@@ -838,6 +838,30 @@ abstract class AppLocalizations {
   /// **'留空则用类型名加序号'**
   String get sourcesFieldNameHint;
 
+  /// No description provided for @sourcesClearSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空曲目'**
+  String get sourcesClearSongs;
+
+  /// No description provided for @sourcesClearSongsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清空「{name}」的曲目？'**
+  String sourcesClearSongsTitle(String name);
+
+  /// No description provided for @sourcesClearSongsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只移除这个来源带来的曲目，来源本身保留'**
+  String get sourcesClearSongsHint;
+
+  /// No description provided for @sourcesSongsCleared.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已清空「{name}」的曲目'**
+  String sourcesSongsCleared(String name);
+
   /// No description provided for @sourcesDelete.
   ///
   /// In zh_CN, this message translates to:
