@@ -9,18 +9,18 @@ import 'package:tune/domain/models/song.dart';
 /// with a hundred thousand tracks would be a hundred megabytes rewritten on
 /// every scan. A table writes the rows that changed, and the rows are read
 /// back without decoding one giant list.
-class LibraryDatabase {
-  LibraryDatabase(this._db);
+class AppDatabase {
+  AppDatabase(this._db);
 
   final Database _db;
 
   /// Opens the database at [path], creating the table the first time.
-  static LibraryDatabase open(String path) =>
-      LibraryDatabase(_prepare(sqlite3.open(path)));
+  static AppDatabase open(String path) =>
+      AppDatabase(_prepare(sqlite3.open(path)));
 
   /// Opens a database that lives only in memory, for tests.
-  static LibraryDatabase inMemory() =>
-      LibraryDatabase(_prepare(sqlite3.openInMemory()));
+  static AppDatabase inMemory() =>
+      AppDatabase(_prepare(sqlite3.openInMemory()));
 
   /// Creates the table and its indexes when they are not there yet.
   static Database _prepare(Database db) {
@@ -43,6 +43,12 @@ class LibraryDatabase {
       'CREATE INDEX IF NOT EXISTS idx_songs_source ON songs(source_id)',
     );
     db.execute('CREATE INDEX IF NOT EXISTS idx_songs_title ON songs(title)');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS favorites (
+        uri TEXT PRIMARY KEY,
+        added_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
     _migrateColumns(db);
     return db;
   }
@@ -158,10 +164,7 @@ class LibraryDatabase {
     if (removed.isEmpty) return removed;
 
     final placeholders = List.filled(removed.length, '?').join(', ');
-    _db.execute(
-      'DELETE FROM songs WHERE uri IN ($placeholders)',
-      removed,
-    );
+    _db.execute('DELETE FROM songs WHERE uri IN ($placeholders)', removed);
     return removed;
   }
 
@@ -196,6 +199,35 @@ class LibraryDatabase {
   /// Removes the tracks of one source.
   void removeSource(String sourceId) {
     _db.execute('DELETE FROM songs WHERE source_id = ?', [sourceId]);
+  }
+
+  /// The tracks the reader marked with a heart.
+  List<String> loadFavorites() {
+    final rows = _db.select('SELECT uri FROM favorites ORDER BY added_at');
+    return [for (final row in rows) row['uri'] as String];
+  }
+
+  /// Replaces the marks with [ids].
+  void saveFavorites(Set<String> ids) {
+    _db.execute('BEGIN');
+    try {
+      _db.execute('DELETE FROM favorites');
+      final statement = _db.prepare(
+        'INSERT OR REPLACE INTO favorites (uri, added_at) VALUES (?, ?)',
+      );
+      try {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        for (final id in ids) {
+          statement.execute([id, now]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   /// Empties the library.
