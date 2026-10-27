@@ -1051,6 +1051,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSourceCacheLimit => 'Tracks kept per source';
 
   @override
+  String get settingsSourceCacheLimitHint =>
+      'Favorites, recently played and recently seen tracks are kept first';
+
+  @override
   String get settingsNoLimit => 'No limit';
 
   @override

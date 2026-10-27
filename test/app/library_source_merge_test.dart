@@ -387,9 +387,15 @@ class FakeLibraryStorage extends LibraryStorage {
   Future<List<Song>> load() async => List.unmodifiable(songs);
 
   @override
-  Future<void> save(List<Song> songs) async {
+  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {
     this.songs = List.of(songs);
   }
+
+  @override
+  Future<List<String>> prune(int limit) async => const [];
+
+  @override
+  Future<void> markPlayed(String uri) async {}
 
   @override
   Future<void> clear() async {

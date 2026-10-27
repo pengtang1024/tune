@@ -32,14 +32,37 @@ class LibraryDatabase {
         artist TEXT,
         album TEXT,
         date_added INTEGER,
-        json TEXT NOT NULL
+        json TEXT NOT NULL,
+        pinned INTEGER NOT NULL DEFAULT 0,
+        last_seen INTEGER NOT NULL DEFAULT 0,
+        last_played INTEGER,
+        play_count INTEGER NOT NULL DEFAULT 0
       )
     ''');
     db.execute(
       'CREATE INDEX IF NOT EXISTS idx_songs_source ON songs(source_id)',
     );
     db.execute('CREATE INDEX IF NOT EXISTS idx_songs_title ON songs(title)');
+    _migrateColumns(db);
     return db;
+  }
+
+  /// Adds the columns an older database does not have yet.
+  static void _migrateColumns(Database db) {
+    final columns = {
+      for (final row in db.select('PRAGMA table_info(songs)'))
+        row['name'] as String,
+    };
+    const additions = {
+      'pinned': 'pinned INTEGER NOT NULL DEFAULT 0',
+      'last_seen': 'last_seen INTEGER NOT NULL DEFAULT 0',
+      'last_played': 'last_played INTEGER',
+      'play_count': 'play_count INTEGER NOT NULL DEFAULT 0',
+    };
+    for (final entry in additions.entries) {
+      if (columns.contains(entry.key)) continue;
+      db.execute('ALTER TABLE songs ADD COLUMN ${entry.value}');
+    }
   }
 
   /// Every track the library holds.
@@ -62,12 +85,13 @@ class LibraryDatabase {
   ///
   /// Rows that did not change are left alone, so a scan that adds ten tracks
   /// writes ten rows instead of the whole library.
-  void save(List<Song> songs) {
+  void save(List<Song> songs, {Set<String> pinned = const {}}) {
     final incoming = {for (final song in songs) song.uri};
     final existing = {
       for (final row in _db.select('SELECT uri FROM songs'))
         row['uri'] as String,
     };
+    final seenAt = DateTime.now().millisecondsSinceEpoch;
 
     _db.execute('BEGIN');
     try {
@@ -75,10 +99,21 @@ class LibraryDatabase {
         _db.execute('DELETE FROM songs WHERE uri = ?', [uri]);
       }
 
+      // The pin and the last seen time follow the scan; the last played time
+      // and the play count belong to the player and are left alone.
       final statement = _db.prepare('''
-        INSERT OR REPLACE INTO songs
-          (uri, source_id, title, artist, album, date_added, json)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO songs
+          (uri, source_id, title, artist, album, date_added, json, pinned, last_seen)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(uri) DO UPDATE SET
+          source_id = excluded.source_id,
+          title = excluded.title,
+          artist = excluded.artist,
+          album = excluded.album,
+          date_added = excluded.date_added,
+          json = excluded.json,
+          pinned = excluded.pinned,
+          last_seen = excluded.last_seen
       ''');
       try {
         for (final song in songs) {
@@ -90,6 +125,8 @@ class LibraryDatabase {
             song.album,
             song.dateAdded,
             jsonEncode(song.toJson()),
+            pinned.contains(song.uri) ? 1 : 0,
+            seenAt,
           ]);
         }
       } finally {
@@ -100,6 +137,50 @@ class LibraryDatabase {
       _db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  /// Drops the least valuable tracks of every remote source beyond [limit].
+  ///
+  /// The ranking happens inside the database, so a library of a hundred
+  /// thousand tracks is pruned without loading all of them into memory. A
+  /// pinned track (a favorite, a queued track) is never dropped; the rest go
+  /// by last played, then last seen, then by the time they entered.
+  List<String> prune(int limit) {
+    if (limit <= 0) return const [];
+
+    final rows = _db.select(
+      '''
+      SELECT uri FROM (
+        SELECT uri,
+          ROW_NUMBER() OVER (
+            PARTITION BY source_id
+            ORDER BY pinned DESC, last_played DESC, last_seen DESC, date_added DESC
+          ) AS position
+        FROM songs
+        WHERE source_id != 'local'
+      )
+      WHERE position > ?
+      ''',
+      [limit],
+    );
+    final removed = [for (final row in rows) row['uri'] as String];
+    if (removed.isEmpty) return removed;
+
+    final placeholders = List.filled(removed.length, '?').join(', ');
+    _db.execute(
+      'DELETE FROM songs WHERE uri IN ($placeholders)',
+      removed,
+    );
+    return removed;
+  }
+
+  /// Notes that a track played, which raises its place in the ranking.
+  void markPlayed(String uri) {
+    if (uri.isEmpty) return;
+    _db.execute(
+      'UPDATE songs SET last_played = ?, play_count = play_count + 1 WHERE uri = ?',
+      [DateTime.now().millisecondsSinceEpoch, uri],
+    );
   }
 
   /// Empties the library.

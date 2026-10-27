@@ -11,7 +11,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
-import 'package:tune/features/library/domain/library_cache_limit.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -192,9 +192,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       };
 
       if (_disposed || generation != _scanGeneration) return;
-      final saved = await _saveQuietly(songs);
+      final saved = await _saveQuietly(songs, pinned: _pinnedUris());
       if (_disposed || generation != _scanGeneration) return;
       if (saved) {
+        final removed = await _prune();
+        if (removed.isNotEmpty) {
+          songs.removeWhere((song) => removed.contains(song.uri));
+        }
+        if (_disposed || generation != _scanGeneration) return;
         await _sourceService.commitSuccessfulScans(results);
         if (_disposed || generation != _scanGeneration) return;
       }
@@ -267,10 +272,24 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     ];
     final merged = _dedupe([..._current.songs, ...incoming])
       ..sort((a, b) => compareText(a.title, b.title));
+    final saved = await _saveQuietly(merged, pinned: _pinnedUris());
+    final removed = await _prune();
+    if (removed.isNotEmpty) {
+      merged.removeWhere((song) => removed.contains(song.uri));
+    }
+    if (_disposed || !state.hasValue) return false;
     state = AsyncData(
       _current.copyWith(songs: List<Song>.unmodifiable(merged)),
     );
-    return _saveQuietly(merged);
+    return saved;
+  }
+
+  /// Notes that a track played, so the prune keeps it over an untouched one.
+  Future<void> notePlayed(String uri) async {
+    if (uri.isEmpty) return;
+    await future;
+    if (_disposed) return;
+    await _storage.markPlayed(uri);
   }
 
   void setQuery(String query) {
@@ -381,18 +400,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     // Sources that are disabled have no result, so their cached songs are
     // intentionally dropped from the active library.
-    final deduped = _dedupe(merged)
-      ..sort((a, b) => compareText(a.title, b.title));
-    return _applyCacheLimit(deduped);
+    return _dedupe(merged)..sort((a, b) => compareText(a.title, b.title));
   }
 
-  /// Keeps the newest tracks of every remote source when a limit is set.
-  List<Song> _applyCacheLimit(List<Song> songs) {
-    final limit = ref.read(libraryCacheLimitProvider);
-    if (limit <= 0) return songs;
-    return applyCacheLimit(songs, limit)
-      ..sort((a, b) => compareText(a.title, b.title));
-  }
+
 
   /// Keeps the first time a track entered the library.
   ///
@@ -447,9 +458,28 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     return AppStrings.instance.scanUpdated(failedCount, songCount);
   }
 
-  Future<bool> _saveQuietly(List<Song> songs) async {
+  /// The tracks a prune must never drop.
+  ///
+  /// A favorite stays. The queue is not read here: it lives in the player,
+  /// and the library must not pull the player up to merge a scan.
+  Set<String> _pinnedUris() =>
+      ref.read(favoritesControllerProvider).ids;
+
+
+  /// Drops what the storage ranks lowest, and answers what it removed.
+  Future<Set<String>> _prune() async {
+    final limit = ref.read(libraryCacheLimitProvider);
+    if (limit <= 0) return const {};
+    final removed = await _storage.prune(limit);
+    return removed.toSet();
+  }
+
+  Future<bool> _saveQuietly(
+    List<Song> songs, {
+    Set<String> pinned = const {},
+  }) async {
     try {
-      await _storage.save(songs);
+      await _storage.save(songs, pinned: pinned);
       return true;
     } catch (error, stackTrace) {
       // A successful scan should still be usable even if persistence fails.
