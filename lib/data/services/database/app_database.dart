@@ -24,6 +24,9 @@ class AppDatabase {
 
   /// Creates the table and its indexes when they are not there yet.
   static Database _prepare(Database db) {
+    // Two connections may open the same file (the library and the session
+    // store); a short wait keeps one from failing the other's write.
+    db.execute('PRAGMA busy_timeout = 5000');
     db.execute('''
       CREATE TABLE IF NOT EXISTS songs (
         uri TEXT PRIMARY KEY,
@@ -47,6 +50,19 @@ class AppDatabase {
       CREATE TABLE IF NOT EXISTS favorites (
         uri TEXT PRIMARY KEY,
         added_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS queue (
+        position INTEGER PRIMARY KEY,
+        uri TEXT NOT NULL,
+        json TEXT NOT NULL
+      )
+    ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS queue_meta (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
       )
     ''');
     _migrateColumns(db);
@@ -228,6 +244,80 @@ class AppDatabase {
       _db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  /// The playback queue, in play order.
+  List<Song> loadQueue() {
+    final rows = _db.select('SELECT json FROM queue ORDER BY position');
+    final songs = <Song>[];
+    for (final row in rows) {
+      try {
+        final decoded = jsonDecode(row['json'] as String);
+        if (decoded is! Map<String, dynamic>) continue;
+        songs.add(Song.fromMap(decoded));
+      } catch (_) {
+        // One broken row must not take the queue down.
+      }
+    }
+    return songs;
+  }
+
+  /// Replaces the queue with [songs].
+  void saveQueue(List<Song> songs) {
+    _db.execute('BEGIN');
+    try {
+      _db.execute('DELETE FROM queue');
+      final statement = _db.prepare(
+        'INSERT INTO queue (position, uri, json) VALUES (?, ?, ?)',
+      );
+      try {
+        for (var index = 0; index < songs.length; index++) {
+          final song = songs[index];
+          statement.execute([index, song.uri, jsonEncode(song.toJson())]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  /// The small values of the session: the cursor, the mode, the history.
+  Map<String, String> loadQueueMeta() {
+    final rows = _db.select('SELECT key, value FROM queue_meta');
+    return {
+      for (final row in rows)
+        row['key'] as String: row['value'] as String,
+    };
+  }
+
+  void saveQueueMeta(Map<String, String> meta) {
+    _db.execute('BEGIN');
+    try {
+      _db.execute('DELETE FROM queue_meta');
+      final statement = _db.prepare(
+        'INSERT INTO queue_meta (key, value) VALUES (?, ?)',
+      );
+      try {
+        for (final entry in meta.entries) {
+          statement.execute([entry.key, entry.value]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  void clearQueue() {
+    _db.execute('DELETE FROM queue');
+    _db.execute('DELETE FROM queue_meta');
   }
 
   /// Empties the library.

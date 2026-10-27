@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:tune/core/constants/app_preferences_constants.dart';
+import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
@@ -9,12 +13,20 @@ import 'package:tune/utils/logger.dart';
 
 /// Reads and writes the part of the playback that survives a restart.
 ///
-/// The queue and the position are stored apart: the position changes every
-/// few seconds, and rewriting the whole queue for it would keep the disk busy.
+/// The queue lives in SQLite, in the same file as the library; the position
+/// is a small value beside it. A build without a database falls back to the
+/// older JSON document, so the store works before the database is open.
 class PlaybackSessionStore {
-  final PersistenceService _persistence;
+  PlaybackSessionStore(
+    this._persistence, {
+    Future<Directory> Function()? supportDirectory,
+  }) : _supportDirectory = supportDirectory;
 
-  PlaybackSessionStore(this._persistence);
+  final PersistenceService _persistence;
+  final Future<Directory> Function()? _supportDirectory;
+
+  AppDatabase? _database;
+  PlaybackSession? _session;
 
   /// Writes run one after another, so two position writes cannot overlap and
   /// leave the older value behind.
@@ -26,11 +38,206 @@ class PlaybackSessionStore {
   /// The history the queue keeps; the controller applies the same limit.
   static const _maxHistory = 50;
 
+  /// Opens the database and reads the session that is already there.
+  Future<void> init() async {
+    try {
+      final base =
+          await (_supportDirectory?.call() ??
+              getApplicationSupportDirectory());
+      final directory = Directory(path.join(base.path, 'library'));
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      final database = AppDatabase.open(
+        path.join(directory.path, 'library.db'),
+      );
+      _database = database;
+
+      final queue = database.loadQueue();
+      if (queue.isEmpty) {
+        final legacy = _parseLegacy();
+        if (legacy != null) {
+          _session = legacy;
+          database.saveQueue(legacy.queue);
+          database.saveQueueMeta(_metaOf(legacy));
+        }
+        return;
+      }
+      _session = _sessionFromDb(queue, database.loadQueueMeta());
+    } catch (error, stackTrace) {
+      Log.error('打开播放会话数据库失败: $error\n$stackTrace');
+    }
+  }
+
   /// Reads the queue, the cursor, the mode and the last position.
   ///
-  /// A missing, empty or broken document is the same as no session: the app
-  /// starts with the empty player instead of guessing.
-  PlaybackSession? readSession() {
+  /// Before the database is open the older JSON document is read, so a build
+  /// that starts without one still answers.
+  PlaybackSession? readSession() => _session ?? _parseLegacy();
+
+  /// The volume of the player.
+  double readVolume() {
+    final value = _persistence.getDouble(AppPreferencesConstants.volume);
+    if (value == null) return 1.0;
+    return value.clamp(0.0, 1.0).toDouble();
+  }
+
+  /// Writes the queue and everything but the position.
+  Future<void> saveQueue({
+    required List<Song> queue,
+    required String currentUri,
+    required PlayMode playMode,
+    required List<String> history,
+  }) {
+    if (queue.isEmpty || currentUri.isEmpty) {
+      return clearSession();
+    }
+
+    _session = PlaybackSession(
+      queue: queue,
+      currentUri: currentUri,
+      playMode: playMode,
+      // A history entry that is no longer in the queue is dropped here, so
+      // the same rule holds before and after the database is open.
+      history: _readHistory(history, queue),
+    );
+    final database = _database;
+    if (database == null) {
+      return _serialize(
+        () => _persistence.setString(queueKey, _encode(_session!)),
+      );
+    }
+    return _serialize(() async {
+      database.saveQueue(queue);
+      database.saveQueueMeta(_metaOf(_session!));
+    });
+  }
+
+  /// Writes the cursor of the saved position.
+  Future<void> savePosition(String currentUri, Duration position) {
+    if (currentUri.isEmpty) {
+      return clearPosition();
+    }
+
+    final session = _session;
+    if (session != null && session.currentUri == currentUri) {
+      _session = PlaybackSession(
+        queue: session.queue,
+        currentUri: currentUri,
+        position: _clampPosition(
+          position,
+          Duration(milliseconds: session.currentSong.duration),
+        ),
+        playMode: session.playMode,
+        history: session.history,
+      );
+    }
+    final database = _database;
+    if (database == null) {
+      return _serialize(
+        () => _persistence.setString(
+          positionKey,
+          jsonEncode({
+            'uri': currentUri,
+            'positionMs': position.inMilliseconds,
+          }),
+        ),
+      );
+    }
+    return _serialize(() async {
+      final meta = database.loadQueueMeta();
+      meta['positionUri'] = currentUri;
+      meta['positionMs'] = '${position.inMilliseconds}';
+      database.saveQueueMeta(meta);
+    });
+  }
+
+  Future<void> saveVolume(double volume) {
+    return _serialize(
+      () => _persistence.setDouble(
+        AppPreferencesConstants.volume,
+        volume.clamp(0.0, 1.0).toDouble(),
+      ),
+    );
+  }
+
+  /// Drops the queue and the position, but keeps the volume.
+  Future<void> clearSession() {
+    _session = null;
+    final database = _database;
+    if (database == null) {
+      return _serialize(() async {
+        await _persistence.remove(queueKey);
+        await _persistence.remove(positionKey);
+      });
+    }
+    return _serialize(() async => database.clearQueue());
+  }
+
+  Future<void> clearPosition() {
+    _session = _session == null ? null : _zeroPosition(_session!);
+    final database = _database;
+    if (database == null) {
+      return _serialize(() => _persistence.remove(positionKey));
+    }
+    return _serialize(() async {
+      final meta = database.loadQueueMeta()
+        ..remove('positionUri')
+        ..remove('positionMs');
+      database.saveQueueMeta(meta);
+    });
+  }
+
+  PlaybackSession _zeroPosition(PlaybackSession session) {
+    return PlaybackSession(
+      queue: session.queue,
+      currentUri: session.currentUri,
+      playMode: session.playMode,
+      history: session.history,
+    );
+  }
+
+  Map<String, String> _metaOf(PlaybackSession session) {
+    return {
+      'currentUri': session.currentUri,
+      'playMode': session.playMode.name,
+      'history': jsonEncode(session.history),
+      'positionUri': session.currentUri,
+      'positionMs': '${session.position.inMilliseconds}',
+    };
+  }
+
+  PlaybackSession? _sessionFromDb(
+    List<Song> queue,
+    Map<String, String> meta,
+  ) {
+    if (queue.isEmpty) return null;
+    final savedUri = meta['currentUri'] ?? '';
+    final currentUri = queue.any((song) => song.uri == savedUri)
+        ? savedUri
+        : queue.first.uri;
+    final song = queue.firstWhere((item) => item.uri == currentUri);
+
+    final positionUri = meta['positionUri'] ?? '';
+    final positionMs = int.tryParse(meta['positionMs'] ?? '') ?? 0;
+    final position = positionUri == currentUri
+        ? _clampPosition(
+            Duration(milliseconds: positionMs),
+            Duration(milliseconds: song.duration),
+          )
+        : Duration.zero;
+
+    return PlaybackSession(
+      queue: queue,
+      currentUri: currentUri,
+      position: position,
+      playMode: _readMode(meta['playMode']),
+      history: _readHistory(_decodeHistory(meta['history']), queue),
+    );
+  }
+
+  /// Reads the session of the older JSON document.
+  PlaybackSession? _parseLegacy() {
     final raw = _persistence.getString(queueKey);
     if (raw == null || raw.trim().isEmpty) return null;
 
@@ -50,7 +257,7 @@ class PlaybackSessionStore {
       return PlaybackSession(
         queue: queue,
         currentUri: currentUri,
-        position: _readPosition(
+        position: _readLegacyPosition(
           currentUri,
           Duration(milliseconds: song.duration),
         ),
@@ -63,68 +270,13 @@ class PlaybackSessionStore {
     }
   }
 
-  /// The volume of the player.
-  ///
-  /// It uses the key the old theme service reserved for the volume, so the
-  /// two writers keep speaking about the same preference.
-  double readVolume() {
-    final value = _persistence.getDouble(AppPreferencesConstants.volume);
-    if (value == null) return 1.0;
-    return value.clamp(0.0, 1.0).toDouble();
-  }
-
-  /// Writes the queue and everything but the position.
-  Future<void> saveQueue({
-    required List<Song> queue,
-    required String currentUri,
-    required PlayMode playMode,
-    required List<String> history,
-  }) {
-    if (queue.isEmpty || currentUri.isEmpty) {
-      return clearSession();
-    }
-
-    final data = jsonEncode({
-      'queue': [for (final song in queue) song.toJson()],
-      'currentUri': currentUri,
-      'playMode': playMode.name,
-      'history': history,
+  String _encode(PlaybackSession session) {
+    return jsonEncode({
+      'queue': [for (final song in session.queue) song.toJson()],
+      'currentUri': session.currentUri,
+      'playMode': session.playMode.name,
+      'history': session.history,
     });
-    return _serialize(() => _persistence.setString(queueKey, data));
-  }
-
-  /// Writes the cursor of the saved position.
-  Future<void> savePosition(String currentUri, Duration position) {
-    if (currentUri.isEmpty) {
-      return clearPosition();
-    }
-    return _serialize(
-      () => _persistence.setString(
-        positionKey,
-        jsonEncode({'uri': currentUri, 'positionMs': position.inMilliseconds}),
-      ),
-    );
-  }
-
-  Future<void> saveVolume(double volume) {
-    return _serialize(
-      () => _persistence.setDouble(
-        AppPreferencesConstants.volume,
-        volume.clamp(0.0, 1.0).toDouble(),
-      ),
-    );
-  }
-
-  /// Drops the queue and the position, but keeps the volume.
-  Future<void> clearSession() {
-    return _serialize(() async {
-      await _persistence.remove(queueKey);
-      await _persistence.remove(positionKey);
-    });
-  }
-
-  Future<void> clearPosition() {
-    return _serialize(() => _persistence.remove(positionKey));
   }
 
   /// Runs [write] after every write that was asked for before it.
@@ -147,6 +299,15 @@ class PlaybackSessionStore {
     return List.unmodifiable(queue);
   }
 
+  Object? _decodeHistory(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return jsonDecode(raw);
+    } catch (_) {
+      return null;
+    }
+  }
+
   PlayMode _readMode(Object? value) {
     for (final mode in PlayMode.values) {
       if (mode.name == value) return mode;
@@ -167,11 +328,17 @@ class PlaybackSessionStore {
     return List.unmodifiable(history);
   }
 
-  /// The saved position, but only when it belongs to the saved track.
-  ///
-  /// A position at the very end would end the track the moment it starts, so
-  /// the last second is treated as "start from the beginning".
-  Duration _readPosition(String currentUri, Duration duration) {
+  Duration _clampPosition(Duration position, Duration duration) {
+    if (position <= Duration.zero) return Duration.zero;
+    if (duration > Duration.zero &&
+        position >= duration - const Duration(seconds: 1)) {
+      return Duration.zero;
+    }
+    return position;
+  }
+
+  /// The saved position of the older JSON document.
+  Duration _readLegacyPosition(String currentUri, Duration duration) {
     final raw = _persistence.getString(positionKey);
     if (raw == null || raw.trim().isEmpty) return Duration.zero;
 
@@ -182,14 +349,10 @@ class PlaybackSessionStore {
       }
       final milliseconds = decoded['positionMs'];
       if (milliseconds is! num) return Duration.zero;
-
-      final position = Duration(milliseconds: milliseconds.toInt());
-      if (position <= Duration.zero) return Duration.zero;
-      if (duration > Duration.zero &&
-          position >= duration - const Duration(seconds: 1)) {
-        return Duration.zero;
-      }
-      return position;
+      return _clampPosition(
+        Duration(milliseconds: milliseconds.toInt()),
+        duration,
+      );
     } catch (error, stackTrace) {
       Log.error('读取播放位置失败: $error\n$stackTrace');
       return Duration.zero;
