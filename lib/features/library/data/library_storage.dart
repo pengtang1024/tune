@@ -1,5 +1,6 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 
 /// The library of the app, as the songs it holds.
 ///
@@ -33,6 +34,12 @@ abstract class LibraryStorage {
 
   /// How many tracks match [query] and [sourceId].
   Future<int> countMatching({required String query, String? sourceId});
+
+  /// The albums of the library, without their tracks.
+  Future<List<AlbumSummary>> albumSummaries();
+
+  /// The tracks of one album.
+  Future<List<Song>> albumSongs(String key);
 
   /// Removes the tracks of one source.
   Future<void> removeSource(String sourceId);

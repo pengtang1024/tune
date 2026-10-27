@@ -10,6 +10,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
@@ -60,9 +61,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
   /// The album the reader opened, if any.
   ///
-  /// The key is kept instead of the album itself: the album is grouped
-  /// again on every build, and a search can take a track out of it.
-  String? _openAlbumKey;
+  /// The tracks are read when the album is opened, so a large library does
+  /// not hold every track of every album in memory.
+  LibraryAlbum? _openAlbum;
 
   /// The list widget of the last build, and what it was built from.
   ///
@@ -181,10 +182,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // The albums are grouped only while the page is showing them: the songs
     // view has no use for the groups, and a library can hold thousands of
     // tracks.
-    final albums = _view == LibraryViewMode.albums
-        ? libraryAlbumsOf(songs)
-        : const <LibraryAlbum>[];
-    final openAlbum = _albumOfKey(albums);
+    final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
 
     return Column(
@@ -210,7 +208,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 )
               : LibraryAlbumHeader(
                   album: openAlbum,
-                  onBack: () => setState(() => _openAlbumKey = null),
+                  onBack: () => setState(() => _openAlbum = null),
                   onPlay: () => _playAlbum(openAlbum),
                   onAddAll: () => _addAllToQueue(openAlbum.songs),
                 ),
@@ -249,7 +247,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               : _body(
                   library,
                   songs,
-                  albums,
                   openAlbum,
                   sourceLabels,
                   settings.onlyLikeOnDoubleClick,
@@ -309,7 +306,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   Widget _body(
     _LibrarySlice library,
     List<Song> songs,
-    List<LibraryAlbum> albums,
     LibraryAlbum? openAlbum,
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick,
@@ -343,11 +339,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             ),
           );
           return LibraryAlbumsView(
-            albums: albums,
+            albums: library.albums,
             currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
             controller: _albumsScrollController,
-            onOpen: (album) => setState(() => _openAlbumKey = album.key),
-            onPlay: _playAlbum,
+            onOpen: _openAlbumByKey,
+            onPlay: _playAlbumByKey,
           );
         },
       );
@@ -488,6 +484,35 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// The grid marks the album the reader is hearing; the track may be
   /// outside the current search, so the key is looked up in the whole
   /// library and not only in the list on screen.
+  /// Reads the tracks of an album and opens it.
+  Future<void> _openAlbumByKey(AlbumSummary summary) async {
+    final songs = await ref
+        .read(libraryControllerProvider.notifier)
+        .albumSongs(summary.key);
+    if (!mounted) return;
+    setState(() => _openAlbum = _albumOf(summary, songs));
+  }
+
+  /// Reads the tracks of an album and plays them.
+  Future<void> _playAlbumByKey(AlbumSummary summary) async {
+    final songs = await ref
+        .read(libraryControllerProvider.notifier)
+        .albumSongs(summary.key);
+    if (!mounted || songs.isEmpty) return;
+    await _playAlbum(_albumOf(summary, songs));
+  }
+
+  LibraryAlbum _albumOf(AlbumSummary summary, List<Song> songs) {
+    return LibraryAlbum(
+      key: summary.key,
+      name: summary.name,
+      artist: summary.artist,
+      songs: songs,
+      coverPath: summary.coverPath,
+      coverUrl: summary.coverUrl,
+    );
+  }
+
   String? _currentAlbumKey(List<Song> librarySongs, String? currentUri) {
     if (currentUri == null) return null;
     for (final song in librarySongs) {
@@ -496,20 +521,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return null;
   }
 
-  /// The album of [_openAlbumKey] in the albums that are on screen now.
-  LibraryAlbum? _albumOfKey(List<LibraryAlbum> albums) {
-    final key = _openAlbumKey;
-    if (key == null) return null;
-    for (final album in albums) {
-      if (album.key == key) return album;
-    }
-    return null;
-  }
-
   void _setView(LibraryViewMode view) {
     setState(() {
       _view = view;
-      _openAlbumKey = null;
+      _openAlbum = null;
     });
   }
 
@@ -576,6 +591,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 /// it. The parts that show the scan watch it on their own.
 typedef _LibrarySlice = ({
   List<Song> songs,
+  List<AlbumSummary> albums,
   List<Song> filteredSongs,
   String query,
   String? sourceFilter,
@@ -589,6 +605,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
   if (state == null) return null;
   return (
     songs: state.songs,
+    albums: state.albums,
     filteredSongs: state.filteredSongs,
     query: state.query,
     sourceFilter: state.sourceFilter,

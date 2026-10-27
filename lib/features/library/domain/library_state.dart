@@ -1,5 +1,6 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 
 enum LibraryScanStatus { idle, scanning, completed, error }
 
@@ -27,6 +28,9 @@ class LibraryState {
   /// Whether another window of the library is waiting on disk.
   final bool hasMore;
 
+  /// The albums of the library, without their tracks.
+  final List<AlbumSummary> albums;
+
   const LibraryState({
     this.songs = const [],
     this.query = '',
@@ -39,6 +43,7 @@ class LibraryState {
     this.sourceSummaries = const {},
     this.total = 0,
     this.hasMore = false,
+    this.albums = const [],
   });
 
   static const LibraryState initial = LibraryState();
@@ -70,6 +75,7 @@ class LibraryState {
     Map<String, SourceScanSummary>? sourceSummaries,
     int? total,
     bool? hasMore,
+    List<AlbumSummary>? albums,
   }) {
     return LibraryState(
       songs: songs ?? this.songs,
@@ -89,6 +95,7 @@ class LibraryState {
       sourceSummaries: sourceSummaries ?? this.sourceSummaries,
       total: total ?? this.total,
       hasMore: hasMore ?? this.hasMore,
+      albums: albums ?? this.albums,
     );
   }
 }

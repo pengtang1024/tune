@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -461,7 +462,14 @@ class MusicSourceService implements StreamUrlResolver {
       final songs = <Song>[];
       String? cursor;
       SourceScanResult? last;
+      // A scan of many pages may not run for minutes: the budget is the
+      // single-page timeout times the pages, capped at three minutes.
+      final budget = Duration(
+        seconds: math.min(adapter.scanTimeout.inSeconds * pages, 180),
+      );
+      final deadline = DateTime.now().add(budget);
       for (var page = 0; page < pages; page++) {
+        if (DateTime.now().isAfter(deadline)) break;
         final result = await adapter
             .scan(
               MusicSourceScanRequest(

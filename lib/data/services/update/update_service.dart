@@ -19,6 +19,13 @@ class UpdateService {
 
   final Dio _dio;
 
+  /// The release read the last time, and when.
+  UpdateRelease? _cached;
+  DateTime? _cachedAt;
+
+  /// How long a check may reuse the last answer.
+  static const _cacheFor = Duration(minutes: 10);
+
   UpdateService({Dio? dio})
     : _dio =
           dio ??
@@ -32,6 +39,10 @@ class UpdateService {
 
   /// The newest release, or `null` when the project published none.
   Future<UpdateRelease?> latest() async {
+    final cachedAt = _cachedAt;
+    if (cachedAt != null && DateTime.now().difference(cachedAt) < _cacheFor) {
+      return _cached;
+    }
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '$_apiHost/repos/$_repo/releases/latest',
@@ -41,8 +52,15 @@ class UpdateService {
           validateStatus: (status) => status != null && status < 500,
         ),
       );
-      if (response.statusCode == 404) return null;
-      return parseRelease(response.data);
+      if (response.statusCode == 404) {
+        _cached = null;
+        _cachedAt = DateTime.now();
+        return null;
+      }
+      final release = parseRelease(response.data);
+      _cached = release;
+      _cachedAt = DateTime.now();
+      return release;
     } on DioException catch (error) {
       if (error.response?.statusCode == 404) return null;
       rethrow;

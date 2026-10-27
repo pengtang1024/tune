@@ -83,6 +83,9 @@ abstract class RadioStationProvider {
   /// The name of the directory, shown in the interface.
   String get displayName;
 
+  /// Whether the directory can answer a window after the first one.
+  bool get supportsPaging => false;
+
   /// Reads the stations that match [query].
   ///
   /// An empty [query] returns the stations the directory considers its

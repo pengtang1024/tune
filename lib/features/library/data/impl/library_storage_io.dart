@@ -5,6 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/library/data/library_document.dart';
@@ -126,6 +128,31 @@ class FileLibraryStorage implements LibraryStorage {
     }).toList(growable: false);
     filtered.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return filtered;
+  }
+
+  @override
+  Future<List<AlbumSummary>> albumSummaries() async {
+    final albums = libraryAlbumsOf(await load());
+    return [
+      for (final album in albums)
+        AlbumSummary(
+          key: album.key,
+          name: album.name,
+          artist: album.artist,
+          trackCount: album.trackCount,
+          coverPath: album.coverPath,
+          coverUrl: album.coverUrl,
+        ),
+    ];
+  }
+
+  @override
+  Future<List<Song>> albumSongs(String key) async {
+    final albums = libraryAlbumsOf(await load());
+    for (final album in albums) {
+      if (album.key == key) return album.songs;
+    }
+    return const [];
   }
 
   @override
@@ -324,6 +351,26 @@ class SqliteLibraryStorage implements LibraryStorage {
     } catch (error, stackTrace) {
       Log.error('统计音乐库搜索结果失败: $error\n$stackTrace');
       return 0;
+    }
+  }
+
+  @override
+  Future<List<AlbumSummary>> albumSummaries() async {
+    try {
+      return (await _db()).albumSummaries();
+    } catch (error, stackTrace) {
+      Log.error('读取专辑列表失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<List<Song>> albumSongs(String key) async {
+    try {
+      return (await _db()).albumSongs(key);
+    } catch (error, stackTrace) {
+      Log.error('读取专辑曲目失败: $error\n$stackTrace');
+      return const [];
     }
   }
 
