@@ -23,11 +23,25 @@ abstract class LibraryStorage {
   /// Reads one window of the library, ordered by title.
   Future<List<Song>> page({required int offset, required int limit});
 
+  /// Reads one window of the tracks that match [query] and [sourceId].
+  Future<List<Song>> search({
+    required String query,
+    String? sourceId,
+    required int offset,
+    required int limit,
+  });
+
+  /// How many tracks match [query] and [sourceId].
+  Future<int> countMatching({required String query, String? sourceId});
+
   /// Removes the tracks of one source.
   Future<void> removeSource(String sourceId);
 
   /// The counts a taste profile needs, without loading every track.
   Future<TasteAggregates> tasteAggregates();
+
+  /// Marks exactly [ids] as pinned, so a prune keeps them.
+  Future<void> syncPinned(Set<String> ids);
 
   /// Drops the least valuable tracks of every remote source beyond [limit].
   ///

@@ -1,11 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/features/favorites/data/favorites_store.dart';
 import 'package:tune/features/favorites/domain/favorites_state.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 final favoritesStoreProvider = Provider<FavoritesStore>((ref) {
-  return FavoritesStore(ref.watch(persistenceServiceProvider));
+  return FavoritesStore(
+    ref.watch(persistenceServiceProvider),
+    database: () => ref.read(appDatabaseProvider.future),
+  );
 });
 
 final favoritesControllerProvider =

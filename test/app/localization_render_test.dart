@@ -457,7 +457,7 @@ class FakeLibraryController extends LibraryController {
   Future<void> scan(List<String> paths, {bool auto = false}) async {}
 
   @override
-  void setQuery(String query) {
+  Future<void> setQuery(String query) async {
     state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
   }
 }

@@ -42,11 +42,13 @@ class TuneApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(playbackNotesProvider);
     final initialization = ref.watch(appInitializationProvider);
 
     return initialization.when(
       data: (_) {
+        // The player is built only after the session store opened: a player
+        // built earlier would read an empty session and lose the queue.
+        ref.watch(playbackNotesProvider);
         final settings = ref.watch(settingsControllerProvider);
         final router = ref.watch(appRouterProvider);
 

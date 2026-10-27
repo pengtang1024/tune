@@ -20,10 +20,13 @@ class PlaybackSessionStore {
   PlaybackSessionStore(
     this._persistence, {
     Future<Directory> Function()? supportDirectory,
-  }) : _supportDirectory = supportDirectory;
+    Future<AppDatabase> Function()? database,
+  }) : _supportDirectory = supportDirectory,
+       _databaseFactory = database;
 
   final PersistenceService _persistence;
   final Future<Directory> Function()? _supportDirectory;
+  final Future<AppDatabase> Function()? _databaseFactory;
 
   AppDatabase? _database;
   PlaybackSession? _session;
@@ -41,16 +44,10 @@ class PlaybackSessionStore {
   /// Opens the database and reads the session that is already there.
   Future<void> init() async {
     try {
-      final base =
-          await (_supportDirectory?.call() ??
-              getApplicationSupportDirectory());
-      final directory = Directory(path.join(base.path, 'library'));
-      if (!await directory.exists()) {
-        await directory.create(recursive: true);
-      }
-      final database = AppDatabase.open(
-        path.join(directory.path, 'library.db'),
-      );
+      final factory = _databaseFactory;
+      final database = factory != null
+          ? await factory()
+          : await _openDefault();
       _database = database;
 
       final queue = database.loadQueue();
@@ -67,6 +64,16 @@ class PlaybackSessionStore {
     } catch (error, stackTrace) {
       Log.error('打开播放会话数据库失败: $error\n$stackTrace');
     }
+  }
+
+  Future<AppDatabase> _openDefault() async {
+    final base =
+        await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
+    final directory = Directory(path.join(base.path, 'library'));
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return AppDatabase.open(path.join(directory.path, 'library.db'));
   }
 
   /// Reads the queue, the cursor, the mode and the last position.

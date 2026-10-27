@@ -402,6 +402,44 @@ class FakeLibraryStorage extends LibraryStorage {
   }
 
   @override
+  Future<List<Song>> search({
+    required String query,
+    String? sourceId,
+    required int offset,
+    required int limit,
+  }) async {
+    final needle = query.trim().toLowerCase();
+    final filtered = songs.where((song) {
+      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
+        return false;
+      }
+      if (needle.isEmpty) return true;
+      return song.title.toLowerCase().contains(needle) ||
+          song.artist.toLowerCase().contains(needle) ||
+          song.album.toLowerCase().contains(needle);
+    }).toList();
+    if (offset >= filtered.length) return const [];
+    return filtered.sublist(
+      offset,
+      (offset + limit).clamp(0, filtered.length),
+    );
+  }
+
+  @override
+  Future<int> countMatching({required String query, String? sourceId}) async {
+    final needle = query.trim().toLowerCase();
+    return songs.where((song) {
+      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
+        return false;
+      }
+      if (needle.isEmpty) return true;
+      return song.title.toLowerCase().contains(needle) ||
+          song.artist.toLowerCase().contains(needle) ||
+          song.album.toLowerCase().contains(needle);
+    }).length;
+  }
+
+  @override
   Future<void> removeSource(String sourceId) async {
     songs = songs
         .where((song) => (song.sourceId ?? 'local') != sourceId)
@@ -410,6 +448,9 @@ class FakeLibraryStorage extends LibraryStorage {
 
   @override
   Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
+
+  @override
+  Future<void> syncPinned(Set<String> ids) async {}
 
   @override
   Future<List<String>> prune(int limit) async => const [];

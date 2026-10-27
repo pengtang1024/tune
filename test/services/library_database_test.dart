@@ -26,17 +26,28 @@ void main() {
       addTearDown(database.close);
 
       database.save(
-        [song(1, added: 1), song(2, added: 2), song(3, added: 3)],
+        [
+          song(1, added: 1),
+          song(2, added: 2),
+          song(3, added: 3),
+          song(4, added: 4),
+        ],
         pinned: {'tune://openverse/1'},
       );
 
+      // The pinned track never counts against the limit: the three unpinned
+      // tracks keep the two newest, and the oldest one goes.
       final removed = database.prune(2);
 
       expect(removed, {'tune://openverse/2'});
-      expect(database.count(), 2);
+      expect(database.count(), 3);
       expect(
         database.load().map((track) => track.uri),
-        containsAll(['tune://openverse/1', 'tune://openverse/3']),
+        containsAll([
+          'tune://openverse/1',
+          'tune://openverse/3',
+          'tune://openverse/4',
+        ]),
       );
     });
 
@@ -98,6 +109,40 @@ void main() {
       });
       expect(database.favoriteGenreCounts(), {'rock': 1, 'jazz': 1});
       expect(database.favoriteDecadeCounts(), {1990: 1, 2000: 1});
+    });
+
+    test('a pinned track outside the saved window is kept', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        song(1, added: 1),
+        song(2, added: 2),
+        song(3, added: 3),
+      ]);
+
+      // The pin is written for a row that is not part of the saved window.
+      database.syncPinned({'tune://openverse/3'});
+      database.prune(1);
+
+      // The unpinned tracks keep the newest one; the pinned track stays even
+      // though it is outside that window.
+      final uris = database.load().map((track) => track.uri);
+      expect(database.count(), 2);
+      expect(uris, contains('tune://openverse/3'));
+      expect(uris, contains('tune://openverse/2'));
+      expect(uris, isNot(contains('tune://openverse/1')));
+    });
+
+    test('a prune larger than the parameter limit still works', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      final songs = [for (var i = 0; i < 1500; i++) song(i, added: i)];
+      database.save(songs);
+
+      final removed = database.prune(1);
+
+      expect(removed, hasLength(1499));
+      expect(database.count(), 1);
     });
 
     test('a limit of zero keeps everything', () {
