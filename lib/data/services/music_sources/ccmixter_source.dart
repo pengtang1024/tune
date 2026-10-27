@@ -70,6 +70,9 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -81,7 +84,11 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
-      final parameters = <String, dynamic>{'f': 'json', 'limit': limit};
+      final parameters = <String, dynamic>{
+        'f': 'json',
+        'limit': limit,
+        if (request.offset > 0) 'offset': request.offset,
+      };
       if (query != null) {
         parameters['tags'] = query;
       } else if (browseModeOf(request.config) == BrowseMode.charts) {

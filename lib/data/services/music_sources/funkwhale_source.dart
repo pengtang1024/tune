@@ -74,6 +74,9 @@ class FunkwhaleSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 12);
 
   @override
@@ -98,6 +101,7 @@ class FunkwhaleSourceAdapter extends MusicSourceAdapter {
         '$server/api/v1/tracks/',
         queryParameters: {
           'page_size': limit,
+          'page': request.offset ~/ limit + 1,
           'ordering': '-creation_date',
           'q': ?keyword,
         },

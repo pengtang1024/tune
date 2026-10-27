@@ -92,5 +92,6 @@ abstract class RadioStationProvider {
     required String query,
     required int limit,
     String? country,
+    int offset = 0,
   });
 }

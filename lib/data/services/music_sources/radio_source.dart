@@ -77,6 +77,9 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 12);
 
   @override
@@ -95,7 +98,12 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     for (final provider in selected) {
       try {
         stations.addAll(
-          await provider.fetch(query: query, limit: limit, country: country),
+          await provider.fetch(
+            query: query,
+            limit: limit,
+            country: country,
+            offset: request.offset,
+          ),
         );
       } catch (error) {
         failures.add(error);
