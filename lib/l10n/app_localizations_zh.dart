@@ -1037,6 +1037,23 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get searchAddLibraryFailed => '加入音乐库失败';
+
+  @override
+  String get searchAddToLibrary => '加入音乐库';
+
+  @override
+  String get searchAddAllToLibrary => '全部加入';
+
+  @override
+  String get searchAddedToLibrary => '已加入';
+
+  @override
+  String searchAddedManyToLibrary(int count) {
+    return '已加入 $count 首到音乐库';
+  }
+
+  @override
   String get searchNoSourcesEnabled => '没有启用在线音源，请先在设置中开启';
 
   @override
@@ -3266,6 +3283,23 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get searchAddLibraryFailed => '加入音乐库失败';
+
+  @override
+  String get searchAddToLibrary => '加入音乐库';
+
+  @override
+  String get searchAddAllToLibrary => '全部加入';
+
+  @override
+  String get searchAddedToLibrary => '已加入';
+
+  @override
+  String searchAddedManyToLibrary(int count) {
+    return '已加入 $count 首到音乐库';
+  }
+
+  @override
   String get searchNoSourcesEnabled => '没有启用在线音源，请先在设置中开启';
 
   @override
@@ -5492,6 +5526,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String searchAddedToQueue(String title) {
     return '已加入佇列：$title';
+  }
+
+  @override
+  String get searchAddLibraryFailed => '加入音樂庫失敗';
+
+  @override
+  String get searchAddToLibrary => '加入音樂庫';
+
+  @override
+  String get searchAddAllToLibrary => '全部加入';
+
+  @override
+  String get searchAddedToLibrary => '已加入';
+
+  @override
+  String searchAddedManyToLibrary(int count) {
+    return '已加入 $count 首到音樂庫';
   }
 
   @override

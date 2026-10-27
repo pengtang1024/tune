@@ -576,6 +576,18 @@
   "searchPlayAll": "播放全部",
   "searchAddToQueue": "加入队列",
   "searchAddedToQueue": "已加入队列：{title}",
+  "searchAddLibraryFailed": "加入音乐库失败",
+  "searchAddToLibrary": "加入音乐库",
+  "searchAddAllToLibrary": "全部加入",
+  "searchAddedToLibrary": "已加入",
+  "searchAddedManyToLibrary": "已加入 {count} 首到音乐库",
+  "@searchAddedManyToLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@searchAddedToQueue": {
     "placeholders": {
       "title": {

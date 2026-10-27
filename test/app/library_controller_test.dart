@@ -149,6 +149,30 @@ void main() {
     expect(state.songs.map((song) => song.uri), [songA.uri, songB.uri]);
   });
 
+  test('adding search results merges them into the library', () async {
+    await container.read(libraryControllerProvider.future);
+    const found = Song(
+      id: 9,
+      title: 'Delta',
+      artist: 'Artist D',
+      uri: 'tune://openverse/delta',
+      sourceId: 'openverse',
+      externalId: 'delta',
+      streamUrl: 'https://example.com/delta.mp3',
+    );
+
+    final added = await container
+        .read(libraryControllerProvider.notifier)
+        .addSongs([found, songA]);
+
+    expect(added, isTrue);
+    final state = container.read(libraryControllerProvider).requireValue;
+    // The new track joins the library and the one that was already there is
+    // kept once, in title order.
+    expect(state.songs.map((song) => song.title), ['Alpha', 'Delta']);
+    expect(storage.songs.map((song) => song.title), ['Alpha', 'Delta']);
+  });
+
   test('clearing the library discards a pending scan result', () async {
     await container.read(libraryControllerProvider.future);
     final gate = Completer<void>();

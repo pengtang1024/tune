@@ -576,6 +576,18 @@
   "searchPlayAll": "Play all",
   "searchAddToQueue": "Add to queue",
   "searchAddedToQueue": "Added to the queue: {title}",
+  "searchAddLibraryFailed": "Could not add the tracks to the library",
+  "searchAddToLibrary": "Add to library",
+  "searchAddAllToLibrary": "Add all",
+  "searchAddedToLibrary": "Added",
+  "searchAddedManyToLibrary": "Added {count} tracks to the library",
+  "@searchAddedManyToLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@searchAddedToQueue": {
     "placeholders": {
       "title": {
