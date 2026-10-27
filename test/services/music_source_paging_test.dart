@@ -114,19 +114,20 @@ void main() {
       expect(captured.uri?.queryParameters['generator'], 'search');
     });
 
-    test('Wikimedia has no later window for the category stream', () async {
+    test('Wikimedia passes the cursor to the category stream', () async {
       final captured = _Captured(
         body: {
           'query': {'pages': <dynamic>{}},
+          'continue': {'gcmcontinue': 'token-2'},
         },
       );
 
       final result = await WikimediaSourceAdapter(
         dio: captured.dio,
-      ).scan(_request('wikimedia', offset: 2));
+      ).scan(_request('wikimedia', cursor: 'token-1'));
 
-      expect(result.songs, isEmpty);
-      expect(captured.uris, isEmpty);
+      expect(captured.uri?.queryParameters['gcmcontinue'], 'token-1');
+      expect(result.cursor, 'token-2');
     });
 
     test('Jellyfin asks for the window at the offset', () async {
@@ -255,6 +256,7 @@ void main() {
 MusicSourceScanRequest _request(
   String id, {
   int offset = 0,
+  String? cursor,
   Map<String, String> settings = const {},
 }) {
   return MusicSourceScanRequest(
@@ -266,6 +268,7 @@ MusicSourceScanRequest _request(
       settings: settings,
     ),
     offset: offset,
+    cursor: cursor,
   );
 }
 

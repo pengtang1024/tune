@@ -14,6 +14,9 @@ class OnlineSearchState {
   /// The source whose next window is being fetched.
   final String? loadingMore;
 
+  /// Where the next window of a source starts, when it walks with a cursor.
+  final Map<String, String> cursors;
+
   const OnlineSearchState({
     this.query = '',
     this.isSearching = false,
@@ -21,6 +24,7 @@ class OnlineSearchState {
     this.progress = const {},
     this.message,
     this.loadingMore,
+    this.cursors = const {},
   });
 
   bool get hasQuery => query.isNotEmpty;
@@ -39,6 +43,7 @@ class OnlineSearchState {
     Map<String, double>? progress,
     Object? message = _keep,
     Object? loadingMore = _keep,
+    Map<String, String>? cursors,
   }) {
     return OnlineSearchState(
       query: query ?? this.query,
@@ -49,6 +54,7 @@ class OnlineSearchState {
       loadingMore: identical(loadingMore, _keep)
           ? this.loadingMore
           : loadingMore as String?,
+      cursors: cursors ?? this.cursors,
     );
   }
 }

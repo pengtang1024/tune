@@ -11,6 +11,10 @@ class SourceScanResult {
   final DateTime scannedAt;
   final Duration elapsed;
 
+  /// Where the next window of the answer starts, when the source uses a
+  /// cursor instead of an offset.
+  final String? cursor;
+
   SourceScanResult({
     required this.sourceId,
     required this.status,
@@ -18,6 +22,7 @@ class SourceScanResult {
     this.message,
     DateTime? scannedAt,
     this.elapsed = Duration.zero,
+    this.cursor,
   }) : scannedAt = scannedAt ?? DateTime.now();
 
   bool get isSuccess => status == SourceScanStatus.success;
