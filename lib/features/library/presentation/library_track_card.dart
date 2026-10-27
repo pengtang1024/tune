@@ -32,6 +32,9 @@ class LibraryTrackCard extends StatelessWidget {
   final bool selected;
   final bool playing;
   final bool isFavorite;
+
+  /// Whether the last playback of the track failed.
+  final bool unavailable;
   final SourceLabel? source;
 
   /// What the viewport resolved for this row.
@@ -58,6 +61,7 @@ class LibraryTrackCard extends StatelessWidget {
     required this.selected,
     required this.playing,
     required this.isFavorite,
+    this.unavailable = false,
     this.source,
     required this.metrics,
     required this.onTap,
@@ -118,17 +122,36 @@ class LibraryTrackCard extends StatelessWidget {
               const SizedBox(width: CompactTokens.space10),
               Expanded(
                 flex: 5,
-                child: TuneTooltip(
-                  message: song.title.isEmpty ? unknownTitle : song.title,
-                  child: Text(
-                    song.title.isEmpty ? unknownTitle : song.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected ? theme.colorScheme.primary : null,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TuneTooltip(
+                        message: song.title.isEmpty ? unknownTitle : song.title,
+                        child: Text(
+                          song.title.isEmpty ? unknownTitle : song.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            color: selected ? theme.colorScheme.primary : null,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    if (unavailable) ...[
+                      const SizedBox(width: CompactTokens.space4),
+                      TuneTooltip(
+                        message: context.loc.songMayBeUnavailable,
+                        child: Icon(
+                          Icons.link_off_rounded,
+                          size: CompactTokens.icon14,
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               if (metrics.showArtist) ...[

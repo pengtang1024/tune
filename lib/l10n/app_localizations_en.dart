@@ -116,6 +116,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'This platform has no automatic install; download it from the release page';
 
   @override
+  String get songMayBeUnavailable => 'May be unavailable';
+
+  @override
   String get about => 'About';
 
   @override
