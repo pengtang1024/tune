@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -38,6 +40,8 @@ final libraryControllerProvider =
 class LibraryController extends AsyncNotifier<LibraryState> {
   late MusicSourceService _sourceService;
   late LibraryStorage _storage;
+  Timer? _queryDebounce;
+  int _reloadGeneration = 0;
   bool _disposed = false;
   bool _autoScanStarted = false;
   int _scanGeneration = 0;
@@ -54,7 +58,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     _autoScanStarted = false;
     _sourceService = ref.read(musicSourceServiceProvider);
     _storage = ref.read(libraryStorageProvider);
-    ref.onDispose(() => _disposed = true);
+    ref.onDispose(() {
+      _disposed = true;
+      _queryDebounce?.cancel();
+    });
 
     final total = await _storage.count();
     final songs = total > windowSize
@@ -389,10 +396,23 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await _storage.markPlayed(uri);
   }
 
+  /// Notes what the reader typed, and reads the window that matches it.
+  ///
+  /// The word lands on the page at once; the read follows a breath behind,
+  /// so a search that narrows a library of twenty thousand tracks by LIKE
+  /// is paid once per pause of typing, not once per key.
   Future<void> setQuery(String query) async {
     if (_disposed || !state.hasValue) return;
     state = AsyncData(_current.copyWith(query: query));
-    await _reloadForFilter();
+    _queryDebounce?.cancel();
+    if (query.trim().isEmpty) {
+      // A cleared search reads the plain window back at once.
+      await _reloadForFilter();
+      return;
+    }
+    _queryDebounce = Timer(const Duration(milliseconds: 180), () {
+      unawaited(_reloadForFilter());
+    });
   }
 
   /// Removes a source's songs immediately, e.g. after the reader removes it.
@@ -429,9 +449,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await _reloadForFilter();
   }
 
-  /// Reads the window that matches the current query and source filter.
+  /// Reads the window that matches the query and source filter.
+  ///
+  /// A read that a newer filter change supersedes drops its own answer, so
+  /// the last word the reader typed is the one the page answers.
   Future<void> _reloadForFilter() async {
     if (_disposed || !state.hasValue) return;
+    final generation = ++_reloadGeneration;
     final query = _current.query.trim();
     final sourceId = _current.sourceFilter;
 
@@ -441,7 +465,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           ? await _storage.page(offset: 0, limit: windowSize)
           : await _storage.load();
       final albums = await _storage.albumSummaries();
-      if (_disposed || !state.hasValue) return;
+      if (_disposed || generation != _reloadGeneration) return;
       state = AsyncData(
         _current.copyWith(
           songs: List.unmodifiable(songs),
@@ -464,7 +488,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       limit: windowSize,
     );
     final albums = await _storage.albumSummaries();
-    if (_disposed || !state.hasValue) return;
+    if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
       _current.copyWith(
         songs: List.unmodifiable(songs),

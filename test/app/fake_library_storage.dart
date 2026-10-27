@@ -25,11 +25,20 @@ class FakeLibraryStorage extends SqliteLibraryStorage {
   /// Whether the next merge fails, as a full disk does.
   bool failIngest = false;
 
+  /// How many times the controller read a window for a filter.
+  int reloadCount = 0;
+
   @override
   Future<int> ingest(List<Song> songs) async {
     ingestCount += 1;
     if (failIngest) throw StateError('ingest failed');
     return super.ingest(songs);
+  }
+
+  @override
+  Future<int> countMatching({required String query, String? sourceId}) async {
+    reloadCount += 1;
+    return super.countMatching(query: query, sourceId: sourceId);
   }
 
   @override

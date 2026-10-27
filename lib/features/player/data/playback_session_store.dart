@@ -152,10 +152,10 @@ class PlaybackSessionStore {
       );
     }
     return _serialize(() async {
-      final meta = database.loadQueueMeta();
-      meta['positionUri'] = currentUri;
-      meta['positionMs'] = '${position.inMilliseconds}';
-      database.saveQueueMeta(meta);
+      database.saveQueueMeta({
+        'positionUri': currentUri,
+        'positionMs': '${position.inMilliseconds}',
+      });
     });
   }
 
@@ -188,10 +188,7 @@ class PlaybackSessionStore {
       return _serialize(() => _persistence.remove(positionKey));
     }
     return _serialize(() async {
-      final meta = database.loadQueueMeta()
-        ..remove('positionUri')
-        ..remove('positionMs');
-      database.saveQueueMeta(meta);
+      database.deleteQueueMetaKeys(['positionUri', 'positionMs']);
     });
   }
 

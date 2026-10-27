@@ -1,4 +1,5 @@
 import 'dart:io' show Directory, File, FileSystemEntityType, Platform;
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
@@ -10,8 +11,6 @@ import 'package:tune/data/services/song_creator.dart';
 /// Reading tags is synchronous work: a single large or malformed tag can hold
 /// the thread for a second, and the scan runs while the reader is already
 /// looking at the library. The worker gets the path and hands the song back.
-/// One file per worker keeps the scan ordered and its progress honest; the
-/// cost of starting a worker is far below the cost of freezing the window.
 /// On the web the worker runs where the app runs, because a browser has no
 /// second thread for it.
 Future<Song?> _readSongWorker(String filePath) =>
@@ -20,6 +19,28 @@ Future<Song?> _readSongWorker(String filePath) =>
 /// The worker of [_readSongWorker]; [compute] wants a top-level function.
 Future<Song?> _songOfFile(String filePath) =>
     SongCreator.createFromFile(File(filePath));
+
+/// Reads the tags of a batch of files in one worker.
+///
+/// A scan of twenty thousand files used to pay for one isolate per file and
+/// read them strictly one by one; the batch hands one isolate a hundred
+/// files at a time, and a handful of batches run side by side.
+Future<List<Song?>?> _readSongsWorker(List<String> filePaths) =>
+    compute(_songsOfFiles, filePaths);
+
+/// The worker of [_readSongsFiles]; [compute] wants a top-level function.
+Future<List<Song?>> _songsOfFiles(List<String> filePaths) async {
+  final songs = <Song?>[];
+  for (final filePath in filePaths) {
+    try {
+      songs.add(await SongCreator.createFromFile(File(filePath)));
+    } catch (error) {
+      Log.info('CrossPlatformMusicScanner: Failed to create song from file $filePath: $error');
+      songs.add(null);
+    }
+  }
+  return songs;
+}
 
 /// 跨平台音乐扫描服务接口
 abstract class CrossPlatformMusicScanner {
@@ -41,6 +62,9 @@ abstract class CrossPlatformMusicScanner {
 /// 跨平台音乐扫描服务实现
 class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   CrossPlatformMusicScannerImpl();
+
+  /// How many batches read their tags at the same time.
+  static const int _maxWorkers = 8;
 
   @override
   Future<void> init() async {
@@ -183,20 +207,42 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         'CrossPlatformMusicScanner: Found ${files.length} audio files in directory: $directoryPath',
       );
 
-      for (int i = 0; i < files.length; i++) {
-        final file = files[i];
-        try {
-          final song = await _readSongWorker(file.path);
-          if (song != null) {
-            songs.add(song);
+      // The batches are read by a fixed pool of workers side by side; the
+      // pool is the processors the machine has, capped, so the scan cannot
+      // crowd the rest of the desktop out.
+      const chunkSize = 200;
+      final chunks = <List<String>>[
+        for (var start = 0; start < files.length; start += chunkSize)
+          [
+            for (var index = start; index < files.length && index < start + chunkSize; index++)
+              files[index].path,
+          ],
+      ];
+      final results = List<List<Song?>?>.filled(chunks.length, null);
+      var nextChunk = 0;
+      var processed = 0;
+      Future<void> worker() async {
+        while (true) {
+          final index = nextChunk++;
+          if (index >= chunks.length) return;
+          try {
+            results[index] = await _readSongsWorker(chunks[index]);
+          } catch (error, stackTrace) {
+            Log.error('读取一批文件的标签失败: $error\n$stackTrace');
           }
-        } catch (e) {
-          Log.info(
-            'CrossPlatformMusicScanner: Failed to create song from file ${file.path}: $e',
-          );
+          processed += chunks[index].length;
+          onProgress(processed / files.length);
         }
-        onProgress((i + 1) / files.length);
       }
+
+      final workers = math.min(_maxWorkers, chunks.length);
+      await Future.wait([
+        for (var pool = 0; pool < workers; pool++) worker(),
+      ]);
+      songs.addAll([
+        for (final result in results)
+          if (result != null) ...result.whereType<Song>(),
+      ]);
     } catch (e) {
       Log.info(
         'CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e',

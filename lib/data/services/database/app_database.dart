@@ -27,8 +27,14 @@ class AppDatabase {
 
   /// Creates the table and its indexes when they are not there yet.
   static Database _prepare(Database db) {
-    // Two connections may open the same file (the library and the session
-    // store); a short wait keeps one from failing the other's write.
+    // A write lands on the journal file first; WAL keeps that append in one
+    // file and lets a reader run while a write is in flight, so the bursts
+    // of writes a session produces (every switch of track, every mark) do
+    // not turn into fsyncs on the thread that draws the window.
+    db.execute('PRAGMA journal_mode = WAL');
+    db.execute('PRAGMA synchronous = NORMAL');
+    // Two connections may open the same file (a store that opened its own);
+    // a short wait keeps one from failing the other's write.
     db.execute('PRAGMA busy_timeout = 5000');
     db.execute('''
       CREATE TABLE IF NOT EXISTS songs (
@@ -853,16 +859,39 @@ class AppDatabase {
     };
   }
 
+  /// Writes the given keys over whatever is stored, and leaves the others.
+  ///
+  /// The position is written every few seconds while a track plays; it is
+  /// one or two keys of the meta, not the table.
   void saveQueueMeta(Map<String, String> meta) {
     _db.execute('BEGIN');
     try {
-      _db.execute('DELETE FROM queue_meta');
-      final statement = _db.prepare(
-        'INSERT INTO queue_meta (key, value) VALUES (?, ?)',
-      );
+      final statement = _db.prepare('''
+        INSERT INTO queue_meta (key, value) VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value
+      ''');
       try {
         for (final entry in meta.entries) {
           statement.execute([entry.key, entry.value]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  /// Removes the given keys of the meta, and leaves the others.
+  void deleteQueueMetaKeys(Iterable<String> keys) {
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare('DELETE FROM queue_meta WHERE key = ?');
+      try {
+        for (final key in keys) {
+          statement.execute([key]);
         }
       } finally {
         statement.close();
@@ -886,6 +915,30 @@ class AppDatabase {
       for (final row in rows)
         row['uri'] as String: jsonDecode(row['json'] as String),
     };
+  }
+
+  /// Writes one record of one track.
+  ///
+  /// A listen and a skip settle one track at a time; the record is one row,
+  /// not a diff over the table.
+  void saveListeningEntry(String uri, Map<String, Object?> entry) {
+    _db.execute(
+      'INSERT OR REPLACE INTO listening_signals (uri, json) VALUES (?, ?)',
+      [uri, jsonEncode(entry)],
+    );
+  }
+
+  /// Drops the records of [uris].
+  void deleteListening(Iterable<String> uris) {
+    final batch = uris.toList(growable: false);
+    for (var start = 0; start < batch.length; start += 500) {
+      final window = batch.skip(start).take(500).toList(growable: false);
+      final placeholders = List.filled(window.length, '?').join(', ');
+      _db.execute(
+        'DELETE FROM listening_signals WHERE uri IN ($placeholders)',
+        window,
+      );
+    }
   }
 
   void saveListening(Map<String, Object?> tracks) {

@@ -219,6 +219,100 @@ void main() {
       expect(database.count(), 0);
       expect(database.load(), isEmpty);
     });
+
+    test('an ingest that brings the same facts back writes nothing', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+
+      database.ingestBatch([song(1, added: 1), song(2, added: 2)]);
+      final firstSeen = database.load().firstWhere(
+        (track) => track.uri == song(1).uri,
+      );
+      database.ingestBatch([song(1), song(2)]);
+
+      // The unchanged tracks keep the stamp of the first ingest, so the
+      // library page does not rebuild for a scan that changed nothing.
+      expect(database.ingestBatch([song(1), song(2)]), 0);
+      final settled = database.load().firstWhere(
+        (track) => track.uri == song(1).uri,
+      );
+      expect(settled.dateAdded, firstSeen.dateAdded);
+    });
+
+    test('an ingest rewrites only the row whose facts changed', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.ingestBatch([song(1), song(2)]);
+
+      final renamed = song(1).copyWith(title: 'Renamed');
+      expect(database.ingestBatch([renamed, song(2)]), 1);
+      expect(
+        database.load().firstWhere((track) => track.uri == song(1).uri).title,
+        'Renamed',
+      );
+    });
+
+    test('an ingest merges the copies another source brings', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.ingestBatch([song(1)]);
+
+      // The same track, met under a folder of its own: one row knows both.
+      const copy = Song(
+        id: 1,
+        title: 'Track 1',
+        artist: 'Artist',
+        uri: 'tune://openverse/1',
+        sourceId: 'openverse',
+        externalId: '1',
+        localPath: '/music/Artist/Track 1.mp3',
+        size: 4096,
+      );
+      expect(database.ingestBatch([copy]), 1);
+      final merged = database.load().single;
+      expect(merged.hasRemoteSource, isTrue);
+      expect(merged.hasLocalFile, isTrue);
+      expect(merged.localPath, copy.localPath);
+      // The next scan of either side changes nothing: the merged row is the
+      // fixed point of both inputs.
+      expect(database.ingestBatch([song(1)]), 0);
+      expect(database.ingestBatch([copy]), 0);
+    });
+
+    test('the rows of a source that is off leave the page, not the disk', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.ingestBatch([song(1), song(2), song(3)]);
+      const local = Song(id: 9, title: 'Local', uri: '/music/local.mp3');
+      database.ingestBatch([local]);
+
+      // The source turns off: its three rows leave the page.
+      expect(
+        database.deactivateUncovered(
+          enabledSourceIds: {'local'},
+          localPaths: ['/music'],
+        ),
+        3,
+      );
+      // The local row sits under the folder the scan reads and stays.
+      expect(database.count(), 1);
+      expect(database.load().map((track) => track.uri), ['/music/local.mp3']);
+
+      // The folder the scan reads goes away: the local rows leave too.
+      expect(
+        database.deactivateUncovered(
+          enabledSourceIds: {'local'},
+          localPaths: ['/elsewhere'],
+        ),
+        1,
+      );
+      expect(database.count(), 0);
+
+      // Every row is still on the disk, and the next scan of the source
+      // brings it back.
+      expect(database.ingestBatch([song(1)]), 1);
+      expect(database.count(), 1);
+    });
   });
 
   group('sqlite storage', () {

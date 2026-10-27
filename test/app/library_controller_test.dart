@@ -201,11 +201,36 @@ void main() {
     await container
         .read(libraryControllerProvider.notifier)
         .setQuery('Track ${LibraryController.windowSize}');
+    // The read follows the word a breath behind; the pause is what pays for
+    // it once instead of once per key.
+    await Future<void>.delayed(const Duration(milliseconds: 250));
 
     final state = container.read(libraryControllerProvider).requireValue;
     expect(state.songs.map((song) => song.title), [
       'Track ${LibraryController.windowSize}',
     ]);
+  });
+
+  test('a search waits for the pause of typing', () async {
+    final storage = FakeLibraryStorage([
+      for (var index = 0; index <= LibraryController.windowSize; index++)
+        Song(
+          id: index,
+          title: 'Track $index',
+          uri: '/music/$index.mp3',
+        ),
+    ]);
+    final container = buildContainer(storage);
+    await container.read(libraryControllerProvider.future);
+
+    await container.read(libraryControllerProvider.notifier).setQuery('Tra');
+    await container
+        .read(libraryControllerProvider.notifier)
+        .setQuery('Track 1');
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
+    // Two keys, one read: the pause pays for the window, not each key.
+    expect(storage.reloadCount, 1);
   });
 
   test('adding search results merges them into the library', () async {

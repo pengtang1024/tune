@@ -89,22 +89,20 @@ class ListeningSignalStore {
     DateTime? at,
   }) async {
     if (uri.isEmpty) return;
-    final tracks = {...read()};
-    final current = tracks[uri] ?? const TrackListening();
-    tracks[uri] = current.recordListen(
+    final current = read()[uri] ?? const TrackListening();
+    final next = current.recordListen(
       listened: listened,
       completed: completed,
       at: at ?? DateTime.now(),
     );
-    await _write(tracks);
+    await _writeOne(uri, next);
   }
 
   Future<void> recordSkip(String uri, {DateTime? at}) async {
     if (uri.isEmpty) return;
-    final tracks = {...read()};
-    final current = tracks[uri] ?? const TrackListening();
-    tracks[uri] = current.recordSkip(at: at ?? DateTime.now());
-    await _write(tracks);
+    final current = read()[uri] ?? const TrackListening();
+    final next = current.recordSkip(at: at ?? DateTime.now());
+    await _writeOne(uri, next);
   }
 
   Future<void> clear() async {
@@ -122,6 +120,31 @@ class ListeningSignalStore {
       database.clearListening();
     } catch (error, stackTrace) {
       Log.error('清除播放记录失败: $error\n$stackTrace');
+    }
+  }
+
+  /// Notes the record of one track: the session map is replaced so the
+  /// readers of [read] keep an immutable answer, and only that one row
+  /// travels to the disk.
+  Future<void> _writeOne(String uri, TrackListening next) async {
+    final database = _database;
+    if (database == null) {
+      // The database is not open yet: the older document holds the whole
+      // table, so it is written whole as well.
+      final tracks = Map.of(read())..[uri] = next;
+      await _write(tracks);
+      return;
+    }
+
+    final tracks = Map.of(_tracks)..[uri] = next;
+    final limited = _trim(tracks);
+    _tracks = limited;
+    try {
+      database.saveListeningEntry(uri, next.toJson());
+      final dropped = tracks.keys.toSet().difference(limited.keys.toSet());
+      if (dropped.isNotEmpty) database.deleteListening(dropped);
+    } catch (error, stackTrace) {
+      Log.error('保存播放记录失败: $error\n$stackTrace');
     }
   }
 
