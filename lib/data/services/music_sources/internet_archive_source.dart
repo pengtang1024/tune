@@ -66,6 +66,9 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 12);
 
   @override
@@ -85,7 +88,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           'q': query ?? 'mediatype:audio',
           'fl[]': ['identifier', 'title', 'creator', 'date'],
           'rows': limit,
-          'page': 1,
+          'page': request.offset ~/ limit + 1,
           'output': 'json',
           'sort[]': 'downloads desc',
         },

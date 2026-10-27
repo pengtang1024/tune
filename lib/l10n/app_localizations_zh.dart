@@ -1040,6 +1040,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchAddLibraryFailed => '加入音乐库失败';
 
   @override
+  String get searchLoadMore => '加载更多';
+
+  @override
+  String get searchNoMore => '没有更多了';
+
+  @override
   String get searchAddToLibrary => '加入音乐库';
 
   @override
@@ -3286,6 +3292,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get searchAddLibraryFailed => '加入音乐库失败';
 
   @override
+  String get searchLoadMore => '加载更多';
+
+  @override
+  String get searchNoMore => '没有更多了';
+
+  @override
   String get searchAddToLibrary => '加入音乐库';
 
   @override
@@ -5530,6 +5542,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get searchAddLibraryFailed => '加入音樂庫失敗';
+
+  @override
+  String get searchLoadMore => '載入更多';
+
+  @override
+  String get searchNoMore => '沒有更多了';
 
   @override
   String get searchAddToLibrary => '加入音樂庫';

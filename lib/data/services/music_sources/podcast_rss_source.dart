@@ -79,7 +79,10 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       final response = await _dio.get<String>(feed);
       final body = response.data;
       if (body == null || body.trim().isEmpty) {
-        return failedResult(request.config.id, AppStrings.instance.podcastRssEmptyFeed);
+        return failedResult(
+          request.config.id,
+          AppStrings.instance.podcastRssEmptyFeed,
+        );
       }
 
       final songs = parseFeed(body, sourceId: request.config.id, limit: limit);

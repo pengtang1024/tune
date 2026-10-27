@@ -1124,6 +1124,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not add the tracks to the library';
 
   @override
+  String get searchLoadMore => 'Load more';
+
+  @override
+  String get searchNoMore => 'No more results';
+
+  @override
   String get searchAddToLibrary => 'Add to library';
 
   @override

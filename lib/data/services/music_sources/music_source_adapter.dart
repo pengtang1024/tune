@@ -10,10 +10,17 @@ class MusicSourceScanRequest {
   final List<String> localPaths;
   final void Function(double progress)? onProgress;
 
+  /// How many tracks of the answer to skip.
+  ///
+  /// A source that serves its list in pages reads this to return the next
+  /// window; a source that has no pages ignores it.
+  final int offset;
+
   const MusicSourceScanRequest({
     required this.config,
     this.localPaths = const [],
     this.onProgress,
+    this.offset = 0,
   });
 }
 
@@ -51,6 +58,12 @@ abstract class MusicSourceAdapter {
     if (chosen != null && browseModes.contains(chosen)) return chosen;
     return browseModes.first;
   }
+
+  /// Whether a scan can ask for the window after the first one.
+  ///
+  /// Only a source that serves its list in pages can answer a later offset;
+  /// the others would return the same window again.
+  bool get supportsPaging => false;
 
   /// Whether the source can be tried out before it is kept.
   ///

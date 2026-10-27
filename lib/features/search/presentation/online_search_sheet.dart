@@ -178,6 +178,10 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   onAddToQueue: _addToQueue,
                   onAddToLibrary: _addToLibrary,
                   addedUris: _addedUris,
+                  onLoadMore: ref
+                      .read(onlineSearchControllerProvider.notifier)
+                      .loadMore,
+                  loadingMore: search?.loadingMore,
                   waitsForDoubleClick: settings.onlyLikeOnDoubleClick,
                 ),
               ),
@@ -334,6 +338,8 @@ class _Body extends StatelessWidget {
   /// Puts the tracks of a group into the library.
   final Future<void> Function(List<Song> songs) onAddToLibrary;
   final Set<String> addedUris;
+  final Future<void> Function(String sourceId) onLoadMore;
+  final String? loadingMore;
 
   /// Whether a click waits for a possible second click before it plays.
   ///
@@ -351,6 +357,8 @@ class _Body extends StatelessWidget {
     required this.onAddToQueue,
     required this.onAddToLibrary,
     required this.addedUris,
+    required this.onLoadMore,
+    required this.loadingMore,
     required this.waitsForDoubleClick,
   });
 
@@ -408,6 +416,8 @@ class _Body extends StatelessWidget {
             onAddToQueue: onAddToQueue,
             onAddToLibrary: onAddToLibrary,
             addedUris: addedUris,
+            onLoadMore: onLoadMore,
+            isLoadingMore: loadingMore == result.sourceId,
             waitsForDoubleClick: waitsForDoubleClick,
           ),
       ],
@@ -487,6 +497,8 @@ class _SourceGroup extends StatelessWidget {
   /// Puts the tracks of a group into the library.
   final Future<void> Function(List<Song> songs) onAddToLibrary;
   final Set<String> addedUris;
+  final Future<void> Function(String sourceId) onLoadMore;
+  final bool isLoadingMore;
 
   /// Whether a click waits for a possible second click before it plays.
   ///
@@ -504,6 +516,8 @@ class _SourceGroup extends StatelessWidget {
     required this.onAddToQueue,
     required this.onAddToLibrary,
     required this.addedUris,
+    required this.onLoadMore,
+    required this.isLoadingMore,
     required this.waitsForDoubleClick,
   });
 
@@ -613,6 +627,31 @@ class _SourceGroup extends StatelessWidget {
             isAdded: addedUris.contains(result.songs[index].uri),
             onAdd: () => onAddToLibrary([result.songs[index]]),
             waitsForDoubleClick: waitsForDoubleClick,
+          ),
+        if (result.songs.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: CompactTokens.space4),
+            child: isLoadingMore
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: LinearProgressIndicator(minHeight: 2),
+                  )
+                : TextButton.icon(
+                    onPressed: () => onLoadMore(result.sourceId),
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, CompactTokens.controlTiny),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: CompactTokens.space8,
+                      ),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(
+                      Icons.expand_more_rounded,
+                      size: CompactTokens.icon16,
+                    ),
+                    label: Text(context.loc.searchLoadMore),
+                  ),
           ),
         const SizedBox(height: CompactTokens.space4),
       ],
@@ -755,9 +794,7 @@ class _SongRow extends StatelessWidget {
               child: IconButton(
                 onPressed: isAdded ? null : onAdd,
                 icon: Icon(
-                  isAdded
-                      ? Icons.check_rounded
-                      : Icons.library_add_rounded,
+                  isAdded ? Icons.check_rounded : Icons.library_add_rounded,
                   size: CompactTokens.icon18,
                 ),
                 style: IconButton.styleFrom(

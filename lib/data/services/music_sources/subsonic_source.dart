@@ -152,7 +152,10 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
 
       final payload = _payload(decoded);
       if (payload == null) {
-        return failedResult(request.config.id, AppStrings.instance.subsonicAuthFailed);
+        return failedResult(
+          request.config.id,
+          AppStrings.instance.subsonicAuthFailed,
+        );
       }
       if (payload['status']?.toString() != 'ok') {
         return failedResult(

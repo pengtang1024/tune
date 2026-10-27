@@ -273,6 +273,7 @@ class FakeDiscoverySourceService extends MusicSourceService {
   Future<List<SourceScanResult>> search({
     required List<MusicSourceConfig> sources,
     required String query,
+    Map<String, int> offsets = const {},
     void Function(String sourceId, double progress)? onProgress,
   }) async {
     return [
