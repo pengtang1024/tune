@@ -354,9 +354,10 @@ class AppDatabase {
                   song.dateAdded,
                   (previous['date_added'] as int?) ?? 0,
                 );
-          final candidate = previous == null
-              ? resolved
-              : _mergedWithStored(resolved, previous);
+          // Every row that reaches the disk has the same shape, normalized
+          // once: the machine facts of a local file ride on the row, and
+          // either side's next scan lands on the stored row unchanged.
+          final candidate = mergedCandidate(resolved, previous);
           final previousActive = previous?['active'] as int? ?? 0;
           final previousHash = previous?['facts_hash'] as int? ?? 0;
           if (previousActive == 1 && previousHash == factsHashOf(candidate)) {
@@ -423,29 +424,49 @@ class AppDatabase {
     return left < right ? left : right;
   }
 
-  /// Folds the facts of the stored row into the scanned one.
+  /// Builds the row a scan leaves behind for one of the tracks it brought.
   ///
-  /// The row on the disk may know more than the scan does: a remote track's
-  /// stream address, the copy of a track that another source brought. The
-  /// merged row keeps both, and it is the fixed point of either side's next
-  /// scan — once merged, rescanning either source changes nothing.
-  Song _mergedWithStored(Song scanned, Map<String, Object?> stored) {
-    final Map<String, dynamic>? document;
-    try {
-      final decoded = jsonDecode(stored['json'] as String);
-      document = decoded is Map<String, dynamic> ? decoded : null;
-    } catch (_) {
-      // A row that cannot be read is replaced by what the scan brought.
-      return scanned;
+  /// A track the library has not seen is written as the scan knows it, with
+  /// the path of its local file riding on the row. A track the library holds
+  /// meets the row it names: what only the stored row knows — the stream
+  /// address of its source, the file facts of a fetched copy — is kept, so
+  /// the row is the fixed point of either side's next scan. A row that is
+  /// only a local file is the scan's own facts alone, so a renamed track is
+  /// renamed here as well. Either way the row reaches the disk in one shape,
+  /// and the same scan of the same facts writes nothing.
+  Song mergedCandidate(Song scanned, Map<String, Object?>? stored) {
+    if (stored == null) return _normalized(scanned);
+    final storedSong = _storedSongOf(stored);
+    if (storedSong == null) return _normalized(scanned);
+    // A row that holds no source is the previous shape of this very scan: the
+    // scan is the authority of the files it reads. A row a source names may
+    // know what the scan does not, so the two fold.
+    final sameSource = _sourceKeyOf(storedSong) == _sourceKeyOf(scanned);
+    if (sameSource && scanned.hasLocalFile && !storedSong.hasRemoteSource) {
+      return _normalized(scanned);
     }
-    if (document == null) return scanned;
-    final storedSong = Song.fromMap(document);
     return _withFirstSeen(
       scanned.mergeWith(storedSong),
       scanned.dateAdded,
       storedSong.dateAdded,
     );
   }
+
+  /// The song the json column of [stored] holds, or null when the column
+  /// does not hold one.
+  static Song? _storedSongOf(Map<String, Object?> stored) {
+    try {
+      final decoded = jsonDecode(stored['json'] as String);
+      return decoded is Map<String, dynamic> ? Song.fromMap(decoded) : null;
+    } catch (_) {
+      // A row that cannot be read is replaced by what the scan brought.
+      return null;
+    }
+  }
+
+  /// The one shape a row takes: the path of a local file rides on the row,
+  /// so a scan that brings the file again lands on the row it left before.
+  static Song _normalized(Song song) => song.mergeWith(song);
 
   /// Marks the rows the current scan does not cover as outside the library.
   ///
