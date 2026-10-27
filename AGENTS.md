@@ -29,7 +29,7 @@
 | 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
 | 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
-| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D5 已修） |
+| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D7 已修） |
 | 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
 
@@ -89,6 +89,10 @@
   `docs/recommendation.md` §7.8 那样），超预算就换算法或换线程。
 - **UI 线程不做同步 I/O。** `existsSync()`、`readAsBytesSync()` 这类调用不进
   每秒都会走到的路径。
+- **库不入内存。** `LibraryState.songs` 始终是数据库读出的一个窗口
+  （`windowSize = 1000`）；扫描结果分批 upsert 进库，控制器里不合并全量列表。
+- **每操作路径不做写放大。** 写库按键、按需、按批：单键 UPSERT、搜索防抖、
+  进度节流、行形态归一（同事实重扫零写、改名一写）。
 
 诊断、数字与判据见 [`docs/performance.md`](docs/performance.md)。
 
