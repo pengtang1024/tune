@@ -75,7 +75,31 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   List<Song>? _cachedTrackSongs;
   Map<String, SourceLabel>? _cachedTrackLabels;
   LibraryRowMetrics? _cachedTrackMetrics;
+
+  /// Reads the next window when the reader reaches the end of the list.
+  Widget _withLoadMore(Widget list, bool hasMore) {
+    if (!hasMore) return list;
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (!mounted || _loadingMore) return false;
+        if (notification.metrics.axis != Axis.vertical) return false;
+        if (notification.metrics.extentAfter > 600) return false;
+        _loadingMore = true;
+        ref
+            .read(libraryControllerProvider.notifier)
+            .loadMore()
+            .whenComplete(() {
+              if (mounted) _loadingMore = false;
+            });
+        return false;
+      },
+      child: list,
+    );
+  }
   bool? _cachedTrackHasMore;
+
+  /// Whether the next window of the library is already on its way.
+  bool _loadingMore = false;
   bool? _cachedTrackWaits;
   ScrollController? _cachedTrackController;
 
@@ -448,7 +472,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         _cachedTrackHasMore = hasMore;
         _cachedTrackWaits = onlyLikeOnDoubleClick;
         _cachedTrackController = controller;
-        return _cachedTracks = list;
+        return _cachedTracks = _withLoadMore(list, hasMore);
       },
     );
   }

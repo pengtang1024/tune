@@ -173,7 +173,7 @@ class AppDatabase {
         SELECT uri,
           ROW_NUMBER() OVER (
             PARTITION BY source_id
-            ORDER BY pinned DESC, last_played DESC, last_seen DESC, date_added DESC
+            ORDER BY pinned DESC, last_played DESC, play_count DESC, last_seen DESC, date_added DESC
           ) AS position
         FROM songs
         WHERE source_id != 'local'

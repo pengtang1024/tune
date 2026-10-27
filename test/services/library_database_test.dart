@@ -54,6 +54,19 @@ void main() {
       );
     });
 
+    test('a track played more often outranks a quieter one', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([song(1, added: 1), song(2, added: 2), song(3, added: 3)]);
+      database.markPlayed('tune://openverse/1');
+      database.markPlayed('tune://openverse/1');
+
+      final removed = database.prune(1);
+
+      expect(removed, isNot(contains('tune://openverse/1')));
+      expect(database.count(), 1);
+    });
+
     test('a limit of zero keeps everything', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);
