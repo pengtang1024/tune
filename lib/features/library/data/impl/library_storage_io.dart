@@ -15,8 +15,10 @@ import 'package:tune/utils/logger.dart';
 ///
 /// The tracks live in a SQLite database, so a library of a hundred thousand
 /// tracks is written row by row instead of as one document.
-LibraryStorage createLibraryStorage(PersistenceService persistence) =>
-    SqliteLibraryStorage();
+LibraryStorage createLibraryStorage(
+  PersistenceService persistence, {
+  Future<AppDatabase> Function()? database,
+}) => SqliteLibraryStorage(database: database);
 
 /// Persists the scanned library as a single JSON document.
 ///
@@ -94,6 +96,39 @@ class FileLibraryStorage implements LibraryStorage {
   }
 
   @override
+  Future<List<Song>> search({
+    required String query,
+    String? sourceId,
+    required int offset,
+    required int limit,
+  }) async {
+    final all = await _filtered(query, sourceId);
+    if (offset >= all.length) return const [];
+    return all.sublist(offset, (offset + limit).clamp(0, all.length));
+  }
+
+  @override
+  Future<int> countMatching({required String query, String? sourceId}) async {
+    return (await _filtered(query, sourceId)).length;
+  }
+
+  Future<List<Song>> _filtered(String query, String? sourceId) async {
+    final all = await load();
+    final needle = query.trim().toLowerCase();
+    final filtered = all.where((song) {
+      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
+        return false;
+      }
+      if (needle.isEmpty) return true;
+      return song.title.toLowerCase().contains(needle) ||
+          song.artist.toLowerCase().contains(needle) ||
+          song.album.toLowerCase().contains(needle);
+    }).toList(growable: false);
+    filtered.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    return filtered;
+  }
+
+  @override
   Future<void> removeSource(String sourceId) async {
     final all = await load();
     final kept = all
@@ -104,6 +139,9 @@ class FileLibraryStorage implements LibraryStorage {
 
   @override
   Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
+
+  @override
+  Future<void> syncPinned(Set<String> ids) async {}
 
   @override
   Future<List<String>> prune(int limit) async => const [];
@@ -158,14 +196,18 @@ class FileLibraryStorage implements LibraryStorage {
 
 /// The library of a build with a file system, kept in SQLite.
 class SqliteLibraryStorage implements LibraryStorage {
-  SqliteLibraryStorage({Future<Directory> Function()? supportDirectory})
-    : _supportDirectory = supportDirectory;
+  SqliteLibraryStorage({
+    Future<Directory> Function()? supportDirectory,
+    Future<AppDatabase> Function()? database,
+  }) : _supportDirectory = supportDirectory,
+       _databaseFactory = database;
 
   static const _fileName = 'library.db';
   static const _folderName = 'library';
   static const _legacyDocument = 'scanned_songs.json';
 
   final Future<Directory> Function()? _supportDirectory;
+  final Future<AppDatabase> Function()? _databaseFactory;
 
   AppDatabase? _database;
 
@@ -183,10 +225,12 @@ class SqliteLibraryStorage implements LibraryStorage {
     final existing = _database;
     if (existing != null) return existing;
 
-    final directory = await _directory();
-    final database = AppDatabase.open(path.join(directory.path, _fileName));
+    final factory = _databaseFactory;
+    final database = factory != null
+        ? await factory()
+        : AppDatabase.open(path.join((await _directory()).path, _fileName));
     _database = database;
-    await _adoptLegacyDocument(database, directory);
+    await _adoptLegacyDocument(database, await _directory());
     return database;
   }
 
@@ -254,6 +298,36 @@ class SqliteLibraryStorage implements LibraryStorage {
   }
 
   @override
+  Future<List<Song>> search({
+    required String query,
+    String? sourceId,
+    required int offset,
+    required int limit,
+  }) async {
+    try {
+      return (await _db()).search(
+        query: query,
+        sourceId: sourceId,
+        offset: offset,
+        limit: limit,
+      );
+    } catch (error, stackTrace) {
+      Log.error('搜索音乐库失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<int> countMatching({required String query, String? sourceId}) async {
+    try {
+      return (await _db()).countMatching(query: query, sourceId: sourceId);
+    } catch (error, stackTrace) {
+      Log.error('统计音乐库搜索结果失败: $error\n$stackTrace');
+      return 0;
+    }
+  }
+
+  @override
   Future<void> removeSource(String sourceId) async {
     try {
       (await _db()).removeSource(sourceId);
@@ -285,6 +359,15 @@ class SqliteLibraryStorage implements LibraryStorage {
     } catch (error, stackTrace) {
       Log.error('读取口味聚合失败: $error\n$stackTrace');
       return TasteAggregates.empty;
+    }
+  }
+
+  @override
+  Future<void> syncPinned(Set<String> ids) async {
+    try {
+      (await _db()).syncPinned(ids);
+    } catch (error, stackTrace) {
+      Log.error('同步收藏标记失败: $error\n$stackTrace');
     }
   }
 

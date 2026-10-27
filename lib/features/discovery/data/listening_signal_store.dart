@@ -19,7 +19,9 @@ class ListeningSignalStore {
   ListeningSignalStore(
     this._persistence, {
     Future<Directory> Function()? supportDirectory,
-  }) : _supportDirectory = supportDirectory;
+    Future<AppDatabase> Function()? database,
+  }) : _supportDirectory = supportDirectory,
+       _databaseFactory = database;
 
   static const String key = 'discovery_listening_v1';
   static const int version = 1;
@@ -27,6 +29,7 @@ class ListeningSignalStore {
 
   final PersistenceService _persistence;
   final Future<Directory> Function()? _supportDirectory;
+  final Future<AppDatabase> Function()? _databaseFactory;
 
   AppDatabase? _database;
   Map<String, TrackListening> _tracks = const {};
@@ -34,16 +37,10 @@ class ListeningSignalStore {
   /// Opens the database and reads the records that are already there.
   Future<void> init() async {
     try {
-      final base =
-          await (_supportDirectory?.call() ??
-              getApplicationSupportDirectory());
-      final directory = Directory(path.join(base.path, 'library'));
-      if (!await directory.exists()) {
-        await directory.create(recursive: true);
-      }
-      final database = AppDatabase.open(
-        path.join(directory.path, 'library.db'),
-      );
+      final factory = _databaseFactory;
+      final database = factory != null
+          ? await factory()
+          : await _openDefault();
       _database = database;
 
       final stored = database.loadListening();
@@ -68,6 +65,16 @@ class ListeningSignalStore {
     } catch (error, stackTrace) {
       Log.error('打开播放记录数据库失败: $error\n$stackTrace');
     }
+  }
+
+  Future<AppDatabase> _openDefault() async {
+    final base =
+        await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
+    final directory = Directory(path.join(base.path, 'library'));
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return AppDatabase.open(path.join(directory.path, 'library.db'));
   }
 
   Map<String, TrackListening> read() {

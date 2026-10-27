@@ -172,11 +172,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       sourceLabels,
       orderedConfigs,
     );
-    final songs = filteredSongsOf(
-      songs: library.songs,
-      query: library.query,
-      sourceFilter: library.sourceFilter,
-    );
+    final songs = library.filteredSongs;
     final albumCount = library.songs
         .map((song) => song.album.trim())
         .where((album) => album.isNotEmpty)
@@ -580,6 +576,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 /// it. The parts that show the scan watch it on their own.
 typedef _LibrarySlice = ({
   List<Song> songs,
+  List<Song> filteredSongs,
   String query,
   String? sourceFilter,
   bool hasSourceIssues,
@@ -592,6 +589,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
   if (state == null) return null;
   return (
     songs: state.songs,
+    filteredSongs: state.filteredSongs,
     query: state.query,
     sourceFilter: state.sourceFilter,
     // The page only shows whether a source has a problem, not the whole

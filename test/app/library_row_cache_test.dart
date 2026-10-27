@@ -19,6 +19,20 @@ class _FakeLibraryController extends LibraryController {
 
   @override
   Future<LibraryState> build() async => LibraryState(songs: songs);
+
+  @override
+  Future<void> setQuery(String query) async {
+    state = AsyncData((state.valueOrNull ?? LibraryState(songs: songs)).copyWith(query: query));
+  }
+
+  @override
+  Future<void> setSourceFilter(String? sourceId) async {
+    state = AsyncData(
+      (state.valueOrNull ?? LibraryState(songs: songs)).copyWith(
+        sourceFilter: sourceId,
+      ),
+    );
+  }
 }
 
 Song _song(int i) => Song(

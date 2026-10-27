@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
@@ -17,9 +18,13 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
-final libraryStorageProvider = Provider<LibraryStorage>(
-  (ref) => createLibraryStorage(ref.watch(persistenceServiceProvider)),
-);
+final libraryStorageProvider = Provider<LibraryStorage>((ref) {
+  final database = ref.watch(appDatabaseProvider.future);
+  return createLibraryStorage(
+    ref.watch(persistenceServiceProvider),
+    database: () => database,
+  );
+});
 
 final libraryControllerProvider =
     AsyncNotifierProvider<LibraryController, LibraryState>(
@@ -73,10 +78,19 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   Future<void> loadMore() async {
     if (_disposed || !state.hasValue || !_current.hasMore) return;
 
-    final next = await _storage.page(
-      offset: _current.songs.length,
-      limit: windowSize,
-    );
+    final query = _current.query.trim();
+    final sourceId = _current.sourceFilter;
+    final next = query.isEmpty && sourceId == null
+        ? await _storage.page(
+            offset: _current.songs.length,
+            limit: windowSize,
+          )
+        : await _storage.search(
+            query: query,
+            sourceId: sourceId,
+            offset: _current.songs.length,
+            limit: windowSize,
+          );
     if (_disposed || !state.hasValue) return;
 
     if (next.isEmpty) {
@@ -136,8 +150,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         .toSet()
         .toList(growable: false);
 
+    // A scan is a whole-library operation: the list it refreshes is the
+    // library, not the result of the last search.
     state = AsyncData(
       _current.copyWith(
+        query: '',
+        sourceFilter: null,
         scanStatus: LibraryScanStatus.scanning,
         scanProgress: 0,
         statusMessage: AppStrings.instance.scanPreparing,
@@ -317,6 +335,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       merged.removeWhere((song) => removed.contains(song.uri));
     }
     if (_disposed || !state.hasValue) return false;
+    if (_current.query.isNotEmpty || _current.sourceFilter != null) {
+      await _reloadForFilter();
+      return saved;
+    }
     final total = await _storage.count();
     if (_disposed || !state.hasValue) return false;
     state = AsyncData(
@@ -337,9 +359,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await _storage.markPlayed(uri);
   }
 
-  void setQuery(String query) {
+  Future<void> setQuery(String query) async {
     if (_disposed || !state.hasValue) return;
     state = AsyncData(_current.copyWith(query: query));
+    await _reloadForFilter();
   }
 
   /// Removes a source's songs immediately, e.g. after the reader removes it.
@@ -365,7 +388,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await _storage.removeSource(sourceId);
   }
 
-  void setSourceFilter(String? sourceId) {
+  Future<void> setSourceFilter(String? sourceId) async {
     if (_disposed || !state.hasValue) return;
     final normalized = sourceId?.trim();
     state = AsyncData(
@@ -373,6 +396,49 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         sourceFilter: normalized == null || normalized.isEmpty
             ? null
             : normalized,
+      ),
+    );
+    await _reloadForFilter();
+  }
+
+  /// Reads the window that matches the current query and source filter.
+  Future<void> _reloadForFilter() async {
+    if (_disposed || !state.hasValue) return;
+    final query = _current.query.trim();
+    final sourceId = _current.sourceFilter;
+
+    if (query.isEmpty && sourceId == null) {
+      final total = await _storage.count();
+      final songs = total > windowSize
+          ? await _storage.page(offset: 0, limit: windowSize)
+          : await _storage.load();
+      if (_disposed || !state.hasValue) return;
+      state = AsyncData(
+        _current.copyWith(
+          songs: List.unmodifiable(songs),
+          total: total,
+          hasMore: songs.length < total,
+        ),
+      );
+      return;
+    }
+
+    final total = await _storage.countMatching(
+      query: query,
+      sourceId: sourceId,
+    );
+    final songs = await _storage.search(
+      query: query,
+      sourceId: sourceId,
+      offset: 0,
+      limit: windowSize,
+    );
+    if (_disposed || !state.hasValue) return;
+    state = AsyncData(
+      _current.copyWith(
+        songs: List.unmodifiable(songs),
+        total: total,
+        hasMore: songs.length < total,
       ),
     );
   }
@@ -515,6 +581,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   Future<Set<String>> _prune() async {
     final limit = ref.read(libraryCacheLimitProvider);
     if (limit <= 0) return const {};
+    // The window does not hold every marked track, so the pins are written
+    // to the whole table before a prune decides what to drop.
+    await _storage.syncPinned(_pinnedUris());
     final removed = await _storage.prune(limit);
     return removed.toSet();
   }

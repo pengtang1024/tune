@@ -117,12 +117,12 @@ presentation → application → domain
 | 数据 | 落在哪 | 谁写 |
 | --- | --- | --- |
 | 偏好（主题、语言、扫描目录、音源开关） | `<应用支持目录>/settings/`，一个偏好一个文件 | `FilePersistenceService`（`lib/data/services/impl/preference_store_io.dart`） |
-| 喜欢的曲目 | `<应用支持目录>/settings/`，键 `favorite_tracks`（一个文件） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
+| 喜欢的曲目 | `library.db` 的 `favorites` 表（旧 `favorite_tracks` 首次启动导入） | `FavoritesStore`（`lib/features/favorites/data/favorites_store.dart`） |
 | 推荐反馈 | `<应用支持目录>/settings/`，键 `discovery_feedback_v1` | `DiscoveryFeedbackStore`（`lib/features/discovery/data/discovery_feedback_store.dart`） |
 | 歌手推荐反馈 | `<应用支持目录>/settings/`，键 `discovery_artist_feedback_v1` | `DiscoveryArtistFeedbackStore`（同一文件） |
-| 播放记录 | `<应用支持目录>/settings/`，键 `discovery_listening_v1` | `ListeningSignalStore`（`lib/features/discovery/data/listening_signal_store.dart`） |
-| 播放会话（队列、游标、模式、历史） | `<应用支持目录>/settings/`，键 `playback_queue_v1` | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
-| 播放进度 | `<应用支持目录>/settings/`，键 `playback_position_v1` | `PlaybackSessionStore` |
+| 播放记录 | `library.db` 的 `listening_signals` 表（旧 `discovery_listening_v1` 首次启动导入） | `ListeningSignalStore`（`lib/features/discovery/data/listening_signal_store.dart`） |
+| 播放会话（队列、游标、模式、历史） | `library.db` 的 `queue` / `queue_meta` 表（旧 `playback_queue_v1` 首次启动导入） | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
+| 播放进度 | `library.db` 的 `queue_meta` 表（旧 `playback_position_v1` 首次启动导入） | `PlaybackSessionStore` |
 | 音乐库索引 | `<应用支持目录>/library/library.db`（SQLite） | `SqliteLibraryStorage`（`lib/features/library/data/impl/library_storage_io.dart`） |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
@@ -136,7 +136,7 @@ presentation → application → domain
 - **Web 不再是目标平台**：Web 构建保留工程入口，但音乐库不落盘（`library_storage_stub.dart` 是空实现），曲目只在当前会话里；偏好仍走浏览器存储。
 - **音乐库索引存在 SQLite**：桌面把索引写在 `<应用支持目录>/library/library.db`。首次启动时如果旧版的 `scanned_songs.json` 还在，会导入数据库并改名为 `.migrated`。索引和音源的扫描时间必须落在同一个存储里：只存扫描时间而不存索引，下次打开就会跳过所有音源，索引也就空了。
 - **库按窗读取**：超过 1000 首时首帧只读第一窗，列表底部按需从 SQLite 取下一窗；保存是增量 upsert，写一窗不会删掉窗口外的行。
-- **淘汰在数据库里完成**：设了「每来源最多保留」后，保存完新窗口就让 SQLite 按 `pinned`（收藏）→ `last_played`（最近播放）→ `last_seen`（最近出现）→ `date_added` 排序，用窗口函数删掉超出上限的行。全库不需要加载进内存来排序，几万到几十万行都能在数据库内裁剪。播放成功会写 `last_played`，扫描会更新 `last_seen`。
+- **淘汰在数据库里完成**：设了「每来源最多保留」后，保存完新窗口就让 SQLite 按 `last_played`（最近播放）→ `play_count`（播放次数）→ `last_seen`（最近出现）→ `date_added` 排序，用窗口函数删掉超出上限的行；`pinned = 1` 的收藏完全不参与排名。全库不需要加载进内存来排序，几万到几十万行都能在数据库内裁剪。播放成功会写 `last_played`，扫描会更新 `last_seen`。
 - **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
 
 ## 音乐库的目录

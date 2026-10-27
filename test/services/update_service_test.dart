@@ -101,7 +101,9 @@ void main() {
       expect(File('${target.path}/lib/old.txt').existsSync(), isFalse);
       expect(File('${target.path}/tune').readAsStringSync(), 'new binary');
       expect(Directory('${root.path}/.tune-update').existsSync(), isFalse);
-      expect(Directory('${root.path}/.tune-previous').existsSync(), isFalse);
+      // The previous bundle is kept until the next update, so a build that
+      // starts and then fails can be restored by hand.
+      expect(Directory('${root.path}/.tune-previous').existsSync(), isTrue);
     });
   });
 }

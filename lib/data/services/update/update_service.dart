@@ -167,7 +167,8 @@ class UpdateService {
       await Directory(backup).rename(targetDirectory);
       rethrow;
     }
-    await _delete(backup);
+    // The previous bundle is kept: a build that starts and then fails can be
+    // restored by hand. The next update removes the old copy first.
     await _delete(staging);
   }
 

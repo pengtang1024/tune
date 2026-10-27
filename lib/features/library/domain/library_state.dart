@@ -46,6 +46,12 @@ class LibraryState {
   bool get hasSongs => songs.isNotEmpty;
   bool get isScanning => scanStatus == LibraryScanStatus.scanning;
 
+  /// The tracks the page shows.
+  ///
+  /// The storage already applies the query and the source filter, so this
+  /// filter is idempotent: a window that came from the database passes
+  /// through unchanged, and a hand-made state (a test, a cached list) is
+  /// still narrowed the way the page expects.
   List<Song> get filteredSongs => filteredSongsOf(
     songs: songs,
     query: query,

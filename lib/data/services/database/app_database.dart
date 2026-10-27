@@ -176,27 +176,67 @@ class AppDatabase {
   List<String> prune(int limit) {
     if (limit <= 0) return const [];
 
+    const ranking = '''
+      SELECT uri,
+        ROW_NUMBER() OVER (
+          PARTITION BY source_id
+          ORDER BY last_played DESC, play_count DESC, last_seen DESC, date_added DESC
+        ) AS position
+      FROM songs
+      WHERE source_id != 'local' AND pinned = 0
+    ''';
     final rows = _db.select(
-      '''
-      SELECT uri FROM (
-        SELECT uri,
-          ROW_NUMBER() OVER (
-            PARTITION BY source_id
-            ORDER BY pinned DESC, last_played DESC, play_count DESC, last_seen DESC, date_added DESC
-          ) AS position
-        FROM songs
-        WHERE source_id != 'local'
-      )
-      WHERE position > ?
-      ''',
+      'SELECT uri FROM ($ranking) WHERE position > ?',
       [limit],
     );
-    final removed = [for (final row in rows) row['uri'] as String];
-    if (removed.isEmpty) return removed;
+    if (rows.isEmpty) return const [];
 
-    final placeholders = List.filled(removed.length, '?').join(', ');
-    _db.execute('DELETE FROM songs WHERE uri IN ($placeholders)', removed);
-    return removed;
+    // The delete names the rows through a subquery: a library that drops
+    // thousands of tracks at once would exceed the bound parameter limit of
+    // SQLite if every uri travelled as one more `?`.
+    _db.execute(
+      'DELETE FROM songs WHERE uri IN '
+      '(SELECT uri FROM ($ranking) WHERE position > ?)',
+      [limit],
+    );
+    return [for (final row in rows) row['uri'] as String];
+  }
+
+  /// Marks exactly [ids] as pinned, and every other row as not pinned.
+  ///
+  /// A window of a large library does not hold every marked track, so the
+  /// pin is written to the table as a whole instead of riding on a save.
+  /// The ids travel through a temporary table, so a large set of marks does
+  /// not become a parameter list that SQLite refuses.
+  void syncPinned(Set<String> ids) {
+    _db.execute('BEGIN');
+    try {
+      _db.execute(
+        'CREATE TEMP TABLE IF NOT EXISTS tune_pins (uri TEXT PRIMARY KEY)',
+      );
+      _db.execute('DELETE FROM tune_pins');
+      if (ids.isNotEmpty) {
+        final statement = _db.prepare(
+          'INSERT OR IGNORE INTO tune_pins (uri) VALUES (?)',
+        );
+        try {
+          for (final id in ids) {
+            statement.execute([id]);
+          }
+        } finally {
+          statement.close();
+        }
+      }
+      _db.execute('UPDATE songs SET pinned = 0 WHERE pinned = 1');
+      _db.execute(
+        'UPDATE songs SET pinned = 1 '
+        'WHERE uri IN (SELECT uri FROM tune_pins)',
+      );
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   /// Notes that a track played, which raises its place in the ranking.
@@ -225,6 +265,51 @@ class AppDatabase {
       }
     }
     return songs;
+  }
+
+  /// Reads one window of the tracks that match [query] and [sourceId].
+  List<Song> search({
+    required String query,
+    String? sourceId,
+    required int offset,
+    required int limit,
+  }) {
+    final like = '%${query.trim()}%';
+    final rows = _db.select(
+      '''
+      SELECT json FROM songs
+      WHERE (title LIKE ? OR artist LIKE ? OR album LIKE ?)
+        AND (? IS NULL OR source_id = ?)
+      ORDER BY title COLLATE NOCASE
+      LIMIT ? OFFSET ?
+      ''',
+      [like, like, like, sourceId, sourceId, limit, offset],
+    );
+    final songs = <Song>[];
+    for (final row in rows) {
+      try {
+        final decoded = jsonDecode(row['json'] as String);
+        if (decoded is! Map<String, dynamic>) continue;
+        songs.add(Song.fromMap(decoded));
+      } catch (_) {
+        // One broken row must not take the whole window down.
+      }
+    }
+    return songs;
+  }
+
+  /// How many tracks match [query] and [sourceId].
+  int countMatching({required String query, String? sourceId}) {
+    final like = '%${query.trim()}%';
+    final rows = _db.select(
+      '''
+      SELECT COUNT(*) AS count FROM songs
+      WHERE (title LIKE ? OR artist LIKE ? OR album LIKE ?)
+        AND (? IS NULL OR source_id = ?)
+      ''',
+      [like, like, like, sourceId, sourceId],
+    );
+    return (rows.first['count'] as int?) ?? 0;
   }
 
   /// Removes the tracks of one source.
@@ -298,13 +383,20 @@ class AppDatabase {
   void saveFavorites(Set<String> ids) {
     _db.execute('BEGIN');
     try {
-      _db.execute('DELETE FROM favorites');
+      final existing = {
+        for (final row in _db.select('SELECT uri FROM favorites'))
+          row['uri'] as String,
+      };
+      for (final uri in existing.difference(ids)) {
+        _db.execute('DELETE FROM favorites WHERE uri = ?', [uri]);
+      }
       final statement = _db.prepare(
-        'INSERT OR REPLACE INTO favorites (uri, added_at) VALUES (?, ?)',
+        'INSERT OR IGNORE INTO favorites (uri, added_at) VALUES (?, ?)',
       );
       try {
         final now = DateTime.now().millisecondsSinceEpoch;
         for (final id in ids) {
+          if (existing.contains(id)) continue;
           statement.execute([id, now]);
         }
       } finally {
@@ -403,13 +495,22 @@ class AppDatabase {
   void saveListening(Map<String, Object?> tracks) {
     _db.execute('BEGIN');
     try {
-      _db.execute('DELETE FROM listening_signals');
+      final existing = {
+        for (final row
+            in _db.select('SELECT uri, json FROM listening_signals'))
+          row['uri'] as String: row['json'] as String,
+      };
+      for (final uri in existing.keys.toSet().difference(tracks.keys.toSet())) {
+        _db.execute('DELETE FROM listening_signals WHERE uri = ?', [uri]);
+      }
       final statement = _db.prepare(
-        'INSERT INTO listening_signals (uri, json) VALUES (?, ?)',
+        'INSERT OR REPLACE INTO listening_signals (uri, json) VALUES (?, ?)',
       );
       try {
         for (final entry in tracks.entries) {
-          statement.execute([entry.key, jsonEncode(entry.value)]);
+          final json = jsonEncode(entry.value);
+          if (existing[entry.key] == json) continue;
+          statement.execute([entry.key, json]);
         }
       } finally {
         statement.close();
