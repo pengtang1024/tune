@@ -75,6 +75,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   List<Song>? _cachedTrackSongs;
   Map<String, SourceLabel>? _cachedTrackLabels;
   LibraryRowMetrics? _cachedTrackMetrics;
+  bool? _cachedTrackHasMore;
   bool? _cachedTrackWaits;
   ScrollController? _cachedTrackController;
 
@@ -337,6 +338,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       sourceLabels,
       onlyLikeOnDoubleClick,
       controller: _songsScrollController,
+      hasMore:
+          library.hasMore && library.query.isEmpty && library.sourceFilter == null,
     );
   }
 
@@ -345,6 +348,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick, {
     ScrollController? controller,
+    bool hasMore = false,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -361,6 +365,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             identical(controller, _cachedTrackController) &&
             onlyLikeOnDoubleClick == _cachedTrackWaits &&
             metrics == _cachedTrackMetrics &&
+            hasMore == _cachedTrackHasMore &&
             _sameRows(_cachedTrackSongs!, songs) &&
             mapEquals(_cachedTrackLabels!, sourceLabels)) {
           return cached;
@@ -379,8 +384,23 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           // it and the mark comes back from the controller. The default
           // wrapper only adds a listener to every row.
           addAutomaticKeepAlives: false,
-          itemCount: songs.length,
+          itemCount: songs.length + (hasMore ? 1 : 0),
           itemBuilder: (context, index) {
+            if (index >= songs.length) {
+              return Center(
+                child: TextButton.icon(
+                  key: const ValueKey('library-load-more'),
+                  onPressed: () => ref
+                      .read(libraryControllerProvider.notifier)
+                      .loadMore(),
+                  icon: const Icon(
+                    Icons.expand_more_rounded,
+                    size: CompactTokens.icon16,
+                  ),
+                  label: Text(context.loc.libraryLoadMore),
+                ),
+              );
+            }
             final song = songs[index];
             // Each row listens to the three values it paints, not to the
             // whole page state. Liking a track rebuilds one row; playing a
@@ -425,6 +445,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         _cachedTrackSongs = songs;
         _cachedTrackLabels = sourceLabels;
         _cachedTrackMetrics = metrics;
+        _cachedTrackHasMore = hasMore;
         _cachedTrackWaits = onlyLikeOnDoubleClick;
         _cachedTrackController = controller;
         return _cachedTracks = list;
@@ -539,6 +560,7 @@ typedef _LibrarySlice = ({
   String? sourceFilter,
   bool hasSourceIssues,
   bool isLoading,
+  bool hasMore,
 });
 
 _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
@@ -555,6 +577,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
       (summary) => summary.status != SourceScanStatus.success,
     ),
     isLoading: state.isLoading,
+    hasMore: state.hasMore,
   );
 }
 

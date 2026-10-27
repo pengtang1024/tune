@@ -39,6 +39,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   bool _autoScanStarted = false;
   int _scanGeneration = 0;
 
+  /// How many tracks one window of the library holds.
+  ///
+  /// A small library is read whole; a library larger than this is read a
+  /// window at a time, so its size never decides the cost of the first frame.
+  static const int windowSize = 1000;
+
   @override
   Future<LibraryState> build() async {
     _disposed = false;
@@ -47,9 +53,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     _storage = ref.read(libraryStorageProvider);
     ref.onDispose(() => _disposed = true);
 
-    final songs = await _storage.load();
+    final total = await _storage.count();
+    final songs = total > windowSize
+        ? await _storage.page(offset: 0, limit: windowSize)
+        : await _storage.load();
     return LibraryState(
       songs: List.unmodifiable(songs),
+      total: total,
+      hasMore: songs.length < total,
       statusMessage: songs.isEmpty
           ? null
           : AppStrings.instance.scanSongCountShort(songs.length),
@@ -57,6 +68,30 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   }
 
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
+
+  /// Reads the next window of the library.
+  Future<void> loadMore() async {
+    if (_disposed || !state.hasValue || !_current.hasMore) return;
+
+    final next = await _storage.page(
+      offset: _current.songs.length,
+      limit: windowSize,
+    );
+    if (_disposed || !state.hasValue) return;
+
+    if (next.isEmpty) {
+      state = AsyncData(_current.copyWith(hasMore: false));
+      return;
+    }
+    final merged = _dedupe([..._current.songs, ...next])
+      ..sort((a, b) => compareText(a.title, b.title));
+    state = AsyncData(
+      _current.copyWith(
+        songs: List.unmodifiable(merged),
+        hasMore: next.length == windowSize,
+      ),
+    );
+  }
 
   /// Marks the copies of the tracks in the library that are on this machine.
   ///
@@ -221,9 +256,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           )
           .length;
 
+      final total = await _storage.count();
+      if (_disposed || generation != _scanGeneration) return;
       state = AsyncData(
         _current.copyWith(
           songs: songsUnchanged ? _current.songs : List.unmodifiable(songs),
+          total: total,
+          hasMore: songs.length < total,
           scanStatus: LibraryScanStatus.completed,
           scanProgress: 1,
           isLoading: false,
@@ -278,8 +317,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       merged.removeWhere((song) => removed.contains(song.uri));
     }
     if (_disposed || !state.hasValue) return false;
+    final total = await _storage.count();
+    if (_disposed || !state.hasValue) return false;
     state = AsyncData(
-      _current.copyWith(songs: List<Song>.unmodifiable(merged)),
+      _current.copyWith(
+        songs: List<Song>.unmodifiable(merged),
+        total: total,
+        hasMore: merged.length < total,
+      ),
     );
     return saved;
   }
@@ -317,7 +362,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             : _current.sourceFilter,
       ),
     );
-    await _saveQuietly(songs);
+    await _storage.removeSource(sourceId);
   }
 
   void setSourceFilter(String? sourceId) {

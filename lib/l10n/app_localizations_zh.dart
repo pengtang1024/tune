@@ -165,6 +165,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryScanAllSources => '扫描全部音源';
 
   @override
+  String get libraryLoadMore => '加载更多曲目';
+
+  @override
   String libraryTrackCount(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2454,6 +2457,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryScanAllSources => '扫描全部音源';
 
   @override
+  String get libraryLoadMore => '加载更多曲目';
+
+  @override
   String libraryTrackCount(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -4741,6 +4747,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryScanAllSources => '掃描全部音源';
+
+  @override
+  String get libraryLoadMore => '載入更多曲目';
 
   @override
   String libraryTrackCount(int count) {

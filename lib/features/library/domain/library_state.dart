@@ -19,6 +19,14 @@ class LibraryState {
   /// from the sources that succeeded.
   final Map<String, SourceScanSummary> sourceSummaries;
 
+  /// How many tracks the library holds on disk.
+  ///
+  /// It is larger than [songs] when the library is read a window at a time.
+  final int total;
+
+  /// Whether another window of the library is waiting on disk.
+  final bool hasMore;
+
   const LibraryState({
     this.songs = const [],
     this.query = '',
@@ -29,6 +37,8 @@ class LibraryState {
     this.errorMessage,
     this.isLoading = false,
     this.sourceSummaries = const {},
+    this.total = 0,
+    this.hasMore = false,
   });
 
   static const LibraryState initial = LibraryState();
@@ -52,6 +62,8 @@ class LibraryState {
     Object? errorMessage = _unset,
     bool? isLoading,
     Map<String, SourceScanSummary>? sourceSummaries,
+    int? total,
+    bool? hasMore,
   }) {
     return LibraryState(
       songs: songs ?? this.songs,
@@ -69,6 +81,8 @@ class LibraryState {
           : errorMessage as String?,
       isLoading: isLoading ?? this.isLoading,
       sourceSummaries: sourceSummaries ?? this.sourceSummaries,
+      total: total ?? this.total,
+      hasMore: hasMore ?? this.hasMore,
     );
   }
 }

@@ -80,22 +80,46 @@ void main() {
       );
     });
 
-    test('a second save keeps the old rows and removes the gone ones', () {
+    test('a second save adds the new rows and keeps the old ones', () {
       final database = LibraryDatabase.inMemory();
       addTearDown(database.close);
 
       database.save([song(1), song(2)]);
       database.save([song(2), song(3)]);
 
-      expect(database.count(), 2);
+      // One window of a large library is written without erasing the rows
+      // outside it; removing a source is an explicit call.
+      expect(database.count(), 3);
       expect(
         database.load().map((track) => track.uri),
-        containsAll(['tune://openverse/2', 'tune://openverse/3']),
+        containsAll([
+          'tune://openverse/1',
+          'tune://openverse/2',
+          'tune://openverse/3',
+        ]),
       );
-      expect(
-        database.load().map((track) => track.uri),
-        isNot(contains('tune://openverse/1')),
-      );
+    });
+
+    test('a source can be removed on its own', () {
+      final database = LibraryDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([song(1), song(2)]);
+
+      database.removeSource('openverse');
+
+      expect(database.count(), 0);
+    });
+
+    test('a page reads the library by title', () {
+      final database = LibraryDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([song(1), song(2), song(3)]);
+
+      final page = database.page(offset: 0, limit: 2);
+      expect(page, hasLength(2));
+
+      final next = database.page(offset: 2, limit: 2);
+      expect(next, hasLength(1));
     });
 
     test('clearing the database leaves no track', () {

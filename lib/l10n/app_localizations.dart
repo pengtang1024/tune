@@ -376,6 +376,12 @@ abstract class AppLocalizations {
   /// **'扫描全部音源'**
   String get libraryScanAllSources;
 
+  /// No description provided for @libraryLoadMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载更多曲目'**
+  String get libraryLoadMore;
+
   /// No description provided for @libraryTrackCount.
   ///
   /// In zh_CN, this message translates to:
