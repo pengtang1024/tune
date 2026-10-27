@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
@@ -14,6 +15,7 @@ import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
+import 'package:tune/features/settings/presentation/settings_update_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -136,6 +138,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 ],
                 const SizedBox(height: 14),
                 SettingsAboutCard(version: AppVersion.version),
+                if (!kIsWeb) ...[
+                  const SizedBox(height: 14),
+                  const SettingsUpdateCard(),
+                ],
               ],
             ),
           ),

@@ -57,6 +57,63 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scanning => '扫描中';
 
   @override
+  String get updateEyebrow => '更新';
+
+  @override
+  String get updateTitle => '版本';
+
+  @override
+  String get updateDescription => '检查项目发布页是否有新版本，并直接安装';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return '当前版本 $version';
+  }
+
+  @override
+  String get updateIdle => '还没有检查过发布页';
+
+  @override
+  String get updateChecking => '正在检查发布页…';
+
+  @override
+  String get updateUpToDate => '已经是最新版本';
+
+  @override
+  String updateAvailable(String version) {
+    return '新版本 $version 可用';
+  }
+
+  @override
+  String get updateDownloading => '正在下载';
+
+  @override
+  String get updateInstalling => '正在安装…';
+
+  @override
+  String get updateReady => '更新已就绪，重启后生效';
+
+  @override
+  String updateFailed(String error) {
+    return '检查失败：$error';
+  }
+
+  @override
+  String get updateCheck => '检查更新';
+
+  @override
+  String get updateInstall => '下载并安装';
+
+  @override
+  String get updateRetry => '重试';
+
+  @override
+  String get updateRestart => '立即重启';
+
+  @override
+  String get updateNoArchive => '这个平台不支持自动安装，请到发布页手动下载';
+
+  @override
   String get about => '关于';
 
   @override
@@ -2229,6 +2286,63 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get scanning => '扫描中';
 
   @override
+  String get updateEyebrow => '更新';
+
+  @override
+  String get updateTitle => '版本';
+
+  @override
+  String get updateDescription => '检查项目发布页是否有新版本，并直接安装';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return '当前版本 $version';
+  }
+
+  @override
+  String get updateIdle => '还没有检查过发布页';
+
+  @override
+  String get updateChecking => '正在检查发布页…';
+
+  @override
+  String get updateUpToDate => '已经是最新版本';
+
+  @override
+  String updateAvailable(String version) {
+    return '新版本 $version 可用';
+  }
+
+  @override
+  String get updateDownloading => '正在下载';
+
+  @override
+  String get updateInstalling => '正在安装…';
+
+  @override
+  String get updateReady => '更新已就绪，重启后生效';
+
+  @override
+  String updateFailed(String error) {
+    return '检查失败：$error';
+  }
+
+  @override
+  String get updateCheck => '检查更新';
+
+  @override
+  String get updateInstall => '下载并安装';
+
+  @override
+  String get updateRetry => '重试';
+
+  @override
+  String get updateRestart => '立即重启';
+
+  @override
+  String get updateNoArchive => '这个平台不支持自动安装，请到发布页手动下载';
+
+  @override
   String get about => '关于';
 
   @override
@@ -4399,6 +4513,63 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get scanning => '掃描中';
+
+  @override
+  String get updateEyebrow => '更新';
+
+  @override
+  String get updateTitle => '版本';
+
+  @override
+  String get updateDescription => '檢查專案發布頁是否有新版本，並直接安裝';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return '目前版本 $version';
+  }
+
+  @override
+  String get updateIdle => '還沒檢查過發布頁';
+
+  @override
+  String get updateChecking => '正在檢查發布頁…';
+
+  @override
+  String get updateUpToDate => '已經是最新版本';
+
+  @override
+  String updateAvailable(String version) {
+    return '新版本 $version 可用';
+  }
+
+  @override
+  String get updateDownloading => '正在下載';
+
+  @override
+  String get updateInstalling => '正在安裝…';
+
+  @override
+  String get updateReady => '更新已就緒，重新啟動後生效';
+
+  @override
+  String updateFailed(String error) {
+    return '檢查失敗：$error';
+  }
+
+  @override
+  String get updateCheck => '檢查更新';
+
+  @override
+  String get updateInstall => '下載並安裝';
+
+  @override
+  String get updateRetry => '重試';
+
+  @override
+  String get updateRestart => '立即重新啟動';
+
+  @override
+  String get updateNoArchive => '這個平台不支援自動安裝，請到發布頁手動下載';
 
   @override
   String get about => '關於';

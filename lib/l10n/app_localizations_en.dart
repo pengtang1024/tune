@@ -57,6 +57,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanning => 'Scanning';
 
   @override
+  String get updateEyebrow => 'Updates';
+
+  @override
+  String get updateTitle => 'Version';
+
+  @override
+  String get updateDescription =>
+      'Checks the project page for a newer release and installs it';
+
+  @override
+  String updateCurrentVersion(String version) {
+    return 'Current version $version';
+  }
+
+  @override
+  String get updateIdle => 'The project page has not been checked yet';
+
+  @override
+  String get updateChecking => 'Checking the project page…';
+
+  @override
+  String get updateUpToDate => 'This is the newest version';
+
+  @override
+  String updateAvailable(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String get updateDownloading => 'Downloading';
+
+  @override
+  String get updateInstalling => 'Installing…';
+
+  @override
+  String get updateReady => 'The update is ready; restart to use it';
+
+  @override
+  String updateFailed(String error) {
+    return 'The check failed: $error';
+  }
+
+  @override
+  String get updateCheck => 'Check for updates';
+
+  @override
+  String get updateInstall => 'Download and install';
+
+  @override
+  String get updateRetry => 'Try again';
+
+  @override
+  String get updateRestart => 'Restart now';
+
+  @override
+  String get updateNoArchive =>
+      'This platform has no automatic install; download it from the release page';
+
+  @override
   String get about => 'About';
 
   @override

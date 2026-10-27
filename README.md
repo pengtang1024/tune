@@ -68,6 +68,17 @@ flutter build linux --debug
 
 Android 的 release 签名从 `android/key.properties` 读取 `storeFile`、`storePassword`、`keyAlias`、`keyPassword`。没有该文件时回落到 debug 签名，产物只能本机试装，不能发布。
 
+## 自动更新
+
+设置页「关于」下方有「检查更新」：桌面端从 GitHub 的 release 读最新版本，
+发现新版本后下载对应平台的归档并换掉正在运行的 bundle，重启后生效。
+Linux 的打包与发布步骤见 [docs/updates.md](docs/updates.md)。
+
+```bash
+flutter build linux --release
+./tool/package_linux.sh    # dist/tune-linux-x64-<version>.tar.gz
+```
+
 ## 桌面图标
 
 - 原图是 `branding/app_icon.png`；改完原图后跑 `dart run flutter_launcher_icons` 重新生成各平台图标。原图不进包，`assets/` 里只放运行时要用的素材。
