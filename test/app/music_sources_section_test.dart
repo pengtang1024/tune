@@ -445,6 +445,8 @@ void main() {
     expect(find.text('上移'), findsOneWidget);
     expect(find.text('下移'), findsOneWidget);
     expect(find.text('移到更多音源'), findsOneWidget);
+    // A source keeps a way to start over after its tracks piled up.
+    expect(find.text('清空曲目'), findsOneWidget);
     expect(find.text('删除'), findsNothing);
   });
 }

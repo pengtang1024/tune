@@ -438,6 +438,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesFieldNameHint => '留空则用类型名加序号';
 
   @override
+  String get sourcesClearSongs => '清空曲目';
+
+  @override
+  String sourcesClearSongsTitle(String name) {
+    return '清空「$name」的曲目？';
+  }
+
+  @override
+  String get sourcesClearSongsHint => '只移除这个来源带来的曲目，来源本身保留';
+
+  @override
+  String sourcesSongsCleared(String name) {
+    return '已清空「$name」的曲目';
+  }
+
+  @override
   String get sourcesDelete => '删除';
 
   @override
@@ -2690,6 +2706,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesFieldNameHint => '留空则用类型名加序号';
 
   @override
+  String get sourcesClearSongs => '清空曲目';
+
+  @override
+  String sourcesClearSongsTitle(String name) {
+    return '清空「$name」的曲目？';
+  }
+
+  @override
+  String get sourcesClearSongsHint => '只移除这个来源带来的曲目，来源本身保留';
+
+  @override
+  String sourcesSongsCleared(String name) {
+    return '已清空「$name」的曲目';
+  }
+
+  @override
   String get sourcesDelete => '删除';
 
   @override
@@ -4940,6 +4972,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesFieldNameHint => '留空則用類型名加序號';
+
+  @override
+  String get sourcesClearSongs => '清空曲目';
+
+  @override
+  String sourcesClearSongsTitle(String name) {
+    return '清空「$name」的曲目？';
+  }
+
+  @override
+  String get sourcesClearSongsHint => '只移除這個來源帶來的曲目，來源本身保留';
+
+  @override
+  String sourcesSongsCleared(String name) {
+    return '已清空「$name」的曲目';
+  }
 
   @override
   String get sourcesDelete => '刪除';

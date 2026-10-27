@@ -95,14 +95,12 @@ class _SourceFormDialogState extends ConsumerState<SourceFormDialog> {
   }
 
   /// The settings the reader filled in first.
-  List<MusicSourceField> get _basicFields => widget.fields
-      .where((field) => !field.advanced)
-      .toList(growable: false);
+  List<MusicSourceField> get _basicFields =>
+      widget.fields.where((field) => !field.advanced).toList(growable: false);
 
   /// The settings that are rarely needed.
-  List<MusicSourceField> get _advancedFields => widget.fields
-      .where((field) => field.advanced)
-      .toList(growable: false);
+  List<MusicSourceField> get _advancedFields =>
+      widget.fields.where((field) => field.advanced).toList(growable: false);
 
   /// Whether the type of the source can be tried out before it is kept.
   bool get _canPreview {
