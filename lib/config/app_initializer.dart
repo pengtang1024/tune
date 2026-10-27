@@ -5,6 +5,7 @@ import 'package:tune/data/services/providers/playback_session_store_provider.dar
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
 import 'package:tune/features/discovery/application/discovery_signal_observer.dart';
+import 'package:tune/features/discovery/application/discovery_providers.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
@@ -21,6 +22,7 @@ class AppInitializer {
 
       await _initPersistenceService(ref);
       await _initFavorites(ref);
+      await _initListeningSignals(ref);
       await _initPlaybackSession(ref);
       await _initAudioPlayerService(ref);
       await _initMusicScannerService(ref);
@@ -54,6 +56,16 @@ class AppInitializer {
     } catch (error, stackTrace) {
       Log.error('初始化收藏失败: $error', stackTrace);
       Log.info('收藏初始化失败，但应用将继续运行');
+    }
+  }
+
+  static Future<void> _initListeningSignals(Ref ref) async {
+    try {
+      await ref.read(listeningSignalStoreProvider).init();
+      Log.info('播放记录初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('初始化播放记录失败: $error', stackTrace);
+      Log.info('播放记录初始化失败，但应用将继续运行');
     }
   }
 
