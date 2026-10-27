@@ -95,15 +95,6 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final keyword = request.config.setting('query');
-    if (request.offset > 0 && keyword == null) {
-      // The category walk answers with a continuation token, not an offset,
-      // so a later window cannot be named here.
-      return SourceScanResult(
-        sourceId: request.config.id,
-        status: SourceScanStatus.success,
-      );
-    }
-
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
       final response = await _dio.get<Map<String, dynamic>>(
@@ -118,6 +109,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'gcmtype': 'file',
                 'gcmnamespace': _fileNamespace,
                 'gcmlimit': limit,
+                if (request.cursor != null) 'gcmcontinue': request.cursor,
                 'prop': 'imageinfo',
                 'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
               }
@@ -150,10 +142,22 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
         status: SourceScanStatus.success,
         songs: songs,
         message: songs.isEmpty ? AppStrings.instance.wikimediaNoMatch : null,
+        cursor: _nextCursor(data),
       );
     } catch (error) {
       return failedResult(request.config.id, error);
     }
+  }
+
+  /// The token the next window of the category walk starts at.
+  ///
+  /// The search stream answers with an offset instead, so only the category
+  /// walk carries a cursor.
+  static String? _nextCursor(Map<String, dynamic> data) {
+    final continuation = data['continue'];
+    if (continuation is! Map) return null;
+    final token = continuation['gcmcontinue']?.toString().trim() ?? '';
+    return token.isEmpty ? null : token;
   }
 
   /// The search term of the wiki.

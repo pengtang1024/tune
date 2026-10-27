@@ -103,6 +103,7 @@ class _PagingService extends MusicSourceService {
     required List<MusicSourceConfig> sources,
     required String query,
     Map<String, int> offsets = const {},
+    Map<String, String> cursors = const {},
     void Function(String sourceId, double progress)? onProgress,
   }) async {
     final offset = offsets['openverse'] ?? 0;

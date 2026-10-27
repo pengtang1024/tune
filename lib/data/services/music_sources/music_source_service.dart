@@ -305,6 +305,7 @@ class MusicSourceService implements StreamUrlResolver {
     required List<MusicSourceConfig> sources,
     required String query,
     Map<String, int> offsets = const {},
+    Map<String, String> cursors = const {},
     void Function(String sourceId, double progress)? onProgress,
   }) async {
     final trimmed = query.trim();
@@ -353,6 +354,7 @@ class MusicSourceService implements StreamUrlResolver {
             MusicSourceScanRequest(
               config: searchConfig,
               offset: offset,
+              cursor: cursors[config.id],
               onProgress: (progress) => onProgress?.call(config.id, progress),
             ),
           );

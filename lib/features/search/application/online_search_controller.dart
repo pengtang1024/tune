@@ -85,6 +85,10 @@ class OnlineSearchController
         OnlineSearchState(
           query: query,
           results: bySource,
+          cursors: {
+            for (final result in results)
+              if (result.cursor != null) result.sourceId: result.cursor!,
+          },
           message: total == 0 ? AppStrings.instance.searchNoMatch : null,
         ),
       );
@@ -136,10 +140,12 @@ class OnlineSearchController
     final generation = _generation;
     state = AsyncData(current.copyWith(loadingMore: sourceId));
     try {
+      final cursor = current.cursors[sourceId];
       final results = await service.search(
         sources: [source],
         query: current.query,
-        offsets: {sourceId: result.songs.length},
+        offsets: cursor == null ? {sourceId: result.songs.length} : const {},
+        cursors: cursor == null ? const {} : {sourceId: cursor},
       );
       if (_disposed || generation != _generation) return;
 
@@ -148,6 +154,11 @@ class OnlineSearchController
       state = AsyncData(
         current.copyWith(
           results: {...current.results, sourceId: merged},
+          cursors: {
+            for (final entry in current.cursors.entries)
+              if (entry.key != sourceId) entry.key: entry.value,
+            if (merged.cursor != null) sourceId: merged.cursor!,
+          },
           loadingMore: null,
           message: merged.songs.length == result.songs.length
               ? AppStrings.instance.searchNoMore
@@ -181,6 +192,7 @@ class OnlineSearchController
       message: songs.length == current.songs.length
           ? AppStrings.instance.searchNoMore
           : null,
+      cursor: fresh.cursor,
     );
   }
 

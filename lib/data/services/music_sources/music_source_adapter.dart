@@ -16,11 +16,16 @@ class MusicSourceScanRequest {
   /// window; a source that has no pages ignores it.
   final int offset;
 
+  /// The cursor the previous window ended at, for sources that walk a list
+  /// with a continuation token instead of a number.
+  final String? cursor;
+
   const MusicSourceScanRequest({
     required this.config,
     this.localPaths = const [],
     this.onProgress,
     this.offset = 0,
+    this.cursor,
   });
 }
 
