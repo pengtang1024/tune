@@ -1835,6 +1835,12 @@ abstract class AppLocalizations {
   /// **'每来源最多保留'**
   String get settingsSourceCacheLimit;
 
+  /// No description provided for @settingsSourceCacheLimitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'优先保留收藏、最近播放与最近出现的曲目'**
+  String get settingsSourceCacheLimitHint;
+
   /// No description provided for @settingsNoLimit.
   ///
   /// In zh_CN, this message translates to:

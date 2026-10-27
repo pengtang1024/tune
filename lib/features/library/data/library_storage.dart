@@ -10,7 +10,19 @@ abstract class LibraryStorage {
   Future<List<Song>> load();
 
   /// Writes the songs into the library.
-  Future<void> save(List<Song> songs);
+  ///
+  /// A pinned track (a favorite, a queued track) is marked so a later prune
+  /// never drops it.
+  Future<void> save(List<Song> songs, {Set<String> pinned = const {}});
+
+  /// Drops the least valuable tracks of every remote source beyond [limit].
+  ///
+  /// Returns the addresses that were removed. A build without a database
+  /// keeps everything and answers with nothing.
+  Future<List<String>> prune(int limit);
+
+  /// Notes that a track played, which raises its place in the ranking.
+  Future<void> markPlayed(String uri);
 
   /// Removes the library.
   Future<void> clear();

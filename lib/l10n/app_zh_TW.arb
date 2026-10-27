@@ -557,6 +557,7 @@
   "settingsNoDefaultFolder": "找不到預設音樂目錄",
   "settingsCustomPath": "自訂",
   "settingsSourceCacheLimit": "每來源最多保留",
+  "settingsSourceCacheLimitHint": "優先保留收藏、最近播放與最近出現的曲目",
   "settingsNoLimit": "不限",
   "settingsAddFolder": "新增資料夾",
   "settingsClearLibrary": "清空音樂庫",

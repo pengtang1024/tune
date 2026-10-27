@@ -135,6 +135,7 @@ presentation → application → domain
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - **Web 不再是目标平台**：Web 构建保留工程入口，但音乐库不落盘（`library_storage_stub.dart` 是空实现），曲目只在当前会话里；偏好仍走浏览器存储。
 - **音乐库索引存在 SQLite**：桌面把索引写在 `<应用支持目录>/library/library.db`。首次启动时如果旧版的 `scanned_songs.json` 还在，会导入数据库并改名为 `.migrated`。索引和音源的扫描时间必须落在同一个存储里：只存扫描时间而不存索引，下次打开就会跳过所有音源，索引也就空了。
+- **淘汰在数据库里完成**：设了「每来源最多保留」后，保存完新窗口就让 SQLite 按 `pinned`（收藏）→ `last_played`（最近播放）→ `last_seen`（最近出现）→ `date_added` 排序，用窗口函数删掉超出上限的行。全库不需要加载进内存来排序，几万到几十万行都能在数据库内裁剪。播放成功会写 `last_played`，扫描会更新 `last_seen`。
 - **应用 id 定下来就别再改**：Linux 上应用支持目录名就是应用 id（`~/.local/share/<id>`），改 id 等于换了一个空目录，老数据不会再被读到。
 
 ## 音乐库的目录

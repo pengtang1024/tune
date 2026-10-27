@@ -9,7 +9,7 @@ import 'package:tune/features/library/data/impl/library_storage_io.dart';
 /// The library lives in SQLite: rows are written one by one and a library of
 /// a hundred thousand tracks never has to be rewritten as one document.
 void main() {
-  Song song(int id) => Song(
+  Song song(int id, {int added = 0}) => Song(
     id: id,
     title: 'Track $id',
     artist: 'Artist',
@@ -17,9 +17,56 @@ void main() {
     sourceId: 'openverse',
     externalId: '$id',
     streamUrl: 'https://example.com/$id.mp3',
+    dateAdded: added,
   );
 
   group('library database', () {
+    test('prune keeps the pinned and the newest tracks of a source', () {
+      final database = LibraryDatabase.inMemory();
+      addTearDown(database.close);
+
+      database.save(
+        [song(1, added: 1), song(2, added: 2), song(3, added: 3)],
+        pinned: {'tune://openverse/1'},
+      );
+
+      final removed = database.prune(2);
+
+      expect(removed, {'tune://openverse/2'});
+      expect(database.count(), 2);
+      expect(
+        database.load().map((track) => track.uri),
+        containsAll(['tune://openverse/1', 'tune://openverse/3']),
+      );
+    });
+
+    test('prune never drops the local files', () {
+      final database = LibraryDatabase.inMemory();
+      addTearDown(database.close);
+      const local = Song(
+        id: 9,
+        title: 'Local',
+        uri: '/music/local.mp3',
+      );
+      database.save([local, song(1), song(2)]);
+
+      database.prune(1);
+
+      expect(
+        database.load().map((track) => track.uri),
+        contains('/music/local.mp3'),
+      );
+    });
+
+    test('a limit of zero keeps everything', () {
+      final database = LibraryDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([song(1), song(2), song(3)]);
+
+      expect(database.prune(0), isEmpty);
+      expect(database.count(), 3);
+    });
+
     test('saves and reads the tracks back', () {
       final database = LibraryDatabase.inMemory();
       addTearDown(database.close);

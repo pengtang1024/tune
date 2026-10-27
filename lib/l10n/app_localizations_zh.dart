@@ -977,6 +977,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSourceCacheLimit => '每来源最多保留';
 
   @override
+  String get settingsSourceCacheLimitHint => '优先保留收藏、最近播放与最近出现的曲目';
+
+  @override
   String get settingsNoLimit => '不限';
 
   @override
@@ -3263,6 +3266,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsSourceCacheLimit => '每来源最多保留';
 
   @override
+  String get settingsSourceCacheLimitHint => '优先保留收藏、最近播放与最近出现的曲目';
+
+  @override
   String get settingsNoLimit => '不限';
 
   @override
@@ -5547,6 +5553,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSourceCacheLimit => '每來源最多保留';
+
+  @override
+  String get settingsSourceCacheLimitHint => '優先保留收藏、最近播放與最近出現的曲目';
 
   @override
   String get settingsNoLimit => '不限';

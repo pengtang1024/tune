@@ -7,6 +7,7 @@ import 'package:tune/config/app_initializer.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/localization_bridge.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/application/playback_notes_provider.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
@@ -41,6 +42,7 @@ class TuneApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(playbackNotesProvider);
     final initialization = ref.watch(appInitializationProvider);
 
     return initialization.when(

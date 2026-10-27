@@ -70,7 +70,7 @@ class FileLibraryStorage implements LibraryStorage {
   }
 
   @override
-  Future<void> save(List<Song> songs) async {
+  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {
     try {
       final file = await _file();
       await file.writeAsString(encodeLibrary(songs), flush: true);
@@ -80,6 +80,12 @@ class FileLibraryStorage implements LibraryStorage {
       Log.error('保存音乐库失败: $error\n$stackTrace');
     }
   }
+
+  @override
+  Future<List<String>> prune(int limit) async => const [];
+
+  @override
+  Future<void> markPlayed(String uri) async {}
 
   @override
   Future<void> clear() async {
@@ -195,11 +201,30 @@ class SqliteLibraryStorage implements LibraryStorage {
   }
 
   @override
-  Future<void> save(List<Song> songs) async {
+  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {
     try {
-      (await _db()).save(songs);
+      (await _db()).save(songs, pinned: pinned);
     } catch (error, stackTrace) {
       Log.error('保存音乐库失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<List<String>> prune(int limit) async {
+    try {
+      return (await _db()).prune(limit);
+    } catch (error, stackTrace) {
+      Log.error('裁剪音乐库失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<void> markPlayed(String uri) async {
+    try {
+      (await _db()).markPlayed(uri);
+    } catch (error, stackTrace) {
+      Log.error('记录播放失败: $error\n$stackTrace');
     }
   }
 

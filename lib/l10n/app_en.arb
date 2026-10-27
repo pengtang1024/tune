@@ -557,6 +557,7 @@
   "settingsNoDefaultFolder": "No default music folder found",
   "settingsCustomPath": "Custom",
   "settingsSourceCacheLimit": "Tracks kept per source",
+  "settingsSourceCacheLimitHint": "Favorites, recently played and recently seen tracks are kept first",
   "settingsNoLimit": "No limit",
   "settingsAddFolder": "Add folder",
   "settingsClearLibrary": "Clear library",

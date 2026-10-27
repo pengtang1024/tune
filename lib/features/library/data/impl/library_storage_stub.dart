@@ -17,7 +17,13 @@ class EmptyLibraryStorage implements LibraryStorage {
   Future<List<Song>> load() async => const [];
 
   @override
-  Future<void> save(List<Song> songs) async {}
+  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {}
+
+  @override
+  Future<List<String>> prune(int limit) async => const [];
+
+  @override
+  Future<void> markPlayed(String uri) async {}
 
   @override
   Future<void> clear() async {}

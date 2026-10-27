@@ -260,6 +260,8 @@ class SettingsLibraryCard extends StatelessWidget {
             onReset: onResetLibraryFolder,
           ),
           const SizedBox(height: 14),
+          _CacheLimitHint(text: context.loc.settingsSourceCacheLimitHint),
+          const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
@@ -946,6 +948,24 @@ class _EmptyPath extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The line under the source cache limit that says what is kept first.
+class _CacheLimitHint extends StatelessWidget {
+  final String text;
+
+  const _CacheLimitHint({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      text,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
       ),
     );
   }
