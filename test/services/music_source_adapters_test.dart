@@ -6,7 +6,6 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
-import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
@@ -125,70 +124,6 @@ void main() {
       final adapter = CcMixterSourceAdapter();
 
       expect(adapter.isConfigured(_request('ccmixter', const {}).config), isTrue);
-    });
-  });
-
-  group('iTunes adapter', () {
-    test('maps songs, upgrades the cover and skips everything else', () async {
-      final server = await _startServer((request) async {
-        expect(request.uri.queryParameters['term'], 'jazz');
-        expect(request.uri.queryParameters['media'], 'music');
-        expect(request.uri.queryParameters['entity'], 'song');
-        await _writeJson(request, {
-          'resultCount': 3,
-          'results': [
-            {
-              'wrapperType': 'track',
-              'kind': 'song',
-              'trackId': 1585892546,
-              'trackName': 'Jazz (We have got)',
-              'artistName': 'A Tribe Called Quest',
-              'collectionName': 'Jazz EP',
-              'trackTimeMillis': 240000,
-              'previewUrl': 'https://audio-ssl.itunes.apple.com/a.m4a',
-              'artworkUrl100':
-                  'https://is1-ssl.mzstatic.com/image/thumb/abc/100x100bb.jpg',
-              'releaseDate': '2020-05-01T00:00:00Z',
-              'primaryGenreName': 'Jazz',
-            },
-            {
-              'wrapperType': 'track',
-              'kind': 'movie',
-              'trackId': 2,
-              'trackName': 'The Jazz Singer',
-              'previewUrl': 'https://example.com/movie.m4v',
-            },
-            {
-              'wrapperType': 'track',
-              'kind': 'song',
-              'trackId': 3,
-              'trackName': 'Without preview',
-            },
-          ],
-        });
-      });
-
-      final result = await ITunesSourceAdapter(
-        dio: _localDio(server.port),
-      ).scan(_request('itunes', {'query': 'jazz'}));
-
-      expect(result.status, SourceScanStatus.success);
-      expect(result.songs, hasLength(1));
-
-      final song = result.songs.single;
-      expect(song.title, 'Jazz (We have got)');
-      expect(song.artist, 'A Tribe Called Quest');
-      expect(song.album, 'Jazz EP');
-      expect(song.duration, 240000);
-      expect(song.streamUrl, 'https://audio-ssl.itunes.apple.com/a.m4a');
-      expect(
-        song.artworkUrl,
-        'https://is1-ssl.mzstatic.com/image/thumb/abc/600x600bb.jpg',
-      );
-      expect(song.genre, 'Jazz');
-      expect(song.year, 2020);
-      expect(song.sourceId, 'itunes');
-      expect(server.port, greaterThan(0));
     });
   });
 

@@ -7,6 +7,7 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/shared/utils/plain_text.dart';
 
 /// Wikimedia Commons hosts the media files of the Wikipedia projects.
 ///
@@ -123,7 +124,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
           AppStrings.instance.wikimediaEmptyResponse,
         );
       }
-      final songs = parseResults(data, sourceId: request.config.id, limit: limit);
+      final songs = parseResults(
+        data,
+        sourceId: request.config.id,
+        limit: limit,
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,
@@ -272,18 +277,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   ///
   /// The metadata is written for the wiki, so the artist and the description
   /// arrive as small HTML fragments that have to be plain text again.
-  static String stripHtml(String value) {
-    return value
-        .replaceAll(RegExp(r'<[^>]*>'), ' ')
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll('&quot;', '"')
-        .replaceAll('&#39;', "'")
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll('&amp;', '&')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-  }
+  static String stripHtml(String value) => plainText(value);
 
   static String? _emptyToNull(String value) => value.isEmpty ? null : value;
 }

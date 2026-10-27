@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
@@ -28,6 +29,7 @@ List<MusicSourceConfig> localizedSources(
   List<MusicSourceConfig> sources,
 ) {
   final catalogue = SourceTypeCatalogue.byType(strings);
+  final builtIns = BuiltInMusicSources.catalogueOf(strings);
   return sources
       .map((source) {
         final entry = catalogue[source.sourceType];
@@ -35,10 +37,11 @@ List<MusicSourceConfig> localizedSources(
         // A built-in source is named by the catalogue, so the reader meets it
         // in their own language. A source the reader added keeps the name
         // they gave it: two instances of one type are told apart by it.
+        final builtIn = source.builtIn ? builtIns[source.id] : null;
         return source.copyWith(
-          name: source.builtIn ? entry.name : source.name,
-          localizedName: entry.localizedName,
-          description: entry.description,
+          name: builtIn?.name ?? (source.builtIn ? entry.name : source.name),
+          localizedName: builtIn?.localizedName ?? entry.localizedName,
+          description: builtIn?.description ?? entry.description,
         );
       })
       .toList(growable: false);
@@ -55,15 +58,21 @@ Map<String, SourceLabel> sourceLabelsOf(
   List<MusicSourceConfig> sources,
 ) {
   final catalogue = SourceTypeCatalogue.byType(strings);
+  final builtIns = BuiltInMusicSources.catalogueOf(strings);
   return {
     for (final source in sources)
       source.id: SourceLabel(
-        // The name of a built-in source is the name of its type; a source the
-        // reader added keeps the name they gave it.
+        // The name of a built-in source is the name of its instance; a
+        // source the reader added keeps the name they gave it.
         name: source.builtIn
-            ? (catalogue[source.sourceType]?.name ?? source.name)
+            ? (builtIns[source.id]?.name ??
+                  catalogue[source.sourceType]?.name ??
+                  source.name)
             : source.name,
-        localizedName: catalogue[source.sourceType]?.localizedName ?? '',
+        localizedName:
+            builtIns[source.id]?.localizedName ??
+            catalogue[source.sourceType]?.localizedName ??
+            '',
         type: source.sourceType,
         kind: source.kind,
       ),

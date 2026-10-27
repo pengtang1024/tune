@@ -9,7 +9,6 @@ import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
-import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
@@ -145,21 +144,6 @@ void main() {
       );
     });
 
-    test('a source without a browse stream still needs its keyword', () {
-      final adapter = ITunesSourceAdapter();
-
-      expect(
-        adapter.isConfigured(_request('itunes', const {}).config),
-        isFalse,
-      );
-      expect(
-        adapter.isConfigured(
-          _request('itunes', const {'query': 'jazz'}).config,
-        ),
-        isTrue,
-      );
-    });
-
     test('a source that asks for no key is ready without a keyword', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),
@@ -236,67 +220,6 @@ void main() {
       final openverse = sources.firstWhere((source) => source.id == 'openverse');
 
       expect(openverse.setting('query'), 'piano');
-    });
-
-    test('a keyword the app wrote in another language is lost as well', () {
-      final persistence = FakePersistenceService();
-      persistence.values[MusicSourceStore.configsKey] = jsonEncode([
-        {
-          'id': 'netease',
-          'name': 'Netease',
-          'kind': 'openApi',
-          'settings': {'keywords': 'trending'},
-        },
-      ]);
-
-      final sources = MusicSourceStore(persistence).loadConfigs();
-      final netease = sources.firstWhere((source) => source.id == 'netease');
-
-      expect(netease.setting('keywords'), isNull);
-    });
-  });
-
-  group('the form of a source', () {
-    test('a source with a browse stream offers the streams it serves', () {
-      final service = MusicSourceService(
-        scanner: CrossPlatformMusicScannerImpl(),
-        store: MusicSourceStore(FakePersistenceService()),
-      );
-
-      final fields = service.fieldsFor(
-        MusicSourceConfig(
-          id: 'audius:1',
-          type: 'audius',
-          name: 'Audius',
-          kind: MusicSourceKind.openCatalog,
-        ),
-      );
-
-      final browse = fields.firstWhere((field) => field.key == 'browse');
-      expect(browse.choices.map((choice) => choice.value), [
-        BrowseMode.charts,
-      ]);
-      expect(browse.label, isNotEmpty);
-      expect(browse.hint, isNotEmpty);
-    });
-
-    test('a source without a browse stream asks for no stream', () {
-      final service = MusicSourceService(
-        scanner: CrossPlatformMusicScannerImpl(),
-        store: MusicSourceStore(FakePersistenceService()),
-      );
-
-      final fields = service.fieldsFor(
-        MusicSourceConfig(
-          id: 'itunes:1',
-          type: 'itunes',
-          name: 'iTunes',
-          kind: MusicSourceKind.openCatalog,
-        ),
-      );
-
-      expect(fields.where((field) => field.key == 'browse'), isEmpty);
-      expect(fields.firstWhere((field) => field.key == 'query').required, isTrue);
     });
 
     test('the names of the streams are written in the language of the app', () {

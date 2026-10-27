@@ -33,7 +33,7 @@ void main() async {
 
       // The configs the app ships with, not hand-made ones.
       final sources = BuiltInMusicSources.defaults
-          .where((config) => const {'ccmixter', 'itunes'}.contains(config.id))
+          .where((config) => const {'ccmixter', 'audius'}.contains(config.id))
           .map(
             (config) => config.copyWith(
               settings: {...config.settings, 'query': 'jazz'},
@@ -68,6 +68,111 @@ void main() async {
     },
     skip: online ? false : offline,
     timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the service scans LibriVox into whole chapters',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The built-in configuration of LibriVox: no keyword, no limits set.
+      // A scan without a keyword reads the books everybody listens to.
+      final result = (await service.scanAll(
+        sources: BuiltInMusicSources.defaults
+            .where((config) => config.id == 'librivox')
+            .toList(),
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'LibriVox failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty, reason: 'LibriVox returned nothing');
+
+      // One book is fetched for each of its chapters, so every chapter of
+      // the scan carries the album of the book it belongs to.
+      final albums = result.songs.map((song) => song.album).toSet();
+      expect(albums.where((album) => album.isEmpty), isEmpty);
+      expect(result.songs.first.trackNumber, isNotNull);
+      expect(result.songs.first.streamUrl, startsWith('https://'));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the radio source reads the stations of any country',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final radio = BuiltInMusicSources.radio;
+
+      for (final country in const ['SG', 'MY', 'AU']) {
+        final result = (await service.scanAll(
+          sources: [
+            radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'country': country,
+                'query': '',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '\$country failed: \${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '\$country returned nothing');
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the service reads the podcast directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.search(
+        sources: BuiltInMusicSources.defaults
+            .where((config) => config.id == 'podcast_catalog')
+            .toList(),
+        query: 'jazz',
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Podcast directory failed: ${result.message}',
+      );
+      expect(
+        result.songs,
+        isNotEmpty,
+        reason: 'Podcast directory returned nothing: ${result.message}',
+      );
+
+      final song = result.songs.first;
+      expect(song.album, isNotEmpty);
+      expect(song.streamUrl, startsWith('http'));
+      expect(song.title, isNotEmpty);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
   );
 }
 

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
@@ -126,6 +127,16 @@ void main() {
 
     test('answers an empty answer with no station', () {
       expect(RadioBrowserProvider.parseStations(const []), isEmpty);
+    });
+
+    test('a country narrows the stations of the directory', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'SG');
+
+      expect(captured.uris.first.queryParameters['countrycode'], 'SG');
+      expect(captured.uris.first.path, '/json/stations/search');
     });
   });
 
@@ -298,4 +309,28 @@ Map<String, dynamic> _somaFmAnswer() {
       },
     ],
   };
+}
+
+/// A Dio that answers with an empty station list and keeps the requests.
+class _CapturedStations {
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: <dynamic>[],
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
 }

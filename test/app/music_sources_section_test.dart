@@ -128,7 +128,7 @@ void main() {
       MusicSourcesState(
         sources: [
           BuiltInMusicSources.ccmixter,
-          BuiltInMusicSources.itunes,
+          BuiltInMusicSources.jellyfin,
           BuiltInMusicSources.podcastRss,
           BuiltInMusicSources.subsonic,
         ],
@@ -142,7 +142,7 @@ void main() {
     await openMoreSources(tester);
 
     // Every new source is listed with its own switch.
-    for (final id in ['ccmixter', 'itunes', 'podcast_rss', 'subsonic']) {
+    for (final id in ['ccmixter', 'jellyfin', 'podcast_rss', 'subsonic']) {
       expect(
         find.byKey(ValueKey('source-switch-$id')),
         findsOneWidget,
@@ -150,7 +150,7 @@ void main() {
       );
     }
     expect(find.text('ccMixter'), findsOneWidget);
-    expect(find.text('iTunes'), findsOneWidget);
+    expect(find.text('Jellyfin'), findsOneWidget);
     expect(find.text('Subsonic'), findsOneWidget);
     expect(find.text('播客订阅'), findsOneWidget);
 
@@ -301,7 +301,7 @@ void main() {
       MusicSourcesState(
         sources: [
           BuiltInMusicSources.ccmixter,
-          BuiltInMusicSources.itunes,
+          BuiltInMusicSources.jellyfin,
           BuiltInMusicSources.subsonic,
         ],
       ),
@@ -318,7 +318,7 @@ void main() {
       find.byKey(const ValueKey('source-switch-ccmixter')),
       findsOneWidget,
     );
-    expect(find.byKey(const ValueKey('source-switch-itunes')), findsNothing);
+    expect(find.byKey(const ValueKey('source-switch-jellyfin')), findsNothing);
     expect(find.byKey(const ValueKey('source-switch-subsonic')), findsNothing);
     expect(find.text('更多音源'), findsOneWidget);
     expect(find.text('我添加的'), findsNothing);
@@ -327,7 +327,7 @@ void main() {
   testWidgets('the folded group opens once and stays open', (tester) async {
     final controller = FakeMusicSourcesController(
       MusicSourcesState(
-        sources: [BuiltInMusicSources.ccmixter, BuiltInMusicSources.itunes],
+        sources: [BuiltInMusicSources.ccmixter, BuiltInMusicSources.jellyfin],
       ),
     );
 

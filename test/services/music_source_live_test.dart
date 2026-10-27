@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
-import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -40,30 +39,6 @@ void main() async {
         expect(song.artist, isNotEmpty);
         expect(song.streamUrl, startsWith('https://'));
         expect(song.duration, greaterThan(0));
-
-        await _expectPlayable(song);
-      },
-      skip: online ? false : offline,
-      timeout: const Timeout(Duration(seconds: 90)),
-    );
-  });
-
-  group('iTunes', () {
-    test(
-      'delivers tracks whose preview can be downloaded',
-      () async {
-        final result = await ITunesSourceAdapter().scan(
-          _request('itunes', {'query': 'jazz'}),
-        );
-
-        expect(result.status, SourceScanStatus.success);
-        expect(result.songs, isNotEmpty);
-
-        final song = result.songs.first;
-        expect(song.title, isNotEmpty);
-        expect(song.artist, isNotEmpty);
-        expect(song.streamUrl, startsWith('https://'));
-        expect(song.artworkUrl, isNotNull);
 
         await _expectPlayable(song);
       },

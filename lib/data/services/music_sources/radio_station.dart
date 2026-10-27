@@ -86,6 +86,11 @@ abstract class RadioStationProvider {
   /// Reads the stations that match [query].
   ///
   /// An empty [query] returns the stations the directory considers its
-  /// highlights. [limit] caps the number of stations.
-  Future<List<RadioStation>> fetch({required String query, required int limit});
+  /// highlights. [limit] caps the number of stations. [country] narrows the
+  /// stations to a two-letter country code when the directory knows one.
+  Future<List<RadioStation>> fetch({
+    required String query,
+    required int limit,
+    String? country,
+  });
 }

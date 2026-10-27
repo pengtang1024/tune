@@ -50,7 +50,7 @@ void main() {
       state.byId('openverse')!.weight,
       greaterThanOrEqualTo(SourceWeights.mainThreshold),
     );
-    expect(state.byId('itunes')!.weight, lessThan(SourceWeights.mainThreshold));
+    expect(state.byId('jellyfin')!.weight, lessThan(SourceWeights.mainThreshold));
   });
 
   test('a source folds into More and comes back', () async {

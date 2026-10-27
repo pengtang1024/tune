@@ -60,6 +60,19 @@ void main() {
         'A source the user brought along',
       );
     });
+
+    test('a type that ships more than one instance names each of them', () {
+      final labels = sourceLabelsOf(english, BuiltInMusicSources.defaults);
+
+      expect(labels['internet_archive']?.name, 'Internet Archive');
+      expect(labels['live_music_archive']?.name, 'Live Music Archive');
+      expect(labels['librivox']?.name, 'LibriVox');
+      expect(labels['librivox']?.localizedName, 'Audiobooks');
+      expect(
+        labels['live_music_archive']?.name,
+        isNot(labels['internet_archive']?.name),
+      );
+    });
   });
 
   group('source names of the interface', () {
@@ -130,11 +143,19 @@ void main() {
             strings.fieldLimitFiles,
             strings.fieldLimitEpisodes,
             strings.fieldLimitStations,
+            strings.fieldLimitBooks,
+            strings.fieldLimitPodcasts,
           },
           'server': {strings.fieldServer},
           'user': {strings.fieldUser},
           'password': {strings.fieldPassword},
           'format': {strings.fieldFormat},
+          'language': {strings.fieldLanguage},
+          'token': {
+            strings.plexFieldToken,
+            strings.funkwhaleFieldToken,
+            strings.audiobookshelfFieldToken,
+          },
         };
 
         for (final adapter in service.adapters) {

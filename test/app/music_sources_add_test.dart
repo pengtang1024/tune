@@ -155,9 +155,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.byKey(const ValueKey('source-type-json_api')),
-      200,
+      320,
       scrollable: find.byType(Scrollable).last,
     );
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('source-type-json_api')),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('source-type-json_api')));
     await tester.pumpAndSettle();
 

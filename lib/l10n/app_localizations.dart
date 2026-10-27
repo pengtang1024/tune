@@ -1445,6 +1445,12 @@ abstract class AppLocalizations {
   /// **'每次扫描集数'**
   String get fieldLimitEpisodes;
 
+  /// No description provided for @fieldLimitPodcasts.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描播客数'**
+  String get fieldLimitPodcasts;
+
   /// No description provided for @fieldLimitStations.
   ///
   /// In zh_CN, this message translates to:
@@ -1456,6 +1462,84 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'默认 {count}，最大 {max}'**
   String fieldLimitHint(int count, int max);
+
+  /// No description provided for @fieldLimitBooks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次扫描书数'**
+  String get fieldLimitBooks;
+
+  /// No description provided for @fieldLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get fieldLanguage;
+
+  /// No description provided for @fieldLanguageHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只保留一种语言的有声书'**
+  String get fieldLanguageHint;
+
+  /// No description provided for @fieldLanguageAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不限制语言'**
+  String get fieldLanguageAll;
+
+  /// No description provided for @fieldLanguageEnglish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语'**
+  String get fieldLanguageEnglish;
+
+  /// No description provided for @fieldLanguageChinese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文'**
+  String get fieldLanguageChinese;
+
+  /// No description provided for @fieldLanguageFrench.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'法语'**
+  String get fieldLanguageFrench;
+
+  /// No description provided for @fieldLanguageGerman.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'德语'**
+  String get fieldLanguageGerman;
+
+  /// No description provided for @fieldLanguageSpanish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西班牙语'**
+  String get fieldLanguageSpanish;
+
+  /// No description provided for @fieldLanguageItalian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'意大利语'**
+  String get fieldLanguageItalian;
+
+  /// No description provided for @fieldLanguageJapanese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'日语'**
+  String get fieldLanguageJapanese;
+
+  /// No description provided for @fieldLanguageRussian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'俄语'**
+  String get fieldLanguageRussian;
+
+  /// No description provided for @fieldLanguagePortuguese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'葡萄牙语'**
+  String get fieldLanguagePortuguese;
 
   /// No description provided for @fieldServer.
   ///
@@ -1955,42 +2039,6 @@ abstract class AppLocalizations {
   /// **'未配置本地音乐目录'**
   String get localSourceNotConfigured;
 
-  /// No description provided for @neteaseHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000'**
-  String get neteaseHint;
-
-  /// No description provided for @neteaseFieldApi.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'API 地址'**
-  String get neteaseFieldApi;
-
-  /// No description provided for @neteaseFieldQueryHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'例如 热门、周杰伦'**
-  String get neteaseFieldQueryHint;
-
-  /// No description provided for @neteaseHotKeyword.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'热门'**
-  String get neteaseHotKeyword;
-
-  /// No description provided for @neteaseEmptyResponse.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'网易云 API 返回了空响应'**
-  String get neteaseEmptyResponse;
-
-  /// No description provided for @neteaseNoStream.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'接口未返回可播放地址（可能需要在服务端登录或受版权限制）'**
-  String get neteaseNoStream;
-
   /// No description provided for @openverseHint.
   ///
   /// In zh_CN, this message translates to:
@@ -2062,18 +2110,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'公共领域音频'**
   String get sourceInternetArchiveName;
-
-  /// No description provided for @sourceNeteaseName.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'网易云音乐 API'**
-  String get sourceNeteaseName;
-
-  /// No description provided for @sourceNeteaseDescription.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'连接自建的 NeteaseCloudMusicApi 服务'**
-  String get sourceNeteaseDescription;
 
   /// No description provided for @jamendoHint.
   ///
@@ -2183,30 +2219,6 @@ abstract class AppLocalizations {
   /// **'没有找到匹配的 ccMixter 曲目'**
   String get ccmixterNoMatch;
 
-  /// No description provided for @itunesEmptyResponse.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'iTunes API 返回了空响应'**
-  String get itunesEmptyResponse;
-
-  /// No description provided for @itunesFieldQueryHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'例如 jazz、piano、lo-fi'**
-  String get itunesFieldQueryHint;
-
-  /// No description provided for @itunesHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'填写搜索关键词，例如 jazz、piano 或 lo-fi'**
-  String get itunesHint;
-
-  /// No description provided for @itunesNoMatch.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'没有找到匹配的 iTunes 曲目'**
-  String get itunesNoMatch;
-
   /// No description provided for @podcastRssEmptyFeed.
   ///
   /// In zh_CN, this message translates to:
@@ -2255,17 +2267,17 @@ abstract class AppLocalizations {
   /// **'共享混音素材'**
   String get sourceCcmixterName;
 
-  /// No description provided for @sourceItunesDescription.
+  /// No description provided for @sourceLiveMusicArchiveDescription.
   ///
   /// In zh_CN, this message translates to:
-  /// **'iTunes 目录的 30 秒试听片段'**
-  String get sourceItunesDescription;
+  /// **'Internet Archive 收藏的现场录音'**
+  String get sourceLiveMusicArchiveDescription;
 
-  /// No description provided for @sourceItunesName.
+  /// No description provided for @sourceLiveMusicArchiveName.
   ///
   /// In zh_CN, this message translates to:
-  /// **'商店试听片段'**
-  String get sourceItunesName;
+  /// **'现场音乐档案'**
+  String get sourceLiveMusicArchiveName;
 
   /// No description provided for @sourcePodcastRssDescription.
   ///
@@ -2278,6 +2290,36 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'播客订阅'**
   String get sourcePodcastRssName;
+
+  /// No description provided for @sourcePodcastCatalogName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播客目录'**
+  String get sourcePodcastCatalogName;
+
+  /// No description provided for @sourcePodcastCatalogDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索 gpodder 开放播客目录，取最新单集'**
+  String get sourcePodcastCatalogDescription;
+
+  /// No description provided for @podcastCatalogHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'输入关键词找播客，留空则浏览目录'**
+  String get podcastCatalogHint;
+
+  /// No description provided for @podcastCatalogFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如爵士、历史、科技'**
+  String get podcastCatalogFieldQueryHint;
+
+  /// No description provided for @podcastCatalogNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到播客'**
+  String get podcastCatalogNoMatch;
 
   /// No description provided for @sourceSubsonicDescription.
   ///
@@ -2411,6 +2453,18 @@ abstract class AppLocalizations {
   /// **'全部目录'**
   String get radioProviderAll;
 
+  /// No description provided for @radioFieldCountry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'国家/地区'**
+  String get radioFieldCountry;
+
+  /// No description provided for @radioFieldCountryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填'**
+  String get radioFieldCountryHint;
+
   /// No description provided for @radioFieldQuery.
   ///
   /// In zh_CN, this message translates to:
@@ -2465,6 +2519,162 @@ abstract class AppLocalizations {
   /// **'没有找到可播放的共享音频'**
   String get wikimediaNoMatch;
 
+  /// No description provided for @sourceFunkwhaleName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'联邦音乐'**
+  String get sourceFunkwhaleName;
+
+  /// No description provided for @sourceFunkwhaleDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'联邦 Funkwhale 实例里的音乐'**
+  String get sourceFunkwhaleDescription;
+
+  /// No description provided for @funkwhaleHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Funkwhale 实例地址；只有私密库需要令牌'**
+  String get funkwhaleHint;
+
+  /// No description provided for @funkwhaleFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://open.audio'**
+  String get funkwhaleFieldServerHint;
+
+  /// No description provided for @funkwhaleFieldToken.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'访问令牌'**
+  String get funkwhaleFieldToken;
+
+  /// No description provided for @funkwhaleFieldTokenHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'实例的库私密时才需要'**
+  String get funkwhaleFieldTokenHint;
+
+  /// No description provided for @funkwhaleFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如爵士、民谣、电子'**
+  String get funkwhaleFieldQueryHint;
+
+  /// No description provided for @funkwhaleEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Funkwhale 返回了空响应'**
+  String get funkwhaleEmptyResponse;
+
+  /// No description provided for @funkwhaleNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Funkwhale 上没有匹配的曲目'**
+  String get funkwhaleNoMatch;
+
+  /// No description provided for @sourceAudiobookshelfName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建有声书'**
+  String get sourceAudiobookshelfName;
+
+  /// No description provided for @sourceAudiobookshelfDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Audiobookshelf 服务器里的有声书'**
+  String get sourceAudiobookshelfDescription;
+
+  /// No description provided for @audiobookshelfHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Audiobookshelf 服务器的地址与令牌'**
+  String get audiobookshelfHint;
+
+  /// No description provided for @audiobookshelfFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:13378'**
+  String get audiobookshelfFieldServerHint;
+
+  /// No description provided for @audiobookshelfFieldToken.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'访问令牌'**
+  String get audiobookshelfFieldToken;
+
+  /// No description provided for @audiobookshelfFieldTokenHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Audiobookshelf 账号的 API 令牌'**
+  String get audiobookshelfFieldTokenHint;
+
+  /// No description provided for @audiobookshelfFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如历史、小说、科学'**
+  String get audiobookshelfFieldQueryHint;
+
+  /// No description provided for @audiobookshelfEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Audiobookshelf 返回了空响应'**
+  String get audiobookshelfEmptyResponse;
+
+  /// No description provided for @audiobookshelfNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到有声书'**
+  String get audiobookshelfNoMatch;
+
+  /// No description provided for @sourcePlexName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建媒体库'**
+  String get sourcePlexName;
+
+  /// No description provided for @sourcePlexDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接自建的 Plex 媒体库'**
+  String get sourcePlexDescription;
+
+  /// No description provided for @plexHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Plex 服务器的地址与访问令牌'**
+  String get plexHint;
+
+  /// No description provided for @plexFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:32400'**
+  String get plexFieldServerHint;
+
+  /// No description provided for @plexFieldToken.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'访问令牌'**
+  String get plexFieldToken;
+
+  /// No description provided for @plexFieldTokenHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Plex 账号的 X-Plex-Token'**
+  String get plexFieldTokenHint;
+
+  /// No description provided for @plexNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Plex 上没有匹配的曲目'**
+  String get plexNoMatch;
+
+  /// No description provided for @plexInvalidAnswer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读不出 Plex 的回答：{error}'**
+  String plexInvalidAnswer(String error);
+
   /// No description provided for @sourceJellyfinDescription.
   ///
   /// In zh_CN, this message translates to:
@@ -2512,6 +2722,96 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'无法连接 Jellyfin 服务器，请检查地址与账号'**
   String get jellyfinAuthFailed;
+
+  /// No description provided for @sourceLibrivoxName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有声书'**
+  String get sourceLibrivoxName;
+
+  /// No description provided for @sourceLibrivoxDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'LibriVox 志愿者朗读的公版有声书'**
+  String get sourceLibrivoxDescription;
+
+  /// No description provided for @librivoxHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'输入书名或作者，留空则浏览最热门的有声书'**
+  String get librivoxHint;
+
+  /// No description provided for @librivoxFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如爱丽丝梦游仙境、狄更斯、童话'**
+  String get librivoxFieldQueryHint;
+
+  /// No description provided for @librivoxNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有匹配的有声书'**
+  String get librivoxNoMatch;
+
+  /// No description provided for @librivoxEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'LibriVox 返回了空响应'**
+  String get librivoxEmptyResponse;
+
+  /// No description provided for @librivoxInvalidFeed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读不出一本书的章节列表：{error}'**
+  String librivoxInvalidFeed(String error);
+
+  /// No description provided for @sourceEmbyName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Emby 媒体库'**
+  String get sourceEmbyName;
+
+  /// No description provided for @sourceEmbyDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'连接自建的 Emby 媒体库'**
+  String get sourceEmbyDescription;
+
+  /// No description provided for @embyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写自建 Emby 的地址与账号'**
+  String get embyHint;
+
+  /// No description provided for @embyFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:8095'**
+  String get embyFieldServerHint;
+
+  /// No description provided for @embyFieldUserHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Emby 的登录用户名'**
+  String get embyFieldUserHint;
+
+  /// No description provided for @embyFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用于换取访问令牌'**
+  String get embyFieldPasswordHint;
+
+  /// No description provided for @embyEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Emby 返回了空响应'**
+  String get embyEmptyResponse;
+
+  /// No description provided for @embyAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接 Emby 服务器，请检查地址与账号'**
+  String get embyAuthFailed;
 
   /// No description provided for @audioSourceStreaming.
   ///

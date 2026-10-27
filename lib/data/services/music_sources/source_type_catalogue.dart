@@ -78,12 +78,6 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openCatalog,
       ),
       SourceTypeDescriptor(
-        type: 'netease',
-        name: strings.sourceNeteaseName,
-        description: strings.sourceNeteaseDescription,
-        kind: MusicSourceKind.openApi,
-      ),
-      SourceTypeDescriptor(
         type: 'ccmixter',
         name: 'ccMixter',
         localizedName: strings.sourceCcmixterName,
@@ -91,17 +85,16 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openCatalog,
       ),
       SourceTypeDescriptor(
-        type: 'itunes',
-        name: 'iTunes',
-        localizedName: strings.sourceItunesName,
-        description: strings.sourceItunesDescription,
-        kind: MusicSourceKind.openCatalog,
-      ),
-      SourceTypeDescriptor(
         type: 'podcast_rss',
         name: strings.sourcePodcastRssName,
         description: strings.sourcePodcastRssDescription,
         kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
+        type: 'podcast_catalog',
+        name: strings.sourcePodcastCatalogName,
+        description: strings.sourcePodcastCatalogDescription,
+        kind: MusicSourceKind.openCatalog,
       ),
       SourceTypeDescriptor(
         type: 'subsonic',
@@ -135,6 +128,41 @@ class SourceTypeCatalogue {
         name: 'Jellyfin',
         localizedName: strings.sourceJellyfinName,
         description: strings.sourceJellyfinDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
+        type: 'librivox',
+        name: 'LibriVox',
+        localizedName: strings.sourceLibrivoxName,
+        description: strings.sourceLibrivoxDescription,
+        kind: MusicSourceKind.openCatalog,
+      ),
+      SourceTypeDescriptor(
+        type: 'emby',
+        name: 'Emby',
+        localizedName: strings.sourceEmbyName,
+        description: strings.sourceEmbyDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
+        type: 'plex',
+        name: 'Plex',
+        localizedName: strings.sourcePlexName,
+        description: strings.sourcePlexDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
+        type: 'funkwhale',
+        name: 'Funkwhale',
+        localizedName: strings.sourceFunkwhaleName,
+        description: strings.sourceFunkwhaleDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
+        type: 'audiobookshelf',
+        name: 'Audiobookshelf',
+        localizedName: strings.sourceAudiobookshelfName,
+        description: strings.sourceAudiobookshelfDescription,
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(

@@ -7,7 +7,7 @@
 
 - 四种语言（`zh_CN` / `zh` / `zh_TW` / `en`）的键集合一致，没有死键，没有漏翻的繁体。
 - 两道门禁守着：`test/app/localization_test.dart` 扫源码，`test/app/localization_render_test.dart` 把界面画出来读树。
-- 13 个内置音源都有名字：品牌名（不翻译）＋ 品牌名音源另有一条本地化名。
+- 18 个内置音源都有名字：品牌名（不翻译）＋ 品牌名音源另有一条本地化名。
 - 流派名由独立的模块翻译：认得出的流派换成读者语言的名字，认不出的保持原样（`Drum & Bass` 这类没有通行译名的）。规则见 [genre-localization.md](genre-localization.md)。
 - 已修的漏：英文下溢出的徽章、启动时语言滞后、中文界面里没解释的音源 chip。
 

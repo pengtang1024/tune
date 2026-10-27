@@ -4,23 +4,27 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/audiobookshelf_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/direct_url_source.dart';
+import 'package:tune/data/services/music_sources/emby_source.dart';
 import 'package:tune/data/services/music_sources/graphql_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/json_api_source.dart';
-import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/jellyfin_source.dart';
+import 'package:tune/data/services/music_sources/librivox_source.dart';
 import 'package:tune/data/services/music_sources/local_directory_source.dart';
 import 'package:tune/data/services/music_sources/m3u_source.dart';
 import 'package:tune/data/services/music_sources/lrclib_lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
-import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
+import 'package:tune/data/services/music_sources/funkwhale_source.dart';
+import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/podcast_catalog_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
@@ -64,15 +68,19 @@ class MusicSourceService implements StreamUrlResolver {
       'openverse': OpenverseSourceAdapter(dio: dio),
       'jamendo': JamendoSourceAdapter(dio: dio),
       'internet_archive': InternetArchiveSourceAdapter(dio: dio),
-      'netease': NeteaseCloudMusicSourceAdapter(dio: dio),
       'ccmixter': CcMixterSourceAdapter(dio: dio),
-      'itunes': ITunesSourceAdapter(dio: dio),
       'podcast_rss': PodcastRssSourceAdapter(dio: dio),
+      'podcast_catalog': PodcastCatalogSourceAdapter(dio: dio),
       'subsonic': SubsonicSourceAdapter(dio: dio),
       'audius': AudiusSourceAdapter(dio: dio),
       'radio': RadioSourceAdapter(dio: dio),
       'wikimedia': WikimediaSourceAdapter(dio: dio),
       'jellyfin': JellyfinSourceAdapter(dio: dio),
+      'librivox': LibrivoxSourceAdapter(dio: dio),
+      'emby': EmbySourceAdapter(dio: dio),
+      'plex': PlexSourceAdapter(dio: dio),
+      'funkwhale': FunkwhaleSourceAdapter(dio: dio),
+      'audiobookshelf': AudiobookshelfSourceAdapter(dio: dio),
       'direct_url': DirectUrlSourceAdapter(),
       'm3u': M3uSourceAdapter(dio: dio),
       'json_api': JsonApiSourceAdapter(dio: dio),
