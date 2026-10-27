@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/data/services/update/update_release.dart';
+import 'package:tune/data/services/providers/playback_session_store_provider.dart';
 import 'package:tune/data/services/update/update_service.dart';
+import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Where the update stands.
@@ -126,7 +128,19 @@ class UpdateController extends Notifier<UpdateState> {
   }
 
   /// Starts the new build and ends the running one.
-  Future<void> restart() => _service.restart();
+  ///
+  /// The position of the last track is written first: the process ends right
+  /// after the new one starts, and the five-second save may not have run.
+  Future<void> restart() async {
+    final playback = ref.read(playbackControllerProvider);
+    final song = playback.currentSong;
+    if (song != null) {
+      await ref
+          .read(playbackSessionStoreProvider)
+          .savePosition(song.uri, playback.position);
+    }
+    await _service.restart();
+  }
 
   static String _bundleDirectory() =>
       File(Platform.resolvedExecutable).parent.path;

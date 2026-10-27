@@ -35,6 +35,9 @@ class RadioBrowserProvider extends RadioStationProvider {
   String get displayName => 'Radio Browser';
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,

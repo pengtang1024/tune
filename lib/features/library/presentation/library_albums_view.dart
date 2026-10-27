@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/domain/library_album.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -12,7 +12,7 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 /// whole album instead of one row of its tracks. The songs view stays one
 /// click away for the reader who does know the name.
 class LibraryAlbumsView extends StatelessWidget {
-  final List<LibraryAlbum> albums;
+  final List<AlbumSummary> albums;
 
   /// Keeps the place of the grid while an album is open.
   final ScrollController? controller;
@@ -21,10 +21,10 @@ class LibraryAlbumsView extends StatelessWidget {
   final String? currentAlbumKey;
 
   /// Opens the album and shows its tracks.
-  final ValueChanged<LibraryAlbum> onOpen;
+  final ValueChanged<AlbumSummary> onOpen;
 
   /// Plays the whole album without opening it.
-  final ValueChanged<LibraryAlbum> onPlay;
+  final ValueChanged<AlbumSummary> onPlay;
 
   /// The longest side of a cover.
   ///
@@ -95,7 +95,7 @@ class LibraryAlbumsView extends StatelessWidget {
 }
 
 class _AlbumCard extends StatefulWidget {
-  final LibraryAlbum album;
+  final AlbumSummary album;
   final double coverSize;
   final bool current;
   final VoidCallback onOpen;
@@ -123,11 +123,9 @@ class _AlbumCardState extends State<_AlbumCard> {
     final name = album.name.isEmpty
         ? context.loc.libraryUnknownAlbum
         : album.name;
-    final artist = album.isUnknown && album.hasMultipleArtists
-        ? context.loc.libraryVariousArtists
-        : (album.artist.isEmpty
-              ? context.loc.playerUnknownArtist
-              : album.artist);
+    final artist = album.artist.isEmpty
+        ? context.loc.playerUnknownArtist
+        : album.artist;
 
     return Material(
       color: Colors.transparent,

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/services/window_manager_service.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
@@ -21,6 +22,7 @@ class AppInitializer {
       Log.info('开始初始化应用核心服务');
 
       await _initPersistenceService(ref);
+      await _initDatabase(ref);
       await _initFavorites(ref);
       await _initListeningSignals(ref);
       await _initPlaybackSession(ref);
@@ -44,6 +46,20 @@ class AppInitializer {
       Log.info('持久化服务初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化持久化服务失败: $error', stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Opens the library database. A database that cannot be opened is a
+  /// startup failure: every library, favorite, queue and listening read goes
+  /// through it, so the error reaches the startup screen instead of leaving
+  /// an empty player behind.
+  static Future<void> _initDatabase(Ref ref) async {
+    try {
+      await ref.read(appDatabaseProvider.future);
+      Log.info('数据库初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('打开数据库失败: $error', stackTrace);
       rethrow;
     }
   }

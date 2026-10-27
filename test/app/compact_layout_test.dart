@@ -9,6 +9,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
@@ -1332,7 +1334,17 @@ class FakeLibraryController extends LibraryController {
   final LibraryState seed;
 
   @override
-  Future<LibraryState> build() async => seed;
+  Future<LibraryState> build() async {
+    return seed.copyWith(albums: _summariesOf(seed.songs));
+  }
+
+  @override
+  Future<List<Song>> albumSongs(String key) async {
+    for (final album in libraryAlbumsOf(seed.songs)) {
+      if (album.key == key) return album.songs;
+    }
+    return const [];
+  }
 
   @override
   Future<void> scan(List<String> paths, {bool auto = false}) async {}
@@ -1348,4 +1360,18 @@ class FakeLibraryController extends LibraryController {
       (state.valueOrNull ?? seed).copyWith(sourceFilter: sourceId),
     );
   }
+}
+
+List<AlbumSummary> _summariesOf(List<Song> songs) {
+  return [
+    for (final album in libraryAlbumsOf(songs))
+      AlbumSummary(
+        key: album.key,
+        name: album.name,
+        artist: album.artist,
+        trackCount: album.trackCount,
+        coverPath: album.coverPath,
+        coverUrl: album.coverUrl,
+      ),
+  ];
 }

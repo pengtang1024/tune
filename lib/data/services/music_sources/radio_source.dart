@@ -96,6 +96,8 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     final failures = <Object>[];
 
     for (final provider in selected) {
+      // A directory without pages would only answer with the same window.
+      if (request.offset > 0 && !provider.supportsPaging) continue;
       try {
         stations.addAll(
           await provider.fetch(

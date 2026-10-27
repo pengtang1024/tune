@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:sqlite3/sqlite3.dart';
+import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 
 /// The library of the app, kept in one SQLite file.
 ///
@@ -310,6 +312,81 @@ class AppDatabase {
       [like, like, like, sourceId, sourceId],
     );
     return (rows.first['count'] as int?) ?? 0;
+  }
+
+  /// The albums of the library, one row per album and artist.
+  List<AlbumSummary> albumSummaries() {
+    final rows = _db.select('''
+      SELECT album AS name, artist AS artist, COUNT(*) AS count,
+             MIN(json) AS sample
+      FROM songs
+      WHERE album != ''
+      GROUP BY album, artist
+      ORDER BY album COLLATE NOCASE, artist COLLATE NOCASE
+    ''');
+    final albums = <AlbumSummary>[];
+    for (final row in rows) {
+      final name = row['name'] as String? ?? '';
+      if (name.isEmpty) continue;
+      final artist = row['artist'] as String? ?? '';
+      String? coverPath;
+      String? coverUrl;
+      try {
+        final decoded = jsonDecode(row['sample'] as String);
+        if (decoded is Map<String, dynamic>) {
+          final song = Song.fromMap(decoded);
+          coverPath = song.albumArtPath;
+          coverUrl = song.artworkUrl;
+        }
+      } catch (_) {
+        // A broken sample only costs the cover of the card.
+      }
+      albums.add(
+        AlbumSummary(
+          key: '\${name.trim().toLowerCase()}\u0000'
+              '\${artist.trim().toLowerCase()}',
+          name: name,
+          artist: artist,
+          trackCount: row['count'] as int? ?? 0,
+          coverPath: coverPath,
+          coverUrl: coverUrl,
+        ),
+      );
+    }
+    return albums;
+  }
+
+  /// The tracks of one album, in the order of the album.
+  List<Song> albumSongs(String key) {
+    final parts = key.split('\u0000');
+    final album = parts.isNotEmpty ? parts[0] : '';
+    final artist = parts.length > 1 ? parts[1] : '';
+    final rows = _db.select(
+      '''
+      SELECT json FROM songs
+      WHERE lower(trim(album)) = ? AND lower(trim(artist)) = ?
+      ORDER BY title COLLATE NOCASE
+      ''',
+      [album, artist],
+    );
+    final songs = <Song>[];
+    for (final row in rows) {
+      try {
+        final decoded = jsonDecode(row['json'] as String);
+        if (decoded is! Map<String, dynamic>) continue;
+        songs.add(Song.fromMap(decoded));
+      } catch (_) {
+        // One broken row must not take the album down.
+      }
+    }
+    songs.sort((left, right) {
+      final disc = (left.discNumber ?? 1).compareTo(right.discNumber ?? 1);
+      if (disc != 0) return disc;
+      final track = (left.trackNumber ?? 0).compareTo(right.trackNumber ?? 0);
+      if (track != 0) return track;
+      return compareText(left.title, right.title);
+    });
+    return songs;
   }
 
   /// Removes the tracks of one source.

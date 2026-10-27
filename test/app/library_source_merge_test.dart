@@ -9,6 +9,7 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
+import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/data/library_storage.dart';
@@ -438,6 +439,12 @@ class FakeLibraryStorage extends LibraryStorage {
           song.album.toLowerCase().contains(needle);
     }).length;
   }
+
+  @override
+  Future<List<AlbumSummary>> albumSummaries() async => const [];
+
+  @override
+  Future<List<Song>> albumSongs(String key) async => const [];
 
   @override
   Future<void> removeSource(String sourceId) async {

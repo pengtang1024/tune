@@ -62,10 +62,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final songs = total > windowSize
         ? await _storage.page(offset: 0, limit: windowSize)
         : await _storage.load();
+    final albums = await _storage.albumSummaries();
     return LibraryState(
       songs: List.unmodifiable(songs),
       total: total,
       hasMore: songs.length < total,
+      albums: albums,
       statusMessage: songs.isEmpty
           ? null
           : AppStrings.instance.scanSongCountShort(songs.length),
@@ -113,15 +115,26 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// music library is then read with the markers in place, and the copy and
   /// the track it belongs to become one row.
   Future<void> _markCopies() async {
-    final songs = state.valueOrNull?.songs ?? const <Song>[];
-    if (songs.isEmpty) return;
+    final total = await _storage.count();
+    if (total == 0) return;
 
-    try {
-      await ref.read(songDownloadServiceProvider).markCopiesOf(songs);
-    } catch (error, stackTrace) {
-      // A copy that cannot be marked stays a track of its own; the library
-      // still works.
-      Log.error('标记已下载的副本失败: $error\n$stackTrace');
+    // A copy may be anywhere in the library, not only in the first window:
+    // the rows are marked a batch at a time so a large library is still
+    // covered without holding all of it in memory.
+    const batch = 500;
+    for (var offset = 0; offset < total; offset += batch) {
+      if (_disposed) return;
+      final songs = offset == 0 && total <= windowSize
+          ? state.valueOrNull?.songs ?? const <Song>[]
+          : await _storage.page(offset: offset, limit: batch);
+      if (songs.isEmpty) break;
+      try {
+        await ref.read(songDownloadServiceProvider).markCopiesOf(songs);
+      } catch (error, stackTrace) {
+        // A copy that cannot be marked stays a track of its own; the library
+        // still works.
+        Log.error('标记已下载的副本失败: $error\n$stackTrace');
+      }
     }
   }
 
@@ -352,6 +365,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   }
 
   /// Notes that a track played, so the prune keeps it over an untouched one.
+  /// The tracks of one album, read on demand.
+  Future<List<Song>> albumSongs(String key) => _storage.albumSongs(key);
+
   Future<void> notePlayed(String uri) async {
     if (uri.isEmpty) return;
     await future;
@@ -386,6 +402,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       ),
     );
     await _storage.removeSource(sourceId);
+    final total = await _storage.count();
+    if (_disposed || !state.hasValue) return;
+    state = AsyncData(
+      _current.copyWith(
+        total: total,
+        hasMore: _current.songs.length < total,
+      ),
+    );
   }
 
   Future<void> setSourceFilter(String? sourceId) async {
@@ -412,12 +436,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       final songs = total > windowSize
           ? await _storage.page(offset: 0, limit: windowSize)
           : await _storage.load();
+      final albums = await _storage.albumSummaries();
       if (_disposed || !state.hasValue) return;
       state = AsyncData(
         _current.copyWith(
           songs: List.unmodifiable(songs),
           total: total,
           hasMore: songs.length < total,
+          albums: albums,
         ),
       );
       return;
@@ -433,12 +459,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       offset: 0,
       limit: windowSize,
     );
+    final albums = await _storage.albumSummaries();
     if (_disposed || !state.hasValue) return;
     state = AsyncData(
       _current.copyWith(
         songs: List.unmodifiable(songs),
         total: total,
         hasMore: songs.length < total,
+        albums: albums,
       ),
     );
   }
