@@ -98,7 +98,7 @@ flutter build linux --debug
 
 - 当前主要验收平台为 Linux 桌面端。
 - 远程播放依赖网络；桌面端边播边缓存，播放不等待下载，Web 端只能流式播放。
-- Web 端没有本地音乐目录，也没有托盘、MPRIS 与默认播放器设置；音乐库索引存在浏览器里，刷新后还在。
+- Web 端不再是目标平台：没有本地音乐目录、托盘、MPRIS 与默认播放器设置，音乐库也不落盘，刷新后为空。
 - 浏览器不允许脚本自定义 `User-Agent` 与 `Referer`，Web 端也带不了请求头；需要请求头的音源（Jellyfin、ccMixter）在 Web 端可能无法播放。
 - 浏览器的同源策略会拦掉没有返回 CORS 头的接口（Wikimedia、ccMixter 等），这些音源在 Web 端扫描失败；能否播完取决于对方接口是否放行浏览器。
 - Windows 使用 just_audio_windows 播放，不支持自定义请求头；需要请求头的音源（Jellyfin、ccMixter）可能无法播放，且没有托盘与 MPRIS 媒体控制。

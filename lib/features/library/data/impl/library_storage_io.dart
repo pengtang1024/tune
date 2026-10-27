@@ -4,13 +4,17 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/data/impl/library_database.dart';
 import 'package:tune/features/library/data/library_document.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/utils/logger.dart';
 
 /// The library storage of a build with a file system.
+///
+/// The tracks live in a SQLite database, so a library of a hundred thousand
+/// tracks is written row by row instead of as one document.
 LibraryStorage createLibraryStorage(PersistenceService persistence) =>
-    FileLibraryStorage();
+    SqliteLibraryStorage();
 
 /// Persists the scanned library as a single JSON document.
 ///
@@ -118,6 +122,93 @@ class FileLibraryStorage implements LibraryStorage {
       // A platform without a documents folder simply has no older library.
       Log.info('没有旧音乐库可迁移: $error');
       return null;
+    }
+  }
+}
+
+/// The library of a build with a file system, kept in SQLite.
+class SqliteLibraryStorage implements LibraryStorage {
+  SqliteLibraryStorage({Future<Directory> Function()? supportDirectory})
+    : _supportDirectory = supportDirectory;
+
+  static const _fileName = 'library.db';
+  static const _folderName = 'library';
+  static const _legacyDocument = 'scanned_songs.json';
+
+  final Future<Directory> Function()? _supportDirectory;
+
+  LibraryDatabase? _database;
+
+  Future<Directory> _directory() async {
+    final base =
+        await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
+    final directory = Directory(path.join(base.path, _folderName));
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return directory;
+  }
+
+  Future<LibraryDatabase> _db() async {
+    final existing = _database;
+    if (existing != null) return existing;
+
+    final directory = await _directory();
+    final database = LibraryDatabase.open(path.join(directory.path, _fileName));
+    _database = database;
+    await _adoptLegacyDocument(database, directory);
+    return database;
+  }
+
+  /// Moves the library of the previous version into the database.
+  ///
+  /// The document is renamed after it is read, so a second start does not
+  /// read it again, and the songs it held stay readable if the import fails.
+  Future<void> _adoptLegacyDocument(
+    LibraryDatabase database,
+    Directory directory,
+  ) async {
+    if (database.count() > 0) return;
+
+    final document = File(path.join(directory.path, _legacyDocument));
+    if (!await document.exists()) return;
+
+    try {
+      final songs = decodeLibrary(await document.readAsString());
+      if (songs.isEmpty) return;
+      database.save(songs);
+      await document.rename('${document.path}.migrated');
+      Log.info('音乐库已迁入数据库: ${songs.length} 首');
+    } catch (error, stackTrace) {
+      Log.error('迁移音乐库到数据库失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<List<Song>> load() async {
+    try {
+      return (await _db()).load();
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<void> save(List<Song> songs) async {
+    try {
+      (await _db()).save(songs);
+    } catch (error, stackTrace) {
+      Log.error('保存音乐库失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<void> clear() async {
+    try {
+      (await _db()).clear();
+    } catch (error, stackTrace) {
+      Log.error('清空音乐库失败: $error\n$stackTrace');
     }
   }
 }
