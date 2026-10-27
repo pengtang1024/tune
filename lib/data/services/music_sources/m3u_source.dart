@@ -19,10 +19,7 @@ class M3uSourceAdapter extends MusicSourceAdapter {
   static const int maxEntries = 500;
 
   /// The key of a pls entry: `File1`, `File2` and the like.
-  static final RegExp _plsFileKey = RegExp(
-    r'^file\d+$',
-    caseSensitive: false,
-  );
+  static final RegExp _plsFileKey = RegExp(r'^file\d+$', caseSensitive: false);
 
   final Dio _dio;
 

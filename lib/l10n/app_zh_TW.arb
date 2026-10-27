@@ -577,6 +577,8 @@
   "searchAddToQueue": "加入佇列",
   "searchAddedToQueue": "已加入佇列：{title}",
   "searchAddLibraryFailed": "加入音樂庫失敗",
+  "searchLoadMore": "載入更多",
+  "searchNoMore": "沒有更多了",
   "searchAddToLibrary": "加入音樂庫",
   "searchAddAllToLibrary": "全部加入",
   "searchAddedToLibrary": "已加入",

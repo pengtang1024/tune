@@ -11,12 +11,16 @@ class OnlineSearchState {
   final Map<String, double> progress;
   final String? message;
 
+  /// The source whose next window is being fetched.
+  final String? loadingMore;
+
   const OnlineSearchState({
     this.query = '',
     this.isSearching = false,
     this.results = const {},
     this.progress = const {},
     this.message,
+    this.loadingMore,
   });
 
   bool get hasQuery => query.isNotEmpty;
@@ -34,6 +38,7 @@ class OnlineSearchState {
     Map<String, SourceScanResult>? results,
     Map<String, double>? progress,
     Object? message = _keep,
+    Object? loadingMore = _keep,
   }) {
     return OnlineSearchState(
       query: query ?? this.query,
@@ -41,6 +46,9 @@ class OnlineSearchState {
       results: results ?? this.results,
       progress: progress ?? this.progress,
       message: identical(message, _keep) ? this.message : message as String?,
+      loadingMore: identical(loadingMore, _keep)
+          ? this.loadingMore
+          : loadingMore as String?,
     );
   }
 }

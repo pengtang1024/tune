@@ -115,10 +115,7 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
     }
 
     if (!isHttpAddress(url)) {
-      return failedResult(
-        config.id,
-        AppStrings.instance.sourceAddressNotHttp,
-      );
+      return failedResult(config.id, AppStrings.instance.sourceAddressNotHttp);
     }
 
     final keyword = config.setting('query') ?? '';
@@ -197,10 +194,7 @@ class JsonApiSourceAdapter extends MusicSourceAdapter {
   ) {
     final address = url.replaceAll('\${query}', Uri.encodeComponent(keyword));
     final options = Options(
-      headers: {
-        if (post) 'content-type': 'application/json',
-        ...headers,
-      },
+      headers: {if (post) 'content-type': 'application/json', ...headers},
       responseType: ResponseType.plain,
     );
 

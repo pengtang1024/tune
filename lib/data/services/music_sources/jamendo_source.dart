@@ -109,7 +109,10 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(request.config.id, AppStrings.instance.jamendoEmptyResponse);
+        return failedResult(
+          request.config.id,
+          AppStrings.instance.jamendoEmptyResponse,
+        );
       }
 
       final songs = parseResults(data, sourceId: request.config.id);

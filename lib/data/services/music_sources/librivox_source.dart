@@ -118,6 +118,9 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   /// A whole book is fetched for each of its chapters, so a scan runs
   /// longer than the scan of a song catalogue.
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 12);
 
   @override
@@ -129,7 +132,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final keyword = config.setting('query');
-      final raw = await _rawAnswer(keyword, limit);
+      final raw = await _rawAnswer(keyword, limit, request.offset);
       final books = parseBookList(raw);
       if (books.isEmpty) {
         return SourceScanResult(
@@ -174,11 +177,11 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   /// A keyword asks the catalogue twice, by title and by author; both
   /// answers count. Without a keyword the scan reads the list the
   /// catalogue serves by itself.
-  Future<Object?> _rawAnswer(String? keyword, int limit) async {
+  Future<Object?> _rawAnswer(String? keyword, int limit, int offset) async {
     if (keyword != null) {
       final pages = await Future.wait([
-        _searchPage('title', keyword, limit),
-        _searchPage('author', keyword, limit),
+        _searchPage('title', keyword, limit, offset),
+        _searchPage('author', keyword, limit, offset),
       ]);
       return {
         'books': [...pages[0], ...pages[1]],
@@ -186,7 +189,11 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     }
     final response = await _dio.get(
       _apiHost,
-      queryParameters: {'format': 'json', 'limit': limit},
+      queryParameters: {
+        'format': 'json',
+        'limit': limit,
+        if (offset > 0) 'offset': offset,
+      },
     );
     return response.data;
   }
@@ -196,10 +203,16 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     String field,
     String value,
     int limit,
+    int offset,
   ) async {
     final response = await _dio.get(
       _apiHost,
-      queryParameters: {'format': 'json', 'limit': limit, field: value},
+      queryParameters: {
+        'format': 'json',
+        'limit': limit,
+        if (offset > 0) 'offset': offset,
+        field: value,
+      },
     );
     return parseBookList(response.data);
   }

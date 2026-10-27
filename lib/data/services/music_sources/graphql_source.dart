@@ -132,10 +132,7 @@ query Tracks(\$q: String) {
     }
 
     if (!isHttpAddress(url)) {
-      return failedResult(
-        config.id,
-        AppStrings.instance.sourceAddressNotHttp,
-      );
+      return failedResult(config.id, AppStrings.instance.sourceAddressNotHttp);
     }
 
     final keyword = config.setting('query') ?? '';

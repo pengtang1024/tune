@@ -58,6 +58,9 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -71,7 +74,11 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://api.openverse.org/v1/audio/',
         // Without a keyword the service serves the audio it published last.
-        queryParameters: {'q': ?query, 'page_size': 20},
+        queryParameters: {
+          'q': ?query,
+          'page_size': 20,
+          'page': request.offset ~/ 20 + 1,
+        },
       );
       final data = response.data;
       if (data == null) {

@@ -74,6 +74,9 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   ];
 
   @override
+  bool get supportsPaging => true;
+
+  @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
   @override
@@ -92,16 +95,23 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
             ? '$_discoveryHost/v1/tracks/trending'
             : '$_discoveryHost/v1/tracks/search',
         queryParameters: browsing
-            ? {'app_name': _appName}
-            : {'query': query, 'app_name': _appName},
+            ? {'app_name': _appName, 'offset': request.offset}
+            : {'query': query, 'app_name': _appName, 'offset': request.offset},
       );
       final data = response.data;
       if (data == null) {
-        return failedResult(request.config.id, AppStrings.instance.audiusEmptyResponse);
+        return failedResult(
+          request.config.id,
+          AppStrings.instance.audiusEmptyResponse,
+        );
       }
 
       final limit = scanLimit.read(request.config.setting('limit'));
-      final songs = parseResults(data, sourceId: request.config.id, limit: limit);
+      final songs = parseResults(
+        data,
+        sourceId: request.config.id,
+        limit: limit,
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,

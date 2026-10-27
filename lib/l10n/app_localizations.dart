@@ -1949,6 +1949,18 @@ abstract class AppLocalizations {
   /// **'加入音乐库失败'**
   String get searchAddLibraryFailed;
 
+  /// No description provided for @searchLoadMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加载更多'**
+  String get searchLoadMore;
+
+  /// No description provided for @searchNoMore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有更多了'**
+  String get searchNoMore;
+
   /// No description provided for @searchAddToLibrary.
   ///
   /// In zh_CN, this message translates to:

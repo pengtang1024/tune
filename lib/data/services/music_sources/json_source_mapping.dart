@@ -83,11 +83,7 @@ class JsonSourceMapping {
   ///
   /// A track without a playable address is not a track: the app has nothing
   /// to play, so it is left out.
-  List<Song> songs(
-    Object? root, {
-    required String sourceId,
-    int limit = 200,
-  }) {
+  List<Song> songs(Object? root, {required String sourceId, int limit = 200}) {
     final list = _list(root);
     if (list == null) return const [];
 

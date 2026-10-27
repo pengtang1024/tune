@@ -304,6 +304,7 @@ class MusicSourceService implements StreamUrlResolver {
   Future<List<SourceScanResult>> search({
     required List<MusicSourceConfig> sources,
     required String query,
+    Map<String, int> offsets = const {},
     void Function(String sourceId, double progress)? onProgress,
   }) async {
     final trimmed = query.trim();
@@ -335,6 +336,15 @@ class MusicSourceService implements StreamUrlResolver {
           );
         }
 
+        final offset = offsets[config.id] ?? 0;
+        // A source without pages would only answer with the same window.
+        if (offset > 0 && !adapter.supportsPaging) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.success,
+          );
+        }
+
         final searchConfig = config.copyWith(
           settings: {...config.settings, 'query': trimmed, 'keywords': trimmed},
         );
@@ -342,6 +352,7 @@ class MusicSourceService implements StreamUrlResolver {
           final result = await adapter.scan(
             MusicSourceScanRequest(
               config: searchConfig,
+              offset: offset,
               onProgress: (progress) => onProgress?.call(config.id, progress),
             ),
           );
