@@ -9,6 +9,7 @@ import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/data/services/providers/tray_service_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
@@ -104,6 +105,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   onClear: libraryReady && !busy ? _clearLibrary : null,
                   onChooseLibraryFolder: _pickLibraryFolder,
                   onResetLibraryFolder: _resetLibraryFolder,
+                  cacheLimit: ref.watch(libraryCacheLimitProvider),
+                  onCacheLimitChanged: ref
+                      .read(libraryCacheLimitProvider.notifier)
+                      .set,
                 ),
                 const SizedBox(height: 14),
                 SettingsPlaybackCard(

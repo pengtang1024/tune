@@ -187,6 +187,8 @@ class SettingsLibraryCard extends StatelessWidget {
   final VoidCallback? onClear;
   final VoidCallback onChooseLibraryFolder;
   final VoidCallback onResetLibraryFolder;
+  final int cacheLimit;
+  final ValueChanged<int> onCacheLimitChanged;
 
   const SettingsLibraryCard({
     super.key,
@@ -199,6 +201,8 @@ class SettingsLibraryCard extends StatelessWidget {
     required this.onClear,
     required this.onChooseLibraryFolder,
     required this.onResetLibraryFolder,
+    required this.cacheLimit,
+    required this.onCacheLimitChanged,
   });
 
   @override
@@ -254,6 +258,32 @@ class SettingsLibraryCard extends StatelessWidget {
             isCustom: settings.libraryFolder != null,
             onChoose: onChooseLibraryFolder,
             onReset: onResetLibraryFolder,
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  context.loc.settingsSourceCacheLimit,
+                  style: theme.textTheme.labelMedium,
+                ),
+              ),
+              DropdownButton<int>(
+                value: cacheLimit,
+                items: [
+                  for (final limit in const [0, 500, 1000, 2000, 5000, 10000])
+                    DropdownMenuItem(
+                      value: limit,
+                      child: Text(
+                        limit == 0 ? context.loc.settingsNoLimit : '$limit',
+                      ),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) onCacheLimitChanged(value);
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 14),
           Wrap(

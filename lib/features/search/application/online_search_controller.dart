@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -49,10 +51,12 @@ class OnlineSearchController
       return;
     }
 
+    final autoSave = state.valueOrNull?.autoSave ?? false;
     state = AsyncData(
       OnlineSearchState(
         query: query,
         isSearching: true,
+        autoSave: autoSave,
         progress: {for (final source in remoteSources) source.id: 0},
       ),
     );
@@ -81,10 +85,14 @@ class OnlineSearchController
         0,
         (sum, result) => sum + result.songs.length,
       );
+      if (autoSave && total > 0) {
+        await _saveToLibrary([for (final result in results) ...result.songs]);
+      }
       state = AsyncData(
         OnlineSearchState(
           query: query,
           results: bySource,
+          autoSave: autoSave,
           cursors: {
             for (final result in results)
               if (result.cursor != null) result.sourceId: result.cursor!,
@@ -151,6 +159,9 @@ class OnlineSearchController
 
       final fresh = results.single;
       final merged = _append(result, fresh);
+      if (current.autoSave && fresh.songs.isNotEmpty) {
+        await _saveToLibrary(fresh.songs);
+      }
       state = AsyncData(
         current.copyWith(
           results: {...current.results, sourceId: merged},
@@ -194,6 +205,23 @@ class OnlineSearchController
           : null,
       cursor: fresh.cursor,
     );
+  }
+
+  /// Turns the automatic save of the results on or off.
+  void setAutoSave(bool value) {
+    final current = state.valueOrNull;
+    if (current == null || current.autoSave == value) return;
+    state = AsyncData(current.copyWith(autoSave: value));
+  }
+
+  /// Puts the tracks the search found into the library.
+  Future<void> _saveToLibrary(List<Song> songs) async {
+    if (songs.isEmpty) return;
+    try {
+      await ref.read(libraryControllerProvider.notifier).addSongs(songs);
+    } catch (error, stackTrace) {
+      Log.error('自动保存搜索结果失败: $error\n$stackTrace');
+    }
   }
 
   void clear() {
