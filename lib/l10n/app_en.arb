@@ -16,6 +16,44 @@
   "scanNow": "Scan now",
   "search": "Search",
   "scanning": "Scanning",
+  "updateEyebrow": "Updates",
+  "updateTitle": "Version",
+  "updateDescription": "Checks the project page for a newer release and installs it",
+  "updateCurrentVersion": "Current version {version}",
+  "@updateCurrentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateIdle": "The project page has not been checked yet",
+  "updateChecking": "Checking the project page…",
+  "updateUpToDate": "This is the newest version",
+  "updateAvailable": "Version {version} is available",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateDownloading": "Downloading",
+  "updateInstalling": "Installing…",
+  "updateReady": "The update is ready; restart to use it",
+  "updateFailed": "The check failed: {error}",
+  "@updateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "updateCheck": "Check for updates",
+  "updateInstall": "Download and install",
+  "updateRetry": "Try again",
+  "updateRestart": "Restart now",
+  "updateNoArchive": "This platform has no automatic install; download it from the release page",
   "about": "About",
   "language": "Language",
   "theme": "Theme",

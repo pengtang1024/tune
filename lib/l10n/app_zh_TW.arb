@@ -16,6 +16,44 @@
   "scanNow": "立即掃描",
   "search": "搜尋",
   "scanning": "掃描中",
+  "updateEyebrow": "更新",
+  "updateTitle": "版本",
+  "updateDescription": "檢查專案發布頁是否有新版本，並直接安裝",
+  "updateCurrentVersion": "目前版本 {version}",
+  "@updateCurrentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateIdle": "還沒檢查過發布頁",
+  "updateChecking": "正在檢查發布頁…",
+  "updateUpToDate": "已經是最新版本",
+  "updateAvailable": "新版本 {version} 可用",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateDownloading": "正在下載",
+  "updateInstalling": "正在安裝…",
+  "updateReady": "更新已就緒，重新啟動後生效",
+  "updateFailed": "檢查失敗：{error}",
+  "@updateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "updateCheck": "檢查更新",
+  "updateInstall": "下載並安裝",
+  "updateRetry": "重試",
+  "updateRestart": "立即重新啟動",
+  "updateNoArchive": "這個平台不支援自動安裝，請到發布頁手動下載",
   "about": "關於",
   "language": "語言",
   "theme": "主題",

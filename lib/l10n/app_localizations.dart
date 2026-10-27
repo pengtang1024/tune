@@ -196,6 +196,108 @@ abstract class AppLocalizations {
   /// **'扫描中'**
   String get scanning;
 
+  /// No description provided for @updateEyebrow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更新'**
+  String get updateEyebrow;
+
+  /// No description provided for @updateTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'版本'**
+  String get updateTitle;
+
+  /// No description provided for @updateDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查项目发布页是否有新版本，并直接安装'**
+  String get updateDescription;
+
+  /// No description provided for @updateCurrentVersion.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前版本 {version}'**
+  String updateCurrentVersion(String version);
+
+  /// No description provided for @updateIdle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有检查过发布页'**
+  String get updateIdle;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在检查发布页…'**
+  String get updateChecking;
+
+  /// No description provided for @updateUpToDate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已经是最新版本'**
+  String get updateUpToDate;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新版本 {version} 可用'**
+  String updateAvailable(String version);
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在下载'**
+  String get updateDownloading;
+
+  /// No description provided for @updateInstalling.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在安装…'**
+  String get updateInstalling;
+
+  /// No description provided for @updateReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更新已就绪，重启后生效'**
+  String get updateReady;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：{error}'**
+  String updateFailed(String error);
+
+  /// No description provided for @updateCheck.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查更新'**
+  String get updateCheck;
+
+  /// No description provided for @updateInstall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载并安装'**
+  String get updateInstall;
+
+  /// No description provided for @updateRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重试'**
+  String get updateRetry;
+
+  /// No description provided for @updateRestart.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'立即重启'**
+  String get updateRestart;
+
+  /// No description provided for @updateNoArchive.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个平台不支持自动安装，请到发布页手动下载'**
+  String get updateNoArchive;
+
   /// No description provided for @about.
   ///
   /// In zh_CN, this message translates to:

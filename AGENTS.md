@@ -21,6 +21,7 @@
 | 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |
 | 查队列的呈现（浮层、入口、关闭） | [`docs/queue-panel.md`](docs/queue-panel.md) |
 | 改歌词（取词、解析、高亮、落盘） | [`docs/lyrics.md`](docs/lyrics.md) |
+| 查自动更新：数据源、产物命名、发布步骤 | [`docs/updates.md`](docs/updates.md) |
 | 查桌面集成（MPRIS、托盘、默认播放器） | [`需求/桌面集成方案.md`](需求/桌面集成方案.md) |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
