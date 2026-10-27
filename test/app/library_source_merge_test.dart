@@ -148,7 +148,7 @@ void main() {
     },
   );
 
-  test('a successful source replaces its previous songs', () async {
+  test('a successful source adds to its previous songs', () async {
     final container = createContainer(
       sources: const [localSource, remoteSource],
       results: {
@@ -169,11 +169,14 @@ void main() {
     await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
     final state = container.read(libraryControllerProvider).requireValue;
+    // The window of the scan joins the tracks the source brought before
+    // instead of replacing them.
     expect(state.songs.map((song) => song.uri), [
       localSong.uri,
       newRemoteSong.uri,
+      oldRemoteSong.uri,
     ]);
-    expect(state.statusMessage, '已扫描 2 个音源，共 2 首歌曲');
+    expect(state.statusMessage, '已扫描 2 个音源，共 3 首歌曲');
   });
 
   test('a disabled source is removed from the active library', () async {
