@@ -49,15 +49,19 @@ void main() {
       'openverse',
       'jamendo',
       'internet_archive',
-      'netease',
       'ccmixter',
-      'itunes',
       'podcast_rss',
       'subsonic',
       'audius',
       'radio',
       'wikimedia',
       'jellyfin',
+      'librivox',
+      'emby',
+      'plex',
+      'podcast_catalog',
+      'funkwhale',
+      'audiobookshelf',
     ];
 
     final icons = ids

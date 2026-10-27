@@ -770,12 +770,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldLimitEpisodes => '每次扫描集数';
 
   @override
+  String get fieldLimitPodcasts => '每次扫描播客数';
+
+  @override
   String get fieldLimitStations => '每次扫描电台数';
 
   @override
   String fieldLimitHint(int count, int max) {
     return '默认 $count，最大 $max';
   }
+
+  @override
+  String get fieldLimitBooks => '每次扫描书数';
+
+  @override
+  String get fieldLanguage => '语言';
+
+  @override
+  String get fieldLanguageHint => '只保留一种语言的有声书';
+
+  @override
+  String get fieldLanguageAll => '不限制语言';
+
+  @override
+  String get fieldLanguageEnglish => '英语';
+
+  @override
+  String get fieldLanguageChinese => '中文';
+
+  @override
+  String get fieldLanguageFrench => '法语';
+
+  @override
+  String get fieldLanguageGerman => '德语';
+
+  @override
+  String get fieldLanguageSpanish => '西班牙语';
+
+  @override
+  String get fieldLanguageItalian => '意大利语';
+
+  @override
+  String get fieldLanguageJapanese => '日语';
+
+  @override
+  String get fieldLanguageRussian => '俄语';
+
+  @override
+  String get fieldLanguagePortuguese => '葡萄牙语';
 
   @override
   String get fieldServer => '服务器地址';
@@ -1089,25 +1131,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
-  String get neteaseHint =>
-      '填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000';
-
-  @override
-  String get neteaseFieldApi => 'API 地址';
-
-  @override
-  String get neteaseFieldQueryHint => '例如 热门、周杰伦';
-
-  @override
-  String get neteaseHotKeyword => '热门';
-
-  @override
-  String get neteaseEmptyResponse => '网易云 API 返回了空响应';
-
-  @override
-  String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
-
-  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -1143,12 +1166,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourceInternetArchiveName => '公共领域音频';
-
-  @override
-  String get sourceNeteaseName => '网易云音乐 API';
-
-  @override
-  String get sourceNeteaseDescription => '连接自建的 NeteaseCloudMusicApi 服务';
 
   @override
   String get jamendoHint => '在 developer.jamendo.com 免费申请 Client ID 后填入';
@@ -1206,18 +1223,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterNoMatch => '没有找到匹配的 ccMixter 曲目';
 
   @override
-  String get itunesEmptyResponse => 'iTunes API 返回了空响应';
-
-  @override
-  String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
-
-  @override
-  String get itunesHint => '填写搜索关键词，例如 jazz、piano 或 lo-fi';
-
-  @override
-  String get itunesNoMatch => '没有找到匹配的 iTunes 曲目';
-
-  @override
   String get podcastRssEmptyFeed => '订阅地址返回了空内容';
 
   @override
@@ -1244,16 +1249,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'iTunes 目录的 30 秒试听片段';
+  String get sourceLiveMusicArchiveDescription => 'Internet Archive 收藏的现场录音';
 
   @override
-  String get sourceItunesName => '商店试听片段';
+  String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
   String get sourcePodcastRssName => '播客订阅';
+
+  @override
+  String get sourcePodcastCatalogName => '播客目录';
+
+  @override
+  String get sourcePodcastCatalogDescription => '搜索 gpodder 开放播客目录，取最新单集';
+
+  @override
+  String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
+
+  @override
+  String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
+
+  @override
+  String get podcastCatalogNoMatch => '没有找到播客';
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
@@ -1325,6 +1345,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioProviderAll => '全部目录';
 
   @override
+  String get radioFieldCountry => '国家/地区';
+
+  @override
+  String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
+
+  @override
   String get radioFieldQuery => '电台关键词';
 
   @override
@@ -1352,6 +1378,86 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaNoMatch => '没有找到可播放的共享音频';
 
   @override
+  String get sourceFunkwhaleName => '联邦音乐';
+
+  @override
+  String get sourceFunkwhaleDescription => '联邦 Funkwhale 实例里的音乐';
+
+  @override
+  String get funkwhaleHint => '填写 Funkwhale 实例地址；只有私密库需要令牌';
+
+  @override
+  String get funkwhaleFieldServerHint => '例如 https://open.audio';
+
+  @override
+  String get funkwhaleFieldToken => '访问令牌';
+
+  @override
+  String get funkwhaleFieldTokenHint => '实例的库私密时才需要';
+
+  @override
+  String get funkwhaleFieldQueryHint => '例如爵士、民谣、电子';
+
+  @override
+  String get funkwhaleEmptyResponse => 'Funkwhale 返回了空响应';
+
+  @override
+  String get funkwhaleNoMatch => 'Funkwhale 上没有匹配的曲目';
+
+  @override
+  String get sourceAudiobookshelfName => '自建有声书';
+
+  @override
+  String get sourceAudiobookshelfDescription => '自建 Audiobookshelf 服务器里的有声书';
+
+  @override
+  String get audiobookshelfHint => '填写 Audiobookshelf 服务器的地址与令牌';
+
+  @override
+  String get audiobookshelfFieldServerHint => '例如 http://localhost:13378';
+
+  @override
+  String get audiobookshelfFieldToken => '访问令牌';
+
+  @override
+  String get audiobookshelfFieldTokenHint => 'Audiobookshelf 账号的 API 令牌';
+
+  @override
+  String get audiobookshelfFieldQueryHint => '例如历史、小说、科学';
+
+  @override
+  String get audiobookshelfEmptyResponse => 'Audiobookshelf 返回了空响应';
+
+  @override
+  String get audiobookshelfNoMatch => '没有找到有声书';
+
+  @override
+  String get sourcePlexName => '自建媒体库';
+
+  @override
+  String get sourcePlexDescription => '连接自建的 Plex 媒体库';
+
+  @override
+  String get plexHint => '填写 Plex 服务器的地址与访问令牌';
+
+  @override
+  String get plexFieldServerHint => '例如 http://localhost:32400';
+
+  @override
+  String get plexFieldToken => '访问令牌';
+
+  @override
+  String get plexFieldTokenHint => 'Plex 账号的 X-Plex-Token';
+
+  @override
+  String get plexNoMatch => 'Plex 上没有匹配的曲目';
+
+  @override
+  String plexInvalidAnswer(String error) {
+    return '读不出 Plex 的回答：$error';
+  }
+
+  @override
   String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
 
   @override
@@ -1374,6 +1480,53 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
+
+  @override
+  String get sourceLibrivoxName => '有声书';
+
+  @override
+  String get sourceLibrivoxDescription => 'LibriVox 志愿者朗读的公版有声书';
+
+  @override
+  String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
+
+  @override
+  String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
+
+  @override
+  String get librivoxNoMatch => '没有匹配的有声书';
+
+  @override
+  String get librivoxEmptyResponse => 'LibriVox 返回了空响应';
+
+  @override
+  String librivoxInvalidFeed(String error) {
+    return '读不出一本书的章节列表：$error';
+  }
+
+  @override
+  String get sourceEmbyName => 'Emby 媒体库';
+
+  @override
+  String get sourceEmbyDescription => '连接自建的 Emby 媒体库';
+
+  @override
+  String get embyHint => '填写自建 Emby 的地址与账号';
+
+  @override
+  String get embyFieldServerHint => '例如 http://localhost:8095';
+
+  @override
+  String get embyFieldUserHint => 'Emby 的登录用户名';
+
+  @override
+  String get embyFieldPasswordHint => '用于换取访问令牌';
+
+  @override
+  String get embyEmptyResponse => 'Emby 返回了空响应';
+
+  @override
+  String get embyAuthFailed => '无法连接 Emby 服务器，请检查地址与账号';
 
   @override
   String get audioSourceStreaming => '网络';
@@ -2789,12 +2942,54 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldLimitEpisodes => '每次扫描集数';
 
   @override
+  String get fieldLimitPodcasts => '每次扫描播客数';
+
+  @override
   String get fieldLimitStations => '每次扫描电台数';
 
   @override
   String fieldLimitHint(int count, int max) {
     return '默认 $count，最大 $max';
   }
+
+  @override
+  String get fieldLimitBooks => '每次扫描书数';
+
+  @override
+  String get fieldLanguage => '语言';
+
+  @override
+  String get fieldLanguageHint => '只保留一种语言的有声书';
+
+  @override
+  String get fieldLanguageAll => '不限制语言';
+
+  @override
+  String get fieldLanguageEnglish => '英语';
+
+  @override
+  String get fieldLanguageChinese => '中文';
+
+  @override
+  String get fieldLanguageFrench => '法语';
+
+  @override
+  String get fieldLanguageGerman => '德语';
+
+  @override
+  String get fieldLanguageSpanish => '西班牙语';
+
+  @override
+  String get fieldLanguageItalian => '意大利语';
+
+  @override
+  String get fieldLanguageJapanese => '日语';
+
+  @override
+  String get fieldLanguageRussian => '俄语';
+
+  @override
+  String get fieldLanguagePortuguese => '葡萄牙语';
 
   @override
   String get fieldServer => '服务器地址';
@@ -3108,25 +3303,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
-  String get neteaseHint =>
-      '填写自建的 NeteaseCloudMusicApi 地址，例如 http://localhost:3000';
-
-  @override
-  String get neteaseFieldApi => 'API 地址';
-
-  @override
-  String get neteaseFieldQueryHint => '例如 热门、周杰伦';
-
-  @override
-  String get neteaseHotKeyword => '热门';
-
-  @override
-  String get neteaseEmptyResponse => '网易云 API 返回了空响应';
-
-  @override
-  String get neteaseNoStream => '接口未返回可播放地址（可能需要在服务端登录或受版权限制）';
-
-  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -3162,12 +3338,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourceInternetArchiveName => '公共领域音频';
-
-  @override
-  String get sourceNeteaseName => '网易云音乐 API';
-
-  @override
-  String get sourceNeteaseDescription => '连接自建的 NeteaseCloudMusicApi 服务';
 
   @override
   String get jamendoHint => '在 developer.jamendo.com 免费申请 Client ID 后填入';
@@ -3225,18 +3395,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterNoMatch => '没有找到匹配的 ccMixter 曲目';
 
   @override
-  String get itunesEmptyResponse => 'iTunes API 返回了空响应';
-
-  @override
-  String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
-
-  @override
-  String get itunesHint => '填写搜索关键词，例如 jazz、piano 或 lo-fi';
-
-  @override
-  String get itunesNoMatch => '没有找到匹配的 iTunes 曲目';
-
-  @override
   String get podcastRssEmptyFeed => '订阅地址返回了空内容';
 
   @override
@@ -3263,16 +3421,31 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'iTunes 目录的 30 秒试听片段';
+  String get sourceLiveMusicArchiveDescription => 'Internet Archive 收藏的现场录音';
 
   @override
-  String get sourceItunesName => '商店试听片段';
+  String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
   String get sourcePodcastRssName => '播客订阅';
+
+  @override
+  String get sourcePodcastCatalogName => '播客目录';
+
+  @override
+  String get sourcePodcastCatalogDescription => '搜索 gpodder 开放播客目录，取最新单集';
+
+  @override
+  String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
+
+  @override
+  String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
+
+  @override
+  String get podcastCatalogNoMatch => '没有找到播客';
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
@@ -3344,6 +3517,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioProviderAll => '全部目录';
 
   @override
+  String get radioFieldCountry => '国家/地区';
+
+  @override
+  String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
+
+  @override
   String get radioFieldQuery => '电台关键词';
 
   @override
@@ -3371,6 +3550,86 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaNoMatch => '没有找到可播放的共享音频';
 
   @override
+  String get sourceFunkwhaleName => '联邦音乐';
+
+  @override
+  String get sourceFunkwhaleDescription => '联邦 Funkwhale 实例里的音乐';
+
+  @override
+  String get funkwhaleHint => '填写 Funkwhale 实例地址；只有私密库需要令牌';
+
+  @override
+  String get funkwhaleFieldServerHint => '例如 https://open.audio';
+
+  @override
+  String get funkwhaleFieldToken => '访问令牌';
+
+  @override
+  String get funkwhaleFieldTokenHint => '实例的库私密时才需要';
+
+  @override
+  String get funkwhaleFieldQueryHint => '例如爵士、民谣、电子';
+
+  @override
+  String get funkwhaleEmptyResponse => 'Funkwhale 返回了空响应';
+
+  @override
+  String get funkwhaleNoMatch => 'Funkwhale 上没有匹配的曲目';
+
+  @override
+  String get sourceAudiobookshelfName => '自建有声书';
+
+  @override
+  String get sourceAudiobookshelfDescription => '自建 Audiobookshelf 服务器里的有声书';
+
+  @override
+  String get audiobookshelfHint => '填写 Audiobookshelf 服务器的地址与令牌';
+
+  @override
+  String get audiobookshelfFieldServerHint => '例如 http://localhost:13378';
+
+  @override
+  String get audiobookshelfFieldToken => '访问令牌';
+
+  @override
+  String get audiobookshelfFieldTokenHint => 'Audiobookshelf 账号的 API 令牌';
+
+  @override
+  String get audiobookshelfFieldQueryHint => '例如历史、小说、科学';
+
+  @override
+  String get audiobookshelfEmptyResponse => 'Audiobookshelf 返回了空响应';
+
+  @override
+  String get audiobookshelfNoMatch => '没有找到有声书';
+
+  @override
+  String get sourcePlexName => '自建媒体库';
+
+  @override
+  String get sourcePlexDescription => '连接自建的 Plex 媒体库';
+
+  @override
+  String get plexHint => '填写 Plex 服务器的地址与访问令牌';
+
+  @override
+  String get plexFieldServerHint => '例如 http://localhost:32400';
+
+  @override
+  String get plexFieldToken => '访问令牌';
+
+  @override
+  String get plexFieldTokenHint => 'Plex 账号的 X-Plex-Token';
+
+  @override
+  String get plexNoMatch => 'Plex 上没有匹配的曲目';
+
+  @override
+  String plexInvalidAnswer(String error) {
+    return '读不出 Plex 的回答：$error';
+  }
+
+  @override
   String get sourceJellyfinDescription => '连接自建的 Jellyfin 媒体库';
 
   @override
@@ -3393,6 +3652,53 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get jellyfinAuthFailed => '无法连接 Jellyfin 服务器，请检查地址与账号';
+
+  @override
+  String get sourceLibrivoxName => '有声书';
+
+  @override
+  String get sourceLibrivoxDescription => 'LibriVox 志愿者朗读的公版有声书';
+
+  @override
+  String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
+
+  @override
+  String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
+
+  @override
+  String get librivoxNoMatch => '没有匹配的有声书';
+
+  @override
+  String get librivoxEmptyResponse => 'LibriVox 返回了空响应';
+
+  @override
+  String librivoxInvalidFeed(String error) {
+    return '读不出一本书的章节列表：$error';
+  }
+
+  @override
+  String get sourceEmbyName => 'Emby 媒体库';
+
+  @override
+  String get sourceEmbyDescription => '连接自建的 Emby 媒体库';
+
+  @override
+  String get embyHint => '填写自建 Emby 的地址与账号';
+
+  @override
+  String get embyFieldServerHint => '例如 http://localhost:8095';
+
+  @override
+  String get embyFieldUserHint => 'Emby 的登录用户名';
+
+  @override
+  String get embyFieldPasswordHint => '用于换取访问令牌';
+
+  @override
+  String get embyEmptyResponse => 'Emby 返回了空响应';
+
+  @override
+  String get embyAuthFailed => '无法连接 Emby 服务器，请检查地址与账号';
 
   @override
   String get audioSourceStreaming => '网络';
@@ -4808,12 +5114,54 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get fieldLimitEpisodes => '每次掃描集數';
 
   @override
+  String get fieldLimitPodcasts => '每次掃描播客數';
+
+  @override
   String get fieldLimitStations => '每次掃描電台數';
 
   @override
   String fieldLimitHint(int count, int max) {
     return '預設 $count，最多 $max';
   }
+
+  @override
+  String get fieldLimitBooks => '每次掃描書數';
+
+  @override
+  String get fieldLanguage => '語言';
+
+  @override
+  String get fieldLanguageHint => '只保留一種語言的有聲書';
+
+  @override
+  String get fieldLanguageAll => '不限制語言';
+
+  @override
+  String get fieldLanguageEnglish => '英語';
+
+  @override
+  String get fieldLanguageChinese => '中文';
+
+  @override
+  String get fieldLanguageFrench => '法語';
+
+  @override
+  String get fieldLanguageGerman => '德語';
+
+  @override
+  String get fieldLanguageSpanish => '西班牙語';
+
+  @override
+  String get fieldLanguageItalian => '義大利語';
+
+  @override
+  String get fieldLanguageJapanese => '日語';
+
+  @override
+  String get fieldLanguageRussian => '俄語';
+
+  @override
+  String get fieldLanguagePortuguese => '葡萄牙語';
 
   @override
   String get fieldServer => '伺服器位址';
@@ -5127,25 +5475,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get localSourceNotConfigured => '未設定本機音樂目錄';
 
   @override
-  String get neteaseHint =>
-      '填寫自建的 NeteaseCloudMusicApi 位址，例如 http://localhost:3000';
-
-  @override
-  String get neteaseFieldApi => 'API 位址';
-
-  @override
-  String get neteaseFieldQueryHint => '例如 熱門、周杰倫';
-
-  @override
-  String get neteaseHotKeyword => '熱門';
-
-  @override
-  String get neteaseEmptyResponse => '網易雲 API 回傳了空回應';
-
-  @override
-  String get neteaseNoStream => '介面未回傳可播放網址（可能需要在伺服器端登入或受版權限制）';
-
-  @override
   String get openverseHint => '填寫搜尋關鍵字，例如 piano、ambient 或 jazz';
 
   @override
@@ -5181,12 +5510,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceInternetArchiveName => '公共領域音頻';
-
-  @override
-  String get sourceNeteaseName => '網易雲音樂 API';
-
-  @override
-  String get sourceNeteaseDescription => '連結自建的 NeteaseCloudMusicApi 服務';
 
   @override
   String get jamendoHint => '在 developer.jamendo.com 免費申請 Client ID 後填入';
@@ -5244,18 +5567,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get ccmixterNoMatch => '找不到符合的 ccMixter 曲目';
 
   @override
-  String get itunesEmptyResponse => 'iTunes API 回傳了空回應';
-
-  @override
-  String get itunesFieldQueryHint => '例如 jazz、piano、lo-fi';
-
-  @override
-  String get itunesHint => '填寫搜尋關鍵字，例如 jazz、piano 或 lo-fi';
-
-  @override
-  String get itunesNoMatch => '找不到符合的 iTunes 曲目';
-
-  @override
   String get podcastRssEmptyFeed => '訂閱網址回傳了空內容';
 
   @override
@@ -5282,16 +5593,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceCcmixterName => '共享混音素材';
 
   @override
-  String get sourceItunesDescription => 'iTunes 目錄的 30 秒試聽片段';
+  String get sourceLiveMusicArchiveDescription => 'Internet Archive 收藏的現場錄音';
 
   @override
-  String get sourceItunesName => '商店試聽片段';
+  String get sourceLiveMusicArchiveName => '現場音樂檔案';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
 
   @override
   String get sourcePodcastRssName => 'Podcast 訂閱';
+
+  @override
+  String get sourcePodcastCatalogName => '播客目錄';
+
+  @override
+  String get sourcePodcastCatalogDescription => '搜尋 gpodder 開放播客目錄，取最新單集';
+
+  @override
+  String get podcastCatalogHint => '輸入關鍵字找播客，留空則瀏覽目錄';
+
+  @override
+  String get podcastCatalogFieldQueryHint => '例如爵士、歷史、科技';
+
+  @override
+  String get podcastCatalogNoMatch => '沒有找到播客';
 
   @override
   String get sourceSubsonicDescription => '連線自建的 Navidrome / Subsonic 音樂庫';
@@ -5363,6 +5689,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioProviderAll => '全部目錄';
 
   @override
+  String get radioFieldCountry => '國家／地區';
+
+  @override
+  String get radioFieldCountryHint => '兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填';
+
+  @override
   String get radioFieldQuery => '電台關鍵字';
 
   @override
@@ -5390,6 +5722,86 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get wikimediaNoMatch => '找不到可播放的共享音訊';
 
   @override
+  String get sourceFunkwhaleName => '聯邦音樂';
+
+  @override
+  String get sourceFunkwhaleDescription => '聯邦 Funkwhale 實例裡的音樂';
+
+  @override
+  String get funkwhaleHint => '填寫 Funkwhale 實例位址；只有私密庫需要權杖';
+
+  @override
+  String get funkwhaleFieldServerHint => '例如 https://open.audio';
+
+  @override
+  String get funkwhaleFieldToken => '存取權杖';
+
+  @override
+  String get funkwhaleFieldTokenHint => '實例的庫私密時才需要';
+
+  @override
+  String get funkwhaleFieldQueryHint => '例如爵士、民謠、電子';
+
+  @override
+  String get funkwhaleEmptyResponse => 'Funkwhale 回傳了空回應';
+
+  @override
+  String get funkwhaleNoMatch => 'Funkwhale 上沒有符合的曲目';
+
+  @override
+  String get sourceAudiobookshelfName => '自架有聲書';
+
+  @override
+  String get sourceAudiobookshelfDescription => '自架 Audiobookshelf 伺服器裡的有聲書';
+
+  @override
+  String get audiobookshelfHint => '填寫 Audiobookshelf 伺服器的位址與權杖';
+
+  @override
+  String get audiobookshelfFieldServerHint => '例如 http://localhost:13378';
+
+  @override
+  String get audiobookshelfFieldToken => '存取權杖';
+
+  @override
+  String get audiobookshelfFieldTokenHint => 'Audiobookshelf 帳號的 API 權杖';
+
+  @override
+  String get audiobookshelfFieldQueryHint => '例如歷史、小說、科學';
+
+  @override
+  String get audiobookshelfEmptyResponse => 'Audiobookshelf 回傳了空回應';
+
+  @override
+  String get audiobookshelfNoMatch => '沒有找到有聲書';
+
+  @override
+  String get sourcePlexName => '自架媒體庫';
+
+  @override
+  String get sourcePlexDescription => '連結自架的 Plex 媒體庫';
+
+  @override
+  String get plexHint => '填寫 Plex 伺服器的位址與存取權杖';
+
+  @override
+  String get plexFieldServerHint => '例如 http://localhost:32400';
+
+  @override
+  String get plexFieldToken => '存取權杖';
+
+  @override
+  String get plexFieldTokenHint => 'Plex 帳號的 X-Plex-Token';
+
+  @override
+  String get plexNoMatch => 'Plex 上沒有符合的曲目';
+
+  @override
+  String plexInvalidAnswer(String error) {
+    return '讀不出 Plex 的回應：$error';
+  }
+
+  @override
   String get sourceJellyfinDescription => '連接自建的 Jellyfin 媒體庫';
 
   @override
@@ -5412,6 +5824,53 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get jellyfinAuthFailed => '無法連線 Jellyfin 伺服器，請檢查位址與帳號';
+
+  @override
+  String get sourceLibrivoxName => '有聲書';
+
+  @override
+  String get sourceLibrivoxDescription => 'LibriVox 志工朗讀的公版有聲書';
+
+  @override
+  String get librivoxHint => '輸入書名或作者，留空白則瀏覽最熱門的有聲書';
+
+  @override
+  String get librivoxFieldQueryHint => '例如愛麗絲夢遊仙境、狄更斯、童話';
+
+  @override
+  String get librivoxNoMatch => '沒有符合的有聲書';
+
+  @override
+  String get librivoxEmptyResponse => 'LibriVox 回傳了空回應';
+
+  @override
+  String librivoxInvalidFeed(String error) {
+    return '讀不出一本書的章節列表：$error';
+  }
+
+  @override
+  String get sourceEmbyName => 'Emby 媒體庫';
+
+  @override
+  String get sourceEmbyDescription => '連接自建的 Emby 媒體庫';
+
+  @override
+  String get embyHint => '填寫自建 Emby 的位址與帳號';
+
+  @override
+  String get embyFieldServerHint => '例如 http://localhost:8095';
+
+  @override
+  String get embyFieldUserHint => 'Emby 的登入使用者名稱';
+
+  @override
+  String get embyFieldPasswordHint => '用於換取存取權杖';
+
+  @override
+  String get embyEmptyResponse => 'Emby 回傳了空回應';
+
+  @override
+  String get embyAuthFailed => '無法連線 Emby 伺服器，請檢查位址與帳號';
 
   @override
   String get audioSourceStreaming => '網路';

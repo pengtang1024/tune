@@ -3,12 +3,10 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
-import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
-import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
@@ -104,9 +102,7 @@ void main() {
         OpenverseSourceAdapter(),
         JamendoSourceAdapter(),
         InternetArchiveSourceAdapter(),
-        NeteaseCloudMusicSourceAdapter(),
         CcMixterSourceAdapter(),
-        ITunesSourceAdapter(),
         PodcastRssSourceAdapter(),
         SubsonicSourceAdapter(),
       ];
@@ -198,37 +194,6 @@ void main() {
       expect(songs.first.duration, 180000);
       expect(songs.first.genre, 'electronic');
       expect(songs.first.year, 2020);
-    });
-  });
-
-  group('Netease mapping', () {
-    test('maps search songs and keeps artwork https', () {
-      final songs = NeteaseCloudMusicSourceAdapter.parseSearchResults({
-        'result': {
-          'songs': [
-            {
-              'id': 123,
-              'name': 'Song',
-              'ar': [
-                {'name': 'A'},
-                {'name': 'B'},
-              ],
-              'al': {
-                'name': 'Album',
-                'picUrl': 'http://p1.music.126.net/a.jpg',
-              },
-              'dt': 240000,
-            },
-          ],
-        },
-      });
-
-      expect(songs, hasLength(1));
-      expect(songs.first.title, 'Song');
-      expect(songs.first.artist, 'A / B');
-      expect(songs.first.album, 'Album');
-      expect(songs.first.duration, 240000);
-      expect(songs.first.artworkUrl, startsWith('https://'));
     });
   });
 

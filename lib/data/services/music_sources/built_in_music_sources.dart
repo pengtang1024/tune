@@ -29,10 +29,17 @@ class BuiltInMusicSources {
       _instance(types, 'openverse'),
       _instance(types, 'jamendo', enabled: false, settings: {'format': 'mp32'}),
       _instance(types, 'internet_archive'),
-      _instance(types, 'netease', enabled: false),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'live_music_archive',
+        name: strings.sourceLiveMusicArchiveName,
+        description: strings.sourceLiveMusicArchiveDescription,
+        settings: {'query': 'collection:etree'},
+      ),
       _instance(types, 'ccmixter'),
-      _instance(types, 'itunes'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
+      _instance(types, 'podcast_catalog'),
       _instance(
         types,
         'subsonic',
@@ -53,26 +60,58 @@ class BuiltInMusicSources {
         enabled: false,
         settings: {'server': '', 'user': '', 'password': ''},
       ),
+      _instance(types, 'librivox'),
+      _instance(
+        types,
+        'emby',
+        enabled: false,
+        settings: {'server': '', 'user': '', 'password': ''},
+      ),
+      _instance(
+        types,
+        'plex',
+        enabled: false,
+        settings: {'server': '', 'token': ''},
+      ),
+      _instance(
+        types,
+        'funkwhale',
+        enabled: false,
+        settings: {'server': '', 'token': '', 'query': ''},
+      ),
+      _instance(
+        types,
+        'audiobookshelf',
+        enabled: false,
+        settings: {'server': '', 'token': '', 'query': ''},
+      ),
     ];
   }
 
   /// The built-in instance of a type.
   ///
-  /// The id of a built-in instance is its type, so the two are one key.
+  /// The id of an instance is its type unless the instance names its own id:
+  /// a type may ship more than once (a second collection of the Internet
+  /// Archive), and each of those instances is told apart by its id and its
+  /// own name. Country and language are not instances: they are settings of
+  /// the type, so one source serves every country and language it knows.
   static MusicSourceConfig _instance(
     Map<String, SourceTypeDescriptor> types,
     String type, {
+    String? id,
+    String? name,
+    String? description,
     bool enabled = true,
     Map<String, String> settings = const {},
   }) {
     final descriptor = types[type]!;
     return MusicSourceConfig(
-      id: type,
+      id: id ?? type,
       type: type,
       builtIn: true,
-      name: descriptor.name,
+      name: name ?? descriptor.name,
       localizedName: descriptor.localizedName,
-      description: descriptor.description,
+      description: description ?? descriptor.description,
       kind: descriptor.kind,
       enabled: enabled,
       settings: settings,
@@ -111,20 +150,11 @@ class BuiltInMusicSources {
       'ccmixter' => const {
         'query': {'jazz'},
       },
-      'itunes' => const {
-        'query': {'jazz'},
-      },
       'audius' => const {
         'query': {'ambient'},
       },
       'wikimedia' => const {
         'query': {'piano'},
-      },
-      'netease' => {
-        'keywords': {
-          for (final locale in AppLocalizations.supportedLocales)
-            AppStrings.of(locale).neteaseHotKeyword,
-        },
       },
       _ => const {},
     };
@@ -133,10 +163,11 @@ class BuiltInMusicSources {
   /// The name of a source in a language.
   ///
   /// A source the reader added keeps the name it was given; only the built-in
-  /// ones are named by the catalogue.
+  /// ones are named by the catalogue. The id of the instance names it, so the
+  /// instances a type ships more than once keep their own names.
   static String nameOf(MusicSourceConfig config, AppLocalizations strings) {
     if (!config.builtIn) return config.name;
-    return catalogueOf(strings)[config.sourceType]?.name ?? config.name;
+    return catalogueOf(strings)[config.id]?.name ?? config.name;
   }
 
   /// The description of a source in a language.
@@ -145,7 +176,7 @@ class BuiltInMusicSources {
     AppLocalizations strings,
   ) {
     if (!config.builtIn) return config.description;
-    return catalogueOf(strings)[config.sourceType]?.description ?? config.description;
+    return catalogueOf(strings)[config.id]?.description ?? config.description;
   }
 
   /// The source of the local music folders.
@@ -160,17 +191,17 @@ class BuiltInMusicSources {
   /// The source of the archive of the net.
   static MusicSourceConfig get internetArchive => _entry('internet_archive');
 
-  /// The source of a self-hosted NetEase cloud music service.
-  static MusicSourceConfig get netease => _entry('netease');
+  /// The source of the live recordings the archive keeps.
+  static MusicSourceConfig get liveMusicArchive => _entry('live_music_archive');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');
 
-  /// The source of the previews of the songs of the store.
-  static MusicSourceConfig get itunes => _entry('itunes');
-
   /// The source of the podcasts a feed publishes.
   static MusicSourceConfig get podcastRss => _entry('podcast_rss');
+
+  /// The source of the podcasts the directory lists.
+  static MusicSourceConfig get podcastCatalog => _entry('podcast_catalog');
 
   /// The source of a self-hosted music server.
   static MusicSourceConfig get subsonic => _entry('subsonic');
@@ -186,6 +217,21 @@ class BuiltInMusicSources {
 
   /// The source of a self-hosted media library.
   static MusicSourceConfig get jellyfin => _entry('jellyfin');
+
+  /// The source of the audiobooks the volunteers of LibriVox read.
+  static MusicSourceConfig get librivox => _entry('librivox');
+
+  /// The source of a self-hosted Emby library.
+  static MusicSourceConfig get emby => _entry('emby');
+
+  /// The source of a self-hosted Plex library.
+  static MusicSourceConfig get plex => _entry('plex');
+
+  /// The source of a federated Funkwhale instance.
+  static MusicSourceConfig get funkwhale => _entry('funkwhale');
+
+  /// The source of a self-hosted audiobook server.
+  static MusicSourceConfig get audiobookshelf => _entry('audiobookshelf');
 
   /// The catalogue entry of a built-in instance.
   static MusicSourceConfig _entry(String id) {

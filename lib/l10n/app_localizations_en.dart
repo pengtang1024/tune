@@ -836,12 +836,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldLimitEpisodes => 'Episodes per scan';
 
   @override
+  String get fieldLimitPodcasts => 'Podcasts per scan';
+
+  @override
   String get fieldLimitStations => 'Stations per scan';
 
   @override
   String fieldLimitHint(int count, int max) {
     return '$count by default, $max at most';
   }
+
+  @override
+  String get fieldLimitBooks => 'Books per scan';
+
+  @override
+  String get fieldLanguage => 'Language';
+
+  @override
+  String get fieldLanguageHint => 'Only keep the audiobooks of one language';
+
+  @override
+  String get fieldLanguageAll => 'All languages';
+
+  @override
+  String get fieldLanguageEnglish => 'English';
+
+  @override
+  String get fieldLanguageChinese => 'Chinese';
+
+  @override
+  String get fieldLanguageFrench => 'French';
+
+  @override
+  String get fieldLanguageGerman => 'German';
+
+  @override
+  String get fieldLanguageSpanish => 'Spanish';
+
+  @override
+  String get fieldLanguageItalian => 'Italian';
+
+  @override
+  String get fieldLanguageJapanese => 'Japanese';
+
+  @override
+  String get fieldLanguageRussian => 'Russian';
+
+  @override
+  String get fieldLanguagePortuguese => 'Portuguese';
 
   @override
   String get fieldServer => 'Server address';
@@ -1221,27 +1263,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localSourceNotConfigured => 'No local music folder configured';
 
   @override
-  String get neteaseHint =>
-      'Enter the address of your own NeteaseCloudMusicApi, e.g. http://localhost:3000';
-
-  @override
-  String get neteaseFieldApi => 'API address';
-
-  @override
-  String get neteaseFieldQueryHint => 'e.g. trending, an artist';
-
-  @override
-  String get neteaseHotKeyword => 'trending';
-
-  @override
-  String get neteaseEmptyResponse =>
-      'The NetEase API returned an empty response';
-
-  @override
-  String get neteaseNoStream =>
-      'The service returned no playable address. You may need to sign in on the server, or the track is restricted.';
-
-  @override
   String get openverseHint =>
       'Enter a search keyword, e.g. piano, ambient or jazz';
 
@@ -1280,13 +1301,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceInternetArchiveName => 'Public domain';
-
-  @override
-  String get sourceNeteaseName => 'NetEase Cloud Music API';
-
-  @override
-  String get sourceNeteaseDescription =>
-      'Connects to a self-hosted NeteaseCloudMusicApi service';
 
   @override
   String get jamendoHint =>
@@ -1349,18 +1363,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterNoMatch => 'No matching ccMixter tracks';
 
   @override
-  String get itunesEmptyResponse => 'The iTunes API returned an empty response';
-
-  @override
-  String get itunesFieldQueryHint => 'e.g. jazz, piano, lo-fi';
-
-  @override
-  String get itunesHint => 'Enter a search keyword, e.g. jazz, piano or lo-fi';
-
-  @override
-  String get itunesNoMatch => 'No matching iTunes tracks';
-
-  @override
   String get podcastRssEmptyFeed =>
       'The feed address returned an empty document';
 
@@ -1389,11 +1391,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceCcmixterName => 'Shared remixes';
 
   @override
-  String get sourceItunesDescription =>
-      '30 second previews from the iTunes catalog';
+  String get sourceLiveMusicArchiveDescription =>
+      'Live recordings the Internet Archive keeps';
 
   @override
-  String get sourceItunesName => 'Store previews';
+  String get sourceLiveMusicArchiveName => 'Live Music Archive';
 
   @override
   String get sourcePodcastRssDescription =>
@@ -1401,6 +1403,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcePodcastRssName => 'Podcasts';
+
+  @override
+  String get sourcePodcastCatalogName => 'Podcast directory';
+
+  @override
+  String get sourcePodcastCatalogDescription =>
+      'Search the open podcast directory of gpodder, newest episodes first';
+
+  @override
+  String get podcastCatalogHint =>
+      'Type a keyword to find podcasts, or leave it empty to browse the directory';
+
+  @override
+  String get podcastCatalogFieldQueryHint => 'e.g. jazz, history or technology';
+
+  @override
+  String get podcastCatalogNoMatch => 'No podcast found';
 
   @override
   String get sourceSubsonicDescription =>
@@ -1480,6 +1499,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radioProviderAll => 'All directories';
 
   @override
+  String get radioFieldCountry => 'Country or region';
+
+  @override
+  String get radioFieldCountryHint =>
+      'A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works';
+
+  @override
   String get radioFieldQuery => 'Station keyword';
 
   @override
@@ -1509,6 +1535,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wikimediaNoMatch => 'No playable audio found on Commons';
 
   @override
+  String get sourceFunkwhaleName => 'Federated music';
+
+  @override
+  String get sourceFunkwhaleDescription =>
+      'Music of a federated Funkwhale instance';
+
+  @override
+  String get funkwhaleHint =>
+      'Type the address of a Funkwhale instance; a token is only needed for a private library';
+
+  @override
+  String get funkwhaleFieldServerHint => 'e.g. https://open.audio';
+
+  @override
+  String get funkwhaleFieldToken => 'Access token';
+
+  @override
+  String get funkwhaleFieldTokenHint =>
+      'Only needed when the instance keeps its library private';
+
+  @override
+  String get funkwhaleFieldQueryHint => 'e.g. jazz, folk or electronic';
+
+  @override
+  String get funkwhaleEmptyResponse => 'Funkwhale returned an empty response';
+
+  @override
+  String get funkwhaleNoMatch => 'No matching tracks on Funkwhale';
+
+  @override
+  String get sourceAudiobookshelfName => 'Self-hosted audiobooks';
+
+  @override
+  String get sourceAudiobookshelfDescription =>
+      'Audiobooks of a self-hosted Audiobookshelf server';
+
+  @override
+  String get audiobookshelfHint =>
+      'Type the address and the token of your Audiobookshelf server';
+
+  @override
+  String get audiobookshelfFieldServerHint => 'e.g. http://localhost:13378';
+
+  @override
+  String get audiobookshelfFieldToken => 'Access token';
+
+  @override
+  String get audiobookshelfFieldTokenHint =>
+      'The API token of your Audiobookshelf account';
+
+  @override
+  String get audiobookshelfFieldQueryHint => 'e.g. history, novel or science';
+
+  @override
+  String get audiobookshelfEmptyResponse =>
+      'Audiobookshelf returned an empty response';
+
+  @override
+  String get audiobookshelfNoMatch => 'No audiobook found';
+
+  @override
+  String get sourcePlexName => 'Media library';
+
+  @override
+  String get sourcePlexDescription => 'Connect to a self-hosted Plex library';
+
+  @override
+  String get plexHint => 'Type the address of your Plex server and its token';
+
+  @override
+  String get plexFieldServerHint => 'e.g. http://localhost:32400';
+
+  @override
+  String get plexFieldToken => 'Access token';
+
+  @override
+  String get plexFieldTokenHint => 'The X-Plex-Token of your Plex account';
+
+  @override
+  String get plexNoMatch => 'No matching tracks on Plex';
+
+  @override
+  String plexInvalidAnswer(String error) {
+    return 'The answer of Plex cannot be read: $error';
+  }
+
+  @override
   String get sourceJellyfinDescription =>
       'Connect to a self-hosted Jellyfin library';
 
@@ -1534,6 +1647,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get jellyfinAuthFailed =>
       'Cannot reach the Jellyfin server, check the address and the account';
+
+  @override
+  String get sourceLibrivoxName => 'Audiobooks';
+
+  @override
+  String get sourceLibrivoxDescription =>
+      'Public-domain audiobooks read by LibriVox volunteers';
+
+  @override
+  String get librivoxHint =>
+      'Type a book or an author, or leave it empty to browse the most popular audiobooks';
+
+  @override
+  String get librivoxFieldQueryHint =>
+      'e.g. Alice in Wonderland, Dickens or fairy tales';
+
+  @override
+  String get librivoxNoMatch => 'No matching audiobooks';
+
+  @override
+  String get librivoxEmptyResponse => 'LibriVox returned an empty response';
+
+  @override
+  String librivoxInvalidFeed(String error) {
+    return 'The chapter list of a book cannot be read: $error';
+  }
+
+  @override
+  String get sourceEmbyName => 'Emby library';
+
+  @override
+  String get sourceEmbyDescription => 'Connect to a self-hosted Emby library';
+
+  @override
+  String get embyHint => 'Type the address and the account of your Emby server';
+
+  @override
+  String get embyFieldServerHint => 'e.g. http://localhost:8095';
+
+  @override
+  String get embyFieldUserHint => 'The login name of your Emby account';
+
+  @override
+  String get embyFieldPasswordHint => 'Used to obtain an access token';
+
+  @override
+  String get embyEmptyResponse => 'Emby returned an empty response';
+
+  @override
+  String get embyAuthFailed =>
+      'Cannot reach the Emby server, check the address and the account';
 
   @override
   String get audioSourceStreaming => 'Network';

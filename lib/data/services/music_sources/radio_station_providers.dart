@@ -38,11 +38,34 @@ class RadioBrowserProvider extends RadioStationProvider {
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
+    String? country,
   }) async {
     final trimmed = query.trim();
+    final code = country?.trim() ?? '';
     final stations = <RadioStation>[];
 
-    if (trimmed.isEmpty) {
+    if (code.isNotEmpty) {
+      stations.addAll(
+        await _read('/stations/search', {
+          'countrycode': code,
+          if (trimmed.isNotEmpty) 'name': trimmed,
+          'limit': '$limit',
+          'order': 'votes',
+          'reverse': 'true',
+        }),
+      );
+      if (trimmed.isNotEmpty) {
+        stations.addAll(
+          await _read('/stations/search', {
+            'countrycode': code,
+            'tagname': trimmed,
+            'limit': '$limit',
+            'order': 'votes',
+            'reverse': 'true',
+          }),
+        );
+      }
+    } else if (trimmed.isEmpty) {
       stations.addAll(await _read('/stations/topclick/$limit'));
     } else {
       final byName = await _read('/stations/search', {
@@ -172,6 +195,7 @@ class SomaFmProvider extends RadioStationProvider {
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
+    String? country,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
@@ -305,6 +329,7 @@ class RadioParadiseProvider extends RadioStationProvider {
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
+    String? country,
   }) async {
     final trimmed = query.trim().toLowerCase();
     final selected = _stations.entries

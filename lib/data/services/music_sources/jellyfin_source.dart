@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
-import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -16,14 +16,8 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(50, 200);
 
-  /// The name the server shows in its logs.
-  static const _clientName = 'Tune';
-
-  /// The version the server shows in its logs.
-  static const _clientVersion = '1.1.0';
-
-  /// A stable device id, so the server keeps the session of the app.
-  static const _deviceId = 'tune';
+  /// The addresses of a Jellyfin server carry no prefix.
+  static const _prefix = '';
 
   final Dio _dio;
 
@@ -179,7 +173,7 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
       final token = await _authenticate(config);
       if (token == null) return null;
       return song.copyWith(
-        streamUrl: streamUrlFor(server, id),
+        streamUrl: MediaServerItems.streamUrlFor(server, _prefix, id),
         httpHeaders: {'X-Emby-Token': token},
       );
     } catch (_) {
@@ -218,68 +212,44 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The header the Jellyfin API expects on every request.
-  static String get authorizationHeader =>
-      'MediaBrowser Client="$_clientName", Device="$_clientName", '
-      'DeviceId="$_deviceId", Version="$_clientVersion"';
+  static String get authorizationHeader => MediaServerItems.authorizationHeader;
 
   /// The server address without a trailing slash.
   ///
-  /// A bare host is accepted, because the address of a self hosted server is
-  /// often typed as `192.168.1.10:8096` and plain HTTP is the default there.
-  static String? normalizeServer(String? raw) {
-    final trimmed = raw?.trim() ?? '';
-    if (trimmed.isEmpty) return null;
-
-    final withScheme = trimmed.contains('://') ? trimmed : 'http://$trimmed';
-    final server = withScheme.replaceFirst(RegExp(r'/+$'), '');
-    final uri = Uri.tryParse(server);
-    if (uri == null || uri.host.isEmpty) return null;
-    return server;
-  }
+  /// A bare host is accepted, because the address of a self-hosted server
+  /// is often typed as `192.168.1.10:8096` and plain HTTP is the default
+  /// there.
+  static String? normalizeServer(String? raw) =>
+      MediaServerItems.trimServerAddress(raw);
 
   /// The token of an answered login.
-  static String? parseToken(Map<String, dynamic>? data) {
-    final token = data?['AccessToken']?.toString().trim() ?? '';
-    return token.isEmpty ? null : token;
-  }
+  static String? parseToken(Map<String, dynamic>? data) =>
+      MediaServerItems.parseToken(data);
 
   /// The lyrics of a track.
   ///
   /// Older servers answer with a single text, newer ones with a list of
   /// texts that carry their language.
-  static String? parseLyrics(Map<String, dynamic>? data) {
-    if (data == null) return null;
-
-    final raw = data['Lyrics'];
-    if (raw is String) {
-      final text = raw.trim();
-      return text.isEmpty ? null : text;
-    }
-    if (raw is! List) return null;
-
-    final parts = <String>[];
-    for (final item in raw) {
-      final text = item is String
-          ? item.trim()
-          : (item is Map ? item['Text']?.toString().trim() ?? '' : '');
-      if (text.isNotEmpty) parts.add(text);
-    }
-    return parts.isEmpty ? null : parts.join('\n');
-  }
+  static String? parseLyrics(Map<String, dynamic>? data) =>
+      MediaServerItems.parseLyrics(data);
 
   /// The playable address of a track.
   static String streamUrlFor(String server, String itemId) =>
-      '$server/Audio/${Uri.encodeComponent(itemId)}/stream?static=true';
+      MediaServerItems.streamUrlFor(server, _prefix, itemId);
 
   /// The cover of a track.
   ///
-  /// The player loads the cover without the headers of the song, so the token
-  /// travels in the query of the address.
-  static String artworkUrlFor(String server, String itemId, {String? token}) {
-    final base = '$server/Items/${Uri.encodeComponent(itemId)}/Images/Primary';
-    if (token == null || token.isEmpty) return base;
-    return '$base?api_key=${Uri.encodeComponent(token)}';
-  }
+  /// The player loads the cover without the headers of the song, so the
+  /// token travels in the query of the address.
+  static String artworkUrlFor(String server, String itemId, {String? token}) =>
+      MediaServerItems.artworkUrlFor(server, _prefix, itemId, token: token);
+
+  /// The length of a track in milliseconds.
+  ///
+  /// The server counts time in ticks of 100 nanoseconds, so a tick is a
+  /// hundredth of a millisecond.
+  static int durationFromTicks(Object? raw) =>
+      MediaServerItems.durationFromTicks(raw);
 
   /// Kept static so JSON mapping can be tested without network access.
   static List<Song> parseItems(
@@ -289,126 +259,13 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
     String? token,
     int limit = 50,
   }) {
-    final rawItems = data['Items'];
-    if (rawItems is! List) return const [];
-
-    final songs = <Song>[];
-    final seen = <String>{};
-    for (final raw in rawItems) {
-      if (raw is! Map) continue;
-      if (songs.length >= limit) break;
-
-      final id = raw['Id']?.toString() ?? '';
-      final title = raw['Name']?.toString().trim() ?? '';
-      if (id.isEmpty || title.isEmpty || !seen.add(id)) continue;
-
-      final media = _mediaSource(raw);
-      final genres = _genresOf(raw);
-      songs.add(
-        SourceSongFactory.create(
-          sourceId: sourceId,
-          externalId: id,
-          title: title,
-          artist: _artistOf(raw),
-          album: raw['Album']?.toString() ?? '',
-          duration: durationFromTicks(raw['RunTimeTicks']),
-          streamUrl: streamUrlFor(server, id),
-          artworkUrl: artworkUrlFor(server, id, token: token),
-          genre: genres?.first,
-          genres: genres,
-          year: _yearOf(raw),
-          bitrate: _kbpsOf(raw, media),
-          sampleRate: _khzOf(raw, media),
-          trackNumber: _positiveInt(raw['IndexNumber']),
-          discNumber: _positiveInt(raw['ParentIndexNumber']),
-          size: _sizeOf(media),
-          httpHeaders: token == null || token.isEmpty
-              ? null
-              : {'X-Emby-Token': token},
-        ),
-      );
-    }
-    return songs;
-  }
-
-  /// The file behind a track, which holds the technical details.
-  static Map<dynamic, dynamic> _mediaSource(Map<dynamic, dynamic> raw) {
-    final sources = raw['MediaSources'];
-    if (sources is! List || sources.isEmpty) return const {};
-    final first = sources.first;
-    return first is Map ? first : const {};
-  }
-
-  /// The artist of a track.
-  ///
-  /// The album artist names the band, the list of artists names the guests,
-  /// so the album artist is the better choice.
-  static String _artistOf(Map<dynamic, dynamic> raw) {
-    final albumArtist = raw['AlbumArtist']?.toString().trim() ?? '';
-    if (albumArtist.isNotEmpty) return albumArtist;
-
-    final artists = raw['Artists'];
-    if (artists is List) {
-      for (final artist in artists) {
-        final name = artist?.toString().trim() ?? '';
-        if (name.isNotEmpty) return name;
-      }
-    }
-    return '';
-  }
-
-  static List<String>? _genresOf(Map<dynamic, dynamic> raw) {
-    final genres = raw['Genres'];
-    if (genres is! List) return null;
-
-    final names = genres
-        .map((genre) => genre?.toString().trim() ?? '')
-        .where((genre) => genre.isNotEmpty)
-        .toList(growable: false);
-    return names.isEmpty ? null : names;
-  }
-
-  static int? _yearOf(Map<dynamic, dynamic> raw) {
-    final year = SourceSongFactory.parseInt(
-      raw['Year'] ?? raw['ProductionYear'],
+    return MediaServerItems.parseItems(
+      data,
+      sourceId: sourceId,
+      server: server,
+      prefix: _prefix,
+      token: token,
+      limit: limit,
     );
-    return year > 0 ? year : null;
-  }
-
-  /// The bitrate in kbit/s.
-  ///
-  /// The server counts bits per second, the library stores kilobits.
-  static int? _kbpsOf(Map<dynamic, dynamic> raw, Map<dynamic, dynamic> media) {
-    final bitrate = SourceSongFactory.parseInt(
-      raw['Bitrate'] ?? media['Bitrate'],
-    );
-    return bitrate > 0 ? bitrate ~/ 1000 : null;
-  }
-
-  /// The sample rate in kHz.
-  static int? _khzOf(Map<dynamic, dynamic> raw, Map<dynamic, dynamic> media) {
-    final rate = SourceSongFactory.parseInt(
-      raw['SampleRate'] ?? media['SampleRate'],
-    );
-    return rate > 0 ? rate ~/ 1000 : null;
-  }
-
-  /// The length of a track in milliseconds.
-  ///
-  /// The server counts time in ticks of 100 nanoseconds, so a tick is a
-  /// hundredth of a millisecond.
-  static int durationFromTicks(Object? raw) {
-    final ticks = SourceSongFactory.parseInt(raw);
-    return ticks > 0 ? ticks ~/ 10000 : 0;
-  }
-
-  static int? _positiveInt(Object? raw) {
-    final value = SourceSongFactory.parseInt(raw);
-    return value > 0 ? value : null;
-  }
-
-  static int? _sizeOf(Map<dynamic, dynamic> media) {
-    final size = SourceSongFactory.parseInt(media['Size']);
-    return size > 0 ? size : null;
   }
 }

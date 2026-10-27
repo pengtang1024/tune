@@ -59,6 +59,11 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'country',
+      AppStrings.instance.radioFieldCountry,
+      AppStrings.instance.radioFieldCountryHint,
+    ),
+    MusicSourceField(
       'query',
       AppStrings.instance.radioFieldQuery,
       AppStrings.instance.radioFieldQueryHint,
@@ -80,6 +85,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query') ?? '';
+    final country = request.config.setting('country');
     final limit = scanLimit.read(request.config.setting('limit'));
     final selected = _selectedProviders(request.config);
 
@@ -88,7 +94,9 @@ class RadioSourceAdapter extends MusicSourceAdapter {
 
     for (final provider in selected) {
       try {
-        stations.addAll(await provider.fetch(query: query, limit: limit));
+        stations.addAll(
+          await provider.fetch(query: query, limit: limit, country: country),
+        );
       } catch (error) {
         failures.add(error);
       }

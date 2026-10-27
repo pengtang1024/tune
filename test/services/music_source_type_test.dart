@@ -68,13 +68,18 @@ void main() {
     });
 
     test('the built-in sources are marked as built-in', () {
+      final types = SourceTypeCatalogue.byType(AppStrings.instance);
       for (final source in BuiltInMusicSources.defaults) {
         expect(
           source.builtIn,
           isTrue,
           reason: '${source.id} comes with the app',
         );
-        expect(source.sourceType, source.id);
+        expect(
+          types.containsKey(source.sourceType),
+          isTrue,
+          reason: '${source.id} belongs to a type the app knows',
+        );
       }
     });
   });
@@ -180,7 +185,8 @@ void main() {
         expect(
           catalogue.containsKey(adapter.sourceType),
           isTrue,
-          reason: '${adapter.sourceType} is served but the catalogue does not name it',
+          reason:
+              '${adapter.sourceType} is served but the catalogue does not name it',
         );
       }
     });
@@ -195,26 +201,11 @@ void main() {
 
       // The local folder is a setting of the app, not an instance the reader
       // adds.
-      expect(
-        addable.where((type) => type.type == 'local'),
-        isEmpty,
-      );
-      expect(
-        addable.where((type) => type.type == 'direct_url'),
-        hasLength(1),
-      );
-      expect(
-        addable.where((type) => type.type == 'm3u'),
-        hasLength(1),
-      );
-      expect(
-        addable.where((type) => type.type == 'json_api'),
-        hasLength(1),
-      );
-      expect(
-        addable.where((type) => type.type == 'graphql'),
-        hasLength(1),
-      );
+      expect(addable.where((type) => type.type == 'local'), isEmpty);
+      expect(addable.where((type) => type.type == 'direct_url'), hasLength(1));
+      expect(addable.where((type) => type.type == 'm3u'), hasLength(1));
+      expect(addable.where((type) => type.type == 'json_api'), hasLength(1));
+      expect(addable.where((type) => type.type == 'graphql'), hasLength(1));
     });
   });
 
@@ -242,17 +233,12 @@ void main() {
         );
       }
 
-      for (final id in [
-        'itunes',
-        'podcast_rss',
-        'netease',
-        'subsonic',
-        'jellyfin',
-      ]) {
+      for (final id in ['podcast_rss', 'subsonic', 'jellyfin', 'plex']) {
         expect(
           service.isFeatured(_builtIn(id)),
           isFalse,
-          reason: '$id needs a key or a decision, so it waits in the folded group',
+          reason:
+              '$id needs a key or a decision, so it waits in the folded group',
         );
       }
     });

@@ -11,10 +11,17 @@ const List<String> properNames = [
   'Internet Archive',
   'ccMixter',
   'iTunes',
+  'Deezer',
   'Audius',
   'Wikimedia Commons',
   'Subsonic',
   'Jellyfin',
+  'Emby',
+  'Plex',
+  'SoundCloud',
+  'Funkwhale',
+  'Audiobookshelf',
+  'LibriVox',
   'SomaFM',
   'Radio Browser',
   'Radio Paradise',
@@ -51,4 +58,3 @@ const List<String> formatNames = [
   'WEBA',
   'WMA',
 ];
-

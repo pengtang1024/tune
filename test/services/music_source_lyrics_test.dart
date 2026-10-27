@@ -9,7 +9,6 @@ import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
-import 'package:tune/data/services/music_sources/netease_cloud_music_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -83,35 +82,6 @@ void main() {
     test('answers an empty answer with no sheet', () {
       expect(LrclibLyricsProvider.pickLyrics(const [], 100000), isNull);
       expect(LrclibLyricsProvider.pickLyrics(['not a map'], 100000), isNull);
-    });
-  });
-
-  group('Netease lyrics', () {
-    test('prefers the timed sheet', () {
-      final lyrics = NeteaseCloudMusicSourceAdapter.parseLyrics({
-        'lrc': {'lyric': '[00:00] plain'},
-        'tlyric': {'lyric': '[00:00] timed'},
-      });
-
-      expect(lyrics, '[00:00] timed');
-    });
-
-    test('falls back to the plain text', () {
-      final lyrics = NeteaseCloudMusicSourceAdapter.parseLyrics({
-        'lrc': {'lyric': '  [00:00] plain  '},
-      });
-
-      expect(lyrics, '[00:00] plain');
-    });
-
-    test('answers an empty answer with no text', () {
-      expect(NeteaseCloudMusicSourceAdapter.parseLyrics(const {}), isNull);
-      expect(
-        NeteaseCloudMusicSourceAdapter.parseLyrics({
-          'lrc': {'lyric': ' '},
-        }),
-        isNull,
-      );
     });
   });
 
