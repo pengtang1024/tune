@@ -40,6 +40,29 @@ class TasteProfile {
 
   static const empty = TasteProfile();
 
+  /// Builds a profile from weights that were already counted.
+  ///
+  /// A library of a hundred thousand tracks is counted by the database; the
+  /// profile only normalizes the totals, so the page never loads every track
+  /// to learn the same numbers.
+  factory TasteProfile.fromWeights({
+    Map<String, double> artists = const {},
+    Map<String, double> genres = const {},
+    Map<int, double> decades = const {},
+    Map<String, double> albums = const {},
+    int favoriteCount = 0,
+    int listenCount = 0,
+  }) {
+    return TasteProfile(
+      artists: _normalize(artists),
+      genres: _normalize(genres),
+      decades: _normalizeDecades(decades),
+      albums: _normalize(albums),
+      favoriteCount: favoriteCount,
+      listenCount: listenCount,
+    );
+  }
+
   factory TasteProfile.from({
     required List<Song> library,
     required Set<String> favoriteUris,

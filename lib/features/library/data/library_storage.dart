@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 
 /// The library of the app, as the songs it holds.
 ///
@@ -24,6 +25,9 @@ abstract class LibraryStorage {
 
   /// Removes the tracks of one source.
   Future<void> removeSource(String sourceId);
+
+  /// The counts a taste profile needs, without loading every track.
+  Future<TasteAggregates> tasteAggregates();
 
   /// Drops the least valuable tracks of every remote source beyond [limit].
   ///

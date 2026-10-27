@@ -35,6 +35,8 @@ class AppDatabase {
         artist TEXT,
         album TEXT,
         date_added INTEGER,
+        year INTEGER,
+        genre TEXT,
         json TEXT NOT NULL,
         pinned INTEGER NOT NULL DEFAULT 0,
         last_seen INTEGER NOT NULL DEFAULT 0,
@@ -86,6 +88,8 @@ class AppDatabase {
       'last_seen': 'last_seen INTEGER NOT NULL DEFAULT 0',
       'last_played': 'last_played INTEGER',
       'play_count': 'play_count INTEGER NOT NULL DEFAULT 0',
+      'year': 'year INTEGER',
+      'genre': 'genre TEXT',
     };
     for (final entry in additions.entries) {
       if (columns.contains(entry.key)) continue;
@@ -122,14 +126,17 @@ class AppDatabase {
       // and the play count belong to the player and are left alone.
       final statement = _db.prepare('''
         INSERT INTO songs
-          (uri, source_id, title, artist, album, date_added, json, pinned, last_seen)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (uri, source_id, title, artist, album, date_added, year, genre,
+           json, pinned, last_seen)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
           artist = excluded.artist,
           album = excluded.album,
           date_added = excluded.date_added,
+          year = excluded.year,
+          genre = excluded.genre,
           json = excluded.json,
           pinned = excluded.pinned,
           last_seen = excluded.last_seen
@@ -143,6 +150,8 @@ class AppDatabase {
             song.artist,
             song.album,
             song.dateAdded,
+            song.year,
+            song.genre,
             jsonEncode(song.toJson()),
             pinned.contains(song.uri) ? 1 : 0,
             seenAt,
@@ -221,6 +230,62 @@ class AppDatabase {
   /// Removes the tracks of one source.
   void removeSource(String sourceId) {
     _db.execute('DELETE FROM songs WHERE source_id = ?', [sourceId]);
+  }
+
+  /// The artists of the marked tracks, with how many marks each one holds.
+  Map<String, int> favoriteArtistCounts() =>
+      _counts('artist', 'artist != \'\'');
+
+  /// The genres of the marked tracks.
+  Map<String, int> favoriteGenreCounts() =>
+      _counts('genre', 'genre IS NOT NULL AND genre != \'\'');
+
+  /// The albums of the marked tracks.
+  Map<String, int> favoriteAlbumCounts() =>
+      _counts('album', 'album != \'\'');
+
+  /// The decades of the marked tracks.
+  Map<int, int> favoriteDecadeCounts() {
+    final rows = _db.select('''
+      SELECT (year / 10) * 10 AS decade, COUNT(*) AS count
+      FROM songs s JOIN favorites f ON f.uri = s.uri
+      WHERE year > 0
+      GROUP BY decade
+    ''');
+    return {
+      for (final row in rows) row['decade'] as int: row['count'] as int,
+    };
+  }
+
+  Map<String, int> _counts(String column, String where) {
+    final rows = _db.select('''
+      SELECT $column AS key, COUNT(*) AS count
+      FROM songs s JOIN favorites f ON f.uri = s.uri
+      WHERE $where
+      GROUP BY $column
+    ''');
+    return {
+      for (final row in rows) row['key'] as String: row['count'] as int,
+    };
+  }
+
+  /// The rows the listening aggregates point at, for the taste profile.
+  List<TrackSignalRow> listeningRows() {
+    final rows = _db.select('''
+      SELECT s.artist AS artist, s.genre AS genre, s.year AS year,
+             s.album AS album, l.json AS signal
+      FROM songs s JOIN listening_signals l ON l.uri = s.uri
+    ''');
+    return [
+      for (final row in rows)
+        TrackSignalRow(
+          artist: row['artist'] as String? ?? '',
+          genre: row['genre'] as String? ?? '',
+          year: row['year'] as int? ?? 0,
+          album: row['album'] as String? ?? '',
+          signal: jsonDecode(row['signal'] as String) as Map<String, dynamic>,
+        ),
+    ];
   }
 
   /// The tracks the reader marked with a heart.
@@ -372,4 +437,22 @@ class AppDatabase {
   }
 
   void close() => _db.close();
+}
+
+
+/// One row of the listening aggregates, joined with the facts of its track.
+class TrackSignalRow {
+  final String artist;
+  final String genre;
+  final int year;
+  final String album;
+  final Map<String, dynamic> signal;
+
+  const TrackSignalRow({
+    required this.artist,
+    required this.genre,
+    required this.year,
+    required this.album,
+    required this.signal,
+  });
 }
