@@ -39,6 +39,7 @@ class RadioBrowserProvider extends RadioStationProvider {
     required String query,
     required int limit,
     String? country,
+    int offset = 0,
   }) async {
     final trimmed = query.trim();
     final code = country?.trim() ?? '';
@@ -50,6 +51,7 @@ class RadioBrowserProvider extends RadioStationProvider {
           'countrycode': code,
           if (trimmed.isNotEmpty) 'name': trimmed,
           'limit': '$limit',
+          if (offset > 0) 'offset': '$offset',
           'order': 'votes',
           'reverse': 'true',
         }),
@@ -60,23 +62,30 @@ class RadioBrowserProvider extends RadioStationProvider {
             'countrycode': code,
             'tagname': trimmed,
             'limit': '$limit',
+            if (offset > 0) 'offset': '$offset',
             'order': 'votes',
             'reverse': 'true',
           }),
         );
       }
     } else if (trimmed.isEmpty) {
-      stations.addAll(await _read('/stations/topclick/$limit'));
+      stations.addAll(
+        await _read('/stations/topclick/$limit', {
+          if (offset > 0) 'offset': '$offset',
+        }),
+      );
     } else {
       final byName = await _read('/stations/search', {
         'name': trimmed,
         'limit': '$limit',
+        if (offset > 0) 'offset': '$offset',
         'order': 'votes',
         'reverse': 'true',
       });
       final byTag = await _read('/stations/search', {
         'tagname': trimmed,
         'limit': '$limit',
+        if (offset > 0) 'offset': '$offset',
         'order': 'votes',
         'reverse': 'true',
       });
@@ -196,6 +205,7 @@ class SomaFmProvider extends RadioStationProvider {
     required String query,
     required int limit,
     String? country,
+    int offset = 0,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
@@ -330,6 +340,7 @@ class RadioParadiseProvider extends RadioStationProvider {
     required String query,
     required int limit,
     String? country,
+    int offset = 0,
   }) async {
     final trimmed = query.trim().toLowerCase();
     final selected = _stations.entries

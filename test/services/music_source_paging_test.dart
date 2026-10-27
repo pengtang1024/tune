@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/ccmixter_source.dart';
+import 'package:tune/data/services/music_sources/funkwhale_source.dart';
+import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/librivox_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -56,11 +59,48 @@ void main() {
       expect(captured.uris.first.queryParameters['offset'], '8');
     });
 
+    test('ccMixter passes the offset to the query', () async {
+      final captured = _Captured(body: '[]');
+
+      await CcMixterSourceAdapter(
+        dio: captured.dio,
+      ).scan(_request('ccmixter', offset: 20));
+
+      expect(captured.uri?.queryParameters['offset'], '20');
+    });
+
+    test('Funkwhale asks for the page of the offset', () async {
+      final captured = _Captured(body: {'results': <dynamic>[]});
+
+      await FunkwhaleSourceAdapter(dio: captured.dio).scan(
+        _request(
+          'funkwhale',
+          offset: 20,
+          settings: {'server': 'https://fw.example'},
+        ),
+      );
+
+      expect(captured.uri?.queryParameters['page'], '2');
+    });
+
+    test('Radio Browser passes the offset through', () async {
+      final captured = _Captured(body: <dynamic>[]);
+
+      await RadioSourceAdapter(
+        dio: captured.dio,
+      ).scan(_request('radio', offset: 20, settings: {'provider': 'browser'}));
+
+      expect(captured.uri?.queryParameters['offset'], '20');
+    });
+
     test('a source without pages says so', () {
       expect(OpenverseSourceAdapter().supportsPaging, isTrue);
       expect(AudiusSourceAdapter().supportsPaging, isTrue);
       expect(InternetArchiveSourceAdapter().supportsPaging, isTrue);
       expect(LibrivoxSourceAdapter().supportsPaging, isTrue);
+      expect(CcMixterSourceAdapter().supportsPaging, isTrue);
+      expect(FunkwhaleSourceAdapter().supportsPaging, isTrue);
+      expect(RadioSourceAdapter().supportsPaging, isTrue);
     });
   });
 }

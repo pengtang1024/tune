@@ -2,6 +2,15 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
+## [1.9.0] - 2026-10-27
+
+### 新增
+
+- **分页扩展到更多音源**：ccMixter、Funkwhale、Radio Browser 也能「加载更多」。
+  现在支持分页的源共 7 个：Openverse、Audius、Internet Archive、LibriVox、
+  ccMixter、Funkwhale、Radio Browser。
+- Radio Browser 的分页对浏览、关键词与国家筛选三种路径都生效。
+
 ## [1.8.0] - 2026-10-27
 
 ### 新增
