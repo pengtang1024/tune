@@ -328,8 +328,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     }
   }
 
-  /// Successful sources replace their previous songs. Failed or skipped
-  /// sources keep their cached songs instead of disappearing from the library.
+  /// A successful scan adds its songs to the library instead of replacing
+  /// what the source brought before. A window of 8–50 tracks would otherwise
+  /// throw away every track the reader had already seen, and the library is
+  /// an index of what the reader has met, not a copy of the last answer.
+  /// Failed or skipped sources keep their cached songs as well.
   /// Whether two libraries hold the same tracks with the same facts.
   ///
   /// A scan builds new [Song] objects on every pass, so the objects cannot be
@@ -358,9 +361,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     final merged = <Song>[];
     for (final result in results) {
-      if (result.shouldKeepPreviousSongs) {
-        merged.addAll(previousBySource[result.sourceId] ?? const []);
-      } else {
+      final previous = previousBySource[result.sourceId] ?? const <Song>[];
+      // The songs the source brought before stay, and the new window joins
+      // them. A track that is in both keeps the time it first entered.
+      merged.addAll(previous);
+      if (!result.shouldKeepPreviousSongs) {
         merged.addAll(
           result.songs.map(
             (song) => _keepFirstSeen(song, previousByUri[song.uri]),

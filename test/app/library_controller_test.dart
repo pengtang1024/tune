@@ -73,7 +73,7 @@ void main() {
     expect(state.statusMessage, '1 首歌曲');
   });
 
-  test('scan replaces the library and persists sorted songs', () async {
+  test('scan adds to the library and persists sorted songs', () async {
     await container.read(libraryControllerProvider.future);
     scanner.songs = [songC, songB];
 
@@ -85,9 +85,10 @@ void main() {
     final state = container.read(libraryControllerProvider).requireValue;
     expect(scanner.lastPaths, ['/music']);
     expect(state.scanStatus, LibraryScanStatus.completed);
-    expect(state.songs.map((song) => song.title), ['Beta', 'Gamma']);
-    expect(state.statusMessage, '已扫描 2 首歌曲');
-    expect(storage.songs.map((song) => song.title), ['Beta', 'Gamma']);
+    // The scanned window joins the persisted library instead of replacing it.
+    expect(state.songs.map((song) => song.title), ['Alpha', 'Beta', 'Gamma']);
+    expect(state.statusMessage, '已扫描 3 首歌曲');
+    expect(storage.songs.map((song) => song.title), ['Alpha', 'Beta', 'Gamma']);
     expect(storage.saveCount, 1);
   });
 
@@ -102,7 +103,7 @@ void main() {
     expect(scanner.scanCount, 1);
     expect(scanner.lastPaths, ['/music']);
     final state = container.read(libraryControllerProvider).requireValue;
-    expect(state.songs.map((song) => song.uri), [songB.uri]);
+    expect(state.songs.map((song) => song.uri), [songA.uri, songB.uri]);
   });
 
   test('scan marks the source timestamp after saving songs', () async {
@@ -145,7 +146,7 @@ void main() {
     await first;
 
     final state = container.read(libraryControllerProvider).requireValue;
-    expect(state.songs.map((song) => song.uri), [songB.uri]);
+    expect(state.songs.map((song) => song.uri), [songA.uri, songB.uri]);
   });
 
   test('clearing the library discards a pending scan result', () async {
