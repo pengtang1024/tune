@@ -80,6 +80,12 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     ),
   ];
 
+  /// Only the search stream knows where the next window starts; the category
+  /// stream walks a list with a continuation token, which an offset cannot
+  /// name.
+  @override
+  bool get supportsPaging => true;
+
   @override
   Duration get autoScanInterval => const Duration(hours: 6);
 
@@ -88,9 +94,18 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
 
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
+    final keyword = request.config.setting('query');
+    if (request.offset > 0 && keyword == null) {
+      // The category walk answers with a continuation token, not an offset,
+      // so a later window cannot be named here.
+      return SourceScanResult(
+        sourceId: request.config.id,
+        status: SourceScanStatus.success,
+      );
+    }
+
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
-      final keyword = request.config.setting('query');
       final response = await _dio.get<Map<String, dynamic>>(
         _apiHost,
         queryParameters: keyword == null
@@ -113,6 +128,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'gsrsearch': searchTerm(keyword),
                 'gsrnamespace': _fileNamespace,
                 'gsrlimit': limit,
+                if (request.offset > 0) 'gsroffset': request.offset,
                 'prop': 'imageinfo',
                 'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
               },
