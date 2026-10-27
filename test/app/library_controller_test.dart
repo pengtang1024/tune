@@ -9,6 +9,7 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -262,6 +263,9 @@ class FakeLibraryStorage extends LibraryStorage {
         .where((song) => (song.sourceId ?? 'local') != sourceId)
         .toList();
   }
+
+  @override
+  Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
 
   @override
   Future<List<String>> prune(int limit) async => const [];

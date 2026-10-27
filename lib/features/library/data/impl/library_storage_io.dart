@@ -4,6 +4,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/taste_aggregates.dart';
+import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/library/data/library_document.dart';
 import 'package:tune/features/library/data/library_storage.dart';
@@ -99,6 +101,9 @@ class FileLibraryStorage implements LibraryStorage {
         .toList(growable: false);
     await save(kept);
   }
+
+  @override
+  Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
 
   @override
   Future<List<String>> prune(int limit) async => const [];
@@ -254,6 +259,32 @@ class SqliteLibraryStorage implements LibraryStorage {
       (await _db()).removeSource(sourceId);
     } catch (error, stackTrace) {
       Log.error('移除音源曲目失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<TasteAggregates> tasteAggregates() async {
+    try {
+      final database = await _db();
+      return TasteAggregates(
+        artists: database.favoriteArtistCounts(),
+        genres: database.favoriteGenreCounts(),
+        albums: database.favoriteAlbumCounts(),
+        decades: database.favoriteDecadeCounts(),
+        signals: [
+          for (final row in database.listeningRows())
+            TasteSignalRow(
+              artist: row.artist,
+              genre: row.genre,
+              album: row.album,
+              year: row.year,
+              signal: TrackListening.fromJson(row.signal),
+            ),
+        ],
+      );
+    } catch (error, stackTrace) {
+      Log.error('读取口味聚合失败: $error\n$stackTrace');
+      return TasteAggregates.empty;
     }
   }
 

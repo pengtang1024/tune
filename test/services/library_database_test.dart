@@ -67,6 +67,39 @@ void main() {
       expect(database.count(), 1);
     });
 
+    test('the marked tracks are grouped for the taste profile', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        Song(
+          id: 1,
+          title: 'A',
+          artist: 'Artist A',
+          uri: 'tune://openverse/1',
+          sourceId: 'openverse',
+          year: 1990,
+          genre: 'rock',
+        ),
+        Song(
+          id: 2,
+          title: 'B',
+          artist: 'Artist B',
+          uri: 'tune://openverse/2',
+          sourceId: 'openverse',
+          year: 2001,
+          genre: 'jazz',
+        ),
+      ]);
+      database.saveFavorites({'tune://openverse/1', 'tune://openverse/2'});
+
+      expect(database.favoriteArtistCounts(), {
+        'Artist A': 1,
+        'Artist B': 1,
+      });
+      expect(database.favoriteGenreCounts(), {'rock': 1, 'jazz': 1});
+      expect(database.favoriteDecadeCounts(), {1990: 1, 2000: 1});
+    });
+
     test('a limit of zero keeps everything', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);

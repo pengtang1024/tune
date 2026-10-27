@@ -1,5 +1,6 @@
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 
 /// The library storage of a build without a file system.
@@ -28,6 +29,9 @@ class EmptyLibraryStorage implements LibraryStorage {
 
   @override
   Future<void> removeSource(String sourceId) async {}
+
+  @override
+  Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
 
   @override
   Future<List<String>> prune(int limit) async => const [];

@@ -7,6 +7,7 @@ import 'package:tune/features/discovery/domain/discovery_state.dart';
 import 'package:tune/features/discovery/domain/recommendation_reason.dart';
 import 'package:tune/features/discovery/domain/recommended_track.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
+import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/discovery/domain/taste_profile.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -24,6 +25,7 @@ typedef _LibrarySnapshot = ({
   bool hasValue,
   bool hasError,
   List<Song> songs,
+  int total,
 });
 
 final discoveryControllerProvider =
@@ -114,7 +116,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       uri: now,
     };
     await _feedbackStore?.write(_feedback);
-    _recompute();
+    await _recompute();
   }
 
   /// Takes one mark away, for example when the reader undoes a dismissal.
@@ -122,7 +124,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     if (!_feedback.containsKey(uri)) return;
     _feedback = {..._feedback}..remove(uri);
     await _feedbackStore?.write(_feedback);
-    _recompute();
+    await _recompute();
   }
 
   /// Shows less of a whole artist for the same thirty days.
@@ -132,7 +134,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     if (_artistFeedback.containsKey(key)) return;
     _artistFeedback = {..._artistFeedback, key: DateTime.now()};
     await _artistFeedbackStore?.dismiss(key);
-    _recompute();
+    await _recompute();
   }
 
   Future<void> forgetArtistDismissal(String artist) async {
@@ -140,7 +142,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     if (!_artistFeedback.containsKey(key)) return;
     _artistFeedback = {..._artistFeedback}..remove(key);
     await _artistFeedbackStore?.remove(key);
-    _recompute();
+    await _recompute();
   }
 
   /// Removes every mark and every listen the page kept.
@@ -152,7 +154,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     await _feedbackStore?.clear();
     await _artistFeedbackStore?.clear();
     await ref.read(listeningSignalStoreProvider).clear();
-    _recompute();
+    await _recompute();
   }
 
   /// Looks for more tracks of [artist] in the enabled online sources.
@@ -231,7 +233,7 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
       return DiscoveryOnlineResult.failed;
     } finally {
       _setFinding({..._finding}..remove(artist));
-      if (!_disposed) _recompute();
+      if (!_disposed) await _recompute();
     }
   }
 
@@ -257,32 +259,32 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
         : const {};
   }
 
-  void _recompute() {
+  Future<void> _recompute() async {
     if (_disposed) return;
     _refreshListening();
-    state = AsyncData(
-      _compute(
-        library: _snapshotOf(ref.read(libraryControllerProvider)),
-        favoriteUris: ref.read(favoritesControllerProvider).ids,
-        sourceOrder: _sourceOrderOf(
-          _sourceOrderKeyOf(ref.read(musicSourcesControllerProvider)),
-        ),
-        queuedUris: {
-          for (final song in ref.read(playbackControllerProvider).queue)
-            song.uri,
-        },
-        sourceHealth: ref.read(sourceHealthScoresProvider),
+    final next = await _compute(
+      library: _snapshotOf(ref.read(libraryControllerProvider)),
+      favoriteUris: ref.read(favoritesControllerProvider).ids,
+      sourceOrder: _sourceOrderOf(
+        _sourceOrderKeyOf(ref.read(musicSourcesControllerProvider)),
       ),
+      queuedUris: {
+        for (final song in ref.read(playbackControllerProvider).queue)
+          song.uri,
+      },
+      sourceHealth: ref.read(sourceHealthScoresProvider),
     );
+    if (_disposed) return;
+    state = AsyncData(next);
   }
 
-  DiscoveryState _compute({
+  Future<DiscoveryState> _compute({
     required _LibrarySnapshot library,
     required Set<String> favoriteUris,
     required List<String> sourceOrder,
     required Set<String> queuedUris,
     required Map<String, double> sourceHealth,
-  }) {
+  }) async {
     if (library.isLoading && !library.hasValue) {
       return const DiscoveryState(isLoading: true);
     }
@@ -302,12 +304,21 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     }
 
     try {
-      final profile = TasteProfile.from(
-        library: songs,
-        favoriteUris: favoriteUris,
-        listening: _listening,
-        now: now,
-      );
+      // A library larger than the window is counted by the database; the
+      // tracks on the page still come from the window, but the taste of the
+      // reader is read from every track that was ever stored.
+      final profile = library.total > songs.length
+          ? _profileFromAggregates(
+              await ref.read(libraryStorageProvider).tasteAggregates(),
+              now: now,
+              favoriteCount: favoriteUris.length,
+            )
+          : TasteProfile.from(
+              library: songs,
+              favoriteUris: favoriteUris,
+              listening: _listening,
+              now: now,
+            );
       final output = ref
           .read(recommendationEngineProvider)
           .recommend(
@@ -363,12 +374,105 @@ class DiscoveryController extends AutoDisposeAsyncNotifier<DiscoveryState> {
     return visible;
   }
 
+  /// Builds the profile from the counts the database already grouped.
+  TasteProfile _profileFromAggregates(
+    TasteAggregates aggregates, {
+    required DateTime now,
+    required int favoriteCount,
+  }) {
+    final artists = <String, double>{};
+    final genres = <String, double>{};
+    final decades = <int, double>{};
+    final albums = <String, double>{};
+
+    for (final entry in aggregates.artists.entries) {
+      final key = normalizeTasteKey(entry.key);
+      if (key.isEmpty || isGenericArtistKey(key)) continue;
+      artists.update(
+        key,
+        (value) => value + entry.value * 3,
+        ifAbsent: () => entry.value * 3,
+      );
+    }
+    for (final entry in aggregates.genres.entries) {
+      final key = normalizeTasteKey(entry.key);
+      if (key.isEmpty || isGenericGenreKey(key)) continue;
+      genres.update(
+        key,
+        (value) => value + entry.value * 1.5,
+        ifAbsent: () => entry.value * 1.5,
+      );
+    }
+    for (final entry in aggregates.albums.entries) {
+      final key = normalizeTasteKey(entry.key);
+      if (key.isEmpty) continue;
+      albums.update(
+        key,
+        (value) => value + entry.value.toDouble(),
+        ifAbsent: () => entry.value.toDouble(),
+      );
+    }
+    for (final entry in aggregates.decades.entries) {
+      decades.update(
+        entry.key,
+        (value) => value + entry.value.toDouble(),
+        ifAbsent: () => entry.value.toDouble(),
+      );
+    }
+
+    var listenCount = 0;
+    for (final row in aggregates.signals) {
+      final weight = listenWeight(row.signal, now);
+      listenCount += row.signal.listens;
+      if (weight <= 0) continue;
+
+      final artist = normalizeTasteKey(row.artist);
+      if (artist.isNotEmpty && !isGenericArtistKey(artist)) {
+        artists.update(artist, (value) => value + weight, ifAbsent: () => weight);
+      }
+      final genre = normalizeTasteKey(row.genre);
+      if (genre.isNotEmpty && !isGenericGenreKey(genre)) {
+        genres.update(
+          genre,
+          (value) => value + weight * 0.5,
+          ifAbsent: () => weight * 0.5,
+        );
+      }
+      final decade = decadeOf(row.year);
+      if (decade != null) {
+        decades.update(
+          decade,
+          (value) => value + weight * 0.5,
+          ifAbsent: () => weight * 0.5,
+        );
+      }
+      final album = normalizeTasteKey(row.album);
+      if (album.isNotEmpty) {
+        albums.update(
+          album,
+          (value) => value + weight * 0.3,
+          ifAbsent: () => weight * 0.3,
+        );
+      }
+    }
+
+    return TasteProfile.fromWeights(
+      artists: artists,
+      genres: genres,
+      decades: decades,
+      albums: albums,
+      favoriteCount: favoriteCount,
+      listenCount: listenCount,
+    );
+  }
+
   static _LibrarySnapshot _snapshotOf(AsyncValue<LibraryState> value) {
     return (
       isLoading: value.isLoading,
       hasValue: value.hasValue,
       hasError: value.hasError,
       songs: value.valueOrNull?.songs ?? const <Song>[],
+      total: value.valueOrNull?.total ?? 0,
     );
   }
 
