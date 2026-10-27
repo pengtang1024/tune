@@ -82,6 +82,25 @@ class FileLibraryStorage implements LibraryStorage {
   }
 
   @override
+  Future<int> count() async => (await load()).length;
+
+  @override
+  Future<List<Song>> page({required int offset, required int limit}) async {
+    final all = await load();
+    if (offset >= all.length) return const [];
+    return all.sublist(offset, (offset + limit).clamp(0, all.length));
+  }
+
+  @override
+  Future<void> removeSource(String sourceId) async {
+    final all = await load();
+    final kept = all
+        .where((song) => (song.sourceId ?? 'local') != sourceId)
+        .toList(growable: false);
+    await save(kept);
+  }
+
+  @override
   Future<List<String>> prune(int limit) async => const [];
 
   @override
@@ -206,6 +225,35 @@ class SqliteLibraryStorage implements LibraryStorage {
       (await _db()).save(songs, pinned: pinned);
     } catch (error, stackTrace) {
       Log.error('保存音乐库失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<int> count() async {
+    try {
+      return (await _db()).count();
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库数量失败: $error\n$stackTrace');
+      return 0;
+    }
+  }
+
+  @override
+  Future<List<Song>> page({required int offset, required int limit}) async {
+    try {
+      return (await _db()).page(offset: offset, limit: limit);
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库分页失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<void> removeSource(String sourceId) async {
+    try {
+      (await _db()).removeSource(sourceId);
+    } catch (error, stackTrace) {
+      Log.error('移除音源曲目失败: $error\n$stackTrace');
     }
   }
 

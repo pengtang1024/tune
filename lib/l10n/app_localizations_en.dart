@@ -185,6 +185,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryScanAllSources => 'Scan all sources';
 
   @override
+  String get libraryLoadMore => 'Load more tracks';
+
+  @override
   String libraryTrackCount(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);

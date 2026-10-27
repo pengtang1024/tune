@@ -83,6 +83,7 @@
   "libraryFilterSources": "Filter sources",
   "libraryAllSources": "All sources",
   "libraryScanAllSources": "Scan all sources",
+  "libraryLoadMore": "Load more tracks",
   "libraryTrackCount": "{count, plural, =1{1 track} other{{count} tracks}}",
   "@libraryTrackCount": {
     "placeholders": {

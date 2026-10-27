@@ -86,19 +86,10 @@ class LibraryDatabase {
   /// Rows that did not change are left alone, so a scan that adds ten tracks
   /// writes ten rows instead of the whole library.
   void save(List<Song> songs, {Set<String> pinned = const {}}) {
-    final incoming = {for (final song in songs) song.uri};
-    final existing = {
-      for (final row in _db.select('SELECT uri FROM songs'))
-        row['uri'] as String,
-    };
     final seenAt = DateTime.now().millisecondsSinceEpoch;
 
     _db.execute('BEGIN');
     try {
-      for (final uri in existing.difference(incoming)) {
-        _db.execute('DELETE FROM songs WHERE uri = ?', [uri]);
-      }
-
       // The pin and the last seen time follow the scan; the last played time
       // and the play count belong to the player and are left alone.
       final statement = _db.prepare('''
@@ -181,6 +172,30 @@ class LibraryDatabase {
       'UPDATE songs SET last_played = ?, play_count = play_count + 1 WHERE uri = ?',
       [DateTime.now().millisecondsSinceEpoch, uri],
     );
+  }
+
+  /// Reads one window of the library, ordered by title.
+  List<Song> page({required int offset, required int limit}) {
+    final rows = _db.select(
+      'SELECT json FROM songs ORDER BY title COLLATE NOCASE LIMIT ? OFFSET ?',
+      [limit, offset],
+    );
+    final songs = <Song>[];
+    for (final row in rows) {
+      try {
+        final decoded = jsonDecode(row['json'] as String);
+        if (decoded is! Map<String, dynamic>) continue;
+        songs.add(Song.fromMap(decoded));
+      } catch (_) {
+        // One broken row must not take the whole window down.
+      }
+    }
+    return songs;
+  }
+
+  /// Removes the tracks of one source.
+  void removeSource(String sourceId) {
+    _db.execute('DELETE FROM songs WHERE source_id = ?', [sourceId]);
   }
 
   /// Empties the library.

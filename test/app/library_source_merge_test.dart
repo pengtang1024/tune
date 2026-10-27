@@ -392,6 +392,22 @@ class FakeLibraryStorage extends LibraryStorage {
   }
 
   @override
+  Future<int> count() async => songs.length;
+
+  @override
+  Future<List<Song>> page({required int offset, required int limit}) async {
+    if (offset >= songs.length) return const [];
+    return songs.sublist(offset, (offset + limit).clamp(0, songs.length));
+  }
+
+  @override
+  Future<void> removeSource(String sourceId) async {
+    songs = songs
+        .where((song) => (song.sourceId ?? 'local') != sourceId)
+        .toList();
+  }
+
+  @override
   Future<List<String>> prune(int limit) async => const [];
 
   @override

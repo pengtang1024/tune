@@ -73,6 +73,30 @@ void main() {
     expect(state.statusMessage, '1 首歌曲');
   });
 
+  test('a large library is read a window at a time', () async {
+    storage.songs = [
+      for (var index = 0; index <= LibraryController.windowSize; index++)
+        Song(
+          id: index,
+          title: 'Track $index',
+          uri: '/music/$index.mp3',
+        ),
+    ];
+    container.invalidate(libraryControllerProvider);
+
+    final first = await container.read(libraryControllerProvider.future);
+
+    expect(first.songs, hasLength(LibraryController.windowSize));
+    expect(first.total, LibraryController.windowSize + 1);
+    expect(first.hasMore, isTrue);
+
+    await container.read(libraryControllerProvider.notifier).loadMore();
+
+    final rest = container.read(libraryControllerProvider).requireValue;
+    expect(rest.songs, hasLength(LibraryController.windowSize + 1));
+    expect(rest.hasMore, isFalse);
+  });
+
   test('scan adds to the library and persists sorted songs', () async {
     await container.read(libraryControllerProvider.future);
     scanner.songs = [songC, songB];
@@ -221,6 +245,22 @@ class FakeLibraryStorage extends LibraryStorage {
     saveCount += 1;
     if (failSave) throw StateError('save failed');
     this.songs = List.of(songs);
+  }
+
+  @override
+  Future<int> count() async => songs.length;
+
+  @override
+  Future<List<Song>> page({required int offset, required int limit}) async {
+    if (offset >= songs.length) return const [];
+    return songs.sublist(offset, (offset + limit).clamp(0, songs.length));
+  }
+
+  @override
+  Future<void> removeSource(String sourceId) async {
+    songs = songs
+        .where((song) => (song.sourceId ?? 'local') != sourceId)
+        .toList();
   }
 
   @override

@@ -83,6 +83,7 @@
   "libraryFilterSources": "篩選來源",
   "libraryAllSources": "全部來源",
   "libraryScanAllSources": "掃描全部音源",
+  "libraryLoadMore": "載入更多曲目",
   "libraryTrackCount": "{count} 首",
   "@libraryTrackCount": {
     "placeholders": {

@@ -11,9 +11,19 @@ abstract class LibraryStorage {
 
   /// Writes the songs into the library.
   ///
-  /// A pinned track (a favorite, a queued track) is marked so a later prune
-  /// never drops it.
+  /// The rows are upserted and nothing else is touched: a caller that holds
+  /// one window of a large library must not erase the rows outside it. A
+  /// pinned track (a favorite) is marked so a later prune never drops it.
   Future<void> save(List<Song> songs, {Set<String> pinned = const {}});
+
+  /// How many tracks the library holds.
+  Future<int> count();
+
+  /// Reads one window of the library, ordered by title.
+  Future<List<Song>> page({required int offset, required int limit});
+
+  /// Removes the tracks of one source.
+  Future<void> removeSource(String sourceId);
 
   /// Drops the least valuable tracks of every remote source beyond [limit].
   ///
