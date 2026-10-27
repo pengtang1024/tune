@@ -1943,6 +1943,36 @@ abstract class AppLocalizations {
   /// **'已加入队列：{title}'**
   String searchAddedToQueue(String title);
 
+  /// No description provided for @searchAddLibraryFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入音乐库失败'**
+  String get searchAddLibraryFailed;
+
+  /// No description provided for @searchAddToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入音乐库'**
+  String get searchAddToLibrary;
+
+  /// No description provided for @searchAddAllToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部加入'**
+  String get searchAddAllToLibrary;
+
+  /// No description provided for @searchAddedToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入'**
+  String get searchAddedToLibrary;
+
+  /// No description provided for @searchAddedManyToLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已加入 {count} 首到音乐库'**
+  String searchAddedManyToLibrary(int count);
+
   /// No description provided for @searchNoSourcesEnabled.
   ///
   /// In zh_CN, this message translates to:

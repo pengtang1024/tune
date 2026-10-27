@@ -250,22 +250,25 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
   /// Puts songs into the library.
   ///
-  /// The files the desktop hands to the player belong in the library, so they
-  /// show up in the list like every other track.
-  Future<void> addSongs(List<Song> songs) async {
-    if (songs.isEmpty) return;
+  /// The files the desktop hands to the player belong in the library, and so
+  /// do the tracks the reader picks from an online search. A track that is
+  /// already here keeps the time it first entered, and the batch is written
+  /// once.
+  Future<bool> addSongs(List<Song> songs) async {
+    if (songs.isEmpty) return false;
     await future;
-    if (_disposed || !state.hasValue) return;
+    if (_disposed || !state.hasValue) return false;
 
     final previousByUri = {for (final song in _current.songs) song.uri: song};
     final incoming = [
       for (final song in songs) _keepFirstSeen(song, previousByUri[song.uri]),
     ];
-    final merged = _dedupe([..._current.songs, ...incoming]);
+    final merged = _dedupe([..._current.songs, ...incoming])
+      ..sort((a, b) => compareText(a.title, b.title));
     state = AsyncData(
       _current.copyWith(songs: List<Song>.unmodifiable(merged)),
     );
-    await _saveQuietly(merged);
+    return _saveQuietly(merged);
   }
 
   void setQuery(String query) {

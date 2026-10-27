@@ -1120,6 +1120,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get searchAddLibraryFailed =>
+      'Could not add the tracks to the library';
+
+  @override
+  String get searchAddToLibrary => 'Add to library';
+
+  @override
+  String get searchAddAllToLibrary => 'Add all';
+
+  @override
+  String get searchAddedToLibrary => 'Added';
+
+  @override
+  String searchAddedManyToLibrary(int count) {
+    return 'Added $count tracks to the library';
+  }
+
+  @override
   String get searchNoSourcesEnabled =>
       'No online source is enabled. Turn one on in settings first.';
 

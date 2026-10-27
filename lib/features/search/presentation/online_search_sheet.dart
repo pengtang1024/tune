@@ -7,6 +7,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/favorites/domain/favorites_state.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -40,6 +41,9 @@ class _OnlineSearchSheet extends ConsumerStatefulWidget {
 class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   final TextEditingController _queryController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  /// The tracks the reader already put into the library from this sheet.
+  final Set<String> _addedUris = {};
 
   @override
   void dispose() {
@@ -172,6 +176,8 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
                   onToggleFavorite: _like,
                   onDoubleTapFavorite: _mark,
                   onAddToQueue: _addToQueue,
+                  onAddToLibrary: _addToLibrary,
+                  addedUris: _addedUris,
                   waitsForDoubleClick: settings.onlyLikeOnDoubleClick,
                 ),
               ),
@@ -198,6 +204,36 @@ class _OnlineSearchSheetState extends ConsumerState<_OnlineSearchSheet> {
   /// A double click adds a mark; it never takes one away.
   void _mark(Song song) {
     ref.read(favoritesControllerProvider.notifier).mark(song.uri);
+  }
+
+  Future<void> _addToLibrary(List<Song> songs) async {
+    if (songs.isEmpty) return;
+    final added = await ref
+        .read(libraryControllerProvider.notifier)
+        .addSongs(songs);
+    if (!mounted) return;
+    if (!added) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(context.loc.searchAddLibraryFailed),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      return;
+    }
+    setState(() {
+      _addedUris.addAll(songs.map((song) => song.uri));
+    });
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(context.loc.searchAddedManyToLibrary(songs.length)),
+          duration: const Duration(seconds: 2),
+        ),
+      );
   }
 
   void _addToQueue(Song song) {
@@ -295,6 +331,10 @@ class _Body extends StatelessWidget {
   final ValueChanged<Song> onDoubleTapFavorite;
   final ValueChanged<Song> onAddToQueue;
 
+  /// Puts the tracks of a group into the library.
+  final Future<void> Function(List<Song> songs) onAddToLibrary;
+  final Set<String> addedUris;
+
   /// Whether a click waits for a possible second click before it plays.
   ///
   /// A double click that only likes the track may not play it, so the click
@@ -309,6 +349,8 @@ class _Body extends StatelessWidget {
     required this.onToggleFavorite,
     required this.onDoubleTapFavorite,
     required this.onAddToQueue,
+    required this.onAddToLibrary,
+    required this.addedUris,
     required this.waitsForDoubleClick,
   });
 
@@ -364,6 +406,8 @@ class _Body extends StatelessWidget {
             onToggleFavorite: onToggleFavorite,
             onDoubleTapFavorite: onDoubleTapFavorite,
             onAddToQueue: onAddToQueue,
+            onAddToLibrary: onAddToLibrary,
+            addedUris: addedUris,
             waitsForDoubleClick: waitsForDoubleClick,
           ),
       ],
@@ -440,6 +484,10 @@ class _SourceGroup extends StatelessWidget {
   final ValueChanged<Song> onDoubleTapFavorite;
   final ValueChanged<Song> onAddToQueue;
 
+  /// Puts the tracks of a group into the library.
+  final Future<void> Function(List<Song> songs) onAddToLibrary;
+  final Set<String> addedUris;
+
   /// Whether a click waits for a possible second click before it plays.
   ///
   /// A double click that only likes the track may not play it, so the click
@@ -454,6 +502,8 @@ class _SourceGroup extends StatelessWidget {
     required this.onToggleFavorite,
     required this.onDoubleTapFavorite,
     required this.onAddToQueue,
+    required this.onAddToLibrary,
+    required this.addedUris,
     required this.waitsForDoubleClick,
   });
 
@@ -514,6 +564,25 @@ class _SourceGroup extends StatelessWidget {
               ),
               const Spacer(),
               TextButton.icon(
+                onPressed: result.songs.isEmpty
+                    ? null
+                    : () => onAddToLibrary(result.songs),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, CompactTokens.controlTiny),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: CompactTokens.space8,
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
+                icon: const Icon(
+                  Icons.library_add_rounded,
+                  size: CompactTokens.icon16,
+                ),
+                label: Text(context.loc.searchAddAllToLibrary),
+              ),
+              const SizedBox(width: CompactTokens.space4),
+              TextButton.icon(
                 onPressed: () => onPlay(result, 0),
                 style: TextButton.styleFrom(
                   minimumSize: const Size(0, CompactTokens.controlTiny),
@@ -541,6 +610,8 @@ class _SourceGroup extends StatelessWidget {
             onToggleFavorite: () => onToggleFavorite(result.songs[index]),
             onDoubleTapFavorite: () => onDoubleTapFavorite(result.songs[index]),
             onAddToQueue: () => onAddToQueue(result.songs[index]),
+            isAdded: addedUris.contains(result.songs[index].uri),
+            onAdd: () => onAddToLibrary([result.songs[index]]),
             waitsForDoubleClick: waitsForDoubleClick,
           ),
         const SizedBox(height: CompactTokens.space4),
@@ -561,6 +632,8 @@ class _SongRow extends StatelessWidget {
   /// A double click adds a mark; it never takes one away.
   final VoidCallback onDoubleTapFavorite;
   final VoidCallback onAddToQueue;
+  final bool isAdded;
+  final VoidCallback onAdd;
 
   /// Whether a click waits for a possible second click before it plays.
   ///
@@ -576,6 +649,8 @@ class _SongRow extends StatelessWidget {
     required this.onToggleFavorite,
     required this.onDoubleTapFavorite,
     required this.onAddToQueue,
+    required this.isAdded,
+    required this.onAdd,
     required this.waitsForDoubleClick,
   });
 
@@ -664,6 +739,25 @@ class _SongRow extends StatelessWidget {
                 onPressed: onAddToQueue,
                 icon: const Icon(
                   Icons.playlist_add_rounded,
+                  size: CompactTokens.icon18,
+                ),
+                style: IconButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+            TuneTooltip(
+              message: isAdded
+                  ? context.loc.searchAddedToLibrary
+                  : context.loc.searchAddToLibrary,
+              child: IconButton(
+                onPressed: isAdded ? null : onAdd,
+                icon: Icon(
+                  isAdded
+                      ? Icons.check_rounded
+                      : Icons.library_add_rounded,
                   size: CompactTokens.icon18,
                 ),
                 style: IconButton.styleFrom(
