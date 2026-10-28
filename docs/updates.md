@@ -42,8 +42,8 @@ flutter build linux --release
 4. 在 GitHub（与 Gitea）创建同名 release，把归档作为附件上传。
 5. 老版本的应用点「检查更新」就能看到并安装。
 
-Gitea 的 release 接口当前不可用，所以更新检查统一走 GitHub；Gitea 的
-release 只作为人工下载入口。
+Gitea 的仓库是私有的，release 接口要令牌，应用不带令牌——所以更新检查
+统一走公开的 GitHub；Gitea 的 release 只作为自己人的人工下载入口。
 
 ## 从旧版本升级一次
 
