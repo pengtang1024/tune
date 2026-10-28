@@ -44,6 +44,12 @@ The full texts of the MPL-2.0, Apache-2.0, BSD-3-Clause and Unlicense are in
 the generated `NOTICES` file. `dbus` is not modified by Tune; its source is the
 pub.dev release linked above.
 
+## Vendored and modified packages
+
+| Package | Version | License | Notes |
+| --- | --- | --- | --- |
+| `audio_metadata_reader` | 1.8.1 | MIT | Vendored under `vendor/audio_metadata_reader` with a local patch: `Buffer.read` clamps declared sizes to the bytes the file actually holds, so one corrupt tag header cannot trigger a gigabyte allocation. MIT, Copyright (c) 2023 Clément Béal, kept in the vendored `LICENSE`. The patch list and upgrade steps live in `vendor/audio_metadata_reader/VENDORED.md`. |
+
 ## Linux audio backend: libmpv and FFmpeg
 
 On Linux, Tune uses `just_audio_media_kit` → `media_kit` → the **system**

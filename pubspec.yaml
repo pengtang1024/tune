@@ -103,6 +103,12 @@ dependencies:
   sqlite3: ^3.8.0
   sqlite3_flutter_libs: ^0.6.0+eol
 
+# 上游 Buffer.read 无界分配（损坏标签可声明 GB 级帧），本地补丁见
+# vendor/audio_metadata_reader/VENDORED.md。
+dependency_overrides:
+  audio_metadata_reader:
+    path: vendor/audio_metadata_reader
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
