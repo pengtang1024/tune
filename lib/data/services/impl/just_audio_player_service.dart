@@ -32,6 +32,11 @@ class JustAudioPlayerService implements AudioPlayerService {
       // The web build uses just_audio_web, and touching Platform there throws.
       if (!kIsWeb && Platform.isLinux) {
         JustAudioMediaKit.title = 'Tune';
+        // libmpv 的解复用缓存（demuxer-max-bytes 与 demuxer-max-back-bytes
+        // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的
+        // 采样率固定，8MB 足够缓存约 3 分钟的 320kbps 音频，也够网络流
+        // 顶住常见的抖动。
+        JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
         JustAudioMediaKit.ensureInitialized(linux: true, windows: false);
         Log.info('已注册 Linux 音频后端 (just_audio_media_kit)');
       }
