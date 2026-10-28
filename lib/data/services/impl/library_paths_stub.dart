@@ -53,4 +53,10 @@ class BrowserLibraryPaths implements LibraryPaths {
 
   @override
   Future<void> saveChosenLyrics(Song song, String lyrics) async {}
+
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async {}
+
+  @override
+  Future<String?> readSmartLyrics(Song song) async => null;
 }

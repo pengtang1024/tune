@@ -283,6 +283,20 @@ class _FakeLibraryPaths implements LibraryPaths {
     stored[song.id] = lyrics;
   }
 
+  /// The machine sheets, kept apart from the sheets the reader matched.
+  final Map<int, String> smart = {};
+
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async {
+    if (unwritable.contains(song.id)) {
+      throw StateError('the folder is not writable');
+    }
+    smart[song.id] = lyrics;
+  }
+
+  @override
+  Future<String?> readSmartLyrics(Song song) async => smart[song.id];
+
   @override
   Future<Directory> folderFor(Song song) async =>
       throw UnsupportedError('the test has no file system');

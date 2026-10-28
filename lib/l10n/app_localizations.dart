@@ -4253,6 +4253,36 @@ abstract class AppLocalizations {
   /// **'还没有密钥——先到设置的「智能歌词」里贴一把'**
   String get lyricsSmartGenerateNeedsKey;
 
+  /// No description provided for @lyricsSmartGenerating.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在生成歌词——先问人写稿，再开通道，一轮最多几分钟'**
+  String get lyricsSmartGenerating;
+
+  /// No description provided for @lyricsSmartFailedAudio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取音频失败：曲目没有本地副本，也没拉到流'**
+  String get lyricsSmartFailedAudio;
+
+  /// No description provided for @lyricsSmartFailedUpload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'通道没有答上来：稍后再试，或到设置里检查钥匙与端点'**
+  String get lyricsSmartFailedUpload;
+
+  /// No description provided for @lyricsSmartFailedEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有识别出人声'**
+  String get lyricsSmartFailedEmpty;
+
+  /// No description provided for @lyricsSmartNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'机器稿：票池生成，重新查找可以找更好的词'**
+  String get lyricsSmartNote;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:
@@ -4324,6 +4354,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'你常把这首听完'**
   String get discoverReasonCompleted;
+
+  /// No description provided for @smartPromptCorrect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「{title}」，歌手「{artist}」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{draft}'**
+  String smartPromptCorrect(String title, String artist, String draft);
+
+  /// No description provided for @smartPromptRebuild.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请凭你对这首歌的了解，写出《{title}》({artist}) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：'**
+  String smartPromptRebuild(String title, String artist);
 }
 
 class _AppLocalizationsDelegate

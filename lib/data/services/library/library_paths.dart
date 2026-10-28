@@ -64,4 +64,14 @@ abstract class LibraryPaths {
   /// The file the app matched is not overwritten: the reader's lyrics go to
   /// `<歌名>.manual.lrc` when `<歌名>.lrc` is taken.
   Future<void> saveChosenLyrics(Song song, String lyrics);
+
+  /// Writes the machine sheet of [song] next to its other files.
+  ///
+  /// The smart sheet carries its own name (`<歌名>.smart.lrc`), so it never
+  /// tops the sheets the reader or the source brought; the reader of the
+  /// lyrics falls through to it only when the three segments found nothing.
+  Future<void> saveSmartLyrics(Song song, String lyrics);
+
+  /// Reads the machine sheet of [song], when one is there.
+  Future<String?> readSmartLyrics(Song song);
 }

@@ -142,6 +142,30 @@ void main() {
     expect(await file.exists(), isTrue);
   });
 
+  test('the smart sheet sits in its own file and never tops the real ones', () async {
+    const song = Song(
+      id: 1,
+      title: 'So What',
+      artist: 'Miles Davis',
+      uri: 'https://source.test/so-what',
+    );
+
+    await paths.saveSmartLyrics(song, '[00:01] machine');
+    expect(await paths.readSmartLyrics(song), '[00:01] machine');
+    expect(
+      await paths.readLyrics(song),
+      isNull,
+      reason: 'the reading order manual > lrc > smart lives in one place — '
+          'the controller falls through to the smart sheet only when the '
+          'three segments found nothing',
+    );
+
+    await paths.saveLyrics(song, '[00:01] matched');
+    expect(await paths.readLyrics(song), '[00:01] matched');
+    expect(await paths.readSmartLyrics(song), '[00:01] machine',
+        reason: 'a better sheet tops the smart one without erasing it');
+  });
+
   test('the lyrics the reader brought are written when the file is free', () async {
     const song = Song(
       id: 1,

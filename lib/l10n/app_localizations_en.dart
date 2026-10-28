@@ -2502,6 +2502,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'No key yet — paste one in Settings, Smart lyrics';
 
   @override
+  String get lyricsSmartGenerating =>
+      'Generating the lyrics — human sheets first, then the channels; a round takes minutes at most';
+
+  @override
+  String get lyricsSmartFailedAudio =>
+      'The audio never arrived: no local copy and no stream to pull';
+
+  @override
+  String get lyricsSmartFailedUpload =>
+      'The channels did not answer: try again later, or check the key and the endpoint in Settings';
+
+  @override
+  String get lyricsSmartFailedEmpty => 'No voice was heard';
+
+  @override
+  String get lyricsSmartNote =>
+      'Machine sheet, from the vote pool — search again for better words';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }
@@ -2549,4 +2568,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverReasonCompleted => 'You often finish this one';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return 'Here is a machine transcript of a song; it may hold wrong words. Title \"$title\", artist \"$artist\".\nFix the wrong characters; the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return 'Write the lyrics of \"$title\" ($artist) from what you know of the song, one line a line, in the order they are sung.\nAnswer with a JSON array of strings only, nothing else. When you are not sure of the song, answer with an empty array — do not invent:';
+  }
 }

@@ -1233,6 +1233,11 @@
   "settingsSmartLyricsPrivacy": "生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。",
   "lyricsSmartGenerate": "智能生成",
   "lyricsSmartGenerateNeedsKey": "还没有密钥——先到设置的「智能歌词」里贴一把",
+  "lyricsSmartGenerating": "正在生成歌词——先问人写稿，再开通道，一轮最多几分钟",
+  "lyricsSmartFailedAudio": "取音频失败：曲目没有本地副本，也没拉到流",
+  "lyricsSmartFailedUpload": "通道没有答上来：稍后再试，或到设置里检查钥匙与端点",
+  "lyricsSmartFailedEmpty": "没有识别出人声",
+  "lyricsSmartNote": "机器稿：票池生成，重新查找可以找更好的词",
   "discoverSectionOnlineArtist": "在线找到的 {artist}",
   "discoverFindMoreOnline": "在线找更多",
   "discoverFindingMore": "正在找…",
@@ -1273,5 +1278,30 @@
     }
   },
   "discoverSectionFavoriteArtists": "更多来自你标心的歌手",
-  "discoverReasonCompleted": "你常把这首听完"
+  "discoverReasonCompleted": "你常把这首听完",
+  "smartPromptCorrect": "下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「{title}」，歌手「{artist}」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{draft}",
+  "@smartPromptCorrect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "draft": {
+        "type": "String"
+      }
+    }
+  },
+  "smartPromptRebuild": "请凭你对这首歌的了解，写出《{title}》({artist}) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：",
+  "@smartPromptRebuild": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

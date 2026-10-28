@@ -1233,6 +1233,11 @@
   "settingsSmartLyricsPrivacy": "Generating uploads the whole track to the endpoint you configured, and nowhere else.",
   "lyricsSmartGenerate": "Smart lyrics",
   "lyricsSmartGenerateNeedsKey": "No key yet — paste one in Settings, Smart lyrics",
+  "lyricsSmartGenerating": "Generating the lyrics — human sheets first, then the channels; a round takes minutes at most",
+  "lyricsSmartFailedAudio": "The audio never arrived: no local copy and no stream to pull",
+  "lyricsSmartFailedUpload": "The channels did not answer: try again later, or check the key and the endpoint in Settings",
+  "lyricsSmartFailedEmpty": "No voice was heard",
+  "lyricsSmartNote": "Machine sheet, from the vote pool — search again for better words",
   "discoverSectionOnlineArtist": "Found online: {artist}",
   "discoverFindMoreOnline": "Find more online",
   "discoverFindingMore": "Looking…",
@@ -1273,5 +1278,30 @@
     }
   },
   "discoverSectionFavoriteArtists": "More from the artists you like",
-  "discoverReasonCompleted": "You often finish this one"
+  "discoverReasonCompleted": "You often finish this one",
+  "smartPromptCorrect": "Here is a machine transcript of a song; it may hold wrong words. Title \"{title}\", artist \"{artist}\".\nFix the wrong characters; the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n{draft}",
+  "@smartPromptCorrect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "draft": {
+        "type": "String"
+      }
+    }
+  },
+  "smartPromptRebuild": "Write the lyrics of \"{title}\" ({artist}) from what you know of the song, one line a line, in the order they are sung.\nAnswer with a JSON array of strings only, nothing else. When you are not sure of the song, answer with an empty array — do not invent:",
+  "@smartPromptRebuild": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

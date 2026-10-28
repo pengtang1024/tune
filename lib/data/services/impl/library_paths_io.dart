@@ -85,17 +85,21 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Future<File> lyricsFileFor(Song song) => _lyricsFileFor(song, manual: false);
+  Future<File> lyricsFileFor(Song song) => _lyricsFile(song, manual: false);
 
   /// The file the lyrics of [song] are written to.
   ///
   /// The lyrics the reader brought have a name of their own, so the file the
-  /// app matched is never overwritten.
-  Future<File> _lyricsFileFor(Song song, {required bool manual}) async {
+  /// app matched is never overwritten; the smart sheet carries its own mark.
+  Future<File> _lyricsFile(
+    Song song, {
+    required bool manual,
+    bool smart = false,
+  }) async {
     final folder = await folderFor(song);
     final name = nameFor(song);
-    final file = manual ? '$name.manual.lrc' : '$name.lrc';
-    return File(path.join(folder.path, file));
+    final suffix = smart ? '.smart' : (manual ? '.manual' : '');
+    return File(path.join(folder.path, '$name$suffix.lrc'));
   }
 
   @override
@@ -107,9 +111,9 @@ class FileLibraryPaths implements LibraryPaths {
 
   @override
   Future<String?> readLyrics(Song song) async {
-    final chosen = await _readLyricsFile(_lyricsFileFor(song, manual: true));
+    final chosen = await _readLyricsFile(_lyricsFile(song, manual: true));
     if (chosen != null) return chosen;
-    return _readLyricsFile(_lyricsFileFor(song, manual: false));
+    return _readLyricsFile(_lyricsFile(song, manual: false));
   }
 
   @override
@@ -123,7 +127,7 @@ class FileLibraryPaths implements LibraryPaths {
   Future<void> saveChosenLyrics(Song song, String lyrics) async {
     final matched = await lyricsFileFor(song);
     final target = await matched.exists()
-        ? await _lyricsFileFor(song, manual: true)
+        ? await _lyricsFile(song, manual: true)
         : matched;
     await target.parent.create(recursive: true);
     await target.writeAsString(lyrics, flush: true);
@@ -140,6 +144,18 @@ class FileLibraryPaths implements LibraryPaths {
     }
   }
 
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async {
+    final file = await _lyricsFile(song, manual: false, smart: true);
+    await file.parent.create(recursive: true);
+    await file.writeAsString(lyrics, flush: true);
+  }
+
+  @override
+  Future<String?> readSmartLyrics(Song song) {
+    return _readLyricsFile(_lyricsFile(song, manual: false, smart: true));
+  }
+
   /// The file of a track that is on the disk, when the track is one.
   ///
   /// A remote track keeps a canonical `tune://` URI for its identity, and
@@ -153,6 +169,7 @@ class FileLibraryPaths implements LibraryPaths {
     }
     return File(song.uri);
   }
+
 
   /// The folder of a track that is on the disk, when the track is one.
   Directory? _localFolderOf(Song song) {

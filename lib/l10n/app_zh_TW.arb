@@ -1233,6 +1233,11 @@
   "settingsSmartLyricsPrivacy": "生成會把整首歌的音訊上傳到你設定的端點；只發給你自己填的位址。",
   "lyricsSmartGenerate": "智慧生成",
   "lyricsSmartGenerateNeedsKey": "還沒有金鑰——先到設定的「智慧歌詞」裡貼一把",
+  "lyricsSmartGenerating": "正在生成歌詞——先問人寫稿，再開通道，一輪最多幾分鐘",
+  "lyricsSmartFailedAudio": "取音訊失敗：曲目沒有本機副本，也沒拉到串流",
+  "lyricsSmartFailedUpload": "通道沒有答上來：稍後再試，或到設定裡檢查金鑰與端點",
+  "lyricsSmartFailedEmpty": "沒有識別出人聲",
+  "lyricsSmartNote": "機器稿：票池生成，重新查找可以找更好的詞",
   "discoverSectionOnlineArtist": "線上找到的 {artist}",
   "discoverFindMoreOnline": "線上找更多",
   "discoverFindingMore": "正在找…",
@@ -1273,5 +1278,30 @@
     }
   },
   "discoverSectionFavoriteArtists": "更多來自你標心的歌手",
-  "discoverReasonCompleted": "你常把這首聽完"
+  "discoverReasonCompleted": "你常把這首聽完",
+  "smartPromptCorrect": "下面是一首歌的機器轉寫稿，可能有同音字或聽錯的詞。歌名「{title}」，歌手「{artist}」。\n請修正錯別字，行數與順序必須與原稿完全一致。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n{draft}",
+  "@smartPromptCorrect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "draft": {
+        "type": "String"
+      }
+    }
+  },
+  "smartPromptRebuild": "請憑你對這首歌的了解，寫出《{title}》({artist}) 的歌詞，按演唱順序拆成一行一句。\n只輸出 JSON 字串陣列，不要輸出其他內容。不確定的歌曲就輸出空陣列，不要編造：",
+  "@smartPromptRebuild": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  }
 }

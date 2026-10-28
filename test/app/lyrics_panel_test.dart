@@ -20,6 +20,8 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -155,6 +157,93 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('First line'), findsOneWidget);
   });
+
+  testWidgets('a machine sheet says what it is and offers the search again', (
+    tester,
+  ) async {
+    final database = _FakeDatabase();
+    final paths = _FakeLibraryPaths()..smartSheets[1] = '[00:01.00]机器词';
+
+    await _pumpPanel(tester, database: database, song: song, paths: paths);
+
+    expect(find.text('机器词'), findsOneWidget);
+    expect(find.text('机器稿：票池生成，重新查找可以找更好的词'), findsOneWidget);
+
+    // A real sheet the search finds later tops the machine's — that is the
+    // whole point of the reading order.
+    database.answers[1] = '[00:02.00]真词';
+    await tester.tap(find.text('重新查找'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('真词'), findsOneWidget);
+    expect(find.text('机器词'), findsNothing);
+  });
+
+  testWidgets('a generation shows its progress and can be stopped', (
+    tester,
+  ) async {
+    final service = _GatedService();
+    final persistence = FakePersistenceService()
+      ..values['smart_lyrics'] = jsonEncode(
+        const SmartLyricsConfig(apiKey: 'sk-test').toJson(),
+      );
+
+    await _pumpPanel(
+      tester,
+      state: const LyricsState(songId: 1),
+      song: song,
+      persistence: persistence,
+      extra: [smartLyricsServiceProvider.overrideWithValue(service)],
+    );
+
+    await tester.tap(find.text('智能生成'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('正在生成歌词'), findsOneWidget);
+    expect(find.text('取消'), findsOneWidget);
+
+    await tester.tap(find.text('取消'));
+    service.gate!.complete(const SmartLyricsOutcome.cancelled());
+    await tester.pumpAndSettle();
+
+    expect(find.text('智能生成'), findsOneWidget, reason: 'the run is over: '
+        'the missing state is back, nothing half-written stays');
+  });
+
+  testWidgets('a finished generation swaps the words in', (tester) async {
+    final service = _GatedService();
+    final lyrics = _FakeLyricsController(const LyricsState(songId: 1));
+    final persistence = FakePersistenceService()
+      ..values['smart_lyrics'] = jsonEncode(
+        const SmartLyricsConfig(apiKey: 'sk-test').toJson(),
+      );
+
+    await _pumpPanel(
+      tester,
+      controller: lyrics,
+      song: song,
+      persistence: persistence,
+      extra: [smartLyricsServiceProvider.overrideWithValue(service)],
+    );
+
+    await tester.tap(find.text('智能生成'));
+    await tester.pump();
+
+    // The service writes the sheet next to the audio, then answers; the
+    // panel learns the words the way it learns every sheet — by reading.
+    service.gate!.complete(
+      SmartLyricsOutcome(saved: true, votes: 3, origins: const ['lrclib']),
+    );
+    lyrics.fixed = LyricsState(
+      songId: 1,
+      document: LyricsDocument.parse('[00:01.00]机器词'),
+      smart: true,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('机器词'), findsOneWidget);
+    expect(find.text('机器稿：票池生成，重新查找可以找更好的词'), findsOneWidget);
+  });
 }
 
 /// The panel under test, with the lyrics state and the track in reach.
@@ -165,6 +254,8 @@ Future<void> _pumpPanel(
   LyricsProvider? database,
   Song? song,
   FakePersistenceService? persistence,
+  LibraryPaths? paths,
+  List<Override> extra = const [],
 }) async {
   final audio = FakeAudioPlayerService();
   addTearDown(audio.dispose);
@@ -185,11 +276,14 @@ Future<void> _pumpPanel(
     settingsControllerProvider.overrideWith(
       (ref) => SettingsController(settingsPersistence),
     ),
+    ...extra,
   ];
 
   if (database != null) {
     overrides.add(
-      libraryPathsProvider.overrideWithValue(_FakeLibraryPaths()),
+      libraryPathsProvider.overrideWithValue(
+        paths ?? _FakeLibraryPaths(),
+      ),
     );
     overrides.add(
       musicSourceServiceProvider.overrideWithValue(
@@ -227,7 +321,9 @@ Future<void> _pumpPanel(
 class _FakeLyricsController extends LyricsController {
   _FakeLyricsController(this.fixed);
 
-  final LyricsState fixed;
+  /// The state the panel reads; a test that plays the pipeline changes it
+  /// before the next rebuild, the way the file on the disk would.
+  LyricsState fixed;
 
   /// The number of times the reader was asked to try again.
   int reloads = 0;
@@ -264,6 +360,16 @@ class _FakeLibraryPaths implements LibraryPaths {
   @override
   Future<void> saveChosenLyrics(Song song, String lyrics) async {}
 
+  /// The machine sheets, kept apart from the sheets the reader matched.
+  final Map<int, String> smartSheets = {};
+
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async =>
+      smartSheets[song.id] = lyrics;
+
+  @override
+  Future<String?> readSmartLyrics(Song song) async => smartSheets[song.id];
+
 
   @override
   Future<Directory> folderFor(Song song) async =>
@@ -292,4 +398,23 @@ class _FakeDatabase implements LyricsProvider {
 
   @override
   Future<String?> lookup(Song song) async => answers[song.id];
+}
+
+/// The service of the smart pipeline that waits for the test to let the
+/// run come home.
+class _GatedService extends SmartLyricsService {
+  _GatedService() : super(engines: const [], humanPool: const [], paths: _FakeLibraryPaths());
+
+  /// The run waits here; the test completes it with the outcome it chose.
+  Completer<SmartLyricsOutcome>? gate;
+
+  /// The tracks the pipeline was asked to work on.
+  final List<Song> asked = [];
+
+  @override
+  Future<SmartLyricsOutcome> generate(Song song, {bool Function()? cancelled}) {
+    asked.add(song);
+    gate ??= Completer<SmartLyricsOutcome>();
+    return gate!.future;
+  }
 }

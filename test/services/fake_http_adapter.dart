@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:convert' show utf8;
 
 import 'package:dio/dio.dart';
 
@@ -56,7 +57,7 @@ class FakeHttpAdapter implements HttpClientAdapter {
     final body = this.body;
     final bytes = body == null
         ? Uint8List.fromList(List<int>.filled(1024, 7))
-        : Uint8List.fromList(body.codeUnits);
+        : Uint8List.fromList(utf8.encode(body));
     return ResponseBody(
       Stream<Uint8List>.value(bytes),
       200,

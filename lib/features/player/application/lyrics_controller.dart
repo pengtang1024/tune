@@ -51,7 +51,17 @@ class LyricsState {
   /// Whether the file the reader brought cannot be read as a sheet.
   final bool invalid;
 
-  const LyricsState({this.songId, this.document, this.invalid = false});
+  /// Whether the sheet on show is the machine's — the one the smart
+  /// pipeline wrote. A better sheet found later tops it, so the panel says
+  /// what this one is and offers the search again.
+  final bool smart;
+
+  const LyricsState({
+    this.songId,
+    this.document,
+    this.invalid = false,
+    this.smart = false,
+  });
 
   /// Whether there is something to show.
   bool get hasLyrics => document != null && document!.lines.isNotEmpty;
@@ -113,7 +123,7 @@ class LyricsController extends AutoDisposeAsyncNotifier<LyricsState> {
     if (memory.knows(song)) return memory.answerOf(song);
 
     final generation = _generation;
-    final raw = await _lyricsFor(song);
+    final answer = await _lyricsFor(song);
 
     // While the request was on its way the reader may have brought lyrics
     // of their own; those are the ones that count.
@@ -121,25 +131,39 @@ class LyricsController extends AutoDisposeAsyncNotifier<LyricsState> {
       return memory.answerOf(song);
     }
 
-    final answer = raw == null || raw.trim().isEmpty
+    final state = answer == null || answer.$1.trim().isEmpty
         ? LyricsState(songId: song.id)
-        : LyricsState(songId: song.id, document: LyricsDocument.parse(raw));
-    memory.remember(song, answer);
-    return answer;
+        : LyricsState(
+            songId: song.id,
+            document: LyricsDocument.parse(answer.$1),
+            smart: answer.$2,
+          );
+    memory.remember(song, state);
+    return state;
   }
 
-  /// The raw lyrics of [song], from the file next to it or from the source.
-  Future<String?> _lyricsFor(Song song) async {
+  /// The raw lyrics of [song], and whether they are the machine's.
+  ///
+  /// The order is the one the reading chain keeps (docs/lyrics.md): the
+  /// file the reader brought, then the file the app matched, then the three
+  /// segments of the sources, and the machine sheet the smart pipeline
+  /// wrote — always last, so a real sheet found later tops it without
+  /// erasing it.
+  Future<(String, bool)?> _lyricsFor(Song song) async {
     final paths = ref.read(libraryPathsProvider);
 
     final stored = await paths.readLyrics(song);
-    if (stored != null && stored.trim().isNotEmpty) return stored;
+    if (stored != null && stored.trim().isNotEmpty) return (stored, false);
 
     final raw = await ref.read(musicSourceServiceProvider).fetchLyrics(song);
-    if (raw == null || raw.trim().isEmpty) return raw;
+    if (raw != null && raw.trim().isNotEmpty) {
+      unawaited(_write(paths.saveLyrics(song, raw)));
+      return (raw, false);
+    }
 
-    unawaited(_write(paths.saveLyrics(song, raw)));
-    return raw;
+    final machine = await paths.readSmartLyrics(song);
+    if (machine != null && machine.trim().isNotEmpty) return (machine, true);
+    return null;
   }
 
   /// Remembers an answer and shows it.

@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
-import 'package:tune/utils/logger.dart';
 
 /// Height of one lyric line.
 const _lineExtent = 30.0;
@@ -37,6 +39,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final lyrics = ref.watch(lyricsControllerProvider);
     final song = ref.watch(
       playbackControllerProvider.select((state) => state.currentSong),
@@ -72,10 +75,11 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     final answer = lyrics.valueOrNull;
     // The answer of the track that plays, not the one of the track before it.
     final current = answer != null && answer.songId == song.id ? answer : null;
+    final run = ref.watch(smartLyricsControllerProvider);
 
     if (current != null && current.hasLyrics) {
       final document = current.document!;
-      return ListView.builder(
+      final list = ListView.builder(
         controller: _scroll,
         padding: const EdgeInsets.symmetric(vertical: CompactTokens.space8),
         itemExtent: _lineExtent,
@@ -84,6 +88,71 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           final line = document.lines[index];
           return _LyricLine(line: line.text, active: index == active);
         },
+      );
+      // The machine sheet says what it is: a better sheet found later tops
+      // it, and the search again is the way.
+      if (current.smart) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: CompactTokens.space12,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      context.loc.lyricsSmartNote,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _reload(song),
+                    child: Text(context.loc.lyricsSearchAgain),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(child: list),
+          ],
+        );
+      }
+      return list;
+    }
+
+    // A run for this track is on its way; its progress is the message.
+    if (run.isRunningFor(song.id)) {
+      return _Message(
+        text: context.loc.lyricsSmartGenerating,
+        icon: Icons.lyrics_outlined,
+        actions: [
+          _Action(
+            label: context.loc.cancel,
+            onPressed: () =>
+                ref.read(smartLyricsControllerProvider.notifier).cancel(),
+          ),
+        ],
+      );
+    }
+
+    if (run.phase == SmartLyricsPhase.failed && run.songId == song.id) {
+      return _Message(
+        text: _failureOf(context, run.failure),
+        icon: Icons.error_outline_rounded,
+        actions: [
+          _Action(
+            label: context.loc.lyricsSmartGenerate,
+            onPressed: () =>
+                ref.read(smartLyricsControllerProvider.notifier).generate(song),
+          ),
+          _Action(label: context.loc.lyricsSearchAgain, onPressed: () => _reload(song)),
+          _Action(
+            label: context.loc.lyricsChooseFile,
+            onPressed: () => _chooseFile(song),
+          ),
+        ],
       );
     }
 
@@ -116,26 +185,37 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           label: context.loc.lyricsChooseFile,
           onPressed: () => _chooseFile(song),
         ),
-        _generateAction(context),
+        _generateAction(context, song),
       ],
     );
   }
 
   /// The door of the smart pipeline: greyed until a key sits in the
-  /// settings, and then the single-song loop of M2 answers the press.
-  _Action _generateAction(BuildContext context) {
+  /// settings, and the press of an open door runs the loop of M2.
+  _Action _generateAction(BuildContext context, Song song) {
     final configured = ref.watch(
-      settingsControllerProvider.select((state) => state.smartLyrics.isConfigured),
+      settingsControllerProvider.select(
+        (state) => state.smartLyrics.isConfigured,
+      ),
     );
     return _Action(
       label: context.loc.lyricsSmartGenerate,
-      // The press is wired with the single-song loop of M2; until then a
-      // reachable press says so in the log.
-      onPressed: () => Log.info('智能生成的单曲闭环在 M2 接线'),
+      onPressed: () =>
+          ref.read(smartLyricsControllerProvider.notifier).generate(song),
       enabled: configured,
       tooltip: configured ? null : context.loc.lyricsSmartGenerateNeedsKey,
     );
   }
+
+  /// The words a failed run gets: every failure its own, so the reader
+  /// knows whether it is the network, the endpoint, or the song itself.
+  String _failureOf(BuildContext context, SmartLyricsFailure? failure) =>
+      switch (failure) {
+        SmartLyricsFailure.noAudio => context.loc.lyricsSmartFailedAudio,
+        SmartLyricsFailure.uploadFailed => context.loc.lyricsSmartFailedUpload,
+        SmartLyricsFailure.emptyResult => context.loc.lyricsSmartFailedEmpty,
+        null => context.loc.lyricsFailed,
+      };
 
   /// Keeps the sung line in the middle of the panel.
   void _scrollTo(int index) {

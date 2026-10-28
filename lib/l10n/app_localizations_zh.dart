@@ -2299,6 +2299,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
 
   @override
+  String get lyricsSmartGenerating => '正在生成歌词——先问人写稿，再开通道，一轮最多几分钟';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音频失败：曲目没有本地副本，也没拉到流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道没有答上来：稍后再试，或到设置里检查钥匙与端点';
+
+  @override
+  String get lyricsSmartFailedEmpty => '没有识别出人声';
+
+  @override
+  String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -2345,6 +2360,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverReasonCompleted => '你常把这首听完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「$title」，歌手「$artist」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -4642,6 +4667,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
 
   @override
+  String get lyricsSmartGenerating => '正在生成歌词——先问人写稿，再开通道，一轮最多几分钟';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音频失败：曲目没有本地副本，也没拉到流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道没有答上来：稍后再试，或到设置里检查钥匙与端点';
+
+  @override
+  String get lyricsSmartFailedEmpty => '没有识别出人声';
+
+  @override
+  String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4688,6 +4728,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverReasonCompleted => '你常把这首听完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「$title」，歌手「$artist」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6985,6 +7035,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get lyricsSmartGenerateNeedsKey => '還沒有金鑰——先到設定的「智慧歌詞」裡貼一把';
 
   @override
+  String get lyricsSmartGenerating => '正在生成歌詞——先問人寫稿，再開通道，一輪最多幾分鐘';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音訊失敗：曲目沒有本機副本，也沒拉到串流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道沒有答上來：稍後再試，或到設定裡檢查金鑰與端點';
+
+  @override
+  String get lyricsSmartFailedEmpty => '沒有識別出人聲';
+
+  @override
+  String get lyricsSmartNote => '機器稿：票池生成，重新查找可以找更好的詞';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '線上找到的 $artist';
   }
@@ -7031,4 +7096,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverReasonCompleted => '你常把這首聽完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的機器轉寫稿，可能有同音字或聽錯的詞。歌名「$title」，歌手「$artist」。\n請修正錯別字，行數與順序必須與原稿完全一致。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '請憑你對這首歌的了解，寫出《$title》($artist) 的歌詞，按演唱順序拆成一行一句。\n只輸出 JSON 字串陣列，不要輸出其他內容。不確定的歌曲就輸出空陣列，不要編造：';
+  }
 }
