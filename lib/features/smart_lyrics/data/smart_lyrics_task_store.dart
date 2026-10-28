@@ -249,19 +249,46 @@ class SmartLyricsTaskStore {
   /// management lists and the panel flies flags for.
   Future<List<SmartLyricsMark>> openMarks(int songId) async {
     final rows = (await _db()).openMarkRows(songId);
-    return [
-      for (final row in rows)
-        SmartLyricsMark(
-          id: row.id,
-          songId: row.songId,
-          line: row.line,
-          kind: SmartLyricsMarkKind.values.byName(row.kind),
-          source: row.source,
-          state: SmartLyricsMarkState.values.byName(row.state),
-          createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
-        ),
-    ];
+    return [for (final row in rows) _markOf(row)];
   }
+
+  /// The marks across the library, grouped by track: the tracks with
+  /// something open first, the answered ones behind — the management page
+  /// reads this window (docs/smart-lyrics.md §7.4).
+  Future<List<SmartLyricsMarkGroup>> markGroups({int limit = 300}) async {
+    final rows = (await _db()).markRowsWithSongs(limit: limit);
+    final marks = <int, List<SmartLyricsMark>>{};
+    final songs = <int, Song>{};
+    for (final row in rows) {
+      marks.putIfAbsent(row.mark.songId, () => []).add(_markOf(row.mark));
+      songs[row.mark.songId] = row.song;
+    }
+    final groups = [
+      for (final entry in marks.entries)
+        SmartLyricsMarkGroup(song: songs[entry.key]!, marks: entry.value),
+    ];
+    groups.sort((a, b) {
+      final byOpen = (b.hasOpen ? 1 : 0).compareTo(a.hasOpen ? 1 : 0);
+      return byOpen != 0 ? byOpen : a.song.id.compareTo(b.song.id);
+    });
+    return groups;
+  }
+
+  /// An explicit reword answers one line mark: the reader wrote the words
+  /// themselves, and that settles the mark (docs/smart-lyrics.md §7.4).
+  Future<void> rewordMark(int songId, int line) async {
+    (await _db()).rewordMarkRow(songId, line: line, now: _now());
+  }
+
+  SmartLyricsMark _markOf(SmartLyricsMarkRow row) => SmartLyricsMark(
+    id: row.id,
+    songId: row.songId,
+    line: row.line,
+    kind: SmartLyricsMarkKind.values.byName(row.kind),
+    source: row.source,
+    state: SmartLyricsMarkState.values.byName(row.state),
+    createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+  );
 
   static int _now() => DateTime.now().millisecondsSinceEpoch;
 }

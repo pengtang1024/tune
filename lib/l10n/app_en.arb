@@ -1068,7 +1068,7 @@
   "settingsPlaybackTitle": "Playback behavior",
   "settingsPlaybackDescription": "Startup behavior and what a single click and a double click on a track do",
   "settingsResumePlaybackOnStartup": "Resume the last session at launch",
-  "settingsResumePlaybackOnStartupHint": "Restore the queue and playback position when Tune opens, paused. Turn off to start with an empty queue",
+  "settingsResumePlaybackOnStartupHint": "The queue and the playback position are always restored when Tune opens. This switch decides whether the song picks up playing right away; turn off to wait, paused",
   "settingsReplaceQueueOnClick": "Replace the play queue when a track is clicked",
   "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays",
   "settingsOnlyLikeOnDoubleClick": "Only like the track on a double click",

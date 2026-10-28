@@ -107,34 +107,52 @@ void main() {
     expect(controller.state.status, PlaybackStatus.playing);
   });
 
-  test('the switch can leave the start empty but keeps the volume', () async {
+  test('the switch off start restores the queue but stays paused', () async {
     final controller = PlaybackController(
       audio,
       downloads,
       resolver,
       sessionStore: await savedStore(),
-      restoreSession: false,
     );
     addTearDown(controller.dispose);
 
-    expect(controller.state.queue, isEmpty);
-    expect(controller.state.currentSong, isNull);
-    expect(controller.state.status, PlaybackStatus.idle);
+    expect(controller.state.queue, [songA, songB]);
+    expect(controller.state.currentUri, songB.uri);
+    expect(controller.state.status, PlaybackStatus.paused);
     expect(controller.state.volume, 0.4);
+    expect(audio.playedSong, isNull);
     expect(audio.volume, 0.4);
   });
 
-  test('a start with the switch off keeps the saved session', () async {
+  test('the switch on start restores the queue and plays on', () async {
+    final controller = PlaybackController(
+      audio,
+      downloads,
+      resolver,
+      sessionStore: await savedStore(),
+      autoResume: true,
+    );
+    addTearDown(controller.dispose);
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(controller.state.queue, [songA, songB]);
+    expect(controller.state.currentSong, songB);
+    expect(audio.playedSong, songB);
+    expect(audio.currentPosition, const Duration(seconds: 42));
+    expect(controller.state.status, PlaybackStatus.playing);
+  });
+
+  test('a restored session survives a start that only reads it', () async {
     final store = await savedStore();
     final controller = PlaybackController(
       audio,
       downloads,
       resolver,
       sessionStore: store,
-      restoreSession: false,
     );
 
     controller.dispose();
+    await Future<void>.delayed(const Duration(milliseconds: 10));
 
     final session = store.readSession();
     expect(session, isNotNull);
@@ -142,28 +160,24 @@ void main() {
     expect(session.position, const Duration(seconds: 42));
   });
 
-  test(
-    'a queue played with the switch off replaces the saved session',
-    () async {
-      final store = await savedStore();
-      final controller = PlaybackController(
-        audio,
-        downloads,
-        resolver,
-        sessionStore: store,
-        restoreSession: false,
-      );
+  test('a played queue replaces the saved session', () async {
+    final store = await savedStore();
+    final controller = PlaybackController(
+      audio,
+      downloads,
+      resolver,
+      sessionStore: store,
+    );
 
-      await controller.playQueue(const [songA]);
-      controller.dispose();
-      await Future<void>.delayed(const Duration(milliseconds: 10));
+    await controller.playQueue(const [songA]);
+    controller.dispose();
+    await Future<void>.delayed(const Duration(milliseconds: 10));
 
-      final session = store.readSession();
-      expect(session, isNotNull);
-      expect(session!.queue, [songA]);
-      expect(session.currentUri, songA.uri);
-    },
-  );
+    final session = store.readSession();
+    expect(session, isNotNull);
+    expect(session!.queue, [songA]);
+    expect(session.currentUri, songA.uri);
+  });
 
   test('the queue and position are written when the player closes', () async {
     final persistence = FakePersistenceService();

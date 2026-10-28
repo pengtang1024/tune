@@ -3740,7 +3740,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsResumePlaybackOnStartupHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始'**
+  /// **'打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态'**
   String get settingsResumePlaybackOnStartupHint;
 
   /// No description provided for @settingsReplaceQueueOnClick.

@@ -2193,7 +2193,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      'Restore the queue and playback position when Tune opens, paused. Turn off to start with an empty queue';
+      'The queue and the playback position are always restored when Tune opens. This switch decides whether the song picks up playing right away; turn off to wait, paused';
 
   @override
   String get settingsReplaceQueueOnClick =>

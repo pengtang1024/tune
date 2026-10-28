@@ -1435,18 +1435,53 @@ class AppDatabase {
   }
 
   List<SmartLyricsMarkRow> _for(ResultSet rows) => [
-    for (final row in rows)
-      (
-        id: row['id'] as int,
-        songId: row['song_id'] as int,
-        line: row['line'] as int?,
-        kind: row['kind'] as String,
-        source: row['source'] as String,
-        state: row['state'] as String,
-        createdAt: row['created_at'] as int? ?? 0,
-        updatedAt: row['updated_at'] as int? ?? 0,
-      ),
+    for (final row in rows) _markRowOf(row),
   ];
+
+  SmartLyricsMarkRow _markRowOf(Map<String, Object?> row) => (
+    id: row['id'] as int,
+    songId: row['song_id'] as int,
+    line: row['line'] as int?,
+    kind: row['kind'] as String,
+    source: row['source'] as String,
+    state: row['state'] as String,
+    createdAt: row['created_at'] as int? ?? 0,
+    updatedAt: row['updated_at'] as int? ?? 0,
+  );
+
+  /// The marks of the library, each with the track it belongs to — the
+  /// window the management page reads (docs/smart-lyrics.md §7.4).
+  List<({SmartLyricsMarkRow mark, Song song})> markRowsWithSongs({
+    required int limit,
+  }) {
+    final rows = _db.select(
+      "SELECT songs.json AS json, m.id AS id, m.song_id AS song_id, "
+      'm.line AS line, m.kind AS kind, m.source AS source, '
+      'm.state AS state, m.created_at AS created_at, '
+      'm.updated_at AS updated_at '
+      'FROM smart_lyrics_marks m '
+      'JOIN songs ON songs.active = 1 '
+      "  AND json_extract(songs.json, '\$.id') = m.song_id "
+      'ORDER BY m.song_id, m.id LIMIT ?',
+      [limit],
+    );
+    return [
+      for (final row in rows)
+        (
+          mark: _markRowOf(row),
+          song: Song.fromMap(jsonDecode(row['json'] as String? ?? '')),
+        ),
+    ];
+  }
+
+  /// Answers a line mark the way the reader's own words answer it.
+  void rewordMarkRow(int songId, {required int line, required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_marks SET state = 'reworded', updated_at = ? "
+      'WHERE song_id = ? AND line = ? AND state = \'uncleared\'',
+      [now, songId, line],
+    );
+  }
 
   void close() => _db.close();
 }

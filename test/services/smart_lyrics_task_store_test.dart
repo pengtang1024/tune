@@ -3,6 +3,7 @@ import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_task_store.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
 /// The batch tasks of the library (docs/smart-lyrics.md §7.2, M5): the
@@ -271,5 +272,34 @@ void main() {
       1,
       reason: 'the lines left in dispute keep the track on the account',
     );
+  });
+
+  test('the management sees the marks grouped by track, open ones first', () async {
+    ingestLibrary();
+    await store.markSong(1); // track 1: open
+    await store.markLine(3, 2); // track 3: open
+    await store.markLine(2, 0); // track 2: open
+    await store.unmarkLine(2, 0); // track 2: answered
+
+    final groups = await store.markGroups();
+
+    expect(groups.map((group) => group.song.id), [1, 3, 2],
+        reason: 'the tracks with something open come first, the answered '
+            'ones behind — and each track holds its marks together');
+    expect(groups.last.marks.single.state, SmartLyricsMarkState.revoked);
+  });
+
+  test('an explicit reword answers the line mark and nothing else', () async {
+    ingestLibrary();
+    await store.markLine(2, 5);
+    await store.markSong(2);
+
+    await store.rewordMark(2, 5);
+
+    final flags = await store.flagsOf(2);
+    expect(flags.lines, isEmpty, reason: 'the reader wrote the words; the '
+        'line mark is answered that way');
+    expect(flags.song, isTrue, reason: 'the other mark stands — it has its '
+        'own way out');
   });
 }

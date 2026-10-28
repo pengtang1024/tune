@@ -1068,7 +1068,7 @@
   "settingsPlaybackTitle": "播放行为",
   "settingsPlaybackDescription": "决定启动时的播放行为，以及单击、双击歌曲时会发生什么",
   "settingsResumePlaybackOnStartup": "启动时继续上次播放",
-  "settingsResumePlaybackOnStartupHint": "打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始",
+  "settingsResumePlaybackOnStartupHint": "打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态",
   "settingsReplaceQueueOnClick": "单击歌曲时替换播放队列",
   "settingsReplaceQueueOnClickHint": "关掉时单击只把这首排进队列并立即播放，队列里的其余曲目保留",
   "settingsOnlyLikeOnDoubleClick": "双击时只标成喜欢",

@@ -1222,7 +1222,7 @@ void main() {
       tester.element(find.byType(SettingsPane)),
     );
     expect(
-      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      container.read(settingsControllerProvider).autoResumeOnStartup,
       isTrue,
     );
 
@@ -1235,7 +1235,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      container.read(settingsControllerProvider).autoResumeOnStartup,
       isFalse,
     );
     expect(tester.takeException(), isNull);

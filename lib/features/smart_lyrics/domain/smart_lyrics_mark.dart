@@ -4,6 +4,8 @@
 /// it, the reader takes it back, or the track is named「不是唱的」.
 library;
 
+import 'package:tune/domain/models/song.dart';
+
 /// What a mark is about.
 enum SmartLyricsMarkKind {
   /// One line of the sheet, by its number in the order it is shown.
@@ -83,4 +85,18 @@ class SmartLyricsSongFlags {
   static const SmartLyricsSongFlags empty = SmartLyricsSongFlags();
 
   bool get isEmpty => lines.isEmpty && !song && !instrumental;
+}
+
+/// One track's marks as the management lists them: the track, and the
+/// marks it carries in the order they were made.
+class SmartLyricsMarkGroup {
+  final Song song;
+  final List<SmartLyricsMark> marks;
+
+  const SmartLyricsMarkGroup({required this.song, required this.marks});
+
+  /// Whether anything on this track still waits for an answer.
+  bool get hasOpen => marks.any(
+    (mark) => mark.state == SmartLyricsMarkState.uncleared,
+  );
 }

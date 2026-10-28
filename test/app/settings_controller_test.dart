@@ -107,18 +107,27 @@ void main() {
     expect(reloaded.state.sourceHealthWeights.activity, 0);
   });
 
-  test('resuming the last session is on by default and survives', () async {
+  test('auto resuming the last session is on by default and survives', () async {
     final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
-    expect(controller.state.restorePlaybackOnStartup, isTrue);
+    expect(controller.state.autoResumeOnStartup, isTrue);
 
-    await controller.setRestorePlaybackOnStartup(false);
+    await controller.setAutoResumeOnStartup(false);
     controller.dispose();
 
     final reloaded = SettingsController(persistence);
     addTearDown(reloaded.dispose);
-    expect(reloaded.state.restorePlaybackOnStartup, isFalse);
+    expect(reloaded.state.autoResumeOnStartup, isFalse);
+  });
+
+  test('the old restore switch still answers after the rename', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setBool('restore_playback_on_startup', false);
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+    expect(controller.state.autoResumeOnStartup, isFalse);
   });
 
   test('local listening history is off by default and survives', () async {

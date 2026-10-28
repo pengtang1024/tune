@@ -5,23 +5,24 @@ import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 
 /// The settings of the playback.
 ///
-/// The group holds the rules of what a click on a track means: a single
+/// The group holds what a start does — the restored track plays on or
+/// waits — and the rules of what a click on a track means: a single
 /// click decides whether the play queue survives, a double click decides
 /// whether the track is only liked or played as well.
 class SettingsPlaybackCard extends StatelessWidget {
-  final bool restorePlaybackOnStartup;
+  final bool autoResumeOnStartup;
   final bool replaceQueueOnClick;
   final bool onlyLikeOnDoubleClick;
-  final ValueChanged<bool> onRestorePlaybackOnStartup;
+  final ValueChanged<bool> onAutoResumeOnStartup;
   final ValueChanged<bool> onReplaceQueueOnClick;
   final ValueChanged<bool> onOnlyLikeOnDoubleClick;
 
   const SettingsPlaybackCard({
     super.key,
-    required this.restorePlaybackOnStartup,
+    required this.autoResumeOnStartup,
     required this.replaceQueueOnClick,
     required this.onlyLikeOnDoubleClick,
-    required this.onRestorePlaybackOnStartup,
+    required this.onAutoResumeOnStartup,
     required this.onReplaceQueueOnClick,
     required this.onOnlyLikeOnDoubleClick,
   });
@@ -39,8 +40,8 @@ class SettingsPlaybackCard extends StatelessWidget {
           SettingsSwitchRow(
             title: context.loc.settingsResumePlaybackOnStartup,
             description: context.loc.settingsResumePlaybackOnStartupHint,
-            value: restorePlaybackOnStartup,
-            onChanged: onRestorePlaybackOnStartup,
+            value: autoResumeOnStartup,
+            onChanged: onAutoResumeOnStartup,
           ),
           const SizedBox(height: 8),
           SettingsSwitchRow(

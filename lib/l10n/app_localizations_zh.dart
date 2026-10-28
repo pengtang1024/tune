@@ -2009,7 +2009,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
+      '打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -4461,7 +4461,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
+      '打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -6913,7 +6913,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '開啟 Tune 時恢復佇列和播放進度，停在暫停狀態；關掉後從空白佇列開始';
+      '開啟 Tune 時總會恢復佇列和播放進度；這個開關只決定當前這首是否自動繼續播放，關掉則停在暫停狀態';
 
   @override
   String get settingsReplaceQueueOnClick => '單擊歌曲時取代播放佇列';

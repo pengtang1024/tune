@@ -47,8 +47,13 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('replace_queue_on_click') ?? false,
           onlyLikeOnDoubleClick:
               _persistence.getBool('only_like_on_double_click') ?? false,
-          restorePlaybackOnStartup:
-              _persistence.getBool('restore_playback_on_startup') ?? true,
+          autoResumeOnStartup:
+              _persistence.getBool('auto_resume_on_startup') ??
+                  // The switch used to decide whether the queue was read at
+                  // all; its old value carries over so a reader who turned it
+                  // off still gets no surprise playback.
+                  _persistence.getBool('restore_playback_on_startup') ??
+                  true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
           smartLyrics: _readSmartLyrics(_persistence),
@@ -123,11 +128,11 @@ class SettingsController extends StateNotifier<SettingsState> {
     await _persistence.setBool('only_like_on_double_click', value);
   }
 
-  /// Sets whether a start restores the queue of the last run.
-  Future<void> setRestorePlaybackOnStartup(bool value) async {
-    if (state.restorePlaybackOnStartup == value) return;
-    state = state.copyWith(restorePlaybackOnStartup: value);
-    await _persistence.setBool('restore_playback_on_startup', value);
+  /// Sets whether a start picks up playing where the last run stopped.
+  Future<void> setAutoResumeOnStartup(bool value) async {
+    if (state.autoResumeOnStartup == value) return;
+    state = state.copyWith(autoResumeOnStartup: value);
+    await _persistence.setBool('auto_resume_on_startup', value);
   }
 
   /// Opens or folds the group of the sources that need a key.

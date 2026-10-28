@@ -15,11 +15,12 @@ class SettingsState {
   /// Whether the player shows up in the media controls of the system.
   final bool mediaControlsEnabled;
 
-  /// Whether a start restores the queue and the position of the last run.
+  /// Whether a start picks up playing where the last run stopped.
   ///
-  /// The session always opens paused; the switch only decides whether the
-  /// saved queue is read at all.
-  final bool restorePlaybackOnStartup;
+  /// The queue and the position are always restored; the switch only
+  /// decides whether the restored track plays on by itself instead of
+  /// waiting, paused, for the reader to press play.
+  final bool autoResumeOnStartup;
 
   /// Whether a single click on a track replaces the play queue.
   ///
@@ -73,7 +74,7 @@ class SettingsState {
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
     this.onlyLikeOnDoubleClick = false,
-    this.restorePlaybackOnStartup = true,
+    this.autoResumeOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
     this.smartLyrics = const SmartLyricsConfig(),
@@ -97,7 +98,7 @@ class SettingsState {
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
     bool? onlyLikeOnDoubleClick,
-    bool? restorePlaybackOnStartup,
+    bool? autoResumeOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
     SmartLyricsConfig? smartLyrics,
@@ -116,8 +117,7 @@ class SettingsState {
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
       onlyLikeOnDoubleClick:
           onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
-      restorePlaybackOnStartup:
-          restorePlaybackOnStartup ?? this.restorePlaybackOnStartup,
+      autoResumeOnStartup: autoResumeOnStartup ?? this.autoResumeOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
       smartLyrics: smartLyrics ?? this.smartLyrics,

@@ -113,11 +113,11 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 ),
                 const SizedBox(height: 14),
                 SettingsPlaybackCard(
-                  restorePlaybackOnStartup: settings.restorePlaybackOnStartup,
+                  autoResumeOnStartup: settings.autoResumeOnStartup,
                   replaceQueueOnClick: settings.replaceQueueOnClick,
                   onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
-                  onRestorePlaybackOnStartup:
-                      settingsController.setRestorePlaybackOnStartup,
+                  onAutoResumeOnStartup:
+                      settingsController.setAutoResumeOnStartup,
                   onReplaceQueueOnClick:
                       settingsController.setReplaceQueueOnClick,
                   onOnlyLikeOnDoubleClick:
