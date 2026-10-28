@@ -32,7 +32,10 @@ class SmartLyricsOutcome {
   final bool cancelled;
   final int votes;
   final List<String> origins;
-  final int disputed;
+
+  /// The line numbers the pool still cannot agree on — where a system
+  /// mark is made (docs/smart-lyrics.md §7.4).
+  final List<int> disputedLines;
   final SmartLyricsFailure? failure;
 
   const SmartLyricsOutcome({
@@ -40,9 +43,12 @@ class SmartLyricsOutcome {
     this.cancelled = false,
     this.votes = 0,
     this.origins = const [],
-    this.disputed = 0,
+    this.disputedLines = const [],
     this.failure,
   });
+
+  /// How many lines are left in dispute.
+  int get disputed => disputedLines.length;
 
   const SmartLyricsOutcome.cancelled() : this(saved: false, cancelled: true);
 
@@ -85,7 +91,10 @@ class SmartLyricsService {
     bool Function() stopped,
   ) async {
     if (stopped()) return const SmartLyricsOutcome.cancelled();
-    final disputed = consensus.lines.where((line) => line.disputed).length;
+    final disputedLines = [
+      for (var index = 0; index < consensus.lines.length; index++)
+        if (consensus.lines[index].disputed) index,
+    ];
     await paths.saveSmartLyrics(
       song,
       buildSmartLrc(consensus, origins: origins, at: DateTime.now()),
@@ -94,7 +103,7 @@ class SmartLyricsService {
       saved: true,
       votes: consensus.votesCounted,
       origins: origins,
-      disputed: disputed,
+      disputedLines: disputedLines,
     );
   }
 

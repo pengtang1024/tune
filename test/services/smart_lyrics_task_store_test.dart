@@ -50,7 +50,7 @@ void main() {
   test('a marked track goes first, whatever else is in the way', () async {
     ingestLibrary();
     await store.enqueueMissing();
-    await store.recordMark(3);
+    await store.markSong(3);
 
     expect((await store.nextPending())?.id, 3);
   });
@@ -137,7 +137,7 @@ void main() {
     await store.markRunning(2);
     await store.markFailed(2, error: 'gone');
     await store.requeueFailed();
-    await store.recordMark(3);
+    await store.markSong(3);
 
     expect((await store.nextPending())?.id, 3);
   });
@@ -190,5 +190,86 @@ void main() {
 
     final counts = await store.counts();
     expect(counts[SmartLyricsTaskStatus.failed], 1);
+  });
+
+  test('a mark puts the track back in line for a re-solve', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+    await store.markDone(2, votes: 3);
+
+    await store.markSong(2);
+
+    expect((await store.nextPending())?.id, 2, reason: 'a mark is the '
+        'reader telling the pool where to look again');
+    expect((await store.flagsOf(2)).song, isTrue);
+  });
+
+  test('a track that carried words gets a place in line from its mark', () async {
+    ingestLibrary();
+
+    await store.markSong(1);
+
+    expect((await store.nextPending())?.id, 1, reason: 'the song had words '
+        'on the scan, but the reader says they are wrong');
+  });
+
+  test('a line mark flags that line and only that line', () async {
+    ingestLibrary();
+    await store.markLine(2, 5);
+    await store.markLine(2, 9);
+
+    final flags = await store.flagsOf(2);
+
+    expect(flags.lines, {5, 9});
+    expect(flags.song, isFalse);
+    expect(flags.isEmpty, isFalse);
+  });
+
+  test('taking a mark back leaves the account empty and the track in line', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markLine(2, 5);
+    await store.unmarkLine(2, 5);
+
+    expect((await store.flagsOf(2)).isEmpty, isTrue);
+    expect((await store.nextPending())?.id, 2);
+  });
+
+  test('naming a track not-sung keeps it out of the queue', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+
+    await store.markNotSung(2);
+
+    final counts = await store.counts();
+    expect(counts[SmartLyricsTaskStatus.instrumental], 1);
+    expect((await store.flagsOf(2)).instrumental, isTrue);
+    expect((await store.nextPending())?.id, 3, reason: 'not sung is a name, '
+        'not a debt — nothing waits for it');
+  });
+
+  test('a re-solve settles the marks; new disputes are system marks', () async {
+    ingestLibrary();
+    await store.markLine(2, 5);
+    await store.markSong(2);
+
+    final song = await store.nextPending();
+    await store.applyOutcome(
+      song!,
+      const SmartLyricsOutcome(saved: true, votes: 3, disputedLines: [2]),
+    );
+
+    final flags = await store.flagsOf(2);
+    expect(flags.lines, {2}, reason: 'the fresh dispute, and nothing else');
+    expect(flags.song, isFalse, reason: 'the whole-song mark was answered '
+        'by the new sheet');
+    final mark = (await store.openMarks(2)).single;
+    expect(mark.source, 'system');
+    expect(
+      (await store.counts())[SmartLyricsTaskStatus.disputed],
+      1,
+      reason: 'the lines left in dispute keep the track on the account',
+    );
   });
 }

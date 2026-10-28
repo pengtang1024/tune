@@ -90,15 +90,33 @@ class AppDatabase {
         updated_at INTEGER NOT NULL DEFAULT 0
       )
     ''');
+    // The marks of the pipeline (docs/smart-lyrics.md §7.4): one row per
+    // mark — a line, a whole track, or the name for「不是唱的」. The shape
+    // grew from one mark per track to a mark per line within the same
+    // release cycle; the old rows held nothing a reader made.
+    final markColumns = {
+      for (final row in db.select('PRAGMA table_info(smart_lyrics_marks)'))
+        row['name'] as String,
+    };
+    if (markColumns.isNotEmpty && !markColumns.contains('line')) {
+      db.execute('DROP TABLE smart_lyrics_marks');
+    }
     db.execute('''
       CREATE TABLE IF NOT EXISTS smart_lyrics_marks (
-        song_id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        song_id INTEGER NOT NULL,
+        line INTEGER,
+        kind TEXT NOT NULL,
         source TEXT NOT NULL,
         state TEXT NOT NULL,
         created_at INTEGER NOT NULL DEFAULT 0,
         updated_at INTEGER NOT NULL DEFAULT 0
       )
     ''');
+    db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_marks_song '
+      'ON smart_lyrics_marks(song_id)',
+    );
     db.execute('''
       CREATE TABLE IF NOT EXISTS favorites (
         uri TEXT PRIMARY KEY,
@@ -1302,15 +1320,19 @@ class AppDatabase {
     return _db.updatedRows;
   }
 
-  /// The tracks a free check may revive: the failed and the disputed ones,
-  /// a batch at a time — the check asks the human pool, and the pool grows
-  /// over the years.
+  /// The tracks a free check may revive: the failed, the disputed, and the
+  /// marked ones — a mark is the reader saying the words are wrong, and
+  /// the pool is asked again (docs/smart-lyrics.md §7.4).
   List<Song> leakySongs({required int limit}) {
     final rows = _db.select(
       "SELECT songs.json AS json FROM smart_lyrics_tasks t "
       "JOIN songs ON songs.active = 1 "
       "  AND json_extract(songs.json, '\$.id') = t.song_id "
       "WHERE t.status IN ('failed', 'disputed') "
+      'OR EXISTS ('
+      "  SELECT 1 FROM smart_lyrics_marks m "
+      "  WHERE m.song_id = t.song_id AND m.state = 'uncleared'"
+      ') '
       'ORDER BY t.song_id LIMIT ?',
       [limit],
     );
@@ -1333,15 +1355,98 @@ class AppDatabase {
 
   /// Records a mark on a track — the reader's or the system's; the batch
   /// runs the marked tracks first.
-  void recordSongMark(int songId, {required String source, required int now}) {
+  void addMarkRow({
+    required int songId,
+    int? line,
+    required String kind,
+    required String source,
+    required int now,
+  }) {
     _db.execute(
-      'INSERT INTO smart_lyrics_marks (song_id, source, state, created_at, '
-      'updated_at) VALUES (?, ?, ?, ?, ?) '
-      "ON CONFLICT(song_id) DO UPDATE SET state = 'uncleared', "
-      'updated_at = excluded.updated_at',
-      [songId, source, 'uncleared', now, now],
+      'INSERT INTO smart_lyrics_marks '
+      '(song_id, line, kind, source, state, created_at, updated_at) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [songId, line, kind, source, 'uncleared', now, now],
     );
   }
+
+  /// Takes back the open marks of a track — [line] when one line is taken
+  /// back, the whole track when it is left out.
+  void revokeMarkRows(int songId, {int? line}) {
+    if (line == null) {
+      _db.execute(
+        "UPDATE smart_lyrics_marks SET state = 'revoked' "
+        "WHERE song_id = ? AND state = 'uncleared'",
+        [songId],
+      );
+    } else {
+      _db.execute(
+        "UPDATE smart_lyrics_marks SET state = 'revoked' "
+        "WHERE song_id = ? AND line = ? AND state = 'uncleared'",
+        [songId, line],
+      );
+    }
+  }
+
+  /// The open marks of a track, in the order they were made.
+  List<SmartLyricsMarkRow> openMarkRows(int songId) {
+    final rows = _db.select(
+      'SELECT id, song_id, line, kind, source, state, created_at, updated_at '
+      "FROM smart_lyrics_marks WHERE song_id = ? AND state = 'uncleared' "
+      'ORDER BY id',
+      [songId],
+    );
+    return _for(rows);
+  }
+
+  /// Whether anything is still on the track's account.
+  bool hasOpenMarkRow(int songId) {
+    final row = _db.select(
+      'SELECT COUNT(*) AS n FROM smart_lyrics_marks '
+      "WHERE song_id = ? AND state = 'uncleared'",
+      [songId],
+    ).first;
+    return (row['n'] as int? ?? 0) > 0;
+  }
+
+  /// The re-solve worked: the open marks of a track are settled — they
+  /// stay on record as resolved, never dangle.
+  void resolveMarkRows(int songId, {required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_marks SET state = 'resolved', updated_at = ? "
+      "WHERE song_id = ? AND state = 'uncleared'",
+      [now, songId],
+    );
+  }
+
+  /// Puts a track back in line for a re-solve: a mark is the reader saying
+  /// the words are wrong, and the pool should hear the song again
+  /// (docs/smart-lyrics.md §7.4). A track that carried words has no task
+  /// yet — the mark gives it one.
+  void requeueSongTask(int songId, {required int now}) {
+    _db.execute(
+      "INSERT INTO smart_lyrics_tasks (song_id, uri, status, attempts, updated_at) "
+      "SELECT json_extract(json, '\$.id'), uri, 'pending', 0, ? "
+      "FROM songs WHERE active = 1 AND json_extract(json, '\$.id') = ? "
+      'ON CONFLICT(song_id) DO UPDATE SET '
+      "status = 'pending', updated_at = excluded.updated_at",
+      [now, songId],
+    );
+  }
+
+  List<SmartLyricsMarkRow> _for(ResultSet rows) => [
+    for (final row in rows)
+      (
+        id: row['id'] as int,
+        songId: row['song_id'] as int,
+        line: row['line'] as int?,
+        kind: row['kind'] as String,
+        source: row['source'] as String,
+        state: row['state'] as String,
+        createdAt: row['created_at'] as int? ?? 0,
+        updatedAt: row['updated_at'] as int? ?? 0,
+      ),
+  ];
 
   void close() => _db.close();
 }
@@ -1369,6 +1474,20 @@ typedef SmartLyricsSampleCountRow = ({
   int checked,
   int correct,
 });
+
+/// One mark a track carries: a line, the whole track, or the name for
+///「不是唱的」— and where it stands.
+typedef SmartLyricsMarkRow =
+    ({
+      int id,
+      int songId,
+      int? line,
+      String kind,
+      String source,
+      String state,
+      int createdAt,
+      int updatedAt,
+    });
 
 /// One row of the listening aggregates, joined with the facts of its track.
 class TrackSignalRow {  final String artist;

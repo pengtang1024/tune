@@ -22,7 +22,9 @@ import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
@@ -244,6 +246,100 @@ void main() {
     expect(find.text('机器词'), findsOneWidget);
     expect(find.text('机器稿：票池生成，重新查找可以找更好的词'), findsOneWidget);
   });
+
+  testWidgets('a flagged line flies its flag and the press takes the mark '
+      'back', (tester) async {
+    final database = _FakeDatabase()
+      ..answers[1] = '[00:12.00]First line\n[00:20.00]Second line';
+    _RecordingMarks? marks;
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        smartLyricsMarksControllerProvider
+            .overrideWith((ref) => marks = _RecordingMarks(ref)),
+        songMarksProvider.overrideWith(
+          (ref, songId) =>
+              Future.value(const SmartLyricsSongFlags(lines: {0})),
+        ),
+      ],
+    );
+
+    expect(
+      find.byTooltip('撤销标记'),
+      findsOneWidget,
+      reason: 'the marked line flies its flag',
+    );
+    expect(
+      find.byTooltip('这行不对'),
+      findsOneWidget,
+      reason: 'the others wait, faint — one press marks them',
+    );
+
+    await tester.tap(find.byTooltip('撤销标记'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('这行不对'));
+    await tester.pumpAndSettle();
+
+    expect(marks!.toggledLines, [(1, 0), (1, 1)]);
+  });
+
+  testWidgets('the whole-track marks sit under the list and answer the '
+      'press', (tester) async {
+    final database = _FakeDatabase()..answers[1] = '[00:12.00]First line';
+    _RecordingMarks? marks;
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        smartLyricsMarksControllerProvider
+            .overrideWith((ref) => marks = _RecordingMarks(ref)),
+        songMarksProvider.overrideWith(
+          (ref, songId) => Future.value(
+            const SmartLyricsSongFlags(song: true),
+          ),
+        ),
+      ],
+    );
+
+    expect(find.text('整首不对'), findsOneWidget);
+    expect(find.text('这不是唱的'), findsOneWidget);
+
+    await tester.tap(find.text('整首不对'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('这不是唱的'));
+    await tester.pumpAndSettle();
+
+    expect(marks!.toggledSongs, [1]);
+    expect(marks!.toggledNotSung, [1]);
+  });
+
+  testWidgets('the panel shows flags only for the track that plays', (
+    tester,
+  ) async {
+    final database = _FakeDatabase()..answers[1] = '[00:12.00]First line';
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        smartLyricsMarksControllerProvider
+            .overrideWith((ref) => _RecordingMarks(ref)),
+        songMarksProvider.overrideWith(
+          (ref, songId) => Future.value(SmartLyricsSongFlags.empty),
+        ),
+      ],
+    );
+
+    expect(find.byTooltip('这行不对'), findsOneWidget, reason: 'faint flags, '
+        'one press each — the panel keeps its wordless promise');
+    expect(find.text('整首不对'), findsOneWidget);
+  });
 }
 
 /// The panel under test, with the lyrics state and the track in reach.
@@ -416,5 +512,30 @@ class _GatedService extends SmartLyricsService {
     asked.add(song);
     gate ??= Completer<SmartLyricsOutcome>();
     return gate!.future;
+  }
+}
+
+/// The presses on record: the panel writes marks through the controller,
+/// and the test reads what came out.
+class _RecordingMarks extends SmartLyricsMarksController {
+  _RecordingMarks(super.ref);
+
+  final List<(int, int)> toggledLines = [];
+  final List<int> toggledSongs = [];
+  final List<int> toggledNotSung = [];
+
+  @override
+  Future<void> toggleLine(int songId, int line) async {
+    toggledLines.add((songId, line));
+  }
+
+  @override
+  Future<void> toggleSong(int songId) async {
+    toggledSongs.add(songId);
+  }
+
+  @override
+  Future<void> toggleNotSung(int songId) async {
+    toggledNotSung.add(songId);
   }
 }

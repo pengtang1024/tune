@@ -239,6 +239,9 @@ class _MemoryStore extends SmartLyricsTaskStore {
   }
 
   @override
+  Future<void> settleMarks(Song song, SmartLyricsOutcome outcome) async {}
+
+  @override
   Future<void> markDone(int songId, {required int votes, int disputed = 0}) async {
     states[songId] = SmartLyricsTaskStatus.done;
   }
@@ -280,8 +283,6 @@ class _MemoryStore extends SmartLyricsTaskStore {
     return moved;
   }
 
-  @override
-  Future<void> recordMark(int songId) async {}
 }
 
 /// The pipeline with a script: every song answers what the test wrote,

@@ -2386,6 +2386,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
+  String get lyricsMarkLine => '这行不对';
+
+  @override
+  String get lyricsUnmarkLine => '撤销标记';
+
+  @override
+  String get lyricsMarkSong => '整首不对';
+
+  @override
+  String get lyricsMarkNotSung => '这不是唱的';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4826,6 +4838,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
+  String get lyricsMarkLine => '这行不对';
+
+  @override
+  String get lyricsUnmarkLine => '撤销标记';
+
+  @override
+  String get lyricsMarkSong => '整首不对';
+
+  @override
+  String get lyricsMarkNotSung => '这不是唱的';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -7264,6 +7288,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get lyricsSmartNote => '機器稿：票池生成，重新查找可以找更好的詞';
+
+  @override
+  String get lyricsMarkLine => '這行不對';
+
+  @override
+  String get lyricsUnmarkLine => '撤銷標記';
+
+  @override
+  String get lyricsMarkSong => '整首不對';
+
+  @override
+  String get lyricsMarkNotSung => '這不是唱的';
 
   @override
   String discoverSectionOnlineArtist(String artist) {

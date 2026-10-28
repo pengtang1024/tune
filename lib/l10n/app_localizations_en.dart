@@ -2596,6 +2596,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Machine sheet, from the vote pool — search again for better words';
 
   @override
+  String get lyricsMarkLine => 'This line is wrong';
+
+  @override
+  String get lyricsUnmarkLine => 'Take the mark back';
+
+  @override
+  String get lyricsMarkSong => 'The whole track is wrong';
+
+  @override
+  String get lyricsMarkNotSung => 'This is not sung';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }

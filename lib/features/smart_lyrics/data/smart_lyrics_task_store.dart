@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
 /// The batch queue of the smart lyrics pipeline (docs/smart-lyrics.md
@@ -138,6 +139,7 @@ class SmartLyricsTaskStore {
   /// done, the disputed part for a re-solve, silence for「不是唱的」, and
   /// every failure for an explicit retry.
   Future<void> applyOutcome(Song song, SmartLyricsOutcome outcome) async {
+    if (outcome.saved) await settleMarks(song, outcome);
     if (outcome.saved && outcome.disputed > 0) {
       await markDisputed(song.id, votes: outcome.votes);
     } else if (outcome.saved) {
@@ -149,9 +151,116 @@ class SmartLyricsTaskStore {
     }
   }
 
-  /// Records a mark on a track: the batch runs the marked tracks first.
-  Future<void> recordMark(int songId) async {
-    (await _db()).recordSongMark(songId, source: 'system', now: _now());
+  /// The marks a saved run answered: the open ones settle as resolved —
+  /// they stay on record, never dangle — and the lines the pool still
+  /// cannot agree on become fresh system marks (docs/smart-lyrics.md §7.4).
+  Future<void> settleMarks(Song song, SmartLyricsOutcome outcome) async {
+    final database = await _db();
+    final now = _now();
+    database.resolveMarkRows(song.id, now: now);
+    for (final line in outcome.disputedLines) {
+      database.addMarkRow(
+        songId: song.id,
+        line: line,
+        kind: SmartLyricsMarkKind.line.id,
+        source: 'system',
+        now: now,
+      );
+    }
+  }
+
+  /// Marks one line of a track wrong: the reader heard it, or the pool
+  /// left it in dispute. The track goes back in line for a re-solve.
+  Future<void> markLine(
+    int songId,
+    int line, {
+    String source = 'reader',
+  }) async {
+    final database = await _db();
+    final now = _now();
+    database.addMarkRow(
+      songId: songId,
+      line: line,
+      kind: SmartLyricsMarkKind.line.id,
+      source: source,
+      now: now,
+    );
+    database.requeueSongTask(songId, now: now);
+  }
+
+  /// Marks the whole track wrong; the re-solve hears it again.
+  Future<void> markSong(int songId, {String source = 'reader'}) async {
+    final database = await _db();
+    final now = _now();
+    database.addMarkRow(
+      songId: songId,
+      kind: SmartLyricsMarkKind.song.id,
+      source: source,
+      now: now,
+    );
+    database.requeueSongTask(songId, now: now);
+  }
+
+  /// Names a track not-sung: it leaves the gap — no re-solve, no requeue
+  /// (docs/smart-lyrics.md §1, 除名).
+  Future<void> markNotSung(int songId, {String source = 'reader'}) async {
+    final database = await _db();
+    database.addMarkRow(
+      songId: songId,
+      kind: SmartLyricsMarkKind.instrumental.id,
+      source: source,
+      now: _now(),
+    );
+    await markInstrumental(songId);
+  }
+
+  /// Takes back the mark of one line — the reader heard right the second
+  /// time.
+  Future<void> unmarkLine(int songId, int line) async {
+    final database = await _db();
+    database.revokeMarkRows(songId, line: line);
+    database.requeueSongTask(songId, now: _now());
+  }
+
+  /// Takes back the whole-track mark; the track is in line again.
+  Future<void> unmarkSong(int songId) async {
+    final database = await _db();
+    database.revokeMarkRows(songId, line: null);
+    database.requeueSongTask(songId, now: _now());
+  }
+
+  /// What the panel shows of a track's open marks.
+  Future<SmartLyricsSongFlags> flagsOf(int songId) async {
+    final open = await openMarks(songId);
+    return SmartLyricsSongFlags(
+      lines: {
+        for (final mark in open)
+          if (mark.kind == SmartLyricsMarkKind.line && mark.line != null)
+            mark.line!,
+      },
+      song: open.any((mark) => mark.kind == SmartLyricsMarkKind.song),
+      instrumental: open.any(
+        (mark) => mark.kind == SmartLyricsMarkKind.instrumental,
+      ),
+    );
+  }
+
+  /// The open marks of a track, in the order they were made — what the
+  /// management lists and the panel flies flags for.
+  Future<List<SmartLyricsMark>> openMarks(int songId) async {
+    final rows = (await _db()).openMarkRows(songId);
+    return [
+      for (final row in rows)
+        SmartLyricsMark(
+          id: row.id,
+          songId: row.songId,
+          line: row.line,
+          kind: SmartLyricsMarkKind.values.byName(row.kind),
+          source: row.source,
+          state: SmartLyricsMarkState.values.byName(row.state),
+          createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+        ),
+    ];
   }
 
   static int _now() => DateTime.now().millisecondsSinceEpoch;

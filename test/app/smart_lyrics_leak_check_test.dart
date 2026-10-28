@@ -107,6 +107,9 @@ class _LeakStore extends SmartLyricsTaskStore {
   }
 
   @override
+  Future<void> settleMarks(Song song, SmartLyricsOutcome outcome) async {}
+
+  @override
   Future<void> markDone(int songId, {required int votes, int disputed = 0}) async {
     states[songId] = SmartLyricsTaskStatus.done;
   }

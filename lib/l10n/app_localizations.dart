@@ -4409,6 +4409,30 @@ abstract class AppLocalizations {
   /// **'机器稿：票池生成，重新查找可以找更好的词'**
   String get lyricsSmartNote;
 
+  /// No description provided for @lyricsMarkLine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这行不对'**
+  String get lyricsMarkLine;
+
+  /// No description provided for @lyricsUnmarkLine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销标记'**
+  String get lyricsUnmarkLine;
+
+  /// No description provided for @lyricsMarkSong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'整首不对'**
+  String get lyricsMarkSong;
+
+  /// No description provided for @lyricsMarkNotSung.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这不是唱的'**
+  String get lyricsMarkNotSung;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:
