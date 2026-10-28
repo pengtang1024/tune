@@ -566,6 +566,15 @@ glibc 堆 ~60MB。**「稳态 200MB」在这台机器上达不到**：光图形�
 - 字体是设计语言的一部分（Serif 是壳层 display 字级），且为文件映射页
   可回收，不砍。
 
+GPU 栈的口径（2026-10-28 消融）：这台机器是 NVIDIA 独显 + Intel 核显双
+卡，但核显被 `vfio-pci` 接管（直通给虚拟机），宿主机没有它的渲染节点。
+强制走 Mesa（`__EGL_VENDOR_LIBRARY_FILENAMES=50_mesa.json`）只会落到
+llvmpipe 软渲染，RSS 反升到 404MB——不是核显的真实数字。纯核显（Mesa
+ANV/iris）机器上，NVIDIA 专属驻留（`nvidiactl` 48MB + `eglcore` 10MB +
+`gpucomp` 18MB ≈ 76MB）会消失，同构建稳态按此外推 ~230MB。应用**不自选
+GPU**：Flutter 没有这个 API，Linux 上由会话与 glvnd 决定（`prime-run`、
+`DRI_PRIME`），覆盖用户的选择得不偿失；核显机器自然继承轻驱动栈。
+
 ### 判据
 
 - `flutter test test/services/song_creator_test.dart`：损坏帧回归测试
