@@ -4,6 +4,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_local_section.dart';
 import 'package:tune/features/smart_lyrics/presentation/smart_lyrics_bound_field.dart';
 
 /// The key hole and the endpoint preset of the smart lyrics pipeline
@@ -75,6 +76,8 @@ class SmartLyricsKeySection extends ConsumerWidget {
           ],
         ),
         _AdvancedFold(config: config),
+        const SizedBox(height: CompactTokens.space12),
+        const SmartLyricsLocalSection(),
       ],
     );
   }

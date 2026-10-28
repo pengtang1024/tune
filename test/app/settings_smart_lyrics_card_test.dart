@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_sample_provider.dart';
@@ -10,6 +12,7 @@ import 'package:tune/features/smart_lyrics/data/smart_lyrics_sample_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
+import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_local_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 import '../services/fake_persistence.dart';
@@ -30,6 +33,26 @@ class _RecordingStore extends SmartLyricsSampleStore {
   @override
   Future<SmartLyricsSampleAccount> read() async =>
       SmartLyricsSampleAccount.empty;
+}
+
+/// The store the local section downloads through: it records the call and
+/// answers the checksum the home would publish, without a network.
+class _FakeModelStore extends WhisperModelStore {
+  _FakeModelStore() : super(root: Directory('/does/not/exist'));
+
+  final List<String> downloaded = [];
+
+  @override
+  Future<String?> checksumOf(String name) async => 'fake-checksum';
+
+  @override
+  Future<void> download(
+    String name, {
+    required String checksum,
+    void Function(double progress)? onProgress,
+  }) async {
+    downloaded.add(name);
+  }
 }
 
 /// The ledger of the lyrics the library carries, and the key hole the
@@ -217,5 +240,43 @@ void main() {
       controller.state.smartLyrics.asrModels,
       ['whisper-1', 'whisper-large-v3'],
     );
+  });
+
+  testWidgets('the local engine dropdown names the model the channel votes '
+      'with', (tester) async {
+    final controller = await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+    );
+
+    await tester.tap(find.byKey(const Key('smart-lyrics-local-model')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('base'));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.smartLyrics.localModel, 'base');
+  });
+
+  testWidgets('the download button brings the model home through the store', (
+    tester,
+  ) async {
+    final store = _FakeModelStore();
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        whisperModelStoreProvider.overrideWith((ref) => Future.value(store)),
+      ],
+    );
+
+    await tester.tap(find.byKey(const Key('smart-lyrics-local-model')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('small'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('smart-lyrics-local-download')));
+    await tester.pumpAndSettle();
+
+    expect(store.downloaded, ['small']);
+    expect(find.text('模型已就绪'), findsOneWidget);
   });
 }

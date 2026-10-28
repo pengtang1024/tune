@@ -68,12 +68,17 @@ class SmartLyricsConfig {
   /// run on — the same endpoint, one more name.
   final String chatModel;
 
+  /// The whisper model the local channel votes with — `''` when the local
+  /// channel is off (docs/smart-lyrics.md §6.2).
+  final String localModel;
+
   const SmartLyricsConfig({
     this.presetId = SmartLyricsPreset.openaiId,
     this.baseUrl = SmartLyricsPreset._openaiBaseUrl,
     this.apiKey = '',
     this.asrModels = const ['whisper-1'],
     this.chatModel = 'gpt-4o-mini',
+    this.localModel = '',
   });
 
   /// Whether the pipeline has a place to go and a key to knock with.
@@ -90,12 +95,14 @@ class SmartLyricsConfig {
     String? apiKey,
     List<String>? asrModels,
     String? chatModel,
+    String? localModel,
   }) => SmartLyricsConfig(
     presetId: presetId ?? this.presetId,
     baseUrl: baseUrl ?? this.baseUrl,
     apiKey: apiKey ?? this.apiKey,
     asrModels: asrModels ?? this.asrModels,
     chatModel: chatModel ?? this.chatModel,
+    localModel: localModel ?? this.localModel,
   );
 
   Map<String, dynamic> toJson() => {
@@ -104,6 +111,7 @@ class SmartLyricsConfig {
     'apiKey': apiKey,
     'asrModels': asrModels,
     'chatModel': chatModel,
+    'localModel': localModel,
   };
 
   /// Reads the config back; a broken field falls to the default of that
@@ -125,6 +133,9 @@ class SmartLyricsConfig {
       chatModel: json['chatModel'] is String
           ? json['chatModel'] as String
           : fallback.chatModel,
+      localModel: json['localModel'] is String
+          ? json['localModel'] as String
+          : fallback.localModel,
     );
   }
 }

@@ -2511,6 +2511,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'The accuracy is judged by hand on a stratified sample of the resolved tracks (studio / live / rap / non-Chinese); the sample only grows, and the last verdict of a track counts.';
 
   @override
+  String get settingsSmartLyricsLocal => 'Local engine';
+
+  @override
+  String get settingsSmartLyricsLocalOff => 'Off';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => 'Download the model';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => 'Downloading……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => 'The model is ready';
+
+  @override
+  String get settingsSmartLyricsLocalFailed =>
+      'The download failed: try again, or pick another model';
+
+  @override
   String get lyricsSmartGenerate => 'Smart lyrics';
 
   @override

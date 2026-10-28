@@ -86,4 +86,9 @@ abstract class SmartLyricsEngine {
 
   /// Closes the channel. Calling [transcribe] after this throws.
   void dispose() => _disposed = true;
+
+  /// Stops the run that is on its way, when the engine has something to
+  /// stop. An engine with nothing running lets the run finish; the caller
+  /// discards the answer when the run was cancelled.
+  void requestCancel() {}
 }

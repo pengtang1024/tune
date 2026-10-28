@@ -2309,6 +2309,24 @@ class AppLocalizationsZh extends AppLocalizations {
       '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
 
   @override
+  String get settingsSmartLyricsLocal => '本地引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '关闭';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下载模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下载中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就绪';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -4693,6 +4711,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
 
   @override
+  String get settingsSmartLyricsLocal => '本地引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '关闭';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下载模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下载中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就绪';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -7075,6 +7111,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsSmartLyricsAccuracyNote =>
       '正確率按已解決樣本分層人工核對（直錄棚 / Live / 說唱 / 非中文）；樣本只增不減，改判以最後一筆為準。';
+
+  @override
+  String get settingsSmartLyricsLocal => '本機引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '關閉';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下載模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下載中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就緒';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下載失敗：重試，或換個模型';
 
   @override
   String get lyricsSmartGenerate => '智慧生成';

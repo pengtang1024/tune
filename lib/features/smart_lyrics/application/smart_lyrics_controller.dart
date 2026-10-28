@@ -6,6 +6,8 @@ import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
+import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
+import 'package:tune/data/services/smart_lyrics/whisper_local_engine.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
@@ -39,10 +41,23 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     apiKey: config.apiKey,
   );
 
+  // The local channel votes when a model was named for it: a binary the
+  // system already has first, the downloaded one as the fallback. The
+  // folders are resolved once per run of the pipeline, not per song.
+  final localModel = config.localModel.trim();
+  final assets = Future<WhisperAssets>.sync(WhisperAssets.appDefault);
+
   return SmartLyricsService(
     engines: [
       for (final model in config.asrModels)
         OpenAiCompatibleEngine(model: model, client: client),
+      if (localModel.isNotEmpty)
+        WhisperLocalEngine(
+          model: localModel,
+          binaryOf: () async => (await assets).findBinary(),
+          modelOf: () async => (await assets).findModel(localModel),
+          workspaceOf: () async => (await assets).workspace(),
+        ),
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
@@ -115,5 +130,15 @@ class SmartLyricsController extends Notifier<SmartLyricsRun> {
   }
 
   /// Stops the run between two votes; nothing half-written stays behind.
-  void cancel() => _cancelled = true;
+  ///
+  /// A channel that is mid-pass is asked to stop with it — a local
+  /// transcription that would keep chewing minutes of CPU is killed where
+  /// it stands.
+  void cancel() {
+    _cancelled = true;
+    final engines = ref.read(smartLyricsServiceProvider).engines;
+    for (final engine in engines) {
+      engine.requestCancel();
+    }
+  }
 }

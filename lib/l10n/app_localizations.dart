@@ -4271,6 +4271,42 @@ abstract class AppLocalizations {
   /// **'正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。'**
   String get settingsSmartLyricsAccuracyNote;
 
+  /// No description provided for @settingsSmartLyricsLocal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地引擎'**
+  String get settingsSmartLyricsLocal;
+
+  /// No description provided for @settingsSmartLyricsLocalOff.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭'**
+  String get settingsSmartLyricsLocalOff;
+
+  /// No description provided for @settingsSmartLyricsLocalDownload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载模型'**
+  String get settingsSmartLyricsLocalDownload;
+
+  /// No description provided for @settingsSmartLyricsLocalBusy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载中……'**
+  String get settingsSmartLyricsLocalBusy;
+
+  /// No description provided for @settingsSmartLyricsLocalReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'模型已就绪'**
+  String get settingsSmartLyricsLocalReady;
+
+  /// No description provided for @settingsSmartLyricsLocalFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载失败：重试，或换个模型'**
+  String get settingsSmartLyricsLocalFailed;
+
   /// No description provided for @lyricsSmartGenerate.
   ///
   /// In zh_CN, this message translates to:

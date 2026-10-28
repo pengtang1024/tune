@@ -14,7 +14,7 @@
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
-| 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M3 已实施，方案推进中） |
+| 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M4 已实施，方案推进中） |
 | 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（提案，待评审） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
 | 查健康度里 unknown 的处理约定 | [`docs/health-unknown.md`](docs/health-unknown.md)（给健康度会话的提醒） |

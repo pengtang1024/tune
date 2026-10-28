@@ -52,6 +52,7 @@ void main() {
         apiKey: 'sk-test',
         asrModels: ['whisper-1', 'whisper-large-v3'],
         chatModel: 'gpt-4o',
+        localModel: 'base',
       );
 
       final restored = SmartLyricsConfig.fromJson(config.toJson());
@@ -61,6 +62,7 @@ void main() {
       expect(restored.apiKey, 'sk-test');
       expect(restored.asrModels, ['whisper-1', 'whisper-large-v3']);
       expect(restored.chatModel, 'gpt-4o');
+      expect(restored.localModel, 'base');
       expect(restored.isConfigured, isTrue);
     });
 
@@ -68,10 +70,20 @@ void main() {
       final restored = SmartLyricsConfig.fromJson({
         'asrModels': 'not a list',
         'chatModel': 42,
+        'localModel': 42,
       });
 
       expect(restored.asrModels, SmartLyricsConfig().asrModels);
       expect(restored.chatModel, SmartLyricsConfig().chatModel);
+      expect(restored.localModel, SmartLyricsConfig().localModel);
+    });
+
+    test('the local channel is off until a model is named', () {
+      expect(const SmartLyricsConfig().localModel, '');
+      expect(
+        const SmartLyricsConfig(localModel: 'base').localModel,
+        'base',
+      );
     });
   });
 }
