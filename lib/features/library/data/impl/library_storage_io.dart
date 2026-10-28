@@ -88,6 +88,56 @@ class FileLibraryStorage implements LibraryStorage {
   }
 
   @override
+  Future<int> ingest(List<Song> songs) async {
+    // The document is the whole library, so the merge happens in memory: this
+    // storage only serves builds and tests that predate the database.
+    final stored = {
+      for (final song in await load()) song.uri: song,
+    };
+    final incoming = <String, Song>{
+      for (final song in songs) song.uri: song,
+    };
+    for (final entry in incoming.entries) {
+      final known = stored[entry.key];
+      stored[entry.key] = known == null
+          ? entry.value
+          : entry.value.mergeWith(known);
+    }
+    final merged = stored.values.toList(growable: false);
+    final written = merged.length;
+    await save(merged);
+    return written;
+  }
+
+  @override
+  Future<int> deactivateUncovered({
+    required Set<String> enabledSourceIds,
+    required List<String> localPaths,
+  }) async {
+    // A document cannot hold an inactive row: the rows the scan does not
+    // cover are dropped, and the next scan of their source writes them back.
+    final coveredPrefixes = [
+      for (final folder in localPaths) folder,
+    ];
+    bool covered(Song song) {
+      final sourceId = song.sourceId ?? 'local';
+      if (!enabledSourceIds.contains(sourceId)) return false;
+      if (sourceId == 'local' && coveredPrefixes.isNotEmpty) {
+        return coveredPrefixes.any(
+          (folder) =>
+              song.uri == folder || song.uri.startsWith('$folder/'),
+        );
+      }
+      return true;
+    }
+
+    final kept = (await load()).where(covered).toList(growable: false);
+    final marked = (await load()).length - kept.length;
+    if (marked > 0) await save(kept);
+    return marked;
+  }
+
+  @override
   Future<int> count() async => (await load()).length;
 
   @override
@@ -257,7 +307,11 @@ class SqliteLibraryStorage implements LibraryStorage {
         ? await factory()
         : AppDatabase.open(path.join((await _directory()).path, _fileName));
     _database = database;
-    await _adoptLegacyDocument(database, await _directory());
+    // A database that the app opens itself owns its migrations; only a
+    // database this storage opens on its own adopts the legacy document.
+    if (_databaseFactory == null) {
+      await _adoptLegacyDocument(database, await _directory());
+    }
     return database;
   }
 
@@ -301,6 +355,47 @@ class SqliteLibraryStorage implements LibraryStorage {
       (await _db()).save(songs, pinned: pinned);
     } catch (error, stackTrace) {
       Log.error('保存音乐库失败: $error\n$stackTrace');
+    }
+  }
+
+  @override
+  Future<int> ingest(List<Song> songs) async {
+    try {
+      final database = await _db();
+      // The rows travel to the disk a window at a time. The pause between two
+      // windows is a breath for the event loop, so the progress of a scan
+      // keeps moving while a library of any size is ingested — this is
+      // cooperative scheduling of a bulk write, not a way to hide a state
+      // problem from the build.
+      var written = 0;
+      for (var start = 0; start < songs.length; start += 500) {
+        written += database.ingestBatch(
+          songs.skip(start).take(500).toList(growable: false),
+        );
+        if (start + 500 < songs.length) {
+          await Future<void>.delayed(Duration.zero);
+        }
+      }
+      return written;
+    } catch (error, stackTrace) {
+      Log.error('合并音乐库失败: $error\n$stackTrace');
+      return 0;
+    }
+  }
+
+  @override
+  Future<int> deactivateUncovered({
+    required Set<String> enabledSourceIds,
+    required List<String> localPaths,
+  }) async {
+    try {
+      return (await _db()).deactivateUncovered(
+        enabledSourceIds: enabledSourceIds,
+        localPaths: localPaths,
+      );
+    } catch (error, stackTrace) {
+      Log.error('收窄音乐库失败: $error\n$stackTrace');
+      return 0;
     }
   }
 

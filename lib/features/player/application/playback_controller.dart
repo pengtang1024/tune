@@ -839,12 +839,29 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   ///
   /// The transfer never decides the playback: when it fails, the track keeps
   /// playing from the network and only the offline copy is missing.
+  ///
+  /// The progress events arrive with every chunk; a fast connection can
+  /// raise dozens of them per second, and each one hands a new state to the
+  /// whole chain of listeners. They are published at most ten times a
+  /// second, with the final value always riding through.
   Future<void> _cacheInBackground(Song song, int request) async {
+    // The first event rides through at once; after that the events are
+    // published at most ten times a second, with the final value always
+    // riding through.
+    DateTime? publishedAt;
     try {
       await _downloads.download(
         song,
         onProgress: (progress) {
           if (!mounted || request != _loadRequest) return;
+          final now = DateTime.now();
+          final last = publishedAt;
+          if (progress < 1 &&
+              last != null &&
+              now.difference(last) < const Duration(milliseconds: 100)) {
+            return;
+          }
+          publishedAt = now;
           state = state.copyWith(downloadProgress: progress);
         },
       );

@@ -55,4 +55,35 @@ void main() {
     expect(scanned.hasLocalFile, isTrue);
     expect(scanned.hasRemoteSource, isTrue);
   });
+
+  test('a corrupt tag declaring a gigabyte frame stays bounded', () async {
+    // A real-world mp3 (2014-02-12 Bigwords.mp3) carried a corrupt ID3v2
+    // frame header that declared ~1.2 GB of payload on a 4 MB file. The
+    // tag reader used to allocate the declared size, so scanning that one
+    // file raised the resident memory by 1.2 GB. This replica keeps the
+    // shape: a valid tag, one small frame, then a frame header whose size
+    // runs past the end of the file.
+    final bytes = <int>[
+      // ID3v2.3 header: "ID3", version 2.3, no flags, tag size 118.
+      0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x76,
+      // COMM frame, 98 bytes of payload.
+      0x43, 0x4F, 0x4D, 0x4D, 0x00, 0x00, 0x00, 0x62,
+      ...List.filled(98, 0),
+      // The corrupt frame: id "\x00COM" declaring 1,291,845,632 bytes.
+      0x00, 0x43, 0x4F, 0x4D, 0x4D, 0x00, 0x00, 0x00,
+    ];
+    final file = File(path.join(library.path, 'Corrupt.mp3'))
+      ..writeAsBytesSync(bytes);
+
+    int rss() => ProcessInfo.currentRss;
+    final before = rss();
+
+    final scanned = await SongCreator.createFromFile(file);
+
+    expect(scanned, isNotNull);
+    expect(scanned!.uri, file.path);
+    // The declared 1.2 GB must never become a resident allocation. The
+    // parse itself costs a few MB; two orders of magnitude is slack.
+    expect(rss() - before, lessThan(100 * 1024 * 1024));
+  });
 }

@@ -25,6 +25,15 @@ class EmptyLibraryStorage implements LibraryStorage {
   Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {}
 
   @override
+  Future<int> ingest(List<Song> songs) async => 0;
+
+  @override
+  Future<int> deactivateUncovered({
+    required Set<String> enabledSourceIds,
+    required List<String> localPaths,
+  }) async => 0;
+
+  @override
   Future<int> count() async => 0;
 
   @override

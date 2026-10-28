@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.24.0+25
+version: 1.25.0+26
 
 environment:
   sdk: ^3.8.1
@@ -102,6 +102,12 @@ dependencies:
   media_kit_libs_linux: ^1.2.1
   sqlite3: ^3.8.0
   sqlite3_flutter_libs: ^0.6.0+eol
+
+# 上游 Buffer.read 无界分配（损坏标签可声明 GB 级帧），本地补丁见
+# vendor/audio_metadata_reader/VENDORED.md。
+dependency_overrides:
+  audio_metadata_reader:
+    path: vendor/audio_metadata_reader
 
 dev_dependencies:
   flutter_test:

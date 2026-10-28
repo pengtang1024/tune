@@ -8,15 +8,13 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/discovery/domain/taste_aggregates.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 
 import '../services/fake_persistence.dart';
+import 'fake_library_storage.dart';
 import 'fake_song_download_service.dart';
 
 void main() {
@@ -115,40 +113,37 @@ void main() {
     expect(state.statusMessage, contains('1 个音源失败'));
   });
 
-  test(
-    'a skipped source keeps its cached songs and no error is shown',
-    () async {
-      // The web build has no music folder, so every source is skipped when the
-      // last scan is still too recent. The library keeps the songs of that
-      // scan, so the player must not report a failure.
-      final container = createContainer(
-        sources: const [localSource, remoteSource],
-        results: {
-          'local': SourceScanResult(
-            sourceId: 'local',
-            status: SourceScanStatus.skipped,
-            message: '距上次扫描不足间隔',
-          ),
-          'openverse': SourceScanResult(
-            sourceId: 'openverse',
-            status: SourceScanStatus.skipped,
-            message: '距上次扫描不足间隔',
-          ),
-        },
-      );
+  test('a skipped source keeps its cached songs and no error is shown', () async {
+    // The web build has no music folder, so every source is skipped when the
+    // last scan is still too recent. The library keeps the songs of that
+    // scan, so the player must not report a failure.
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.skipped,
+          message: '距上次扫描不足间隔',
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.skipped,
+          message: '距上次扫描不足间隔',
+        ),
+      },
+    );
 
-      await container.read(libraryControllerProvider.future);
-      await container.read(libraryControllerProvider.notifier).scan(['/music']);
+    await container.read(libraryControllerProvider.future);
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
-      final state = container.read(libraryControllerProvider).requireValue;
-      expect(state.songs.map((song) => song.uri), [
-        localSong.uri,
-        oldRemoteSong.uri,
-      ]);
-      expect(state.errorMessage, isNull);
-      expect(state.statusMessage, '已保留缓存，距上次扫描不足间隔');
-    },
-  );
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.songs.map((song) => song.uri), [
+      localSong.uri,
+      oldRemoteSong.uri,
+    ]);
+    expect(state.errorMessage, isNull);
+    expect(state.statusMessage, '已保留缓存，距上次扫描不足间隔');
+  });
 
   test('a successful source adds to its previous songs', () async {
     final container = createContainer(
@@ -276,7 +271,7 @@ void main() {
       externalId: 'new',
       dateAdded: 8000,
     );
-    storage.songs = [firstSeen];
+    storage.database.save([firstSeen]);
 
     final container = createContainer(
       sources: const [localSource, remoteSource],
@@ -332,6 +327,43 @@ void main() {
 
     expect(downloads.markedUris, contains(oldRemoteSong.uri));
   });
+
+  test('a scan that brings the library back keeps the window it had', () async {
+    // The rows the scan re-arms are exactly the rows that are stored: no
+    // write, no new window, and the page does not rebuild. The first scan
+    // settles the storage into its fixed point; the second one costs
+    // nothing.
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.success,
+          songs: [localSong],
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.success,
+          songs: [oldRemoteSong],
+        ),
+      },
+    );
+
+    await container.read(libraryControllerProvider.future);
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
+    final before = container
+        .read(libraryControllerProvider)
+        .requireValue
+        .songs;
+    await container.read(libraryControllerProvider.notifier).scan(['/music']);
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(identical(state.songs, before), isTrue);
+    expect(state.songs.map((song) => song.uri), [
+      localSong.uri,
+      oldRemoteSong.uri,
+    ]);
+  });
 }
 
 class FakeScanner extends CrossPlatformMusicScannerImpl {
@@ -378,95 +410,4 @@ class FakeSourcesController extends MusicSourcesController {
 
   @override
   Future<MusicSourcesState> build() async => seed;
-}
-
-class FakeLibraryStorage extends LibraryStorage {
-  FakeLibraryStorage(this.songs);
-
-  List<Song> songs;
-
-  @override
-  Future<List<Song>> load() async => List.unmodifiable(songs);
-
-  @override
-  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {
-    this.songs = List.of(songs);
-  }
-
-  @override
-  Future<int> count() async => songs.length;
-
-  @override
-  Future<List<Song>> page({required int offset, required int limit}) async {
-    if (offset >= songs.length) return const [];
-    return songs.sublist(offset, (offset + limit).clamp(0, songs.length));
-  }
-
-  @override
-  Future<List<Song>> search({
-    required String query,
-    String? sourceId,
-    required int offset,
-    required int limit,
-  }) async {
-    final needle = query.trim().toLowerCase();
-    final filtered = songs.where((song) {
-      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
-        return false;
-      }
-      if (needle.isEmpty) return true;
-      return song.title.toLowerCase().contains(needle) ||
-          song.artist.toLowerCase().contains(needle) ||
-          song.album.toLowerCase().contains(needle);
-    }).toList();
-    if (offset >= filtered.length) return const [];
-    return filtered.sublist(
-      offset,
-      (offset + limit).clamp(0, filtered.length),
-    );
-  }
-
-  @override
-  Future<int> countMatching({required String query, String? sourceId}) async {
-    final needle = query.trim().toLowerCase();
-    return songs.where((song) {
-      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
-        return false;
-      }
-      if (needle.isEmpty) return true;
-      return song.title.toLowerCase().contains(needle) ||
-          song.artist.toLowerCase().contains(needle) ||
-          song.album.toLowerCase().contains(needle);
-    }).length;
-  }
-
-  @override
-  Future<List<AlbumSummary>> albumSummaries() async => const [];
-
-  @override
-  Future<List<Song>> albumSongs(String key) async => const [];
-
-  @override
-  Future<void> removeSource(String sourceId) async {
-    songs = songs
-        .where((song) => (song.sourceId ?? 'local') != sourceId)
-        .toList();
-  }
-
-  @override
-  Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
-
-  @override
-  Future<void> syncPinned(Set<String> ids) async {}
-
-  @override
-  Future<List<String>> prune(int limit) async => const [];
-
-  @override
-  Future<void> markPlayed(String uri) async {}
-
-  @override
-  Future<void> clear() async {
-    songs = [];
-  }
 }

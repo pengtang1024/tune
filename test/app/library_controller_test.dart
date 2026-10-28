@@ -9,15 +9,13 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/discovery/domain/taste_aggregates.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 
 import '../services/fake_persistence.dart';
+import 'fake_library_storage.dart';
 import 'fake_song_download_service.dart';
 
 void main() {
@@ -43,14 +41,12 @@ void main() {
     uri: '/music/c.mp3',
   );
 
-  late FakeLibraryStorage storage;
   late FakeMusicScanner scanner;
   late FakeMusicSourceStore sourceStore;
   late FakeSongDownloadService downloads;
   late ProviderContainer container;
 
-  setUp(() {
-    storage = FakeLibraryStorage([songA]);
+  ProviderContainer buildContainer(FakeLibraryStorage storage) {
     scanner = FakeMusicScanner();
     sourceStore = FakeMusicSourceStore();
     downloads = FakeSongDownloadService();
@@ -66,9 +62,11 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
-  });
+    return container;
+  }
 
   test('build loads the persisted library', () async {
+    final container = buildContainer(FakeLibraryStorage([songA]));
     final state = await container.read(libraryControllerProvider.future);
 
     expect(state.songs.map((song) => song.uri), [songA.uri]);
@@ -76,16 +74,16 @@ void main() {
   });
 
   test('a large library is read a window at a time', () async {
-    storage.songs = [
-      for (var index = 0; index <= LibraryController.windowSize; index++)
-        Song(
-          id: index,
-          title: 'Track $index',
-          uri: '/music/$index.mp3',
-        ),
-    ];
-    container.invalidate(libraryControllerProvider);
-
+    final container = buildContainer(
+      FakeLibraryStorage([
+        for (var index = 0; index <= LibraryController.windowSize; index++)
+          Song(
+            id: index,
+            title: 'Track $index',
+            uri: '/music/$index.mp3',
+          ),
+      ]),
+    );
     final first = await container.read(libraryControllerProvider.future);
 
     expect(first.songs, hasLength(LibraryController.windowSize));
@@ -100,6 +98,8 @@ void main() {
   });
 
   test('scan adds to the library and persists sorted songs', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
     scanner.songs = [songC, songB];
 
@@ -114,11 +114,16 @@ void main() {
     // The scanned window joins the persisted library instead of replacing it.
     expect(state.songs.map((song) => song.title), ['Alpha', 'Beta', 'Gamma']);
     expect(state.statusMessage, '已扫描 3 首歌曲');
-    expect(storage.songs.map((song) => song.title), ['Alpha', 'Beta', 'Gamma']);
-    expect(storage.saveCount, 1);
+    expect(storage.database.load().map((song) => song.title), [
+      'Alpha',
+      'Beta',
+      'Gamma',
+    ]);
+    expect(storage.ingestCount, 1);
   });
 
   test('startup auto scan runs once with the configured paths', () async {
+    final container = buildContainer(FakeLibraryStorage([songA]));
     await container.read(libraryControllerProvider.future);
     scanner.songs = [songB];
     final controller = container.read(libraryControllerProvider.notifier);
@@ -133,27 +138,32 @@ void main() {
   });
 
   test('scan marks the source timestamp after saving songs', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
     scanner.songs = [songB];
 
     await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
-    expect(storage.saveCount, 1);
+    expect(storage.ingestCount, 1);
     expect(sourceStore.marked, ['local']);
   });
 
   test('failed library save does not mark the source as scanned', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
-    storage.failSave = true;
+    storage.failIngest = true;
     scanner.songs = [songB];
 
     await container.read(libraryControllerProvider.notifier).scan(['/music']);
 
-    expect(storage.saveCount, 1);
+    expect(storage.ingestCount, 1);
     expect(sourceStore.marked, isEmpty);
   });
 
   test('a second scan request is ignored while one is running', () async {
+    final container = buildContainer(FakeLibraryStorage([songA]));
     await container.read(libraryControllerProvider.future);
     final gate = Completer<void>();
     scanner.gate = gate;
@@ -176,20 +186,24 @@ void main() {
   });
 
   test('a search finds a track outside the first window', () async {
-    storage.songs = [
-      for (var index = 0; index <= LibraryController.windowSize; index++)
-        Song(
-          id: index,
-          title: 'Track $index',
-          uri: '/music/$index.mp3',
-        ),
-    ];
-    container.invalidate(libraryControllerProvider);
+    final container = buildContainer(
+      FakeLibraryStorage([
+        for (var index = 0; index <= LibraryController.windowSize; index++)
+          Song(
+            id: index,
+            title: 'Track $index',
+            uri: '/music/$index.mp3',
+          ),
+      ]),
+    );
     await container.read(libraryControllerProvider.future);
 
     await container
         .read(libraryControllerProvider.notifier)
         .setQuery('Track ${LibraryController.windowSize}');
+    // The read follows the word a breath behind; the pause is what pays for
+    // it once instead of once per key.
+    await Future<void>.delayed(const Duration(milliseconds: 250));
 
     final state = container.read(libraryControllerProvider).requireValue;
     expect(state.songs.map((song) => song.title), [
@@ -197,7 +211,31 @@ void main() {
     ]);
   });
 
+  test('a search waits for the pause of typing', () async {
+    final storage = FakeLibraryStorage([
+      for (var index = 0; index <= LibraryController.windowSize; index++)
+        Song(
+          id: index,
+          title: 'Track $index',
+          uri: '/music/$index.mp3',
+        ),
+    ]);
+    final container = buildContainer(storage);
+    await container.read(libraryControllerProvider.future);
+
+    await container.read(libraryControllerProvider.notifier).setQuery('Tra');
+    await container
+        .read(libraryControllerProvider.notifier)
+        .setQuery('Track 1');
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
+    // Two keys, one read: the pause pays for the window, not each key.
+    expect(storage.reloadCount, 1);
+  });
+
   test('adding search results merges them into the library', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
     const found = Song(
       id: 9,
@@ -218,10 +256,15 @@ void main() {
     // The new track joins the library and the one that was already there is
     // kept once, in title order.
     expect(state.songs.map((song) => song.title), ['Alpha', 'Delta']);
-    expect(storage.songs.map((song) => song.title), ['Alpha', 'Delta']);
+    expect(storage.database.load().map((song) => song.title), [
+      'Alpha',
+      'Delta',
+    ]);
   });
 
   test('clearing the library discards a pending scan result', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
     final gate = Completer<void>();
     scanner.gate = gate;
@@ -237,7 +280,7 @@ void main() {
     );
 
     await container.read(libraryControllerProvider.notifier).clearLibrary();
-    expect(storage.clearCount, 1);
+    expect(storage.database.count(), 0);
     expect(
       container.read(libraryControllerProvider).requireValue.songs,
       isEmpty,
@@ -249,105 +292,8 @@ void main() {
     final state = container.read(libraryControllerProvider).requireValue;
     expect(state.songs, isEmpty);
     expect(state.isScanning, isFalse);
-    expect(storage.songs, isEmpty);
+    expect(storage.database.load(), isEmpty);
   });
-}
-
-class FakeLibraryStorage extends LibraryStorage {
-  FakeLibraryStorage(this.songs);
-
-  List<Song> songs;
-  int saveCount = 0;
-  int clearCount = 0;
-  bool failSave = false;
-
-  @override
-  Future<List<Song>> load() async => List.unmodifiable(songs);
-
-  @override
-  Future<void> save(List<Song> songs, {Set<String> pinned = const {}}) async {
-    saveCount += 1;
-    if (failSave) throw StateError('save failed');
-    this.songs = List.of(songs);
-  }
-
-  @override
-  Future<int> count() async => songs.length;
-
-  @override
-  Future<List<Song>> page({required int offset, required int limit}) async {
-    if (offset >= songs.length) return const [];
-    return songs.sublist(offset, (offset + limit).clamp(0, songs.length));
-  }
-
-  @override
-  Future<List<Song>> search({
-    required String query,
-    String? sourceId,
-    required int offset,
-    required int limit,
-  }) async {
-    final needle = query.trim().toLowerCase();
-    final filtered = songs.where((song) {
-      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
-        return false;
-      }
-      if (needle.isEmpty) return true;
-      return song.title.toLowerCase().contains(needle) ||
-          song.artist.toLowerCase().contains(needle) ||
-          song.album.toLowerCase().contains(needle);
-    }).toList();
-    if (offset >= filtered.length) return const [];
-    return filtered.sublist(
-      offset,
-      (offset + limit).clamp(0, filtered.length),
-    );
-  }
-
-  @override
-  Future<int> countMatching({required String query, String? sourceId}) async {
-    final needle = query.trim().toLowerCase();
-    return songs.where((song) {
-      if (sourceId != null && (song.sourceId ?? 'local') != sourceId) {
-        return false;
-      }
-      if (needle.isEmpty) return true;
-      return song.title.toLowerCase().contains(needle) ||
-          song.artist.toLowerCase().contains(needle) ||
-          song.album.toLowerCase().contains(needle);
-    }).length;
-  }
-
-  @override
-  Future<List<AlbumSummary>> albumSummaries() async => const [];
-
-  @override
-  Future<List<Song>> albumSongs(String key) async => const [];
-
-  @override
-  Future<void> removeSource(String sourceId) async {
-    songs = songs
-        .where((song) => (song.sourceId ?? 'local') != sourceId)
-        .toList();
-  }
-
-  @override
-  Future<TasteAggregates> tasteAggregates() async => TasteAggregates.empty;
-
-  @override
-  Future<void> syncPinned(Set<String> ids) async {}
-
-  @override
-  Future<List<String>> prune(int limit) async => const [];
-
-  @override
-  Future<void> markPlayed(String uri) async {}
-
-  @override
-  Future<void> clear() async {
-    songs = [];
-    clearCount += 1;
-  }
 }
 
 class FakeMusicSourceStore extends MusicSourceStore {

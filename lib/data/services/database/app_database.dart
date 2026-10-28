@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/core/utils/text_order.dart';
@@ -26,8 +27,14 @@ class AppDatabase {
 
   /// Creates the table and its indexes when they are not there yet.
   static Database _prepare(Database db) {
-    // Two connections may open the same file (the library and the session
-    // store); a short wait keeps one from failing the other's write.
+    // A write lands on the journal file first; WAL keeps that append in one
+    // file and lets a reader run while a write is in flight, so the bursts
+    // of writes a session produces (every switch of track, every mark) do
+    // not turn into fsyncs on the thread that draws the window.
+    db.execute('PRAGMA journal_mode = WAL');
+    db.execute('PRAGMA synchronous = NORMAL');
+    // Two connections may open the same file (a store that opened its own);
+    // a short wait keeps one from failing the other's write.
     db.execute('PRAGMA busy_timeout = 5000');
     db.execute('''
       CREATE TABLE IF NOT EXISTS songs (
@@ -92,16 +99,72 @@ class AppDatabase {
       'play_count': 'play_count INTEGER NOT NULL DEFAULT 0',
       'year': 'year INTEGER',
       'genre': 'genre TEXT',
+      // The fingerprint of a row's facts: a scan that brings the same track
+      // back skips the write instead of rewriting the row.
+      'facts_hash': 'facts_hash INTEGER NOT NULL DEFAULT 0',
+      // Whether the row still belongs to the library the reader sees: a row
+      // of a source that is off, or of a file that is gone, does not.
+      'active': 'active INTEGER NOT NULL DEFAULT 1',
+      // The folded title the rows are ordered by, so a window read from the
+      // disk stands in the order the page expects.
+      'title_sort': "title_sort TEXT NOT NULL DEFAULT ''",
     };
+    final added = <String>{};
     for (final entry in additions.entries) {
       if (columns.contains(entry.key)) continue;
       db.execute('ALTER TABLE songs ADD COLUMN ${entry.value}');
+      added.add(entry.key);
+    }
+    // The local files had no source of their own; the built-in local source
+    // is named 'local', and every row that belongs to it says so from now on.
+    db.execute("UPDATE songs SET source_id = 'local' WHERE source_id IS NULL");
+    if (added.contains('title_sort')) _backfillTitleSort(db);
+  }
+
+  /// Writes the folded title of every row that misses its sort key.
+  ///
+  /// An older database ordered its rows the moment they were read; the key is
+  /// written once here so the windows that follow read an ordered table.
+  /// This runs inside [open], so the one run of it is a one-time pause on the
+  /// first start with an older database — a few hundred rows cost nothing, a
+  /// library of fifty thousand rows pauses once and never again.
+  static void _backfillTitleSort(Database db) {
+    final rows = db.select("SELECT uri, title FROM songs WHERE title_sort = ''");
+    if (rows.isEmpty) return;
+    db.execute('BEGIN');
+    try {
+      final statement = db.prepare(
+        'UPDATE songs SET title_sort = ? WHERE uri = ?',
+      );
+      try {
+        for (final row in rows) {
+          statement.execute([
+            foldText(row['title'] as String? ?? ''),
+            row['uri'] as String,
+          ]);
+        }
+      } finally {
+        statement.close();
+      }
+      db.execute('COMMIT');
+    } catch (error) {
+      db.execute('ROLLBACK');
+      rethrow;
     }
   }
 
-  /// Every track the library holds.
+  /// The tracks the library still holds: the rows that belong to an enabled
+  /// source or a file that is still on the disk, in play order.
   List<Song> load() {
-    final rows = _db.select('SELECT json FROM songs');
+    final rows = _db.select(
+      'SELECT json FROM songs WHERE active = 1 '
+      'ORDER BY title_sort COLLATE NOCASE',
+    );
+    return _songsFromRows(rows);
+  }
+
+  /// Decodes the json column of [rows], skipping the rows that cannot.
+  List<Song> _songsFromRows(List<Map<String, Object?>> rows) {
     final songs = <Song>[];
     for (final row in rows) {
       try {
@@ -115,13 +178,72 @@ class AppDatabase {
     return songs;
   }
 
-  /// Replaces the library with [songs] in one transaction.
-  ///
-  /// Rows that did not change are left alone, so a scan that adds ten tracks
-  /// writes ten rows instead of the whole library.
-  void save(List<Song> songs, {Set<String> pinned = const {}}) {
-    final seenAt = DateTime.now().millisecondsSinceEpoch;
+  /// The fingerprint of a track's facts: every field the json column holds
+  /// takes part. Equal fingerprints mean equal json (a collision misses one
+  /// write of one row — harmless), so a scan that brings a track back with
+  /// the same facts skips its write instead of rewriting it.
+  static int factsHashOf(Song song) {
+    final document = Object.hash(
+      song.id,
+      song.title,
+      song.artist,
+      song.album,
+      song.duration,
+      song.uri,
+      song.dateAdded,
+      song.genre,
+      song.year,
+      song.bitrate,
+      song.sampleRate,
+      song.trackNumber,
+      song.trackTotal,
+      song.discNumber,
+      song.totalDisc,
+      song.lyrics,
+      song.language,
+      song.size,
+      song.type,
+      song.albumArtPath,
+    );
+    final source = Object.hash(
+      song.sourceId,
+      song.externalId,
+      song.streamUrl,
+      song.artworkUrl,
+      song.isLiveStream,
+      song.license,
+      song.description,
+      song.localPath,
+      song.genres == null ? null : Object.hashAll(song.genres!),
+      song.performers == null ? null : Object.hashAll(song.performers!),
+      song.sourceData == null
+          ? null
+          : Object.hashAll(
+              song.sourceData!.entries.map(
+                (entry) => Object.hash(entry.key, entry.value),
+              ),
+            ),
+      song.httpHeaders == null
+          ? null
+          : Object.hashAll(
+              song.httpHeaders!.entries.map(
+                (entry) => Object.hash(entry.key, entry.value),
+              ),
+            ),
+    );
+    return Object.hash(document, source);
+  }
 
+  /// The id a row of [song] belongs to: the local files all belong to the
+  /// built-in local source.
+  static String _sourceKeyOf(Song song) => song.sourceId ?? 'local';
+
+  /// Upserts [songs] in one transaction.
+  ///
+  /// The rows outside the batch are left alone: removing a source or a stale
+  /// track is an explicit call. A caller that holds one window of a large
+  /// library must not erase the rows beyond it.
+  void save(List<Song> songs, {Set<String> pinned = const {}}) {
     _db.execute('BEGIN');
     try {
       // The pin and the last seen time follow the scan; the last played time
@@ -129,8 +251,8 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, pinned, last_seen)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           json, pinned, last_seen, title_sort, facts_hash, active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -141,13 +263,17 @@ class AppDatabase {
           genre = excluded.genre,
           json = excluded.json,
           pinned = excluded.pinned,
-          last_seen = excluded.last_seen
+          last_seen = excluded.last_seen,
+          title_sort = excluded.title_sort,
+          facts_hash = excluded.facts_hash,
+          active = 1
       ''');
       try {
+        final seenAt = DateTime.now().millisecondsSinceEpoch;
         for (final song in songs) {
           statement.execute([
             song.uri,
-            song.sourceId,
+            _sourceKeyOf(song),
             song.title,
             song.artist,
             song.album,
@@ -157,6 +283,8 @@ class AppDatabase {
             jsonEncode(song.toJson()),
             pinned.contains(song.uri) ? 1 : 0,
             seenAt,
+            foldText(song.title),
+            factsHashOf(song),
           ]);
         }
       } finally {
@@ -167,6 +295,242 @@ class AppDatabase {
       _db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  /// Merges one batch of scanned tracks into the library.
+  ///
+  /// A track the library already holds this way is left alone; a track whose
+  /// facts changed is rewritten with the earlier "added" time kept; a track
+  /// that arrives from another source than the row it names is merged with
+  /// that row, so one row says everything both sides knew. Answers how many
+  /// rows were written.
+  int ingestBatch(List<Song> songs) {
+    // A batch can name a uri twice (a file and the copy of its track meet in
+    // the same scan); they fold first, so the row is written once.
+    final incoming = <String, Song>{};
+    for (final song in songs) {
+      final known = incoming[song.uri];
+      incoming[song.uri] = known == null
+          ? song
+          : _withFirstSeen(song.mergeWith(known), song.dateAdded, known.dateAdded);
+    }
+
+    final existing = {
+      for (final row in _existingRows(incoming.keys))
+        row['uri'] as String: row,
+    };
+
+    var written = 0;
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare('''
+        INSERT INTO songs
+          (uri, source_id, title, artist, album, date_added, year, genre,
+           json, last_seen, title_sort, facts_hash, active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        ON CONFLICT(uri) DO UPDATE SET
+          source_id = excluded.source_id,
+          title = excluded.title,
+          artist = excluded.artist,
+          album = excluded.album,
+          date_added = excluded.date_added,
+          year = excluded.year,
+          genre = excluded.genre,
+          json = excluded.json,
+          last_seen = excluded.last_seen,
+          title_sort = excluded.title_sort,
+          facts_hash = excluded.facts_hash,
+          active = 1
+      ''');
+      try {
+        final seenAt = DateTime.now().millisecondsSinceEpoch;
+        for (final entry in incoming.entries) {
+          final song = entry.value;
+          final previous = existing[entry.key];
+          final resolved = previous == null
+              ? song
+              : _withFirstSeen(
+                  song,
+                  song.dateAdded,
+                  (previous['date_added'] as int?) ?? 0,
+                );
+          // Every row that reaches the disk has the same shape, normalized
+          // once: the machine facts of a local file ride on the row, and
+          // either side's next scan lands on the stored row unchanged.
+          final candidate = mergedCandidate(resolved, previous);
+          final previousActive = previous?['active'] as int? ?? 0;
+          final previousHash = previous?['facts_hash'] as int? ?? 0;
+          if (previousActive == 1 && previousHash == factsHashOf(candidate)) {
+            // The scan brought the track back exactly as it is stored: the
+            // row is not written, and the library page does not rebuild.
+            continue;
+          }
+          statement.execute([
+            candidate.uri,
+            _sourceKeyOf(candidate),
+            candidate.title,
+            candidate.artist,
+            candidate.album,
+            candidate.dateAdded,
+            candidate.year,
+            candidate.genre,
+            jsonEncode(candidate.toJson()),
+            seenAt,
+            foldText(candidate.title),
+            factsHashOf(candidate),
+          ]);
+          written++;
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return written;
+  }
+
+  /// Reads the rows the batch names, a window of uris at a time: SQLite
+  /// refuses more bound parameters than its limit holds.
+  List<Map<String, Object?>> _existingRows(Iterable<String> uris) {
+    final rows = <Map<String, Object?>>[];
+    final batch = uris.toList(growable: false);
+    for (var start = 0; start < batch.length; start += 500) {
+      final window = batch.skip(start).take(500).toList(growable: false);
+      final placeholders = List.filled(window.length, '?').join(', ');
+      rows.addAll(
+        _db.select(
+          'SELECT uri, json, source_id, date_added, facts_hash, active '
+          'FROM songs WHERE uri IN ($placeholders)',
+          window,
+        ),
+      );
+    }
+    return rows;
+  }
+
+  /// Keeps the earlier of the two "added" stamps on [song].
+  static Song _withFirstSeen(Song song, int incoming, int stored) {
+    final earlier = _earlierDate(incoming, stored);
+    if (earlier == song.dateAdded) return song;
+    return song.copyWith(dateAdded: earlier);
+  }
+
+  static int _earlierDate(int left, int right) {
+    if (left <= 0) return right;
+    if (right <= 0) return left;
+    return left < right ? left : right;
+  }
+
+  /// Builds the row a scan leaves behind for one of the tracks it brought.
+  ///
+  /// A track the library has not seen is written as the scan knows it, with
+  /// the path of its local file riding on the row. A track the library holds
+  /// meets the row it names: what only the stored row knows — the stream
+  /// address of its source, the file facts of a fetched copy — is kept, so
+  /// the row is the fixed point of either side's next scan. A row that is
+  /// only a local file is the scan's own facts alone, so a renamed track is
+  /// renamed here as well. Either way the row reaches the disk in one shape,
+  /// and the same scan of the same facts writes nothing.
+  Song mergedCandidate(Song scanned, Map<String, Object?>? stored) {
+    if (stored == null) return _normalized(scanned);
+    final storedSong = _storedSongOf(stored);
+    if (storedSong == null) return _normalized(scanned);
+    // A row that holds no source is the previous shape of this very scan: the
+    // scan is the authority of the files it reads. A row a source names may
+    // know what the scan does not, so the two fold.
+    final sameSource = _sourceKeyOf(storedSong) == _sourceKeyOf(scanned);
+    if (sameSource && scanned.hasLocalFile && !storedSong.hasRemoteSource) {
+      return _normalized(scanned);
+    }
+    return _withFirstSeen(
+      scanned.mergeWith(storedSong),
+      scanned.dateAdded,
+      storedSong.dateAdded,
+    );
+  }
+
+  /// The song the json column of [stored] holds, or null when the column
+  /// does not hold one.
+  static Song? _storedSongOf(Map<String, Object?> stored) {
+    try {
+      final decoded = jsonDecode(stored['json'] as String);
+      return decoded is Map<String, dynamic> ? Song.fromMap(decoded) : null;
+    } catch (_) {
+      // A row that cannot be read is replaced by what the scan brought.
+      return null;
+    }
+  }
+
+  /// The one shape a row takes: the path of a local file rides on the row,
+  /// so a scan that brings the file again lands on the row it left before.
+  static Song _normalized(Song song) => song.mergeWith(song);
+
+  /// Marks the rows the current scan does not cover as outside the library.
+  ///
+  /// A row of a source that is off, or of a file that no longer sits under
+  /// one of the folders the scan reads, is not part of the library the
+  /// reader sees: the page reads only the rows that stay marked [active].
+  /// The rows are kept, so turning the source back on — or the file coming
+  /// back — brings them back with the next scan. Answers how many rows were
+  /// marked.
+  int deactivateUncovered({
+    required Set<String> enabledSourceIds,
+    required List<String> localPaths,
+  }) {
+    var marked = 0;
+    _db.execute('BEGIN');
+    try {
+      if (enabledSourceIds.isEmpty) {
+        _db.execute(
+          'UPDATE songs SET active = 0 WHERE active = 1',
+        );
+      } else {
+        final placeholders = List.filled(enabledSourceIds.length, '?').join(
+          ', ',
+        );
+        _db.execute(
+          'UPDATE songs SET active = 0 WHERE active = 1 '
+          'AND source_id NOT IN ($placeholders)',
+          enabledSourceIds.toList(growable: false),
+        );
+      }
+      marked += _db.updatedRows;
+
+      // A local row of a folder the scan no longer reads is a file the
+      // reader took out of the library. The folders travel as one LIKE
+      // clause each: there are a handful of them, not one per file.
+      if (localPaths.isNotEmpty) {
+        final separator = Platform.isWindows ? r'\' : '/';
+        final covered = [
+          for (final _ in localPaths) 'uri LIKE ? ESCAPE \'|\'',
+        ].join(' OR ');
+        final patterns = [
+          for (final folder in localPaths)
+            '${_likePattern(folder)}$separator%',
+        ];
+        _db.execute(
+          'UPDATE songs SET active = 0 WHERE active = 1 '
+          "AND source_id = 'local' AND NOT ($covered)",
+          patterns,
+        );
+        marked += _db.updatedRows;
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return marked;
+  }
+
+  /// The folder as a LIKE pattern: the characters the pattern language owns
+  /// are kept literal with the escape character.
+  static String _likePattern(String folder) {
+    final escaped = folder.replaceAll('|', '||');
+    return escaped.replaceAll('%', '|%').replaceAll('_', '|_');
   }
 
   /// Drops the least valuable tracks of every remote source beyond [limit].
@@ -250,23 +614,14 @@ class AppDatabase {
     );
   }
 
-  /// Reads one window of the library, ordered by title.
+  /// Reads one window of the library, ordered by the folded title.
   List<Song> page({required int offset, required int limit}) {
     final rows = _db.select(
-      'SELECT json FROM songs ORDER BY title COLLATE NOCASE LIMIT ? OFFSET ?',
+      'SELECT json FROM songs WHERE active = 1 '
+      'ORDER BY title_sort COLLATE NOCASE LIMIT ? OFFSET ?',
       [limit, offset],
     );
-    final songs = <Song>[];
-    for (final row in rows) {
-      try {
-        final decoded = jsonDecode(row['json'] as String);
-        if (decoded is! Map<String, dynamic>) continue;
-        songs.add(Song.fromMap(decoded));
-      } catch (_) {
-        // One broken row must not take the whole window down.
-      }
-    }
-    return songs;
+    return _songsFromRows(rows);
   }
 
   /// Reads one window of the tracks that match [query] and [sourceId].
@@ -280,24 +635,15 @@ class AppDatabase {
     final rows = _db.select(
       '''
       SELECT json FROM songs
-      WHERE (title LIKE ? OR artist LIKE ? OR album LIKE ?)
+      WHERE active = 1
+        AND (title LIKE ? OR artist LIKE ? OR album LIKE ?)
         AND (? IS NULL OR source_id = ?)
-      ORDER BY title COLLATE NOCASE
+      ORDER BY title_sort COLLATE NOCASE
       LIMIT ? OFFSET ?
       ''',
       [like, like, like, sourceId, sourceId, limit, offset],
     );
-    final songs = <Song>[];
-    for (final row in rows) {
-      try {
-        final decoded = jsonDecode(row['json'] as String);
-        if (decoded is! Map<String, dynamic>) continue;
-        songs.add(Song.fromMap(decoded));
-      } catch (_) {
-        // One broken row must not take the whole window down.
-      }
-    }
-    return songs;
+    return _songsFromRows(rows);
   }
 
   /// How many tracks match [query] and [sourceId].
@@ -534,16 +880,39 @@ class AppDatabase {
     };
   }
 
+  /// Writes the given keys over whatever is stored, and leaves the others.
+  ///
+  /// The position is written every few seconds while a track plays; it is
+  /// one or two keys of the meta, not the table.
   void saveQueueMeta(Map<String, String> meta) {
     _db.execute('BEGIN');
     try {
-      _db.execute('DELETE FROM queue_meta');
-      final statement = _db.prepare(
-        'INSERT INTO queue_meta (key, value) VALUES (?, ?)',
-      );
+      final statement = _db.prepare('''
+        INSERT INTO queue_meta (key, value) VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value
+      ''');
       try {
         for (final entry in meta.entries) {
           statement.execute([entry.key, entry.value]);
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  /// Removes the given keys of the meta, and leaves the others.
+  void deleteQueueMetaKeys(Iterable<String> keys) {
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare('DELETE FROM queue_meta WHERE key = ?');
+      try {
+        for (final key in keys) {
+          statement.execute([key]);
         }
       } finally {
         statement.close();
@@ -567,6 +936,30 @@ class AppDatabase {
       for (final row in rows)
         row['uri'] as String: jsonDecode(row['json'] as String),
     };
+  }
+
+  /// Writes one record of one track.
+  ///
+  /// A listen and a skip settle one track at a time; the record is one row,
+  /// not a diff over the table.
+  void saveListeningEntry(String uri, Map<String, Object?> entry) {
+    _db.execute(
+      'INSERT OR REPLACE INTO listening_signals (uri, json) VALUES (?, ?)',
+      [uri, jsonEncode(entry)],
+    );
+  }
+
+  /// Drops the records of [uris].
+  void deleteListening(Iterable<String> uris) {
+    final batch = uris.toList(growable: false);
+    for (var start = 0; start < batch.length; start += 500) {
+      final window = batch.skip(start).take(500).toList(growable: false);
+      final placeholders = List.filled(window.length, '?').join(', ');
+      _db.execute(
+        'DELETE FROM listening_signals WHERE uri IN ($placeholders)',
+        window,
+      );
+    }
   }
 
   void saveListening(Map<String, Object?> tracks) {
@@ -610,7 +1003,9 @@ class AppDatabase {
 
   /// How many tracks the library holds.
   int count() {
-    final rows = _db.select('SELECT COUNT(*) AS count FROM songs');
+    final rows = _db.select(
+      'SELECT COUNT(*) AS count FROM songs WHERE active = 1',
+    );
     return (rows.first['count'] as int?) ?? 0;
   }
 

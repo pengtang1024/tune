@@ -1,11 +1,12 @@
 # 性能：诊断与修复方案
 
-> 2026-10-24 实测，2026-10-25 补 D5。这一页是诊断与方案：D1–D5 都已修完，
-> 每一节写着修之前与修之后的数字，以及守住这条线的判据。
+> 2026-10-24 实测，2026-10-25 补 D5，2026-10-28 补 D6/D7 与 D8。这一页是诊断与方案：
+> D1–D8 都已修完，每一节写着修之前与修之后的数字，以及守住这条线的判据。
 
 ## 1. 结论
 
-卡顿不是某一段代码写得慢，是五个问题、三类设计毛病叠在一起（订阅粒度、同步计算、同步 I/O）：
+卡顿不是某一段代码写得慢，是七个问题、几类设计毛病叠在一起
+（订阅粒度、同步计算、同步 I/O、整库驻留内存、每操作写放大）：
 
 | # | 问题 | 一句话 | 影响面 |
 | --- | --- | --- | --- |
@@ -14,8 +15,11 @@
 | D3 | 音乐库页订阅整份库状态 | 已修：一次扫描进度更新重建 2848 → **53** 个 element（工具条与进度线，列表行不再重建） | 扫描时 |
 | D4 | 推荐引擎在 UI 线程同步算全库 | 已修：排序的稳定哈希预计算后，2 万首 129ms、5 万首 280ms，回到预算内 | 发现页 |
 | D5 | 列表行自己带 8 个提示、每个提示一个 `OverlayPortal`，动作还是页面按钮 | 已修：一行 293 → **162** 个 element、空闲 overlay 8 → **0**；滚动一步 85ms → **23ms**；一次收藏重建 3751 → **87** 个 element | 音乐库滚动 |
+| D6 | 曲库整库常驻内存，扫描时还要再建一份 | 已修：控制器只持 1000 行窗口，合并归数据库一家 | 常驻内存、扫描 |
+| D7 | 每操作路径写放大：整表往返、无防抖、不节流、重扫重写整库 | 已修：重扫 0 写、改名 1 写、单键 UPSERT、节流与防抖 | 切歌/扫描/搜索/收藏 |
+| D8 | 损坏标签的 GB 级帧声明把启动内存抬到 1.5GB | 已修：vendored 读包在 `Buffer.read` 按文件剩余收界，启动峰值 1578 → **316**MB | 启动、扫描 |
 
-五个问题都已修完。下面每一节写着修法、判据与守住这条线的测试。
+八个问题都已修完。下面每一节写着修法、判据与守住这条线的测试。
 
 **这些不是新提的标准，项目自己已经写过：**
 
@@ -380,7 +384,207 @@ D4 的耗时分解（2 万首 / 5 万首）：
 - 空闲时 0 个提示 overlay。
 - 滚动一步 ≤ 30ms（debug；profile 见 §2 的帧数据口径）。
 
-## 8. 四条硬规则（已写进 AGENTS.md §1.3）
+## 8. D6：整库常驻内存（已修）
+
+### 现象
+
+内存占用随曲库线性涨、扫描时翻着涨，扫描完不回落；库里几万首时进程内存吓人。
+
+### 根因
+
+`LibraryState.songs` 把**整库**的 `Song` 对象常驻在控制器状态里，扫描还要再建一份：
+
+1. 扫描结果先在控制器里整库合并成新列表——旧列表、新列表与合并副本
+   同时活着；
+2. 合并完再整体写回存储，旧的全量文档与新的并行存在；
+3. 之后每次 `scan` / `addSongs` / `loadMore` 都重建并替换整份列表。
+
+库 2 万首时，堆上至少三份全量列表同时存在；RSS 跟着库大小走，没有上限。
+
+### 修法
+
+**库不入内存，内存只留一页。** 曲库的权威从控制器状态挪回数据库：
+
+1. 扫描结果不再在内存里合并成全量列表，而是**分批 upsert 进库**
+   （`LibraryStorage.ingest`，一批 500 行，批间让出事件循环）；
+2. `LibraryState.songs` 始终是从数据库读出的一个窗口（`windowSize = 1000`），
+   `loadMore` 往下翻；控制器里不再有「全库列表」这个东西；
+3. 死掉的合并逻辑一并删除（`_sameLibrary`、`_mergeResults`、`_dedupe`、
+   `_keepFirstSeen`）——合并语义只剩数据库一家，见 D7 的 `mergedCandidate`；
+4. 行的去留也归数据库：`deactivateUncovered` 按两条规则收窄——本地行按
+   「本次扫描的目录前缀」收窄（列举失败不误伤库），远程行按「音源启用
+   集合」收窄（禁用即出列）。行留在磁盘上，音源重新打开就回来。
+
+### 判据
+
+- `LibraryState.songs` ≤ 窗口大小（1000）+ 一批进来的行；重扫不换窗口：
+  `test/app/library_source_merge_test.dart`
+  「a scan that brings the library back keeps the window it had」
+  （同一份列表实例，页面不重建）。
+- 控制器里没有第二份合并实现：`test/app/fake_library_storage.dart` 包装
+  真的 in-memory 库，控制器测试跑的是真 SQL 语义。
+
+**现状：已达标。** 控制器里没有任何全量列表路径；合并只有数据库一家
+（`lib/features/library/application/library_controller.dart`）。
+
+## 9. D7：每个操作都在重写整库（已修）
+
+### 现象
+
+切歌、搜索、收藏、扫描时卡一下，库越大越明显。磁盘与 CPU 的占用都落在
+「每操作」路径上，不是播放路径上（播放路径由 D1/D2 守着）。
+
+### 根因
+
+六处写放大：
+
+1. **queue_meta 全表往返**：`savePosition` 把队列元数据整表读出、改一个键、
+   整表写回；每次落位置都是一次全表往返。
+2. **收听记录全表重写**：写一条收听记录要读全表、改一行、全表回写。
+3. **搜索没有防抖**：每敲一个字符做一次全表 reload；输入「周杰伦」
+   = 3 次全量窗口重建。
+4. **下载进度不节流**：每 1% 一次状态重建，界面跟着抖。
+5. **tag 解析一个文件一个 worker**：2 万首 = 2 万个 isolate 的生成与销毁，
+   扫描的 CPU 花在调度上比花在解析上还多。
+6. **ingest 行形态不一致**：首轮扫描把行写成原始形态，下一轮合并时
+   `mergeWith` 才把本地文件路径补到行上——重扫必须把整库重写一轮才稳定；
+   反过来，纯本地行的同源改名又被 `mergeWith` 的「文件侧当 track」选择
+   吃掉，改名永远落不了库。
+
+### 修法
+
+写路径全部改成「按键、按需、按批」：
+
+| 修法 | 内容 |
+| --- | --- |
+| SQLite 日志模式 | WAL + `synchronous=NORMAL`：提交不再每次全量 fsync |
+| `queue_meta` | 单键 UPSERT + `deleteQueueMetaKeys`；`savePosition` 只写 position 两个键 |
+| 收听记录 | 单行 UPSERT（`saveListeningEntry` / `deleteListening`）+ 内存 map 原地更新 |
+| 搜索 | 180ms 防抖 + reload 世代守卫（`_reloadGeneration`），过期结果不落地 |
+| 下载进度 | 10Hz 节流（首个事件直通、`progress == 1` 必达） |
+| tag 解析 | 固定 worker 池：一批 200 个文件、至多 8 个 worker |
+| ingest 行形态 | `mergedCandidate`：落库前自合并归一，同一次扫描永远落在同一形态上 |
+
+### ingest 的行形态（最后一项展开）
+
+- 行**首次落库**就是归一形态：本地文件行把路径落在 `localPath` 上
+  （`song.mergeWith(song)` 只做这一件事，且幂等）。
+- 存量行与扫描相遇，**只由存量行补扫描不知道的事实**（流地址、副本的
+  文件事实）；**纯本地行**（没有音源身份的行）就是本次扫描自己的上一
+  形态，扫描是权威——改名得以传播。
+- 带音源身份的行保持合流固定点：任何一侧重扫都落在已存的行上，零写入。
+
+### 实测（2 万首，in-memory 库，2026-10-28 一次性脚本）
+
+| | 修之前 | 修之后 |
+| --- | ---: | ---: |
+| 首次 ingest | 196ms / 20000 写 | 215ms / 20000 写 |
+| 重扫（同事实） | 287ms / 20000 写 | **119ms / 0 写** |
+| 改名一首 | 0 写（改名被吃掉） | **1 写** |
+
+修之前重扫要整库重写一轮（形态归一那轮），且**改名永远落不了库**：
+纯本地行的扫描带着文件，`mergeWith` 让存量行当 track 侧，存量的文本
+赢了扫描的文本。修后重扫零写、改名一写。
+
+### 决定不做
+
+- **把歌词/genres/performers/sourceData 移出 songs 表的 json 列**：
+  收益是行体积与解码时间，代价是 schema churn 与详情面板全链路异步化；
+  D6 窗口化之后解码只发生在 1000 行窗口上，收益不抵。
+- **`albumSummaries` 加封面列**：延后，等专辑视图有性能证据再加。
+
+### 判据
+
+- 重扫同事实 0 写：`test/services/library_database_test.dart`
+  「an ingest that brings the same facts back writes nothing」。
+- 同源改名 1 写：同文件「an ingest rewrites only the row whose facts
+  changed」；两侧固定点「an ingest merges the copies another source
+  brings」（任一侧重扫都是 0 写）。
+- 队列与位置只写该写的键：`test/app/playback_session_test.dart`
+  「the queue and position are written when the player closes」。
+- 收听记录单行落库：`test/services/listening_signal_store_test.dart`
+  「a listened track is summarized」。
+
+**现状：已达标。** 863 个测试全绿，六处写放大全部按上表收掉。
+
+## 10. D8：一个损坏的标签把启动内存抬到 1.5GB（已修）
+
+### 现象
+
+每次启动，t≈4.4–4.8s 处 RSS 从 ~320MB 一跳到 **1.5–1.6GB**，有时几秒回落、
+有时滞留 30 秒以上。空库也一样（库本身不背锅），VM 里 5 万个
+`_OneByteString` 合计 **1.23GB**，full GC 之后仍然存活——是「有持有者的
+瞬时大块」，不是碎片也不是泄漏。
+
+### 根因
+
+曲库里的 `2014-02-12 Bigwords.mp3`（文件 4,146,688 字节）的 ID3v2 标签
+损坏：合法的 tag 头声明 51,142 字节，内部却有一个 id 为 `\x00COM` 的坏帧，
+帧头声明 size=**1,291,845,632**（~1.2GB）。上游读包
+`audio_metadata_reader 1.8.1`（当时已是最新版）的 `Buffer.read(size)` 对
+声明大小无条件 `Uint8List(size)`，不做文件边界校验——4MB 的文件按声明
+分配了 1.2GB 的零填充缓冲，再解码成一个常驻大字符串。FLAC
+（`buffer.read(block.length)`）与 MP4（`buffer.read(box.payloadSize)`）
+共用同一个无界读，属同一类 bug；RIFF/AIFF 的解析器倒是自己做了
+`remainingBytes` 防护，说明包里本就有这个原语（`readAtMost`），只是
+ID3v2/FLAC/MP4 没用上。
+
+### 修法
+
+上游没有修复，把包复制到 `vendor/audio_metadata_reader`（MIT，保留
+LICENSE，走 `dependency_overrides` 接入），在 `Buffer.read` 一处收界：
+读取前把 `size` 收到 `remainingBytes`（文件真实剩余）内，非正数请求返回
+空列表。只影响分配大小，不改变各解析器的游标推进；这一处补丁同时修掉
+mp3/flac/mp4 整类「声明超界」问题。补丁清单与升级步骤见
+`vendor/audio_metadata_reader/VENDORED.md`。回归测试在
+`test/services/song_creator_test.dart`：自造一个帧声明 1.29GB 的损坏文件，
+断言解析完成且 RSS 增量 < 100MB（修之前是 +1.2GB）。
+
+顺手把 `JustAudioMediaKit.bufferSize` 从默认 32MB 下调到 8MB
+（`demuxer-max-bytes` 与 `demuxer-max-back-bytes` 各取一份）：本地小文件
+的播放开销实测与此无关（4MB 的曲子整个装得进 8MB 缓存，30MB 的 84 分钟
+m4a 播放期 RSS 也稳定在 ~355MB 不涨），这条只给**长网络流**封顶——最坏
+情况从 64MB 降到 16MB。
+
+### 实测（真实数据副本，release 构建，`/proc/<pid>/status` 采样）
+
+| 指标 | 修之前 | 修之后 |
+| --- | --- | --- |
+| 启动峰值 RSS | 1578MB（t≈4.4s，持续 3s–30s+） | **316MB**（曲线全程无跳变） |
+| 坏文件单文件解析 | +1237MB 且 3s 不回落（1636ms） | **+8MB**（30ms） |
+| 稳态 RSS | 320–355MB | **306–316MB** |
+
+稳态的构成（smaps 按 mapping 聚合，NVIDIA + Impeller/JIT 的机器）：
+NVIDIA/LLVM 图形栈 ~123MB、flutter engine + AOT 代码 ~42MB、Dart 堆
+~34MB、内置字体（Noto Sans/Serif SC-VF）~35MB（文件映射，可回收）、
+glibc 堆 ~60MB。**「稳态 200MB」在这台机器上达不到**：光图形栈加引擎
+就有 ~205MB，是任何 Flutter Linux 应用的地板。两件没做的事如实记录：
+
+- glibc 的 malloc arena 按 CPU 数劈堆，`MALLOC_ARENA_MAX=2` 一次性消融
+  实测省 ~28MB（[heap] 60 → 32MB）。这是 libc 环境调优不是应用代码，
+  要进的话走启动期 `mallopt` 并单独验证，本轮不做。
+- 字体是设计语言的一部分（Serif 是壳层 display 字级），且为文件映射页
+  可回收，不砍。
+
+GPU 栈的口径（2026-10-28 消融）：这台机器是 NVIDIA 独显 + Intel 核显双
+卡，但核显被 `vfio-pci` 接管（直通给虚拟机），宿主机没有它的渲染节点。
+强制走 Mesa（`__EGL_VENDOR_LIBRARY_FILENAMES=50_mesa.json`）只会落到
+llvmpipe 软渲染，RSS 反升到 404MB——不是核显的真实数字。纯核显（Mesa
+ANV/iris）机器上，NVIDIA 专属驻留（`nvidiactl` 48MB + `eglcore` 10MB +
+`gpucomp` 18MB ≈ 76MB）会消失，同构建稳态按此外推 ~230MB。应用**不自选
+GPU**：Flutter 没有这个 API，Linux 上由会话与 glvnd 决定（`prime-run`、
+`DRI_PRIME`），覆盖用户的选择得不偿失；核显机器自然继承轻驱动栈。
+
+### 判据
+
+- `flutter test test/services/song_creator_test.dart`：损坏帧回归测试
+  （RSS 增量 < 100MB），每次改动 tag 解析路径都要过。
+- 真实库启动：RSS 曲线在 t=10s 内单调平滑、无 >60MB 的跳变；坏文件在库
+  里时启动峰值不得回到 GB 量级。
+- 升级 `audio_metadata_reader` 前先读本节的根因与
+  `vendor/audio_metadata_reader/VENDORED.md` 的补丁清单。
+
+## 11. 四条硬规则（已写进 AGENTS.md §1.3）
 
 1. **快值与慢值分两条订阅通道。** 一份状态里既有 5 Hz 的值又有 0.1 Hz 的值时，
    读它的界面必须按频率分开订阅；只订阅自己真正要显示的那部分。
@@ -393,8 +597,9 @@ D4 的耗时分解（2 万首 / 5 万首）：
 4. **列表行的值由行自己订阅。** 行的收藏、当前曲与播放状态由行读；页面只
    订阅结构、顺序与筛选。一次收藏只重建那一行（`library_rebuild_test.dart`）。
 
-AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式版本，
-外加一条「状态仍然只有一个主人」。
+AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式版本，外加
+「状态仍然只有一个主人」，以及 D6/D7 落地时的两条：库不入内存、
+每操作路径不做写放大。
 
 ### 不要做的事
 
@@ -405,9 +610,9 @@ AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式�
 - 不要把「进度条」整块搬进 `PlaybackState` 之外的新状态对象——它就该是
   `PlaybackState` 的一个字段，只是读法要分开。
 
-## 9. 落地顺序与风险
+## 12. 落地顺序与风险
 
-五件事互相独立，可以分开做、分开验（都已完成）：
+八件事互相独立，可以分开做、分开验（都已完成）：
 
 | 顺序 | 做什么 | 收益 | 状态 |
 | --- | --- | --- | --- |
@@ -416,10 +621,13 @@ AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式�
 | 3 | D3 音乐库页 | 扫描时的卡顿 | 已修：2848 → 53 个 element，列表行不再重建 |
 | 4 | D4 推荐引擎 | 发现页冻结 | 已修：排序哈希预计算，2 万首 247ms → 129ms |
 | 5 | D5 列表行 | 音乐库滚动 | 已修：293 → 162 个 element，8 → 0 个空闲 overlay，滚动一步 85 → 23ms，一次收藏重建 3751 → 87 |
+| 6 | D6 库不入内存 | 常驻内存随库不封顶 | 已修：控制器只持 1000 行窗口，合并归数据库一家 |
+| 7 | D7 每操作写放大 | 切歌/搜索/收藏/扫描的卡顿与磁盘写 | 已修：重扫 0 写、改名 1 写、单键 UPSERT、防抖与节流 |
+| 8 | D8 损坏标签的 GB 级帧声明 | 启动、扫描的内存峰值 | 已修：vendored 读包收界，峰值 1578 → 316MB |
 
 回退：每一件都是独立改动，`git revert` 即可，没有数据迁移，没有存储格式变化。
 
-## 10. 相关文档
+## 13. 相关文档
 
 - `docs/architecture.md`：状态归属与「播放位置由 `PlaybackController` 独家持有」。
 - `docs/lyrics.md` §2 D5：同一个毛病在歌词面板上的先例（已修）。
