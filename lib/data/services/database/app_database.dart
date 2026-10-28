@@ -58,6 +58,23 @@ class AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_songs_source ON songs(source_id)',
     );
     db.execute('CREATE INDEX IF NOT EXISTS idx_songs_title ON songs(title)');
+    // The stratified sample of the accuracy audit (docs/smart-lyrics.md §10):
+    // the drawn tracks in one table, the human verdicts in another. The
+    // draw only adds rows — a redraw keeps the verdicts of the rounds before.
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_sample (
+        uri TEXT PRIMARY KEY,
+        layer TEXT NOT NULL,
+        added_at INTEGER NOT NULL
+      )
+    ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_audit (
+        uri TEXT PRIMARY KEY,
+        verdict TEXT NOT NULL,
+        checked_at INTEGER NOT NULL
+      )
+    ''');
     db.execute('''
       CREATE TABLE IF NOT EXISTS favorites (
         uri TEXT PRIMARY KEY,
@@ -1031,13 +1048,141 @@ class AppDatabase {
     return (total, withLyrics);
   }
 
+  /// The facts the accuracy sample classifies on, for the rows that are
+  /// still in the library and carry lyrics — the audited share of the
+  /// library is its resolved share.
+  List<SmartLyricsCandidateRow> resolvedCandidateRows() {
+    final rows = _db.select(
+      "SELECT uri, title, artist, album, genre, "
+      "json_extract(json, '\$.language') AS language "
+      'FROM songs WHERE active = 1 AND has_lyrics = 1',
+    );
+    return [
+      for (final row in rows)
+        (
+          uri: row['uri'] as String,
+          title: row['title'] as String? ?? '',
+          artist: row['artist'] as String? ?? '',
+          album: row['album'] as String? ?? '',
+          genre: row['genre'] as String? ?? '',
+          language: row['language'] as String?,
+        ),
+    ];
+  }
+
+  /// Writes the drawn tracks; the rows already there stay what they are, so
+  /// a redraw neither jumps nor loses a verdict. Answers the count of the
+  /// rows the draw added.
+  int saveSampleDrawn(List<({String uri, String layer})> entries) {
+    var added = 0;
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare(
+        'INSERT OR IGNORE INTO smart_lyrics_sample (uri, layer, added_at) '
+        'VALUES (?, ?, ?)',
+      );
+      try {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        for (final entry in entries) {
+          statement.execute([entry.uri, entry.layer, now]);
+          added += _db.updatedRows;
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return added;
+  }
+
+  /// The drawn tracks of one layer, still in the library, with the facts
+  /// the verification round shows.
+  List<SmartLyricsSampleTrackRow> sampleTracksOf(String layer) {
+    final rows = _db.select(
+      'SELECT s.uri AS uri, s.title AS title, s.artist AS artist '
+      'FROM smart_lyrics_sample sample '
+      'JOIN songs s ON s.uri = sample.uri AND s.active = 1 '
+      'WHERE sample.layer = ? '
+      'ORDER BY sample.added_at, sample.uri',
+      [layer],
+    );
+    return [
+      for (final row in rows)
+        (
+          uri: row['uri'] as String,
+          title: row['title'] as String? ?? '',
+          artist: row['artist'] as String? ?? '',
+        ),
+    ];
+  }
+
+  /// The account of the sample, layer by layer, over the rows that are
+  /// still in the library.
+  List<SmartLyricsSampleCountRow> sampleCountRows() {
+    final rows = _db.select('''
+      SELECT sample.layer AS layer, COUNT(*) AS drawn,
+             COUNT(audit.uri) AS checked,
+             COALESCE(SUM(audit.verdict = 'correct'), 0) AS correct
+      FROM smart_lyrics_sample sample
+      JOIN songs ON songs.uri = sample.uri AND songs.active = 1
+      LEFT JOIN smart_lyrics_audit audit ON audit.uri = sample.uri
+      GROUP BY sample.layer
+      ORDER BY sample.layer
+    ''');
+    return [
+      for (final row in rows)
+        (
+          layer: row['layer'] as String,
+          drawn: row['drawn'] as int? ?? 0,
+          checked: row['checked'] as int? ?? 0,
+          correct: row['correct'] as int? ?? 0,
+        ),
+    ];
+  }
+
+  /// Records — or changes — the human verdict of one drawn track.
+  void recordSampleVerdict(String uri, {required bool correct}) {
+    _db.execute(
+      "INSERT INTO smart_lyrics_audit (uri, verdict, checked_at) "
+      "VALUES (?, ?, ?) "
+      "ON CONFLICT(uri) DO UPDATE SET "
+      "verdict = excluded.verdict, checked_at = excluded.checked_at",
+      [uri, correct ? 'correct' : 'incorrect', DateTime.now().millisecondsSinceEpoch],
+    );
+  }
+
   void close() => _db.close();
 }
 
 
+/// The facts the accuracy sample classifies on, one row of the library.
+typedef SmartLyricsCandidateRow =
+    ({
+      String uri,
+      String title,
+      String artist,
+      String album,
+      String genre,
+      String? language,
+    });
+
+/// One drawn track of the accuracy sample, with the facts the verification
+/// round shows.
+typedef SmartLyricsSampleTrackRow = ({String uri, String title, String artist});
+
+/// One layer's counts of the accuracy sample.
+typedef SmartLyricsSampleCountRow = ({
+  String layer,
+  int drawn,
+  int checked,
+  int correct,
+});
+
 /// One row of the listening aggregates, joined with the facts of its track.
-class TrackSignalRow {
-  final String artist;
+class TrackSignalRow {  final String artist;
   final String genre;
   final int year;
   final String album;

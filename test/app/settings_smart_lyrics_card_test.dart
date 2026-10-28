@@ -5,11 +5,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_sample_provider.dart';
+import 'package:tune/features/smart_lyrics/data/smart_lyrics_sample_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 import '../services/fake_persistence.dart';
+
+/// The store that counts the draws and answers a fixed account, so the
+/// card test never opens a database.
+class _RecordingStore extends SmartLyricsSampleStore {
+  _RecordingStore() : super(database: () => throw UnimplementedError());
+
+  int draws = 0;
+
+  @override
+  Future<int> draw({int perLayer = 200, int seed = defaultSampleSeed}) async {
+    draws++;
+    return 0;
+  }
+
+  @override
+  Future<SmartLyricsSampleAccount> read() async =>
+      SmartLyricsSampleAccount.empty;
+}
 
 /// The ledger of the lyrics the library carries, and the key hole the
 /// reader pastes theirs into (docs/smart-lyrics.md §7.1, M0+M1).
@@ -17,6 +38,7 @@ void main() {
   Future<SettingsController> pumpCard(
     WidgetTester tester, {
     required Future<SmartLyricsLedger> ledger,
+    List<Override> extra = const [],
   }) async {
     // The provider owns the controller: it disposes it when the scope
     // unmounts, so the test adds no teardown of its own.
@@ -27,8 +49,10 @@ void main() {
         overrides: [
           smartLyricsLedgerProvider.overrideWith((ref) => ledger),
           settingsControllerProvider.overrideWith((ref) => controller),
+          ...extra,
         ],
         child: MaterialApp(
+          locale: const Locale('zh', 'CN'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const Scaffold(body: SingleChildScrollView(
@@ -50,6 +74,71 @@ void main() {
     expect(find.text('400'), findsOneWidget, reason: 'the whole library');
     expect(find.text('370'), findsOneWidget, reason: 'the tracks with lyrics');
     expect(find.text('30'), findsOneWidget, reason: 'the gap the pipeline fills');
+  });
+
+  testWidgets('the card shows the second number of the double figures: the '
+      'accuracy of the checked sample rows', (tester) async {
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsSampleProvider.overrideWith(
+          (ref) => Future.value(
+            const SmartLyricsSampleAccount(
+              layers: [
+                SmartLyricsSampleRow(
+                  layer: SmartLyricsLayer.studio,
+                  drawn: 400,
+                  checked: 2,
+                  correct: 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    expect(find.text('400'), findsOneWidget, reason: 'the drawn sample');
+    expect(find.text('2'), findsOneWidget, reason: 'the checked rows');
+    expect(find.text('50.0%'), findsOneWidget,
+        reason: 'the rate counts only the checked rows');
+  });
+
+  testWidgets('an unchecked sample shows a dash, never a zero', (tester) async {
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsSampleProvider.overrideWith(
+          (ref) => Future.value(SmartLyricsSampleAccount.empty),
+        ),
+      ],
+    );
+
+    expect(find.text('0.0%'), findsNothing,
+        reason: 'nothing drawn is not zero: zero would pretend the question '
+            'was asked');
+    expect(find.text('-'), findsWidgets);
+  });
+
+  testWidgets('the draw button fills the sample through the store', (
+    tester,
+  ) async {
+    final store = _RecordingStore();
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsSampleStoreProvider.overrideWithValue(store),
+        smartLyricsSampleProvider.overrideWith((ref) => store.read()),
+      ],
+    );
+
+    await tester.tap(find.text('开始抽样'));
+    await tester.pumpAndSettle();
+
+    expect(store.draws, 1);
   });
 
   testWidgets('a ledger that cannot be read shows itself as unavailable', (

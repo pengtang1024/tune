@@ -4241,6 +4241,36 @@ abstract class AppLocalizations {
   /// **'生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。'**
   String get settingsSmartLyricsPrivacy;
 
+  /// No description provided for @settingsSmartLyricsSampled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'抽样'**
+  String get settingsSmartLyricsSampled;
+
+  /// No description provided for @settingsSmartLyricsChecked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已核'**
+  String get settingsSmartLyricsChecked;
+
+  /// No description provided for @settingsSmartLyricsAccuracy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正确率'**
+  String get settingsSmartLyricsAccuracy;
+
+  /// No description provided for @settingsSmartLyricsDrawSample.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开始抽样'**
+  String get settingsSmartLyricsDrawSample;
+
+  /// No description provided for @settingsSmartLyricsAccuracyNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。'**
+  String get settingsSmartLyricsAccuracyNote;
+
   /// No description provided for @lyricsSmartGenerate.
   ///
   /// In zh_CN, this message translates to:

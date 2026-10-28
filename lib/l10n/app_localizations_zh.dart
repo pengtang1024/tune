@@ -2293,6 +2293,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
 
   @override
+  String get settingsSmartLyricsSampled => '抽样';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正确率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '开始抽样';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -4661,6 +4677,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
 
   @override
+  String get settingsSmartLyricsSampled => '抽样';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正确率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '开始抽样';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -7027,6 +7059,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSmartLyricsPrivacy => '生成會把整首歌的音訊上傳到你設定的端點；只發給你自己填的位址。';
+
+  @override
+  String get settingsSmartLyricsSampled => '抽樣';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正確率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '開始抽樣';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正確率按已解決樣本分層人工核對（直錄棚 / Live / 說唱 / 非中文）；樣本只增不減，改判以最後一筆為準。';
 
   @override
   String get lyricsSmartGenerate => '智慧生成';

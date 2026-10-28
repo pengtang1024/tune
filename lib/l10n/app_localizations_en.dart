@@ -2495,6 +2495,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Generating uploads the whole track to the endpoint you configured, and nowhere else.';
 
   @override
+  String get settingsSmartLyricsSampled => 'Sampled';
+
+  @override
+  String get settingsSmartLyricsChecked => 'Checked';
+
+  @override
+  String get settingsSmartLyricsAccuracy => 'Accuracy';
+
+  @override
+  String get settingsSmartLyricsDrawSample => 'Draw the sample';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      'The accuracy is judged by hand on a stratified sample of the resolved tracks (studio / live / rap / non-Chinese); the sample only grows, and the last verdict of a track counts.';
+
+  @override
   String get lyricsSmartGenerate => 'Smart lyrics';
 
   @override
