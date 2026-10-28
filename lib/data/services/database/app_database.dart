@@ -75,6 +75,30 @@ class AppDatabase {
         checked_at INTEGER NOT NULL
       )
     ''');
+    // The batch (docs/smart-lyrics.md §7.2): the queue of the tracks the
+    // three segments could not bring words for, and the marks a line or a
+    // track carries — the marks are the priority the queue runs by.
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_tasks (
+        song_id INTEGER PRIMARY KEY,
+        uri TEXT NOT NULL,
+        status TEXT NOT NULL,
+        votes INTEGER NOT NULL DEFAULT 0,
+        disputed INTEGER NOT NULL DEFAULT 0,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_marks (
+        song_id INTEGER PRIMARY KEY,
+        source TEXT NOT NULL,
+        state TEXT NOT NULL,
+        created_at INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
     db.execute('''
       CREATE TABLE IF NOT EXISTS favorites (
         uri TEXT PRIMARY KEY,
@@ -1151,6 +1175,153 @@ class AppDatabase {
       "ON CONFLICT(uri) DO UPDATE SET "
       "verdict = excluded.verdict, checked_at = excluded.checked_at",
       [uri, correct ? 'correct' : 'incorrect', DateTime.now().millisecondsSinceEpoch],
+    );
+  }
+
+  /// Puts every active track that carries no lyrics into the queue, and
+  /// answers how many rows the press added.
+  ///
+  /// A scan that finds new gap tracks writes nothing here: the queue moves
+  /// when the reader presses the button, never by itself
+  /// (docs/smart-lyrics.md §7.2).
+  int enqueueMissingTasks({required int now}) {
+    var added = 0;
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare(
+        "INSERT INTO smart_lyrics_tasks (song_id, uri, status, attempts, updated_at) "
+        "SELECT json_extract(json, '\$.id'), uri, 'pending', 0, ? "
+        'FROM songs '
+        "WHERE active = 1 AND has_lyrics = 0 "
+        'AND NOT EXISTS ('
+        "  SELECT 1 FROM smart_lyrics_tasks t "
+        "  WHERE t.song_id = json_extract(json, '\$.id')"
+        ')',
+      );
+      try {
+        statement.execute([now]);
+        added = _db.updatedRows;
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return added;
+  }
+
+  /// The gap tracks a scan brought in that are not queued yet.
+  int countNewMissingTasks() {
+    final row = _db
+        .select(
+          'SELECT COUNT(*) AS n FROM songs '
+          "WHERE active = 1 AND has_lyrics = 0 "
+          'AND NOT EXISTS ('
+          "  SELECT 1 FROM smart_lyrics_tasks t "
+          "  WHERE t.song_id = json_extract(songs.json, '\$.id')"
+          ')',
+        )
+        .first;
+    return row['n'] as int? ?? 0;
+  }
+
+  /// The next queued track to run, in the order the batch keeps:
+  /// a marked track first, then one that was played recently, then one the
+  /// reader likes, then the rest — and within one group the song id decides,
+  /// so an interrupted run resumes where it stood.
+  ({int songId, String uri})? nextPendingTask() {
+    final rows = _db.select(
+      "SELECT json_extract(songs.json, '\$.id') AS song_id, songs.uri AS uri "
+      'FROM songs '
+      'WHERE songs.active = 1 '
+      'AND EXISTS ('
+      '  SELECT 1 FROM smart_lyrics_tasks t '
+      "  WHERE t.song_id = json_extract(songs.json, '\$.id') AND t.status = 'pending'"
+      ') '
+      'ORDER BY CASE '
+      "  WHEN EXISTS (SELECT 1 FROM smart_lyrics_marks m "
+      "    WHERE m.song_id = json_extract(songs.json, '\$.id') "
+      "    AND m.state = 'uncleared') THEN 0 "
+      '  WHEN songs.last_played IS NOT NULL THEN 1 '
+      '  WHEN EXISTS (SELECT 1 FROM favorites f WHERE f.uri = songs.uri) THEN 2 '
+      '  ELSE 3 '
+      'END, song_id '
+      'LIMIT 1',
+    );
+    if (rows.isEmpty) return null;
+    final row = rows.first;
+    return (songId: row['song_id'] as int, uri: row['uri'] as String);
+  }
+
+  /// Marks a task as running; the attempt is counted where it starts.
+  void beginTaskRun(int songId, {required int now}) {
+    _db.execute(
+      'UPDATE smart_lyrics_tasks SET status = ?, attempts = attempts + 1, '
+      'updated_at = ? WHERE song_id = ?',
+      ['running', now, songId],
+    );
+  }
+
+  /// Writes how a run ended: the status, what the pool said, and the error
+  /// when there was one.
+  void setTaskOutcome(
+    int songId,
+    String status, {
+    int votes = 0,
+    int disputed = 0,
+    String? error,
+    required int now,
+  }) {
+    _db.execute(
+      'UPDATE smart_lyrics_tasks SET status = ?, votes = ?, disputed = ?, '
+      'last_error = ?, updated_at = ? WHERE song_id = ?',
+      [status, votes, disputed, error, now, songId],
+    );
+  }
+
+  /// The tasks by their status, for the card.
+  List<({String status, int count})> taskStatusCounts() {
+    final rows = _db.select(
+      'SELECT status, COUNT(*) AS n FROM smart_lyrics_tasks GROUP BY status',
+    );
+    return [
+      for (final row in rows)
+        (status: row['status'] as String, count: row['n'] as int? ?? 0),
+    ];
+  }
+
+  /// Puts every failed task back in line for a recheck.
+  int requeueFailedTasks({required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_tasks SET status = 'pending', updated_at = ? "
+      "WHERE status = 'failed'",
+      [now],
+    );
+    return _db.updatedRows;
+  }
+
+  /// The track a task names, read back whole from its row.
+  Song? songWithId(int id) {
+    final rows = _db.select(
+      "SELECT json FROM songs WHERE active = 1 AND json_extract(json, '\$.id') = ?",
+      [id],
+    );
+    if (rows.isEmpty) return null;
+    final decoded = jsonDecode(rows.first['json'] as String? ?? '');
+    return decoded is Map<String, dynamic> ? Song.fromMap(decoded) : null;
+  }
+
+  /// Records a mark on a track — the reader's or the system's; the batch
+  /// runs the marked tracks first.
+  void recordSongMark(int songId, {required String source, required int now}) {
+    _db.execute(
+      'INSERT INTO smart_lyrics_marks (song_id, source, state, created_at, '
+      'updated_at) VALUES (?, ?, ?, ?, ?) '
+      "ON CONFLICT(song_id) DO UPDATE SET state = 'uncleared', "
+      'updated_at = excluded.updated_at',
+      [songId, source, 'uncleared', now, now],
     );
   }
 

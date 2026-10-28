@@ -72,6 +72,10 @@ class SmartLyricsConfig {
   /// channel is off (docs/smart-lyrics.md §6.2).
   final String localModel;
 
+  /// How many cloud songs one batch run may spend before it pauses itself
+  /// (docs/smart-lyrics.md §7.2); `0` lets the run go without a cap.
+  final int batchCloudBudget;
+
   const SmartLyricsConfig({
     this.presetId = SmartLyricsPreset.openaiId,
     this.baseUrl = SmartLyricsPreset._openaiBaseUrl,
@@ -79,6 +83,7 @@ class SmartLyricsConfig {
     this.asrModels = const ['whisper-1'],
     this.chatModel = 'gpt-4o-mini',
     this.localModel = '',
+    this.batchCloudBudget = 500,
   });
 
   /// Whether the pipeline has a place to go and a key to knock with.
@@ -96,6 +101,7 @@ class SmartLyricsConfig {
     List<String>? asrModels,
     String? chatModel,
     String? localModel,
+    int? batchCloudBudget,
   }) => SmartLyricsConfig(
     presetId: presetId ?? this.presetId,
     baseUrl: baseUrl ?? this.baseUrl,
@@ -103,6 +109,7 @@ class SmartLyricsConfig {
     asrModels: asrModels ?? this.asrModels,
     chatModel: chatModel ?? this.chatModel,
     localModel: localModel ?? this.localModel,
+    batchCloudBudget: batchCloudBudget ?? this.batchCloudBudget,
   );
 
   Map<String, dynamic> toJson() => {
@@ -112,6 +119,7 @@ class SmartLyricsConfig {
     'asrModels': asrModels,
     'chatModel': chatModel,
     'localModel': localModel,
+    'batchCloudBudget': batchCloudBudget,
   };
 
   /// Reads the config back; a broken field falls to the default of that
@@ -136,6 +144,9 @@ class SmartLyricsConfig {
       localModel: json['localModel'] is String
           ? json['localModel'] as String
           : fallback.localModel,
+      batchCloudBudget: json['batchCloudBudget'] is int
+          ? json['batchCloudBudget'] as int
+          : fallback.batchCloudBudget,
     );
   }
 }

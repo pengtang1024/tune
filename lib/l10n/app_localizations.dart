@@ -4307,6 +4307,60 @@ abstract class AppLocalizations {
   /// **'下载失败：重试，或换个模型'**
   String get settingsSmartLyricsLocalFailed;
 
+  /// No description provided for @settingsSmartLyricsBatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'批量补齐'**
+  String get settingsSmartLyricsBatch;
+
+  /// No description provided for @settingsSmartLyricsBatchStart.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'补齐曲库'**
+  String get settingsSmartLyricsBatchStart;
+
+  /// No description provided for @settingsSmartLyricsBatchStop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'停止'**
+  String get settingsSmartLyricsBatchStop;
+
+  /// No description provided for @settingsSmartLyricsBatchRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重查失败曲目'**
+  String get settingsSmartLyricsBatchRetry;
+
+  /// No description provided for @settingsSmartLyricsBudget.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'云端预算（首/批，0 为不限）'**
+  String get settingsSmartLyricsBudget;
+
+  /// No description provided for @settingsSmartLyricsBatchIdle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'待补 {pending} · 已完成 {done} · 失败 {failed}'**
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed);
+
+  /// No description provided for @settingsSmartLyricsBatchRunning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在补齐：待补 {pending} · 已完成 {done}'**
+  String settingsSmartLyricsBatchRunning(int pending, int done);
+
+  /// No description provided for @settingsSmartLyricsBudgetPaused.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已达云端预算（{budget} 首），本批暂停——余下待补不丢'**
+  String settingsSmartLyricsBudgetPaused(int budget);
+
+  /// No description provided for @settingsSmartLyricsBatchFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新增 {count} 首待补，按「补齐曲库」入队'**
+  String settingsSmartLyricsBatchFresh(int count);
+
   /// No description provided for @lyricsSmartGenerate.
   ///
   /// In zh_CN, this message translates to:

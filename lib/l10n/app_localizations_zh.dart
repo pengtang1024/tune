@@ -2327,6 +2327,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
 
   @override
+  String get settingsSmartLyricsBatch => '批量补齐';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '补齐曲库';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失败曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '云端预算（首/批，0 为不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待补 $pending · 已完成 $done · 失败 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在补齐：待补 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已达云端预算（$budget 首），本批暂停——余下待补不丢';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待补，按「补齐曲库」入队';
+  }
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -4729,6 +4764,41 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
 
   @override
+  String get settingsSmartLyricsBatch => '批量补齐';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '补齐曲库';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失败曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '云端预算（首/批，0 为不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待补 $pending · 已完成 $done · 失败 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在补齐：待补 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已达云端预算（$budget 首），本批暂停——余下待补不丢';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待补，按「补齐曲库」入队';
+  }
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -7129,6 +7199,41 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSmartLyricsLocalFailed => '下載失敗：重試，或換個模型';
+
+  @override
+  String get settingsSmartLyricsBatch => '批次補齊';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '補齊曲庫';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失敗曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '雲端預算（首/批，0 為不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待補 $pending · 已完成 $done · 失敗 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在補齊：待補 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已達雲端預算（$budget 首），本批暫停——餘下待補不丟';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待補，按「補齊曲庫」入隊';
+  }
 
   @override
   String get lyricsSmartGenerate => '智慧生成';

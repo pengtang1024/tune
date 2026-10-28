@@ -53,6 +53,7 @@ void main() {
         asrModels: ['whisper-1', 'whisper-large-v3'],
         chatModel: 'gpt-4o',
         localModel: 'base',
+        batchCloudBudget: 120,
       );
 
       final restored = SmartLyricsConfig.fromJson(config.toJson());
@@ -63,6 +64,7 @@ void main() {
       expect(restored.asrModels, ['whisper-1', 'whisper-large-v3']);
       expect(restored.chatModel, 'gpt-4o');
       expect(restored.localModel, 'base');
+      expect(restored.batchCloudBudget, 120);
       expect(restored.isConfigured, isTrue);
     });
 

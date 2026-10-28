@@ -6,11 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_sample_provider.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_sample_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_local_section.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -53,6 +55,36 @@ class _FakeModelStore extends WhisperModelStore {
   }) async {
     downloaded.add(name);
   }
+}
+
+/// The batch with the presses on record; the figures come from the
+/// provider the test hands in.
+class _FakeBatchController extends SmartLyricsBatchController {
+  int starts = 0;
+  int retries = 0;
+
+  @override
+  SmartLyricsBatchProgress build() => SmartLyricsBatchProgress.idle;
+
+  @override
+  Future<void> start() async {
+    starts++;
+  }
+
+  @override
+  Future<void> retryFailed() async {
+    retries++;
+  }
+}
+
+/// A batch that is on its way right now.
+class _RunningBatchController extends SmartLyricsBatchController {
+  @override
+  SmartLyricsBatchProgress build() => const SmartLyricsBatchProgress(
+    running: true,
+    currentSongId: 1,
+    counts: {SmartLyricsTaskStatus.pending: 1},
+  );
 }
 
 /// The ledger of the lyrics the library carries, and the key hole the
@@ -278,5 +310,64 @@ void main() {
 
     expect(store.downloaded, ['small']);
     expect(find.text('模型已就绪'), findsOneWidget);
+  });
+
+  testWidgets('the batch line says the account and the presses run their '
+      'actions', (tester) async {
+    final batch = _FakeBatchController();
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsBatchControllerProvider.overrideWith(() => batch),
+        smartLyricsBatchCountsProvider.overrideWith(
+          (ref) => Future.value(const {
+            SmartLyricsTaskStatus.pending: 3,
+            SmartLyricsTaskStatus.done: 5,
+            SmartLyricsTaskStatus.failed: 2,
+          }),
+        ),
+        smartLyricsNewMissingProvider.overrideWith((ref) => Future.value(7)),
+      ],
+    );
+
+    expect(find.text('待补 3 · 已完成 5 · 失败 2'), findsOneWidget);
+    expect(find.textContaining('新增 7 首待补'), findsOneWidget,
+        reason: 'a scan brought tracks in; the queue waits for the press');
+
+    await tester.tap(find.byKey(const Key('smart-lyrics-batch-start')));
+    await tester.pumpAndSettle();
+    expect(batch.starts, 1);
+
+    await tester.tap(find.byKey(const Key('smart-lyrics-batch-retry')));
+    await tester.pumpAndSettle();
+    expect(batch.retries, 1);
+  });
+
+  testWidgets('a batch that is on says so and offers the stop', (tester) async {
+    await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsBatchControllerProvider
+            .overrideWith(() => _RunningBatchController()),
+        smartLyricsBatchCountsProvider.overrideWith(
+          (ref) => Future.value(const {
+            SmartLyricsTaskStatus.pending: 1,
+          }),
+        ),
+        smartLyricsNewMissingProvider.overrideWith((ref) => Future.value(0)),
+      ],
+    );
+
+    expect(find.text('正在补齐：待补 1 · 已完成 0'), findsOneWidget);
+    expect(find.byKey(const Key('smart-lyrics-batch-stop')), findsOneWidget);
+    expect(
+      tester.widget<TextButton>(
+        find.byKey(const Key('smart-lyrics-batch-start')),
+      ).onPressed,
+      isNull,
+      reason: 'the queue runs; a second press would double it',
+    );
   });
 }

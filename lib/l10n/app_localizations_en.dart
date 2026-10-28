@@ -2530,6 +2530,42 @@ class AppLocalizationsEn extends AppLocalizations {
       'The download failed: try again, or pick another model';
 
   @override
+  String get settingsSmartLyricsBatch => 'Batch fill';
+
+  @override
+  String get settingsSmartLyricsBatchStart => 'Fill the library';
+
+  @override
+  String get settingsSmartLyricsBatchStop => 'Stop';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => 'Recheck the failed tracks';
+
+  @override
+  String get settingsSmartLyricsBudget =>
+      'Cloud budget (tracks per run, 0 for none)';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '$pending waiting · $done done · $failed failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return 'Filling: $pending waiting · $done done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return 'The cloud budget ($budget tracks) is spent: this run paused — the rest waits';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '$count new tracks are missing; press \"Fill the library\" to queue them';
+  }
+
+  @override
   String get lyricsSmartGenerate => 'Smart lyrics';
 
   @override

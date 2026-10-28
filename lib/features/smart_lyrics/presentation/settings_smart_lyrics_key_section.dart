@@ -153,6 +153,17 @@ class _AdvancedFoldState extends ConsumerState<_AdvancedFold> {
             onChanged: (value) =>
                 _write(widget.config.copyWith(chatModel: value)),
           ),
+          SmartLyricsBoundField(
+            fieldKey: 'smart-lyrics-batch-budget',
+            label: strings.settingsSmartLyricsBudget,
+            text: '${widget.config.batchCloudBudget}',
+            onChanged: (value) {
+              final parsed = int.tryParse(value.trim());
+              if (parsed != null && parsed >= 0) {
+                _write(widget.config.copyWith(batchCloudBudget: parsed));
+              }
+            },
+          ),
         ],
       ],
     );
