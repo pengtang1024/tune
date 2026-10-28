@@ -2466,6 +2466,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSmartLyricsMissing => 'Gap to fill';
 
   @override
+  String get settingsSmartLyricsPreset => 'Endpoint preset';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => 'Custom';
+
+  @override
+  String get settingsSmartLyricsApiKey => 'API key';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => 'Paste a key of your own';
+
+  @override
+  String get settingsSmartLyricsAdvanced => 'Advanced';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => 'Endpoint URL';
+
+  @override
+  String get settingsSmartLyricsAsrModels =>
+      'Transcription models (comma-separated)';
+
+  @override
+  String get settingsSmartLyricsChatModel => 'Text model';
+
+  @override
+  String get settingsSmartLyricsPrivacy =>
+      'Generating uploads the whole track to the endpoint you configured, and nowhere else.';
+
+  @override
+  String get lyricsSmartGenerate => 'Smart lyrics';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey =>
+      'No key yet — paste one in Settings, Smart lyrics';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }

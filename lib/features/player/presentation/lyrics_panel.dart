@@ -8,6 +8,9 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
+import 'package:tune/utils/logger.dart';
 
 /// Height of one lyric line.
 const _lineExtent = 30.0;
@@ -113,7 +116,24 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           label: context.loc.lyricsChooseFile,
           onPressed: () => _chooseFile(song),
         ),
+        _generateAction(context),
       ],
+    );
+  }
+
+  /// The door of the smart pipeline: greyed until a key sits in the
+  /// settings, and then the single-song loop of M2 answers the press.
+  _Action _generateAction(BuildContext context) {
+    final configured = ref.watch(
+      settingsControllerProvider.select((state) => state.smartLyrics.isConfigured),
+    );
+    return _Action(
+      label: context.loc.lyricsSmartGenerate,
+      // The press is wired with the single-song loop of M2; until then a
+      // reachable press says so in the log.
+      onPressed: () => Log.info('智能生成的单曲闭环在 M2 接线'),
+      enabled: configured,
+      tooltip: configured ? null : context.loc.lyricsSmartGenerateNeedsKey,
     );
   }
 
@@ -192,10 +212,20 @@ class _LyricLine extends StatelessWidget {
 
 /// One thing the reader can do when there are no lyrics to show.
 class _Action {
-  const _Action({required this.label, required this.onPressed});
+  const _Action({
+    required this.label,
+    required this.onPressed,
+    this.enabled = true,
+    this.tooltip,
+  });
 
   final String label;
   final VoidCallback onPressed;
+
+  /// Whether the action can answer a press; a greyed one explains itself
+  /// in [tooltip] instead.
+  final bool enabled;
+  final String? tooltip;
 }
 
 /// Placeholder shown while there is nothing to read.
@@ -228,10 +258,21 @@ class _Message extends StatelessWidget {
           ),
           for (final action in actions) ...[
             const SizedBox(height: CompactTokens.space8),
-            TextButton(onPressed: action.onPressed, child: Text(action.label)),
+            _actionButton(context, action),
           ],
         ],
       ),
     );
+  }
+
+  /// The button of one action: a greyed press is null, and the reason it
+  /// waits travels as a hint over it.
+  Widget _actionButton(BuildContext context, _Action action) {
+    final button = TextButton(
+      onPressed: action.enabled ? action.onPressed : null,
+      child: Text(action.label),
+    );
+    if (action.tooltip == null) return button;
+    return TuneTooltip(message: action.tooltip!, child: button);
   }
 }

@@ -35,6 +35,8 @@ const List<String> properNames = [
   'Freesound',
   'API',
   'Client ID',
+  'OpenAI',
+  'Groq',
 ];
 
 /// The names of the file formats.

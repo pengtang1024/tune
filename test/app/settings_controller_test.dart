@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 
 import '../services/fake_persistence.dart';
 
@@ -132,5 +133,39 @@ void main() {
     final reloaded = SettingsController(persistence);
     addTearDown(reloaded.dispose);
     expect(reloaded.state.useListeningHistory, isTrue);
+  });
+
+  test('the smart lyrics config survives a controller rebuild', () async {
+    final persistence = FakePersistenceService();
+    final controller = SettingsController(persistence);
+
+    await controller.setSmartLyrics(
+      controller.state.smartLyrics.copyWith(
+        presetId: 'groq',
+        baseUrl: SmartLyricsPreset.byId('groq').baseUrl,
+        apiKey: 'sk-test',
+      ),
+    );
+    controller.dispose();
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+    expect(reloaded.state.smartLyrics.presetId, 'groq');
+    expect(reloaded.state.smartLyrics.apiKey, 'sk-test');
+    expect(reloaded.state.smartLyrics.isConfigured, isTrue);
+  });
+
+  test('a broken saved config falls back to the defaults', () {
+    final persistence = FakePersistenceService()
+      ..setString('smart_lyrics', '{oops');
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    expect(
+      controller.state.smartLyrics.baseUrl,
+      SmartLyricsConfig().baseUrl,
+      reason: 'a broken paste must not take the pipeline down with it',
+    );
   });
 }

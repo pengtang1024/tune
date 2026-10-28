@@ -4187,6 +4187,72 @@ abstract class AppLocalizations {
   /// **'待补缺口'**
   String get settingsSmartLyricsMissing;
 
+  /// No description provided for @settingsSmartLyricsPreset.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口模板'**
+  String get settingsSmartLyricsPreset;
+
+  /// No description provided for @settingsSmartLyricsPresetCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义'**
+  String get settingsSmartLyricsPresetCustom;
+
+  /// No description provided for @settingsSmartLyricsApiKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密钥'**
+  String get settingsSmartLyricsApiKey;
+
+  /// No description provided for @settingsSmartLyricsApiKeyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'粘贴你自己的 API 密钥'**
+  String get settingsSmartLyricsApiKeyHint;
+
+  /// No description provided for @settingsSmartLyricsAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'高级'**
+  String get settingsSmartLyricsAdvanced;
+
+  /// No description provided for @settingsSmartLyricsBaseUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口地址'**
+  String get settingsSmartLyricsBaseUrl;
+
+  /// No description provided for @settingsSmartLyricsAsrModels.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'转写模型（逗号分隔）'**
+  String get settingsSmartLyricsAsrModels;
+
+  /// No description provided for @settingsSmartLyricsChatModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'文本模型'**
+  String get settingsSmartLyricsChatModel;
+
+  /// No description provided for @settingsSmartLyricsPrivacy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。'**
+  String get settingsSmartLyricsPrivacy;
+
+  /// No description provided for @lyricsSmartGenerate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'智能生成'**
+  String get lyricsSmartGenerate;
+
+  /// No description provided for @lyricsSmartGenerateNeedsKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有密钥——先到设置的「智能歌词」里贴一把'**
+  String get lyricsSmartGenerateNeedsKey;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:

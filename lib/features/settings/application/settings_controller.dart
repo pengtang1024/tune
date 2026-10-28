@@ -9,6 +9,7 @@ import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
@@ -50,6 +51,7 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('restore_playback_on_startup') ?? true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
+          smartLyrics: _readSmartLyrics(_persistence),
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
@@ -149,6 +151,29 @@ class SettingsController extends StateNotifier<SettingsState> {
       'source_health_weights_v1',
       jsonEncode(weights.toJson()),
     );
+  }
+
+  /// Sets what the reader pasted for the smart lyrics pipeline.
+  ///
+  /// Every keystroke of the key goes out at once: the button the pipeline
+  /// waits behind reads the same state this writes.
+  Future<void> setSmartLyrics(SmartLyricsConfig config) async {
+    state = state.copyWith(smartLyrics: config);
+    await _persistence.setString('smart_lyrics', jsonEncode(config.toJson()));
+  }
+
+  static SmartLyricsConfig _readSmartLyrics(PersistenceService persistence) {
+    final raw = persistence.getString('smart_lyrics');
+    if (raw == null || raw.trim().isEmpty) return SmartLyricsConfig();
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        return SmartLyricsConfig.fromJson(Map<String, dynamic>.from(decoded));
+      }
+    } catch (error, stackTrace) {
+      Log.error('读取智能歌词配置失败: $error\n$stackTrace');
+    }
+    return SmartLyricsConfig();
   }
 
   static SourceHealthWeights _readSourceHealthWeights(

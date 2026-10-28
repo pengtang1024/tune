@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
@@ -50,6 +51,9 @@ class SettingsState {
   /// The weights of the dimensions of the source health score.
   final SourceHealthWeights sourceHealthWeights;
 
+  /// What the reader pasted for the smart lyrics pipeline.
+  final SmartLyricsConfig smartLyrics;
+
   /// Whether the discover page may learn from the tracks that were played.
   ///
   /// It is off by default: the page works from the hearts and the metadata
@@ -72,6 +76,7 @@ class SettingsState {
     this.restorePlaybackOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
+    this.smartLyrics = const SmartLyricsConfig(),
     this.useListeningHistory = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
@@ -95,6 +100,7 @@ class SettingsState {
     bool? restorePlaybackOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
+    SmartLyricsConfig? smartLyrics,
     bool? useListeningHistory,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
@@ -114,6 +120,7 @@ class SettingsState {
           restorePlaybackOnStartup ?? this.restorePlaybackOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
+      smartLyrics: smartLyrics ?? this.smartLyrics,
       useListeningHistory: useListeningHistory ?? this.useListeningHistory,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder

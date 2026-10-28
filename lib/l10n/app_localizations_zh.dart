@@ -2266,6 +2266,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSmartLyricsMissing => '待补缺口';
 
   @override
+  String get settingsSmartLyricsPreset => '接口模板';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自定义';
+
+  @override
+  String get settingsSmartLyricsApiKey => '密钥';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '粘贴你自己的 API 密钥';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '高级';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '接口地址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '转写模型（逗号分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文本模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
+
+  @override
+  String get lyricsSmartGenerate => '智能生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4576,6 +4609,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsSmartLyricsMissing => '待补缺口';
 
   @override
+  String get settingsSmartLyricsPreset => '接口模板';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自定义';
+
+  @override
+  String get settingsSmartLyricsApiKey => '密钥';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '粘贴你自己的 API 密钥';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '高级';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '接口地址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '转写模型（逗号分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文本模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
+
+  @override
+  String get lyricsSmartGenerate => '智能生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -6884,6 +6950,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSmartLyricsMissing => '待補缺口';
+
+  @override
+  String get settingsSmartLyricsPreset => '介面範本';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自訂';
+
+  @override
+  String get settingsSmartLyricsApiKey => '金鑰';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '貼上你自己的 API 金鑰';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '進階';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '介面位址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '轉寫模型（逗號分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文字模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成會把整首歌的音訊上傳到你設定的端點；只發給你自己填的位址。';
+
+  @override
+  String get lyricsSmartGenerate => '智慧生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '還沒有金鑰——先到設定的「智慧歌詞」裡貼一把';
 
   @override
   String discoverSectionOnlineArtist(String artist) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
@@ -45,6 +48,37 @@ void main() {
     expect(find.text('这首歌没有歌词'), findsOneWidget);
     expect(find.text('重新查找'), findsOneWidget);
     expect(find.text('选择歌词文件'), findsOneWidget);
+    // The smart generation is on the sheet, but without a key it waits.
+    expect(find.text('智能生成'), findsOneWidget);
+    final generate = tester.widget<TextButton>(
+      find.ancestor(
+        of: find.text('智能生成'),
+        matching: find.byType(TextButton),
+      ),
+    );
+    expect(generate.onPressed, isNull, reason: 'no key pasted: the button waits');
+  });
+
+  testWidgets('a key pasted wakes the smart generation up', (tester) async {
+    final persistence = FakePersistenceService()
+      ..values['smart_lyrics'] = jsonEncode(
+        const SmartLyricsConfig(apiKey: 'sk-test').toJson(),
+      );
+
+    await _pumpPanel(
+      tester,
+      state: const LyricsState(songId: 1),
+      song: song,
+      persistence: persistence,
+    );
+
+    final generate = tester.widget<TextButton>(
+      find.ancestor(
+        of: find.text('智能生成'),
+        matching: find.byType(TextButton),
+      ),
+    );
+    expect(generate.onPressed, isNotNull);
   });
 
   testWidgets('a request that failed offers to try again', (tester) async {
@@ -130,9 +164,13 @@ Future<void> _pumpPanel(
   LyricsController? controller,
   LyricsProvider? database,
   Song? song,
+  FakePersistenceService? persistence,
 }) async {
   final audio = FakeAudioPlayerService();
   addTearDown(audio.dispose);
+  // The provider owns the controller; the test hands in a persistence that
+  // already holds the values the scene needs.
+  final settingsPersistence = persistence ?? FakePersistenceService();
   final playback = PlaybackController(
     audio,
     FakeSongDownloadService(),
@@ -144,6 +182,9 @@ Future<void> _pumpPanel(
     persistenceServiceProvider.overrideWithValue(FakePersistenceService()),
     audioPlayerServiceProvider.overrideWithValue(audio),
     playbackControllerProvider.overrideWith((ref) => playback),
+    settingsControllerProvider.overrideWith(
+      (ref) => SettingsController(settingsPersistence),
+    ),
   ];
 
   if (database != null) {
