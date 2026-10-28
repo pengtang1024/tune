@@ -1302,6 +1302,24 @@ class AppDatabase {
     return _db.updatedRows;
   }
 
+  /// The tracks a free check may revive: the failed and the disputed ones,
+  /// a batch at a time — the check asks the human pool, and the pool grows
+  /// over the years.
+  List<Song> leakySongs({required int limit}) {
+    final rows = _db.select(
+      "SELECT songs.json AS json FROM smart_lyrics_tasks t "
+      "JOIN songs ON songs.active = 1 "
+      "  AND json_extract(songs.json, '\$.id') = t.song_id "
+      "WHERE t.status IN ('failed', 'disputed') "
+      'ORDER BY t.song_id LIMIT ?',
+      [limit],
+    );
+    return [
+      for (final row in rows)
+        Song.fromMap(jsonDecode(row['json'] as String? ?? '')),
+    ];
+  }
+
   /// The track a task names, read back whole from its row.
   Song? songWithId(int id) {
     final rows = _db.select(

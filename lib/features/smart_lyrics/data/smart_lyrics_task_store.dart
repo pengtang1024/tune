@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/database/app_database.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
@@ -126,6 +127,27 @@ class SmartLyricsTaskStore {
   /// card offers after a new source or a new model was configured.
   Future<int> requeueFailed() async =>
       (await _db()).requeueFailedTasks(now: _now());
+
+  /// The tracks the free check may revive: the failed and the disputed
+  /// ones, a batch at a time.
+  Future<List<Song>> leakyCandidates({int limit = 50}) async =>
+      (await _db()).leakySongs(limit: limit);
+
+  /// How a run ended, as the task table reads it — the same mapping for
+  /// the batch and for the free check: the sheet on the disk stands for
+  /// done, the disputed part for a re-solve, silence for「不是唱的」, and
+  /// every failure for an explicit retry.
+  Future<void> applyOutcome(Song song, SmartLyricsOutcome outcome) async {
+    if (outcome.saved && outcome.disputed > 0) {
+      await markDisputed(song.id, votes: outcome.votes);
+    } else if (outcome.saved) {
+      await markDone(song.id, votes: outcome.votes);
+    } else if (outcome.failure == SmartLyricsFailure.emptyResult) {
+      await markInstrumental(song.id);
+    } else {
+      await markFailed(song.id, error: '${outcome.failure}');
+    }
+  }
 
   /// Records a mark on a track: the batch runs the marked tracks first.
   Future<void> recordMark(int songId) async {

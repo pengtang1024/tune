@@ -2566,6 +2566,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsSmartLyricsLeakCheck =>
+      'Free check: re-asks the human pool when the machine is idle — never the cloud, never the CPU';
+
+  @override
   String get lyricsSmartGenerate => 'Smart lyrics';
 
   @override

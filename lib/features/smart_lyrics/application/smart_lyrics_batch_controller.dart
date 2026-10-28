@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
-import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
@@ -121,7 +120,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
           await store.markPending(next.id);
           break;
         }
-        await _write(store, next, outcome);
+        await store.applyOutcome(next, outcome);
         if (_usesCloud(outcome)) cloudUsed++;
       } catch (error, stackTrace) {
         Log.error('批量单曲失败: $error', stackTrace);
@@ -142,25 +141,6 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
     // The figures on the card follow the run, without the notifier
     // becoming a second account of them.
     ref.invalidate(smartLyricsBatchCountsProvider);
-  }
-
-  /// How a run ended, as the task table reads it: the sheet on the disk
-  /// stands for done, the disputed part for a re-solve, silence for
-  ///「不是唱的」, and every failure for an explicit retry.
-  Future<void> _write(
-    SmartLyricsTaskStore store,
-    Song song,
-    SmartLyricsOutcome outcome,
-  ) async {
-    if (outcome.saved && outcome.disputed > 0) {
-      await store.markDisputed(song.id, votes: outcome.votes);
-    } else if (outcome.saved) {
-      await store.markDone(song.id, votes: outcome.votes);
-    } else if (outcome.failure == SmartLyricsFailure.emptyResult) {
-      await store.markInstrumental(song.id);
-    } else {
-      await store.markFailed(song.id, error: '${outcome.failure}');
-    }
   }
 
   /// Whether the run spent the cloud: a song the free votes could settle

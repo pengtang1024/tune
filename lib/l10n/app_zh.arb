@@ -1254,6 +1254,7 @@
   "settingsSmartLyricsBudgetPaused": "已达云端预算（{budget} 首），本批暂停——余下待补不丢",
   "@settingsSmartLyricsBudgetPaused": {"placeholders": {"budget": {"type": "int"}}},
   "settingsSmartLyricsBatchFresh": "新增 {count} 首待补，按「补齐曲库」入队",
+  "settingsSmartLyricsLeakCheck": "查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU",
   "@settingsSmartLyricsBatchFresh": {"placeholders": {"count": {"type": "int"}}},
   "lyricsSmartGenerate": "智能生成",
   "lyricsSmartGenerateNeedsKey": "还没有密钥——先到设置的「智能歌词」里贴一把",

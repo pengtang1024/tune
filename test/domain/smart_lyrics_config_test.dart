@@ -65,7 +65,16 @@ void main() {
       expect(restored.chatModel, 'gpt-4o');
       expect(restored.localModel, 'base');
       expect(restored.batchCloudBudget, 120);
+      expect(restored.gapCheckEnabled, isTrue);
       expect(restored.isConfigured, isTrue);
+    });
+
+    test('the free check is on until the reader turns it off', () {
+      expect(const SmartLyricsConfig().gapCheckEnabled, isTrue);
+      expect(
+        const SmartLyricsConfig(gapCheckEnabled: false).gapCheckEnabled,
+        isFalse,
+      );
     });
 
     test('a broken field falls back to the defaults of that field', () {

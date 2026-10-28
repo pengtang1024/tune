@@ -4361,6 +4361,12 @@ abstract class AppLocalizations {
   /// **'新增 {count} 首待补，按「补齐曲库」入队'**
   String settingsSmartLyricsBatchFresh(int count);
 
+  /// No description provided for @settingsSmartLyricsLeakCheck.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU'**
+  String get settingsSmartLyricsLeakCheck;
+
   /// No description provided for @lyricsSmartGenerate.
   ///
   /// In zh_CN, this message translates to:

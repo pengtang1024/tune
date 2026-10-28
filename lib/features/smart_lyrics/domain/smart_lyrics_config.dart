@@ -76,6 +76,11 @@ class SmartLyricsConfig {
   /// (docs/smart-lyrics.md §7.2); `0` lets the run go without a cap.
   final int batchCloudBudget;
 
+  /// Whether the free check may run on its own: the periodic re-ask of the
+  /// human pool for the dead accounts, off the cloud, off the CPU
+  /// (docs/smart-lyrics.md §7.2).
+  final bool gapCheckEnabled;
+
   const SmartLyricsConfig({
     this.presetId = SmartLyricsPreset.openaiId,
     this.baseUrl = SmartLyricsPreset._openaiBaseUrl,
@@ -84,6 +89,7 @@ class SmartLyricsConfig {
     this.chatModel = 'gpt-4o-mini',
     this.localModel = '',
     this.batchCloudBudget = 500,
+    this.gapCheckEnabled = true,
   });
 
   /// Whether the pipeline has a place to go and a key to knock with.
@@ -102,6 +108,7 @@ class SmartLyricsConfig {
     String? chatModel,
     String? localModel,
     int? batchCloudBudget,
+    bool? gapCheckEnabled,
   }) => SmartLyricsConfig(
     presetId: presetId ?? this.presetId,
     baseUrl: baseUrl ?? this.baseUrl,
@@ -110,6 +117,7 @@ class SmartLyricsConfig {
     chatModel: chatModel ?? this.chatModel,
     localModel: localModel ?? this.localModel,
     batchCloudBudget: batchCloudBudget ?? this.batchCloudBudget,
+    gapCheckEnabled: gapCheckEnabled ?? this.gapCheckEnabled,
   );
 
   Map<String, dynamic> toJson() => {
@@ -120,6 +128,7 @@ class SmartLyricsConfig {
     'chatModel': chatModel,
     'localModel': localModel,
     'batchCloudBudget': batchCloudBudget,
+    'gapCheckEnabled': gapCheckEnabled,
   };
 
   /// Reads the config back; a broken field falls to the default of that
@@ -147,6 +156,9 @@ class SmartLyricsConfig {
       batchCloudBudget: json['batchCloudBudget'] is int
           ? json['batchCloudBudget'] as int
           : fallback.batchCloudBudget,
+      gapCheckEnabled: json['gapCheckEnabled'] is bool
+          ? json['gapCheckEnabled'] as bool
+          : fallback.gapCheckEnabled,
     );
   }
 }

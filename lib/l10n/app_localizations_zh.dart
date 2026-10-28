@@ -2362,6 +2362,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settingsSmartLyricsLeakCheck => '查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -4799,6 +4802,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get settingsSmartLyricsLeakCheck => '查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU';
+
+  @override
   String get lyricsSmartGenerate => '智能生成';
 
   @override
@@ -7234,6 +7240,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String settingsSmartLyricsBatchFresh(int count) {
     return '新增 $count 首待補，按「補齊曲庫」入隊';
   }
+
+  @override
+  String get settingsSmartLyricsLeakCheck => '查漏長開：機器閒置時只重問人寫票池，不花雲端、不佔 CPU';
 
   @override
   String get lyricsSmartGenerate => '智慧生成';

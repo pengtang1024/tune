@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/database/app_database.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_task_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
@@ -139,5 +140,55 @@ void main() {
     await store.recordMark(3);
 
     expect((await store.nextPending())?.id, 3);
+  });
+
+  test('the free check only sees the dead accounts', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+    await store.markRunning(3);
+    await store.markDisputed(3, votes: 2);
+
+    final candidates = await store.leakyCandidates();
+
+    expect(candidates.map((song) => song.id), [2, 3]);
+  });
+
+  test('a track the free check revived is done, its rivals are not asked', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+    await store.markRunning(3);
+    await store.markDisputed(3, votes: 2);
+
+    final candidates = await store.leakyCandidates();
+    await store.applyOutcome(
+      candidates.first,
+      const SmartLyricsOutcome(saved: true, votes: 3, origins: ['lrclib']),
+    );
+
+    expect((await store.counts())[SmartLyricsTaskStatus.done], 1);
+    expect(
+      (await store.leakyCandidates()).map((song) => song.id),
+      [3],
+      reason: 'the revived one is done; the rivals are still dead accounts',
+    );
+  });
+
+  test('a run that failed twice says so where the reader can read it', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+
+    final song = await store.nextPending();
+    await store.applyOutcome(
+      song!,
+      const SmartLyricsOutcome(saved: false),
+    );
+
+    final counts = await store.counts();
+    expect(counts[SmartLyricsTaskStatus.failed], 1);
   });
 }

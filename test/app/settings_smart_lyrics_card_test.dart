@@ -370,4 +370,30 @@ void main() {
       reason: 'the queue runs; a second press would double it',
     );
   });
+
+  testWidgets('the free check is on, and the reader may turn it off', (
+    tester,
+  ) async {
+    final controller = await pumpCard(
+      tester,
+      ledger: Future.value(SmartLyricsLedger.empty),
+      extra: [
+        smartLyricsBatchControllerProvider
+            .overrideWith(() => _FakeBatchController()),
+        smartLyricsBatchCountsProvider.overrideWith(
+          (ref) => Future.value(const {}),
+        ),
+        smartLyricsNewMissingProvider.overrideWith((ref) => Future.value(0)),
+      ],
+    );
+
+    expect(controller.state.smartLyrics.gapCheckEnabled, isTrue,
+        reason: 'the check converges the ledger on its own — it is on '
+            'until the reader says otherwise');
+
+    await tester.tap(find.byKey(const Key('smart-lyrics-gap-check')));
+    await tester.pumpAndSettle();
+
+    expect(controller.state.smartLyrics.gapCheckEnabled, isFalse);
+  });
 }

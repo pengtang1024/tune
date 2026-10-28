@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
@@ -79,6 +80,34 @@ class SmartLyricsBatchSection extends ConsumerWidget {
                     ),
                   ),
                 ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                strings.settingsSmartLyricsLeakCheck,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            Switch(
+              key: const ValueKey('smart-lyrics-gap-check'),
+              value: ref.watch(
+                settingsControllerProvider.select(
+                  (state) => state.smartLyrics.gapCheckEnabled,
+                ),
+              ),
+              onChanged: (value) {
+                final config = ref
+                    .read(settingsControllerProvider)
+                    .smartLyrics;
+                ref
+                    .read(settingsControllerProvider.notifier)
+                    .setSmartLyrics(config.copyWith(gapCheckEnabled: value));
+              },
+            ),
+          ],
         ),
       ],
     );

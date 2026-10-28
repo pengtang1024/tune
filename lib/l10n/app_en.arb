@@ -1254,6 +1254,7 @@
   "settingsSmartLyricsBudgetPaused": "The cloud budget ({budget} tracks) is spent: this run paused — the rest waits",
   "@settingsSmartLyricsBudgetPaused": {"placeholders": {"budget": {"type": "int"}}},
   "settingsSmartLyricsBatchFresh": "{count} new tracks are missing; press \"Fill the library\" to queue them",
+  "settingsSmartLyricsLeakCheck": "Free check: re-asks the human pool when the machine is idle — never the cloud, never the CPU",
   "@settingsSmartLyricsBatchFresh": {"placeholders": {"count": {"type": "int"}}},
   "lyricsSmartGenerate": "Smart lyrics",
   "lyricsSmartGenerateNeedsKey": "No key yet — paste one in Settings, Smart lyrics",

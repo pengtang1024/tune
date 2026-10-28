@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app.dart';
 import 'package:tune/app/licenses.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_leak_check_controller.dart';
 import 'package:tune/utils/logger.dart';
 
 Future<void> main() async {
@@ -38,6 +39,12 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(container: container, child: const TuneApp()),
   );
+
+  // The free check of the smart lyrics pipeline (docs/smart-lyrics.md
+  // §7.2): periodic, quiet, and free — the loop it lives in starts once,
+  // here, and every tick decides for itself whether the machine is idle
+  // enough to ask the human pool again.
+  container.read(smartLyricsLeakCheckControllerProvider).start();
 }
 
 /// Takes the place of the player on the machine.
