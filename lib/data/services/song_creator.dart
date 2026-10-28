@@ -8,6 +8,20 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart' as audio_meta;
 
 /// 歌曲创建工具类
 class SongCreator {
+  /// Whether a lyrics sheet sits next to [file].
+  ///
+  /// The names are the ones the app reads and writes the sheets under
+  /// (`LibraryPaths`): the sheet the app matched (`<name>.lrc`) and the one
+  /// the reader brought (`<name>.manual.lrc`). One `exists()` per name is
+  /// nothing next to the metadata read every scan already pays for.
+  static Future<bool> _hasLyricsSheet(File file, String fileName) async {
+    final folder = file.parent;
+    if (await File(path.join(folder.path, '$fileName.lrc')).exists()) {
+      return true;
+    }
+    return File(path.join(folder.path, '$fileName.manual.lrc')).exists();
+  }
+
   /// 从文件创建歌曲对象
   static Future<Song?> createFromFile(File file) async {
     final filePath = file.path;
@@ -45,6 +59,8 @@ class SongCreator {
         'discNumber': metadata.discNumber,
         'totalDisc': metadata.totalDisc,
         'lyrics': metadata.lyrics,
+        'hasLyrics': (metadata.lyrics?.trim().isNotEmpty ?? false) ||
+            await _hasLyricsSheet(file, fileName),
         'genres': metadata.genres,
         'performers': metadata.performers,
         'language': metadata.language,
@@ -81,6 +97,7 @@ class SongCreator {
       'year': 0,
       'size': await file.length(),
       'type': 'audio',
+      'hasLyrics': await _hasLyricsSheet(file, fileName),
     };
 
     return Song.fromMap(songData);

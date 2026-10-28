@@ -2447,6 +2447,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Optional local listening history (off by default)';
 
   @override
+  String get settingsSectionSmartLyrics => 'Smart lyrics';
+
+  @override
+  String get settingsSmartLyricsTitle => 'Lyrics coverage';
+
+  @override
+  String get settingsSmartLyricsDescription =>
+      'Tag sheets and lyrics files next to the tracks count; the numbers follow the last scan';
+
+  @override
+  String get settingsSmartLyricsTotal => 'Tracks';
+
+  @override
+  String get settingsSmartLyricsResolved => 'With lyrics';
+
+  @override
+  String get settingsSmartLyricsMissing => 'Gap to fill';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }

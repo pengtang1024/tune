@@ -18,7 +18,7 @@ class SettingsUpdateCard extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '08',
+      index: '09',
       eyebrow: strings.updateEyebrow,
       title: strings.updateTitle,
       description: strings.updateDescription,

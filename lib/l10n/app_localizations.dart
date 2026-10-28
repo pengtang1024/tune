@@ -4151,6 +4151,42 @@ abstract class AppLocalizations {
   /// **'可选的本地播放记录（默认关闭）'**
   String get discoverWhyHistory;
 
+  /// No description provided for @settingsSectionSmartLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'智能歌词'**
+  String get settingsSectionSmartLyrics;
+
+  /// No description provided for @settingsSmartLyricsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词覆盖'**
+  String get settingsSmartLyricsTitle;
+
+  /// No description provided for @settingsSmartLyricsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标签里的词和曲目旁的词稿都算；统计来自最近一次扫描'**
+  String get settingsSmartLyricsDescription;
+
+  /// No description provided for @settingsSmartLyricsTotal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'曲目总数'**
+  String get settingsSmartLyricsTotal;
+
+  /// No description provided for @settingsSmartLyricsResolved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已知有词'**
+  String get settingsSmartLyricsResolved;
+
+  /// No description provided for @settingsSmartLyricsMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'待补缺口'**
+  String get settingsSmartLyricsMissing;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:

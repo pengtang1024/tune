@@ -56,6 +56,39 @@ void main() {
     expect(scanned.hasRemoteSource, isTrue);
   });
 
+  test('a lyrics file next to the audio counts as lyrics', () async {
+    final file = File(path.join(library.path, 'WithLrc.mp3'))
+      ..writeAsStringSync('not really audio');
+    File(path.join(library.path, 'WithLrc.lrc')).writeAsStringSync(
+      '[00:01.00]一句词',
+    );
+
+    final scanned = await SongCreator.createFromFile(file);
+
+    expect(scanned!.hasLyrics, isTrue);
+  });
+
+  test('a manual lyrics file next to the audio counts as lyrics', () async {
+    final file = File(path.join(library.path, 'Chosen.mp3'))
+      ..writeAsStringSync('not really audio');
+    File(path.join(library.path, 'Chosen.manual.lrc')).writeAsStringSync(
+      '[00:01.00]一句词',
+    );
+
+    final scanned = await SongCreator.createFromFile(file);
+
+    expect(scanned!.hasLyrics, isTrue);
+  });
+
+  test('a file without a lyrics sheet carries none', () async {
+    final file = File(path.join(library.path, 'Bare.mp3'))
+      ..writeAsStringSync('not really audio');
+
+    final scanned = await SongCreator.createFromFile(file);
+
+    expect(scanned!.hasLyrics, isFalse);
+  });
+
   test('a corrupt tag declaring a gigabyte frame stays bounded', () async {
     // A real-world mp3 (2014-02-12 Bigwords.mp3) carried a corrupt ID3v2
     // frame header that declared ~1.2 GB of payload on a 4 MB file. The

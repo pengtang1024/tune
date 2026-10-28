@@ -17,6 +17,7 @@ import 'package:tune/features/settings/presentation/settings_discovery_card.dart
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 import 'package:tune/features/settings/presentation/settings_update_card.dart';
+import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -126,6 +127,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                 const SettingsDiscoveryCard(),
                 const SizedBox(height: 14),
                 const SettingsSourceHealthCard(),
+                const SizedBox(height: 14),
+                const SettingsSmartLyricsCard(),
                 if (hasDesktopIntegration) ...[
                   const SizedBox(height: 14),
                   SettingsDesktopCard(

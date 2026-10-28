@@ -371,7 +371,7 @@ class SettingsAboutCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '07',
+      index: '08',
       eyebrow: context.loc.about,
       title: context.loc.appName,
       description: context.loc.appTagline,

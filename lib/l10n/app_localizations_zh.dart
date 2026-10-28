@@ -2248,6 +2248,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 
   @override
+  String get settingsSectionSmartLyrics => '智能歌词';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌词覆盖';
+
+  @override
+  String get settingsSmartLyricsDescription => '标签里的词和曲目旁的词稿都算；统计来自最近一次扫描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目总数';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有词';
+
+  @override
+  String get settingsSmartLyricsMissing => '待补缺口';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4540,6 +4558,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 
   @override
+  String get settingsSectionSmartLyrics => '智能歌词';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌词覆盖';
+
+  @override
+  String get settingsSmartLyricsDescription => '标签里的词和曲目旁的词稿都算；统计来自最近一次扫描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目总数';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有词';
+
+  @override
+  String get settingsSmartLyricsMissing => '待补缺口';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -6830,6 +6866,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverWhyHistory => '可選的本機播放記錄（預設關閉）';
+
+  @override
+  String get settingsSectionSmartLyrics => '智慧歌詞';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌詞覆蓋';
+
+  @override
+  String get settingsSmartLyricsDescription => '標籤裡的詞和曲目旁的詞稿都算；統計來自最近一次掃描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目總數';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有詞';
+
+  @override
+  String get settingsSmartLyricsMissing => '待補缺口';
 
   @override
   String discoverSectionOnlineArtist(String artist) {

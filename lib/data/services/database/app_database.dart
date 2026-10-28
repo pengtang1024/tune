@@ -50,7 +50,8 @@ class AppDatabase {
         pinned INTEGER NOT NULL DEFAULT 0,
         last_seen INTEGER NOT NULL DEFAULT 0,
         last_played INTEGER,
-        play_count INTEGER NOT NULL DEFAULT 0
+        play_count INTEGER NOT NULL DEFAULT 0,
+        has_lyrics INTEGER NOT NULL DEFAULT 0
       )
     ''');
     db.execute(
@@ -108,6 +109,9 @@ class AppDatabase {
       // The folded title the rows are ordered by, so a window read from the
       // disk stands in the order the page expects.
       'title_sort': "title_sort TEXT NOT NULL DEFAULT ''",
+      // Whether lyrics are known to sit with the track (a tag sheet or a
+      // lyrics file next to the audio); the lyrics ledger counts on it.
+      'has_lyrics': 'has_lyrics INTEGER NOT NULL DEFAULT 0',
     };
     final added = <String>{};
     for (final entry in additions.entries) {
@@ -200,10 +204,8 @@ class AppDatabase {
       song.discNumber,
       song.totalDisc,
       song.lyrics,
-      song.language,
-      song.size,
-      song.type,
-      song.albumArtPath,
+      song.hasLyrics,
+      Object.hash(song.language, song.size, song.type, song.albumArtPath),
     );
     final source = Object.hash(
       song.sourceId,
@@ -251,8 +253,8 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, pinned, last_seen, title_sort, facts_hash, active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+           json, pinned, last_seen, title_sort, facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -266,7 +268,8 @@ class AppDatabase {
           last_seen = excluded.last_seen,
           title_sort = excluded.title_sort,
           facts_hash = excluded.facts_hash,
-          active = 1
+          active = 1,
+          has_lyrics = excluded.has_lyrics
       ''');
       try {
         final seenAt = DateTime.now().millisecondsSinceEpoch;
@@ -285,6 +288,7 @@ class AppDatabase {
             seenAt,
             foldText(song.title),
             factsHashOf(song),
+            song.hasLyrics ? 1 : 0,
           ]);
         }
       } finally {
@@ -326,8 +330,8 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, last_seen, title_sort, facts_hash, active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+           json, last_seen, title_sort, facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -340,7 +344,8 @@ class AppDatabase {
           last_seen = excluded.last_seen,
           title_sort = excluded.title_sort,
           facts_hash = excluded.facts_hash,
-          active = 1
+          active = 1,
+          has_lyrics = excluded.has_lyrics
       ''');
       try {
         final seenAt = DateTime.now().millisecondsSinceEpoch;
@@ -378,6 +383,7 @@ class AppDatabase {
             seenAt,
             foldText(candidate.title),
             factsHashOf(candidate),
+            candidate.hasLyrics ? 1 : 0,
           ]);
           written++;
         }
@@ -1007,6 +1013,22 @@ class AppDatabase {
       'SELECT COUNT(*) AS count FROM songs WHERE active = 1',
     );
     return (rows.first['count'] as int?) ?? 0;
+  }
+
+  /// How many active tracks carry lyrics, and how many the library holds.
+  ///
+  /// The lyrics ledger of the settings page reads this — one query over the
+  /// indexed rows, no library in memory (docs/smart-lyrics.md, M0).
+  (int, int) lyricsLedgerCounts() {
+    final row = _db
+        .select(
+          'SELECT COUNT(*) AS total, SUM(has_lyrics) AS with_lyrics '
+          'FROM songs WHERE active = 1',
+        )
+        .first;
+    final total = row['total'] as int? ?? 0;
+    final withLyrics = row['with_lyrics'] as int? ?? 0;
+    return (total, withLyrics);
   }
 
   void close() => _db.close();

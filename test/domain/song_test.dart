@@ -157,6 +157,39 @@ void main() {
     });
   });
 
+  group('the lyrics a track carries', () {
+    test('a track without a sheet defaults to none', () {
+      const song = Song(id: 1, uri: '/music/one.mp3');
+
+      expect(song.hasLyrics, isFalse);
+    });
+
+    test('the json round trip keeps the lyrics fact', () {
+      const song = Song(id: 1, uri: '/music/one.mp3', hasLyrics: true);
+
+      final restored = Song.fromMap(song.toJson());
+
+      expect(restored.hasLyrics, isTrue);
+    });
+
+    test('the merged track keeps the lyrics fact of either side', () {
+      const remote = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        streamUrl: 'https://cdn.test/one.mp3',
+      );
+      const file = Song(
+        id: 1,
+        uri: 'tune://openverse/one',
+        localPath: '/music/Artist/One/One.mp3',
+        hasLyrics: true,
+      );
+
+      expect(remote.mergeWith(file).hasLyrics, isTrue);
+      expect(file.mergeWith(remote).hasLyrics, isTrue);
+    });
+  });
+
   group('the addresses of a track', () {
     test('a track of the library is its own file', () {
       const local = Song(id: 1, uri: '/music/one.flac');
