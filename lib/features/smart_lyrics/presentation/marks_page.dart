@@ -189,6 +189,9 @@ class _RewordDialogState extends ConsumerState<_RewordDialog> {
   final TextEditingController _text = TextEditingController();
   var _loaded = false;
 
+  /// A save is on its way; a second press would pop the dialog twice.
+  var _saving = false;
+
   @override
   void initState() {
     super.initState();
@@ -230,13 +233,19 @@ class _RewordDialogState extends ConsumerState<_RewordDialog> {
         ),
         TextButton(
           key: const ValueKey('smart-lyrics-reword-save'),
-          onPressed: () async {
-            final navigator = Navigator.of(context);
-            await ref
-                .read(smartLyricsMarksControllerProvider)
-                .rewordLine(widget.song, widget.line, _text.text);
-            navigator.pop();
-          },
+          onPressed: _saving
+              ? null
+              : () async {
+                  setState(() => _saving = true);
+                  final navigator = Navigator.of(context);
+                  try {
+                    await ref
+                        .read(smartLyricsMarksControllerProvider)
+                        .rewordLine(widget.song, widget.line, _text.text);
+                  } finally {
+                    if (mounted) navigator.pop();
+                  }
+                },
           child: Text(strings.lyricsMarkRewordSave),
         ),
       ],

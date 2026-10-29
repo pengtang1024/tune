@@ -12,6 +12,7 @@ import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
@@ -116,6 +117,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
         itemBuilder: (context, index) {
           final line = document.lines[index];
           return _LyricLine(
+            key: ValueKey(index),
             line: line.text,
             active: index == active,
             flagged: flags.lines.contains(index),
@@ -236,11 +238,15 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
         (state) => state.smartLyrics.isConfigured,
       ),
     );
+    // The batch owns the engines while it drains; one run at a time.
+    final batchRunning = ref.watch(
+      smartLyricsBatchControllerProvider.select((state) => state.running),
+    );
     return _Action(
       label: context.loc.lyricsSmartGenerate,
       onPressed: () =>
           ref.read(smartLyricsControllerProvider.notifier).generate(song),
-      enabled: configured,
+      enabled: configured && !batchRunning,
       tooltip: configured ? null : context.loc.lyricsSmartGenerateNeedsKey,
     );
   }
@@ -298,8 +304,9 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 }
 
 /// One line of the lyric sheet.
-class _LyricLine extends StatelessWidget {
+class _LyricLine extends StatefulWidget {
   const _LyricLine({
+    super.key,
     required this.line,
     required this.active,
     this.flagged = false,
@@ -325,8 +332,21 @@ class _LyricLine extends StatelessWidget {
   final String? transliteration;
 
   @override
+  State<_LyricLine> createState() => _LyricLineState();
+}
+
+class _LyricLineState extends State<_LyricLine> {
+  /// The line under the pointer: its flag shows only then, so the sheet
+  /// reads as words, not as a column of icons.
+  var _hovering = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final line = widget.line;
+    final active = widget.active;
+    final translation = widget.translation;
+    final transliteration = widget.transliteration;
     // The sung line takes the step above the others, so the eye finds it
     // without reading the words first.
     final style = active
@@ -348,47 +368,56 @@ class _LyricLine extends StatelessWidget {
             ),
           ),
         ),
-        // One press marks the line wrong, another takes it back; the
-        // flag of a marked line flies in the accent, the others wait,
-        // faint.
-        if (onToggleFlag != null)
-          TuneTooltip(
-            message: flagged
-                ? context.loc.lyricsUnmarkLine
-                : context.loc.lyricsMarkLine,
-            child: IconButton(
-              onPressed: onToggleFlag,
-              icon: Icon(
-                flagged ? Icons.flag : Icons.flag_outlined,
-                size: CompactTokens.icon16,
-                color: flagged
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.3,
-                      ),
+        // One press marks the line wrong, another takes it back. The
+        // marked line keeps its flag in the accent; every other flag waits
+        // for the pointer — the playing page stays words first.
+        if (widget.onToggleFlag != null)
+          Visibility(
+            visible: widget.flagged || _hovering,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: TuneTooltip(
+              message: widget.flagged
+                  ? context.loc.lyricsUnmarkLine
+                  : context.loc.lyricsMarkLine,
+              child: IconButton(
+                onPressed: widget.onToggleFlag,
+                icon: Icon(
+                  widget.flagged ? Icons.flag : Icons.flag_outlined,
+                  size: CompactTokens.icon16,
+                  color: widget.flagged
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: CompactTokens.icon20,
+                  minHeight: CompactTokens.icon20,
+                ),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
               ),
-              constraints: const BoxConstraints(
-                minWidth: CompactTokens.icon20,
-                minHeight: CompactTokens.icon20,
-              ),
-              padding: EdgeInsets.zero,
-              visualDensity: VisualDensity.compact,
             ),
           ),
       ],
     );
+    final row = MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: words,
+    );
     // Without a contrast the line stays the single row the cheap scroll
     // was measured for; the contrasts add their rows under the words.
-    if (translation == null && transliteration == null) return words;
+    if (translation == null && transliteration == null) return row;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        words,
+        row,
         if (translation != null)
-          _contrast(context, translation!, theme, faint: false),
+          _contrast(context, translation, theme, faint: false),
         if (transliteration != null)
-          _contrast(context, transliteration!, theme, faint: true),
+          _contrast(context, transliteration, theme, faint: true),
       ],
     );
   }

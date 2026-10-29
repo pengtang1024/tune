@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -278,11 +279,22 @@ void main() {
     expect(
       find.byTooltip('这行不对'),
       findsOneWidget,
-      reason: 'the others wait, faint — one press marks them',
+      reason: 'the unmarked flag waits in the tree, out of the way',
+    );
+    expect(
+      _flagVisibility(tester, '这行不对'),
+      isFalse,
+      reason: 'the playing page reads as words, not as a column of icons',
     );
 
     await tester.tap(find.byTooltip('撤销标记'));
     await tester.pumpAndSettle();
+    await _hover(tester, find.text('Second line'));
+    expect(
+      _flagVisibility(tester, '这行不对'),
+      isTrue,
+      reason: 'the pointer brings the flag out',
+    );
     await tester.tap(find.byTooltip('这行不对'));
     await tester.pumpAndSettle();
 
@@ -339,8 +351,8 @@ void main() {
       ],
     );
 
-    expect(find.byTooltip('这行不对'), findsOneWidget, reason: 'faint flags, '
-        'one press each — the panel keeps its wordless promise');
+    expect(find.byTooltip('这行不对'), findsOneWidget, reason: 'the flag '
+        'waits for the pointer — the panel keeps its wordless promise');
     expect(find.text('整首不对'), findsOneWidget);
   });
 
@@ -638,4 +650,26 @@ class _RecordingMarks extends SmartLyricsMarksController {
   Future<void> toggleNotSung(int songId) async {
     toggledNotSung.add(songId);
   }
+}
+
+/// The nearest Visibility that hides or shows the flag of [tooltip].
+bool _flagVisibility(WidgetTester tester, String tooltip) => tester
+    .widget<Visibility>(
+      find
+          .ancestor(
+            of: find.byTooltip(tooltip),
+            matching: find.byType(Visibility),
+          )
+          .first,
+    )
+    .visible;
+
+/// Puts the mouse over [finder]: the desktop hover that brings a flag out.
+Future<void> _hover(WidgetTester tester, Finder finder) async {
+  final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  await gesture.addPointer(location: Offset.zero);
+  addTearDown(gesture.removePointer);
+  await tester.pump();
+  await gesture.moveTo(tester.getCenter(finder));
+  await tester.pumpAndSettle();
 }
