@@ -104,12 +104,14 @@ void main() {
     List<SmartLyricsEngine> engines = const [],
     List<({String name, LyricsProvider provider})> humanPool = const [],
     SmartTextAssist? assist,
+    List<String> knowledgeModels = const [],
     ChannelHealthLedger? health,
   }) => SmartLyricsService(
     engines: engines,
     humanPool: humanPool,
     paths: paths,
     assist: assist,
+    knowledgeModels: knowledgeModels,
     health: health,
   );
 
@@ -168,24 +170,33 @@ void main() {
     final whisper = _Engine('cloud:whisper-1', answer: segmentsOf(['一句', '两句']));
     final paraformer = _Engine('cloud:paraformer', answer: segmentsOf(['一句', '两句']));
     final human = _Human()..sheets[1] = _sheetText(['一句', '两句']);
+    final second = _Human()..sheets[1] = _sheetText(['一句', '两句']);
     // The correction answers with the wrong line count — the drafts vote
     // as they were read.
     final assist = assistAnswering(jsonEncode(['两句']));
 
     final outcome = await service(
       engines: [whisper, paraformer],
-      humanPool: [(name: 'lrclib', provider: human)],
+      humanPool: [
+        (name: 'lrclib', provider: human),
+        (name: 'music123', provider: second),
+      ],
       assist: assist,
+      knowledgeModels: ['gpt-4o-mini', 'deepseek-chat'],
     ).generate(localSong());
 
     expect(outcome.saved, isTrue, reason: 'the human class plus the machine '
         'class (two distinct families) read the same words — §7.6 admits');
-    expect(outcome.votes, 4);
+    expect(outcome.votes, 6, reason: 'two human + two ASR + two LLM rebuilds');
     expect(
       outcome.origins,
       containsAll(['lrclib', 'cloud:whisper-1', 'cloud:paraformer']),
     );
     expect(outcome.disputed, 0);
+    expect(outcome.auditChecked, 1,
+        reason: 'four voices carried the words — the leave-one-out audit '
+            'put the line on trial and it stood every rotation');
+    expect(outcome.auditMismatched, 0);
   });
 
   test('a disputed line is not written, its place goes to the header', () async {

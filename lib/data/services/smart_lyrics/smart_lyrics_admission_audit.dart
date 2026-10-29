@@ -106,26 +106,55 @@ AdmissionAudit auditAdmission(
   // drop still leaves two classes a chance to stand.
   if (voices.length < 4) return (false, false);
 
+  final winnerSupport = _speakingSupport(cluster)[normalized] ?? 0;
   var verifiable = false;
   for (var left = 0; left < voices.length; left++) {
     final rotated = {
       for (var i = 0; i < cluster.length; i++)
         if (_familyOf(cluster[i].ballot.origin) != voices[left].family)
-          cluster[i].ballot,
+          cluster[i],
     }.toList();
-    if (rotated.length < 2) continue;
-    final rotatedWinners = admit(rotated)
-        .lines
-        .where((line) => !line.disputed);
+    final support = _speakingSupport(rotated);
     // 说不了话的裁判不下结论
-    if (rotatedWinners.isEmpty) continue;
-    verifiable = true;
-    if (_normalizeAudit(rotatedWinners.first.text) != normalized) {
-      // 一轮判出了别的字——抓到
-      return (true, false);
+    if (support.isEmpty) continue;
+    final top = support.entries.reduce(
+      (a, b) => b.value > a.value ? b : a,
+    );
+    if (top.value < 2) continue;
+    if (top.key == normalized) {
+      verifiable = true;
+      continue;
     }
+    // 平票不是矛盾：支持度相当时的异文只是存疑，跳过；只有支持度严格
+    // 更强的异文才算抓到。
+    if (top.value > winnerSupport) return (true, false);
   }
   return (verifiable, true);
+}
+
+/// The classes that speak each normalized text inside [cluster], under the
+/// gate's own formation rules: one human voice, two machine families.
+Map<String, int> _speakingSupport(
+  List<({LyricsBallot ballot, BallotLine line})> cluster,
+) {
+  final texts = <LineageClass, Map<String, Map<String, String>>>{};
+  for (final entry in cluster) {
+    final (klass, family) = lineageOf(entry.ballot.origin);
+    texts
+        .putIfAbsent(klass, () => {})
+        .putIfAbsent(_normalizeAudit(entry.line.text), () => {})
+        .putIfAbsent(family, () => entry.line.text);
+  }
+  final perNorm = <String, int>{};
+  texts.forEach((klass, byNorm) {
+    final required = klass == LineageClass.human ? 1 : 2;
+    for (final entry in byNorm.entries) {
+      if (entry.value.length >= required) {
+        perNorm.update(entry.key, (count) => count + 1, ifAbsent: () => 1);
+      }
+    }
+  });
+  return perNorm;
 }
 
 String _familyOf(String origin) => lineageOf(origin).$2;

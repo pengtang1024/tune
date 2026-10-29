@@ -6,6 +6,7 @@ import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission_audit.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
@@ -37,6 +38,14 @@ class SmartLyricsOutcome {
   /// The line numbers the pool still cannot agree on — where a system
   /// mark is made (docs/smart-lyrics.md §7.4).
   final List<int> disputedLines;
+
+  /// The leave-one-out audit of this run's admitted lines: how many went
+  /// on trial and how many rotations the machines caught wrong
+  /// (docs/smart-lyrics.md §7.6, M11b). Zero trials is not a pass — it
+  /// means no line had the four voices the audit needs.
+  final int auditChecked;
+  final int auditMismatched;
+
   final SmartLyricsFailure? failure;
 
   const SmartLyricsOutcome({
@@ -45,6 +54,8 @@ class SmartLyricsOutcome {
     this.votes = 0,
     this.origins = const [],
     this.disputedLines = const [],
+    this.auditChecked = 0,
+    this.auditMismatched = 0,
     this.failure,
   });
 
@@ -102,8 +113,10 @@ class SmartLyricsService {
     Song song,
     SmartConsensus consensus,
     List<String> origins,
-    bool Function() stopped,
-  ) async {
+    bool Function() stopped, {
+    int auditChecked = 0,
+    int auditMismatched = 0,
+  }) async {
     if (stopped()) return const SmartLyricsOutcome.cancelled();
     final disputedLines = [
       for (var index = 0; index < consensus.lines.length; index++)
@@ -118,6 +131,8 @@ class SmartLyricsService {
       votes: consensus.votesCounted,
       origins: origins,
       disputedLines: disputedLines,
+      auditChecked: auditChecked,
+      auditMismatched: auditMismatched,
     );
   }
 
@@ -147,7 +162,22 @@ class SmartLyricsService {
       if (consensus.lines.isEmpty) {
         return const SmartLyricsOutcome.failed(SmartLyricsFailure.emptyResult);
       }
-      return await _save(song, consensus, origins, stopped);
+      // The leave-one-out audit rides along on every save: machines
+      // judging machines, its account carried out with the sheet
+      // (docs/smart-lyrics.md §7.6, M11b).
+      final audit = auditAdmission(votes, knowledge: knowledges);
+      Log.info(
+        '准入审计: 受审=${audit.checked} 抓错=${audit.mismatched} '
+        '上界=${audit.missRateUpperBound.toStringAsFixed(4)}',
+      );
+      return await _save(
+        song,
+        consensus,
+        origins,
+        stopped,
+        auditChecked: audit.checked,
+        auditMismatched: audit.mismatched,
+      );
     } finally {
       if (temporary) await _discard(audio);
     }
