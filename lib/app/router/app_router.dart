@@ -10,6 +10,7 @@ import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
+import 'package:tune/features/smart_lyrics/presentation/marks_page.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -22,7 +23,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           path == '/favorites' ||
           path == '/sources' ||
           path == '/settings' ||
-          path == '/now-playing') {
+          path == '/now-playing' ||
+          path == '/marks') {
         return null;
       }
       // The compact player replaces the old four-tab shell. Any old deep link
@@ -74,6 +76,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             queuePanelBuilder: (context, onClose) =>
                 QueuePanel(onClose: onClose, showTransport: true),
           ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            );
+            return FadeTransition(
+              opacity: curved,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.06),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: child,
+              ),
+            );
+          },
+        ),
+      ),
+      // The marks of the library are one place of their own
+      // (docs/smart-lyrics.md §7.4): reached from the settings card and
+      // the lyrics panel, covering the whole window like the view above.
+      GoRoute(
+        path: '/marks',
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 280),
+          reverseTransitionDuration: const Duration(milliseconds: 200),
+          child: const SmartLyricsMarksPage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             final curved = CurvedAnimation(
               parent: animation,

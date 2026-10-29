@@ -4433,6 +4433,84 @@ abstract class AppLocalizations {
   /// **'这不是唱的'**
   String get lyricsMarkNotSung;
 
+  /// No description provided for @lyricsMarksTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标记管理'**
+  String get lyricsMarksTitle;
+
+  /// No description provided for @lyricsMarksEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有标记——听到不对的行，点行尾的小旗'**
+  String get lyricsMarksEmpty;
+
+  /// No description provided for @lyricsMarkLineNumber.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'第 {line} 行'**
+  String lyricsMarkLineNumber(int line);
+
+  /// No description provided for @lyricsMarkReword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'改词'**
+  String get lyricsMarkReword;
+
+  /// No description provided for @lyricsMarkRewordTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'改这一行'**
+  String get lyricsMarkRewordTitle;
+
+  /// No description provided for @lyricsMarkRewordSave.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存改词'**
+  String get lyricsMarkRewordSave;
+
+  /// No description provided for @lyricsMarkRevoke.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销'**
+  String get lyricsMarkRevoke;
+
+  /// No description provided for @lyricsMarkWaiting.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'等复解'**
+  String get lyricsMarkWaiting;
+
+  /// No description provided for @lyricsMarkResolved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已复解'**
+  String get lyricsMarkResolved;
+
+  /// No description provided for @lyricsMarkReworded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已改词'**
+  String get lyricsMarkReworded;
+
+  /// No description provided for @lyricsMarkRevoked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已撤销'**
+  String get lyricsMarkRevoked;
+
+  /// No description provided for @lyricsMarkSourceReader.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读者'**
+  String get lyricsMarkSourceReader;
+
+  /// No description provided for @lyricsMarkSourceSystem.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'系统'**
+  String get lyricsMarkSourceSystem;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:

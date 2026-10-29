@@ -1371,21 +1371,20 @@ class AppDatabase {
   }
 
   /// Takes back the open marks of a track — [line] when one line is taken
-  /// back, the whole track when it is left out.
-  void revokeMarkRows(int songId, {int? line}) {
-    if (line == null) {
-      _db.execute(
-        "UPDATE smart_lyrics_marks SET state = 'revoked' "
-        "WHERE song_id = ? AND state = 'uncleared'",
-        [songId],
-      );
-    } else {
-      _db.execute(
-        "UPDATE smart_lyrics_marks SET state = 'revoked' "
-        "WHERE song_id = ? AND line = ? AND state = 'uncleared'",
-        [songId, line],
-      );
-    }
+  /// back, [kind] when only one kind is — so undoing the whole-track mark
+  /// never touches the flags on its lines.
+  void revokeMarkRows(int songId, {int? line, String? kind}) {
+    final parts = [
+      'song_id = ?',
+      "state = 'uncleared'",
+      if (line != null) 'line = ?',
+      if (kind != null) 'kind = ?',
+    ];
+    _db.execute(
+      'UPDATE smart_lyrics_marks SET state = \'revoked\' WHERE '
+      '${parts.join(' AND ')}',
+      [songId, ?line, ?kind],
+    );
   }
 
   /// The open marks of a track, in the order they were made.

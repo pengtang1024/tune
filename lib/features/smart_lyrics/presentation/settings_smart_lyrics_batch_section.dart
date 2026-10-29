@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -56,6 +57,15 @@ class SmartLyricsBatchSection extends ConsumerWidget {
                 child: Text(strings.settingsSmartLyricsBatchRetry),
               ),
             ],
+            const Spacer(),
+            // The other door into the marks: every mark of the library,
+            // grouped, with the way out it waits for (docs/smart-lyrics.md
+            // §7.4).
+            TextButton(
+              key: const ValueKey('smart-lyrics-marks'),
+              onPressed: () => context.push('/marks'),
+              child: Text(strings.lyricsMarksTitle),
+            ),
           ],
         ),
         Text(

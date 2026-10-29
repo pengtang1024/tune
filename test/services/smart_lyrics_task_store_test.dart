@@ -302,4 +302,28 @@ void main() {
     expect(flags.song, isTrue, reason: 'the other mark stands — it has its '
         'own way out');
   });
+
+  test('taking back one kind never touches the marks next to it', () async {
+    ingestLibrary();
+    await store.markLine(2, 5);
+    await store.markSong(2);
+    await store.markNotSung(2);
+
+    await store.unmarkSong(2);
+
+    var flags = await store.flagsOf(2);
+    expect(flags.song, isFalse, reason: 'the whole-track mark is taken back');
+    expect(flags.lines, {5}, reason: 'the flag on the line stands');
+    expect(flags.instrumental, isTrue, reason: 'the not-sung name stands');
+
+    await store.unmarkNotSung(2);
+    flags = await store.flagsOf(2);
+    expect(flags.instrumental, isFalse);
+    expect(flags.lines, {5}, reason: 'still only what was pressed away');
+    expect(
+      (await store.nextPending())?.id,
+      2,
+      reason: 'the name taken back puts the track in line again',
+    );
+  });
 }

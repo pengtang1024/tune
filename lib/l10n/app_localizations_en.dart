@@ -2608,6 +2608,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsMarkNotSung => 'This is not sung';
 
   @override
+  String get lyricsMarksTitle => 'Marks';
+
+  @override
+  String get lyricsMarksEmpty =>
+      'No marks yet — hear a wrong line, press the flag at its end';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return 'Line $line';
+  }
+
+  @override
+  String get lyricsMarkReword => 'Reword';
+
+  @override
+  String get lyricsMarkRewordTitle => 'Reword this line';
+
+  @override
+  String get lyricsMarkRewordSave => 'Save the words';
+
+  @override
+  String get lyricsMarkRevoke => 'Take back';
+
+  @override
+  String get lyricsMarkWaiting => 'Waiting for the re-solve';
+
+  @override
+  String get lyricsMarkResolved => 'Re-solved';
+
+  @override
+  String get lyricsMarkReworded => 'Reworded';
+
+  @override
+  String get lyricsMarkRevoked => 'Taken back';
+
+  @override
+  String get lyricsMarkSourceReader => 'Reader';
+
+  @override
+  String get lyricsMarkSourceSystem => 'Pool';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }

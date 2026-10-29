@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
@@ -376,6 +377,14 @@ class _MarkRow extends ConsumerWidget {
             label: context.loc.lyricsMarkNotSung,
             active: flags.instrumental,
             onPressed: () => marks.toggleNotSung(songId),
+          ),
+          const Spacer(),
+          // The other door into the marks of the library
+          // (docs/smart-lyrics.md §7.4).
+          TextButton(
+            key: const ValueKey('panel-marks'),
+            onPressed: () => context.push('/marks'),
+            child: Text(context.loc.lyricsMarksTitle),
           ),
         ],
       ),

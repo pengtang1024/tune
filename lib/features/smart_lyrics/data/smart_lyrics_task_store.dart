@@ -218,14 +218,29 @@ class SmartLyricsTaskStore {
   /// time.
   Future<void> unmarkLine(int songId, int line) async {
     final database = await _db();
-    database.revokeMarkRows(songId, line: line);
+    database.revokeMarkRows(
+      songId,
+      line: line,
+      kind: SmartLyricsMarkKind.line.id,
+    );
     database.requeueSongTask(songId, now: _now());
   }
 
-  /// Takes back the whole-track mark; the track is in line again.
+  /// Takes back the whole-track mark; the track is in line again. The
+  /// flags on its lines stand — they have their own way out.
   Future<void> unmarkSong(int songId) async {
     final database = await _db();
-    database.revokeMarkRows(songId, line: null);
+    database.revokeMarkRows(songId, kind: SmartLyricsMarkKind.song.id);
+    database.requeueSongTask(songId, now: _now());
+  }
+
+  /// Takes the not-sung name back: the track is a gap again, and in line.
+  Future<void> unmarkNotSung(int songId) async {
+    final database = await _db();
+    database.revokeMarkRows(
+      songId,
+      kind: SmartLyricsMarkKind.instrumental.id,
+    );
     database.requeueSongTask(songId, now: _now());
   }
 

@@ -2398,6 +2398,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsMarkNotSung => '这不是唱的';
 
   @override
+  String get lyricsMarksTitle => '标记管理';
+
+  @override
+  String get lyricsMarksEmpty => '还没有标记——听到不对的行，点行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改词';
+
+  @override
+  String get lyricsMarkRewordTitle => '改这一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改词';
+
+  @override
+  String get lyricsMarkRevoke => '撤销';
+
+  @override
+  String get lyricsMarkWaiting => '等复解';
+
+  @override
+  String get lyricsMarkResolved => '已复解';
+
+  @override
+  String get lyricsMarkReworded => '已改词';
+
+  @override
+  String get lyricsMarkRevoked => '已撤销';
+
+  @override
+  String get lyricsMarkSourceReader => '读者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系统';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4850,6 +4891,47 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsMarkNotSung => '这不是唱的';
 
   @override
+  String get lyricsMarksTitle => '标记管理';
+
+  @override
+  String get lyricsMarksEmpty => '还没有标记——听到不对的行，点行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改词';
+
+  @override
+  String get lyricsMarkRewordTitle => '改这一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改词';
+
+  @override
+  String get lyricsMarkRevoke => '撤销';
+
+  @override
+  String get lyricsMarkWaiting => '等复解';
+
+  @override
+  String get lyricsMarkResolved => '已复解';
+
+  @override
+  String get lyricsMarkReworded => '已改词';
+
+  @override
+  String get lyricsMarkRevoked => '已撤销';
+
+  @override
+  String get lyricsMarkSourceReader => '读者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系统';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -7300,6 +7382,47 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get lyricsMarkNotSung => '這不是唱的';
+
+  @override
+  String get lyricsMarksTitle => '標記管理';
+
+  @override
+  String get lyricsMarksEmpty => '還沒有標記——聽到不對的行，點行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改詞';
+
+  @override
+  String get lyricsMarkRewordTitle => '改這一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改詞';
+
+  @override
+  String get lyricsMarkRevoke => '撤銷';
+
+  @override
+  String get lyricsMarkWaiting => '等復解';
+
+  @override
+  String get lyricsMarkResolved => '已復解';
+
+  @override
+  String get lyricsMarkReworded => '已改詞';
+
+  @override
+  String get lyricsMarkRevoked => '已撤銷';
+
+  @override
+  String get lyricsMarkSourceReader => '讀者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系統';
 
   @override
   String discoverSectionOnlineArtist(String artist) {
