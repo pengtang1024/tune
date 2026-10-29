@@ -1311,10 +1311,33 @@ class AppDatabase {
   }
 
   /// Puts every failed task back in line for a recheck.
-  int requeueFailedTasks({required int now}) {
+  int requeueFailedTasks({required int now, int? maxAttempts}) {
+    if (maxAttempts == null) {
+      // The reader pressed「重试」: a new source or model deserves a clean
+      // slate, so the attempt count starts over.
+      _db.execute(
+        "UPDATE smart_lyrics_tasks SET status = 'pending', attempts = 0, "
+        'updated_at = ? '
+        "WHERE status = 'failed'",
+        [now],
+      );
+    } else {
+      // The automatic pass only revives what has not burned its attempts.
+      _db.execute(
+        "UPDATE smart_lyrics_tasks SET status = 'pending', updated_at = ? "
+        "WHERE status = 'failed' AND attempts < ?",
+        [now, maxAttempts],
+      );
+    }
+    return _db.updatedRows;
+  }
+
+  /// A run that died with the app left its task `running`; when the queue
+  /// starts again no run is in flight, so those rows go back in line.
+  int requeueInterruptedTasks({required int now}) {
     _db.execute(
       "UPDATE smart_lyrics_tasks SET status = 'pending', updated_at = ? "
-      "WHERE status = 'failed'",
+      "WHERE status = 'running'",
       [now],
     );
     return _db.updatedRows;

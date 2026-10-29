@@ -126,8 +126,12 @@ class SmartLyricsTaskStore {
 
   /// Puts every failed task back in line for a recheck; the action the
   /// card offers after a new source or a new model was configured.
-  Future<int> requeueFailed() async =>
-      (await _db()).requeueFailedTasks(now: _now());
+  Future<int> requeueFailed({int? maxAttempts}) async =>
+      (await _db()).requeueFailedTasks(now: _now(), maxAttempts: maxAttempts);
+
+  /// Puts the tasks a dead run left `running` back in line.
+  Future<int> requeueInterrupted() async =>
+      (await _db()).requeueInterruptedTasks(now: _now());
 
   /// The tracks the free check may revive: the failed and the disputed
   /// ones, a batch at a time.

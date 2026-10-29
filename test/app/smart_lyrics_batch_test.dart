@@ -234,6 +234,38 @@ void main() {
     lock.releasePanel();
   });
 
+  test('a task a dead run left running is back in line at start', () async {
+    final store = _MemoryStore([gap])
+      ..states[1] = SmartLyricsTaskStatus.running;
+    final service = _ScriptedService({
+      1: const SmartLyricsOutcome(saved: true, votes: 3),
+    });
+    final container = containerWith(store: store, service: service);
+
+    await container.read(smartLyricsBatchControllerProvider.notifier).start();
+
+    expect(service.asked, [1],
+        reason: 'no run is in flight when the queue starts again');
+    expect(store.states[1], SmartLyricsTaskStatus.done);
+  });
+
+  test('an automatic pass retries a failed task until its attempts run out',
+      () async {
+    final store = _MemoryStore([gap])
+      ..states[1] = SmartLyricsTaskStatus.failed
+      ..attempts[1] = 3;
+    final service = _ScriptedService({
+      1: const SmartLyricsOutcome(saved: true, votes: 3),
+    });
+    final container = containerWith(store: store, service: service);
+
+    await container.read(smartLyricsBatchControllerProvider.notifier).start();
+
+    expect(service.asked, isEmpty,
+        reason: 'three failed attempts wait for the reader, not for a '
+            'fourth automatic round');
+  });
+
   test('an empty queue is an idle batch, not a spinner forever', () async {
     final store = _MemoryStore([]);
     final service = _ScriptedService({});
@@ -262,6 +294,9 @@ class _MemoryStore extends SmartLyricsTaskStore {
   /// The songs a recheck brought back into line.
   final List<int> requeued = [];
 
+  /// How many times each song was started.
+  final Map<int, int> attempts = {};
+
   @override
   Future<int> enqueueMissing() async {
     var added = 0;
@@ -287,6 +322,7 @@ class _MemoryStore extends SmartLyricsTaskStore {
 
   @override
   Future<void> markRunning(int songId) async {
+    attempts[songId] = (attempts[songId] ?? 0) + 1;
     states[songId] = SmartLyricsTaskStatus.running;
   }
 
@@ -328,14 +364,29 @@ class _MemoryStore extends SmartLyricsTaskStore {
   }
 
   @override
-  Future<int> requeueFailed() async {
+  Future<int> requeueInterrupted() async {
     var moved = 0;
     for (final entry in states.entries.toList()) {
-      if (entry.value == SmartLyricsTaskStatus.failed) {
+      if (entry.value == SmartLyricsTaskStatus.running) {
         states[entry.key] = SmartLyricsTaskStatus.pending;
-        requeued.add(entry.key);
         moved++;
       }
+    }
+    return moved;
+  }
+
+  @override
+  Future<int> requeueFailed({int? maxAttempts}) async {
+    var moved = 0;
+    for (final entry in states.entries.toList()) {
+      if (entry.value != SmartLyricsTaskStatus.failed) continue;
+      if (maxAttempts != null && (attempts[entry.key] ?? 0) >= maxAttempts) {
+        continue;
+      }
+      states[entry.key] = SmartLyricsTaskStatus.pending;
+      if (maxAttempts == null) attempts[entry.key] = 0;
+      requeued.add(entry.key);
+      moved++;
     }
     return moved;
   }

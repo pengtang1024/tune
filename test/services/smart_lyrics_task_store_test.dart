@@ -100,6 +100,36 @@ void main() {
     expect((await store.nextPending())?.id, 2);
   });
 
+  test('a run the app died under is back in line, not stuck running',
+      () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+
+    expect(await store.requeueInterrupted(), 1);
+    expect((await store.nextPending())?.id, 2,
+        reason: 'no run is in flight when the queue starts again');
+  });
+
+  test('an automatic pass only revives the attempts it has left', () async {
+    ingestLibrary();
+    await store.enqueueMissing();
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+
+    expect(await store.requeueFailed(maxAttempts: 3), 1,
+        reason: 'two attempts burned, one left');
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+
+    expect(await store.requeueFailed(maxAttempts: 3), 0,
+        reason: 'three attempts is where the automatic pass stops');
+    expect(await store.requeueFailed(), 1,
+        reason: 'the reader pressing retry is not capped');
+  });
+
   test('a track that carries no voice is not a gap any more', () async {
     ingestLibrary();
     await store.enqueueMissing();
