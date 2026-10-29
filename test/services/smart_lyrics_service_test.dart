@@ -187,7 +187,9 @@ void main() {
 
     expect(outcome.saved, isTrue, reason: 'the human class plus the machine '
         'class (two distinct families) read the same words — §7.6 admits');
-    expect(outcome.votes, 6, reason: 'two human + two ASR + two LLM rebuilds');
+    expect(outcome.votes, 5,
+        reason: 'two human + two ASR + one pooled knowledge rebuild — '
+            'voteOn weighs the best single sheet, the audit still sees all');
     expect(
       outcome.origins,
       containsAll(['lrclib', 'cloud:whisper-1', 'cloud:paraformer']),

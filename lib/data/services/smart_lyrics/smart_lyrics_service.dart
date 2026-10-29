@@ -5,8 +5,8 @@ import 'package:path/path.dart' as path;
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
-import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission_audit.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_consensus.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
@@ -158,7 +158,14 @@ class SmartLyricsService {
       if (machine.votes.isEmpty) return _silenceOf(machine);
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
-      final consensus = admit(votes, knowledge: knowledges);
+      // Every song gets words: the pool hands in its best sheet — the
+      // product promise is 每首有词 (M2–M8 semantics). Cross-proof from
+      // independent families raises confidence and is recorded, but it
+      // never blanks a line the pool could write.
+      final consensus = voteOn(
+        votes,
+        knowledge: knowledges.isEmpty ? null : knowledges.first,
+      );
       if (consensus.lines.isEmpty) {
         return const SmartLyricsOutcome.failed(SmartLyricsFailure.emptyResult);
       }
