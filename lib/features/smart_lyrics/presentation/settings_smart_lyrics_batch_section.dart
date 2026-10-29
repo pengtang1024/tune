@@ -5,6 +5,8 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
 /// The gap the batch fills (docs/smart-lyrics.md §7.2, M5): the reader
@@ -18,6 +20,13 @@ class SmartLyricsBatchSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final progress = ref.watch(smartLyricsBatchControllerProvider);
+    // The panel's single-song run holds the same engines; the batch waits
+    // its turn instead of fighting it for the whisper output.
+    final panelRunning = ref.watch(
+      smartLyricsControllerProvider.select(
+        (run) => run.phase == SmartLyricsPhase.running,
+      ),
+    );
     final counts = ref.watch(smartLyricsBatchCountsProvider);
     final fresh = ref.watch(smartLyricsNewMissingProvider);
     final strings = context.loc;
@@ -32,7 +41,7 @@ class SmartLyricsBatchSection extends ConsumerWidget {
           children: [
             TextButton(
               key: const ValueKey('smart-lyrics-batch-start'),
-              onPressed: progress.running
+              onPressed: progress.running || panelRunning
                   ? null
                   : () => ref
                         .read(smartLyricsBatchControllerProvider.notifier)
@@ -51,9 +60,11 @@ class SmartLyricsBatchSection extends ConsumerWidget {
               const SizedBox(width: CompactTokens.space12),
               TextButton(
                 key: const ValueKey('smart-lyrics-batch-retry'),
-                onPressed: () => ref
-                    .read(smartLyricsBatchControllerProvider.notifier)
-                    .retryFailed(),
+                onPressed: panelRunning
+                    ? null
+                    : () => ref
+                          .read(smartLyricsBatchControllerProvider.notifier)
+                          .retryFailed(),
                 child: Text(strings.settingsSmartLyricsBatchRetry),
               ),
             ],

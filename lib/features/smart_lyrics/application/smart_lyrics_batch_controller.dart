@@ -1,15 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run_lock.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_task_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 import 'package:tune/utils/logger.dart';
 
 /// The store the batch queue reads through and writes to.
 final smartLyricsTaskStoreProvider = Provider<SmartLyricsTaskStore>(
-  (ref) => SmartLyricsTaskStore(),
+  // The one connection the library also reads: the task rows and the song
+  // rows are the same file, and a second connection would compete for its
+  // lock.
+  (ref) => SmartLyricsTaskStore(
+    database: () => ref.read(appDatabaseProvider.future),
+  ),
 );
 
 /// The gap tracks a scan brought in that are not queued yet — the card
@@ -66,20 +73,38 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   /// budget is spent.
   Future<void> start() async {
     if (state.running) return;
+    final lock = ref.read(smartLyricsRunLockProvider);
+    if (!lock.claimBatch()) return;
     _stopped = false;
     final store = ref.read(smartLyricsTaskStoreProvider);
-    await store.enqueueMissing();
-    await _drain(store);
+    try {
+      await store.enqueueMissing();
+      await _drain(store);
+    } catch (error, stackTrace) {
+      Log.error('批量运行失败: $error', stackTrace);
+      state = const SmartLyricsBatchProgress(running: false, counts: {});
+    } finally {
+      lock.releaseBatch();
+    }
   }
 
   /// Puts the failed tasks back in line and runs them — the action after
   /// a new source or a new model was configured.
   Future<void> retryFailed() async {
     if (state.running) return;
+    final lock = ref.read(smartLyricsRunLockProvider);
+    if (!lock.claimBatch()) return;
     _stopped = false;
     final store = ref.read(smartLyricsTaskStoreProvider);
-    await store.requeueFailed();
-    await _drain(store);
+    try {
+      await store.requeueFailed();
+      await _drain(store);
+    } catch (error, stackTrace) {
+      Log.error('批量重试失败: $error', stackTrace);
+      state = const SmartLyricsBatchProgress(running: false, counts: {});
+    } finally {
+      lock.releaseBatch();
+    }
   }
 
   /// Stops between two tracks; the track in flight is stopped with the
@@ -89,8 +114,10 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   Future<void> _drain(SmartLyricsTaskStore store) async {
     final service = ref.read(smartLyricsServiceProvider);
     final budget = ref.read(
-      settingsControllerProvider.select((state) => state.smartLyrics),
-    ).batchCloudBudget;
+      settingsControllerProvider.select(
+        (state) => state.smartLyrics.batchCloudBudget,
+      ),
+    );
     var cloudUsed = 0;
 
     state = SmartLyricsBatchProgress(
@@ -121,6 +148,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
           break;
         }
         await store.applyOutcome(next, outcome);
+        if (outcome.saved) refreshLyricsPanel(ref, next);
         if (_usesCloud(outcome)) cloudUsed++;
       } catch (error, stackTrace) {
         Log.error('批量单曲失败: $error', stackTrace);
@@ -143,9 +171,11 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
     ref.invalidate(smartLyricsBatchCountsProvider);
   }
 
-  /// Whether the run spent the cloud: a song the free votes could settle
-  /// costs nothing.
+  /// Whether the run spent money: a cloud ASR vote or a knowledge rebuild
+  /// both leave the machine. A song the free votes could settle costs
+  /// nothing.
   bool _usesCloud(SmartLyricsOutcome outcome) => outcome.origins.any(
-    (origin) => origin.startsWith('cloud:'),
+    (origin) =>
+        origin.startsWith('cloud:') || origin.startsWith('knowledge:'),
   );
 }

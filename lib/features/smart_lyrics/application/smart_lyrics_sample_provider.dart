@@ -1,11 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_sample_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
 
 /// The store the accuracy sample reads through and draws with.
 final smartLyricsSampleStoreProvider = Provider<SmartLyricsSampleStore>(
-  (ref) => SmartLyricsSampleStore(),
+  (ref) => SmartLyricsSampleStore(
+    database: () => ref.read(appDatabaseProvider.future),
+  ),
 );
 
 /// The account of the accuracy sample: what was drawn per layer, what a

@@ -16,8 +16,10 @@ import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run_lock.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_channel_health_store.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/utils/logger.dart';
 
 /// The channel health rings the pipeline asks before every question and
 /// feeds after every answer — one store, one preference file, shared by
@@ -33,8 +35,18 @@ final smartLyricsChannelHealthProvider = Provider<SmartLyricsChannelHealthStore>
 /// correction and the knowledge vote, the shared libraries as the human
 /// pool. A change of the config builds the next run on the new voices.
 final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
-  final config = ref.watch(
-    settingsControllerProvider.select((state) => state.smartLyrics),
+  // Watch the fields the service actually reads: watching the whole
+  // config rebuilt the service on every unrelated keystroke.
+  final (baseUrl, apiKey, asrModels, chatModel, localModel) = ref.watch(
+    settingsControllerProvider.select(
+      (state) => (
+        state.smartLyrics.baseUrl,
+        state.smartLyrics.apiKey,
+        state.smartLyrics.asrModels,
+        state.smartLyrics.chatModel,
+        state.smartLyrics.localModel,
+      ),
+    ),
   );
   final sources = ref.watch(musicSourceServiceProvider);
   final paths = ref.watch(libraryPathsProvider);
@@ -48,28 +60,35 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
       sendTimeout: const Duration(minutes: 10),
     ),
   );
-  ref.onDispose(dio.close);
+  // The Dio is not closed here: a config edit rebuilds the provider while
+  // a run may still be on the wire, and closing the client under it would
+  // abort a request the run still needs. One client per config edit is a
+  // bounded cost; a killed request is a lost song.
   final client = OpenAiCompatibleClient(
     dio: dio,
-    baseUrl: config.baseUrl,
-    apiKey: config.apiKey,
+    baseUrl: baseUrl,
+    apiKey: apiKey,
   );
 
   // The local channel votes when a model was named for it: a binary the
   // system already has first, the downloaded one as the fallback. The
   // folders are resolved once per run of the pipeline, not per song.
-  final localModel = config.localModel.trim();
+  final local = localModel.trim();
+  final chatModelList = [
+    for (final model in chatModel.split(','))
+      if (model.trim().isNotEmpty) model.trim(),
+  ];
   final assets = Future<WhisperAssets>.sync(WhisperAssets.appDefault);
 
   return SmartLyricsService(
     engines: [
-      for (final model in config.asrModels)
+      for (final model in asrModels)
         OpenAiCompatibleEngine(model: model, client: client),
-      if (localModel.isNotEmpty)
+      if (local.isNotEmpty)
         WhisperLocalEngine(
-          model: localModel,
+          model: local,
           binaryOf: () async => (await assets).findBinary(),
-          modelOf: () async => (await assets).findModel(localModel),
+          modelOf: () async => (await assets).findModel(local),
           workspaceOf: () async => (await assets).workspace(),
         ),
       // The second, independent ASR family (M12): SenseVoice via
@@ -100,13 +119,28 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     health: ref.watch(smartLyricsChannelHealthProvider),
     // The correction runs on the first model; every listed model casts a
     // knowledge ballot — two families make the class speak (§7.6).
-    assist: config.chatModelList.isEmpty
+    assist: chatModelList.isEmpty
         ? null
-        : SmartTextAssist(client: client, model: config.chatModelList.first),
-    knowledgeModels: config.chatModelList,
+        : SmartTextAssist(client: client, model: chatModelList.first),
+    knowledgeModels: chatModelList,
     resolver: resolver,
   );
 });
+
+/// Lets the lyrics panel learn a sheet that landed outside its own button.
+///
+/// A batch track or a leak-check song is written straight to the disk; the
+/// panel holds the answer it read earlier in the session, so it would keep
+/// saying「没有词」until the reader reopens the page. Forgetting the memory
+/// is enough; the panel is invalidated only when the sheet is the track
+/// playing, so a long batch does not reload it for every other song.
+void refreshLyricsPanel(Ref ref, Song song) {
+  ref.read(lyricsMemoryProvider).forget(song);
+  final current = ref.read(
+    playbackControllerProvider.select((state) => state.currentSong?.id),
+  );
+  if (current == song.id) ref.invalidate(lyricsControllerProvider);
+}
 
 /// The progress of the smart pipeline's single-song run.
 ///
@@ -120,6 +154,10 @@ final smartLyricsControllerProvider =
 
 class SmartLyricsController extends Notifier<SmartLyricsRun> {
   bool _cancelled = false;
+
+  /// The service this run holds: cancel kills these engines, not the ones
+  /// a later config edit built.
+  SmartLyricsService? _service;
 
   @override
   SmartLyricsRun build() {
@@ -135,37 +173,58 @@ class SmartLyricsController extends Notifier<SmartLyricsRun> {
   }
 
   /// Generates the lyrics of [song] with the pipeline as configured.
+  ///
+  /// The batch holds the same engines; the run lock makes the two doors
+  /// take turns instead of corrupting each other's whisper output.
   Future<void> generate(Song song) async {
-    if (state.phase == SmartLyricsPhase.running) return;
+    final lock = ref.read(smartLyricsRunLockProvider);
+    if (!lock.claimPanel()) return;
     _cancelled = false;
+    final service = ref.read(smartLyricsServiceProvider);
+    _service = service;
     state = SmartLyricsRun(
       phase: SmartLyricsPhase.running,
       songId: song.id,
     );
 
-    final outcome = await ref
-        .read(smartLyricsServiceProvider)
-        .generate(song, cancelled: () => _cancelled);
-    if (_cancelled) {
-      state = const SmartLyricsRun();
-      return;
-    }
-
-    if (outcome.saved) {
-      // The sheet is on the disk; the panel learns it the way every sheet
-      // does — the controller reads again and the memory forgets the gap.
-      ref.read(lyricsMemoryProvider).forget(song);
-      ref.invalidate(lyricsControllerProvider);
-      state = SmartLyricsRun(
-        phase: SmartLyricsPhase.done,
-        songId: song.id,
+    try {
+      final outcome = await service.generate(
+        song,
+        cancelled: () => _cancelled,
       );
-    } else {
+      if (_cancelled) {
+        state = const SmartLyricsRun();
+        return;
+      }
+
+      if (outcome.saved) {
+        // The sheet is on the disk; the panel learns it the way every
+        // sheet does — the controller reads again and the memory forgets
+        // the gap.
+        refreshLyricsPanel(ref, song);
+        state = SmartLyricsRun(
+          phase: SmartLyricsPhase.done,
+          songId: song.id,
+        );
+      } else {
+        state = SmartLyricsRun(
+          phase: SmartLyricsPhase.failed,
+          songId: song.id,
+          failure: outcome.failure,
+        );
+      }
+    } catch (error, stackTrace) {
+      // A run that dies on the way must not leave the button greyed for
+      // the rest of the session.
+      Log.error('智能歌词单曲失败: $error', stackTrace);
       state = SmartLyricsRun(
         phase: SmartLyricsPhase.failed,
         songId: song.id,
-        failure: outcome.failure,
+        failure: SmartLyricsFailure.uploadFailed,
       );
+    } finally {
+      _service = null;
+      lock.releasePanel();
     }
   }
 
@@ -176,8 +235,9 @@ class SmartLyricsController extends Notifier<SmartLyricsRun> {
   /// it stands.
   void cancel() {
     _cancelled = true;
-    final engines = ref.read(smartLyricsServiceProvider).engines;
-    for (final engine in engines) {
+    final service = _service;
+    if (service == null) return;
+    for (final engine in service.engines) {
       engine.requestCancel();
     }
   }

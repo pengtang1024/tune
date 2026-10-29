@@ -9,6 +9,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run_lock.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_task_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
@@ -111,6 +112,25 @@ void main() {
         isTrue);
   });
 
+  test('a knowledge rebuild spends the budget like a cloud vote', () async {
+    final store = _MemoryStore([gap, second]);
+    final service = _ScriptedService({
+      1: const SmartLyricsOutcome(
+        saved: true,
+        votes: 3,
+        origins: ['lrclib', 'knowledge:mimo'],
+      ),
+      2: const SmartLyricsOutcome(saved: true, votes: 3),
+    });
+    final container = containerWith(store: store, service: service, budget: 1);
+
+    await container.read(smartLyricsBatchControllerProvider.notifier).start();
+
+    expect(service.asked, [1], reason: 'a chat rebuild leaves the machine '
+        'too — counting only cloud: ASR undercounted the bill');
+    expect(store.states[2], isNull);
+  });
+
   test('a human-only song spends no cloud', () async {
     final store = _MemoryStore([gap, second]);
     final service = _ScriptedService({
@@ -175,6 +195,43 @@ void main() {
     expect(service.asked, [1], reason: 'the done ones are never re-run; the '
         'recheck is for the dead accounts a new source may revive');
     expect(store.states[1], SmartLyricsTaskStatus.done);
+  });
+
+  test('two presses of the button drain the queue once', () async {
+    final store = _MemoryStore([gap, second]);
+    final service = _ScriptedService({
+      1: const SmartLyricsOutcome(saved: true, votes: 3),
+      2: const SmartLyricsOutcome(saved: true, votes: 3),
+    });
+    service.gates[1] = Completer<void>();
+    final container = containerWith(store: store, service: service);
+    final batch = container.read(smartLyricsBatchControllerProvider.notifier);
+
+    final firstPress = batch.start();
+    final secondPress = batch.start();
+    service.gates[1]!.complete();
+    await Future.wait([firstPress, secondPress]);
+
+    expect(service.asked, [1, 2],
+        reason: 'the second press must lose the seat before the first '
+            'await — the old state.running check left that gap open');
+  });
+
+  test('the batch refuses to start while the panel holds the engines',
+      () async {
+    final store = _MemoryStore([gap]);
+    final service = _ScriptedService({
+      1: const SmartLyricsOutcome(saved: true, votes: 3),
+    });
+    final container = containerWith(store: store, service: service);
+    final lock = container.read(smartLyricsRunLockProvider);
+    lock.claimPanel();
+
+    await container.read(smartLyricsBatchControllerProvider.notifier).start();
+
+    expect(service.asked, isEmpty, reason: 'the panel run owns the engines');
+    expect(container.read(smartLyricsBatchControllerProvider).running, isFalse);
+    lock.releasePanel();
   });
 
   test('an empty queue is an idle batch, not a spinner forever', () async {

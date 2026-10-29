@@ -104,6 +104,7 @@ class SmartLyricsLeakCheckController {
         if (outcome.saved ||
             outcome.failure == SmartLyricsFailure.emptyResult) {
           await store.applyOutcome(song, outcome);
+          if (outcome.saved) refreshLyricsPanel(_ref, song);
         }
       } catch (error, stackTrace) {
         Log.error('查漏单曲失败: $error', stackTrace);

@@ -14,12 +14,20 @@ import 'package:tune/utils/logger.dart';
 /// and key the pipeline already uses. `null` when the reader configured
 /// no text model — the buttons of the panel grey out with it.
 final smartLyricsAssistProvider = Provider<SmartTextAssist?>((ref) {
-  final config = ref.watch(
-    settingsControllerProvider.select((state) => state.smartLyrics),
+  // Watch the three fields the client actually reads: watching the whole
+  // config would rebuild the client on every keystroke and close the Dio
+  // an in-flight translation is still using.
+  final (baseUrl, apiKey, chatModel) = ref.watch(
+    settingsControllerProvider.select(
+      (state) => (
+        state.smartLyrics.baseUrl,
+        state.smartLyrics.apiKey,
+        state.smartLyrics.chatModel,
+      ),
+    ),
   );
-  if (config.chatModel.trim().isEmpty || config.baseUrl.trim().isEmpty) {
-    return null;
-  }
+  final model = chatModel.split(',').first.trim();
+  if (model.isEmpty || baseUrl.trim().isEmpty) return null;
   final dio = Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 30),
@@ -29,12 +37,8 @@ final smartLyricsAssistProvider = Provider<SmartTextAssist?>((ref) {
   );
   ref.onDispose(dio.close);
   return SmartTextAssist(
-    client: OpenAiCompatibleClient(
-      dio: dio,
-      baseUrl: config.baseUrl,
-      apiKey: config.apiKey,
-    ),
-    model: config.chatModel,
+    client: OpenAiCompatibleClient(dio: dio, baseUrl: baseUrl, apiKey: apiKey),
+    model: model,
   );
 });
 

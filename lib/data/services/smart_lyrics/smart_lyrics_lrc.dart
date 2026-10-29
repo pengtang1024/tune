@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:tune/core/utils/sheet_content_key.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -17,17 +18,20 @@ String buildSmartLrc(
       if (consensus.lines[index].disputed) index,
   ];
 
+  final body = [
+    for (final line in consensus.lines)
+      if (!line.disputed) '[${_stampOf(line.start)}]${line.text}',
+  ];
+
+  // The content key lets a contrast know the exact words it speaks about:
+  // the date alone would let a same-day regeneration keep stale lines.
   final header = [
     '[tune:smart]',
     '[votes:${consensus.votesCounted}]',
     '[sources:${origins.join(',')}]',
     if (disputed.isNotEmpty) '[disputed:${disputed.join(',')}]',
+    '[sheet:${sheetContentKey(body.join('\n'))}]',
     '[date:${at.toIso8601String().substring(0, 10)}]',
-  ];
-
-  final body = [
-    for (final line in consensus.lines)
-      if (!line.disputed) '[${_stampOf(line.start)}]${line.text}',
   ];
 
   return [...header, ...body].join('\n');

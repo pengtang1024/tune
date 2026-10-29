@@ -1,11 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_ledger_store.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
 
 /// The store the ledger reads through.
 final smartLyricsLedgerStoreProvider = Provider<SmartLyricsLedgerStore>(
-  (ref) => SmartLyricsLedgerStore(),
+  // The one connection the library reads: a count is a query over the
+  // same rows, not a second handle on the same file.
+  (ref) => SmartLyricsLedgerStore(
+    database: () => ref.read(appDatabaseProvider.future),
+  ),
 );
 
 /// The lyrics ledger of the library.

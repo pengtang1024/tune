@@ -59,11 +59,16 @@ class SmartSongContrast {
   }
 }
 
-/// The date the machine header of [sheet] carries, `null` when the sheet
-/// has no header of its own.
+/// The identity of the sheet the contrasts belong to.
+///
+/// A machine sheet carries `[sheet:<content hash>]` — the words, not the
+/// day. Sheets written before that header existed fall back to their date,
+/// so the contrasts already on the disk keep working.
 String? contrastSheetKey(String sheet) {
-  final match = RegExp(r'\[date:([^\]]+)\]').firstMatch(sheet);
-  return match?.group(1);
+  final content = RegExp(r'\[sheet:([^\]]+)\]').firstMatch(sheet);
+  if (content != null) return content.group(1);
+  final date = RegExp(r'\[date:([^\]]+)\]').firstMatch(sheet);
+  return date?.group(1);
 }
 
 /// The record the file on the disk holds, `null` when it holds nothing

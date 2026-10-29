@@ -11,6 +11,17 @@ void main() {
     expect(contrastSheetKey('[00:01.00]一'), isNull);
   });
 
+  test('a content key outranks the date; an old sheet keeps its date', () {
+    const fresh =
+        '[tune:smart]\n[sheet:abc123]\n[date:2026-10-29]\n[00:01.00]一';
+    const legacy = '[tune:smart]\n[date:2026-10-29]\n[00:01.00]一';
+
+    expect(contrastSheetKey(fresh), 'abc123',
+        reason: 'a regenerated same-day sheet must not keep stale contrasts');
+    expect(contrastSheetKey(legacy), '2026-10-29',
+        reason: 'records written before the key existed still match');
+  });
+
   test('the record survives a json round trip', () {
     const contrast = SmartSongContrast(
       sheetDate: '2026-10-29',
