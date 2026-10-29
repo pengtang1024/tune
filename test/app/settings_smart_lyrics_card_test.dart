@@ -219,7 +219,8 @@ void main() {
       ledger: Future.value(const SmartLyricsLedger(total: 0, resolved: 0)),
     );
 
-    expect(controller.state.smartLyrics.isConfigured, isFalse);
+    expect(controller.state.smartLyrics.isConfigured, isTrue,
+        reason: 'the local engine ships on — a key is not a toll gate');
 
     await tester.enterText(
       find.byKey(const Key('smart-lyrics-api-key')),

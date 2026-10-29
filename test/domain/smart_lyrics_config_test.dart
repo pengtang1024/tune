@@ -8,7 +8,8 @@ import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 /// key — and the pipeline is on.
 void main() {
   group('the smart lyrics config', () {
-    test('defaults to the OpenAI template that waits only for a key', () {
+    test('ships with the local engine on — the pipeline runs out of the '
+        'box', () {
       const config = SmartLyricsConfig();
 
       expect(config.presetId, 'openai');
@@ -16,7 +17,11 @@ void main() {
       expect(config.asrModels, ['whisper-1']);
       expect(config.chatModel, 'gpt-4o-mini');
       expect(config.apiKey, isEmpty);
-      expect(config.isConfigured, isFalse, reason: 'no key yet');
+      expect(config.localModel, 'tiny',
+          reason: 'the local vote answers without any key or cloud');
+      expect(config.isConfigured, isTrue,
+          reason: 'a key is for the cloud, not a toll gate — the local '
+              'engine alone already makes the pipeline runnable');
     });
 
     test('a key pasted on the default template turns the pipeline on', () {
@@ -28,9 +33,12 @@ void main() {
     });
 
     test('a key of blanks is no key', () {
-      const config = SmartLyricsConfig();
+      // With the local engine off, a blank key leaves the cloud
+      // unconfigured — a key of blanks never opens the cloud door.
+      const config = SmartLyricsConfig(localModel: '');
 
       expect(config.copyWith(apiKey: '   ').isConfigured, isFalse);
+      expect(config.copyWith(apiKey: 'sk-x').isConfigured, isTrue);
     });
 
     test('the Groq template prefills its own endpoint and models', () {
@@ -89,8 +97,9 @@ void main() {
       expect(restored.localModel, SmartLyricsConfig().localModel);
     });
 
-    test('the local channel is off until a model is named', () {
-      expect(const SmartLyricsConfig().localModel, '');
+    test('the local channel ships on and the reader may turn it off', () {
+      expect(const SmartLyricsConfig().localModel, 'tiny');
+      expect(const SmartLyricsConfig(localModel: '').localModel, '');
       expect(
         const SmartLyricsConfig(localModel: 'base').localModel,
         'base',

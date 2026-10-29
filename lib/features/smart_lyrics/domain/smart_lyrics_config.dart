@@ -87,7 +87,9 @@ class SmartLyricsConfig {
     this.apiKey = '',
     this.asrModels = const ['whisper-1'],
     this.chatModel = 'gpt-4o-mini',
-    this.localModel = '',
+    // tiny out of the box: the assets are one button away, and a machine
+    // that lacks them fails soft — the health rings park the channel.
+    this.localModel = 'tiny',
     this.batchCloudBudget = 500,
     this.gapCheckEnabled = true,
   });
@@ -95,10 +97,14 @@ class SmartLyricsConfig {
   /// Whether the pipeline has a place to go and a key to knock with.
   ///
   /// A custom endpoint with no address waits for one, however loud the key.
+  /// Whether the pipeline can run at all: a cloud endpoint with a key,
+  /// or a local engine standing on its own — the reader needs neither a
+  /// key nor the cloud for the local vote to answer.
   bool get isConfigured =>
-      apiKey.trim().isNotEmpty &&
-      baseUrl.trim().isNotEmpty &&
-      asrModels.isNotEmpty;
+      localModel.trim().isNotEmpty ||
+      (apiKey.trim().isNotEmpty &&
+          baseUrl.trim().isNotEmpty &&
+          asrModels.isNotEmpty);
 
   /// The text models the correction, the knowledge rebuilds and the
   /// translation run on.

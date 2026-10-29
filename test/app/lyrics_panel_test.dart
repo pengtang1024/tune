@@ -54,7 +54,8 @@ void main() {
     expect(find.text('这首歌没有歌词'), findsOneWidget);
     expect(find.text('重新查找'), findsOneWidget);
     expect(find.text('选择歌词文件'), findsOneWidget);
-    // The smart generation is on the sheet, but without a key it waits.
+    // The local engine ships on: the button answers a press out of the
+    // box — a key is for the cloud, not a toll gate.
     expect(find.text('智能生成'), findsOneWidget);
     final generate = tester.widget<TextButton>(
       find.ancestor(
@@ -62,7 +63,7 @@ void main() {
         matching: find.byType(TextButton),
       ),
     );
-    expect(generate.onPressed, isNull, reason: 'no key pasted: the button waits');
+    expect(generate.onPressed, isNotNull);
   });
 
   testWidgets('a key pasted wakes the smart generation up', (tester) async {
