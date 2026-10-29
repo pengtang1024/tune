@@ -111,4 +111,28 @@ void main() {
     expect(line.disputed, isFalse);
     expect(line.text.trim(), '月亮走我也走');
   });
+
+  test('text that agrees but time that does not stays a gap', () {
+    final consensus = admit([
+      _ballot('lrclib', BallotKind.human, ['月亮走我也走']),
+      _ballot(
+        'cloud:paraformer',
+        BallotKind.machine,
+        ['月亮走我也走'],
+        at: const Duration(milliseconds: 10800),
+      ),
+      _ballot(
+        'cloud:SenseVoice',
+        BallotKind.machine,
+        ['月亮走我也走'],
+        at: const Duration(milliseconds: 10800),
+      ),
+    ]);
+
+    final line = consensus.lines.single;
+    expect(line.disputed, isTrue,
+        reason: 'the two classes read the same words but their measurements '
+            'of when the line is sung are 0.8s apart — inside the same cluster, past the 0.5s tolerance — a subtitle that drifts '
+            'is wrong even when the words are right');
+  });
 }

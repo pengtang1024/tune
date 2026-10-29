@@ -160,8 +160,34 @@ ConsensusLine _admitCluster(
   final wording = agreed[LineageClass.human]?[admitted] ??
       agreed[LineageClass.asr]?[admitted] ??
       agreed[LineageClass.llm]![admitted]!;
+
+  // Timing cross-check (§7.6): the admitting classes are the independent
+  // measurements — their line times must agree within 0.5s, or the
+  // seconds are as unproven as the words and the line stays a gap. A
+  // class without a real time of its own (the rebuilds carry no
+  // timeline) cannot measure; the forced-alignment measurement joins
+  // here when it lands.
+  Duration? startOf(LineageClass klass) {
+    for (final entry in cluster) {
+      final (k, _) = lineageOf(entry.ballot.origin);
+      if (k == klass && _normalize(entry.line.text) == admitted) {
+        return entry.line.start;
+      }
+    }
+    return null;
+  }
+
+  final starts = <Duration>[
+    for (final klass in perNorm[admitted]!) ?startOf(klass),
+  ];
+  final minStart = starts.reduce((a, b) => a < b ? a : b);
+  if (starts.length < 2 ||
+      starts.reduce((a, b) => a > b ? a : b) - minStart >
+          const Duration(milliseconds: 500)) {
+    return ConsensusLine(start: minStart, text: '', disputed: true);
+  }
   return ConsensusLine(
-    start: cluster.first.line.start,
+    start: minStart,
     text: wording,
     disputed: false,
   );
