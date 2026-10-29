@@ -422,21 +422,23 @@ void main() {
       ],
     );
 
-    final translate = tester.widget<TextButton>(
-      find.ancestor(
-        of: find.text('翻译'),
-        matching: find.byType(TextButton),
-      ),
+    final translate = find.byKey(const Key('panel-more'));
+    await tester.tap(translate);
+    await tester.pumpAndSettle();
+
+    expect(find.text('翻译'), findsOneWidget, reason: '菜单收纳了动作——'
+        '播放页只留两个整曲标记加一个 ⋯');
+    expect(find.text('音译'), findsOneWidget);
+    expect(
+      find.byIcon(Icons.check),
+      findsOneWidget,
+      reason: '翻译已做成——菜单里打勾，再按也无谓重做',
     );
-    expect(translate.onPressed, isNull, reason: 'each kind is made once '
-        'per sheet — the words are there, the press has nothing to add');
-    final transliterate = tester.widget<TextButton>(
-      find.ancestor(
-        of: find.text('音译'),
-        matching: find.byType(TextButton),
-      ),
+    expect(
+      find.byIcon(Icons.spatial_audio_off),
+      findsOneWidget,
+      reason: '音译还没做——以原图标示人',
     );
-    expect(transliterate.onPressed, isNotNull);
   });
 }
 

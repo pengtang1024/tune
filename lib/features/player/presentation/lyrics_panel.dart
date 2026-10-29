@@ -451,38 +451,53 @@ class _MarkRow extends ConsumerWidget {
             active: flags.instrumental,
             onPressed: () => marks.toggleNotSung(song.id),
           ),
-          // The contrasts of M7 (docs/smart-lyrics.md §7.5): each kind is
-          // made once per sheet — the second press has nothing to add,
-          // and a reader without a text model never sees the door.
-          if (hasAssist) ...[
-            const SizedBox(width: CompactTokens.space8),
-            _contrast(
-              context,
-              ref: ref,
-              label: context.loc.lyricsContrastTranslate,
-              icon: Icons.translate,
-              done: contrast.translation != null,
-              onPressed: () =>
-                  unawaited(contrastController.translate(song)),
-            ),
-            const SizedBox(width: CompactTokens.space8),
-            _contrast(
-              context,
-              ref: ref,
-              label: context.loc.lyricsContrastTransliterate,
-              icon: Icons.spatial_audio_off,
-              done: contrast.transliteration != null,
-              onPressed: () =>
-                  unawaited(contrastController.transliterate(song)),
-            ),
-          ],
           const Spacer(),
-          // The other door into the marks of the library
-          // (docs/smart-lyrics.md §7.4).
-          TextButton(
-            key: const ValueKey('panel-marks'),
-            onPressed: () => context.push('/marks'),
-            child: Text(context.loc.lyricsMarksTitle),
+          // The playing page stays lean (2026-10-29 用户拍板): the rest
+          // of the actions live behind one menu — the panel is for
+          // listening first, not for a control board.
+          PopupMenuButton<String>(
+            key: const ValueKey('panel-more'),
+            icon: const Icon(Icons.more_horiz),
+            onSelected: (action) {
+              switch (action) {
+                case 'translate':
+                  if (contrast.translation == null) {
+                    unawaited(contrastController.translate(song));
+                  }
+                case 'transliterate':
+                  if (contrast.transliteration == null) {
+                    unawaited(contrastController.transliterate(song));
+                  }
+                case 'marks':
+                  context.push('/marks');
+              }
+            },
+            itemBuilder: (context) => [
+              if (hasAssist)
+                PopupMenuItem(
+                  value: 'translate',
+                  child: _menuItem(
+                    context,
+                    label: context.loc.lyricsContrastTranslate,
+                    icon: Icons.translate,
+                    done: contrast.translation != null,
+                  ),
+                ),
+              if (hasAssist)
+                PopupMenuItem(
+                  value: 'transliterate',
+                  child: _menuItem(
+                    context,
+                    label: context.loc.lyricsContrastTransliterate,
+                    icon: Icons.spatial_audio_off,
+                    done: contrast.transliteration != null,
+                  ),
+                ),
+              PopupMenuItem(
+                value: 'marks',
+                child: Text(context.loc.lyricsMarksTitle),
+              ),
+            ],
           ),
         ],
       ),
@@ -514,33 +529,26 @@ class _MarkRow extends ConsumerWidget {
     );
   }
 
-  /// One of the two contrasts: grey until it is made, an accent check
-  /// after — the words are there, and the press has nothing left to add
-  /// (docs/smart-lyrics.md §7.5).
-  Widget _contrast(
+  /// One menu line: the action's name, with an accent check once it has
+  /// been done.
+  Widget _menuItem(
     BuildContext context, {
-    required WidgetRef ref,
     required String label,
     required IconData icon,
     required bool done,
-    required VoidCallback onPressed,
   }) {
     final theme = Theme.of(context);
-    final button = TextButton.icon(
-      onPressed: done ? null : onPressed,
-      icon: Icon(
-        done ? Icons.check : icon,
-        size: CompactTokens.icon16,
-        color: done ? theme.colorScheme.primary : null,
-      ),
-      label: Text(
-        label,
-        style: done ? TextStyle(color: theme.colorScheme.primary) : null,
-      ),
-    );
-    return TuneTooltip(
-      message: done ? context.loc.lyricsContrastDone : '',
-      child: button,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          done ? Icons.check : icon,
+          size: CompactTokens.icon16,
+          color: done ? theme.colorScheme.primary : null,
+        ),
+        const SizedBox(width: CompactTokens.space8),
+        Text(label),
+      ],
     );
   }
 }
