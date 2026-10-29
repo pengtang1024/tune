@@ -1,6 +1,6 @@
 class AppVersion {
-  static const String version = '1.25.0';
-  static const int buildNumber = 26;
-  static const String buildDate = '2026-10-28';
+  static const String version = '1.26.0';
+  static const int buildNumber = 27;
+  static const String buildDate = '2026-10-29';
   static const String codename = 'Memory';
 }
