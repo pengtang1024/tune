@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app.dart';
 import 'package:tune/app/licenses.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_auto_fill_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_leak_check_controller.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -45,6 +46,12 @@ Future<void> main() async {
   // here, and every tick decides for itself whether the machine is idle
   // enough to ask the human pool again.
   container.read(smartLyricsLeakCheckControllerProvider).start();
+
+  // The library fills itself (2026-10-29 用户拍板): with the toggle on —
+  // and it is on by default — the batch drains the gap until every song
+  // carries words. No button, no queue-watching; the toggle closes the
+  // door and the loop walks through it.
+  container.read(smartLyricsAutoFillControllerProvider).start();
 }
 
 /// Takes the place of the player on the machine.

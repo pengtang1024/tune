@@ -95,6 +95,32 @@ class SmartLyricsBatchSection extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
+                strings.settingsSmartLyricsAutoFill,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            Switch(
+              key: const ValueKey('smart-lyrics-auto-fill'),
+              value: ref.watch(
+                settingsControllerProvider.select(
+                  (state) => state.smartLyrics.autoFill,
+                ),
+              ),
+              onChanged: (value) {
+                final config = ref.read(settingsControllerProvider).smartLyrics;
+                ref
+                    .read(settingsControllerProvider.notifier)
+                    .setSmartLyrics(config.copyWith(autoFill: value));
+              },
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
                 strings.settingsSmartLyricsLeakCheck,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,

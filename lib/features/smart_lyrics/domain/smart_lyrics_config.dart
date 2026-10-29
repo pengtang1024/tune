@@ -81,6 +81,10 @@ class SmartLyricsConfig {
   /// (docs/smart-lyrics.md §7.2).
   final bool gapCheckEnabled;
 
+  /// Whether the batch fills the library by itself — no button to press,
+  /// the queue drains until every song carries words.
+  final bool autoFill;
+
   const SmartLyricsConfig({
     this.presetId = SmartLyricsPreset.openaiId,
     this.baseUrl = SmartLyricsPreset._openaiBaseUrl,
@@ -92,6 +96,9 @@ class SmartLyricsConfig {
     this.localModel = 'tiny',
     this.batchCloudBudget = 500,
     this.gapCheckEnabled = true,
+    // The library fills itself: the batch runs on its own until every
+    // song carries words. The reader may turn the machine off at will.
+    this.autoFill = true,
   });
 
   /// Whether the pipeline has a place to go and a key to knock with.
@@ -127,6 +134,7 @@ class SmartLyricsConfig {
     String? localModel,
     int? batchCloudBudget,
     bool? gapCheckEnabled,
+    bool? autoFill,
   }) => SmartLyricsConfig(
     presetId: presetId ?? this.presetId,
     baseUrl: baseUrl ?? this.baseUrl,
@@ -136,6 +144,7 @@ class SmartLyricsConfig {
     localModel: localModel ?? this.localModel,
     batchCloudBudget: batchCloudBudget ?? this.batchCloudBudget,
     gapCheckEnabled: gapCheckEnabled ?? this.gapCheckEnabled,
+    autoFill: autoFill ?? this.autoFill,
   );
 
   Map<String, dynamic> toJson() => {
@@ -147,6 +156,7 @@ class SmartLyricsConfig {
     'localModel': localModel,
     'batchCloudBudget': batchCloudBudget,
     'gapCheckEnabled': gapCheckEnabled,
+    'autoFill': autoFill,
   };
 
   /// Reads the config back; a broken field falls to the default of that
@@ -177,6 +187,9 @@ class SmartLyricsConfig {
       gapCheckEnabled: json['gapCheckEnabled'] is bool
           ? json['gapCheckEnabled'] as bool
           : fallback.gapCheckEnabled,
+      autoFill: json['autoFill'] is bool
+          ? json['autoFill'] as bool
+          : fallback.autoFill,
     );
   }
 }

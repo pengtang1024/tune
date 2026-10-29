@@ -1408,5 +1408,6 @@
   "smartContrastTargetLanguage": "英文",
   "lyricsContrastTranslate": "翻譯",
   "lyricsContrastTransliterate": "音譯",
-  "lyricsContrastDone": "已對照"
+  "lyricsContrastDone": "已對照",
+  "settingsSmartLyricsAutoFill": "自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞"
 }

@@ -1408,5 +1408,6 @@
   "smartContrastTargetLanguage": "Chinese",
   "lyricsContrastTranslate": "Translate",
   "lyricsContrastTransliterate": "Transliterate",
-  "lyricsContrastDone": "On the sheet"
+  "lyricsContrastDone": "On the sheet",
+  "settingsSmartLyricsAutoFill": "Auto-fill: keep filling every track without lyrics until the library has none left"
 }

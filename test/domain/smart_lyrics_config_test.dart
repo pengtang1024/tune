@@ -77,6 +77,15 @@ void main() {
       expect(restored.isConfigured, isTrue);
     });
 
+    test('the library fills itself on by default', () {
+      expect(const SmartLyricsConfig().autoFill, isTrue);
+      expect(const SmartLyricsConfig(autoFill: false).autoFill, isFalse);
+      final restored = SmartLyricsConfig.fromJson(
+        const SmartLyricsConfig(autoFill: false).toJson(),
+      );
+      expect(restored.autoFill, isFalse);
+    });
+
     test('the free check is on until the reader turns it off', () {
       expect(const SmartLyricsConfig().gapCheckEnabled, isTrue);
       expect(

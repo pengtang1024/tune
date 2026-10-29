@@ -2517,6 +2517,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lyricsContrastDone => '已对照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5032,6 +5035,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get lyricsContrastDone => '已对照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7547,4 +7553,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get lyricsContrastDone => '已對照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞';
 }

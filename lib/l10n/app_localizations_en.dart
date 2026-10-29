@@ -2729,4 +2729,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lyricsContrastDone => 'On the sheet';
+
+  @override
+  String get settingsSmartLyricsAutoFill =>
+      'Auto-fill: keep filling every track without lyrics until the library has none left';
 }

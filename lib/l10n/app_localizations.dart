@@ -4630,6 +4630,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'已对照'**
   String get lyricsContrastDone;
+
+  /// No description provided for @settingsSmartLyricsAutoFill.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐：开着就把库里所有没词的歌自动补到有词'**
+  String get settingsSmartLyricsAutoFill;
 }
 
 class _AppLocalizationsDelegate
