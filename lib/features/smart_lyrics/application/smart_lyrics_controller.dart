@@ -13,6 +13,17 @@ import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
+import 'package:tune/features/smart_lyrics/data/smart_lyrics_channel_health_store.dart';
+import 'package:tune/providers/persistence_providers.dart';
+
+/// The channel health rings the pipeline asks before every question and
+/// feeds after every answer — one store, one preference file, shared by
+/// every service that runs the pool (docs/smart-lyrics.md §7.2, M9).
+final smartLyricsChannelHealthProvider = Provider<SmartLyricsChannelHealthStore>(
+  (ref) => SmartLyricsChannelHealthStore(
+    ref.watch(persistenceServiceProvider),
+  ),
+);
 
 /// The service the pipeline runs through, built from what the reader
 /// pasted: one channel per transcription model, the text model for the
@@ -61,6 +72,7 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
+    health: ref.watch(smartLyricsChannelHealthProvider),
     assist: config.chatModel.trim().isEmpty
         ? null
         : SmartTextAssist(client: client, model: config.chatModel),

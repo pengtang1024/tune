@@ -72,3 +72,14 @@ class ChannelHealth {
   /// Whether the channel keeps being asked.
   bool get usable => score >= threshold;
 }
+
+/// What the pipeline keeps of its channels' answers — the rings of recent
+/// outcomes, asked before every question and fed after every answer.
+abstract class ChannelHealthLedger {
+  /// The health of [channelId] as it stands; a channel with no history is
+  /// healthy until it proves otherwise.
+  ChannelHealth healthOf(String channelId);
+
+  /// One answer lands in the ring; the oldest falls off.
+  void record(String channelId, ChannelOutcome outcome);
+}

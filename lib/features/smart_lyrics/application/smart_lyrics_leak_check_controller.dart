@@ -7,6 +7,7 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/utils/logger.dart';
 
 /// The pipeline without any channels (docs/smart-lyrics.md §7.2): the free
@@ -22,6 +23,7 @@ final smartLyricsHumanOnlyServiceProvider = Provider<SmartLyricsService>((
     engines: const [],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
+    health: ref.watch(smartLyricsChannelHealthProvider),
   );
 });
 

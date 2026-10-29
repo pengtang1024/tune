@@ -10,6 +10,7 @@ import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
+import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -103,11 +104,13 @@ void main() {
     List<SmartLyricsEngine> engines = const [],
     List<({String name, LyricsProvider provider})> humanPool = const [],
     SmartTextAssist? assist,
+    ChannelHealthLedger? health,
   }) => SmartLyricsService(
     engines: engines,
     humanPool: humanPool,
     paths: paths,
     assist: assist,
+    health: health,
   );
 
   List<TranscribedSegment> segmentsOf(List<String> words) => [
@@ -274,4 +277,61 @@ void main() {
     expect(outcome.saved, isFalse);
     expect(await paths.readSmartLyrics(localSong()), isNull);
   });
+
+  test('a channel under the health threshold is not asked this round', () async {
+    final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final ledger = _FakeLedger();
+
+    // Six failures land before the run: the channel waits out the round.
+    for (var i = 0; i < 6; i++) {
+      ledger.record('cloud:whisper-1', ChannelOutcome.failure);
+    }
+
+    await service(
+      engines: [engine],
+      humanPool: [(name: 'lrclib', provider: human)],
+      health: ledger,
+    ).generate(localSong());
+
+    expect(engine.asked, isEmpty, reason: 'the pool stops spending on a '
+        'channel that keeps failing — the failures counted it down');
+  });
+
+  test('every answer lands in the ring', () async {
+    final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
+    final silent = _Engine('cloud:other', empty: true);
+    final broken = _Engine(
+      'cloud:broken',
+      error: DioException(requestOptions: RequestOptions(path: '/x')),
+    );
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final ledger = _FakeLedger();
+
+    await service(
+      engines: [engine, silent, broken],
+      humanPool: [(name: 'lrclib', provider: human)],
+      health: ledger,
+    ).generate(localSong());
+
+    expect(ledger.recorded['cloud:whisper-1'], [ChannelOutcome.success]);
+    expect(ledger.recorded['cloud:other'], [ChannelOutcome.empty]);
+    expect(ledger.recorded['cloud:broken'], [ChannelOutcome.failure]);
+    expect(ledger.recorded['lrclib'], [ChannelOutcome.success]);
+  });
+}
+
+/// The rings in memory.
+class _FakeLedger implements ChannelHealthLedger {
+  final Map<String, List<ChannelOutcome>> recorded = {};
+
+  @override
+  ChannelHealth healthOf(String channelId) => ChannelHealth.fromOutcomes(
+    recorded[channelId] ?? const [],
+  );
+
+  @override
+  void record(String channelId, ChannelOutcome outcome) {
+    recorded.putIfAbsent(channelId, () => []).add(outcome);
+  }
 }

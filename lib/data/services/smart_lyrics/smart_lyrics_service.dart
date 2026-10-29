@@ -9,6 +9,7 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_consensus.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
+import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
@@ -67,6 +68,11 @@ class SmartLyricsService {
   final List<({String name, LyricsProvider provider})> humanPool;
   final LibraryPaths paths;
 
+  /// The channel health rings: asked before every question, fed after
+  /// every answer — a channel that keeps failing waits out the rounds
+  /// without a reader tending the list (docs/smart-lyrics.md §7.2, M9).
+  final ChannelHealthLedger? health;
+
   /// The text side: the correction of a draft and the knowledge vote.
   /// `null` when no text model is configured — the pool then votes on the
   /// drafts as they were read.
@@ -80,6 +86,7 @@ class SmartLyricsService {
     required this.paths,
     this.assist,
     this.resolver,
+    this.health,
     Dio? dio,
   }) : _dio = dio ?? Dio();
 
@@ -149,23 +156,41 @@ class SmartLyricsService {
 
   /// The human pool, one sheet each. A source that fails or hands in a
   /// sheet without a timeline stays out — untimed words cannot vote on the
-  /// lines of a timed song.
+  /// lines of a timed song. A source under the health threshold is not
+  /// asked at all this round.
   Future<List<LyricsBallot>> _humanVotes(Song song, List<String> origins) async {
     final votes = <LyricsBallot>[];
     for (final source in humanPool) {
+      if (!_usable(source.name)) continue;
       try {
         final raw = await source.provider.lookup(song);
-        if (raw == null || raw.trim().isEmpty) continue;
+        if (raw == null || raw.trim().isEmpty) {
+          _record(source.name, ChannelOutcome.empty);
+          continue;
+        }
         final ballot = _timedBallot(source.name, BallotKind.human, raw);
-        if (ballot == null) continue;
+        if (ballot == null) {
+          _record(source.name, ChannelOutcome.empty);
+          continue;
+        }
         votes.add(ballot);
         origins.add(source.name);
+        _record(source.name, ChannelOutcome.success);
       } catch (error, stackTrace) {
+        _record(source.name, ChannelOutcome.failure);
         Log.error('人写票源 ${source.name} 失败: $error', stackTrace);
       }
     }
     return votes;
   }
+
+  /// Whether the health rings let [channelId] be asked this round.
+  bool _usable(String channelId) =>
+      health?.healthOf(channelId).usable ?? true;
+
+  /// One answer lands in the ring.
+  void _record(String channelId, ChannelOutcome outcome) =>
+      health?.record(channelId, outcome);
 
   /// The machine channels, one pass each, every draft corrected before it
   /// joins the pool. A channel that fails is skipped — the others still
@@ -181,6 +206,7 @@ class SmartLyricsService {
     var failed = 0;
     for (final engine in engines) {
       if (stopped()) break;
+      if (!_usable(engine.id)) continue;
       try {
         final result = await engine.transcribe(
           SmartAudioInput(
@@ -190,6 +216,7 @@ class SmartLyricsService {
           ),
         );
         if (result.segments.isEmpty) {
+          _record(engine.id, ChannelOutcome.empty);
           empty++;
           continue;
         }
@@ -212,7 +239,9 @@ class SmartLyricsService {
           ),
         );
         origins.add(engine.id);
+        _record(engine.id, ChannelOutcome.success);
       } catch (error, stackTrace) {
+        _record(engine.id, ChannelOutcome.failure);
         failed++;
         Log.error('通道 ${engine.id} 转写失败: $error', stackTrace);
       }
