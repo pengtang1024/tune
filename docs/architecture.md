@@ -55,6 +55,8 @@ presentation → application → domain
 | 发现页 | `DiscoveryController` / `DiscoveryState`（`features/discovery`） | 音乐库、喜欢与反馈的派生视图；分段只在内存，不落盘 |
 | 推荐反馈 | `DiscoveryFeedbackStore` / `DiscoveryArtistFeedbackStore`（`features/discovery`） | 单曲与歌手的「少推荐」标记，30 天过期；收藏与音乐库不受影响 |
 | 播放记录 | `ListeningSignalStore` + `DiscoverySignalObserver`（`features/discovery`） | 可选的本地聚合；默认关闭，观察播放状态后结算 |
+| 智能歌词的生成进度 | `SmartLyricsController` / `SmartLyricsRun`（`features/smart_lyrics`） | 只持有单曲/批量的运行进度；生成的**结果**经 `LyricsController` 进 `LyricsState`，不持有第二份歌词 |
+| 智能歌词的任务、标记、抽样、核对 | `library.db` 的 `smart_lyrics_tasks` / `smart_lyrics_marks` / `smart_lyrics_sample` / `smart_lyrics_audit` 表（`SmartLyricsTaskStore` 等，`features/smart_lyrics/data`） | 批量队列、读者与系统的标记、分层抽样集、人工核对账；统计在数据库里算，按需取窗口 |
 
 - 状态只在 application 层修改；presentation 层只 `ref.watch` 读、`ref.read(...notifier)` 写。
 - 纯逻辑下沉到 domain，I/O 下沉到 `data/services`；service 不依赖 Riverpod——`MusicSourceService` 是范例：它只编排 I/O，状态由 controller 持有。
@@ -128,6 +130,7 @@ presentation → application → domain
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
 | 歌词 | 曲目所在目录，`<歌名>.lrc`（读者指定的写 `<歌名>.manual.lrc`） | `LyricsController` → `LibraryPaths` |
+| 智能歌词的机器稿与对照 | 曲目所在目录，`<歌名>.smart.lrc`（票池共识稿，读取顺序永远垫底）与 `<歌名>.smart.json`（翻译/音译对照，键入词稿日期——词稿重生成即作废） | `SmartLyricsService` / `SmartLyricsContrastController` → `LibraryPaths` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **播放会话与进度分开存**：队列只在切歌/编辑时写，进度每 5 秒单独写，避免为了几秒钟的进度反复重写整条队列。恢复时一律停在暂停态，规则见 [playback-session.md](playback-session.md)。
