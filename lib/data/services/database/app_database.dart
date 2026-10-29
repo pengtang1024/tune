@@ -1082,7 +1082,8 @@ class AppDatabase {
     final row = _db
         .select(
           'SELECT COUNT(*) AS total, SUM(has_lyrics) AS with_lyrics '
-          'FROM songs WHERE active = 1',
+          'FROM songs WHERE active = 1 '
+          "AND json_extract(json, '\$.isLiveStream') IS NOT 1",
         )
         .first;
     final total = row['total'] as int? ?? 0;
@@ -1211,6 +1212,7 @@ class AppDatabase {
         "SELECT json_extract(json, '\$.id'), uri, 'pending', 0, ? "
         'FROM songs '
         "WHERE active = 1 AND has_lyrics = 0 "
+        "AND json_extract(json, '\$.isLiveStream') IS NOT 1 "
         'AND NOT EXISTS ('
         "  SELECT 1 FROM smart_lyrics_tasks t "
         "  WHERE t.song_id = json_extract(json, '\$.id')"
@@ -1236,6 +1238,7 @@ class AppDatabase {
         .select(
           'SELECT COUNT(*) AS n FROM songs '
           "WHERE active = 1 AND has_lyrics = 0 "
+          "AND json_extract(songs.json, '\$.isLiveStream') IS NOT 1 "
           'AND NOT EXISTS ('
           "  SELECT 1 FROM smart_lyrics_tasks t "
           "  WHERE t.song_id = json_extract(songs.json, '\$.id')"
@@ -1329,6 +1332,18 @@ class AppDatabase {
         [now, maxAttempts],
       );
     }
+    return _db.updatedRows;
+  }
+
+  /// Drops the tasks of live streams: a radio station has no fixed
+  /// recording to transcribe, so a queued task for one is a wait that can
+  /// never end.
+  int dropLiveStreamTasks() {
+    _db.execute(
+      'DELETE FROM smart_lyrics_tasks WHERE song_id IN ('
+      "SELECT json_extract(json, '\$.id') FROM songs "
+      "WHERE json_extract(json, '\$.isLiveStream') = 1)",
+    );
     return _db.updatedRows;
   }
 

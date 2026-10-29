@@ -272,6 +272,28 @@ void main() {
     expect(engine.asked.single.path, audio.path);
   });
 
+  test('a live stream is never fetched — no fixed recording, no words',
+      () async {
+    final engine = _Engine(
+      'cloud:whisper-1',
+      answer: segmentsOf(['一句']),
+    );
+    const station = Song(
+      id: 1,
+      title: 'Beat Blender',
+      artist: 'SomaFM',
+      uri: 'tune://radio/somafm%2Fbeatblender',
+      streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
+      isLiveStream: true,
+    );
+
+    final outcome = await service(engines: [engine]).generate(station);
+
+    expect(outcome.failure, SmartLyricsFailure.noAudio);
+    expect(engine.asked, isEmpty,
+        reason: 'an endless stream would fill the disk and never finish');
+  });
+
   test('a track with neither a file nor a stream fails before any channel runs', () async {
     final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
 

@@ -97,6 +97,10 @@ class SmartLyricsService {
   final StreamUrlResolver? resolver;
   final Dio _dio;
 
+  /// Set once the first download of this service cleaned the folders a
+  /// killed run left behind.
+  Future<void>? _cleaned;
+
   SmartLyricsService({
     required this.engines,
     required this.humanPool,
@@ -384,7 +388,11 @@ class SmartLyricsService {
   Future<(File?, bool)> _audioFor(Song song) async {
     final local = song.localFile;
     if (local != null && local.isNotEmpty) return (File(local), false);
+    // A live stream never ends: downloading it would fill the disk and
+    // hang the batch on a song that has no fixed words.
+    if (song.isLiveStream) return (null, false);
 
+    await _cleanStaleAudioOnce();
     Directory? folder;
     try {
       final fresh = await resolver?.refresh(song) ?? song;
@@ -400,6 +408,28 @@ class SmartLyricsService {
       // is the run's own mess, so the run cleans it.
       if (folder != null) await _discardFolder(folder);
       return (null, false);
+    }
+  }
+
+  /// Removes the `tune_smart_audio*` folders a killed run left behind.
+  ///
+  /// Only folders older than an hour are touched: a download of this run
+  /// (or another instance) is fresh, and its folder is not ours to delete.
+  Future<void> _cleanStaleAudioOnce() => _cleaned ??= _cleanStaleAudio();
+
+  Future<void> _cleanStaleAudio() async {
+    try {
+      final now = DateTime.now();
+      await for (final entity in Directory.systemTemp.list()) {
+        if (entity is! Directory) continue;
+        final name = path.basename(entity.path);
+        if (!name.startsWith('tune_smart_audio')) continue;
+        final modified = (await entity.stat()).modified;
+        if (now.difference(modified) < const Duration(hours: 1)) continue;
+        await entity.delete(recursive: true);
+      }
+    } catch (error, stackTrace) {
+      Log.error('残留临时音频清理失败: $error', stackTrace);
     }
   }
 

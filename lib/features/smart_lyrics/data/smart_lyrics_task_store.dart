@@ -43,8 +43,13 @@ class SmartLyricsTaskStore {
 
   /// Puts every active track that carries no lyrics into the queue;
   /// answers how many rows the press added.
-  Future<int> enqueueMissing() async =>
-      (await _db()).enqueueMissingTasks(now: _now());
+  Future<int> enqueueMissing() async {
+    final db = await _db();
+    // Radio is not a gap: drop any task an older queue left for a live
+    // stream before counting the new gap.
+    db.dropLiveStreamTasks();
+    return db.enqueueMissingTasks(now: _now());
+  }
 
   /// The gap tracks a scan brought in that are not queued yet — the card
   /// says so; the queue only moves on a press.

@@ -130,6 +130,42 @@ void main() {
         reason: 'the reader pressing retry is not capped');
   });
 
+  test('a live stream is not a gap: no task, no ledger entry', () async {
+    db.ingestBatch([
+      const Song(
+        id: 1,
+        uri: 'tune://radio/a',
+        title: 'Radio',
+        isLiveStream: true,
+      ),
+      const Song(id: 2, uri: '/b.mp3', title: '太阳'),
+    ]);
+
+    expect(await store.enqueueMissing(), 1);
+    expect((await store.nextPending())?.id, 2);
+    expect(db.lyricsLedgerCounts(), (1, 0),
+        reason: 'a station has no fixed recording to put words on');
+  });
+
+  test('a task an older queue left for a live stream is dropped', () async {
+    const station = Song(id: 1, uri: 'tune://radio/a', title: 'Radio');
+    db.ingestBatch([station]);
+    await store.enqueueMissing();
+
+    db.ingestBatch([
+      const Song(
+        id: 1,
+        uri: 'tune://radio/a',
+        title: 'Radio',
+        isLiveStream: true,
+      ),
+    ]);
+    await store.enqueueMissing();
+
+    expect(await store.nextPending(), isNull);
+    expect((await store.counts()).values.fold<int>(0, (a, b) => a + b), 0);
+  });
+
   test('a track that carries no voice is not a gap any more', () async {
     ingestLibrary();
     await store.enqueueMissing();
