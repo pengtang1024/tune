@@ -5,7 +5,7 @@ import 'package:path/path.dart' as path;
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
-import 'package:tune/data/services/smart_lyrics/smart_lyrics_consensus.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
@@ -130,7 +130,7 @@ class SmartLyricsService {
 
       // Enough human votes that agree on every line: the cheap way home.
       if (votes.length >= 3) {
-        final consensus = voteOn(votes);
+        final consensus = admit(votes);
         if (!_hasDisputed(consensus)) {
           return await _save(song, consensus, origins, stopped);
         }
@@ -144,7 +144,7 @@ class SmartLyricsService {
       if (machine.votes.isEmpty) return _silenceOf(machine);
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
-      final consensus = voteOn(votes, knowledge: knowledge);
+      final consensus = admit(votes, knowledge: knowledge);
       if (consensus.lines.isEmpty) {
         return const SmartLyricsOutcome.failed(SmartLyricsFailure.emptyResult);
       }

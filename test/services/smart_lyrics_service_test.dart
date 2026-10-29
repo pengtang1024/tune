@@ -141,7 +141,7 @@ void main() {
     );
   }
 
-  test('the human pool settles it: no channel is asked', () async {
+  test('a human pool alone settles nothing — admission needs a second class', () async {
     final engine = _Engine('cloud:whisper-1');
     final human = _Human()..sheets[1] = _sheetText(['一句', '两句']);
     final second = _Human()..sheets[1] = _sheetText(['一句', '两句']);
@@ -156,31 +156,35 @@ void main() {
       ],
     ).generate(localSong());
 
-    expect(outcome.saved, isTrue);
-    expect(engine.asked, isEmpty, reason: 'the cheap votes came first');
-    expect(
-      await paths.readSmartLyrics(localSong()),
-      isNotNull,
-      reason: 'the sheet lands next to the audio',
-    );
+    expect(engine.asked, isNotEmpty, reason: 'one class however unanimous '
+        'cannot cross-prove itself — §7.6 sends the run to the machine '
+        'channels for a second class');
+    expect(outcome.saved, isFalse, reason: 'single class settles nothing — '
+        'the sheet stays a gap rather than a guess');
+    expect(await paths.readSmartLyrics(localSong()), isNull);
   });
 
   test('the machine channels fill the gap; a failed correction keeps the draft', () async {
-    final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句', '两句']));
-    final human = _Human()..sheets[1] = _sheetText(['一句']);
-    // The same answer serves the correction (a wrong count: the draft
-    // survives as it was) and the rebuild (a knowledge line).
+    final whisper = _Engine('cloud:whisper-1', answer: segmentsOf(['一句', '两句']));
+    final paraformer = _Engine('cloud:paraformer', answer: segmentsOf(['一句', '两句']));
+    final human = _Human()..sheets[1] = _sheetText(['一句', '两句']);
+    // The correction answers with the wrong line count — the drafts vote
+    // as they were read.
     final assist = assistAnswering(jsonEncode(['两句']));
 
     final outcome = await service(
-      engines: [engine],
+      engines: [whisper, paraformer],
       humanPool: [(name: 'lrclib', provider: human)],
       assist: assist,
     ).generate(localSong());
 
-    expect(outcome.saved, isTrue, reason: 'human + machine + knowledge = 3');
-    expect(outcome.votes, 3);
-    expect(outcome.origins, containsAll(['lrclib', 'cloud:whisper-1']));
+    expect(outcome.saved, isTrue, reason: 'the human class plus the machine '
+        'class (two distinct families) read the same words — §7.6 admits');
+    expect(outcome.votes, 4);
+    expect(
+      outcome.origins,
+      containsAll(['lrclib', 'cloud:whisper-1', 'cloud:paraformer']),
+    );
     expect(outcome.disputed, 0);
   });
 
