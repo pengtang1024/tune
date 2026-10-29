@@ -337,8 +337,10 @@ class _LyricLine extends StatefulWidget {
 
 class _LyricLineState extends State<_LyricLine> {
   /// The line under the pointer: its flag shows only then, so the sheet
-  /// reads as words, not as a column of icons.
+  /// reads as words, not as a column of icons. A long press pins the flag
+  /// out on a touch screen, where there is no pointer to hover.
   var _hovering = false;
+  var _pinned = false;
 
   @override
   Widget build(BuildContext context) {
@@ -373,7 +375,7 @@ class _LyricLineState extends State<_LyricLine> {
         // for the pointer — the playing page stays words first.
         if (widget.onToggleFlag != null)
           Visibility(
-            visible: widget.flagged || _hovering,
+            visible: widget.flagged || _hovering || _pinned,
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
@@ -404,7 +406,10 @@ class _LyricLineState extends State<_LyricLine> {
     final row = MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
-      child: words,
+      child: GestureDetector(
+        onLongPress: () => setState(() => _pinned = !_pinned),
+        child: words,
+      ),
     );
     // Without a contrast the line stays the single row the cheap scroll
     // was measured for; the contrasts add their rows under the words.
