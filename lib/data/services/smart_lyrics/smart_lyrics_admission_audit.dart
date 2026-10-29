@@ -86,12 +86,12 @@ AdmissionAudit auditAdmission(
 (bool, bool) _auditCluster(
   List<({LyricsBallot ballot, BallotLine line})> cluster,
 ) {
-  final agreed = admit([for (final entry in cluster) entry.ballot]);
-  final winners = agreed.lines.where((line) => !line.disputed);
-  if (winners.isEmpty) return (false, false);
-  final winner = winners.first;
-
-  final normalized = _normalizeAudit(winner.text);
+  // The cluster under trial, not the whole song: re-running the gate on
+  // the full ballots would hand back the earliest admitted line and put
+  // every later cluster on trial for words it never sang.
+  final verdict = admitCluster(cluster);
+  if (verdict.disputed) return (false, false);
+  final normalized = _normalizeAudit(verdict.text);
   final voices = <({LineageClass klass, String family})>[];
   for (final entry in cluster) {
     if (_normalizeAudit(entry.line.text) != normalized) continue;
@@ -109,9 +109,12 @@ AdmissionAudit auditAdmission(
   final winnerSupport = _speakingSupport(cluster)[normalized] ?? 0;
   var verifiable = false;
   for (var left = 0; left < voices.length; left++) {
+    // Drop the voice, not every ballot that shares its family name: a
+    // family is only a voice inside its own class.
     final rotated = {
       for (var i = 0; i < cluster.length; i++)
-        if (_familyOf(cluster[i].ballot.origin) != voices[left].family)
+        if (lineageOf(cluster[i].ballot.origin) !=
+            (voices[left].klass, voices[left].family))
           cluster[i],
     }.toList();
     final support = _speakingSupport(rotated);
@@ -156,8 +159,6 @@ Map<String, int> _speakingSupport(
   });
   return perNorm;
 }
-
-String _familyOf(String origin) => lineageOf(origin).$2;
 
 final RegExp _auditComparable = RegExp(r'[\p{L}\p{N}]', unicode: true);
 

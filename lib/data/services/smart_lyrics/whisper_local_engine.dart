@@ -144,7 +144,8 @@ class WhisperLocalEngine extends SmartLyricsEngine {
   static final RegExp _progressPattern = RegExp(r'progress\s*=\s*([\d.]+)');
 
   Future<void> _readProgress(Process process, void Function(double)? sink) {
-    if (sink == null) return Future.value();
+    // Both pipes are drained even when nobody listens: a full pipe would
+    // block the child and hang the run on long audio.
     return Future.wait([
       _reportOf(process.stdout, sink),
       _reportOf(process.stderr, sink),
@@ -153,13 +154,17 @@ class WhisperLocalEngine extends SmartLyricsEngine {
 
   Future<void> _reportOf(
     Stream<List<int>> stream,
-    void Function(double) sink,
+    void Function(double)? sink,
   ) async {
     await for (final line in stream
         .transform(utf8.decoder)
         .transform(const LineSplitter())) {
+      if (sink == null) continue;
       final match = _progressPattern.firstMatch(line);
-      if (match != null) sink(double.parse(match.group(1)!) / 100);
+      if (match != null) {
+        final value = double.tryParse(match.group(1)!);
+        if (value != null) sink(value / 100);
+      }
     }
   }
 

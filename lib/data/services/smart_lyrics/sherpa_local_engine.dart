@@ -83,8 +83,12 @@ class SherpaLocalEngine extends SmartLyricsEngine {
       );
       _process = process;
 
-      final stdoutText = await process.stdout.transform(utf8.decoder).join();
-      final stderrText = await process.stderr.transform(utf8.decoder).join();
+      // Both pipes listen at once: reading one to the end first would let
+      // the other fill and block the child.
+      final stdoutFuture = process.stdout.transform(utf8.decoder).join();
+      final stderrFuture = process.stderr.transform(utf8.decoder).join();
+      final stdoutText = await stdoutFuture;
+      final stderrText = await stderrFuture;
       final code = await process.exitCode;
       if (_cancelled) {
         throw const SherpaLocalException('the run was cancelled');

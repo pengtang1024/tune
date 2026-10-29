@@ -143,27 +143,68 @@ void main() {
     );
   }
 
-  test('a human pool alone settles nothing — admission needs a second class', () async {
-    final engine = _Engine('cloud:whisper-1');
+  test('a human pool alone writes its best sheet — 每首有词', () async {
     final human = _Human()..sheets[1] = _sheetText(['一句', '两句']);
-    final second = _Human()..sheets[1] = _sheetText(['一句', '两句']);
-    final third = _Human()..sheets[1] = _sheetText(['一句', '两句']);
 
     final outcome = await service(
-      engines: [engine],
-      humanPool: [
-        (name: 'a', provider: human),
-        (name: 'b', provider: second),
-        (name: 'c', provider: third),
-      ],
+      humanPool: [(name: 'lrclib', provider: human)],
     ).generate(localSong());
 
-    expect(engine.asked, isNotEmpty, reason: 'one class however unanimous '
-        'cannot cross-prove itself — §7.6 sends the run to the machine '
-        'channels for a second class');
-    expect(outcome.saved, isFalse, reason: 'single class settles nothing — '
-        'the sheet stays a gap rather than a guess');
-    expect(await paths.readSmartLyrics(localSong()), isNull);
+    expect(outcome.saved, isTrue,
+        reason: 'the free check has no machines to wait for; one human '
+            'sheet is a sheet worth showing');
+    expect(await paths.readSmartLyrics(localSong()), contains('一句'));
+  });
+
+  test('a human sheet survives the machines staying quiet', () async {
+    final human = _Human()..sheets[1] = _sheetText(['一句', '两句']);
+    final broken = _Engine('cloud:whisper-1', error: StateError('no answer'));
+
+    final outcome = await service(
+      engines: [broken],
+      humanPool: [(name: 'lrclib', provider: human)],
+    ).generate(localSong());
+
+    expect(outcome.saved, isTrue,
+        reason: 'a failed channel is not a verdict on the words a person '
+            'wrote — the sheet must not be discarded as silence');
+    expect(await paths.readSmartLyrics(localSong()), contains('一句'));
+  });
+
+  test('an empty segment is not a line', () async {
+    final engine = _Engine(
+      'cloud:whisper-1',
+      answer: segmentsOf(['一句', '', '   ']),
+    );
+
+    final outcome = await service(engines: [engine]).generate(localSong());
+    final sheet = await paths.readSmartLyrics(localSong());
+
+    expect(outcome.saved, isTrue);
+    expect(sheet, contains('一句'));
+    expect(sheet, isNot(contains('[]')));
+    expect(
+      sheet!
+          .split('\n')
+          .where((line) => RegExp(r'^\[\d+:\d{2}\.\d{2}\]').hasMatch(line))
+          .length,
+      1,
+      reason: 'one sung line; the blanks never became rows',
+    );
+  });
+
+  test('a disk that refuses the sheet is a failed run, not a crash', () async {
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final refusing = SmartLyricsService(
+      engines: const [],
+      humanPool: [(name: 'lrclib', provider: human)],
+      paths: _ThrowingPaths(),
+    );
+
+    final outcome = await refusing.generate(localSong());
+
+    expect(outcome.saved, isFalse);
+    expect(outcome.failure, SmartLyricsFailure.uploadFailed);
   });
 
   test('the machine channels fill the gap; a failed correction keeps the draft', () async {
@@ -339,6 +380,17 @@ void main() {
 }
 
 /// The rings in memory.
+/// Paths whose disk refuses every write.
+class _ThrowingPaths implements LibraryPaths {
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async =>
+      throw const FileSystemException('no space left');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('the test only reaches the write');
+}
+
 class _FakeLedger implements ChannelHealthLedger {
   final Map<String, List<ChannelOutcome>> recorded = {};
 

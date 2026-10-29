@@ -63,6 +63,25 @@ void main() {
     expect(audit.missRateUpperBound, 0);
   });
 
+  test('every cluster of a multi-line sheet is audited, not only the first',
+      () {
+    // One ballot carries the whole song; the audit used to re-run the gate
+    // on the full ballots and put every later cluster on trial for the
+    // first cluster's words — checked collapsed to one.
+    final audit = auditAdmission([
+      _ballot('lrclib', BallotKind.human, ['月亮走我也走', '我送阿哥到村口']),
+      _ballot('lrclib-fr', BallotKind.human, ['月亮走我也走', '我送阿哥到村口']),
+      _ballot('cloud:whisper-1', BallotKind.machine, ['月亮走我也走', '我送阿哥到村口']),
+      _ballot('cloud:paraformer', BallotKind.machine, ['月亮走我也走', '我送阿哥到村口']),
+    ]);
+
+    expect(audit.checked, 2,
+        reason: 'both time windows have four voices and were admitted');
+    expect(audit.mismatched, 0,
+        reason: 'a later cluster must not be judged by the first cluster '
+            'words');
+  });
+
   test('a hundred clean lines bound the miss rate at three-per-N', () {
     final audit = auditAdmission([
       for (var i = 0; i < 100; i++)

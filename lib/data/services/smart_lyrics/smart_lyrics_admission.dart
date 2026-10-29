@@ -109,6 +109,13 @@ SmartConsensus admit(
   return SmartConsensus(lines: agreed, votesCounted: pool.length);
 }
 
+/// One time window's verdict, exposed for the leave-one-out audit
+/// (docs/smart-lyrics.md §7.6, M11b): the audit must judge the cluster it
+/// is holding, not re-cluster the whole song and take an early line.
+ConsensusLine admitCluster(
+  List<({LyricsBallot ballot, BallotLine line})> cluster,
+) => _admitCluster(cluster);
+
 /// One cluster's verdict: two independent classes must read the same words.
 ConsensusLine _admitCluster(
   List<({LyricsBallot ballot, BallotLine line})> cluster,

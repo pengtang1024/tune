@@ -122,10 +122,17 @@ class SmartLyricsService {
       for (var index = 0; index < consensus.lines.length; index++)
         if (consensus.lines[index].disputed) index,
     ];
-    await paths.saveSmartLyrics(
-      song,
-      buildSmartLrc(consensus, origins: origins, at: DateTime.now()),
-    );
+    try {
+      await paths.saveSmartLyrics(
+        song,
+        buildSmartLrc(consensus, origins: origins, at: DateTime.now()),
+      );
+    } catch (error, stackTrace) {
+      // A disk that refuses the sheet is a failed run, not a crash — and
+      // never a half-written file.
+      Log.error('写入智能词稿失败: $error', stackTrace);
+      return const SmartLyricsOutcome.failed(SmartLyricsFailure.uploadFailed);
+    }
     return SmartLyricsOutcome(
       saved: true,
       votes: consensus.votesCounted,
@@ -155,7 +162,12 @@ class SmartLyricsService {
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
       final knowledges = await _knowledgeVotes(song, origins, stopped);
-      if (machine.votes.isEmpty) return _silenceOf(machine);
+      if (votes.isEmpty) {
+        // No sheet anywhere: a channel that answered with silence heard
+        // an instrumental; one that never answered failed. A human sheet
+        // is never discarded because the machines stayed quiet — 每首有词.
+        return _silenceOf(machine);
+      }
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
       // Every song gets words: the pool hands in its best sheet — the
@@ -251,26 +263,27 @@ class SmartLyricsService {
             artist: song.artist,
           ),
         );
-        if (result.segments.isEmpty) {
+        // A segment with no words is not a line: silence markers and
+        // empty rows never reach the sheet.
+        final rows = [
+          for (final segment in result.segments)
+            if (segment.text.trim().isNotEmpty) segment,
+        ];
+        if (rows.isEmpty) {
           _record(engine.id, ChannelOutcome.empty);
           empty++;
           continue;
         }
 
-        final drafts = [
-          for (final segment in result.segments) segment.text,
-        ];
+        final drafts = [for (final segment in rows) segment.text];
         final corrected = await _correctedDrafts(song, drafts);
         votes.add(
           LyricsBallot(
             origin: engine.id,
             kind: BallotKind.machine,
             lines: [
-              for (var index = 0; index < result.segments.length; index++)
-                BallotLine(
-                  start: result.segments[index].start,
-                  text: corrected[index],
-                ),
+              for (var index = 0; index < rows.length; index++)
+                BallotLine(start: rows[index].start, text: corrected[index]),
             ],
           ),
         );
@@ -372,23 +385,28 @@ class SmartLyricsService {
     final local = song.localFile;
     if (local != null && local.isNotEmpty) return (File(local), false);
 
+    Directory? folder;
     try {
       final fresh = await resolver?.refresh(song) ?? song;
       final url = fresh.streamUrl ?? song.streamUrl;
       if (url == null || url.isEmpty) return (null, false);
-      final folder = await Directory.systemTemp.createTemp('tune_smart_audio');
+      folder = await Directory.systemTemp.createTemp('tune_smart_audio');
       final file = File(path.join(folder.path, 'audio'));
       await _dio.download(url, file.path);
       return (file, true);
     } catch (error, stackTrace) {
       Log.error('取音频失败: $error', stackTrace);
+      // A download that died halfway leaves a folder of bytes behind: it
+      // is the run's own mess, so the run cleans it.
+      if (folder != null) await _discardFolder(folder);
       return (null, false);
     }
   }
 
-  Future<void> _discard(File audio) async {
+  Future<void> _discard(File audio) => _discardFolder(audio.parent);
+
+  Future<void> _discardFolder(Directory folder) async {
     try {
-      final folder = audio.parent;
       if (await folder.exists()) await folder.delete(recursive: true);
     } catch (error) {
       Log.error('临时音频清理失败: $error');
