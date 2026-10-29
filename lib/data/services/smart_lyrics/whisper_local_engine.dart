@@ -127,7 +127,10 @@ class WhisperLocalEngine extends SmartLyricsEngine {
   /// The folder the run writes its json into.
   Future<Directory> _room() async {
     final given = workspace;
-    if (given != null) return given;
+    if (given != null) {
+      await given.create(recursive: true);
+      return given;
+    }
     final resolve = workspaceOf;
     if (resolve == null) {
       throw const WhisperLocalException('the run has no folder to write in');
