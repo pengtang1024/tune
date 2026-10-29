@@ -37,16 +37,18 @@ class AdmissionAudit {
 /// gate votes with, including [knowledge].
 AdmissionAudit auditAdmission(
   List<LyricsBallot> ballots, {
-  LyricsBallot? knowledge,
+  List<LyricsBallot> knowledge = const [],
 }) {
   final pool = [...ballots];
-  if (knowledge != null && pool.isNotEmpty) {
+  if (knowledge.isNotEmpty && pool.isNotEmpty) {
     final anchor = pool.firstWhere(
       (sheet) => sheet.kind == BallotKind.machine,
       orElse: () => pool.first,
     );
-    final aligned = alignKnowledgeVote(knowledge, anchor);
-    if (aligned != null) pool.add(aligned);
+    for (final extra in knowledge) {
+      final aligned = alignKnowledgeVote(extra, anchor);
+      if (aligned != null) pool.add(aligned);
+    }
   }
 
   final lines = [
@@ -115,10 +117,12 @@ AdmissionAudit auditAdmission(
     final rotatedWinners = admit(rotated)
         .lines
         .where((line) => !line.disputed);
-    if (rotatedWinners.isEmpty) continue; // 说不了话的裁判不下结论
+    // 说不了话的裁判不下结论
+    if (rotatedWinners.isEmpty) continue;
     verifiable = true;
     if (_normalizeAudit(rotatedWinners.first.text) != normalized) {
-      return (true, false); // 一轮判出了别的字——抓到
+      // 一轮判出了别的字——抓到
+      return (true, false);
     }
   }
   return (verifiable, true);

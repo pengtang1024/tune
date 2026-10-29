@@ -77,6 +77,12 @@ class SmartLyricsService {
   /// `null` when no text model is configured — the pool then votes on the
   /// drafts as they were read.
   final SmartTextAssist? assist;
+
+  /// The chat models the knowledge rebuilds run on — one ballot each, so
+  /// two different families can cross-prove a line (docs/smart-lyrics.md
+  /// §7.6, M11c).
+  final List<String> knowledgeModels;
+
   final StreamUrlResolver? resolver;
   final Dio _dio;
 
@@ -85,6 +91,7 @@ class SmartLyricsService {
     required this.humanPool,
     required this.paths,
     this.assist,
+    this.knowledgeModels = const [],
     this.resolver,
     this.health,
     Dio? dio,
@@ -128,23 +135,15 @@ class SmartLyricsService {
       final origins = <String>[];
       final votes = await _humanVotes(song, origins);
 
-      // Enough human votes that agree on every line: the cheap way home.
-      if (votes.length >= 3) {
-        final consensus = admit(votes);
-        if (!_hasDisputed(consensus)) {
-          return await _save(song, consensus, origins, stopped);
-        }
-      }
-
       final machine = await _machineVotes(song, audio, origins, stopped);
       votes.addAll(machine.votes);
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
-      final knowledge = await _knowledgeVote(song, origins, stopped);
+      final knowledges = await _knowledgeVotes(song, origins, stopped);
       if (machine.votes.isEmpty) return _silenceOf(machine);
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
-      final consensus = admit(votes, knowledge: knowledge);
+      final consensus = admit(votes, knowledge: knowledges);
       if (consensus.lines.isEmpty) {
         return const SmartLyricsOutcome.failed(SmartLyricsFailure.emptyResult);
       }
@@ -266,34 +265,48 @@ class SmartLyricsService {
     }
   }
 
-  /// The knowledge vote: text only, never the audio. A rebuild that says
-  /// nothing, or says what cannot be read, keeps out of the pool.
-  Future<LyricsBallot?> _knowledgeVote(
+  /// The knowledge votes: text only, never the audio — one ballot per
+  /// configured chat model, so rebuilds of two different families can
+  /// cross-prove a line (§7.6). A rebuild that says nothing, or says
+  /// what cannot be read, keeps out of the pool.
+
+  Future<List<LyricsBallot>> _knowledgeVotes(
     Song song,
     List<String> origins,
     bool Function() stopped,
   ) async {
-    final corrector = assist;
-    if (corrector == null || stopped()) return null;
-    try {
-      final lines = await corrector.rebuildLyrics(
-        title: song.title,
-        artist: song.artist,
-      );
-      if (lines.isEmpty) return null;
-      origins.add('knowledge');
-      return LyricsBallot(
-        origin: 'knowledge',
-        kind: BallotKind.knowledge,
-        lines: [
-          for (final line in lines)
-            BallotLine(start: Duration.zero, text: line),
-        ],
-      );
-    } catch (error, stackTrace) {
-      Log.error('知识票重建失败: $error', stackTrace);
-      return null;
+    final assist = this.assist;
+    if (assist == null) return const [];
+    // A single configured model keeps its vote — one family, so the
+    // knowledge class stays silent alone, but the ballot exists.
+    final models = knowledgeModels.isEmpty ? [assist.model] : knowledgeModels;
+    if (models.isEmpty) return const [];
+    final votes = <LyricsBallot>[];
+    for (final model in models) {
+      if (stopped()) break;
+      try {
+        final sidekick = SmartTextAssist(client: assist.client, model: model);
+        final lines = await sidekick.rebuildLyrics(
+          title: song.title,
+          artist: song.artist,
+        );
+        if (lines.isEmpty) continue;
+        origins.add('knowledge:$model');
+        votes.add(
+          LyricsBallot(
+            origin: 'knowledge:$model',
+            kind: BallotKind.knowledge,
+            lines: [
+              for (final line in lines)
+                BallotLine(start: Duration.zero, text: line),
+            ],
+          ),
+        );
+      } catch (error, stackTrace) {
+        Log.error('知识票 $model 重建失败: $error', stackTrace);
+      }
     }
+    return votes;
   }
 
   /// What it means that no vote came home: a channel that answered with
@@ -315,9 +328,6 @@ class SmartLyricsService {
     if (timed.isEmpty) return null;
     return LyricsBallot(origin: origin, kind: kind, lines: timed);
   }
-
-  bool _hasDisputed(SmartConsensus consensus) =>
-      consensus.lines.any((line) => line.disputed);
 
   /// The audio of [song]: the file it is on this machine, or the stream
   /// pulled into a temporary file that the run deletes when it is done.

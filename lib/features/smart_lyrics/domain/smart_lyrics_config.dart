@@ -100,6 +100,18 @@ class SmartLyricsConfig {
       baseUrl.trim().isNotEmpty &&
       asrModels.isNotEmpty;
 
+  /// The text models the correction, the knowledge rebuilds and the
+  /// translation run on.
+  ///
+  /// A comma-separated line names several models — rebuilds of two
+  /// **different families** are what lets the knowledge class speak at
+  /// all (docs/smart-lyrics.md §7.6): one family cannot cross-prove
+  /// itself, however many revisions it ships.
+  List<String> get chatModelList => [
+    for (final model in chatModel.split(','))
+      if (model.trim().isNotEmpty) model.trim(),
+  ];
+
   SmartLyricsConfig copyWith({
     String? presetId,
     String? baseUrl,

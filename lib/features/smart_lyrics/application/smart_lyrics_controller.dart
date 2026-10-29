@@ -73,9 +73,12 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
     health: ref.watch(smartLyricsChannelHealthProvider),
-    assist: config.chatModel.trim().isEmpty
+    // The correction runs on the first model; every listed model casts a
+    // knowledge ballot — two families make the class speak (§7.6).
+    assist: config.chatModelList.isEmpty
         ? null
-        : SmartTextAssist(client: client, model: config.chatModel),
+        : SmartTextAssist(client: client, model: config.chatModelList.first),
+    knowledgeModels: config.chatModelList,
     resolver: resolver,
   );
 });

@@ -135,4 +135,41 @@ void main() {
             'of when the line is sung are 0.8s apart — inside the same cluster, past the 0.5s tolerance — a subtitle that drifts '
             'is wrong even when the words are right');
   });
+
+  test('two LLM families rebuild the same line — the knowledge class speaks', () {
+    final consensus = admit(
+      [
+        _ballot('cloud:whisper-1', BallotKind.machine, ['月亮走我也走']),
+        _ballot('cloud:paraformer', BallotKind.machine, ['月亮走我也走']),
+      ],
+      knowledge: [
+        _ballot('knowledge:gpt-4o', BallotKind.knowledge, ['月亮走我也走']),
+        _ballot('knowledge:deepseek-chat', BallotKind.knowledge, ['月亮走我也走']),
+      ],
+    );
+
+    final line = consensus.lines.single;
+    expect(line.disputed, isFalse,
+        reason: 'B class forms from two LLM families; C class from two '
+            'ASR families — two classes read the same words');
+    expect(line.text.trim(), '月亮走我也走');
+  });
+
+  test('one LLM family keeps the knowledge class silent', () {
+    final consensus = admit(
+      [
+        _ballot('cloud:whisper-1', BallotKind.machine, ['月亮走我也走']),
+        _ballot('cloud:paraformer', BallotKind.machine, ['月亮走我也走']),
+      ],
+      knowledge: [
+        _ballot('knowledge:gpt-4o', BallotKind.knowledge, ['月亮走我也走']),
+        _ballot('knowledge:gpt-4o-mini', BallotKind.knowledge, ['月亮走我也走']),
+      ],
+    );
+
+    final line = consensus.lines.single;
+    expect(line.disputed, isTrue,
+        reason: 'two gpt revisions are one voice wearing two hats — the '
+            'knowledge class needs two families to speak');
+  });
 }

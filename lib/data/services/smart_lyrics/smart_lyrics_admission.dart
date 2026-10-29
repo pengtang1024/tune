@@ -72,15 +72,20 @@ String _normalize(String text) => _comparable
 /// agreeing with a second ASR family, two LLM families rebuilding the
 /// same line, and so on. Anything else is recorded disputed and stays out
 /// of the sheet's body: 宁缺勿错.
-SmartConsensus admit(List<LyricsBallot> ballots, {LyricsBallot? knowledge}) {
+SmartConsensus admit(
+  List<LyricsBallot> ballots, {
+  List<LyricsBallot> knowledge = const [],
+}) {
   final pool = [...ballots];
-  if (knowledge != null && pool.isNotEmpty) {
+  if (knowledge.isNotEmpty && pool.isNotEmpty) {
     final anchor = pool.firstWhere(
       (sheet) => sheet.kind == BallotKind.machine,
       orElse: () => pool.first,
     );
-    final aligned = alignKnowledgeVote(knowledge, anchor);
-    if (aligned != null) pool.add(aligned);
+    for (final extra in knowledge) {
+      final aligned = alignKnowledgeVote(extra, anchor);
+      if (aligned != null) pool.add(aligned);
+    }
   }
 
   final lines = [

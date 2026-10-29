@@ -96,5 +96,16 @@ void main() {
         'base',
       );
     });
+
+    test('a comma-separated chat model line names several models', () {
+      const config = SmartLyricsConfig(
+        chatModel: 'gpt-4o-mini, deepseek-chat ,mimo-v2.6-flash',
+      );
+
+      expect(config.chatModelList, ['gpt-4o-mini', 'deepseek-chat', 'mimo-v2.6-flash']);
+      expect(const SmartLyricsConfig(chatModel: '').chatModelList, isEmpty);
+      expect(const SmartLyricsConfig().chatModelList, ['gpt-4o-mini'],
+          reason: 'a single name behaves exactly as before');
+    });
   });
 }
