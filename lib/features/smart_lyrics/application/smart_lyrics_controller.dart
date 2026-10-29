@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
+import 'package:tune/data/services/smart_lyrics/sherpa_local_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
@@ -69,6 +72,28 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
           modelOf: () async => (await assets).findModel(localModel),
           workspaceOf: () async => (await assets).workspace(),
         ),
+      // The second, independent ASR family (M12): SenseVoice via
+      // sherpa-onnx when it is installed — a free vote whose lineage
+      // (sensevoice) is a different algorithm from whisper's, so the two
+      // can cross-prove a line. Absent install: the channel fails soft
+      // and the health rings park it.
+      SherpaLocalEngine(
+        model: 'sensevoice',
+        binaryOf: () async {
+          final file = File(
+            '${Platform.environment['HOME'] ?? ''}'
+            '/.local/opt/sherpa-onnx/bin/sherpa-onnx-offline',
+          );
+          return await file.exists() ? file : null;
+        },
+        modelDirOf: () async {
+          final dir = Directory(
+            '${Platform.environment['HOME'] ?? ''}'
+            '/.local/opt/sherpa-onnx/models/sense-voice',
+          );
+          return await dir.exists() ? dir : null;
+        },
+      ),
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,

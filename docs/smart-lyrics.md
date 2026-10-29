@@ -224,6 +224,7 @@ LyricsController._lyricsFor(song)
 | 速度 | CPU 上 4 分钟歌约 0.5–3 分钟（tiny→base）；批量 2000 首是「过夜」量级，GPU 快一个量级 |
 | 隐私 | 零外发；引擎与模型下载（含校验和）是唯一一次网络行为 |
 | M4 已落地 | `WhisperLocalEngine`（子进程转写，`requestCancel` 可中途杀掉，产物只在干净退出后读、成败都清理）+ `WhisperAssets`（系统 PATH 优先、可执行位判定、app 目录兜底）+ `WhisperModelStore`（从 whisper.cpp 官方模型仓下载，sha256 对照官方 tree API 的 LFS 清单，不符即销毁）；设置卡「本地引擎」下拉选模型 + 「下载模型」按钮，`local:<模型名>` 作为一张永远免费的机器票进池 |
+| M12 已落地 | **第二 ASR 家族（SenseVoice via sherpa-onnx，Apache/MIT）**：`SherpaLocalEngine` 子进程转 stdout JSON，按词级起止的**静默间隙切行**（与 whisper 段模型是两种独立计时法）；id `local:sensevoice` 与 whisper 家族天然独立互证；本机真音频验证 9 段带真实时刻；装于 `~/.local/opt/sherpa-onnx`，未装的机器该通道软失败、健康度挂起 |
 | 结论 | **免费票**与异构第二票：一个按钮装好，装了就永远有一票不花钱 |
 
 ### 6.3 票池与共识（核心算法）
