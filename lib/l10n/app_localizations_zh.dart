@@ -2495,6 +2495,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String smartPromptRebuild(String title, String artist) {
     return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
   }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面这首歌的歌词逐行译成$target，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -4988,6 +5001,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String smartPromptRebuild(String title, String artist) {
     return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
   }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面这首歌的歌词逐行译成$target，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7481,4 +7507,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String smartPromptRebuild(String title, String artist) {
     return '請憑你對這首歌的了解，寫出《$title》($artist) 的歌詞，按演唱順序拆成一行一句。\n只輸出 JSON 字串陣列，不要輸出其他內容。不確定的歌曲就輸出空陣列，不要編造：';
   }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面這首歌的歌詞逐行譯成$target，行數與順序必須與原稿完全一致，不譯標點風格差異。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面這首歌的歌詞逐行轉寫成拉丁字母拼讀（拼音或通行讀音），行數與順序必須與原稿完全一致。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
 }

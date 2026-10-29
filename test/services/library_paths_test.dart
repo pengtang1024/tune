@@ -166,6 +166,27 @@ void main() {
         reason: 'a better sheet tops the smart one without erasing it');
   });
 
+  test('the contrasts of a song sit in one small json beside its sheet', () async {
+    const song = Song(
+      id: 1,
+      title: 'So What',
+      artist: 'Miles Davis',
+      uri: 'https://source.test/so-what',
+    );
+
+    expect(await paths.readSmartContrast(song), isNull);
+
+    await paths.saveSmartContrast(song, '{"translation":["One","Two"]}');
+    expect(
+      await paths.readSmartContrast(song),
+      '{"translation":["One","Two"]}',
+      reason: 'the contrast follows the song the way its sheet does',
+    );
+
+    await paths.clearSmartContrast(song);
+    expect(await paths.readSmartContrast(song), isNull);
+  });
+
   test('the lyrics the reader brought are written when the file is free', () async {
     const song = Song(
       id: 1,

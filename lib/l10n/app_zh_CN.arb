@@ -1248,14 +1248,47 @@
   "settingsSmartLyricsBatchRetry": "重查失败曲目",
   "settingsSmartLyricsBudget": "云端预算（首/批，0 为不限）",
   "settingsSmartLyricsBatchIdle": "待补 {pending} · 已完成 {done} · 失败 {failed}",
-  "@settingsSmartLyricsBatchIdle": {"placeholders": {"pending": {"type": "int"}, "done": {"type": "int"}, "failed": {"type": "int"}}},
+  "@settingsSmartLyricsBatchIdle": {
+    "placeholders": {
+      "pending": {
+        "type": "int"
+      },
+      "done": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBatchRunning": "正在补齐：待补 {pending} · 已完成 {done}",
-  "@settingsSmartLyricsBatchRunning": {"placeholders": {"pending": {"type": "int"}, "done": {"type": "int"}}},
+  "@settingsSmartLyricsBatchRunning": {
+    "placeholders": {
+      "pending": {
+        "type": "int"
+      },
+      "done": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBudgetPaused": "已达云端预算（{budget} 首），本批暂停——余下待补不丢",
-  "@settingsSmartLyricsBudgetPaused": {"placeholders": {"budget": {"type": "int"}}},
+  "@settingsSmartLyricsBudgetPaused": {
+    "placeholders": {
+      "budget": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBatchFresh": "新增 {count} 首待补，按「补齐曲库」入队",
   "settingsSmartLyricsLeakCheck": "查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU",
-  "@settingsSmartLyricsBatchFresh": {"placeholders": {"count": {"type": "int"}}},
+  "@settingsSmartLyricsBatchFresh": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "lyricsSmartGenerate": "智能生成",
   "lyricsSmartGenerateNeedsKey": "还没有密钥——先到设置的「智能歌词」里贴一把",
   "lyricsSmartGenerating": "正在生成歌词——先问人写稿，再开通道，一轮最多几分钟",
@@ -1270,7 +1303,13 @@
   "lyricsMarksTitle": "标记管理",
   "lyricsMarksEmpty": "还没有标记——听到不对的行，点行尾的小旗",
   "lyricsMarkLineNumber": "第 {line} 行",
-  "@lyricsMarkLineNumber": {"placeholders": {"line": {"type": "int"}}},
+  "@lyricsMarkLineNumber": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
   "lyricsMarkReword": "改词",
   "lyricsMarkRewordTitle": "改这一行",
   "lyricsMarkRewordSave": "保存改词",
@@ -1346,5 +1385,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "smartPromptTranslate": "把下面这首歌的歌词逐行译成{target}，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}",
+  "smartPromptTransliterate": "把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}",
+  "@smartPromptTranslate": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "lines": {
+        "type": "String"
+      }
+    }
+  },
+  "@smartPromptTransliterate": {
+    "placeholders": {
+      "lines": {
+        "type": "String"
+      }
+    }
+  },
+  "smartContrastTargetLanguage": "英文"
 }

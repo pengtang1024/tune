@@ -1248,14 +1248,47 @@
   "settingsSmartLyricsBatchRetry": "Recheck the failed tracks",
   "settingsSmartLyricsBudget": "Cloud budget (tracks per run, 0 for none)",
   "settingsSmartLyricsBatchIdle": "{pending} waiting · {done} done · {failed} failed",
-  "@settingsSmartLyricsBatchIdle": {"placeholders": {"pending": {"type": "int"}, "done": {"type": "int"}, "failed": {"type": "int"}}},
+  "@settingsSmartLyricsBatchIdle": {
+    "placeholders": {
+      "pending": {
+        "type": "int"
+      },
+      "done": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBatchRunning": "Filling: {pending} waiting · {done} done",
-  "@settingsSmartLyricsBatchRunning": {"placeholders": {"pending": {"type": "int"}, "done": {"type": "int"}}},
+  "@settingsSmartLyricsBatchRunning": {
+    "placeholders": {
+      "pending": {
+        "type": "int"
+      },
+      "done": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBudgetPaused": "The cloud budget ({budget} tracks) is spent: this run paused — the rest waits",
-  "@settingsSmartLyricsBudgetPaused": {"placeholders": {"budget": {"type": "int"}}},
+  "@settingsSmartLyricsBudgetPaused": {
+    "placeholders": {
+      "budget": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSmartLyricsBatchFresh": "{count} new tracks are missing; press \"Fill the library\" to queue them",
   "settingsSmartLyricsLeakCheck": "Free check: re-asks the human pool when the machine is idle — never the cloud, never the CPU",
-  "@settingsSmartLyricsBatchFresh": {"placeholders": {"count": {"type": "int"}}},
+  "@settingsSmartLyricsBatchFresh": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "lyricsSmartGenerate": "Smart lyrics",
   "lyricsSmartGenerateNeedsKey": "No key yet — paste one in Settings, Smart lyrics",
   "lyricsSmartGenerating": "Generating the lyrics — human sheets first, then the channels; a round takes minutes at most",
@@ -1270,7 +1303,13 @@
   "lyricsMarksTitle": "Marks",
   "lyricsMarksEmpty": "No marks yet — hear a wrong line, press the flag at its end",
   "lyricsMarkLineNumber": "Line {line}",
-  "@lyricsMarkLineNumber": {"placeholders": {"line": {"type": "int"}}},
+  "@lyricsMarkLineNumber": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
   "lyricsMarkReword": "Reword",
   "lyricsMarkRewordTitle": "Reword this line",
   "lyricsMarkRewordSave": "Save the words",
@@ -1346,5 +1385,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "smartPromptTranslate": "Translate the lyrics below into {target}, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n{lines}",
+  "smartPromptTransliterate": "Write the lyrics below in Latin letters the way they sound, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n{lines}",
+  "@smartPromptTranslate": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "lines": {
+        "type": "String"
+      }
+    }
+  },
+  "@smartPromptTransliterate": {
+    "placeholders": {
+      "lines": {
+        "type": "String"
+      }
+    }
+  },
+  "smartContrastTargetLanguage": "Chinese"
 }

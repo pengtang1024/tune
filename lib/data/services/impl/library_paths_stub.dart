@@ -59,4 +59,13 @@ class BrowserLibraryPaths implements LibraryPaths {
 
   @override
   Future<String?> readSmartLyrics(Song song) async => null;
+
+  @override
+  Future<void> saveSmartContrast(Song song, String json) async {}
+
+  @override
+  Future<String?> readSmartContrast(Song song) async => null;
+
+  @override
+  Future<void> clearSmartContrast(Song song) async {}
 }

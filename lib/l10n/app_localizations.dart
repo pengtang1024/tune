@@ -4594,6 +4594,24 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'请凭你对这首歌的了解，写出《{title}》({artist}) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：'**
   String smartPromptRebuild(String title, String artist);
+
+  /// No description provided for @smartPromptTranslate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把下面这首歌的歌词逐行译成{target}，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}'**
+  String smartPromptTranslate(String target, String lines);
+
+  /// No description provided for @smartPromptTransliterate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}'**
+  String smartPromptTransliterate(String lines);
+
+  /// No description provided for @smartContrastTargetLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英文'**
+  String get smartContrastTargetLanguage;
 }
 
 class _AppLocalizationsDelegate

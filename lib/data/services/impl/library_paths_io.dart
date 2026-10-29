@@ -156,6 +156,32 @@ class FileLibraryPaths implements LibraryPaths {
     return _readLyricsFile(_lyricsFile(song, manual: false, smart: true));
   }
 
+  @override
+  Future<void> saveSmartContrast(Song song, String json) async {
+    final file = await _contrastFile(song);
+    await file.parent.create(recursive: true);
+    await file.writeAsString(json, flush: true);
+  }
+
+  @override
+  Future<String?> readSmartContrast(Song song) {
+    return _readLyricsFile(_contrastFile(song));
+  }
+
+  @override
+  Future<void> clearSmartContrast(Song song) async {
+    final file = await _contrastFile(song);
+    if (await file.exists()) await file.delete();
+  }
+
+  /// The contrasts of [song]: a small json beside the sheet they belong
+  /// to, so the family of the song's files stays in one folder.
+  Future<File> _contrastFile(Song song) async {
+    final folder = await folderFor(song);
+    final name = nameFor(song);
+    return File(path.join(folder.path, '$name.smart.json'));
+  }
+
   /// The file of a track that is on the disk, when the track is one.
   ///
   /// A remote track keeps a canonical `tune://` URI for its identity, and

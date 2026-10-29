@@ -74,4 +74,16 @@ abstract class LibraryPaths {
 
   /// Reads the machine sheet of [song], when one is there.
   Future<String?> readSmartLyrics(Song song);
+
+  /// Writes the contrasts of [song] next to its other files
+  /// (docs/smart-lyrics.md §7.5): the translation and the transliteration
+  /// of the sheet, in one small json beside the sheet itself.
+  Future<void> saveSmartContrast(Song song, String json);
+
+  /// Reads the contrasts of [song], when any were made.
+  Future<String?> readSmartContrast(Song song);
+
+  /// Takes the contrasts of [song] away — the words under them changed, so
+  /// what was said about the old ones no longer holds.
+  Future<void> clearSmartContrast(Song song);
 }

@@ -103,4 +103,55 @@ void main() {
       throwsA(isA<SmartLyricsTextException>()),
     );
   });
+
+  test('the translation answers line for line, in the target language', () async {
+    final adapter = FakeHttpAdapter()
+      ..body = _contentOf('["The moon walks with me","I see my bro off"]');
+
+    final lines = await _assist(adapter).translateLines(
+      lines: const ['月亮走我也走', '我送阿哥到村口'],
+      targetLanguage: 'English',
+    );
+
+    expect(lines, ['The moon walks with me', 'I see my bro off']);
+    final asked = adapter.requests.single.data.toString();
+    expect(asked.contains('English'), isTrue, reason: 'the prompt names '
+        'the language the words are wanted in');
+    expect(asked.contains('月亮走我也走'), isTrue, reason: 'the sheet '
+        'travels with it, line for line');
+  });
+
+  test('a translation that changes the line count is a failure', () async {
+    final adapter = FakeHttpAdapter()..body = _contentOf('["one"]');
+
+    expect(
+      () => _assist(adapter).translateLines(
+        lines: const ['一', '二'],
+        targetLanguage: 'English',
+      ),
+      throwsA(isA<SmartLyricsTextException>()),
+      reason: 'a contrast that no longer fits the sheet would lie about '
+          'which line says what',
+    );
+  });
+
+  test('the transliteration answers with the words as they sound', () async {
+    final adapter = FakeHttpAdapter()
+      ..body = _contentOf('["yue liang zou wo ye zou","wo song a ge"]');
+
+    final lines = await _assist(adapter).transliterateLines(
+      lines: const ['月亮走我也走', '我送阿哥到村口'],
+    );
+
+    expect(lines.first, 'yue liang zou wo ye zou');
+  });
+
+  test('a transliteration that changes the line count is a failure', () async {
+    final adapter = FakeHttpAdapter()..body = _contentOf('["a","b","c"]');
+
+    expect(
+      () => _assist(adapter).transliterateLines(lines: const ['一', '二']),
+      throwsA(isA<SmartLyricsTextException>()),
+    );
+  });
 }

@@ -2707,4 +2707,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String smartPromptRebuild(String title, String artist) {
     return 'Write the lyrics of \"$title\" ($artist) from what you know of the song, one line a line, in the order they are sung.\nAnswer with a JSON array of strings only, nothing else. When you are not sure of the song, answer with an empty array — do not invent:';
   }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return 'Translate the lyrics below into $target, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return 'Write the lyrics below in Latin letters the way they sound, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => 'Chinese';
 }

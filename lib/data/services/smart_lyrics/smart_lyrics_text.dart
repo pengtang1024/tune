@@ -57,6 +57,35 @@ class SmartTextAssist {
     return _linesOf(content);
   }
 
+  /// The lines of a sheet in [targetLanguage], line for line.
+  ///
+  /// The answer must hold exactly as many lines as the sheet: a contrast
+  /// that grew or shrank would say the wrong line says what. Such an
+  /// answer is a failure, never a guess (docs/smart-lyrics.md §7.5).
+  Future<List<String>> translateLines({
+    required List<String> lines,
+    required String targetLanguage,
+  }) async {
+    final content = await client.complete(
+      model: model,
+      prompt: AppStrings.instance.smartPromptTranslate(
+        targetLanguage,
+        jsonEncode(lines),
+      ),
+    );
+    return _linesOf(content, expected: lines.length);
+  }
+
+  /// The lines of a sheet written the way they sound, line for line — the
+  /// reader's way through a language they do not read.
+  Future<List<String>> transliterateLines({required List<String> lines}) async {
+    final content = await client.complete(
+      model: model,
+      prompt: AppStrings.instance.smartPromptTransliterate(jsonEncode(lines)),
+    );
+    return _linesOf(content, expected: lines.length);
+  }
+
   /// The lines a model answer holds, once the fence is off and the JSON is
   /// read; a model that answered with prose drops out here.
   List<String> _linesOf(String content, {int? expected}) {
