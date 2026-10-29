@@ -202,7 +202,7 @@ void main() {
   });
 
   test('a disputed line is not written, its place goes to the header', () async {
-    final human = _Human()..sheets[1] = _sheetText(['一边一个说法']);
+    // Machines fighting only themselves — no human sheet to break the tie.
     final engines = [
       _Engine('cloud:a', answer: segmentsOf(['另一句'])),
       _Engine('cloud:b', answer: segmentsOf(['还有一句'])),
@@ -211,7 +211,7 @@ void main() {
 
     final outcome = await service(
       engines: engines,
-      humanPool: [(name: 'lrclib', provider: human)],
+      humanPool: const [],
     ).generate(localSong());
 
     expect(outcome.saved, isTrue);

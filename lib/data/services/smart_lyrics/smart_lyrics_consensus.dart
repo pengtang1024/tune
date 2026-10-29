@@ -51,9 +51,6 @@ SmartConsensus voteOn(List<LyricsBallot> ballots, {LyricsBallot? knowledge}) {
     if (aligned != null) pool.add(aligned);
   }
 
-  // Fewer than three votes: the pool cannot settle anything by itself.
-  final settled = pool.length >= 3;
-
   final lines = [
     for (var index = 0; index < pool.length; index++)
       for (final line in pool[index].lines) (ballot: pool[index], line: line),
@@ -68,7 +65,7 @@ SmartConsensus voteOn(List<LyricsBallot> ballots, {LyricsBallot? knowledge}) {
         lines[end].line.start - anchor <= const Duration(milliseconds: 1000)) {
       end++;
     }
-    agreed.add(_voteCluster(lines.sublist(cursor, end), settled));
+    agreed.add(_voteCluster(lines.sublist(cursor, end)));
     cursor = end;
   }
 
@@ -76,9 +73,13 @@ SmartConsensus voteOn(List<LyricsBallot> ballots, {LyricsBallot? knowledge}) {
 }
 
 /// One cluster votes: the lines that landed within a second of each other.
+///
+/// The product promise is 每首有词 (2026-10-29 产品口径): a line is
+/// written whenever the pool can name it — one source singing one
+/// version is a version worth showing. A line drops only when machines
+/// disagree among themselves with no human sheet to break the tie.
 ConsensusLine _voteCluster(
   List<({LyricsBallot ballot, BallotLine line})> cluster,
-  bool settled,
 ) {
   // The words grouped by what they read like; the first sheet to write them
   // this way keeps the wording the reader sees.
@@ -90,14 +91,12 @@ ConsensusLine _voteCluster(
   String? best;
   BallotKind? bestKind;
   var bestWeight = 0;
-  var totalWeight = 0;
   List<({LyricsBallot ballot, BallotLine line})>? bestGroup;
   for (final group in groups.values) {
     var weight = 0;
     for (final entry in group) {
       weight += _weightOf(entry.ballot.kind);
     }
-    totalWeight += weight;
     final champion = group.first.ballot.kind;
     final beats =
         best == null ||
@@ -111,10 +110,10 @@ ConsensusLine _voteCluster(
     }
   }
 
-  // A strict minority is a dispute: half the pool or more must have sung
-  // these words. (Two against two settles through the tie-break above.)
-  // The group votes with its text, so `best` and `bestGroup` settle together.
-  final disputed = !settled || bestWeight * 2 < totalWeight;
+  // A human sheet among the rivals settles the line (the reader's
+  // library outranks the machines); machines fighting only themselves
+  // cannot say what is sung — that is the one case left unwritten.
+  final disputed = groups.length > 1 && bestKind != BallotKind.human;
   // The line starts where the winning words started, not where the loudest
   // cluster began: a stray line a second early must not pull the highlight.
   final start = bestGroup!

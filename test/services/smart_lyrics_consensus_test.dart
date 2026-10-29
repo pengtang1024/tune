@@ -60,13 +60,24 @@ void main() {
       expect(consensus.lines.first.disputed, isTrue);
     });
 
-    test('少于三票时整首要人看过才落盘', () {
+    test('少于三票一致也落盘——每首有词', () {
       final consensus = voteOn([
         machine('a', [(1000, '一句')]),
         machine('b', [(1000, '一句')]),
       ]);
 
-      expect(consensus.lines.first.disputed, isTrue);
+      expect(consensus.lines.first.disputed, isFalse,
+          reason: '票池说出的词就是词：一致即写，不看票数');
+    });
+
+    test('机器各说各话又没有人类稿时，这行留白', () {
+      final consensus = voteOn([
+        machine('a', [(1000, '甲句')]),
+        machine('b', [(1000, '乙句')]),
+      ]);
+
+      expect(consensus.lines.first.disputed, isTrue,
+          reason: '机器自己打架、无人裁决——池子说不出唱的是什么');
     });
 
     test('两张人写票压过一张机器票', () {
