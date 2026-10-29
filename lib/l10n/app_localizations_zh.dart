@@ -2508,6 +2508,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻译';
+
+  @override
+  String get lyricsContrastTransliterate => '音译';
+
+  @override
+  String get lyricsContrastDone => '已对照';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5014,6 +5023,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻译';
+
+  @override
+  String get lyricsContrastTransliterate => '音译';
+
+  @override
+  String get lyricsContrastDone => '已对照';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7520,4 +7538,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻譯';
+
+  @override
+  String get lyricsContrastTransliterate => '音譯';
+
+  @override
+  String get lyricsContrastDone => '已對照';
 }

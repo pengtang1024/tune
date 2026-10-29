@@ -11,14 +11,21 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Height of one lyric line.
 const _lineExtent = 30.0;
+
+/// The height one contrast line adds under the words (docs/
+/// smart-lyrics.md §7.5): the translation and the transliteration may
+/// both stand, each on a row of its own.
+const _contrastLineExtent = 16.0;
 
 /// Shows the lyrics of the track that plays and follows the playback.
 ///
@@ -33,6 +40,10 @@ class LyricsPanel extends ConsumerStatefulWidget {
 
 class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   final ScrollController _scroll = ScrollController();
+
+  /// The height one line takes right now: taller while a contrast rides
+  /// under the words, so the scroll arithmetic follows what is drawn.
+  double _extent = _lineExtent;
 
   @override
   void dispose() {
@@ -85,11 +96,21 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       final flags =
           ref.watch(songMarksProvider(song.id)).valueOrNull ??
           SmartLyricsSongFlags.empty;
+      final contrast =
+          ref.watch(songContrastProvider(song)).valueOrNull ??
+          SmartSongContrast.empty;
       final marks = ref.read(smartLyricsMarksControllerProvider);
+      // A sheet with a contrast under its lines reads taller — the cells
+      // stay uniform, so the cheap scroll keeps its arithmetic. Both
+      // kinds may stand at once, each under the words.
+      final contrastCount =
+          (contrast.translation != null ? 1 : 0) +
+          (contrast.transliteration != null ? 1 : 0);
+      _extent = _lineExtent + contrastCount * _contrastLineExtent;
       final list = ListView.builder(
         controller: _scroll,
         padding: const EdgeInsets.symmetric(vertical: CompactTokens.space8),
-        itemExtent: _lineExtent,
+        itemExtent: _extent,
         itemCount: document.lines.length,
         itemBuilder: (context, index) {
           final line = document.lines[index];
@@ -98,10 +119,12 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
             active: index == active,
             flagged: flags.lines.contains(index),
             onToggleFlag: () => marks.toggleLine(song.id, index),
+            translation: _at(contrast.translation, index),
+            transliteration: _at(contrast.transliteration, index),
           );
         },
       );
-      final markRow = _MarkRow(songId: song.id, flags: flags);
+      final markRow = _MarkRow(song: song, flags: flags);
       // The machine sheet says what it is: a better sheet found later tops
       // it, and the search again is the way.
       if (current.smart) {
@@ -232,10 +255,9 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       };
 
   /// Keeps the sung line in the middle of the panel.
-  void _scrollTo(int index) {
-    if (index < 0 || !_scroll.hasClients) return;
+  void _scrollTo(int index) {    if (index < 0 || !_scroll.hasClients) return;
     final target =
-        (index * _lineExtent - _scroll.position.viewportDimension / 2).clamp(
+        (index * _extent - _scroll.position.viewportDimension / 2).clamp(
           0.0,
           _scroll.position.maxScrollExtent,
         );
@@ -281,6 +303,8 @@ class _LyricLine extends StatelessWidget {
     required this.active,
     this.flagged = false,
     this.onToggleFlag,
+    this.translation,
+    this.transliteration,
   });
 
   final String line;
@@ -292,6 +316,13 @@ class _LyricLine extends StatelessWidget {
   /// The press that marks the line, or takes the mark back.
   final VoidCallback? onToggleFlag;
 
+  /// The words under this one: the translation and the transliteration,
+  /// each on a row of its own. They never take part in the locating or
+  /// the highlight — they are what the eye reads under the words that are
+  /// sung (docs/smart-lyrics.md §7.5).
+  final String? translation;
+  final String? transliteration;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -301,7 +332,7 @@ class _LyricLine extends StatelessWidget {
         ? theme.textTheme.titleMedium
         : theme.textTheme.bodyMedium;
 
-    return Row(
+    final words = Row(
       children: [
         Expanded(
           child: Text(
@@ -316,8 +347,9 @@ class _LyricLine extends StatelessWidget {
             ),
           ),
         ),
-        // One press marks the line wrong, another takes it back; the flag
-        // of a marked line flies in the accent, the others wait, faint.
+        // One press marks the line wrong, another takes it back; the
+        // flag of a marked line flies in the accent, the others wait,
+        // faint.
         if (onToggleFlag != null)
           TuneTooltip(
             message: flagged
@@ -344,20 +376,60 @@ class _LyricLine extends StatelessWidget {
           ),
       ],
     );
+    // Without a contrast the line stays the single row the cheap scroll
+    // was measured for; the contrasts add their rows under the words.
+    if (translation == null && transliteration == null) return words;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        words,
+        if (translation != null)
+          _contrast(context, translation!, theme, faint: false),
+        if (transliteration != null)
+          _contrast(context, transliteration!, theme, faint: true),
+      ],
+    );
   }
+
+  /// One contrast row: quiet under the words, never the line the eye
+  /// hunts for — it is the reading, not the song.
+  Widget _contrast(
+    BuildContext context,
+    String words,
+    ThemeData theme, {
+    required bool faint,
+  }) => Padding(
+    padding: const EdgeInsets.only(left: CompactTokens.space6),
+    child: Text(
+      words,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+        fontWeight: faint ? FontWeight.w300 : FontWeight.w400,
+      ),
+    ),
+  );
 }
 
 /// The two whole-track marks the reader hears their way to (docs/
 /// smart-lyrics.md §7.4): the track is wrong, or the track is not sung.
 class _MarkRow extends ConsumerWidget {
-  const _MarkRow({required this.songId, required this.flags});
+  const _MarkRow({required this.song, required this.flags});
 
-  final int songId;
+  final Song song;
   final SmartLyricsSongFlags flags;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final marks = ref.read(smartLyricsMarksControllerProvider);
+    final contrast =
+        ref.watch(songContrastProvider(song)).valueOrNull ??
+        SmartSongContrast.empty;
+    final hasAssist = ref.watch(smartLyricsAssistProvider) != null;
+    final contrastController = ref.read(smartLyricsContrastControllerProvider);
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: CompactTokens.space12,
@@ -369,15 +441,40 @@ class _MarkRow extends ConsumerWidget {
             context,
             label: context.loc.lyricsMarkSong,
             active: flags.song,
-            onPressed: () => marks.toggleSong(songId),
+            onPressed: () => marks.toggleSong(song.id),
           ),
           const SizedBox(width: CompactTokens.space8),
           _toggle(
             context,
             label: context.loc.lyricsMarkNotSung,
             active: flags.instrumental,
-            onPressed: () => marks.toggleNotSung(songId),
+            onPressed: () => marks.toggleNotSung(song.id),
           ),
+          // The contrasts of M7 (docs/smart-lyrics.md §7.5): each kind is
+          // made once per sheet — the second press has nothing to add,
+          // and a reader without a text model never sees the door.
+          if (hasAssist) ...[
+            const SizedBox(width: CompactTokens.space8),
+            _contrast(
+              context,
+              ref: ref,
+              label: context.loc.lyricsContrastTranslate,
+              icon: Icons.translate,
+              done: contrast.translation != null,
+              onPressed: () =>
+                  unawaited(contrastController.translate(song)),
+            ),
+            const SizedBox(width: CompactTokens.space8),
+            _contrast(
+              context,
+              ref: ref,
+              label: context.loc.lyricsContrastTransliterate,
+              icon: Icons.spatial_audio_off,
+              done: contrast.transliteration != null,
+              onPressed: () =>
+                  unawaited(contrastController.transliterate(song)),
+            ),
+          ],
           const Spacer(),
           // The other door into the marks of the library
           // (docs/smart-lyrics.md §7.4).
@@ -415,7 +512,43 @@ class _MarkRow extends ConsumerWidget {
       ),
     );
   }
+
+  /// One of the two contrasts: grey until it is made, an accent check
+  /// after — the words are there, and the press has nothing left to add
+  /// (docs/smart-lyrics.md §7.5).
+  Widget _contrast(
+    BuildContext context, {
+    required WidgetRef ref,
+    required String label,
+    required IconData icon,
+    required bool done,
+    required VoidCallback onPressed,
+  }) {
+    final theme = Theme.of(context);
+    final button = TextButton.icon(
+      onPressed: done ? null : onPressed,
+      icon: Icon(
+        done ? Icons.check : icon,
+        size: CompactTokens.icon16,
+        color: done ? theme.colorScheme.primary : null,
+      ),
+      label: Text(
+        label,
+        style: done ? TextStyle(color: theme.colorScheme.primary) : null,
+      ),
+    );
+    return TuneTooltip(
+      message: done ? context.loc.lyricsContrastDone : '',
+      child: button,
+    );
+  }
 }
+
+/// The words at [index] of [lines], `null` when the contrast does not
+/// reach that far — a sheet that grew since the contrast was made leaves
+/// the extra lines alone.
+String? _at(List<String>? lines, int index) =>
+    lines == null || index >= lines.length ? null : lines[index];
 
 /// One thing the reader can do when there are no lyrics to show.
 class _Action {

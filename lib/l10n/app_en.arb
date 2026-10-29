@@ -1405,5 +1405,8 @@
       }
     }
   },
-  "smartContrastTargetLanguage": "Chinese"
+  "smartContrastTargetLanguage": "Chinese",
+  "lyricsContrastTranslate": "Translate",
+  "lyricsContrastTransliterate": "Transliterate",
+  "lyricsContrastDone": "On the sheet"
 }

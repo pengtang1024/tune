@@ -5,6 +5,7 @@ import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/domain/lyrics_document.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_reword.dart';
 
@@ -109,7 +110,8 @@ class SmartLyricsMarksController {
   /// Writes the reader's words over one line: the sheet goes through the
   /// file the reading chain tops, and the mark is answered that way — the
   /// reader never types into the panel, only here (docs/smart-lyrics.md
-  /// §7.4).
+  /// §7.4). The contrasts of the song go with the old words: what was
+  /// said about lines that are not there any more holds for nobody.
   Future<void> rewordLine(Song song, int line, String text) async {
     final paths = _ref.read(libraryPathsProvider);
     final sheet =
@@ -117,11 +119,13 @@ class SmartLyricsMarksController {
     if (sheet == null || sheet.trim().isEmpty) return;
 
     await paths.saveChosenLyrics(song, rewordSheet(sheet, line: line, text: text));
+    await paths.clearSmartContrast(song);
     await _ref.read(smartLyricsTaskStoreProvider).rewordMark(song.id, line);
 
     // The panel shows the words the reader wrote from the next read on.
     _ref.read(lyricsMemoryProvider).forget(song);
     _ref.invalidate(lyricsControllerProvider);
+    _ref.invalidate(songContrastProvider(song));
     await _refresh(song.id);
   }
 

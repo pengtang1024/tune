@@ -4612,6 +4612,24 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'英文'**
   String get smartContrastTargetLanguage;
+
+  /// No description provided for @lyricsContrastTranslate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译'**
+  String get lyricsContrastTranslate;
+
+  /// No description provided for @lyricsContrastTransliterate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音译'**
+  String get lyricsContrastTransliterate;
+
+  /// No description provided for @lyricsContrastDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已对照'**
+  String get lyricsContrastDone;
 }
 
 class _AppLocalizationsDelegate

@@ -170,6 +170,9 @@ class _RecordingPaths implements LibraryPaths {
   }
 
   @override
+  Future<void> clearSmartContrast(Song song) async {}
+
+  @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('the marks page test has no file system');
 }

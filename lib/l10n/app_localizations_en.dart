@@ -2720,4 +2720,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get smartContrastTargetLanguage => 'Chinese';
+
+  @override
+  String get lyricsContrastTranslate => 'Translate';
+
+  @override
+  String get lyricsContrastTransliterate => 'Transliterate';
+
+  @override
+  String get lyricsContrastDone => 'On the sheet';
 }
