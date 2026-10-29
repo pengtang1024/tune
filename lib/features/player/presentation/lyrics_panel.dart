@@ -24,8 +24,9 @@ const _lineExtent = 30.0;
 
 /// The height one contrast line adds under the words (docs/
 /// smart-lyrics.md §7.5): the translation and the transliteration may
-/// both stand, each on a row of its own.
-const _contrastLineExtent = 16.0;
+/// both stand, each on a row of its own. The row carries the whole line
+/// above it too, so it takes what that line takes and then some.
+const _contrastLineExtent = 24.0;
 
 /// Shows the lyrics of the track that plays and follows the playback.
 ///

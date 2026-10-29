@@ -22,8 +22,10 @@ import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -339,6 +341,101 @@ void main() {
     expect(find.byTooltip('这行不对'), findsOneWidget, reason: 'faint flags, '
         'one press each — the panel keeps its wordless promise');
     expect(find.text('整首不对'), findsOneWidget);
+  });
+
+  testWidgets('a contrast rides under the words in a quieter ink', (
+    tester,
+  ) async {
+    final database = _FakeDatabase()
+      ..answers[1] = '[00:12.00]月亮走我也走\n[00:20.00]我送阿哥到村口';
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        songContrastProvider.overrideWith(
+          (ref, forSong) => Future.value(
+            const SmartSongContrast(
+              sheetDate: '2026-10-29',
+              translationLanguage: 'English',
+              translation: ['The moon walks with me', 'I see my bro off'],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    expect(find.text('月亮走我也走'), findsOneWidget, reason: 'the words stay');
+    expect(find.text('The moon walks with me'), findsOneWidget,
+        reason: 'the reading sits under them');
+    final theme = Theme.of(tester.element(find.text('月亮走我也走')));
+    final words = tester.widget<Text>(find.text('The moon walks with me'));
+    expect(words.style?.color, theme.colorScheme.onSurfaceVariant,
+        reason: 'the contrast is a reading, not the line the eye hunts — '
+            'it never takes the accent');
+  });
+
+  testWidgets('both kinds may stand, each on a row of its own', (tester) async {
+    final database = _FakeDatabase()..answers[1] = '[00:12.00]月亮走我也走';
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        songContrastProvider.overrideWith(
+          (ref, forSong) => Future.value(
+            const SmartSongContrast(
+              sheetDate: '2026-10-29',
+              translation: ['The moon walks with me'],
+              transliteration: ['yue liang zou wo ye zou'],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    expect(find.text('The moon walks with me'), findsOneWidget);
+    expect(find.text('yue liang zou wo ye zou'), findsOneWidget,
+        reason: 'the transliteration keeps its own row — one press does '
+            'not cost the other');
+  });
+
+  testWidgets('a contrast that stands greys its button', (tester) async {
+    final database = _FakeDatabase()..answers[1] = '[00:12.00]月亮走我也走';
+
+    await _pumpPanel(
+      tester,
+      database: database,
+      song: song,
+      extra: [
+        songContrastProvider.overrideWith(
+          (ref, forSong) => Future.value(
+            const SmartSongContrast(
+              sheetDate: '2026-10-29',
+              translation: ['The moon walks with me'],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    final translate = tester.widget<TextButton>(
+      find.ancestor(
+        of: find.text('翻译'),
+        matching: find.byType(TextButton),
+      ),
+    );
+    expect(translate.onPressed, isNull, reason: 'each kind is made once '
+        'per sheet — the words are there, the press has nothing to add');
+    final transliterate = tester.widget<TextButton>(
+      find.ancestor(
+        of: find.text('音译'),
+        matching: find.byType(TextButton),
+      ),
+    );
+    expect(transliterate.onPressed, isNotNull);
   });
 }
 
