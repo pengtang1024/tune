@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
@@ -15,6 +17,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run_lock.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_channel_health_store.dart';
@@ -136,10 +139,22 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
 /// playing, so a long batch does not reload it for every other song.
 void refreshLyricsPanel(Ref ref, Song song) {
   ref.read(lyricsMemoryProvider).forget(song);
+  unawaited(_markLedger(ref, song));
   final current = ref.read(
     playbackControllerProvider.select((state) => state.currentSong?.id),
   );
   if (current == song.id) ref.invalidate(lyricsControllerProvider);
+}
+
+/// Moves the coverage number the moment a sheet lands.
+Future<void> _markLedger(Ref ref, Song song) async {
+  try {
+    final database = await ref.read(appDatabaseProvider.future);
+    database.markSongHasLyrics(song.id);
+  } catch (error, stackTrace) {
+    Log.error('歌词账本更新失败: $error', stackTrace);
+  }
+  ref.invalidate(smartLyricsLedgerProvider);
 }
 
 /// The progress of the smart pipeline's single-song run.

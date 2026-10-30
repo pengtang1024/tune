@@ -48,6 +48,16 @@ void main() {
       expect(ledger.$2, 0);
     });
 
+    test('a sheet that lands while the app runs moves the number', () {
+      final db = AppDatabase.inMemory();
+      db.ingestBatch([const Song(id: 1, uri: '/a.mp3', title: 'A')]);
+
+      db.markSongHasLyrics(1);
+
+      expect(db.lyricsLedgerCounts(), (1, 1),
+          reason: 'the ledger must not wait for the next full scan');
+    });
+
     test('the lyrics fact survives a row written twice', () {
       final db = AppDatabase.inMemory();
       final song = const Song(id: 1, uri: '/a.mp3', title: 'A');

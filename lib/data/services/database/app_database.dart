@@ -1074,6 +1074,17 @@ class AppDatabase {
     return (rows.first['count'] as int?) ?? 0;
   }
 
+  /// Records that the smart pipeline put words next to [songId].
+  ///
+  /// The ledger reads `has_lyrics`; a sheet that lands while the app runs
+  /// must move the number without waiting for the next full scan.
+  void markSongHasLyrics(int songId) {
+    _db.execute(
+      "UPDATE songs SET has_lyrics = 1 WHERE json_extract(json, '\$.id') = ?",
+      [songId],
+    );
+  }
+
   /// How many active tracks carry lyrics, and how many the library holds.
   ///
   /// The lyrics ledger of the settings page reads this — one query over the

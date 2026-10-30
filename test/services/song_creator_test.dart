@@ -80,6 +80,19 @@ void main() {
     expect(scanned!.hasLyrics, isTrue);
   });
 
+  test('a smart sheet next to the audio counts as lyrics', () async {
+    final file = File(path.join(library.path, 'Generated.mp3'))
+      ..writeAsStringSync('not really audio');
+    File(path.join(library.path, 'Generated.smart.lrc')).writeAsStringSync(
+      '[tune:smart]\n[00:01.00]一句词',
+    );
+
+    final scanned = await SongCreator.createFromFile(file);
+
+    expect(scanned!.hasLyrics, isTrue,
+        reason: 'the pipeline filled the gap; a rescan must see it');
+  });
+
   test('a file without a lyrics sheet carries none', () async {
     final file = File(path.join(library.path, 'Bare.mp3'))
       ..writeAsStringSync('not really audio');

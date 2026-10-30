@@ -11,15 +11,18 @@ class SongCreator {
   /// Whether a lyrics sheet sits next to [file].
   ///
   /// The names are the ones the app reads and writes the sheets under
-  /// (`LibraryPaths`): the sheet the app matched (`<name>.lrc`) and the one
-  /// the reader brought (`<name>.manual.lrc`). One `exists()` per name is
+  /// (`LibraryPaths`): the sheet the app matched (`<name>.lrc`), the one
+  /// the reader brought (`<name>.manual.lrc`), and the one the smart
+  /// pipeline wrote (`<name>.smart.lrc`). One `exists()` per name is
   /// nothing next to the metadata read every scan already pays for.
   static Future<bool> _hasLyricsSheet(File file, String fileName) async {
     final folder = file.parent;
-    if (await File(path.join(folder.path, '$fileName.lrc')).exists()) {
-      return true;
+    for (final suffix in const ['.lrc', '.manual.lrc', '.smart.lrc']) {
+      if (await File(path.join(folder.path, '$fileName$suffix')).exists()) {
+        return true;
+      }
     }
-    return File(path.join(folder.path, '$fileName.manual.lrc')).exists();
+    return false;
   }
 
   /// 从文件创建歌曲对象
