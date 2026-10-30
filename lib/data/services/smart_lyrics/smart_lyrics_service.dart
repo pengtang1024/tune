@@ -97,6 +97,11 @@ class SmartLyricsService {
   final StreamUrlResolver? resolver;
   final Dio _dio;
 
+  /// The program that turns a format the local engines cannot read into
+  /// the 16 kHz mono WAV they can. Missing is not an error: the engines
+  /// then try the original file and fail soft.
+  final String ffmpegBinary;
+
   /// Set once the first download of this service cleaned the folders a
   /// killed run left behind.
   Future<void>? _cleaned;
@@ -109,6 +114,7 @@ class SmartLyricsService {
     this.knowledgeModels = const [],
     this.resolver,
     this.health,
+    this.ffmpegBinary = 'ffmpeg',
     Dio? dio,
   }) : _dio = dio ?? Dio();
 
@@ -256,7 +262,8 @@ class SmartLyricsService {
     final ledger = health;
     if (ledger == null) return true;
     if (_probeAlive[channelId] == true) return true;
-    if (ledger.healthOf(channelId).usable) return true;
+    final healthNow = ledger.healthOf(channelId);
+    if (healthNow.usable) return true;
     final now = DateTime.now();
     final last = _probes[channelId];
     if (last != null && now.difference(last) < _probeInterval) return false;
@@ -431,7 +438,9 @@ class SmartLyricsService {
   /// pulled into a temporary file that the run deletes when it is done.
   Future<(File?, bool)> _audioFor(Song song) async {
     final local = song.localFile;
-    if (local != null && local.isNotEmpty) return (File(local), false);
+    if (local != null && local.isNotEmpty) {
+      return _decoded(song, File(local), false);
+    }
     // A live stream never ends: downloading it would fill the disk and
     // hang the batch on a song that has no fixed words.
     if (song.isLiveStream) return (null, false);
@@ -445,13 +454,61 @@ class SmartLyricsService {
       folder = await Directory.systemTemp.createTemp('tune_smart_audio');
       final file = File(path.join(folder.path, 'audio'));
       await _dio.download(url, file.path);
-      return (file, true);
+      return await _decoded(song, file, true);
     } catch (error, stackTrace) {
       Log.error('取音频失败: $error', stackTrace);
       // A download that died halfway leaves a folder of bytes behind: it
       // is the run's own mess, so the run cleans it.
       if (folder != null) await _discardFolder(folder);
       return (null, false);
+    }
+  }
+
+  /// The audio as the local engines read it: 16 kHz mono WAV.
+  ///
+  /// whisper.cpp and sherpa-onnx both read WAV; an m4a podcast or an mp4
+  /// makes them exit without words. ffmpeg is used when the machine has
+  /// it — no bundle, no download — and a missing ffmpeg leaves the
+  /// original file for the engines to try.
+  Future<(File?, bool)> _decoded(
+    Song song,
+    File audio,
+    bool temporary,
+  ) async {
+    final source = song.localFile ?? song.streamUrl ?? song.uri;
+    final extension = path
+        .extension(Uri.tryParse(source)?.path ?? source)
+        .toLowerCase();
+    if (extension == '.wav') return (audio, temporary);
+
+    final folder = temporary
+        ? audio.parent
+        : await Directory.systemTemp.createTemp('tune_smart_audio');
+    final wav = File(path.join(folder.path, 'decoded.wav'));
+    try {
+      final result = await Process.run(ffmpegBinary, [
+        '-y',
+        '-loglevel',
+        'error',
+        '-i',
+        audio.path,
+        '-ar',
+        '16000',
+        '-ac',
+        '1',
+        '-f',
+        'wav',
+        wav.path,
+      ]);
+      if (result.exitCode != 0 || !await wav.exists()) {
+        if (!temporary) await _discardFolder(folder);
+        return (audio, temporary);
+      }
+      return (wav, true);
+    } catch (error, stackTrace) {
+      Log.error('音频转码失败: $error', stackTrace);
+      if (!temporary) await _discardFolder(folder);
+      return (audio, temporary);
     }
   }
 

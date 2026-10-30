@@ -106,6 +106,7 @@ void main() {
     SmartTextAssist? assist,
     List<String> knowledgeModels = const [],
     ChannelHealthLedger? health,
+    String ffmpegBinary = 'ffmpeg',
   }) => SmartLyricsService(
     engines: engines,
     humanPool: humanPool,
@@ -113,6 +114,7 @@ void main() {
     assist: assist,
     knowledgeModels: knowledgeModels,
     health: health,
+    ffmpegBinary: ffmpegBinary,
   );
 
   List<TranscribedSegment> segmentsOf(List<String> words) => [
@@ -270,6 +272,46 @@ void main() {
     await service(engines: [engine]).generate(local);
 
     expect(engine.asked.single.path, audio.path);
+  });
+
+  test('an m4a is turned into wav before the local engines read it',
+      () async {
+    final m4a = File(path.join(root.path, 'So What.m4a'))
+      ..writeAsStringSync('not really audio');
+    final fake = File(path.join(root.path, 'ffmpeg.sh'));
+    await fake.writeAsString(
+      '#!/usr/bin/env bash\nout="\${@: -1}"\nprintf RIFF > "\$out"\n',
+    );
+    await Process.run('chmod', ['+x', fake.path]);
+    final engine = _Engine('local:tiny', answer: segmentsOf(['一句']));
+
+    final outcome = await service(
+      engines: [engine],
+      ffmpegBinary: fake.path,
+    ).generate(
+      Song(id: 1, title: 'So What', artist: 'Miles', uri: m4a.path),
+    );
+
+    expect(outcome.saved, isTrue);
+    expect(engine.asked.single.path, endsWith('decoded.wav'),
+        reason: 'whisper and sherpa both read WAV; m4a makes them exit');
+  });
+
+  test('without ffmpeg the original file still goes to the engine',
+      () async {
+    final m4a = File(path.join(root.path, 'So What.m4a'))
+      ..writeAsStringSync('not really audio');
+    final engine = _Engine('local:tiny', answer: segmentsOf(['一句']));
+
+    await service(
+      engines: [engine],
+      ffmpegBinary: '/no/such/ffmpeg',
+    ).generate(
+      Song(id: 1, title: 'So What', artist: 'Miles', uri: m4a.path),
+    );
+
+    expect(engine.asked.single.path, endsWith('.m4a'),
+        reason: 'a machine without ffmpeg falls back to what it has');
   });
 
   test('a live stream is never fetched — no fixed recording, no words',

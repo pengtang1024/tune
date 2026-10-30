@@ -77,6 +77,12 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
   // system already has first, the downloaded one as the fallback. The
   // folders are resolved once per run of the pipeline, not per song.
   final local = localModel.trim();
+  // Without a key the default endpoints answer 401 on every song; a
+  // keyless local endpoint is the one exception worth asking.
+  final cloud =
+      apiKey.trim().isNotEmpty ||
+      baseUrl.contains('localhost') ||
+      baseUrl.contains('127.0.0.1');
   final chatModelList = [
     for (final model in chatModel.split(','))
       if (model.trim().isNotEmpty) model.trim(),
@@ -85,8 +91,9 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
 
   return SmartLyricsService(
     engines: [
-      for (final model in asrModels)
-        OpenAiCompatibleEngine(model: model, client: client),
+      if (cloud)
+        for (final model in asrModels)
+          OpenAiCompatibleEngine(model: model, client: client),
       if (local.isNotEmpty)
         WhisperLocalEngine(
           model: local,
@@ -122,10 +129,10 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     health: ref.watch(smartLyricsChannelHealthProvider),
     // The correction runs on the first model; every listed model casts a
     // knowledge ballot — two families make the class speak (§7.6).
-    assist: chatModelList.isEmpty
+    assist: !cloud || chatModelList.isEmpty
         ? null
         : SmartTextAssist(client: client, model: chatModelList.first),
-    knowledgeModels: chatModelList,
+    knowledgeModels: cloud ? chatModelList : const [],
     resolver: resolver,
   );
 });
