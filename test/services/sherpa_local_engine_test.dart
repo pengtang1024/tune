@@ -127,6 +127,27 @@ JSON
     );
   });
 
+  test('a cancelled run does not poison the channel for the next song',
+      () async {
+    final binary = await installBinary(r'''
+sleep 0.3
+cat <<'JSON'
+{"tokens": ["甲"], "timestamps": [0.5]}
+JSON
+''');
+    final engine = engineOf(binary);
+    final input = SmartAudioInput(audio: audio, title: 'One', artist: 'A');
+
+    final first = engine.runTranscription(input);
+    engine.requestCancel();
+    await expectLater(first, throwsA(isA<SherpaLocalException>()));
+
+    final second = await engine.runTranscription(input);
+
+    expect(second.segments, isNotEmpty,
+        reason: 'a cancel stops one run, not the channel');
+  });
+
   test('a WAV that is not 16 kHz mono never reaches the binary', () async {
     final marker = File('${root.path}/started');
     final binary = await installBinary('touch ${marker.path}; exit 0');

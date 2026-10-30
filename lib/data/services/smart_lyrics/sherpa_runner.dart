@@ -18,6 +18,10 @@ class SherpaRunner {
 
   bool get cancelled => _cancelled;
 
+  /// A cancel belongs to the run it stopped, not to the channel: the next
+  /// song must be able to use the engine again.
+  void reset() => _cancelled = false;
+
   /// Runs [arguments] through [binary] and returns stdout.
   Future<String> run(File binary, List<String> arguments) async {
     final command = await SherpaProcessLimit.wrap(binary.path, arguments);

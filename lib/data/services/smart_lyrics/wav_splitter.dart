@@ -44,11 +44,15 @@ extension WavSplitting on WavFile {
       for (var start = 0; start < dataSize; start += bytes) {
         final span = math.min(bytes, dataSize - start);
         await source.setPosition(dataOffset + start);
-        final samples = await source.read(span);
+        final samples = await _readFully(source, span);
+        if (samples.isEmpty) break;
+        // A file that ended early gets a header for what it actually
+        // holds, never for the bytes it promised.
+        final actual = samples.length;
         final target = File('${folder.path}/part-${start ~/ bytes}.wav');
         final sink = await target.open(mode: FileMode.write);
         try {
-          await sink.writeFrom(_headerFor(span));
+          await sink.writeFrom(_headerFor(actual));
           await sink.writeFrom(samples);
         } finally {
           await sink.close();
@@ -59,13 +63,29 @@ extension WavSplitting on WavFile {
             microseconds: start * 1000000 ~/ (_frameBytes * sampleRate),
           ),
           length: Duration(
-            microseconds: span * 1000000 ~/ (_frameBytes * sampleRate),
+            microseconds: actual * 1000000 ~/ (_frameBytes * sampleRate),
           ),
         );
       }
     } finally {
       await source.close();
     }
+  }
+
+  /// Reads [count] bytes, or what is left when the file ends early.
+  static Future<Uint8List> _readFully(
+    RandomAccessFile source,
+    int count,
+  ) async {
+    final builder = BytesBuilder(copy: false);
+    var remaining = count;
+    while (remaining > 0) {
+      final chunk = await source.read(remaining);
+      if (chunk.isEmpty) break;
+      builder.add(chunk);
+      remaining -= chunk.length;
+    }
+    return builder.takeBytes();
   }
 
   /// A canonical 44-byte header for one piece of 16-bit PCM.

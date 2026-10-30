@@ -66,6 +66,7 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     SmartAudioInput input, {
     void Function(double progress)? onProgress,
   }) async {
+    _runner.reset();
     final target = await _target();
     final wav = await _readableAudio(input.audio);
 
