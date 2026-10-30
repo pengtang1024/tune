@@ -47,7 +47,7 @@ class SmartLyricsTaskStore {
     final db = await _db();
     // Radio is not a gap: drop any task an older queue left for a live
     // stream before counting the new gap.
-    db.dropLiveStreamTasks();
+    db.dropUnqueueableTasks();
     return db.enqueueMissingTasks(now: _now());
   }
 
@@ -146,6 +146,11 @@ class SmartLyricsTaskStore {
   /// card offers after a new source or a new model was configured.
   Future<int> requeueFailed({int? maxAttempts}) async =>
       (await _db()).requeueFailedTasks(now: _now(), maxAttempts: maxAttempts);
+
+  /// Drops the tasks the automatic queue does not take: live streams and
+  /// spoken word over ten minutes.
+  Future<int> dropUnqueueable() async =>
+      (await _db()).dropUnqueueableTasks();
 
   /// Puts the tasks a dead run left `running` back in line.
   Future<int> requeueInterrupted() async =>

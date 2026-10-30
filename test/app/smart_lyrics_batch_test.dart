@@ -425,6 +425,9 @@ class _MemoryStore extends SmartLyricsTaskStore {
   }
 
   @override
+  Future<int> dropUnqueueable() async => 0;
+
+  @override
   Future<int> requeueInterrupted() async {
     var moved = 0;
     for (final entry in states.entries.toList()) {

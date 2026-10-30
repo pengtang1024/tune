@@ -107,6 +107,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
     _stopped = false;
     final store = ref.read(smartLyricsTaskStoreProvider);
     try {
+      await store.dropUnqueueable();
       await store.requeueInterrupted();
       await store.requeueFailed();
       await _drain(store);

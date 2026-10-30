@@ -179,6 +179,32 @@ void main() {
         reason: 'the reader pressing retry is not capped');
   });
 
+  test('a spoken-word track over ten minutes is not queued', () async {
+    db.ingestBatch([
+      const Song(id: 1, uri: '/audiobook.mp3', title: 'Book', duration: 900000),
+      const Song(id: 2, uri: '/song.mp3', title: 'Song', duration: 300000),
+    ]);
+
+    expect(await store.enqueueMissing(), 1);
+    expect((await store.nextPending())?.id, 2,
+        reason: 'an audiobook is not a song; the panel can still run it');
+  });
+
+  test('a long task an older queue left is dropped', () async {
+    db.ingestBatch([
+      const Song(id: 1, uri: '/book.mp3', title: 'Book'),
+    ]);
+    await store.enqueueMissing();
+
+    db.ingestBatch([
+      const Song(id: 1, uri: '/book.mp3', title: 'Book', duration: 900000),
+    ]);
+    await store.enqueueMissing();
+
+    expect(await store.nextPending(), isNull);
+    expect((await store.counts()).values.fold<int>(0, (a, b) => a + b), 0);
+  });
+
   test('a live stream is not a gap: no task, no ledger entry', () async {
     db.ingestBatch([
       const Song(

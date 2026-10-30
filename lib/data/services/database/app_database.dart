@@ -1085,6 +1085,11 @@ class AppDatabase {
     );
   }
 
+  /// A track longer than ten minutes is spoken word (audiobook/podcast),
+  /// not a song: it stays out of the automatic queue and the coverage
+  /// denominator. The panel's manual generate still handles it.
+  static const int longAudioMs = 10 * 60 * 1000;
+
   /// How many active tracks carry lyrics, and how many the library holds.
   ///
   /// The lyrics ledger of the settings page reads this — one query over the
@@ -1099,7 +1104,8 @@ class AppDatabase {
           "  AND t.status IN ('done', 'disputed')"
           ') THEN 1 ELSE 0 END) AS with_lyrics '
           'FROM songs WHERE active = 1 '
-          "AND json_extract(json, '\$.isLiveStream') IS NOT 1",
+          "AND json_extract(json, '\$.isLiveStream') IS NOT 1 "
+          "AND COALESCE(json_extract(json, '\$.duration'), 0) <= $longAudioMs",
         )
         .first;
     final total = row['total'] as int? ?? 0;
@@ -1229,6 +1235,7 @@ class AppDatabase {
         'FROM songs '
         "WHERE active = 1 AND has_lyrics = 0 "
         "AND json_extract(json, '\$.isLiveStream') IS NOT 1 "
+        "AND COALESCE(json_extract(json, '\$.duration'), 0) <= $longAudioMs "
         'AND NOT EXISTS ('
         "  SELECT 1 FROM smart_lyrics_tasks t "
         "  WHERE t.song_id = json_extract(json, '\$.id')"
@@ -1255,6 +1262,8 @@ class AppDatabase {
           'SELECT COUNT(*) AS n FROM songs '
           "WHERE active = 1 AND has_lyrics = 0 "
           "AND json_extract(songs.json, '\$.isLiveStream') IS NOT 1 "
+          "AND COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+          "  <= $longAudioMs "
           'AND NOT EXISTS ('
           "  SELECT 1 FROM smart_lyrics_tasks t "
           "  WHERE t.song_id = json_extract(songs.json, '\$.id')"
@@ -1360,14 +1369,17 @@ class AppDatabase {
     return _db.updatedRows;
   }
 
-  /// Drops the tasks of live streams: a radio station has no fixed
-  /// recording to transcribe, so a queued task for one is a wait that can
-  /// never end.
-  int dropLiveStreamTasks() {
+  /// Drops the tasks of tracks the automatic queue does not take: a live
+  /// stream has no fixed recording, and a track over ten minutes is
+  /// spoken word. Both wait forever; the panel can still generate them
+  /// one at a time.
+  int dropUnqueueableTasks() {
     _db.execute(
       'DELETE FROM smart_lyrics_tasks WHERE song_id IN ('
       "SELECT json_extract(json, '\$.id') FROM songs "
-      "WHERE json_extract(json, '\$.isLiveStream') = 1)",
+      "WHERE json_extract(json, '\$.isLiveStream') = 1 "
+      "  OR COALESCE(json_extract(json, '\$.duration'), 0) > $longAudioMs"
+      ") AND status IN ('pending', 'failed', 'running')",
     );
     return _db.updatedRows;
   }
@@ -1391,11 +1403,13 @@ class AppDatabase {
       "SELECT songs.json AS json FROM smart_lyrics_tasks t "
       "JOIN songs ON songs.active = 1 "
       "  AND json_extract(songs.json, '\$.id') = t.song_id "
-      "WHERE t.status IN ('failed', 'disputed') "
+      "WHERE (t.status IN ('failed', 'disputed') "
       'OR EXISTS ('
       "  SELECT 1 FROM smart_lyrics_marks m "
       "  WHERE m.song_id = t.song_id AND m.state = 'uncleared'"
-      ') '
+      ')) '
+      "AND COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+      "  <= $longAudioMs "
       'ORDER BY t.song_id LIMIT ?',
       [limit],
     );

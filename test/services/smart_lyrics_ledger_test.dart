@@ -58,6 +58,22 @@ void main() {
           reason: 'the ledger must not wait for the next full scan');
     });
 
+    test('spoken word over ten minutes stays out of the denominator', () {
+      final db = AppDatabase.inMemory();
+      db.ingestBatch([
+        const Song(id: 1, uri: '/song.mp3', title: 'Song', duration: 300000),
+        const Song(
+          id: 2,
+          uri: '/book.mp3',
+          title: 'Book',
+          duration: 900000,
+        ),
+      ]);
+
+      expect(db.lyricsLedgerCounts(), (1, 0),
+          reason: 'an audiobook is not a song the coverage promises');
+    });
+
     test('a remote song whose smart task is done counts as having words', () {
       final db = AppDatabase.inMemory();
       db.ingestBatch([
