@@ -235,6 +235,7 @@ LyricsController._lyricsFor(song)
 | 隐私 | 零外发；引擎与模型下载（含校验和）是唯一一次网络行为 |
 | M4 已落地 | `WhisperLocalEngine`（子进程转写，`requestCancel` 可中途杀掉，产物只在干净退出后读、成败都清理）+ `WhisperAssets`（系统 PATH 优先、可执行位判定、app 目录兜底）+ `WhisperModelStore`（从 whisper.cpp 官方模型仓下载，sha256 对照官方 tree API 的 LFS 清单，不符即销毁）；设置卡「本地引擎」下拉选模型 + 「下载模型」按钮，`local:<模型名>` 作为一张永远免费的机器票进池 |
 | M12 已落地 | **第二 ASR 家族（SenseVoice via sherpa-onnx，Apache/MIT）**：`SherpaLocalEngine` 子进程转 stdout JSON，按词级起止的**静默间隙切行**（与 whisper 段模型是两种独立计时法）；id `local:sensevoice` 与 whisper 家族天然独立互证；本机真音频验证 9 段带真实时刻；装于 `~/.local/opt/sherpa-onnx`，未装的机器该通道软失败、健康度挂起 |
+| M12 护栏（2026-10-30） | 编码器**非流式**：自注意力是 T×T，内存随时长**平方**增长。2549 s 的合法 16 kHz 单声道 WAV 让 `/encoder/encoders0.0/self_attn/MatMul` 要 28.9 GB（T=42483），ONNX Runtime 的 BFC arena 再向内核要 128 GiB，本机因此三次全局 OOM、桌面版 IPC 断链。现在两道墙：`WavFile` 先读 RIFF 头（`fmt`/`data` 长度必须与文件相符、必须 16 kHz 单声道 PCM，否则软失败）+ 按 5 分钟切片（2549 s 峰值 1.8 GB），每片跑在 `systemd-run --scope -p MemoryMax=4G -p MemorySwapMax=0` 里，越界只死自己 |
 | 结论 | **免费票**与异构第二票：一个按钮装好，装了就永远有一票不花钱 |
 
 ### 6.3 票池与共识（核心算法）
@@ -442,7 +443,7 @@ lib/features/settings/             # settings_pane 挂「智能歌词」卡（�
 | 识别结果遮挡未来补上的真词 | 错词常驻 | smart 永远垫底 + 「重新查找」顶掉 + 头部注释声明来源 |
 | 密钥明文落盘 | 本机泄露面 | 与音源凭据同一现状同一待遇，文档写明 |
 | 远程同名曲共享同一 `.smart.lrc` | 两首同名曲互相覆盖词稿 | **已知限制，暂不修**：改布局会造成旧文件迁移孤儿；读取顺序仍是 manual > lrc > smart，重新查找可顶掉 |
-| 长播客/有声书单首转写数分钟 | 批量推进慢 | 后台一首一首跑、断点续跑；自动补齐不设时限，进度落库；长文件不阻塞后续重启 |
+| 长播客/有声书单首转写数分钟 | 批量推进慢 | 后台一首一首跑、断点续跑；自动补齐不设时限，进度落库；长文件不阻塞后续重启。**且必须切片**：非流式编码器的注意力是 T×T，42.5 分钟喂整段曾申请 28.9 GB、外带 128 GiB 的 arena 扩张，把整台机器拖进 OOM（2026-10-30） |
 | 无系统 ffmpeg 的机器读不了 m4a | 该格式没有本机票 | 通道软失败、健康度熔断；whisper 能读的 mp3/ogg/flac/wav 照常；不下载、不捆绑 |
 
 **回退**：M0（统计）、M2（票池与单曲）、M4（本地）、M5（批量与查漏）、M6（标记）、

@@ -1,19 +1,17 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:tune/data/services/smart_lyrics/sherpa_local_exception.dart';
+import 'package:tune/data/services/smart_lyrics/sherpa_runner.dart';
+import 'package:tune/data/services/smart_lyrics/sherpa_transcript.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
+import 'package:tune/data/services/smart_lyrics/wav_file.dart';
+import 'package:tune/data/services/smart_lyrics/wav_splitter.dart';
 import 'package:tune/utils/logger.dart';
 
-/// The local sherpa-onnx channel failed (docs/smart-lyrics.md §6.2, M12).
-class SherpaLocalException implements Exception {
-  final String message;
+export 'package:tune/data/services/smart_lyrics/sherpa_local_exception.dart';
 
-  const SherpaLocalException(this.message);
-
-  @override
-  String toString() => 'SherpaLocalException: $message';
-}
+/// The binary, the model and the tokens of one channel.
+typedef _Target = ({File binary, File tokens, File onnx});
 
 /// The second ASR family the confidence story needs (M12): SenseVoice via
 /// sherpa-onnx — Apache/MIT licensed, free, offline, and a **different
@@ -22,6 +20,13 @@ class SherpaLocalException implements Exception {
 /// The binary prints one JSON of token-level timestamps to stdout; the
 /// engine cuts the text into lines at the silences between tokens — a
 /// timing method genuinely independent of whisper's segment model.
+///
+/// The encoder is not streaming: it builds a T×T self-attention map from the
+/// whole file, so memory grows with the square of the length. A 42-minute
+/// track asked for 28.9 GB in one buffer and 128 GiB from the kernel, which
+/// took the desktop down (2026-10-30). Two walls keep that from happening
+/// again: the audio is cut into [chunk] long pieces, and every piece runs
+/// under a 4 GB memory ceiling ([SherpaProcessLimit]).
 class SherpaLocalEngine extends SmartLyricsEngine {
   /// The model name the channel votes under — `sensevoice`.
   final String model;
@@ -33,23 +38,56 @@ class SherpaLocalEngine extends SmartLyricsEngine {
   /// model is not downloaded.
   final Future<Directory?> Function() modelDirOf;
 
+  /// The longest piece handed to the recognizer at once.
+  ///
+  /// Measured on the crash input: 60 s → 0.5 GB, 300 s → 1.8 GB, 600 s →
+  /// 5.3 GB, 2549 s → 47 GB. Five minutes sits well inside the ceiling.
+  final Duration chunk;
+
+  /// A track longer than this is not a song; a header claiming it is a broken
+  /// file. Both soft-fail the channel.
+  final Duration longestTrack;
+
   SherpaLocalEngine({
     required this.model,
     required this.binaryOf,
     required this.modelDirOf,
+    this.chunk = const Duration(minutes: 5),
+    this.longestTrack = const Duration(hours: 6),
   });
 
   @override
   String get id => 'local:$model';
 
-  Process? _process;
-  var _cancelled = false;
+  final SherpaRunner _runner = SherpaRunner();
 
   @override
   Future<TranscriptionResult> runTranscription(
     SmartAudioInput input, {
     void Function(double progress)? onProgress,
   }) async {
+    final target = await _target();
+    final wav = await _readableAudio(input.audio);
+
+    final folder = await Directory.systemTemp.createTemp('tune_sherpa_parts');
+    try {
+      return await _transcribe(
+        wav: wav,
+        folder: folder,
+        target: target,
+        onProgress: onProgress,
+      );
+    } catch (error, stackTrace) {
+      Log.error('本地 sherpa 转写失败: $error', stackTrace);
+      if (error is SherpaLocalException) rethrow;
+      throw SherpaLocalException('the binary could not run: $error');
+    } finally {
+      await _discard(folder);
+    }
+  }
+
+  /// The channel's files, or the reason there is no channel to run.
+  Future<_Target> _target() async {
     final binary = await binaryOf();
     if (binary == null) {
       throw const SherpaLocalException('sherpa-onnx is not installed');
@@ -65,161 +103,79 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     if (!await tokens.exists() || !await onnx.exists()) {
       throw const SherpaLocalException('the model folder is incomplete');
     }
-
-    _cancelled = false;
-    try {
-      final process = await Process.start(
-        binary.path,
-        [
-          '--tokens=${tokens.path}',
-          '--sense-voice-model=${onnx.path}',
-          '--num-threads=${Platform.numberOfProcessors.clamp(1, 4)}',
-          input.audio.path,
-        ],
-        environment: {
-          ...Platform.environment,
-          'LD_LIBRARY_PATH': _libraryPathOf(binary),
-        },
-      );
-      _process = process;
-
-      // Both pipes listen at once: reading one to the end first would let
-      // the other fill and block the child.
-      final stdoutFuture = process.stdout.transform(utf8.decoder).join();
-      final stderrFuture = process.stderr.transform(utf8.decoder).join();
-      final stdoutText = await stdoutFuture;
-      final stderrText = await stderrFuture;
-      final code = await process.exitCode;
-      if (_cancelled) {
-        throw const SherpaLocalException('the run was cancelled');
-      }
-      if (code != 0) {
-        throw SherpaLocalException(
-          'sherpa-onnx exited with $code: ${stderrText.split('\n').first}',
-        );
-      }
-
-      final result = _parse(stdoutText);
-      onProgress?.call(1.0);
-      return result;
-    } catch (error, stackTrace) {
-      if (error is SherpaLocalException) {
-        Log.error('本地 sherpa 转写失败: $error', stackTrace);
-        rethrow;
-      }
-      Log.error('本地 sherpa 转写失败: $error', stackTrace);
-      throw SherpaLocalException('the binary could not run: $error');
-    } finally {
-      _process = null;
-    }
+    return (binary: binary, tokens: tokens, onnx: onnx);
   }
+
+  /// The audio, or the reason the binary must not see it.
+  ///
+  /// The header is read before the binary does: the header is what sizes its
+  /// buffers, and a file that promises more samples than it holds turns into
+  /// an allocation no machine can serve.
+  Future<WavFile> _readableAudio(File audio) async {
+    final wav = await WavFile.read(audio);
+    if (wav == null) {
+      throw SherpaLocalException('${audio.path} is not a readable wav');
+    }
+    if (!wav.isSpeechReady) {
+      throw SherpaLocalException(
+        'the audio is not 16 kHz mono 16-bit PCM '
+        '(${wav.sampleRate} Hz, ${wav.channels} ch, ${wav.bitsPerSample} bit)',
+      );
+    }
+    if (wav.duration > longestTrack) {
+      throw SherpaLocalException(
+        'the audio claims ${wav.duration.inHours} h — a broken header, '
+        'not a track',
+      );
+    }
+    return wav;
+  }
+
+  /// Runs the pieces one after another and joins their words on one clock.
+  Future<TranscriptionResult> _transcribe({
+    required WavFile wav,
+    required Directory folder,
+    required _Target target,
+    required void Function(double progress)? onProgress,
+  }) async {
+    final total = wav.partCount(chunk);
+    final words = <SherpaWord>[];
+    String? language;
+    var done = 0;
+    await for (final part in wav.parts(folder: folder, chunk: chunk)) {
+      if (_cancelled) throw const SherpaLocalException('the run was cancelled');
+      final answer = decodeSherpaAnswer(await _run(target, part.file));
+      if (answer == null) {
+        throw const SherpaLocalException('the answer has no json');
+      }
+      language ??= answer.language;
+      words.addAll(answer.words.map((word) => word.shifted(part.offset)));
+      await part.file.delete();
+      onProgress?.call(++done / total);
+    }
+    return TranscriptionResult(segments: linesOf(words), language: language);
+  }
+
+  /// One piece through the binary, inside its memory ceiling.
+  Future<String> _run(_Target target, File audio) => _runner.run(target.binary, [
+    '--tokens=${target.tokens.path}',
+    '--sense-voice-model=${target.onnx.path}',
+    '--num-threads=${Platform.numberOfProcessors.clamp(1, 4)}',
+    audio.path,
+  ]);
 
   /// Stops the run; nothing half-written stays because nothing is written.
   @override
-  void requestCancel() {
-    _cancelled = true;
-    _process?.kill();
+  void requestCancel() => _runner.cancel();
+
+  /// Whether the run was cancelled between two pieces.
+  bool get _cancelled => _runner.cancelled;
+
+  static Future<void> _discard(Directory folder) async {
+    try {
+      if (await folder.exists()) await folder.delete(recursive: true);
+    } on FileSystemException catch (error) {
+      Log.error('临时分片清理失败: $error');
+    }
   }
-
-  /// The shared libraries that ride with the binary.
-  static String _libraryPathOf(File binary) {
-    final root = binary.parent.parent.path;
-    final existing = Platform.environment['LD_LIBRARY_PATH'];
-    return existing == null || existing.isEmpty
-        ? '$root/lib'
-        : '$root/lib:$existing';
-  }
-
-  /// The lines of the answer, cut at the silences between tokens.
-  ///
-  /// A gap of 0.6 seconds closes a line; a line also closes after sixteen
-  /// tokens so no monster line swallows the screen. The start of a line
-  /// is its first token's time — a measurement that owes nothing to
-  /// whisper's segment model.
-  TranscriptionResult _parse(String stdoutText) {
-    final line = stdoutText
-        .split('\n')
-        .map((row) => row.trim())
-        .firstWhere((row) => row.startsWith('{'), orElse: () => '');
-    if (line.isEmpty) {
-      throw const SherpaLocalException('the answer has no json');
-    }
-    final decoded = jsonDecode(line);
-    if (decoded is! Map<String, dynamic>) {
-      throw const SherpaLocalException('the answer is not an object');
-    }
-    final tokens = decoded['tokens'];
-    final timestamps = decoded['timestamps'];
-    final durations = decoded['durations'];
-    if (tokens is! List ||
-        timestamps is! List ||
-        durations is! List ||
-        tokens.isEmpty) {
-      // No tokens: no words were heard — silence is an answer, not a crash.
-      return const TranscriptionResult(segments: []);
-    }
-
-    // SenseVoice prints no durations — only starts. The count is tokens
-    // against timestamps; a line's end is a token ahead of its last word.
-    final count = [tokens.length, timestamps.length].reduce(
-      (a, b) => a < b ? a : b,
-    );
-
-    final segments = <TranscribedSegment>[];
-    final words = <String>[];
-    var start = Duration.zero;
-    var end = Duration.zero;
-    var lastStart = Duration.zero;
-    var written = 0;
-
-    void close() {
-      if (words.isEmpty) return;
-      segments.add(
-        TranscribedSegment(
-          start: start,
-          end: end,
-          text: _cleanText(words.join('')),
-        ),
-      );
-      words.clear();
-      written = 0;
-    }
-
-    for (var i = 0; i < count; i++) {
-      final rawToken = '${tokens[i]}';
-      if (rawToken.startsWith('<|') || rawToken == '</s>') continue;
-      final beginSeconds = _secondsOf(timestamps[i]);
-      final begin = Duration(milliseconds: (beginSeconds * 1000).round());
-
-      if (words.isNotEmpty) {
-        final gap = begin - lastStart;
-        if (gap > const Duration(milliseconds: 600) || written >= 40) {
-          close();
-        }
-      }
-      if (words.isEmpty) start = begin;
-      words.add(rawToken.replaceAll('▁', ' '));
-      written += rawToken.length;
-      // The line ends a beat past its last word — no durations to read.
-      end = begin + const Duration(milliseconds: 500);
-      lastStart = begin;
-    }
-    close();
-
-    // SenseVoice prints the language under `lang`; some models use
-    // `language` — take whichever is there.
-    final raw = decoded['language'] ?? decoded['lang'];
-    return TranscriptionResult(
-      segments: segments,
-      language: raw is String ? raw : null,
-    );
-  }
-
-  static double _secondsOf(Object? value) => value is num ? value.toDouble() : 0;
-
-  static String _cleanText(String text) =>
-      text
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .replaceAll(RegExp(r'^[.\s]+'), '')
-          .trim();
 }

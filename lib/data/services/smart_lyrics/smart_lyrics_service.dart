@@ -10,6 +10,7 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_consensus.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
+import 'package:tune/data/services/smart_lyrics/wav_file.dart';
 import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
@@ -479,7 +480,13 @@ class SmartLyricsService {
     final extension = path
         .extension(Uri.tryParse(source)?.path ?? source)
         .toLowerCase();
-    if (extension == '.wav') return (audio, temporary);
+    // A WAV the engines can read goes in as it is. The extension alone is not
+    // the answer: a 44.1 kHz stereo recording is still a WAV, and the local
+    // engines size their buffers from the header, so it has to be read.
+    if (extension == '.wav') {
+      final wav = await WavFile.read(audio);
+      if (wav != null && wav.isSpeechReady) return (audio, temporary);
+    }
 
     final folder = temporary
         ? audio.parent

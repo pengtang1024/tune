@@ -4,18 +4,27 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/smart_lyrics/sherpa_local_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 
+import 'wav_fixture.dart';
+
 /// The second ASR family (docs/smart-lyrics.md §6.2, M12): the sherpa
 /// binary answers with token-level timestamps, and the engine cuts lines
 /// at the silences — a timing method that owes nothing to whisper.
+///
+/// The encoder sizes a T×T attention map from the whole file, so these tests
+/// also hold the two walls that keep a long track from taking the machine
+/// down: the audio is cut into pieces, and only a readable 16 kHz mono WAV
+/// is fed to the binary at all.
 void main() {
   late Directory root;
   late Directory modelDir;
+  late File audio;
 
   setUp(() async {
     root = await Directory.systemTemp.createTemp('tune_sherpa_engine');
     modelDir = Directory('${root.path}/models')..createSync();
     File('${modelDir.path}/tokens.txt').writeAsStringSync('<pad>\t0\n');
     File('${modelDir.path}/model.int8.onnx').writeAsBytesSync([0]);
+    audio = writeWavFile(root, 'one.wav');
   });
 
   tearDown(() async {
@@ -30,13 +39,15 @@ void main() {
     return file;
   }
 
-  SherpaLocalEngine engineOf(File binary) => SherpaLocalEngine(
+  SherpaLocalEngine engineOf(
+    File binary, {
+    Duration chunk = const Duration(minutes: 5),
+  }) => SherpaLocalEngine(
     model: 'sensevoice',
     binaryOf: () async => binary,
     modelDirOf: () async => modelDir,
+    chunk: chunk,
   );
-
-  final audio = File('/no-such-audio.wav');
 
   test('a silence gap closes a line and the line takes the first word\'s '
       'time', () async {
@@ -113,6 +124,73 @@ JSON
         SmartAudioInput(audio: audio, title: 'One', artist: 'Artist'),
       ),
       throwsA(isA<SherpaLocalException>()),
+    );
+  });
+
+  test('a WAV that is not 16 kHz mono never reaches the binary', () async {
+    final marker = File('${root.path}/started');
+    final binary = await installBinary('touch ${marker.path}; exit 0');
+    final stereo = writeWavFile(root, 'stereo.wav', channels: 2);
+
+    await expectLater(
+      engineOf(binary).runTranscription(
+        SmartAudioInput(audio: stereo, title: 'One', artist: 'Artist'),
+      ),
+      throwsA(isA<SherpaLocalException>()),
+    );
+    expect(marker.existsSync(), isFalse,
+        reason: 'the binary is what would size its buffers from the header');
+  });
+
+  test('a header promising more audio than the file holds fails soft',
+      () async {
+    final marker = File('${root.path}/started');
+    final binary = await installBinary('touch ${marker.path}; exit 0');
+    final broken = writeWavFile(
+      root,
+      'broken.wav',
+      frames: 16000,
+      // 128 GiB of samples promised by a 32 KB file.
+      claimedDataSize: 0x7FFFFFFF,
+    );
+
+    await expectLater(
+      engineOf(binary).runTranscription(
+        SmartAudioInput(audio: broken, title: 'One', artist: 'Artist'),
+      ),
+      throwsA(isA<SherpaLocalException>()),
+    );
+    expect(marker.existsSync(), isFalse);
+  });
+
+  test('a long track is cut into pieces and every word keeps its place on '
+      'one clock', () async {
+    final calls = File('${root.path}/calls');
+    final binary = await installBinary('''
+echo x >> ${calls.path}
+cat <<'JSON'
+{"tokens": ["甲", "乙"], "timestamps": [0.5, 1.0]}
+JSON
+''');
+    final long = writeWavFile(root, 'long.wav', frames: 5 * 16000);
+
+    final answer = await engineOf(
+      binary,
+      chunk: const Duration(seconds: 2),
+    ).runTranscription(
+      SmartAudioInput(audio: long, title: 'One', artist: 'Artist'),
+    );
+
+    expect(calls.readAsLinesSync(), hasLength(3),
+        reason: 'five seconds at two per piece is three pieces');
+    expect(
+      answer.segments.map((segment) => segment.start),
+      [
+        const Duration(milliseconds: 500),
+        const Duration(milliseconds: 2500),
+        const Duration(milliseconds: 4500),
+      ],
+      reason: 'the second piece starts where the first one ended',
     );
   });
 }
