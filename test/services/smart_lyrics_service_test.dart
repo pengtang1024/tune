@@ -399,6 +399,34 @@ void main() {
         reason: 'a probe that fails parks the channel for the rest of the run');
   });
 
+  test('a living channel survives one bad file, three in a row park it',
+      () async {
+    final engine = _ScriptedEngine('cloud:flaky', [
+      TranscriptionResult(segments: segmentsOf(['一句'])),
+      StateError('bad file'),
+      StateError('bad file'),
+      StateError('bad file'),
+    ]);
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final ledger = _FakeLedger();
+    for (var i = 0; i < 6; i++) {
+      ledger.record('cloud:flaky', ChannelOutcome.failure);
+    }
+    final pipeline = service(
+      engines: [engine],
+      humanPool: [(name: 'lrclib', provider: human)],
+      health: ledger,
+    );
+
+    for (var i = 0; i < 5; i++) {
+      await pipeline.generate(localSong());
+    }
+
+    expect(engine.calls, 4,
+        reason: 'the probe answered, so one bad file does not park it; '
+            'three failures in a row do');
+  });
+
   test('every answer lands in the ring', () async {
     final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
     final silent = _Engine('cloud:other', empty: true);
@@ -423,6 +451,27 @@ void main() {
 }
 
 /// The rings in memory.
+/// A channel with a script: each call takes the next answer.
+class _ScriptedEngine extends SmartLyricsEngine {
+  _ScriptedEngine(this.id, this.answers);
+
+  @override
+  final String id;
+
+  final List<Object> answers;
+  var calls = 0;
+
+  @override
+  Future<TranscriptionResult> runTranscription(
+    SmartAudioInput input, {
+    void Function(double progress)? onProgress,
+  }) async {
+    final answer = answers[calls++];
+    if (answer is TranscriptionResult) return answer;
+    throw answer;
+  }
+}
+
 /// Paths whose disk refuses every write.
 class _ThrowingPaths implements LibraryPaths {
   @override

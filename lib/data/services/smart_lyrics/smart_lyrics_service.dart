@@ -242,6 +242,9 @@ class SmartLyricsService {
   /// The parked channels a probe brought back this run.
   final Map<String, bool> _probeAlive = {};
 
+  /// Consecutive failures per channel in this run.
+  final Map<String, int> _failStreak = {};
+
   /// Whether the health rings let [channelId] be asked this round.
   ///
   /// The ring has no clock: a parked channel would never be asked again,
@@ -270,10 +273,20 @@ class SmartLyricsService {
   /// burn a whole queue waiting for the ring to climb back.
   void _record(String channelId, ChannelOutcome outcome) {
     health?.record(channelId, outcome);
-    if (_probes.containsKey(channelId)) {
-      _probeAlive[channelId] = outcome != ChannelOutcome.failure;
+    if (outcome == ChannelOutcome.failure) {
+      // One bad file does not condemn a living channel: three failures in
+      // a row do. A single m4a whisper cannot decode must not park the
+      // channel for the rest of a 700-song queue.
+      final streak = (_failStreak[channelId] ?? 0) + 1;
+      _failStreak[channelId] = streak;
+      if (streak >= _failStreakLimit) _probeAlive[channelId] = false;
+      return;
     }
+    _failStreak[channelId] = 0;
+    if (_probes.containsKey(channelId)) _probeAlive[channelId] = true;
   }
+
+  static const _failStreakLimit = 3;
 
   /// The machine channels, one pass each, every draft corrected before it
   /// joins the pool. A channel that fails is skipped — the others still
