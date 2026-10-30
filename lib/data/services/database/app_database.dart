@@ -1092,7 +1092,12 @@ class AppDatabase {
   (int, int) lyricsLedgerCounts() {
     final row = _db
         .select(
-          'SELECT COUNT(*) AS total, SUM(has_lyrics) AS with_lyrics '
+          'SELECT COUNT(*) AS total, '
+          'SUM(CASE WHEN has_lyrics = 1 OR EXISTS ('
+          '  SELECT 1 FROM smart_lyrics_tasks t '
+          "  WHERE t.song_id = json_extract(songs.json, '\$.id') "
+          "  AND t.status IN ('done', 'disputed')"
+          ') THEN 1 ELSE 0 END) AS with_lyrics '
           'FROM songs WHERE active = 1 '
           "AND json_extract(json, '\$.isLiveStream') IS NOT 1",
         )

@@ -58,6 +58,20 @@ void main() {
           reason: 'the ledger must not wait for the next full scan');
     });
 
+    test('a remote song whose smart task is done counts as having words', () {
+      final db = AppDatabase.inMemory();
+      db.ingestBatch([
+        const Song(id: 1, uri: 'tune://source.test/one', title: 'A'),
+      ]);
+      db.enqueueMissingTasks(now: 1);
+      db.beginTaskRun(1, now: 2);
+      db.setTaskOutcome(1, 'done', now: 3);
+
+      expect(db.lyricsLedgerCounts(), (1, 1),
+          reason: 'a scan cannot see the sheet of a remote song; the task '
+              'row is the fact that it was written');
+    });
+
     test('the lyrics fact survives a row written twice', () {
       final db = AppDatabase.inMemory();
       final song = const Song(id: 1, uri: '/a.mp3', title: 'A');
