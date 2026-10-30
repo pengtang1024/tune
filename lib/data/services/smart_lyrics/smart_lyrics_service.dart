@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -325,7 +326,7 @@ class SmartLyricsService {
     // CPU for a marginal second vote. It stays the fallback when the
     // sliced family fails or hears nothing.
     final longAudio =
-        song.duration > const Duration(minutes: 20).inMilliseconds;
+        song.duration > const Duration(minutes: 10).inMilliseconds;
     for (final engine in engines) {
       if (stopped()) break;
       if (longAudio &&
@@ -486,16 +487,26 @@ class SmartLyricsService {
       if (url == null || url.isEmpty) return (null, false);
       folder = await Directory.systemTemp.createTemp('tune_smart_audio');
       final file = File(path.join(folder.path, 'audio'));
-      await _dio.download(
-        url,
-        file.path,
-        options: Options(
-          // A whole song at 64 kbps is a few MB; ninety seconds is a slow
-          // connection, not a dead one. Ten minutes would park the queue.
-          receiveTimeout: const Duration(seconds: 90),
-          sendTimeout: const Duration(seconds: 30),
-        ),
-      );
+      // A stalled or throttled stream must not park a worker forever:
+      // Dio's receiveTimeout only watches the gap between chunks, and a
+      // trickle of bytes never trips it. Two minutes is the whole budget.
+      final cancel = CancelToken();
+      final watchdog = Timer(const Duration(minutes: 2), () {
+        cancel.cancel('the download took too long');
+      });
+      try {
+        await _dio.download(
+          url,
+          file.path,
+          cancelToken: cancel,
+          options: Options(
+            receiveTimeout: const Duration(seconds: 90),
+            sendTimeout: const Duration(seconds: 30),
+          ),
+        );
+      } finally {
+        watchdog.cancel();
+      }
       return await _decoded(song, file, true);
     } catch (error, stackTrace) {
       Log.error('取音频失败: $error', stackTrace);

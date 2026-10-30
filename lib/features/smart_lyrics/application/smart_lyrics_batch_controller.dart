@@ -42,8 +42,8 @@ final smartLyricsBatchCountsProvider = FutureProvider<
 });
 
 /// How many songs the batch may work on at once. Downloads and CPU
-/// overlap; three fits a desktop without starving the player.
-final smartLyricsBatchWorkersProvider = Provider<int>((ref) => 3);
+/// overlap; six keeps a slow host from parking the whole queue.
+final smartLyricsBatchWorkersProvider = Provider<int>((ref) => 6);
 
 /// The pause between two tracks of a batch (docs/smart-lyrics.md §7.2):
 /// the run breathes between songs so it never fights the player for the
@@ -128,7 +128,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
         (state) => state.smartLyrics.batchCloudBudget,
       ),
     );
-    final workers = ref.read(smartLyricsBatchWorkersProvider).clamp(1, 4);
+    final workers = ref.read(smartLyricsBatchWorkersProvider).clamp(1, 6);
     var cloudUsed = 0;
     var budgetReached = false;
 
