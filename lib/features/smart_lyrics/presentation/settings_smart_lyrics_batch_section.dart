@@ -85,6 +85,15 @@ class SmartLyricsBatchSection extends ConsumerWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
+        if (progress.running && progress.progress != null)
+          Padding(
+            padding: const EdgeInsets.only(top: CompactTokens.space6),
+            child: LinearProgressIndicator(
+              key: const ValueKey('smart-lyrics-batch-progress'),
+              value: progress.progress,
+              minHeight: 2,
+            ),
+          ),
         // What a scan brought in since the last press: the queue only
         // moves when the reader says so.
         fresh.when(

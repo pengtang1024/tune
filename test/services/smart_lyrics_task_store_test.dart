@@ -48,6 +48,51 @@ void main() {
     expect(song?.uri, '/b.mp3');
   });
 
+  test('the shortest track runs first, long podcasts last', () async {
+    db.ingestBatch([
+      const Song(id: 1, uri: '/long.mp3', title: 'Long', duration: 300000),
+      const Song(id: 2, uri: '/short.mp3', title: 'Short', duration: 60000),
+      const Song(id: 3, uri: '/medium.mp3', title: 'Medium', duration: 180000),
+    ]);
+    await store.enqueueMissing();
+
+    expect((await store.nextPending())?.id, 2);
+    await store.markRunning(2);
+    await store.markDone(2, votes: 1);
+    expect((await store.nextPending())?.id, 3);
+  });
+
+  test('a local file goes before a stream of the same length', () async {
+    db.ingestBatch([
+      const Song(id: 1, uri: 'tune://source.test/one', title: 'Remote', duration: 60000),
+      const Song(
+        id: 2,
+        uri: '/local.mp3',
+        title: 'Local',
+        duration: 60000,
+        localPath: '/local.mp3',
+      ),
+    ]);
+    await store.enqueueMissing();
+
+    expect((await store.nextPending())?.id, 2,
+        reason: 'a local file needs no network and is the healthy first try');
+  });
+
+  test('a never-tried track goes before a retry of the same length', () async {
+    db.ingestBatch([
+      const Song(id: 1, uri: '/fresh.mp3', title: 'Fresh', duration: 60000),
+      const Song(id: 2, uri: '/retry.mp3', title: 'Retry', duration: 60000),
+    ]);
+    await store.enqueueMissing();
+    await store.markRunning(2);
+    await store.markFailed(2, error: 'gone');
+    await store.requeueFailed(maxAttempts: 5);
+
+    expect((await store.nextPending())?.id, 1,
+        reason: 'the fresh track is the healthier first try; the retry waits');
+  });
+
   test('a marked track goes first, whatever else is in the way', () async {
     ingestLibrary();
     await store.enqueueMissing();
@@ -107,8 +152,12 @@ void main() {
     await store.markRunning(2);
 
     expect(await store.requeueInterrupted(), 1);
+    expect((await store.nextPending())?.id, 3,
+        reason: 'the fresh task is the healthier first try');
+    await store.markRunning(3);
+    await store.markDone(3, votes: 1);
     expect((await store.nextPending())?.id, 2,
-        reason: 'no run is in flight when the queue starts again');
+        reason: 'the interrupted task is back in line, not stuck running');
   });
 
   test('an automatic pass only revives the attempts it has left', () async {

@@ -314,6 +314,63 @@ void main() {
         reason: 'a machine without ffmpeg falls back to what it has');
   });
 
+  test('a long podcast skips whisper once the sliced family has words',
+      () async {
+    final sherpa = _Engine('local:sensevoice', answer: segmentsOf(['一句']));
+    final whisper = _Engine('local:tiny', answer: segmentsOf(['一句']));
+    final podcast = Song(
+      id: 1,
+      title: 'Podcast',
+      artist: 'Host',
+      uri: audio.path,
+      duration: const Duration(hours: 1).inMilliseconds,
+    );
+
+    final outcome = await service(
+      engines: [sherpa, whisper],
+    ).generate(podcast);
+
+    expect(outcome.saved, isTrue);
+    expect(sherpa.asked, isNotEmpty);
+    expect(whisper.asked, isEmpty,
+        reason: 'an hour of speech is not a lyric; the segment model would '
+            'burn minutes of CPU for a marginal second vote');
+  });
+
+  test('a long podcast still falls back to whisper when the slice fails',
+      () async {
+    final sherpa = _Engine('local:sensevoice', error: StateError('no model'));
+    final whisper = _Engine('local:tiny', answer: segmentsOf(['一句']));
+    final podcast = Song(
+      id: 1,
+      title: 'Podcast',
+      artist: 'Host',
+      uri: audio.path,
+      duration: const Duration(hours: 1).inMilliseconds,
+    );
+
+    final outcome = await service(
+      engines: [sherpa, whisper],
+    ).generate(podcast);
+
+    expect(outcome.saved, isTrue);
+    expect(whisper.asked, isNotEmpty,
+        reason: 'the skip is an optimisation, never the only chance');
+  });
+
+  test('progress reaches the caller from zero to one', () async {
+    final engine = _Engine('local:sensevoice', answer: segmentsOf(['一句']));
+    final values = <double>[];
+
+    await service(engines: [engine]).generate(
+      localSong(),
+      onProgress: values.add,
+    );
+
+    expect(values.first, 0);
+    expect(values.last, 1);
+  });
+
   test('a live stream is never fetched — no fixed recording, no words',
       () async {
     final engine = _Engine(

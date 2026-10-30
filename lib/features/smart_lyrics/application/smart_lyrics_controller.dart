@@ -94,13 +94,6 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
       if (cloud)
         for (final model in asrModels)
           OpenAiCompatibleEngine(model: model, client: client),
-      if (local.isNotEmpty)
-        WhisperLocalEngine(
-          model: local,
-          binaryOf: () async => (await assets).findBinary(),
-          modelOf: () async => (await assets).findModel(local),
-          workspaceOf: () async => (await assets).workspace(),
-        ),
       // The second, independent ASR family (M12): SenseVoice via
       // sherpa-onnx when it is installed — a free vote whose lineage
       // (sensevoice) is a different algorithm from whisper's, so the two
@@ -123,6 +116,13 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
           return await dir.exists() ? dir : null;
         },
       ),
+      if (local.isNotEmpty)
+        WhisperLocalEngine(
+          model: local,
+          binaryOf: () async => (await assets).findBinary(),
+          modelOf: () async => (await assets).findModel(local),
+          workspaceOf: () async => (await assets).workspace(),
+        ),
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,

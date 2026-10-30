@@ -414,7 +414,11 @@ class _ScriptedService extends SmartLyricsService {
   var _active = 0;
 
   @override
-  Future<SmartLyricsOutcome> generate(Song song, {bool Function()? cancelled}) {
+  Future<SmartLyricsOutcome> generate(
+    Song song, {
+    bool Function()? cancelled,
+    void Function(double)? onProgress,
+  }) {
     asked.add(song.id);
     _active++;
     if (_active > maxActive) maxActive = _active;

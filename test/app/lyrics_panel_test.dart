@@ -620,7 +620,11 @@ class _GatedService extends SmartLyricsService {
   final List<Song> asked = [];
 
   @override
-  Future<SmartLyricsOutcome> generate(Song song, {bool Function()? cancelled}) {
+  Future<SmartLyricsOutcome> generate(
+    Song song, {
+    bool Function()? cancelled,
+    void Function(double)? onProgress,
+  }) {
     asked.add(song);
     gate ??= Completer<SmartLyricsOutcome>();
     return gate!.future;

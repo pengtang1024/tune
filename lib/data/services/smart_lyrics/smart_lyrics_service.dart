@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission_audit.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_consensus.dart';
@@ -157,8 +158,10 @@ class SmartLyricsService {
   Future<SmartLyricsOutcome> generate(
     Song song, {
     bool Function()? cancelled,
+    void Function(double progress)? onProgress,
   }) async {
     final stopped = cancelled ?? () => false;
+    onProgress?.call(0);
     final (audio, temporary) = await _audioFor(song);
     if (audio == null) {
       return const SmartLyricsOutcome.failed(SmartLyricsFailure.noAudio);
@@ -168,7 +171,13 @@ class SmartLyricsService {
       final origins = <String>[];
       final votes = await _humanVotes(song, origins);
 
-      final machine = await _machineVotes(song, audio, origins, stopped);
+      final machine = await _machineVotes(
+        song,
+        audio,
+        origins,
+        stopped,
+        onProgress,
+      );
       votes.addAll(machine.votes);
       if (stopped()) return const SmartLyricsOutcome.cancelled();
 
@@ -304,13 +313,32 @@ class SmartLyricsService {
     File audio,
     List<String> origins,
     bool Function() stopped,
+    void Function(double progress)? onProgress,
   ) async {
     final votes = <LyricsBallot>[];
     var empty = 0;
     var failed = 0;
+    final total = engines.isEmpty ? 1 : engines.length;
+    var asked = 0;
+    // A podcast of an hour is spoken word, not a lyric: once a sliced
+    // family has words, the whisper segment model would burn minutes of
+    // CPU for a marginal second vote. It stays the fallback when the
+    // sliced family fails or hears nothing.
+    final longAudio =
+        song.duration > const Duration(minutes: 20).inMilliseconds;
     for (final engine in engines) {
       if (stopped()) break;
-      if (!_usable(engine.id)) continue;
+      if (longAudio &&
+          votes.isNotEmpty &&
+          asrFamilyOf(engine.id.split(':').last) == 'whisper') {
+        asked++;
+        onProgress?.call(asked / total);
+        continue;
+      }
+      if (!_usable(engine.id)) {
+        asked++;
+        continue;
+      }
       try {
         final result = await engine.transcribe(
           SmartAudioInput(
@@ -318,6 +346,8 @@ class SmartLyricsService {
             title: song.title,
             artist: song.artist,
           ),
+          onProgress: (value) =>
+              onProgress?.call((asked + value.clamp(0, 1)) / total),
         );
         // A segment with no words is not a line: silence markers and
         // empty rows never reach the sheet.
@@ -350,6 +380,8 @@ class SmartLyricsService {
         failed++;
         Log.error('通道 ${engine.id} 转写失败: $error', stackTrace);
       }
+      asked++;
+      onProgress?.call(asked / total);
     }
     return (votes: votes, empty: empty, failed: failed);
   }

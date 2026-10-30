@@ -1265,27 +1265,36 @@ class AppDatabase {
   }
 
   /// The next queued track to run, in the order the batch keeps:
-  /// a marked track first, then one that was played recently, then one the
-  /// reader likes, then the rest — and within one group the song id decides,
-  /// so an interrupted run resumes where it stood.
+  /// a marked track first; then the shortest track, so the queue shows
+  /// progress before a long podcast; then the healthy ones — a local file
+  /// before a stream, a track that never failed before a retry, fewer
+  /// attempts before more; then recent, liked, and the rest. Within one
+  /// group the song id decides, so an interrupted run resumes where it
+  /// stood.
   ({int songId, String uri})? nextPendingTask() {
     final rows = _db.select(
       "SELECT json_extract(songs.json, '\$.id') AS song_id, songs.uri AS uri "
       'FROM songs '
-      'WHERE songs.active = 1 '
-      'AND EXISTS ('
-      '  SELECT 1 FROM smart_lyrics_tasks t '
-      "  WHERE t.song_id = json_extract(songs.json, '\$.id') AND t.status = 'pending'"
-      ') '
-      'ORDER BY CASE '
-      "  WHEN EXISTS (SELECT 1 FROM smart_lyrics_marks m "
+      'JOIN smart_lyrics_tasks t '
+      "  ON t.song_id = json_extract(songs.json, '\$.id') "
+      'WHERE songs.active = 1 AND t.status = ? '
+      'ORDER BY '
+      '  CASE WHEN EXISTS (SELECT 1 FROM smart_lyrics_marks m '
       "    WHERE m.song_id = json_extract(songs.json, '\$.id') "
-      "    AND m.state = 'uncleared') THEN 0 "
-      '  WHEN songs.last_played IS NOT NULL THEN 1 '
-      '  WHEN EXISTS (SELECT 1 FROM favorites f WHERE f.uri = songs.uri) THEN 2 '
-      '  ELSE 3 '
-      'END, song_id '
+      "    AND m.state = 'uncleared') THEN 0 ELSE 1 END, "
+      "  CASE WHEN COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+      '    <= 0 THEN 1 ELSE 0 END, '
+      "  COALESCE(json_extract(songs.json, '\$.duration'), 0) ASC, "
+      "  CASE WHEN json_extract(songs.json, '\$.localPath') IS NOT NULL "
+      '    THEN 0 ELSE 1 END, '
+      '  CASE WHEN t.last_error IS NULL THEN 0 ELSE 1 END, '
+      '  t.attempts ASC, '
+      '  CASE WHEN songs.last_played IS NOT NULL THEN 0 '
+      '    WHEN EXISTS (SELECT 1 FROM favorites f WHERE f.uri = songs.uri) '
+      '    THEN 1 ELSE 2 END, '
+      '  song_id '
       'LIMIT 1',
+      ['pending'],
     );
     if (rows.isEmpty) return null;
     final row = rows.first;
@@ -1336,7 +1345,7 @@ class AppDatabase {
       // slate, so the attempt count starts over.
       _db.execute(
         "UPDATE smart_lyrics_tasks SET status = 'pending', attempts = 0, "
-        'updated_at = ? '
+        'last_error = NULL, updated_at = ? '
         "WHERE status = 'failed'",
         [now],
       );

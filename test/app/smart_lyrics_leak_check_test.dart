@@ -139,7 +139,11 @@ class _ScriptedService extends SmartLyricsService {
   final List<int> asked = [];
 
   @override
-  Future<SmartLyricsOutcome> generate(Song song, {bool Function()? cancelled}) {
+  Future<SmartLyricsOutcome> generate(
+    Song song, {
+    bool Function()? cancelled,
+    void Function(double)? onProgress,
+  }) {
     asked.add(song.id);
     final answer = answers[song.id];
     if (answer == null) return Future.value(const SmartLyricsOutcome(saved: false));

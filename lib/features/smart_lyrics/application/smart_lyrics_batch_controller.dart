@@ -146,10 +146,29 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
         counts: await store.counts(),
         cloudUsed: cloudUsed,
         cloudBudget: budget > 0 ? budget : null,
+        progress: 0,
       );
 
       try {
-        final outcome = await service.generate(next, cancelled: () => _stopped);
+        var lastProgress = -1.0;
+        final outcome = await service.generate(
+          next,
+          cancelled: () => _stopped,
+          onProgress: (value) {
+            // A whisper pass reports often; two percent is enough for the
+            // bar without rebuilding the card on every line.
+            if (value - lastProgress < 0.02 && value < 1) return;
+            lastProgress = value;
+            state = SmartLyricsBatchProgress(
+              running: true,
+              currentSongId: next.id,
+              counts: state.counts,
+              cloudUsed: cloudUsed,
+              cloudBudget: budget > 0 ? budget : null,
+              progress: value,
+            );
+          },
+        );
         if (_stopped || outcome.cancelled) {
           await store.markPending(next.id);
           break;

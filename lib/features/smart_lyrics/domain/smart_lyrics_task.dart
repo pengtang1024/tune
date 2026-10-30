@@ -48,12 +48,18 @@ class SmartLyricsBatchProgress {
   /// The budget the reader set; `null` when they let the run go unlimited.
   final int? cloudBudget;
 
+  /// How far the current song's transcription has come, 0..1; `null`
+  /// between songs. The card draws a bar with it so a long podcast does
+  /// not look like a hung process.
+  final double? progress;
+
   const SmartLyricsBatchProgress({
     required this.running,
     this.currentSongId,
     this.counts = const {},
     this.cloudUsed = 0,
     this.cloudBudget,
+    this.progress,
   });
 
   /// The account before any run started.
