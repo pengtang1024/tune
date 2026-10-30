@@ -486,7 +486,16 @@ class SmartLyricsService {
       if (url == null || url.isEmpty) return (null, false);
       folder = await Directory.systemTemp.createTemp('tune_smart_audio');
       final file = File(path.join(folder.path, 'audio'));
-      await _dio.download(url, file.path);
+      await _dio.download(
+        url,
+        file.path,
+        options: Options(
+          // A whole song at 64 kbps is a few MB; ninety seconds is a slow
+          // connection, not a dead one. Ten minutes would park the queue.
+          receiveTimeout: const Duration(seconds: 90),
+          sendTimeout: const Duration(seconds: 30),
+        ),
+      );
       return await _decoded(song, file, true);
     } catch (error, stackTrace) {
       Log.error('取音频失败: $error', stackTrace);

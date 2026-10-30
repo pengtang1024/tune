@@ -37,7 +37,7 @@ final smartLyricsChannelHealthProvider = Provider<SmartLyricsChannelHealthStore>
 /// pasted: one channel per transcription model, the text model for the
 /// correction and the knowledge vote, the shared libraries as the human
 /// pool. A change of the config builds the next run on the new voices.
-final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
+SmartLyricsService _buildSmartLyricsService(Ref ref) {
   // Watch the fields the service actually reads: watching the whole
   // config rebuilt the service on every unrelated keystroke.
   final (baseUrl, apiKey, asrModels, chatModel, localModel) = ref.watch(
@@ -135,7 +135,19 @@ final smartLyricsServiceProvider = Provider<SmartLyricsService>((ref) {
     knowledgeModels: cloud ? chatModelList : const [],
     resolver: resolver,
   );
-});
+}
+
+/// The service of the panel and the first batch worker.
+final smartLyricsServiceProvider = Provider<SmartLyricsService>(
+  (ref) => _buildSmartLyricsService(ref),
+);
+
+/// One service per extra batch worker: each owns its engines and its Dio,
+/// so several songs can download and transcribe at the same time.
+final smartLyricsWorkerServiceProvider =
+    Provider.family<SmartLyricsService, int>(
+      (ref, slot) => _buildSmartLyricsService(ref),
+    );
 
 /// Lets the lyrics panel learn a sheet that landed outside its own button.
 ///

@@ -63,6 +63,19 @@ class SmartLyricsTaskStore {
     return database.songWithId(next.songId);
   }
 
+  /// Claims the next queued track for one worker.
+  ///
+  /// The select and the `running` write are two synchronous database calls
+  /// with no `await` between them, so two workers in this isolate cannot
+  /// take the same row.
+  Future<Song?> claimNext() async {
+    final database = await _db();
+    final next = database.nextPendingTask();
+    if (next == null) return null;
+    database.beginTaskRun(next.songId, now: _now());
+    return database.songWithId(next.songId);
+  }
+
   /// A run is on [songId] now; the attempt is counted.
   Future<void> markRunning(int songId) async {
     (await _db()).beginTaskRun(songId, now: _now());

@@ -60,6 +60,8 @@ class WhisperLocalEngine extends SmartLyricsEngine {
   Process? _process;
   bool _cancelled = false;
 
+  static int _runs = 0;
+
   @override
   Future<TranscriptionResult> runTranscription(
     SmartAudioInput input, {
@@ -75,7 +77,9 @@ class WhisperLocalEngine extends SmartLyricsEngine {
     }
 
     final room = await _room();
-    final prefix = '${room.path}/whisper-out';
+    // One run, one prefix: three batch workers share the workspace, and a
+    // fixed name would let one run read another's answer.
+    final prefix = '${room.path}/whisper-out-${_runs++}';
     _cancelled = false;
     try {
       final process = await Process.start(binary.path, [

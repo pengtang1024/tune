@@ -40,6 +40,9 @@ void main() {
       overrides: [
         smartLyricsTaskStoreProvider.overrideWithValue(store),
         smartLyricsServiceProvider.overrideWithValue(service),
+        // One worker keeps the scripted service the only one asked; the
+        // concurrency test below opts into three.
+        smartLyricsBatchWorkersProvider.overrideWithValue(1),
         smartLyricsBatchGapProvider.overrideWithValue(Duration.zero),
         settingsControllerProvider.overrideWith(
           (ref) => SettingsController(persistence),
@@ -266,6 +269,56 @@ void main() {
             'sixth automatic round');
   });
 
+  test('three workers take three songs at once', () async {
+    final store = _MemoryStore([gap, second, third]);
+    final active = _Active();
+    final services = [
+      for (var slot = 0; slot < 3; slot++)
+        _ScriptedService({
+          1: const SmartLyricsOutcome(saved: true, votes: 3),
+          2: const SmartLyricsOutcome(saved: true, votes: 3),
+          3: const SmartLyricsOutcome(saved: true, votes: 3),
+        }, active: active),
+    ];
+    for (final service in services) {
+      for (final id in [1, 2, 3]) {
+        service.gates[id] = Completer<void>();
+      }
+    }
+    final persistence = FakePersistenceService();
+    final container = ProviderContainer(
+      overrides: [
+        smartLyricsTaskStoreProvider.overrideWithValue(store),
+        smartLyricsServiceProvider.overrideWithValue(services[0]),
+        smartLyricsWorkerServiceProvider.overrideWith(
+          (ref, slot) => services[slot],
+        ),
+        smartLyricsBatchWorkersProvider.overrideWithValue(3),
+        smartLyricsBatchGapProvider.overrideWithValue(Duration.zero),
+        settingsControllerProvider.overrideWith(
+          (ref) => SettingsController(persistence),
+        ),
+      ],
+    );
+
+    final run = container
+        .read(smartLyricsBatchControllerProvider.notifier)
+        .start();
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    for (final service in services) {
+      for (final gate in service.gates.values) {
+        if (!gate.isCompleted) gate.complete();
+      }
+    }
+    await run;
+
+    expect(active.max, 3,
+        reason: 'downloads and transcriptions overlap instead of queueing');
+    expect(store.states[1], SmartLyricsTaskStatus.done);
+    expect(store.states[2], SmartLyricsTaskStatus.done);
+    expect(store.states[3], SmartLyricsTaskStatus.done);
+  });
+
   test('an empty queue is an idle batch, not a spinner forever', () async {
     final store = _MemoryStore([]);
     final service = _ScriptedService({});
@@ -318,6 +371,14 @@ class _MemoryStore extends SmartLyricsTaskStore {
       }
     }
     return null;
+  }
+
+  @override
+  Future<Song?> claimNext() async {
+    final song = await nextPending();
+    if (song == null) return null;
+    await markRunning(song.id);
+    return song;
   }
 
   @override
@@ -395,9 +456,18 @@ class _MemoryStore extends SmartLyricsTaskStore {
 
 /// The pipeline with a script: every song answers what the test wrote,
 /// and the concurrency it was asked under is on record.
+/// How many scripted runs were in flight at once, across services.
+class _Active {
+  var value = 0;
+  var max = 0;
+}
+
 class _ScriptedService extends SmartLyricsService {
-  _ScriptedService(this.answers)
+  _ScriptedService(this.answers, {this.active})
     : super(engines: const [], humanPool: const [], paths: _NoPaths());
+
+  /// The shared concurrency account, when a test wants it.
+  final _Active? active;
 
   /// What each song answers: an outcome, or the error it throws.
   final Map<int, Object> answers;
@@ -422,6 +492,11 @@ class _ScriptedService extends SmartLyricsService {
     asked.add(song.id);
     _active++;
     if (_active > maxActive) maxActive = _active;
+    final shared = active;
+    if (shared != null) {
+      shared.value++;
+      if (shared.value > shared.max) shared.max = shared.value;
+    }
     return Future<SmartLyricsOutcome>.sync(() async {
       try {
         final gate = gates[song.id];
@@ -432,6 +507,7 @@ class _ScriptedService extends SmartLyricsService {
         throw answer;
       } finally {
         _active--;
+        active?.value--;
       }
     });
   }

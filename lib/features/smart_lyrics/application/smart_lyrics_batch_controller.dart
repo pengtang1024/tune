@@ -41,6 +41,10 @@ final smartLyricsBatchCountsProvider = FutureProvider<
   return ref.watch(smartLyricsTaskStoreProvider).counts();
 });
 
+/// How many songs the batch may work on at once. Downloads and CPU
+/// overlap; three fits a desktop without starving the player.
+final smartLyricsBatchWorkersProvider = Provider<int>((ref) => 3);
+
 /// The pause between two tracks of a batch (docs/smart-lyrics.md §7.2):
 /// the run breathes between songs so it never fights the player for the
 /// machine. Tests set it to zero.
@@ -119,13 +123,14 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   void stop() => _stopped = true;
 
   Future<void> _drain(SmartLyricsTaskStore store) async {
-    final service = ref.read(smartLyricsServiceProvider);
     final budget = ref.read(
       settingsControllerProvider.select(
         (state) => state.smartLyrics.batchCloudBudget,
       ),
     );
+    final workers = ref.read(smartLyricsBatchWorkersProvider).clamp(1, 4);
     var cloudUsed = 0;
+    var budgetReached = false;
 
     state = SmartLyricsBatchProgress(
       running: true,
@@ -134,57 +139,71 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
       cloudBudget: budget > 0 ? budget : null,
     );
 
-    while (true) {
-      if (_stopped) break;
-      final next = await store.nextPending();
-      if (next == null) break;
-
-      await store.markRunning(next.id);
-      state = SmartLyricsBatchProgress(
-        running: true,
-        currentSongId: next.id,
-        counts: await store.counts(),
-        cloudUsed: cloudUsed,
-        cloudBudget: budget > 0 ? budget : null,
-        progress: 0,
-      );
-
-      try {
-        var lastProgress = -1.0;
-        final outcome = await service.generate(
-          next,
-          cancelled: () => _stopped,
-          onProgress: (value) {
-            // A whisper pass reports often; two percent is enough for the
-            // bar without rebuilding the card on every line.
-            if (value - lastProgress < 0.02 && value < 1) return;
-            lastProgress = value;
-            state = SmartLyricsBatchProgress(
-              running: true,
-              currentSongId: next.id,
-              counts: state.counts,
-              cloudUsed: cloudUsed,
-              cloudBudget: budget > 0 ? budget : null,
-              progress: value,
-            );
-          },
-        );
-        if (_stopped || outcome.cancelled) {
+    Future<void> runWorker(int slot) async {
+      final service = slot == 0
+          ? ref.read(smartLyricsServiceProvider)
+          : ref.read(smartLyricsWorkerServiceProvider(slot));
+      while (true) {
+        if (_stopped || budgetReached) break;
+        final next = await store.claimNext();
+        if (next == null) break;
+        if (_stopped) {
           await store.markPending(next.id);
           break;
         }
-        await store.applyOutcome(next, outcome);
-        if (outcome.saved) refreshLyricsPanel(ref, next);
-        if (_usesCloud(outcome)) cloudUsed++;
-      } catch (error, stackTrace) {
-        Log.error('批量单曲失败: $error', stackTrace);
-        await store.markFailed(next.id, error: '$error');
-      }
+        state = SmartLyricsBatchProgress(
+          running: true,
+          currentSongId: next.id,
+          counts: state.counts,
+          cloudUsed: cloudUsed,
+          cloudBudget: budget > 0 ? budget : null,
+          progress: 0,
+        );
 
-      if (budget > 0 && cloudUsed >= budget) break;
-      final gap = ref.read(smartLyricsBatchGapProvider);
-      if (gap > Duration.zero) await Future<void>.delayed(gap);
+        try {
+          var lastProgress = -1.0;
+          final outcome = await service.generate(
+            next,
+            cancelled: () => _stopped,
+            onProgress: (value) {
+              // A whisper pass reports often; two percent is enough for
+              // the bar without rebuilding the card on every line.
+              if (value - lastProgress < 0.02 && value < 1) return;
+              lastProgress = value;
+              state = SmartLyricsBatchProgress(
+                running: true,
+                currentSongId: next.id,
+                counts: state.counts,
+                cloudUsed: cloudUsed,
+                cloudBudget: budget > 0 ? budget : null,
+                progress: value,
+              );
+            },
+          );
+          if (_stopped || outcome.cancelled) {
+            await store.markPending(next.id);
+            break;
+          }
+          await store.applyOutcome(next, outcome);
+          if (outcome.saved) refreshLyricsPanel(ref, next);
+          if (_usesCloud(outcome)) cloudUsed++;
+        } catch (error, stackTrace) {
+          Log.error('批量单曲失败: $error', stackTrace);
+          await store.markFailed(next.id, error: '$error');
+        }
+
+        if (budget > 0 && cloudUsed >= budget) {
+          budgetReached = true;
+          break;
+        }
+        final gap = ref.read(smartLyricsBatchGapProvider);
+        if (gap > Duration.zero) await Future<void>.delayed(gap);
+      }
     }
+
+    await Future.wait([
+      for (var slot = 0; slot < workers; slot++) runWorker(slot),
+    ]);
 
     state = SmartLyricsBatchProgress(
       running: false,
