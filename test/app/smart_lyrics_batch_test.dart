@@ -253,7 +253,7 @@ void main() {
       () async {
     final store = _MemoryStore([gap])
       ..states[1] = SmartLyricsTaskStatus.failed
-      ..attempts[1] = 3;
+      ..attempts[1] = 5;
     final service = _ScriptedService({
       1: const SmartLyricsOutcome(saved: true, votes: 3),
     });
@@ -262,8 +262,8 @@ void main() {
     await container.read(smartLyricsBatchControllerProvider.notifier).start();
 
     expect(service.asked, isEmpty,
-        reason: 'three failed attempts wait for the reader, not for a '
-            'fourth automatic round');
+        reason: 'five failed attempts wait for the reader, not for a '
+            'sixth automatic round');
   });
 
   test('an empty queue is an idle batch, not a spinner forever', () async {

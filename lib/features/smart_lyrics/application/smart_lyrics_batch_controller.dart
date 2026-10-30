@@ -80,11 +80,11 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
     try {
       // A dead run leaves its task `running` and a transient failure
       // leaves it `failed`; the automatic pass revives both so the
-      // library reaches 100% without a press. A task that burned three
+      // library reaches 100% without a press. A task that burned five
       // attempts waits for the reader's explicit retry.
       await store.requeueInterrupted();
       await store.enqueueMissing();
-      await store.requeueFailed(maxAttempts: 3);
+      await store.requeueFailed(maxAttempts: 5);
       await _drain(store);
     } catch (error, stackTrace) {
       Log.error('批量运行失败: $error', stackTrace);
