@@ -236,13 +236,44 @@ class SmartLyricsService {
     return votes;
   }
 
+  /// When each parked channel was last probed.
+  final Map<String, DateTime> _probes = {};
+
+  /// The parked channels a probe brought back this run.
+  final Map<String, bool> _probeAlive = {};
+
   /// Whether the health rings let [channelId] be asked this round.
-  bool _usable(String channelId) =>
-      health?.healthOf(channelId).usable ?? true;
+  ///
+  /// The ring has no clock: a parked channel would never be asked again,
+  /// so a binary installed after its failures could never come back. A
+  /// parked channel gets one probe when the run starts, then at most one
+  /// every ten minutes — cheap enough to forgive, rare enough not to
+  /// spend a batch on a dead endpoint.
+  bool _usable(String channelId) {
+    final ledger = health;
+    if (ledger == null) return true;
+    if (_probeAlive[channelId] == true) return true;
+    if (ledger.healthOf(channelId).usable) return true;
+    final now = DateTime.now();
+    final last = _probes[channelId];
+    if (last != null && now.difference(last) < _probeInterval) return false;
+    _probes[channelId] = now;
+    return true;
+  }
+
+  static const _probeInterval = Duration(minutes: 10);
 
   /// One answer lands in the ring.
-  void _record(String channelId, ChannelOutcome outcome) =>
-      health?.record(channelId, outcome);
+  ///
+  /// A probe that came back alive keeps the channel in the run even while
+  /// the old failures still weigh the ring down — otherwise a batch would
+  /// burn a whole queue waiting for the ring to climb back.
+  void _record(String channelId, ChannelOutcome outcome) {
+    health?.record(channelId, outcome);
+    if (_probes.containsKey(channelId)) {
+      _probeAlive[channelId] = outcome != ChannelOutcome.failure;
+    }
+  }
 
   /// The machine channels, one pass each, every draft corrected before it
   /// joins the pool. A channel that fails is skipped — the others still

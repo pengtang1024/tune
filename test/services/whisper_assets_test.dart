@@ -45,6 +45,23 @@ void main() {
     );
   });
 
+  test('a desktop launch still finds whisper in the user bin folder',
+      () async {
+    final home = Directory('${root.path}/home')..createSync();
+    final userBin = Directory('${home.path}/.local/bin')
+      ..createSync(recursive: true);
+    final installed = await binaryIn(userBin, 'whisper-cli');
+
+    final assets = WhisperAssets.ofMachine(
+      appFolder: '${root.path}/app',
+      modelsFolder: '${root.path}/models',
+      environment: {'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': home.path},
+    );
+
+    expect((await assets.findBinary())?.path, installed.path,
+        reason: 'a desktop icon does not carry ~/.local/bin in PATH');
+  });
+
   test('without a system binary the app one is used', () async {
     final downloaded = await binaryIn(
       Directory('${root.path}/app')..createSync(recursive: true),

@@ -358,24 +358,45 @@ void main() {
     expect(await paths.readSmartLyrics(localSong()), isNull);
   });
 
-  test('a channel under the health threshold is not asked this round', () async {
+  test('a parked channel is probed once per run, then waits', () async {
     final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
     final human = _Human()..sheets[1] = _sheetText(['一句']);
     final ledger = _FakeLedger();
 
-    // Six failures land before the run: the channel waits out the round.
+    // Six failures land before the run: the channel is parked.
     for (var i = 0; i < 6; i++) {
       ledger.record('cloud:whisper-1', ChannelOutcome.failure);
     }
-
-    await service(
+    final pipeline = service(
       engines: [engine],
       humanPool: [(name: 'lrclib', provider: human)],
       health: ledger,
-    ).generate(localSong());
+    );
 
-    expect(engine.asked, isEmpty, reason: 'the pool stops spending on a '
-        'channel that keeps failing — the failures counted it down');
+    await pipeline.generate(localSong());
+    expect(engine.asked, hasLength(1),
+        reason: 'the first ask is the probe — a binary installed after '
+            'the failures must be able to come back');
+
+    await pipeline.generate(localSong());
+    expect(engine.asked, hasLength(2),
+        reason: 'a probe that answers keeps the channel in the run — the '
+            'old failures no longer outweigh a living channel');
+
+    final broken = _Engine('cloud:broken', error: StateError('gone'));
+    final other = _FakeLedger();
+    for (var i = 0; i < 6; i++) {
+      other.record('cloud:broken', ChannelOutcome.failure);
+    }
+    final pipeline2 = service(
+      engines: [broken],
+      humanPool: [(name: 'lrclib', provider: human)],
+      health: other,
+    );
+    await pipeline2.generate(localSong());
+    await pipeline2.generate(localSong());
+    expect(broken.asked, hasLength(1),
+        reason: 'a probe that fails parks the channel for the rest of the run');
   });
 
   test('every answer lands in the ring', () async {

@@ -34,14 +34,24 @@ class WhisperAssets {
   factory WhisperAssets.ofMachine({
     required String appFolder,
     required String modelsFolder,
-  }) => WhisperAssets(
-    systemFolders: (Platform.environment['PATH'] ?? '')
-        .split(':')
-        .where((folder) => folder.isNotEmpty)
-        .toList(),
-    appFolder: appFolder,
-    modelsFolder: modelsFolder,
-  );
+    Map<String, String>? environment,
+  }) {
+    final env = environment ?? Platform.environment;
+    final home = env['HOME'] ?? '';
+    // A desktop icon starts the app with a lean PATH that often misses
+    // `~/.local/bin`, where a reader's whisper usually sits. Ask the
+    // standard user folders by name, not only by PATH.
+    final folders = <String>{
+      ...(env['PATH'] ?? '').split(':').where((folder) => folder.isNotEmpty),
+      if (home.isNotEmpty) '$home/.local/bin',
+      if (home.isNotEmpty) '$home/bin',
+    };
+    return WhisperAssets(
+      systemFolders: folders.toList(),
+      appFolder: appFolder,
+      modelsFolder: modelsFolder,
+    );
+  }
 
   /// The assets the app opens for itself, under the application support
   /// directory — one folder for the binary the reader may bring and the
