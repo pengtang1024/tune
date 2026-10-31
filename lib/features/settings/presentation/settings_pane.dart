@@ -55,6 +55,11 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   bool _desktopEntryInstalled = false;
 
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _scrollViewKey = GlobalKey();
+
+  /// Set while a nav click animates the page; the scroll spy must not
+  /// fight the animation and land on a section it passes on the way.
+  var _programmaticScroll = false;
 
   final Map<_SettingsSection, GlobalKey> _sectionKeys = {
     for (final section in _SettingsSection.values) section: GlobalKey(),
@@ -98,21 +103,31 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
             children: [
               _header(context, controller),
               Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(
-                    CompactTokens.pageGutter,
-                    CompactTokens.space8,
-                    CompactTokens.pageGutter,
-                    CompactTokens.pageGutter,
-                  ),
-                  child: _body(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is ScrollUpdateNotification ||
+                        notification is ScrollEndNotification) {
+                      _syncSectionWithScroll();
+                    }
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    key: _scrollViewKey,
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(
+                      CompactTokens.pageGutter,
+                      CompactTokens.space8,
+                      CompactTokens.pageGutter,
+                      CompactTokens.pageGutter,
+                    ),
+                    child: _body(
                     context,
                     settings,
                     controller,
-                    libraryReady: library.$1,
-                    scanning: library.$2,
-                    clearing: library.$3,
+                      libraryReady: library.$1,
+                      scanning: library.$2,
+                      clearing: library.$3,
+                    ),
                   ),
                 ),
               ),
@@ -433,22 +448,59 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   void _goTo(_SettingsSection section) {
     setState(() => _section = section);
+    _programmaticScroll = true;
+    Future<void> done;
     if (section == _SettingsSection.overview) {
-      _scrollController.animateTo(
+      done = _scrollController.animateTo(
         0,
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOut,
       );
+    } else {
+      final anchor = _sectionKeys[section]?.currentContext;
+      if (anchor == null) {
+        _programmaticScroll = false;
+        return;
+      }
+      done = Scrollable.ensureVisible(
+        anchor,
+        duration: const Duration(milliseconds: 180),
+        alignment: 0.02,
+        curve: Curves.easeOut,
+      );
+    }
+    done.whenComplete(() {
+      if (mounted) _programmaticScroll = false;
+    });
+  }
+
+  /// Makes the left rail follow the section under the top of the page.
+  void _syncSectionWithScroll() {
+    if (!mounted || _programmaticScroll || _query.isNotEmpty) return;
+    if (_scrollController.offset <= 4) {
+      if (_section != _SettingsSection.overview) {
+        setState(() => _section = _SettingsSection.overview);
+      }
       return;
     }
-    final anchor = _sectionKeys[section]?.currentContext;
-    if (anchor == null) return;
-    Scrollable.ensureVisible(
-      anchor,
-      duration: const Duration(milliseconds: 180),
-      alignment: 0.02,
-      curve: Curves.easeOut,
-    );
+    final viewport =
+        _scrollViewKey.currentContext?.findRenderObject() as RenderBox?;
+    if (viewport == null) return;
+    final top = viewport.localToGlobal(Offset.zero).dy;
+    _SettingsSection? active;
+    for (final section in _SettingsSection.values) {
+      if (!_matches(section)) continue;
+      final box =
+          _sectionKeys[section]?.currentContext?.findRenderObject()
+              as RenderBox?;
+      if (box == null) continue;
+      final cardTop = box.localToGlobal(Offset.zero).dy;
+      if (cardTop <= top + 24) active = section;
+    }
+    final next = active;
+    if (next != null && next != _section) {
+      setState(() => _section = next);
+    }
   }
 
   Widget _sectionCard(
