@@ -67,7 +67,10 @@ void main() {
     final service = FakeDefaultPlayerService();
     await openSettings(tester, service);
 
-    // The card of the desktop sits below the fold of the pane.
+    await tester.tap(find.byKey(const ValueKey('settings-nav-desktop')));
+    await tester.pumpAndSettle();
+
+    // The quick action of the desktop section.
     final button = find.text('设为默认播放器');
     await tester.ensureVisible(button);
     await tester.pumpAndSettle();
@@ -92,6 +95,12 @@ void main() {
   ) async {
     final service = FakeDefaultPlayerService(entryInstalled: false);
     await openSettings(tester, service);
+    await tester.tap(find.byKey(const ValueKey('settings-nav-desktop')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
 
     expect(
       find.text('还没有安装桌面项，先运行 linux/install-desktop-entry.sh'),

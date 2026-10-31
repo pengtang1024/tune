@@ -2885,4 +2885,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageRu => 'Russian';
+
+  @override
+  String get settingsOverview => 'All';
+
+  @override
+  String get settingsSearchHint => 'Search settings';
+
+  @override
+  String get settingsCustomize => 'Customize…';
+
+  @override
+  String get settingsResetSection => 'Reset this section';
+
+  @override
+  String get settingsResetAll => 'Reset everything';
+
+  @override
+  String get settingsResetTitle => 'Reset to defaults?';
+
+  @override
+  String get settingsResetMessage =>
+      'This overwrites the settings of this section. Continue?';
+
+  @override
+  String get settingsResetAllMessage =>
+      'This overwrites every setting. Continue?';
+
+  @override
+  String get settingsPresetAutoScan => 'Automatic scan';
+
+  @override
+  String get settingsPresetAutoScanHint => 'Scan every source on startup';
+
+  @override
+  String get settingsPresetManualScan => 'Manual scan';
+
+  @override
+  String get settingsPresetManualScanHint => 'Update only when you press scan';
+
+  @override
+  String get settingsPresetQueueFirst => 'Queue first';
+
+  @override
+  String get settingsPresetQueueFirstHint =>
+      'A click joins the queue without replacing it';
+
+  @override
+  String get settingsPresetSingleFirst => 'Single track first';
+
+  @override
+  String get settingsPresetSingleFirstHint =>
+      'A click replaces the queue with that track';
+
+  @override
+  String get settingsPresetFavoriteFirst => 'Favorites first';
+
+  @override
+  String get settingsPresetFavoriteFirstHint =>
+      'A double click only likes; a single click still plays';
+
+  @override
+  String get settingsPresetLyricsManual => 'Manual';
+
+  @override
+  String get settingsPresetLyricsManualHint => 'No automatic filling';
+
+  @override
+  String get settingsPresetLyricsBalanced => 'Balanced';
+
+  @override
+  String get settingsPresetLyricsBalancedHint =>
+      'Automatic filling plus periodic recheck';
+
+  @override
+  String get settingsPresetLyricsSaver => 'Battery saver';
+
+  @override
+  String get settingsPresetLyricsSaverHint =>
+      'Automatic filling without periodic recheck';
+
+  @override
+  String get settingsPresetLearnOn => 'Learning on';
+
+  @override
+  String get settingsPresetLearnOnHint =>
+      'Use listening history to improve picks';
+
+  @override
+  String get settingsPresetLearnOff => 'Learning off';
+
+  @override
+  String get settingsPresetLearnOffHint => 'Use only favorites and metadata';
+
+  @override
+  String get settingsPresetTray => 'Keep in tray';
+
+  @override
+  String get settingsPresetTrayHint => 'Keep playing after the window closes';
+
+  @override
+  String get settingsPresetQuit => 'Quit on close';
+
+  @override
+  String get settingsPresetQuitHint => 'Stop playing when the window closes';
 }

@@ -4936,6 +4936,198 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'俄语'**
   String get languageRu;
+
+  /// No description provided for @settingsOverview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部'**
+  String get settingsOverview;
+
+  /// No description provided for @settingsSearchHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索设置'**
+  String get settingsSearchHint;
+
+  /// No description provided for @settingsCustomize.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义…'**
+  String get settingsCustomize;
+
+  /// No description provided for @settingsResetSection.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复本分区默认'**
+  String get settingsResetSection;
+
+  /// No description provided for @settingsResetAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复全部默认'**
+  String get settingsResetAll;
+
+  /// No description provided for @settingsResetTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复默认设置？'**
+  String get settingsResetTitle;
+
+  /// No description provided for @settingsResetMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这会覆盖当前分区的设置，确定继续？'**
+  String get settingsResetMessage;
+
+  /// No description provided for @settingsResetAllMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这会覆盖所有设置，确定继续？'**
+  String get settingsResetAllMessage;
+
+  /// No description provided for @settingsPresetAutoScan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动扫描'**
+  String get settingsPresetAutoScan;
+
+  /// No description provided for @settingsPresetAutoScanHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启动时扫描全部音源'**
+  String get settingsPresetAutoScanHint;
+
+  /// No description provided for @settingsPresetManualScan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动扫描'**
+  String get settingsPresetManualScan;
+
+  /// No description provided for @settingsPresetManualScanHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只在点扫描时更新'**
+  String get settingsPresetManualScanHint;
+
+  /// No description provided for @settingsPresetQueueFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'队列优先'**
+  String get settingsPresetQueueFirst;
+
+  /// No description provided for @settingsPresetQueueFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'点歌加入队列，不替换正在放的'**
+  String get settingsPresetQueueFirstHint;
+
+  /// No description provided for @settingsPresetSingleFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲优先'**
+  String get settingsPresetSingleFirst;
+
+  /// No description provided for @settingsPresetSingleFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'点歌替换队列，只放这一首'**
+  String get settingsPresetSingleFirstHint;
+
+  /// No description provided for @settingsPresetFavoriteFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏优先'**
+  String get settingsPresetFavoriteFirst;
+
+  /// No description provided for @settingsPresetFavoriteFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双击只标喜欢，单击照常'**
+  String get settingsPresetFavoriteFirstHint;
+
+  /// No description provided for @settingsPresetLyricsManual.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动'**
+  String get settingsPresetLyricsManual;
+
+  /// No description provided for @settingsPresetLyricsManualHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不自动补齐'**
+  String get settingsPresetLyricsManualHint;
+
+  /// No description provided for @settingsPresetLyricsBalanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平衡'**
+  String get settingsPresetLyricsBalanced;
+
+  /// No description provided for @settingsPresetLyricsBalancedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐 + 周期查漏'**
+  String get settingsPresetLyricsBalancedHint;
+
+  /// No description provided for @settingsPresetLyricsSaver.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'省电'**
+  String get settingsPresetLyricsSaver;
+
+  /// No description provided for @settingsPresetLyricsSaverHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐，不周期查漏'**
+  String get settingsPresetLyricsSaverHint;
+
+  /// No description provided for @settingsPresetLearnOn.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开启学习'**
+  String get settingsPresetLearnOn;
+
+  /// No description provided for @settingsPresetLearnOnHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用播放历史改进推荐'**
+  String get settingsPresetLearnOnHint;
+
+  /// No description provided for @settingsPresetLearnOff.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭学习'**
+  String get settingsPresetLearnOff;
+
+  /// No description provided for @settingsPresetLearnOffHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只用收藏和元数据'**
+  String get settingsPresetLearnOffHint;
+
+  /// No description provided for @settingsPresetTray.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'托盘常驻'**
+  String get settingsPresetTray;
+
+  /// No description provided for @settingsPresetTrayHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关窗口继续播放'**
+  String get settingsPresetTrayHint;
+
+  /// No description provided for @settingsPresetQuit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭即退出'**
+  String get settingsPresetQuit;
+
+  /// No description provided for @settingsPresetQuitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关窗口就停止播放'**
+  String get settingsPresetQuitHint;
 }
 
 class _AppLocalizationsDelegate

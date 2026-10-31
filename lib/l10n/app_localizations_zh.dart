@@ -2671,6 +2671,102 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageRu => '俄语';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜索设置';
+
+  @override
+  String get settingsCustomize => '自定义…';
+
+  @override
+  String get settingsResetSection => '恢复本分区默认';
+
+  @override
+  String get settingsResetAll => '恢复全部默认';
+
+  @override
+  String get settingsResetTitle => '恢复默认设置？';
+
+  @override
+  String get settingsResetMessage => '这会覆盖当前分区的设置，确定继续？';
+
+  @override
+  String get settingsResetAllMessage => '这会覆盖所有设置，确定继续？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '点歌加入队列，不替换正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '点歌替换队列，只放这一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '双击只标喜欢，单击照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自动补齐 + 周期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自动补齐，不周期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放历史改进推荐';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '关窗口继续播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '关窗口就停止播放';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5340,6 +5436,102 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get languageRu => '俄语';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜索设置';
+
+  @override
+  String get settingsCustomize => '自定义…';
+
+  @override
+  String get settingsResetSection => '恢复本分区默认';
+
+  @override
+  String get settingsResetAll => '恢复全部默认';
+
+  @override
+  String get settingsResetTitle => '恢复默认设置？';
+
+  @override
+  String get settingsResetMessage => '这会覆盖当前分区的设置，确定继续？';
+
+  @override
+  String get settingsResetAllMessage => '这会覆盖所有设置，确定继续？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '点歌加入队列，不替换正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '点歌替换队列，只放这一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '双击只标喜欢，单击照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自动补齐 + 周期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自动补齐，不周期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放历史改进推荐';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '关窗口继续播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '关窗口就停止播放';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8009,4 +8201,100 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get languageRu => '俄語';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜尋設定';
+
+  @override
+  String get settingsCustomize => '自訂…';
+
+  @override
+  String get settingsResetSection => '恢復本分區預設';
+
+  @override
+  String get settingsResetAll => '恢復全部預設';
+
+  @override
+  String get settingsResetTitle => '恢復預設設定？';
+
+  @override
+  String get settingsResetMessage => '這會覆蓋目前分區的設定，確定繼續？';
+
+  @override
+  String get settingsResetAllMessage => '這會覆蓋所有設定，確定繼續？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '點歌加入佇列，不替換正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '點歌替換佇列，只放這一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '雙擊只標喜歡，單擊照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自動補齊 + 週期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自動補齊，不週期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放歷史改進推薦';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '關視窗繼續播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '關視窗就停止播放';
 }

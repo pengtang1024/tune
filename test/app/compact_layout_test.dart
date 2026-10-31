@@ -1059,9 +1059,9 @@ void main() {
     // At 760 the rail is compact: its page names wait in tooltips, so only
     // the texts of the page itself are on screen.
     expect(find.text('设置'), findsOneWidget);
-    expect(find.text('偏好'), findsOneWidget);
-    expect(find.text('音乐库'), findsOneWidget);
-    expect(find.text('资料库'), findsOneWidget);
+    expect(find.text('全部'), findsOneWidget);
+    expect(find.text('音乐库'), findsWidgets);
+    expect(find.text('音源'), findsWidgets);
   });
 
   testWidgets('settings page exposes the health weights and opens them', (
@@ -1087,6 +1087,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.byKey(const ValueKey('settings-nav-sourceHealth')));
+    await tester.pumpAndSettle();
     final adjust = find.byKey(const ValueKey('settings-source-health-adjust'));
     await tester.scrollUntilVisible(
       adjust,
@@ -1142,6 +1144,8 @@ void main() {
       ThemeMode.system,
     );
 
+    await tester.tap(find.byKey(const ValueKey('settings-nav-appearance')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('深色模式'));
     await tester.pumpAndSettle();
 
@@ -1182,6 +1186,12 @@ void main() {
       container.read(settingsControllerProvider).replaceQueueOnClick,
       isFalse,
     );
+    await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
     expect(find.text('单击歌曲时替换播放队列'), findsOneWidget);
 
     final row = find
@@ -1227,6 +1237,13 @@ void main() {
       container.read(settingsControllerProvider).autoResumeOnStartup,
       isTrue,
     );
+
+    await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
 
     final row = find
         .ancestor(of: find.text('启动时继续上次播放'), matching: find.byType(Row))
@@ -1312,6 +1329,14 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
+
+    await tester.tap(find.byKey(const ValueKey('settings-nav-library')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(
       tester

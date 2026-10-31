@@ -3,7 +3,7 @@
 > 2026-10-31。回答「设置页怎么从一张长表变成紧凑、好看、好用的控制台」。
 > 相关：[conventions.md](conventions.md)（尺寸/字体）、[architecture.md](architecture.md)（状态归属）、
 > [i18n.md](i18n.md)（文案）、[library-browse.md](library-browse.md)（刚落地的新页面语言）。
-> 状态：**已拍板，待实施**（2026-10-31）。
+> 状态：**已实施**（2026-10-31）。
 
 ## 1. 现状
 
@@ -121,8 +121,8 @@
 | 播放 | 单曲优先 | `replaceQueueOnClick=true`、`favoritesDoubleClickPlays=true`、`onlyLikeOnDoubleClick=false`、`autoResumeOnStartup=true` |
 | 播放 | 收藏优先 | `replaceQueueOnClick=false`、`favoritesDoubleClickPlays=false`、`onlyLikeOnDoubleClick=true`、`autoResumeOnStartup=true` |
 | 歌词 | 手动 | `autoFill=false`、`gapCheckEnabled=false` |
-| 歌词 | 平衡 | `autoFill=true`、`gapCheckEnabled=true`、`localModel='tiny'` |
-| 歌词 | 本地双家族 | 平衡 + 保持本地 tiny / SenseVoice（安装即用），不启用云端 |
+| 歌词 | 平衡 | `autoFill=true`、`gapCheckEnabled=true` |
+| 歌词 | 省电 | `autoFill=true`、`gapCheckEnabled=false` |
 | 发现 | 关闭学习 / 开启学习 | `useListeningHistory` |
 | 桌面 | 托盘常驻 / 关闭即退出 | `closeToTray` |
 
@@ -175,7 +175,13 @@
 ### S4 · 收尾
 9. 四语文案、空态/窄窗、截图与测试基准、文档与 AGENTS 地图。
 
-## 8. 仍待定
+## 8. 实施备注（2026-10-31）
+
+- 已按本方案落地：左侧分区导航 + 「全部」总览、六区预设、每区自定义 sheet、设置搜索、恢复本区/全部默认（含确认）。
+- 额外保留「音源健康」分区（无预设，卡片直达权重对话框）。
+- 搜索按分区标题与说明匹配；关键词（如「托盘」）没有硬编码进界面，避免文案表之外的字符串。
+
+## 8.1 仍待定
 
 1. 智能歌词卡：拆成「预设 + 自定义 sheet」，还是保留现有整卡、只加预设入口？（推荐拆）
 2. 「全部」总览的卡片是否显示每项当前值，还是只显示预设名？
