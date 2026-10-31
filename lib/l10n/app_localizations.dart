@@ -5128,6 +5128,54 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'关窗口就停止播放'**
   String get settingsPresetQuitHint;
+
+  /// No description provided for @settingsSearchKeywordsAppearance.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'主题 语言 深色 浅色 theme language'**
+  String get settingsSearchKeywordsAppearance;
+
+  /// No description provided for @settingsSearchKeywordsLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描 文件夹 缓存 音乐库 scan folder cache'**
+  String get settingsSearchKeywordsLibrary;
+
+  /// No description provided for @settingsSearchKeywordsPlayback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'队列 双击 收藏 播放 queue click favorite'**
+  String get settingsSearchKeywordsPlayback;
+
+  /// No description provided for @settingsSearchKeywordsLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词 补齐 查漏 标记 lyrics fill'**
+  String get settingsSearchKeywordsLyrics;
+
+  /// No description provided for @settingsSearchKeywordsDiscovery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐 历史 发现 discover history'**
+  String get settingsSearchKeywordsDiscovery;
+
+  /// No description provided for @settingsSearchKeywordsDesktop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'托盘 媒体控制 默认播放器 desktop tray media'**
+  String get settingsSearchKeywordsDesktop;
+
+  /// No description provided for @settingsSearchKeywordsSourceHealth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音源 健康度 权重 source health weight'**
+  String get settingsSearchKeywordsSourceHealth;
+
+  /// No description provided for @settingsSearchNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有匹配的设置'**
+  String get settingsSearchNoMatch;
 }
 
 class _AppLocalizationsDelegate

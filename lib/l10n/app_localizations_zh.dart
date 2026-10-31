@@ -2767,6 +2767,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsPresetQuitHint => '关窗口就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主题 语言 深色 浅色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盘 媒体控制 默认播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '没有匹配的设置';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5532,6 +5559,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsPresetQuitHint => '关窗口就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主题 语言 深色 浅色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盘 媒体控制 默认播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '没有匹配的设置';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8297,4 +8351,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsPresetQuitHint => '關視窗就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主題 語言 深色 淺色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盤 媒體控制 預設播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '沒有符合的設定';
 }

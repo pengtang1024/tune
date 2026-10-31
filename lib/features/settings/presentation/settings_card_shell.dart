@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 
 /// The frame every group of settings sits in.
 ///
 /// The groups of the settings page look the same, so the frame is written
 /// once and only the content differs.
+/// Says that the cards below are inside the custom sheet.
+///
+/// The sheet already names the section, so a card inside it drops its own
+/// numbered header and shows only its controls.
+class SettingsSheetScope extends InheritedWidget {
+  final bool inSheet;
+
+  const SettingsSheetScope({
+    super.key,
+    required this.inSheet,
+    required super.child,
+  });
+
+  static bool of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<SettingsSheetScope>()?.inSheet ??
+      false;
+
+  @override
+  bool updateShouldNotify(SettingsSheetScope oldWidget) =>
+      oldWidget.inSheet != inSheet;
+}
+
 class SettingsCard extends StatelessWidget {
   final String index;
   final String eyebrow;
@@ -27,6 +50,13 @@ class SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (SettingsSheetScope.of(context)) {
+      // The sheet has its own heading; the controls are all that is left.
+      return Padding(
+        padding: const EdgeInsets.only(bottom: CompactTokens.space8),
+        child: child,
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.all(20),

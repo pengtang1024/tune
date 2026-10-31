@@ -15,6 +15,7 @@ import 'package:tune/features/library/application/library_cache_limit_provider.d
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
+import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
@@ -147,6 +148,16 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           CompactTokens.space12,
         ),
         children: [
+          if (items.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(CompactTokens.space8),
+              child: Text(
+                context.loc.settingsSearchNoMatch,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           for (final section in items) ...[
             _navTile(context, section, wide),
             const SizedBox(height: CompactTokens.space4),
@@ -352,7 +363,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   bool _matches(_SettingsSection section) {
     if (_query.isEmpty) return true;
     final text =
-        '${_labelOf(context, section)} ${_descriptionOf(context, section)}'
+        '${_labelOf(context, section)} ${_descriptionOf(context, section)} '
+        '${_keywordsOf(context, section)}'
             .toLowerCase();
     return text.contains(_query);
   }
@@ -840,9 +852,45 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           width: math.min(640, width),
           height: MediaQuery.sizeOf(context).height,
           child: Material(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(CompactTokens.space16),
-              child: _customCard(context),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CompactTokens.space16,
+                    CompactTokens.space12,
+                    CompactTokens.space8,
+                    CompactTokens.space8,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _labelOf(context, _section),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      TuneTooltip(
+                        message: context.loc.cancel,
+                        child: IconButton(
+                          key: const ValueKey('settings-custom-close'),
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(CompactTokens.space16),
+                    child: SettingsSheetScope(
+                      inSheet: true,
+                      child: _customCard(context),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -1009,6 +1057,22 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         _SettingsSection.sourceHealth =>
           context.loc.settingsSourceHealthDescription,
         _SettingsSection.about => context.loc.appTagline,
+      };
+
+  String _keywordsOf(BuildContext context, _SettingsSection section) =>
+      switch (section) {
+        _SettingsSection.appearance =>
+          context.loc.settingsSearchKeywordsAppearance,
+        _SettingsSection.library => context.loc.settingsSearchKeywordsLibrary,
+        _SettingsSection.playback =>
+          context.loc.settingsSearchKeywordsPlayback,
+        _SettingsSection.lyrics => context.loc.settingsSearchKeywordsLyrics,
+        _SettingsSection.discovery =>
+          context.loc.settingsSearchKeywordsDiscovery,
+        _SettingsSection.desktop => context.loc.settingsSearchKeywordsDesktop,
+        _SettingsSection.sourceHealth =>
+          context.loc.settingsSearchKeywordsSourceHealth,
+        _SettingsSection.overview || _SettingsSection.about => '',
       };
 
   IconData _iconOf(_SettingsSection section) => switch (section) {

@@ -1491,5 +1491,13 @@
   "settingsPresetTray": "Keep in tray",
   "settingsPresetTrayHint": "Keep playing after the window closes",
   "settingsPresetQuit": "Quit on close",
-  "settingsPresetQuitHint": "Stop playing when the window closes"
+  "settingsPresetQuitHint": "Stop playing when the window closes",
+  "settingsSearchKeywordsAppearance": "theme language dark light",
+  "settingsSearchKeywordsLibrary": "scan folder cache library",
+  "settingsSearchKeywordsPlayback": "queue double click favorite playback",
+  "settingsSearchKeywordsLyrics": "lyrics fill gap mark",
+  "settingsSearchKeywordsDiscovery": "recommendation history discover",
+  "settingsSearchKeywordsDesktop": "tray media default player desktop",
+  "settingsSearchKeywordsSourceHealth": "source health weight",
+  "settingsSearchNoMatch": "No matching settings"
 }

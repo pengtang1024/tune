@@ -1491,5 +1491,13 @@
   "settingsPresetTray": "托盘常驻",
   "settingsPresetTrayHint": "關視窗繼續播放",
   "settingsPresetQuit": "关闭即退出",
-  "settingsPresetQuitHint": "關視窗就停止播放"
+  "settingsPresetQuitHint": "關視窗就停止播放",
+  "settingsSearchKeywordsAppearance": "主題 語言 深色 淺色 theme language",
+  "settingsSearchKeywordsLibrary": "扫描 文件夹 缓存 音乐库 scan folder cache",
+  "settingsSearchKeywordsPlayback": "队列 双击 收藏 播放 queue click favorite",
+  "settingsSearchKeywordsLyrics": "歌词 补齐 查漏 标记 lyrics fill",
+  "settingsSearchKeywordsDiscovery": "推荐 历史 发现 discover history",
+  "settingsSearchKeywordsDesktop": "托盤 媒體控制 預設播放器 desktop tray media",
+  "settingsSearchKeywordsSourceHealth": "音源 健康度 权重 source health weight",
+  "settingsSearchNoMatch": "沒有符合的設定"
 }

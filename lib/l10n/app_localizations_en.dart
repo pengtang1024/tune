@@ -2989,4 +2989,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPresetQuitHint => 'Stop playing when the window closes';
+
+  @override
+  String get settingsSearchKeywordsAppearance => 'theme language dark light';
+
+  @override
+  String get settingsSearchKeywordsLibrary => 'scan folder cache library';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      'queue double click favorite playback';
+
+  @override
+  String get settingsSearchKeywordsLyrics => 'lyrics fill gap mark';
+
+  @override
+  String get settingsSearchKeywordsDiscovery =>
+      'recommendation history discover';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      'tray media default player desktop';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth => 'source health weight';
+
+  @override
+  String get settingsSearchNoMatch => 'No matching settings';
 }
