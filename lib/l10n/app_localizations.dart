@@ -5176,6 +5176,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'没有匹配的设置'**
   String get settingsSearchNoMatch;
+
+  /// No description provided for @settingsSectionSourceHealth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'健康度'**
+  String get settingsSectionSourceHealth;
 }
 
 class _AppLocalizationsDelegate

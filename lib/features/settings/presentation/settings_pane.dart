@@ -56,6 +56,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   final ScrollController _scrollController = ScrollController();
 
+  final Map<_SettingsSection, GlobalKey> _sectionKeys = {
+    for (final section in _SettingsSection.values) section: GlobalKey(),
+  };
+
   @override
   void initState() {
     super.initState();
@@ -171,7 +175,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       borderRadius: CompactTokens.borderRadius8,
       child: InkWell(
         key: ValueKey('settings-nav-${section.name}'),
-        onTap: () => setState(() => _section = section),
+        onTap: () => _goTo(section),
         borderRadius: CompactTokens.borderRadius8,
         child: Container(
           height: 36,
@@ -374,96 +378,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     required bool scanning,
     required bool clearing,
   }) {
-    if (_section == _SettingsSection.overview) {
-      return _overview(context, settings);
-    }
-    if (_section == _SettingsSection.sourceHealth) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeading(context),
-          const SizedBox(height: CompactTokens.space12),
-          const SettingsSourceHealthCard(),
-        ],
-      );
-    }
-    if (_section == _SettingsSection.about) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionHeading(context),
-          const SizedBox(height: CompactTokens.space12),
-          SettingsAboutCard(version: AppVersion.version),
-          if (!kIsWeb) ...[
-            const SizedBox(height: CompactTokens.space12),
-            const SettingsUpdateCard(),
-          ],
-        ],
-      );
-    }
-    final presets = _presets(settings, controller);
-    final selected = _selectedPreset(settings);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeading(context),
-        const SizedBox(height: CompactTokens.space12),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns = (constraints.maxWidth / 260)
-                .floor()
-                .clamp(1, 4);
-            final width =
-                (constraints.maxWidth - 12 * (columns - 1)) / columns;
-            return Wrap(
-              spacing: CompactTokens.space12,
-              runSpacing: CompactTokens.space12,
-              children: [
-                for (final preset in presets)
-                  SizedBox(
-                    width: width,
-                    child: _PresetCard(
-                      preset: preset,
-                      selected: preset.id == selected,
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: CompactTokens.space12),
-        Row(
-          children: [
-            OutlinedButton.icon(
-              key: const ValueKey('settings-customize'),
-              onPressed: () => _openCustom(context),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, CompactTokens.controlDefault),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-              ),
-              icon: const Icon(
-                Icons.tune_rounded,
-                size: CompactTokens.icon16,
-              ),
-              label: Text(context.loc.settingsCustomize),
-            ),
-            const SizedBox(width: CompactTokens.space8),
-            ..._quickActions(
-              context,
-              controller,
-              libraryReady: libraryReady,
-              scanning: scanning,
-              clearing: clearing,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _overview(BuildContext context, SettingsState settings) {
     final sections = [
       _SettingsSection.appearance,
       _SettingsSection.library,
@@ -472,60 +386,173 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       _SettingsSection.discovery,
       _SettingsSection.desktop,
       _SettingsSection.sourceHealth,
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeading(context),
-        const SizedBox(height: CompactTokens.space12),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns = (constraints.maxWidth / 300)
-                .floor()
-                .clamp(1, 4);
-            final width =
-                (constraints.maxWidth - 12 * (columns - 1)) / columns;
-            return Wrap(
-              spacing: CompactTokens.space12,
-              runSpacing: CompactTokens.space12,
-              children: [
-                for (final section in sections)
-                  SizedBox(
-                    width: width,
-                    child: _OverviewCard(
-                      section: section,
-                      label: _labelOf(context, section),
-                      description: _descriptionOf(context, section),
-                      status: _presetLabel(context, _selectedPreset(settings)),
-                      onTap: () => setState(() => _section = section),
-                    ),
-                  ),
-              ],
-            );
-          },
+      _SettingsSection.about,
+    ].where(_matches).toList();
+    if (sections.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(CompactTokens.space16),
+        child: Text(
+          context.loc.settingsSearchNoMatch,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
-      ],
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 900 ? 2 : 1;
+        final width = (constraints.maxWidth - 12 * (columns - 1)) / columns;
+        return Wrap(
+          spacing: CompactTokens.space12,
+          runSpacing: CompactTokens.space12,
+          children: [
+            for (final section in sections)
+              SizedBox(
+                key: _sectionKeys[section],
+                width: section == _SettingsSection.about
+                    ? constraints.maxWidth
+                    : width,
+                child: section == _SettingsSection.about
+                    ? _aboutCard(context)
+                    : _sectionCard(
+                        context,
+                        section,
+                        settings,
+                        controller,
+                        libraryReady: libraryReady,
+                        scanning: scanning,
+                        clearing: clearing,
+                      ),
+              ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _sectionHeading(BuildContext context) {
+  void _goTo(_SettingsSection section) {
+    setState(() => _section = section);
+    if (section == _SettingsSection.overview) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+      );
+      return;
+    }
+    final anchor = _sectionKeys[section]?.currentContext;
+    if (anchor == null) return;
+    Scrollable.ensureVisible(
+      anchor,
+      duration: const Duration(milliseconds: 180),
+      alignment: 0.02,
+      curve: Curves.easeOut,
+    );
+  }
+
+  Widget _sectionCard(
+    BuildContext context,
+    _SettingsSection section,
+    SettingsState settings,
+    SettingsController controller, {
+    required bool libraryReady,
+    required bool scanning,
+    required bool clearing,
+  }) {
     final theme = Theme.of(context);
+    final presets = _presets(section, settings, controller);
+    final selected = _selectedPreset(section, settings);
+    final actions = _quickActions(
+      section,
+      context,
+      controller,
+      libraryReady: libraryReady,
+      scanning: scanning,
+      clearing: clearing,
+    );
+    return Container(
+      padding: const EdgeInsets.all(CompactTokens.space16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: CompactTokens.borderRadius12,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                _iconOf(section),
+                size: CompactTokens.icon18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: CompactTokens.space8),
+              Expanded(
+                child: Text(
+                  _labelOf(context, section),
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              TextButton(
+                key: ValueKey('settings-customize-${section.name}'),
+                onPressed: () => _openCustom(context, section),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(context.loc.settingsCustomize),
+              ),
+            ],
+          ),
+          const SizedBox(height: CompactTokens.space4),
+          Text(
+            _descriptionOf(context, section),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (section == _SettingsSection.sourceHealth) ...[
+            const SizedBox(height: CompactTokens.space12),
+            const SettingsSourceHealthCard(),
+          ],
+          if (presets.isNotEmpty) ...[
+            const SizedBox(height: CompactTokens.space12),
+            Wrap(
+              spacing: CompactTokens.space6,
+              runSpacing: CompactTokens.space6,
+              children: [
+                for (final preset in presets)
+                  ChoiceChip(
+                    label: Text(preset.title),
+                    avatar: Icon(preset.icon, size: CompactTokens.icon14),
+                    selected: preset.id == selected,
+                    onSelected: (_) => preset.apply(),
+                  ),
+              ],
+            ),
+          ],
+          if (actions.isNotEmpty) ...[
+            const SizedBox(height: CompactTokens.space8),
+            Wrap(spacing: CompactTokens.space8, children: actions),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _aboutCard(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _labelOf(context, _section),
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: CompactTokens.space4),
-        Text(
-          _descriptionOf(context, _section),
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
+        SettingsAboutCard(version: AppVersion.version),
+        if (!kIsWeb) ...[
+          const SizedBox(height: CompactTokens.space12),
+          const SettingsUpdateCard(),
+        ],
       ],
     );
   }
@@ -533,8 +560,12 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   // ---------------------------------------------------------------------
   // Presets
 
-  List<_Preset> _presets(SettingsState settings, SettingsController controller) {
-    switch (_section) {
+  List<_Preset> _presets(
+    _SettingsSection section,
+    SettingsState settings,
+    SettingsController controller,
+  ) {
+    switch (section) {
       case _SettingsSection.appearance:
         return [
           _Preset(
@@ -695,8 +726,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     }
   }
 
-  String _selectedPreset(SettingsState settings) {
-    switch (_section) {
+  String _selectedPreset(_SettingsSection section, SettingsState settings) {
+    switch (section) {
       case _SettingsSection.appearance:
         return settings.themeMode.name;
       case _SettingsSection.library:
@@ -736,24 +767,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     }
   }
 
-  String _presetLabel(BuildContext context, String id) => switch (id) {
-    'system' => context.loc.systemMode,
-    'light' => context.loc.lightMode,
-    'dark' => context.loc.darkMode,
-    'auto' => context.loc.settingsPresetAutoScan,
-    'manual' => context.loc.settingsPresetManualScan,
-    'queue' => context.loc.settingsPresetQueueFirst,
-    'single' => context.loc.settingsPresetSingleFirst,
-    'favorite' => context.loc.settingsPresetFavoriteFirst,
-    'balanced' => context.loc.settingsPresetLyricsBalanced,
-    'saver' => context.loc.settingsPresetLyricsSaver,
-    'on' => context.loc.settingsPresetLearnOn,
-    'off' => context.loc.settingsPresetLearnOff,
-    'tray' => context.loc.settingsPresetTray,
-    'quit' => context.loc.settingsPresetQuit,
-    _ => context.loc.settingsCustomize,
-  };
-
   void _applyPlayback(
     SettingsController controller, {
     required bool replaceQueue,
@@ -784,13 +797,14 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   // Custom sheet and quick actions
 
   List<Widget> _quickActions(
+    _SettingsSection section,
     BuildContext context,
     SettingsController controller, {
     required bool libraryReady,
     required bool scanning,
     required bool clearing,
   }) {
-    switch (_section) {
+    switch (section) {
       case _SettingsSection.library:
         return [
           OutlinedButton.icon(
@@ -837,7 +851,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
   );
 
-  void _openCustom(BuildContext context) {
+  void _openCustom(BuildContext context, _SettingsSection section) {
     final width = MediaQuery.sizeOf(context).width;
     showDialog<void>(
       context: context,
@@ -863,7 +877,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                     children: [
                       Expanded(
                         child: Text(
-                          _labelOf(context, _section),
+                          _labelOf(context, section),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
@@ -884,7 +898,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                     padding: const EdgeInsets.all(CompactTokens.space16),
                     child: SettingsSheetScope(
                       inSheet: true,
-                      child: _customCard(context),
+                      child: _customCard(context, section),
                     ),
                   ),
                 ),
@@ -896,7 +910,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     );
   }
 
-  Widget _customCard(BuildContext context) {
+  Widget _customCard(BuildContext context, _SettingsSection section) {
     final settings = ref.watch(settingsControllerProvider);
     final controller = ref.read(settingsControllerProvider.notifier);
     final library = ref.watch(
@@ -908,7 +922,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         ),
       ),
     );
-    return switch (_section) {
+    return switch (section) {
       _SettingsSection.appearance => SettingsInterfaceCard(
         themeMode: settings.themeMode,
         locale: settings.locale,
@@ -1217,167 +1231,4 @@ class _Preset {
     required this.icon,
     required this.apply,
   });
-}
-
-class _PresetCard extends StatelessWidget {
-  final _Preset preset;
-  final bool selected;
-
-  const _PresetCard({required this.preset, required this.selected});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: selected
-          ? theme.colorScheme.primary.withValues(alpha: 0.08)
-          : theme.colorScheme.surfaceContainer,
-      borderRadius: CompactTokens.borderRadius12,
-      child: InkWell(
-        onTap: () => preset.apply(),
-        borderRadius: CompactTokens.borderRadius12,
-        child: Container(
-          height: 84,
-          padding: const EdgeInsets.all(CompactTokens.space12),
-          decoration: BoxDecoration(
-            borderRadius: CompactTokens.borderRadius12,
-            border: Border.all(
-              color: selected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.outlineVariant,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                preset.icon,
-                size: CompactTokens.icon20,
-                color: selected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: CompactTokens.space8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      preset.title,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: selected ? theme.colorScheme.primary : null,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      preset.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (selected)
-                Icon(
-                  Icons.check_rounded,
-                  size: CompactTokens.icon16,
-                  color: theme.colorScheme.primary,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OverviewCard extends StatelessWidget {
-  final _SettingsSection section;
-  final String label;
-  final String description;
-  final String status;
-  final VoidCallback onTap;
-
-  const _OverviewCard({
-    required this.section,
-    required this.label,
-    required this.description,
-    required this.status,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: theme.colorScheme.surfaceContainer,
-      borderRadius: CompactTokens.borderRadius12,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: CompactTokens.borderRadius12,
-        child: Container(
-          height: 96,
-          padding: const EdgeInsets.all(CompactTokens.space12),
-          decoration: BoxDecoration(
-            borderRadius: CompactTokens.borderRadius12,
-            border: Border.all(color: theme.colorScheme.outlineVariant),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                switch (section) {
-                  _SettingsSection.appearance => Icons.palette_outlined,
-                  _SettingsSection.library => Icons.library_music_rounded,
-                  _SettingsSection.playback =>
-                    Icons.play_circle_outline_rounded,
-                  _SettingsSection.lyrics => Icons.lyrics_outlined,
-                  _SettingsSection.discovery => Icons.explore_rounded,
-                  _SettingsSection.desktop => Icons.desktop_windows_outlined,
-                  _SettingsSection.sourceHealth => Icons.monitor_heart_outlined,
-                  _ => Icons.tune_rounded,
-                },
-                size: CompactTokens.icon20,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: CompactTokens.space8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(label, style: theme.textTheme.labelLarge),
-                    const SizedBox(height: 2),
-                    Text(
-                      description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      status,
-                      style: CompactTypography.mono(
-                        theme.colorScheme.primary,
-                        size: CompactTypeScale.mark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: CompactTokens.icon16,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

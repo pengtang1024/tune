@@ -1499,5 +1499,6 @@
   "settingsSearchKeywordsDiscovery": "recommendation history discover",
   "settingsSearchKeywordsDesktop": "tray media default player desktop",
   "settingsSearchKeywordsSourceHealth": "source health weight",
-  "settingsSearchNoMatch": "No matching settings"
+  "settingsSearchNoMatch": "No matching settings",
+  "settingsSectionSourceHealth": "Health"
 }

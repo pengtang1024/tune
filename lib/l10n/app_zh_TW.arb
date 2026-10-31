@@ -1499,5 +1499,6 @@
   "settingsSearchKeywordsDiscovery": "推荐 历史 发现 discover history",
   "settingsSearchKeywordsDesktop": "托盤 媒體控制 預設播放器 desktop tray media",
   "settingsSearchKeywordsSourceHealth": "音源 健康度 权重 source health weight",
-  "settingsSearchNoMatch": "沒有符合的設定"
+  "settingsSearchNoMatch": "沒有符合的設定",
+  "settingsSectionSourceHealth": "健康度"
 }

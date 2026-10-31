@@ -3016,4 +3016,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSearchNoMatch => 'No matching settings';
+
+  @override
+  String get settingsSectionSourceHealth => 'Health';
 }

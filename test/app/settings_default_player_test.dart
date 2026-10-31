@@ -97,9 +97,9 @@ void main() {
     await openSettings(tester, service);
     await tester.tap(find.byKey(const ValueKey('settings-nav-desktop')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-desktop')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.tap(find.byKey(const ValueKey('settings-customize-desktop')));
     await tester.pumpAndSettle();
 
     expect(

@@ -1059,7 +1059,6 @@ void main() {
     // At 760 the rail is compact: its page names wait in tooltips, so only
     // the texts of the page itself are on screen.
     expect(find.text('设置'), findsOneWidget);
-    expect(find.text('全部'), findsOneWidget);
     expect(find.text('音乐库'), findsWidgets);
     expect(find.text('音源'), findsWidgets);
   });
@@ -1090,16 +1089,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('settings-nav-sourceHealth')));
     await tester.pumpAndSettle();
     final adjust = find.byKey(const ValueKey('settings-source-health-adjust'));
-    await tester.scrollUntilVisible(
-      adjust,
-      300,
-      scrollable: find
-          .descendant(
-            of: find.byType(SettingsPane),
-            matching: find.byType(Scrollable),
-          )
-          .first,
-    );
+    await tester.ensureVisible(adjust);
+    await tester.pumpAndSettle();
     expect(adjust, findsOneWidget);
     expect(find.text('健康度权重'), findsOneWidget);
 
@@ -1188,9 +1179,9 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
     expect(find.text('单击歌曲时替换播放队列'), findsOneWidget);
 
@@ -1240,9 +1231,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
 
     final row = find
@@ -1332,9 +1323,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-library')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize')));
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-library')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('settings-customize')));
+    await tester.tap(find.byKey(const ValueKey('settings-customize-library')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
