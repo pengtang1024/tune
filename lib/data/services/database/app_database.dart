@@ -4,7 +4,12 @@ import 'dart:io' show Platform;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/song_facts.dart';
+import 'package:tune/data/services/database/library_query.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 
 /// The library of the app, kept in one SQLite file.
 ///
@@ -16,6 +21,8 @@ class AppDatabase {
   AppDatabase(this._db);
 
   final Database _db;
+
+  late final LibraryQuery _libraryQuery = LibraryQuery(_db);
 
   /// Opens the database at [path], creating the table the first time.
   static AppDatabase open(String path) =>
@@ -51,7 +58,10 @@ class AppDatabase {
         last_seen INTEGER NOT NULL DEFAULT 0,
         last_played INTEGER,
         play_count INTEGER NOT NULL DEFAULT 0,
-        has_lyrics INTEGER NOT NULL DEFAULT 0
+        has_lyrics INTEGER NOT NULL DEFAULT 0,
+        language TEXT,
+        format TEXT,
+        duration INTEGER NOT NULL DEFAULT 0
       )
     ''');
     db.execute(
@@ -143,6 +153,16 @@ class AppDatabase {
       )
     ''');
     _migrateColumns(db);
+    for (final index in const [
+      'CREATE INDEX IF NOT EXISTS idx_songs_year ON songs(year)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_date_added ON songs(date_added)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_duration ON songs(duration)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_has_lyrics ON songs(has_lyrics)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_language ON songs(language)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_format ON songs(format)',
+    ]) {
+      db.execute(index);
+    }
     return db;
   }
 
@@ -171,6 +191,14 @@ class AppDatabase {
       // Whether lyrics are known to sit with the track (a tag sheet or a
       // lyrics file next to the audio); the lyrics ledger counts on it.
       'has_lyrics': 'has_lyrics INTEGER NOT NULL DEFAULT 0',
+      // The language and the format the filter panel and the category
+      // cards group by; the json holds them, the columns make them
+      // filterable and countable without parsing every row.
+      'language': 'language TEXT',
+      'format': 'format TEXT',
+      // The duration the filter buckets and the sort read; it lived only in
+      // the json column before.
+      'duration': 'duration INTEGER NOT NULL DEFAULT 0',
     };
     final added = <String>{};
     for (final entry in additions.entries) {
@@ -182,6 +210,50 @@ class AppDatabase {
     // is named 'local', and every row that belongs to it says so from now on.
     db.execute("UPDATE songs SET source_id = 'local' WHERE source_id IS NULL");
     if (added.contains('title_sort')) _backfillTitleSort(db);
+    if (added.contains('language') ||
+        added.contains('format') ||
+        added.contains('duration')) {
+      _backfillMediaFacts(db);
+    }
+  }
+
+  /// Writes the language and format of every row that misses them.
+  ///
+  /// An older database kept both only in the json column; the filters read
+  /// the real columns, so the one-time backfill keeps the first filter
+  /// honest. A broken row is skipped, not fatal.
+  static void _backfillMediaFacts(Database db) {
+    final rows = db.select('SELECT uri, json FROM songs');
+    if (rows.isEmpty) return;
+    db.execute('BEGIN');
+    try {
+      final statement = db.prepare(
+        'UPDATE songs SET language = ?, format = ?, duration = ? WHERE uri = ?',
+      );
+      try {
+        for (final row in rows) {
+          try {
+            final decoded = jsonDecode(row['json'] as String);
+            if (decoded is! Map<String, dynamic>) continue;
+            final song = Song.fromMap(decoded);
+            statement.execute([
+              languageKeyOf(song),
+              formatOfSong(song),
+              song.duration,
+              song.uri,
+            ]);
+          } catch (_) {
+            // One broken row must not stop the backfill.
+          }
+        }
+      } finally {
+        statement.close();
+      }
+      db.execute('COMMIT');
+    } catch (error) {
+      db.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   /// Writes the folded title of every row that misses its sort key.
@@ -312,8 +384,9 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, pinned, last_seen, title_sort, facts_hash, active, has_lyrics)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+           language, format, duration, json, pinned, last_seen, title_sort,
+           facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -322,6 +395,9 @@ class AppDatabase {
           date_added = excluded.date_added,
           year = excluded.year,
           genre = excluded.genre,
+          language = excluded.language,
+          format = excluded.format,
+          duration = excluded.duration,
           json = excluded.json,
           pinned = excluded.pinned,
           last_seen = excluded.last_seen,
@@ -342,6 +418,9 @@ class AppDatabase {
             song.dateAdded,
             song.year,
             song.genre,
+            languageKeyOf(song),
+            formatOfSong(song),
+            song.duration,
             jsonEncode(song.toJson()),
             pinned.contains(song.uri) ? 1 : 0,
             seenAt,
@@ -389,8 +468,9 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, last_seen, title_sort, facts_hash, active, has_lyrics)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+           language, format, duration, json, last_seen, title_sort,
+           facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -399,6 +479,9 @@ class AppDatabase {
           date_added = excluded.date_added,
           year = excluded.year,
           genre = excluded.genre,
+          language = excluded.language,
+          format = excluded.format,
+          duration = excluded.duration,
           json = excluded.json,
           last_seen = excluded.last_seen,
           title_sort = excluded.title_sort,
@@ -438,6 +521,9 @@ class AppDatabase {
             candidate.dateAdded,
             candidate.year,
             candidate.genre,
+            languageKeyOf(candidate),
+            formatOfSong(candidate),
+            candidate.duration,
             jsonEncode(candidate.toJson()),
             seenAt,
             foldText(candidate.title),
@@ -678,6 +764,29 @@ class AppDatabase {
       [DateTime.now().millisecondsSinceEpoch, uri],
     );
   }
+
+  /// Reads one window of the tracks that match [query] and [filter].
+  List<Song> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) => _libraryQuery.songs(
+    query: query,
+    filter: filter,
+    sort: sort,
+    offset: offset,
+    limit: limit,
+  );
+
+  /// How many tracks match [query] and [filter].
+  int countQuery({required String query, required LibraryFilter filter}) =>
+      _libraryQuery.count(query: query, filter: filter);
+
+  /// The counts of the filter groups.
+  LibraryFacets facets({required LibraryFilter filter}) =>
+      _libraryQuery.facets(filter: filter);
 
   /// Reads one window of the library, ordered by the folded title.
   List<Song> page({required int offset, required int limit}) {

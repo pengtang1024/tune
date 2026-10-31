@@ -1,6 +1,9 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 
 /// The library of the app, as the songs it holds.
 ///
@@ -53,6 +56,37 @@ abstract class LibraryStorage {
 
   /// How many tracks match [query] and [sourceId].
   Future<int> countMatching({required String query, String? sourceId});
+
+  /// One window of the tracks that match [query] and [filter], in [sort].
+  ///
+  /// The SQLite storage runs the whole filter in SQL. A build without a
+  /// database falls back to the search and ignores the groups it cannot
+  /// answer; the desktop build is the one that promises the facets.
+  Future<List<Song>> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) => search(
+    query: query,
+    sourceId: filter.sources.length == 1 ? filter.sources.first : null,
+    offset: offset,
+    limit: limit,
+  );
+
+  /// How many tracks match [query] and [filter].
+  Future<int> countQuery({
+    required String query,
+    required LibraryFilter filter,
+  }) => countMatching(
+    query: query,
+    sourceId: filter.sources.length == 1 ? filter.sources.first : null,
+  );
+
+  /// The counts of the filter groups.
+  Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
+      LibraryFacets.empty;
 
   /// The albums of the library, without their tracks.
   Future<List<AlbumSummary>> albumSummaries();

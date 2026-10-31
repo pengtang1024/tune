@@ -1,6 +1,8 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 
 enum LibraryScanStatus { idle, scanning, completed, error }
 
@@ -9,7 +11,16 @@ class LibraryState {
   final String query;
 
   /// `null` shows every source; otherwise only songs from this source id.
+  ///
+  /// The source is also part of [filter]; the field stays for the toolbar
+  /// that still reads it, and the controller folds both into one filter.
   final String? sourceFilter;
+
+  /// What the page narrows beyond the search word (docs/library-browse.md).
+  final LibraryFilter filter;
+
+  /// The column the page is ordered by.
+  final LibrarySort sort;
   final LibraryScanStatus scanStatus;
   final double scanProgress;
   final String? statusMessage;
@@ -35,6 +46,8 @@ class LibraryState {
     this.songs = const [],
     this.query = '',
     this.sourceFilter,
+    this.filter = LibraryFilter.empty,
+    this.sort = LibrarySort.title,
     this.scanStatus = LibraryScanStatus.idle,
     this.scanProgress = 0,
     this.statusMessage,
@@ -50,6 +63,9 @@ class LibraryState {
 
   bool get hasSongs => songs.isNotEmpty;
   bool get isScanning => scanStatus == LibraryScanStatus.scanning;
+
+  /// Whether the page is narrowed by something other than the search word.
+  bool get hasFilter => !filter.isEmpty || sourceFilter != null;
 
   /// The tracks the page shows.
   ///
@@ -67,6 +83,8 @@ class LibraryState {
     List<Song>? songs,
     String? query,
     Object? sourceFilter = _unset,
+    LibraryFilter? filter,
+    LibrarySort? sort,
     LibraryScanStatus? scanStatus,
     double? scanProgress,
     Object? statusMessage = _unset,
@@ -83,6 +101,8 @@ class LibraryState {
       sourceFilter: identical(sourceFilter, _unset)
           ? this.sourceFilter
           : sourceFilter as String?,
+      filter: filter ?? this.filter,
+      sort: sort ?? this.sort,
       scanStatus: scanStatus ?? this.scanStatus,
       scanProgress: scanProgress ?? this.scanProgress,
       statusMessage: identical(statusMessage, _unset)

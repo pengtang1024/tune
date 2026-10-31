@@ -3,6 +3,9 @@ import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 
 /// The library storage of a build without a file system.
@@ -51,6 +54,25 @@ class EmptyLibraryStorage implements LibraryStorage {
   @override
   Future<int> countMatching({required String query, String? sourceId}) async =>
       0;
+
+  @override
+  Future<List<Song>> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) async => const [];
+
+  @override
+  Future<int> countQuery({
+    required String query,
+    required LibraryFilter filter,
+  }) async => 0;
+
+  @override
+  Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
+      LibraryFacets.empty;
 
   @override
   Future<List<AlbumSummary>> albumSummaries() async => const [];
