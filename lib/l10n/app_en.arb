@@ -1447,5 +1447,17 @@
   "libraryFilterAddedWeek": "Last 7 days",
   "libraryFilterAddedMonth": "Last 30 days",
   "libraryFilterAddedYear": "Last year",
-  "libraryFilterAddedOlder": "Older"
+  "libraryFilterAddedOlder": "Older",
+  "libraryViewCategories": "Category view",
+  "libraryAllSongs": "All songs",
+  "libraryTreeExpand": "Expand categories",
+  "libraryTreeCollapse": "Collapse categories",
+  "languageZh": "Chinese",
+  "languageEn": "English",
+  "languageJa": "Japanese",
+  "languageKo": "Korean",
+  "languageFr": "French",
+  "languageDe": "German",
+  "languageEs": "Spanish",
+  "languageRu": "Russian"
 }

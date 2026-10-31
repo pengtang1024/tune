@@ -2849,4 +2849,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryFilterAddedOlder => 'Older';
+
+  @override
+  String get libraryViewCategories => 'Category view';
+
+  @override
+  String get libraryAllSongs => 'All songs';
+
+  @override
+  String get libraryTreeExpand => 'Expand categories';
+
+  @override
+  String get libraryTreeCollapse => 'Collapse categories';
+
+  @override
+  String get languageZh => 'Chinese';
+
+  @override
+  String get languageEn => 'English';
+
+  @override
+  String get languageJa => 'Japanese';
+
+  @override
+  String get languageKo => 'Korean';
+
+  @override
+  String get languageFr => 'French';
+
+  @override
+  String get languageDe => 'German';
+
+  @override
+  String get languageEs => 'Spanish';
+
+  @override
+  String get languageRu => 'Russian';
 }

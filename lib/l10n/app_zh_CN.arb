@@ -1447,5 +1447,17 @@
   "libraryFilterAddedWeek": "最近 7 天",
   "libraryFilterAddedMonth": "最近 30 天",
   "libraryFilterAddedYear": "最近一年",
-  "libraryFilterAddedOlder": "更早"
+  "libraryFilterAddedOlder": "更早",
+  "libraryViewCategories": "分类视图",
+  "libraryAllSongs": "全部歌曲",
+  "libraryTreeExpand": "展开分类",
+  "libraryTreeCollapse": "收起分类",
+  "languageZh": "中文",
+  "languageEn": "英语",
+  "languageJa": "日语",
+  "languageKo": "韩语",
+  "languageFr": "法语",
+  "languageDe": "德语",
+  "languageEs": "西班牙语",
+  "languageRu": "俄语"
 }

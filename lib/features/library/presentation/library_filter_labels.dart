@@ -37,6 +37,17 @@ String filterDecadeLabel(int decade) => '${decade}s';
 /// Formats are technical names: MP3 stays MP3 in every language.
 String filterFormatLabel(String format) => format.toUpperCase();
 
-/// The language codes are shown as codes for now; the localized names are
-/// the next polish step (docs/library-browse.md §4.3).
-String filterLanguageLabel(String language) => language.toUpperCase();
+/// The name of a language in the reader's language; an unknown code keeps
+/// its own spelling so the filter still says what it holds.
+String filterLanguageLabel(BuildContext context, String language) =>
+    switch (language.toLowerCase()) {
+      'zh' => context.loc.languageZh,
+      'en' => context.loc.languageEn,
+      'ja' => context.loc.languageJa,
+      'ko' => context.loc.languageKo,
+      'fr' => context.loc.languageFr,
+      'de' => context.loc.languageDe,
+      'es' => context.loc.languageEs,
+      'ru' => context.loc.languageRu,
+      _ => language.toUpperCase(),
+    };

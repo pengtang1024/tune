@@ -606,7 +606,7 @@ void main() {
     // tooltip, so the row keeps its shape whatever the source is called.
     expect(find.byType(SourceBadge), findsOneWidget);
 
-    await tester.tap(find.byTooltip('筛选来源'));
+    await tester.tap(find.byKey(const ValueKey('library-source-filter')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Openverse').last);
     await tester.pumpAndSettle();

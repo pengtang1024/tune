@@ -203,7 +203,7 @@ class LibraryFilterPanel extends ConsumerWidget {
                         for (final entry in _top(facets.languages))
                           FilterChip(
                             label: Text(
-                              '${filterLanguageLabel(entry.key)} · '
+                              '${filterLanguageLabel(context, entry.key)} · '
                               '${entry.value}',
                             ),
                             selected: filter.languages.contains(entry.key),

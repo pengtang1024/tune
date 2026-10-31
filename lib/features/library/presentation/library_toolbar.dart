@@ -315,6 +315,7 @@ class _SourceFilter extends StatelessWidget {
           ? '${context.loc.libraryFilterSources} · $label'
           : context.loc.libraryFilterSources,
       child: PopupMenuButton<String>(
+        key: const ValueKey('library-source-filter'),
         padding: EdgeInsets.zero,
         initialValue: sourceFilter ?? allSourcesFilterValue,
         onSelected: (value) {

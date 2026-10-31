@@ -25,6 +25,10 @@ class LibraryHeader extends StatelessWidget {
 
   final VoidCallback onSearchOnline;
 
+  /// Whether the category tree stands open.
+  final bool treeExpanded;
+  final VoidCallback onToggleTree;
+
   const LibraryHeader({
     super.key,
     required this.summary,
@@ -32,6 +36,8 @@ class LibraryHeader extends StatelessWidget {
     required this.onScan,
     required this.scanning,
     required this.onSearchOnline,
+    required this.treeExpanded,
+    required this.onToggleTree,
   });
 
   @override
@@ -47,6 +53,27 @@ class LibraryHeader extends StatelessWidget {
       height: 40,
       child: Row(
         children: [
+          TuneTooltip(
+            message: treeExpanded
+                ? context.loc.libraryTreeCollapse
+                : context.loc.libraryTreeExpand,
+            child: IconButton(
+              key: const ValueKey('library-tree-toggle'),
+              onPressed: onToggleTree,
+              icon: Icon(
+                treeExpanded
+                    ? Icons.menu_open_rounded
+                    : Icons.menu_rounded,
+                size: CompactTokens.icon18,
+              ),
+              style: IconButton.styleFrom(
+                fixedSize: const Size.square(CompactTokens.controlDefault),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          ),
+          const SizedBox(width: CompactTokens.space4),
           Text(context.loc.libraryTitle, style: titleStyle),
           const SizedBox(width: CompactTokens.space12),
           Expanded(

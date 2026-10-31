@@ -2635,6 +2635,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分类视图';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展开分类';
+
+  @override
+  String get libraryTreeCollapse => '收起分类';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英语';
+
+  @override
+  String get languageJa => '日语';
+
+  @override
+  String get languageKo => '韩语';
+
+  @override
+  String get languageFr => '法语';
+
+  @override
+  String get languageDe => '德语';
+
+  @override
+  String get languageEs => '西班牙语';
+
+  @override
+  String get languageRu => '俄语';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5268,6 +5304,42 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分类视图';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展开分类';
+
+  @override
+  String get libraryTreeCollapse => '收起分类';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英语';
+
+  @override
+  String get languageJa => '日语';
+
+  @override
+  String get languageKo => '韩语';
+
+  @override
+  String get languageFr => '法语';
+
+  @override
+  String get languageDe => '德语';
+
+  @override
+  String get languageEs => '西班牙语';
+
+  @override
+  String get languageRu => '俄语';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7901,4 +7973,40 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分類檢視';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展開分類';
+
+  @override
+  String get libraryTreeCollapse => '收起分類';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英語';
+
+  @override
+  String get languageJa => '日語';
+
+  @override
+  String get languageKo => '韓語';
+
+  @override
+  String get languageFr => '法語';
+
+  @override
+  String get languageDe => '德語';
+
+  @override
+  String get languageEs => '西班牙語';
+
+  @override
+  String get languageRu => '俄語';
 }

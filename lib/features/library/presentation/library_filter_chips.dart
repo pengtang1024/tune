@@ -72,7 +72,7 @@ class LibraryFilterChips extends StatelessWidget {
       for (final language in filter.languages)
         _chip(
           context,
-          filterLanguageLabel(language),
+          filterLanguageLabel(context, language),
           () => onChanged(
             filter.copyWith(
               languages: {...filter.languages}..remove(language),

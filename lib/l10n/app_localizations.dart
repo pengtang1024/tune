@@ -4864,6 +4864,78 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'更早'**
   String get libraryFilterAddedOlder;
+
+  /// No description provided for @libraryViewCategories.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'分类视图'**
+  String get libraryViewCategories;
+
+  /// No description provided for @libraryAllSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部歌曲'**
+  String get libraryAllSongs;
+
+  /// No description provided for @libraryTreeExpand.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'展开分类'**
+  String get libraryTreeExpand;
+
+  /// No description provided for @libraryTreeCollapse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起分类'**
+  String get libraryTreeCollapse;
+
+  /// No description provided for @languageZh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文'**
+  String get languageZh;
+
+  /// No description provided for @languageEn.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语'**
+  String get languageEn;
+
+  /// No description provided for @languageJa.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'日语'**
+  String get languageJa;
+
+  /// No description provided for @languageKo.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'韩语'**
+  String get languageKo;
+
+  /// No description provided for @languageFr.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'法语'**
+  String get languageFr;
+
+  /// No description provided for @languageDe.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'德语'**
+  String get languageDe;
+
+  /// No description provided for @languageEs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西班牙语'**
+  String get languageEs;
+
+  /// No description provided for @languageRu.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'俄语'**
+  String get languageRu;
 }
 
 class _AppLocalizationsDelegate
