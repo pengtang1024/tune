@@ -102,19 +102,13 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                     CompactTokens.pageGutter,
                     CompactTokens.pageGutter,
                   ),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 760),
-                      child: _body(
-                        context,
-                        settings,
-                        controller,
-                        libraryReady: library.$1,
-                        scanning: library.$2,
-                        clearing: library.$3,
-                      ),
-                    ),
+                  child: _body(
+                    context,
+                    settings,
+                    controller,
+                    libraryReady: library.$1,
+                    scanning: library.$2,
+                    clearing: library.$3,
                   ),
                 ),
               ),
@@ -416,9 +410,11 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         const SizedBox(height: CompactTokens.space12),
         LayoutBuilder(
           builder: (context, constraints) {
-            final width = constraints.maxWidth >= 700
-                ? (constraints.maxWidth - 12) / 2
-                : constraints.maxWidth;
+            final columns = (constraints.maxWidth / 260)
+                .floor()
+                .clamp(1, 4);
+            final width =
+                (constraints.maxWidth - 12 * (columns - 1)) / columns;
             return Wrap(
               spacing: CompactTokens.space12,
               runSpacing: CompactTokens.space12,
@@ -484,9 +480,11 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         const SizedBox(height: CompactTokens.space12),
         LayoutBuilder(
           builder: (context, constraints) {
-            final width = constraints.maxWidth >= 700
-                ? (constraints.maxWidth - 12) / 2
-                : constraints.maxWidth;
+            final columns = (constraints.maxWidth / 300)
+                .floor()
+                .clamp(1, 4);
+            final width =
+                (constraints.maxWidth - 12 * (columns - 1)) / columns;
             return Wrap(
               spacing: CompactTokens.space12,
               runSpacing: CompactTokens.space12,
