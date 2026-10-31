@@ -10,6 +10,8 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
@@ -64,6 +66,24 @@ void main() {
     addTearDown(container.dispose);
     return container;
   }
+
+  test('the order and filters survive a rebuild', () async {
+    final storage = FakeLibraryStorage([songA]);
+    final first = buildContainer(storage);
+    await first.read(libraryControllerProvider.future);
+    await first
+        .read(libraryControllerProvider.notifier)
+        .setFilter(const LibraryFilter(genres: {'jazz'}));
+    await first
+        .read(libraryControllerProvider.notifier)
+        .setSort(LibrarySort.recent);
+
+    final second = buildContainer(storage);
+    final state = await second.read(libraryControllerProvider.future);
+
+    expect(state.filter.genres, {'jazz'});
+    expect(state.sort, LibrarySort.recent);
+  });
 
   test('build loads the persisted library', () async {
     final container = buildContainer(FakeLibraryStorage([songA]));
@@ -222,6 +242,7 @@ void main() {
     ]);
     final container = buildContainer(storage);
     await container.read(libraryControllerProvider.future);
+    storage.reloadCount = 0;
 
     await container.read(libraryControllerProvider.notifier).setQuery('Tra');
     await container

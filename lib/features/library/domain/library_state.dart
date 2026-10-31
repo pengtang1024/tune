@@ -47,7 +47,7 @@ class LibraryState {
     this.query = '',
     this.sourceFilter,
     this.filter = LibraryFilter.empty,
-    this.sort = LibrarySort.title,
+    this.sort = LibrarySort.recent,
     this.scanStatus = LibraryScanStatus.idle,
     this.scanProgress = 0,
     this.statusMessage,

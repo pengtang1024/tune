@@ -3,7 +3,7 @@
 > 2026-10-31。回答「音乐库除了搜索还能怎么找歌」：分类怎么分、筛选怎么叠、视觉上怎么读。
 > 相关：[library-redesign.md](library-redesign.md)（页头/列头/排序/密度）、[chips.md](chips.md)（标识）、
 > [genre-localization.md](genre-localization.md)（流派名）、[performance.md](performance.md)（查询预算）。
-> 状态：**M0–M3 已实施**（M4 收尾中）。
+> 状态：**M0–M4 已实施**。
 
 ## 1. 问题与目标
 
@@ -167,10 +167,10 @@
 | 状态 | 归属 | 持久化 |
 | --- | --- | --- |
 | 搜索词 | `LibraryState.query` | 会话 |
-| 筛选条件 | `LibraryState.filter`（新） | 会话；P3 可选写入 `view.json` |
+| 筛选条件 | `LibraryState.filter`（新） | 写入 `view.json`，下次启动恢复 |
 | 分类视图当前类别 | 路由参数或 `LibraryPane` 本地 state | 会话；面包屑可后退 |
 | 分类树展开 | `LibraryPane` 本地 state | 会话；<1120 默认收起 |
-| 排序 | `LibraryState.sort`（library-redesign §5） | `view.json` |
+| 排序 | `LibraryState.sort`（library-redesign §5） | 写入 `view.json`，默认最近加入倒序 |
 | 视图模式 | `LibraryPane` 本地 state | 会话 |
 
 - `sourceFilter` 并入 `LibraryFilter.sources`；旧的单选入口保留兼容，但内部只认一份 filter。

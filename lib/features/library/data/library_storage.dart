@@ -4,6 +4,7 @@ import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_facets.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 
 /// The library of the app, as the songs it holds.
 ///
@@ -87,6 +88,12 @@ abstract class LibraryStorage {
   /// The counts of the filter groups.
   Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
       LibraryFacets.empty;
+
+  /// The order and the filters the reader left the library with.
+  Future<LibraryView?> loadView() async => null;
+
+  /// Saves the order and the filters for the next run.
+  Future<void> saveView(LibraryView view) async {}
 
   /// The albums of the library, without their tracks.
   Future<List<AlbumSummary>> albumSummaries();

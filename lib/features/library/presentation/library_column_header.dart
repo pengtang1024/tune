@@ -23,7 +23,7 @@ class LibraryColumnHeader extends StatelessWidget {
     required this.onSort,
   });
 
-  static const double _addedWidth = 56;
+  static const double _addedWidth = 64;
   static const double _tailWidth = 102;
 
   @override
@@ -125,12 +125,16 @@ class LibraryColumnHeader extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                label,
-                style: style?.copyWith(
-                  color: active
-                      ? theme.colorScheme.onSurface
-                      : theme.colorScheme.onSurfaceVariant,
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: style?.copyWith(
+                    color: active
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               if (active) ...[

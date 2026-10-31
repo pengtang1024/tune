@@ -6,6 +6,7 @@ import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_facets.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 
 /// The library storage of a build without a file system.
@@ -73,6 +74,12 @@ class EmptyLibraryStorage implements LibraryStorage {
   @override
   Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
       LibraryFacets.empty;
+
+  @override
+  Future<LibraryView?> loadView() async => null;
+
+  @override
+  Future<void> saveView(LibraryView view) async {}
 
   @override
   Future<List<AlbumSummary>> albumSummaries() async => const [];

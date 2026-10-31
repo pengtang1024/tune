@@ -3,7 +3,7 @@
 > 2026-10-25。这一页回答三件事：音乐库现在为什么挤、改成什么样、按什么顺序落地。
 > 相关：[conventions.md](conventions.md)（尺寸与字体）、[performance-row-design.md](performance-row-design.md)（行预算）、
 > [chips.md](chips.md)（标识）、[architecture.md](architecture.md)（状态归属）。
-> 状态：**M1a/M1b 已实施**（页头/工具条/列头/行尾/排序/双列）；分类与筛选见 library-browse M0–M3。线框稿见 [`mockups/library-redesign.html`](mockups/library-redesign.html)。
+> 状态：**M1a/M1b 已实施**（页头/工具条/列头/行尾/排序/双列）；分类与筛选见 library-browse M0–M4。线框稿见 [`mockups/library-redesign.html`](mockups/library-redesign.html)。
 > 分类、分面筛选与左侧分类树见 [`library-browse.md`](library-browse.md)；两件事**同一批落地**。
 
 ## 1. 现状

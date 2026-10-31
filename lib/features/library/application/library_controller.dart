@@ -16,6 +16,7 @@ import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/domain/library_facets.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -66,13 +67,23 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       _queryDebounce?.cancel();
     });
 
-    final total = await _storage.count();
-    final songs = total > windowSize
-        ? await _storage.page(offset: 0, limit: windowSize)
-        : await _storage.load();
+    final view = await _storage.loadView();
+    final sort = view?.sort ?? LibrarySort.recent;
+    final filter = view?.filter ?? LibraryFilter.empty;
+    final total = await _storage.countQuery(query: '', filter: filter);
+    final songs = await _storage.query(
+      query: '',
+      filter: filter,
+      sort: sort,
+      offset: 0,
+      limit: windowSize,
+    );
     final albums = await _storage.albumSummaries();
     return LibraryState(
       songs: List.unmodifiable(songs),
+      filter: filter,
+      sort: sort,
+      sourceFilter: filter.sources.length == 1 ? filter.sources.first : null,
       total: total,
       hasMore: songs.length < total,
       albums: albums,
@@ -372,10 +383,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     }
     if (_disposed || !state.hasValue) return false;
 
-    final filterActive =
-        _current.query.isNotEmpty ||
-        _current.hasFilter ||
-        _current.sort != LibrarySort.title;
+    final filterActive = _current.query.isNotEmpty || _current.hasFilter;
     if (written > 0 || filterActive) {
       await _reloadForFilter();
       return written > 0;
@@ -457,6 +465,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         ),
       ),
     );
+    _saveView();
     await _reloadForFilter();
   }
 
@@ -471,6 +480,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
             : null,
       ),
     );
+    _saveView();
     await _reloadForFilter();
   }
 
@@ -484,7 +494,18 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   Future<void> setSort(LibrarySort sort) async {
     if (_disposed || !state.hasValue || _current.sort == sort) return;
     state = AsyncData(_current.copyWith(sort: sort));
+    _saveView();
     await _reloadForFilter();
+  }
+
+  void _saveView() {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    unawaited(
+      _storage.saveView(
+        LibraryView(sort: current.sort, filter: current.filter),
+      ),
+    );
   }
 
   /// The filter the queries use: the state's filter plus the legacy source

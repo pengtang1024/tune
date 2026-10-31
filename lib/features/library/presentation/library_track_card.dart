@@ -185,7 +185,7 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
               ],
               if (metrics.showAdded)
                 SizedBox(
-                  width: 56,
+                  width: 64,
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
