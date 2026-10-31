@@ -1423,5 +1423,6 @@
   "libraryColumnAlbum": "专辑",
   "libraryColumnAdded": "加入",
   "libraryColumnDuration": "时长",
-  "libraryMoreActions": "更多操作"
+  "libraryMoreActions": "更多操作",
+  "libraryViewColumns": "双列视图"
 }

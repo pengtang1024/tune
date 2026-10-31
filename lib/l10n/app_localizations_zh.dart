@@ -2563,6 +2563,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '双列视图';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5124,6 +5127,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '双列视图';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7685,4 +7691,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '雙欄檢視';
 }

@@ -2777,4 +2777,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryMoreActions => 'More actions';
+
+  @override
+  String get libraryViewColumns => 'Two-column view';
 }

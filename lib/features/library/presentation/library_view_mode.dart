@@ -5,4 +5,7 @@ enum LibraryViewMode {
 
   /// The covers of the albums the tracks belong to.
   albums,
+
+  /// Two tracks per line: the wall of the library.
+  columns,
 }

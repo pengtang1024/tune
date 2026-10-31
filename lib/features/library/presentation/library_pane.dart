@@ -18,6 +18,7 @@ import 'package:tune/features/library/presentation/library_empty_state.dart';
 import 'package:tune/features/library/presentation/library_album_header.dart';
 import 'package:tune/features/library/presentation/library_albums_view.dart';
 import 'package:tune/features/library/presentation/library_column_header.dart';
+import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
@@ -57,6 +58,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// the same covers instead of the top of the page.
   final ScrollController _songsScrollController = ScrollController();
   final ScrollController _albumsScrollController = ScrollController();
+  final ScrollController _columnsScrollController = ScrollController();
 
   /// How the list below the toolbar is read.
   LibraryViewMode _view = LibraryViewMode.songs;
@@ -111,6 +113,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     _searchController.dispose();
     _songsScrollController.dispose();
     _albumsScrollController.dispose();
+    _columnsScrollController.dispose();
     super.dispose();
   }
 
@@ -336,6 +339,33 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         sourceLabels,
         onlyLikeOnDoubleClick,
         library.sort,
+      );
+    }
+
+    if (_view == LibraryViewMode.columns) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final rowWidth =
+              constraints.maxWidth - CompactTokens.pageGutter * 2;
+          if (rowWidth < 860) {
+            // Too narrow for two columns: the list takes over, the choice
+            // stays so the wall comes back when the window grows.
+            return _trackList(
+              songs,
+              sourceLabels,
+              onlyLikeOnDoubleClick,
+              library.sort,
+              controller: _songsScrollController,
+              hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+            );
+          }
+          return LibraryColumnsView(
+            songs: songs,
+            sourceLabels: sourceLabels,
+            waitsForDoubleClick: onlyLikeOnDoubleClick,
+            controller: _columnsScrollController,
+          );
+        },
       );
     }
 

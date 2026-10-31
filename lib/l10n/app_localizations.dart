@@ -4720,6 +4720,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'更多操作'**
   String get libraryMoreActions;
+
+  /// No description provided for @libraryViewColumns.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双列视图'**
+  String get libraryViewColumns;
 }
 
 class _AppLocalizationsDelegate

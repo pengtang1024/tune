@@ -41,6 +41,12 @@ class LibraryViewSwitch extends StatelessWidget {
             onPressed: () => onChanged(LibraryViewMode.songs),
           ),
           _ViewButton(
+            icon: Icons.view_column_rounded,
+            tooltip: context.loc.libraryViewColumns,
+            selected: view == LibraryViewMode.columns,
+            onPressed: () => onChanged(LibraryViewMode.columns),
+          ),
+          _ViewButton(
             icon: Icons.grid_view_rounded,
             tooltip: context.loc.libraryViewAlbums,
             selected: view == LibraryViewMode.albums,

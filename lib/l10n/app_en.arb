@@ -1423,5 +1423,6 @@
   "libraryColumnAlbum": "Album",
   "libraryColumnAdded": "Added",
   "libraryColumnDuration": "Duration",
-  "libraryMoreActions": "More actions"
+  "libraryMoreActions": "More actions",
+  "libraryViewColumns": "Two-column view"
 }
