@@ -47,6 +47,8 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('replace_queue_on_click') ?? false,
           onlyLikeOnDoubleClick:
               _persistence.getBool('only_like_on_double_click') ?? false,
+          favoritesDoubleClickPlays:
+              _persistence.getBool('favorites_double_click_plays') ?? true,
           autoResumeOnStartup:
               _persistence.getBool('auto_resume_on_startup') ??
                   // The switch used to decide whether the queue was read at
@@ -126,6 +128,14 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.onlyLikeOnDoubleClick == value) return;
     state = state.copyWith(onlyLikeOnDoubleClick: value);
     await _persistence.setBool('only_like_on_double_click', value);
+  }
+
+  /// Sets whether a double click in the favorites page plays the track and
+  /// replaces the queue.
+  Future<void> setFavoritesDoubleClickPlays(bool value) async {
+    if (state.favoritesDoubleClickPlays == value) return;
+    state = state.copyWith(favoritesDoubleClickPlays: value);
+    await _persistence.setBool('favorites_double_click_plays', value);
   }
 
   /// Sets whether a start picks up playing where the last run stopped.

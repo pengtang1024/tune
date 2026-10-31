@@ -77,6 +77,23 @@ void main() {
     expect(controller.state.onlyLikeOnDoubleClick, isTrue);
   });
 
+  test('a double click in favorites plays and replaces the queue by default',
+      () async {
+    final persistence = FakePersistenceService();
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    expect(controller.state.favoritesDoubleClickPlays, isTrue);
+
+    await controller.setFavoritesDoubleClickPlays(false);
+    expect(controller.state.favoritesDoubleClickPlays, isFalse);
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+    expect(reloaded.state.favoritesDoubleClickPlays, isFalse);
+  });
+
   test('the double click behavior survives a controller rebuild', () async {
     final persistence = FakePersistenceService();
 

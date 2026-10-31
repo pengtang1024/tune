@@ -13,18 +13,22 @@ class SettingsPlaybackCard extends StatelessWidget {
   final bool autoResumeOnStartup;
   final bool replaceQueueOnClick;
   final bool onlyLikeOnDoubleClick;
+  final bool favoritesDoubleClickPlays;
   final ValueChanged<bool> onAutoResumeOnStartup;
   final ValueChanged<bool> onReplaceQueueOnClick;
   final ValueChanged<bool> onOnlyLikeOnDoubleClick;
+  final ValueChanged<bool> onFavoritesDoubleClickPlays;
 
   const SettingsPlaybackCard({
     super.key,
     required this.autoResumeOnStartup,
     required this.replaceQueueOnClick,
     required this.onlyLikeOnDoubleClick,
+    required this.favoritesDoubleClickPlays,
     required this.onAutoResumeOnStartup,
     required this.onReplaceQueueOnClick,
     required this.onOnlyLikeOnDoubleClick,
+    required this.onFavoritesDoubleClickPlays,
   });
 
   @override
@@ -56,6 +60,13 @@ class SettingsPlaybackCard extends StatelessWidget {
             description: context.loc.settingsOnlyLikeOnDoubleClickHint,
             value: onlyLikeOnDoubleClick,
             onChanged: onOnlyLikeOnDoubleClick,
+          ),
+          const SizedBox(height: 8),
+          SettingsSwitchRow(
+            title: context.loc.settingsFavoritesDoubleClickPlays,
+            description: context.loc.settingsFavoritesDoubleClickPlaysHint,
+            value: favoritesDoubleClickPlays,
+            onChanged: onFavoritesDoubleClickPlays,
           ),
         ],
       ),

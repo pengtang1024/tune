@@ -217,6 +217,76 @@ void main() {
     expect(find.text('Alpha'), findsOneWidget);
   });
 
+  testWidgets('a double click on a favorite plays it and replaces the queue',
+      (tester) async {
+    await tester.pumpWidget(
+      app(home: const FavoritesPane(), songs: const [songA, songB]),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FavoritesPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .toggle(songA.uri);
+    await container
+        .read(playbackControllerProvider.notifier)
+        .playQueue([songB]);
+    await tester.pumpAndSettle();
+    expect(
+      container.read(playbackControllerProvider).queue.map((s) => s.uri),
+      [songB.uri],
+    );
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+
+    final playback = container.read(playbackControllerProvider);
+    expect(playback.currentSong?.uri, songA.uri);
+    expect(
+      playback.queue.map((s) => s.uri),
+      [songA.uri],
+      reason: 'the favorites double click replaces the queue with the track',
+    );
+  });
+
+  testWidgets('with the switch off, a double click only likes the track',
+      (tester) async {
+    persistence.values['favorites_double_click_plays'] = false;
+    await tester.pumpWidget(
+      app(home: const FavoritesPane(), songs: const [songA, songB]),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FavoritesPane)),
+    );
+    await container
+        .read(favoritesControllerProvider.notifier)
+        .toggle(songA.uri);
+    await container
+        .read(playbackControllerProvider.notifier)
+        .playQueue([songB]);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+
+    final playback = container.read(playbackControllerProvider);
+    expect(playback.currentSong?.uri, songB.uri,
+        reason: 'the old behavior leaves the music alone');
+    expect(playback.queue.map((s) => s.uri), [songB.uri]);
+    expect(
+      container.read(favoritesControllerProvider).contains(songA.uri),
+      isTrue,
+    );
+  });
+
   testWidgets('a double click on a heart does not take two marks away', (
     tester,
   ) async {

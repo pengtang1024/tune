@@ -1073,6 +1073,8 @@
   "settingsReplaceQueueOnClickHint": "關掉時單擊只把這首排進佇列並立即播放，佇列裡的其餘曲目保留",
   "settingsOnlyLikeOnDoubleClick": "雙擊時只標成喜歡",
   "settingsOnlyLikeOnDoubleClickHint": "開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡",
+  "settingsFavoritesDoubleClickPlays": "雙擊喜歡的曲目時播放並替換佇列",
+  "settingsFavoritesDoubleClickPlaysHint": "開啟時，雙擊喜歡列表裡的曲目會播放它並把佇列換成它；關閉時雙擊只標成喜歡",
   "sidebarDiscover": "發現",
   "discoverEyebrow": "發現",
   "discoverTitle": "今天聽什麼",

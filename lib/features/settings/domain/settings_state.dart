@@ -36,6 +36,14 @@ class SettingsState {
   /// away, that is the single click on the heart.
   final bool onlyLikeOnDoubleClick;
 
+  /// Whether a double click in the favorites page plays the track and
+  /// replaces the play queue.
+  ///
+  /// The favorites page is the one list where the reader usually wants to
+  /// hear the track now; this switch keeps that the default and lets the
+  /// reader fall back to the old "double click only likes" behavior.
+  final bool favoritesDoubleClickPlays;
+
   /// The folder the app writes the files it fetches into.
   ///
   /// It is the music library of the machine, unless the user picked another
@@ -74,6 +82,7 @@ class SettingsState {
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
     this.onlyLikeOnDoubleClick = false,
+    this.favoritesDoubleClickPlays = true,
     this.autoResumeOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
@@ -98,6 +107,7 @@ class SettingsState {
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
     bool? onlyLikeOnDoubleClick,
+    bool? favoritesDoubleClickPlays,
     bool? autoResumeOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
@@ -117,6 +127,8 @@ class SettingsState {
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
       onlyLikeOnDoubleClick:
           onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
+      favoritesDoubleClickPlays:
+          favoritesDoubleClickPlays ?? this.favoritesDoubleClickPlays,
       autoResumeOnStartup: autoResumeOnStartup ?? this.autoResumeOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,

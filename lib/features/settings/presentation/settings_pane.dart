@@ -116,12 +116,16 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   autoResumeOnStartup: settings.autoResumeOnStartup,
                   replaceQueueOnClick: settings.replaceQueueOnClick,
                   onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
+                  favoritesDoubleClickPlays:
+                      settings.favoritesDoubleClickPlays,
                   onAutoResumeOnStartup:
                       settingsController.setAutoResumeOnStartup,
                   onReplaceQueueOnClick:
                       settingsController.setReplaceQueueOnClick,
                   onOnlyLikeOnDoubleClick:
                       settingsController.setOnlyLikeOnDoubleClick,
+                  onFavoritesDoubleClickPlays:
+                      settingsController.setFavoritesDoubleClickPlays,
                 ),
                 const SizedBox(height: 14),
                 const SettingsDiscoveryCard(),

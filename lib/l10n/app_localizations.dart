@@ -3767,6 +3767,18 @@ abstract class AppLocalizations {
   /// **'打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢'**
   String get settingsOnlyLikeOnDoubleClickHint;
 
+  /// No description provided for @settingsFavoritesDoubleClickPlays.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双击喜欢的曲目时播放并替换队列'**
+  String get settingsFavoritesDoubleClickPlays;
+
+  /// No description provided for @settingsFavoritesDoubleClickPlaysHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢'**
+  String get settingsFavoritesDoubleClickPlaysHint;
+
   /// No description provided for @sidebarDiscover.
   ///
   /// In zh_CN, this message translates to:

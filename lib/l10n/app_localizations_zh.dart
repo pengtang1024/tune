@@ -2025,6 +2025,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
 
   @override
+  String get settingsFavoritesDoubleClickPlays => '双击喜欢的曲目时播放并替换队列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢';
+
+  @override
   String get sidebarDiscover => '发现';
 
   @override
@@ -4543,6 +4550,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
 
   @override
+  String get settingsFavoritesDoubleClickPlays => '双击喜欢的曲目时播放并替换队列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢';
+
+  @override
   String get sidebarDiscover => '发现';
 
   @override
@@ -7059,6 +7073,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡';
+
+  @override
+  String get settingsFavoritesDoubleClickPlays => '雙擊喜歡的曲目時播放並替換佇列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '開啟時，雙擊喜歡列表裡的曲目會播放它並把佇列換成它；關閉時雙擊只標成喜歡';
 
   @override
   String get sidebarDiscover => '發現';

@@ -1073,6 +1073,8 @@
   "settingsReplaceQueueOnClickHint": "When off, a click queues the track and plays it right away; the rest of the queue stays",
   "settingsOnlyLikeOnDoubleClick": "Only like the track on a double click",
   "settingsOnlyLikeOnDoubleClickHint": "When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well",
+  "settingsFavoritesDoubleClickPlays": "Play and replace the queue on a double click in Favorites",
+  "settingsFavoritesDoubleClickPlaysHint": "When on, double-clicking a favorite plays it and replaces the play queue; when off, it only likes the track",
   "sidebarDiscover": "Discover",
   "discoverEyebrow": "DISCOVER",
   "discoverTitle": "What to play",

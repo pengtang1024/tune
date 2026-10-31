@@ -2212,6 +2212,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well';
 
   @override
+  String get settingsFavoritesDoubleClickPlays =>
+      'Play and replace the queue on a double click in Favorites';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      'When on, double-clicking a favorite plays it and replaces the play queue; when off, it only likes the track';
+
+  @override
   String get sidebarDiscover => 'Discover';
 
   @override
