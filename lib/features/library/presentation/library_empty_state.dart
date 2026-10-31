@@ -19,8 +19,12 @@ class LibraryEmptyState extends ConsumerWidget {
   /// The source the reader picked, if any.
   final String? sourceFilter;
 
+  /// Whether a filter narrows the page.
+  final bool filterActive;
+
   final VoidCallback onClearQuery;
   final VoidCallback onClearSourceFilter;
+  final VoidCallback onClearFilters;
   final VoidCallback onScan;
 
   const LibraryEmptyState({
@@ -28,8 +32,10 @@ class LibraryEmptyState extends ConsumerWidget {
     required this.query,
     required this.hasSongs,
     required this.sourceFilter,
+    required this.filterActive,
     required this.onClearQuery,
     required this.onClearSourceFilter,
+    required this.onClearFilters,
     required this.onScan,
   });
 
@@ -55,6 +61,18 @@ class LibraryEmptyState extends ConsumerWidget {
         action: TextButton(
           onPressed: onClearQuery,
           child: Text(context.loc.libraryClearSearch),
+        ),
+      );
+    }
+
+    if (filterActive && hasSongs) {
+      return EmptyStateView(
+        icon: Icons.filter_alt_off_rounded,
+        title: context.loc.libraryNoMatchTitle,
+        subtitle: context.loc.libraryNoMatchSubtitle,
+        action: TextButton(
+          onPressed: onClearFilters,
+          child: Text(context.loc.libraryFilterClearAll),
         ),
       );
     }

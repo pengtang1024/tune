@@ -13,6 +13,7 @@ import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -473,6 +474,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await _reloadForFilter();
   }
 
+  /// The counts the filter panel reads, for [filter].
+  Future<LibraryFacets> facets(LibraryFilter filter) async {
+    await future;
+    return _storage.facets(filter: filter);
+  }
+
   /// Orders the page by [sort].
   Future<void> setSort(LibrarySort sort) async {
     if (_disposed || !state.hasValue || _current.sort == sort) return;
@@ -629,3 +636,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// and the library must not pull the player up to merge a scan.
   Set<String> _pinnedUris() => ref.read(favoritesControllerProvider).ids;
 }
+
+/// The counts of the filter panel, following the filter on the page.
+final libraryFacetsProvider = FutureProvider.autoDispose<LibraryFacets>((ref) async {
+  final filter = ref.watch(
+    libraryControllerProvider.select(
+      (value) => value.valueOrNull?.filter ?? LibraryFilter.empty,
+    ),
+  );
+  return ref.read(libraryControllerProvider.notifier).facets(filter);
+});

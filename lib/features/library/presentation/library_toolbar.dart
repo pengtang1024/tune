@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/features/library/presentation/library_view_switch.dart';
@@ -25,12 +26,14 @@ class LibraryToolbar extends ConsumerWidget {
   final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
   final LibrarySort sort;
+  final LibraryFilter filter;
   final LibraryViewMode view;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClearQuery;
   final ValueChanged<String?> onSourceFilter;
   final ValueChanged<LibrarySort> onSort;
   final ValueChanged<LibraryViewMode> onViewChanged;
+  final VoidCallback onFilter;
 
   const LibraryToolbar({
     super.key,
@@ -41,12 +44,14 @@ class LibraryToolbar extends ConsumerWidget {
     required this.sourceLabels,
     required this.sourceFilter,
     required this.sort,
+    required this.filter,
     required this.view,
     required this.onQueryChanged,
     required this.onClearQuery,
     required this.onSourceFilter,
     required this.onSort,
     required this.onViewChanged,
+    required this.onFilter,
   });
 
   @override
@@ -151,6 +156,36 @@ class LibraryToolbar extends ConsumerWidget {
             ),
             const SizedBox(width: CompactTokens.space8),
           ],
+          OutlinedButton.icon(
+            key: const ValueKey('library-filter'),
+            onPressed: onFilter,
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, CompactTokens.controlDefault),
+              padding: const EdgeInsets.symmetric(
+                horizontal: CompactTokens.space8,
+              ),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+              side: BorderSide(
+                color: filter.isEmpty
+                    ? theme.colorScheme.outlineVariant
+                    : theme.colorScheme.primary.withValues(alpha: 0.4),
+              ),
+              foregroundColor: filter.isEmpty
+                  ? theme.colorScheme.onSurfaceVariant
+                  : theme.colorScheme.primary,
+            ),
+            icon: const Icon(
+              Icons.filter_alt_outlined,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(
+              filter.activeGroups == 0
+                  ? context.loc.libraryFilter
+                  : '${context.loc.libraryFilter} ${filter.activeGroups}',
+            ),
+          ),
+          const SizedBox(width: CompactTokens.space8),
           _SortButton(sort: sort, onSort: onSort),
           const SizedBox(width: CompactTokens.space8),
           LibraryViewSwitch(view: view, onChanged: onViewChanged),

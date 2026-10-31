@@ -2780,4 +2780,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryViewColumns => 'Two-column view';
+
+  @override
+  String get libraryFilter => 'Filter';
+
+  @override
+  String get libraryFilterClearAll => 'Clear all';
+
+  @override
+  String get libraryFilterStatus => 'Status';
+
+  @override
+  String get libraryFilterStatusAll => 'All';
+
+  @override
+  String get libraryFilterStatusLiked => 'Liked';
+
+  @override
+  String get libraryFilterStatusWithLyrics => 'With lyrics';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => 'Missing lyrics';
+
+  @override
+  String get libraryFilterStatusInstrumental => 'Instrumental';
+
+  @override
+  String get libraryFilterGenres => 'Genre';
+
+  @override
+  String get libraryFilterDecades => 'Decade';
+
+  @override
+  String get libraryFilterArtists => 'Artist';
+
+  @override
+  String get libraryFilterLanguages => 'Language';
+
+  @override
+  String get libraryFilterFormats => 'Format';
+
+  @override
+  String get libraryFilterDurations => 'Duration';
+
+  @override
+  String get libraryFilterAdded => 'Added';
+
+  @override
+  String get libraryFilterDurationShort => '<2 min';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 min';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 min';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 min';
+
+  @override
+  String get libraryFilterAddedWeek => 'Last 7 days';
+
+  @override
+  String get libraryFilterAddedMonth => 'Last 30 days';
+
+  @override
+  String get libraryFilterAddedYear => 'Last year';
+
+  @override
+  String get libraryFilterAddedOlder => 'Older';
 }

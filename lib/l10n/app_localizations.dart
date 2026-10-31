@@ -4726,6 +4726,144 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'双列视图'**
   String get libraryViewColumns;
+
+  /// No description provided for @libraryFilter.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'筛选'**
+  String get libraryFilter;
+
+  /// No description provided for @libraryFilterClearAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清除全部'**
+  String get libraryFilterClearAll;
+
+  /// No description provided for @libraryFilterStatus.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'状态'**
+  String get libraryFilterStatus;
+
+  /// No description provided for @libraryFilterStatusAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部'**
+  String get libraryFilterStatusAll;
+
+  /// No description provided for @libraryFilterStatusLiked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'喜欢'**
+  String get libraryFilterStatusLiked;
+
+  /// No description provided for @libraryFilterStatusWithLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有词'**
+  String get libraryFilterStatusWithLyrics;
+
+  /// No description provided for @libraryFilterStatusWithoutLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'缺词'**
+  String get libraryFilterStatusWithoutLyrics;
+
+  /// No description provided for @libraryFilterStatusInstrumental.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'纯音乐'**
+  String get libraryFilterStatusInstrumental;
+
+  /// No description provided for @libraryFilterGenres.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流派'**
+  String get libraryFilterGenres;
+
+  /// No description provided for @libraryFilterDecades.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'年代'**
+  String get libraryFilterDecades;
+
+  /// No description provided for @libraryFilterArtists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get libraryFilterArtists;
+
+  /// No description provided for @libraryFilterLanguages.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get libraryFilterLanguages;
+
+  /// No description provided for @libraryFilterFormats.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'格式'**
+  String get libraryFilterFormats;
+
+  /// No description provided for @libraryFilterDurations.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get libraryFilterDurations;
+
+  /// No description provided for @libraryFilterAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入时间'**
+  String get libraryFilterAdded;
+
+  /// No description provided for @libraryFilterDurationShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'<2 分钟'**
+  String get libraryFilterDurationShort;
+
+  /// No description provided for @libraryFilterDurationMedium.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'2–5 分钟'**
+  String get libraryFilterDurationMedium;
+
+  /// No description provided for @libraryFilterDurationLong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'5–10 分钟'**
+  String get libraryFilterDurationLong;
+
+  /// No description provided for @libraryFilterDurationEpic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'>10 分钟'**
+  String get libraryFilterDurationEpic;
+
+  /// No description provided for @libraryFilterAddedWeek.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近 7 天'**
+  String get libraryFilterAddedWeek;
+
+  /// No description provided for @libraryFilterAddedMonth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近 30 天'**
+  String get libraryFilterAddedMonth;
+
+  /// No description provided for @libraryFilterAddedYear.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近一年'**
+  String get libraryFilterAddedYear;
+
+  /// No description provided for @libraryFilterAddedOlder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更早'**
+  String get libraryFilterAddedOlder;
 }
 
 class _AppLocalizationsDelegate

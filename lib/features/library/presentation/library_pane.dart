@@ -12,6 +12,7 @@ import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
@@ -19,6 +20,8 @@ import 'package:tune/features/library/presentation/library_album_header.dart';
 import 'package:tune/features/library/presentation/library_albums_view.dart';
 import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_columns_view.dart';
+import 'package:tune/features/library/presentation/library_filter_chips.dart';
+import 'package:tune/features/library/presentation/library_filter_panel.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
@@ -234,6 +237,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               sourceLabels: sourceLabels,
               sourceFilter: library.sourceFilter,
               sort: library.sort,
+              filter: library.filter,
               view: _view,
               onQueryChanged: (value) {
                 ref.read(libraryControllerProvider.notifier).setQuery(value);
@@ -248,7 +252,19 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 ref.read(libraryControllerProvider.notifier).setSort(sort);
               },
               onViewChanged: _setView,
+              onFilter: () => showLibraryFilterPanel(
+                context,
+                sourceLabels: sourceLabels,
+              ),
             ),
+          ),
+        if (!library.filter.isEmpty)
+          LibraryFilterChips(
+            filter: library.filter,
+            sourceLabels: sourceLabels,
+            onChanged: (filter) {
+              ref.read(libraryControllerProvider.notifier).setFilter(filter);
+            },
           ),
         LibraryScanStatusBar(sourceIssues: hasSourceIssues),
         Expanded(
@@ -325,9 +341,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         query: library.query,
         hasSongs: library.songs.isNotEmpty,
         sourceFilter: library.sourceFilter,
+        filterActive: !library.filter.isEmpty,
         onClearQuery: _clearQuery,
         onClearSourceFilter: () {
           ref.read(libraryControllerProvider.notifier).setSourceFilter(null);
+        },
+        onClearFilters: () {
+          ref
+              .read(libraryControllerProvider.notifier)
+              .setFilter(LibraryFilter.empty);
         },
         onScan: _scan,
       );
@@ -662,6 +684,7 @@ typedef _LibrarySlice = ({
   String query,
   String? sourceFilter,
   LibrarySort sort,
+  LibraryFilter filter,
   bool hasFilter,
   bool hasSourceIssues,
   bool isScanning,
@@ -679,6 +702,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,
+    filter: state.filter,
     hasFilter: state.hasFilter,
     isScanning: state.isScanning,
     // The page only shows whether a source has a problem, not the whole

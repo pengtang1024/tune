@@ -2566,6 +2566,75 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryViewColumns => '双列视图';
+
+  @override
+  String get libraryFilter => '筛选';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜欢';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有词';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺词';
+
+  @override
+  String get libraryFilterStatusInstrumental => '纯音乐';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '艺术家';
+
+  @override
+  String get libraryFilterLanguages => '语言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '时长';
+
+  @override
+  String get libraryFilterAdded => '加入时间';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5130,6 +5199,75 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryViewColumns => '双列视图';
+
+  @override
+  String get libraryFilter => '筛选';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜欢';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有词';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺词';
+
+  @override
+  String get libraryFilterStatusInstrumental => '纯音乐';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '艺术家';
+
+  @override
+  String get libraryFilterLanguages => '语言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '时长';
+
+  @override
+  String get libraryFilterAdded => '加入时间';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7694,4 +7832,73 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewColumns => '雙欄檢視';
+
+  @override
+  String get libraryFilter => '篩選';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜歡';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有詞';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺詞';
+
+  @override
+  String get libraryFilterStatusInstrumental => '純音樂';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '藝術家';
+
+  @override
+  String get libraryFilterLanguages => '語言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '時長';
+
+  @override
+  String get libraryFilterAdded => '加入時間';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
 }
