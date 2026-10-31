@@ -15,6 +15,7 @@
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
 | 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M12 已实施；产品口径：每首有词，准入降级为高置信标注） |
+| 改设置页的布局、分区导航、预设与自定义 | [`docs/settings-redesign.md`](docs/settings-redesign.md)（提案，待评审） |
 | 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（M1a/M1b 已实施；分类筛选见 library-browse） |
 | 查音乐库的分类、分面筛选与浏览视图 | [`docs/library-browse.md`](docs/library-browse.md)（M0–M4 已实施） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
