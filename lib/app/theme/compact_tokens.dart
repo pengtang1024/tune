@@ -219,7 +219,7 @@ abstract final class CompactTokens {
   /// A field that follows the whole width of the page turns into a thin
   /// ribbon; the cap keeps it a box a reader can aim at, and the actions of
   /// the row keep the far end of the page.
-  static const double searchFieldMaxWidth = 420;
+  static const double searchFieldMaxWidth = 680;
 
   /// Size of the ring that says the app is busy, and of its stroke.
   ///

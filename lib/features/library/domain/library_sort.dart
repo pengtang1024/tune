@@ -24,6 +24,16 @@ class LibrarySort {
 
   LibrarySort flipped() => LibrarySort(field: field, ascending: !ascending);
 
+  /// The order a click on [field] asks for: the same column flips, a new
+  /// column takes its natural direction (the added time newest first).
+  LibrarySort then(LibrarySortField field) {
+    if (field == this.field) return flipped();
+    return LibrarySort(
+      field: field,
+      ascending: field != LibrarySortField.addedAt,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       other is LibrarySort &&

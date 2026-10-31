@@ -1411,5 +1411,17 @@
   "lyricsContrastTranslate": "翻译",
   "lyricsContrastTransliterate": "音译",
   "lyricsContrastDone": "已对照",
-  "settingsSmartLyricsAutoFill": "自动补齐：开着就把库里所有没词的歌自动补到有词"
+  "settingsSmartLyricsAutoFill": "自动补齐：开着就把库里所有没词的歌自动补到有词",
+  "librarySortTooltip": "排序",
+  "librarySortRecent": "最近加入",
+  "librarySortTitle": "标题",
+  "librarySortArtist": "艺术家",
+  "librarySortAlbum": "专辑",
+  "librarySortDuration": "时长",
+  "libraryColumnTitle": "标题",
+  "libraryColumnArtist": "艺术家",
+  "libraryColumnAlbum": "专辑",
+  "libraryColumnAdded": "加入",
+  "libraryColumnDuration": "时长",
+  "libraryMoreActions": "更多操作"
 }

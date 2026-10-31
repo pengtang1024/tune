@@ -12,8 +12,8 @@ class LibraryRowMetrics {
   /// Whether the artist column fits.
   final bool showArtist;
 
-  /// Whether the facts of the file fit.
-  final bool showFacts;
+  /// Whether the added date fits.
+  final bool showAdded;
 
   /// Whether the album column fits.
   final bool showAlbum;
@@ -27,7 +27,7 @@ class LibraryRowMetrics {
 
   const LibraryRowMetrics({
     required this.showArtist,
-    required this.showFacts,
+    required this.showAdded,
     required this.showAlbum,
     this.extent,
   });
@@ -36,12 +36,12 @@ class LibraryRowMetrics {
   bool operator ==(Object other) =>
       other is LibraryRowMetrics &&
       other.showArtist == showArtist &&
-      other.showFacts == showFacts &&
+      other.showAdded == showAdded &&
       other.showAlbum == showAlbum &&
       other.extent == extent;
 
   @override
-  int get hashCode => Object.hash(showArtist, showFacts, showAlbum, extent);
+  int get hashCode => Object.hash(showArtist, showAdded, showAlbum, extent);
 
   /// The metrics of a row that is [width] wide at [textScale].
   factory LibraryRowMetrics.at({
@@ -49,11 +49,11 @@ class LibraryRowMetrics {
     required double textScale,
   }) {
     return LibraryRowMetrics(
-      // The album is the first column to go, then the facts of the file.
-      // A narrow window keeps the artist and the time, because those are
-      // what tell two tracks apart.
+      // The album is the first column to go, then the added date. A narrow
+      // window keeps the artist and the duration, because those are what
+      // tell two tracks apart.
       showArtist: width >= 480,
-      showFacts: width >= 600,
+      showAdded: width >= 760,
       showAlbum: width >= 820,
       extent: (textScale - 1.0).abs() < 0.01
           ? CompactTokens.libraryRowHeight

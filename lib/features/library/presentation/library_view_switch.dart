@@ -24,8 +24,8 @@ class LibraryViewSwitch extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      height: 28,
-      padding: const EdgeInsets.all(2),
+      height: CompactTokens.controlDefault,
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
         borderRadius: CompactTokens.borderRadius8,
@@ -76,8 +76,8 @@ class _ViewButton extends StatelessWidget {
         icon: Icon(icon, size: CompactTokens.icon16),
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(
-          width: CompactTokens.libraryRowAction,
-          height: CompactTokens.libraryRowAction,
+          width: CompactTokens.controlSmall,
+          height: CompactTokens.controlSmall,
         ),
         style: IconButton.styleFrom(
           foregroundColor: selected

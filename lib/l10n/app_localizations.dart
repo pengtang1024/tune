@@ -4648,6 +4648,78 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'自动补齐：开着就把库里所有没词的歌自动补到有词'**
   String get settingsSmartLyricsAutoFill;
+
+  /// No description provided for @librarySortTooltip.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排序'**
+  String get librarySortTooltip;
+
+  /// No description provided for @librarySortRecent.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近加入'**
+  String get librarySortRecent;
+
+  /// No description provided for @librarySortTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标题'**
+  String get librarySortTitle;
+
+  /// No description provided for @librarySortArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get librarySortArtist;
+
+  /// No description provided for @librarySortAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get librarySortAlbum;
+
+  /// No description provided for @librarySortDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get librarySortDuration;
+
+  /// No description provided for @libraryColumnTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标题'**
+  String get libraryColumnTitle;
+
+  /// No description provided for @libraryColumnArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get libraryColumnArtist;
+
+  /// No description provided for @libraryColumnAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get libraryColumnAlbum;
+
+  /// No description provided for @libraryColumnAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入'**
+  String get libraryColumnAdded;
+
+  /// No description provided for @libraryColumnDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get libraryColumnDuration;
+
+  /// No description provided for @libraryMoreActions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多操作'**
+  String get libraryMoreActions;
 }
 
 class _AppLocalizationsDelegate

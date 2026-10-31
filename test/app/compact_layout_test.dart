@@ -564,7 +564,9 @@ void main() {
       tester.element(find.byType(LibraryPane)),
     );
 
-    await tester.tap(find.byTooltip('将整个列表加入队列'));
+    await tester.tap(find.byKey(const ValueKey('library-more')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('将整个列表加入队列').last);
     await tester.pumpAndSettle();
 
     final state = container.read(playbackControllerProvider);

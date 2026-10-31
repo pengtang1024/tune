@@ -2,6 +2,7 @@ import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/data/impl/library_storage_io.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
 
 /// A library storage over a database that lives only in memory.
 ///
@@ -39,6 +40,15 @@ class FakeLibraryStorage extends SqliteLibraryStorage {
   Future<int> countMatching({required String query, String? sourceId}) async {
     reloadCount += 1;
     return super.countMatching(query: query, sourceId: sourceId);
+  }
+
+  @override
+  Future<int> countQuery({
+    required String query,
+    required LibraryFilter filter,
+  }) async {
+    reloadCount += 1;
+    return super.countQuery(query: query, filter: filter);
   }
 
   @override

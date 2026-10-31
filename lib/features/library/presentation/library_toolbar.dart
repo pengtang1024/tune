@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/shared/ui/compact_spinner.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
+import 'package:tune/features/library/presentation/library_view_switch.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Value of the source filter that stands for "every source".
 const String allSourcesFilterValue = '__all_sources__';
 
-/// Search field, source filter, result count and scan action of the library.
+/// Search, source filter, result count, sort and view of the library.
 ///
-/// The scan action watches the scan on its own: a running scan reports its
-/// progress every percent, and the list of the library must not be rebuilt
-/// by it.
+/// The toolbar changes how the list is read; the whole-page actions (scan,
+/// queue all) live behind the menu of the header.
 class LibraryToolbar extends ConsumerWidget {
   final TextEditingController controller;
   final String query;
@@ -22,10 +24,13 @@ class LibraryToolbar extends ConsumerWidget {
   final List<String> sources;
   final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
+  final LibrarySort sort;
+  final LibraryViewMode view;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClearQuery;
   final ValueChanged<String?> onSourceFilter;
-  final VoidCallback onScan;
+  final ValueChanged<LibrarySort> onSort;
+  final ValueChanged<LibraryViewMode> onViewChanged;
 
   const LibraryToolbar({
     super.key,
@@ -35,33 +40,24 @@ class LibraryToolbar extends ConsumerWidget {
     required this.sources,
     required this.sourceLabels,
     required this.sourceFilter,
+    required this.sort,
+    required this.view,
     required this.onQueryChanged,
     required this.onClearQuery,
     required this.onSourceFilter,
-    required this.onScan,
+    required this.onSort,
+    required this.onViewChanged,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final scanning = ref.watch(
-      libraryControllerProvider.select(
-        (value) {
-          final state = value.valueOrNull;
-          if (state == null) return false;
-          return state.isScanning || state.isLoading;
-        },
-      ),
-    );
 
     return SizedBox(
-      height: CompactTokens.inputHeight,
+      height: CompactTokens.controlDefault,
       child: Row(
         children: [
           Expanded(
-            // The field keeps a readable width instead of stretching into a
-            // thin ribbon, and the actions of the row keep the far end of
-            // the page.
             child: Align(
               alignment: Alignment.centerLeft,
               child: ConstrainedBox(
@@ -146,9 +142,6 @@ class LibraryToolbar extends ConsumerWidget {
             ),
           ],
           const SizedBox(width: CompactTokens.space12),
-          // The page heading already counts the whole library. The field of
-          // the toolbar only speaks up when a search or a source narrows the
-          // list, so the same number is not written twice on the page.
           if (query.trim().isNotEmpty || sourceFilter != null) ...[
             Text(
               context.loc.libraryTrackCount(filteredCount),
@@ -158,11 +151,103 @@ class LibraryToolbar extends ConsumerWidget {
             ),
             const SizedBox(width: CompactTokens.space8),
           ],
-          _ScanButton(
-            scanning: scanning,
-            onPressed: scanning ? null : onScan,
-          ),
+          _SortButton(sort: sort, onSort: onSort),
+          const SizedBox(width: CompactTokens.space8),
+          LibraryViewSwitch(view: view, onChanged: onViewChanged),
         ],
+      ),
+    );
+  }
+}
+
+/// The button that says how the list is ordered and opens the other orders.
+class _SortButton extends StatelessWidget {
+  final LibrarySort sort;
+  final ValueChanged<LibrarySort> onSort;
+
+  const _SortButton({required this.sort, required this.onSort});
+
+  static String labelOf(BuildContext context, LibrarySort sort) {
+    final strings = context.loc;
+    return switch (sort.field) {
+      LibrarySortField.title => strings.librarySortTitle,
+      LibrarySortField.addedAt => strings.librarySortRecent,
+      LibrarySortField.artist => strings.librarySortArtist,
+      LibrarySortField.album => strings.librarySortAlbum,
+      LibrarySortField.duration => strings.librarySortDuration,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return TuneTooltip(
+      message: context.loc.librarySortTooltip,
+      child: PopupMenuButton<LibrarySortField>(
+        key: const ValueKey('library-sort'),
+        padding: EdgeInsets.zero,
+        onSelected: (field) => onSort(sort.then(field)),
+        itemBuilder: (context) => [
+          for (final field in LibrarySortField.values)
+            PopupMenuItem<LibrarySortField>(
+              value: field,
+              height: 36,
+              child: Row(
+                children: [
+                  Icon(
+                    field == sort.field
+                        ? (sort.ascending
+                              ? Icons.arrow_upward_rounded
+                              : Icons.arrow_downward_rounded)
+                        : Icons.remove_rounded,
+                    size: CompactTokens.icon14,
+                    color: field == sort.field
+                        ? theme.colorScheme.primary
+                        : Colors.transparent,
+                  ),
+                  const SizedBox(width: CompactTokens.space8),
+                  Text(
+                    labelOf(
+                      context,
+                      LibrarySort(
+                        field: field,
+                        ascending: field != LibrarySortField.addedAt,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+        child: Container(
+          height: CompactTokens.controlDefault,
+          padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainer,
+            borderRadius: CompactTokens.borderRadius8,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                labelOf(context, sort),
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurfaceVariant,
+                  size: CompactTypeScale.mark,
+                ),
+              ),
+              const SizedBox(width: CompactTokens.space4),
+              Icon(
+                sort.ascending
+                    ? Icons.arrow_upward_rounded
+                    : Icons.arrow_downward_rounded,
+                size: CompactTokens.icon14,
+                color: theme.colorScheme.primary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -191,8 +276,6 @@ class _SourceFilter extends StatelessWidget {
         : (sourceLabels[sourceFilter]?.name ?? sourceFilter!);
 
     return TuneTooltip(
-      // The button says what it filters in its tooltip: the words of a chip
-      // belong to the mouse, not to the toolbar.
       message: active
           ? '${context.loc.libraryFilterSources} · $label'
           : context.loc.libraryFilterSources,
@@ -216,7 +299,7 @@ class _SourceFilter extends StatelessWidget {
             ),
         ],
         child: Container(
-          height: CompactTokens.inputHeight,
+          height: CompactTokens.controlDefault,
           padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
           decoration: BoxDecoration(
             color: active
@@ -246,37 +329,6 @@ class _SourceFilter extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Action that rescans every enabled source.
-class _ScanButton extends StatelessWidget {
-  final bool scanning;
-  final VoidCallback? onPressed;
-
-  const _ScanButton({required this.scanning, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return TuneTooltip(
-      message: context.loc.libraryScanAllSources,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: scanning
-            ? const CompactSpinner.small()
-            : const Icon(Icons.refresh_rounded, size: CompactTokens.icon18),
-        style: IconButton.styleFrom(
-          fixedSize: const Size.square(CompactTokens.controlSmall),
-          minimumSize: const Size.square(CompactTokens.controlSmall),
-          padding: EdgeInsets.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-          foregroundColor: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );

@@ -2527,6 +2527,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '标题';
+
+  @override
+  String get librarySortArtist => '艺术家';
+
+  @override
+  String get librarySortAlbum => '专辑';
+
+  @override
+  String get librarySortDuration => '时长';
+
+  @override
+  String get libraryColumnTitle => '标题';
+
+  @override
+  String get libraryColumnArtist => '艺术家';
+
+  @override
+  String get libraryColumnAlbum => '专辑';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '时长';
+
+  @override
+  String get libraryMoreActions => '更多操作';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5052,6 +5088,42 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '标题';
+
+  @override
+  String get librarySortArtist => '艺术家';
+
+  @override
+  String get librarySortAlbum => '专辑';
+
+  @override
+  String get librarySortDuration => '时长';
+
+  @override
+  String get libraryColumnTitle => '标题';
+
+  @override
+  String get libraryColumnArtist => '艺术家';
+
+  @override
+  String get libraryColumnAlbum => '专辑';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '时长';
+
+  @override
+  String get libraryMoreActions => '更多操作';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7577,4 +7649,40 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSmartLyricsAutoFill => '自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '標題';
+
+  @override
+  String get librarySortArtist => '藝術家';
+
+  @override
+  String get librarySortAlbum => '專輯';
+
+  @override
+  String get librarySortDuration => '時長';
+
+  @override
+  String get libraryColumnTitle => '標題';
+
+  @override
+  String get libraryColumnArtist => '藝術家';
+
+  @override
+  String get libraryColumnAlbum => '專輯';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '時長';
+
+  @override
+  String get libraryMoreActions => '更多操作';
 }

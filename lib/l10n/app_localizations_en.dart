@@ -2741,4 +2741,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsSmartLyricsAutoFill =>
       'Auto-fill: keep filling every track without lyrics until the library has none left';
+
+  @override
+  String get librarySortTooltip => 'Sort';
+
+  @override
+  String get librarySortRecent => 'Recently added';
+
+  @override
+  String get librarySortTitle => 'Title';
+
+  @override
+  String get librarySortArtist => 'Artist';
+
+  @override
+  String get librarySortAlbum => 'Album';
+
+  @override
+  String get librarySortDuration => 'Duration';
+
+  @override
+  String get libraryColumnTitle => 'Title';
+
+  @override
+  String get libraryColumnArtist => 'Artist';
+
+  @override
+  String get libraryColumnAlbum => 'Album';
+
+  @override
+  String get libraryColumnAdded => 'Added';
+
+  @override
+  String get libraryColumnDuration => 'Duration';
+
+  @override
+  String get libraryMoreActions => 'More actions';
 }

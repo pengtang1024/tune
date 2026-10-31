@@ -1411,5 +1411,17 @@
   "lyricsContrastTranslate": "翻譯",
   "lyricsContrastTransliterate": "音譯",
   "lyricsContrastDone": "已對照",
-  "settingsSmartLyricsAutoFill": "自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞"
+  "settingsSmartLyricsAutoFill": "自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞",
+  "librarySortTooltip": "排序",
+  "librarySortRecent": "最近加入",
+  "librarySortTitle": "標題",
+  "librarySortArtist": "藝術家",
+  "librarySortAlbum": "專輯",
+  "librarySortDuration": "時長",
+  "libraryColumnTitle": "標題",
+  "libraryColumnArtist": "藝術家",
+  "libraryColumnAlbum": "專輯",
+  "libraryColumnAdded": "加入",
+  "libraryColumnDuration": "時長",
+  "libraryMoreActions": "更多操作"
 }

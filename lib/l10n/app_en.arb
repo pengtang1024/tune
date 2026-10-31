@@ -1411,5 +1411,17 @@
   "lyricsContrastTranslate": "Translate",
   "lyricsContrastTransliterate": "Transliterate",
   "lyricsContrastDone": "On the sheet",
-  "settingsSmartLyricsAutoFill": "Auto-fill: keep filling every track without lyrics until the library has none left"
+  "settingsSmartLyricsAutoFill": "Auto-fill: keep filling every track without lyrics until the library has none left",
+  "librarySortTooltip": "Sort",
+  "librarySortRecent": "Recently added",
+  "librarySortTitle": "Title",
+  "librarySortArtist": "Artist",
+  "librarySortAlbum": "Album",
+  "librarySortDuration": "Duration",
+  "libraryColumnTitle": "Title",
+  "libraryColumnArtist": "Artist",
+  "libraryColumnAlbum": "Album",
+  "libraryColumnAdded": "Added",
+  "libraryColumnDuration": "Duration",
+  "libraryMoreActions": "More actions"
 }

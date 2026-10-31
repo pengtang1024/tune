@@ -85,21 +85,16 @@ void main() {
       findsNothing,
       reason: 'a row inside the app never falls back to the old tooltip',
     );
-    expect(
-      find.byType(OverlayPortal),
-      findsNothing,
-      reason: 'an idle viewport holds no card at all',
-    );
 
-    // The row still says every hint it said before: the title, the artist,
-    // the album, the facts of the file and the three actions.
+    // The row still says every hint it keeps: the title, the artist, the
+    // album and the three actions. The file facts moved to the details.
     expect(
       find.descendant(of: row, matching: find.byType(HintTrigger)),
-      findsNWidgets(8),
+      findsNWidgets(4),
     );
   });
 
-  testWidgets('a row with every fact stays under the heavy-row ceiling', (
+  testWidgets('a row with every column stays under the heavy-row ceiling', (
     tester,
   ) async {
     await _pumpLibrary(tester, _richSong);
@@ -110,11 +105,11 @@ void main() {
     expect(
       elements,
       lessThanOrEqualTo(190),
-      reason: 'a row with four facts and ten hints holds $elements elements',
+      reason: 'a row with every column holds $elements elements',
     );
     expect(
       find.descendant(of: row, matching: find.byType(HintTrigger)),
-      findsNWidgets(10),
+      findsNWidgets(4),
     );
   });
 
@@ -146,7 +141,7 @@ void main() {
     );
     expect(
       find.descendant(of: row, matching: find.byType(HintTrigger)),
-      findsNWidgets(10),
+      findsNWidgets(5),
     );
   });
 

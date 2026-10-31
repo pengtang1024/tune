@@ -3,34 +3,35 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/presentation/library_queue_all_button.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
-import 'package:tune/features/library/presentation/library_view_switch.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
-/// The compact heading of the library.
+/// The heading of the library.
 ///
-/// The library is the page a reader lives on while looking for a track, so
-/// its heading shares one line with the counts and the two actions instead
-/// of taking three lines above the list. The title keeps the display face:
-/// the page still says who it is, it just does not spend a whole track row
-/// on saying it.
+/// One title, the account of what the library holds, and the two whole-page
+/// actions behind a menu. The view switch and the search belong to the
+/// toolbar: they change how the list is read, not what the page is.
 class LibraryHeader extends StatelessWidget {
   /// What the library holds: tracks, albums and sources.
   final String summary;
 
   /// Puts the whole visible list into the queue.
   final VoidCallback? onAddAll;
+
+  /// Scans every configured source again.
+  final VoidCallback onScan;
+
+  /// Whether a scan is already running; the menu item waits then.
+  final bool scanning;
+
   final VoidCallback onSearchOnline;
-  final LibraryViewMode view;
-  final ValueChanged<LibraryViewMode> onViewChanged;
 
   const LibraryHeader({
     super.key,
     required this.summary,
     required this.onAddAll,
+    required this.onScan,
+    required this.scanning,
     required this.onSearchOnline,
-    required this.view,
-    required this.onViewChanged,
   });
 
   @override
@@ -43,18 +44,9 @@ class LibraryHeader extends StatelessWidget {
     );
 
     return SizedBox(
-      height: CompactTokens.controlDefault,
+      height: 40,
       child: Row(
         children: [
-          Text(
-            context.loc.libraryEyebrow,
-            style: CompactTypography.mono(
-              theme.colorScheme.primary,
-              size: CompactTypeScale.mark,
-              letterSpacing: 2,
-            ),
-          ),
-          const SizedBox(width: CompactTokens.space8),
           Text(context.loc.libraryTitle, style: titleStyle),
           const SizedBox(width: CompactTokens.space12),
           Expanded(
@@ -62,16 +54,13 @@ class LibraryHeader extends StatelessWidget {
               summary,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              style: CompactTypography.mono(
+                theme.colorScheme.onSurfaceVariant,
+                size: CompactTypeScale.mark,
               ),
             ),
           ),
           const SizedBox(width: CompactTokens.space12),
-          LibraryViewSwitch(view: view, onChanged: onViewChanged),
-          const SizedBox(width: CompactTokens.space12),
-          LibraryQueueAllButton(onPressed: onAddAll),
-          const SizedBox(width: CompactTokens.space8),
           OutlinedButton.icon(
             onPressed: onSearchOnline,
             style: OutlinedButton.styleFrom(
@@ -88,6 +77,52 @@ class LibraryHeader extends StatelessWidget {
               size: CompactTokens.icon16,
             ),
             label: Text(context.loc.searchOnlineTitle),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+          TuneTooltip(
+            message: context.loc.libraryMoreActions,
+            child: PopupMenuButton<String>(
+              key: const ValueKey('library-more'),
+              icon: const Icon(Icons.more_horiz),
+              onSelected: (action) {
+              switch (action) {
+                case 'scan':
+                  onScan();
+                case 'addAll':
+                  onAddAll?.call();
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'scan',
+                enabled: !scanning,
+                child: ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    scanning
+                        ? Icons.hourglass_top_rounded
+                        : Icons.refresh_rounded,
+                    size: CompactTokens.icon16,
+                  ),
+                  title: Text(context.loc.libraryScanAllSources),
+                ),
+              ),
+              PopupMenuItem(
+                value: 'addAll',
+                enabled: onAddAll != null,
+                child: ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(
+                    Icons.playlist_add_rounded,
+                    size: CompactTokens.icon16,
+                  ),
+                  title: Text(context.loc.libraryAddAllToQueue),
+                ),
+              ),
+            ],
+            ),
           ),
         ],
       ),

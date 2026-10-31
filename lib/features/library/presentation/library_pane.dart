@@ -12,10 +12,12 @@ import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
 import 'package:tune/features/library/presentation/library_album_header.dart';
 import 'package:tune/features/library/presentation/library_albums_view.dart';
+import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
@@ -202,9 +204,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                     availableSources.length,
                   ),
                   onAddAll: songs.isEmpty ? null : () => _addAllToQueue(songs),
+                  onScan: _scan,
+                  scanning: library.isScanning,
                   onSearchOnline: () => showOnlineSearchSheet(context),
-                  view: _view,
-                  onViewChanged: _setView,
                 )
               : LibraryAlbumHeader(
                   album: openAlbum,
@@ -228,6 +230,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               sources: availableSources,
               sourceLabels: sourceLabels,
               sourceFilter: library.sourceFilter,
+              sort: library.sort,
+              view: _view,
               onQueryChanged: (value) {
                 ref.read(libraryControllerProvider.notifier).setQuery(value);
               },
@@ -237,7 +241,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                     .read(libraryControllerProvider.notifier)
                     .setSourceFilter(value);
               },
-              onScan: _scan,
+              onSort: (sort) {
+                ref.read(libraryControllerProvider.notifier).setSort(sort);
+              },
+              onViewChanged: _setView,
             ),
           ),
         LibraryScanStatusBar(sourceIssues: hasSourceIssues),
@@ -324,7 +331,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     if (openAlbum != null) {
-      return _trackList(openAlbum.songs, sourceLabels, onlyLikeOnDoubleClick);
+      return _trackList(
+        openAlbum.songs,
+        sourceLabels,
+        onlyLikeOnDoubleClick,
+        library.sort,
+      );
     }
 
     if (_view == LibraryViewMode.albums) {
@@ -353,16 +365,17 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       songs,
       sourceLabels,
       onlyLikeOnDoubleClick,
+      library.sort,
       controller: _songsScrollController,
-      hasMore:
-          library.hasMore && library.query.isEmpty && library.sourceFilter == null,
+      hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
     );
   }
 
   Widget _trackList(
     List<Song> songs,
     Map<String, SourceLabel> sourceLabels,
-    bool onlyLikeOnDoubleClick, {
+    bool onlyLikeOnDoubleClick,
+    LibrarySort sort, {
     ScrollController? controller,
     bool hasMore = false,
   }) {
@@ -384,7 +397,18 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             hasMore == _cachedTrackHasMore &&
             _sameRows(_cachedTrackSongs!, songs) &&
             mapEquals(_cachedTrackLabels!, sourceLabels)) {
-          return cached;
+          return Column(
+            children: [
+              LibraryColumnHeader(
+                metrics: metrics,
+                sort: sort,
+                onSort: (field) => ref
+                    .read(libraryControllerProvider.notifier)
+                    .setSort(sort.then(field)),
+              ),
+              Expanded(child: cached),
+            ],
+          );
         }
 
         final list = ListView.builder(
@@ -464,7 +488,19 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         _cachedTrackHasMore = hasMore;
         _cachedTrackWaits = onlyLikeOnDoubleClick;
         _cachedTrackController = controller;
-        return _cachedTracks = _withLoadMore(list, hasMore);
+        _cachedTracks = _withLoadMore(list, hasMore);
+        return Column(
+          children: [
+            LibraryColumnHeader(
+              metrics: metrics,
+              sort: sort,
+              onSort: (field) => ref
+                  .read(libraryControllerProvider.notifier)
+                  .setSort(sort.then(field)),
+            ),
+            Expanded(child: _cachedTracks!),
+          ],
+        );
       },
     );
   }
@@ -595,7 +631,10 @@ typedef _LibrarySlice = ({
   List<Song> filteredSongs,
   String query,
   String? sourceFilter,
+  LibrarySort sort,
+  bool hasFilter,
   bool hasSourceIssues,
+  bool isScanning,
   bool isLoading,
   bool hasMore,
 });
@@ -609,6 +648,9 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     filteredSongs: state.filteredSongs,
     query: state.query,
     sourceFilter: state.sourceFilter,
+    sort: state.sort,
+    hasFilter: state.hasFilter,
+    isScanning: state.isScanning,
     // The page only shows whether a source has a problem, not the whole
     // report: a scan that finishes without changing the songs must not hand
     // the page a new map and rebuild every visible row for it.
