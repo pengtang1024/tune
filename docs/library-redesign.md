@@ -4,6 +4,7 @@
 > 相关：[conventions.md](conventions.md)（尺寸与字体）、[performance-row-design.md](performance-row-design.md)（行预算）、
 > [chips.md](chips.md)（标识）、[architecture.md](architecture.md)（状态归属）。
 > 状态：**待评审**，未落地。线框稿见 [`mockups/library-redesign.html`](mockups/library-redesign.html)。
+> 分类、分面筛选与左侧分类树见 [`library-browse.md`](library-browse.md)；两件事**同一批落地**。
 
 ## 1. 现状
 
@@ -270,6 +271,7 @@ class LibrarySort {
 
 ## 11. 不在范围
 
+- 分类、分面筛选、左侧分类树——见 [`library-browse.md`](library-browse.md)，与本版同批。
 - 侧栏、播放底栏、喜欢页、发现页的视觉。
 - 多选、拖拽排序、列宽拖拽、列显示偏好。
 - 扫描器与音源适配器的行为。
