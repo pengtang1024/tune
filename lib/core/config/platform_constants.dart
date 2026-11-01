@@ -7,7 +7,6 @@ import 'dart:io' show Platform;
 class PlatformConstants {
   // 平台检测 - 使用运行时检测
   static bool get isWindows => Platform.isWindows;
-  static bool get isMacOS => Platform.isMacOS;
   static bool get isLinux => Platform.isLinux;
   static bool get isAndroid => Platform.isAndroid;
   static bool get isIOS => Platform.isIOS;
@@ -16,7 +15,7 @@ class PlatformConstants {
   /// 检查是否为桌面平台
   static bool get isDesktop {
     try {
-      return Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+      return Platform.isWindows || Platform.isLinux;
     } catch (e) {
       return false;
     }

@@ -7,6 +7,9 @@ Tune is a compact local and online music player built with Flutter. The shell ha
 ## Features
 
 - Scan, search, and persist local music folders
+- Browse and filter the library: a category drawer (genre / decade / artist / source / language / format), nine filter groups with active chips, and list / two-column / album views; sort and filters come back on the next start
+- Smart lyrics: auto-fills every track by default from a human-written pool plus local whisper / SenseVoice; shows votes and sources, and supports edits, marks, and translation / transliteration contrast
+- Settings console: section rail + presets (appearance / library / playback / lyrics / discovery / desktop) + custom sheets + search and reset
 - Online sources: Openverse, Jamendo, Internet Archive, ccMixter, iTunes previews, podcast RSS, Audius, Wikimedia Commons, internet radio, and self-hosted NeteaseCloudMusicApi, Navidrome/Subsonic, or Jellyfin
 - Add sources of your own: pick a type (direct audio, playlist, JSON API, GraphQL API, …), fill in its parameters, and it becomes a new source; one type can be added more than once
 - Queue management with reorder, play-at-index, and clear
@@ -32,7 +35,7 @@ Tune is a compact local and online music player built with Flutter. The shell ha
 ```text
 lib/
 ├── app/                  # entry, routing, theme, shell
-├── features/             # player / library / queue / settings / sources / desktop
+├── features/             # player / library / queue / settings / sources / discovery / favorites / smart_lyrics / desktop
 ├── data/services/        # audio, scanning, source adapters, persistence, MPRIS, tray
 ├── domain/models/        # Song, source config, scan results
 ├── shared/               # shared UI and utilities
@@ -56,15 +59,15 @@ Linux is the target of the current release:
 flutter build linux --debug
 ```
 
-The other platforms keep an entry point and are built on their own system:
+Windows, Android, and iOS keep an entry point and are built on their own system:
 
 | Platform | Command | Prerequisite |
 | --- | --- | --- |
 | Linux | `flutter build linux --release` | libmpv (`libmpv2`) installed on the system |
 | Windows | `flutter build windows --release` | The C++ desktop workload of Visual Studio |
-| macOS | `flutter build macos --release` | Xcode command line tools |
 | Android | `flutter build apk --release` | Optional `android/key.properties`, see below |
-| Web | `flutter build web --release` | — |
+
+macOS and Web are no longer supported: their platform entry points and code have been removed.
 
 Android reads the release keys from `android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`). Without that file the build falls back to the debug keys: the artifact is fine for a local install but cannot be published.
 
@@ -82,13 +85,9 @@ flutter build linux --debug
 
 ## Known limitations
 
-- Linux desktop is the primary target for the current release.
-- Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download, and the web build streams tracks.
-- The web build has no local music folder, tray, MPRIS, or default-player settings; the library index lives in the browser, so it survives a reload.
-- A browser does not let a script set `User-Agent` or `Referer`, and the web build carries no request headers at all: sources that need them (Jellyfin, ccMixter) may not play in the browser.
-- The same-origin policy of the browser blocks the APIs that answer without a CORS header (Wikimedia, ccMixter, and others), so those sources fail to scan in the browser; whether a source works depends on the API allowing browsers.
+- Linux desktop is the primary target for the current release; macOS and Web are no longer supported.
+- Remote playback requires a network connection; the desktop app plays while it caches, so playback never waits for the download.
 - Windows plays through just_audio_windows, which ignores custom request headers: sources that need them (Jellyfin, ccMixter) may not play, and there is no tray or MPRIS control.
-- macOS has no tray or MPRIS control; the sandbox only grants `~/Music` and the folders the user picked. Pick the music folder again if access is denied after a restart.
 - Local scanning on Android and iOS needs a runtime storage permission that the app does not request yet, so the mobile library can stay empty; online sources are unaffected.
 - Remote stream URLs can expire; Netease, Subsonic, podcast RSS, and Jellyfin refresh a single track, other sources need a rescan.
 - Internet radio is a live stream: it is never cached and shows no progress bar.

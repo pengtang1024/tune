@@ -108,7 +108,7 @@ presentation → application → domain
 硬约束：
 
 - 播放状态仍只有 `PlaybackController` 一个来源；桌面集成只读它、只调它的公开动作。
-- service 不依赖 Riverpod，不 import `features/`；平台差异按 `*_io.dart` / `*_stub.dart` 成对实现。
+- service 不依赖 Riverpod，不 import `features/`；平台实现只保留 `*_io.dart`，不再维护 Web 空实现。
 - MPRIS、托盘、单实例都走**会话总线**（`DBusClient.session()`），不是系统总线。
 - 详细的协议与验收见 [桌面集成方案](../需求/桌面集成方案.md)。
 
@@ -126,6 +126,7 @@ presentation → application → domain
 | 播放会话（队列、游标、模式、历史） | `library.db` 的 `queue` / `queue_meta` 表（旧 `playback_queue_v1` 首次启动导入） | `PlaybackSessionStore`（`lib/features/player/data/playback_session_store.dart`） |
 | 播放进度 | `library.db` 的 `queue_meta` 表（旧 `playback_position_v1` 首次启动导入） | `PlaybackSessionStore` |
 | 音乐库索引 | `<应用支持目录>/library/library.db`（SQLite） | `SqliteLibraryStorage`（`lib/features/library/data/impl/library_storage_io.dart`） |
+| 音乐库视图（排序、筛选） | `<应用支持目录>/library/view.json` | `LibraryStorage.saveView`；`LibraryController` 在 `setSort` / `setFilter` 后写一次 |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
 | 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
@@ -136,7 +137,6 @@ presentation → application → domain
 - **播放会话与进度分开存**：队列只在切歌/编辑时写，进度每 5 秒单独写，避免为了几秒钟的进度反复重写整条队列。恢复时一律停在暂停态，规则见 [playback-session.md](playback-session.md)。
 - **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
-- **Web 不再是目标平台**：Web 构建保留工程入口，但音乐库不落盘（`library_storage_stub.dart` 是空实现），曲目只在当前会话里；偏好仍走浏览器存储。
 - **音乐库索引存在 SQLite**：桌面把索引写在 `<应用支持目录>/library/library.db`。首次启动时如果旧版的 `scanned_songs.json` 还在，会导入数据库并改名为 `.migrated`。索引和音源的扫描时间必须落在同一个存储里：只存扫描时间而不存索引，下次打开就会跳过所有音源，索引也就空了。
 - **库按窗读取**：超过 1000 首时首帧只读第一窗，列表底部按需从 SQLite 取下一窗；保存是增量 upsert，写一窗不会删掉窗口外的行。
 - **淘汰在数据库里完成**：设了「每来源最多保留」后，保存完新窗口就让 SQLite 按 `last_played`（最近播放）→ `play_count`（播放次数）→ `last_seen`（最近出现）→ `date_added` 排序，用窗口函数删掉超出上限的行；`pinned = 1` 的收藏完全不参与排名。全库不需要加载进内存来排序，几万到几十万行都能在数据库内裁剪。播放成功会写 `last_played`，扫描会更新 `last_seen`。
@@ -144,7 +144,7 @@ presentation → application → domain
 
 ## 音乐库的目录
 
-app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录（Linux `~/Music`、macOS / Windows `~/Music`、Android `/storage/emulated/0/Music`），也就是 `MusicScannerConfig.getDefaultMusicPaths()` 给的那几个。设置里可以改成别的目录（`library_folder` 偏好），默认就是音乐库。
+app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录（Linux / Windows `~/Music`、Android `/storage/emulated/0/Music`），也就是 `MusicScannerConfig.getDefaultMusicPaths()` 给的那几个。设置里可以改成别的目录（`library_folder` 偏好），默认就是音乐库。
 
 目录的形状由 `LibraryPaths`（`lib/data/services/library/library_paths.dart`）说了算，别处不要自己拼路径：
 

@@ -114,9 +114,9 @@ void main() {
   });
 
   test('a skipped source keeps its cached songs and no error is shown', () async {
-    // The web build has no music folder, so every source is skipped when the
-    // last scan is still too recent. The library keeps the songs of that
-    // scan, so the player must not report a failure.
+    // Every source is skipped when the last scan is still too recent. The
+    // library keeps the songs of that scan, so the player must not report a
+    // failure.
     final container = createContainer(
       sources: const [localSource, remoteSource],
       results: {

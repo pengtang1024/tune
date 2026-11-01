@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:tune/data/services/audio_player_service.dart';
@@ -29,8 +28,7 @@ class JustAudioPlayerService implements AudioPlayerService {
   Future<void> init() async {
     try {
       // Linux 上 just_audio 没有官方实现，使用 media_kit（libmpv）作为后端。
-      // The web build uses just_audio_web, and touching Platform there throws.
-      if (!kIsWeb && Platform.isLinux) {
+      if (Platform.isLinux) {
         JustAudioMediaKit.title = 'Tune';
         // libmpv 的解复用缓存（demuxer-max-bytes 与 demuxer-max-back-bytes
         // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的

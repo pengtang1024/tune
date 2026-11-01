@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
@@ -634,15 +633,13 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       builder: (context, constraints) {
         // Side by side needs room for the longest action label ("Check for
         // updates") beside the title; below that the cards stack full width.
-        if (kIsWeb || constraints.maxWidth < 640) {
+        if (constraints.maxWidth < 640) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               about,
-              if (!kIsWeb) ...[
-                const SizedBox(height: CompactTokens.space8),
-                update,
-              ],
+              const SizedBox(height: CompactTokens.space8),
+              update,
             ],
           );
         }

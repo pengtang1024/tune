@@ -135,7 +135,7 @@ LyricsPanel (features/player/presentation)
 - `lib/data/services/music_sources/music_source_service.dart`——三段取词与错误语义
 - `lib/data/services/music_sources/lrclib_lyrics_provider.dart`——精确匹配、归一化、容差
 - `lib/data/services/library/lyrics_text.dart`（新）——歌词文件的解码（UTF-8 / GBK）
-- `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart` + `impl/library_paths_stub.dart`——两个歌词文件的名字与读取顺序
+- `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart`——两个歌词文件的名字与读取顺序
 - `lib/l10n/app_*.arb` + 生成的 `app_localizations*.dart`——新文案（四种语言同步）
 - `pubspec.yaml` + `pubspec.lock`——`charset`（GBK 解码）
 

@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.0+-blue.svg" alt="Flutter Version">
   <img src="https://img.shields.io/badge/License-MIT%20(code)-green.svg" alt="License: MIT (source code)">
-  <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Web-brightgreen" alt="Supported Platforms">
+  <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20Linux-brightgreen" alt="Supported Platforms">
 </p>
 
 ## 📋 项目概述
@@ -13,9 +13,10 @@
 ### 🎯 核心目标
 
 - 在 900×600（最小 760×520）窗口内提供高信息密度的播放体验
-- 高效扫描、搜索、筛选本地与在线歌曲
+- 高效扫描、搜索、分类浏览与分面筛选本地与在线歌曲
 - 通过适配器接入开放曲库和自建 API 音源
-- 保持主题、语言、扫描目录和音源配置可持久化
+- 每首有词：人写票池优先，本地 / 云端 ASR 自动补齐歌词
+- 保持主题、语言、扫描目录、排序筛选和音源配置可持久化
 
 > 说明：本页列出的四份文档是**现行**的需求与设计。2025 年 12 月那版旧稿（架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范）已经移到 [历史/](历史/README.md)，只当历史读，不作规范。
 
@@ -43,7 +44,7 @@
 | 状态管理 | Riverpod |
 | 路由管理 | go_router |
 | 音频播放 | just_audio；Linux 使用 just_audio_media_kit + 系统 libmpv |
-| 本地存储 | shared_preferences + JSON 音乐库文件 |
+| 本地存储 | SQLite（`library.db`）+ 单键偏好文件（`settings/`）；shared_preferences 仅旧数据迁移 |
 | 网络请求 | dio |
 | 文件选择 | file_picker |
 | 国际化和本地化 | flutter_localizations + gen-l10n |
@@ -55,8 +56,9 @@
 - ✅ 窗口管理、左侧导航 + 内容区 + 底部播放条
 - ✅ 本地文件与在线音源统一播放
 
-### 移动端 / Web
-- 移动端与 Web 保留 Flutter 工程入口，但不是当前 v1 的主验收平台。
+### 移动端
+- Android / iOS 保留 Flutter 工程入口，但不是当前 v1 的主验收平台。
+- macOS 与 Web 不再支持：平台工程入口与相关代码已移除。
 - 通知栏控制、锁屏控制等旧能力已退出当前主链路。
 - Linux 桌面的后台播放（系统媒体控制 + 系统托盘）与默认播放器见 [桌面集成方案](桌面集成方案.md)。
 

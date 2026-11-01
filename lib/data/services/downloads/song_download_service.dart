@@ -7,9 +7,6 @@ import 'package:tune/domain/models/song.dart';
 /// the caching policy stays in one place.
 abstract class SongDownloadService {
   /// Whether the platform can keep a copy of a track on disk.
-  ///
-  /// The web build has no file system; the player then streams the track
-  /// directly instead of asking for a cached file.
   bool get isSupported;
 
   /// Returns the stored copy of [song] when it was fetched before.

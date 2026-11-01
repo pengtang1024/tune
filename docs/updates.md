@@ -11,7 +11,7 @@ GET https://api.github.com/repos/pengtang1024/tune/releases/latest
 ```
 
 - `tag_name` 是版本号（`v1.4.0` 去掉 `v`），与 `AppVersion.version` 逐段比较。
-- `assets` 里按平台挑一个归档：文件名包含 `linux` / `windows` / `macos` 的那个。
+- `assets` 里按平台挑一个归档：文件名包含 `linux` / `windows` / `android` 的那个。
 - 没有 release（404）时显示「已是最新版本」，不报错。
 
 仓库必须是公开的：私有仓库的 release 接口需要令牌，应用不带令牌。
@@ -24,7 +24,6 @@ GET https://api.github.com/repos/pengtang1024/tune/releases/latest
 | --- | --- | --- |
 | Linux | `tune-linux-x64-<version>.tar.gz` | `tune`、`lib/`、`data/`、`share/` |
 | Windows | `tune-windows-x64-<version>.zip` | 同上，`tune.exe` |
-| macOS | `tune-macos-<version>.zip` | `.app` |
 | Android | `tune-android-<version>.apk` | — |
 
 Linux 用打包脚本生成：
@@ -65,9 +64,8 @@ Gitea 的仓库是私有的，release 接口要令牌，应用不带令牌——
 - **Linux**：归档下载到临时目录，解压到 bundle 同级的 `.tune-update`，再把
   旧 bundle 换成 `.tune-previous`、新目录换入原位；旧目录随后删除。完成后
   提示「重启后生效」，按钮直接启动新进程并结束旧进程。
-- **Windows / macOS / Android**：只显示版本与「到发布页手动下载」，不做替换
+- **Windows / Android**：只显示版本与「到发布页手动下载」，不做替换
   （运行中的可执行文件在 Windows 上无法覆盖）。
-- **Web**：不显示更新卡片。
 
 升级失败时旧 bundle 会换回来（新目录换入失败会先把备份还原），不会把应用
 留在半装状态。下载与解压都在 UI 线程之外，进度只刷新卡片那一小块。

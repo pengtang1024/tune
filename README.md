@@ -7,6 +7,9 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 ## 功能
 
 - 本地音乐目录扫描、搜索与持久化
+- 音乐库分类与筛选：左侧分类树（流派 / 年代 / 艺术家 / 音源 / 语言 / 格式）、九组筛选面板与生效 chip，列表 / 双列 / 专辑三种视图；排序与筛选下次启动恢复
+- 智能歌词：默认自动补齐到每首有词，人写票池 + 本地 whisper / SenseVoice；可见票数与来源，支持改词、标记、翻译 / 音译对照
+- 设置页：分区导航 + 六区预设（外观 / 音乐库 / 播放 / 歌词 / 发现 / 桌面）+ 自定义 sheet + 搜索与恢复默认
 - 在线音源：Openverse、Jamendo、Internet Archive、ccMixter、iTunes 试听、播客 RSS、Audius、Wikimedia Commons、网络电台，以及自建 NeteaseCloudMusicApi、Navidrome/Subsonic 与 Jellyfin
 - 自己添加音源：挑一个类型（直链音频、播放列表、JSON 接口、GraphQL 接口……），填上它的参数就是一个新实例；同一类型可以加好几个
 - 播放队列增删、拖拽重排、点播与清空
@@ -32,7 +35,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 ```text
 lib/
 ├── app/                  # 应用入口、路由、主题、壳层
-├── features/             # player / library / queue / settings / sources / desktop
+├── features/             # player / library / queue / settings / sources / discovery / favorites / smart_lyrics / desktop
 ├── data/services/        # 音频、扫描、音源适配器、持久化、MPRIS、托盘
 ├── domain/models/        # Song、音源配置与扫描结果
 ├── shared/               # 通用 UI 与工具
@@ -56,15 +59,15 @@ Linux 是当前验收平台：
 flutter build linux --debug
 ```
 
-其它平台保留工程入口，要在对应系统上构建：
+Windows / Android / iOS 保留工程入口，要在对应系统上构建：
 
 | 平台 | 命令 | 前置条件 |
 | --- | --- | --- |
 | Linux | `flutter build linux --release` | 系统装有 libmpv（`libmpv2`） |
 | Windows | `flutter build windows --release` | Visual Studio 的 C++ 桌面工作负载 |
-| macOS | `flutter build macos --release` | Xcode 命令行工具 |
 | Android | `flutter build apk --release` | 可选 `android/key.properties`，见下 |
-| Web | `flutter build web --release` | — |
+
+macOS 与 Web 不再支持：平台工程入口与相关代码已移除。
 
 Android 的 release 签名从 `android/key.properties` 读取 `storeFile`、`storePassword`、`keyAlias`、`keyPassword`。没有该文件时回落到 debug 签名，产物只能本机试装，不能发布。
 
@@ -96,13 +99,9 @@ flutter build linux --debug
 
 ## 已知限制
 
-- 当前主要验收平台为 Linux 桌面端。
-- 远程播放依赖网络；桌面端边播边缓存，播放不等待下载，Web 端只能流式播放。
-- Web 端不再是目标平台：没有本地音乐目录、托盘、MPRIS 与默认播放器设置，音乐库也不落盘，刷新后为空。
-- 浏览器不允许脚本自定义 `User-Agent` 与 `Referer`，Web 端也带不了请求头；需要请求头的音源（Jellyfin、ccMixter）在 Web 端可能无法播放。
-- 浏览器的同源策略会拦掉没有返回 CORS 头的接口（Wikimedia、ccMixter 等），这些音源在 Web 端扫描失败；能否播完取决于对方接口是否放行浏览器。
+- 当前主要验收平台为 Linux 桌面端；macOS 与 Web 不再支持。
+- 远程播放依赖网络；桌面端边播边缓存，播放不等待下载。
 - Windows 使用 just_audio_windows 播放，不支持自定义请求头；需要请求头的音源（Jellyfin、ccMixter）可能无法播放，且没有托盘与 MPRIS 媒体控制。
-- macOS 没有托盘与 MPRIS 媒体控制；沙盒只放行 `~/Music` 和用户亲手选过的目录，重开应用后若目录访问被拒，需要重新选择一次。
 - Android / iOS 的本地扫描需要运行时存储权限，当前没有实现申请流程，移动端本地库可能为空；在线音源不受影响。
 - 远程播放地址可能过期；网易云、Subsonic、播客订阅与 Jellyfin 支持单曲刷新，其余音源需重新扫描。
 - 网络电台是直播流，不缓存、不显示进度条。

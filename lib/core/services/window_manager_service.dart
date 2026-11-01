@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:tune/core/config/platform_constants.dart';
@@ -21,7 +20,7 @@ class WindowManagerService with WindowListener {
   /// 初始化窗口管理器
   static Future<void> init() async {
     // 仅在桌面端初始化
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
 
     try {
       Log.info('开始初始化窗口管理器');
@@ -110,25 +109,25 @@ class WindowManagerService with WindowListener {
 
   /// Keeps the window from closing on its own.
   static Future<void> setPreventClose(bool prevent) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setPreventClose(prevent);
   }
 
   /// Closes the window for good, which ends the app.
   static Future<void> destroy() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.destroy();
   }
 
   /// 设置窗口大小
   static Future<void> setSize(Size size) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setSize(size);
   }
 
   /// 设置窗口最小尺寸
   static Future<void> setMinimumSize() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     Log.info(
       '设置窗口最小尺寸为: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}',
     );
@@ -142,97 +141,97 @@ class WindowManagerService with WindowListener {
 
   /// 设置窗口最大尺寸
   static Future<void> setMaximumSize(Size size) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setMaximumSize(size);
   }
 
   /// 设置窗口位置
   static Future<void> setPosition(Offset position) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setPosition(position);
   }
 
   /// 设置窗口居中
   static Future<void> center() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.center();
   }
 
   /// 最小化窗口
   static Future<void> minimize() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.minimize();
   }
 
   /// 最大化窗口
   static Future<void> maximize() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.maximize();
   }
 
   /// 恢复窗口（取消最大化）
   static Future<void> unmaximize() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.unmaximize();
   }
 
   /// 检查窗口是否已最大化
   static Future<bool> isMaximized() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return false;
+    if (!PlatformConstants.isDesktop) return false;
     return await windowManager.isMaximized();
   }
 
   /// 全屏切换
   static Future<void> setFullScreen(bool isFullScreen) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setFullScreen(isFullScreen);
   }
 
   /// 设置窗口标题
   static Future<void> setTitle(String title) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setTitle(title);
   }
 
   /// 设置是否跳过任务栏
   static Future<void> setSkipTaskbar(bool skip) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setSkipTaskbar(skip);
   }
 
   /// 设置是否始终置顶
   static Future<void> setAlwaysOnTop(bool alwaysOnTop) async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.setAlwaysOnTop(alwaysOnTop);
   }
 
   /// 检查窗口是否可见
   static Future<bool> isVisible() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return false;
+    if (!PlatformConstants.isDesktop) return false;
     return await windowManager.isVisible();
   }
 
   /// 显示窗口
   static Future<void> show() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.show();
   }
 
   /// 隐藏窗口
   static Future<void> hide() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.hide();
   }
 
   /// 聚焦窗口
   static Future<void> focus() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.focus();
   }
 
   /// 开始拖拽窗口（用于无边框窗口）
   static Future<void> startDragging() async {
-    if (kIsWeb || !(PlatformConstants.isDesktop)) return;
+    if (!PlatformConstants.isDesktop) return;
     await windowManager.startDragging();
   }
 }
