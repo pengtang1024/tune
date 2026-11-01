@@ -16,7 +16,6 @@ import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
-import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
@@ -325,7 +324,12 @@ void main() {
       ),
     );
     await tester.pump();
-    lefts.add(tester.getRect(find.byType(SettingsPageHeader).first).left);
+    // The settings page has its own section rail; the page itself still
+    // starts where every other page does.
+    expect(
+      tester.getRect(find.byType(SettingsPane).first).left,
+      moreOrLessEquals(CompactTokens.sidebarWidth, epsilon: 0.5),
+    );
 
     for (final left in lefts) {
       expect(

@@ -37,8 +37,9 @@ class PlaybackSessionRecorder {
 
   /// Whether the reader changed the session in this run.
   ///
-  /// A start with the restore switch off is empty on purpose; it must not
-  /// erase the queue the switch will read after it is turned on again.
+  /// A start that found no session is empty on purpose; it must not
+  /// erase a session that is still being read — a broken document, for
+  /// example, stays until the reader plays or edits the queue.
   bool _dirty = false;
 
   PlaybackSession? read() => _store.readSession();

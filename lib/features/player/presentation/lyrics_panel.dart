@@ -3,14 +3,31 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
+import 'package:tune/features/smart_lyrics/application/smart_lyrics_run.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// Height of one lyric line.
 const _lineExtent = 30.0;
+
+/// The height one contrast line adds under the words (docs/
+/// smart-lyrics.md §7.5): the translation and the transliteration may
+/// both stand, each on a row of its own. The row carries the whole line
+/// above it too, so it takes what that line takes and then some.
+const _contrastLineExtent = 24.0;
 
 /// Shows the lyrics of the track that plays and follows the playback.
 ///
@@ -26,6 +43,10 @@ class LyricsPanel extends ConsumerStatefulWidget {
 class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   final ScrollController _scroll = ScrollController();
 
+  /// The height one line takes right now: taller while a contrast rides
+  /// under the words, so the scroll arithmetic follows what is drawn.
+  double _extent = _lineExtent;
+
   @override
   void dispose() {
     _scroll.dispose();
@@ -34,6 +55,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final lyrics = ref.watch(lyricsControllerProvider);
     final song = ref.watch(
       playbackControllerProvider.select((state) => state.currentSong),
@@ -69,18 +91,108 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     final answer = lyrics.valueOrNull;
     // The answer of the track that plays, not the one of the track before it.
     final current = answer != null && answer.songId == song.id ? answer : null;
+    final run = ref.watch(smartLyricsControllerProvider);
 
     if (current != null && current.hasLyrics) {
       final document = current.document!;
-      return ListView.builder(
+      final flags =
+          ref.watch(songMarksProvider(song.id)).valueOrNull ??
+          SmartLyricsSongFlags.empty;
+      final contrast =
+          ref.watch(songContrastProvider(song)).valueOrNull ??
+          SmartSongContrast.empty;
+      final marks = ref.read(smartLyricsMarksControllerProvider);
+      // A sheet with a contrast under its lines reads taller — the cells
+      // stay uniform, so the cheap scroll keeps its arithmetic. Both
+      // kinds may stand at once, each under the words.
+      final contrastCount =
+          (contrast.translation != null ? 1 : 0) +
+          (contrast.transliteration != null ? 1 : 0);
+      _extent = _lineExtent + contrastCount * _contrastLineExtent;
+      final list = ListView.builder(
         controller: _scroll,
         padding: const EdgeInsets.symmetric(vertical: CompactTokens.space8),
-        itemExtent: _lineExtent,
+        itemExtent: _extent,
         itemCount: document.lines.length,
         itemBuilder: (context, index) {
           final line = document.lines[index];
-          return _LyricLine(line: line.text, active: index == active);
+          return _LyricLine(
+            key: ValueKey(index),
+            line: line.text,
+            active: index == active,
+            flagged: flags.lines.contains(index),
+            onToggleFlag: () => marks.toggleLine(song.id, index),
+            translation: _at(contrast.translation, index),
+            transliteration: _at(contrast.transliteration, index),
+          );
         },
+      );
+      final markRow = _MarkRow(song: song, flags: flags);
+      // The machine sheet says what it is: a better sheet found later tops
+      // it, and the search again is the way.
+      if (current.smart) {
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: CompactTokens.space12,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      context.loc.lyricsSmartNote,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _reload(song),
+                    child: Text(context.loc.lyricsSearchAgain),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(child: list),
+            markRow,
+          ],
+        );
+      }
+      return Column(children: [Expanded(child: list), markRow]);
+    }
+
+    // A run for this track is on its way; its progress is the message.
+    if (run.isRunningFor(song.id)) {
+      return _Message(
+        text: context.loc.lyricsSmartGenerating,
+        icon: Icons.lyrics_outlined,
+        actions: [
+          _Action(
+            label: context.loc.cancel,
+            onPressed: () =>
+                ref.read(smartLyricsControllerProvider.notifier).cancel(),
+          ),
+        ],
+      );
+    }
+
+    if (run.phase == SmartLyricsPhase.failed && run.songId == song.id) {
+      return _Message(
+        text: _failureOf(context, run.failure),
+        icon: Icons.error_outline_rounded,
+        actions: [
+          _Action(
+            label: context.loc.lyricsSmartGenerate,
+            onPressed: () =>
+                ref.read(smartLyricsControllerProvider.notifier).generate(song),
+          ),
+          _Action(label: context.loc.lyricsSearchAgain, onPressed: () => _reload(song)),
+          _Action(
+            label: context.loc.lyricsChooseFile,
+            onPressed: () => _chooseFile(song),
+          ),
+        ],
       );
     }
 
@@ -113,15 +225,46 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           label: context.loc.lyricsChooseFile,
           onPressed: () => _chooseFile(song),
         ),
+        _generateAction(context, song),
       ],
     );
   }
 
+  /// The door of the smart pipeline: greyed until a key sits in the
+  /// settings, and the press of an open door runs the loop of M2.
+  _Action _generateAction(BuildContext context, Song song) {
+    final configured = ref.watch(
+      settingsControllerProvider.select(
+        (state) => state.smartLyrics.isConfigured,
+      ),
+    );
+    // The batch owns the engines while it drains; one run at a time.
+    final batchRunning = ref.watch(
+      smartLyricsBatchControllerProvider.select((state) => state.running),
+    );
+    return _Action(
+      label: context.loc.lyricsSmartGenerate,
+      onPressed: () =>
+          ref.read(smartLyricsControllerProvider.notifier).generate(song),
+      enabled: configured && !batchRunning,
+      tooltip: configured ? null : context.loc.lyricsSmartGenerateNeedsKey,
+    );
+  }
+
+  /// The words a failed run gets: every failure its own, so the reader
+  /// knows whether it is the network, the endpoint, or the song itself.
+  String _failureOf(BuildContext context, SmartLyricsFailure? failure) =>
+      switch (failure) {
+        SmartLyricsFailure.noAudio => context.loc.lyricsSmartFailedAudio,
+        SmartLyricsFailure.uploadFailed => context.loc.lyricsSmartFailedUpload,
+        SmartLyricsFailure.emptyResult => context.loc.lyricsSmartFailedEmpty,
+        null => context.loc.lyricsFailed,
+      };
+
   /// Keeps the sung line in the middle of the panel.
-  void _scrollTo(int index) {
-    if (index < 0 || !_scroll.hasClients) return;
+  void _scrollTo(int index) {    if (index < 0 || !_scroll.hasClients) return;
     final target =
-        (index * _lineExtent - _scroll.position.viewportDimension / 2).clamp(
+        (index * _extent - _scroll.position.viewportDimension / 2).clamp(
           0.0,
           _scroll.position.maxScrollExtent,
         );
@@ -161,41 +304,311 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 }
 
 /// One line of the lyric sheet.
-class _LyricLine extends StatelessWidget {
-  const _LyricLine({required this.line, required this.active});
+class _LyricLine extends StatefulWidget {
+  const _LyricLine({
+    super.key,
+    required this.line,
+    required this.active,
+    this.flagged = false,
+    this.onToggleFlag,
+    this.translation,
+    this.transliteration,
+  });
 
   final String line;
   final bool active;
 
+  /// Whether the reader (or the pool) marked this line wrong.
+  final bool flagged;
+
+  /// The press that marks the line, or takes the mark back.
+  final VoidCallback? onToggleFlag;
+
+  /// The words under this one: the translation and the transliteration,
+  /// each on a row of its own. They never take part in the locating or
+  /// the highlight — they are what the eye reads under the words that are
+  /// sung (docs/smart-lyrics.md §7.5).
+  final String? translation;
+  final String? transliteration;
+
+  @override
+  State<_LyricLine> createState() => _LyricLineState();
+}
+
+class _LyricLineState extends State<_LyricLine> {
+  /// The line under the pointer: its flag shows only then, so the sheet
+  /// reads as words, not as a column of icons. A long press pins the flag
+  /// out on a touch screen, where there is no pointer to hover.
+  var _hovering = false;
+  var _pinned = false;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final line = widget.line;
+    final active = widget.active;
+    final translation = widget.translation;
+    final transliteration = widget.transliteration;
     // The sung line takes the step above the others, so the eye finds it
     // without reading the words first.
     final style = active
         ? theme.textTheme.titleMedium
         : theme.textTheme.bodyMedium;
 
-    return Text(
-      line,
+    final words = Row(
+      children: [
+        Expanded(
+          child: Text(
+            line,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style?.copyWith(
+              height: 1.2,
+              color: active
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        // One press marks the line wrong, another takes it back. The
+        // marked line keeps its flag in the accent; every other flag waits
+        // for the pointer — the playing page stays words first.
+        if (widget.onToggleFlag != null)
+          Visibility(
+            visible: widget.flagged || _hovering || _pinned,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: TuneTooltip(
+              message: widget.flagged
+                  ? context.loc.lyricsUnmarkLine
+                  : context.loc.lyricsMarkLine,
+              child: IconButton(
+                onPressed: widget.onToggleFlag,
+                icon: Icon(
+                  widget.flagged ? Icons.flag : Icons.flag_outlined,
+                  size: CompactTokens.icon16,
+                  color: widget.flagged
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: CompactTokens.icon20,
+                  minHeight: CompactTokens.icon20,
+                ),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          ),
+      ],
+    );
+    final row = MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onLongPress: () => setState(() => _pinned = !_pinned),
+        child: words,
+      ),
+    );
+    // Without a contrast the line stays the single row the cheap scroll
+    // was measured for; the contrasts add their rows under the words.
+    if (translation == null && transliteration == null) return row;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        row,
+        if (translation != null)
+          _contrast(context, translation, theme, faint: false),
+        if (transliteration != null)
+          _contrast(context, transliteration, theme, faint: true),
+      ],
+    );
+  }
+
+  /// One contrast row: quiet under the words, never the line the eye
+  /// hunts for — it is the reading, not the song.
+  Widget _contrast(
+    BuildContext context,
+    String words,
+    ThemeData theme, {
+    required bool faint,
+  }) => Padding(
+    padding: const EdgeInsets.only(left: CompactTokens.space6),
+    child: Text(
+      words,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: style?.copyWith(
-        height: 1.2,
-        color: active
-            ? theme.colorScheme.primary
-            : theme.colorScheme.onSurfaceVariant,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+        fontWeight: faint ? FontWeight.w300 : FontWeight.w400,
       ),
+    ),
+  );
+}
+
+/// The two whole-track marks the reader hears their way to (docs/
+/// smart-lyrics.md §7.4): the track is wrong, or the track is not sung.
+class _MarkRow extends ConsumerWidget {
+  const _MarkRow({required this.song, required this.flags});
+
+  final Song song;
+  final SmartLyricsSongFlags flags;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final marks = ref.read(smartLyricsMarksControllerProvider);
+    final contrast =
+        ref.watch(songContrastProvider(song)).valueOrNull ??
+        SmartSongContrast.empty;
+    final hasAssist = ref.watch(smartLyricsAssistProvider) != null;
+    final contrastController = ref.read(smartLyricsContrastControllerProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: CompactTokens.space12,
+        vertical: CompactTokens.space6,
+      ),
+      child: Row(
+        children: [
+          _toggle(
+            context,
+            label: context.loc.lyricsMarkSong,
+            active: flags.song,
+            onPressed: () => marks.toggleSong(song.id),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+          _toggle(
+            context,
+            label: context.loc.lyricsMarkNotSung,
+            active: flags.instrumental,
+            onPressed: () => marks.toggleNotSung(song.id),
+          ),
+          const Spacer(),
+          // The playing page stays lean (2026-10-29 用户拍板): the rest
+          // of the actions live behind one menu — the panel is for
+          // listening first, not for a control board.
+          PopupMenuButton<String>(
+            key: const ValueKey('panel-more'),
+            icon: const Icon(Icons.more_horiz),
+            onSelected: (action) {
+              switch (action) {
+                case 'translate':
+                  if (contrast.translation == null) {
+                    unawaited(contrastController.translate(song));
+                  }
+                case 'transliterate':
+                  if (contrast.transliteration == null) {
+                    unawaited(contrastController.transliterate(song));
+                  }
+                case 'marks':
+                  context.push('/marks');
+              }
+            },
+            itemBuilder: (context) => [
+              if (hasAssist)
+                PopupMenuItem(
+                  value: 'translate',
+                  child: _menuItem(
+                    context,
+                    label: context.loc.lyricsContrastTranslate,
+                    icon: Icons.translate,
+                    done: contrast.translation != null,
+                  ),
+                ),
+              if (hasAssist)
+                PopupMenuItem(
+                  value: 'transliterate',
+                  child: _menuItem(
+                    context,
+                    label: context.loc.lyricsContrastTransliterate,
+                    icon: Icons.spatial_audio_off,
+                    done: contrast.transliteration != null,
+                  ),
+                ),
+              PopupMenuItem(
+                value: 'marks',
+                child: Text(context.loc.lyricsMarksTitle),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// One of the two marks: a plain button until it is pressed, an accent
+  /// one after — the reader sees what their signal said.
+  Widget _toggle(
+    BuildContext context, {
+    required String label,
+    required bool active,
+    required VoidCallback onPressed,
+  }) {
+    final theme = Theme.of(context);
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.flag,
+        size: CompactTokens.icon16,
+        color: active ? theme.colorScheme.primary : null,
+      ),
+      label: Text(
+        label,
+        style: active
+            ? TextStyle(color: theme.colorScheme.primary)
+            : null,
+      ),
+    );
+  }
+
+  /// One menu line: the action's name, with an accent check once it has
+  /// been done.
+  Widget _menuItem(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required bool done,
+  }) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          done ? Icons.check : icon,
+          size: CompactTokens.icon16,
+          color: done ? theme.colorScheme.primary : null,
+        ),
+        const SizedBox(width: CompactTokens.space8),
+        Text(label),
+      ],
     );
   }
 }
 
+/// The words at [index] of [lines], `null` when the contrast does not
+/// reach that far — a sheet that grew since the contrast was made leaves
+/// the extra lines alone.
+String? _at(List<String>? lines, int index) =>
+    lines == null || index >= lines.length ? null : lines[index];
+
 /// One thing the reader can do when there are no lyrics to show.
 class _Action {
-  const _Action({required this.label, required this.onPressed});
+  const _Action({
+    required this.label,
+    required this.onPressed,
+    this.enabled = true,
+    this.tooltip,
+  });
 
   final String label;
   final VoidCallback onPressed;
+
+  /// Whether the action can answer a press; a greyed one explains itself
+  /// in [tooltip] instead.
+  final bool enabled;
+  final String? tooltip;
 }
 
 /// Placeholder shown while there is nothing to read.
@@ -228,10 +641,21 @@ class _Message extends StatelessWidget {
           ),
           for (final action in actions) ...[
             const SizedBox(height: CompactTokens.space8),
-            TextButton(onPressed: action.onPressed, child: Text(action.label)),
+            _actionButton(context, action),
           ],
         ],
       ),
     );
+  }
+
+  /// The button of one action: a greyed press is null, and the reason it
+  /// waits travels as a hint over it.
+  Widget _actionButton(BuildContext context, _Action action) {
+    final button = TextButton(
+      onPressed: action.enabled ? action.onPressed : null,
+      child: Text(action.label),
+    );
+    if (action.tooltip == null) return button;
+    return TuneTooltip(message: action.tooltip!, child: button);
   }
 }

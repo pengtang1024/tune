@@ -3740,7 +3740,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsResumePlaybackOnStartupHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始'**
+  /// **'打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态'**
   String get settingsResumePlaybackOnStartupHint;
 
   /// No description provided for @settingsReplaceQueueOnClick.
@@ -3766,6 +3766,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢'**
   String get settingsOnlyLikeOnDoubleClickHint;
+
+  /// No description provided for @settingsFavoritesDoubleClickPlays.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双击喜欢的曲目时播放并替换队列'**
+  String get settingsFavoritesDoubleClickPlays;
+
+  /// No description provided for @settingsFavoritesDoubleClickPlaysHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢'**
+  String get settingsFavoritesDoubleClickPlaysHint;
 
   /// No description provided for @sidebarDiscover.
   ///
@@ -4151,6 +4163,366 @@ abstract class AppLocalizations {
   /// **'可选的本地播放记录（默认关闭）'**
   String get discoverWhyHistory;
 
+  /// No description provided for @settingsSectionSmartLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'智能歌词'**
+  String get settingsSectionSmartLyrics;
+
+  /// No description provided for @settingsSmartLyricsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词覆盖'**
+  String get settingsSmartLyricsTitle;
+
+  /// No description provided for @settingsSmartLyricsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标签里的词和曲目旁的词稿都算；统计来自最近一次扫描'**
+  String get settingsSmartLyricsDescription;
+
+  /// No description provided for @settingsSmartLyricsTotal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'曲目总数'**
+  String get settingsSmartLyricsTotal;
+
+  /// No description provided for @settingsSmartLyricsResolved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已知有词'**
+  String get settingsSmartLyricsResolved;
+
+  /// No description provided for @settingsSmartLyricsMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'待补缺口'**
+  String get settingsSmartLyricsMissing;
+
+  /// No description provided for @settingsSmartLyricsPreset.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口模板'**
+  String get settingsSmartLyricsPreset;
+
+  /// No description provided for @settingsSmartLyricsPresetCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义'**
+  String get settingsSmartLyricsPresetCustom;
+
+  /// No description provided for @settingsSmartLyricsApiKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密钥'**
+  String get settingsSmartLyricsApiKey;
+
+  /// No description provided for @settingsSmartLyricsApiKeyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'粘贴你自己的 API 密钥'**
+  String get settingsSmartLyricsApiKeyHint;
+
+  /// No description provided for @settingsSmartLyricsAdvanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'高级'**
+  String get settingsSmartLyricsAdvanced;
+
+  /// No description provided for @settingsSmartLyricsBaseUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'接口地址'**
+  String get settingsSmartLyricsBaseUrl;
+
+  /// No description provided for @settingsSmartLyricsAsrModels.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'转写模型（逗号分隔）'**
+  String get settingsSmartLyricsAsrModels;
+
+  /// No description provided for @settingsSmartLyricsChatModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'文本模型'**
+  String get settingsSmartLyricsChatModel;
+
+  /// No description provided for @settingsSmartLyricsPrivacy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。'**
+  String get settingsSmartLyricsPrivacy;
+
+  /// No description provided for @settingsSmartLyricsSampled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'抽样'**
+  String get settingsSmartLyricsSampled;
+
+  /// No description provided for @settingsSmartLyricsChecked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已核'**
+  String get settingsSmartLyricsChecked;
+
+  /// No description provided for @settingsSmartLyricsAccuracy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正确率'**
+  String get settingsSmartLyricsAccuracy;
+
+  /// No description provided for @settingsSmartLyricsDrawSample.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开始抽样'**
+  String get settingsSmartLyricsDrawSample;
+
+  /// No description provided for @settingsSmartLyricsAccuracyNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。'**
+  String get settingsSmartLyricsAccuracyNote;
+
+  /// No description provided for @settingsSmartLyricsLocal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地引擎'**
+  String get settingsSmartLyricsLocal;
+
+  /// No description provided for @settingsSmartLyricsLocalOff.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭'**
+  String get settingsSmartLyricsLocalOff;
+
+  /// No description provided for @settingsSmartLyricsLocalDownload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载模型'**
+  String get settingsSmartLyricsLocalDownload;
+
+  /// No description provided for @settingsSmartLyricsLocalBusy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载中……'**
+  String get settingsSmartLyricsLocalBusy;
+
+  /// No description provided for @settingsSmartLyricsLocalReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'模型已就绪'**
+  String get settingsSmartLyricsLocalReady;
+
+  /// No description provided for @settingsSmartLyricsLocalFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载失败：重试，或换个模型'**
+  String get settingsSmartLyricsLocalFailed;
+
+  /// No description provided for @settingsSmartLyricsBatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'批量补齐'**
+  String get settingsSmartLyricsBatch;
+
+  /// No description provided for @settingsSmartLyricsBatchStart.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'补齐曲库'**
+  String get settingsSmartLyricsBatchStart;
+
+  /// No description provided for @settingsSmartLyricsBatchStop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'停止'**
+  String get settingsSmartLyricsBatchStop;
+
+  /// No description provided for @settingsSmartLyricsBatchRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重查失败曲目'**
+  String get settingsSmartLyricsBatchRetry;
+
+  /// No description provided for @settingsSmartLyricsBudget.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'云端预算（首/批，0 为不限）'**
+  String get settingsSmartLyricsBudget;
+
+  /// No description provided for @settingsSmartLyricsBatchIdle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'待补 {pending} · 已完成 {done} · 失败 {failed}'**
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed);
+
+  /// No description provided for @settingsSmartLyricsBatchRunning.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在补齐：待补 {pending} · 已完成 {done}'**
+  String settingsSmartLyricsBatchRunning(int pending, int done);
+
+  /// No description provided for @settingsSmartLyricsBudgetPaused.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已达云端预算（{budget} 首），本批暂停——余下待补不丢'**
+  String settingsSmartLyricsBudgetPaused(int budget);
+
+  /// No description provided for @settingsSmartLyricsBatchFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新增 {count} 首待补，按「补齐曲库」入队'**
+  String settingsSmartLyricsBatchFresh(int count);
+
+  /// No description provided for @settingsSmartLyricsLeakCheck.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU'**
+  String get settingsSmartLyricsLeakCheck;
+
+  /// No description provided for @lyricsSmartGenerate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'智能生成'**
+  String get lyricsSmartGenerate;
+
+  /// No description provided for @lyricsSmartGenerateNeedsKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有密钥——先到设置的「智能歌词」里贴一把'**
+  String get lyricsSmartGenerateNeedsKey;
+
+  /// No description provided for @lyricsSmartGenerating.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在生成歌词——先问人写稿，再开通道，一轮最多几分钟'**
+  String get lyricsSmartGenerating;
+
+  /// No description provided for @lyricsSmartFailedAudio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取音频失败：曲目没有本地副本，也没拉到流'**
+  String get lyricsSmartFailedAudio;
+
+  /// No description provided for @lyricsSmartFailedUpload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'通道没有答上来：稍后再试，或到设置里检查钥匙与端点'**
+  String get lyricsSmartFailedUpload;
+
+  /// No description provided for @lyricsSmartFailedEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有识别出人声'**
+  String get lyricsSmartFailedEmpty;
+
+  /// No description provided for @lyricsSmartNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'机器稿：票池生成，重新查找可以找更好的词'**
+  String get lyricsSmartNote;
+
+  /// No description provided for @lyricsMarkLine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这行不对'**
+  String get lyricsMarkLine;
+
+  /// No description provided for @lyricsUnmarkLine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销标记'**
+  String get lyricsUnmarkLine;
+
+  /// No description provided for @lyricsMarkSong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'整首不对'**
+  String get lyricsMarkSong;
+
+  /// No description provided for @lyricsMarkNotSung.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这不是唱的'**
+  String get lyricsMarkNotSung;
+
+  /// No description provided for @lyricsMarksTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标记管理'**
+  String get lyricsMarksTitle;
+
+  /// No description provided for @lyricsMarksEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'还没有标记——听到不对的行，点行尾的小旗'**
+  String get lyricsMarksEmpty;
+
+  /// No description provided for @lyricsMarkLineNumber.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'第 {line} 行'**
+  String lyricsMarkLineNumber(int line);
+
+  /// No description provided for @lyricsMarkReword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'改词'**
+  String get lyricsMarkReword;
+
+  /// No description provided for @lyricsMarkRewordTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'改这一行'**
+  String get lyricsMarkRewordTitle;
+
+  /// No description provided for @lyricsMarkRewordSave.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'保存改词'**
+  String get lyricsMarkRewordSave;
+
+  /// No description provided for @lyricsMarkRevoke.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'撤销'**
+  String get lyricsMarkRevoke;
+
+  /// No description provided for @lyricsMarkWaiting.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'等复解'**
+  String get lyricsMarkWaiting;
+
+  /// No description provided for @lyricsMarkResolved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已复解'**
+  String get lyricsMarkResolved;
+
+  /// No description provided for @lyricsMarkReworded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已改词'**
+  String get lyricsMarkReworded;
+
+  /// No description provided for @lyricsMarkRevoked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已撤销'**
+  String get lyricsMarkRevoked;
+
+  /// No description provided for @lyricsMarkSourceReader.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读者'**
+  String get lyricsMarkSourceReader;
+
+  /// No description provided for @lyricsMarkSourceSystem.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'系统'**
+  String get lyricsMarkSourceSystem;
+
   /// No description provided for @discoverSectionOnlineArtist.
   ///
   /// In zh_CN, this message translates to:
@@ -4222,6 +4594,678 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'你常把这首听完'**
   String get discoverReasonCompleted;
+
+  /// No description provided for @smartPromptCorrect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「{title}」，歌手「{artist}」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{draft}'**
+  String smartPromptCorrect(String title, String artist, String draft);
+
+  /// No description provided for @smartPromptRebuild.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请凭你对这首歌的了解，写出《{title}》({artist}) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：'**
+  String smartPromptRebuild(String title, String artist);
+
+  /// No description provided for @smartPromptTranslate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把下面这首歌的歌词逐行译成{target}，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}'**
+  String smartPromptTranslate(String target, String lines);
+
+  /// No description provided for @smartPromptTransliterate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n{lines}'**
+  String smartPromptTransliterate(String lines);
+
+  /// No description provided for @smartContrastTargetLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英文'**
+  String get smartContrastTargetLanguage;
+
+  /// No description provided for @lyricsContrastTranslate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译'**
+  String get lyricsContrastTranslate;
+
+  /// No description provided for @lyricsContrastTransliterate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音译'**
+  String get lyricsContrastTransliterate;
+
+  /// No description provided for @lyricsContrastDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已对照'**
+  String get lyricsContrastDone;
+
+  /// No description provided for @settingsSmartLyricsAutoFill.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐：开着就把库里所有没词的歌自动补到有词'**
+  String get settingsSmartLyricsAutoFill;
+
+  /// No description provided for @librarySortTooltip.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排序'**
+  String get librarySortTooltip;
+
+  /// No description provided for @librarySortRecent.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近加入'**
+  String get librarySortRecent;
+
+  /// No description provided for @librarySortTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标题'**
+  String get librarySortTitle;
+
+  /// No description provided for @librarySortArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get librarySortArtist;
+
+  /// No description provided for @librarySortAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get librarySortAlbum;
+
+  /// No description provided for @librarySortDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get librarySortDuration;
+
+  /// No description provided for @libraryColumnTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标题'**
+  String get libraryColumnTitle;
+
+  /// No description provided for @libraryColumnArtist.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get libraryColumnArtist;
+
+  /// No description provided for @libraryColumnAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get libraryColumnAlbum;
+
+  /// No description provided for @libraryColumnAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入'**
+  String get libraryColumnAdded;
+
+  /// No description provided for @libraryColumnDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get libraryColumnDuration;
+
+  /// No description provided for @libraryMoreActions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多操作'**
+  String get libraryMoreActions;
+
+  /// No description provided for @libraryViewColumns.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双列视图'**
+  String get libraryViewColumns;
+
+  /// No description provided for @libraryFilter.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'筛选'**
+  String get libraryFilter;
+
+  /// No description provided for @libraryFilterClearAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'清除全部'**
+  String get libraryFilterClearAll;
+
+  /// No description provided for @libraryFilterStatus.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'状态'**
+  String get libraryFilterStatus;
+
+  /// No description provided for @libraryFilterStatusAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部'**
+  String get libraryFilterStatusAll;
+
+  /// No description provided for @libraryFilterStatusLiked.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'喜欢'**
+  String get libraryFilterStatusLiked;
+
+  /// No description provided for @libraryFilterStatusWithLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有词'**
+  String get libraryFilterStatusWithLyrics;
+
+  /// No description provided for @libraryFilterStatusWithoutLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'缺词'**
+  String get libraryFilterStatusWithoutLyrics;
+
+  /// No description provided for @libraryFilterStatusInstrumental.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'纯音乐'**
+  String get libraryFilterStatusInstrumental;
+
+  /// No description provided for @libraryFilterGenres.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流派'**
+  String get libraryFilterGenres;
+
+  /// No description provided for @libraryFilterDecades.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'年代'**
+  String get libraryFilterDecades;
+
+  /// No description provided for @libraryFilterArtists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术家'**
+  String get libraryFilterArtists;
+
+  /// No description provided for @libraryFilterLanguages.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get libraryFilterLanguages;
+
+  /// No description provided for @libraryFilterFormats.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'格式'**
+  String get libraryFilterFormats;
+
+  /// No description provided for @libraryFilterDurations.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get libraryFilterDurations;
+
+  /// No description provided for @libraryFilterAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'加入时间'**
+  String get libraryFilterAdded;
+
+  /// No description provided for @libraryFilterDurationShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'<2 分钟'**
+  String get libraryFilterDurationShort;
+
+  /// No description provided for @libraryFilterDurationMedium.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'2–5 分钟'**
+  String get libraryFilterDurationMedium;
+
+  /// No description provided for @libraryFilterDurationLong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'5–10 分钟'**
+  String get libraryFilterDurationLong;
+
+  /// No description provided for @libraryFilterDurationEpic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'>10 分钟'**
+  String get libraryFilterDurationEpic;
+
+  /// No description provided for @libraryFilterAddedWeek.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近 7 天'**
+  String get libraryFilterAddedWeek;
+
+  /// No description provided for @libraryFilterAddedMonth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近 30 天'**
+  String get libraryFilterAddedMonth;
+
+  /// No description provided for @libraryFilterAddedYear.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近一年'**
+  String get libraryFilterAddedYear;
+
+  /// No description provided for @libraryFilterAddedOlder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更早'**
+  String get libraryFilterAddedOlder;
+
+  /// No description provided for @libraryViewCategories.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'分类视图'**
+  String get libraryViewCategories;
+
+  /// No description provided for @libraryAllSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部歌曲'**
+  String get libraryAllSongs;
+
+  /// No description provided for @libraryTreeExpand.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'展开分类'**
+  String get libraryTreeExpand;
+
+  /// No description provided for @libraryTreeCollapse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起分类'**
+  String get libraryTreeCollapse;
+
+  /// No description provided for @languageZh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文'**
+  String get languageZh;
+
+  /// No description provided for @languageEn.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语'**
+  String get languageEn;
+
+  /// No description provided for @languageJa.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'日语'**
+  String get languageJa;
+
+  /// No description provided for @languageKo.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'韩语'**
+  String get languageKo;
+
+  /// No description provided for @languageFr.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'法语'**
+  String get languageFr;
+
+  /// No description provided for @languageDe.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'德语'**
+  String get languageDe;
+
+  /// No description provided for @languageEs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西班牙语'**
+  String get languageEs;
+
+  /// No description provided for @languageRu.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'俄语'**
+  String get languageRu;
+
+  /// No description provided for @settingsOverview.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部'**
+  String get settingsOverview;
+
+  /// No description provided for @settingsSearchHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索设置'**
+  String get settingsSearchHint;
+
+  /// No description provided for @settingsCustomize.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义…'**
+  String get settingsCustomize;
+
+  /// No description provided for @settingsResetSection.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复本分区默认'**
+  String get settingsResetSection;
+
+  /// No description provided for @settingsResetAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复全部默认'**
+  String get settingsResetAll;
+
+  /// No description provided for @settingsResetTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'恢复默认设置？'**
+  String get settingsResetTitle;
+
+  /// No description provided for @settingsResetMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这会覆盖当前分区的设置，确定继续？'**
+  String get settingsResetMessage;
+
+  /// No description provided for @settingsResetAllMessage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这会覆盖所有设置，确定继续？'**
+  String get settingsResetAllMessage;
+
+  /// No description provided for @settingsPresetAutoScan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动扫描'**
+  String get settingsPresetAutoScan;
+
+  /// No description provided for @settingsPresetAutoScanHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启动时扫描全部音源'**
+  String get settingsPresetAutoScanHint;
+
+  /// No description provided for @settingsPresetManualScan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动扫描'**
+  String get settingsPresetManualScan;
+
+  /// No description provided for @settingsPresetManualScanHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只在点扫描时更新'**
+  String get settingsPresetManualScanHint;
+
+  /// No description provided for @settingsPresetQueueFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'队列优先'**
+  String get settingsPresetQueueFirst;
+
+  /// No description provided for @settingsPresetQueueFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'点歌加入队列，不替换正在放的'**
+  String get settingsPresetQueueFirstHint;
+
+  /// No description provided for @settingsPresetSingleFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲优先'**
+  String get settingsPresetSingleFirst;
+
+  /// No description provided for @settingsPresetSingleFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'点歌替换队列，只放这一首'**
+  String get settingsPresetSingleFirstHint;
+
+  /// No description provided for @settingsPresetFavoriteFirst.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收藏优先'**
+  String get settingsPresetFavoriteFirst;
+
+  /// No description provided for @settingsPresetFavoriteFirstHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'双击只标喜欢，单击照常'**
+  String get settingsPresetFavoriteFirstHint;
+
+  /// No description provided for @settingsPresetLyricsManual.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手动'**
+  String get settingsPresetLyricsManual;
+
+  /// No description provided for @settingsPresetLyricsManualHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不自动补齐'**
+  String get settingsPresetLyricsManualHint;
+
+  /// No description provided for @settingsPresetLyricsBalanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平衡'**
+  String get settingsPresetLyricsBalanced;
+
+  /// No description provided for @settingsPresetLyricsBalancedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐 + 周期查漏'**
+  String get settingsPresetLyricsBalancedHint;
+
+  /// No description provided for @settingsPresetLyricsSaver.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'省电'**
+  String get settingsPresetLyricsSaver;
+
+  /// No description provided for @settingsPresetLyricsSaverHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动补齐，不周期查漏'**
+  String get settingsPresetLyricsSaverHint;
+
+  /// No description provided for @settingsPresetLearnOn.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'开启学习'**
+  String get settingsPresetLearnOn;
+
+  /// No description provided for @settingsPresetLearnOnHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用播放历史改进推荐'**
+  String get settingsPresetLearnOnHint;
+
+  /// No description provided for @settingsPresetLearnOff.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭学习'**
+  String get settingsPresetLearnOff;
+
+  /// No description provided for @settingsPresetLearnOffHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只用收藏和元数据'**
+  String get settingsPresetLearnOffHint;
+
+  /// No description provided for @settingsPresetTray.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'托盘常驻'**
+  String get settingsPresetTray;
+
+  /// No description provided for @settingsPresetTrayHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关窗口继续播放'**
+  String get settingsPresetTrayHint;
+
+  /// No description provided for @settingsPresetQuit.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭即退出'**
+  String get settingsPresetQuit;
+
+  /// No description provided for @settingsPresetQuitHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关窗口就停止播放'**
+  String get settingsPresetQuitHint;
+
+  /// No description provided for @settingsSearchKeywordsAppearance.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'主题 语言 深色 浅色 theme language'**
+  String get settingsSearchKeywordsAppearance;
+
+  /// No description provided for @settingsSearchKeywordsLibrary.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描 文件夹 缓存 音乐库 scan folder cache'**
+  String get settingsSearchKeywordsLibrary;
+
+  /// No description provided for @settingsSearchKeywordsPlayback.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'队列 双击 收藏 播放 queue click favorite'**
+  String get settingsSearchKeywordsPlayback;
+
+  /// No description provided for @settingsSearchKeywordsLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词 补齐 查漏 标记 lyrics fill'**
+  String get settingsSearchKeywordsLyrics;
+
+  /// No description provided for @settingsSearchKeywordsDiscovery.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐 历史 发现 discover history'**
+  String get settingsSearchKeywordsDiscovery;
+
+  /// No description provided for @settingsSearchKeywordsDesktop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'托盘 媒体控制 默认播放器 desktop tray media'**
+  String get settingsSearchKeywordsDesktop;
+
+  /// No description provided for @settingsSearchKeywordsSourceHealth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音源 健康度 权重 source health weight'**
+  String get settingsSearchKeywordsSourceHealth;
+
+  /// No description provided for @settingsSearchNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有匹配的设置'**
+  String get settingsSearchNoMatch;
+
+  /// No description provided for @settingsSectionSourceHealth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'健康度'**
+  String get settingsSectionSourceHealth;
+
+  /// No description provided for @sourcesHealthPresetBalanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平衡'**
+  String get sourcesHealthPresetBalanced;
+
+  /// No description provided for @sourcesHealthPresetBalancedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认权重，各项均衡'**
+  String get sourcesHealthPresetBalancedHint;
+
+  /// No description provided for @sourcesHealthPresetPlayable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'能播优先'**
+  String get sourcesHealthPresetPlayable;
+
+  /// No description provided for @sourcesHealthPresetPlayableHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用、配置、扫描、可靠与可播放更重'**
+  String get sourcesHealthPresetPlayableHint;
+
+  /// No description provided for @sourcesHealthPresetFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜优先'**
+  String get sourcesHealthPresetFresh;
+
+  /// No description provided for @sourcesHealthPresetFreshHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜度、产出与活跃度更重'**
+  String get sourcesHealthPresetFreshHint;
+
+  /// No description provided for @sourcesHealthWeightsCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义…'**
+  String get sourcesHealthWeightsCustom;
+
+  /// No description provided for @sourcesHealthWeightsShare.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'占比'**
+  String get sourcesHealthWeightsShare;
+
+  /// No description provided for @sourcesHealthWeightsOffHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'0 = 关闭该维度；百分比为自动归一化后的占比'**
+  String get sourcesHealthWeightsOffHint;
+
+  /// No description provided for @sourcesHealthGroupCore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用与配置'**
+  String get sourcesHealthGroupCore;
+
+  /// No description provided for @sourcesHealthGroupOutput.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜与产出'**
+  String get sourcesHealthGroupOutput;
+
+  /// No description provided for @sourcesHealthGroupReliable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可靠与稳定'**
+  String get sourcesHealthGroupReliable;
+
+  /// No description provided for @sourcesHealthGroupShow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'展示与活跃'**
+  String get sourcesHealthGroupShow;
+
+  /// No description provided for @sourcesHealthWeightsDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'完成'**
+  String get sourcesHealthWeightsDone;
 }
 
 class _AppLocalizationsDelegate

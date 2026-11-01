@@ -29,17 +29,18 @@ final playbackControllerProvider =
       final downloads = ref.watch(songDownloadServiceProvider);
       final resolver = ref.watch(streamUrlResolverProvider);
       final store = ref.watch(playbackSessionStoreProvider);
-      // The switch decides what a start reads, not what the running player
-      // writes, so it is read once when the controller is built.
-      final restore = ref
+      // The queue and the position are always restored; the switch only
+      // decides whether the restored track plays on. It is read once when
+      // the controller is built, because that is when the start happens.
+      final autoResume = ref
           .read(settingsControllerProvider)
-          .restorePlaybackOnStartup;
+          .autoResumeOnStartup;
       return PlaybackController(
         audio,
         downloads,
         resolver,
         sessionStore: store,
-        restoreSession: restore,
+        autoResume: autoResume,
         deadSongs: ref.watch(deadSongsProvider.notifier),
       );
     });
@@ -55,7 +56,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
     this._downloads,
     this._resolver, {
     PlaybackSessionStore? sessionStore,
-    bool restoreSession = true,
+    bool autoResume = false,
     DeadSongsController? deadSongs,
   }) : _deadSongs = deadSongs,
        _audioSources = AudioSourceResolver(_downloads),
@@ -73,7 +74,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       }),
     );
     _subscriptions.add(_audio.errorStream.listen(_handlePlayerError));
-    _restoreSession(restoreSession);
+    _restoreSession(autoResume);
 
     final recorder = _sessionRecorder;
     if (recorder != null) {
@@ -611,26 +612,27 @@ class PlaybackController extends StateNotifier<PlaybackState> {
   // ---------------------------------------------------------------------------
 
   /// Loads the queue the last run left behind, paused at its position.
-  void _restoreSession(bool restore) {
+  ///
+  /// The queue and the position come back whenever they were saved; the
+  /// switch only decides whether the restored track plays on by itself.
+  void _restoreSession(bool autoResume) {
     final recorder = _sessionRecorder;
     if (recorder == null) return;
 
-    if (restore) {
-      final session = recorder.read();
-      if (session != null) {
-        final song = session.currentSong;
-        state = PlaybackState(
-          status: PlaybackStatus.paused,
-          position: song.isLiveStream ? Duration.zero : session.position,
-          duration: _knownDuration(song),
-          volume: state.volume,
-          playMode: session.playMode,
-          queue: session.queue,
-          currentUri: session.currentUri,
-          history: session.history,
-          audioSourceStatus: _initialSourceStatus(song),
-        );
-      }
+    final session = recorder.read();
+    if (session != null) {
+      final song = session.currentSong;
+      state = PlaybackState(
+        status: PlaybackStatus.paused,
+        position: song.isLiveStream ? Duration.zero : session.position,
+        duration: _knownDuration(song),
+        volume: state.volume,
+        playMode: session.playMode,
+        queue: session.queue,
+        currentUri: session.currentUri,
+        history: session.history,
+        audioSourceStatus: _initialSourceStatus(song),
+      );
     }
 
     final volume = recorder.readVolume();
@@ -638,6 +640,10 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       state = state.copyWith(volume: volume);
     }
     unawaited(_applyVolume(volume));
+
+    if (autoResume && state.hasTrack) {
+      unawaited(resume());
+    }
   }
 
   Future<void> _applyVolume(double volume) async {

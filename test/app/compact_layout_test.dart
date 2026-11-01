@@ -21,6 +21,7 @@ import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -564,7 +565,9 @@ void main() {
       tester.element(find.byType(LibraryPane)),
     );
 
-    await tester.tap(find.byTooltip('将整个列表加入队列'));
+    await tester.tap(find.byKey(const ValueKey('library-more')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('将整个列表加入队列').last);
     await tester.pumpAndSettle();
 
     final state = container.read(playbackControllerProvider);
@@ -604,7 +607,7 @@ void main() {
     // tooltip, so the row keeps its shape whatever the source is called.
     expect(find.byType(SourceBadge), findsOneWidget);
 
-    await tester.tap(find.byTooltip('筛选来源'));
+    await tester.tap(find.byKey(const ValueKey('library-source-filter')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Openverse').last);
     await tester.pumpAndSettle();
@@ -1057,9 +1060,84 @@ void main() {
     // At 760 the rail is compact: its page names wait in tooltips, so only
     // the texts of the page itself are on screen.
     expect(find.text('设置'), findsOneWidget);
-    expect(find.text('偏好'), findsOneWidget);
-    expect(find.text('音乐库'), findsOneWidget);
-    expect(find.text('资料库'), findsOneWidget);
+    expect(find.text('音乐库'), findsWidgets);
+    expect(find.text('健康度'), findsWidgets);
+  });
+
+  testWidgets('settings cards share a row height and the health card spans it', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(1180, 860));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final appearance = tester.getSize(
+      find.byKey(const ValueKey('settings-card-appearance')),
+    );
+    final library = tester.getSize(
+      find.byKey(const ValueKey('settings-card-library')),
+    );
+    final health = tester.getSize(
+      find.byKey(const ValueKey('settings-card-sourceHealth')),
+    );
+
+    // Cards in one row end on the same line, and the health table reads
+    // across the page instead of leaving a hole beside it.
+    expect(appearance.height, library.height);
+    expect(appearance.width, library.width);
+    expect(health.width, closeTo(appearance.width * 2 + 8, 0.5));
+  });
+
+  testWidgets('about and update sit side by side on a wide page', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(1180, 860));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final about = find.byKey(const ValueKey('settings-card-about'));
+    final update = find.byKey(const ValueKey('settings-card-update'));
+
+    expect(about, findsOneWidget);
+    expect(update, findsOneWidget);
+    expect(tester.getSize(about).height, tester.getSize(update).height);
+    expect(tester.getTopLeft(about).dy, tester.getTopLeft(update).dy);
+    expect(
+      tester.getTopLeft(update).dx,
+      greaterThan(tester.getTopRight(about).dx),
+    );
   });
 
   testWidgets('settings page exposes the health weights and opens them', (
@@ -1085,30 +1163,18 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final adjust = find.byKey(const ValueKey('settings-source-health-adjust'));
-    await tester.scrollUntilVisible(
-      adjust,
-      300,
-      scrollable: find
-          .descendant(
-            of: find.byType(SettingsPane),
-            matching: find.byType(Scrollable),
-          )
-          .first,
-    );
+    await tester.tap(find.byKey(const ValueKey('settings-nav-sourceHealth')));
+    await tester.pumpAndSettle();
+    final adjust = find.byKey(const ValueKey('settings-customize-sourceHealth'));
+    await tester.ensureVisible(adjust);
+    await tester.pumpAndSettle();
     expect(adjust, findsOneWidget);
-    expect(find.text('健康度权重'), findsOneWidget);
+    expect(find.text('健康度'), findsWidgets);
 
     await tester.tap(adjust);
     await tester.pumpAndSettle();
-    expect(find.byType(AlertDialog), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(Slider),
-      ),
-      findsNWidgets(12),
-    );
+    expect(find.byType(SourceHealthWeightsSheet), findsOneWidget);
+    expect(find.byIcon(Icons.add_rounded), findsWidgets);
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {
@@ -1140,6 +1206,8 @@ void main() {
       ThemeMode.system,
     );
 
+    await tester.tap(find.byKey(const ValueKey('settings-nav-appearance')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('深色模式'));
     await tester.pumpAndSettle();
 
@@ -1180,6 +1248,12 @@ void main() {
       container.read(settingsControllerProvider).replaceQueueOnClick,
       isFalse,
     );
+    await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.pumpAndSettle();
     expect(find.text('单击歌曲时替换播放队列'), findsOneWidget);
 
     final row = find
@@ -1222,9 +1296,16 @@ void main() {
       tester.element(find.byType(SettingsPane)),
     );
     expect(
-      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      container.read(settingsControllerProvider).autoResumeOnStartup,
       isTrue,
     );
+
+    await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.pumpAndSettle();
 
     final row = find
         .ancestor(of: find.text('启动时继续上次播放'), matching: find.byType(Row))
@@ -1235,7 +1316,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      container.read(settingsControllerProvider).restorePlaybackOnStartup,
+      container.read(settingsControllerProvider).autoResumeOnStartup,
       isFalse,
     );
     expect(tester.takeException(), isNull);
@@ -1310,6 +1391,14 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
+
+    await tester.tap(find.byKey(const ValueKey('settings-nav-library')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-library')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('settings-customize-library')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(
       tester

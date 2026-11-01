@@ -9,6 +9,7 @@ import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
@@ -46,10 +47,18 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('replace_queue_on_click') ?? false,
           onlyLikeOnDoubleClick:
               _persistence.getBool('only_like_on_double_click') ?? false,
-          restorePlaybackOnStartup:
-              _persistence.getBool('restore_playback_on_startup') ?? true,
+          favoritesDoubleClickPlays:
+              _persistence.getBool('favorites_double_click_plays') ?? true,
+          autoResumeOnStartup:
+              _persistence.getBool('auto_resume_on_startup') ??
+                  // The switch used to decide whether the queue was read at
+                  // all; its old value carries over so a reader who turned it
+                  // off still gets no surprise playback.
+                  _persistence.getBool('restore_playback_on_startup') ??
+                  true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
+          smartLyrics: _readSmartLyrics(_persistence),
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
@@ -121,11 +130,19 @@ class SettingsController extends StateNotifier<SettingsState> {
     await _persistence.setBool('only_like_on_double_click', value);
   }
 
-  /// Sets whether a start restores the queue of the last run.
-  Future<void> setRestorePlaybackOnStartup(bool value) async {
-    if (state.restorePlaybackOnStartup == value) return;
-    state = state.copyWith(restorePlaybackOnStartup: value);
-    await _persistence.setBool('restore_playback_on_startup', value);
+  /// Sets whether a double click in the favorites page plays the track and
+  /// replaces the queue.
+  Future<void> setFavoritesDoubleClickPlays(bool value) async {
+    if (state.favoritesDoubleClickPlays == value) return;
+    state = state.copyWith(favoritesDoubleClickPlays: value);
+    await _persistence.setBool('favorites_double_click_plays', value);
+  }
+
+  /// Sets whether a start picks up playing where the last run stopped.
+  Future<void> setAutoResumeOnStartup(bool value) async {
+    if (state.autoResumeOnStartup == value) return;
+    state = state.copyWith(autoResumeOnStartup: value);
+    await _persistence.setBool('auto_resume_on_startup', value);
   }
 
   /// Opens or folds the group of the sources that need a key.
@@ -149,6 +166,29 @@ class SettingsController extends StateNotifier<SettingsState> {
       'source_health_weights_v1',
       jsonEncode(weights.toJson()),
     );
+  }
+
+  /// Sets what the reader pasted for the smart lyrics pipeline.
+  ///
+  /// Every keystroke of the key goes out at once: the button the pipeline
+  /// waits behind reads the same state this writes.
+  Future<void> setSmartLyrics(SmartLyricsConfig config) async {
+    state = state.copyWith(smartLyrics: config);
+    await _persistence.setString('smart_lyrics', jsonEncode(config.toJson()));
+  }
+
+  static SmartLyricsConfig _readSmartLyrics(PersistenceService persistence) {
+    final raw = persistence.getString('smart_lyrics');
+    if (raw == null || raw.trim().isEmpty) return SmartLyricsConfig();
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        return SmartLyricsConfig.fromJson(Map<String, dynamic>.from(decoded));
+      }
+    } catch (error, stackTrace) {
+      Log.error('读取智能歌词配置失败: $error\n$stackTrace');
+    }
+    return SmartLyricsConfig();
   }
 
   static SourceHealthWeights _readSourceHealthWeights(

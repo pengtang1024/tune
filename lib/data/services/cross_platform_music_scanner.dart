@@ -11,8 +11,6 @@ import 'package:tune/data/services/song_creator.dart';
 /// Reading tags is synchronous work: a single large or malformed tag can hold
 /// the thread for a second, and the scan runs while the reader is already
 /// looking at the library. The worker gets the path and hands the song back.
-/// On the web the worker runs where the app runs, because a browser has no
-/// second thread for it.
 Future<Song?> _readSongWorker(String filePath) =>
     compute(_songOfFile, filePath);
 
@@ -75,10 +73,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   Future<List<Song>> scanMusic() async {
     Log.info('CrossPlatformMusicScanner: Starting cross-platform music scan');
 
-    if (kIsWeb) {
-      Log.info('CrossPlatformMusicScanner: Running on Web platform');
-      return [];
-    } else if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid || Platform.isIOS) {
       Log.info('CrossPlatformMusicScanner: Running on mobile platform');
       try {
         final paths = MusicScannerConfig.getMobileMusicPaths();

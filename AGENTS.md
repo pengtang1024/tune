@@ -14,8 +14,12 @@
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
-| 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（提案，待评审） |
+| 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M12 已实施；产品口径：每首有词，准入降级为高置信标注） |
+| 改设置页的布局、分区导航、预设与自定义 | [`docs/settings-redesign.md`](docs/settings-redesign.md)（已实施） |
+| 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（M1a/M1b 已实施；分类筛选见 library-browse） |
+| 查音乐库的分类、分面筛选与浏览视图 | [`docs/library-browse.md`](docs/library-browse.md)（M0–M4 已实施） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
+| 加音源类型 / 实例：适配器注册、参数与依赖方向 | [`docs/source-extension.md`](docs/source-extension.md)（结论已并回 需求/音源设计.md） |
 | 查健康度里 unknown 的处理约定 | [`docs/health-unknown.md`](docs/health-unknown.md)（给健康度会话的提醒） |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
 | 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |
@@ -29,6 +33,7 @@
 | 写代码：命名、日志、主题、体积、注释、脚本目录 | [`docs/conventions.md`](docs/conventions.md) |
 | 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
+| 新增依赖、字体或第三方素材：许可证边界与声明 | [`docs/licensing.md`](docs/licensing.md) |
 | 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D8 已修） |
 | 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
@@ -36,8 +41,8 @@
 ## 0. 项目快照
 
 - 产品：紧凑的桌面音乐播放器（Flutter）。壳层是左侧导航（音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是底栏和正在播放页打开的非模态侧栏，不是一级导航页；它只遮住内容区，底栏和侧栏仍可用。
-- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅 Web 存储与旧数据迁移）· gen-l10n。
-- 验收平台：Linux 桌面优先；Android / iOS / Windows / macOS / Web 保留工程入口，但不是 v1 验收目标。
+- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅旧数据迁移）· gen-l10n。
+- 验收平台：Linux 桌面优先；Windows / Android / iOS 保留工程入口，但不是 v1 验收目标。**macOS 与 Web 不再支持**，平台工程入口与相关代码已移除。
 - 需求文档：`需求/README.md` 是入口，那里列的四份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。
 - **旧稿在 [`需求/历史/`](需求/历史/README.md)**：2025 年 12 月那版的架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范都在那里。它们描述的是当时的目录与调色板，**只当历史读，不作规范**。
 - `.trae/documents/` 是历史迭代计划，其中还引用 `lib/ui`、`PlaylistService` 等已删除的结构——只当历史读，不当规范。
@@ -122,4 +127,4 @@ flutter test             # 全绿
 ## 4. 不在当前范围
 
 - 移动端通知栏 / 锁屏控制、均衡器、播放历史、账号系统已移出主链路，不要顺手加回来。
-- 主要验收平台是 Linux 桌面端；其它平台行为可以不同，但差异要写进 README 的「已知限制」。
+- 主要验收平台是 Linux 桌面端；其它保留入口的平台行为可以不同，但差异要写进 README 的「已知限制」。macOS 与 Web 不在支持范围。

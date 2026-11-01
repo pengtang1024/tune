@@ -7,6 +7,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/data/playback_session_store.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
+import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 import '../services/fake_persistence.dart';
@@ -25,7 +26,7 @@ void main() {
     uri: '/music/a.mp3',
   );
 
-  test('the start reads the restore switch from the settings', () async {
+  test('the start reads the auto resume switch from the settings', () async {
     final persistence = FakePersistenceService();
     final store = PlaybackSessionStore(persistence);
     await store.saveQueue(
@@ -45,13 +46,20 @@ void main() {
       streamUrlResolverProvider.overrideWithValue(FakeStreamUrlResolver()),
     ];
 
+    // The queue comes back either way; the switch only decides whether
+    // the restored track plays on by itself.
     final on = ProviderContainer(overrides: overrides);
     addTearDown(on.dispose);
     expect(on.read(playbackControllerProvider).queue, [song]);
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    expect(audio.playedSong, song);
 
-    await persistence.setBool('restore_playback_on_startup', false);
+    await persistence.setBool('auto_resume_on_startup', false);
     final off = ProviderContainer(overrides: overrides);
     addTearDown(off.dispose);
-    expect(off.read(playbackControllerProvider).queue, isEmpty);
+    expect(off.read(playbackControllerProvider).queue, [song]);
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    expect(audio.playedSong, song); // Still the first container's play.
+    expect(off.read(playbackControllerProvider).status, PlaybackStatus.paused);
   });
 }

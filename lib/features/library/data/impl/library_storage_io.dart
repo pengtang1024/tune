@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -6,6 +7,10 @@ import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/data/services/database/app_database.dart';
@@ -55,6 +60,16 @@ class FileLibraryStorage implements LibraryStorage {
       await directory.create(recursive: true);
     }
     return File(path.join(directory.path, _fileName));
+  }
+
+  Future<File> _viewFile() async {
+    final base =
+        await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
+    final directory = Directory(path.join(base.path, _folderName));
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return File(path.join(directory.path, 'view.json'));
   }
 
   @override
@@ -162,6 +177,58 @@ class FileLibraryStorage implements LibraryStorage {
   @override
   Future<int> countMatching({required String query, String? sourceId}) async {
     return (await _filtered(query, sourceId)).length;
+  }
+
+  @override
+  Future<List<Song>> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) => search(
+    query: query,
+    sourceId: filter.sources.length == 1 ? filter.sources.first : null,
+    offset: offset,
+    limit: limit,
+  );
+
+  @override
+  Future<int> countQuery({
+    required String query,
+    required LibraryFilter filter,
+  }) => countMatching(
+    query: query,
+    sourceId: filter.sources.length == 1 ? filter.sources.first : null,
+  );
+
+  @override
+  Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
+      LibraryFacets.empty;
+
+  @override
+  Future<LibraryView?> loadView() async {
+    try {
+      final file = await _viewFile();
+      if (!await file.exists()) return null;
+      final decoded = jsonDecode(await file.readAsString());
+      return decoded is Map<String, dynamic>
+          ? LibraryView.fromJson(decoded)
+          : null;
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库视图失败: $error\n$stackTrace');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveView(LibraryView view) async {
+    try {
+      final file = await _viewFile();
+      await file.writeAsString(jsonEncode(view.toJson()), flush: true);
+    } catch (error, stackTrace) {
+      Log.error('保存音乐库视图失败: $error\n$stackTrace');
+    }
   }
 
   Future<List<Song>> _filtered(String query, String? sourceId) async {
@@ -446,6 +513,76 @@ class SqliteLibraryStorage implements LibraryStorage {
     } catch (error, stackTrace) {
       Log.error('统计音乐库搜索结果失败: $error\n$stackTrace');
       return 0;
+    }
+  }
+
+  @override
+  Future<List<Song>> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) async {
+    try {
+      return (await _db()).query(
+        query: query,
+        filter: filter,
+        sort: sort,
+        offset: offset,
+        limit: limit,
+      );
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库筛选窗口失败: $error\n$stackTrace');
+      return const [];
+    }
+  }
+
+  @override
+  Future<int> countQuery({
+    required String query,
+    required LibraryFilter filter,
+  }) async {
+    try {
+      return (await _db()).countQuery(query: query, filter: filter);
+    } catch (error, stackTrace) {
+      Log.error('统计音乐库筛选结果失败: $error\n$stackTrace');
+      return 0;
+    }
+  }
+
+  @override
+  Future<LibraryFacets> facets({required LibraryFilter filter}) async {
+    try {
+      return (await _db()).facets(filter: filter);
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库分面计数失败: $error\n$stackTrace');
+      return LibraryFacets.empty;
+    }
+  }
+
+  @override
+  Future<LibraryView?> loadView() async {
+    try {
+      final file = File(path.join((await _directory()).path, 'view.json'));
+      if (!await file.exists()) return null;
+      final decoded = jsonDecode(await file.readAsString());
+      return decoded is Map<String, dynamic>
+          ? LibraryView.fromJson(decoded)
+          : null;
+    } catch (error, stackTrace) {
+      Log.error('读取音乐库视图失败: $error\n$stackTrace');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveView(LibraryView view) async {
+    try {
+      final file = File(path.join((await _directory()).path, 'view.json'));
+      await file.writeAsString(jsonEncode(view.toJson()), flush: true);
+    } catch (error, stackTrace) {
+      Log.error('保存音乐库视图失败: $error\n$stackTrace');
     }
   }
 

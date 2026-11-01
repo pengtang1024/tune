@@ -2193,7 +2193,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      'Restore the queue and playback position when Tune opens, paused. Turn off to start with an empty queue';
+      'The queue and the playback position are always restored when Tune opens. This switch decides whether the song picks up playing right away; turn off to wait, paused';
 
   @override
   String get settingsReplaceQueueOnClick =>
@@ -2210,6 +2210,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       'When on, a double click only likes the track and leaves the music alone; when off, it plays the track as well';
+
+  @override
+  String get settingsFavoritesDoubleClickPlays =>
+      'Play and replace the queue on a double click in Favorites';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      'When on, double-clicking a favorite plays it and replaces the play queue; when off, it only likes the track';
 
   @override
   String get sidebarDiscover => 'Discover';
@@ -2447,6 +2455,209 @@ class AppLocalizationsEn extends AppLocalizations {
       'Optional local listening history (off by default)';
 
   @override
+  String get settingsSectionSmartLyrics => 'Smart lyrics';
+
+  @override
+  String get settingsSmartLyricsTitle => 'Lyrics coverage';
+
+  @override
+  String get settingsSmartLyricsDescription =>
+      'Tag sheets and lyrics files next to the tracks count; the numbers follow the last scan';
+
+  @override
+  String get settingsSmartLyricsTotal => 'Tracks';
+
+  @override
+  String get settingsSmartLyricsResolved => 'With lyrics';
+
+  @override
+  String get settingsSmartLyricsMissing => 'Gap to fill';
+
+  @override
+  String get settingsSmartLyricsPreset => 'Endpoint preset';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => 'Custom';
+
+  @override
+  String get settingsSmartLyricsApiKey => 'API key';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => 'Paste a key of your own';
+
+  @override
+  String get settingsSmartLyricsAdvanced => 'Advanced';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => 'Endpoint URL';
+
+  @override
+  String get settingsSmartLyricsAsrModels =>
+      'Transcription models (comma-separated)';
+
+  @override
+  String get settingsSmartLyricsChatModel => 'Text model';
+
+  @override
+  String get settingsSmartLyricsPrivacy =>
+      'Generating uploads the whole track to the endpoint you configured, and nowhere else.';
+
+  @override
+  String get settingsSmartLyricsSampled => 'Sampled';
+
+  @override
+  String get settingsSmartLyricsChecked => 'Checked';
+
+  @override
+  String get settingsSmartLyricsAccuracy => 'Accuracy';
+
+  @override
+  String get settingsSmartLyricsDrawSample => 'Draw the sample';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      'The accuracy is judged by hand on a stratified sample of the resolved tracks (studio / live / rap / non-Chinese); the sample only grows, and the last verdict of a track counts.';
+
+  @override
+  String get settingsSmartLyricsLocal => 'Local engine';
+
+  @override
+  String get settingsSmartLyricsLocalOff => 'Off';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => 'Download the model';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => 'Downloading……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => 'The model is ready';
+
+  @override
+  String get settingsSmartLyricsLocalFailed =>
+      'The download failed: try again, or pick another model';
+
+  @override
+  String get settingsSmartLyricsBatch => 'Batch fill';
+
+  @override
+  String get settingsSmartLyricsBatchStart => 'Fill the library';
+
+  @override
+  String get settingsSmartLyricsBatchStop => 'Stop';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => 'Recheck the failed tracks';
+
+  @override
+  String get settingsSmartLyricsBudget =>
+      'Cloud budget (tracks per run, 0 for none)';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '$pending waiting · $done done · $failed failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return 'Filling: $pending waiting · $done done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return 'The cloud budget ($budget tracks) is spent: this run paused — the rest waits';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '$count new tracks are missing; press \"Fill the library\" to queue them';
+  }
+
+  @override
+  String get settingsSmartLyricsLeakCheck =>
+      'Free check: re-asks the human pool when the machine is idle — never the cloud, never the CPU';
+
+  @override
+  String get lyricsSmartGenerate => 'Smart lyrics';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey =>
+      'No key yet — paste one in Settings, Smart lyrics';
+
+  @override
+  String get lyricsSmartGenerating =>
+      'Generating the lyrics — human sheets first, then the channels; a round takes minutes at most';
+
+  @override
+  String get lyricsSmartFailedAudio =>
+      'The audio never arrived: no local copy and no stream to pull';
+
+  @override
+  String get lyricsSmartFailedUpload =>
+      'The channels did not answer: try again later, or check the key and the endpoint in Settings';
+
+  @override
+  String get lyricsSmartFailedEmpty => 'No voice was heard';
+
+  @override
+  String get lyricsSmartNote =>
+      'Machine sheet, from the vote pool — search again for better words';
+
+  @override
+  String get lyricsMarkLine => 'This line is wrong';
+
+  @override
+  String get lyricsUnmarkLine => 'Take the mark back';
+
+  @override
+  String get lyricsMarkSong => 'The whole track is wrong';
+
+  @override
+  String get lyricsMarkNotSung => 'This is not sung';
+
+  @override
+  String get lyricsMarksTitle => 'Marks';
+
+  @override
+  String get lyricsMarksEmpty =>
+      'No marks yet — hear a wrong line, press the flag at its end';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return 'Line $line';
+  }
+
+  @override
+  String get lyricsMarkReword => 'Reword';
+
+  @override
+  String get lyricsMarkRewordTitle => 'Reword this line';
+
+  @override
+  String get lyricsMarkRewordSave => 'Save the words';
+
+  @override
+  String get lyricsMarkRevoke => 'Take back';
+
+  @override
+  String get lyricsMarkWaiting => 'Waiting for the re-solve';
+
+  @override
+  String get lyricsMarkResolved => 'Re-solved';
+
+  @override
+  String get lyricsMarkReworded => 'Reworded';
+
+  @override
+  String get lyricsMarkRevoked => 'Taken back';
+
+  @override
+  String get lyricsMarkSourceReader => 'Reader';
+
+  @override
+  String get lyricsMarkSourceSystem => 'Pool';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return 'Found online: $artist';
   }
@@ -2494,4 +2705,364 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverReasonCompleted => 'You often finish this one';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return 'Here is a machine transcript of a song; it may hold wrong words. Title \"$title\", artist \"$artist\".\nFix the wrong characters; the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return 'Write the lyrics of \"$title\" ($artist) from what you know of the song, one line a line, in the order they are sung.\nAnswer with a JSON array of strings only, nothing else. When you are not sure of the song, answer with an empty array — do not invent:';
+  }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return 'Translate the lyrics below into $target, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return 'Write the lyrics below in Latin letters the way they sound, line for line: the number and the order of the lines must stay exactly as they are.\nAnswer with a JSON array of strings only, one line each, nothing else:\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => 'Chinese';
+
+  @override
+  String get lyricsContrastTranslate => 'Translate';
+
+  @override
+  String get lyricsContrastTransliterate => 'Transliterate';
+
+  @override
+  String get lyricsContrastDone => 'On the sheet';
+
+  @override
+  String get settingsSmartLyricsAutoFill =>
+      'Auto-fill: keep filling every track without lyrics until the library has none left';
+
+  @override
+  String get librarySortTooltip => 'Sort';
+
+  @override
+  String get librarySortRecent => 'Recently added';
+
+  @override
+  String get librarySortTitle => 'Title';
+
+  @override
+  String get librarySortArtist => 'Artist';
+
+  @override
+  String get librarySortAlbum => 'Album';
+
+  @override
+  String get librarySortDuration => 'Duration';
+
+  @override
+  String get libraryColumnTitle => 'Title';
+
+  @override
+  String get libraryColumnArtist => 'Artist';
+
+  @override
+  String get libraryColumnAlbum => 'Album';
+
+  @override
+  String get libraryColumnAdded => 'Added';
+
+  @override
+  String get libraryColumnDuration => 'Duration';
+
+  @override
+  String get libraryMoreActions => 'More actions';
+
+  @override
+  String get libraryViewColumns => 'Two-column view';
+
+  @override
+  String get libraryFilter => 'Filter';
+
+  @override
+  String get libraryFilterClearAll => 'Clear all';
+
+  @override
+  String get libraryFilterStatus => 'Status';
+
+  @override
+  String get libraryFilterStatusAll => 'All';
+
+  @override
+  String get libraryFilterStatusLiked => 'Liked';
+
+  @override
+  String get libraryFilterStatusWithLyrics => 'With lyrics';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => 'Missing lyrics';
+
+  @override
+  String get libraryFilterStatusInstrumental => 'Instrumental';
+
+  @override
+  String get libraryFilterGenres => 'Genre';
+
+  @override
+  String get libraryFilterDecades => 'Decade';
+
+  @override
+  String get libraryFilterArtists => 'Artist';
+
+  @override
+  String get libraryFilterLanguages => 'Language';
+
+  @override
+  String get libraryFilterFormats => 'Format';
+
+  @override
+  String get libraryFilterDurations => 'Duration';
+
+  @override
+  String get libraryFilterAdded => 'Added';
+
+  @override
+  String get libraryFilterDurationShort => '<2 min';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 min';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 min';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 min';
+
+  @override
+  String get libraryFilterAddedWeek => 'Last 7 days';
+
+  @override
+  String get libraryFilterAddedMonth => 'Last 30 days';
+
+  @override
+  String get libraryFilterAddedYear => 'Last year';
+
+  @override
+  String get libraryFilterAddedOlder => 'Older';
+
+  @override
+  String get libraryViewCategories => 'Category view';
+
+  @override
+  String get libraryAllSongs => 'All songs';
+
+  @override
+  String get libraryTreeExpand => 'Expand categories';
+
+  @override
+  String get libraryTreeCollapse => 'Collapse categories';
+
+  @override
+  String get languageZh => 'Chinese';
+
+  @override
+  String get languageEn => 'English';
+
+  @override
+  String get languageJa => 'Japanese';
+
+  @override
+  String get languageKo => 'Korean';
+
+  @override
+  String get languageFr => 'French';
+
+  @override
+  String get languageDe => 'German';
+
+  @override
+  String get languageEs => 'Spanish';
+
+  @override
+  String get languageRu => 'Russian';
+
+  @override
+  String get settingsOverview => 'All';
+
+  @override
+  String get settingsSearchHint => 'Search settings';
+
+  @override
+  String get settingsCustomize => 'Customize…';
+
+  @override
+  String get settingsResetSection => 'Reset this section';
+
+  @override
+  String get settingsResetAll => 'Reset everything';
+
+  @override
+  String get settingsResetTitle => 'Reset to defaults?';
+
+  @override
+  String get settingsResetMessage =>
+      'This overwrites the settings of this section. Continue?';
+
+  @override
+  String get settingsResetAllMessage =>
+      'This overwrites every setting. Continue?';
+
+  @override
+  String get settingsPresetAutoScan => 'Automatic scan';
+
+  @override
+  String get settingsPresetAutoScanHint => 'Scan every source on startup';
+
+  @override
+  String get settingsPresetManualScan => 'Manual scan';
+
+  @override
+  String get settingsPresetManualScanHint => 'Update only when you press scan';
+
+  @override
+  String get settingsPresetQueueFirst => 'Queue first';
+
+  @override
+  String get settingsPresetQueueFirstHint =>
+      'A click joins the queue without replacing it';
+
+  @override
+  String get settingsPresetSingleFirst => 'Single track first';
+
+  @override
+  String get settingsPresetSingleFirstHint =>
+      'A click replaces the queue with that track';
+
+  @override
+  String get settingsPresetFavoriteFirst => 'Favorites first';
+
+  @override
+  String get settingsPresetFavoriteFirstHint =>
+      'A double click only likes; a single click still plays';
+
+  @override
+  String get settingsPresetLyricsManual => 'Manual';
+
+  @override
+  String get settingsPresetLyricsManualHint => 'No automatic filling';
+
+  @override
+  String get settingsPresetLyricsBalanced => 'Balanced';
+
+  @override
+  String get settingsPresetLyricsBalancedHint =>
+      'Automatic filling plus periodic recheck';
+
+  @override
+  String get settingsPresetLyricsSaver => 'Battery saver';
+
+  @override
+  String get settingsPresetLyricsSaverHint =>
+      'Automatic filling without periodic recheck';
+
+  @override
+  String get settingsPresetLearnOn => 'Learning on';
+
+  @override
+  String get settingsPresetLearnOnHint =>
+      'Use listening history to improve picks';
+
+  @override
+  String get settingsPresetLearnOff => 'Learning off';
+
+  @override
+  String get settingsPresetLearnOffHint => 'Use only favorites and metadata';
+
+  @override
+  String get settingsPresetTray => 'Keep in tray';
+
+  @override
+  String get settingsPresetTrayHint => 'Keep playing after the window closes';
+
+  @override
+  String get settingsPresetQuit => 'Quit on close';
+
+  @override
+  String get settingsPresetQuitHint => 'Stop playing when the window closes';
+
+  @override
+  String get settingsSearchKeywordsAppearance => 'theme language dark light';
+
+  @override
+  String get settingsSearchKeywordsLibrary => 'scan folder cache library';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      'queue double click favorite playback';
+
+  @override
+  String get settingsSearchKeywordsLyrics => 'lyrics fill gap mark';
+
+  @override
+  String get settingsSearchKeywordsDiscovery =>
+      'recommendation history discover';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      'tray media default player desktop';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth => 'source health weight';
+
+  @override
+  String get settingsSearchNoMatch => 'No matching settings';
+
+  @override
+  String get settingsSectionSourceHealth => 'Health';
+
+  @override
+  String get sourcesHealthPresetBalanced => 'Balanced';
+
+  @override
+  String get sourcesHealthPresetBalancedHint =>
+      'Default weights, every dimension even';
+
+  @override
+  String get sourcesHealthPresetPlayable => 'Playability first';
+
+  @override
+  String get sourcesHealthPresetPlayableHint =>
+      'Availability, setup, scan, reliability and playable weigh more';
+
+  @override
+  String get sourcesHealthPresetFresh => 'Freshness first';
+
+  @override
+  String get sourcesHealthPresetFreshHint =>
+      'Freshness, output and activity weigh more';
+
+  @override
+  String get sourcesHealthWeightsCustom => 'Customize…';
+
+  @override
+  String get sourcesHealthWeightsShare => 'Share';
+
+  @override
+  String get sourcesHealthWeightsOffHint =>
+      '0 turns the dimension off; shares are normalized automatically';
+
+  @override
+  String get sourcesHealthGroupCore => 'Availability and setup';
+
+  @override
+  String get sourcesHealthGroupOutput => 'Freshness and output';
+
+  @override
+  String get sourcesHealthGroupReliable => 'Reliability and stability';
+
+  @override
+  String get sourcesHealthGroupShow => 'Presentation and activity';
+
+  @override
+  String get sourcesHealthWeightsDone => 'Done';
 }

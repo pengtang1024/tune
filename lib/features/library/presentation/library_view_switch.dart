@@ -24,8 +24,8 @@ class LibraryViewSwitch extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      height: 28,
-      padding: const EdgeInsets.all(2),
+      height: CompactTokens.controlDefault,
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
         borderRadius: CompactTokens.borderRadius8,
@@ -39,6 +39,18 @@ class LibraryViewSwitch extends StatelessWidget {
             tooltip: context.loc.libraryViewSongs,
             selected: view == LibraryViewMode.songs,
             onPressed: () => onChanged(LibraryViewMode.songs),
+          ),
+          _ViewButton(
+            icon: Icons.view_column_rounded,
+            tooltip: context.loc.libraryViewColumns,
+            selected: view == LibraryViewMode.columns,
+            onPressed: () => onChanged(LibraryViewMode.columns),
+          ),
+          _ViewButton(
+            icon: Icons.category_rounded,
+            tooltip: context.loc.libraryViewCategories,
+            selected: view == LibraryViewMode.categories,
+            onPressed: () => onChanged(LibraryViewMode.categories),
           ),
           _ViewButton(
             icon: Icons.grid_view_rounded,
@@ -76,8 +88,8 @@ class _ViewButton extends StatelessWidget {
         icon: Icon(icon, size: CompactTokens.icon16),
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(
-          width: CompactTokens.libraryRowAction,
-          height: CompactTokens.libraryRowAction,
+          width: CompactTokens.controlSmall,
+          height: CompactTokens.controlSmall,
         ),
         style: IconButton.styleFrom(
           foregroundColor: selected

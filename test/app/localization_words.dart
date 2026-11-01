@@ -35,6 +35,14 @@ const List<String> properNames = [
   'Freesound',
   'API',
   'Client ID',
+  'OpenAI',
+  'Groq',
+  // The whisper.cpp model names the local engine menu shows — they are
+  // model identifiers, not interface language.
+  'tiny',
+  'base',
+  'small',
+  'medium',
 ];
 
 /// The names of the file formats.

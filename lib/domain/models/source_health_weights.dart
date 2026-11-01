@@ -32,6 +32,48 @@ class SourceHealthWeights {
     activity: 5,
   );
 
+  /// The default preset: every dimension keeps its balanced weight.
+  static const SourceHealthWeights balanced = defaults;
+
+  /// A source that answers and plays is worth more than one with pretty
+  /// covers: setup, scan, reliability and playable carry the score.
+  static const SourceHealthWeights playableFirst = SourceHealthWeights(
+    availability: 20,
+    configuration: 15,
+    scan: 15,
+    freshness: 5,
+    output: 5,
+    speed: 5,
+    reliability: 15,
+    stability: 10,
+    playable: 10,
+    artwork: 0,
+    metadata: 0,
+    activity: 0,
+  );
+
+  /// A fresh catalogue matters more than the artwork: the new sources rise.
+  static const SourceHealthWeights freshFirst = SourceHealthWeights(
+    availability: 10,
+    configuration: 5,
+    scan: 5,
+    freshness: 25,
+    output: 15,
+    speed: 5,
+    reliability: 5,
+    stability: 5,
+    playable: 5,
+    artwork: 10,
+    metadata: 5,
+    activity: 10,
+  );
+
+  static const List<SourceHealthWeights> presets = [
+    balanced,
+    playableFirst,
+    freshFirst,
+  ];
+
   const SourceHealthWeights({
     required this.availability,
     required this.configuration,
@@ -60,6 +102,38 @@ class SourceHealthWeights {
       artwork +
       metadata +
       activity;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SourceHealthWeights &&
+      other.availability == availability &&
+      other.configuration == configuration &&
+      other.scan == scan &&
+      other.freshness == freshness &&
+      other.output == output &&
+      other.speed == speed &&
+      other.reliability == reliability &&
+      other.stability == stability &&
+      other.playable == playable &&
+      other.artwork == artwork &&
+      other.metadata == metadata &&
+      other.activity == activity;
+
+  @override
+  int get hashCode => Object.hash(
+    availability,
+    configuration,
+    scan,
+    freshness,
+    output,
+    speed,
+    reliability,
+    stability,
+    playable,
+    artwork,
+    metadata,
+    activity,
+  );
 
   SourceHealthWeights copyWith({
     int? availability,

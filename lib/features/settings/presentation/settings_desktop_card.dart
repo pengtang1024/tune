@@ -39,7 +39,7 @@ class SettingsDesktopCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SettingsCard(
-      index: '06',
+      index: '07',
       eyebrow: context.loc.settingsSectionDesktop,
       title: context.loc.settingsDesktopTitle,
       description: context.loc.settingsDesktopDescription,

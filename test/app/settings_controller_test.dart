@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 
 import '../services/fake_persistence.dart';
 
@@ -76,6 +77,23 @@ void main() {
     expect(controller.state.onlyLikeOnDoubleClick, isTrue);
   });
 
+  test('a double click in favorites plays and replaces the queue by default',
+      () async {
+    final persistence = FakePersistenceService();
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    expect(controller.state.favoritesDoubleClickPlays, isTrue);
+
+    await controller.setFavoritesDoubleClickPlays(false);
+    expect(controller.state.favoritesDoubleClickPlays, isFalse);
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+    expect(reloaded.state.favoritesDoubleClickPlays, isFalse);
+  });
+
   test('the double click behavior survives a controller rebuild', () async {
     final persistence = FakePersistenceService();
 
@@ -106,18 +124,27 @@ void main() {
     expect(reloaded.state.sourceHealthWeights.activity, 0);
   });
 
-  test('resuming the last session is on by default and survives', () async {
+  test('auto resuming the last session is on by default and survives', () async {
     final persistence = FakePersistenceService();
 
     final controller = SettingsController(persistence);
-    expect(controller.state.restorePlaybackOnStartup, isTrue);
+    expect(controller.state.autoResumeOnStartup, isTrue);
 
-    await controller.setRestorePlaybackOnStartup(false);
+    await controller.setAutoResumeOnStartup(false);
     controller.dispose();
 
     final reloaded = SettingsController(persistence);
     addTearDown(reloaded.dispose);
-    expect(reloaded.state.restorePlaybackOnStartup, isFalse);
+    expect(reloaded.state.autoResumeOnStartup, isFalse);
+  });
+
+  test('the old restore switch still answers after the rename', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setBool('restore_playback_on_startup', false);
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+    expect(controller.state.autoResumeOnStartup, isFalse);
   });
 
   test('local listening history is off by default and survives', () async {
@@ -132,5 +159,39 @@ void main() {
     final reloaded = SettingsController(persistence);
     addTearDown(reloaded.dispose);
     expect(reloaded.state.useListeningHistory, isTrue);
+  });
+
+  test('the smart lyrics config survives a controller rebuild', () async {
+    final persistence = FakePersistenceService();
+    final controller = SettingsController(persistence);
+
+    await controller.setSmartLyrics(
+      controller.state.smartLyrics.copyWith(
+        presetId: 'groq',
+        baseUrl: SmartLyricsPreset.byId('groq').baseUrl,
+        apiKey: 'sk-test',
+      ),
+    );
+    controller.dispose();
+
+    final reloaded = SettingsController(persistence);
+    addTearDown(reloaded.dispose);
+    expect(reloaded.state.smartLyrics.presetId, 'groq');
+    expect(reloaded.state.smartLyrics.apiKey, 'sk-test');
+    expect(reloaded.state.smartLyrics.isConfigured, isTrue);
+  });
+
+  test('a broken saved config falls back to the defaults', () {
+    final persistence = FakePersistenceService()
+      ..setString('smart_lyrics', '{oops');
+
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    expect(
+      controller.state.smartLyrics.baseUrl,
+      SmartLyricsConfig().baseUrl,
+      reason: 'a broken paste must not take the pipeline down with it',
+    );
   });
 }

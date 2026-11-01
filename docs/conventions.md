@@ -120,8 +120,8 @@
 
 ## 平台差异
 
-- 按 `lib/data/services/impl/*_io.dart` + `*_stub.dart` 成对实现（见 `http_song_download_service_io.dart` / `_stub.dart`）。
-- 或走抽象服务，如 `lib/core/services/window_manager_service.dart`。
+- 平台实现只保留 `lib/data/services/impl/*_io.dart`；macOS 与 Web 下线后不再维护 `*_stub.dart` 空实现。
+- 平台判断走抽象服务（如 `lib/core/services/window_manager_service.dart`）或集中在一处 `Platform` 判断。
 - 不要在 widget 里写平台判断。
 
 ## 脚本与工具目录

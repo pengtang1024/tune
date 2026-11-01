@@ -94,9 +94,9 @@ LyricsPanel (features/player/presentation)
   - `build()`：跟着当前曲目取词（命中记忆直接用）。
   - `reload(song)`：强制重查（清记忆 + 重建），给「重试」与「重新查找」用。
   - `attach(song, bytes)`：用读者指定的歌词文件，写到曲目旁边，立刻生效；返回文件里有没有歌词。
-- 歌词文件有两个名字：`<歌名>.lrc`（app 匹配到的）与 `<歌名>.manual.lrc`（读者自己指定的）。
-  - 读的时候**先读后者**，再读前者：读者明确选的，比 app 匹配到的更算数。
-  - 写的时候：`<歌名>.lrc` 不存在就写它；已经存在就写 `<歌名>.manual.lrc`，**不覆盖读者自己的文件**（AGENTS.md：用户磁盘上已有的东西不动）。
+- 歌词文件有三个名字：`<歌名>.lrc`（app 匹配到的）、`<歌名>.manual.lrc`（读者自己指定的）与 `<歌名>.smart.lrc`（智能管线写的机器稿）。
+  - 读的时候**先读 manual，再读 .lrc，最后读 .smart.lrc**：读者明确选的比 app 匹配到的更算数，app 匹配到的比机器稿更算数；机器稿永远垫底，更好的稿找到时顶掉它、但不删它。
+  - 写的时候：`<歌名>.lrc` 不存在就写它；已经存在就写 `<歌名>.manual.lrc`，**不覆盖读者自己的文件**（AGENTS.md：用户磁盘上已有的东西不动）。`.smart.lrc` 只由智能管线写，取词链路不碰它。
 - 落盘失败只记日志，不变成未捕获异常，也不把歌词藏起来。
 
 ### 3.4 界面（`features/player/presentation/`）
@@ -110,8 +110,13 @@ LyricsPanel (features/player/presentation)
   | 加载中 | 转圈 + 「正在加载歌词」 | — |
   | 加载失败 | 错误图标 + 「歌词加载失败」 | 「重试」「选择歌词文件」 |
   | 文件读不出 | 图标 + 「这个文件里没有歌词」 | 「选择歌词文件」 |
-  | 没有歌词 | 图标 + 「这首歌没有歌词」 | 「重新查找」「选择歌词文件」 |
-  | 有歌词 | 歌词列表，当前行高亮并自动滚动 | — |
+  | 没有歌词 | 图标 + 「这首歌没有歌词」 | 「智能生成」（没贴钥匙时置灰）「重新查找」「选择歌词文件」 |
+  | 生成中 | 图标 + 「正在生成歌词——先问人写稿，再开通道，一轮最多几分钟」 | 「取消」 |
+  | 生成失败 | 错误图标 + 失败原因（取音频失败 / 通道没答上来 / 没识别出人声） | 「智能生成」「重新查找」「选择歌词文件」 |
+  | 有歌词（机器稿） | 头部说明行「机器稿：票池生成……」+「重新查找」，下面是歌词列表 | 「重新查找」 |
+  | 有歌词 | 歌词列表，当前行高亮并自动滚动；行尾小旗（悬停可见）一键标记「这行不对」，再按撤销 | 见下「有词态的动作行」 |
+
+- **有词态的动作行**（列表底部，M6/M7）：「整首不对」「这不是唱的」两个一键整曲标记（已标高亮，再按撤销）；配了文本模型时另有「翻译」「音译」——各只做一次，做完变主题色对勾并置灰（tooltip「已对照」），对照以次级样式贴在原文行下（不参与定位、不高亮）；尾部「标记管理」进 `/marks` 一页看全部标记。读者的词只从 `manual.lrc` 来：改词在标记管理里做，面板没有任何写字入口。
 
 - 高亮位置由派生 provider（`activeLyricLineProvider`）算，**只有高亮行变了面板才重建**（D5）。
 - 滚动由 `ref.listen` 驱动，不在 build 里做副作用。
@@ -130,7 +135,7 @@ LyricsPanel (features/player/presentation)
 - `lib/data/services/music_sources/music_source_service.dart`——三段取词与错误语义
 - `lib/data/services/music_sources/lrclib_lyrics_provider.dart`——精确匹配、归一化、容差
 - `lib/data/services/library/lyrics_text.dart`（新）——歌词文件的解码（UTF-8 / GBK）
-- `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart` + `impl/library_paths_stub.dart`——两个歌词文件的名字与读取顺序
+- `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart`——两个歌词文件的名字与读取顺序
 - `lib/l10n/app_*.arb` + 生成的 `app_localizations*.dart`——新文案（四种语言同步）
 - `pubspec.yaml` + `pubspec.lock`——`charset`（GBK 解码）
 

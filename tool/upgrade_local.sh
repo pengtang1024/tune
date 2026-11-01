@@ -30,7 +30,17 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 echo "下载 $version…"
 curl -fsSL "$url" -o "$tmp/tune.tar.gz"
-tar -tzf "$tmp/tune.tar.gz" | grep -qx './tune'
+
+# 先把清单落盘再校验：tar | grep -q 会让 grep 提前退出、tar 死于 SIGPIPE，
+# 在 pipefail 下被当成校验失败，脚本就无声死在这里。
+if ! tar -tzf "$tmp/tune.tar.gz" > "$tmp/listing.txt"; then
+  echo "下载的归档损坏，重试一次" >&2
+  exit 1
+fi
+if ! grep -qx './tune' "$tmp/listing.txt"; then
+  echo "归档不是 bundle 形状（根上没有 ./tune），拒绝安装" >&2
+  exit 1
+fi
 
 backup="${install_dir}.previous"
 echo "备份到 $backup"

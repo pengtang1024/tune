@@ -46,6 +46,13 @@ class MusicSourceService implements StreamUrlResolver {
   final LyricsProvider _lyricsProvider;
   final Map<String, MusicSourceAdapter> _adapters;
 
+  /// The shared library the lyrics fall back to.
+  ///
+  /// The smart lyrics pipeline reads the same library as its pool of
+  /// human-written votes — one instance, one voice, no second copy of the
+  /// lookup logic.
+  LyricsProvider get lyricsProvider => _lyricsProvider;
+
   MusicSourceService({
     required CrossPlatformMusicScanner scanner,
     required MusicSourceStore store,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
@@ -14,11 +15,12 @@ class SettingsState {
   /// Whether the player shows up in the media controls of the system.
   final bool mediaControlsEnabled;
 
-  /// Whether a start restores the queue and the position of the last run.
+  /// Whether a start picks up playing where the last run stopped.
   ///
-  /// The session always opens paused; the switch only decides whether the
-  /// saved queue is read at all.
-  final bool restorePlaybackOnStartup;
+  /// The queue and the position are always restored; the switch only
+  /// decides whether the restored track plays on by itself instead of
+  /// waiting, paused, for the reader to press play.
+  final bool autoResumeOnStartup;
 
   /// Whether a single click on a track replaces the play queue.
   ///
@@ -33,6 +35,14 @@ class SettingsState {
   /// music alone and only adds the heart: a double click never takes a mark
   /// away, that is the single click on the heart.
   final bool onlyLikeOnDoubleClick;
+
+  /// Whether a double click in the favorites page plays the track and
+  /// replaces the play queue.
+  ///
+  /// The favorites page is the one list where the reader usually wants to
+  /// hear the track now; this switch keeps that the default and lets the
+  /// reader fall back to the old "double click only likes" behavior.
+  final bool favoritesDoubleClickPlays;
 
   /// The folder the app writes the files it fetches into.
   ///
@@ -49,6 +59,9 @@ class SettingsState {
 
   /// The weights of the dimensions of the source health score.
   final SourceHealthWeights sourceHealthWeights;
+
+  /// What the reader pasted for the smart lyrics pipeline.
+  final SmartLyricsConfig smartLyrics;
 
   /// Whether the discover page may learn from the tracks that were played.
   ///
@@ -69,9 +82,11 @@ class SettingsState {
     this.mediaControlsEnabled = true,
     this.replaceQueueOnClick = false,
     this.onlyLikeOnDoubleClick = false,
-    this.restorePlaybackOnStartup = true,
+    this.favoritesDoubleClickPlays = true,
+    this.autoResumeOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
+    this.smartLyrics = const SmartLyricsConfig(),
     this.useListeningHistory = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
@@ -92,9 +107,11 @@ class SettingsState {
     bool? mediaControlsEnabled,
     bool? replaceQueueOnClick,
     bool? onlyLikeOnDoubleClick,
-    bool? restorePlaybackOnStartup,
+    bool? favoritesDoubleClickPlays,
+    bool? autoResumeOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
+    SmartLyricsConfig? smartLyrics,
     bool? useListeningHistory,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
@@ -110,10 +127,12 @@ class SettingsState {
       replaceQueueOnClick: replaceQueueOnClick ?? this.replaceQueueOnClick,
       onlyLikeOnDoubleClick:
           onlyLikeOnDoubleClick ?? this.onlyLikeOnDoubleClick,
-      restorePlaybackOnStartup:
-          restorePlaybackOnStartup ?? this.restorePlaybackOnStartup,
+      favoritesDoubleClickPlays:
+          favoritesDoubleClickPlays ?? this.favoritesDoubleClickPlays,
+      autoResumeOnStartup: autoResumeOnStartup ?? this.autoResumeOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
+      smartLyrics: smartLyrics ?? this.smartLyrics,
       useListeningHistory: useListeningHistory ?? this.useListeningHistory,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder

@@ -2009,7 +2009,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
+      '打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -2023,6 +2023,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
+
+  @override
+  String get settingsFavoritesDoubleClickPlays => '双击喜欢的曲目时播放并替换队列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢';
 
   @override
   String get sidebarDiscover => '发现';
@@ -2248,6 +2255,197 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 
   @override
+  String get settingsSectionSmartLyrics => '智能歌词';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌词覆盖';
+
+  @override
+  String get settingsSmartLyricsDescription => '标签里的词和曲目旁的词稿都算；统计来自最近一次扫描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目总数';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有词';
+
+  @override
+  String get settingsSmartLyricsMissing => '待补缺口';
+
+  @override
+  String get settingsSmartLyricsPreset => '接口模板';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自定义';
+
+  @override
+  String get settingsSmartLyricsApiKey => '密钥';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '粘贴你自己的 API 密钥';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '高级';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '接口地址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '转写模型（逗号分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文本模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
+
+  @override
+  String get settingsSmartLyricsSampled => '抽样';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正确率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '开始抽样';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
+
+  @override
+  String get settingsSmartLyricsLocal => '本地引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '关闭';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下载模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下载中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就绪';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
+
+  @override
+  String get settingsSmartLyricsBatch => '批量补齐';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '补齐曲库';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失败曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '云端预算（首/批，0 为不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待补 $pending · 已完成 $done · 失败 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在补齐：待补 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已达云端预算（$budget 首），本批暂停——余下待补不丢';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待补，按「补齐曲库」入队';
+  }
+
+  @override
+  String get settingsSmartLyricsLeakCheck => '查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU';
+
+  @override
+  String get lyricsSmartGenerate => '智能生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
+
+  @override
+  String get lyricsSmartGenerating => '正在生成歌词——先问人写稿，再开通道，一轮最多几分钟';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音频失败：曲目没有本地副本，也没拉到流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道没有答上来：稍后再试，或到设置里检查钥匙与端点';
+
+  @override
+  String get lyricsSmartFailedEmpty => '没有识别出人声';
+
+  @override
+  String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
+
+  @override
+  String get lyricsMarkLine => '这行不对';
+
+  @override
+  String get lyricsUnmarkLine => '撤销标记';
+
+  @override
+  String get lyricsMarkSong => '整首不对';
+
+  @override
+  String get lyricsMarkNotSung => '这不是唱的';
+
+  @override
+  String get lyricsMarksTitle => '标记管理';
+
+  @override
+  String get lyricsMarksEmpty => '还没有标记——听到不对的行，点行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改词';
+
+  @override
+  String get lyricsMarkRewordTitle => '改这一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改词';
+
+  @override
+  String get lyricsMarkRevoke => '撤销';
+
+  @override
+  String get lyricsMarkWaiting => '等复解';
+
+  @override
+  String get lyricsMarkResolved => '已复解';
+
+  @override
+  String get lyricsMarkReworded => '已改词';
+
+  @override
+  String get lyricsMarkRevoked => '已撤销';
+
+  @override
+  String get lyricsMarkSourceReader => '读者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系统';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -2294,6 +2492,353 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get discoverReasonCompleted => '你常把这首听完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「$title」，歌手「$artist」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
+  }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面这首歌的歌词逐行译成$target，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻译';
+
+  @override
+  String get lyricsContrastTransliterate => '音译';
+
+  @override
+  String get lyricsContrastDone => '已对照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '标题';
+
+  @override
+  String get librarySortArtist => '艺术家';
+
+  @override
+  String get librarySortAlbum => '专辑';
+
+  @override
+  String get librarySortDuration => '时长';
+
+  @override
+  String get libraryColumnTitle => '标题';
+
+  @override
+  String get libraryColumnArtist => '艺术家';
+
+  @override
+  String get libraryColumnAlbum => '专辑';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '时长';
+
+  @override
+  String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '双列视图';
+
+  @override
+  String get libraryFilter => '筛选';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜欢';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有词';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺词';
+
+  @override
+  String get libraryFilterStatusInstrumental => '纯音乐';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '艺术家';
+
+  @override
+  String get libraryFilterLanguages => '语言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '时长';
+
+  @override
+  String get libraryFilterAdded => '加入时间';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分类视图';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展开分类';
+
+  @override
+  String get libraryTreeCollapse => '收起分类';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英语';
+
+  @override
+  String get languageJa => '日语';
+
+  @override
+  String get languageKo => '韩语';
+
+  @override
+  String get languageFr => '法语';
+
+  @override
+  String get languageDe => '德语';
+
+  @override
+  String get languageEs => '西班牙语';
+
+  @override
+  String get languageRu => '俄语';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜索设置';
+
+  @override
+  String get settingsCustomize => '自定义…';
+
+  @override
+  String get settingsResetSection => '恢复本分区默认';
+
+  @override
+  String get settingsResetAll => '恢复全部默认';
+
+  @override
+  String get settingsResetTitle => '恢复默认设置？';
+
+  @override
+  String get settingsResetMessage => '这会覆盖当前分区的设置，确定继续？';
+
+  @override
+  String get settingsResetAllMessage => '这会覆盖所有设置，确定继续？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '点歌加入队列，不替换正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '点歌替换队列，只放这一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '双击只标喜欢，单击照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自动补齐 + 周期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自动补齐，不周期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放历史改进推荐';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '关窗口继续播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '关窗口就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主题 语言 深色 浅色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盘 媒体控制 默认播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '没有匹配的设置';
+
+  @override
+  String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播优先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鲜优先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自定义…';
+
+  @override
+  String get sourcesHealthWeightsShare => '占比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 关闭该维度；百分比为自动归一化后的占比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用与配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鲜与产出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠与稳定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示与活跃';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -4301,7 +4846,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '打开 Tune 时恢复队列和播放进度，停在暂停状态；关掉后从空白队列开始';
+      '打开 Tune 时总会恢复队列和播放进度；这个开关只决定当前这首是否自动继续播放，关掉则停在暂停状态';
 
   @override
   String get settingsReplaceQueueOnClick => '单击歌曲时替换播放队列';
@@ -4315,6 +4860,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '打开时双击只标成喜欢，不打断正在放的曲子；关掉时双击照常播放并标成喜欢';
+
+  @override
+  String get settingsFavoritesDoubleClickPlays => '双击喜欢的曲目时播放并替换队列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '打开时，双击喜欢列表里的曲目会播放它并把队列换成它；关掉时双击只标成喜欢';
 
   @override
   String get sidebarDiscover => '发现';
@@ -4540,6 +5092,197 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get discoverWhyHistory => '可选的本地播放记录（默认关闭）';
 
   @override
+  String get settingsSectionSmartLyrics => '智能歌词';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌词覆盖';
+
+  @override
+  String get settingsSmartLyricsDescription => '标签里的词和曲目旁的词稿都算；统计来自最近一次扫描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目总数';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有词';
+
+  @override
+  String get settingsSmartLyricsMissing => '待补缺口';
+
+  @override
+  String get settingsSmartLyricsPreset => '接口模板';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自定义';
+
+  @override
+  String get settingsSmartLyricsApiKey => '密钥';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '粘贴你自己的 API 密钥';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '高级';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '接口地址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '转写模型（逗号分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文本模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成会把整首歌的音频上传到你配置的端点；只发给你自己填的地址。';
+
+  @override
+  String get settingsSmartLyricsSampled => '抽样';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正确率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '开始抽样';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正确率按已解决样本分层人工核对（直录棚 / Live / 说唱 / 非中文）；样本只增不减，改判以最后一笔为准。';
+
+  @override
+  String get settingsSmartLyricsLocal => '本地引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '关闭';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下载模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下载中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就绪';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下载失败：重试，或换个模型';
+
+  @override
+  String get settingsSmartLyricsBatch => '批量补齐';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '补齐曲库';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失败曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '云端预算（首/批，0 为不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待补 $pending · 已完成 $done · 失败 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在补齐：待补 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已达云端预算（$budget 首），本批暂停——余下待补不丢';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待补，按「补齐曲库」入队';
+  }
+
+  @override
+  String get settingsSmartLyricsLeakCheck => '查漏长开：机器空闲时只重问人写票池，不花云端、不占 CPU';
+
+  @override
+  String get lyricsSmartGenerate => '智能生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '还没有密钥——先到设置的「智能歌词」里贴一把';
+
+  @override
+  String get lyricsSmartGenerating => '正在生成歌词——先问人写稿，再开通道，一轮最多几分钟';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音频失败：曲目没有本地副本，也没拉到流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道没有答上来：稍后再试，或到设置里检查钥匙与端点';
+
+  @override
+  String get lyricsSmartFailedEmpty => '没有识别出人声';
+
+  @override
+  String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
+
+  @override
+  String get lyricsMarkLine => '这行不对';
+
+  @override
+  String get lyricsUnmarkLine => '撤销标记';
+
+  @override
+  String get lyricsMarkSong => '整首不对';
+
+  @override
+  String get lyricsMarkNotSung => '这不是唱的';
+
+  @override
+  String get lyricsMarksTitle => '标记管理';
+
+  @override
+  String get lyricsMarksEmpty => '还没有标记——听到不对的行，点行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改词';
+
+  @override
+  String get lyricsMarkRewordTitle => '改这一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改词';
+
+  @override
+  String get lyricsMarkRevoke => '撤销';
+
+  @override
+  String get lyricsMarkWaiting => '等复解';
+
+  @override
+  String get lyricsMarkResolved => '已复解';
+
+  @override
+  String get lyricsMarkReworded => '已改词';
+
+  @override
+  String get lyricsMarkRevoked => '已撤销';
+
+  @override
+  String get lyricsMarkSourceReader => '读者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系统';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '在线找到的 $artist';
   }
@@ -4586,6 +5329,353 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get discoverReasonCompleted => '你常把这首听完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的机器转写稿，可能有同音字或听错的词。歌名「$title」，歌手「$artist」。\n请修正错别字，行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '请凭你对这首歌的了解，写出《$title》($artist) 的歌词，按演唱顺序拆成一行一句。\n只输出 JSON 字符串数组，不要输出其他内容。不确定的歌曲就输出空数组，不要编造：';
+  }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面这首歌的歌词逐行译成$target，行数与顺序必须与原稿完全一致，不译标点风格差异。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面这首歌的歌词逐行转写成拉丁字母拼读（拼音或通行读音），行数与顺序必须与原稿完全一致。\n只输出 JSON 字符串数组，每个元素一行，不要输出其他内容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻译';
+
+  @override
+  String get lyricsContrastTransliterate => '音译';
+
+  @override
+  String get lyricsContrastDone => '已对照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自动补齐：开着就把库里所有没词的歌自动补到有词';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '标题';
+
+  @override
+  String get librarySortArtist => '艺术家';
+
+  @override
+  String get librarySortAlbum => '专辑';
+
+  @override
+  String get librarySortDuration => '时长';
+
+  @override
+  String get libraryColumnTitle => '标题';
+
+  @override
+  String get libraryColumnArtist => '艺术家';
+
+  @override
+  String get libraryColumnAlbum => '专辑';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '时长';
+
+  @override
+  String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '双列视图';
+
+  @override
+  String get libraryFilter => '筛选';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜欢';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有词';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺词';
+
+  @override
+  String get libraryFilterStatusInstrumental => '纯音乐';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '艺术家';
+
+  @override
+  String get libraryFilterLanguages => '语言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '时长';
+
+  @override
+  String get libraryFilterAdded => '加入时间';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分类视图';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展开分类';
+
+  @override
+  String get libraryTreeCollapse => '收起分类';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英语';
+
+  @override
+  String get languageJa => '日语';
+
+  @override
+  String get languageKo => '韩语';
+
+  @override
+  String get languageFr => '法语';
+
+  @override
+  String get languageDe => '德语';
+
+  @override
+  String get languageEs => '西班牙语';
+
+  @override
+  String get languageRu => '俄语';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜索设置';
+
+  @override
+  String get settingsCustomize => '自定义…';
+
+  @override
+  String get settingsResetSection => '恢复本分区默认';
+
+  @override
+  String get settingsResetAll => '恢复全部默认';
+
+  @override
+  String get settingsResetTitle => '恢复默认设置？';
+
+  @override
+  String get settingsResetMessage => '这会覆盖当前分区的设置，确定继续？';
+
+  @override
+  String get settingsResetAllMessage => '这会覆盖所有设置，确定继续？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '点歌加入队列，不替换正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '点歌替换队列，只放这一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '双击只标喜欢，单击照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自动补齐 + 周期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自动补齐，不周期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放历史改进推荐';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '关窗口继续播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '关窗口就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主题 语言 深色 浅色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盘 媒体控制 默认播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '没有匹配的设置';
+
+  @override
+  String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播优先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鲜优先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自定义…';
+
+  @override
+  String get sourcesHealthWeightsShare => '占比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 关闭该维度；百分比为自动归一化后的占比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用与配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鲜与产出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠与稳定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示与活跃';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6593,7 +7683,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsResumePlaybackOnStartupHint =>
-      '開啟 Tune 時恢復佇列和播放進度，停在暫停狀態；關掉後從空白佇列開始';
+      '開啟 Tune 時總會恢復佇列和播放進度；這個開關只決定當前這首是否自動繼續播放，關掉則停在暫停狀態';
 
   @override
   String get settingsReplaceQueueOnClick => '單擊歌曲時取代播放佇列';
@@ -6607,6 +7697,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsOnlyLikeOnDoubleClickHint =>
       '開啟時雙擊只標成喜歡，不打斷正在播放的曲子；關閉時雙擊照常播放並標成喜歡';
+
+  @override
+  String get settingsFavoritesDoubleClickPlays => '雙擊喜歡的曲目時播放並替換佇列';
+
+  @override
+  String get settingsFavoritesDoubleClickPlaysHint =>
+      '開啟時，雙擊喜歡列表裡的曲目會播放它並把佇列換成它；關閉時雙擊只標成喜歡';
 
   @override
   String get sidebarDiscover => '發現';
@@ -6832,6 +7929,197 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get discoverWhyHistory => '可選的本機播放記錄（預設關閉）';
 
   @override
+  String get settingsSectionSmartLyrics => '智慧歌詞';
+
+  @override
+  String get settingsSmartLyricsTitle => '歌詞覆蓋';
+
+  @override
+  String get settingsSmartLyricsDescription => '標籤裡的詞和曲目旁的詞稿都算；統計來自最近一次掃描';
+
+  @override
+  String get settingsSmartLyricsTotal => '曲目總數';
+
+  @override
+  String get settingsSmartLyricsResolved => '已知有詞';
+
+  @override
+  String get settingsSmartLyricsMissing => '待補缺口';
+
+  @override
+  String get settingsSmartLyricsPreset => '介面範本';
+
+  @override
+  String get settingsSmartLyricsPresetCustom => '自訂';
+
+  @override
+  String get settingsSmartLyricsApiKey => '金鑰';
+
+  @override
+  String get settingsSmartLyricsApiKeyHint => '貼上你自己的 API 金鑰';
+
+  @override
+  String get settingsSmartLyricsAdvanced => '進階';
+
+  @override
+  String get settingsSmartLyricsBaseUrl => '介面位址';
+
+  @override
+  String get settingsSmartLyricsAsrModels => '轉寫模型（逗號分隔）';
+
+  @override
+  String get settingsSmartLyricsChatModel => '文字模型';
+
+  @override
+  String get settingsSmartLyricsPrivacy => '生成會把整首歌的音訊上傳到你設定的端點；只發給你自己填的位址。';
+
+  @override
+  String get settingsSmartLyricsSampled => '抽樣';
+
+  @override
+  String get settingsSmartLyricsChecked => '已核';
+
+  @override
+  String get settingsSmartLyricsAccuracy => '正確率';
+
+  @override
+  String get settingsSmartLyricsDrawSample => '開始抽樣';
+
+  @override
+  String get settingsSmartLyricsAccuracyNote =>
+      '正確率按已解決樣本分層人工核對（直錄棚 / Live / 說唱 / 非中文）；樣本只增不減，改判以最後一筆為準。';
+
+  @override
+  String get settingsSmartLyricsLocal => '本機引擎';
+
+  @override
+  String get settingsSmartLyricsLocalOff => '關閉';
+
+  @override
+  String get settingsSmartLyricsLocalDownload => '下載模型';
+
+  @override
+  String get settingsSmartLyricsLocalBusy => '下載中……';
+
+  @override
+  String get settingsSmartLyricsLocalReady => '模型已就緒';
+
+  @override
+  String get settingsSmartLyricsLocalFailed => '下載失敗：重試，或換個模型';
+
+  @override
+  String get settingsSmartLyricsBatch => '批次補齊';
+
+  @override
+  String get settingsSmartLyricsBatchStart => '補齊曲庫';
+
+  @override
+  String get settingsSmartLyricsBatchStop => '停止';
+
+  @override
+  String get settingsSmartLyricsBatchRetry => '重查失敗曲目';
+
+  @override
+  String get settingsSmartLyricsBudget => '雲端預算（首/批，0 為不限）';
+
+  @override
+  String settingsSmartLyricsBatchIdle(int pending, int done, int failed) {
+    return '待補 $pending · 已完成 $done · 失敗 $failed';
+  }
+
+  @override
+  String settingsSmartLyricsBatchRunning(int pending, int done) {
+    return '正在補齊：待補 $pending · 已完成 $done';
+  }
+
+  @override
+  String settingsSmartLyricsBudgetPaused(int budget) {
+    return '已達雲端預算（$budget 首），本批暫停——餘下待補不丟';
+  }
+
+  @override
+  String settingsSmartLyricsBatchFresh(int count) {
+    return '新增 $count 首待補，按「補齊曲庫」入隊';
+  }
+
+  @override
+  String get settingsSmartLyricsLeakCheck => '查漏長開：機器閒置時只重問人寫票池，不花雲端、不佔 CPU';
+
+  @override
+  String get lyricsSmartGenerate => '智慧生成';
+
+  @override
+  String get lyricsSmartGenerateNeedsKey => '還沒有金鑰——先到設定的「智慧歌詞」裡貼一把';
+
+  @override
+  String get lyricsSmartGenerating => '正在生成歌詞——先問人寫稿，再開通道，一輪最多幾分鐘';
+
+  @override
+  String get lyricsSmartFailedAudio => '取音訊失敗：曲目沒有本機副本，也沒拉到串流';
+
+  @override
+  String get lyricsSmartFailedUpload => '通道沒有答上來：稍後再試，或到設定裡檢查金鑰與端點';
+
+  @override
+  String get lyricsSmartFailedEmpty => '沒有識別出人聲';
+
+  @override
+  String get lyricsSmartNote => '機器稿：票池生成，重新查找可以找更好的詞';
+
+  @override
+  String get lyricsMarkLine => '這行不對';
+
+  @override
+  String get lyricsUnmarkLine => '撤銷標記';
+
+  @override
+  String get lyricsMarkSong => '整首不對';
+
+  @override
+  String get lyricsMarkNotSung => '這不是唱的';
+
+  @override
+  String get lyricsMarksTitle => '標記管理';
+
+  @override
+  String get lyricsMarksEmpty => '還沒有標記——聽到不對的行，點行尾的小旗';
+
+  @override
+  String lyricsMarkLineNumber(int line) {
+    return '第 $line 行';
+  }
+
+  @override
+  String get lyricsMarkReword => '改詞';
+
+  @override
+  String get lyricsMarkRewordTitle => '改這一行';
+
+  @override
+  String get lyricsMarkRewordSave => '保存改詞';
+
+  @override
+  String get lyricsMarkRevoke => '撤銷';
+
+  @override
+  String get lyricsMarkWaiting => '等復解';
+
+  @override
+  String get lyricsMarkResolved => '已復解';
+
+  @override
+  String get lyricsMarkReworded => '已改詞';
+
+  @override
+  String get lyricsMarkRevoked => '已撤銷';
+
+  @override
+  String get lyricsMarkSourceReader => '讀者';
+
+  @override
+  String get lyricsMarkSourceSystem => '系統';
+
+  @override
   String discoverSectionOnlineArtist(String artist) {
     return '線上找到的 $artist';
   }
@@ -6878,4 +8166,351 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get discoverReasonCompleted => '你常把這首聽完';
+
+  @override
+  String smartPromptCorrect(String title, String artist, String draft) {
+    return '下面是一首歌的機器轉寫稿，可能有同音字或聽錯的詞。歌名「$title」，歌手「$artist」。\n請修正錯別字，行數與順序必須與原稿完全一致。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$draft';
+  }
+
+  @override
+  String smartPromptRebuild(String title, String artist) {
+    return '請憑你對這首歌的了解，寫出《$title》($artist) 的歌詞，按演唱順序拆成一行一句。\n只輸出 JSON 字串陣列，不要輸出其他內容。不確定的歌曲就輸出空陣列，不要編造：';
+  }
+
+  @override
+  String smartPromptTranslate(String target, String lines) {
+    return '把下面這首歌的歌詞逐行譯成$target，行數與順序必須與原稿完全一致，不譯標點風格差異。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$lines';
+  }
+
+  @override
+  String smartPromptTransliterate(String lines) {
+    return '把下面這首歌的歌詞逐行轉寫成拉丁字母拼讀（拼音或通行讀音），行數與順序必須與原稿完全一致。\n只輸出 JSON 字串陣列，每個元素一行，不要輸出其他內容：\n$lines';
+  }
+
+  @override
+  String get smartContrastTargetLanguage => '英文';
+
+  @override
+  String get lyricsContrastTranslate => '翻譯';
+
+  @override
+  String get lyricsContrastTransliterate => '音譯';
+
+  @override
+  String get lyricsContrastDone => '已對照';
+
+  @override
+  String get settingsSmartLyricsAutoFill => '自動補齊：開著就把庫裡所有沒詞的歌自動補到有詞';
+
+  @override
+  String get librarySortTooltip => '排序';
+
+  @override
+  String get librarySortRecent => '最近加入';
+
+  @override
+  String get librarySortTitle => '標題';
+
+  @override
+  String get librarySortArtist => '藝術家';
+
+  @override
+  String get librarySortAlbum => '專輯';
+
+  @override
+  String get librarySortDuration => '時長';
+
+  @override
+  String get libraryColumnTitle => '標題';
+
+  @override
+  String get libraryColumnArtist => '藝術家';
+
+  @override
+  String get libraryColumnAlbum => '專輯';
+
+  @override
+  String get libraryColumnAdded => '加入';
+
+  @override
+  String get libraryColumnDuration => '時長';
+
+  @override
+  String get libraryMoreActions => '更多操作';
+
+  @override
+  String get libraryViewColumns => '雙欄檢視';
+
+  @override
+  String get libraryFilter => '篩選';
+
+  @override
+  String get libraryFilterClearAll => '清除全部';
+
+  @override
+  String get libraryFilterStatus => '状态';
+
+  @override
+  String get libraryFilterStatusAll => '全部';
+
+  @override
+  String get libraryFilterStatusLiked => '喜歡';
+
+  @override
+  String get libraryFilterStatusWithLyrics => '有詞';
+
+  @override
+  String get libraryFilterStatusWithoutLyrics => '缺詞';
+
+  @override
+  String get libraryFilterStatusInstrumental => '純音樂';
+
+  @override
+  String get libraryFilterGenres => '流派';
+
+  @override
+  String get libraryFilterDecades => '年代';
+
+  @override
+  String get libraryFilterArtists => '藝術家';
+
+  @override
+  String get libraryFilterLanguages => '語言';
+
+  @override
+  String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterDurations => '時長';
+
+  @override
+  String get libraryFilterAdded => '加入時間';
+
+  @override
+  String get libraryFilterDurationShort => '<2 分钟';
+
+  @override
+  String get libraryFilterDurationMedium => '2–5 分钟';
+
+  @override
+  String get libraryFilterDurationLong => '5–10 分钟';
+
+  @override
+  String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterAddedWeek => '最近 7 天';
+
+  @override
+  String get libraryFilterAddedMonth => '最近 30 天';
+
+  @override
+  String get libraryFilterAddedYear => '最近一年';
+
+  @override
+  String get libraryFilterAddedOlder => '更早';
+
+  @override
+  String get libraryViewCategories => '分類檢視';
+
+  @override
+  String get libraryAllSongs => '全部歌曲';
+
+  @override
+  String get libraryTreeExpand => '展開分類';
+
+  @override
+  String get libraryTreeCollapse => '收起分類';
+
+  @override
+  String get languageZh => '中文';
+
+  @override
+  String get languageEn => '英語';
+
+  @override
+  String get languageJa => '日語';
+
+  @override
+  String get languageKo => '韓語';
+
+  @override
+  String get languageFr => '法語';
+
+  @override
+  String get languageDe => '德語';
+
+  @override
+  String get languageEs => '西班牙語';
+
+  @override
+  String get languageRu => '俄語';
+
+  @override
+  String get settingsOverview => '全部';
+
+  @override
+  String get settingsSearchHint => '搜尋設定';
+
+  @override
+  String get settingsCustomize => '自訂…';
+
+  @override
+  String get settingsResetSection => '恢復本分區預設';
+
+  @override
+  String get settingsResetAll => '恢復全部預設';
+
+  @override
+  String get settingsResetTitle => '恢復預設設定？';
+
+  @override
+  String get settingsResetMessage => '這會覆蓋目前分區的設定，確定繼續？';
+
+  @override
+  String get settingsResetAllMessage => '這會覆蓋所有設定，確定繼續？';
+
+  @override
+  String get settingsPresetAutoScan => '自动扫描';
+
+  @override
+  String get settingsPresetAutoScanHint => '启动时扫描全部音源';
+
+  @override
+  String get settingsPresetManualScan => '手动扫描';
+
+  @override
+  String get settingsPresetManualScanHint => '只在点扫描时更新';
+
+  @override
+  String get settingsPresetQueueFirst => '队列优先';
+
+  @override
+  String get settingsPresetQueueFirstHint => '點歌加入佇列，不替換正在放的';
+
+  @override
+  String get settingsPresetSingleFirst => '单曲优先';
+
+  @override
+  String get settingsPresetSingleFirstHint => '點歌替換佇列，只放這一首';
+
+  @override
+  String get settingsPresetFavoriteFirst => '收藏优先';
+
+  @override
+  String get settingsPresetFavoriteFirstHint => '雙擊只標喜歡，單擊照常';
+
+  @override
+  String get settingsPresetLyricsManual => '手动';
+
+  @override
+  String get settingsPresetLyricsManualHint => '不自动补齐';
+
+  @override
+  String get settingsPresetLyricsBalanced => '平衡';
+
+  @override
+  String get settingsPresetLyricsBalancedHint => '自動補齊 + 週期查漏';
+
+  @override
+  String get settingsPresetLyricsSaver => '省电';
+
+  @override
+  String get settingsPresetLyricsSaverHint => '自動補齊，不週期查漏';
+
+  @override
+  String get settingsPresetLearnOn => '开启学习';
+
+  @override
+  String get settingsPresetLearnOnHint => '用播放歷史改進推薦';
+
+  @override
+  String get settingsPresetLearnOff => '关闭学习';
+
+  @override
+  String get settingsPresetLearnOffHint => '只用收藏和元数据';
+
+  @override
+  String get settingsPresetTray => '托盘常驻';
+
+  @override
+  String get settingsPresetTrayHint => '關視窗繼續播放';
+
+  @override
+  String get settingsPresetQuit => '关闭即退出';
+
+  @override
+  String get settingsPresetQuitHint => '關視窗就停止播放';
+
+  @override
+  String get settingsSearchKeywordsAppearance => '主題 語言 深色 淺色 theme language';
+
+  @override
+  String get settingsSearchKeywordsLibrary => '扫描 文件夹 缓存 音乐库 scan folder cache';
+
+  @override
+  String get settingsSearchKeywordsPlayback =>
+      '队列 双击 收藏 播放 queue click favorite';
+
+  @override
+  String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
+
+  @override
+  String get settingsSearchKeywordsDiscovery => '推荐 历史 发现 discover history';
+
+  @override
+  String get settingsSearchKeywordsDesktop =>
+      '托盤 媒體控制 預設播放器 desktop tray media';
+
+  @override
+  String get settingsSearchKeywordsSourceHealth =>
+      '音源 健康度 权重 source health weight';
+
+  @override
+  String get settingsSearchNoMatch => '沒有符合的設定';
+
+  @override
+  String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播優先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鮮優先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自訂…';
+
+  @override
+  String get sourcesHealthWeightsShare => '佔比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 關閉該維度；百分比為自動歸一化後的佔比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用與配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鮮與產出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠與穩定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示與活躍';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }

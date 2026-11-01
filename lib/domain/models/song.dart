@@ -15,6 +15,15 @@ class Song {
   final int? discNumber;
   final int? totalDisc;
   final String? lyrics;
+
+  /// Whether lyrics are known to sit with this track locally.
+  ///
+  /// A tag sheet or a lyrics file next to the audio counts. The fact is
+  /// written once per scan, so the lyrics ledger of the settings page can
+  /// count the gap it fills without opening one folder per track — see
+  /// docs/smart-lyrics.md (M0).
+  final bool hasLyrics;
+
   final List<String>? genres;
   final List<String>? performers;
   final String? language;
@@ -84,6 +93,7 @@ class Song {
     this.discNumber,
     this.totalDisc,
     this.lyrics,
+    this.hasLyrics = false,
     this.genres,
     this.performers,
     this.language,
@@ -120,6 +130,7 @@ class Song {
       discNumber: data['discNumber'],
       totalDisc: data['totalDisc'],
       lyrics: data['lyrics'],
+      hasLyrics: data['hasLyrics'] == true,
       genres: data['genres'] is List ? List<String>.from(data['genres']) : null,
       performers: data['performers'] is List
           ? List<String>.from(data['performers'])
@@ -164,6 +175,7 @@ class Song {
     int? discNumber,
     int? totalDisc,
     String? lyrics,
+    bool? hasLyrics,
     List<String>? genres,
     List<String>? performers,
     String? language,
@@ -198,6 +210,7 @@ class Song {
       discNumber: discNumber ?? this.discNumber,
       totalDisc: totalDisc ?? this.totalDisc,
       lyrics: lyrics ?? this.lyrics,
+      hasLyrics: hasLyrics ?? this.hasLyrics,
       genres: genres ?? this.genres,
       performers: performers ?? this.performers,
       language: language ?? this.language,
@@ -334,6 +347,7 @@ class Song {
       discNumber: track.discNumber ?? file.discNumber,
       totalDisc: track.totalDisc ?? file.totalDisc,
       lyrics: track.lyrics ?? file.lyrics,
+      hasLyrics: track.hasLyrics || file.hasLyrics,
       genres: track.genres ?? file.genres,
       performers: track.performers ?? file.performers,
       language: track.language ?? file.language,
@@ -360,6 +374,7 @@ class Song {
     'discNumber': discNumber,
     'totalDisc': totalDisc,
     'lyrics': lyrics,
+    'hasLyrics': hasLyrics,
     'genres': genres,
     'performers': performers,
     'language': language,

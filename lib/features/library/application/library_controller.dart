@@ -13,6 +13,10 @@ import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -63,13 +67,23 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       _queryDebounce?.cancel();
     });
 
-    final total = await _storage.count();
-    final songs = total > windowSize
-        ? await _storage.page(offset: 0, limit: windowSize)
-        : await _storage.load();
+    final view = await _storage.loadView();
+    final sort = view?.sort ?? LibrarySort.recent;
+    final filter = view?.filter ?? LibraryFilter.empty;
+    final total = await _storage.countQuery(query: '', filter: filter);
+    final songs = await _storage.query(
+      query: '',
+      filter: filter,
+      sort: sort,
+      offset: 0,
+      limit: windowSize,
+    );
     final albums = await _storage.albumSummaries();
     return LibraryState(
       songs: List.unmodifiable(songs),
+      filter: filter,
+      sort: sort,
+      sourceFilter: filter.sources.length == 1 ? filter.sources.first : null,
       total: total,
       hasMore: songs.length < total,
       albums: albums,
@@ -90,18 +104,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     if (_disposed || !state.hasValue || !_current.hasMore) return;
 
     final query = _current.query.trim();
-    final sourceId = _current.sourceFilter;
-    final next = query.isEmpty && sourceId == null
-        ? await _storage.page(
-            offset: _current.songs.length,
-            limit: windowSize,
-          )
-        : await _storage.search(
-            query: query,
-            sourceId: sourceId,
-            offset: _current.songs.length,
-            limit: windowSize,
-          );
+    final next = await _storage.query(
+      query: query,
+      filter: _effectiveFilter(),
+      sort: _current.sort,
+      offset: _current.songs.length,
+      limit: windowSize,
+    );
     if (_disposed || !state.hasValue) return;
 
     if (next.isEmpty) {
@@ -315,7 +324,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       // input of the whole viewport, and a new list — even an equal one —
       // rebuilds every visible row.
       final songs = written > 0 || deactivated > 0
-          ? List<Song>.unmodifiable(await _window(query: '', sourceId: null))
+          ? List<Song>.unmodifiable(await _window())
           : _current.songs;
       state = AsyncData(
         _current.copyWith(
@@ -374,7 +383,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     }
     if (_disposed || !state.hasValue) return false;
 
-    final filterActive = _current.query.isNotEmpty || _current.sourceFilter != null;
+    final filterActive = _current.query.isNotEmpty || _current.hasFilter;
     if (written > 0 || filterActive) {
       await _reloadForFilter();
       return written > 0;
@@ -429,6 +438,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         sourceFilter: _current.sourceFilter == sourceId
             ? null
             : _current.sourceFilter,
+        filter: _current.filter.copyWith(
+          sources: {
+            for (final source in _current.filter.sources)
+              if (source != sourceId) source,
+          },
+        ),
       ),
     );
     await _storage.removeSource(sourceId);
@@ -439,14 +454,68 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   Future<void> setSourceFilter(String? sourceId) async {
     if (_disposed || !state.hasValue) return;
     final normalized = sourceId?.trim();
+    final source = normalized == null || normalized.isEmpty
+        ? null
+        : normalized;
     state = AsyncData(
       _current.copyWith(
-        sourceFilter: normalized == null || normalized.isEmpty
-            ? null
-            : normalized,
+        sourceFilter: source,
+        filter: _current.filter.copyWith(
+          sources: source == null ? const {} : {source},
+        ),
       ),
     );
+    _saveView();
     await _reloadForFilter();
+  }
+
+  /// Narrows the page to [filter]; the search word stays as it is.
+  Future<void> setFilter(LibraryFilter filter) async {
+    if (_disposed || !state.hasValue || _current.filter == filter) return;
+    state = AsyncData(
+      _current.copyWith(
+        filter: filter,
+        sourceFilter: filter.sources.length == 1
+            ? filter.sources.first
+            : null,
+      ),
+    );
+    _saveView();
+    await _reloadForFilter();
+  }
+
+  /// The counts the filter panel reads, for [filter].
+  Future<LibraryFacets> facets(LibraryFilter filter) async {
+    await future;
+    return _storage.facets(filter: filter);
+  }
+
+  /// Orders the page by [sort].
+  Future<void> setSort(LibrarySort sort) async {
+    if (_disposed || !state.hasValue || _current.sort == sort) return;
+    state = AsyncData(_current.copyWith(sort: sort));
+    _saveView();
+    await _reloadForFilter();
+  }
+
+  void _saveView() {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    unawaited(
+      _storage.saveView(
+        LibraryView(sort: current.sort, filter: current.filter),
+      ),
+    );
+  }
+
+  /// The filter the queries use: the state's filter plus the legacy source
+  /// field a hand-made state or an older toolbar may still set.
+  LibraryFilter _effectiveFilter() {
+    final source = _current.sourceFilter;
+    if (source == null || _current.filter.sources.isNotEmpty) {
+      return _current.filter;
+    }
+    return _current.filter.copyWith(sources: {source});
   }
 
   /// Reads the window that matches the query and source filter.
@@ -457,33 +526,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     if (_disposed || !state.hasValue) return;
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
-    final sourceId = _current.sourceFilter;
-
-    if (query.isEmpty && sourceId == null) {
-      final total = await _storage.count();
-      final songs = total > windowSize
-          ? await _storage.page(offset: 0, limit: windowSize)
-          : await _storage.load();
-      final albums = await _storage.albumSummaries();
-      if (_disposed || generation != _reloadGeneration) return;
-      state = AsyncData(
-        _current.copyWith(
-          songs: List.unmodifiable(songs),
-          total: total,
-          hasMore: songs.length < total,
-          albums: albums,
-        ),
-      );
-      return;
-    }
-
-    final total = await _storage.countMatching(
+    final filter = _effectiveFilter();
+    final total = await _storage.countQuery(query: query, filter: filter);
+    final songs = await _storage.query(
       query: query,
-      sourceId: sourceId,
-    );
-    final songs = await _storage.search(
-      query: query,
-      sourceId: sourceId,
+      filter: filter,
+      sort: _current.sort,
       offset: 0,
       limit: windowSize,
     );
@@ -550,23 +598,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   ///
   /// A small library is read whole; a larger one is read a window at a time,
   /// so its size never decides the cost of the frame.
-  Future<List<Song>> _window({
-    required String query,
-    required String? sourceId,
-  }) async {
-    if (query.isEmpty && sourceId == null) {
-      final total = await _storage.count();
-      return total > windowSize
-          ? _storage.page(offset: 0, limit: windowSize)
-          : _storage.load();
-    }
-    return _storage.search(
-      query: query,
-      sourceId: sourceId,
-      offset: 0,
-      limit: windowSize,
-    );
-  }
+  Future<List<Song>> _window() => _storage.query(
+    query: _current.query.trim(),
+    filter: _effectiveFilter(),
+    sort: _current.sort,
+    offset: 0,
+    limit: windowSize,
+  );
 
   String _statusMessage({
     required List<SourceScanResult> results,
@@ -619,3 +657,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// and the library must not pull the player up to merge a scan.
   Set<String> _pinnedUris() => ref.read(favoritesControllerProvider).ids;
 }
+
+/// The counts of the filter panel, following the filter on the page.
+final libraryFacetsProvider = FutureProvider.autoDispose<LibraryFacets>((ref) async {
+  final filter = ref.watch(
+    libraryControllerProvider.select(
+      (value) => value.valueOrNull?.filter ?? LibraryFilter.empty,
+    ),
+  );
+  return ref.read(libraryControllerProvider.notifier).facets(filter);
+});

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/config/app_version.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
+import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/application/update_controller.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 
 /// The card that checks the project page and installs a newer release.
+///
+/// One line of state and one action: the dashboard already says what the
+/// page is for, so the card does not repeat the version story.
 class SettingsUpdateCard extends ConsumerWidget {
   const SettingsUpdateCard({super.key});
 
@@ -17,38 +22,62 @@ class SettingsUpdateCard extends ConsumerWidget {
     final strings = context.loc;
     final theme = Theme.of(context);
 
-    return SettingsCard(
-      index: '08',
-      eyebrow: strings.updateEyebrow,
-      title: strings.updateTitle,
-      description: strings.updateDescription,
+    return SettingsPanel(
+      key: const ValueKey('settings-card-update'),
+      icon: Icons.system_update_alt_rounded,
+      title: strings.updateEyebrow,
+      trailing: _Actions(state: state, controller: controller),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            strings.updateCurrentVersion(AppVersion.version),
-            style: theme.textTheme.bodySmall,
+          Row(
+            children: [
+              Text(
+                'v${AppVersion.version}',
+                style: CompactTypography.mono(
+                  theme.colorScheme.onSurfaceVariant,
+                  size: CompactTypeScale.mark,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _statusText(context, state),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-          _StatusLine(state: state),
-          const SizedBox(height: 12),
-          _Actions(state: state, controller: controller),
+          if (state.status == UpdateStatus.downloading) ...[
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(CompactTokens.radius4),
+              child: LinearProgressIndicator(
+                value: state.progress,
+                minHeight: 4,
+              ),
+            ),
+          ],
+          if (state.status == UpdateStatus.available &&
+              state.release?.asset == null) ...[
+            const SizedBox(height: 4),
+            Text(
+              strings.updateNoArchive,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
-}
 
-class _StatusLine extends StatelessWidget {
-  final UpdateState state;
-
-  const _StatusLine({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
+  static String _statusText(BuildContext context, UpdateState state) {
     final strings = context.loc;
-    final theme = Theme.of(context);
-    final text = switch (state.status) {
+    return switch (state.status) {
       UpdateStatus.idle => strings.updateIdle,
       UpdateStatus.checking => strings.updateChecking,
       UpdateStatus.upToDate => strings.updateUpToDate,
@@ -61,20 +90,6 @@ class _StatusLine extends StatelessWidget {
       UpdateStatus.ready => strings.updateReady,
       UpdateStatus.failed => strings.updateFailed(state.error ?? ''),
     };
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(text, style: theme.textTheme.bodyMedium),
-        if (state.status == UpdateStatus.downloading) ...[
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(CompactTokens.radius4),
-            child: LinearProgressIndicator(value: state.progress, minHeight: 4),
-          ),
-        ],
-      ],
-    );
   }
 }
 
@@ -95,37 +110,54 @@ class _Actions extends StatelessWidget {
       UpdateStatus.installing => const SizedBox.shrink(),
       UpdateStatus.ready => FilledButton(
         onPressed: controller.restart,
+        style: _filled(context),
         child: Text(strings.updateRestart),
       ),
       UpdateStatus.available => Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           FilledButton(
             onPressed: release?.asset == null ? null : controller.install,
+            style: _filled(context),
             child: Text(strings.updateInstall),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 6),
           OutlinedButton(
             onPressed: controller.check,
+            style: _outlined(context),
             child: Text(strings.updateCheck),
           ),
-          const SizedBox(width: 10),
-          if (release?.asset == null)
-            Flexible(
-              child: Text(
-                strings.updateNoArchive,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
         ],
       ),
       UpdateStatus.failed => FilledButton(
         onPressed: controller.check,
+        style: _filled(context),
         child: Text(strings.updateRetry),
       ),
       _ => OutlinedButton(
         onPressed: controller.check,
+        style: _outlined(context),
         child: Text(strings.updateCheck),
       ),
     };
+  }
+
+  static ButtonStyle _filled(BuildContext context) {
+    return FilledButton.styleFrom(
+      minimumSize: const Size(0, 30),
+      padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space12),
+      visualDensity: VisualDensity.compact,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+  }
+
+  static ButtonStyle _outlined(BuildContext context) {
+    return OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 30),
+      padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space12),
+      visualDensity: VisualDensity.compact,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    );
   }
 }

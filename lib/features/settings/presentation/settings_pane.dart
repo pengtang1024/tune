@@ -1,22 +1,43 @@
+import 'dart:math' as math;
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/app/theme/compact_type_scale.dart';
+import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
-import 'package:tune/data/services/providers/tray_service_provider.dart';
-import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
+import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/settings/domain/settings_state.dart';
+import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 import 'package:tune/features/settings/presentation/settings_update_card.dart';
+import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
+import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
+
+/// The sections of the settings page.
+enum _SettingsSection {
+  overview,
+  appearance,
+  library,
+  playback,
+  lyrics,
+  discovery,
+  desktop,
+  sourceHealth,
+  about,
+}
 
 class SettingsPane extends ConsumerStatefulWidget {
   const SettingsPane({super.key});
@@ -26,13 +47,23 @@ class SettingsPane extends ConsumerStatefulWidget {
 }
 
 class _SettingsPaneState extends ConsumerState<SettingsPane> {
-  /// Whether the desktop already opens audio files with Tune.
-  bool? _isDefaultPlayer;
+  var _section = _SettingsSection.overview;
+  final _search = TextEditingController();
+  var _query = '';
 
-  /// Whether the desktop entry of Tune is in place.
+  bool? _isDefaultPlayer;
   bool _desktopEntryInstalled = false;
 
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _scrollViewKey = GlobalKey();
+
+  /// Set while a nav click animates the page; the scroll spy must not
+  /// fight the animation and land on a section it passes on the way.
+  var _programmaticScroll = false;
+
+  final Map<_SettingsSection, GlobalKey> _sectionKeys = {
+    for (final section in _SettingsSection.values) section: GlobalKey(),
+  };
 
   @override
   void initState() {
@@ -42,6 +73,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   @override
   void dispose() {
+    _search.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -58,95 +90,932 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         ),
       ),
     );
-    final libraryReady = library.$1;
-    final scanning = library.$2;
-    final clearing = library.$3;
-    final busy = scanning || clearing;
-    final settingsController = ref.read(settingsControllerProvider.notifier);
-    // The tray and the default player are Linux-only for now. Other platforms
-    // get no card of switches that could not do anything.
-    final hasDesktopIntegration =
-        ref.watch(trayServiceProvider).isSupported ||
-        ref.watch(defaultPlayerServiceProvider).isSupported;
+    final controller = ref.read(settingsControllerProvider.notifier);
+    final wide = MediaQuery.sizeOf(context).width >= 900;
 
-    return Scrollbar(
-      controller: _scrollController,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(
-          CompactTokens.pageGutter,
-          CompactTokens.pageTopPadding,
-          CompactTokens.pageGutter,
-          CompactTokens.pageGutter,
-        ),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SettingsPageHeader(version: AppVersion.version),
-                const SizedBox(height: CompactTokens.space20),
-                SettingsInterfaceCard(
-                  themeMode: settings.themeMode,
-                  locale: settings.locale,
-                  onThemeChanged: settingsController.setThemeMode,
-                  onLocaleChanged: settingsController.setLocale,
-                ),
-                const SizedBox(height: 14),
-                SettingsLibraryCard(
-                  settings: settings,
-                  scanning: scanning,
-                  canScan: libraryReady && !busy,
-                  onAddFolder: _pickDirectory,
-                  onRemoveFolder: settingsController.removeScanPath,
-                  onScan: _scan,
-                  onClear: libraryReady && !busy ? _clearLibrary : null,
-                  onChooseLibraryFolder: _pickLibraryFolder,
-                  onResetLibraryFolder: _resetLibraryFolder,
-                  cacheLimit: ref.watch(libraryCacheLimitProvider),
-                  onCacheLimitChanged: ref
-                      .read(libraryCacheLimitProvider.notifier)
-                      .set,
-                ),
-                const SizedBox(height: 14),
-                SettingsPlaybackCard(
-                  restorePlaybackOnStartup: settings.restorePlaybackOnStartup,
-                  replaceQueueOnClick: settings.replaceQueueOnClick,
-                  onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
-                  onRestorePlaybackOnStartup:
-                      settingsController.setRestorePlaybackOnStartup,
-                  onReplaceQueueOnClick:
-                      settingsController.setReplaceQueueOnClick,
-                  onOnlyLikeOnDoubleClick:
-                      settingsController.setOnlyLikeOnDoubleClick,
-                ),
-                const SizedBox(height: 14),
-                const SettingsDiscoveryCard(),
-                const SizedBox(height: 14),
-                const SettingsSourceHealthCard(),
-                if (hasDesktopIntegration) ...[
-                  const SizedBox(height: 14),
-                  SettingsDesktopCard(
-                    closeToTray: settings.closeToTray,
-                    mediaControlsEnabled: settings.mediaControlsEnabled,
-                    isDefaultPlayer: _isDefaultPlayer ?? false,
-                    desktopEntryInstalled: _desktopEntryInstalled,
-                    onCloseToTrayChanged: settingsController.setCloseToTray,
-                    onMediaControlsChanged:
-                        settingsController.setMediaControlsEnabled,
-                    onSetDefaultPlayer: _canSetDefaultPlayer
-                        ? _setDefaultPlayer
-                        : null,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _nav(context, wide, settings),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _header(context, controller),
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is ScrollUpdateNotification ||
+                        notification is ScrollEndNotification) {
+                      _syncSectionWithScroll();
+                    }
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    key: _scrollViewKey,
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(
+                      CompactTokens.pageGutter,
+                      CompactTokens.space8,
+                      CompactTokens.pageGutter,
+                      CompactTokens.pageGutter,
+                    ),
+                    child: _body(
+                    context,
+                    settings,
+                    controller,
+                      libraryReady: library.$1,
+                      scanning: library.$2,
+                      clearing: library.$3,
+                    ),
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Navigation
+
+  static const _sections = _SettingsSection.values;
+
+  Widget _nav(BuildContext context, bool wide, SettingsState settings) {
+    final theme = Theme.of(context);
+    final items = _sections.where((section) => _matches(section)).toList();
+    return Container(
+      width: wide ? 176 : 56,
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+      ),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          CompactTokens.space8,
+          CompactTokens.space12,
+          CompactTokens.space8,
+          CompactTokens.space12,
+        ),
+        children: [
+          if (items.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(CompactTokens.space8),
+              child: Text(
+                context.loc.settingsSearchNoMatch,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          for (final section in items) ...[
+            _navTile(context, section, wide),
+            const SizedBox(height: CompactTokens.space4),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _navTile(BuildContext context, _SettingsSection section, bool wide) {
+    final theme = Theme.of(context);
+    final selected = _section == section;
+    final tile = Material(
+      color: selected
+          ? theme.colorScheme.primary.withValues(alpha: 0.10)
+          : Colors.transparent,
+      borderRadius: CompactTokens.borderRadius8,
+      child: InkWell(
+        key: ValueKey('settings-nav-${section.name}'),
+        onTap: () => _goTo(section),
+        borderRadius: CompactTokens.borderRadius8,
+        child: Container(
+          height: 36,
+          padding: EdgeInsets.symmetric(
+            horizontal: wide ? CompactTokens.space8 : 0,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                width: 2,
+                color: selected ? theme.colorScheme.primary : Colors.transparent,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: wide
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            children: [
+              Icon(
+                _iconOf(section),
+                size: CompactTokens.icon18,
+                color: selected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
+              if (wide) ...[
+                const SizedBox(width: CompactTokens.space8),
+                Expanded(
+                  child: Text(
+                    _labelOf(context, section),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: selected ? theme.colorScheme.primary : null,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+    if (wide) return tile;
+    return TuneTooltip(message: _labelOf(context, section), child: tile);
+  }
+
+  // ---------------------------------------------------------------------
+  // Header
+
+  Widget _header(BuildContext context, SettingsController controller) {
+    final theme = Theme.of(context);
+    final wide = MediaQuery.sizeOf(context).width >= 900;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        CompactTokens.pageGutter,
+        CompactTokens.space12,
+        CompactTokens.pageGutter,
+        CompactTokens.space4,
+      ),
+      child: Row(
+        children: [
+          Text(
+            context.loc.settingsTitle,
+            style: CompactTypography.asDisplay(
+              theme.textTheme.displayMedium,
+              size: CompactTypeScale.displayMedium,
+              height: 0.95,
+            ),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+          Text(
+            'v${AppVersion.version}',
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurfaceVariant,
+              size: CompactTypeScale.mark,
+            ),
+          ),
+          const Spacer(),
+          SizedBox(
+            width: wide ? 220 : 150,
+            child: TextField(
+              controller: _search,
+              onChanged: _onSearchChanged,
+              style: theme.textTheme.bodySmall,
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainer,
+                hintText: context.loc.settingsSearchHint,
+                hintStyle: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  size: CompactTokens.icon16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 30,
+                  minHeight: 30,
+                ),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        onPressed: () {
+                          _search.clear();
+                          _onSearchChanged('');
+                        },
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          size: CompactTokens.icon14,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints.tightFor(
+                          width: 26,
+                          height: 26,
+                        ),
+                      ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space8,
+                  vertical: CompactTokens.space8,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: CompactTokens.borderRadius8,
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: CompactTokens.borderRadius8,
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: CompactTokens.borderRadius8,
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+          TuneTooltip(
+            message: context.loc.libraryMoreActions,
+            child: PopupMenuButton<String>(
+              key: const ValueKey('settings-more'),
+              icon: const Icon(Icons.more_horiz),
+              onSelected: (value) {
+                if (value == 'resetSection') _confirmReset(all: false);
+                if (value == 'resetAll') _confirmReset(all: true);
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'resetSection',
+                  enabled: _section != _SettingsSection.overview,
+                  child: Text(context.loc.settingsResetSection),
+                ),
+                PopupMenuItem(
+                  value: 'resetAll',
+                  child: Text(context.loc.settingsResetAll),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onSearchChanged(String value) {
+    final query = value.trim().toLowerCase();
+    setState(() {
+      _query = query;
+      if (query.isEmpty) return;
+      if (_matches(_section)) return;
+      final first = _sections.where(_matches).firstOrNull;
+      if (first != null) _section = first;
+    });
+  }
+
+  bool _matches(_SettingsSection section) {
+    if (_query.isEmpty) return true;
+    final text =
+        '${_labelOf(context, section)} ${_descriptionOf(context, section)} '
+        '${_keywordsOf(context, section)}'
+            .toLowerCase();
+    return text.contains(_query);
+  }
+
+  // ---------------------------------------------------------------------
+  // Body
+
+  Widget _body(
+    BuildContext context,
+    SettingsState settings,
+    SettingsController controller, {
+    required bool libraryReady,
+    required bool scanning,
+    required bool clearing,
+  }) {
+    final sections = [
+      _SettingsSection.appearance,
+      _SettingsSection.library,
+      _SettingsSection.playback,
+      _SettingsSection.lyrics,
+      _SettingsSection.discovery,
+      _SettingsSection.desktop,
+      _SettingsSection.sourceHealth,
+      _SettingsSection.about,
+    ].where(_matches).toList();
+    if (sections.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(CompactTokens.space16),
+        child: Text(
+          context.loc.settingsSearchNoMatch,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1180
+            ? 3
+            : constraints.maxWidth >= 560
+            ? 2
+            : 1;
+        final gap = CompactTokens.space8;
+        // The health table and the about block read across the page; the
+        // other sections sit in an even grid.
+        final fullWidth = {
+          _SettingsSection.sourceHealth,
+          _SettingsSection.about,
+        };
+        final rows = <Widget>[];
+        var row = <_SettingsSection>[];
+
+        void flushRow() {
+          if (row.isEmpty) return;
+          final rowSections = List.of(row);
+          row = [];
+          rows.add(
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < columns; i++) ...[
+                    if (i > 0) const SizedBox(width: CompactTokens.space8),
+                    Expanded(
+                      child: i < rowSections.length
+                          ? SizedBox(
+                              key: _sectionKeys[rowSections[i]],
+                              child: _sectionCard(
+                                context,
+                                rowSections[i],
+                                settings,
+                                controller,
+                                libraryReady: libraryReady,
+                                scanning: scanning,
+                                clearing: clearing,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
                 ],
-                const SizedBox(height: 14),
-                SettingsAboutCard(version: AppVersion.version),
-                if (!kIsWeb) ...[
-                  const SizedBox(height: 14),
-                  const SettingsUpdateCard(),
-                ],
+              ),
+            ),
+          );
+        }
+
+        for (final section in sections) {
+          if (fullWidth.contains(section)) {
+            flushRow();
+            rows.add(
+              SizedBox(
+                key: _sectionKeys[section],
+                width: constraints.maxWidth,
+                child: section == _SettingsSection.about
+                    ? _aboutCard(context)
+                    : _sectionCard(
+                        context,
+                        section,
+                        settings,
+                        controller,
+                        libraryReady: libraryReady,
+                        scanning: scanning,
+                        clearing: clearing,
+                      ),
+              ),
+            );
+            continue;
+          }
+          row.add(section);
+          if (row.length == columns) flushRow();
+        }
+        flushRow();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < rows.length; i++) ...[
+              if (i > 0) SizedBox(height: gap),
+              rows[i],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  void _goTo(_SettingsSection section) {
+    setState(() => _section = section);
+    _programmaticScroll = true;
+    Future<void> done;
+    if (section == _SettingsSection.overview) {
+      done = _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+      );
+    } else {
+      final anchor = _sectionKeys[section]?.currentContext;
+      if (anchor == null) {
+        _programmaticScroll = false;
+        return;
+      }
+      done = Scrollable.ensureVisible(
+        anchor,
+        duration: const Duration(milliseconds: 180),
+        alignment: 0.02,
+        curve: Curves.easeOut,
+      );
+    }
+    done.whenComplete(() {
+      if (mounted) _programmaticScroll = false;
+    });
+  }
+
+  /// Makes the left rail follow the section under the top of the page.
+  void _syncSectionWithScroll() {
+    if (!mounted || _programmaticScroll || _query.isNotEmpty) return;
+    if (_scrollController.offset <= 4) {
+      if (_section != _SettingsSection.overview) {
+        setState(() => _section = _SettingsSection.overview);
+      }
+      return;
+    }
+    final viewport =
+        _scrollViewKey.currentContext?.findRenderObject() as RenderBox?;
+    if (viewport == null) return;
+    final top = viewport.localToGlobal(Offset.zero).dy;
+    _SettingsSection? active;
+    for (final section in _SettingsSection.values) {
+      if (!_matches(section)) continue;
+      final box =
+          _sectionKeys[section]?.currentContext?.findRenderObject()
+              as RenderBox?;
+      if (box == null) continue;
+      final cardTop = box.localToGlobal(Offset.zero).dy;
+      if (cardTop <= top + 24) active = section;
+    }
+    final next = active;
+    if (next != null && next != _section) {
+      setState(() => _section = next);
+    }
+  }
+
+  Widget _sectionCard(
+    BuildContext context,
+    _SettingsSection section,
+    SettingsState settings,
+    SettingsController controller, {
+    required bool libraryReady,
+    required bool scanning,
+    required bool clearing,
+  }) {
+    final presets = _presets(section, settings, controller);
+    final selected = _selectedPreset(section, settings);
+    final actions = _quickActions(
+      section,
+      context,
+      controller,
+      libraryReady: libraryReady,
+      scanning: scanning,
+      clearing: clearing,
+    );
+    return SettingsPanel(
+      key: ValueKey('settings-card-${section.name}'),
+      icon: _iconOf(section),
+      title: _labelOf(context, section),
+      trailing: TextButton(
+        key: ValueKey('settings-customize-${section.name}'),
+        onPressed: () => section == _SettingsSection.sourceHealth
+            ? _openHealthSheet(context)
+            : _openCustom(context, section),
+        style: TextButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(context.loc.settingsCustomize),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (section == _SettingsSection.sourceHealth)
+            const SettingsSourceHealthCard(embedded: true),
+          if (presets.isNotEmpty)
+            Wrap(
+              spacing: CompactTokens.space6,
+              runSpacing: CompactTokens.space6,
+              children: [
+                for (final preset in presets)
+                  ChoiceChip(
+                    label: Text(preset.title),
+                    avatar: Icon(preset.icon, size: CompactTokens.icon14),
+                    selected: preset.id == selected,
+                    onSelected: (_) => preset.apply(),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+              ],
+            ),
+          if (presets.isNotEmpty && actions.isNotEmpty)
+            const SizedBox(height: CompactTokens.space8),
+          if (actions.isNotEmpty)
+            Wrap(spacing: CompactTokens.space8, children: actions),
+        ],
+      ),
+    );
+  }
+
+  Widget _aboutCard(BuildContext context) {
+    final about = SettingsAboutCard(version: AppVersion.version);
+    const update = SettingsUpdateCard();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Side by side needs room for the longest action label ("Check for
+        // updates") beside the title; below that the cards stack full width.
+        if (constraints.maxWidth < 640) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              about,
+              const SizedBox(height: CompactTokens.space8),
+              update,
+            ],
+          );
+        }
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: about),
+              const SizedBox(width: CompactTokens.space8),
+              const Expanded(child: update),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Presets
+
+  List<_Preset> _presets(
+    _SettingsSection section,
+    SettingsState settings,
+    SettingsController controller,
+  ) {
+    switch (section) {
+      case _SettingsSection.appearance:
+        return [
+          _Preset(
+            id: ThemeMode.system.name,
+            title: context.loc.systemMode,
+            description: context.loc.settingsThemeDescription,
+            icon: Icons.brightness_auto_rounded,
+            apply: () => controller.setThemeMode(ThemeMode.system),
+          ),
+          _Preset(
+            id: ThemeMode.light.name,
+            title: context.loc.lightMode,
+            description: context.loc.settingsThemeDescription,
+            icon: Icons.light_mode_rounded,
+            apply: () => controller.setThemeMode(ThemeMode.light),
+          ),
+          _Preset(
+            id: ThemeMode.dark.name,
+            title: context.loc.darkMode,
+            description: context.loc.settingsThemeDescription,
+            icon: Icons.dark_mode_rounded,
+            apply: () => controller.setThemeMode(ThemeMode.dark),
+          ),
+        ];
+      case _SettingsSection.library:
+        return [
+          _Preset(
+            id: 'auto',
+            title: context.loc.settingsPresetAutoScan,
+            description: context.loc.settingsPresetAutoScanHint,
+            icon: Icons.autorenew_rounded,
+            apply: () => controller.setAutoScanOnStartup(true),
+          ),
+          _Preset(
+            id: 'manual',
+            title: context.loc.settingsPresetManualScan,
+            description: context.loc.settingsPresetManualScanHint,
+            icon: Icons.touch_app_rounded,
+            apply: () => controller.setAutoScanOnStartup(false),
+          ),
+        ];
+      case _SettingsSection.playback:
+        return [
+          _Preset(
+            id: 'queue',
+            title: context.loc.settingsPresetQueueFirst,
+            description: context.loc.settingsPresetQueueFirstHint,
+            icon: Icons.queue_music_rounded,
+            apply: () => _applyPlayback(
+              controller,
+              replaceQueue: false,
+              favoritesDoubleClick: true,
+              onlyLike: false,
+            ),
+          ),
+          _Preset(
+            id: 'single',
+            title: context.loc.settingsPresetSingleFirst,
+            description: context.loc.settingsPresetSingleFirstHint,
+            icon: Icons.play_circle_outline_rounded,
+            apply: () => _applyPlayback(
+              controller,
+              replaceQueue: true,
+              favoritesDoubleClick: true,
+              onlyLike: false,
+            ),
+          ),
+          _Preset(
+            id: 'favorite',
+            title: context.loc.settingsPresetFavoriteFirst,
+            description: context.loc.settingsPresetFavoriteFirstHint,
+            icon: Icons.favorite_border_rounded,
+            apply: () => _applyPlayback(
+              controller,
+              replaceQueue: false,
+              favoritesDoubleClick: false,
+              onlyLike: true,
+            ),
+          ),
+        ];
+      case _SettingsSection.lyrics:
+        return [
+          _Preset(
+            id: 'manual',
+            title: context.loc.settingsPresetLyricsManual,
+            description: context.loc.settingsPresetLyricsManualHint,
+            icon: Icons.edit_off_rounded,
+            apply: () => _applyLyrics(
+              settings,
+              controller,
+              autoFill: false,
+              gapCheck: false,
+            ),
+          ),
+          _Preset(
+            id: 'balanced',
+            title: context.loc.settingsPresetLyricsBalanced,
+            description: context.loc.settingsPresetLyricsBalancedHint,
+            icon: Icons.balance_rounded,
+            apply: () => _applyLyrics(
+              settings,
+              controller,
+              autoFill: true,
+              gapCheck: true,
+            ),
+          ),
+          _Preset(
+            id: 'saver',
+            title: context.loc.settingsPresetLyricsSaver,
+            description: context.loc.settingsPresetLyricsSaverHint,
+            icon: Icons.battery_saver_rounded,
+            apply: () => _applyLyrics(
+              settings,
+              controller,
+              autoFill: true,
+              gapCheck: false,
+            ),
+          ),
+        ];
+      case _SettingsSection.discovery:
+        return [
+          _Preset(
+            id: 'on',
+            title: context.loc.settingsPresetLearnOn,
+            description: context.loc.settingsPresetLearnOnHint,
+            icon: Icons.auto_awesome_rounded,
+            apply: () => controller.setUseListeningHistory(true),
+          ),
+          _Preset(
+            id: 'off',
+            title: context.loc.settingsPresetLearnOff,
+            description: context.loc.settingsPresetLearnOffHint,
+            icon: Icons.shield_outlined,
+            apply: () => controller.setUseListeningHistory(false),
+          ),
+        ];
+      case _SettingsSection.desktop:
+        return [
+          _Preset(
+            id: 'tray',
+            title: context.loc.settingsPresetTray,
+            description: context.loc.settingsPresetTrayHint,
+            icon: Icons.minimize_rounded,
+            apply: () => controller.setCloseToTray(true),
+          ),
+          _Preset(
+            id: 'quit',
+            title: context.loc.settingsPresetQuit,
+            description: context.loc.settingsPresetQuitHint,
+            icon: Icons.power_settings_new_rounded,
+            apply: () => controller.setCloseToTray(false),
+          ),
+        ];
+      case _SettingsSection.overview:
+      case _SettingsSection.sourceHealth:
+      case _SettingsSection.about:
+        return const [];
+    }
+  }
+
+  String _selectedPreset(_SettingsSection section, SettingsState settings) {
+    switch (section) {
+      case _SettingsSection.appearance:
+        return settings.themeMode.name;
+      case _SettingsSection.library:
+        return settings.autoScanOnStartup ? 'auto' : 'manual';
+      case _SettingsSection.playback:
+        if (!settings.autoResumeOnStartup) return 'custom';
+        if (settings.replaceQueueOnClick &&
+            settings.favoritesDoubleClickPlays &&
+            !settings.onlyLikeOnDoubleClick) {
+          return 'single';
+        }
+        if (!settings.replaceQueueOnClick &&
+            settings.favoritesDoubleClickPlays &&
+            !settings.onlyLikeOnDoubleClick) {
+          return 'queue';
+        }
+        if (!settings.replaceQueueOnClick &&
+            !settings.favoritesDoubleClickPlays &&
+            settings.onlyLikeOnDoubleClick) {
+          return 'favorite';
+        }
+        return 'custom';
+      case _SettingsSection.lyrics:
+        final config = settings.smartLyrics;
+        if (!config.autoFill && !config.gapCheckEnabled) return 'manual';
+        if (config.autoFill && config.gapCheckEnabled) return 'balanced';
+        if (config.autoFill && !config.gapCheckEnabled) return 'saver';
+        return 'custom';
+      case _SettingsSection.discovery:
+        return settings.useListeningHistory ? 'on' : 'off';
+      case _SettingsSection.desktop:
+        return settings.closeToTray ? 'tray' : 'quit';
+      case _SettingsSection.overview:
+      case _SettingsSection.sourceHealth:
+      case _SettingsSection.about:
+        return 'custom';
+    }
+  }
+
+  void _applyPlayback(
+    SettingsController controller, {
+    required bool replaceQueue,
+    required bool favoritesDoubleClick,
+    required bool onlyLike,
+  }) {
+    controller.setReplaceQueueOnClick(replaceQueue);
+    controller.setFavoritesDoubleClickPlays(favoritesDoubleClick);
+    controller.setOnlyLikeOnDoubleClick(onlyLike);
+    controller.setAutoResumeOnStartup(true);
+  }
+
+  void _applyLyrics(
+    SettingsState settings,
+    SettingsController controller, {
+    required bool autoFill,
+    required bool gapCheck,
+  }) {
+    controller.setSmartLyrics(
+      settings.smartLyrics.copyWith(
+        autoFill: autoFill,
+        gapCheckEnabled: gapCheck,
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Custom sheet and quick actions
+
+  List<Widget> _quickActions(
+    _SettingsSection section,
+    BuildContext context,
+    SettingsController controller, {
+    required bool libraryReady,
+    required bool scanning,
+    required bool clearing,
+  }) {
+    switch (section) {
+      case _SettingsSection.library:
+        return [
+          OutlinedButton.icon(
+            onPressed: libraryReady && !scanning && !clearing ? _scan : null,
+            style: _actionStyle(context),
+            icon: const Icon(Icons.refresh_rounded, size: CompactTokens.icon16),
+            label: Text(context.loc.libraryScanAllSources),
+          ),
+          const SizedBox(width: CompactTokens.space8),
+          OutlinedButton.icon(
+            onPressed: _pickDirectory,
+            style: _actionStyle(context),
+            icon: const Icon(
+              Icons.create_new_folder_outlined,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(context.loc.settingsAddFolder),
+          ),
+        ];
+      case _SettingsSection.desktop:
+        if (!_canSetDefaultPlayer) return const [];
+        return [
+          OutlinedButton.icon(
+            onPressed: _isDefaultPlayer == true ? null : _setDefaultPlayer,
+            style: _actionStyle(context),
+            icon: const Icon(
+              Icons.audiotrack_rounded,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(
+              _isDefaultPlayer == true
+                  ? context.loc.settingsDefaultPlayerActive
+                  : context.loc.settingsSetDefaultPlayer,
+            ),
+          ),
+        ];
+      default:
+        return const [];
+    }
+  }
+
+  ButtonStyle _actionStyle(BuildContext context) => OutlinedButton.styleFrom(
+    minimumSize: const Size(0, CompactTokens.controlDefault),
+    side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+  );
+
+  Future<void> _openHealthSheet(BuildContext context) async {
+    final weights = ref
+        .read(settingsControllerProvider)
+        .sourceHealthWeights;
+    final result = await showSourceHealthWeightsSheet(
+      context,
+      initial: weights,
+    );
+    if (result == null) return;
+    await ref
+        .read(settingsControllerProvider.notifier)
+        .setSourceHealthWeights(result);
+  }
+
+  void _openCustom(BuildContext context, _SettingsSection section) {
+    final width = MediaQuery.sizeOf(context).width;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        alignment: Alignment.centerRight,
+        insetPadding: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          width: math.min(640, width),
+          height: MediaQuery.sizeOf(context).height,
+          child: Material(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CompactTokens.space16,
+                    CompactTokens.space12,
+                    CompactTokens.space8,
+                    CompactTokens.space8,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _labelOf(context, section),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      TuneTooltip(
+                        message: context.loc.cancel,
+                        child: IconButton(
+                          key: const ValueKey('settings-custom-close'),
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(CompactTokens.space16),
+                    child: SettingsSheetScope(
+                      inSheet: true,
+                      child: _customCard(context, section),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -154,6 +1023,198 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       ),
     );
   }
+
+  Widget _customCard(BuildContext context, _SettingsSection section) {
+    final settings = ref.watch(settingsControllerProvider);
+    final controller = ref.read(settingsControllerProvider.notifier);
+    final library = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          value.hasValue,
+          value.valueOrNull?.isScanning ?? false,
+          value.valueOrNull?.isLoading ?? false,
+        ),
+      ),
+    );
+    return switch (section) {
+      _SettingsSection.appearance => SettingsInterfaceCard(
+        themeMode: settings.themeMode,
+        locale: settings.locale,
+        onThemeChanged: controller.setThemeMode,
+        onLocaleChanged: controller.setLocale,
+      ),
+      _SettingsSection.library => SettingsLibraryCard(
+        settings: settings,
+        scanning: library.$2,
+        canScan: library.$1 && !library.$2 && !library.$3,
+        onAddFolder: _pickDirectory,
+        onRemoveFolder: controller.removeScanPath,
+        onScan: _scan,
+        onClear: library.$1 && !library.$2 && !library.$3
+            ? _clearLibrary
+            : null,
+        onChooseLibraryFolder: _pickLibraryFolder,
+        onResetLibraryFolder: _resetLibraryFolder,
+        cacheLimit: ref.watch(libraryCacheLimitProvider),
+        onCacheLimitChanged: ref.read(libraryCacheLimitProvider.notifier).set,
+      ),
+      _SettingsSection.playback => SettingsPlaybackCard(
+        autoResumeOnStartup: settings.autoResumeOnStartup,
+        replaceQueueOnClick: settings.replaceQueueOnClick,
+        onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
+        favoritesDoubleClickPlays: settings.favoritesDoubleClickPlays,
+        onAutoResumeOnStartup: controller.setAutoResumeOnStartup,
+        onReplaceQueueOnClick: controller.setReplaceQueueOnClick,
+        onOnlyLikeOnDoubleClick: controller.setOnlyLikeOnDoubleClick,
+        onFavoritesDoubleClickPlays:
+            controller.setFavoritesDoubleClickPlays,
+      ),
+      _SettingsSection.lyrics => const SettingsSmartLyricsCard(),
+      _SettingsSection.discovery => const SettingsDiscoveryCard(),
+      _SettingsSection.desktop => SettingsDesktopCard(
+        closeToTray: settings.closeToTray,
+        mediaControlsEnabled: settings.mediaControlsEnabled,
+        isDefaultPlayer: _isDefaultPlayer ?? false,
+        desktopEntryInstalled: _desktopEntryInstalled,
+        onCloseToTrayChanged: controller.setCloseToTray,
+        onMediaControlsChanged: controller.setMediaControlsEnabled,
+        onSetDefaultPlayer: _canSetDefaultPlayer ? _setDefaultPlayer : null,
+      ),
+      _SettingsSection.sourceHealth => const SettingsSourceHealthCard(),
+      _SettingsSection.overview ||
+      _SettingsSection.about => const SizedBox.shrink(),
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  // Reset
+
+  Future<void> _confirmReset({required bool all}) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.loc.settingsResetTitle),
+        content: Text(
+          all
+              ? context.loc.settingsResetAllMessage
+              : context.loc.settingsResetMessage,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.loc.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.loc.clear),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final controller = ref.read(settingsControllerProvider.notifier);
+    if (all) {
+      await _resetAll(controller);
+    } else {
+      await _resetSection(_section, controller);
+    }
+  }
+
+  Future<void> _resetAll(SettingsController controller) async {
+    for (final section in _sections) {
+      await _resetSection(section, controller);
+    }
+  }
+
+  Future<void> _resetSection(
+    _SettingsSection section,
+    SettingsController controller,
+  ) async {
+    switch (section) {
+      case _SettingsSection.appearance:
+        await controller.setThemeMode(ThemeMode.system);
+        await controller.setLocale(const Locale('en'));
+      case _SettingsSection.library:
+        await controller.setAutoScanOnStartup(true);
+      case _SettingsSection.playback:
+        await controller.setReplaceQueueOnClick(false);
+        await controller.setOnlyLikeOnDoubleClick(false);
+        await controller.setFavoritesDoubleClickPlays(true);
+        await controller.setAutoResumeOnStartup(true);
+      case _SettingsSection.lyrics:
+        await controller.setSmartLyrics(const SmartLyricsConfig());
+      case _SettingsSection.discovery:
+        await controller.setUseListeningHistory(false);
+      case _SettingsSection.desktop:
+        await controller.setCloseToTray(true);
+        await controller.setMediaControlsEnabled(true);
+      case _SettingsSection.overview:
+      case _SettingsSection.sourceHealth:
+      case _SettingsSection.about:
+        break;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Labels and icons
+
+  String _labelOf(BuildContext context, _SettingsSection section) =>
+      switch (section) {
+        _SettingsSection.overview => context.loc.settingsOverview,
+        _SettingsSection.appearance => context.loc.settingsSectionInterface,
+        _SettingsSection.library => context.loc.libraryTitle,
+        _SettingsSection.playback => context.loc.settingsSectionPlayback,
+        _SettingsSection.lyrics => context.loc.settingsSectionSmartLyrics,
+        _SettingsSection.discovery => context.loc.settingsSectionDiscovery,
+        _SettingsSection.desktop => context.loc.settingsSectionDesktop,
+        _SettingsSection.sourceHealth => context.loc.settingsSectionSourceHealth,
+        _SettingsSection.about => context.loc.about,
+      };
+
+  String _descriptionOf(BuildContext context, _SettingsSection section) =>
+      switch (section) {
+        _SettingsSection.overview => context.loc.settingsSubtitle,
+        _SettingsSection.appearance => context.loc.settingsThemeDescription,
+        _SettingsSection.library => context.loc.settingsLibraryDescription,
+        _SettingsSection.playback => context.loc.settingsPlaybackDescription,
+        _SettingsSection.lyrics => context.loc.settingsSmartLyricsDescription,
+        _SettingsSection.discovery => context.loc.settingsDiscoveryDescription,
+        _SettingsSection.desktop => context.loc.settingsDesktopDescription,
+        _SettingsSection.sourceHealth =>
+          context.loc.settingsSourceHealthDescription,
+        _SettingsSection.about => context.loc.appTagline,
+      };
+
+  String _keywordsOf(BuildContext context, _SettingsSection section) =>
+      switch (section) {
+        _SettingsSection.appearance =>
+          context.loc.settingsSearchKeywordsAppearance,
+        _SettingsSection.library => context.loc.settingsSearchKeywordsLibrary,
+        _SettingsSection.playback =>
+          context.loc.settingsSearchKeywordsPlayback,
+        _SettingsSection.lyrics => context.loc.settingsSearchKeywordsLyrics,
+        _SettingsSection.discovery =>
+          context.loc.settingsSearchKeywordsDiscovery,
+        _SettingsSection.desktop => context.loc.settingsSearchKeywordsDesktop,
+        _SettingsSection.sourceHealth =>
+          context.loc.settingsSearchKeywordsSourceHealth,
+        _SettingsSection.overview || _SettingsSection.about => '',
+      };
+
+  IconData _iconOf(_SettingsSection section) => switch (section) {
+    _SettingsSection.overview => Icons.dashboard_customize_rounded,
+    _SettingsSection.appearance => Icons.palette_outlined,
+    _SettingsSection.library => Icons.library_music_rounded,
+    _SettingsSection.playback => Icons.play_circle_outline_rounded,
+    _SettingsSection.lyrics => Icons.lyrics_outlined,
+    _SettingsSection.discovery => Icons.explore_rounded,
+    _SettingsSection.desktop => Icons.desktop_windows_outlined,
+    _SettingsSection.sourceHealth => Icons.monitor_heart_outlined,
+    _SettingsSection.about => Icons.info_outline_rounded,
+  };
+
+  // ---------------------------------------------------------------------
+  // Existing actions of the page
 
   Future<void> _pickDirectory() async {
     final path = await FilePicker.platform.getDirectoryPath(
@@ -166,7 +1227,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     _showMessage(context.loc.settingsFolderAdded);
   }
 
-  /// Picks the folder the app writes the files it fetches into.
   Future<void> _pickLibraryFolder() async {
     final path = await FilePicker.platform.getDirectoryPath(
       dialogTitle: context.loc.settingsChangeLibraryFolder,
@@ -176,7 +1236,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     await ref.read(settingsControllerProvider.notifier).setLibraryFolder(path);
   }
 
-  /// Puts the files back into the music library of the machine.
   Future<void> _resetLibraryFolder() async {
     await ref.read(settingsControllerProvider.notifier).setLibraryFolder(null);
   }
@@ -229,12 +1288,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       );
   }
 
-  /// Whether the desktop can name Tune as the default player.
   bool get _canSetDefaultPlayer {
     return ref.read(defaultPlayerServiceProvider).isSupported;
   }
 
-  /// Reads whether the desktop already opens audio files with Tune.
   Future<void> _loadDefaultPlayerState() async {
     final service = ref.read(defaultPlayerServiceProvider);
     if (!service.isSupported) return;
@@ -249,7 +1306,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     setState(() => _isDefaultPlayer = isDefault);
   }
 
-  /// Makes Tune the program the desktop opens audio files with.
   Future<void> _setDefaultPlayer() async {
     final service = ref.read(defaultPlayerServiceProvider);
 
@@ -273,4 +1329,20 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           : context.loc.settingsDefaultPlayerFailed,
     );
   }
+}
+
+class _Preset {
+  final String id;
+  final String title;
+  final String description;
+  final IconData icon;
+  final VoidCallback apply;
+
+  const _Preset({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.apply,
+  });
 }

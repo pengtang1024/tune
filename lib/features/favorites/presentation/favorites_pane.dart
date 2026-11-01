@@ -129,7 +129,7 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
             favorites,
             playback,
             sourceLabels,
-            settings.onlyLikeOnDoubleClick,
+            settings.favoritesDoubleClickPlays,
           ),
         ),
       ],
@@ -151,7 +151,7 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
     FavoritesState favorites,
     (String?, bool) playback,
     Map<String, SourceLabel> sourceLabels,
-    bool onlyLikeOnDoubleClick,
+    bool favoritesDoubleClickPlays,
   ) {
     if (library.isLoading && !library.hasValue) {
       return const Center(child: CompactSpinner.large());
@@ -215,8 +215,18 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
               // by default the track joins the queue and plays right away.
               ref.read(listPlaybackProvider).play(song);
             },
-            onDoubleTap: () => _markFavorite(ref, song),
-            waitsForDoubleClick: onlyLikeOnDoubleClick,
+            onDoubleTap: () {
+              if (favoritesDoubleClickPlays) {
+                unawaited(
+                  ref.read(playbackControllerProvider.notifier).playSong(song),
+                );
+                return;
+              }
+              _markFavorite(ref, song);
+            },
+            // A double click in this list has its own action; the click
+            // waits so the first half of it does not play or enqueue.
+            waitsForDoubleClick: true,
             onToggleFavorite: () => _toggleFavorite(ref, song),
           );
         },

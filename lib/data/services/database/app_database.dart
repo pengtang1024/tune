@@ -4,7 +4,12 @@ import 'dart:io' show Platform;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/song_facts.dart';
+import 'package:tune/data/services/database/library_query.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/features/library/domain/library_sort.dart';
 
 /// The library of the app, kept in one SQLite file.
 ///
@@ -16,6 +21,8 @@ class AppDatabase {
   AppDatabase(this._db);
 
   final Database _db;
+
+  late final LibraryQuery _libraryQuery = LibraryQuery(_db);
 
   /// Opens the database at [path], creating the table the first time.
   static AppDatabase open(String path) =>
@@ -50,13 +57,76 @@ class AppDatabase {
         pinned INTEGER NOT NULL DEFAULT 0,
         last_seen INTEGER NOT NULL DEFAULT 0,
         last_played INTEGER,
-        play_count INTEGER NOT NULL DEFAULT 0
+        play_count INTEGER NOT NULL DEFAULT 0,
+        has_lyrics INTEGER NOT NULL DEFAULT 0,
+        language TEXT,
+        format TEXT,
+        duration INTEGER NOT NULL DEFAULT 0
       )
     ''');
     db.execute(
       'CREATE INDEX IF NOT EXISTS idx_songs_source ON songs(source_id)',
     );
     db.execute('CREATE INDEX IF NOT EXISTS idx_songs_title ON songs(title)');
+    // The stratified sample of the accuracy audit (docs/smart-lyrics.md §10):
+    // the drawn tracks in one table, the human verdicts in another. The
+    // draw only adds rows — a redraw keeps the verdicts of the rounds before.
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_sample (
+        uri TEXT PRIMARY KEY,
+        layer TEXT NOT NULL,
+        added_at INTEGER NOT NULL
+      )
+    ''');
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_audit (
+        uri TEXT PRIMARY KEY,
+        verdict TEXT NOT NULL,
+        checked_at INTEGER NOT NULL
+      )
+    ''');
+    // The batch (docs/smart-lyrics.md §7.2): the queue of the tracks the
+    // three segments could not bring words for, and the marks a line or a
+    // track carries — the marks are the priority the queue runs by.
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_tasks (
+        song_id INTEGER PRIMARY KEY,
+        uri TEXT NOT NULL,
+        status TEXT NOT NULL,
+        votes INTEGER NOT NULL DEFAULT 0,
+        disputed INTEGER NOT NULL DEFAULT 0,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+    // The marks of the pipeline (docs/smart-lyrics.md §7.4): one row per
+    // mark — a line, a whole track, or the name for「不是唱的」. The shape
+    // grew from one mark per track to a mark per line within the same
+    // release cycle; the old rows held nothing a reader made.
+    final markColumns = {
+      for (final row in db.select('PRAGMA table_info(smart_lyrics_marks)'))
+        row['name'] as String,
+    };
+    if (markColumns.isNotEmpty && !markColumns.contains('line')) {
+      db.execute('DROP TABLE smart_lyrics_marks');
+    }
+    db.execute('''
+      CREATE TABLE IF NOT EXISTS smart_lyrics_marks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        song_id INTEGER NOT NULL,
+        line INTEGER,
+        kind TEXT NOT NULL,
+        source TEXT NOT NULL,
+        state TEXT NOT NULL,
+        created_at INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+    db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_marks_song '
+      'ON smart_lyrics_marks(song_id)',
+    );
     db.execute('''
       CREATE TABLE IF NOT EXISTS favorites (
         uri TEXT PRIMARY KEY,
@@ -83,6 +153,16 @@ class AppDatabase {
       )
     ''');
     _migrateColumns(db);
+    for (final index in const [
+      'CREATE INDEX IF NOT EXISTS idx_songs_year ON songs(year)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_date_added ON songs(date_added)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_duration ON songs(duration)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_has_lyrics ON songs(has_lyrics)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_language ON songs(language)',
+      'CREATE INDEX IF NOT EXISTS idx_songs_format ON songs(format)',
+    ]) {
+      db.execute(index);
+    }
     return db;
   }
 
@@ -108,6 +188,17 @@ class AppDatabase {
       // The folded title the rows are ordered by, so a window read from the
       // disk stands in the order the page expects.
       'title_sort': "title_sort TEXT NOT NULL DEFAULT ''",
+      // Whether lyrics are known to sit with the track (a tag sheet or a
+      // lyrics file next to the audio); the lyrics ledger counts on it.
+      'has_lyrics': 'has_lyrics INTEGER NOT NULL DEFAULT 0',
+      // The language and the format the filter panel and the category
+      // cards group by; the json holds them, the columns make them
+      // filterable and countable without parsing every row.
+      'language': 'language TEXT',
+      'format': 'format TEXT',
+      // The duration the filter buckets and the sort read; it lived only in
+      // the json column before.
+      'duration': 'duration INTEGER NOT NULL DEFAULT 0',
     };
     final added = <String>{};
     for (final entry in additions.entries) {
@@ -119,6 +210,50 @@ class AppDatabase {
     // is named 'local', and every row that belongs to it says so from now on.
     db.execute("UPDATE songs SET source_id = 'local' WHERE source_id IS NULL");
     if (added.contains('title_sort')) _backfillTitleSort(db);
+    if (added.contains('language') ||
+        added.contains('format') ||
+        added.contains('duration')) {
+      _backfillMediaFacts(db);
+    }
+  }
+
+  /// Writes the language and format of every row that misses them.
+  ///
+  /// An older database kept both only in the json column; the filters read
+  /// the real columns, so the one-time backfill keeps the first filter
+  /// honest. A broken row is skipped, not fatal.
+  static void _backfillMediaFacts(Database db) {
+    final rows = db.select('SELECT uri, json FROM songs');
+    if (rows.isEmpty) return;
+    db.execute('BEGIN');
+    try {
+      final statement = db.prepare(
+        'UPDATE songs SET language = ?, format = ?, duration = ? WHERE uri = ?',
+      );
+      try {
+        for (final row in rows) {
+          try {
+            final decoded = jsonDecode(row['json'] as String);
+            if (decoded is! Map<String, dynamic>) continue;
+            final song = Song.fromMap(decoded);
+            statement.execute([
+              languageKeyOf(song),
+              formatOfSong(song),
+              song.duration,
+              song.uri,
+            ]);
+          } catch (_) {
+            // One broken row must not stop the backfill.
+          }
+        }
+      } finally {
+        statement.close();
+      }
+      db.execute('COMMIT');
+    } catch (error) {
+      db.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   /// Writes the folded title of every row that misses its sort key.
@@ -200,10 +335,8 @@ class AppDatabase {
       song.discNumber,
       song.totalDisc,
       song.lyrics,
-      song.language,
-      song.size,
-      song.type,
-      song.albumArtPath,
+      song.hasLyrics,
+      Object.hash(song.language, song.size, song.type, song.albumArtPath),
     );
     final source = Object.hash(
       song.sourceId,
@@ -251,8 +384,9 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, pinned, last_seen, title_sort, facts_hash, active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+           language, format, duration, json, pinned, last_seen, title_sort,
+           facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -261,12 +395,16 @@ class AppDatabase {
           date_added = excluded.date_added,
           year = excluded.year,
           genre = excluded.genre,
+          language = excluded.language,
+          format = excluded.format,
+          duration = excluded.duration,
           json = excluded.json,
           pinned = excluded.pinned,
           last_seen = excluded.last_seen,
           title_sort = excluded.title_sort,
           facts_hash = excluded.facts_hash,
-          active = 1
+          active = 1,
+          has_lyrics = excluded.has_lyrics
       ''');
       try {
         final seenAt = DateTime.now().millisecondsSinceEpoch;
@@ -280,11 +418,15 @@ class AppDatabase {
             song.dateAdded,
             song.year,
             song.genre,
+            languageKeyOf(song),
+            formatOfSong(song),
+            song.duration,
             jsonEncode(song.toJson()),
             pinned.contains(song.uri) ? 1 : 0,
             seenAt,
             foldText(song.title),
             factsHashOf(song),
+            song.hasLyrics ? 1 : 0,
           ]);
         }
       } finally {
@@ -326,8 +468,9 @@ class AppDatabase {
       final statement = _db.prepare('''
         INSERT INTO songs
           (uri, source_id, title, artist, album, date_added, year, genre,
-           json, last_seen, title_sort, facts_hash, active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+           language, format, duration, json, last_seen, title_sort,
+           facts_hash, active, has_lyrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
         ON CONFLICT(uri) DO UPDATE SET
           source_id = excluded.source_id,
           title = excluded.title,
@@ -336,11 +479,15 @@ class AppDatabase {
           date_added = excluded.date_added,
           year = excluded.year,
           genre = excluded.genre,
+          language = excluded.language,
+          format = excluded.format,
+          duration = excluded.duration,
           json = excluded.json,
           last_seen = excluded.last_seen,
           title_sort = excluded.title_sort,
           facts_hash = excluded.facts_hash,
-          active = 1
+          active = 1,
+          has_lyrics = excluded.has_lyrics
       ''');
       try {
         final seenAt = DateTime.now().millisecondsSinceEpoch;
@@ -374,10 +521,14 @@ class AppDatabase {
             candidate.dateAdded,
             candidate.year,
             candidate.genre,
+            languageKeyOf(candidate),
+            formatOfSong(candidate),
+            candidate.duration,
             jsonEncode(candidate.toJson()),
             seenAt,
             foldText(candidate.title),
             factsHashOf(candidate),
+            candidate.hasLyrics ? 1 : 0,
           ]);
           written++;
         }
@@ -613,6 +764,29 @@ class AppDatabase {
       [DateTime.now().millisecondsSinceEpoch, uri],
     );
   }
+
+  /// Reads one window of the tracks that match [query] and [filter].
+  List<Song> query({
+    required String query,
+    required LibraryFilter filter,
+    required LibrarySort sort,
+    required int offset,
+    required int limit,
+  }) => _libraryQuery.songs(
+    query: query,
+    filter: filter,
+    sort: sort,
+    offset: offset,
+    limit: limit,
+  );
+
+  /// How many tracks match [query] and [filter].
+  int countQuery({required String query, required LibraryFilter filter}) =>
+      _libraryQuery.count(query: query, filter: filter);
+
+  /// The counts of the filter groups.
+  LibraryFacets facets({required LibraryFilter filter}) =>
+      _libraryQuery.facets(filter: filter);
 
   /// Reads one window of the library, ordered by the folded title.
   List<Song> page({required int offset, required int limit}) {
@@ -1009,13 +1183,534 @@ class AppDatabase {
     return (rows.first['count'] as int?) ?? 0;
   }
 
+  /// Records that the smart pipeline put words next to [songId].
+  ///
+  /// The ledger reads `has_lyrics`; a sheet that lands while the app runs
+  /// must move the number without waiting for the next full scan.
+  void markSongHasLyrics(int songId) {
+    _db.execute(
+      "UPDATE songs SET has_lyrics = 1 WHERE json_extract(json, '\$.id') = ?",
+      [songId],
+    );
+  }
+
+  /// A track longer than ten minutes is spoken word (audiobook/podcast),
+  /// not a song: it stays out of the automatic queue and the coverage
+  /// denominator. The panel's manual generate still handles it.
+  static const int longAudioMs = 10 * 60 * 1000;
+
+  /// How many active tracks carry lyrics, and how many the library holds.
+  ///
+  /// The lyrics ledger of the settings page reads this — one query over the
+  /// indexed rows, no library in memory (docs/smart-lyrics.md, M0).
+  (int, int) lyricsLedgerCounts() {
+    final row = _db
+        .select(
+          'SELECT COUNT(*) AS total, '
+          'SUM(CASE WHEN has_lyrics = 1 OR EXISTS ('
+          '  SELECT 1 FROM smart_lyrics_tasks t '
+          "  WHERE t.song_id = json_extract(songs.json, '\$.id') "
+          "  AND t.status IN ('done', 'disputed')"
+          ') THEN 1 ELSE 0 END) AS with_lyrics '
+          'FROM songs WHERE active = 1 '
+          "AND json_extract(json, '\$.isLiveStream') IS NOT 1 "
+          "AND COALESCE(json_extract(json, '\$.duration'), 0) <= $longAudioMs",
+        )
+        .first;
+    final total = row['total'] as int? ?? 0;
+    final withLyrics = row['with_lyrics'] as int? ?? 0;
+    return (total, withLyrics);
+  }
+
+  /// The facts the accuracy sample classifies on, for the rows that are
+  /// still in the library and carry lyrics — the audited share of the
+  /// library is its resolved share.
+  List<SmartLyricsCandidateRow> resolvedCandidateRows() {
+    final rows = _db.select(
+      "SELECT uri, title, artist, album, genre, "
+      "json_extract(json, '\$.language') AS language "
+      'FROM songs WHERE active = 1 AND has_lyrics = 1',
+    );
+    return [
+      for (final row in rows)
+        (
+          uri: row['uri'] as String,
+          title: row['title'] as String? ?? '',
+          artist: row['artist'] as String? ?? '',
+          album: row['album'] as String? ?? '',
+          genre: row['genre'] as String? ?? '',
+          language: row['language'] as String?,
+        ),
+    ];
+  }
+
+  /// Writes the drawn tracks; the rows already there stay what they are, so
+  /// a redraw neither jumps nor loses a verdict. Answers the count of the
+  /// rows the draw added.
+  int saveSampleDrawn(List<({String uri, String layer})> entries) {
+    var added = 0;
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare(
+        'INSERT OR IGNORE INTO smart_lyrics_sample (uri, layer, added_at) '
+        'VALUES (?, ?, ?)',
+      );
+      try {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        for (final entry in entries) {
+          statement.execute([entry.uri, entry.layer, now]);
+          added += _db.updatedRows;
+        }
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return added;
+  }
+
+  /// The drawn tracks of one layer, still in the library, with the facts
+  /// the verification round shows.
+  List<SmartLyricsSampleTrackRow> sampleTracksOf(String layer) {
+    final rows = _db.select(
+      'SELECT s.uri AS uri, s.title AS title, s.artist AS artist '
+      'FROM smart_lyrics_sample sample '
+      'JOIN songs s ON s.uri = sample.uri AND s.active = 1 '
+      'WHERE sample.layer = ? '
+      'ORDER BY sample.added_at, sample.uri',
+      [layer],
+    );
+    return [
+      for (final row in rows)
+        (
+          uri: row['uri'] as String,
+          title: row['title'] as String? ?? '',
+          artist: row['artist'] as String? ?? '',
+        ),
+    ];
+  }
+
+  /// The account of the sample, layer by layer, over the rows that are
+  /// still in the library.
+  List<SmartLyricsSampleCountRow> sampleCountRows() {
+    final rows = _db.select('''
+      SELECT sample.layer AS layer, COUNT(*) AS drawn,
+             COUNT(audit.uri) AS checked,
+             COALESCE(SUM(audit.verdict = 'correct'), 0) AS correct
+      FROM smart_lyrics_sample sample
+      JOIN songs ON songs.uri = sample.uri AND songs.active = 1
+      LEFT JOIN smart_lyrics_audit audit ON audit.uri = sample.uri
+      GROUP BY sample.layer
+      ORDER BY sample.layer
+    ''');
+    return [
+      for (final row in rows)
+        (
+          layer: row['layer'] as String,
+          drawn: row['drawn'] as int? ?? 0,
+          checked: row['checked'] as int? ?? 0,
+          correct: row['correct'] as int? ?? 0,
+        ),
+    ];
+  }
+
+  /// Records — or changes — the human verdict of one drawn track.
+  void recordSampleVerdict(String uri, {required bool correct}) {
+    _db.execute(
+      "INSERT INTO smart_lyrics_audit (uri, verdict, checked_at) "
+      "VALUES (?, ?, ?) "
+      "ON CONFLICT(uri) DO UPDATE SET "
+      "verdict = excluded.verdict, checked_at = excluded.checked_at",
+      [uri, correct ? 'correct' : 'incorrect', DateTime.now().millisecondsSinceEpoch],
+    );
+  }
+
+  /// Puts every active track that carries no lyrics into the queue, and
+  /// answers how many rows the press added.
+  ///
+  /// A scan that finds new gap tracks writes nothing here: the queue moves
+  /// when the reader presses the button, never by itself
+  /// (docs/smart-lyrics.md §7.2).
+  int enqueueMissingTasks({required int now}) {
+    var added = 0;
+    _db.execute('BEGIN');
+    try {
+      final statement = _db.prepare(
+        "INSERT INTO smart_lyrics_tasks (song_id, uri, status, attempts, updated_at) "
+        "SELECT json_extract(json, '\$.id'), uri, 'pending', 0, ? "
+        'FROM songs '
+        "WHERE active = 1 AND has_lyrics = 0 "
+        "AND json_extract(json, '\$.isLiveStream') IS NOT 1 "
+        "AND COALESCE(json_extract(json, '\$.duration'), 0) <= $longAudioMs "
+        'AND NOT EXISTS ('
+        "  SELECT 1 FROM smart_lyrics_tasks t "
+        "  WHERE t.song_id = json_extract(json, '\$.id')"
+        ')',
+      );
+      try {
+        statement.execute([now]);
+        added = _db.updatedRows;
+      } finally {
+        statement.close();
+      }
+      _db.execute('COMMIT');
+    } catch (error) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+    return added;
+  }
+
+  /// The gap tracks a scan brought in that are not queued yet.
+  int countNewMissingTasks() {
+    final row = _db
+        .select(
+          'SELECT COUNT(*) AS n FROM songs '
+          "WHERE active = 1 AND has_lyrics = 0 "
+          "AND json_extract(songs.json, '\$.isLiveStream') IS NOT 1 "
+          "AND COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+          "  <= $longAudioMs "
+          'AND NOT EXISTS ('
+          "  SELECT 1 FROM smart_lyrics_tasks t "
+          "  WHERE t.song_id = json_extract(songs.json, '\$.id')"
+          ')',
+        )
+        .first;
+    return row['n'] as int? ?? 0;
+  }
+
+  /// The next queued track to run, in the order the batch keeps:
+  /// a marked track first; then the shortest track, so the queue shows
+  /// progress before a long podcast; then the healthy ones — a local file
+  /// before a stream, a track that never failed before a retry, fewer
+  /// attempts before more; then recent, liked, and the rest. Within one
+  /// group the song id decides, so an interrupted run resumes where it
+  /// stood.
+  ({int songId, String uri})? nextPendingTask() {
+    final rows = _db.select(
+      "SELECT json_extract(songs.json, '\$.id') AS song_id, songs.uri AS uri "
+      'FROM songs '
+      'JOIN smart_lyrics_tasks t '
+      "  ON t.song_id = json_extract(songs.json, '\$.id') "
+      'WHERE songs.active = 1 AND t.status = ? '
+      'ORDER BY '
+      '  CASE WHEN EXISTS (SELECT 1 FROM smart_lyrics_marks m '
+      "    WHERE m.song_id = json_extract(songs.json, '\$.id') "
+      "    AND m.state = 'uncleared') THEN 0 ELSE 1 END, "
+      "  CASE WHEN COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+      '    <= 0 THEN 1 ELSE 0 END, '
+      "  COALESCE(json_extract(songs.json, '\$.duration'), 0) ASC, "
+      "  CASE WHEN json_extract(songs.json, '\$.localPath') IS NOT NULL "
+      '    THEN 0 ELSE 1 END, '
+      '  CASE WHEN t.last_error IS NULL THEN 0 ELSE 1 END, '
+      '  t.attempts ASC, '
+      '  CASE WHEN songs.last_played IS NOT NULL THEN 0 '
+      '    WHEN EXISTS (SELECT 1 FROM favorites f WHERE f.uri = songs.uri) '
+      '    THEN 1 ELSE 2 END, '
+      '  song_id '
+      'LIMIT 1',
+      ['pending'],
+    );
+    if (rows.isEmpty) return null;
+    final row = rows.first;
+    return (songId: row['song_id'] as int, uri: row['uri'] as String);
+  }
+
+  /// Marks a task as running; the attempt is counted where it starts.
+  void beginTaskRun(int songId, {required int now}) {
+    _db.execute(
+      'UPDATE smart_lyrics_tasks SET status = ?, attempts = attempts + 1, '
+      'updated_at = ? WHERE song_id = ?',
+      ['running', now, songId],
+    );
+  }
+
+  /// Writes how a run ended: the status, what the pool said, and the error
+  /// when there was one.
+  void setTaskOutcome(
+    int songId,
+    String status, {
+    int votes = 0,
+    int disputed = 0,
+    String? error,
+    required int now,
+  }) {
+    _db.execute(
+      'UPDATE smart_lyrics_tasks SET status = ?, votes = ?, disputed = ?, '
+      'last_error = ?, updated_at = ? WHERE song_id = ?',
+      [status, votes, disputed, error, now, songId],
+    );
+  }
+
+  /// The tasks by their status, for the card.
+  List<({String status, int count})> taskStatusCounts() {
+    final rows = _db.select(
+      'SELECT status, COUNT(*) AS n FROM smart_lyrics_tasks GROUP BY status',
+    );
+    return [
+      for (final row in rows)
+        (status: row['status'] as String, count: row['n'] as int? ?? 0),
+    ];
+  }
+
+  /// Puts every failed task back in line for a recheck.
+  int requeueFailedTasks({required int now, int? maxAttempts}) {
+    if (maxAttempts == null) {
+      // The reader pressed「重试」: a new source or model deserves a clean
+      // slate, so the attempt count starts over.
+      _db.execute(
+        "UPDATE smart_lyrics_tasks SET status = 'pending', attempts = 0, "
+        'last_error = NULL, updated_at = ? '
+        "WHERE status = 'failed'",
+        [now],
+      );
+    } else {
+      // The automatic pass only revives what has not burned its attempts.
+      _db.execute(
+        "UPDATE smart_lyrics_tasks SET status = 'pending', updated_at = ? "
+        "WHERE status = 'failed' AND attempts < ?",
+        [now, maxAttempts],
+      );
+    }
+    return _db.updatedRows;
+  }
+
+  /// Drops the tasks of tracks the automatic queue does not take: a live
+  /// stream has no fixed recording, and a track over ten minutes is
+  /// spoken word. Both wait forever; the panel can still generate them
+  /// one at a time.
+  int dropUnqueueableTasks() {
+    _db.execute(
+      'DELETE FROM smart_lyrics_tasks WHERE song_id IN ('
+      "SELECT json_extract(json, '\$.id') FROM songs "
+      "WHERE json_extract(json, '\$.isLiveStream') = 1 "
+      "  OR COALESCE(json_extract(json, '\$.duration'), 0) > $longAudioMs"
+      ") AND status IN ('pending', 'failed', 'running')",
+    );
+    return _db.updatedRows;
+  }
+
+  /// A run that died with the app left its task `running`; when the queue
+  /// starts again no run is in flight, so those rows go back in line.
+  int requeueInterruptedTasks({required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_tasks SET status = 'pending', updated_at = ? "
+      "WHERE status = 'running'",
+      [now],
+    );
+    return _db.updatedRows;
+  }
+
+  /// The tracks a free check may revive: the failed, the disputed, and the
+  /// marked ones — a mark is the reader saying the words are wrong, and
+  /// the pool is asked again (docs/smart-lyrics.md §7.4).
+  List<Song> leakySongs({required int limit}) {
+    final rows = _db.select(
+      "SELECT songs.json AS json FROM smart_lyrics_tasks t "
+      "JOIN songs ON songs.active = 1 "
+      "  AND json_extract(songs.json, '\$.id') = t.song_id "
+      "WHERE (t.status IN ('failed', 'disputed') "
+      'OR EXISTS ('
+      "  SELECT 1 FROM smart_lyrics_marks m "
+      "  WHERE m.song_id = t.song_id AND m.state = 'uncleared'"
+      ')) '
+      "AND COALESCE(json_extract(songs.json, '\$.duration'), 0) "
+      "  <= $longAudioMs "
+      'ORDER BY t.song_id LIMIT ?',
+      [limit],
+    );
+    return [
+      for (final row in rows)
+        Song.fromMap(jsonDecode(row['json'] as String? ?? '')),
+    ];
+  }
+
+  /// The track a task names, read back whole from its row.
+  Song? songWithId(int id) {
+    final rows = _db.select(
+      "SELECT json FROM songs WHERE active = 1 AND json_extract(json, '\$.id') = ?",
+      [id],
+    );
+    if (rows.isEmpty) return null;
+    final decoded = jsonDecode(rows.first['json'] as String? ?? '');
+    return decoded is Map<String, dynamic> ? Song.fromMap(decoded) : null;
+  }
+
+  /// Records a mark on a track — the reader's or the system's; the batch
+  /// runs the marked tracks first.
+  void addMarkRow({
+    required int songId,
+    int? line,
+    required String kind,
+    required String source,
+    required int now,
+  }) {
+    _db.execute(
+      'INSERT INTO smart_lyrics_marks '
+      '(song_id, line, kind, source, state, created_at, updated_at) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [songId, line, kind, source, 'uncleared', now, now],
+    );
+  }
+
+  /// Takes back the open marks of a track — [line] when one line is taken
+  /// back, [kind] when only one kind is — so undoing the whole-track mark
+  /// never touches the flags on its lines.
+  void revokeMarkRows(int songId, {int? line, String? kind}) {
+    final parts = [
+      'song_id = ?',
+      "state = 'uncleared'",
+      if (line != null) 'line = ?',
+      if (kind != null) 'kind = ?',
+    ];
+    _db.execute(
+      'UPDATE smart_lyrics_marks SET state = \'revoked\' WHERE '
+      '${parts.join(' AND ')}',
+      [songId, ?line, ?kind],
+    );
+  }
+
+  /// The open marks of a track, in the order they were made.
+  List<SmartLyricsMarkRow> openMarkRows(int songId) {
+    final rows = _db.select(
+      'SELECT id, song_id, line, kind, source, state, created_at, updated_at '
+      "FROM smart_lyrics_marks WHERE song_id = ? AND state = 'uncleared' "
+      'ORDER BY id',
+      [songId],
+    );
+    return _for(rows);
+  }
+
+  /// Whether anything is still on the track's account.
+  bool hasOpenMarkRow(int songId) {
+    final row = _db.select(
+      'SELECT COUNT(*) AS n FROM smart_lyrics_marks '
+      "WHERE song_id = ? AND state = 'uncleared'",
+      [songId],
+    ).first;
+    return (row['n'] as int? ?? 0) > 0;
+  }
+
+  /// The re-solve worked: the open marks of a track are settled — they
+  /// stay on record as resolved, never dangle.
+  void resolveMarkRows(int songId, {required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_marks SET state = 'resolved', updated_at = ? "
+      "WHERE song_id = ? AND state = 'uncleared'",
+      [now, songId],
+    );
+  }
+
+  /// Puts a track back in line for a re-solve: a mark is the reader saying
+  /// the words are wrong, and the pool should hear the song again
+  /// (docs/smart-lyrics.md §7.4). A track that carried words has no task
+  /// yet — the mark gives it one.
+  void requeueSongTask(int songId, {required int now}) {
+    _db.execute(
+      "INSERT INTO smart_lyrics_tasks (song_id, uri, status, attempts, updated_at) "
+      "SELECT json_extract(json, '\$.id'), uri, 'pending', 0, ? "
+      "FROM songs WHERE active = 1 AND json_extract(json, '\$.id') = ? "
+      'ON CONFLICT(song_id) DO UPDATE SET '
+      "status = 'pending', updated_at = excluded.updated_at",
+      [now, songId],
+    );
+  }
+
+  List<SmartLyricsMarkRow> _for(ResultSet rows) => [
+    for (final row in rows) _markRowOf(row),
+  ];
+
+  SmartLyricsMarkRow _markRowOf(Map<String, Object?> row) => (
+    id: row['id'] as int,
+    songId: row['song_id'] as int,
+    line: row['line'] as int?,
+    kind: row['kind'] as String,
+    source: row['source'] as String,
+    state: row['state'] as String,
+    createdAt: row['created_at'] as int? ?? 0,
+    updatedAt: row['updated_at'] as int? ?? 0,
+  );
+
+  /// The marks of the library, each with the track it belongs to — the
+  /// window the management page reads (docs/smart-lyrics.md §7.4).
+  List<({SmartLyricsMarkRow mark, Song song})> markRowsWithSongs({
+    required int limit,
+  }) {
+    final rows = _db.select(
+      "SELECT songs.json AS json, m.id AS id, m.song_id AS song_id, "
+      'm.line AS line, m.kind AS kind, m.source AS source, '
+      'm.state AS state, m.created_at AS created_at, '
+      'm.updated_at AS updated_at '
+      'FROM smart_lyrics_marks m '
+      'JOIN songs ON songs.active = 1 '
+      "  AND json_extract(songs.json, '\$.id') = m.song_id "
+      'ORDER BY m.song_id, m.id LIMIT ?',
+      [limit],
+    );
+    return [
+      for (final row in rows)
+        (
+          mark: _markRowOf(row),
+          song: Song.fromMap(jsonDecode(row['json'] as String? ?? '')),
+        ),
+    ];
+  }
+
+  /// Answers a line mark the way the reader's own words answer it.
+  void rewordMarkRow(int songId, {required int line, required int now}) {
+    _db.execute(
+      "UPDATE smart_lyrics_marks SET state = 'reworded', updated_at = ? "
+      'WHERE song_id = ? AND line = ? AND state = \'uncleared\'',
+      [now, songId, line],
+    );
+  }
+
   void close() => _db.close();
 }
 
 
+/// The facts the accuracy sample classifies on, one row of the library.
+typedef SmartLyricsCandidateRow =
+    ({
+      String uri,
+      String title,
+      String artist,
+      String album,
+      String genre,
+      String? language,
+    });
+
+/// One drawn track of the accuracy sample, with the facts the verification
+/// round shows.
+typedef SmartLyricsSampleTrackRow = ({String uri, String title, String artist});
+
+/// One layer's counts of the accuracy sample.
+typedef SmartLyricsSampleCountRow = ({
+  String layer,
+  int drawn,
+  int checked,
+  int correct,
+});
+
+/// One mark a track carries: a line, the whole track, or the name for
+///「不是唱的」— and where it stands.
+typedef SmartLyricsMarkRow =
+    ({
+      int id,
+      int songId,
+      int? line,
+      String kind,
+      String source,
+      String state,
+      int createdAt,
+      int updatedAt,
+    });
+
 /// One row of the listening aggregates, joined with the facts of its track.
-class TrackSignalRow {
-  final String artist;
+class TrackSignalRow {  final String artist;
   final String genre;
   final int year;
   final String album;
