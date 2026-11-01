@@ -370,62 +370,68 @@ class SettingsAboutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SettingsCard(
-      index: '08',
-      eyebrow: context.loc.about,
-      title: context.loc.appName,
-      description: context.loc.appTagline,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsPanel(
+      key: const ValueKey('settings-card-about'),
+      icon: Icons.info_outline_rounded,
+      title: context.loc.about,
+      trailing: LicensesButton(version: version),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.graphic_eq_rounded,
-                  size: CompactTokens.icon28,
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-              const SizedBox(width: 13),
-              Expanded(
-                child: Text(
-                  'v$version',
-                  style: CompactTypography.mono(
-                    theme.colorScheme.onSurfaceVariant,
-                    size: CompactTypeScale.mark,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              TuneTooltip(
-                message: context.loc.settingsLocalFirst,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Icon(
-                    Icons.verified_rounded,
-                    size: CompactTokens.icon14,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.graphic_eq_rounded,
+              size: CompactTokens.icon20,
+              color: theme.colorScheme.onPrimary,
+            ),
           ),
-          const SizedBox(height: 10),
-          LicensesButton(version: version),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.loc.appName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  context.loc.appTagline,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'v$version',
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurfaceVariant,
+              size: CompactTypeScale.mark,
+            ),
+          ),
+          const SizedBox(width: 6),
+          TuneTooltip(
+            message: context.loc.settingsLocalFirst,
+            child: Icon(
+              Icons.verified_rounded,
+              size: CompactTokens.icon14,
+              color: theme.colorScheme.primary,
+            ),
+          ),
         ],
       ),
     );

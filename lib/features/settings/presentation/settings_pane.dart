@@ -572,7 +572,6 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     required bool scanning,
     required bool clearing,
   }) {
-    final theme = Theme.of(context);
     final presets = _presets(section, settings, controller);
     final selected = _selectedPreset(section, settings);
     final actions = _quickActions(
@@ -583,50 +582,27 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       scanning: scanning,
       clearing: clearing,
     );
-    return Container(
+    return SettingsPanel(
       key: ValueKey('settings-card-${section.name}'),
-      padding: const EdgeInsets.all(CompactTokens.space12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: CompactTokens.borderRadius12,
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+      icon: _iconOf(section),
+      title: _labelOf(context, section),
+      trailing: TextButton(
+        key: ValueKey('settings-customize-${section.name}'),
+        onPressed: () => section == _SettingsSection.sourceHealth
+            ? _openHealthSheet(context)
+            : _openCustom(context, section),
+        style: TextButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(context.loc.settingsCustomize),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                _iconOf(section),
-                size: CompactTokens.icon18,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: CompactTokens.space8),
-              Expanded(
-                child: Text(
-                  _labelOf(context, section),
-                  style: theme.textTheme.titleSmall,
-                ),
-              ),
-              TextButton(
-                key: ValueKey('settings-customize-${section.name}'),
-                onPressed: () => section == _SettingsSection.sourceHealth
-                    ? _openHealthSheet(context)
-                    : _openCustom(context, section),
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(context.loc.settingsCustomize),
-              ),
-            ],
-          ),
-          if (section == _SettingsSection.sourceHealth) ...[
-            const SizedBox(height: CompactTokens.space8),
+          if (section == _SettingsSection.sourceHealth)
             const SettingsSourceHealthCard(embedded: true),
-          ],
-          if (presets.isNotEmpty) ...[
-            const SizedBox(height: CompactTokens.space8),
+          if (presets.isNotEmpty)
             Wrap(
               spacing: CompactTokens.space6,
               runSpacing: CompactTokens.space6,
@@ -642,26 +618,45 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                   ),
               ],
             ),
-          ],
-          if (actions.isNotEmpty) ...[
+          if (presets.isNotEmpty && actions.isNotEmpty)
             const SizedBox(height: CompactTokens.space8),
+          if (actions.isNotEmpty)
             Wrap(spacing: CompactTokens.space8, children: actions),
-          ],
         ],
       ),
     );
   }
 
   Widget _aboutCard(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SettingsAboutCard(version: AppVersion.version),
-        if (!kIsWeb) ...[
-          const SizedBox(height: CompactTokens.space12),
-          const SettingsUpdateCard(),
-        ],
-      ],
+    final about = SettingsAboutCard(version: AppVersion.version);
+    const update = SettingsUpdateCard();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Side by side needs room for the longest action label ("Check for
+        // updates") beside the title; below that the cards stack full width.
+        if (kIsWeb || constraints.maxWidth < 640) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              about,
+              if (!kIsWeb) ...[
+                const SizedBox(height: CompactTokens.space8),
+                update,
+              ],
+            ],
+          );
+        }
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: about),
+              const SizedBox(width: CompactTokens.space8),
+              const Expanded(child: update),
+            ],
+          ),
+        );
+      },
     );
   }
 

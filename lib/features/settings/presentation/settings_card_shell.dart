@@ -125,3 +125,57 @@ class SettingsCard extends StatelessWidget {
     );
   }
 }
+
+/// The compact frame of a dashboard card: one icon, one title and an
+/// optional trailing action, then the content.
+///
+/// The section cards and the about/update cards share it so the page reads
+/// as one grid instead of two generations of cards.
+class SettingsPanel extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final Widget child;
+  final Widget? trailing;
+
+  const SettingsPanel({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.child,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(CompactTokens.space12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: CompactTokens.borderRadius12,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: CompactTokens.icon18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: CompactTokens.space8),
+              Expanded(
+                child: Text(title, style: theme.textTheme.titleSmall),
+              ),
+              ?trailing,
+            ],
+          ),
+          const SizedBox(height: CompactTokens.space8),
+          child,
+        ],
+      ),
+    );
+  }
+}

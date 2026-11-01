@@ -1104,6 +1104,42 @@ void main() {
     expect(health.width, closeTo(appearance.width * 2 + 8, 0.5));
   });
 
+  testWidgets('about and update sit side by side on a wide page', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(1180, 860));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final about = find.byKey(const ValueKey('settings-card-about'));
+    final update = find.byKey(const ValueKey('settings-card-update'));
+
+    expect(about, findsOneWidget);
+    expect(update, findsOneWidget);
+    expect(tester.getSize(about).height, tester.getSize(update).height);
+    expect(tester.getTopLeft(about).dy, tester.getTopLeft(update).dy);
+    expect(
+      tester.getTopLeft(update).dx,
+      greaterThan(tester.getTopRight(about).dx),
+    );
+  });
+
   testWidgets('settings page exposes the health weights and opens them', (
     tester,
   ) async {
