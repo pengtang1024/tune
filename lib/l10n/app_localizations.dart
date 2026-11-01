@@ -5182,6 +5182,90 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'健康度'**
   String get settingsSectionSourceHealth;
+
+  /// No description provided for @sourcesHealthPresetBalanced.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平衡'**
+  String get sourcesHealthPresetBalanced;
+
+  /// No description provided for @sourcesHealthPresetBalancedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认权重，各项均衡'**
+  String get sourcesHealthPresetBalancedHint;
+
+  /// No description provided for @sourcesHealthPresetPlayable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'能播优先'**
+  String get sourcesHealthPresetPlayable;
+
+  /// No description provided for @sourcesHealthPresetPlayableHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用、配置、扫描、可靠与可播放更重'**
+  String get sourcesHealthPresetPlayableHint;
+
+  /// No description provided for @sourcesHealthPresetFresh.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜优先'**
+  String get sourcesHealthPresetFresh;
+
+  /// No description provided for @sourcesHealthPresetFreshHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜度、产出与活跃度更重'**
+  String get sourcesHealthPresetFreshHint;
+
+  /// No description provided for @sourcesHealthWeightsCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义…'**
+  String get sourcesHealthWeightsCustom;
+
+  /// No description provided for @sourcesHealthWeightsShare.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'占比'**
+  String get sourcesHealthWeightsShare;
+
+  /// No description provided for @sourcesHealthWeightsOffHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'0 = 关闭该维度；百分比为自动归一化后的占比'**
+  String get sourcesHealthWeightsOffHint;
+
+  /// No description provided for @sourcesHealthGroupCore.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用与配置'**
+  String get sourcesHealthGroupCore;
+
+  /// No description provided for @sourcesHealthGroupOutput.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新鲜与产出'**
+  String get sourcesHealthGroupOutput;
+
+  /// No description provided for @sourcesHealthGroupReliable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可靠与稳定'**
+  String get sourcesHealthGroupReliable;
+
+  /// No description provided for @sourcesHealthGroupShow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'展示与活跃'**
+  String get sourcesHealthGroupShow;
+
+  /// No description provided for @sourcesHealthWeightsDone.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'完成'**
+  String get sourcesHealthWeightsDone;
 }
 
 class _AppLocalizationsDelegate

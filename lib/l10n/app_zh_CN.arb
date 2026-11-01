@@ -1500,5 +1500,19 @@
   "settingsSearchKeywordsDesktop": "托盘 媒体控制 默认播放器 desktop tray media",
   "settingsSearchKeywordsSourceHealth": "音源 健康度 权重 source health weight",
   "settingsSearchNoMatch": "没有匹配的设置",
-  "settingsSectionSourceHealth": "健康度"
+  "settingsSectionSourceHealth": "健康度",
+  "sourcesHealthPresetBalanced": "平衡",
+  "sourcesHealthPresetBalancedHint": "默认权重，各项均衡",
+  "sourcesHealthPresetPlayable": "能播优先",
+  "sourcesHealthPresetPlayableHint": "可用、配置、扫描、可靠与可播放更重",
+  "sourcesHealthPresetFresh": "新鲜优先",
+  "sourcesHealthPresetFreshHint": "新鲜度、产出与活跃度更重",
+  "sourcesHealthWeightsCustom": "自定义…",
+  "sourcesHealthWeightsShare": "占比",
+  "sourcesHealthWeightsOffHint": "0 = 关闭该维度；百分比为自动归一化后的占比",
+  "sourcesHealthGroupCore": "可用与配置",
+  "sourcesHealthGroupOutput": "新鲜与产出",
+  "sourcesHealthGroupReliable": "可靠与稳定",
+  "sourcesHealthGroupShow": "展示与活跃",
+  "sourcesHealthWeightsDone": "完成"
 }

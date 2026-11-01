@@ -2797,6 +2797,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播优先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鲜优先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自定义…';
+
+  @override
+  String get sourcesHealthWeightsShare => '占比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 关闭该维度；百分比为自动归一化后的占比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用与配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鲜与产出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠与稳定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示与活跃';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -5592,6 +5634,48 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播优先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鲜优先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自定义…';
+
+  @override
+  String get sourcesHealthWeightsShare => '占比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 关闭该维度；百分比为自动归一化后的占比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用与配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鲜与产出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠与稳定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示与活跃';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8387,4 +8471,46 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSectionSourceHealth => '健康度';
+
+  @override
+  String get sourcesHealthPresetBalanced => '平衡';
+
+  @override
+  String get sourcesHealthPresetBalancedHint => '默认权重，各项均衡';
+
+  @override
+  String get sourcesHealthPresetPlayable => '能播優先';
+
+  @override
+  String get sourcesHealthPresetPlayableHint => '可用、配置、扫描、可靠与可播放更重';
+
+  @override
+  String get sourcesHealthPresetFresh => '新鮮優先';
+
+  @override
+  String get sourcesHealthPresetFreshHint => '新鲜度、产出与活跃度更重';
+
+  @override
+  String get sourcesHealthWeightsCustom => '自訂…';
+
+  @override
+  String get sourcesHealthWeightsShare => '佔比';
+
+  @override
+  String get sourcesHealthWeightsOffHint => '0 = 關閉該維度；百分比為自動歸一化後的佔比';
+
+  @override
+  String get sourcesHealthGroupCore => '可用與配置';
+
+  @override
+  String get sourcesHealthGroupOutput => '新鮮與產出';
+
+  @override
+  String get sourcesHealthGroupReliable => '可靠與穩定';
+
+  @override
+  String get sourcesHealthGroupShow => '展示與活躍';
+
+  @override
+  String get sourcesHealthWeightsDone => '完成';
 }

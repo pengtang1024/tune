@@ -7,13 +7,14 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
-import 'package:tune/features/settings/presentation/source_health_weights_dialog.dart';
+import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
 
 /// Settings card for the weights of the source health dimensions.
 ///
-/// The weights are shown as two short columns instead of one long list: the
-/// card sits below the playback settings, and ten stacked rows would push the
-/// desktop and about cards far down the page.
+/// The reader sees the normalized share of each dimension, not the raw
+/// weight: a weight of 15 only means something next to the other eleven.
+/// Three presets cover the common philosophies; the custom sheet has the
+/// twelve steppers for the reader who wants them.
 class SettingsSourceHealthCard extends ConsumerWidget {
   const SettingsSourceHealthCard({super.key});
 
@@ -32,7 +33,21 @@ class SettingsSourceHealthCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _WeightTable(weights: weights),
+          Wrap(
+            spacing: CompactTokens.space6,
+            runSpacing: CompactTokens.space6,
+            children: [
+              for (final preset in SourceHealthWeights.presets)
+                ChoiceChip(
+                  key: ValueKey('settings-health-preset-${_presetId(preset)}'),
+                  label: Text(_presetLabel(context, preset)),
+                  selected: weights == preset,
+                  onSelected: (_) => _apply(ref, preset),
+                ),
+            ],
+          ),
+          const SizedBox(height: CompactTokens.space12),
+          _ShareTable(weights: weights),
           const SizedBox(height: CompactTokens.space12),
           Row(
             children: [
@@ -64,7 +79,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
                   Icons.tune_rounded,
                   size: CompactTokens.icon16,
                 ),
-                label: Text(context.loc.settingsAdjustSourceHealthWeights),
+                label: Text(context.loc.sourcesHealthWeightsCustom),
               ),
             ],
           ),
@@ -73,44 +88,72 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     );
   }
 
+  static Future<void> _apply(
+    WidgetRef ref,
+    SourceHealthWeights weights,
+  ) async {
+    await ref
+        .read(settingsControllerProvider.notifier)
+        .setSourceHealthWeights(weights);
+  }
+
   Future<void> _open(
     BuildContext context,
     WidgetRef ref,
     SourceHealthWeights current,
   ) async {
-    final result = await showDialog<SourceHealthWeights>(
-      context: context,
-      builder: (context) => SourceHealthWeightsDialog(initial: current),
+    final result = await showSourceHealthWeightsSheet(
+      context,
+      initial: current,
     );
     if (result == null) return;
-    await ref
-        .read(settingsControllerProvider.notifier)
-        .setSourceHealthWeights(result);
+    await _apply(ref, result);
+  }
+
+  static String _presetId(SourceHealthWeights preset) {
+    if (preset == SourceHealthWeights.balanced) return 'balanced';
+    if (preset == SourceHealthWeights.playableFirst) return 'playable';
+    return 'fresh';
+  }
+
+  static String _presetLabel(
+    BuildContext context,
+    SourceHealthWeights preset,
+  ) {
+    if (preset == SourceHealthWeights.balanced) {
+      return context.loc.sourcesHealthPresetBalanced;
+    }
+    if (preset == SourceHealthWeights.playableFirst) {
+      return context.loc.sourcesHealthPresetPlayable;
+    }
+    return context.loc.sourcesHealthPresetFresh;
   }
 }
 
-/// The twelve dimensions as two aligned columns of label and value.
-class _WeightTable extends StatelessWidget {
+/// The twelve dimensions as two aligned columns of label and share.
+class _ShareTable extends StatelessWidget {
   final SourceHealthWeights weights;
 
-  const _WeightTable({required this.weights});
+  const _ShareTable({required this.weights});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final total = weights.total;
+    int share(int value) => total == 0 ? 0 : (value * 100 / total).round();
     final entries = <(String, int)>[
-      (context.loc.sourcesHealthAvailability, weights.availability),
-      (context.loc.sourcesHealthConfiguration, weights.configuration),
-      (context.loc.sourcesHealthScan, weights.scan),
-      (context.loc.sourcesHealthFreshness, weights.freshness),
-      (context.loc.sourcesHealthOutput, weights.output),
-      (context.loc.sourcesHealthSpeed, weights.speed),
-      (context.loc.sourcesHealthReliability, weights.reliability),
-      (context.loc.sourcesHealthStability, weights.stability),
-      (context.loc.sourcesHealthPlayable, weights.playable),
-      (context.loc.sourcesHealthArtwork, weights.artwork),
-      (context.loc.sourcesHealthMetadata, weights.metadata),
-      (context.loc.sourcesHealthActivity, weights.activity),
+      (context.loc.sourcesHealthAvailability, share(weights.availability)),
+      (context.loc.sourcesHealthConfiguration, share(weights.configuration)),
+      (context.loc.sourcesHealthScan, share(weights.scan)),
+      (context.loc.sourcesHealthFreshness, share(weights.freshness)),
+      (context.loc.sourcesHealthOutput, share(weights.output)),
+      (context.loc.sourcesHealthSpeed, share(weights.speed)),
+      (context.loc.sourcesHealthReliability, share(weights.reliability)),
+      (context.loc.sourcesHealthStability, share(weights.stability)),
+      (context.loc.sourcesHealthPlayable, share(weights.playable)),
+      (context.loc.sourcesHealthArtwork, share(weights.artwork)),
+      (context.loc.sourcesHealthMetadata, share(weights.metadata)),
+      (context.loc.sourcesHealthActivity, share(weights.activity)),
     ];
 
     return Container(
@@ -127,13 +170,13 @@ class _WeightTable extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: _WeightColumn(entries: entries.sublist(0, 6))),
+            Expanded(child: _ShareColumn(entries: entries.sublist(0, 6))),
             VerticalDivider(
               width: CompactTokens.space20,
               thickness: 1,
               color: theme.colorScheme.outlineVariant,
             ),
-            Expanded(child: _WeightColumn(entries: entries.sublist(6))),
+            Expanded(child: _ShareColumn(entries: entries.sublist(6))),
           ],
         ),
       ),
@@ -141,10 +184,10 @@ class _WeightTable extends StatelessWidget {
   }
 }
 
-class _WeightColumn extends StatelessWidget {
+class _ShareColumn extends StatelessWidget {
   final List<(String, int)> entries;
 
-  const _WeightColumn({required this.entries});
+  const _ShareColumn({required this.entries});
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +212,7 @@ class _WeightColumn extends StatelessWidget {
                 ),
                 const SizedBox(width: CompactTokens.space8),
                 Text(
-                  '${entry.$2}',
+                  '${entry.$2}%',
                   style: CompactTypography.mono(
                     theme.colorScheme.onSurface,
                     size: CompactTypeScale.mark,

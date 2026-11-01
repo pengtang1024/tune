@@ -1500,5 +1500,19 @@
   "settingsSearchKeywordsDesktop": "tray media default player desktop",
   "settingsSearchKeywordsSourceHealth": "source health weight",
   "settingsSearchNoMatch": "No matching settings",
-  "settingsSectionSourceHealth": "Health"
+  "settingsSectionSourceHealth": "Health",
+  "sourcesHealthPresetBalanced": "Balanced",
+  "sourcesHealthPresetBalancedHint": "Default weights, every dimension even",
+  "sourcesHealthPresetPlayable": "Playability first",
+  "sourcesHealthPresetPlayableHint": "Availability, setup, scan, reliability and playable weigh more",
+  "sourcesHealthPresetFresh": "Freshness first",
+  "sourcesHealthPresetFreshHint": "Freshness, output and activity weigh more",
+  "sourcesHealthWeightsCustom": "Customize…",
+  "sourcesHealthWeightsShare": "Share",
+  "sourcesHealthWeightsOffHint": "0 turns the dimension off; shares are normalized automatically",
+  "sourcesHealthGroupCore": "Availability and setup",
+  "sourcesHealthGroupOutput": "Freshness and output",
+  "sourcesHealthGroupReliable": "Reliability and stability",
+  "sourcesHealthGroupShow": "Presentation and activity",
+  "sourcesHealthWeightsDone": "Done"
 }

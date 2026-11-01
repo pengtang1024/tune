@@ -21,6 +21,7 @@ import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -1096,14 +1097,8 @@ void main() {
 
     await tester.tap(adjust);
     await tester.pumpAndSettle();
-    expect(find.byType(AlertDialog), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(Slider),
-      ),
-      findsNWidgets(12),
-    );
+    expect(find.byType(SourceHealthWeightsSheet), findsOneWidget);
+    expect(find.byIcon(Icons.add_rounded), findsWidgets);
   });
 
   testWidgets('settings theme chip updates controller', (tester) async {

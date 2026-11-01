@@ -3019,4 +3019,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSectionSourceHealth => 'Health';
+
+  @override
+  String get sourcesHealthPresetBalanced => 'Balanced';
+
+  @override
+  String get sourcesHealthPresetBalancedHint =>
+      'Default weights, every dimension even';
+
+  @override
+  String get sourcesHealthPresetPlayable => 'Playability first';
+
+  @override
+  String get sourcesHealthPresetPlayableHint =>
+      'Availability, setup, scan, reliability and playable weigh more';
+
+  @override
+  String get sourcesHealthPresetFresh => 'Freshness first';
+
+  @override
+  String get sourcesHealthPresetFreshHint =>
+      'Freshness, output and activity weigh more';
+
+  @override
+  String get sourcesHealthWeightsCustom => 'Customize…';
+
+  @override
+  String get sourcesHealthWeightsShare => 'Share';
+
+  @override
+  String get sourcesHealthWeightsOffHint =>
+      '0 turns the dimension off; shares are normalized automatically';
+
+  @override
+  String get sourcesHealthGroupCore => 'Availability and setup';
+
+  @override
+  String get sourcesHealthGroupOutput => 'Freshness and output';
+
+  @override
+  String get sourcesHealthGroupReliable => 'Reliability and stability';
+
+  @override
+  String get sourcesHealthGroupShow => 'Presentation and activity';
+
+  @override
+  String get sourcesHealthWeightsDone => 'Done';
 }
