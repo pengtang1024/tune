@@ -1061,7 +1061,7 @@ void main() {
     // the texts of the page itself are on screen.
     expect(find.text('设置'), findsOneWidget);
     expect(find.text('音乐库'), findsWidgets);
-    expect(find.text('音源'), findsWidgets);
+    expect(find.text('健康度'), findsWidgets);
   });
 
   testWidgets('settings page exposes the health weights and opens them', (
@@ -1093,7 +1093,7 @@ void main() {
     await tester.ensureVisible(adjust);
     await tester.pumpAndSettle();
     expect(adjust, findsOneWidget);
-    expect(find.text('健康度权重'), findsOneWidget);
+    expect(find.text('健康度'), findsWidgets);
 
     await tester.tap(adjust);
     await tester.pumpAndSettle();

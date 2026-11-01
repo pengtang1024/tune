@@ -16,7 +16,11 @@ import 'package:tune/features/settings/presentation/source_health_weights_sheet.
 /// Three presets cover the common philosophies; the custom sheet has the
 /// twelve steppers for the reader who wants them.
 class SettingsSourceHealthCard extends ConsumerWidget {
-  const SettingsSourceHealthCard({super.key});
+  /// Whether the card stands inside the settings dashboard, where the
+  /// section already names it. The nested header is dropped then.
+  final bool embedded;
+
+  const SettingsSourceHealthCard({super.key, this.embedded = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,12 +29,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     );
     final theme = Theme.of(context);
 
-    return SettingsCard(
-      index: '05',
-      eyebrow: context.loc.sourcesTitle,
-      title: context.loc.sourcesHealthWeightsTitle,
-      description: context.loc.settingsSourceHealthDescription,
-      child: Column(
+    final body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
@@ -84,7 +83,14 @@ class SettingsSourceHealthCard extends ConsumerWidget {
             ],
           ),
         ],
-      ),
+      );
+    if (embedded) return body;
+    return SettingsCard(
+      index: '05',
+      eyebrow: context.loc.sourcesTitle,
+      title: context.loc.sourcesHealthWeightsTitle,
+      description: context.loc.settingsSourceHealthDescription,
+      child: body,
     );
   }
 
@@ -130,7 +136,8 @@ class SettingsSourceHealthCard extends ConsumerWidget {
   }
 }
 
-/// The twelve dimensions as two aligned columns of label and share.
+/// The twelve dimensions in a compact grid: three columns on a wide card,
+/// two on a narrow one. Each cell is a label and its normalized share.
 class _ShareTable extends StatelessWidget {
   final SourceHealthWeights weights;
 
@@ -159,69 +166,76 @@ class _ShareTable extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
-        horizontal: CompactTokens.space12,
-        vertical: CompactTokens.space10,
+        horizontal: CompactTokens.space10,
+        vertical: CompactTokens.space6,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(CompactTokens.radius10),
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: _ShareColumn(entries: entries.sublist(0, 6))),
-            VerticalDivider(
-              width: CompactTokens.space20,
-              thickness: 1,
-              color: theme.colorScheme.outlineVariant,
-            ),
-            Expanded(child: _ShareColumn(entries: entries.sublist(6))),
-          ],
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = constraints.maxWidth >= 560 ? 3 : 2;
+          final rows = (entries.length / columns).ceil();
+          return Column(
+            children: [
+              for (var row = 0; row < rows; row++)
+                Row(
+                  children: [
+                    for (var column = 0; column < columns; column++)
+                      Expanded(
+                        child: _ShareCell(
+                          entry: row * columns + column < entries.length
+                              ? entries[row * columns + column]
+                              : null,
+                        ),
+                      ),
+                  ],
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _ShareColumn extends StatelessWidget {
-  final List<(String, int)> entries;
+class _ShareCell extends StatelessWidget {
+  final (String, int)? entry;
 
-  const _ShareColumn({required this.entries});
+  const _ShareCell({required this.entry});
 
   @override
   Widget build(BuildContext context) {
+    if (entry == null) return const SizedBox.shrink();
     final theme = Theme.of(context);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (final entry in entries)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    entry.$1,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: CompactTokens.space8),
-                Text(
-                  '${entry.$2}%',
-                  style: CompactTypography.mono(
-                    theme.colorScheme.onSurface,
-                    size: CompactTypeScale.mark,
-                  ),
-                ),
-              ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: CompactTokens.space4,
+        vertical: 2,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              entry!.$1,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
-      ],
+          const SizedBox(width: CompactTokens.space4),
+          Text(
+            '${entry!.$2}%',
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurface,
+              size: CompactTypeScale.mark,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

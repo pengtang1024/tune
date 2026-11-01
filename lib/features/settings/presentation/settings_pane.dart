@@ -569,7 +569,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           ),
           if (section == _SettingsSection.sourceHealth) ...[
             const SizedBox(height: CompactTokens.space12),
-            const SettingsSourceHealthCard(),
+            const SettingsSourceHealthCard(embedded: true),
           ],
           if (presets.isNotEmpty) ...[
             const SizedBox(height: CompactTokens.space12),
@@ -1105,7 +1105,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         _SettingsSection.lyrics => context.loc.settingsSectionSmartLyrics,
         _SettingsSection.discovery => context.loc.settingsSectionDiscovery,
         _SettingsSection.desktop => context.loc.settingsSectionDesktop,
-        _SettingsSection.sourceHealth => context.loc.sourcesTitle,
+        _SettingsSection.sourceHealth => context.loc.settingsSectionSourceHealth,
         _SettingsSection.about => context.loc.about,
       };
 
