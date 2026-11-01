@@ -7,7 +7,6 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
-import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
 
 /// Settings card for the weights of the source health dimensions.
 ///
@@ -42,45 +41,22 @@ class SettingsSourceHealthCard extends ConsumerWidget {
                   label: Text(_presetLabel(context, preset)),
                   selected: weights == preset,
                   onSelected: (_) => _apply(ref, preset),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
             ],
           ),
-          const SizedBox(height: CompactTokens.space12),
+          const SizedBox(height: CompactTokens.space8),
           _ShareTable(weights: weights),
-          const SizedBox(height: CompactTokens.space12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  context.loc.sourcesHealthWeightsTotal(weights.total),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CompactTypography.mono(
-                    theme.colorScheme.onSurfaceVariant,
-                    size: CompactTypeScale.mark,
-                  ),
-                ),
-              ),
-              const SizedBox(width: CompactTokens.space12),
-              OutlinedButton.icon(
-                key: const ValueKey('settings-source-health-adjust'),
-                onPressed: () => _open(context, ref, weights),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, CompactTokens.controlDefault),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CompactTokens.space12,
-                  ),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  side: BorderSide(color: theme.colorScheme.outlineVariant),
-                ),
-                icon: const Icon(
-                  Icons.tune_rounded,
-                  size: CompactTokens.icon16,
-                ),
-                label: Text(context.loc.sourcesHealthWeightsCustom),
-              ),
-            ],
+          const SizedBox(height: CompactTokens.space6),
+          Text(
+            context.loc.sourcesHealthWeightsTotal(weights.total),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: CompactTypography.mono(
+              theme.colorScheme.onSurfaceVariant,
+              size: CompactTypeScale.mark,
+            ),
           ),
         ],
       );
@@ -101,19 +77,6 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     await ref
         .read(settingsControllerProvider.notifier)
         .setSourceHealthWeights(weights);
-  }
-
-  Future<void> _open(
-    BuildContext context,
-    WidgetRef ref,
-    SourceHealthWeights current,
-  ) async {
-    final result = await showSourceHealthWeightsSheet(
-      context,
-      initial: current,
-    );
-    if (result == null) return;
-    await _apply(ref, result);
   }
 
   static String _presetId(SourceHealthWeights preset) {
@@ -166,8 +129,8 @@ class _ShareTable extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
-        horizontal: CompactTokens.space10,
-        vertical: CompactTokens.space6,
+        horizontal: CompactTokens.space8,
+        vertical: CompactTokens.space4,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
@@ -175,7 +138,13 @@ class _ShareTable extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth >= 560 ? 3 : 2;
+          final columns = constraints.maxWidth >= 700
+              ? 6
+              : constraints.maxWidth >= 420
+              ? 4
+              : constraints.maxWidth >= 300
+              ? 3
+              : 2;
           final rows = (entries.length / columns).ceil();
           return Column(
             children: [
@@ -212,7 +181,7 @@ class _ShareCell extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: CompactTokens.space4,
-        vertical: 2,
+        vertical: 0,
       ),
       child: Row(
         children: [

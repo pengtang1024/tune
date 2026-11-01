@@ -22,6 +22,7 @@ import 'package:tune/features/settings/presentation/settings_discovery_card.dart
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 import 'package:tune/features/settings/presentation/settings_update_card.dart';
+import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -416,18 +417,62 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 900 ? 2 : 1;
-        final width = (constraints.maxWidth - 12 * (columns - 1)) / columns;
-        return Wrap(
-          spacing: CompactTokens.space12,
-          runSpacing: CompactTokens.space12,
-          children: [
-            for (final section in sections)
+        final columns = constraints.maxWidth >= 1180
+            ? 3
+            : constraints.maxWidth >= 560
+            ? 2
+            : 1;
+        final gap = CompactTokens.space8;
+        // The health table and the about block read across the page; the
+        // other sections sit in an even grid.
+        final fullWidth = {
+          _SettingsSection.sourceHealth,
+          _SettingsSection.about,
+        };
+        final rows = <Widget>[];
+        var row = <_SettingsSection>[];
+
+        void flushRow() {
+          if (row.isEmpty) return;
+          final rowSections = List.of(row);
+          row = [];
+          rows.add(
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < columns; i++) ...[
+                    if (i > 0) const SizedBox(width: CompactTokens.space8),
+                    Expanded(
+                      child: i < rowSections.length
+                          ? SizedBox(
+                              key: _sectionKeys[rowSections[i]],
+                              child: _sectionCard(
+                                context,
+                                rowSections[i],
+                                settings,
+                                controller,
+                                libraryReady: libraryReady,
+                                scanning: scanning,
+                                clearing: clearing,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        for (final section in sections) {
+          if (fullWidth.contains(section)) {
+            flushRow();
+            rows.add(
               SizedBox(
                 key: _sectionKeys[section],
-                width: section == _SettingsSection.about
-                    ? constraints.maxWidth
-                    : width,
+                width: constraints.maxWidth,
                 child: section == _SettingsSection.about
                     ? _aboutCard(context)
                     : _sectionCard(
@@ -440,6 +485,21 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                         clearing: clearing,
                       ),
               ),
+            );
+            continue;
+          }
+          row.add(section);
+          if (row.length == columns) flushRow();
+        }
+        flushRow();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < rows.length; i++) ...[
+              if (i > 0) SizedBox(height: gap),
+              rows[i],
+            ],
           ],
         );
       },
@@ -524,7 +584,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       clearing: clearing,
     );
     return Container(
-      padding: const EdgeInsets.all(CompactTokens.space16),
+      key: ValueKey('settings-card-${section.name}'),
+      padding: const EdgeInsets.all(CompactTokens.space12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
         borderRadius: CompactTokens.borderRadius12,
@@ -549,7 +610,9 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
               ),
               TextButton(
                 key: ValueKey('settings-customize-${section.name}'),
-                onPressed: () => _openCustom(context, section),
+                onPressed: () => section == _SettingsSection.sourceHealth
+                    ? _openHealthSheet(context)
+                    : _openCustom(context, section),
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -558,21 +621,12 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
               ),
             ],
           ),
-          const SizedBox(height: CompactTokens.space4),
-          Text(
-            _descriptionOf(context, section),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
           if (section == _SettingsSection.sourceHealth) ...[
-            const SizedBox(height: CompactTokens.space12),
+            const SizedBox(height: CompactTokens.space8),
             const SettingsSourceHealthCard(embedded: true),
           ],
           if (presets.isNotEmpty) ...[
-            const SizedBox(height: CompactTokens.space12),
+            const SizedBox(height: CompactTokens.space8),
             Wrap(
               spacing: CompactTokens.space6,
               runSpacing: CompactTokens.space6,
@@ -583,6 +637,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                     avatar: Icon(preset.icon, size: CompactTokens.icon14),
                     selected: preset.id == selected,
                     onSelected: (_) => preset.apply(),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
               ],
             ),
@@ -902,6 +958,20 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     minimumSize: const Size(0, CompactTokens.controlDefault),
     side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
   );
+
+  Future<void> _openHealthSheet(BuildContext context) async {
+    final weights = ref
+        .read(settingsControllerProvider)
+        .sourceHealthWeights;
+    final result = await showSourceHealthWeightsSheet(
+      context,
+      initial: weights,
+    );
+    if (result == null) return;
+    await ref
+        .read(settingsControllerProvider.notifier)
+        .setSourceHealthWeights(result);
+  }
 
   void _openCustom(BuildContext context, _SettingsSection section) {
     final width = MediaQuery.sizeOf(context).width;

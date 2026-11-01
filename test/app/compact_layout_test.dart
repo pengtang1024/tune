@@ -1064,6 +1064,46 @@ void main() {
     expect(find.text('健康度'), findsWidgets);
   });
 
+  testWidgets('settings cards share a row height and the health card spans it', (
+    tester,
+  ) async {
+    await setSurface(tester, const Size(1180, 860));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/settings',
+          child: SettingsPane(),
+        ),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(const LibraryState()),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final appearance = tester.getSize(
+      find.byKey(const ValueKey('settings-card-appearance')),
+    );
+    final library = tester.getSize(
+      find.byKey(const ValueKey('settings-card-library')),
+    );
+    final health = tester.getSize(
+      find.byKey(const ValueKey('settings-card-sourceHealth')),
+    );
+
+    // Cards in one row end on the same line, and the health table reads
+    // across the page instead of leaving a hole beside it.
+    expect(appearance.height, library.height);
+    expect(appearance.width, library.width);
+    expect(health.width, closeTo(appearance.width * 2 + 8, 0.5));
+  });
+
   testWidgets('settings page exposes the health weights and opens them', (
     tester,
   ) async {
@@ -1089,7 +1129,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-sourceHealth')));
     await tester.pumpAndSettle();
-    final adjust = find.byKey(const ValueKey('settings-source-health-adjust'));
+    final adjust = find.byKey(const ValueKey('settings-customize-sourceHealth'));
     await tester.ensureVisible(adjust);
     await tester.pumpAndSettle();
     expect(adjust, findsOneWidget);
