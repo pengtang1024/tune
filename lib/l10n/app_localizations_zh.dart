@@ -1486,7 +1486,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -4473,7 +4473,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -7460,7 +7460,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目錄、Radio Browser、SomaFM、Radio Paradise 或 NTS';
+      '全部目錄、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目錄';

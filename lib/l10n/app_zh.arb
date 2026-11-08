@@ -863,7 +863,7 @@
   "sourceRadioDescription": "公开网络电台的直播流",
   "radioHint": "选择电台目录，关键词可进一步过滤",
   "radioFieldProvider": "电台目录",
-  "radioFieldProviderHint": "全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS",
+  "radioFieldProviderHint": "全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France",
   "radioProviderAll": "全部目录",
   "radioFieldCountry": "国家/地区",
   "radioFieldCountryHint": "两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填",

@@ -863,7 +863,7 @@
   "sourceRadioDescription": "公開網路電台的直播串流",
   "radioHint": "選擇電台目錄，關鍵字可進一步篩選",
   "radioFieldProvider": "電台目錄",
-  "radioFieldProviderHint": "全部目錄、Radio Browser、SomaFM、Radio Paradise 或 NTS",
+  "radioFieldProviderHint": "全部目錄、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France",
   "radioProviderAll": "全部目錄",
   "radioFieldCountry": "國家／地區",
   "radioFieldCountryHint": "兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填",

@@ -863,7 +863,7 @@
   "sourceRadioDescription": "Live streams of public internet radio",
   "radioHint": "Pick a directory of stations, a keyword filters them",
   "radioFieldProvider": "Station directory",
-  "radioFieldProviderHint": "All directories, Radio Browser, SomaFM, Radio Paradise or NTS",
+  "radioFieldProviderHint": "All directories, Radio Browser, SomaFM, Radio Paradise, NTS or Radio France",
   "radioProviderAll": "All directories",
   "radioFieldCountry": "Country or region",
   "radioFieldCountryHint": "A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works",

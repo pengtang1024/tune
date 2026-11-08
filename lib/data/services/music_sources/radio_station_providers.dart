@@ -578,3 +578,220 @@ class NtsProvider extends RadioStationProvider {
     return text.isEmpty ? null : text;
   }
 }
+
+/// The music stations of Radio France.
+///
+/// FIP, France Musique and Mouv' broadcast a fixed set of channels, each of
+/// them a direct icecast stream. There is no directory request and no key, so
+/// the channel list lives in the code and a scan is a local operation.
+class RadioFranceProvider extends RadioStationProvider {
+  static const _streamBase = 'https://icecast.radiofrance.fr';
+
+  /// The channels of the network, in the order the network lists them.
+  static const List<_RadioFranceChannel> _channels = [
+    _RadioFranceChannel(
+      'fip',
+      'FIP',
+      'eclectic',
+      'Jazz, rock, electronic and world music',
+      'https://www.radiofrance.fr/fip',
+    ),
+    _RadioFranceChannel(
+      'fipjazz',
+      'FIP Jazz',
+      'jazz',
+      'Jazz of every era',
+      'https://www.radiofrance.fr/fip/radio-jazz',
+    ),
+    _RadioFranceChannel(
+      'fipgroove',
+      'FIP Groove',
+      'soul',
+      'Soul, funk and groove',
+      'https://www.radiofrance.fr/fip/radio-groove',
+    ),
+    _RadioFranceChannel(
+      'fiprock',
+      'FIP Rock',
+      'rock',
+      'Rock of every decade',
+      'https://www.radiofrance.fr/fip/radio-rock',
+    ),
+    _RadioFranceChannel(
+      'fipelectro',
+      'FIP Electro',
+      'electronic',
+      'Electronic music and club sounds',
+      'https://www.radiofrance.fr/fip/radio-electro',
+    ),
+    _RadioFranceChannel(
+      'fipreggae',
+      'FIP Reggae',
+      'reggae',
+      'Reggae, dub and roots',
+      'https://www.radiofrance.fr/fip/radio-reggae',
+    ),
+    _RadioFranceChannel(
+      'fipmetal',
+      'FIP Metal',
+      'metal',
+      'Metal and its neighbours',
+      'https://www.radiofrance.fr/fip/radio-metal',
+    ),
+    _RadioFranceChannel(
+      'fiphiphop',
+      'FIP Hip-Hop',
+      'hip hop',
+      'Hip-hop and rap',
+      'https://www.radiofrance.fr/fip/radio-hip-hop',
+    ),
+    _RadioFranceChannel(
+      'fippop',
+      'FIP Pop',
+      'pop',
+      'Pop songs and their writers',
+      'https://www.radiofrance.fr/fip/radio-pop',
+    ),
+    _RadioFranceChannel(
+      'fipworld',
+      'FIP World',
+      'world',
+      'Music from every continent',
+      'https://www.radiofrance.fr/fip/radio-world',
+    ),
+    _RadioFranceChannel(
+      'fipnouveautes',
+      'FIP Nouveautés',
+      'new releases',
+      'The records of the moment',
+      'https://www.radiofrance.fr/fip/radio-nouveautes',
+    ),
+    _RadioFranceChannel(
+      'fipsacrefrancais',
+      'FIP Sacré Français',
+      'chanson',
+      'French song of every generation',
+      'https://www.radiofrance.fr/fip/radio-sacre-francais',
+    ),
+    _RadioFranceChannel(
+      'francemusique',
+      'France Musique',
+      'classical',
+      'Classical music, concerts and opera',
+      'https://www.radiofrance.fr/francemusique',
+    ),
+    _RadioFranceChannel(
+      'francemusiquebaroque',
+      'France Musique Baroque',
+      'baroque',
+      'Baroque music from its sources',
+      'https://www.radiofrance.fr/francemusique/radio-baroque',
+    ),
+    _RadioFranceChannel(
+      'francemusiqueopera',
+      'France Musique Opéra',
+      'opera',
+      'Opera and its voices',
+      'https://www.radiofrance.fr/francemusique/radio-opera',
+    ),
+    _RadioFranceChannel(
+      'francemusiquelajazz',
+      'France Musique La Jazz',
+      'jazz',
+      'Jazz heard by France Musique',
+      'https://www.radiofrance.fr/francemusique/radio-jazz',
+    ),
+    _RadioFranceChannel(
+      'francemusiquelacontemporaine',
+      'France Musique Contemporaine',
+      'contemporary classical',
+      'Music written today',
+      'https://www.radiofrance.fr/francemusique/radio-contemporaine',
+    ),
+    _RadioFranceChannel(
+      'mouv',
+      'Mouv\'',
+      'hip hop',
+      'Hip-hop and youth culture',
+      'https://www.radiofrance.fr/mouv',
+    ),
+  ];
+
+  @override
+  String get id => 'radiofrance';
+
+  @override
+  String get displayName => 'Radio France';
+
+  @override
+  Future<List<RadioStation>> fetch({
+    required String query,
+    required int limit,
+    String? country,
+    int offset = 0,
+  }) async {
+    // Every channel is broadcast from Paris; a scan of another country has
+    // nothing to take from the network.
+    final code = country?.trim().toUpperCase() ?? '';
+    if (code.isNotEmpty && code != 'FR' && code != 'FRA' && code != 'FRANCE') {
+      return const [];
+    }
+
+    final trimmed = query.trim().toLowerCase();
+    final selected = trimmed.isEmpty
+        ? _channels
+        : _channels
+              .where((channel) => _matches(channel, trimmed))
+              .toList(growable: false);
+
+    return selected
+        .skip(offset)
+        .take(limit)
+        .map(_station)
+        .toList(growable: false);
+  }
+
+  static bool _matches(_RadioFranceChannel channel, String query) {
+    final haystack = [
+      channel.name,
+      channel.genre,
+      channel.description,
+    ].join(' ').toLowerCase();
+    return haystack.contains(query);
+  }
+
+  static RadioStation _station(_RadioFranceChannel channel) {
+    return RadioStation(
+      provider: 'radiofrance',
+      id: channel.slug,
+      name: channel.name,
+      streamUrl: '$_streamBase/${channel.slug}-midfi.mp3',
+      genre: channel.genre,
+      language: 'French',
+      country: 'France',
+      description: channel.description,
+      codec: 'MP3',
+      homepage: channel.homepage,
+    );
+  }
+}
+
+/// One channel of Radio France.
+///
+/// The fields are positional on purpose: the catalogue is data a broadcaster
+/// publishes, not interface text, so it stays out of the translated strings.
+class _RadioFranceChannel {
+  const _RadioFranceChannel(
+    this.slug,
+    this.name,
+    this.genre,
+    this.description,
+    this.homepage,
+  );
+
+  final String slug;
+  final String name;
+  final String genre;
+  final String description;
+  final String homepage;
+}

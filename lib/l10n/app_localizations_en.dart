@@ -1650,7 +1650,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      'All directories, Radio Browser, SomaFM, Radio Paradise or NTS';
+      'All directories, Radio Browser, SomaFM, Radio Paradise, NTS or Radio France';
 
   @override
   String get radioProviderAll => 'All directories';

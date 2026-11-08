@@ -2714,7 +2714,7 @@ abstract class AppLocalizations {
   /// No description provided for @radioFieldProviderHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS'**
+  /// **'全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France'**
   String get radioFieldProviderHint;
 
   /// No description provided for @radioProviderAll.

@@ -32,6 +32,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
             SomaFmProvider(dio: dio),
             RadioParadiseProvider(dio: dio),
             NtsProvider(dio: dio),
+            RadioFranceProvider(),
           ];
 
   @override

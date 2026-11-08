@@ -245,6 +245,73 @@ void main() {
     });
   });
 
+  group('Radio France directory', () {
+    test('lists the channels of the network', () async {
+      final provider = RadioFranceProvider();
+
+      expect(provider.id, 'radiofrance');
+      expect(provider.displayName, 'Radio France');
+
+      final stations = await provider.fetch(query: '', limit: 100);
+
+      expect(stations, hasLength(18));
+      expect(stations.map((station) => station.id).toSet(), hasLength(18));
+
+      final station = stations.first;
+      expect(station.provider, 'radiofrance');
+      expect(station.id, 'fip');
+      expect(station.name, 'FIP');
+      expect(station.streamUrl, 'https://icecast.radiofrance.fr/fip-midfi.mp3');
+      expect(station.genre, 'eclectic');
+      expect(station.language, 'French');
+      expect(station.country, 'France');
+      expect(station.codec, 'MP3');
+      expect(station.homepage, 'https://www.radiofrance.fr/fip');
+
+      for (final channel in stations) {
+        expect(
+          channel.streamUrl,
+          startsWith('https://icecast.radiofrance.fr/'),
+          reason: channel.id,
+        );
+        expect(channel.streamUrl, endsWith('-midfi.mp3'), reason: channel.id);
+      }
+    });
+
+    test('a keyword narrows the channels by name and by reach', () async {
+      final provider = RadioFranceProvider();
+
+      final byName = await provider.fetch(query: 'baroque', limit: 100);
+      expect(byName.single.name, 'France Musique Baroque');
+
+      final byGenre = await provider.fetch(query: 'reggae', limit: 100);
+      expect(byGenre.single.name, 'FIP Reggae');
+    });
+
+    test('a window after the first one skips what it saw', () async {
+      final provider = RadioFranceProvider();
+
+      final stations = await provider.fetch(query: '', limit: 6, offset: 12);
+
+      expect(stations, hasLength(6));
+      expect(stations.first.id, 'francemusique');
+      expect(stations.last.id, 'mouv');
+    });
+
+    test('a scan of another country has nothing to take', () async {
+      final provider = RadioFranceProvider();
+
+      expect(await provider.fetch(query: '', limit: 100, country: 'GB'), isEmpty);
+
+      final france = await provider.fetch(
+        query: '',
+        limit: 100,
+        country: 'fr',
+      );
+      expect(france, hasLength(18));
+    });
+  });
+
   group('Radio source', () {
     test('turns a station into a live track', () {
       final songs = RadioSourceAdapter.buildSongs([

@@ -268,6 +268,7 @@ void main() {
     expect(find.text('SomaFM'), findsOneWidget);
     expect(find.text('Radio Paradise'), findsOneWidget);
     expect(find.text('NTS'), findsOneWidget);
+    expect(find.text('Radio France'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
