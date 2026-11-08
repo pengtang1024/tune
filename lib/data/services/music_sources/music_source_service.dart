@@ -349,8 +349,10 @@ class MusicSourceService implements StreamUrlResolver {
         .toList(growable: false);
     if (candidates.isEmpty) return const [];
 
-    return Future.wait(
-      candidates.map((config) async {
+    // The same rule as a scan: a search that fans out to forty services at
+    // once reads as a burst to them, and a burst is answered with a refusal.
+    return _walk(candidates, (config) async {
+      {
         onProgress?.call(config.id, 0);
         final MusicSourceAdapter? adapter;
         try {
@@ -396,8 +398,35 @@ class MusicSourceService implements StreamUrlResolver {
         } catch (error) {
           return failedResult(config.id, error);
         }
-      }),
-    );
+      }
+    });
+  }
+
+
+  /// Runs [run] over [configs], a few at a time, and answers in their order.
+  ///
+  /// A library of forty sources read all at once looks like a burst to the
+  /// services: Deezer counts the requests of a caller per five seconds and the
+  /// wiki per minute, and both answer a burst with a refusal. The results keep
+  /// the order of the configs rather than the order they happened to finish in.
+  Future<List<T>> _walk<T>(
+    List<MusicSourceConfig> configs,
+    Future<T> Function(MusicSourceConfig config) run,
+  ) async {
+    final results = List<T?>.filled(configs.length, null);
+    var next = 0;
+    Future<void> worker() async {
+      while (true) {
+        final index = next++;
+        if (index >= configs.length) return;
+        results[index] = await run(configs[index]);
+      }
+    }
+
+    await Future.wait([
+      for (var i = 0; i < maxConcurrentScans; i++) worker(),
+    ]);
+    return results.whereType<T>().toList(growable: false);
   }
 
   /// How many sources are read at the same time.
@@ -421,35 +450,20 @@ class MusicSourceService implements StreamUrlResolver {
       onProgress?.call(config.id, 0);
     }
 
-    // A library of forty sources read all at once looks like a burst to the
-    // services: Deezer counts the requests of a caller per five seconds and the
-    // wiki per minute, and both answer a burst with a refusal. The scans are
-    // therefore walked a few at a time, and the answers keep the order of the
-    // sources rather than the order they happened to finish in.
-    final results = List<SourceScanResult?>.filled(enabled.length, null);
-    var next = 0;
-    Future<void> walk() async {
-      while (true) {
-        final index = next++;
-        if (index >= enabled.length) return;
-        final config = enabled[index];
-        results[index] = await _scanOne(
-          config,
-          localPaths: localPaths,
-          respectAutoScanInterval: respectAutoScanInterval,
-          onProgress: (progress) => onProgress?.call(config.id, progress),
-        );
-      }
-    }
-
-    await Future.wait([
-      for (var i = 0; i < maxConcurrentScans; i++) walk(),
-    ]);
+    final results = await _walk(
+      enabled,
+      (config) => _scanOne(
+        config,
+        localPaths: localPaths,
+        respectAutoScanInterval: respectAutoScanInterval,
+        onProgress: (progress) => onProgress?.call(config.id, progress),
+      ),
+    );
 
     for (final config in enabled) {
       onProgress?.call(config.id, 1);
     }
-    return results.whereType<SourceScanResult>().toList(growable: false);
+    return results;
   }
 
   Future<SourceScanResult> _scanOne(

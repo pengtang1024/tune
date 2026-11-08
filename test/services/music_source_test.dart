@@ -74,6 +74,32 @@ void main() {
   });
 
   group('scanning a library', () {
+    test('a search reads the sources a few at a time too', () async {
+      final adapter = _CountingAdapter();
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+        adapters: {'counting': adapter},
+      );
+      final sources = [
+        for (var index = 0; index < 20; index++)
+          MusicSourceConfig(
+            id: 's$index',
+            type: 'counting',
+            name: 'Source $index',
+            kind: MusicSourceKind.openCatalog,
+          ),
+      ];
+
+      final results = await service.search(sources: sources, query: 'jazz');
+
+      expect(results, hasLength(20));
+      expect(results.map((result) => result.sourceId), [
+        for (var index = 0; index < 20; index++) 's$index',
+      ]);
+      expect(adapter.peak, lessThanOrEqualTo(MusicSourceService.maxConcurrentScans));
+      expect(adapter.peak, greaterThan(1));
+    });
     test('the sources are read a few at a time', () async {
       final adapter = _CountingAdapter();
       final service = MusicSourceService(
