@@ -78,23 +78,22 @@ class MusicSourceStore {
   /// taken away.
   ///
   /// A built-in instance that still carries exactly the settings the app used
-  /// to write was never touched by the reader, so the keyword in it goes and
-  /// the platform's own list takes its place. An instance the reader changed
-  /// keeps its settings.
+  /// to write was never touched by the reader, so the instance ships with its
+  /// own settings again: a keyword the app used to pick goes, and a collection
+  /// the instance still names comes from the instance. An instance the reader
+  /// changed keeps its settings.
   Map<String, String> _mergedSettings(
     MusicSourceConfig builtIn,
     MusicSourceConfig saved,
   ) {
-    final settings = {...builtIn.settings, ...saved.settings};
-    final retired = BuiltInMusicSources.retiredSettingsOf(builtIn.sourceType);
-    if (retired.isEmpty || !_isUntouched(saved.settings, retired)) {
-      return settings;
+    final retired = BuiltInMusicSources.retiredSettingsOf(
+      builtIn.sourceType,
+      instanceId: builtIn.id,
+    );
+    if (retired.isNotEmpty && _isUntouched(saved.settings, retired)) {
+      return {...builtIn.settings};
     }
-    final merged = {...settings};
-    for (final key in retired.keys) {
-      merged.remove(key);
-    }
-    return merged;
+    return {...builtIn.settings, ...saved.settings};
   }
 
   /// Whether the settings are exactly the ones the app wrote.

@@ -35,7 +35,7 @@ class BuiltInMusicSources {
         id: 'live_music_archive',
         name: strings.sourceLiveMusicArchiveName,
         description: strings.sourceLiveMusicArchiveDescription,
-        settings: {'query': 'collection:etree'},
+        settings: {'query': 'collection:etree AND mediatype:etree'},
       ),
       _instance(
         types,
@@ -43,7 +43,7 @@ class BuiltInMusicSources {
         id: 'great78',
         name: strings.sourceGreat78Name,
         description: strings.sourceGreat78Description,
-        settings: {'query': 'collection:78rpm'},
+        settings: {'query': 'collection:78rpm AND mediatype:audio'},
       ),
       _instance(
         types,
@@ -51,7 +51,7 @@ class BuiltInMusicSources {
         id: 'netlabels',
         name: strings.sourceNetlabelsName,
         description: strings.sourceNetlabelsDescription,
-        settings: {'query': 'collection:netlabels'},
+        settings: {'query': 'collection:netlabels AND mediatype:audio'},
       ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
@@ -155,13 +155,25 @@ class BuiltInMusicSources {
   /// A keyword is written in the language the app was in when it wrote it, so
   /// the value of a key is a set: the keyword is recognized in every language
   /// the app speaks.
-  static Map<String, Set<String>> retiredSettingsOf(String type) {
+  static Map<String, Set<String>> retiredSettingsOf(
+    String type, {
+    String? instanceId,
+  }) {
     return switch (type) {
       'openverse' => const {
         'query': {'piano'},
       },
-      'internet_archive' => const {
-        'query': {'collection:netlabels AND mediatype:audio'},
+      // The instances of one type each had a keyword of their own, so the
+      // retired values are looked up by instance: a new collection that
+      // happens to use the same query is not taken for the old default.
+      'internet_archive' => switch (instanceId) {
+        'internet_archive' => const {
+          'query': {'collection:netlabels AND mediatype:audio'},
+        },
+        'live_music_archive' => const {
+          'query': {'collection:etree'},
+        },
+        _ => const {},
       },
       'ccmixter' => const {
         'query': {'jazz'},

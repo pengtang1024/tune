@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
@@ -93,6 +95,51 @@ void main() {
       );
       expect(service.supports('openverse'), isTrue);
       expect(service.supports('missing_source'), isFalse);
+    });
+  });
+
+  group('source settings migration', () {
+    test('the old keyword of one instance goes, a new one keeps its query', () {
+      final persistence = FakePersistenceService();
+      persistence.values[MusicSourceStore.configsKey] = jsonEncode([
+        {
+          'id': 'internet_archive',
+          'type': 'internet_archive',
+          'name': 'Internet Archive',
+          'settings': {'query': 'collection:netlabels AND mediatype:audio'},
+        },
+        {
+          'id': 'live_music_archive',
+          'type': 'internet_archive',
+          'name': 'Live Music Archive',
+          'settings': {'query': 'collection:etree'},
+        },
+        {
+          'id': 'netlabels',
+          'type': 'internet_archive',
+          'name': 'Netlabels',
+          'settings': {'query': 'collection:netlabels AND mediatype:audio'},
+        },
+      ]);
+
+      final byId = {
+        for (final config in MusicSourceStore(persistence).loadConfigs())
+          config.id: config,
+      };
+
+      // The original instance never had a keyword of its own: the old default
+      // goes, so the platform's own list takes its place.
+      expect(byId['internet_archive']!.settings['query'], isNull);
+      // The two instances keep their own collections; the retired value of a
+      // neighbour does not touch them.
+      expect(
+        byId['live_music_archive']!.settings['query'],
+        'collection:etree AND mediatype:etree',
+      );
+      expect(
+        byId['netlabels']!.settings['query'],
+        'collection:netlabels AND mediatype:audio',
+      );
     });
   });
 

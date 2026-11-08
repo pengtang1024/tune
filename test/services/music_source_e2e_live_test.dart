@@ -71,6 +71,48 @@ void main() async {
   );
 
   test(
+    'the built-in archive collections expand their items into tracks',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The queries the app ships with. A collection name alone returns the
+      // directory page of the collection, which reads as an item with no
+      // audio files, so this catches a keyword that lost its type filter.
+      final sources = BuiltInMusicSources.defaults
+          .where((config) => config.sourceType == 'internet_archive')
+          .toList(growable: false);
+      expect(
+        sources.map((config) => config.id),
+        containsAll(['live_music_archive', 'great78', 'netlabels']),
+      );
+
+      final results = await service.scanAll(
+        sources: sources,
+        localPaths: const [],
+      );
+
+      for (final result in results) {
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '${result.sourceId} failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: result.sourceId);
+        expect(
+          result.songs.first.streamUrl ?? '',
+          startsWith('https://'),
+          reason: result.sourceId,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 240)),
+  );
+
+  test(
     'the service scans LibriVox into whole chapters',
     () async {
       final service = MusicSourceService(
