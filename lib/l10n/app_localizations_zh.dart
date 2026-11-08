@@ -840,6 +840,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browseModeDaily => '每日推荐';
 
   @override
+  String get browseModeAlbums => '专辑';
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -3916,6 +3919,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get browseModeDaily => '每日推荐';
 
   @override
+  String get browseModeAlbums => '专辑';
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -6990,6 +6996,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get browseModeDaily => '每日推薦';
+
+  @override
+  String get browseModeAlbums => '專輯';
 
   @override
   String get fieldLimit => '每次掃描數量';

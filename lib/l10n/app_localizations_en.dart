@@ -909,6 +909,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browseModeDaily => 'Daily picks';
 
   @override
+  String get browseModeAlbums => 'Albums';
+
+  @override
   String get fieldLimit => 'Tracks per scan';
 
   @override

@@ -1565,6 +1565,12 @@ abstract class AppLocalizations {
   /// **'每日推荐'**
   String get browseModeDaily;
 
+  /// No description provided for @browseModeAlbums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get browseModeAlbums;
+
   /// No description provided for @fieldLimit.
   ///
   /// In zh_CN, this message translates to:

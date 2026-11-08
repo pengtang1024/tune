@@ -502,6 +502,7 @@
   "browseModeLatest": "最新",
   "browseModeCharts": "排行",
   "browseModeDaily": "每日推薦",
+  "browseModeAlbums": "專輯",
   "fieldLimit": "每次掃描數量",
   "fieldLimitFiles": "每次掃描檔案數",
   "fieldLimitEpisodes": "每次掃描集數",

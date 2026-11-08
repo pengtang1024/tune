@@ -90,7 +90,7 @@ MusicSourceConfig（实例 · 数据）
 | `subsonic` | Subsonic | `openApi` | `subsonic` | — | 服务器、账号、密码、关键词、音质、数量 |
 | `ampache` | Ampache | `openApi` | `ampache` | 排行 / 最新 | 服务器、API Key、关键词、数量 |
 | `koel` | Koel | `openApi` | `koel` | 排行 / 最新 | 服务器、邮箱、密码、关键词、数量 |
-| `kodi` | Kodi | `openApi` | `kodi` | 最新 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
+| `kodi` | Kodi | `openApi` | `kodi` | 最新 / 专辑 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
 | `jellyfin` | Jellyfin | `openApi` | `jellyfin` | — | 服务器、账号、密码、数量 |
 | `direct_url` | 直链音频 | `custom` | — | — | 一组音频地址（每行一条） |
 | `m3u` | 播放列表 | `custom` | — | — | 播放列表地址（`.m3u` / `.pls`） |

@@ -21,6 +21,9 @@ class BrowseMode {
   /// The tracks the platform picks for this listener.
   static const daily = 'daily';
 
+  /// The albums of the platform, read as whole albums.
+  static const albums = 'albums';
+
   /// The name a browse stream is called in the language of the app.
   ///
   /// A mode the app does not know is written as it is, so a new mode of a
@@ -30,6 +33,7 @@ class BrowseMode {
       latest => strings.browseModeLatest,
       charts => strings.browseModeCharts,
       daily => strings.browseModeDaily,
+      albums => strings.browseModeAlbums,
       _ => mode,
     };
   }

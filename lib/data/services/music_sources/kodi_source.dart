@@ -57,9 +57,10 @@ class KodiSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.kodiHint;
 
-  /// Without a keyword the scan reads the songs that joined the library last.
+  /// Without a keyword the scan reads the songs that joined the library last,
+  /// or walks the library album by album.
   @override
-  List<String> get browseModes => const [BrowseMode.latest];
+  List<String> get browseModes => const [BrowseMode.latest, BrowseMode.albums];
 
   @override
   List<MusicSourceField> get configurationFields => [
@@ -117,14 +118,23 @@ class KodiSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final query = config.setting('query')?.trim() ?? '';
-      final songs = await _songs(
-        server,
-        sourceId: config.id,
-        query: query,
-        offset: request.offset,
-        limit: limit,
-        headers: _authHeader(config),
-      );
+      final headers = _authHeader(config);
+      final songs = query.isEmpty && browseModeOf(config) == BrowseMode.albums
+          ? await _songsOfAlbums(
+              server,
+              sourceId: config.id,
+              offset: request.offset,
+              limit: limit,
+              headers: headers,
+            )
+          : await _songs(
+              server,
+              sourceId: config.id,
+              query: query,
+              offset: request.offset,
+              limit: limit,
+              headers: headers,
+            );
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.success,
@@ -201,6 +211,153 @@ class KodiSourceAdapter extends MusicSourceAdapter {
       if (song != null) songs.add(song);
     }
     return songs;
+  }
+
+  /// The songs of the albums of one window, album by album.
+  ///
+  /// Walking the albums keeps an album together instead of handing out the
+  /// songs that happened to join the library last; a song of an album inherits
+  /// the album name, the year and the picture when its own entry lacks them.
+  Future<List<Song>> _songsOfAlbums(
+    String server, {
+    required String sourceId,
+    required int offset,
+    required int limit,
+    required String? headers,
+  }) async {
+    final albums = await _albums(
+      server,
+      offset: offset,
+      limit: limit,
+      headers: headers,
+    );
+
+    final songs = <Song>[];
+    for (final album in albums) {
+      final id = SourceSongFactory.parseInt(album['albumid']);
+      if (id <= 0) continue;
+      final tracks = await _albumSongs(
+        server,
+        albumId: id,
+        sourceId: sourceId,
+        headers: headers,
+      );
+      for (final song in tracks) {
+        songs.add(_withAlbum(song, album));
+      }
+    }
+    return songs;
+  }
+
+  /// The albums of one window of the library.
+  Future<List<Map>> _albums(
+    String server, {
+    required int offset,
+    required int limit,
+    required String? headers,
+  }) async {
+    final decoded = await _call(
+      server,
+      method: 'AudioLibrary.GetAlbums',
+      params: {
+        'properties': const [
+          'title',
+          'artist',
+          'year',
+          'thumbnail',
+          'genre',
+          'albumlabel',
+        ],
+        'limits': {'start': offset, 'end': offset + limit},
+      },
+      headers: headers,
+    );
+    final result = decoded?['result'];
+    final raw = result is Map ? result['albums'] : null;
+    if (raw is! List) {
+      throw MusicSourceFailure(AppStrings.instance.kodiEmptyResponse);
+    }
+    return raw.whereType<Map>().toList(growable: false);
+  }
+
+  /// The songs of one album.
+  Future<List<Song>> _albumSongs(
+    String server, {
+    required int albumId,
+    required String sourceId,
+    required String? headers,
+  }) async {
+    final decoded = await _call(
+      server,
+      method: 'AudioLibrary.GetSongs',
+      params: {
+        'properties': _properties,
+        'filter': {'albumid': albumId},
+      },
+      headers: headers,
+    );
+    final result = decoded?['result'];
+    final raw = result is Map ? result['songs'] : null;
+    if (raw is! List) return const [];
+
+    final songs = <Song>[];
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final song = _songOf(
+        entry,
+        sourceId: sourceId,
+        server: server,
+        headers: headers,
+      );
+      if (song != null) songs.add(song);
+    }
+    return songs;
+  }
+
+  /// The song with what its album knows and the song does not.
+  static Song _withAlbum(Song song, Map album) {
+    final title = _text(album['title']);
+    final year = SourceSongFactory.parseInt(album['year']);
+    final artwork = _text(album['thumbnail']);
+
+    return song.copyWith(
+      album: song.album.isEmpty ? title : null,
+      year: song.year == null && year > 0 ? year : null,
+      artworkUrl: song.artworkUrl == null && artwork != null
+          ? _artworkOf(_serverOf(song.streamUrl), artwork)
+          : null,
+    );
+  }
+
+  /// The server a song of this source points at.
+  static String _serverOf(String? streamUrl) {
+    final uri = Uri.tryParse(streamUrl ?? '');
+    if (uri == null || !uri.hasScheme) return '';
+    return '${uri.scheme}://${uri.authority}';
+  }
+
+  /// Asks the library one JSON-RPC call and reads the answer.
+  Future<Map<String, dynamic>?> _call(
+    String server, {
+    required String method,
+    required Map<String, dynamic> params,
+    String? headers,
+  }) async {
+    final response = await _dio.post<String>(
+      '$server/jsonrpc',
+      data: jsonEncode({
+        'jsonrpc': '2.0',
+        'id': 1,
+        'method': method,
+        'params': params,
+      }),
+      options: Options(
+        responseType: ResponseType.plain,
+        contentType: Headers.jsonContentType,
+        headers: headers == null ? null : {'Authorization': headers},
+      ),
+    );
+    return _decode(response.data);
   }
 
   /// One song of the library, or null when it has no file to play.

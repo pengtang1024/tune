@@ -502,6 +502,7 @@
   "browseModeLatest": "Latest",
   "browseModeCharts": "Charts",
   "browseModeDaily": "Daily picks",
+  "browseModeAlbums": "Albums",
   "fieldLimit": "Tracks per scan",
   "fieldLimitFiles": "Files per scan",
   "fieldLimitEpisodes": "Episodes per scan",

@@ -103,6 +103,103 @@ void main() {
       expect(params['limits'], {'start': 20, 'end': 25});
     });
 
+    test('the albums browse stream walks the albums of the library', () async {
+      final server = _KodiServer(
+        albums: [
+          {'albumid': 3, 'title': 'Kind of Blue', 'year': 1959, 'thumbnail': 'image://album.jpg'},
+        ],
+      );
+      final adapter = KodiSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'browse': 'albums', 'limit': '4'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(1));
+
+      final song = result.songs.single;
+      expect(song.album, 'Kind of Blue');
+      expect(
+        song.streamUrl,
+        'http://kodi.local:8080/vfs/%2Fmusic%2Fkind-of-blue%2Fso-what.mp3',
+      );
+
+      expect(server.requests, hasLength(2));
+      final albums = jsonDecode(server.requests.first.data as String) as Map<String, dynamic>;
+      expect(albums['method'], 'AudioLibrary.GetAlbums');
+      expect(
+        (albums['params'] as Map<String, dynamic>)['limits'],
+        {'start': 0, 'end': 4},
+      );
+
+      final tracks = jsonDecode(server.requests.last.data as String) as Map<String, dynamic>;
+      expect(tracks['method'], 'AudioLibrary.GetSongs');
+      expect(
+        (tracks['params'] as Map<String, dynamic>)['filter'],
+        {'albumid': 3},
+      );
+    });
+
+    test('a song takes the album name, the year and the picture it lacks', () async {
+      final bare = Map<String, dynamic>.from(_songJson())
+        ..['album'] = ''
+        ..['year'] = 0
+        ..['thumbnail'] = '';
+      final server = _KodiServer(
+        songs: [bare],
+        albums: [
+          {
+            'albumid': 7,
+            'title': 'Kind of Blue',
+            'year': 1959,
+            'thumbnail': 'image://album-cover.jpg',
+          },
+        ],
+      );
+      final adapter = KodiSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'browse': 'albums'}),
+        ),
+      );
+
+      final song = result.songs.single;
+      expect(song.album, 'Kind of Blue');
+      expect(song.year, 1959);
+      expect(
+        song.artworkUrl,
+        'http://kodi.local:8080/image/image%3A%2F%2Falbum-cover.jpg',
+      );
+      // The song keeps what it already knows.
+      expect(song.title, 'So What');
+      expect(song.artist, 'Miles Davis');
+    });
+
+    test('an album with no songs adds nothing', () async {
+      final server = _KodiServer(
+        albums: const [
+          {'albumid': 3, 'title': 'Kind of Blue'},
+          {'albumid': 9, 'title': 'Empty Album'},
+        ],
+        songs: const [],
+      );
+      final adapter = KodiSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'browse': 'albums'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, isEmpty);
+      expect(result.message, AppStrings.instance.kodiNoMatch);
+    });
+
     test('an open web server is asked without an account', () async {
       final server = _KodiServer();
       final adapter = KodiSourceAdapter(dio: server.dio);
@@ -226,10 +323,16 @@ Map<String, dynamic> _songJson({String? thumbnail}) {
 
 /// A Kodi web server that answers the call the adapter makes.
 class _KodiServer {
-  _KodiServer({List<Map<String, dynamic>>? songs, String? thumbnail, this.error = false})
-    : songs = songs ?? [_songJson(thumbnail: thumbnail)];
+  _KodiServer({
+    List<Map<String, dynamic>>? songs,
+    List<Map<String, dynamic>>? albums,
+    String? thumbnail,
+    this.error = false,
+  }) : songs = songs ?? [_songJson(thumbnail: thumbnail)],
+       albums = albums ?? const [];
 
   final List<Map<String, dynamic>> songs;
+  final List<Map<String, dynamic>> albums;
   final bool error;
   final requests = <RequestOptions>[];
 
@@ -253,13 +356,17 @@ class _KodiServer {
             );
             return;
           }
+          final body = jsonDecode(options.data as String) as Map<String, dynamic>;
+          final method = body['method'];
           handler.resolve(
             Response(
               requestOptions: options,
               data: jsonEncode({
                 'jsonrpc': '2.0',
                 'id': 1,
-                'result': {'limits': {'total': songs.length}, 'songs': songs},
+                'result': method == 'AudioLibrary.GetAlbums'
+                    ? {'limits': {'total': albums.length}, 'albums': albums}
+                    : {'limits': {'total': songs.length}, 'songs': songs},
               }),
               statusCode: 200,
             ),
