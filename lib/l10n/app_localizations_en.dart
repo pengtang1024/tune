@@ -1362,6 +1362,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openverseFieldSource => 'Catalogue';
 
   @override
+  String get openverseFieldLength => 'Length';
+
+  @override
+  String get openverseFieldLengthHint => 'Only the audio of one length';
+
+  @override
+  String get openverseLengthAll => 'Every length';
+
+  @override
+  String get openverseLengthShort => 'Short (under 2 minutes)';
+
+  @override
+  String get openverseLengthMedium => 'Medium (up to 10 minutes)';
+
+  @override
+  String get openverseLengthLong => 'Long (over 10 minutes)';
+
+  @override
   String get openverseFieldLicense => 'Licence';
 
   @override

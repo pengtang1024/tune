@@ -2201,6 +2201,42 @@ abstract class AppLocalizations {
   /// **'来源'**
   String get openverseFieldSource;
 
+  /// No description provided for @openverseFieldLength.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时长'**
+  String get openverseFieldLength;
+
+  /// No description provided for @openverseFieldLengthHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只取某一档时长的音频'**
+  String get openverseFieldLengthHint;
+
+  /// No description provided for @openverseLengthAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部时长'**
+  String get openverseLengthAll;
+
+  /// No description provided for @openverseLengthShort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'短（2 分钟内）'**
+  String get openverseLengthShort;
+
+  /// No description provided for @openverseLengthMedium.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中（10 分钟内）'**
+  String get openverseLengthMedium;
+
+  /// No description provided for @openverseLengthLong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'长（10 分钟以上）'**
+  String get openverseLengthLong;
+
   /// No description provided for @openverseFieldLicense.
   ///
   /// In zh_CN, this message translates to:

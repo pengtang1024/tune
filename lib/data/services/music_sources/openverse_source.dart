@@ -57,6 +57,13 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   /// browses its own categories.
   static const _sources = ['jamendo', 'freesound'];
 
+  /// The lengths the service buckets its audio in.
+  ///
+  /// The service answers a bucket with the tracks of it — short under two
+  /// minutes, medium up to ten, long beyond — so the bucket is the whole
+  /// filter and the tracks are never cut by it.
+  static const _lengths = ['short', 'medium', 'long'];
+
   /// The licences the service files its audio under, by the name it uses.
   ///
   /// Only the licences that were found to hold audio are offered: the public
@@ -77,6 +84,17 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.openverseFieldQueryHint,
+    ),
+    MusicSourceField(
+      'length',
+      AppStrings.instance.openverseFieldLength,
+      AppStrings.instance.openverseFieldLengthHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseLengthAll),
+        MusicSourceChoice('short', AppStrings.instance.openverseLengthShort),
+        MusicSourceChoice('medium', AppStrings.instance.openverseLengthMedium),
+        MusicSourceChoice('long', AppStrings.instance.openverseLengthLong),
+      ],
     ),
     MusicSourceField(
       'license',
@@ -117,6 +135,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
     final query = request.config.setting('query');
     final source = request.config.setting('source')?.trim() ?? '';
     final licence = request.config.setting('license')?.trim() ?? '';
+    final length = request.config.setting('length')?.trim() ?? '';
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -129,6 +148,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
           if (source.isNotEmpty && _sources.contains(source)) 'source': source,
           if (licence.isNotEmpty && _licences.contains(licence))
             'license': licence,
+          if (length.isNotEmpty && _lengths.contains(length)) 'length': length,
           'page_size': 20,
           'page': request.offset ~/ 20 + 1,
         },

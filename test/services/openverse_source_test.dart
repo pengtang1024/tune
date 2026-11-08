@@ -11,6 +11,26 @@ import 'package:tune/domain/models/music_source.dart';
 /// answer would silently be the unfiltered list.
 void main() {
   group('Openverse source', () {
+    test('a length narrows the answer', () async {
+      final answers = _OpenverseAnswers();
+
+      await OpenverseSourceAdapter(
+        dio: answers.dio,
+      ).scan(_request(const {'length': 'short'}));
+
+      expect(answers.uris.single.queryParameters['length'], 'short');
+    });
+
+    test('a length the service does not bucket is not sent', () async {
+      final answers = _OpenverseAnswers();
+
+      await OpenverseSourceAdapter(
+        dio: answers.dio,
+      ).scan(_request(const {'length': 'endless'}));
+
+      // The service would read a name it does not know as no filter at all.
+      expect(answers.uris.single.queryParameters.containsKey('length'), isFalse);
+    });
     test('a licence narrows the answer', () async {
       final answers = _OpenverseAnswers();
 

@@ -1224,6 +1224,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get openverseFieldSource => '来源';
 
   @override
+  String get openverseFieldLength => '时长';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一档时长的音频';
+
+  @override
+  String get openverseLengthAll => '全部时长';
+
+  @override
+  String get openverseLengthShort => '短（2 分钟内）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分钟内）';
+
+  @override
+  String get openverseLengthLong => '长（10 分钟以上）';
+
+  @override
   String get openverseFieldLicense => '许可';
 
   @override
@@ -4947,6 +4965,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get openverseFieldSource => '来源';
 
   @override
+  String get openverseFieldLength => '时长';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一档时长的音频';
+
+  @override
+  String get openverseLengthAll => '全部时长';
+
+  @override
+  String get openverseLengthShort => '短（2 分钟内）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分钟内）';
+
+  @override
+  String get openverseLengthLong => '长（10 分钟以上）';
+
+  @override
   String get openverseFieldLicense => '许可';
 
   @override
@@ -8668,6 +8704,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get openverseFieldSource => '來源';
+
+  @override
+  String get openverseFieldLength => '時長';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一檔時長的音訊';
+
+  @override
+  String get openverseLengthAll => '全部時長';
+
+  @override
+  String get openverseLengthShort => '短（2 分鐘內）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分鐘內）';
+
+  @override
+  String get openverseLengthLong => '長（10 分鐘以上）';
 
   @override
   String get openverseFieldLicense => '授權';
