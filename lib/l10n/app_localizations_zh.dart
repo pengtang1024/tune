@@ -1731,6 +1731,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiusFieldGenre => '风格';
 
   @override
+  String get audiusFieldPlaylists => '每次取几个歌单';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌单方式下一次读几个歌单（1–$max，默认 $count）';
+  }
+
+  @override
   String get audiusFieldMode => '读取方式';
 
   @override
@@ -5446,6 +5454,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiusFieldGenre => '风格';
 
   @override
+  String get audiusFieldPlaylists => '每次取几个歌单';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌单方式下一次读几个歌单（1–$max，默认 $count）';
+  }
+
+  @override
   String get audiusFieldMode => '读取方式';
 
   @override
@@ -9159,6 +9175,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get audiusFieldGenre => '風格';
+
+  @override
+  String get audiusFieldPlaylists => '每次取幾個歌單';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌單方式下一次讀幾個歌單（1–$max，預設 $count）';
+  }
 
   @override
   String get audiusFieldMode => '讀取方式';

@@ -942,6 +942,8 @@
   "sourceAudiusName": "Artist uploads",
   "audiusHint": "Type a search keyword, e.g. jazz, ambient or electronic",
 "audiusFieldGenre": "Reach",
+  "audiusFieldPlaylists": "Playlists per scan",
+  "audiusFieldPlaylistsHint": "How many playlists the playlist mode reads (1–{max}, default {count})",
   "audiusFieldMode": "Reads",
   "audiusFieldModeHint": "Single tracks, or the playlists of the site",
   "audiusModeSongs": "Single tracks",

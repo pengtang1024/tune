@@ -3179,6 +3179,18 @@ abstract class AppLocalizations {
   /// **'风格'**
   String get audiusFieldGenre;
 
+  /// No description provided for @audiusFieldPlaylists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次取几个歌单'**
+  String get audiusFieldPlaylists;
+
+  /// No description provided for @audiusFieldPlaylistsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌单方式下一次读几个歌单（1–{max}，默认 {count}）'**
+  String audiusFieldPlaylistsHint(Object count, Object max);
+
   /// No description provided for @audiusFieldMode.
   ///
   /// In zh_CN, this message translates to:

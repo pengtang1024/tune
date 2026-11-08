@@ -942,6 +942,8 @@
   "sourceAudiusName": "音樂人直發",
   "audiusHint": "填寫搜尋關鍵字，例如 jazz、ambient 或 electronic",
 "audiusFieldGenre": "風格",
+  "audiusFieldPlaylists": "每次取幾個歌單",
+  "audiusFieldPlaylistsHint": "歌單方式下一次讀幾個歌單（1–{max}，預設 {count}）",
   "audiusFieldMode": "讀取方式",
   "audiusFieldModeHint": "單曲，或站點上的歌單",
   "audiusModeSongs": "單曲",

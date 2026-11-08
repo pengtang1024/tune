@@ -1909,6 +1909,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audiusFieldGenre => 'Reach';
 
   @override
+  String get audiusFieldPlaylists => 'Playlists per scan';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return 'How many playlists the playlist mode reads (1–$max, default $count)';
+  }
+
+  @override
   String get audiusFieldMode => 'Reads';
 
   @override

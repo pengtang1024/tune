@@ -89,6 +89,15 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.audiusFieldQueryHint,
     ),
     MusicSourceField(
+      'playlists',
+      AppStrings.instance.audiusFieldPlaylists,
+      AppStrings.instance.audiusFieldPlaylistsHint(
+        _playlistsPerScan.count,
+        _playlistsPerScan.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
       'mode',
       AppStrings.instance.audiusFieldMode,
       AppStrings.instance.audiusFieldModeHint,
@@ -129,8 +138,9 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   /// The name of the mode that reads playlists instead of single tracks.
   static const _modePlaylists = 'playlists';
 
-  /// How many playlists one scan of the playlist mode reads.
-  static const _playlistsPerScan = 3;
+  /// How many playlists one scan of the playlist mode reads, and the most it
+  /// may: a playlist holds dozens of tracks, so the window is the limit.
+  static final _playlistsPerScan = MusicSourceLimit(3, 10);
 
   /// The songs of the playlists the site ranks highest, or of the playlists a
   /// keyword is found in.
@@ -151,7 +161,7 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
             : '$_discoveryHost/v1/playlists/search',
         queryParameters: {
           'app_name': _appName,
-          'limit': '$_playlistsPerScan',
+          'limit': '${_playlistsPerScan.read(config.setting('playlists'))}',
           'query': ?query,
           if (query == null && window.isNotEmpty) 'time': window,
         },

@@ -60,6 +60,16 @@ void main() {
       expect(result.songs, hasLength(4));
     });
 
+    test('the reader decides how many playlists one scan reads', () async {
+      final answers = _AudiusPlaylists();
+
+      await AudiusSourceAdapter(dio: answers.dio).scan(
+        _request('audius', const {'mode': 'playlists', 'playlists': '2'}),
+      );
+
+      expect(answers.uris.first.queryParameters['limit'], '2');
+      expect(answers.uris.first.path, '/v1/playlists/trending');
+    });
     test('a keyword reads the playlists it is found in', () async {
       final answers = _AudiusPlaylists();
 
