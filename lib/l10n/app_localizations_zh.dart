@@ -1334,6 +1334,14 @@ class AppLocalizationsZh extends AppLocalizations {
       '填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => '每项曲目上限';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一个条目最多取多少首（1–$max，默认 $count）';
+  }
+
+  @override
   String get internetArchiveFieldQuery => '收录条件';
 
   @override
@@ -4810,6 +4818,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => '每项曲目上限';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一个条目最多取多少首（1–$max，默认 $count）';
+  }
+
+  @override
   String get internetArchiveFieldQuery => '收录条件';
 
   @override
@@ -8284,6 +8300,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get internetArchiveHint =>
       '填寫 Internet Archive 收錄條件，例如 collection:netlabels AND mediatype:audio';
+
+  @override
+  String get internetArchiveFieldPerItem => '每項曲目上限';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一個條目最多取多少首（1–$max，預設 $count）';
+  }
 
   @override
   String get internetArchiveFieldQuery => '收錄條件';

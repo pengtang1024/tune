@@ -19,11 +19,13 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(8, 20);
 
-  /// The most tracks one item may contribute.
+  /// The most tracks one item contributes, unless the reader asks for more.
   ///
-  /// A few items carry a whole archive of their own (a hundred files of a
-  /// radio series); the cap keeps one such item from filling the library.
-  static const _maxTracksPerItem = 30;
+  /// A few items carry a whole archive of their own (a radio series of a
+  /// hundred files, an audiobook of several hundred chapters); the cap keeps
+  /// one such item from filling the library, and the reader who wants the
+  /// whole of a long book raises it.
+  static const _tracksPerItem = MusicSourceLimit(30, 200);
 
   static const _audioExtensions = ['.mp3', '.ogg', '.m4a', '.flac'];
 
@@ -71,6 +73,15 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       'collection:netlabels AND mediatype:audio',
     ),
     MusicSourceField(
+      'perItem',
+      AppStrings.instance.internetArchiveFieldPerItem,
+      AppStrings.instance.internetArchiveFieldPerItemHint(
+        _tracksPerItem.count,
+        _tracksPerItem.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -93,6 +104,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
+      final perItem = _tracksPerItem.read(request.config.setting('perItem'));
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
         // named: what everybody downloaded most, or what was uploaded last.
@@ -124,7 +136,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             .take(batchSize)
             .toList(growable: false);
         final items = await Future.wait(
-          batch.map((doc) => _fetchTracks(doc, request.config)),
+          batch.map((doc) => _fetchTracks(doc, request.config, perItem)),
         );
         for (final tracks in items) {
           songs.addAll(tracks);
@@ -189,6 +201,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   Future<List<Song>> _fetchTracks(
     Object? rawDoc,
     MusicSourceConfig config,
+    int perItem,
   ) async {
     if (rawDoc is! Map) return const [];
 
@@ -224,7 +237,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final songs = <Song>[];
       for (
         var index = 0;
-        index < files.length && index < _maxTracksPerItem;
+        index < files.length && index < perItem;
         index++
       ) {
         final file = files[index];

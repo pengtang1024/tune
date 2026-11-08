@@ -800,6 +800,8 @@
   "jamendoEmptyResponse": "Jamendo returned an empty response",
   "jamendoNoMatch": "No matching Jamendo tracks",
   "internetArchiveHint": "Enter an Internet Archive query, e.g. collection:netlabels AND mediatype:audio",
+  "internetArchiveFieldPerItem": "Tracks per item",
+  "internetArchiveFieldPerItemHint": "How many tracks one item may give (1–{max}, default {count})",
   "internetArchiveFieldQuery": "Query",
   "internetArchiveInvalidResponse": "Internet Archive returned an unreadable response",
   "internetArchiveBackendBusy": "The search service of Internet Archive is unavailable right now",

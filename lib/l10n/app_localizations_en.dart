@@ -1478,6 +1478,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter an Internet Archive query, e.g. collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => 'Tracks per item';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return 'How many tracks one item may give (1–$max, default $count)';
+  }
+
+  @override
   String get internetArchiveFieldQuery => 'Query';
 
   @override

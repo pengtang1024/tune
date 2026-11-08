@@ -2417,6 +2417,18 @@ abstract class AppLocalizations {
   /// **'填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio'**
   String get internetArchiveHint;
 
+  /// No description provided for @internetArchiveFieldPerItem.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每项曲目上限'**
+  String get internetArchiveFieldPerItem;
+
+  /// No description provided for @internetArchiveFieldPerItemHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'一个条目最多取多少首（1–{max}，默认 {count}）'**
+  String internetArchiveFieldPerItemHint(Object count, Object max);
+
   /// No description provided for @internetArchiveFieldQuery.
   ///
   /// In zh_CN, this message translates to:

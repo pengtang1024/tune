@@ -255,6 +255,39 @@ void main() {
       expect(result.songs.last.title, 'Part 30');
     });
 
+    test('a long book hands over as many chapters as asked for', () async {
+      final files = [
+        for (var index = 1; index <= 40; index++)
+          {
+            'name': 'part$index.mp3',
+            'format': 'VBR MP3',
+            'title': 'Part $index',
+          },
+      ];
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-book', 'title': 'The Book'},
+            ],
+          },
+        },
+        '/metadata/the-book': {
+          'metadata': {'title': 'The Book'},
+          'files': files,
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'limit': '10', 'perItem': '40'}),
+      );
+
+      // A book of forty chapters is read whole when the reader raises the
+      // limit; the default keeps an item from filling the library.
+      expect(result.songs, hasLength(40));
+      expect(result.songs.last.title, 'Part 40');
+    });
+
     test('an item without playable audio adds nothing', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

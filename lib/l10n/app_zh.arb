@@ -800,6 +800,8 @@
   "jamendoEmptyResponse": "Jamendo 返回了空响应",
   "jamendoNoMatch": "没有找到匹配的 Jamendo 曲目",
   "internetArchiveHint": "填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio",
+  "internetArchiveFieldPerItem": "每项曲目上限",
+  "internetArchiveFieldPerItemHint": "一个条目最多取多少首（1–{max}，默认 {count}）",
   "internetArchiveFieldQuery": "收录条件",
   "internetArchiveInvalidResponse": "Internet Archive 返回了无法识别的响应",
   "internetArchiveBackendBusy": "Internet Archive 的搜索服务暂时不可用",
