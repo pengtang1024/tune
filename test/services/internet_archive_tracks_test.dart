@@ -318,6 +318,67 @@ void main() {
       expect(result.songs.last.title, 'Part 40');
     });
 
+    test('an item hands its description and licence to its tracks', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-release', 'title': 'The Release'},
+            ],
+          },
+        },
+        '/metadata/the-release': {
+          'metadata': {
+            'title': 'The Release',
+            'description':
+                '<p>A record of <b>two</b> songs.</p><p>Recorded in 1954.</p>',
+            'licenseurl': 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      final song = result.songs.single;
+      // The description is HTML on the archive; the track keeps the words.
+      expect(song.description, 'A record of two songs. Recorded in 1954.');
+      // The licence is filed as the address of its deed, and read back into
+      // a name the reader knows.
+      expect(song.license, 'CC BY-NC-SA 3.0');
+    });
+
+    test('an item without a creative commons deed keeps no licence', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-plain', 'title': 'The Plain'},
+            ],
+          },
+        },
+        '/metadata/the-plain': {
+          'metadata': {
+            'title': 'The Plain',
+            'licenseurl': 'https://example.com/terms',
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // A link that is not a deed is not shown as a licence.
+      expect(result.songs.single.license, isNull);
+    });
     test('an item without playable audio adds nothing', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

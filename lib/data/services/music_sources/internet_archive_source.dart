@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
+import 'package:tune/shared/utils/plain_text.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -228,6 +229,42 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     );
   }
 
+
+  /// The most characters of an item description a track keeps.
+  static const _descriptionLength = 600;
+
+  /// The description of an item, as plain text.
+  ///
+  /// The archive writes the description as HTML of whatever length the
+  /// uploader left; a track keeps the readable beginning of it.
+  static String? _descriptionOf(Object? raw) {
+    final text = plainText(SourceSongFactory.readString(raw));
+    if (text.isEmpty) return null;
+    return text.length <= _descriptionLength
+        ? text
+        : '${text.substring(0, _descriptionLength).trimRight()}…';
+  }
+
+  /// The licence of an item, written the way the reader knows it.
+  ///
+  /// The archive files a licence as the address of its deed, so the address is
+  /// read back into a name: a creative commons deed becomes "CC BY-SA 3.0",
+  /// and anything else is left out rather than shown as a raw link.
+  static String? _licenceOf(Object? raw) {
+    final value = SourceSongFactory.readString(raw).trim().toLowerCase();
+    if (value.isEmpty || !value.contains('creativecommons.org')) return null;
+
+    final segments = Uri.tryParse(value)?.pathSegments ?? const <String>[];
+    if (segments.contains('zero')) return 'CC0';
+    if (segments.contains('mark')) return 'Public domain';
+
+    final index = segments.indexOf('licenses');
+    if (index < 0 || index + 1 >= segments.length) return null;
+    final code = segments[index + 1].toUpperCase();
+    final version = index + 2 < segments.length ? segments[index + 2] : '';
+    return version.isEmpty ? 'CC $code' : 'CC $code $version';
+  }
+
   /// The tracks of one archive item.
   Future<List<Song>> _fetchTracks(
     Object? rawDoc,
@@ -256,6 +293,10 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final itemTitle = _firstText([metadata['title'], rawDoc['title']]);
       final creator = _firstText([metadata['creator'], rawDoc['creator']]);
       final itemAlbum = SourceSongFactory.readString(metadata['album']).trim();
+      // The item tells the reader what it is about and under which licence it
+      // travels; both belong to every track of it.
+      final itemDescription = _descriptionOf(metadata['description']);
+      final itemLicense = _licenceOf(metadata['licenseurl']);
       final itemGenre = SourceSongFactory.readString(metadata['genre']).trim();
       final year = _parseYear(
         SourceSongFactory.readString(metadata['date'] ?? metadata['publicdate']),
@@ -327,6 +368,8 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             // archive lists its files in.
             trackNumber: track?.number ?? index + 1,
             trackTotal: track?.total ?? files.length,
+            description: itemDescription,
+            license: itemLicense,
           ),
         );
       }
