@@ -1747,6 +1747,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'News broadcasts the archive keeps as recordings';
 
   @override
+  String get sourcePoetryName => 'Poetry readings';
+
+  @override
+  String get sourcePoetryDescription =>
+      'Poems read aloud, the ones the archive files under poetry';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

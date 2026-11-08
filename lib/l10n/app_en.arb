@@ -888,6 +888,8 @@
   "sourceForeignAudioDescription": "Audiobooks and readings the archive keeps outside English",
   "sourceNewsRecordingsName": "News recordings",
   "sourceNewsRecordingsDescription": "News broadcasts the archive keeps as recordings",
+  "sourcePoetryName": "Poetry readings",
+  "sourcePoetryDescription": "Poems read aloud, the ones the archive files under poetry",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
   "sourcePodcastRssName": "Podcasts",
   "sourcePodcastCatalogName": "Podcast directory",

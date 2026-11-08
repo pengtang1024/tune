@@ -133,6 +133,7 @@ void main() async {
           'free_music_archive',
           'foreign_audio',
           'news_recordings',
+          'poetry',
         ]),
       );
 

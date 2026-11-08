@@ -888,6 +888,8 @@
   "sourceForeignAudioDescription": "英语之外的有声书与朗读，档案按语言分开收藏",
   "sourceNewsRecordingsName": "新闻录音",
   "sourceNewsRecordingsDescription": "档案里保存下来的新闻广播录音",
+  "sourcePoetryName": "诗歌朗读",
+  "sourcePoetryDescription": "档案里归在诗歌名下的朗读",
   "sourcePodcastRssDescription": "把任意 RSS 播客订阅变成可播放的单集",
   "sourcePodcastRssName": "播客订阅",
   "sourcePodcastCatalogName": "播客目录",

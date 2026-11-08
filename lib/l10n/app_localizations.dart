@@ -2903,6 +2903,18 @@ abstract class AppLocalizations {
   /// **'档案里保存下来的新闻广播录音'**
   String get sourceNewsRecordingsDescription;
 
+  /// No description provided for @sourcePoetryName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'诗歌朗读'**
+  String get sourcePoetryName;
+
+  /// No description provided for @sourcePoetryDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案里归在诗歌名下的朗读'**
+  String get sourcePoetryDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:
