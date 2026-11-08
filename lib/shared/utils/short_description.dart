@@ -6,7 +6,15 @@ import 'package:tune/shared/utils/plain_text.dart';
 /// track keeps the readable beginning of one, so the details of a song stay one
 /// screen long.
 String? shorten(String? text, {int length = 600}) {
-  final collapsed = (text ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
+  // A tag taken out leaves a space behind: "a <b>case</b>." becomes
+  // "a case .", so a space before a mark of punctuation is closed up.
+  final collapsed = (text ?? '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAllMapped(
+        RegExp(r'\s+([,.;:!?])'),
+        (match) => match.group(1)!,
+      )
+      .trim();
   if (collapsed.isEmpty) return null;
   if (collapsed.length <= length) return collapsed;
   return '${collapsed.substring(0, length).trimRight()}…';

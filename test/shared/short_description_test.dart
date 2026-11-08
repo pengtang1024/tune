@@ -28,5 +28,12 @@ void main() {
         'A note about the song.',
       );
     });
+
+    test('a tag taken out leaves no space before a mark of punctuation', () {
+      expect(
+        shortDescription('<p>A novel about <b>a court case</b>.</p>'),
+        'A novel about a court case.',
+      );
+    });
   });
 }

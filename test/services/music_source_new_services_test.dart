@@ -80,6 +80,12 @@ void main() {
       expect(first.duration, 900000);
       expect(first.trackNumber, 1);
       expect(first.trackTotal, 2);
+      // The book tells what it is about, its kinds and its year; every chapter
+      // carries that.
+      expect(first.description, 'A novel about a court case.');
+      expect(first.genre, 'Classics');
+      expect(first.genres, ['Classics', 'Fiction']);
+      expect(first.year, 1853);
       expect(
         first.streamUrl,
         'http://abs.example/api/items/book-1/file/0?token=token',
@@ -138,7 +144,13 @@ Map<String, dynamic> _audiobookshelfAnswer() => {
     {
       'id': 'book-1',
       'media': {
-        'metadata': {'title': 'Bleak House', 'authorName': 'Charles Dickens'},
+        'metadata': {
+          'title': 'Bleak House',
+          'authorName': 'Charles Dickens',
+          'description': '<p>A novel about <b>a court case</b>.</p>',
+          'genres': ['Classics', 'Fiction'],
+          'publishedYear': '1853',
+        },
         'tracks': [
           {
             'index': 0,
