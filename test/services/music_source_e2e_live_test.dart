@@ -663,6 +663,49 @@ void main() async {
   );
 
   test(
+    'each new category of the commons answers with its own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final category in const [
+        'rock',
+        'hiphop',
+        'country',
+        'blues',
+        'reggae',
+        'choral',
+        'organ',
+      ]) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.wikimedia.copyWith(
+              settings: {'query': '', 'category': category, 'limit': '6'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$category failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$category returned nothing');
+        seen[category] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The categories are separate reaches of the commons.
+      expect(seen['rock'], isNot(equals(seen['organ'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 240)),
+  );
+
+  test(
     'the Openverse source reads one catalogue at a time',
     () async {
       final service = MusicSourceService(

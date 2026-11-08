@@ -1840,6 +1840,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wikimediaCategoryGuitar => 'Guitar';
 
   @override
+  String get wikimediaCategoryRock => 'Rock';
+
+  @override
+  String get wikimediaCategoryPop => 'Pop';
+
+  @override
+  String get wikimediaCategoryHipHop => 'Hip hop';
+
+  @override
+  String get wikimediaCategoryCountry => 'Country';
+
+  @override
+  String get wikimediaCategoryBlues => 'Blues';
+
+  @override
+  String get wikimediaCategoryReggae => 'Reggae';
+
+  @override
+  String get wikimediaCategoryChoral => 'Choral';
+
+  @override
+  String get wikimediaCategoryOrgan => 'Organ';
+
+  @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
 
   @override

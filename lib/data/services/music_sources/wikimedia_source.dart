@@ -40,6 +40,14 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     'folk': 'Category:Audio files of folk music',
     'piano': 'Category:Audio files of piano music',
     'guitar': 'Category:Audio files of guitar music',
+    'rock': 'Category:Audio files of rock music',
+    'pop': 'Category:Audio files of pop music',
+    'hiphop': 'Category:Audio files of hip hop music',
+    'country': 'Category:Audio files of country music',
+    'blues': 'Category:Audio files of blues',
+    'reggae': 'Category:Audio files of reggae',
+    'choral': 'Category:Audio files of choral music',
+    'organ': 'Category:Audio files of organ music',
   };
 
   /// The category a scan browses when the reader names no keyword.
@@ -113,6 +121,14 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       'folk' => strings.genreFolk,
       'piano' => strings.wikimediaCategoryPiano,
       'guitar' => strings.wikimediaCategoryGuitar,
+      'rock' => strings.wikimediaCategoryRock,
+      'pop' => strings.wikimediaCategoryPop,
+      'hiphop' => strings.wikimediaCategoryHipHop,
+      'country' => strings.wikimediaCategoryCountry,
+      'blues' => strings.wikimediaCategoryBlues,
+      'reggae' => strings.wikimediaCategoryReggae,
+      'choral' => strings.wikimediaCategoryChoral,
+      'organ' => strings.wikimediaCategoryOrgan,
       _ => strings.wikimediaCategoryAll,
     };
   }

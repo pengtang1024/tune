@@ -1667,6 +1667,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaCategoryGuitar => '吉他';
 
   @override
+  String get wikimediaCategoryRock => '摇滚';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '乡村';
+
+  @override
+  String get wikimediaCategoryBlues => '蓝调';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管风琴';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -4952,6 +4976,30 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaCategoryGuitar => '吉他';
 
   @override
+  String get wikimediaCategoryRock => '摇滚';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '乡村';
+
+  @override
+  String get wikimediaCategoryBlues => '蓝调';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管风琴';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -8235,6 +8283,30 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get wikimediaCategoryGuitar => '吉他';
+
+  @override
+  String get wikimediaCategoryRock => '搖滾';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '鄉村';
+
+  @override
+  String get wikimediaCategoryBlues => '藍調';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管風琴';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';

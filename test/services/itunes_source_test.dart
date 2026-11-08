@@ -87,6 +87,24 @@ void main() {
       expect(server.requests.single.uri.queryParameters['country'], 'JP');
     });
 
+    test('a bad gateway of the chart is tried once more', () async {
+      final server = _ItunesServer(chartAlbums: true, chartFailures: 1);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': '', 'mode': 'albums'}),
+        ),
+      );
+
+      // The chart service answers 502 every so often; the scan is not failed
+      // by one bad gateway.
+      expect(result.status, SourceScanStatus.success);
+      final chartRequests = server.requests
+          .where((request) => request.uri.host == 'rss.applemarketingtools.com')
+          .length;
+      expect(chartRequests, 2);
+    });
     test('the album mode reads the chart of albums without a keyword', () async {
       final server = _ItunesServer(chartAlbums: true);
       final adapter = ItunesSourceAdapter(dio: server.dio);
@@ -325,6 +343,7 @@ class _ItunesServer {
     this.withCollectionRow = false,
     this.artists = false,
     this.chartAlbums = false,
+    this.chartFailures = 0,
   }) : results = results ?? [_songJson()],
        albumResults =
            albumResults ??
@@ -349,6 +368,9 @@ class _ItunesServer {
 
   /// Answers the chart of albums instead of the song search.
   final bool chartAlbums;
+
+  /// How many chart answers fail with a bad gateway first.
+  final int chartFailures;
   final requests = <RequestOptions>[];
 
   Dio get dio {
@@ -358,6 +380,23 @@ class _ItunesServer {
         onRequest: (options, handler) {
           requests.add(options);
           if (chartAlbums && options.uri.host == 'rss.applemarketingtools.com') {
+            final chartAnswers = requests
+                .where((r) => r.uri.host == 'rss.applemarketingtools.com')
+                .length;
+            if (chartAnswers <= chartFailures) {
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  response: Response(
+                    requestOptions: options,
+                    data: '<html>502</html>',
+                    statusCode: 502,
+                  ),
+                ),
+                true,
+              );
+              return;
+            }
             handler.resolve(
               Response(
                 requestOptions: options,

@@ -315,14 +315,34 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// are read from the lookup like the songs of a searched album.
   Future<List<Map>?> _chartAlbums(String country, int limit) async {
     final count = limit.clamp(1, _albumsPerScan);
-    final response = await _dio.get<String>(
+    final body = await _chartBody(
       '$_chartHost/${country.toLowerCase()}/music/most-played/$count/albums.json',
-      options: Options(responseType: ResponseType.plain),
     );
-    final feed = _decode(response.data)?['feed'];
+    final feed = _decode(body)?['feed'];
     final entries = feed is Map ? feed['results'] : null;
     if (entries is! List) return null;
     return entries.whereType<Map>().toList(growable: false);
+  }
+
+  /// The body of a chart answer, tried twice.
+  ///
+  /// The chart service of the store answers 502 every so often; a second try a
+  /// moment later usually lands, so a scan is not failed by one bad gateway.
+  Future<String?> _chartBody(String url) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        final response = await _dio.get<String>(
+          url,
+          options: Options(responseType: ResponseType.plain),
+        );
+        return response.data;
+      } on DioException catch (error) {
+        final status = error.response?.statusCode ?? 0;
+        final retriable = status == 0 || status >= 500;
+        if (!retriable || attempt >= 1) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+      }
+    }
   }
 
   /// The entries of the answer, when the answer holds a list.

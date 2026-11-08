@@ -3065,6 +3065,54 @@ abstract class AppLocalizations {
   /// **'吉他'**
   String get wikimediaCategoryGuitar;
 
+  /// No description provided for @wikimediaCategoryRock.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'摇滚'**
+  String get wikimediaCategoryRock;
+
+  /// No description provided for @wikimediaCategoryPop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流行'**
+  String get wikimediaCategoryPop;
+
+  /// No description provided for @wikimediaCategoryHipHop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'嘻哈'**
+  String get wikimediaCategoryHipHop;
+
+  /// No description provided for @wikimediaCategoryCountry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'乡村'**
+  String get wikimediaCategoryCountry;
+
+  /// No description provided for @wikimediaCategoryBlues.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'蓝调'**
+  String get wikimediaCategoryBlues;
+
+  /// No description provided for @wikimediaCategoryReggae.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'雷鬼'**
+  String get wikimediaCategoryReggae;
+
+  /// No description provided for @wikimediaCategoryChoral.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'合唱'**
+  String get wikimediaCategoryChoral;
+
+  /// No description provided for @wikimediaCategoryOrgan.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'管风琴'**
+  String get wikimediaCategoryOrgan;
+
   /// No description provided for @wikimediaFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

@@ -128,6 +128,33 @@ void main() {
       );
     });
 
+    test('Wikimedia walks a category the reader picked from the newer ones', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'reggae'}),
+      );
+
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Audio files of reggae',
+      );
+    });
+
+    test('a category the commons does not file falls back to all music', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'soul'}),
+      );
+
+      // Soul is not filed by the commons, and an empty category answers
+      // nothing at all; the whole of the music is read instead.
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Audio files of music',
+      );
+    });
     test('Wikimedia walks the whole music of the wiki by default', () async {
       final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
 
