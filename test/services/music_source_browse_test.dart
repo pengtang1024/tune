@@ -7,6 +7,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
+import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
 import 'package:tune/data/services/music_sources/deezer_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
@@ -311,6 +312,21 @@ void main() {
       expect(captured.uri?.queryParameters['order'], 'popularity_total');
     });
 
+    test('the nichest reaches of the archive ship folded away', () {
+      final catalogue = BuiltInMusicSources.catalogueOf(AppStrings.instance);
+
+      for (final id in const [
+        'news_recordings',
+        'poetry',
+        'poetry_books',
+        'science_talks',
+      ]) {
+        final source = catalogue[id];
+        expect(source, isNotNull, reason: id);
+        // The folded group of the source list starts below 500.
+        expect(source!.weight, lessThan(500), reason: id);
+      }
+    });
     test('the reader decides how many albums one scan reads', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

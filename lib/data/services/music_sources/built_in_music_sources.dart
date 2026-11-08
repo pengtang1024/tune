@@ -123,6 +123,7 @@ class BuiltInMusicSources {
         types,
         'internet_archive',
         id: 'news_recordings',
+        weight: 400,
         name: strings.sourceNewsRecordingsName,
         description: strings.sourceNewsRecordingsDescription,
         settings: {
@@ -133,6 +134,7 @@ class BuiltInMusicSources {
         types,
         'internet_archive',
         id: 'poetry',
+        weight: 400,
         name: strings.sourcePoetryName,
         description: strings.sourcePoetryDescription,
         settings: {
@@ -147,6 +149,7 @@ class BuiltInMusicSources {
         types,
         'internet_archive',
         id: 'poetry_books',
+        weight: 400,
         name: strings.sourcePoetryBooksName,
         description: strings.sourcePoetryBooksDescription,
         settings: {
@@ -161,6 +164,7 @@ class BuiltInMusicSources {
         types,
         'internet_archive',
         id: 'science_talks',
+        weight: 400,
         name: strings.sourceScienceTalksName,
         description: strings.sourceScienceTalksDescription,
         settings: {
@@ -332,6 +336,10 @@ class BuiltInMusicSources {
     String? description,
     bool enabled = true,
     Map<String, String> settings = const {},
+    // The folded group of the source list starts below 500 (see
+    // SourceWeights.mainThreshold): a reach only some readers want waits
+    // there, one tap away, instead of lengthening the main list.
+    int? weight,
   }) {
     final descriptor = types[type]!;
     return MusicSourceConfig(
@@ -344,6 +352,7 @@ class BuiltInMusicSources {
       kind: descriptor.kind,
       enabled: enabled,
       settings: settings,
+      weight: weight,
     );
   }
 
