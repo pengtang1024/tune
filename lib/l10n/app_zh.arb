@@ -905,6 +905,8 @@
   "podcastAppleFieldCountryHint": "两位国家代码，例如 US、CN",
   "podcastAppleFieldGenre": "类别",
   "podcastAppleFieldGenreHint": "只看商店榜单的一个类别",
+  "podcastFieldEpisodes": "每档集数",
+  "podcastFieldEpisodesHint": "每档播客读多少集（1–{max}，默认 {count}）",
   "podcastAppleGenreAll": "全部类别",
   "podcastAppleGenreArts": "艺术",
   "podcastAppleGenreBusiness": "商业",

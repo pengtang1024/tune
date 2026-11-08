@@ -78,6 +78,32 @@ void main() {
       expect(answers.uris.first.path, '/search.json');
       expect(answers.uris.first.queryParameters['q'], 'jazz');
     });
+    test('the reader decides how many episodes one show gives', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedWith('Show A', 'a', 6)},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'episodes': '5'}),
+      );
+
+      // The show publishes six episodes; the scan reads the window asked for.
+      expect(result.songs, hasLength(5));
+    });
+
+    test('a show gives three episodes unless the reader asks otherwise', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedWith('Show A', 'a', 6)},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {}),
+      );
+
+      expect(result.songs, hasLength(3));
+    });
     test('one broken feed does not fail the whole directory', () async {
       final answers = _CatalogDio(
         search: _searchAnswer(),
@@ -127,6 +153,23 @@ String _feedXml(String title, String id) =>
 </channel>
 </rss>
 ''';
+
+
+/// The feed of one show, with [episodes] episodes of its own.
+String _feedWith(String title, String id, int episodes) {
+  final items = [
+    for (var index = 1; index <= episodes; index++)
+      '  <item>'
+          '<title>Episode $index of $title</title>'
+          '<guid>episode-$id-$index</guid>'
+          '<enclosure url="https://cdn.example/$id-$index.mp3" length="0" type="audio/mpeg" />'
+          '<itunes:duration>00:12:30</itunes:duration>'
+          '</item>',
+  ].join();
+  return '<?xml version="1.0" encoding="UTF-8"?>'
+      '<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">'
+      '<channel><title>$title</title>$items</channel></rss>';
+}
 
 /// One scan of the directory.
 MusicSourceScanRequest _request(String id, Map<String, String> settings) {

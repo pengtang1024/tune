@@ -1638,6 +1638,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
 
   @override
+  String get podcastFieldEpisodes => '每档集数';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每档播客读多少集（1–$max，默认 $count）';
+  }
+
+  @override
   String get podcastAppleGenreAll => '全部类别';
 
   @override
@@ -5257,6 +5265,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
 
   @override
+  String get podcastFieldEpisodes => '每档集数';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每档播客读多少集（1–$max，默认 $count）';
+  }
+
+  @override
   String get podcastAppleGenreAll => '全部类别';
 
   @override
@@ -8874,6 +8890,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastAppleFieldGenreHint => '只看商店榜單的一個類別';
+
+  @override
+  String get podcastFieldEpisodes => '每檔集數';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每檔播客讀多少集（1–$max，預設 $count）';
+  }
 
   @override
   String get podcastAppleGenreAll => '全部類別';

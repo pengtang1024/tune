@@ -3005,6 +3005,18 @@ abstract class AppLocalizations {
   /// **'只看商店榜单的一个类别'**
   String get podcastAppleFieldGenreHint;
 
+  /// No description provided for @podcastFieldEpisodes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每档集数'**
+  String get podcastFieldEpisodes;
+
+  /// No description provided for @podcastFieldEpisodesHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每档播客读多少集（1–{max}，默认 {count}）'**
+  String podcastFieldEpisodesHint(Object count, Object max);
+
   /// No description provided for @podcastAppleGenreAll.
   ///
   /// In zh_CN, this message translates to:

@@ -1804,6 +1804,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get podcastAppleFieldGenreHint => 'One category of the store chart';
 
   @override
+  String get podcastFieldEpisodes => 'Episodes per show';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return 'How many episodes of one show to read (1–$max, default $count)';
+  }
+
+  @override
   String get podcastAppleGenreAll => 'All categories';
 
   @override

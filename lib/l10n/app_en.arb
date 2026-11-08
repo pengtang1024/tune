@@ -905,6 +905,8 @@
   "podcastAppleFieldCountryHint": "Two-letter code, e.g. US, CN",
   "podcastAppleFieldGenre": "Category",
   "podcastAppleFieldGenreHint": "One category of the store chart",
+  "podcastFieldEpisodes": "Episodes per show",
+  "podcastFieldEpisodesHint": "How many episodes of one show to read (1–{max}, default {count})",
   "podcastAppleGenreAll": "All categories",
   "podcastAppleGenreArts": "Arts",
   "podcastAppleGenreBusiness": "Business",

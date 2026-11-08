@@ -905,6 +905,8 @@
   "podcastAppleFieldCountryHint": "兩位國家代碼，例如 US、CN",
   "podcastAppleFieldGenre": "類別",
   "podcastAppleFieldGenreHint": "只看商店榜單的一個類別",
+  "podcastFieldEpisodes": "每檔集數",
+  "podcastFieldEpisodesHint": "每檔播客讀多少集（1–{max}，預設 {count}）",
   "podcastAppleGenreAll": "全部類別",
   "podcastAppleGenreArts": "藝術",
   "podcastAppleGenreBusiness": "商業",

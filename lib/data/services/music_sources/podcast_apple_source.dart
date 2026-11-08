@@ -22,8 +22,11 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(5, 10);
 
-  /// How many episodes of one show a scan reads.
-  static const _episodesPerPodcast = 3;
+  /// How many episodes of one show a scan reads, and the most it may.
+  ///
+  /// A show may publish hundreds of episodes; the cap keeps one of them from
+  /// filling the library, and the reader who wants more raises it.
+  static const _episodesPerPodcast = MusicSourceLimit(3, 20);
 
   static const _chartsHost = 'https://itunes.apple.com';
 
@@ -112,6 +115,15 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'episodes',
+      AppStrings.instance.podcastFieldEpisodes,
+      AppStrings.instance.podcastFieldEpisodesHint(
+        _episodesPerPodcast.count,
+        _episodesPerPodcast.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -154,7 +166,12 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       for (var start = 0; start < feeds.length; start += batchSize) {
         final batch = feeds.skip(start).take(batchSize).toList(growable: false);
         final episodes = await Future.wait([
-          for (final feed in batch) _episodesOf(feed, request.config.id),
+          for (final feed in batch)
+            _episodesOf(
+              feed,
+              request.config.id,
+              _episodesPerPodcast.read(request.config.setting('episodes')),
+            ),
         ]);
         for (final episode in episodes) {
           for (final song in episode) {
@@ -231,7 +248,11 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The newest episodes of one feed.
-  Future<List<Song>> _episodesOf(String feed, String sourceId) async {
+  Future<List<Song>> _episodesOf(
+    String feed,
+    String sourceId,
+    int episodes,
+  ) async {
     try {
       final response = await _dio.get<String>(
         feed,
@@ -244,7 +265,7 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       return PodcastRssSourceAdapter.parseFeed(
         body,
         sourceId: sourceId,
-        limit: _episodesPerPodcast,
+        limit: episodes,
       );
     } catch (error) {
       // One broken feed should not fail the whole directory.
