@@ -138,6 +138,23 @@ void main() {
       expect(captured.uris.first.queryParameters['countrycode'], 'SG');
       expect(captured.uris.first.path, '/json/stations/search');
     });
+
+    test('an unreachable mirror falls back to another one', () async {
+      final captured = _FailoverStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      final stations = await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'SG',
+      );
+
+      expect(stations, isEmpty);
+      expect(
+        captured.uris.map((uri) => uri.host),
+        contains('de1.api.radio-browser.info'),
+      );
+    });
   });
 
   group('SomaFM directory', () {
@@ -439,6 +456,41 @@ class _CapturedLive {
 }
 
 /// A Dio that answers with an empty station list and keeps the requests.
+/// A client whose aggregate mirror cannot be reached, as on a network that
+/// resolves it to an address it cannot route to.
+class _FailoverStations {
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          if (options.uri.host == 'all.api.radio-browser.info') {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                type: DioExceptionType.connectionError,
+                message: 'unreachable',
+              ),
+            );
+            return;
+          }
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: <dynamic>[],
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
 class _CapturedStations {
   final uris = <Uri>[];
 

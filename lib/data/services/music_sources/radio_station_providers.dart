@@ -11,7 +11,17 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 /// the information a listener needs: the working stream address, the codec,
 /// the bitrate, the country, the language and the station logo.
 class RadioBrowserProvider extends RadioStationProvider {
-  static const _base = 'https://all.api.radio-browser.info/json';
+  /// The directory answers through any of its mirrors. The aggregate name is
+  /// tried first, then two mirrors, so a network that cannot reach one of
+  /// them (a broken IPv6 route, a blocked name) still reads the directory.
+  static const _hosts = [
+    'https://all.api.radio-browser.info/json',
+    'https://de1.api.radio-browser.info/json',
+    'https://de2.api.radio-browser.info/json',
+  ];
+
+  /// The mirror that answered last, tried first on the next request.
+  String? _base;
 
   final Dio _dio;
 
@@ -107,14 +117,36 @@ class RadioBrowserProvider extends RadioStationProvider {
     String path, [
     Map<String, String> queryParameters = const {},
   ]) async {
-    final response = await _dio.get<List<dynamic>>(
-      '$_base$path',
-      queryParameters: {'hideuuid': 'true', ...queryParameters},
-    );
-    final data = response.data;
-    if (data is! List) return const [];
-    return parseStations(data);
+    DioException? failure;
+    final preferred = _base;
+    final hosts = preferred == null
+        ? _hosts
+        : [preferred, ..._hosts.where((host) => host != preferred)];
+
+    for (final host in hosts) {
+      try {
+        final response = await _dio.get<List<dynamic>>(
+          '$host$path',
+          queryParameters: {'hideuuid': 'true', ...queryParameters},
+        );
+        _base = host;
+        final data = response.data;
+        if (data is! List) return const [];
+        return parseStations(data);
+      } on DioException catch (error) {
+        failure = error;
+        if (!_isUnreachable(error)) rethrow;
+      }
+    }
+    throw failure!;
   }
+
+  /// Whether a mirror could not be reached at all, as opposed to answering
+  /// with an error of its own. Only the former is worth trying elsewhere.
+  static bool _isUnreachable(DioException error) =>
+      error.type == DioExceptionType.connectionError ||
+      error.type == DioExceptionType.connectionTimeout ||
+      error.type == DioExceptionType.unknown;
 
   /// Kept static so the mapping can be tested without network access.
   static List<RadioStation> parseStations(List<dynamic> data) {
