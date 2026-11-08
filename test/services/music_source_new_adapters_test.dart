@@ -1,8 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/jellyfin_source.dart';
+import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
 
 void main() {
+    test('a window of dates keeps only the tracks added inside it', () {
+      final answer = {
+        'Items': [
+          _item(id: 'new', name: 'New track', created: '2026-11-01T10:00:00Z'),
+          _item(id: 'old', name: 'Old track', created: '2019-05-04T10:00:00Z'),
+          _item(id: 'undated', name: 'Undated track'),
+        ],
+      };
+
+      final songs = MediaServerItems.parseItems(
+        answer,
+        sourceId: 'jellyfin',
+        server: 'http://jelly.example',
+        prefix: '/Audio',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The track inside the window and the undated one stay.
+      expect(songs.map((song) => song.title), ['New track', 'Undated track']);
+    });
   group('Wikimedia adapter', () {
     test('maps the metadata of an audio file', () {
       final songs = WikimediaSourceAdapter.parseResults(
@@ -371,3 +392,15 @@ Map<String, dynamic> _jellyfinAnswer() {
     ],
   };
 }
+
+/// One item of a media server, with the date it was added on.
+Map<String, dynamic> _item({
+  required String id,
+  required String name,
+  String? created,
+}) => {
+  'Id': id,
+  'Name': name,
+  'RunTimeTicks': 1800000000,
+  if (created != null) 'DateCreated': created,
+};

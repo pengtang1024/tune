@@ -1,3 +1,4 @@
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/song.dart';
@@ -108,6 +109,7 @@ class MediaServerItems {
     required String prefix,
     String? token,
     int limit = 50,
+    DateTime? since,
   }) {
     final rawItems = data['Items'];
     if (rawItems is! List) return const [];
@@ -121,6 +123,11 @@ class MediaServerItems {
       final id = raw['Id']?.toString() ?? '';
       final title = raw['Name']?.toString().trim() ?? '';
       if (id.isEmpty || title.isEmpty || !seen.add(id)) continue;
+
+      // A track the server added before the window is left out; a track whose
+      // date the server did not send is kept, since nothing proves it is old.
+      final added = RecentWindow.dateTimeOf(raw['DateCreated']);
+      if (since != null && added != null && added.isBefore(since)) continue;
 
       final media = mediaSourceOf(raw);
       final genres = genresOf(raw);

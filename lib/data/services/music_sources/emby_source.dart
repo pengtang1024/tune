@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -71,6 +72,19 @@ class EmbySourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.mediaServerFieldSince,
+      AppStrings.instance.mediaServerFieldSinceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.mediaServerSinceAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.mediaServerSinceDays('$days'),
+          ),
+      ],
+    ),
   ];
 
   @override
@@ -106,7 +120,7 @@ class EmbySourceAdapter extends MusicSourceAdapter {
         queryParameters: {
           'Recursive': 'true',
           'IncludeItemTypes': 'Audio',
-          'Fields': 'Genres,MediaSources,Bitrate,SampleRate',
+          'Fields': 'Genres,MediaSources,Bitrate,SampleRate,DateCreated',
           'StartIndex': request.offset,
           'Limit': limit,
         },
@@ -126,6 +140,7 @@ class EmbySourceAdapter extends MusicSourceAdapter {
         server: server,
         token: token,
         limit: limit,
+        since: RecentWindow.cutoff(config.setting('since')),
       );
       return SourceScanResult(
         sourceId: request.config.id,
@@ -257,6 +272,7 @@ class EmbySourceAdapter extends MusicSourceAdapter {
     required String server,
     String? token,
     int limit = 50,
+    DateTime? since,
   }) {
     return MediaServerItems.parseItems(
       data,
@@ -264,6 +280,7 @@ class EmbySourceAdapter extends MusicSourceAdapter {
       server: server,
       prefix: _prefix,
       token: token,
+      since: since,
       limit: limit,
     );
   }

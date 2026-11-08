@@ -843,6 +843,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browseModeAlbums => '专辑';
 
   @override
+  String get mediaServerFieldSince => '只看最近入库';
+
+  @override
+  String get mediaServerFieldSinceHint => '只收这段时间内加进服务器的曲目';
+
+  @override
+  String get mediaServerSinceAll => '服务器上的全部';
+
+  @override
+  String mediaServerSinceDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -4627,6 +4641,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get browseModeAlbums => '专辑';
 
   @override
+  String get mediaServerFieldSince => '只看最近入库';
+
+  @override
+  String get mediaServerFieldSinceHint => '只收这段时间内加进服务器的曲目';
+
+  @override
+  String get mediaServerSinceAll => '服务器上的全部';
+
+  @override
+  String mediaServerSinceDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -8409,6 +8437,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get browseModeAlbums => '專輯';
+
+  @override
+  String get mediaServerFieldSince => '只看最近入庫';
+
+  @override
+  String get mediaServerFieldSinceHint => '只收這段時間內加進伺服器的曲目';
+
+  @override
+  String get mediaServerSinceAll => '伺服器上的全部';
+
+  @override
+  String mediaServerSinceDays(String days) {
+    return '最近 $days 天';
+  }
 
   @override
   String get fieldLimit => '每次掃描數量';
