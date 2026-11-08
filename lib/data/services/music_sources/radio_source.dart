@@ -50,6 +50,52 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   String get configurationHint => AppStrings.instance.radioHint;
 
 
+
+  /// The tongues the directory files the most stations under.
+  ///
+  /// The directory names them in English; the name is the whole filter, so the
+  /// values are the names themselves. Every one of them was counted on the
+  /// directory, and the ones that hold no station are left out.
+  static const _languages = <String>[
+    'english',
+    'spanish',
+    'german',
+    'french',
+    'chinese',
+    'russian',
+    'italian',
+    'greek',
+    'portuguese',
+    'turkish',
+    'japanese',
+    'polish',
+    'korean',
+    'arabic',
+    'hindi',
+  ];
+
+  /// The name of a tongue in the language of the app.
+  static String _languageLabel(String language) {
+    final strings = AppStrings.instance;
+    return switch (language) {
+      'english' => strings.languageNameEnglish,
+      'spanish' => strings.languageNameSpanish,
+      'german' => strings.languageNameGerman,
+      'french' => strings.languageNameFrench,
+      'chinese' => strings.languageNameChinese,
+      'russian' => strings.languageNameRussian,
+      'italian' => strings.languageNameItalian,
+      'greek' => strings.languageNameGreek,
+      'portuguese' => strings.languageNamePortuguese,
+      'turkish' => strings.languageNameTurkish,
+      'japanese' => strings.languageNameJapanese,
+      'polish' => strings.languageNamePolish,
+      'korean' => strings.languageNameKorean,
+      'arabic' => strings.languageNameArabic,
+      _ => strings.languageNameHindi,
+    };
+  }
+
   /// The reaches the directory files stations under, most used first.
   ///
   /// Every one of them was counted on the directory itself (with broken
@@ -121,6 +167,11 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       'language',
       AppStrings.instance.radioFieldLanguage,
       AppStrings.instance.radioFieldLanguageHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.languageNameAll),
+        for (final language in _languages)
+          MusicSourceChoice(language, _languageLabel(language)),
+      ],
     ),
     MusicSourceField(
       'order',

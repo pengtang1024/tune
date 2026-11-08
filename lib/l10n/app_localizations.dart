@@ -2489,78 +2489,6 @@ abstract class AppLocalizations {
   /// **'只取归档在某种语言下的音频'**
   String get internetArchiveFieldLanguageHint;
 
-  /// No description provided for @internetArchiveLanguageAll.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'全部语言'**
-  String get internetArchiveLanguageAll;
-
-  /// No description provided for @internetArchiveLanguageEnglish.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'英语'**
-  String get internetArchiveLanguageEnglish;
-
-  /// No description provided for @internetArchiveLanguageGerman.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'德语'**
-  String get internetArchiveLanguageGerman;
-
-  /// No description provided for @internetArchiveLanguageFrench.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'法语'**
-  String get internetArchiveLanguageFrench;
-
-  /// No description provided for @internetArchiveLanguageSpanish.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'西班牙语'**
-  String get internetArchiveLanguageSpanish;
-
-  /// No description provided for @internetArchiveLanguageJapanese.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'日语'**
-  String get internetArchiveLanguageJapanese;
-
-  /// No description provided for @internetArchiveLanguageArabic.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'阿拉伯语'**
-  String get internetArchiveLanguageArabic;
-
-  /// No description provided for @internetArchiveLanguageKorean.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'韩语'**
-  String get internetArchiveLanguageKorean;
-
-  /// No description provided for @internetArchiveLanguageRussian.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'俄语'**
-  String get internetArchiveLanguageRussian;
-
-  /// No description provided for @internetArchiveLanguagePortuguese.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'葡萄牙语'**
-  String get internetArchiveLanguagePortuguese;
-
-  /// No description provided for @internetArchiveLanguageChinese.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'中文'**
-  String get internetArchiveLanguageChinese;
-
-  /// No description provided for @internetArchiveLanguageHindi.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'印地语'**
-  String get internetArchiveLanguageHindi;
-
   /// No description provided for @internetArchiveFieldPerItemHint.
   ///
   /// In zh_CN, this message translates to:
@@ -3410,8 +3338,104 @@ abstract class AppLocalizations {
   /// No description provided for @radioFieldLanguageHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'目录里的语言，例如 english、spanish'**
+  /// **'语言：可写中文、日语、法语，也可写 english、spanish 这样的英文名'**
   String get radioFieldLanguageHint;
+
+  /// No description provided for @languageNameAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部语言'**
+  String get languageNameAll;
+
+  /// No description provided for @languageNameEnglish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语'**
+  String get languageNameEnglish;
+
+  /// No description provided for @languageNameSpanish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西班牙语'**
+  String get languageNameSpanish;
+
+  /// No description provided for @languageNameGerman.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'德语'**
+  String get languageNameGerman;
+
+  /// No description provided for @languageNameFrench.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'法语'**
+  String get languageNameFrench;
+
+  /// No description provided for @languageNameChinese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文'**
+  String get languageNameChinese;
+
+  /// No description provided for @languageNameRussian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'俄语'**
+  String get languageNameRussian;
+
+  /// No description provided for @languageNameItalian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'意大利语'**
+  String get languageNameItalian;
+
+  /// No description provided for @languageNameGreek.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'希腊语'**
+  String get languageNameGreek;
+
+  /// No description provided for @languageNamePortuguese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'葡萄牙语'**
+  String get languageNamePortuguese;
+
+  /// No description provided for @languageNameTurkish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'土耳其语'**
+  String get languageNameTurkish;
+
+  /// No description provided for @languageNameJapanese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'日语'**
+  String get languageNameJapanese;
+
+  /// No description provided for @languageNamePolish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'波兰语'**
+  String get languageNamePolish;
+
+  /// No description provided for @languageNameKorean.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'韩语'**
+  String get languageNameKorean;
+
+  /// No description provided for @languageNameArabic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'阿拉伯语'**
+  String get languageNameArabic;
+
+  /// No description provided for @languageNameHindi.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'印地语'**
+  String get languageNameHindi;
 
   /// No description provided for @radioFieldOrder.
   ///

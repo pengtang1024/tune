@@ -183,6 +183,29 @@ void main() {
       expect(captured.uris.first.path, '/json/stations/search');
     });
 
+    test('the tongue of the radio directory is chosen from its tongues', () {
+      final field = RadioSourceAdapter()
+          .configurationFields
+          .firstWhere((field) => field.key == 'language');
+
+      final values = field.choices.map((choice) => choice.value).toList();
+      expect(values.first, isEmpty);
+      expect(values, contains('chinese'));
+      expect(values.length, greaterThan(10));
+      for (final choice in field.choices) {
+        expect(choice.label.trim(), isNotEmpty);
+      }
+    });
+
+    test('a tongue the list does not hold is passed on as written', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, language: 'Klingon');
+
+      // The choices are what the form offers, not what the directory reads.
+      expect(captured.uris.first.queryParameters['language'], 'klingon');
+    });
     test('a country written by its name is read by its code', () async {
       final captured = _CountryStations();
       final provider = RadioBrowserProvider(dio: captured.dio);

@@ -26,17 +26,17 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   static Map<String, String> get _languages {
     final strings = AppStrings.instance;
     return {
-      'English': strings.internetArchiveLanguageEnglish,
-      'German': strings.internetArchiveLanguageGerman,
-      'French': strings.internetArchiveLanguageFrench,
-      'Spanish': strings.internetArchiveLanguageSpanish,
-      'Japanese': strings.internetArchiveLanguageJapanese,
-      'Arabic': strings.internetArchiveLanguageArabic,
-      'Korean': strings.internetArchiveLanguageKorean,
-      'Russian': strings.internetArchiveLanguageRussian,
-      'Portuguese': strings.internetArchiveLanguagePortuguese,
-      'Chinese': strings.internetArchiveLanguageChinese,
-      'Hindi': strings.internetArchiveLanguageHindi,
+      'English': strings.languageNameEnglish,
+      'German': strings.languageNameGerman,
+      'French': strings.languageNameFrench,
+      'Spanish': strings.languageNameSpanish,
+      'Japanese': strings.languageNameJapanese,
+      'Arabic': strings.languageNameArabic,
+      'Korean': strings.languageNameKorean,
+      'Russian': strings.languageNameRussian,
+      'Portuguese': strings.languageNamePortuguese,
+      'Chinese': strings.languageNameChinese,
+      'Hindi': strings.languageNameHindi,
     };
   }
 
@@ -98,7 +98,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.internetArchiveFieldLanguage,
       AppStrings.instance.internetArchiveFieldLanguageHint,
       choices: [
-        MusicSourceChoice('', AppStrings.instance.internetArchiveLanguageAll),
+        MusicSourceChoice('', AppStrings.instance.languageNameAll),
         for (final entry in _languages.entries)
           MusicSourceChoice(entry.key, entry.value),
       ],

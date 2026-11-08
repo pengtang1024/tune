@@ -1372,42 +1372,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
 
   @override
-  String get internetArchiveLanguageAll => '全部语言';
-
-  @override
-  String get internetArchiveLanguageEnglish => '英语';
-
-  @override
-  String get internetArchiveLanguageGerman => '德语';
-
-  @override
-  String get internetArchiveLanguageFrench => '法语';
-
-  @override
-  String get internetArchiveLanguageSpanish => '西班牙语';
-
-  @override
-  String get internetArchiveLanguageJapanese => '日语';
-
-  @override
-  String get internetArchiveLanguageArabic => '阿拉伯语';
-
-  @override
-  String get internetArchiveLanguageKorean => '韩语';
-
-  @override
-  String get internetArchiveLanguageRussian => '俄语';
-
-  @override
-  String get internetArchiveLanguagePortuguese => '葡萄牙语';
-
-  @override
-  String get internetArchiveLanguageChinese => '中文';
-
-  @override
-  String get internetArchiveLanguageHindi => '印地语';
-
-  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return '一个条目最多取多少首（1–$max，默认 $count）';
   }
@@ -1846,7 +1810,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldLanguage => '语言';
 
   @override
-  String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
+  String get radioFieldLanguageHint =>
+      '语言：可写中文、日语、法语，也可写 english、spanish 这样的英文名';
+
+  @override
+  String get languageNameAll => '全部语言';
+
+  @override
+  String get languageNameEnglish => '英语';
+
+  @override
+  String get languageNameSpanish => '西班牙语';
+
+  @override
+  String get languageNameGerman => '德语';
+
+  @override
+  String get languageNameFrench => '法语';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄语';
+
+  @override
+  String get languageNameItalian => '意大利语';
+
+  @override
+  String get languageNameGreek => '希腊语';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙语';
+
+  @override
+  String get languageNameTurkish => '土耳其语';
+
+  @override
+  String get languageNameJapanese => '日语';
+
+  @override
+  String get languageNamePolish => '波兰语';
+
+  @override
+  String get languageNameKorean => '韩语';
+
+  @override
+  String get languageNameArabic => '阿拉伯语';
+
+  @override
+  String get languageNameHindi => '印地语';
 
   @override
   String get radioFieldOrder => '排序';
@@ -5046,42 +5059,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
 
   @override
-  String get internetArchiveLanguageAll => '全部语言';
-
-  @override
-  String get internetArchiveLanguageEnglish => '英语';
-
-  @override
-  String get internetArchiveLanguageGerman => '德语';
-
-  @override
-  String get internetArchiveLanguageFrench => '法语';
-
-  @override
-  String get internetArchiveLanguageSpanish => '西班牙语';
-
-  @override
-  String get internetArchiveLanguageJapanese => '日语';
-
-  @override
-  String get internetArchiveLanguageArabic => '阿拉伯语';
-
-  @override
-  String get internetArchiveLanguageKorean => '韩语';
-
-  @override
-  String get internetArchiveLanguageRussian => '俄语';
-
-  @override
-  String get internetArchiveLanguagePortuguese => '葡萄牙语';
-
-  @override
-  String get internetArchiveLanguageChinese => '中文';
-
-  @override
-  String get internetArchiveLanguageHindi => '印地语';
-
-  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return '一个条目最多取多少首（1–$max，默认 $count）';
   }
@@ -5520,7 +5497,56 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldLanguage => '语言';
 
   @override
-  String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
+  String get radioFieldLanguageHint =>
+      '语言：可写中文、日语、法语，也可写 english、spanish 这样的英文名';
+
+  @override
+  String get languageNameAll => '全部语言';
+
+  @override
+  String get languageNameEnglish => '英语';
+
+  @override
+  String get languageNameSpanish => '西班牙语';
+
+  @override
+  String get languageNameGerman => '德语';
+
+  @override
+  String get languageNameFrench => '法语';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄语';
+
+  @override
+  String get languageNameItalian => '意大利语';
+
+  @override
+  String get languageNameGreek => '希腊语';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙语';
+
+  @override
+  String get languageNameTurkish => '土耳其语';
+
+  @override
+  String get languageNameJapanese => '日语';
+
+  @override
+  String get languageNamePolish => '波兰语';
+
+  @override
+  String get languageNameKorean => '韩语';
+
+  @override
+  String get languageNameArabic => '阿拉伯语';
+
+  @override
+  String get languageNameHindi => '印地语';
 
   @override
   String get radioFieldOrder => '排序';
@@ -8720,42 +8746,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get internetArchiveFieldLanguageHint => '只取歸檔在某種語言下的音訊';
 
   @override
-  String get internetArchiveLanguageAll => '全部語言';
-
-  @override
-  String get internetArchiveLanguageEnglish => '英語';
-
-  @override
-  String get internetArchiveLanguageGerman => '德語';
-
-  @override
-  String get internetArchiveLanguageFrench => '法語';
-
-  @override
-  String get internetArchiveLanguageSpanish => '西班牙語';
-
-  @override
-  String get internetArchiveLanguageJapanese => '日語';
-
-  @override
-  String get internetArchiveLanguageArabic => '阿拉伯語';
-
-  @override
-  String get internetArchiveLanguageKorean => '韓語';
-
-  @override
-  String get internetArchiveLanguageRussian => '俄語';
-
-  @override
-  String get internetArchiveLanguagePortuguese => '葡萄牙語';
-
-  @override
-  String get internetArchiveLanguageChinese => '中文';
-
-  @override
-  String get internetArchiveLanguageHindi => '印地語';
-
-  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return '一個條目最多取多少首（1–$max，預設 $count）';
   }
@@ -9194,7 +9184,56 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioFieldLanguage => '語言';
 
   @override
-  String get radioFieldLanguageHint => '目錄裡的語言，例如 english、spanish';
+  String get radioFieldLanguageHint =>
+      '語言：可寫中文、日語、法語，也可寫 english、spanish 這樣的英文名';
+
+  @override
+  String get languageNameAll => '全部語言';
+
+  @override
+  String get languageNameEnglish => '英語';
+
+  @override
+  String get languageNameSpanish => '西班牙語';
+
+  @override
+  String get languageNameGerman => '德語';
+
+  @override
+  String get languageNameFrench => '法語';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄語';
+
+  @override
+  String get languageNameItalian => '義大利語';
+
+  @override
+  String get languageNameGreek => '希臘語';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙語';
+
+  @override
+  String get languageNameTurkish => '土耳其語';
+
+  @override
+  String get languageNameJapanese => '日語';
+
+  @override
+  String get languageNamePolish => '波蘭語';
+
+  @override
+  String get languageNameKorean => '韓語';
+
+  @override
+  String get languageNameArabic => '阿拉伯語';
+
+  @override
+  String get languageNameHindi => '印地語';
 
   @override
   String get radioFieldOrder => '排序';

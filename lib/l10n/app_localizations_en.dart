@@ -1520,42 +1520,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Only the audio filed under one tongue';
 
   @override
-  String get internetArchiveLanguageAll => 'Every language';
-
-  @override
-  String get internetArchiveLanguageEnglish => 'English';
-
-  @override
-  String get internetArchiveLanguageGerman => 'German';
-
-  @override
-  String get internetArchiveLanguageFrench => 'French';
-
-  @override
-  String get internetArchiveLanguageSpanish => 'Spanish';
-
-  @override
-  String get internetArchiveLanguageJapanese => 'Japanese';
-
-  @override
-  String get internetArchiveLanguageArabic => 'Arabic';
-
-  @override
-  String get internetArchiveLanguageKorean => 'Korean';
-
-  @override
-  String get internetArchiveLanguageRussian => 'Russian';
-
-  @override
-  String get internetArchiveLanguagePortuguese => 'Portuguese';
-
-  @override
-  String get internetArchiveLanguageChinese => 'Chinese';
-
-  @override
-  String get internetArchiveLanguageHindi => 'Hindi';
-
-  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return 'How many tracks one item may give (1–$max, default $count)';
   }
@@ -2027,7 +1991,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldLanguageHint =>
-      'A tongue of the directory, e.g. english, spanish';
+      'A tongue: english, spanish, chinese, or the name in the language of the app';
+
+  @override
+  String get languageNameAll => 'Every language';
+
+  @override
+  String get languageNameEnglish => 'English';
+
+  @override
+  String get languageNameSpanish => 'Spanish';
+
+  @override
+  String get languageNameGerman => 'German';
+
+  @override
+  String get languageNameFrench => 'French';
+
+  @override
+  String get languageNameChinese => 'Chinese';
+
+  @override
+  String get languageNameRussian => 'Russian';
+
+  @override
+  String get languageNameItalian => 'Italian';
+
+  @override
+  String get languageNameGreek => 'Greek';
+
+  @override
+  String get languageNamePortuguese => 'Portuguese';
+
+  @override
+  String get languageNameTurkish => 'Turkish';
+
+  @override
+  String get languageNameJapanese => 'Japanese';
+
+  @override
+  String get languageNamePolish => 'Polish';
+
+  @override
+  String get languageNameKorean => 'Korean';
+
+  @override
+  String get languageNameArabic => 'Arabic';
+
+  @override
+  String get languageNameHindi => 'Hindi';
 
   @override
   String get radioFieldOrder => 'Order';

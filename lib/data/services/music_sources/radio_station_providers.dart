@@ -65,7 +65,7 @@ class RadioBrowserProvider extends RadioStationProvider {
     // The directory names its tag filter tag: a tagname parameter is ignored
     // and would answer with the unfiltered list.
     final wanted = tag?.trim().toLowerCase() ?? '';
-    final tongue = language?.trim().toLowerCase() ?? '';
+    final tongue = _languageOf(language);
     final stations = <RadioStation>[];
 
     // Every narrowing the reader wrote is one filter of the directory, so a
@@ -159,6 +159,14 @@ class RadioBrowserProvider extends RadioStationProvider {
     }
     throw failure!;
   }
+
+
+  /// The name the directory files a tongue under.
+  ///
+  /// The directory names its tongues in English and in lower case, which is
+  /// what the setting carries; a name it does not know is passed on as it was
+  /// written, so a tongue the list does not hold still reaches the directory.
+  static String _languageOf(String? raw) => raw?.trim().toLowerCase() ?? '';
 
   /// The names of the countries the directory lists, by their code.
   Map<String, String>? _countryCodes;
