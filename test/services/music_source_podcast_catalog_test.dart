@@ -49,6 +49,35 @@ void main() {
       expect(answers.uris.first.queryParameters['q'], 'jazz');
     });
 
+    test('a tag reads the shows of that tag', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedXml('Show A', 'a')},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'tag': 'Comedy', 'limit': '8'}),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(answers.uris.first.path, '/api/2/tag/comedy/8.json');
+      expect(result.songs.single.album, 'Show A');
+    });
+
+    test('a keyword still searches the whole directory', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedXml('Show A', 'a')},
+      );
+
+      await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'tag': 'comedy', 'query': 'jazz'}),
+      );
+
+      // The keyword wins over the tag: the search covers the whole directory.
+      expect(answers.uris.first.path, '/search.json');
+      expect(answers.uris.first.queryParameters['q'], 'jazz');
+    });
     test('one broken feed does not fail the whole directory', () async {
       final answers = _CatalogDio(
         search: _searchAnswer(),

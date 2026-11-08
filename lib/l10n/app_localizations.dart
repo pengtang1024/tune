@@ -2621,6 +2621,18 @@ abstract class AppLocalizations {
   /// **'输入关键词找播客，留空则浏览目录'**
   String get podcastCatalogHint;
 
+  /// No description provided for @podcastCatalogFieldTag.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标签'**
+  String get podcastCatalogFieldTag;
+
+  /// No description provided for @podcastCatalogFieldTagHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按标签找节目，例如 comedy、news、technology'**
+  String get podcastCatalogFieldTagHint;
+
   /// No description provided for @podcastCatalogFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

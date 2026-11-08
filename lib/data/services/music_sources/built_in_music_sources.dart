@@ -110,7 +110,7 @@ class BuiltInMusicSources {
       ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
-      _instance(types, 'podcast_catalog'),
+      _instance(types, 'podcast_catalog', settings: {'tag': ''}),
       _instance(
         types,
         'podcast_apple',

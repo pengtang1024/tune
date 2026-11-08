@@ -1597,6 +1597,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a keyword to find podcasts, or leave it empty to browse the directory';
 
   @override
+  String get podcastCatalogFieldTag => 'Tag';
+
+  @override
+  String get podcastCatalogFieldTagHint =>
+      'Shows of one tag, e.g. comedy, news, technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => 'e.g. jazz, history or technology';
 
   @override

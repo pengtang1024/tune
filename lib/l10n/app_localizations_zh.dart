@@ -1441,6 +1441,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
 
   @override
+  String get podcastCatalogFieldTag => '标签';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按标签找节目，例如 comedy、news、technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
 
   @override
@@ -4695,6 +4701,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
 
   @override
+  String get podcastCatalogFieldTag => '标签';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按标签找节目，例如 comedy、news、technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
 
   @override
@@ -7947,6 +7959,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastCatalogHint => '輸入關鍵字找播客，留空則瀏覽目錄';
+
+  @override
+  String get podcastCatalogFieldTag => '標籤';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按標籤找節目，例如 comedy、news、technology';
 
   @override
   String get podcastCatalogFieldQueryHint => '例如爵士、歷史、科技';

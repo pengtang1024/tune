@@ -662,6 +662,46 @@ void main() async {
   );
 
   test(
+    'the podcast directory reads a tag of its own',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final showsOfTag = <String, Set<String>>{};
+      for (final tag in const ['comedy', 'technology']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.podcastCatalog.copyWith(
+              settings: {'tag': tag, 'limit': '2'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$tag failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$tag returned nothing');
+        final shows = result.songs
+            .map((song) => song.album)
+            .where((album) => album.isNotEmpty)
+            .toSet();
+        expect(shows, isNotEmpty, reason: tag);
+        showsOfTag[tag] = shows;
+      }
+      // The tags are separate reaches of the directory, so the two scans must
+      // not answer with the same shows.
+      expect(showsOfTag['comedy'], isNot(equals(showsOfTag['technology'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'every read mode of Deezer works without a keyword',
     () async {
       final service = MusicSourceService(

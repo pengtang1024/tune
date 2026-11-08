@@ -68,6 +68,11 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.podcastCatalogFieldQueryHint,
     ),
     MusicSourceField(
+      'tag',
+      AppStrings.instance.podcastCatalogFieldTag,
+      AppStrings.instance.podcastCatalogFieldTagHint,
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -86,7 +91,11 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
       final keyword = request.config.setting('query');
-      final feeds = await _feeds(keyword, limit);
+      final feeds = await _feeds(
+        keyword,
+        limit,
+        tag: request.config.setting('tag'),
+      );
       if (feeds.isEmpty) {
         return SourceScanResult(
           sourceId: request.config.id,
@@ -129,12 +138,17 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   /// The feeds the directory answers with.
   ///
   /// Without a keyword the directory serves the shows everybody subscribes
-  /// to, so the source is ready as it is.
-  Future<List<String>> _feeds(String? keyword, int limit) async {
+  /// to, or the shows of one tag when the reader wrote one; with a keyword it
+  /// searches the whole directory.
+  Future<List<String>> _feeds(String? keyword, int limit, {String? tag}) async {
+    final wanted = tag?.trim().toLowerCase() ?? '';
+    final path = keyword != null
+        ? '$_directoryHost/search.json'
+        : wanted.isNotEmpty
+        ? '$_directoryHost/api/2/tag/$wanted/$limit.json'
+        : '$_directoryHost/toplist.json';
     final response = await _dio.get<String>(
-      keyword == null
-          ? '$_directoryHost/toplist.json'
-          : '$_directoryHost/search.json',
+      path,
       queryParameters: {'q': ?keyword},
       options: Options(responseType: ResponseType.plain),
     );
