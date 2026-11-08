@@ -55,6 +55,7 @@ class RadioBrowserProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   }) async {
     final trimmed = query.trim();
@@ -75,6 +76,10 @@ class RadioBrowserProvider extends RadioStationProvider {
       if (code.isNotEmpty) 'countrycode': code,
       if (wanted.isNotEmpty) 'tag': wanted,
       if (tongue.isNotEmpty) 'language': tongue,
+      // A floor the directory reads as a number: it answers only the stations
+      // that stream at least that fast. A floor it cannot read would answer
+      // with the whole list, so only the floors the app offers are sent.
+      if (_kbpsOf(bitrate) case final floor?) 'bitrateMin': '$floor',
     };
 
     Map<String, String> page(Map<String, String> extra) => {
@@ -160,6 +165,13 @@ class RadioBrowserProvider extends RadioStationProvider {
     throw failure!;
   }
 
+
+  /// The floor of the bitrate the reader picked, as a number.
+  static int? _kbpsOf(String? raw) {
+    final value = int.tryParse(raw?.trim() ?? '');
+    if (value == null || value < 32 || value > 320) return null;
+    return value;
+  }
 
   /// The name the directory files a tongue under.
   ///
@@ -314,6 +326,7 @@ class SomaFmProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
@@ -452,6 +465,7 @@ class RadioParadiseProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   }) async {
     final trimmed = query.trim().toLowerCase();
@@ -559,6 +573,7 @@ class NtsProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   }) async {
     // Both channels are broadcast from London; a scan of another country has
@@ -811,6 +826,7 @@ class RadioFranceProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   }) async {
     // Every channel is broadcast from Paris; a scan of another country has

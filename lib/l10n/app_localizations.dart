@@ -3509,6 +3509,30 @@ abstract class AppLocalizations {
   /// **'印地语'**
   String get languageNameHindi;
 
+  /// No description provided for @radioFieldBitrate.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最低码率'**
+  String get radioFieldBitrate;
+
+  /// No description provided for @radioFieldBitrateHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只保留码率不低于这一档的台站'**
+  String get radioFieldBitrateHint;
+
+  /// No description provided for @radioBitrateAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不限码率'**
+  String get radioBitrateAll;
+
+  /// No description provided for @radioBitrateAtLeast.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{floor} kbit/s 以上'**
+  String radioBitrateAtLeast(String floor);
+
   /// No description provided for @radioFieldOrder.
   ///
   /// In zh_CN, this message translates to:

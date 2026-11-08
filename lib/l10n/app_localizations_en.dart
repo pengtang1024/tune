@@ -2082,6 +2082,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageNameHindi => 'Hindi';
 
   @override
+  String get radioFieldBitrate => 'Bitrate';
+
+  @override
+  String get radioFieldBitrateHint =>
+      'Only the stations that stream at least this fast';
+
+  @override
+  String get radioBitrateAll => 'Every bitrate';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return 'At least $floor kbit/s';
+  }
+
+  @override
   String get radioFieldOrder => 'Order';
 
   @override

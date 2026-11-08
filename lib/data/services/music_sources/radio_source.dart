@@ -96,6 +96,12 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     };
   }
 
+  /// The bitrate floors the app offers, in kbit/s.
+  ///
+  /// The directory answers a floor it cannot read with the whole list, so the
+  /// floors are a fixed few and every one of them was read back from it.
+  static const _bitrateFloors = [64, 128, 192, 320];
+
   /// The reaches the directory files stations under, most used first.
   ///
   /// Every one of them was counted on the directory itself (with broken
@@ -174,6 +180,16 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'bitrate',
+      AppStrings.instance.radioFieldBitrate,
+      AppStrings.instance.radioFieldBitrateHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.radioBitrateAll),
+        for (final floor in _bitrateFloors)
+          MusicSourceChoice('$floor', AppStrings.instance.radioBitrateAtLeast('$floor')),
+      ],
+    ),
+    MusicSourceField(
       'order',
       AppStrings.instance.radioFieldOrder,
       AppStrings.instance.radioFieldOrderHint,
@@ -211,6 +227,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     final tag = request.config.setting('tag');
     final language = request.config.setting('language');
     final order = request.config.setting('order');
+    final bitrate = request.config.setting('bitrate');
     final limit = scanLimit.read(request.config.setting('limit'));
     final selected = _selectedProviders(request.config);
 
@@ -230,6 +247,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
             tag: tag,
             language: language,
             order: order,
+            bitrate: bitrate,
           ),
         );
       } catch (error) {
@@ -291,6 +309,9 @@ class RadioSourceAdapter extends MusicSourceAdapter {
           language: station.language,
           year: station.nowPlayingYear,
           description: station.description,
+          // The directory tells how fast a station streams; the track carries
+          // it, so the bitrate a reader filters by is the one they see.
+          bitrate: (station.bitrate ?? 0) > 0 ? station.bitrate : null,
           isLiveStream: true,
           sourceData: {
             'provider': station.provider,

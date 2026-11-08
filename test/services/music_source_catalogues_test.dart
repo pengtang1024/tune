@@ -206,6 +206,27 @@ void main() {
       // The choices are what the form offers, not what the directory reads.
       expect(captured.uris.first.queryParameters['language'], 'klingon');
     });
+    test('a bitrate floor narrows the stations', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, bitrate: '192');
+
+      expect(captured.uris.first.queryParameters['bitrateMin'], '192');
+    });
+
+    test('a floor the directory cannot read is not sent', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, bitrate: '12');
+
+      // The directory would read a floor it cannot use as no floor at all.
+      expect(
+        captured.uris.first.queryParameters.containsKey('bitrateMin'),
+        isFalse,
+      );
+    });
     test('a country written by its name is read by its code', () async {
       final captured = _CountryStations();
       final provider = RadioBrowserProvider(dio: captured.dio);

@@ -104,6 +104,7 @@ abstract class RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? bitrate,
     String? order,
   });
 }

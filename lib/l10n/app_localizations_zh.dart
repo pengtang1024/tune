@@ -1900,6 +1900,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageNameHindi => '印地语';
 
   @override
+  String get radioFieldBitrate => '最低码率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留码率不低于这一档的台站';
+
+  @override
+  String get radioBitrateAll => '不限码率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
+
+  @override
   String get radioFieldOrder => '排序';
 
   @override
@@ -5641,6 +5655,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get languageNameHindi => '印地语';
 
   @override
+  String get radioFieldBitrate => '最低码率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留码率不低于这一档的台站';
+
+  @override
+  String get radioBitrateAll => '不限码率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
+
+  @override
   String get radioFieldOrder => '排序';
 
   @override
@@ -9380,6 +9408,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get languageNameHindi => '印地語';
+
+  @override
+  String get radioFieldBitrate => '最低碼率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留碼率不低於這一檔的台站';
+
+  @override
+  String get radioBitrateAll => '不限碼率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
 
   @override
   String get radioFieldOrder => '排序';
