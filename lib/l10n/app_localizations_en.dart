@@ -1481,6 +1481,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get internetArchiveFieldPerItem => 'Tracks per item';
 
   @override
+  String get internetArchiveFieldLanguage => 'Language';
+
+  @override
+  String get internetArchiveFieldLanguageHint =>
+      'Only the audio filed under one tongue';
+
+  @override
+  String get internetArchiveLanguageAll => 'Every language';
+
+  @override
+  String get internetArchiveLanguageEnglish => 'English';
+
+  @override
+  String get internetArchiveLanguageGerman => 'German';
+
+  @override
+  String get internetArchiveLanguageFrench => 'French';
+
+  @override
+  String get internetArchiveLanguageSpanish => 'Spanish';
+
+  @override
+  String get internetArchiveLanguageJapanese => 'Japanese';
+
+  @override
+  String get internetArchiveLanguageArabic => 'Arabic';
+
+  @override
+  String get internetArchiveLanguageKorean => 'Korean';
+
+  @override
+  String get internetArchiveLanguageRussian => 'Russian';
+
+  @override
+  String get internetArchiveLanguagePortuguese => 'Portuguese';
+
+  @override
+  String get internetArchiveLanguageChinese => 'Chinese';
+
+  @override
+  String get internetArchiveLanguageHindi => 'Hindi';
+
+  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return 'How many tracks one item may give (1–$max, default $count)';
   }

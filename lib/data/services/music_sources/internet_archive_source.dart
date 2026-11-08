@@ -20,6 +20,25 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(8, 20);
 
+  /// The tongues the archive files its audio under, by the name the reader
+  /// picks. Only the tongues that were found to hold audio are offered.
+  static Map<String, String> get _languages {
+    final strings = AppStrings.instance;
+    return {
+      'English': strings.internetArchiveLanguageEnglish,
+      'German': strings.internetArchiveLanguageGerman,
+      'French': strings.internetArchiveLanguageFrench,
+      'Spanish': strings.internetArchiveLanguageSpanish,
+      'Japanese': strings.internetArchiveLanguageJapanese,
+      'Arabic': strings.internetArchiveLanguageArabic,
+      'Korean': strings.internetArchiveLanguageKorean,
+      'Russian': strings.internetArchiveLanguageRussian,
+      'Portuguese': strings.internetArchiveLanguagePortuguese,
+      'Chinese': strings.internetArchiveLanguageChinese,
+      'Hindi': strings.internetArchiveLanguageHindi,
+    };
+  }
+
   /// The most tracks one item contributes, unless the reader asks for more.
   ///
   /// A few items carry a whole archive of their own (a radio series of a
@@ -74,6 +93,16 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       'collection:netlabels AND mediatype:audio',
     ),
     MusicSourceField(
+      'language',
+      AppStrings.instance.internetArchiveFieldLanguage,
+      AppStrings.instance.internetArchiveFieldLanguageHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.internetArchiveLanguageAll),
+        for (final entry in _languages.entries)
+          MusicSourceChoice(entry.key, entry.value),
+      ],
+    ),
+    MusicSourceField(
       'perItem',
       AppStrings.instance.internetArchiveFieldPerItem,
       AppStrings.instance.internetArchiveFieldPerItemHint(
@@ -106,10 +135,14 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
       final perItem = _tracksPerItem.read(request.config.setting('perItem'));
+      final language = request.config.setting('language')?.trim() ?? '';
+      final base = query ?? 'mediatype:audio';
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
         // named: what everybody downloaded most, or what was uploaded last.
-        'q': query ?? 'mediatype:audio',
+        // A tongue narrows the stream, and the archive files it as a clause
+        // of the query.
+        'q': language.isEmpty ? base : '$base AND language:($language)',
         'fl[]': ['identifier', 'title', 'creator', 'date'],
         'rows': limit,
         'page': request.offset ~/ limit + 1,

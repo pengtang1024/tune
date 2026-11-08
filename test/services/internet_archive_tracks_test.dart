@@ -134,6 +134,36 @@ void main() {
       expect(result.songs.last.title, 'Say You Understand');
     });
 
+    test('a tongue narrows the query of the archive', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'language': 'German'}),
+      );
+
+      // The archive files a tongue as a clause of the query, so a scan of one
+      // tongue asks the same search with that clause added.
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND language:(German)',
+      );
+    });
+
+    test('every tongue asks the query as it is', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(_request({}));
+
+      expect(adapter.uris.first.queryParameters['q'], 'mediatype:audio');
+    });
     test('a record of several files is named after its item', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

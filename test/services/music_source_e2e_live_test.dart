@@ -686,6 +686,45 @@ void main() async {
   );
 
   test(
+    'a tongue of the archive answers audio of that tongue',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final albums = <String, Set<String>>{};
+      for (final language in const ['German', 'French']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.archiveMusic.copyWith(
+              settings: {
+                'query': 'collection:audio_music AND mediatype:audio',
+                'language': language,
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$language failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$language returned nothing');
+        albums[language] = result.songs.map((song) => song.album).toSet();
+      }
+
+      // The tongues are separate reaches of the archive.
+      expect(albums['German'], isNot(equals(albums['French'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the order of the radio directory answers another list',
     () async {
       final service = MusicSourceService(

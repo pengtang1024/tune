@@ -2423,6 +2423,90 @@ abstract class AppLocalizations {
   /// **'每项曲目上限'**
   String get internetArchiveFieldPerItem;
 
+  /// No description provided for @internetArchiveFieldLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get internetArchiveFieldLanguage;
+
+  /// No description provided for @internetArchiveFieldLanguageHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只取归档在某种语言下的音频'**
+  String get internetArchiveFieldLanguageHint;
+
+  /// No description provided for @internetArchiveLanguageAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部语言'**
+  String get internetArchiveLanguageAll;
+
+  /// No description provided for @internetArchiveLanguageEnglish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语'**
+  String get internetArchiveLanguageEnglish;
+
+  /// No description provided for @internetArchiveLanguageGerman.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'德语'**
+  String get internetArchiveLanguageGerman;
+
+  /// No description provided for @internetArchiveLanguageFrench.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'法语'**
+  String get internetArchiveLanguageFrench;
+
+  /// No description provided for @internetArchiveLanguageSpanish.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西班牙语'**
+  String get internetArchiveLanguageSpanish;
+
+  /// No description provided for @internetArchiveLanguageJapanese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'日语'**
+  String get internetArchiveLanguageJapanese;
+
+  /// No description provided for @internetArchiveLanguageArabic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'阿拉伯语'**
+  String get internetArchiveLanguageArabic;
+
+  /// No description provided for @internetArchiveLanguageKorean.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'韩语'**
+  String get internetArchiveLanguageKorean;
+
+  /// No description provided for @internetArchiveLanguageRussian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'俄语'**
+  String get internetArchiveLanguageRussian;
+
+  /// No description provided for @internetArchiveLanguagePortuguese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'葡萄牙语'**
+  String get internetArchiveLanguagePortuguese;
+
+  /// No description provided for @internetArchiveLanguageChinese.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文'**
+  String get internetArchiveLanguageChinese;
+
+  /// No description provided for @internetArchiveLanguageHindi.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'印地语'**
+  String get internetArchiveLanguageHindi;
+
   /// No description provided for @internetArchiveFieldPerItemHint.
   ///
   /// In zh_CN, this message translates to:

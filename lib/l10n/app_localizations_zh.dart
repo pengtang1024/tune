@@ -1337,6 +1337,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveFieldPerItem => '每项曲目上限';
 
   @override
+  String get internetArchiveFieldLanguage => '语言';
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
+
+  @override
+  String get internetArchiveLanguageAll => '全部语言';
+
+  @override
+  String get internetArchiveLanguageEnglish => '英语';
+
+  @override
+  String get internetArchiveLanguageGerman => '德语';
+
+  @override
+  String get internetArchiveLanguageFrench => '法语';
+
+  @override
+  String get internetArchiveLanguageSpanish => '西班牙语';
+
+  @override
+  String get internetArchiveLanguageJapanese => '日语';
+
+  @override
+  String get internetArchiveLanguageArabic => '阿拉伯语';
+
+  @override
+  String get internetArchiveLanguageKorean => '韩语';
+
+  @override
+  String get internetArchiveLanguageRussian => '俄语';
+
+  @override
+  String get internetArchiveLanguagePortuguese => '葡萄牙语';
+
+  @override
+  String get internetArchiveLanguageChinese => '中文';
+
+  @override
+  String get internetArchiveLanguageHindi => '印地语';
+
+  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return '一个条目最多取多少首（1–$max，默认 $count）';
   }
@@ -4854,6 +4896,48 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveFieldPerItem => '每项曲目上限';
 
   @override
+  String get internetArchiveFieldLanguage => '语言';
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
+
+  @override
+  String get internetArchiveLanguageAll => '全部语言';
+
+  @override
+  String get internetArchiveLanguageEnglish => '英语';
+
+  @override
+  String get internetArchiveLanguageGerman => '德语';
+
+  @override
+  String get internetArchiveLanguageFrench => '法语';
+
+  @override
+  String get internetArchiveLanguageSpanish => '西班牙语';
+
+  @override
+  String get internetArchiveLanguageJapanese => '日语';
+
+  @override
+  String get internetArchiveLanguageArabic => '阿拉伯语';
+
+  @override
+  String get internetArchiveLanguageKorean => '韩语';
+
+  @override
+  String get internetArchiveLanguageRussian => '俄语';
+
+  @override
+  String get internetArchiveLanguagePortuguese => '葡萄牙语';
+
+  @override
+  String get internetArchiveLanguageChinese => '中文';
+
+  @override
+  String get internetArchiveLanguageHindi => '印地语';
+
+  @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
     return '一个条目最多取多少首（1–$max，默认 $count）';
   }
@@ -8369,6 +8453,48 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get internetArchiveFieldPerItem => '每項曲目上限';
+
+  @override
+  String get internetArchiveFieldLanguage => '語言';
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取歸檔在某種語言下的音訊';
+
+  @override
+  String get internetArchiveLanguageAll => '全部語言';
+
+  @override
+  String get internetArchiveLanguageEnglish => '英語';
+
+  @override
+  String get internetArchiveLanguageGerman => '德語';
+
+  @override
+  String get internetArchiveLanguageFrench => '法語';
+
+  @override
+  String get internetArchiveLanguageSpanish => '西班牙語';
+
+  @override
+  String get internetArchiveLanguageJapanese => '日語';
+
+  @override
+  String get internetArchiveLanguageArabic => '阿拉伯語';
+
+  @override
+  String get internetArchiveLanguageKorean => '韓語';
+
+  @override
+  String get internetArchiveLanguageRussian => '俄語';
+
+  @override
+  String get internetArchiveLanguagePortuguese => '葡萄牙語';
+
+  @override
+  String get internetArchiveLanguageChinese => '中文';
+
+  @override
+  String get internetArchiveLanguageHindi => '印地語';
 
   @override
   String internetArchiveFieldPerItemHint(Object count, Object max) {
