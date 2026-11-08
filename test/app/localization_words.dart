@@ -15,6 +15,7 @@ const List<String> properNames = [
   'Audius',
   'Wikimedia Commons',
   'Subsonic',
+  'Ampache',
   'Jellyfin',
   'Emby',
   'Plex',

@@ -2867,6 +2867,66 @@ abstract class AppLocalizations {
   /// **'没有找到有声书'**
   String get audiobookshelfNoMatch;
 
+  /// No description provided for @sourceAmpacheName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Ampache 音乐库'**
+  String get sourceAmpacheName;
+
+  /// No description provided for @sourceAmpacheDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Ampache 服务器里的音乐库'**
+  String get sourceAmpacheDescription;
+
+  /// No description provided for @ampacheHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Ampache 服务器的地址与 API Key'**
+  String get ampacheHint;
+
+  /// No description provided for @ampacheFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'e.g. http://localhost:8080'**
+  String get ampacheFieldServerHint;
+
+  /// No description provided for @ampacheFieldApiKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'API Key'**
+  String get ampacheFieldApiKey;
+
+  /// No description provided for @ampacheFieldApiKeyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Ampache 账号的 API Key（首选项 → API keys）'**
+  String get ampacheFieldApiKeyHint;
+
+  /// No description provided for @ampacheFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、piano'**
+  String get ampacheFieldQueryHint;
+
+  /// No description provided for @ampacheEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Ampache 返回了空响应'**
+  String get ampacheEmptyResponse;
+
+  /// No description provided for @ampacheNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有找到匹配的曲目'**
+  String get ampacheNoMatch;
+
+  /// No description provided for @ampacheAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接 Ampache 服务器，请检查地址与 API Key'**
+  String get ampacheAuthFailed;
+
   /// No description provided for @sourcePlexName.
   ///
   /// In zh_CN, this message translates to:

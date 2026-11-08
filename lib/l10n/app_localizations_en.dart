@@ -1736,6 +1736,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audiobookshelfNoMatch => 'No audiobook found';
 
   @override
+  String get sourceAmpacheName => 'Ampache';
+
+  @override
+  String get sourceAmpacheDescription =>
+      'Music library of a self-hosted Ampache server';
+
+  @override
+  String get ampacheHint =>
+      'Type the address and the API key of your Ampache server';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API key';
+
+  @override
+  String get ampacheFieldApiKeyHint =>
+      'The API key of an Ampache account (Preferences → API keys)';
+
+  @override
+  String get ampacheFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache returned an empty response';
+
+  @override
+  String get ampacheNoMatch => 'No matching tracks on Ampache';
+
+  @override
+  String get ampacheAuthFailed =>
+      'Cannot reach the Ampache server, check the address and the API key';
+
+  @override
   String get sourcePlexName => 'Media library';
 
   @override

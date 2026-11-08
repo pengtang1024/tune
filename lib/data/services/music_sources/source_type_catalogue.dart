@@ -104,6 +104,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'ampache',
+        name: 'Ampache',
+        localizedName: strings.sourceAmpacheName,
+        description: strings.sourceAmpacheDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
         type: 'audius',
         name: 'Audius',
         localizedName: strings.sourceAudiusName,

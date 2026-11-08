@@ -67,6 +67,12 @@ class BuiltInMusicSources {
           'format': 'original',
         },
       ),
+      _instance(
+        types,
+        'ampache',
+        enabled: false,
+        settings: {'server': '', 'apiKey': '', 'query': ''},
+      ),
       _instance(types, 'audius'),
       _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
       _instance(types, 'wikimedia'),
@@ -239,6 +245,9 @@ class BuiltInMusicSources {
 
   /// The source of a self-hosted music server.
   static MusicSourceConfig get subsonic => _entry('subsonic');
+
+  /// The source of a self-hosted Ampache library.
+  static MusicSourceConfig get ampache => _entry('ampache');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

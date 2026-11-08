@@ -1564,6 +1564,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiobookshelfNoMatch => '没有找到有声书';
 
   @override
+  String get sourceAmpacheName => '自建 Ampache 音乐库';
+
+  @override
+  String get sourceAmpacheDescription => '自建 Ampache 服务器里的音乐库';
+
+  @override
+  String get ampacheHint => '填写 Ampache 服务器的地址与 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 账号的 API Key（首选项 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 返回了空响应';
+
+  @override
+  String get ampacheNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -4413,6 +4443,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiobookshelfNoMatch => '没有找到有声书';
 
   @override
+  String get sourceAmpacheName => '自建 Ampache 音乐库';
+
+  @override
+  String get sourceAmpacheDescription => '自建 Ampache 服务器里的音乐库';
+
+  @override
+  String get ampacheHint => '填写 Ampache 服务器的地址与 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 账号的 API Key（首选项 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 返回了空响应';
+
+  @override
+  String get ampacheNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -7260,6 +7320,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get audiobookshelfNoMatch => '沒有找到有聲書';
+
+  @override
+  String get sourceAmpacheName => '自架 Ampache 音樂庫';
+
+  @override
+  String get sourceAmpacheDescription => '自架 Ampache 伺服器裡的音樂庫';
+
+  @override
+  String get ampacheHint => '填寫 Ampache 伺服器的位址與 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 帳號的 API Key（偏好設定 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 傳回了空回應';
+
+  @override
+  String get ampacheNoMatch => '沒有找到符合的曲目';
+
+  @override
+  String get ampacheAuthFailed => '無法連線 Ampache 伺服器，請檢查位址與 API Key';
 
   @override
   String get sourcePlexName => '自架媒體庫';

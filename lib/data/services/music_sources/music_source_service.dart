@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/music_sources/ampache_source.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/audiobookshelf_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
@@ -80,6 +81,7 @@ class MusicSourceService implements StreamUrlResolver {
       'podcast_rss': PodcastRssSourceAdapter(dio: dio),
       'podcast_catalog': PodcastCatalogSourceAdapter(dio: dio),
       'subsonic': SubsonicSourceAdapter(dio: dio),
+      'ampache': AmpacheSourceAdapter(dio: dio),
       'audius': AudiusSourceAdapter(dio: dio),
       'radio': RadioSourceAdapter(dio: dio),
       'wikimedia': WikimediaSourceAdapter(dio: dio),
