@@ -12,6 +12,7 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -69,6 +70,40 @@ void main() {
       expect(SourceSongFactory.normalizeUrl('http://a.test/a.mp3'), isNotNull);
       expect(SourceSongFactory.normalizeUrl('file:///a.mp3'), isNull);
       expect(SourceSongFactory.normalizeUrl(''), isNull);
+    });
+  });
+
+  group('scanning a library', () {
+    test('the sources are read a few at a time', () async {
+      final adapter = _CountingAdapter();
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+        adapters: {'counting': adapter},
+      );
+      final sources = [
+        for (var index = 0; index < 20; index++)
+          MusicSourceConfig(
+            id: 's$index',
+            type: 'counting',
+            name: 'Source $index',
+            kind: MusicSourceKind.openCatalog,
+          ),
+      ];
+
+      final results = await service.scanAll(
+        sources: sources,
+        localPaths: const [],
+      );
+
+      expect(results, hasLength(20));
+      // The answers keep the order of the sources, not of the finishes.
+      expect(results.map((result) => result.sourceId), [
+        for (var index = 0; index < 20; index++) 's$index',
+      ]);
+      // Never more than the app allows at once, and more than one at all.
+      expect(adapter.peak, lessThanOrEqualTo(MusicSourceService.maxConcurrentScans));
+      expect(adapter.peak, greaterThan(1));
     });
   });
 
@@ -326,3 +361,30 @@ void main() {
   });
 }
 
+/// An adapter that counts how many of its scans run at the same time.
+class _CountingAdapter extends MusicSourceAdapter {
+  int _running = 0;
+  int peak = 0;
+
+  @override
+  String get sourceType => 'counting';
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
+
+  @override
+  String get configurationHint => 'Counting';
+
+  @override
+  Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
+    _running++;
+    if (_running > peak) peak = _running;
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    _running--;
+    return SourceScanResult(
+      sourceId: request.config.id,
+      status: SourceScanStatus.success,
+      songs: const [],
+    );
+  }
+}

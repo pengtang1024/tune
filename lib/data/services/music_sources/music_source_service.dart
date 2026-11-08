@@ -400,6 +400,12 @@ class MusicSourceService implements StreamUrlResolver {
     );
   }
 
+  /// How many sources are read at the same time.
+  ///
+  /// Enough to keep a library of forty sources moving, few enough that the
+  /// services do not read the app as a burst.
+  static const maxConcurrentScans = 6;
+
   Future<List<SourceScanResult>> scanAll({
     required List<MusicSourceConfig> sources,
     required List<String> localPaths,
@@ -415,21 +421,35 @@ class MusicSourceService implements StreamUrlResolver {
       onProgress?.call(config.id, 0);
     }
 
-    final results = await Future.wait(
-      enabled.map(
-        (config) => _scanOne(
+    // A library of forty sources read all at once looks like a burst to the
+    // services: Deezer counts the requests of a caller per five seconds and the
+    // wiki per minute, and both answer a burst with a refusal. The scans are
+    // therefore walked a few at a time, and the answers keep the order of the
+    // sources rather than the order they happened to finish in.
+    final results = List<SourceScanResult?>.filled(enabled.length, null);
+    var next = 0;
+    Future<void> walk() async {
+      while (true) {
+        final index = next++;
+        if (index >= enabled.length) return;
+        final config = enabled[index];
+        results[index] = await _scanOne(
           config,
           localPaths: localPaths,
           respectAutoScanInterval: respectAutoScanInterval,
           onProgress: (progress) => onProgress?.call(config.id, progress),
-        ),
-      ),
-    );
+        );
+      }
+    }
+
+    await Future.wait([
+      for (var i = 0; i < maxConcurrentScans; i++) walk(),
+    ]);
 
     for (final config in enabled) {
       onProgress?.call(config.id, 1);
     }
-    return results;
+    return results.whereType<SourceScanResult>().toList(growable: false);
   }
 
   Future<SourceScanResult> _scanOne(
