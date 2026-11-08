@@ -1787,6 +1787,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a keyword, or leave it empty to read Apple\'s top podcasts';
 
   @override
+  String get podcastAppleFieldMode => 'Reads';
+
+  @override
+  String get podcastAppleFieldModeHint =>
+      'The shows of the charts, or the episodes a keyword is found in';
+
+  @override
+  String get podcastAppleModeShows => 'Shows';
+
+  @override
+  String get podcastAppleModeEpisodes => 'Episodes';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired =>
+      'The episode mode needs a keyword: the store has no chart of episodes.';
+
+  @override
   String get podcastAppleFieldQueryHint => 'e.g. jazz, news, comedy';
 
   @override

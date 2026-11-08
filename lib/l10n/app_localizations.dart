@@ -2957,6 +2957,36 @@ abstract class AppLocalizations {
   /// **'填关键词，留空则读 Apple 的播客排行'**
   String get podcastAppleHint;
 
+  /// No description provided for @podcastAppleFieldMode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读取方式'**
+  String get podcastAppleFieldMode;
+
+  /// No description provided for @podcastAppleFieldModeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读榜单上的节目，还是读关键词搜到的单集'**
+  String get podcastAppleFieldModeHint;
+
+  /// No description provided for @podcastAppleModeShows.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'节目'**
+  String get podcastAppleModeShows;
+
+  /// No description provided for @podcastAppleModeEpisodes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单集'**
+  String get podcastAppleModeEpisodes;
+
+  /// No description provided for @podcastAppleEpisodeQueryRequired.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单集方式需要关键词：商店没有单集榜单。'**
+  String get podcastAppleEpisodeQueryRequired;
+
   /// No description provided for @podcastAppleFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

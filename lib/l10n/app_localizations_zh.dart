@@ -1616,6 +1616,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
 
   @override
+  String get podcastAppleFieldMode => '读取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '读榜单上的节目，还是读关键词搜到的单集';
+
+  @override
+  String get podcastAppleModeShows => '节目';
+
+  @override
+  String get podcastAppleModeEpisodes => '单集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '单集方式需要关键词：商店没有单集榜单。';
+
+  @override
   String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
 
   @override
@@ -5371,6 +5386,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
 
   @override
+  String get podcastAppleFieldMode => '读取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '读榜单上的节目，还是读关键词搜到的单集';
+
+  @override
+  String get podcastAppleModeShows => '节目';
+
+  @override
+  String get podcastAppleModeEpisodes => '单集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '单集方式需要关键词：商店没有单集榜单。';
+
+  @override
   String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
 
   @override
@@ -9124,6 +9154,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastAppleHint => '填關鍵字，留空則讀 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldMode => '讀取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '讀榜單上的節目，還是讀關鍵詞搜到的單集';
+
+  @override
+  String get podcastAppleModeShows => '節目';
+
+  @override
+  String get podcastAppleModeEpisodes => '單集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '單集方式需要關鍵詞：商店沒有單集榜單。';
 
   @override
   String get podcastAppleFieldQueryHint => '例如 爵士、新聞、喜劇';

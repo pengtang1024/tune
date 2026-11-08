@@ -43,6 +43,46 @@ void main() {
       expect(lookup.uri.queryParameters['id'], '111,222');
     });
 
+    test('the episode mode reads the episodes of a keyword', () async {
+      final server = _AppleServer();
+      final adapter = PodcastAppleSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(
+            settings: const {'query': 'jazz', 'mode': 'episodes', 'limit': '2'},
+          ),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(2));
+      final first = result.songs.first;
+      expect(first.title, 'Episode One');
+      expect(first.album, 'The Jazz Hour');
+      expect(first.duration, 1800000);
+      expect(first.streamUrl, 'https://cdn.example.com/ep-one.mp3');
+      expect(first.year, 2026);
+      expect(first.description, 'A talk about jazz.');
+
+      // The episodes carry their own files, so no feed is walked.
+      expect(server.requests, hasLength(1));
+      expect(server.requests.first.uri.queryParameters['entity'], 'podcastEpisode');
+    });
+
+    test('the episode mode asks for a keyword', () async {
+      final server = _AppleServer();
+      final adapter = PodcastAppleSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(config: _config(settings: const {'mode': 'episodes'})),
+      );
+
+      // The store has no chart of episodes, so the mode says what it needs.
+      expect(result.status, SourceScanStatus.needsConfiguration);
+      expect(result.songs, isEmpty);
+      expect(server.requests, isEmpty);
+    });
     test('a keyword searches the directory', () async {
       final server = _AppleServer();
       final adapter = PodcastAppleSourceAdapter(dio: server.dio);
@@ -256,6 +296,35 @@ class _AppleServer {
                       'collectionId': int.tryParse(entry.key),
                       'feedUrl': entry.value,
                     },
+                ],
+              }, options),
+            );
+            return;
+          }
+
+          if (path == '/search' &&
+              options.uri.queryParameters['entity'] == 'podcastEpisode') {
+            // The episode mode reads the episodes themselves: every entry
+            // carries the file of the episode.
+            handler.resolve(
+              _json({
+                'resultCount': 2,
+                'results': [
+                  {
+                    'trackName': 'Episode One',
+                    'collectionName': 'The Jazz Hour',
+                    'trackTimeMillis': 1800000,
+                    'episodeUrl': 'https://cdn.example.com/ep-one.mp3',
+                    'artworkUrl600': 'https://cdn.example.com/ep-one.jpg',
+                    'releaseDate': '2026-11-01T10:00:00Z',
+                    'description': 'A talk about <b>jazz</b>.',
+                  },
+                  {
+                    'trackName': 'Episode Two',
+                    'collectionName': 'The Jazz Hour',
+                    'trackTimeMillis': 2400000,
+                    'episodeUrl': 'https://cdn.example.com/ep-two.mp3',
+                  },
                 ],
               }, options),
             );

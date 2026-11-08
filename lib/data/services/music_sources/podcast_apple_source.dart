@@ -5,6 +5,8 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -99,6 +101,15 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.podcastAppleFieldQueryHint,
     ),
     MusicSourceField(
+      'mode',
+      AppStrings.instance.podcastAppleFieldMode,
+      AppStrings.instance.podcastAppleFieldModeHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.podcastAppleModeShows),
+        MusicSourceChoice(_modeEpisodes, AppStrings.instance.podcastAppleModeEpisodes),
+      ],
+    ),
+    MusicSourceField(
       'country',
       AppStrings.instance.podcastAppleFieldCountry,
       AppStrings.instance.podcastAppleFieldCountryHint,
@@ -145,6 +156,32 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(request.config.setting('limit'));
       final country = _countryOf(request.config);
       final keyword = request.config.setting('query')?.trim() ?? '';
+
+      // The episode mode searches the episodes themselves: the store answers
+      // with the newest ones it holds, each of them playable as it is.
+      if (request.config.setting('mode') == _modeEpisodes) {
+        if (keyword.isEmpty) {
+          return SourceScanResult(
+            sourceId: request.config.id,
+            status: SourceScanStatus.needsConfiguration,
+            message: AppStrings.instance.podcastAppleEpisodeQueryRequired,
+          );
+        }
+        final episodes = await _searchEpisodes(
+          keyword,
+          country,
+          limit,
+          request.config.id,
+        );
+        return SourceScanResult(
+          sourceId: request.config.id,
+          status: SourceScanStatus.success,
+          songs: episodes,
+          message: episodes.isEmpty
+              ? AppStrings.instance.podcastAppleNoMatch
+              : null,
+        );
+      }
 
       final feeds = keyword.isEmpty
           ? await _chartFeeds(
@@ -227,6 +264,75 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The feeds of the shows that match a keyword in a storefront.
+  /// The name of the mode that reads episodes instead of shows.
+  static const _modeEpisodes = 'episodes';
+
+  /// The year an episode came out, from the date the store gives it.
+  static int? _yearOf(Object? raw) {
+    final text = raw?.toString().trim() ?? '';
+    if (text.length < 4) return null;
+    final year = int.tryParse(text.substring(0, 4));
+    return year == null || year <= 0 ? null : year;
+  }
+
+  /// The episodes the store holds for a keyword.
+  ///
+  /// The answer carries the file of every episode, so the mode reads them
+  /// without walking the feeds of the shows.
+  Future<List<Song>> _searchEpisodes(
+    String keyword,
+    String country,
+    int limit,
+    String sourceId,
+  ) async {
+    final response = await _dio.get<String>(
+      '$_chartsHost/search',
+      queryParameters: {
+        'media': 'podcast',
+        'entity': 'podcastEpisode',
+        'term': keyword,
+        'limit': '$limit',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final decoded = _decode(response.data);
+    final results = decoded?['results'];
+    if (results is! List) return const [];
+
+    final songs = <Song>[];
+    final seen = <String>{};
+    for (final raw in results) {
+      if (raw is! Map) continue;
+      if (songs.length >= limit) break;
+      final title = raw['trackName']?.toString().trim() ?? '';
+      final stream = SourceSongFactory.normalizeUrl(
+        raw['episodeUrl']?.toString(),
+      );
+      if (title.isEmpty || stream == null || !seen.add(stream)) continue;
+
+      final show = raw['collectionName']?.toString().trim() ?? '';
+      songs.add(
+        SourceSongFactory.create(
+          sourceId: sourceId,
+          externalId: stream,
+          title: title,
+          artist: show,
+          album: show,
+          duration: SourceSongFactory.parseInt(raw['trackTimeMillis']),
+          streamUrl: stream,
+          artworkUrl: SourceSongFactory.normalizeUrl(
+            raw['artworkUrl600']?.toString() ??
+                raw['artworkUrl160']?.toString(),
+          ),
+          description: shortDescription(raw['description']),
+          year: _yearOf(raw['releaseDate']),
+        ),
+      );
+    }
+    return songs;
+  }
+
   Future<List<String>> _searchFeeds(
     String keyword,
     String country,
