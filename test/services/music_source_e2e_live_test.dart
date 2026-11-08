@@ -267,6 +267,43 @@ void main() async {
   );
 
   test(
+    'the reaches of Audius answer with tracks of that reach',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final genre in const ['Jazz', 'Classical', 'Ambient']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.audius.copyWith(
+              settings: {'genre': genre, 'window': 'week', 'limit': '3'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        // The network filters by the reach itself, so every track of the
+        // answer must carry the reach that was asked for.
+        expect(
+          result.songs.every((song) => song.genre == genre),
+          isTrue,
+          reason: '$genre answered ${result.songs.map((s) => s.genre).toSet()}',
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the kinds of book of LibriVox answer with different books',
     () async {
       final service = MusicSourceService(

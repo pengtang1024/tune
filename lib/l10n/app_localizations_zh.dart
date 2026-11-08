@@ -1505,6 +1505,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
+  String get audiusFieldGenre => '风格';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪种风格读';
+
+  @override
+  String get audiusGenreAll => '全部风格';
+
+  @override
+  String get audiusGenreElectronic => '电子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 与灵魂';
+
+  @override
+  String get audiusGenreAmbient => '氛围';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '回响贝斯';
+
+  @override
+  String get audiusFieldWindow => '时间窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '网络默认';
+
+  @override
+  String get audiusWindowWeek => '最近一周';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部时间';
+
+  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
 
   @override
@@ -4647,6 +4695,54 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
+  String get audiusFieldGenre => '风格';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪种风格读';
+
+  @override
+  String get audiusGenreAll => '全部风格';
+
+  @override
+  String get audiusGenreElectronic => '电子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 与灵魂';
+
+  @override
+  String get audiusGenreAmbient => '氛围';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '回响贝斯';
+
+  @override
+  String get audiusFieldWindow => '时间窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '网络默认';
+
+  @override
+  String get audiusWindowWeek => '最近一周';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部时间';
+
+  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
 
   @override
@@ -7787,6 +7883,54 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
+
+  @override
+  String get audiusFieldGenre => '風格';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪種風格讀';
+
+  @override
+  String get audiusGenreAll => '全部風格';
+
+  @override
+  String get audiusGenreElectronic => '電子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 與靈魂';
+
+  @override
+  String get audiusGenreAmbient => '氛圍';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '迴響貝斯';
+
+  @override
+  String get audiusFieldWindow => '時間窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '網路預設';
+
+  @override
+  String get audiusWindowWeek => '最近一週';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部時間';
 
   @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';

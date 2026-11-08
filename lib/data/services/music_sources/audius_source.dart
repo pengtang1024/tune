@@ -24,6 +24,28 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   /// The public discovery API asks every caller to name itself.
   static const _appName = 'tune';
 
+  /// The reaches of the trending list, in the names the network uses.
+  ///
+  /// The name is matched by the network itself, so only the reaches that were
+  /// read from it are offered; an unknown name answers with the whole list.
+  static const _genres = [
+    'Electronic',
+    'Hip-Hop/Rap',
+    'Jazz',
+    'Rock',
+    'Pop',
+    'R&B/Soul',
+    'Classical',
+    'Ambient',
+    'Techno',
+    'House',
+    'Dubstep',
+    'Folk',
+  ];
+
+  /// The windows the trending list may be read over.
+  static const _windows = ['week', 'month', 'allTime'];
+
   final Dio _dio;
 
   AudiusSourceAdapter({Dio? dio})
@@ -66,12 +88,63 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.audiusFieldQueryHint,
     ),
     MusicSourceField(
+      'genre',
+      AppStrings.instance.audiusFieldGenre,
+      AppStrings.instance.audiusFieldGenreHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusGenreAll),
+        for (final genre in _genres)
+          MusicSourceChoice(genre, _genreLabel(genre)),
+      ],
+    ),
+    MusicSourceField(
+      'window',
+      AppStrings.instance.audiusFieldWindow,
+      AppStrings.instance.audiusFieldWindowHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusWindowDefault),
+        for (final window in _windows)
+          MusicSourceChoice(window, _windowLabel(window)),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+  /// The name of a reach in the language of the app.
+  static String _genreLabel(String genre) {
+    final strings = AppStrings.instance;
+    return switch (genre) {
+      'Electronic' => strings.audiusGenreElectronic,
+      'Hip-Hop/Rap' => strings.audiusGenreHipHop,
+      'Jazz' => strings.genreJazz,
+      'Rock' => strings.genreRock,
+      'Pop' => strings.genrePop,
+      'R&B/Soul' => strings.audiusGenreSoul,
+      'Classical' => strings.genreClassical,
+      'Ambient' => strings.audiusGenreAmbient,
+      'Techno' => strings.audiusGenreTechno,
+      'House' => strings.audiusGenreHouse,
+      'Dubstep' => strings.audiusGenreDubstep,
+      'Folk' => strings.genreFolk,
+      _ => genre,
+    };
+  }
+
+  /// The name of a window in the language of the app.
+  static String _windowLabel(String window) {
+    final strings = AppStrings.instance;
+    return switch (window) {
+      'week' => strings.audiusWindowWeek,
+      'month' => strings.audiusWindowMonth,
+      'allTime' => strings.audiusWindowAllTime,
+      _ => window,
+    };
+  }
 
   @override
   bool get supportsPaging => true;
@@ -90,12 +163,19 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       // Without a keyword the scan pulls the tracks everybody plays; with
       // one it searches for it.
       final browsing = query == null;
+      final genre = request.config.setting('genre')?.trim() ?? '';
+      final window = request.config.setting('window')?.trim() ?? '';
       final response = await _dio.get<Map<String, dynamic>>(
         browsing
             ? '$_discoveryHost/v1/tracks/trending'
             : '$_discoveryHost/v1/tracks/search',
         queryParameters: browsing
-            ? {'app_name': _appName, 'offset': request.offset}
+            ? {
+                'app_name': _appName,
+                'offset': request.offset,
+                if (genre.isNotEmpty) 'genre': genre,
+                if (window.isNotEmpty) 'time': window,
+              }
             : {'query': query, 'app_name': _appName, 'offset': request.offset},
       );
       final data = response.data;

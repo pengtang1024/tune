@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/radio_station.dart';
 import 'package:tune/data/services/music_sources/radio_station_providers.dart';
@@ -86,6 +88,48 @@ void main() {
 
     test('answers an empty response with no track', () {
       expect(AudiusSourceAdapter.parseResults({}, sourceId: 'audius'), isEmpty);
+    });
+  });
+
+  group('Audius reaches', () {
+    test('a reach and a window are sent to the trending list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(
+        _audiusRequest(const {'genre': 'Jazz', 'window': 'week'}),
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.path, '/v1/tracks/trending');
+      expect(uri.queryParameters['genre'], 'Jazz');
+      expect(uri.queryParameters['time'], 'week');
+    });
+
+    test('a scan without a reach asks for the whole list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(_audiusRequest(const {}));
+
+      final uri = captured.uris.single;
+      expect(uri.queryParameters.containsKey('genre'), isFalse);
+      expect(uri.queryParameters.containsKey('time'), isFalse);
+    });
+
+    test('a keyword searches instead of walking the trending list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(
+        _audiusRequest(const {'query': 'nova', 'genre': 'Jazz'}),
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.path, '/v1/tracks/search');
+      expect(uri.queryParameters['query'], 'nova');
+      // The search endpoint has no reach: the setting belongs to the list.
+      expect(uri.queryParameters.containsKey('genre'), isFalse);
     });
   });
 
@@ -628,4 +672,16 @@ class _CapturedStations {
     );
     return client;
   }
+}
+
+MusicSourceScanRequest _audiusRequest(Map<String, String> settings) {
+  return MusicSourceScanRequest(
+    config: MusicSourceConfig(
+      id: 'audius',
+      type: 'audius',
+      name: 'Audius',
+      kind: MusicSourceKind.openCatalog,
+      settings: settings,
+    ),
+  );
 }

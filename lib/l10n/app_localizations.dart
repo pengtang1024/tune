@@ -2747,6 +2747,102 @@ abstract class AppLocalizations {
   /// **'填写搜索关键词，例如 jazz、ambient 或 electronic'**
   String get audiusHint;
 
+  /// No description provided for @audiusFieldGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'风格'**
+  String get audiusFieldGenre;
+
+  /// No description provided for @audiusFieldGenreHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排行榜按哪种风格读'**
+  String get audiusFieldGenreHint;
+
+  /// No description provided for @audiusGenreAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部风格'**
+  String get audiusGenreAll;
+
+  /// No description provided for @audiusGenreElectronic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电子'**
+  String get audiusGenreElectronic;
+
+  /// No description provided for @audiusGenreHipHop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'嘻哈'**
+  String get audiusGenreHipHop;
+
+  /// No description provided for @audiusGenreSoul.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'R&B 与灵魂'**
+  String get audiusGenreSoul;
+
+  /// No description provided for @audiusGenreAmbient.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'氛围'**
+  String get audiusGenreAmbient;
+
+  /// No description provided for @audiusGenreTechno.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科技舞曲'**
+  String get audiusGenreTechno;
+
+  /// No description provided for @audiusGenreHouse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'浩室'**
+  String get audiusGenreHouse;
+
+  /// No description provided for @audiusGenreDubstep.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'回响贝斯'**
+  String get audiusGenreDubstep;
+
+  /// No description provided for @audiusFieldWindow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'时间窗'**
+  String get audiusFieldWindow;
+
+  /// No description provided for @audiusFieldWindowHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排行榜回溯多久'**
+  String get audiusFieldWindowHint;
+
+  /// No description provided for @audiusWindowDefault.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络默认'**
+  String get audiusWindowDefault;
+
+  /// No description provided for @audiusWindowWeek.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近一周'**
+  String get audiusWindowWeek;
+
+  /// No description provided for @audiusWindowMonth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近一月'**
+  String get audiusWindowMonth;
+
+  /// No description provided for @audiusWindowAllTime.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部时间'**
+  String get audiusWindowAllTime;
+
   /// No description provided for @audiusFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

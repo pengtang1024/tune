@@ -1670,6 +1670,55 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a search keyword, e.g. jazz, ambient or electronic';
 
   @override
+  String get audiusFieldGenre => 'Reach';
+
+  @override
+  String get audiusFieldGenreHint =>
+      'The kind of music the trending list is read for';
+
+  @override
+  String get audiusGenreAll => 'Every kind';
+
+  @override
+  String get audiusGenreElectronic => 'Electronic';
+
+  @override
+  String get audiusGenreHipHop => 'Hip-hop';
+
+  @override
+  String get audiusGenreSoul => 'R&B and soul';
+
+  @override
+  String get audiusGenreAmbient => 'Ambient';
+
+  @override
+  String get audiusGenreTechno => 'Techno';
+
+  @override
+  String get audiusGenreHouse => 'House';
+
+  @override
+  String get audiusGenreDubstep => 'Dubstep';
+
+  @override
+  String get audiusFieldWindow => 'Window';
+
+  @override
+  String get audiusFieldWindowHint => 'How far back the trending list reaches';
+
+  @override
+  String get audiusWindowDefault => 'The network\'s default';
+
+  @override
+  String get audiusWindowWeek => 'Last week';
+
+  @override
+  String get audiusWindowMonth => 'Last month';
+
+  @override
+  String get audiusWindowAllTime => 'All time';
+
+  @override
   String get audiusFieldQueryHint => 'e.g. jazz, ambient, electronic';
 
   @override

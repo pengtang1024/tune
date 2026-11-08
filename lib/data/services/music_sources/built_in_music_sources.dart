@@ -146,7 +146,7 @@ class BuiltInMusicSources {
           'category': 'music',
         },
       ),
-      _instance(types, 'audius'),
+      _instance(types, 'audius', settings: {'genre': '', 'window': ''}),
       _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
       _instance(
         types,
