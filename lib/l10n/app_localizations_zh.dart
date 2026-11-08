@@ -1451,6 +1451,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '节目停更后仍留在 Internet Archive 上的播客单集';
 
   @override
+  String get sourceRadioRecordingsName => '电台录音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4760,6 +4767,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '节目停更后仍留在 Internet Archive 上的播客单集';
 
   @override
+  String get sourceRadioRecordingsName => '电台录音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -8067,6 +8081,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceArchivePodcastsDescription =>
       '節目停更後仍留在 Internet Archive 上的播客單集';
+
+  @override
+  String get sourceRadioRecordingsName => '電台錄音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老廣播劇收藏之外、Internet Archive 收錄的電台節目錄音';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

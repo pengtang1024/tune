@@ -844,6 +844,8 @@
   "sourceIndependentAudiobooksDescription": "Audiobooks the archive keeps outside the LibriVox collection",
   "sourceArchivePodcastsName": "Archived podcasts",
   "sourceArchivePodcastsDescription": "Podcast episodes the archive keeps after the feeds go quiet",
+  "sourceRadioRecordingsName": "Radio recordings",
+  "sourceRadioRecordingsDescription": "Broadcasts the archive keeps outside its old time radio collection",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
   "sourcePodcastRssName": "Podcasts",
   "sourcePodcastCatalogName": "Podcast directory",

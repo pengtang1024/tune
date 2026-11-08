@@ -128,6 +128,7 @@ void main() async {
           'community_music',
           'independent_audiobooks',
           'archive_podcasts',
+          'radio_recordings',
         ]),
       );
 

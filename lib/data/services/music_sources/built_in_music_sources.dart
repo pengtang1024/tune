@@ -97,6 +97,20 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'radio_recordings',
+        name: strings.sourceRadioRecordingsName,
+        description: strings.sourceRadioRecordingsDescription,
+        settings: {
+          // The collection of old time radio has an instance of its own, so
+          // this reach leaves those items out to keep the two apart.
+          'query':
+              'collection:radioprograms AND mediatype:audio AND '
+              'NOT collection:oldtimeradio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'archive_podcasts',
         name: strings.sourceArchivePodcastsName,
         description: strings.sourceArchivePodcastsDescription,
@@ -356,6 +370,9 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The source of the broadcasts the archive keeps outside old time radio.
+  static MusicSourceConfig get radioRecordings => _entry('radio_recordings');
 
   /// The source of the podcasts the archive keeps after their feeds go quiet.
   static MusicSourceConfig get archivePodcasts => _entry('archive_podcasts');

@@ -844,6 +844,8 @@
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收录的有声书",
   "sourceArchivePodcastsName": "档案播客",
   "sourceArchivePodcastsDescription": "节目停更后仍留在 Internet Archive 上的播客单集",
+  "sourceRadioRecordingsName": "电台录音",
+  "sourceRadioRecordingsDescription": "老广播剧收藏之外、Internet Archive 收录的电台节目录音",
   "sourcePodcastRssDescription": "把任意 RSS 播客订阅变成可播放的单集",
   "sourcePodcastRssName": "播客订阅",
   "sourcePodcastCatalogName": "播客目录",

@@ -2639,6 +2639,18 @@ abstract class AppLocalizations {
   /// **'节目停更后仍留在 Internet Archive 上的播客单集'**
   String get sourceArchivePodcastsDescription;
 
+  /// No description provided for @sourceRadioRecordingsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台录音'**
+  String get sourceRadioRecordingsName;
+
+  /// No description provided for @sourceRadioRecordingsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'老广播剧收藏之外、Internet Archive 收录的电台节目录音'**
+  String get sourceRadioRecordingsDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

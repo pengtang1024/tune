@@ -1605,6 +1605,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Podcast episodes the archive keeps after the feeds go quiet';
 
   @override
+  String get sourceRadioRecordingsName => 'Radio recordings';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      'Broadcasts the archive keeps outside its old time radio collection';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 
