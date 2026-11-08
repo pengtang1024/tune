@@ -686,6 +686,49 @@ void main() async {
   );
 
   test(
+    'the order of the radio directory answers another list',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final order in const ['votes', 'clickcount']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'order': order,
+                'tag': '',
+                'language': '',
+                'query': '',
+                'limit': '5',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$order failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$order returned nothing');
+        seen[order] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The votes of the years and the listening of the day are two lists of
+      // the directory, not one list under two names.
+      expect(seen['votes'], isNot(equals(seen['clickcount'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the category of the podcast chart answers its own shows',
     () async {
       final service = MusicSourceService(

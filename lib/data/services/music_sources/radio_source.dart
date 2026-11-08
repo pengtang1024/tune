@@ -77,6 +77,15 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.radioFieldLanguageHint,
     ),
     MusicSourceField(
+      'order',
+      AppStrings.instance.radioFieldOrder,
+      AppStrings.instance.radioFieldOrderHint,
+      choices: [
+        MusicSourceChoice('votes', AppStrings.instance.radioOrderVotes),
+        MusicSourceChoice('clickcount', AppStrings.instance.radioOrderListened),
+      ],
+    ),
+    MusicSourceField(
       'query',
       AppStrings.instance.radioFieldQuery,
       AppStrings.instance.radioFieldQueryHint,
@@ -104,6 +113,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     final country = request.config.setting('country');
     final tag = request.config.setting('tag');
     final language = request.config.setting('language');
+    final order = request.config.setting('order');
     final limit = scanLimit.read(request.config.setting('limit'));
     final selected = _selectedProviders(request.config);
 
@@ -122,6 +132,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
             offset: request.offset,
             tag: tag,
             language: language,
+            order: order,
           ),
         );
       } catch (error) {

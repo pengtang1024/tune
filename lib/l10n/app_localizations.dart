@@ -3149,6 +3149,30 @@ abstract class AppLocalizations {
   /// **'目录里的语言，例如 english、spanish'**
   String get radioFieldLanguageHint;
 
+  /// No description provided for @radioFieldOrder.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排序'**
+  String get radioFieldOrder;
+
+  /// No description provided for @radioFieldOrderHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'哪些台排在前面'**
+  String get radioFieldOrderHint;
+
+  /// No description provided for @radioOrderVotes.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'得票最多'**
+  String get radioOrderVotes;
+
+  /// No description provided for @radioOrderListened.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在收听最多'**
+  String get radioOrderListened;
+
   /// No description provided for @radioFieldTag.
   ///
   /// In zh_CN, this message translates to:

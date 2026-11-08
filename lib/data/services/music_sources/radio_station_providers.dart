@@ -55,8 +55,12 @@ class RadioBrowserProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   }) async {
     final trimmed = query.trim();
+    // The directory knows two orders worth offering: the votes a station
+    // gathered over the years, and how much it is listened to right now.
+    final sort = order?.trim() == 'clickcount' ? 'clickcount' : 'votes';
     final code = country?.trim() ?? '';
     // The directory names its tag filter tag: a tagname parameter is ignored
     // and would answer with the unfiltered list.
@@ -77,7 +81,7 @@ class RadioBrowserProvider extends RadioStationProvider {
       ...extra,
       'limit': '$limit',
       if (offset > 0) 'offset': '$offset',
-      'order': 'votes',
+      'order': sort,
       'reverse': 'true',
       'hidebroken': 'true',
     };
@@ -100,11 +104,9 @@ class RadioBrowserProvider extends RadioStationProvider {
         );
       }
     } else if (trimmed.isEmpty) {
-      stations.addAll(
-        await _read('/stations/topclick/$limit', {
-          if (offset > 0) 'offset': '$offset',
-        }),
-      );
+      // The highlights of the directory are its stations ordered by the
+      // reader's choice: the votes of the years, or the listening of the day.
+      stations.addAll(await _read('/stations/search', page({})));
     } else {
       stations.addAll(
         await _read('/stations/search', page({'name': trimmed})),
@@ -251,6 +253,7 @@ class SomaFmProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
@@ -388,6 +391,7 @@ class RadioParadiseProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   }) async {
     final trimmed = query.trim().toLowerCase();
     final selected = _stations.entries
@@ -494,6 +498,7 @@ class NtsProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   }) async {
     // Both channels are broadcast from London; a scan of another country has
     // nothing to take from them.
@@ -745,6 +750,7 @@ class RadioFranceProvider extends RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   }) async {
     // Every channel is broadcast from Paris; a scan of another country has
     // nothing to take from the network.

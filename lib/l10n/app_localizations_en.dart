@@ -1883,6 +1883,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'A tongue of the directory, e.g. english, spanish';
 
   @override
+  String get radioFieldOrder => 'Order';
+
+  @override
+  String get radioFieldOrderHint => 'Which stations come first';
+
+  @override
+  String get radioOrderVotes => 'Most voted';
+
+  @override
+  String get radioOrderListened => 'Most listened to';
+
+  @override
   String get radioFieldTag => 'Tag';
 
   @override

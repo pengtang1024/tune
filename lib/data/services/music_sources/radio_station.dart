@@ -94,6 +94,9 @@ abstract class RadioStationProvider {
   /// [tag] and [language] narrow the stations to a reach and a tongue. A
   /// directory that does not know one of the narrowings answers as if it was
   /// not written.
+  ///
+  /// [order] says which stations come first: `votes` is what listeners voted
+  /// for over the years, `clickcount` what is listened to the most right now.
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
@@ -101,5 +104,6 @@ abstract class RadioStationProvider {
     int offset = 0,
     String? tag,
     String? language,
+    String? order,
   });
 }

@@ -261,6 +261,27 @@ void main() {
       expect(uri.queryParameters['language'], 'french');
     });
 
+    test('the order of the directory is asked for', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, order: 'clickcount');
+
+      final uri = captured.uris.first;
+      expect(uri.path, '/json/stations/search');
+      expect(uri.queryParameters['order'], 'clickcount');
+    });
+
+    test('an order the directory does not know falls back to votes', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, order: 'clicktrend');
+
+      // The directory answers clicktrend with the clickcount chart, so an
+      // order it does not honour is not asked for: the votes are read.
+      expect(captured.uris.first.queryParameters['order'], 'votes');
+    });
     test('an unreachable mirror falls back to another one', () async {
       final captured = _FailoverStations();
       final provider = RadioBrowserProvider(dio: captured.dio);

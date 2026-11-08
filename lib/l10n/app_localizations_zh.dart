@@ -1711,6 +1711,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
 
   @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收听最多';
+
+  @override
   String get radioFieldTag => '标签';
 
   @override
@@ -5175,6 +5187,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
 
   @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收听最多';
+
+  @override
   String get radioFieldTag => '标签';
 
   @override
@@ -8637,6 +8661,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldLanguageHint => '目錄裡的語言，例如 english、spanish';
+
+  @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收聽最多';
 
   @override
   String get radioFieldTag => '標籤';
