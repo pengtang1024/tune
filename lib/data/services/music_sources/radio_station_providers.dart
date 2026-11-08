@@ -53,12 +53,31 @@ class RadioBrowserProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
   }) async {
     final trimmed = query.trim();
     final code = country?.trim() ?? '';
+    // The directory names its tag filter tag: a tagname parameter is ignored
+    // and would answer with the unfiltered list.
+    final wanted = tag?.trim().toLowerCase() ?? '';
     final stations = <RadioStation>[];
 
-    if (code.isNotEmpty) {
+    if (wanted.isNotEmpty) {
+      // A tag is a reach of the whole directory: with a keyword it narrows by
+      // name inside the reach, without one it is the reach itself.
+      stations.addAll(
+        await _read('/stations/search', {
+          'tag': wanted,
+          if (code.isNotEmpty) 'countrycode': code,
+          if (trimmed.isNotEmpty) 'name': trimmed,
+          'limit': '$limit',
+          if (offset > 0) 'offset': '$offset',
+          'order': 'votes',
+          'reverse': 'true',
+          'hidebroken': 'true',
+        }),
+      );
+    } else if (code.isNotEmpty) {
       stations.addAll(
         await _read('/stations/search', {
           'countrycode': code,
@@ -73,7 +92,7 @@ class RadioBrowserProvider extends RadioStationProvider {
         stations.addAll(
           await _read('/stations/search', {
             'countrycode': code,
-            'tagname': trimmed,
+            'tag': trimmed.toLowerCase(),
             'limit': '$limit',
             if (offset > 0) 'offset': '$offset',
             'order': 'votes',
@@ -96,7 +115,7 @@ class RadioBrowserProvider extends RadioStationProvider {
         'reverse': 'true',
       });
       final byTag = await _read('/stations/search', {
-        'tagname': trimmed,
+        'tag': trimmed.toLowerCase(),
         'limit': '$limit',
         if (offset > 0) 'offset': '$offset',
         'order': 'votes',
@@ -241,6 +260,7 @@ class SomaFmProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
@@ -376,6 +396,7 @@ class RadioParadiseProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
   }) async {
     final trimmed = query.trim().toLowerCase();
     final selected = _stations.entries
@@ -480,6 +501,7 @@ class NtsProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
   }) async {
     // Both channels are broadcast from London; a scan of another country has
     // nothing to take from them.
@@ -729,6 +751,7 @@ class RadioFranceProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
   }) async {
     // Every channel is broadcast from Paris; a scan of another country has
     // nothing to take from the network.

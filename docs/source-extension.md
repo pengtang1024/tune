@@ -73,7 +73,7 @@ MusicSourceConfig（实例 · 数据）
 | type | 名称 | kind | 内置实例 | 浏览流 | 用户要填的参数 |
 | --- | --- | --- | --- | --- | --- |
 | `local` | 本地音乐 | `localDirectory` | `local` | — | 扫描目录（走全局设置） |
-| `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 台站目录、关键词、数量 |
+| `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 电台目录、标签、国家/地区、关键词、数量 |
 | `azuracast` | AzuraCast | `openApi` | `azuracast` | — | 服务器地址、API Key（可选）、关键词、数量 |
 | `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空） |
 | `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 | Client ID、关键词（可留空）、音质 |

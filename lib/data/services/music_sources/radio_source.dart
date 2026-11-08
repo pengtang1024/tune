@@ -67,6 +67,11 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.radioFieldCountryHint,
     ),
     MusicSourceField(
+      'tag',
+      AppStrings.instance.radioFieldTag,
+      AppStrings.instance.radioFieldTagHint,
+    ),
+    MusicSourceField(
       'query',
       AppStrings.instance.radioFieldQuery,
       AppStrings.instance.radioFieldQueryHint,
@@ -92,6 +97,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query') ?? '';
     final country = request.config.setting('country');
+    final tag = request.config.setting('tag');
     final limit = scanLimit.read(request.config.setting('limit'));
     final selected = _selectedProviders(request.config);
 
@@ -108,6 +114,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
             limit: limit,
             country: country,
             offset: request.offset,
+            tag: tag,
           ),
         );
       } catch (error) {

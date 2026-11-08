@@ -1536,6 +1536,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
 
   @override
+  String get radioFieldTag => '标签';
+
+  @override
+  String get radioFieldTagHint => '目录里的一个分类，例如 jazz、古典、新闻';
+
+  @override
   String get radioFieldQuery => '电台关键词';
 
   @override
@@ -4642,6 +4648,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
 
   @override
+  String get radioFieldTag => '标签';
+
+  @override
+  String get radioFieldTagHint => '目录里的一个分类，例如 jazz、古典、新闻';
+
+  @override
   String get radioFieldQuery => '电台关键词';
 
   @override
@@ -7746,6 +7758,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldCountryHint => '兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填';
+
+  @override
+  String get radioFieldTag => '標籤';
+
+  @override
+  String get radioFieldTagHint => '目錄裡的一個分類，例如 jazz、古典、新聞';
 
   @override
   String get radioFieldQuery => '電台關鍵字';

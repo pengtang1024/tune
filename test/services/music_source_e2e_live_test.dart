@@ -267,6 +267,43 @@ void main() async {
   );
 
   test(
+    'the radio source reads a tag of the directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final radio = BuiltInMusicSources.radio;
+
+      for (final tag in const ['jazz', 'classical', 'news']) {
+        final result = (await service.scanAll(
+          sources: [
+            radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'tag': tag,
+                'query': '',
+                'limit': '5',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$tag failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$tag returned nothing');
+        expect(result.songs.first.streamUrl, startsWith('http'));
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service reads the previews of the iTunes store',
     () async {
       final service = MusicSourceService(

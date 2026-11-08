@@ -1703,6 +1703,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works';
 
   @override
+  String get radioFieldTag => 'Tag';
+
+  @override
+  String get radioFieldTagHint =>
+      'A reach of the directory, e.g. jazz, classical, news';
+
+  @override
   String get radioFieldQuery => 'Station keyword';
 
   @override

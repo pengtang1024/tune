@@ -139,6 +139,55 @@ void main() {
       expect(captured.uris.first.path, '/json/stations/search');
     });
 
+    test('a tag reads a reach of the whole directory', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, tag: 'Jazz');
+
+      final uri = captured.uris.first;
+      expect(uri.path, '/json/stations/search');
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters.containsKey('name'), isFalse);
+    });
+
+    test('a tag and a country narrow together', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'SG', tag: 'jazz');
+
+      final uri = captured.uris.first;
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters['countrycode'], 'SG');
+    });
+
+    test('a keyword searches by the tag parameter the directory reads', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: 'jazz', limit: 5);
+
+      // The directory ignores a tagname parameter and would answer with the
+      // unfiltered list, so neither request may use it.
+      for (final uri in captured.uris) {
+        expect(uri.queryParameters.containsKey('tagname'), isFalse);
+      }
+      // One request searches the names, the other the tag.
+      expect(
+        captured.uris
+            .where((uri) => uri.queryParameters['tag'] == 'jazz')
+            .length,
+        1,
+      );
+      expect(
+        captured.uris
+            .where((uri) => uri.queryParameters['name'] == 'jazz')
+            .length,
+        1,
+      );
+    });
+
     test('an unreachable mirror falls back to another one', () async {
       final captured = _FailoverStations();
       final provider = RadioBrowserProvider(dio: captured.dio);
