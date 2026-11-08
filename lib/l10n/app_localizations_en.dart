@@ -1722,6 +1722,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a search keyword, e.g. piano, lecture or birdsong';
 
   @override
+  String get wikimediaFieldCategory => 'Catalogue';
+
+  @override
+  String get wikimediaFieldCategoryHint => 'The reach of the wiki to walk';
+
+  @override
+  String get wikimediaCategoryAll => 'All music';
+
+  @override
+  String get wikimediaCategoryPiano => 'Piano';
+
+  @override
+  String get wikimediaCategoryGuitar => 'Guitar';
+
+  @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
 
   @override

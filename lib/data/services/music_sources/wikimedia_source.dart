@@ -28,6 +28,20 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   /// The category that names the genre of an audio file.
   static const _genreCategory = 'Audio files of';
 
+  /// The categories a scan may walk, by the name the reader picks.
+  ///
+  /// Commons files its audio under one category per reach; a scan walks the
+  /// one the reader picked, or the whole of the music of the wiki.
+  static const _categories = <String, String>{
+    'all': 'Category:Audio files of music',
+    'classical': 'Category:Audio files of classical music',
+    'jazz': 'Category:Audio files of jazz music',
+    'electronic': 'Category:Audio files of electronic music',
+    'folk': 'Category:Audio files of folk music',
+    'piano': 'Category:Audio files of piano music',
+    'guitar': 'Category:Audio files of guitar music',
+  };
+
   /// The category a scan browses when the reader names no keyword.
   static const _browseCategory = 'Category:Audio files of music';
 
@@ -73,12 +87,35 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.wikimediaFieldQueryHint,
     ),
     MusicSourceField(
+      'category',
+      AppStrings.instance.wikimediaFieldCategory,
+      AppStrings.instance.wikimediaFieldCategoryHint,
+      choices: [
+        for (final entry in _categories.keys)
+          MusicSourceChoice(entry, _categoryLabel(entry)),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitFiles,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+  /// The name of a category in the language of the app.
+  static String _categoryLabel(String category) {
+    final strings = AppStrings.instance;
+    return switch (category) {
+      'classical' => strings.genreClassical,
+      'jazz' => strings.genreJazz,
+      'electronic' => strings.genreElectronic,
+      'folk' => strings.genreFolk,
+      'piano' => strings.wikimediaCategoryPiano,
+      'guitar' => strings.wikimediaCategoryGuitar,
+      _ => strings.wikimediaCategoryAll,
+    };
+  }
 
   /// Only the search stream knows where the next window starts; the category
   /// stream walks a list with a continuation token, which an offset cannot
@@ -105,7 +142,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'action': 'query',
                 'format': 'json',
                 'generator': 'categorymembers',
-                'gcmtitle': _browseCategory,
+                'gcmtitle': _categoryOf(request.config),
                 'gcmtype': 'file',
                 'gcmnamespace': _fileNamespace,
                 'gcmlimit': limit,
@@ -147,6 +184,12 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(request.config.id, error);
     }
+  }
+
+  /// The category the instance walks.
+  static String _categoryOf(MusicSourceConfig config) {
+    final chosen = config.setting('category');
+    return _categories[chosen] ?? _browseCategory;
   }
 
   /// The token the next window of the category walk starts at.

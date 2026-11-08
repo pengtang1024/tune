@@ -154,7 +154,7 @@ class BuiltInMusicSources {
         enabled: false,
         settings: {'server': '', 'apiKey': '', 'query': ''},
       ),
-      _instance(types, 'wikimedia'),
+      _instance(types, 'wikimedia', settings: {'category': 'all'}),
       _instance(
         types,
         'jellyfin',

@@ -80,7 +80,7 @@ MusicSourceConfig（实例 · 数据）
 | `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 / 最新 | 查询条件（可留空）、数量 |
 | `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 | 标签（可留空）、数量 |
 | `audius` | Audius | `openCatalog` | `audius` | 排行 | 关键词（可留空）、数量 |
-| `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、数量 |
+| `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、目录、数量 |
 | `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
 | `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、读取方式（单曲 / 专辑）、国家/地区、数量 |
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
@@ -153,7 +153,7 @@ MusicSourceConfig（实例 · 数据）
 | `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
 | `internet_archive` | `charts` / `latest` | `q` 只留 `mediatype:audio`，`sort[]` 按浏览流取 `downloads desc` 或 `publicdate desc` | ✅ |
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
-| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
+| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（7 个音频分类） | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
 | `itunes` | 无（关键词必填） | `term` 必填，接口不提供无词列表；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算；「读取方式=专辑」时先 `entity=album` 搜专辑，再用一次多点 `lookup` 取整张曲目 | ✅ |

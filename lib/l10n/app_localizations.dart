@@ -2843,6 +2843,36 @@ abstract class AppLocalizations {
   /// **'填写搜索关键词，例如 piano、lecture 或 birdsong'**
   String get wikimediaHint;
 
+  /// No description provided for @wikimediaFieldCategory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'目录'**
+  String get wikimediaFieldCategory;
+
+  /// No description provided for @wikimediaFieldCategoryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'要浏览的维基音频分类'**
+  String get wikimediaFieldCategoryHint;
+
+  /// No description provided for @wikimediaCategoryAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部音乐'**
+  String get wikimediaCategoryAll;
+
+  /// No description provided for @wikimediaCategoryPiano.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'钢琴'**
+  String get wikimediaCategoryPiano;
+
+  /// No description provided for @wikimediaCategoryGuitar.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'吉他'**
+  String get wikimediaCategoryGuitar;
+
   /// No description provided for @wikimediaFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

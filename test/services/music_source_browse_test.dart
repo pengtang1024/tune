@@ -115,6 +115,43 @@ void main() {
       expect(captured.uri?.queryParameters['gcmtitle'], isNotEmpty);
     });
 
+    test('Wikimedia walks the category the reader picked', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'jazz'}),
+      );
+
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Audio files of jazz music',
+      );
+    });
+
+    test('Wikimedia walks the whole music of the wiki by default', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {}),
+      );
+
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Audio files of music',
+      );
+    });
+
+    test('a keyword still searches the wiki, whatever the category', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'jazz', 'query': 'piano'}),
+      );
+
+      expect(captured.uri?.queryParameters['generator'], 'search');
+      expect(captured.uri?.queryParameters.containsKey('gcmtitle'), isFalse);
+    });
+
     test('Jamendo serves its charts', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

@@ -1554,6 +1554,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
+  String get wikimediaFieldCategory => '目录';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要浏览的维基音频分类';
+
+  @override
+  String get wikimediaCategoryAll => '全部音乐';
+
+  @override
+  String get wikimediaCategoryPiano => '钢琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -4645,6 +4660,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
 
   @override
+  String get wikimediaFieldCategory => '目录';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要浏览的维基音频分类';
+
+  @override
+  String get wikimediaCategoryAll => '全部音乐';
+
+  @override
+  String get wikimediaCategoryPiano => '钢琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -7734,6 +7764,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldCategory => '目錄';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要瀏覽的維基音訊分類';
+
+  @override
+  String get wikimediaCategoryAll => '全部音樂';
+
+  @override
+  String get wikimediaCategoryPiano => '鋼琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
