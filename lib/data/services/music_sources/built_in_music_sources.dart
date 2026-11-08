@@ -89,6 +89,12 @@ class BuiltInMusicSources {
         enabled: false,
         settings: {'server': '', 'apiKey': '', 'query': ''},
       ),
+      _instance(
+        types,
+        'koel',
+        enabled: false,
+        settings: {'server': '', 'email': '', 'password': '', 'query': ''},
+      ),
       _instance(types, 'audius'),
       _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
       _instance(
@@ -276,6 +282,8 @@ class BuiltInMusicSources {
 
   /// The source of a self-hosted Ampache library.
   static MusicSourceConfig get ampache => _entry('ampache');
+
+  static MusicSourceConfig get koel => _entry('koel');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

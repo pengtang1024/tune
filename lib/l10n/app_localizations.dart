@@ -1697,6 +1697,12 @@ abstract class AppLocalizations {
   /// **'服务器地址'**
   String get fieldServer;
 
+  /// No description provided for @fieldEmail.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'邮箱'**
+  String get fieldEmail;
+
   /// No description provided for @fieldUser.
   ///
   /// In zh_CN, this message translates to:
@@ -3004,6 +3010,72 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'无法连接 AzuraCast 服务器，请检查地址与 API Key'**
   String get azuracastAuthFailed;
+
+  /// No description provided for @sourceKoelName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Koel 音乐库'**
+  String get sourceKoelName;
+
+  /// No description provided for @sourceKoelDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Koel 服务器的音乐库'**
+  String get sourceKoelDescription;
+
+  /// No description provided for @koelHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Koel 服务器的地址、邮箱与密码'**
+  String get koelHint;
+
+  /// No description provided for @koelFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:8000'**
+  String get koelFieldServerHint;
+
+  /// No description provided for @koelFieldEmailHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Koel 账号的邮箱'**
+  String get koelFieldEmailHint;
+
+  /// No description provided for @koelFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Koel 账号的密码'**
+  String get koelFieldPasswordHint;
+
+  /// No description provided for @koelFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、钢琴'**
+  String get koelFieldQueryHint;
+
+  /// No description provided for @koelEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Koel 返回了空响应'**
+  String get koelEmptyResponse;
+
+  /// No description provided for @koelNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Koel 上没有匹配的曲目'**
+  String get koelNoMatch;
+
+  /// No description provided for @koelAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法登录 Koel 服务器，请检查地址、邮箱与密码'**
+  String get koelAuthFailed;
+
+  /// No description provided for @koelTwoFactor.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Koel 账号开启了两步验证，此音源无法登录'**
+  String get koelTwoFactor;
 
   /// No description provided for @sourcePlexName.
   ///

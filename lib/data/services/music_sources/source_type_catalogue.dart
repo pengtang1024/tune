@@ -111,6 +111,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'koel',
+        name: 'Koel',
+        localizedName: strings.sourceKoelName,
+        description: strings.sourceKoelDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
         type: 'audius',
         name: 'Audius',
         localizedName: strings.sourceAudiusName,

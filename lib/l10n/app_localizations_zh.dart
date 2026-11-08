@@ -908,6 +908,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldServer => '服务器地址';
 
   @override
+  String get fieldEmail => '邮箱';
+
+  @override
   String get fieldUser => '用户名';
 
   @override
@@ -1631,6 +1634,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceKoelName => '自建 Koel 音乐库';
+
+  @override
+  String get sourceKoelDescription => '自建 Koel 服务器的音乐库';
+
+  @override
+  String get koelHint => '填写 Koel 服务器的地址、邮箱与密码';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 账号的邮箱';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 账号的密码';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 返回了空响应';
+
+  @override
+  String get koelNoMatch => 'Koel 上没有匹配的曲目';
+
+  @override
+  String get koelAuthFailed => '无法登录 Koel 服务器，请检查地址、邮箱与密码';
+
+  @override
+  String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
   String get sourcePlexName => '自建媒体库';
@@ -3826,6 +3862,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldServer => '服务器地址';
 
   @override
+  String get fieldEmail => '邮箱';
+
+  @override
   String get fieldUser => '用户名';
 
   @override
@@ -4549,6 +4588,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceKoelName => '自建 Koel 音乐库';
+
+  @override
+  String get sourceKoelDescription => '自建 Koel 服务器的音乐库';
+
+  @override
+  String get koelHint => '填写 Koel 服务器的地址、邮箱与密码';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 账号的邮箱';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 账号的密码';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 返回了空响应';
+
+  @override
+  String get koelNoMatch => 'Koel 上没有匹配的曲目';
+
+  @override
+  String get koelAuthFailed => '无法登录 Koel 服务器，请检查地址、邮箱与密码';
+
+  @override
+  String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
   String get sourcePlexName => '自建媒体库';
@@ -6744,6 +6816,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get fieldServer => '伺服器位址';
 
   @override
+  String get fieldEmail => '電子郵件';
+
+  @override
   String get fieldUser => '使用者名稱';
 
   @override
@@ -7467,6 +7542,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get azuracastAuthFailed => '無法連線 AzuraCast 伺服器，請檢查位址與 API Key';
+
+  @override
+  String get sourceKoelName => '自架 Koel 音樂庫';
+
+  @override
+  String get sourceKoelDescription => '自架 Koel 伺服器的音樂庫';
+
+  @override
+  String get koelHint => '填寫 Koel 伺服器的位址、電子郵件與密碼';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 帳號的電子郵件';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 帳號的密碼';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 傳回了空回應';
+
+  @override
+  String get koelNoMatch => 'Koel 上沒有符合的曲目';
+
+  @override
+  String get koelAuthFailed => '無法登入 Koel 伺服器，請檢查位址、電子郵件與密碼';
+
+  @override
+  String get koelTwoFactor => 'Koel 帳號開啟了兩步驗證，此音源無法登入';
 
   @override
   String get sourcePlexName => '自架媒體庫';

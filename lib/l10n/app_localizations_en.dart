@@ -978,6 +978,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldServer => 'Server address';
 
   @override
+  String get fieldEmail => 'Email';
+
+  @override
   String get fieldUser => 'User name';
 
   @override
@@ -1813,6 +1816,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get azuracastAuthFailed =>
       'Cannot reach the AzuraCast server, check the address and the API key';
+
+  @override
+  String get sourceKoelName => 'Koel';
+
+  @override
+  String get sourceKoelDescription =>
+      'Music library of a self-hosted Koel server';
+
+  @override
+  String get koelHint =>
+      'Type the address, the email and the password of your Koel server';
+
+  @override
+  String get koelFieldServerHint => 'e.g. http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'The email of a Koel account';
+
+  @override
+  String get koelFieldPasswordHint => 'The password of the Koel account';
+
+  @override
+  String get koelFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get koelEmptyResponse => 'Koel returned an empty response';
+
+  @override
+  String get koelNoMatch => 'No matching tracks on Koel';
+
+  @override
+  String get koelAuthFailed =>
+      'Cannot sign in to the Koel server, check the address, the email and the password';
+
+  @override
+  String get koelTwoFactor =>
+      'The Koel account uses two-factor sign-in, which this source cannot do';
 
   @override
   String get sourcePlexName => 'Media library';
