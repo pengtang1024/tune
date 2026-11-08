@@ -49,6 +49,48 @@ class RadioSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.radioHint;
 
+
+  /// The reaches the directory files stations under, most used first.
+  ///
+  /// Every one of them was counted on the directory itself (with broken
+  /// stations left out), and only the reaches that hold a few hundred
+  /// stations are offered: a tag nothing is filed under would be an option
+  /// that answers with nothing.
+  static const _tags = <String>[
+    'pop',
+    'rock',
+    'news',
+    'talk',
+    'dance',
+    'classical',
+    'jazz',
+    'electronic',
+    'oldies',
+    '80s',
+    '90s',
+    'top 40',
+    'house',
+    'alternative',
+    'country',
+    'folk',
+    'soul',
+    'metal',
+    'indie',
+    'ambient',
+    'gospel',
+    'techno',
+    'blues',
+    'disco',
+    'funk',
+    'lounge',
+    'chillout',
+    'easy listening',
+    'salsa',
+    'reggae',
+    'trance',
+    'hiphop',
+  ];
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
@@ -70,6 +112,10 @@ class RadioSourceAdapter extends MusicSourceAdapter {
       'tag',
       AppStrings.instance.radioFieldTag,
       AppStrings.instance.radioFieldTagHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.radioTagAll),
+        for (final tag in _tags) MusicSourceChoice(tag, tag),
+      ],
     ),
     MusicSourceField(
       'language',

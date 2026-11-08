@@ -258,8 +258,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('配置 网络电台'), findsOneWidget);
-    // The directory and the order of its stations are two dropdowns.
-    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(2));
+    // The directory, the reach of the directory and the order of its stations
+    // are three dropdowns.
+    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(3));
     expect(find.text('全部目录'), findsOneWidget);
     expect(find.text('得票最多'), findsOneWidget);
 

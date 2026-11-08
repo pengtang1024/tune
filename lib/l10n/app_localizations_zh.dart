@@ -1849,7 +1849,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldTag => '标签';
 
   @override
-  String get radioFieldTagHint => '目录里的一个分类，例如 jazz、古典、新闻';
+  String get radioFieldTagHint => '目录里实测有几百个台站的分类；想按冷门标签找，把它写进关键词';
+
+  @override
+  String get radioTagAll => '全部分类';
 
   @override
   String get radioFieldQuery => '电台关键词';
@@ -5460,7 +5463,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldTag => '标签';
 
   @override
-  String get radioFieldTagHint => '目录里的一个分类，例如 jazz、古典、新闻';
+  String get radioFieldTagHint => '目录里实测有几百个台站的分类；想按冷门标签找，把它写进关键词';
+
+  @override
+  String get radioTagAll => '全部分类';
 
   @override
   String get radioFieldQuery => '电台关键词';
@@ -9071,7 +9077,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioFieldTag => '標籤';
 
   @override
-  String get radioFieldTagHint => '目錄裡的一個分類，例如 jazz、古典、新聞';
+  String get radioFieldTagHint => '目錄裡實測有幾百個台站的分類；想按冷門標籤找，把它寫進關鍵詞';
+
+  @override
+  String get radioTagAll => '全部分類';
 
   @override
   String get radioFieldQuery => '電台關鍵字';

@@ -3416,8 +3416,14 @@ abstract class AppLocalizations {
   /// No description provided for @radioFieldTagHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'目录里的一个分类，例如 jazz、古典、新闻'**
+  /// **'目录里实测有几百个台站的分类；想按冷门标签找，把它写进关键词'**
   String get radioFieldTagHint;
+
+  /// No description provided for @radioTagAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部分类'**
+  String get radioTagAll;
 
   /// No description provided for @radioFieldQuery.
   ///

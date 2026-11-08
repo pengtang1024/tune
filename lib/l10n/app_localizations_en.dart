@@ -2030,7 +2030,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldTagHint =>
-      'A reach of the directory, e.g. jazz, classical, news';
+      'One of the reaches the directory files a few hundred stations under; a word of your own reaches the rest';
+
+  @override
+  String get radioTagAll => 'Every reach';
 
   @override
   String get radioFieldQuery => 'Station keyword';

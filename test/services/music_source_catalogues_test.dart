@@ -229,6 +229,29 @@ void main() {
 
       expect(captured.uris.last.queryParameters['countrycode'], 'Neverland');
     });
+    test('the reach of the radio directory is chosen from its reaches', () {
+      final field = RadioSourceAdapter()
+          .configurationFields
+          .firstWhere((field) => field.key == 'tag');
+
+      final values = field.choices.map((choice) => choice.value).toList();
+      // The first choice is no reach at all, and every reach was counted on
+      // the directory: an option nothing is filed under answers with nothing.
+      expect(values.first, isEmpty);
+      expect(values, contains('jazz'));
+      expect(values.length, greaterThan(20));
+      expect(values.toSet().length, values.length);
+    });
+
+    test('a reach written before the list stays in use', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, tag: 'moi merino');
+
+      // The choices are what the form offers, not what the directory reads.
+      expect(captured.uris.first.queryParameters['tag'], 'moi merino');
+    });
     test('a tag reads a reach of the whole directory', () async {
       final captured = _CapturedStations();
       final provider = RadioBrowserProvider(dio: captured.dio);
