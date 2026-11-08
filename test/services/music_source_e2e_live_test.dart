@@ -125,6 +125,7 @@ void main() async {
           'old_time_radio',
           'archive_music',
           'unlocked_recordings',
+          'community_music',
         ]),
       );
 

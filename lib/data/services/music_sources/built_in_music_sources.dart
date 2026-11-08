@@ -79,6 +79,21 @@ class BuiltInMusicSources {
           'query': 'collection:unlockedrecordings AND mediatype:audio',
         },
       ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'community_music',
+        name: strings.sourceCommunityMusicName,
+        description: strings.sourceCommunityMusicDescription,
+        settings: {
+          // The community uploads hold talks and poems next to music; the
+          // subject narrows them to the four styles people upload most.
+          'query':
+              'collection:opensource_audio AND mediatype:audio AND '
+              '(subject:rock OR subject:jazz OR subject:blues OR '
+              'subject:electronic)',
+        },
+      ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
       _instance(types, 'podcast_catalog'),
@@ -290,6 +305,9 @@ class BuiltInMusicSources {
   /// The source of the public-domain records the archive unlocked.
   static MusicSourceConfig get unlockedRecordings =>
       _entry('unlocked_recordings');
+
+  /// The source of the music the archive's community uploads.
+  static MusicSourceConfig get communityMusic => _entry('community_music');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');

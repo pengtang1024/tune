@@ -1562,6 +1562,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The public-domain records the Unlocked Recordings project digitises';
 
   @override
+  String get sourceCommunityMusicName => 'Community Music';
+
+  @override
+  String get sourceCommunityMusicDescription =>
+      'Music the archive\'s community uploads: rock, jazz, blues and electronic';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

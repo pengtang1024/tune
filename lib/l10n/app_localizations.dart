@@ -2561,6 +2561,18 @@ abstract class AppLocalizations {
   /// **'Unlocked Recordings 项目数字化的公版唱片'**
   String get sourceUnlockedRecordingsDescription;
 
+  /// No description provided for @sourceCommunityMusicName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区音乐'**
+  String get sourceCommunityMusicName;
+
+  /// No description provided for @sourceCommunityMusicDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子'**
+  String get sourceCommunityMusicDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

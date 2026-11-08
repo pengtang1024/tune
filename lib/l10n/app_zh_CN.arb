@@ -831,6 +831,8 @@
   "sourceAudioMusicName": "档案音乐",
   "sourceUnlockedRecordingsName": "Unlocked Recordings",
   "sourceUnlockedRecordingsDescription": "Unlocked Recordings 项目数字化的公版唱片",
+  "sourceCommunityMusicName": "社区音乐",
+  "sourceCommunityMusicDescription": "Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子",
   "sourcePodcastRssDescription": "把任意 RSS 播客订阅变成可播放的单集",
   "sourcePodcastRssName": "播客订阅",
   "sourcePodcastCatalogName": "播客目录",
