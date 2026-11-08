@@ -94,6 +94,41 @@ void main() {
       expect(request.uri.queryParameters['index'], '10');
     });
 
+    test('the artist mode reads the top songs of the artists', () async {
+      final server = _DeezerServer(artists: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'miles davis', 'mode': 'artists'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(2));
+      expect(result.songs.first.artist, 'Miles Davis');
+      expect(result.songs.first.duration, 30000);
+
+      expect(server.requests.first.uri.path, '/search/artist');
+      expect(server.requests.first.uri.queryParameters['q'], 'miles davis');
+      expect(server.requests[1].uri.path, '/artist/1910/top');
+      expect(server.requests[1].uri.queryParameters['limit'], '20');
+    });
+
+    test('an artist without top songs is skipped', () async {
+      final server = _DeezerServer(artists: true, emptyArtistTop: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'miles davis', 'mode': 'artists'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, isEmpty);
+      expect(result.message, AppStrings.instance.deezerNoMatch);
+    });
     test('the album mode reads the albums the keyword names', () async {
       final server = _DeezerServer(albums: true);
       final adapter = DeezerSourceAdapter(dio: server.dio);
@@ -224,6 +259,8 @@ class _DeezerServer {
     List<Map<String, dynamic>>? data,
     this.broken = false,
     this.albums = false,
+    this.artists = false,
+    this.emptyArtistTop = false,
   }) : data = data ?? [_songJson()];
 
   final List<Map<String, dynamic>> data;
@@ -231,6 +268,12 @@ class _DeezerServer {
 
   /// Answers the album search and the album detail instead of the charts.
   final bool albums;
+
+  /// Answers the artist search and the top songs instead of the charts.
+  final bool artists;
+
+  /// Answers the top songs of an artist with nothing.
+  final bool emptyArtistTop;
   final requests = <RequestOptions>[];
   String? preview;
 
@@ -253,6 +296,37 @@ class _DeezerServer {
             return;
           }
           final path = options.uri.path;
+          if (artists && path == '/search/artist') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 1910, 'name': 'Miles Davis', 'nb_album': 320},
+                  ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (artists && path.startsWith('/artist/')) {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': emptyArtistTop
+                      ? <dynamic>[]
+                      : [
+                          _albumTrack('So What', 3818963601, 'Miles Davis'),
+                          _albumTrack('Blue In Green', 3818963602, 'Miles Davis'),
+                        ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
           if (albums && path == '/search/album') {
             handler.resolve(
               Response(
@@ -317,12 +391,26 @@ class _DeezerServer {
   }
 
   /// A track of an album answer: no album of its own, no cover.
-  static Map<String, dynamic> _albumTrack(String title, int id) {
+  ///
+  /// A track of an artist answer names its artist, so the caller may add one.
+  static Map<String, dynamic> _albumTrack(
+    String title,
+    int id, [
+    String? artist,
+  ]) {
     return {
       'id': id,
       'title': title,
       'duration': 545,
       'preview': 'https://cdnt-preview.example.com/$id.mp3',
+      if (artist != null) 'artist': {'id': 1910, 'name': artist},
+      if (artist != null)
+        'album': {
+          'id': 1441464,
+          'title': 'Kind of Blue',
+          'cover_xl':
+              'https://cdn-images.example.com/cover/abc/1000x1000-000000-80-0-0.jpg',
+        },
     };
   }
 }

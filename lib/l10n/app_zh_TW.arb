@@ -986,6 +986,7 @@
   "deezerFieldModeHint": "單曲，或按關鍵字把整張專輯讀進來",
   "deezerModeSongs": "單曲",
   "deezerModeAlbums": "專輯",
+  "deezerModeArtists": "藝人",
   "sourceKodiName": "自架 Kodi 媒體庫",
   "sourceKodiDescription": "自架 Kodi 媒體中心的音樂庫",
   "kodiHint": "填寫 Kodi Web 伺服器位址；伺服器要求登入時再填帳號",

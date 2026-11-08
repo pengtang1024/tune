@@ -267,6 +267,46 @@ void main() async {
   );
 
   test(
+    'the artist mode of Deezer reads the top songs of an artist',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'miles davis',
+              'genre': '',
+              'mode': 'artists',
+              'limit': '5',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer artists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // The artist mode reads the top songs of the artist the keyword names.
+      expect(
+        result.songs.every((song) => song.artist.contains('Miles Davis')),
+        isTrue,
+        reason: 'artists were ${result.songs.map((s) => s.artist).toSet()}',
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the album mode of Deezer hands over whole records',
     () async {
       final service = MusicSourceService(

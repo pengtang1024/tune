@@ -34,6 +34,12 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// The name of the album mode.
   static const _modeAlbums = 'albums';
 
+  /// The name of the artist mode.
+  static const _modeArtists = 'artists';
+
+  /// How many artists the artist mode reads in one scan.
+  static const _artistsPerScan = 3;
+
   /// The reaches the charts are read for, by the name the reader picks.
   ///
   /// The catalogue names a reach by a number, so the numbers live here and
@@ -98,6 +104,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       choices: [
         MusicSourceChoice('songs', AppStrings.instance.deezerModeSongs),
         MusicSourceChoice(_modeAlbums, AppStrings.instance.deezerModeAlbums),
+        MusicSourceChoice(_modeArtists, AppStrings.instance.deezerModeArtists),
       ],
     ),
     MusicSourceField(
@@ -132,8 +139,31 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
-      final wantsAlbums =
-          keyword.isNotEmpty && config.setting('mode') == _modeAlbums;
+      final mode = config.setting('mode');
+      final wantsArtists = keyword.isNotEmpty && mode == _modeArtists;
+
+      if (wantsArtists) {
+        final songs = await _artistSongs(
+          keyword: keyword,
+          sourceId: config.id,
+          limit: limit,
+        );
+        if (songs == null) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.failed,
+            message: AppStrings.instance.deezerEmptyResponse,
+          );
+        }
+        return SourceScanResult(
+          sourceId: config.id,
+          status: SourceScanStatus.success,
+          songs: songs,
+          message: songs.isEmpty ? AppStrings.instance.deezerNoMatch : null,
+        );
+      }
+
+      final wantsAlbums = keyword.isNotEmpty && mode == _modeAlbums;
 
       if (wantsAlbums) {
         final songs = await _albumSongs(
@@ -203,6 +233,51 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     }
   }
 
+
+
+  /// The most played songs of the artists the keyword names.
+  ///
+  /// The catalogue answers the keyword with artists rather than songs, so the
+  /// top songs of each artist are read: one request per artist, and an artist
+  /// without a list is skipped instead of failing the scan.
+  Future<List<Song>?> _artistSongs({
+    required String keyword,
+    required String sourceId,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      'https://api.deezer.com/search/artist',
+      queryParameters: {
+        'q': keyword,
+        'limit': '${limit < _artistsPerScan ? limit : _artistsPerScan}',
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final artists = _decode(search.data)?['data'];
+    if (artists is! List) return null;
+
+    final songs = <Song>[];
+    for (final artist in artists) {
+      if (artist is! Map) continue;
+      final id = artist['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+
+      final top = await _dio.get<String>(
+        'https://api.deezer.com/artist/$id/top',
+        queryParameters: {'limit': '$limit'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(top.data)?['data'];
+      if (entries is! List) continue;
+
+      for (final entry in entries) {
+        if (entry is! Map) continue;
+        final song = songOf(entry, sourceId: sourceId);
+        if (song != null) songs.add(song);
+      }
+    }
+    return songs;
+  }
 
   /// The songs of the albums the keyword names.
   ///

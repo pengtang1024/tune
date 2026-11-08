@@ -986,6 +986,7 @@
   "deezerFieldModeHint": "Single songs, or whole albums of the keyword",
   "deezerModeSongs": "Songs",
   "deezerModeAlbums": "Albums",
+  "deezerModeArtists": "Artists",
   "sourceKodiName": "Kodi",
   "sourceKodiDescription": "Music library of a self-hosted Kodi media centre",
   "kodiHint": "Type the address of the Kodi web server, and the account when it asks for one",

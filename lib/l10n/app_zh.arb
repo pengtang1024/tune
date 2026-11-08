@@ -986,6 +986,7 @@
   "deezerFieldModeHint": "单曲，或按关键词把整张专辑读进来",
   "deezerModeSongs": "单曲",
   "deezerModeAlbums": "专辑",
+  "deezerModeArtists": "艺人",
   "sourceKodiName": "自建 Kodi 媒体库",
   "sourceKodiDescription": "自建 Kodi 媒体中心的音乐库",
   "kodiHint": "填写 Kodi Web 服务器地址；服务器要求登录时再填账号",
