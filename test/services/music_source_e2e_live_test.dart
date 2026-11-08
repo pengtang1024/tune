@@ -686,6 +686,43 @@ void main() async {
   );
 
   test(
+    'the spoken categories of the commons answer with their own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final category in const ['speeches', 'effects', 'interviews']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.wikimedia.copyWith(
+              settings: {'query': '', 'category': category, 'limit': '6'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$category failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$category returned nothing');
+        seen[category] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // Speech, sound effects and interviews are separate reaches: a reader
+      // who picks one must not get the others.
+      expect(seen['speeches'], isNot(equals(seen['effects'])));
+      expect(seen['interviews'], isNot(equals(seen['speeches'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'every reach of Deezer answers its own chart',
     () async {
       final service = MusicSourceService(

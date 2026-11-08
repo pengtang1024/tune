@@ -1708,6 +1708,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaCategoryOrgan => '管风琴';
 
   @override
+  String get wikimediaCategorySpeeches => '演讲';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '访谈';
+
+  @override
+  String get wikimediaCategoryPoetry => '诗歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有声条目';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -5064,6 +5079,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaCategoryOrgan => '管风琴';
 
   @override
+  String get wikimediaCategorySpeeches => '演讲';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '访谈';
+
+  @override
+  String get wikimediaCategoryPoetry => '诗歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有声条目';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -8418,6 +8448,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get wikimediaCategoryOrgan => '管風琴';
+
+  @override
+  String get wikimediaCategorySpeeches => '演講';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '訪談';
+
+  @override
+  String get wikimediaCategoryPoetry => '詩歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有聲條目';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';

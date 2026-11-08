@@ -48,6 +48,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     'reggae': 'Category:Audio files of reggae',
     'choral': 'Category:Audio files of choral music',
     'organ': 'Category:Audio files of organ music',
+    'speeches': 'Category:Audio files of speeches',
+    'effects': 'Category:Audio files of sound effects',
+    'interviews': 'Category:Audio files of interviews',
+    'poetry': 'Category:Audio files of poetry',
+    'spoken': 'Category:Spoken Wikipedia',
   };
 
   /// The category a scan browses when the reader names no keyword.
@@ -129,6 +134,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       'reggae' => strings.wikimediaCategoryReggae,
       'choral' => strings.wikimediaCategoryChoral,
       'organ' => strings.wikimediaCategoryOrgan,
+      'speeches' => strings.wikimediaCategorySpeeches,
+      'effects' => strings.wikimediaCategoryEffects,
+      'interviews' => strings.wikimediaCategoryInterviews,
+      'poetry' => strings.wikimediaCategoryPoetry,
+      'spoken' => strings.wikimediaCategorySpoken,
       _ => strings.wikimediaCategoryAll,
     };
   }

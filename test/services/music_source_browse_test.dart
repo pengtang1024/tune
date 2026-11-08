@@ -141,6 +141,21 @@ void main() {
       );
     });
 
+    test('a category named by the commons itself is walked as written', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'spoken'}),
+      );
+
+      // Spoken articles are not filed under "Audio files of ...", so the
+      // name of the category is not built from the reach.
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Spoken Wikipedia',
+      );
+    });
+
     test('a category the commons does not file falls back to all music', () async {
       final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
 

@@ -1882,6 +1882,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wikimediaCategoryOrgan => 'Organ';
 
   @override
+  String get wikimediaCategorySpeeches => 'Speeches';
+
+  @override
+  String get wikimediaCategoryEffects => 'Sound effects';
+
+  @override
+  String get wikimediaCategoryInterviews => 'Interviews';
+
+  @override
+  String get wikimediaCategoryPoetry => 'Poetry';
+
+  @override
+  String get wikimediaCategorySpoken => 'Spoken articles';
+
+  @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
 
   @override

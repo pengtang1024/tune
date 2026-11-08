@@ -3143,6 +3143,36 @@ abstract class AppLocalizations {
   /// **'管风琴'**
   String get wikimediaCategoryOrgan;
 
+  /// No description provided for @wikimediaCategorySpeeches.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'演讲'**
+  String get wikimediaCategorySpeeches;
+
+  /// No description provided for @wikimediaCategoryEffects.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音效'**
+  String get wikimediaCategoryEffects;
+
+  /// No description provided for @wikimediaCategoryInterviews.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'访谈'**
+  String get wikimediaCategoryInterviews;
+
+  /// No description provided for @wikimediaCategoryPoetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'诗歌'**
+  String get wikimediaCategoryPoetry;
+
+  /// No description provided for @wikimediaCategorySpoken.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有声条目'**
+  String get wikimediaCategorySpoken;
+
   /// No description provided for @wikimediaFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:
