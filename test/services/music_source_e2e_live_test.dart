@@ -1269,21 +1269,37 @@ class _NoopScanner extends CrossPlatformMusicScannerImpl {
   ) async => const [];
 }
 
+/// Whether this machine reaches the catalogues the live tests read.
+///
+/// The live tests ask several services, so a probe of one of them that fails
+/// says nothing about the others: a slow store would skip every test in the
+/// file, hiding real failures as harmless skips. The probe visits one host of
+/// each kind and counts the machine as online when any of them answers.
 Future<bool> _isOnline() async {
+  const probes = [
+    'https://archive.org/advancedsearch.php?q=mediatype%3Aaudio&rows=1&output=json',
+    'https://itunes.apple.com/search?term=tune&media=music&limit=1',
+    'https://api.deezer.com/chart/0/tracks?limit=1',
+    'https://api.audius.co/v1/tracks/trending?app_name=Tune&limit=1',
+  ];
   final dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 8),
-      receiveTimeout: const Duration(seconds: 8),
+      connectTimeout: const Duration(seconds: 6),
+      receiveTimeout: const Duration(seconds: 6),
     ),
   );
   try {
-    final response = await dio.get<String>(
-      'https://itunes.apple.com/search',
-      queryParameters: {'term': 'tune', 'media': 'music', 'limit': 1},
-      options: Options(responseType: ResponseType.plain),
-    );
-    return response.statusCode == 200;
-  } catch (_) {
+    for (final probe in probes) {
+      try {
+        final response = await dio.get<String>(
+          probe,
+          options: Options(responseType: ResponseType.plain),
+        );
+        if (response.statusCode == 200) return true;
+      } catch (_) {
+        // One host that does not answer says nothing about the next one.
+      }
+    }
     return false;
   } finally {
     dio.close(force: true);
