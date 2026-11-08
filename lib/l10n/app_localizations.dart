@@ -2657,6 +2657,30 @@ abstract class AppLocalizations {
   /// **'订阅地址'**
   String get podcastRssFieldFeed;
 
+  /// No description provided for @podcastRssFieldSince.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看最近'**
+  String get podcastRssFieldSince;
+
+  /// No description provided for @podcastRssFieldSinceHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只收这段时间内发布的单集'**
+  String get podcastRssFieldSinceHint;
+
+  /// No description provided for @podcastRssSinceAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部单集'**
+  String get podcastRssSinceAll;
+
+  /// No description provided for @podcastRssSinceDays.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近 {days} 天'**
+  String podcastRssSinceDays(String days);
+
   /// No description provided for @podcastRssFieldFeedHint.
   ///
   /// In zh_CN, this message translates to:

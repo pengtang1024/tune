@@ -133,6 +133,27 @@ void main() {
   });
 
   group('podcast RSS adapter', () {
+    test('a window of dates drops the episodes older than it', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Show</title>
+  <item><title>Old</title><enclosure url="https://e.com/old.mp3"/>
+    <guid>old</guid><pubDate>Tue, 06 Oct 2020 09:00:00 +0000</pubDate></item>
+  <item><title>New</title><enclosure url="https://e.com/new.mp3"/>
+    <guid>new</guid><pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate></item>
+  <item><title>Undated</title><enclosure url="https://e.com/undated.mp3"/>
+    <guid>undated</guid></item>
+</channel></rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The dated episode inside the window and the undated one stay; the
+      // dated one outside it goes.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
+    });
     test('turns the episodes of a feed into tracks', () async {
       final server = await _startServer((request) async {
         request.response.headers.contentType = ContentType(

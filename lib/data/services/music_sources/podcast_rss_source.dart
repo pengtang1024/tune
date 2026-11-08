@@ -42,6 +42,23 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.podcastRssHint;
 
+  /// The windows an episode may have come out in, by their days.
+  ///
+  /// A window is a filter of the reader's, not a guess of the app's: the feed
+  /// is read whole and the episodes outside the window are dropped, so the
+  /// ones that stay are the ones the feed published inside it.
+  static const _sinceDays = {7: 7, 30: 30, 90: 90, 365: 365};
+
+  static String _sinceLabel(int days) =>
+      AppStrings.instance.podcastRssSinceDays('$days');
+
+  /// The day the window starts, or nothing when the reader asked for all.
+  static DateTime? _sinceOf(String? raw) {
+    final days = int.tryParse(raw?.trim() ?? '');
+    if (days == null || !_sinceDays.containsKey(days)) return null;
+    return DateTime.now().toUtc().subtract(Duration(days: days));
+  }
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
@@ -55,6 +72,16 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitEpisodes,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
+    ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.podcastRssFieldSince,
+      AppStrings.instance.podcastRssFieldSinceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.podcastRssSinceAll),
+        for (final days in _sinceDays.keys)
+          MusicSourceChoice('$days', _sinceLabel(days)),
+      ],
     ),
   ];
 
@@ -86,7 +113,13 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final songs = parseFeed(body, sourceId: request.config.id, limit: limit);
+      final since = _sinceOf(request.config.setting('since'));
+      final songs = parseFeed(
+        body,
+        sourceId: request.config.id,
+        limit: limit,
+        since: since,
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,
@@ -146,6 +179,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     String xml, {
     required String sourceId,
     int limit = 20,
+    DateTime? since,
   }) {
     final document = XmlDocument.parse(xml);
     final channel = _first(document.findAllElements('channel'));
@@ -172,6 +206,10 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       if (!seen.add(externalId)) continue;
 
       final published = _firstText([item], 'pubDate');
+      // An episode older than the window is left out; an episode without a
+      // date it can be read from is kept, since nothing proves it is old.
+      final at = _publishedAt(published);
+      if (since != null && at != null && at.isBefore(since)) continue;
       final year = _yearOf(published);
       final description = _descriptionOf(item);
 
@@ -192,6 +230,67 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     }
 
     return songs;
+  }
+
+
+  /// The months feeds write, by their three letters.
+  static const _months = [
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec',
+  ];
+
+  /// The date an episode came out, read the way feeds write it.
+  ///
+  /// RSS gives an RFC 822 date with any offset ("06 Oct 2020 09:00:00 +0000")
+  /// and Atom an ISO 8601 one; a feed that writes neither is read as a date
+  /// that cannot be known, and an episode whose date cannot be read is kept.
+  static DateTime? _publishedAt(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return null;
+
+    final iso = DateTime.tryParse(text);
+    if (iso != null) return iso.toUtc();
+
+    final match = RegExp(
+      r'(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{2,4})\s+'
+      r'(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([+-]\d{4}|[A-Za-z]{3})?',
+    ).firstMatch(text);
+    if (match == null) return null;
+
+    final month = _months.indexOf(match.group(2)!.toLowerCase());
+    if (month < 0) return null;
+    final year = int.parse(match.group(3)!.length == 2
+        ? '20${match.group(3)}'
+        : match.group(3)!);
+    final at = DateTime.utc(
+      year,
+      month + 1,
+      int.parse(match.group(1)!),
+      int.parse(match.group(4)!),
+      int.parse(match.group(5)!),
+      int.parse(match.group(6) ?? '0'),
+    );
+
+    // An offset names the wall clock of the writer, so the instant is the
+    // clock minus the offset; GMT and UTC are offsets of nothing.
+    final zone = match.group(7) ?? '';
+    if (zone.startsWith('+') || zone.startsWith('-')) {
+      final sign = zone.startsWith('-') ? -1 : 1;
+      final hours = int.tryParse(zone.substring(1, 3)) ?? 0;
+      final minutes = int.tryParse(zone.substring(3, 5)) ?? 0;
+      return at.subtract(Duration(hours: sign * hours, minutes: sign * minutes));
+    }
+    return at;
   }
 
   /// Reads the audio file of an episode.

@@ -1612,6 +1612,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get podcastRssFieldFeed => 'Feed address';
 
   @override
+  String get podcastRssFieldSince => 'Episodes from';
+
+  @override
+  String get podcastRssFieldSinceHint =>
+      'Only the episodes published inside this window';
+
+  @override
+  String get podcastRssSinceAll => 'Every episode';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return 'The last $days days';
+  }
+
+  @override
   String get podcastRssFieldFeedHint => 'e.g. https://example.com/podcast.xml';
 
   @override

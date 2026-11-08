@@ -1458,6 +1458,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastRssFieldFeed => '订阅地址';
 
   @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收这段时间内发布的单集';
+
+  @override
+  String get podcastRssSinceAll => '全部单集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
 
   @override
@@ -5228,6 +5242,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastRssFieldFeed => '订阅地址';
 
   @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收这段时间内发布的单集';
+
+  @override
+  String get podcastRssSinceAll => '全部单集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
 
   @override
@@ -8996,6 +9024,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastRssFieldFeed => '訂閱網址';
+
+  @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收這段時間內發布的單集';
+
+  @override
+  String get podcastRssSinceAll => '全部單集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
