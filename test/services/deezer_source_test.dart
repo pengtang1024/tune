@@ -63,6 +63,20 @@ void main() {
       expect(server.requests.single.uri.path, '/chart/129/tracks');
     });
 
+    test('a reach reads the chart the catalogue numbers it with', () async {
+      // The catalogue lists its genres with /genre, so the number of a reach
+      // is read from it rather than guessed: Brazilian music is 75.
+      final server = _DeezerServer();
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'genre': 'brazilian'}),
+        ),
+      );
+
+      expect(server.requests.single.uri.path, '/chart/75/tracks');
+    });
     test('a keyword searches the catalogue', () async {
       final server = _DeezerServer();
       final adapter = DeezerSourceAdapter(dio: server.dio);

@@ -2114,6 +2114,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deezerGenreAll => 'Every reach';
 
   @override
+  String get deezerGenreAlternative => 'Alternative';
+
+  @override
+  String get deezerGenreFilms => 'Films & games';
+
+  @override
+  String get deezerGenreSoulFunk => 'Soul & funk';
+
+  @override
+  String get deezerGenreAfrican => 'African music';
+
+  @override
+  String get deezerGenreAsian => 'Asian music';
+
+  @override
+  String get deezerGenreBlues => 'Blues';
+
+  @override
+  String get deezerGenreBrazilian => 'Brazilian music';
+
+  @override
+  String get deezerGenreIndian => 'Indian music';
+
+  @override
+  String get deezerGenreKids => 'Kids';
+
+  @override
+  String get deezerGenreLatin => 'Latin music';
+
+  @override
   String get deezerEmptyResponse => 'Deezer returned an empty response';
 
   @override

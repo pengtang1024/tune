@@ -1914,6 +1914,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deezerGenreAll => '全部榜单';
 
   @override
+  String get deezerGenreAlternative => '另类';
+
+  @override
+  String get deezerGenreFilms => '影视与游戏';
+
+  @override
+  String get deezerGenreSoulFunk => '灵魂与放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音乐';
+
+  @override
+  String get deezerGenreAsian => '亚洲音乐';
+
+  @override
+  String get deezerGenreBlues => '蓝调';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音乐';
+
+  @override
+  String get deezerGenreIndian => '印度音乐';
+
+  @override
+  String get deezerGenreKids => '儿童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音乐';
+
+  @override
   String get deezerEmptyResponse => 'Deezer 返回了空响应';
 
   @override
@@ -5230,6 +5260,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deezerGenreAll => '全部榜单';
 
   @override
+  String get deezerGenreAlternative => '另类';
+
+  @override
+  String get deezerGenreFilms => '影视与游戏';
+
+  @override
+  String get deezerGenreSoulFunk => '灵魂与放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音乐';
+
+  @override
+  String get deezerGenreAsian => '亚洲音乐';
+
+  @override
+  String get deezerGenreBlues => '蓝调';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音乐';
+
+  @override
+  String get deezerGenreIndian => '印度音乐';
+
+  @override
+  String get deezerGenreKids => '儿童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音乐';
+
+  @override
   String get deezerEmptyResponse => 'Deezer 返回了空响应';
 
   @override
@@ -8544,6 +8604,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deezerGenreAll => '全部榜單';
+
+  @override
+  String get deezerGenreAlternative => '另類';
+
+  @override
+  String get deezerGenreFilms => '影視與遊戲';
+
+  @override
+  String get deezerGenreSoulFunk => '靈魂與放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音樂';
+
+  @override
+  String get deezerGenreAsian => '亞洲音樂';
+
+  @override
+  String get deezerGenreBlues => '藍調';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音樂';
+
+  @override
+  String get deezerGenreIndian => '印度音樂';
+
+  @override
+  String get deezerGenreKids => '兒童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音樂';
 
   @override
   String get deezerEmptyResponse => 'Deezer 傳回了空回應';

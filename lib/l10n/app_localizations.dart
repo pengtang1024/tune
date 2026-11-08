@@ -3557,6 +3557,66 @@ abstract class AppLocalizations {
   /// **'全部榜单'**
   String get deezerGenreAll;
 
+  /// No description provided for @deezerGenreAlternative.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'另类'**
+  String get deezerGenreAlternative;
+
+  /// No description provided for @deezerGenreFilms.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'影视与游戏'**
+  String get deezerGenreFilms;
+
+  /// No description provided for @deezerGenreSoulFunk.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'灵魂与放克'**
+  String get deezerGenreSoulFunk;
+
+  /// No description provided for @deezerGenreAfrican.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'非洲音乐'**
+  String get deezerGenreAfrican;
+
+  /// No description provided for @deezerGenreAsian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'亚洲音乐'**
+  String get deezerGenreAsian;
+
+  /// No description provided for @deezerGenreBlues.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'蓝调'**
+  String get deezerGenreBlues;
+
+  /// No description provided for @deezerGenreBrazilian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'巴西音乐'**
+  String get deezerGenreBrazilian;
+
+  /// No description provided for @deezerGenreIndian.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'印度音乐'**
+  String get deezerGenreIndian;
+
+  /// No description provided for @deezerGenreKids.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'儿童'**
+  String get deezerGenreKids;
+
+  /// No description provided for @deezerGenreLatin.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'拉丁音乐'**
+  String get deezerGenreLatin;
+
   /// No description provided for @deezerEmptyResponse.
   ///
   /// In zh_CN, this message translates to:

@@ -664,6 +664,52 @@ void main() async {
   );
 
   test(
+    'every reach of Deezer answers its own chart',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final genre in const [
+        'alternative',
+        'latin',
+        'indian',
+        'brazilian',
+        'blues',
+      ]) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {
+                'query': '',
+                'genre': genre,
+                'mode': 'songs',
+                'limit': '4',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        seen[genre] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The reaches are separate charts of the catalogue.
+      expect(seen['latin'], isNot(equals(seen['indian'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'each new category of the commons answers with its own audio',
     () async {
       final service = MusicSourceService(

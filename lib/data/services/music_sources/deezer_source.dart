@@ -62,6 +62,16 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     'reggae': 144,
     'folk': 466,
     'dance': 113,
+    'alternative': 85,
+    'films': 173,
+    'soulfunk': 169,
+    'african': 2,
+    'asian': 16,
+    'blues': 153,
+    'brazilian': 75,
+    'indian': 81,
+    'kids': 95,
+    'latin': 197,
   };
 
   final Dio _dio;
@@ -504,6 +514,16 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       'reggae' => strings.genreReggae,
       'folk' => strings.genreFolk,
       'dance' => strings.genreDance,
+      'alternative' => strings.deezerGenreAlternative,
+      'films' => strings.deezerGenreFilms,
+      'soulfunk' => strings.deezerGenreSoulFunk,
+      'african' => strings.deezerGenreAfrican,
+      'asian' => strings.deezerGenreAsian,
+      'blues' => strings.deezerGenreBlues,
+      'brazilian' => strings.deezerGenreBrazilian,
+      'indian' => strings.deezerGenreIndian,
+      'kids' => strings.deezerGenreKids,
+      'latin' => strings.deezerGenreLatin,
       _ => reach,
     };
   }
