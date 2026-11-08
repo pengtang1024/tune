@@ -1375,6 +1375,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 数字化归档的公版 78 转唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '网络厂牌免费发布的专辑';
+
+  @override
+  String get sourceNetlabelsName => '网络厂牌';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -1459,7 +1471,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -4212,6 +4224,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 数字化归档的公版 78 转唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '网络厂牌免费发布的专辑';
+
+  @override
+  String get sourceNetlabelsName => '网络厂牌';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4296,7 +4320,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -7049,6 +7073,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceLiveMusicArchiveName => '現場音樂檔案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 數位化歸檔的公版 78 轉唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '網路廠牌免費發佈的專輯';
+
+  @override
+  String get sourceNetlabelsName => '網路廠牌';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
 
   @override
@@ -7133,7 +7169,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目錄、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目錄、Radio Browser、SomaFM、Radio Paradise 或 NTS';
 
   @override
   String get radioProviderAll => '全部目錄';

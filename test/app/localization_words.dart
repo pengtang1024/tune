@@ -30,6 +30,7 @@ const List<String> properNames = [
   'Radio Paradise Eclectic',
   'Radio Paradise Rock',
   'Radio Paradise World',
+  'NTS',
   'NeteaseCloudMusicApi',
   'MusicFree',
   'Freesound',

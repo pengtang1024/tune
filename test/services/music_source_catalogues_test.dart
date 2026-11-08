@@ -173,6 +173,61 @@ void main() {
     });
   });
 
+  group('NTS directory', () {
+    test('maps the live channels of the answer', () {
+      final stations = NtsProvider.parseLive(_ntsAnswer());
+
+      expect(stations, hasLength(2));
+
+      final station = stations.first;
+      expect(station.provider, 'nts');
+      expect(station.id, '1');
+      expect(station.name, 'NTS 1');
+      expect(
+        station.streamUrl,
+        'https://stream-relay-geo.ntslive.net/stream',
+      );
+      expect(station.artworkUrl, 'https://cdn.example.com/nts1.jpg');
+      expect(station.genre, 'Ambient / Jazz / Experimental');
+      expect(station.description, 'Freeform radio from the NTS studio.');
+      expect(station.nowPlayingArtist, 'Soup to Nuts');
+      expect(station.country, 'United Kingdom');
+      expect(station.codec, 'MP3');
+
+      expect(stations.last.name, 'NTS 2');
+      expect(stations.last.streamUrl, endsWith('/stream2'));
+    });
+
+    test('skips a channel whose stream is not known', () {
+      final answer = _ntsAnswer();
+      (answer['results'] as List).add({
+        'channel_name': '3',
+        'now': {
+          'embeds': {
+            'details': {'name': 'A channel without a stream'},
+          },
+        },
+      });
+
+      expect(NtsProvider.parseLive(answer), hasLength(2));
+    });
+
+    test('answers an empty answer with no station', () {
+      expect(NtsProvider.parseLive(const {}), isEmpty);
+    });
+
+    test('a keyword narrows the shows on air', () async {
+      final captured = _CapturedLive(_ntsAnswer());
+      final provider = NtsProvider(dio: captured.dio);
+
+      final stations = await provider.fetch(query: 'jazz', limit: 5);
+
+      expect(captured.uris.single.path, '/api/v2/live');
+      expect(stations, hasLength(1));
+      expect(stations.single.name, 'NTS 1');
+    });
+  });
+
   group('Radio source', () {
     test('turns a station into a live track', () {
       final songs = RadioSourceAdapter.buildSongs([
@@ -309,6 +364,78 @@ Map<String, dynamic> _somaFmAnswer() {
       },
     ],
   };
+}
+
+/// The live answer of NTS for its two channels.
+Map<String, dynamic> _ntsAnswer() {
+  return {
+    'results': [
+      {
+        'channel_name': '1',
+        'now': {
+          'broadcast_title': 'Soup to Nuts',
+          'embeds': {
+            'details': {
+              'name': 'Soup to Nuts',
+              'description': 'Freeform radio from the NTS studio.',
+              'genres': [
+                {'id': 1, 'value': 'Ambient'},
+                {'id': 2, 'value': 'Jazz'},
+                {'id': 3, 'value': 'Experimental'},
+                {'id': 4, 'value': 'Soul'},
+              ],
+              'moods': [
+                {'id': 1, 'value': 'Chilled'},
+              ],
+              'media': {
+                'background_large': 'https://cdn.example.com/nts1.jpg',
+              },
+            },
+          },
+        },
+      },
+      {
+        'channel_name': '2',
+        'now': {
+          'embeds': {
+            'details': {
+              'name': 'Rave Cave',
+              'genres': [
+                {'id': 1, 'value': 'Techno'},
+              ],
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
+/// A Dio that answers with the live answer of NTS and keeps the requests.
+class _CapturedLive {
+  _CapturedLive(this.body);
+
+  final Map<String, dynamic> body;
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: body,
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
 }
 
 /// A Dio that answers with an empty station list and keeps the requests.

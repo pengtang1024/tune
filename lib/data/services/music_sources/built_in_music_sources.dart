@@ -37,6 +37,22 @@ class BuiltInMusicSources {
         description: strings.sourceLiveMusicArchiveDescription,
         settings: {'query': 'collection:etree'},
       ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'great78',
+        name: strings.sourceGreat78Name,
+        description: strings.sourceGreat78Description,
+        settings: {'query': 'collection:78rpm'},
+      ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'netlabels',
+        name: strings.sourceNetlabelsName,
+        description: strings.sourceNetlabelsDescription,
+        settings: {'query': 'collection:netlabels'},
+      ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
       _instance(types, 'podcast_catalog'),
@@ -193,6 +209,12 @@ class BuiltInMusicSources {
 
   /// The source of the live recordings the archive keeps.
   static MusicSourceConfig get liveMusicArchive => _entry('live_music_archive');
+
+  /// The source of the public-domain 78 rpm records.
+  static MusicSourceConfig get great78 => _entry('great78');
+
+  /// The source of the albums the netlabels released for free.
+  static MusicSourceConfig get netlabels => _entry('netlabels');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');

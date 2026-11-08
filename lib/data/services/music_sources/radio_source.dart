@@ -10,10 +10,11 @@ import 'package:tune/domain/models/source_scan_result.dart';
 
 /// Internet radio: the streams of public stations.
 ///
-/// The source reads three directories and lets the user pick one of them:
-/// the open station directory, the curated channels of SomaFM and the
-/// curated stations of Radio Paradise. A station is a live stream, so it is
-/// played straight from the network and never stored on disk.
+/// The source reads four directories and lets the user pick one of them:
+/// the open station directory, the curated channels of SomaFM, the curated
+/// stations of Radio Paradise and the live channels of NTS. A station is a
+/// live stream, so it is played straight from the network and never stored on
+/// disk.
 class RadioSourceAdapter extends MusicSourceAdapter {
   /// How many tracks a scan fetches, and the most it may fetch.
   @override
@@ -30,6 +31,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
             RadioBrowserProvider(dio: dio),
             SomaFmProvider(dio: dio),
             RadioParadiseProvider(dio: dio),
+            NtsProvider(dio: dio),
           ];
 
   @override

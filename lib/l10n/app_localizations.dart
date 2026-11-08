@@ -2495,6 +2495,30 @@ abstract class AppLocalizations {
   /// **'现场音乐档案'**
   String get sourceLiveMusicArchiveName;
 
+  /// No description provided for @sourceGreat78Description.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 数字化归档的公版 78 转唱片'**
+  String get sourceGreat78Description;
+
+  /// No description provided for @sourceGreat78Name.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Great 78 Project'**
+  String get sourceGreat78Name;
+
+  /// No description provided for @sourceNetlabelsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络厂牌免费发布的专辑'**
+  String get sourceNetlabelsDescription;
+
+  /// No description provided for @sourceNetlabelsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'网络厂牌'**
+  String get sourceNetlabelsName;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:
@@ -2660,7 +2684,7 @@ abstract class AppLocalizations {
   /// No description provided for @radioFieldProviderHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'全部目录、Radio Browser、SomaFM 或 Radio Paradise'**
+  /// **'全部目录、Radio Browser、SomaFM、Radio Paradise 或 NTS'**
   String get radioFieldProviderHint;
 
   /// No description provided for @radioProviderAll.

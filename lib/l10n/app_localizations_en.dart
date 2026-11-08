@@ -1524,6 +1524,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceLiveMusicArchiveName => 'Live Music Archive';
 
   @override
+  String get sourceGreat78Description =>
+      'The public-domain 78 rpm records the Internet Archive digitises';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription =>
+      'The albums the netlabels released for free';
+
+  @override
+  String get sourceNetlabelsName => 'Netlabels';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 
@@ -1619,7 +1633,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      'All directories, Radio Browser, SomaFM or Radio Paradise';
+      'All directories, Radio Browser, SomaFM, Radio Paradise or NTS';
 
   @override
   String get radioProviderAll => 'All directories';

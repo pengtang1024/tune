@@ -10,13 +10,25 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// Internet Archive exposes a large collection of freely downloadable audio.
 ///
 /// The advanced search returns item identifiers, and a second metadata request
-/// resolves the first playable audio file inside each item.
+/// resolves the playable audio files inside each item. An item is often more
+/// than one track — a 78 rpm disc holds two sides and a netlabel release holds
+/// an album — so the files of an item are read as its track list instead of
+/// keeping only the first one.
 class InternetArchiveSourceAdapter extends MusicSourceAdapter {
-  /// How many tracks a scan fetches, and the most it may fetch.
+  /// How many items a scan fetches, and the most it may fetch.
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(8, 20);
 
+  /// The most tracks one item may contribute.
+  ///
+  /// A few items carry a whole archive of their own (a hundred files of a
+  /// radio series); the cap keeps one such item from filling the library.
+  static const _maxTracksPerItem = 30;
+
   static const _audioExtensions = ['.mp3', '.ogg', '.m4a', '.flac'];
+
+  /// The suffixes the archive adds to name the quality of a copy.
+  static const _qualitySuffixes = ['_64kb', '_128kb', '_192kb', '_vbr'];
 
   final Dio _dio;
 
@@ -108,10 +120,12 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       const batchSize = 4;
       for (var start = 0; start < docs.length; start += batchSize) {
         final batch = docs.skip(start).take(batchSize).toList(growable: false);
-        final tracks = await Future.wait(
-          batch.map((doc) => _fetchTrack(doc, request.config)),
+        final items = await Future.wait(
+          batch.map((doc) => _fetchTracks(doc, request.config)),
         );
-        songs.addAll(tracks.whereType<Song>());
+        for (final tracks in items) {
+          songs.addAll(tracks);
+        }
         request.onProgress?.call(
           docs.isEmpty ? 1 : ((start + batch.length) / docs.length).clamp(0, 1),
         );
@@ -135,11 +149,15 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     }
   }
 
-  Future<Song?> _fetchTrack(Object? rawDoc, MusicSourceConfig config) async {
-    if (rawDoc is! Map) return null;
+  /// The tracks of one archive item.
+  Future<List<Song>> _fetchTracks(
+    Object? rawDoc,
+    MusicSourceConfig config,
+  ) async {
+    if (rawDoc is! Map) return const [];
 
     final identifier = rawDoc['identifier']?.toString() ?? '';
-    if (identifier.isEmpty) return null;
+    if (identifier.isEmpty) return const [];
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -147,67 +165,116 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         options: Options(receiveTimeout: const Duration(seconds: 15)),
       );
       final data = response.data;
-      if (data == null) return null;
+      if (data == null) return const [];
 
-      final files = data['files'];
-      final file = _pickAudioFile(files);
-      if (file == null) return null;
+      final files = _audioFiles(data['files']);
+      if (files.isEmpty) return const [];
 
-      final fileName = file['name']?.toString() ?? '';
-      if (fileName.isEmpty) return null;
-
-      final metadata = data['metadata'];
-      final metadataMap = metadata is Map
-          ? metadata
+      final metadata = data['metadata'] is Map
+          ? data['metadata'] as Map
           : const <dynamic, dynamic>{};
-      final title =
-          SourceSongFactory.readString(metadataMap['title']).trim().isNotEmpty
-          ? SourceSongFactory.readString(metadataMap['title'])
-          : SourceSongFactory.readString(rawDoc['title']);
-      if (title.trim().isEmpty) return null;
-
-      final artist =
-          SourceSongFactory.readString(metadataMap['creator']).trim().isNotEmpty
-          ? SourceSongFactory.readString(metadataMap['creator'])
-          : SourceSongFactory.readString(rawDoc['creator']);
-
-      final date = SourceSongFactory.readString(
-        metadataMap['date'] ?? metadataMap['publicdate'],
+      final itemTitle = _firstText([metadata['title'], rawDoc['title']]);
+      final creator = _firstText([metadata['creator'], rawDoc['creator']]);
+      final itemAlbum = SourceSongFactory.readString(metadata['album']).trim();
+      final itemGenre = SourceSongFactory.readString(metadata['genre']).trim();
+      final year = _parseYear(
+        SourceSongFactory.readString(metadata['date'] ?? metadata['publicdate']),
       );
-      final year = date.length >= 4 ? int.tryParse(date.substring(0, 4)) : null;
-      final encodedPath = fileName
-          .split('/')
-          .map(Uri.encodeComponent)
-          .join('/');
+      final artworkUrl =
+          'https://archive.org/services/img/${Uri.encodeComponent(identifier)}';
+      final trackField = _trackField(files);
+      final multiTrack = files.length > 1;
 
-      return SourceSongFactory.create(
-        sourceId: config.id,
-        externalId: '$identifier/$fileName',
-        title: title,
-        artist: artist,
-        album: SourceSongFactory.readString(metadataMap['album']),
-        duration: _parseDuration(file['length']),
-        streamUrl:
-            'https://archive.org/download/${Uri.encodeComponent(identifier)}/$encodedPath',
-        artworkUrl:
-            'https://archive.org/services/img/${Uri.encodeComponent(identifier)}',
-        genre: SourceSongFactory.readString(metadataMap['genre']),
-        year: year,
-      );
+      final songs = <Song>[];
+      for (
+        var index = 0;
+        index < files.length && index < _maxTracksPerItem;
+        index++
+      ) {
+        final file = files[index];
+        final fileName = file['name']?.toString() ?? '';
+        if (fileName.isEmpty) continue;
+
+        final fileTitle = SourceSongFactory.readString(file['title']).trim();
+        // A one-track item is named after the item: its title is written for
+        // the reader, while the name of the file is written for the machine.
+        final title = multiTrack
+            ? (fileTitle.isEmpty ? _titleFromFileName(fileName) : fileTitle)
+            : (itemTitle.isNotEmpty
+                  ? itemTitle
+                  : fileTitle.isEmpty
+                  ? _titleFromFileName(fileName)
+                  : fileTitle);
+        if (title.isEmpty) continue;
+
+        var artist = _firstText([file['artist'], creator]);
+        var cleanTitle = title;
+        // Some discs write the performer into the title and leave the artist
+        // empty: "My Boy Lollypop - Barbie Gaye". The item names the artist,
+        // so the suffix is the same fact written twice.
+        if (SourceSongFactory.readString(file['artist']).trim().isEmpty &&
+            creator.isNotEmpty &&
+            title.toLowerCase().endsWith(' - ${creator.toLowerCase()}')) {
+          cleanTitle = title
+              .substring(0, title.length - creator.length - 3)
+              .trim();
+          artist = creator;
+        }
+
+        final track = trackField?[index];
+        final encodedPath = fileName
+            .split('/')
+            .map(Uri.encodeComponent)
+            .join('/');
+
+        songs.add(
+          SourceSongFactory.create(
+            sourceId: config.id,
+            externalId: '$identifier/$fileName',
+            title: cleanTitle,
+            artist: artist,
+            album: _firstText([file['album'], itemAlbum]),
+            duration: _parseDuration(file['length']),
+            streamUrl:
+                'https://archive.org/download/${Uri.encodeComponent(identifier)}/$encodedPath',
+            artworkUrl: artworkUrl,
+            genre: _firstText([file['genre'], itemGenre]),
+            year: year,
+            // An item that states no usable order keeps the order the
+            // archive lists its files in.
+            trackNumber: track?.number ?? index + 1,
+            trackTotal: track?.total ?? files.length,
+          ),
+        );
+      }
+
+      return songs;
     } catch (_) {
       // One broken archive item should not fail the whole source.
-      return null;
+      return const [];
     }
   }
 
-  Map? _pickAudioFile(Object? rawFiles) {
-    if (rawFiles is! List) return null;
+  /// The audio files of an item, one per track.
+  ///
+  /// The archive stores one track in several formats and qualities. The files
+  /// are grouped by their name without the extension and the quality suffix,
+  /// and the most playable copy of each group is kept in the order the item
+  /// lists them.
+  List<Map> _audioFiles(Object? rawFiles) {
+    if (rawFiles is! List) return const [];
 
-    Map? fallback;
+    final chosen = <String, Map>{};
+    final scores = <String, int>{};
+
     for (final raw in rawFiles) {
       if (raw is! Map) continue;
 
-      final name = raw['name']?.toString().toLowerCase() ?? '';
+      final name = raw['name']?.toString() ?? '';
+      final lowerName = name.toLowerCase();
+      if (lowerName.isEmpty) continue;
+      if (!_audioExtensions.any(lowerName.endsWith)) continue;
+
       final format = raw['format']?.toString().toLowerCase() ?? '';
       if (format.contains('torrent') ||
           format.contains('metadata') ||
@@ -215,16 +282,102 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         continue;
       }
 
-      final isAudio = _audioExtensions.any(name.endsWith);
-      if (!isAudio) continue;
-
-      if (format.contains('vbr mp3') || format == 'mp3') {
-        return raw;
-      }
-      fallback ??= raw;
+      final stem = _stemOf(lowerName);
+      final score = _formatScore(format);
+      final current = scores[stem];
+      if (current != null && current <= score) continue;
+      chosen[stem] = raw;
+      scores[stem] = score;
     }
 
-    return fallback;
+    return chosen.values.toList(growable: false);
+  }
+
+  /// The name of a file without its folder, its extension and its quality.
+  static String _stemOf(String name) {
+    final base = name.split('/').last;
+    final dot = base.lastIndexOf('.');
+    var stem = dot > 0 ? base.substring(0, dot) : base;
+    for (final suffix in _qualitySuffixes) {
+      if (stem.endsWith(suffix)) {
+        stem = stem.substring(0, stem.length - suffix.length);
+        break;
+      }
+    }
+    return stem;
+  }
+
+  /// Which copy of a track to stream, the smaller number the better.
+  static int _formatScore(String format) {
+    if (format.contains('vbr mp3')) return 0;
+    if (format.contains('mp3')) return 1;
+    if (format.contains('ogg')) return 2;
+    if (format.contains('m4a')) return 3;
+    if (format.contains('flac')) return 4;
+    return 5;
+  }
+
+  /// The track numbers the item states, when they can be trusted.
+  ///
+  /// The field is written as "3" or "3/12". Some items put the number of the
+  /// disc there instead, so the same number repeats across the file list; such
+  /// a field orders nothing, and the position in the item takes its place.
+  List<({int? number, int? total})>? _trackField(List<Map> files) {
+    final numbers = <int?>[];
+    final statedTotals = <int?>[];
+    var statedTotal = 0;
+
+    for (final file in files) {
+      final raw = SourceSongFactory.readString(file['track']).trim();
+      final parts = raw.split('/');
+      final number = int.tryParse(parts.first.trim());
+      final total = parts.length > 1 ? int.tryParse(parts[1].trim()) : null;
+      numbers.add(number);
+      statedTotals.add(total);
+      if (total != null) statedTotal = total;
+    }
+
+    final seen = <int>{};
+    for (final number in numbers) {
+      if (number == null) continue;
+      if (!seen.add(number)) return null;
+    }
+
+    return [
+      for (var index = 0; index < files.length; index++)
+        (
+          number: numbers[index] ?? index + 1,
+          total: statedTotals[index] ??
+              (statedTotal > 0 ? statedTotal : files.length),
+        ),
+    ];
+  }
+
+  /// The name of the file, without its folder and its extension.
+  static String _titleFromFileName(String name) {
+    final base = name.split('/').last;
+    final dot = base.lastIndexOf('.');
+    final stem = dot > 0 ? base.substring(0, dot) : base;
+    return stem.replaceAll('_', ' ').trim();
+  }
+
+  /// The year of an archive date, when the archive states a real one.
+  ///
+  /// A date the archive never filled in is written as 0000, which is not a
+  /// year a track was made.
+  static int? _parseYear(String date) {
+    final text = date.trim();
+    if (text.length < 4) return null;
+    final year = int.tryParse(text.substring(0, 4));
+    return year == null || year <= 0 ? null : year;
+  }
+
+  static String _firstText(List<Object?> values) {
+    for (final value in values) {
+      final text = SourceSongFactory.readString(value).trim();
+      if (text.isNotEmpty) return text;
+    }
+    return '';
   }
 
   int _parseDuration(Object? raw) {

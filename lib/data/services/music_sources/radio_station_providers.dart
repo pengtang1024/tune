@@ -405,3 +405,144 @@ class RadioParadiseProvider extends RadioStationProvider {
     );
   }
 }
+
+/// The live channels of NTS.
+///
+/// The station publishes what is on air right now: the show, its genres, its
+/// moods and the picture of the show. A live answer names a show rather than a
+/// track, so the show stands where the performer stands in a station that
+/// knows its record.
+class NtsProvider extends RadioStationProvider {
+  static const _liveUrl = 'https://www.nts.live/api/v2/live';
+
+  /// The address of the stream of each channel.
+  static const _streams = <String, String>{
+    '1': 'https://stream-relay-geo.ntslive.net/stream',
+    '2': 'https://stream-relay-geo.ntslive.net/stream2',
+  };
+
+  final Dio _dio;
+
+  NtsProvider({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 20),
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
+            ),
+          );
+
+  @override
+  String get id => 'nts';
+
+  @override
+  String get displayName => 'NTS';
+
+  @override
+  Future<List<RadioStation>> fetch({
+    required String query,
+    required int limit,
+    String? country,
+    int offset = 0,
+  }) async {
+    // Both channels are broadcast from London; a scan of another country has
+    // nothing to take from them.
+    final code = country?.trim().toUpperCase() ?? '';
+    if (code.isNotEmpty && code != 'GB' && code != 'UK') return const [];
+
+    final response = await _dio.get<Map<String, dynamic>>(_liveUrl);
+    final data = response.data;
+    if (data == null) {
+      throw MusicSourceFailure(AppStrings.instance.radioNoChannelList);
+    }
+
+    final stations = parseLive(data);
+    final trimmed = query.trim().toLowerCase();
+    final filtered = trimmed.isEmpty
+        ? stations
+        : stations.where((station) => _matches(station, trimmed)).toList();
+
+    return filtered.take(limit).toList(growable: false);
+  }
+
+  static bool _matches(RadioStation station, String query) {
+    final haystack = [
+      station.name,
+      station.genre ?? '',
+      station.description ?? '',
+      station.nowPlayingArtist ?? '',
+      station.country ?? '',
+    ].join(' ').toLowerCase();
+    return haystack.contains(query);
+  }
+
+  /// Kept static so the mapping can be tested without network access.
+  static List<RadioStation> parseLive(Map<String, dynamic> data) {
+    final results = data['results'];
+    if (results is! List) return const [];
+
+    final stations = <RadioStation>[];
+
+    for (final raw in results) {
+      if (raw is! Map) continue;
+
+      final channel = raw['channel_name']?.toString().trim() ?? '';
+      final streamUrl = _streams[channel];
+      if (streamUrl == null) continue;
+
+      final now = raw['now'];
+      final nowMap = now is Map ? now : const <dynamic, dynamic>{};
+      final embeds = nowMap['embeds'];
+      final embedsMap = embeds is Map ? embeds : const <dynamic, dynamic>{};
+      final details = embedsMap['details'];
+      final detailsMap = details is Map
+          ? details
+          : const <dynamic, dynamic>{};
+      final media = detailsMap['media'];
+      final mediaMap = media is Map ? media : const <dynamic, dynamic>{};
+
+      final show =
+          _text(detailsMap['name']) ?? _text(nowMap['broadcast_title']);
+      final genres = _values(detailsMap['genres']);
+
+      stations.add(
+        RadioStation(
+          provider: 'nts',
+          id: channel,
+          name: 'NTS $channel',
+          streamUrl: streamUrl,
+          artworkUrl: SourceSongFactory.normalizeUrl(
+            _text(mediaMap['background_large']) ??
+                _text(mediaMap['background_medium']),
+          ),
+          genre: genres.isEmpty ? null : genres.take(3).join(' / '),
+          language: 'English',
+          country: 'United Kingdom',
+          description: _text(detailsMap['description']),
+          nowPlayingArtist: show,
+          codec: 'MP3',
+          homepage: 'https://www.nts.live/',
+        ),
+      );
+    }
+
+    return stations;
+  }
+
+  static List<String> _values(Object? value) {
+    if (value is! List) return const [];
+    return value
+        .map((entry) => entry is Map ? _text(entry['value']) : null)
+        .whereType<String>()
+        .toList(growable: false);
+  }
+
+  static String? _text(Object? value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty ? null : text;
+  }
+}
