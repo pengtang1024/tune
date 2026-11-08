@@ -1,13 +1,17 @@
 import 'package:tune/shared/utils/plain_text.dart';
 
-/// The beginning of a description, as plain text.
+/// The beginning of a description that is already plain text.
 ///
-/// Sources write a description as HTML or as markdown of whatever length the
-/// uploader left; a track keeps the readable beginning of it so the details of
-/// a song stay one screen long.
-String? shortDescription(Object? raw, {int length = 600}) {
-  final text = plainText(raw?.toString() ?? '');
-  if (text.isEmpty) return null;
-  if (text.length <= length) return text;
-  return '${text.substring(0, length).trimRight()}…';
+/// Sources hand over descriptions of whatever length the uploader left; a
+/// track keeps the readable beginning of one, so the details of a song stay one
+/// screen long.
+String? shorten(String? text, {int length = 600}) {
+  final collapsed = (text ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
+  if (collapsed.isEmpty) return null;
+  if (collapsed.length <= length) return collapsed;
+  return '${collapsed.substring(0, length).trimRight()}…';
 }
+
+/// The beginning of a description written as HTML.
+String? shortDescription(Object? raw, {int length = 600}) =>
+    shorten(plainText(raw?.toString() ?? ''), length: length);

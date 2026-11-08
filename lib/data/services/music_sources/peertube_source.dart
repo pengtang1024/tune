@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -348,13 +349,12 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
     final text =
         _string(raw['description']) ?? _string(raw['truncatedDescription']);
     if (text == null) return null;
-    final plain = text
+    // A PeerTube description is markdown: the marks are taken out before the
+    // beginning of it is kept.
+    final markdownFree = text
         .replaceAll(RegExp(r'\r\n|\r|\n'), ' ')
-        .replaceAll(RegExp(r'[*_#>\[\]()]'), '')
-        .replaceAll(RegExp(r' {2,}'), ' ')
-        .trim();
-    if (plain.isEmpty) return null;
-    return plain.length <= 400 ? plain : '${plain.substring(0, 399)}…';
+        .replaceAll(RegExp(r'[*_#>\[\]()]'), '');
+    return shorten(markdownFree, length: 400);
   }
 
   /// The keyword of the instance, when the reader wrote one.

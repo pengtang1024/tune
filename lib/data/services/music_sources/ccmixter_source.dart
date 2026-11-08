@@ -5,7 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
-import 'package:tune/shared/utils/plain_text.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -174,22 +174,15 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   }
 
 
-  /// The most characters of an upload description a track keeps.
-  static const _descriptionLength = 600;
-
   /// The description of an upload, as plain text.
   ///
   /// The site offers both the plain text and the HTML of an upload; the plain
   /// text is used as it is, and the HTML when there is no plain text.
   static String? _descriptionOf(Map raw) {
-    final plain = raw['upload_description_plain']?.toString().trim() ?? '';
-    final text = plain.isNotEmpty
-        ? plain.replaceAll(RegExp(r'\s+'), ' ').trim()
-        : plainText(raw['upload_description_html']?.toString() ?? '');
-    if (text.isEmpty) return null;
-    return text.length <= _descriptionLength
-        ? text
-        : '${text.substring(0, _descriptionLength).trimRight()}…';
+    final plain = raw['upload_description_plain']?.toString() ?? '';
+    return plain.trim().isEmpty
+        ? shortDescription(raw['upload_description_html'])
+        : shorten(plain);
   }
 
   /// The licence of an upload, read back from the address of its deed.

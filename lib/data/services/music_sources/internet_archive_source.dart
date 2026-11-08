@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
-import 'package:tune/shared/utils/plain_text.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -260,20 +260,12 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   }
 
 
-  /// The most characters of an item description a track keeps.
-  static const _descriptionLength = 600;
-
   /// The description of an item, as plain text.
   ///
   /// The archive writes the description as HTML of whatever length the
   /// uploader left; a track keeps the readable beginning of it.
-  static String? _descriptionOf(Object? raw) {
-    final text = plainText(SourceSongFactory.readString(raw));
-    if (text.isEmpty) return null;
-    return text.length <= _descriptionLength
-        ? text
-        : '${text.substring(0, _descriptionLength).trimRight()}…';
-  }
+  static String? _descriptionOf(Object? raw) =>
+      shortDescription(SourceSongFactory.readString(raw));
 
   /// The licence of an item, written the way the reader knows it.
   ///

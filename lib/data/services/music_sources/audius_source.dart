@@ -4,6 +4,7 @@ import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -361,10 +362,8 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
     return null;
   }
 
-  static String? _descriptionOf(Map<Object?, Object?> raw) {
-    final description = raw['description']?.toString().trim() ?? '';
-    return description.isEmpty ? null : description;
-  }
+  static String? _descriptionOf(Map<Object?, Object?> raw) =>
+      shortDescription(raw['description']);
 
   /// The licence of a track, when the network states one.
   static String? _licenseOf(Object? value) {
