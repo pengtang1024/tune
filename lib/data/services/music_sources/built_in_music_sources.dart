@@ -75,6 +75,12 @@ class BuiltInMusicSources {
       ),
       _instance(types, 'audius'),
       _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
+      _instance(
+        types,
+        'azuracast',
+        enabled: false,
+        settings: {'server': '', 'apiKey': '', 'query': ''},
+      ),
       _instance(types, 'wikimedia'),
       _instance(
         types,
@@ -254,6 +260,9 @@ class BuiltInMusicSources {
 
   /// The source of the internet radio stations.
   static MusicSourceConfig get radio => _entry('radio');
+
+  /// The source of the stations of a self-hosted AzuraCast server.
+  static MusicSourceConfig get azuracast => _entry('azuracast');
 
   /// The source of the sound files of the free repository.
   static MusicSourceConfig get wikimedia => _entry('wikimedia');

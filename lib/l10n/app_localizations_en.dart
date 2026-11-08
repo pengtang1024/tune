@@ -1770,6 +1770,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot reach the Ampache server, check the address and the API key';
 
   @override
+  String get sourceAzuracastName => 'AzuraCast';
+
+  @override
+  String get sourceAzuracastDescription =>
+      'Stations of a self-hosted AzuraCast radio server';
+
+  @override
+  String get azuracastHint =>
+      'Type the address of your AzuraCast server to listen to its stations';
+
+  @override
+  String get azuracastFieldServerHint => 'e.g. https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API key (optional)';
+
+  @override
+  String get azuracastFieldApiKeyHint =>
+      'Only needed when the server keeps its stations private';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast returned an empty response';
+
+  @override
+  String get azuracastNoMatch => 'No matching stations on AzuraCast';
+
+  @override
+  String get azuracastAuthFailed =>
+      'Cannot reach the AzuraCast server, check the address and the API key';
+
+  @override
   String get sourcePlexName => 'Media library';
 
   @override

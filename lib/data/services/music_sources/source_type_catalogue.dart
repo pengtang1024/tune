@@ -124,6 +124,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openCatalog,
       ),
       SourceTypeDescriptor(
+        type: 'azuracast',
+        name: 'AzuraCast',
+        localizedName: strings.sourceAzuracastName,
+        description: strings.sourceAzuracastDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
         type: 'wikimedia',
         name: 'Wikimedia Commons',
         localizedName: strings.sourceWikimediaName,

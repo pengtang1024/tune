@@ -113,6 +113,50 @@ void main() async {
   );
 
   test(
+    'the service reads the stations of an AzuraCast server',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The public demo server of AzuraCast; its stations need no key.
+      final azuracast = BuiltInMusicSources.azuracast.copyWith(
+        enabled: true,
+        settings: {
+          'server': 'https://demo.azuracast.com',
+          'apiKey': '',
+          'query': '',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [azuracast],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'AzuraCast failed: ${result.message}',
+      );
+      expect(
+        result.songs,
+        isNotEmpty,
+        reason: 'AzuraCast returned nothing: ${result.message}',
+      );
+
+      final song = result.songs.first;
+      expect(song.isLiveStream, isTrue);
+      expect(song.title, isNotEmpty);
+      expect(song.streamUrl, startsWith('http'));
+      expect(song.sourceId, azuracast.id);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service scans LibriVox into whole chapters',
     () async {
       final service = MusicSourceService(
@@ -173,9 +217,9 @@ void main() async {
         expect(
           result.status,
           SourceScanStatus.success,
-          reason: '\$country failed: \${result.message}',
+          reason: '$country failed: ${result.message}',
         );
-        expect(result.songs, isNotEmpty, reason: '\$country returned nothing');
+        expect(result.songs, isNotEmpty, reason: '$country returned nothing');
       }
     },
     skip: online ? false : offline,

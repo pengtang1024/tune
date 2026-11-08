@@ -2927,6 +2927,60 @@ abstract class AppLocalizations {
   /// **'无法连接 Ampache 服务器，请检查地址与 API Key'**
   String get ampacheAuthFailed;
 
+  /// No description provided for @sourceAzuracastName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 AzuraCast 电台'**
+  String get sourceAzuracastName;
+
+  /// No description provided for @sourceAzuracastDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 AzuraCast 电台服务器上的电台'**
+  String get sourceAzuracastDescription;
+
+  /// No description provided for @azuracastHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 AzuraCast 服务器的地址，收听它上面的电台'**
+  String get azuracastHint;
+
+  /// No description provided for @azuracastFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://radio.example.com'**
+  String get azuracastFieldServerHint;
+
+  /// No description provided for @azuracastFieldApiKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'API Key（可选）'**
+  String get azuracastFieldApiKey;
+
+  /// No description provided for @azuracastFieldApiKeyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器把电台设为私有时才需要'**
+  String get azuracastFieldApiKeyHint;
+
+  /// No description provided for @azuracastEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'AzuraCast 返回了空响应'**
+  String get azuracastEmptyResponse;
+
+  /// No description provided for @azuracastNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'AzuraCast 上没有匹配的电台'**
+  String get azuracastNoMatch;
+
+  /// No description provided for @azuracastAuthFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'无法连接 AzuraCast 服务器，请检查地址与 API Key'**
+  String get azuracastAuthFailed;
+
   /// No description provided for @sourcePlexName.
   ///
   /// In zh_CN, this message translates to:

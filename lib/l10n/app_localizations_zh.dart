@@ -1594,6 +1594,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
 
   @override
+  String get sourceAzuracastName => '自建 AzuraCast 电台';
+
+  @override
+  String get sourceAzuracastDescription => '自建 AzuraCast 电台服务器上的电台';
+
+  @override
+  String get azuracastHint => '填写 AzuraCast 服务器的地址，收听它上面的电台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（可选）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '服务器把电台设为私有时才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 返回了空响应';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上没有匹配的电台';
+
+  @override
+  String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -4473,6 +4500,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
 
   @override
+  String get sourceAzuracastName => '自建 AzuraCast 电台';
+
+  @override
+  String get sourceAzuracastDescription => '自建 AzuraCast 电台服务器上的电台';
+
+  @override
+  String get azuracastHint => '填写 AzuraCast 服务器的地址，收听它上面的电台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（可选）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '服务器把电台设为私有时才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 返回了空响应';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上没有匹配的电台';
+
+  @override
+  String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -7350,6 +7404,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get ampacheAuthFailed => '無法連線 Ampache 伺服器，請檢查位址與 API Key';
+
+  @override
+  String get sourceAzuracastName => '自架 AzuraCast 電台';
+
+  @override
+  String get sourceAzuracastDescription => '自架 AzuraCast 電台伺服器上的電台';
+
+  @override
+  String get azuracastHint => '填寫 AzuraCast 伺服器的位址，收聽它上面的電台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（選填）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '伺服器把電台設為私有時才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 傳回了空回應';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上沒有符合的電台';
+
+  @override
+  String get azuracastAuthFailed => '無法連線 AzuraCast 伺服器，請檢查位址與 API Key';
 
   @override
   String get sourcePlexName => '自架媒體庫';
