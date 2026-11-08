@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/plain_text.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -172,6 +173,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
 
       final published = _firstText([item], 'pubDate');
       final year = _yearOf(published);
+      final description = _descriptionOf(item);
 
       songs.add(
         SourceSongFactory.create(
@@ -184,6 +186,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
           streamUrl: streamUrl,
           artworkUrl: _artworkUrl(item, podcastArtwork),
           year: year,
+          description: description,
         ),
       );
     }
@@ -230,6 +233,27 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final cover = _first(channel.findElements('image'));
     final url = _first(cover?.findElements('url') ?? const <XmlElement>[]);
     return SourceSongFactory.normalizeUrl(url?.innerText.trim());
+  }
+
+
+  /// The most characters of an episode description a track keeps.
+  static const _descriptionLength = 600;
+
+  /// The show notes of an episode, as plain text.
+  ///
+  /// Feeds write the notes as HTML under `description`, or under the summary
+  /// of the podcast namespace; the track keeps the readable beginning of them.
+  static String? _descriptionOf(XmlElement item) {
+    final notes = _firstText(
+      [item],
+      'summary',
+      fallback: _firstText([item], 'description'),
+    );
+    final text = plainText(notes);
+    if (text.isEmpty) return null;
+    return text.length <= _descriptionLength
+        ? text
+        : '${text.substring(0, _descriptionLength).trimRight()}…';
   }
 
   /// Reads the first matching text of a list of elements.

@@ -689,6 +689,40 @@ void main() async {
   );
 
   test(
+    'the episodes of the podcast directory carry their show notes',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.podcastCatalog.copyWith(
+            settings: {'tag': '', 'episodes': '3', 'limit': '2'},
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: result.message,
+      );
+      expect(result.songs, isNotEmpty);
+      // The notes ride on the episode: every episode of the feed has them, and
+      // the directory reads the feed whole.
+      final noted = result.songs
+          .where((song) => (song.description ?? '').trim().isNotEmpty)
+          .length;
+      expect(noted, greaterThanOrEqualTo(result.songs.length ~/ 2));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
     'a licence of the Openverse source answers its own audio',
     () async {
       final service = MusicSourceService(

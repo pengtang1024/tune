@@ -159,6 +159,8 @@ void main() {
       expect(song.streamUrl, 'https://example.com/ep1.mp3');
       expect(song.artworkUrl, 'https://example.com/episode.jpg');
       expect(song.year, 2026);
+      // The show notes are HTML in the feed; the track keeps the words.
+      expect(song.description, 'Show notes of the episode.');
       expect(song.sourceId, 'podcast_rss');
       expect(server.port, greaterThan(0));
     });
@@ -573,6 +575,7 @@ const _podcastFeed = '''<?xml version="1.0" encoding="UTF-8"?>
       <itunes:image href="https://example.com/episode.jpg"/>
       <pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate>
       <guid isPermaLink="false">ep-1</guid>
+      <description><![CDATA[<p>Show notes   of the<br>episode.</p>]]></description>
     </item>
     <item>
       <title>Episode without audio</title>
