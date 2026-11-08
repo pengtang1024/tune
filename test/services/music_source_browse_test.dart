@@ -337,6 +337,26 @@ void main() {
         expect(source!.weight, lessThan(500), reason: id);
       }
     });
+    test('a licence narrows the uploads', () async {
+      final captured = _Captured(body: '[]');
+
+      await CcMixterSourceAdapter(dio: captured.dio).scan(
+        _request('ccmixter', const {'licence': 'pd'}),
+      );
+
+      expect(captured.uri?.queryParameters['lic'], 'pd');
+    });
+
+    test('a licence the site does not know is not sent', () async {
+      final captured = _Captured(body: '[]');
+
+      await CcMixterSourceAdapter(dio: captured.dio).scan(
+        _request('ccmixter', const {'licence': 'by-sa'}),
+      );
+
+      // The site answers a word it cannot read with an error, not a list.
+      expect(captured.uri?.queryParameters.containsKey('lic'), isFalse);
+    });
     test('the reader decides how many albums one scan reads', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

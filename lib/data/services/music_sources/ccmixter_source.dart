@@ -55,12 +55,35 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.ccmixterHint;
 
+  /// The licences the site narrows by, as the values of the field.
+  ///
+  /// The site files an upload under the licence it was published with and
+  /// narrows by that word; the three values here were read back from it, and a
+  /// word it does not know is answered with an error instead of the list.
+  static const _licences = {'by', 'nc', 'pd'};
+
+  static String? _licenceFilterOf(String? raw) {
+    final value = raw?.trim() ?? '';
+    return _licences.contains(value) ? value : null;
+  }
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.ccmixterFieldQueryHint,
+    ),
+    MusicSourceField(
+      'licence',
+      AppStrings.instance.ccmixterFieldLicence,
+      AppStrings.instance.ccmixterFieldLicenceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.ccmixterLicenceAll),
+        MusicSourceChoice('by', AppStrings.instance.ccmixterLicenceBy),
+        MusicSourceChoice('nc', AppStrings.instance.ccmixterLicenceNc),
+        MusicSourceChoice('pd', AppStrings.instance.ccmixterLicencePd),
+      ],
     ),
     MusicSourceField(
       'tag',
@@ -137,6 +160,12 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
         // The charts of the site: the uploads everybody downloaded most.
         parameters['sort'] = 'rank';
       }
+
+      // The site narrows by licence through the same word it files the upload
+      // under; the values are read back from it, and a word it does not know
+      // is answered with no upload at all.
+      final licence = _licenceFilterOf(request.config.setting('licence'));
+      if (licence != null) parameters['lic'] = licence;
 
       final response = await _dio.get<String>(
         _endpoint,

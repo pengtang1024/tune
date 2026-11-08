@@ -1588,6 +1588,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterFieldQuery => 'Search tag';
 
   @override
+  String get ccmixterFieldLicence => 'Licence';
+
+  @override
+  String get ccmixterFieldLicenceHint =>
+      'Only the uploads published under this licence';
+
+  @override
+  String get ccmixterLicenceAll => 'Every licence';
+
+  @override
+  String get ccmixterLicenceBy => 'Attribution only';
+
+  @override
+  String get ccmixterLicenceNc => 'Noncommercial';
+
+  @override
+  String get ccmixterLicencePd => 'Public domain';
+
+  @override
   String get ccmixterFieldQueryHint => 'e.g. jazz, ambient, electro';
 
   @override

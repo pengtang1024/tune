@@ -2609,6 +2609,42 @@ abstract class AppLocalizations {
   /// **'搜索标签'**
   String get ccmixterFieldQuery;
 
+  /// No description provided for @ccmixterFieldLicence.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'许可'**
+  String get ccmixterFieldLicence;
+
+  /// No description provided for @ccmixterFieldLicenceHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只收以这类许可发布的曲目'**
+  String get ccmixterFieldLicenceHint;
+
+  /// No description provided for @ccmixterLicenceAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不限许可'**
+  String get ccmixterLicenceAll;
+
+  /// No description provided for @ccmixterLicenceBy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'仅需署名'**
+  String get ccmixterLicenceBy;
+
+  /// No description provided for @ccmixterLicenceNc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'非商业'**
+  String get ccmixterLicenceNc;
+
+  /// No description provided for @ccmixterLicencePd.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'公共领域'**
+  String get ccmixterLicencePd;
+
   /// No description provided for @ccmixterFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

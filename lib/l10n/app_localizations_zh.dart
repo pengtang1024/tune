@@ -1436,6 +1436,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
+  String get ccmixterFieldLicence => '许可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以这类许可发布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限许可';
+
+  @override
+  String get ccmixterLicenceBy => '仅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商业';
+
+  @override
+  String get ccmixterLicencePd => '公共领域';
+
+  @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
 
   @override
@@ -5234,6 +5252,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
+  String get ccmixterFieldLicence => '许可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以这类许可发布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限许可';
+
+  @override
+  String get ccmixterLicenceBy => '仅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商业';
+
+  @override
+  String get ccmixterLicencePd => '公共领域';
+
+  @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
 
   @override
@@ -9030,6 +9066,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get ccmixterFieldQuery => '搜尋標籤';
+
+  @override
+  String get ccmixterFieldLicence => '許可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以這類許可發布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限許可';
+
+  @override
+  String get ccmixterLicenceBy => '僅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商業';
+
+  @override
+  String get ccmixterLicencePd => '公共領域';
 
   @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
