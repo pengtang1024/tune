@@ -268,6 +268,47 @@ void main() async {
   );
 
   test(
+    'the playlist mode of Deezer reads the songs of a playlist',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'smooth jazz',
+              'genre': '',
+              'mode': 'playlists',
+              'limit': '4',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer playlists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // A playlist may hold hundreds of songs; the scan keeps the window of
+      // the limit, three playlists at most.
+      expect(result.songs.length, lessThanOrEqualTo(12));
+      expect(
+        result.songs.every((song) => song.artist.isNotEmpty && song.album.isNotEmpty),
+        isTrue,
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the artist mode of Deezer reads the top songs of an artist',
     () async {
       final service = MusicSourceService(

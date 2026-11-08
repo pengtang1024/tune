@@ -37,6 +37,12 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// The name of the artist mode.
   static const _modeArtists = 'artists';
 
+  /// The name of the playlist mode.
+  static const _modePlaylists = 'playlists';
+
+  /// How many playlists the playlist mode reads in one scan.
+  static const _playlistsPerScan = 3;
+
   /// How many artists the artist mode reads in one scan.
   static const _artistsPerScan = 3;
 
@@ -105,6 +111,10 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         MusicSourceChoice('songs', AppStrings.instance.deezerModeSongs),
         MusicSourceChoice(_modeAlbums, AppStrings.instance.deezerModeAlbums),
         MusicSourceChoice(_modeArtists, AppStrings.instance.deezerModeArtists),
+        MusicSourceChoice(
+          _modePlaylists,
+          AppStrings.instance.deezerModePlaylists,
+        ),
       ],
     ),
     MusicSourceField(
@@ -140,6 +150,29 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(config.setting('limit'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
       final mode = config.setting('mode');
+      final wantsPlaylists = keyword.isNotEmpty && mode == _modePlaylists;
+
+      if (wantsPlaylists) {
+        final songs = await _playlistSongs(
+          keyword: keyword,
+          sourceId: config.id,
+          limit: limit,
+        );
+        if (songs == null) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.failed,
+            message: AppStrings.instance.deezerEmptyResponse,
+          );
+        }
+        return SourceScanResult(
+          sourceId: config.id,
+          status: SourceScanStatus.success,
+          songs: songs,
+          message: songs.isEmpty ? AppStrings.instance.deezerNoMatch : null,
+        );
+      }
+
       final wantsArtists = keyword.isNotEmpty && mode == _modeArtists;
 
       if (wantsArtists) {
@@ -234,6 +267,57 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   }
 
 
+
+
+  /// The songs of the playlists the keyword names.
+  ///
+  /// The catalogue answers the keyword with playlists, so each playlist is
+  /// read whole: one request per playlist, and a playlist that answers with
+  /// nothing is skipped instead of failing the scan.
+  Future<List<Song>?> _playlistSongs({
+    required String keyword,
+    required String sourceId,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      'https://api.deezer.com/search/playlist',
+      queryParameters: {
+        'q': keyword,
+        'limit': '${limit < _playlistsPerScan ? limit : _playlistsPerScan}',
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final playlists = _decode(search.data)?['data'];
+    if (playlists is! List) return null;
+
+    final songs = <Song>[];
+    for (final playlist in playlists) {
+      if (playlist is! Map) continue;
+      final id = playlist['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+
+      final detail = await _dio.get<String>(
+        'https://api.deezer.com/playlist/$id',
+        options: Options(responseType: ResponseType.plain),
+      );
+      final tracks = _decode(detail.data)?['tracks'];
+      final entries = tracks is Map ? tracks['data'] : null;
+      if (entries is! List) continue;
+
+      // A playlist may hold hundreds of songs; the scan keeps the window of
+      // the limit so one editorial list does not fill the library.
+      var kept = 0;
+      for (final entry in entries) {
+        if (kept >= limit) break;
+        if (entry is! Map) continue;
+        final song = songOf(entry, sourceId: sourceId);
+        if (song == null) continue;
+        songs.add(song);
+        kept++;
+      }
+    }
+    return songs;
+  }
 
   /// The most played songs of the artists the keyword names.
   ///

@@ -3479,6 +3479,12 @@ abstract class AppLocalizations {
   /// **'艺人'**
   String get deezerModeArtists;
 
+  /// No description provided for @deezerModePlaylists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌单'**
+  String get deezerModePlaylists;
+
   /// No description provided for @sourceKodiName.
   ///
   /// In zh_CN, this message translates to:

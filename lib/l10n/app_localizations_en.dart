@@ -2071,6 +2071,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deezerModeArtists => 'Artists';
 
   @override
+  String get deezerModePlaylists => 'Playlists';
+
+  @override
   String get sourceKodiName => 'Kodi';
 
   @override

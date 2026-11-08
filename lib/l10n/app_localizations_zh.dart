@@ -1873,6 +1873,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deezerModeArtists => '艺人';
 
   @override
+  String get deezerModePlaylists => '歌单';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -5121,6 +5124,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deezerModeArtists => '艺人';
 
   @override
+  String get deezerModePlaylists => '歌单';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -8367,6 +8373,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deezerModeArtists => '藝人';
+
+  @override
+  String get deezerModePlaylists => '歌單';
 
   @override
   String get sourceKodiName => '自架 Kodi 媒體庫';

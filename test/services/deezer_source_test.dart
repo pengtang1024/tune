@@ -94,6 +94,40 @@ void main() {
       expect(request.uri.queryParameters['index'], '10');
     });
 
+    test('the playlist mode reads the playlists the keyword names', () async {
+      final server = _DeezerServer(playlists: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'smooth jazz', 'mode': 'playlists'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(1));
+      expect(result.songs.first.title, 'So What');
+      expect(result.songs.first.album, 'Kind of Blue');
+      expect(result.songs.first.duration, 30000);
+
+      expect(server.requests.first.uri.path, '/search/playlist');
+      expect(server.requests[1].uri.path, '/playlist/5314690902');
+    });
+
+    test('a playlist without songs is skipped', () async {
+      final server = _DeezerServer(playlists: true, emptyPlaylist: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'smooth jazz', 'mode': 'playlists'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, isEmpty);
+      expect(result.message, AppStrings.instance.deezerNoMatch);
+    });
     test('the artist mode reads the top songs of the artists', () async {
       final server = _DeezerServer(artists: true);
       final adapter = DeezerSourceAdapter(dio: server.dio);
@@ -260,6 +294,8 @@ class _DeezerServer {
     this.broken = false,
     this.albums = false,
     this.artists = false,
+    this.playlists = false,
+    this.emptyPlaylist = false,
     this.emptyArtistTop = false,
   }) : data = data ?? [_songJson()];
 
@@ -274,6 +310,12 @@ class _DeezerServer {
 
   /// Answers the top songs of an artist with nothing.
   final bool emptyArtistTop;
+
+  /// Answers the playlist search and the playlist detail instead of the charts.
+  final bool playlists;
+
+  /// Answers a playlist with no song.
+  final bool emptyPlaylist;
   final requests = <RequestOptions>[];
   String? preview;
 
@@ -296,6 +338,36 @@ class _DeezerServer {
             return;
           }
           final path = options.uri.path;
+          if (playlists && path == '/search/playlist') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 5314690902, 'title': 'Smooth Jazz', 'nb_tracks': 2},
+                  ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (playlists && path.startsWith('/playlist/')) {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'id': 5314690902,
+                  'title': 'Smooth Jazz',
+                  'tracks': {
+                    'data': emptyPlaylist ? <dynamic>[] : data,
+                  },
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
           if (artists && path == '/search/artist') {
             handler.resolve(
               Response(
