@@ -3983,36 +3983,6 @@ abstract class AppLocalizations {
   /// **'这首歌的 30 秒试听'**
   String get itunesPreviewNote;
 
-  /// No description provided for @itunesFieldMode.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'读取方式'**
-  String get itunesFieldMode;
-
-  /// No description provided for @itunesFieldModeHint.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'单曲，或按关键词把整张专辑读进来'**
-  String get itunesFieldModeHint;
-
-  /// No description provided for @itunesModeSongs.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'单曲'**
-  String get itunesModeSongs;
-
-  /// No description provided for @itunesModeAlbums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑'**
-  String get itunesModeAlbums;
-
-  /// No description provided for @itunesModeArtists.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'艺人'**
-  String get itunesModeArtists;
-
   /// No description provided for @sourceDeezerName.
   ///
   /// In zh_CN, this message translates to:
@@ -4133,41 +4103,41 @@ abstract class AppLocalizations {
   /// **'这首歌的 30 秒试听'**
   String get deezerPreviewNote;
 
-  /// No description provided for @deezerFieldMode.
+  /// No description provided for @storeReadModeField.
   ///
   /// In zh_CN, this message translates to:
   /// **'读取方式'**
-  String get deezerFieldMode;
+  String get storeReadModeField;
 
-  /// No description provided for @deezerFieldModeHint.
+  /// No description provided for @storeReadModeFieldHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'单曲，或按关键词把整张专辑读进来'**
-  String get deezerFieldModeHint;
+  /// **'读单曲，还是读曲目背后的专辑、艺人与歌单'**
+  String get storeReadModeFieldHint;
 
-  /// No description provided for @deezerModeSongs.
+  /// No description provided for @storeReadModeSongs.
   ///
   /// In zh_CN, this message translates to:
   /// **'单曲'**
-  String get deezerModeSongs;
+  String get storeReadModeSongs;
 
-  /// No description provided for @deezerModeAlbums.
+  /// No description provided for @storeReadModeAlbums.
   ///
   /// In zh_CN, this message translates to:
   /// **'专辑'**
-  String get deezerModeAlbums;
+  String get storeReadModeAlbums;
 
-  /// No description provided for @deezerModeArtists.
+  /// No description provided for @storeReadModeArtists.
   ///
   /// In zh_CN, this message translates to:
   /// **'艺人'**
-  String get deezerModeArtists;
+  String get storeReadModeArtists;
 
-  /// No description provided for @deezerModePlaylists.
+  /// No description provided for @storeReadModePlaylists.
   ///
   /// In zh_CN, this message translates to:
   /// **'歌单'**
-  String get deezerModePlaylists;
+  String get storeReadModePlaylists;
 
   /// No description provided for @sourceKodiName.
   ///

@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/data/services/music_sources/store_read_mode.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -31,14 +32,14 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// while still handing over complete records.
   static const _albumsPerScan = 3;
 
-  /// The name of the album mode.
-  static const _modeAlbums = 'albums';
-
-  /// The name of the artist mode.
-  static const _modeArtists = 'artists';
-
-  /// The name of the playlist mode.
-  static const _modePlaylists = 'playlists';
+  /// The ways the store is read: its tracks, the records they belong to, the
+  /// artists who made them, and the playlists that collect them.
+  static const _modes = [
+    StoreReadMode.songs,
+    StoreReadMode.albums,
+    StoreReadMode.artists,
+    StoreReadMode.playlists,
+  ];
 
   /// How many playlists the playlist mode reads in one scan.
   static const _playlistsPerScan = 3;
@@ -113,20 +114,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.deezerFieldQueryHint,
     ),
-    MusicSourceField(
-      'mode',
-      AppStrings.instance.deezerFieldMode,
-      AppStrings.instance.deezerFieldModeHint,
-      choices: [
-        MusicSourceChoice('songs', AppStrings.instance.deezerModeSongs),
-        MusicSourceChoice(_modeAlbums, AppStrings.instance.deezerModeAlbums),
-        MusicSourceChoice(_modeArtists, AppStrings.instance.deezerModeArtists),
-        MusicSourceChoice(
-          _modePlaylists,
-          AppStrings.instance.deezerModePlaylists,
-        ),
-      ],
-    ),
+    StoreReadMode.field(_modes),
     MusicSourceField(
       'genre',
       AppStrings.instance.deezerFieldGenre,
@@ -159,8 +147,8 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
-      final mode = config.setting('mode');
-      final wantsPlaylists = mode == _modePlaylists;
+      final mode = StoreReadMode.of(config.setting('mode'), _modes);
+      final wantsPlaylists = mode == StoreReadMode.playlists;
 
       if (wantsPlaylists) {
         final songs = await _playlistSongs(
@@ -183,7 +171,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final wantsArtists = mode == _modeArtists;
+      final wantsArtists = mode == StoreReadMode.artists;
 
       if (wantsArtists) {
         final songs = await _artistSongs(
@@ -206,7 +194,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final wantsAlbums = mode == _modeAlbums;
+      final wantsAlbums = mode == StoreReadMode.albums;
 
       if (wantsAlbums) {
         final songs = await _albumSongs(

@@ -2335,22 +2335,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itunesPreviewNote => 'Thirty-second preview of the song';
 
   @override
-  String get itunesFieldMode => 'Read';
-
-  @override
-  String get itunesFieldModeHint =>
-      'Single songs, or whole albums of the keyword';
-
-  @override
-  String get itunesModeSongs => 'Songs';
-
-  @override
-  String get itunesModeAlbums => 'Albums';
-
-  @override
-  String get itunesModeArtists => 'Artists';
-
-  @override
   String get sourceDeezerName => 'Deezer previews';
 
   @override
@@ -2414,23 +2398,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deezerPreviewNote => 'Thirty-second preview of the song';
 
   @override
-  String get deezerFieldMode => 'Read';
+  String get storeReadModeField => 'Reads';
 
   @override
-  String get deezerFieldModeHint =>
-      'Single songs, or whole albums of the keyword';
+  String get storeReadModeFieldHint =>
+      'The tracks themselves, or the records, artists and playlists behind them';
 
   @override
-  String get deezerModeSongs => 'Songs';
+  String get storeReadModeSongs => 'Single tracks';
 
   @override
-  String get deezerModeAlbums => 'Albums';
+  String get storeReadModeAlbums => 'Albums';
 
   @override
-  String get deezerModeArtists => 'Artists';
+  String get storeReadModeArtists => 'Artists';
 
   @override
-  String get deezerModePlaylists => 'Playlists';
+  String get storeReadModePlaylists => 'Playlists';
 
   @override
   String get sourceKodiName => 'Kodi';

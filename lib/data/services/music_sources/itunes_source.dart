@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/data/services/music_sources/store_read_mode.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -31,11 +32,14 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// while still handing over complete records.
   static const _albumsPerScan = 3;
 
-  /// The keyword of the album mode, kept next to the mode it belongs to.
-  static const _modeAlbums = 'albums';
-
-  /// The name of the artist mode.
-  static const _modeArtists = 'artists';
+  /// The ways the store is read: its tracks, the records they belong to, and
+  /// the artists who made them. The album mode is the only one the store
+  /// serves without a keyword, because it reads the chart of the store.
+  static const _modes = [
+    StoreReadMode.songs,
+    StoreReadMode.albums,
+    StoreReadMode.artists,
+  ];
 
   /// How many artists the artist mode reads in one scan.
   static const _artistsPerScan = 3;
@@ -72,7 +76,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   @override
   bool isConfigured(MusicSourceConfig config) =>
       (config.setting('query')?.trim() ?? '').isNotEmpty ||
-      config.setting('mode') == _modeAlbums;
+      StoreReadMode.of(config.setting('mode'), _modes) == StoreReadMode.albums;
 
   @override
   String get configurationHint => AppStrings.instance.itunesHint;
@@ -85,25 +89,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.itunesFieldQueryHint,
       required: true,
     ),
-    MusicSourceField(
-      'mode',
-      AppStrings.instance.itunesFieldMode,
-      AppStrings.instance.itunesFieldModeHint,
-      choices: [
-        MusicSourceChoice(
-          'songs',
-          AppStrings.instance.itunesModeSongs,
-        ),
-        MusicSourceChoice(
-          _modeAlbums,
-          AppStrings.instance.itunesModeAlbums,
-        ),
-        MusicSourceChoice(
-          _modeArtists,
-          AppStrings.instance.itunesModeArtists,
-        ),
-      ],
-    ),
+    StoreReadMode.field(_modes),
     MusicSourceField(
       'country',
       AppStrings.instance.itunesFieldCountry,
@@ -128,7 +114,8 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final config = request.config;
     final query = config.setting('query')?.trim() ?? '';
-    final albums = config.setting('mode') == _modeAlbums;
+    final mode = StoreReadMode.of(config.setting('mode'), _modes);
+    final albums = mode == StoreReadMode.albums;
     // The store has no list of its own for songs or artists, so one of them
     // needs a keyword. The album mode reads the chart of the store instead,
     // which is a list the store serves by itself.
@@ -151,7 +138,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
               sourceId: config.id,
               limit: limit,
             )
-          : config.setting('mode') == _modeArtists
+          : mode == StoreReadMode.artists
           ? await _artistSongs(
               query: query,
               country: country,
