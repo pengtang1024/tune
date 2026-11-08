@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/jellyfin_source.dart';
 import 'package:tune/data/services/music_sources/media_server_items.dart';
+import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
 
 void main() {
@@ -23,6 +24,24 @@ void main() {
 
       // The track inside the window and the undated one stay.
       expect(songs.map((song) => song.title), ['New track', 'Undated track']);
+    });
+    test('a window of stamps keeps only the tracks added inside it', () {
+      final xml = '''<MediaContainer>
+  <Track ratingKey="1" title="New" addedAt="1790000000"><Media><Part key="/library/parts/1" /></Media></Track>
+  <Track ratingKey="2" title="Old" addedAt="1557000000"><Media><Part key="/library/parts/2" /></Media></Track>
+  <Track ratingKey="3" title="Undated"><Media><Part key="/library/parts/3" /></Media></Track>
+</MediaContainer>''';
+
+      final songs = PlexSourceAdapter.parseTracks(
+        xml,
+        sourceId: 'plex',
+        server: 'http://plex.example',
+        token: 'tok',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The track inside the window and the undated one stay.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
     });
   group('Wikimedia adapter', () {
     test('maps the metadata of an audio file', () {
@@ -402,5 +421,5 @@ Map<String, dynamic> _item({
   'Id': id,
   'Name': name,
   'RunTimeTicks': 1800000000,
-  if (created != null) 'DateCreated': created,
+  'DateCreated': ?created,
 };
