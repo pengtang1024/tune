@@ -27,6 +27,7 @@ void main() {
             'user_name': 'JeffSpeed68',
             'upload_extra': {'usertags': 'chill,guitar,jazz'},
             'license_name': 'Attribution Noncommercial (4.0)',
+            'upload_description_plain': '  A note   about the mix.  ',
             'files': [
               {
                 'file_name': 'a.zip',
@@ -83,6 +84,10 @@ void main() {
       expect(song.streamUrl, 'https://ccmixter.org/content/a.mp3');
       expect(song.httpHeaders?['Referer'], 'https://ccmixter.org/');
       expect(song.sourceData?['license'], 'Attribution Noncommercial (4.0)');
+      // The name the site gives the licence is the one the reader sees.
+      expect(song.license, 'Attribution Noncommercial (4.0)');
+      // The description arrives as plain text, with its spacing tidied.
+      expect(song.description, 'A note about the mix.');
       expect(song.sourceId, 'ccmixter');
       expect(server.port, greaterThan(0));
     });
