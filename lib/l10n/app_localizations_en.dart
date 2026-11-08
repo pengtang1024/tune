@@ -1498,6 +1498,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jamendoFieldQueryHint => 'e.g. jazz, electronic';
 
   @override
+  String get jamendoFieldTag => 'Tag';
+
+  @override
+  String get jamendoFieldTagHint =>
+      'A genre or a mood of the catalogue, e.g. jazz, electronic, piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo returned an empty response';
 
   @override

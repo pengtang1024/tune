@@ -807,6 +807,8 @@
   "jamendoFieldClientId": "Client ID",
   "jamendoFieldClientIdHint": "在 developer.jamendo.com 免費申請",
   "jamendoFieldQueryHint": "例如 jazz、electronic",
+  "jamendoFieldTag": "標籤",
+  "jamendoFieldTagHint": "目錄的風格或情緒標籤，例如 jazz、electronic、piano",
   "jamendoEmptyResponse": "Jamendo 回傳了空回應",
   "jamendoNoMatch": "沒有找到符合的 Jamendo 曲目",
   "internetArchiveHint": "填寫 Internet Archive 收錄條件，例如 collection:netlabels AND mediatype:audio",

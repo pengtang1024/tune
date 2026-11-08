@@ -807,6 +807,8 @@
   "jamendoFieldClientId": "Client ID",
   "jamendoFieldClientIdHint": "Apply for free at developer.jamendo.com",
   "jamendoFieldQueryHint": "e.g. jazz, electronic",
+  "jamendoFieldTag": "Tag",
+  "jamendoFieldTagHint": "A genre or a mood of the catalogue, e.g. jazz, electronic, piano",
   "jamendoEmptyResponse": "Jamendo returned an empty response",
   "jamendoNoMatch": "No matching Jamendo tracks",
   "internetArchiveHint": "Enter an Internet Archive query, e.g. collection:netlabels AND mediatype:audio",

@@ -2459,6 +2459,18 @@ abstract class AppLocalizations {
   /// **'例如 jazz、electronic'**
   String get jamendoFieldQueryHint;
 
+  /// No description provided for @jamendoFieldTag.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标签'**
+  String get jamendoFieldTag;
+
+  /// No description provided for @jamendoFieldTagHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'目录的风格或情绪标签，例如 jazz、electronic、piano'**
+  String get jamendoFieldTagHint;
+
   /// No description provided for @jamendoEmptyResponse.
   ///
   /// In zh_CN, this message translates to:

@@ -268,6 +268,25 @@ void main() {
       expect(captured.uri?.queryParameters['order'], 'popularity_total');
     });
 
+    test('Jamendo narrows the catalogue by a tag', () async {
+      final captured = _Captured(body: {'results': <dynamic>[]});
+
+      await JamendoSourceAdapter(dio: captured.dio).scan(
+        _request('jamendo', const {'clientId': 'demo', 'tag': 'jazz'}),
+      );
+
+      expect(captured.uri?.queryParameters['tags'], 'jazz');
+    });
+
+    test('Jamendo asks for no tag when none is written', () async {
+      final captured = _Captured(body: {'results': <dynamic>[]});
+
+      await JamendoSourceAdapter(dio: captured.dio).scan(
+        _request('jamendo', const {'clientId': 'demo'}),
+      );
+
+      expect(captured.uri?.queryParameters.containsKey('tags'), isFalse);
+    });
     test('Jamendo serves its newest releases', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

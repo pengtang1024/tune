@@ -59,6 +59,11 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.jamendoFieldQueryHint,
     ),
     MusicSourceField(
+      'tag',
+      AppStrings.instance.jamendoFieldTag,
+      AppStrings.instance.jamendoFieldTagHint,
+    ),
+    MusicSourceField(
       'format',
       AppStrings.instance.fieldFormat,
       AppStrings.instance.jamendoFieldFormatHint,
@@ -101,6 +106,12 @@ class JamendoSourceAdapter extends MusicSourceAdapter {
       };
       if (query != null) {
         parameters['search'] = query;
+      }
+      // A tag is the genre or the mood the catalogue files a track under; it
+      // is written by hand because the catalogue takes any of its own words.
+      final tag = request.config.setting('tag')?.trim() ?? '';
+      if (tag.isNotEmpty) {
+        parameters['tags'] = tag;
       }
 
       final response = await _dio.get<Map<String, dynamic>>(

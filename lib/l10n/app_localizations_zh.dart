@@ -1354,6 +1354,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
+  String get jamendoFieldTag => '标签';
+
+  @override
+  String get jamendoFieldTagHint => '目录的风格或情绪标签，例如 jazz、electronic、piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo 返回了空响应';
 
   @override
@@ -4967,6 +4973,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
+  String get jamendoFieldTag => '标签';
+
+  @override
+  String get jamendoFieldTagHint => '目录的风格或情绪标签，例如 jazz、electronic、piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo 返回了空响应';
 
   @override
@@ -8578,6 +8590,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
+
+  @override
+  String get jamendoFieldTag => '標籤';
+
+  @override
+  String get jamendoFieldTagHint => '目錄的風格或情緒標籤，例如 jazz、electronic、piano';
 
   @override
   String get jamendoEmptyResponse => 'Jamendo 回傳了空回應';
