@@ -2629,6 +2629,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a book or an author, or leave it empty to browse the most popular audiobooks';
 
   @override
+  String get librivoxFieldChapters => 'Chapters per book';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return 'How many chapters of one book to read (1–$max, default $count)';
+  }
+
+  @override
   String get librivoxFieldGenre => 'Kind of book';
 
   @override

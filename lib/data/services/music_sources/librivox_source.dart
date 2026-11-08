@@ -63,6 +63,15 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.librivoxFieldQueryHint,
     ),
     MusicSourceField(
+      'chapters',
+      AppStrings.instance.librivoxFieldChapters,
+      AppStrings.instance.librivoxFieldChaptersHint(
+        _chaptersPerBook.count,
+        _chaptersPerBook.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
       'genre',
       AppStrings.instance.librivoxFieldGenre,
       AppStrings.instance.librivoxFieldGenreHint,
@@ -140,6 +149,13 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     };
   }
 
+  /// How many chapters of one book a scan reads, and the most it may.
+  ///
+  /// A whole book lands in the library; a long one holds hundreds of chapters,
+  /// so a scan keeps a window of them and the reader who wants the rest raises
+  /// it.
+  static const _chaptersPerBook = MusicSourceLimit(60, 300);
+
   /// A whole book is fetched for each of its chapters, so a scan runs
   /// longer than the scan of a song catalogue.
   @override
@@ -184,6 +200,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       final songs = await _chaptersOf(
         wanted,
         config: config,
+        chapters: _chaptersPerBook.read(config.setting('chapters')),
         onProgress: request.onProgress,
       );
       return SourceScanResult(
@@ -269,6 +286,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   Future<List<Song>> _chaptersOf(
     List<Map<dynamic, dynamic>> books, {
     required MusicSourceConfig config,
+    required int chapters,
     void Function(double progress)? onProgress,
   }) async {
     final songs = <Song>[];
@@ -281,8 +299,15 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       for (var i = 0; i < batch.length; i++) {
         final feed = feeds[i];
         if (feed == null || feed.trim().isEmpty) continue;
+        // A whole book lands in the library: a long one holds hundreds of
+        // chapters, so a scan keeps the window the reader asked for and the
+        // book's own chapter count stays as it is.
         songs.addAll(
-          parseChapterFeed(feed, sourceId: config.id, book: batch[i]),
+          parseChapterFeed(
+            feed,
+            sourceId: config.id,
+            book: batch[i],
+          ).take(chapters),
         );
       }
       onProgress?.call(((start + batch.length) / books.length).clamp(0, 1));

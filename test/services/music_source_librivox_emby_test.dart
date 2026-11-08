@@ -142,6 +142,21 @@ void main() {
       expect(answers.uris.first.queryParameters.containsKey('title'), isFalse);
     });
 
+    test('the reader decides how many chapters of a book are read', () async {
+      final answers = _Replies([
+        {
+          'books': [_book()],
+        },
+        _feedXml(),
+      ]);
+
+      final result = await LibrivoxSourceAdapter(
+        dio: answers.dio,
+      ).scan(_request('librivox', const {'chapters': '1'}));
+
+      // The feed holds two chapters; the window asked for holds one.
+      expect(result.songs, hasLength(1));
+    });
     test('a kind of book narrows the catalogue', () async {
       final answers = _Replies([
         {

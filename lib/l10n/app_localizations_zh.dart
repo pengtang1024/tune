@@ -2406,6 +2406,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
 
   @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本书读多少章（1–$max，默认 $count）';
+  }
+
+  @override
   String get librivoxFieldGenre => '书籍类型';
 
   @override
@@ -6113,6 +6121,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
 
   @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本书读多少章（1–$max，默认 $count）';
+  }
+
+  @override
   String get librivoxFieldGenre => '书籍类型';
 
   @override
@@ -9818,6 +9834,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get librivoxHint => '輸入書名或作者，留空白則瀏覽最熱門的有聲書';
+
+  @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本書讀多少章（1–$max，預設 $count）';
+  }
 
   @override
   String get librivoxFieldGenre => '書籍類型';

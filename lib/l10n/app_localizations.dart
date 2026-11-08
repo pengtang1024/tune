@@ -4517,6 +4517,18 @@ abstract class AppLocalizations {
   /// **'输入书名或作者，留空则浏览最热门的有声书'**
   String get librivoxHint;
 
+  /// No description provided for @librivoxFieldChapters.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每本上限'**
+  String get librivoxFieldChapters;
+
+  /// No description provided for @librivoxFieldChaptersHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每本书读多少章（1–{max}，默认 {count}）'**
+  String librivoxFieldChaptersHint(Object count, Object max);
+
   /// No description provided for @librivoxFieldGenre.
   ///
   /// In zh_CN, this message translates to:

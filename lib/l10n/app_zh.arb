@@ -1172,6 +1172,8 @@
   "sourceLibrivoxName": "有声书",
   "sourceLibrivoxDescription": "LibriVox 志愿者朗读的公版有声书",
   "librivoxHint": "输入书名或作者，留空则浏览最热门的有声书",
+  "librivoxFieldChapters": "每本上限",
+  "librivoxFieldChaptersHint": "每本书读多少章（1–{max}，默认 {count}）",
 "librivoxFieldGenre": "书籍类型",
   "librivoxFieldGenreHint": "目录里的一个门类",
   "librivoxGenreAll": "全部门类",

@@ -1172,6 +1172,8 @@
   "sourceLibrivoxName": "Audiobooks",
   "sourceLibrivoxDescription": "Public-domain audiobooks read by LibriVox volunteers",
   "librivoxHint": "Type a book or an author, or leave it empty to browse the most popular audiobooks",
+  "librivoxFieldChapters": "Chapters per book",
+  "librivoxFieldChaptersHint": "How many chapters of one book to read (1–{max}, default {count})",
 "librivoxFieldGenre": "Kind of book",
   "librivoxFieldGenreHint": "The shelf of the catalogue to read",
   "librivoxGenreAll": "Every kind",
