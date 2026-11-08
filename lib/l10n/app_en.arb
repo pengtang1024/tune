@@ -836,6 +836,8 @@
   "sourceCommunityMusicDescription": "Music the archive's community uploads: rock, jazz, blues and electronic",
   "sourceIndependentAudiobooksName": "Independent audiobooks",
   "sourceIndependentAudiobooksDescription": "Audiobooks the archive keeps outside the LibriVox collection",
+  "sourceArchivePodcastsName": "Archived podcasts",
+  "sourceArchivePodcastsDescription": "Podcast episodes the archive keeps after the feeds go quiet",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
   "sourcePodcastRssName": "Podcasts",
   "sourcePodcastCatalogName": "Podcast directory",

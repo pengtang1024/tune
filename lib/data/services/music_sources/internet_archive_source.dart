@@ -236,7 +236,10 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             externalId: '$identifier/$fileName',
             title: cleanTitle,
             artist: artist,
-            album: _firstText([file['album'], itemAlbum]),
+            // An item is a record of its own: when neither the file nor the
+            // item names an album, the name of the item is the name of the
+            // record its tracks belong to, so nothing lands under no record.
+            album: _firstText([file['album'], itemAlbum, itemTitle]),
             duration: _parseDuration(file['length']),
             streamUrl:
                 'https://archive.org/download/${Uri.encodeComponent(identifier)}/$encodedPath',

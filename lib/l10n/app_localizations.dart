@@ -2591,6 +2591,18 @@ abstract class AppLocalizations {
   /// **'LibriVox 之外、Internet Archive 收录的有声书'**
   String get sourceIndependentAudiobooksDescription;
 
+  /// No description provided for @sourceArchivePodcastsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案播客'**
+  String get sourceArchivePodcastsName;
+
+  /// No description provided for @sourceArchivePodcastsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'节目停更后仍留在 Internet Archive 上的播客单集'**
+  String get sourceArchivePodcastsDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

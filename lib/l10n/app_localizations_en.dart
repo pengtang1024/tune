@@ -1579,6 +1579,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Audiobooks the archive keeps outside the LibriVox collection';
 
   @override
+  String get sourceArchivePodcastsName => 'Archived podcasts';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      'Podcast episodes the archive keeps after the feeds go quiet';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

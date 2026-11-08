@@ -134,6 +134,35 @@ void main() {
       expect(result.songs.last.title, 'Say You Understand');
     });
 
+    test('a record of several files is named after its item', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-show', 'title': 'The Show'},
+            ],
+          },
+        },
+        '/metadata/the-show': {
+          'metadata': {'title': 'The Show', 'creator': 'The Host'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'Episode One'},
+            {'name': 'two.mp3', 'format': 'VBR MP3', 'title': 'Episode Two'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // The item is the record: neither file names an album, so the tracks
+      // are grouped under the name of the item they belong to.
+      expect(
+        result.songs.map((song) => song.album).toSet(),
+        {'The Show'},
+      );
+    });
     test('a one-track item is named after the item', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

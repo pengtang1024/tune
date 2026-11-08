@@ -97,6 +97,18 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'archive_podcasts',
+        name: strings.sourceArchivePodcastsName,
+        description: strings.sourceArchivePodcastsDescription,
+        settings: {
+          // The archive keeps podcasts after their feeds stop answering, which
+          // the podcast directories can no longer show.
+          'query': 'collection:podcasts AND mediatype:audio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'independent_audiobooks',
         name: strings.sourceIndependentAudiobooksName,
         description: strings.sourceIndependentAudiobooksDescription,
@@ -344,6 +356,9 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The source of the podcasts the archive keeps after their feeds go quiet.
+  static MusicSourceConfig get archivePodcasts => _entry('archive_podcasts');
 
   /// The source of the audiobooks the archive keeps outside LibriVox.
   static MusicSourceConfig get independentAudiobooks =>

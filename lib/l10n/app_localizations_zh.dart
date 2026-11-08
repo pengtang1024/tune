@@ -1426,6 +1426,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'LibriVox 之外、Internet Archive 收录的有声书';
 
   @override
+  String get sourceArchivePodcastsName => '档案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '节目停更后仍留在 Internet Archive 上的播客单集';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4686,6 +4693,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'LibriVox 之外、Internet Archive 收录的有声书';
 
   @override
+  String get sourceArchivePodcastsName => '档案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '节目停更后仍留在 Internet Archive 上的播客单集';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -7944,6 +7958,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceIndependentAudiobooksDescription =>
       'LibriVox 之外、Internet Archive 收錄的有聲書';
+
+  @override
+  String get sourceArchivePodcastsName => '檔案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '節目停更後仍留在 Internet Archive 上的播客單集';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
