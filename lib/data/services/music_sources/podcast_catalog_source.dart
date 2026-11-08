@@ -84,6 +84,7 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
       ),
       numeric: true,
     ),
+    PodcastRssSourceAdapter.sinceField(),
     MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
@@ -102,6 +103,9 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
+      final since = PodcastRssSourceAdapter.sinceOf(
+        request.config.setting('since'),
+      );
       final keyword = request.config.setting('query');
       final feeds = await _feeds(
         keyword,
@@ -126,6 +130,7 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
               feed,
               request.config.id,
               _episodesPerPodcast.read(request.config.setting('episodes')),
+              since,
             ),
         ]);
         for (final episode in episodes) {
@@ -182,6 +187,7 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
     String feed,
     String sourceId,
     int episodes,
+    DateTime? since,
   ) async {
     try {
       final response = await _dio.get<String>(
@@ -196,6 +202,7 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
         body,
         sourceId: sourceId,
         limit: episodes,
+        since: since,
       );
     } catch (error) {
       // One broken feed should not fail the whole catalogue.

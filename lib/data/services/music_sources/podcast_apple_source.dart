@@ -134,6 +134,7 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       ),
       numeric: true,
     ),
+    PodcastRssSourceAdapter.sinceField(),
     MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
@@ -156,6 +157,9 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(request.config.setting('limit'));
       final country = _countryOf(request.config);
       final keyword = request.config.setting('query')?.trim() ?? '';
+      final since = PodcastRssSourceAdapter.sinceOf(
+        request.config.setting('since'),
+      );
 
       // The episode mode searches the episodes themselves: the store answers
       // with the newest ones it holds, each of them playable as it is.
@@ -208,6 +212,7 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
               feed,
               request.config.id,
               _episodesPerPodcast.read(request.config.setting('episodes')),
+              since,
             ),
         ]);
         for (final episode in episodes) {
@@ -358,6 +363,7 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
     String feed,
     String sourceId,
     int episodes,
+    DateTime? since,
   ) async {
     try {
       final response = await _dio.get<String>(
@@ -372,6 +378,7 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
         body,
         sourceId: sourceId,
         limit: episodes,
+        since: since,
       );
     } catch (error) {
       // One broken feed should not fail the whole directory.

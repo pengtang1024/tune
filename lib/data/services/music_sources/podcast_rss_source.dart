@@ -47,15 +47,27 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   /// A window is a filter of the reader's, not a guess of the app's: the feed
   /// is read whole and the episodes outside the window are dropped, so the
   /// ones that stay are the ones the feed published inside it.
-  static const _sinceDays = {7: 7, 30: 30, 90: 90, 365: 365};
+  static const sinceDays = {7, 30, 90, 365};
 
-  static String _sinceLabel(int days) =>
-      AppStrings.instance.podcastRssSinceDays('$days');
+  /// The field the three podcast sources share for the window.
+  ///
+  /// The parsing of a feed is shared by all of them, so the window is offered
+  /// by all of them rather than by the subscription alone.
+  static MusicSourceField sinceField() => MusicSourceField(
+    'since',
+    AppStrings.instance.podcastRssFieldSince,
+    AppStrings.instance.podcastRssFieldSinceHint,
+    choices: [
+      MusicSourceChoice('', AppStrings.instance.podcastRssSinceAll),
+      for (final days in sinceDays)
+        MusicSourceChoice('$days', AppStrings.instance.podcastRssSinceDays('$days')),
+    ],
+  );
 
   /// The day the window starts, or nothing when the reader asked for all.
-  static DateTime? _sinceOf(String? raw) {
+  static DateTime? sinceOf(String? raw) {
     final days = int.tryParse(raw?.trim() ?? '');
-    if (days == null || !_sinceDays.containsKey(days)) return null;
+    if (days == null || !sinceDays.contains(days)) return null;
     return DateTime.now().toUtc().subtract(Duration(days: days));
   }
 
@@ -73,16 +85,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
-    MusicSourceField(
-      'since',
-      AppStrings.instance.podcastRssFieldSince,
-      AppStrings.instance.podcastRssFieldSinceHint,
-      choices: [
-        MusicSourceChoice('', AppStrings.instance.podcastRssSinceAll),
-        for (final days in _sinceDays.keys)
-          MusicSourceChoice('$days', _sinceLabel(days)),
-      ],
-    ),
+    sinceField(),
   ];
 
   @override
@@ -113,7 +116,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final since = _sinceOf(request.config.setting('since'));
+      final since = sinceOf(request.config.setting('since'));
       final songs = parseFeed(
         body,
         sourceId: request.config.id,

@@ -49,6 +49,19 @@ void main() {
       expect(answers.uris.first.queryParameters['q'], 'jazz');
     });
 
+    test('a window of dates keeps the episodes published inside it', () async {
+      final dio = _CatalogDio(
+        search: '[{"url":"https://f1.example/feed.xml"}]',
+        feeds: {'https://f1.example/feed.xml': _datedFeedWith('One', 'f1')},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: dio.dio).scan(
+        _request('podcast_catalog', const {'since': '7'}),
+      );
+
+      // The feed holds two episodes, one of them from 2020.
+      expect(result.songs.map((song) => song.title), ['New episode of One']);
+    });
     test('a tag reads the shows of that tag', () async {
       final answers = _CatalogDio(
         search: _searchAnswer(),
@@ -137,6 +150,31 @@ String _searchAnswer() =>
     '[{"url":"https://a.example/feed.xml"},'
     '{"url":"https://b.example/feed.xml"}]';
 
+/// The feed of one show, with an episode of today and one of 2020.
+String _datedFeedWith(String title, String id) {
+  final today = DateTime.now().toUtc();
+  String stamp(DateTime at) =>
+      '${_weekdays[at.weekday - 1]}, ${at.day.toString().padLeft(2, '0')} '
+      '${_months[at.month - 1]} ${at.year} '
+      '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}:00 +0000';
+  return '<?xml version="1.0" encoding="UTF-8"?>'
+      '<rss version="2.0"><channel><title>$title</title>'
+      '<item><title>New episode of $title</title>'
+      '<guid>new-$id</guid>'
+      '<enclosure url="https://cdn.example/$id-new.mp3" length="0" type="audio/mpeg" />'
+      '<pubDate>${stamp(today)}</pubDate></item>'
+      '<item><title>Old episode of $title</title>'
+      '<guid>old-$id</guid>'
+      '<enclosure url="https://cdn.example/$id-old.mp3" length="0" type="audio/mpeg" />'
+      '<pubDate>${stamp(DateTime.utc(2020, 1, 2, 9))}</pubDate></item>'
+      '</channel></rss>';
+}
+
+const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
 /// The feed of one show, with one episode.
 String _feedXml(String title, String id) =>
     '''
