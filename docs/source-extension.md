@@ -75,7 +75,7 @@ MusicSourceConfig（实例 · 数据）
 | `local` | 本地音乐 | `localDirectory` | `local` | — | 扫描目录（走全局设置） |
 | `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 电台目录、标签、语言、国家/地区、关键词、数量 |
 | `azuracast` | AzuraCast | `openApi` | `azuracast` | — | 服务器地址、API Key（可选）、关键词、数量 |
-| `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空） |
+| `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空）、来源（可留空） |
 | `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 | Client ID、关键词（可留空）、音质 |
 | `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 / 最新 | 查询条件（可留空）、数量 |
 | `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 | 标签（可留空）、数量 |

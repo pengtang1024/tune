@@ -2267,6 +2267,42 @@ abstract class AppLocalizations {
   /// **'未配置本地音乐目录'**
   String get localSourceNotConfigured;
 
+  /// No description provided for @openverseFieldSource.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来源'**
+  String get openverseFieldSource;
+
+  /// No description provided for @openverseFieldSourceHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看一个目录，不混着来'**
+  String get openverseFieldSourceHint;
+
+  /// No description provided for @openverseSourceAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部目录'**
+  String get openverseSourceAll;
+
+  /// No description provided for @openverseSourceJamendo.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Jamendo'**
+  String get openverseSourceJamendo;
+
+  /// No description provided for @openverseSourceWikimedia.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'维基共享资源'**
+  String get openverseSourceWikimedia;
+
+  /// No description provided for @openverseSourceFreesound.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Freesound'**
+  String get openverseSourceFreesound;
+
   /// No description provided for @openverseHint.
   ///
   /// In zh_CN, this message translates to:

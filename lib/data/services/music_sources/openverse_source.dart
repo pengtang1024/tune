@@ -48,12 +48,34 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.openverseHint;
 
+  /// The catalogues Openverse audio comes from, by the name the service knows
+  /// them by.
+  ///
+  /// Wikimedia Commons is a catalogue of the service too, but its audio is
+  /// mostly pronunciation samples rather than music, so it is not offered
+  /// here: the music of the commons is read by the wikimedia source, which
+  /// browses its own categories.
+  static const _sources = ['jamendo', 'freesound'];
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.openverseFieldQueryHint,
+    ),
+    MusicSourceField(
+      'source',
+      AppStrings.instance.openverseFieldSource,
+      AppStrings.instance.openverseFieldSourceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseSourceAll),
+        MusicSourceChoice(_sources[0], AppStrings.instance.openverseSourceJamendo),
+        MusicSourceChoice(
+          _sources[1],
+          AppStrings.instance.openverseSourceFreesound,
+        ),
+      ],
     ),
   ];
 
@@ -69,13 +91,17 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
+    final source = request.config.setting('source')?.trim() ?? '';
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://api.openverse.org/v1/audio/',
         // Without a keyword the service serves the audio it published last.
+        // A source narrows the answer to one catalogue, which the service
+        // filters on without a keyword.
         queryParameters: {
           'q': ?query,
+          if (source.isNotEmpty && _sources.contains(source)) 'source': source,
           'page_size': 20,
           'page': request.offset ~/ 20 + 1,
         },

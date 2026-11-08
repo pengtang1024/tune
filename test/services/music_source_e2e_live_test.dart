@@ -663,6 +663,42 @@ void main() async {
   );
 
   test(
+    'the Openverse source reads one catalogue at a time',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final source in const ['jamendo', 'freesound']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.openverse.copyWith(
+              settings: {'query': '', 'source': source},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$source failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$source returned nothing');
+        seen[source] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The catalogues are separate: a music catalogue and a sound effect
+      // catalogue must not answer with the same tracks.
+      expect(seen['jamendo'], isNot(equals(seen['freesound'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the podcast directory reads a tag of its own',
     () async {
       final service = MusicSourceService(

@@ -1257,6 +1257,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
+  String get openverseFieldSource => '来源';
+
+  @override
+  String get openverseFieldSourceHint => '只看一个目录，不混着来';
+
+  @override
+  String get openverseSourceAll => '全部目录';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '维基共享资源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -4524,6 +4542,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
+  String get openverseFieldSource => '来源';
+
+  @override
+  String get openverseFieldSourceHint => '只看一个目录，不混着来';
+
+  @override
+  String get openverseSourceAll => '全部目录';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '维基共享资源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -7789,6 +7825,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get localSourceNotConfigured => '未設定本機音樂目錄';
+
+  @override
+  String get openverseFieldSource => '來源';
+
+  @override
+  String get openverseFieldSourceHint => '只看一個目錄，不混著來';
+
+  @override
+  String get openverseSourceAll => '全部目錄';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '維基共享資源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
 
   @override
   String get openverseHint => '填寫搜尋關鍵字，例如 piano、ambient 或 jazz';

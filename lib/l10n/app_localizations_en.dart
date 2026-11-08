@@ -1395,6 +1395,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localSourceNotConfigured => 'No local music folder configured';
 
   @override
+  String get openverseFieldSource => 'Catalogue';
+
+  @override
+  String get openverseFieldSourceHint =>
+      'One catalogue instead of every one at once';
+
+  @override
+  String get openverseSourceAll => 'Every catalogue';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => 'Wikimedia Commons';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint =>
       'Enter a search keyword, e.g. piano, ambient or jazz';
 
