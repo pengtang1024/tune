@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -168,8 +169,12 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     final keyword = request.config.setting('query');
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
-      final response = await _dio.get<Map<String, dynamic>>(
-        _apiHost,
+      // The wiki answers a request it finds too frequent with a 429 and a
+      // note asking the caller to slow down; the read is given a few more
+      // tries before the scan counts as failed.
+      final response = await retrySourceRead(
+        () => _dio.get<Map<String, dynamic>>(
+          _apiHost,
         queryParameters: keyword == null
             ? {
                 // Without a keyword the scan walks a category of the wiki.
@@ -195,6 +200,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'prop': 'imageinfo',
                 'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
               },
+        ),
+        // The wiki answers with an empty page when it could not read the
+        // request at all, which is worth one more try as well.
+        answered: (answer) => answer.data != null,
+        delays: const [Duration(seconds: 1), Duration(seconds: 3)],
       );
       final data = response.data;
       if (data == null) {

@@ -10,6 +10,7 @@ import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/librivox_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -130,6 +131,48 @@ void main() {
       expect(result.cursor, 'token-2');
     });
 
+    test('a wiki that asks to slow down is asked once more', () async {
+      var calls = 0;
+      final client = Dio();
+      client.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            calls++;
+            if (calls == 1) {
+              // The wiki answers a request it finds too frequent this way.
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  type: DioExceptionType.badResponse,
+                  response: Response(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                ),
+                true,
+              );
+              return;
+            }
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: {
+                  'query': {'pages': <dynamic>{}},
+                },
+              ),
+            );
+          },
+        ),
+      );
+
+      final result = await WikimediaSourceAdapter(
+        dio: client,
+      ).scan(_request('wikimedia', settings: {'query': 'jazz'}));
+
+      expect(calls, 2);
+      expect(result.status, SourceScanStatus.success);
+    });
     test('Jellyfin asks for the window at the offset', () async {
       final routed = _RoutedDio({
         '/Users/AuthenticateByName': {'AccessToken': 'tok'},
