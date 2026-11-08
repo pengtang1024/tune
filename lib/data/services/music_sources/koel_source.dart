@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -91,6 +92,19 @@ class KoelSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.koelFieldQueryHint,
     ),
     MusicSourceField(
+      'since',
+      AppStrings.instance.mediaServerFieldSince,
+      AppStrings.instance.mediaServerFieldSinceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.mediaServerSinceAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.mediaServerSinceDays('$days'),
+          ),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -145,7 +159,13 @@ class KoelSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final songs = await _playable(config.id, server, token, answer);
+      final songs = await _playable(
+        config.id,
+        server,
+        token,
+        answer,
+        since: RecentWindow.cutoff(config.setting('since')),
+      );
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.success,
@@ -291,11 +311,20 @@ class KoelSourceAdapter extends MusicSourceAdapter {
     String sourceId,
     String server,
     String token,
-    List<Map<String, dynamic>> tracks,
-  ) async {
+    List<Map<String, dynamic>> tracks, {
+    DateTime? since,
+  }) async {
+    // The window is applied before the addresses are asked for: a track that
+    // is left out does not cost a request.
+    final kept = since == null
+        ? tracks
+        : [
+            for (final track in tracks)
+              if (_addedInside(track, since)) track,
+          ];
     final songs = <Song>[];
-    for (var start = 0; start < tracks.length; start += 4) {
-      final batch = tracks.skip(start).take(4).toList(growable: false);
+    for (var start = 0; start < kept.length; start += 4) {
+      final batch = kept.skip(start).take(4).toList(growable: false);
       final urls = await Future.wait(
         batch.map((track) async {
           final id = _string(track['id']);
@@ -317,6 +346,16 @@ class KoelSourceAdapter extends MusicSourceAdapter {
       }
     }
     return songs;
+  }
+
+
+  /// Whether the server added a track inside the window.
+  ///
+  /// Koel stamps a track with the moment it was added; a track without a
+  /// stamp it can be read from is kept.
+  static bool _addedInside(Map<String, dynamic> track, DateTime since) {
+    final added = RecentWindow.dateTimeOf(track['created_at']);
+    return added == null || !added.isBefore(since);
   }
 
   /// Reads the signed address of one track.

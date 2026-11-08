@@ -19,6 +19,25 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// lyrics.
 void main() {
   group('Koel adapter', () {
+    test('a window of stamps is applied before the addresses are asked for', () async {
+      final today = DateTime.now().toUtc().toIso8601String();
+      final server = _KoelServer(
+        tracks: [
+          {..._trackJson(id: 'uuid-new'), 'title': 'New', 'created_at': today},
+          {..._trackJson(id: 'uuid-old'), 'title': 'Old', 'created_at': '2019-05-04T10:00:00Z'},
+        ],
+      );
+
+      final result = await KoelSourceAdapter(dio: _dio(server)).scan(
+        MusicSourceScanRequest(
+          config: _config(extra: const {'since': '30', 'limit': '10'}),
+        ),
+      );
+
+      expect(result.songs.map((song) => song.title), ['New']);
+      // The track outside the window never asked for a signed address.
+      expect(server.signatures, 1);
+    });
     test('maps a track of the server', () async {
       final server = _KoelServer();
       final adapter = KoelSourceAdapter(dio: _dio(server));

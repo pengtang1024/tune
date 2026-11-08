@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -88,6 +89,19 @@ class AmpacheSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.mediaServerFieldSince,
+      AppStrings.instance.mediaServerFieldSinceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.mediaServerSinceAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.mediaServerSinceDays('$days'),
+          ),
+      ],
+    ),
   ];
 
   @override
@@ -138,7 +152,11 @@ class AmpacheSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final songs = parseSongs(data, sourceId: request.config.id);
+      final songs = parseSongs(
+        data,
+        sourceId: request.config.id,
+        since: RecentWindow.cutoff(config.setting('since')),
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,
@@ -266,16 +284,34 @@ class AmpacheSourceAdapter extends MusicSourceAdapter {
   static List<Song> parseSongs(
     Map<String, dynamic> data, {
     required String sourceId,
+    DateTime? since,
   }) {
     final raw = data['song'];
     if (raw is! List) return const [];
     final songs = <Song>[];
     for (final entry in raw) {
       if (entry is! Map) continue;
-      final song = _songFrom(Map<String, dynamic>.from(entry), sourceId);
+      final row = Map<String, dynamic>.from(entry);
+      // The server stamps a track with the moment it was added; a track older
+      // than the window is left out, one without the stamp is kept.
+      if (since != null) {
+        final added = RecentWindow.dateTimeOf(_addedAtOf(row));
+        if (added != null && added.isBefore(since)) continue;
+      }
+      final song = _songFrom(row, sourceId);
       if (song != null) songs.add(song);
     }
     return songs;
+  }
+
+  /// The moment the server added a track, out of its stamp in seconds.
+  static Object? _addedAtOf(Map<String, dynamic> raw) {
+    final seconds = SourceSongFactory.parseInt(raw['addition_time']);
+    if (seconds <= 0) return null;
+    return DateTime.fromMillisecondsSinceEpoch(
+      seconds * 1000,
+      isUtc: true,
+    ).toIso8601String();
   }
 
   /// One track of an answer, or null when it cannot be played.

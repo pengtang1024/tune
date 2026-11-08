@@ -17,6 +17,24 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// track that carries the address of the token it was read with.
 void main() {
   group('Ampache adapter', () {
+    test('a window of stamps keeps only the tracks added inside it', () {
+      final answer = {
+        'song': [
+          {..._songJson(), 'id': 'new', 'title': 'New', 'addition_time': 1790000000},
+          {..._songJson(), 'id': 'old', 'title': 'Old', 'addition_time': 1557000000},
+          {..._songJson(), 'id': 'undated', 'title': 'Undated'},
+        ],
+      };
+
+      final songs = AmpacheSourceAdapter.parseSongs(
+        answer,
+        sourceId: 'ampache',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The track inside the window and the undated one stay.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
+    });
     test('maps a track of the server', () async {
       final server = _AmpacheServer();
       final adapter = AmpacheSourceAdapter(dio: _dio(server));
