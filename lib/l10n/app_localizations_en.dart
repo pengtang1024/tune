@@ -1572,6 +1572,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Music the archive\'s community uploads: rock, jazz, blues and electronic';
 
   @override
+  String get sourceIndependentAudiobooksName => 'Independent audiobooks';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'Audiobooks the archive keeps outside the LibriVox collection';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

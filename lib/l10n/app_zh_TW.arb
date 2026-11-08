@@ -834,6 +834,8 @@
   "sourceUnlockedRecordingsDescription": "Unlocked Recordings 專案數位化的公版唱片",
   "sourceCommunityMusicName": "社群音樂",
   "sourceCommunityMusicDescription": "Internet Archive 社群上傳的音樂：搖滾、爵士、藍調與電子",
+  "sourceIndependentAudiobooksName": "獨立有聲書",
+  "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收錄的有聲書",
   "sourcePodcastRssDescription": "把任意 RSS podcast 訂閱變成可播放的單集",
   "sourcePodcastRssName": "Podcast 訂閱",
   "sourcePodcastCatalogName": "播客目錄",

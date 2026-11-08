@@ -94,6 +94,20 @@ class BuiltInMusicSources {
               'subject:electronic)',
         },
       ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'independent_audiobooks',
+        name: strings.sourceIndependentAudiobooksName,
+        description: strings.sourceIndependentAudiobooksDescription,
+        settings: {
+          // LibriVox has an adapter of its own; this reach is everything the
+          // archive keeps outside it, which the LibriVox source never shows.
+          'query':
+              'collection:audio_bookspoetry AND mediatype:audio AND '
+              'NOT collection:librivoxaudio',
+        },
+      ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
       _instance(types, 'podcast_catalog'),
@@ -330,6 +344,10 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The source of the audiobooks the archive keeps outside LibriVox.
+  static MusicSourceConfig get independentAudiobooks =>
+      _entry('independent_audiobooks');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');

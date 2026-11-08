@@ -834,6 +834,8 @@
   "sourceUnlockedRecordingsDescription": "The public-domain records the Unlocked Recordings project digitises",
   "sourceCommunityMusicName": "Community Music",
   "sourceCommunityMusicDescription": "Music the archive's community uploads: rock, jazz, blues and electronic",
+  "sourceIndependentAudiobooksName": "Independent audiobooks",
+  "sourceIndependentAudiobooksDescription": "Audiobooks the archive keeps outside the LibriVox collection",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
   "sourcePodcastRssName": "Podcasts",
   "sourcePodcastCatalogName": "Podcast directory",

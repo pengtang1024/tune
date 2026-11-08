@@ -2579,6 +2579,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子'**
   String get sourceCommunityMusicDescription;
 
+  /// No description provided for @sourceIndependentAudiobooksName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'独立有声书'**
+  String get sourceIndependentAudiobooksName;
+
+  /// No description provided for @sourceIndependentAudiobooksDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'LibriVox 之外、Internet Archive 收录的有声书'**
+  String get sourceIndependentAudiobooksDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

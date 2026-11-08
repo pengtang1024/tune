@@ -126,6 +126,7 @@ void main() async {
           'archive_music',
           'unlocked_recordings',
           'community_music',
+          'independent_audiobooks',
         ]),
       );
 

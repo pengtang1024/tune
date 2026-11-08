@@ -1419,6 +1419,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
 
   @override
+  String get sourceIndependentAudiobooksName => '独立有声书';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收录的有声书';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4660,6 +4667,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
 
   @override
+  String get sourceIndependentAudiobooksName => '独立有声书';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收录的有声书';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -7899,6 +7913,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceCommunityMusicDescription =>
       'Internet Archive 社群上傳的音樂：搖滾、爵士、藍調與電子';
+
+  @override
+  String get sourceIndependentAudiobooksName => '獨立有聲書';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收錄的有聲書';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
