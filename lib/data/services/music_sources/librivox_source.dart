@@ -6,7 +6,6 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
-import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/utils/plain_text.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:xml/xml.dart';
@@ -23,37 +22,6 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
 
   /// The catalogue endpoint of LibriVox.
   static const _apiHost = 'https://librivox.org/api/feed/audiobooks/';
-
-  /// The languages the catalogue lists on its own pages.
-  ///
-  /// The catalogue API keeps no language filter, so the scan narrows the
-  /// books on the spot; these are the names the books carry as values.
-  static const _languages = [
-    'English',
-    'Chinese',
-    'French',
-    'German',
-    'Spanish',
-    'Italian',
-    'Japanese',
-    'Russian',
-    'Portuguese',
-  ];
-
-  /// The label of one language, written in the language of the app.
-  static String _languageLabel(String language, AppLocalizations strings) =>
-      switch (language) {
-        'English' => strings.fieldLanguageEnglish,
-        'Chinese' => strings.fieldLanguageChinese,
-        'French' => strings.fieldLanguageFrench,
-        'German' => strings.fieldLanguageGerman,
-        'Spanish' => strings.fieldLanguageSpanish,
-        'Italian' => strings.fieldLanguageItalian,
-        'Japanese' => strings.fieldLanguageJapanese,
-        'Russian' => strings.fieldLanguageRussian,
-        'Portuguese' => strings.fieldLanguagePortuguese,
-        _ => language,
-      };
 
   final Dio _dio;
 
@@ -93,19 +61,6 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.librivoxFieldQueryHint,
-    ),
-    MusicSourceField(
-      'language',
-      AppStrings.instance.fieldLanguage,
-      AppStrings.instance.fieldLanguageHint,
-      choices: [
-        MusicSourceChoice('', AppStrings.instance.fieldLanguageAll),
-        for (final language in _languages)
-          MusicSourceChoice(
-            language,
-            _languageLabel(language, AppStrings.instance),
-          ),
-      ],
     ),
     MusicSourceField(
       'genre',
@@ -188,7 +143,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
               : AppStrings.instance.librivoxEmptyResponse,
         );
       }
-      final wanted = wantedBooks(books, language: config.setting('language'));
+      final wanted = books;
       if (wanted.isEmpty) {
         return SourceScanResult(
           sourceId: config.id,
@@ -335,25 +290,6 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       books.add(item);
     }
     return books;
-  }
-
-  /// The books the language of the scan asks for.
-  ///
-  /// The catalogue keeps no language filter, so the scan narrows the books
-  /// itself; a configuration without a language keeps them all.
-  static List<Map<dynamic, dynamic>> wantedBooks(
-    List<Map<dynamic, dynamic>> books, {
-    String? language,
-  }) {
-    final wanted = language?.trim() ?? '';
-    if (wanted.isEmpty) return books;
-    return books
-        .where(
-          (book) =>
-              '${book['language'] ?? ''}'.trim().toLowerCase() ==
-              wanted.toLowerCase(),
-        )
-        .toList(growable: false);
   }
 
   /// The name of the author of a book.

@@ -872,42 +872,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldLimitBooks => '每次扫描书数';
 
   @override
-  String get fieldLanguage => '语言';
-
-  @override
-  String get fieldLanguageHint => '只保留一种语言的有声书';
-
-  @override
-  String get fieldLanguageAll => '不限制语言';
-
-  @override
-  String get fieldLanguageEnglish => '英语';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法语';
-
-  @override
-  String get fieldLanguageGerman => '德语';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙语';
-
-  @override
-  String get fieldLanguageItalian => '意大利语';
-
-  @override
-  String get fieldLanguageJapanese => '日语';
-
-  @override
-  String get fieldLanguageRussian => '俄语';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙语';
-
-  @override
   String get fieldServer => '服务器地址';
 
   @override
@@ -4519,42 +4483,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldLimitBooks => '每次扫描书数';
 
   @override
-  String get fieldLanguage => '语言';
-
-  @override
-  String get fieldLanguageHint => '只保留一种语言的有声书';
-
-  @override
-  String get fieldLanguageAll => '不限制语言';
-
-  @override
-  String get fieldLanguageEnglish => '英语';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法语';
-
-  @override
-  String get fieldLanguageGerman => '德语';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙语';
-
-  @override
-  String get fieldLanguageItalian => '意大利语';
-
-  @override
-  String get fieldLanguageJapanese => '日语';
-
-  @override
-  String get fieldLanguageRussian => '俄语';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙语';
-
-  @override
   String get fieldServer => '服务器地址';
 
   @override
@@ -8164,42 +8092,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get fieldLimitBooks => '每次掃描書數';
-
-  @override
-  String get fieldLanguage => '語言';
-
-  @override
-  String get fieldLanguageHint => '只保留一種語言的有聲書';
-
-  @override
-  String get fieldLanguageAll => '不限制語言';
-
-  @override
-  String get fieldLanguageEnglish => '英語';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法語';
-
-  @override
-  String get fieldLanguageGerman => '德語';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙語';
-
-  @override
-  String get fieldLanguageItalian => '義大利語';
-
-  @override
-  String get fieldLanguageJapanese => '日語';
-
-  @override
-  String get fieldLanguageRussian => '俄語';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙語';
 
   @override
   String get fieldServer => '伺服器位址';

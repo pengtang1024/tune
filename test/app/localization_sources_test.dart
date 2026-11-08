@@ -150,7 +150,6 @@ void main() {
           'user': {strings.fieldUser},
           'password': {strings.fieldPassword},
           'format': {strings.fieldFormat},
-          'language': {strings.fieldLanguage},
           'token': {
             strings.plexFieldToken,
             strings.funkwhaleFieldToken,

@@ -61,25 +61,6 @@ void main() {
       expect(LibrivoxSourceAdapter.bookAuthorOf(const {}), isEmpty);
     });
 
-    test('keeps only the books of the language the scan asks for', () {
-      final books = [
-        _book(),
-        {..._book(), 'id': '99', 'language': 'French'},
-      ];
-
-      expect(
-        LibrivoxSourceAdapter.wantedBooks(books, language: 'french'),
-        hasLength(1),
-      );
-      expect(
-        LibrivoxSourceAdapter.wantedBooks(books, language: null),
-        hasLength(2),
-      );
-      expect(
-        LibrivoxSourceAdapter.wantedBooks(books, language: '  '),
-        hasLength(2),
-      );
-    });
 
     test('one item of the feed becomes one chapter of the book', () {
       final songs = LibrivoxSourceAdapter.parseChapterFeed(

@@ -942,42 +942,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldLimitBooks => 'Books per scan';
 
   @override
-  String get fieldLanguage => 'Language';
-
-  @override
-  String get fieldLanguageHint => 'Only keep the audiobooks of one language';
-
-  @override
-  String get fieldLanguageAll => 'All languages';
-
-  @override
-  String get fieldLanguageEnglish => 'English';
-
-  @override
-  String get fieldLanguageChinese => 'Chinese';
-
-  @override
-  String get fieldLanguageFrench => 'French';
-
-  @override
-  String get fieldLanguageGerman => 'German';
-
-  @override
-  String get fieldLanguageSpanish => 'Spanish';
-
-  @override
-  String get fieldLanguageItalian => 'Italian';
-
-  @override
-  String get fieldLanguageJapanese => 'Japanese';
-
-  @override
-  String get fieldLanguageRussian => 'Russian';
-
-  @override
-  String get fieldLanguagePortuguese => 'Portuguese';
-
-  @override
   String get fieldServer => 'Server address';
 
   @override
