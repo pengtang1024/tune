@@ -29,6 +29,7 @@ const List<String> properNames = [
   'SomaFM',
   'Radio Browser',
   'Radio Paradise',
+  'Unlocked Recordings',
   'Radio Paradise Main',
   'Radio Paradise Mellow',
   'Radio Paradise Eclectic',

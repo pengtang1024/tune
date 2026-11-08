@@ -829,6 +829,8 @@
   "sourceOldTimeRadioName": "老式广播剧",
   "sourceAudioMusicDescription": "Internet Archive 音频收藏里的音乐录音",
   "sourceAudioMusicName": "档案音乐",
+  "sourceUnlockedRecordingsName": "Unlocked Recordings",
+  "sourceUnlockedRecordingsDescription": "Unlocked Recordings 项目数字化的公版唱片",
   "sourcePodcastRssDescription": "把任意 RSS 播客订阅变成可播放的单集",
   "sourcePodcastRssName": "播客订阅",
   "sourcePodcastCatalogName": "播客目录",

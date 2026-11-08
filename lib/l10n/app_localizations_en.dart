@@ -1555,6 +1555,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceAudioMusicName => 'Archive Music';
 
   @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'The public-domain records the Unlocked Recordings project digitises';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

@@ -51,10 +51,11 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   @override
   bool get featured => true;
 
-  /// The archive serves the audio everybody downloaded most, so the source
-  /// is ready as it is: a keyword is a choice, not a requirement.
+  /// The archive serves the audio everybody downloaded most, or the audio
+  /// that was uploaded last, so the source is ready as it is: a keyword is a
+  /// choice, not a requirement.
   @override
-  List<String> get browseModes => const [BrowseMode.charts];
+  List<String> get browseModes => const [BrowseMode.charts, BrowseMode.latest];
 
   @override
   bool isConfigured(MusicSourceConfig config) => true;
@@ -95,14 +96,16 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://archive.org/advancedsearch.php',
         queryParameters: {
-          // Without a keyword the archive serves the audio everybody
-          // downloaded most.
+          // Without a keyword the archive serves the stream the instance
+          // named: what everybody downloaded most, or what was uploaded last.
           'q': query ?? 'mediatype:audio',
           'fl[]': ['identifier', 'title', 'creator', 'date'],
           'rows': limit,
           'page': request.offset ~/ limit + 1,
           'output': 'json',
-          'sort[]': 'downloads desc',
+          'sort[]': browseModeOf(request.config) == BrowseMode.latest
+              ? 'publicdate desc'
+              : 'downloads desc',
         },
       );
 

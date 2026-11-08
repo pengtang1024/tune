@@ -1402,6 +1402,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceAudioMusicName => '档案音乐';
 
   @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 项目数字化的公版唱片';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4389,6 +4396,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceAudioMusicName => '档案音乐';
 
   @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 项目数字化的公版唱片';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -7374,6 +7388,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceAudioMusicName => '檔案音樂';
+
+  @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 專案數位化的公版唱片';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

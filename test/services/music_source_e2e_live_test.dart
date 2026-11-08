@@ -124,6 +124,7 @@ void main() async {
           'netlabels',
           'old_time_radio',
           'archive_music',
+          'unlocked_recordings',
         ]),
       );
 

@@ -83,6 +83,16 @@ void main() {
       expect(captured.uri?.queryParameters['sort[]'], 'downloads desc');
     });
 
+    test('the Internet Archive serves the audio published last', () async {
+      final captured = _Captured(body: {'response': {'docs': <dynamic>[]}});
+
+      await InternetArchiveSourceAdapter(dio: captured.dio).scan(
+        _request('internet_archive', const {'browse': BrowseMode.latest}),
+      );
+
+      expect(captured.uri?.queryParameters['sort[]'], 'publicdate desc');
+    });
+
     test('Openverse serves the audio it published last', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

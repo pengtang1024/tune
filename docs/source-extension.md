@@ -8,7 +8,7 @@
 
 ## 1. 为什么要改
 
-现状是「26 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「27 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -77,7 +77,7 @@ MusicSourceConfig（实例 · 数据）
 | `azuracast` | AzuraCast | `openApi` | `azuracast` | — | 服务器地址、API Key（可选）、关键词、数量 |
 | `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空） |
 | `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 | Client ID、关键词（可留空）、音质 |
-| `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 | 查询条件（可留空）、数量 |
+| `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 / 最新 | 查询条件（可留空）、数量 |
 | `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 | 标签（可留空）、数量 |
 | `audius` | Audius | `openCatalog` | `audius` | 排行 | 关键词（可留空）、数量 |
 | `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、数量 |
@@ -108,7 +108,7 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-26 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+27 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。
@@ -148,7 +148,7 @@ MusicSourceConfig（实例 · 数据）
 | --- | --- | --- | --- |
 | `audius` | `charts` | 换成 `/v1/tracks/trending` | ✅ |
 | `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
-| `internet_archive` | `charts` | `q` 只留 `mediatype:audio`，`sort[]=downloads desc` 已经就位 | ✅ |
+| `internet_archive` | `charts` / `latest` | `q` 只留 `mediatype:audio`，`sort[]` 按浏览流取 `downloads desc` 或 `publicdate desc` | ✅ |
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
 | `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |

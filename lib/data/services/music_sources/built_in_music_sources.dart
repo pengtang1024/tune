@@ -69,6 +69,16 @@ class BuiltInMusicSources {
         description: strings.sourceAudioMusicDescription,
         settings: {'query': 'collection:audio_music AND mediatype:audio'},
       ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'unlocked_recordings',
+        name: strings.sourceUnlockedRecordingsName,
+        description: strings.sourceUnlockedRecordingsDescription,
+        settings: {
+          'query': 'collection:unlockedrecordings AND mediatype:audio',
+        },
+      ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
       _instance(types, 'podcast_catalog'),
@@ -276,6 +286,10 @@ class BuiltInMusicSources {
 
   /// The source of the music recordings of the archive audio collection.
   static MusicSourceConfig get archiveMusic => _entry('archive_music');
+
+  /// The source of the public-domain records the archive unlocked.
+  static MusicSourceConfig get unlockedRecordings =>
+      _entry('unlocked_recordings');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');

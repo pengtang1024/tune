@@ -829,6 +829,8 @@
   "sourceOldTimeRadioName": "Old Time Radio",
   "sourceAudioMusicDescription": "The music recordings the Internet Archive keeps in its audio collection",
   "sourceAudioMusicName": "Archive Music",
+  "sourceUnlockedRecordingsName": "Unlocked Recordings",
+  "sourceUnlockedRecordingsDescription": "The public-domain records the Unlocked Recordings project digitises",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",
   "sourcePodcastRssName": "Podcasts",
   "sourcePodcastCatalogName": "Podcast directory",

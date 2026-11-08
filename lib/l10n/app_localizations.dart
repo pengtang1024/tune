@@ -2549,6 +2549,18 @@ abstract class AppLocalizations {
   /// **'档案音乐'**
   String get sourceAudioMusicName;
 
+  /// No description provided for @sourceUnlockedRecordingsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Unlocked Recordings'**
+  String get sourceUnlockedRecordingsName;
+
+  /// No description provided for @sourceUnlockedRecordingsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Unlocked Recordings 项目数字化的公版唱片'**
+  String get sourceUnlockedRecordingsDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:
