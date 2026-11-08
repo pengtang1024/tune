@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -82,6 +83,19 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
+    ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.mediaServerFieldSince,
+      AppStrings.instance.mediaServerFieldSinceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.mediaServerSinceAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.mediaServerSinceDays('$days'),
+          ),
+      ],
     ),
     MusicSourceField(
       'format',
@@ -170,7 +184,11 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final songs = parseSearchResults(payload, config: config);
+      final songs = parseSearchResults(
+        payload,
+        config: config,
+        since: RecentWindow.cutoff(config.setting('since')),
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,
@@ -258,6 +276,7 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
     Map<String, dynamic> payload, {
     required MusicSourceConfig config,
     String sourceId = 'subsonic',
+    DateTime? since,
   }) {
     final search = payload['search3'];
     final result = search is Map ? search['result'] : null;
@@ -273,6 +292,13 @@ class SubsonicSourceAdapter extends MusicSourceAdapter {
       final id = raw['id']?.toString() ?? '';
       final title = raw['title']?.toString().trim() ?? '';
       if (id.isEmpty || title.isEmpty || !seen.add(id)) continue;
+
+      // The server stamps a song with the moment it was added; one outside
+      // the window is left out, one without the stamp is kept.
+      if (since != null) {
+        final added = RecentWindow.dateTimeOf(raw['created']);
+        if (added != null && added.isBefore(since)) continue;
+      }
 
       final suffix = raw['suffix']?.toString() ?? 'mp3';
       final streamUrl = _streamUrl(config, id, suffix: suffix);

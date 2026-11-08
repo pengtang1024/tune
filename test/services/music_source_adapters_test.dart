@@ -16,6 +16,28 @@ import 'package:tune/domain/models/source_scan_result.dart';
 
 void main() {
   group('ccMixter adapter', () {
+    test('a window of stamps keeps only the songs added inside it', () {
+      final payload = {
+        'search3': {
+          'result': {
+            'song': [
+              {..._subsonicSong(), 'id': 'new', 'title': 'New', 'created': '2026-11-01T10:00:00Z'},
+              {..._subsonicSong(), 'id': 'old', 'title': 'Old', 'created': '2019-05-04T10:00:00Z'},
+              {..._subsonicSong(), 'id': 'undated', 'title': 'Undated'},
+            ],
+          },
+        },
+      };
+
+      final songs = SubsonicSourceAdapter.parseSearchResults(
+        payload,
+        config: _subsonicConfig(8096, 'secret'),
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The song inside the window and the undated one stay.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
+    });
     test('maps uploads, prefers mp3 and keeps the referer header', () async {
       final server = await _startServer((request) async {
         expect(request.uri.queryParameters['tags'], 'jazz');
@@ -604,3 +626,13 @@ const _podcastFeed = '''<?xml version="1.0" encoding="UTF-8"?>
   </channel>
 </rss>
 ''';
+
+/// One song of the Subsonic answer.
+Map<String, dynamic> _subsonicSong() => {
+  'id': 'tr-x',
+  'title': 'A song',
+  'artist': 'Artist',
+  'album': 'Album',
+  'duration': 212,
+  'suffix': 'mp3',
+};

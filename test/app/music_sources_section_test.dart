@@ -291,8 +291,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('配置 Subsonic'), findsOneWidget);
-    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    // The quality and the window of dates are two dropdowns.
+    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(2));
     expect(find.text('原始音质'), findsOneWidget);
+    expect(find.text('只看最近入库'), findsOneWidget);
 
     await tester.tap(find.text('原始音质'));
     await tester.pumpAndSettle();
