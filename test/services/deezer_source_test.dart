@@ -94,6 +94,32 @@ void main() {
       expect(request.uri.queryParameters['index'], '10');
     });
 
+    test('the artist mode reads the chart of artists without a keyword', () async {
+      final server = _DeezerServer(artists: true, charts: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(config: _config(settings: const {'mode': 'artists'})),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(server.requests.first.uri.path, '/chart/0/artists');
+      expect(server.requests[1].uri.path, '/artist/1910/top');
+      expect(result.songs, isNotEmpty);
+    });
+
+    test('the playlist mode reads the chart of playlists without a keyword', () async {
+      final server = _DeezerServer(playlists: true, charts: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(config: _config(settings: const {'mode': 'playlists'})),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(server.requests.first.uri.path, '/chart/0/playlists');
+      expect(result.songs, isNotEmpty);
+    });
     test('the playlist mode reads the playlists the keyword names', () async {
       final server = _DeezerServer(playlists: true);
       final adapter = DeezerSourceAdapter(dio: server.dio);
@@ -298,6 +324,7 @@ class _DeezerServer {
     this.albumsWithoutKeyword = false,
     this.artists = false,
     this.playlists = false,
+    this.charts = false,
     this.emptyPlaylist = false,
     this.emptyArtistTop = false,
   }) : data = data ?? [_songJson()];
@@ -319,6 +346,9 @@ class _DeezerServer {
 
   /// Answers the playlist search and the playlist detail instead of the charts.
   final bool playlists;
+
+  /// Answers the chart of artists and of playlists.
+  final bool charts;
 
   /// Answers a playlist with no song.
   final bool emptyPlaylist;
@@ -344,6 +374,34 @@ class _DeezerServer {
             return;
           }
           final path = options.uri.path;
+          if (charts && path == '/chart/0/artists') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 1910, 'name': 'Miles Davis'},
+                  ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (charts && path == '/chart/0/playlists') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 5314690902, 'title': 'Smooth Jazz'},
+                  ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
           if (playlists && path == '/search/playlist') {
             handler.resolve(
               Response(

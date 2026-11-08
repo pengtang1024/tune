@@ -979,7 +979,7 @@
   "itunesModeArtists": "艺人",
   "sourceDeezerName": "Deezer 试听",
   "sourceDeezerDescription": "Deezer 曲库里每首歌的 30 秒试听",
-  "deezerHint": "填关键词，留空则读排行榜",
+  "deezerHint": "填关键词，留空则读商店的榜单",
   "deezerFieldQueryHint": "例如 miles davis、kind of blue",
   "deezerFieldGenre": "风格",
   "deezerFieldGenreHint": "不填关键词时读哪个榜单",

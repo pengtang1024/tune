@@ -979,7 +979,7 @@
   "itunesModeArtists": "Artists",
   "sourceDeezerName": "Deezer previews",
   "sourceDeezerDescription": "Thirty-second previews of the songs of the Deezer catalogue",
-  "deezerHint": "Type a keyword, or leave it empty to read the charts",
+  "deezerHint": "Type a keyword, or leave it empty to read the charts of the store",
   "deezerFieldQueryHint": "e.g. miles davis, kind of blue",
   "deezerFieldGenre": "Reach",
   "deezerFieldGenreHint": "The chart to read when no keyword is written",

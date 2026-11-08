@@ -662,6 +662,41 @@ void main() async {
   );
 
   test(
+    'every read mode of Deezer works without a keyword',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final mode in const ['songs', 'albums', 'artists', 'playlists']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {'query': '', 'genre': '', 'mode': mode, 'limit': '4'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$mode failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$mode returned nothing');
+        expect(
+          result.songs.every((song) => song.artist.isNotEmpty),
+          isTrue,
+          reason: mode,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the album modes of the stores read the album chart without a keyword',
     () async {
       final service = MusicSourceService(

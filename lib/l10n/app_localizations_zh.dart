@@ -1837,7 +1837,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
 
   @override
-  String get deezerHint => '填关键词，留空则读排行榜';
+  String get deezerHint => '填关键词，留空则读商店的榜单';
 
   @override
   String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
@@ -5091,7 +5091,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
 
   @override
-  String get deezerHint => '填关键词，留空则读排行榜';
+  String get deezerHint => '填关键词，留空则读商店的榜单';
 
   @override
   String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
@@ -8345,7 +8345,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceDeezerDescription => 'Deezer 曲庫裡每首歌的 30 秒試聽';
 
   @override
-  String get deezerHint => '填關鍵字，留空則讀排行榜';
+  String get deezerHint => '填關鍵字，留空則讀商店的榜單';
 
   @override
   String get deezerFieldQueryHint => '例如 miles davis、kind of blue';

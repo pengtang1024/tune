@@ -150,7 +150,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(config.setting('limit'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
       final mode = config.setting('mode');
-      final wantsPlaylists = keyword.isNotEmpty && mode == _modePlaylists;
+      final wantsPlaylists = mode == _modePlaylists;
 
       if (wantsPlaylists) {
         final songs = await _playlistSongs(
@@ -173,7 +173,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final wantsArtists = keyword.isNotEmpty && mode == _modeArtists;
+      final wantsArtists = mode == _modeArtists;
 
       if (wantsArtists) {
         final songs = await _artistSongs(
@@ -279,16 +279,27 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     required String sourceId,
     required int limit,
   }) async {
-    final search = await _dio.get<String>(
-      'https://api.deezer.com/search/playlist',
-      queryParameters: {
-        'q': keyword,
-        'limit': '${limit < _playlistsPerScan ? limit : _playlistsPerScan}',
-      },
-      options: Options(responseType: ResponseType.plain),
-    );
-    final playlists = _decode(search.data)?['data'];
-    if (playlists is! List) return null;
+    final count = limit < _playlistsPerScan ? limit : _playlistsPerScan;
+    final List<dynamic> playlists;
+    if (keyword.isEmpty) {
+      final chart = await _dio.get<String>(
+        'https://api.deezer.com/chart/0/playlists',
+        queryParameters: {'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(chart.data)?['data'];
+      if (entries is! List) return null;
+      playlists = entries;
+    } else {
+      final search = await _dio.get<String>(
+        'https://api.deezer.com/search/playlist',
+        queryParameters: {'q': keyword, 'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(search.data)?['data'];
+      if (entries is! List) return null;
+      playlists = entries;
+    }
 
     final songs = <Song>[];
     for (final playlist in playlists) {
@@ -329,16 +340,27 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     required String sourceId,
     required int limit,
   }) async {
-    final search = await _dio.get<String>(
-      'https://api.deezer.com/search/artist',
-      queryParameters: {
-        'q': keyword,
-        'limit': '${limit < _artistsPerScan ? limit : _artistsPerScan}',
-      },
-      options: Options(responseType: ResponseType.plain),
-    );
-    final artists = _decode(search.data)?['data'];
-    if (artists is! List) return null;
+    final count = limit < _artistsPerScan ? limit : _artistsPerScan;
+    final List<dynamic> artists;
+    if (keyword.isEmpty) {
+      final chart = await _dio.get<String>(
+        'https://api.deezer.com/chart/0/artists',
+        queryParameters: {'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(chart.data)?['data'];
+      if (entries is! List) return null;
+      artists = entries;
+    } else {
+      final search = await _dio.get<String>(
+        'https://api.deezer.com/search/artist',
+        queryParameters: {'q': keyword, 'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(search.data)?['data'];
+      if (entries is! List) return null;
+      artists = entries;
+    }
 
     final songs = <Song>[];
     for (final artist in artists) {

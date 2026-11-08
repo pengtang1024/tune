@@ -3410,7 +3410,7 @@ abstract class AppLocalizations {
   /// No description provided for @deezerHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'填关键词，留空则读排行榜'**
+  /// **'填关键词，留空则读商店的榜单'**
   String get deezerHint;
 
   /// No description provided for @deezerFieldQueryHint.

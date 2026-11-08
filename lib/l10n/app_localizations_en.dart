@@ -2034,7 +2034,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deezerHint =>
-      'Type a keyword, or leave it empty to read the charts';
+      'Type a keyword, or leave it empty to read the charts of the store';
 
   @override
   String get deezerFieldQueryHint => 'e.g. miles davis, kind of blue';
