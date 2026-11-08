@@ -1387,6 +1387,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceNetlabelsName => '网络厂牌';
 
   @override
+  String get sourceOldTimeRadioDescription => '广播黄金年代的广播剧与综艺节目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式广播剧';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音频收藏里的音乐录音';
+
+  @override
+  String get sourceAudioMusicName => '档案音乐';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4293,6 +4305,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceNetlabelsName => '网络厂牌';
 
   @override
+  String get sourceOldTimeRadioDescription => '广播黄金年代的广播剧与综艺节目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式广播剧';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音频收藏里的音乐录音';
+
+  @override
+  String get sourceAudioMusicName => '档案音乐';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -7197,6 +7221,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourceNetlabelsName => '網路廠牌';
+
+  @override
+  String get sourceOldTimeRadioDescription => '廣播黃金年代的廣播劇與綜藝節目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式廣播劇';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音訊收藏裡的音樂錄音';
+
+  @override
+  String get sourceAudioMusicName => '檔案音樂';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

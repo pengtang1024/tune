@@ -86,7 +86,13 @@ void main() async {
           .toList(growable: false);
       expect(
         sources.map((config) => config.id),
-        containsAll(['live_music_archive', 'great78', 'netlabels']),
+        containsAll([
+          'live_music_archive',
+          'great78',
+          'netlabels',
+          'old_time_radio',
+          'archive_music',
+        ]),
       );
 
       final results = await service.scanAll(

@@ -2519,6 +2519,30 @@ abstract class AppLocalizations {
   /// **'网络厂牌'**
   String get sourceNetlabelsName;
 
+  /// No description provided for @sourceOldTimeRadioDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'广播黄金年代的广播剧与综艺节目'**
+  String get sourceOldTimeRadioDescription;
+
+  /// No description provided for @sourceOldTimeRadioName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'老式广播剧'**
+  String get sourceOldTimeRadioName;
+
+  /// No description provided for @sourceAudioMusicDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 音频收藏里的音乐录音'**
+  String get sourceAudioMusicDescription;
+
+  /// No description provided for @sourceAudioMusicName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案音乐'**
+  String get sourceAudioMusicName;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

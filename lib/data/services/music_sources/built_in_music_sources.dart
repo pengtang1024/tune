@@ -53,6 +53,22 @@ class BuiltInMusicSources {
         description: strings.sourceNetlabelsDescription,
         settings: {'query': 'collection:netlabels AND mediatype:audio'},
       ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'old_time_radio',
+        name: strings.sourceOldTimeRadioName,
+        description: strings.sourceOldTimeRadioDescription,
+        settings: {'query': 'collection:oldtimeradio AND mediatype:audio'},
+      ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'archive_music',
+        name: strings.sourceAudioMusicName,
+        description: strings.sourceAudioMusicDescription,
+        settings: {'query': 'collection:audio_music AND mediatype:audio'},
+      ),
       _instance(types, 'ccmixter'),
       _instance(types, 'podcast_rss', enabled: false, settings: {'feed': ''}),
       _instance(types, 'podcast_catalog'),
@@ -239,6 +255,12 @@ class BuiltInMusicSources {
 
   /// The source of the albums the netlabels released for free.
   static MusicSourceConfig get netlabels => _entry('netlabels');
+
+  /// The source of the radio dramas of the broadcasting golden age.
+  static MusicSourceConfig get oldTimeRadio => _entry('old_time_radio');
+
+  /// The source of the music recordings of the archive audio collection.
+  static MusicSourceConfig get archiveMusic => _entry('archive_music');
 
   /// The source of the recordings of the artists who share them.
   static MusicSourceConfig get ccmixter => _entry('ccmixter');

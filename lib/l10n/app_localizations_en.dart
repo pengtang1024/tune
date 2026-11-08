@@ -1538,6 +1538,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceNetlabelsName => 'Netlabels';
 
   @override
+  String get sourceOldTimeRadioDescription =>
+      'Radio dramas and shows from the golden age of broadcasting';
+
+  @override
+  String get sourceOldTimeRadioName => 'Old Time Radio';
+
+  @override
+  String get sourceAudioMusicDescription =>
+      'The music recordings the Internet Archive keeps in its audio collection';
+
+  @override
+  String get sourceAudioMusicName => 'Archive Music';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 
