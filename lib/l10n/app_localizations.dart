@@ -2501,6 +2501,30 @@ abstract class AppLocalizations {
   /// **'语言'**
   String get internetArchiveFieldLanguage;
 
+  /// No description provided for @internetArchiveFieldDecade.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'年代'**
+  String get internetArchiveFieldDecade;
+
+  /// No description provided for @internetArchiveFieldDecadeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只取归档在某个年代的音频'**
+  String get internetArchiveFieldDecadeHint;
+
+  /// No description provided for @internetArchiveDecadeAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部年代'**
+  String get internetArchiveDecadeAll;
+
+  /// No description provided for @internetArchiveDecade.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{decade} 年代'**
+  String internetArchiveDecade(String decade);
+
   /// No description provided for @internetArchiveFieldLanguageHint.
   ///
   /// In zh_CN, this message translates to:

@@ -104,6 +104,16 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'decade',
+      AppStrings.instance.internetArchiveFieldDecade,
+      AppStrings.instance.internetArchiveFieldDecadeHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.internetArchiveDecadeAll),
+        for (final decade in _decades)
+          MusicSourceChoice('$decade', _decadeLabel(decade)),
+      ],
+    ),
+    MusicSourceField(
       'perItem',
       AppStrings.instance.internetArchiveFieldPerItem,
       AppStrings.instance.internetArchiveFieldPerItemHint(
@@ -137,13 +147,18 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final limit = scanLimit.read(request.config.setting('limit'));
       final perItem = _tracksPerItem.read(request.config.setting('perItem'));
       final language = request.config.setting('language')?.trim() ?? '';
+      final decade = _decadeOf(request.config.setting('decade'));
       final base = query ?? 'mediatype:audio';
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
         // named: what everybody downloaded most, or what was uploaded last.
         // A tongue narrows the stream, and the archive files it as a clause
         // of the query.
-        'q': language.isEmpty ? base : '$base AND language:($language)',
+        'q': [
+          base,
+          if (language.isNotEmpty) 'language:($language)',
+          if (decade != null) 'year:[$decade TO ${decade + 9}]',
+        ].join(' AND '),
         'fl[]': ['identifier', 'title', 'creator', 'date'],
         'rows': limit,
         'page': request.offset ~/ limit + 1,
@@ -264,6 +279,27 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     final version = index + 2 < segments.length ? segments[index + 2] : '';
     return version.isEmpty ? 'CC $code' : 'CC $code $version';
   }
+
+
+  /// The decades the archive holds audio of, by the year they start.
+  static const _decades = <int>[
+    1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020,
+  ];
+
+  /// The year a chosen decade starts, or null when every year is wanted.
+  ///
+  /// The archive files a year as a number rather than a range, so a decade is
+  /// asked for as a range of its own; anything that is not one of the decades
+  /// offered is read as no decade at all.
+  static int? _decadeOf(String? raw) {
+    final value = int.tryParse(raw?.trim() ?? '');
+    if (value == null || !_decades.contains(value)) return null;
+    return value;
+  }
+
+  /// The name of a decade in the language of the reader.
+  static String _decadeLabel(int decade) =>
+      AppStrings.instance.internetArchiveDecade('$decade');
 
   /// The tracks of one archive item.
   Future<List<Song>> _fetchTracks(

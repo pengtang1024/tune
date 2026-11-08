@@ -689,6 +689,45 @@ void main() async {
   );
 
   test(
+    'a decade of the archive answers audio of those years',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.liveMusicArchive.copyWith(
+            settings: {'decade': '1990', 'limit': '3'},
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: result.message,
+      );
+      expect(result.songs, isNotEmpty);
+      // The archive files a year on every track, so the decade is proved by
+      // the years of the tracks rather than by the request alone.
+      for (final song in result.songs) {
+        final year = song.year;
+        if (year == null) continue;
+        expect(
+          year,
+          allOf(greaterThanOrEqualTo(1990), lessThanOrEqualTo(1999)),
+          reason: '${song.title} was answered for the nineties',
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
     'the episodes of the podcast directory carry their show notes',
     () async {
       final service = MusicSourceService(

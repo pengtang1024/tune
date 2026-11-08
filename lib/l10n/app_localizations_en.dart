@@ -1521,6 +1521,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get internetArchiveFieldLanguage => 'Language';
 
   @override
+  String get internetArchiveFieldDecade => 'Decade';
+
+  @override
+  String get internetArchiveFieldDecadeHint =>
+      'Only the audio filed under one decade';
+
+  @override
+  String get internetArchiveDecadeAll => 'Every decade';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '${decade}s';
+  }
+
+  @override
   String get internetArchiveFieldLanguageHint =>
       'Only the audio filed under one tongue';
 

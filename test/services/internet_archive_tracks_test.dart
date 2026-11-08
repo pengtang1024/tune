@@ -318,6 +318,55 @@ void main() {
       expect(result.songs.last.title, 'Part 40');
     });
 
+    test('a decade narrows the query to the years of it', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'decade': '1990'}),
+      );
+
+      // The archive files a year, not a decade, so the decade is asked for as
+      // the range of its ten years.
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND year:[1990 TO 1999]',
+      );
+    });
+
+    test('a decade the archive does not file is not asked for', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'decade': '1890'}),
+      );
+
+      expect(adapter.uris.first.queryParameters['q'], 'mediatype:audio');
+    });
+
+    test('a tongue and a decade narrow together', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'language': 'German', 'decade': '1970'}),
+      );
+
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND language:(German) AND year:[1970 TO 1979]',
+      );
+    });
     test('an item hands its description and licence to its tracks', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

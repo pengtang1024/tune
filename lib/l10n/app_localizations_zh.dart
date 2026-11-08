@@ -1376,6 +1376,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveFieldLanguage => '语言';
 
   @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
+
+  @override
   String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
 
   @override
@@ -4994,6 +5008,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveFieldLanguage => '语言';
 
   @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
+
+  @override
   String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
 
   @override
@@ -8610,6 +8638,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get internetArchiveFieldLanguage => '語言';
+
+  @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取歸檔在某個年代的音訊';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
 
   @override
   String get internetArchiveFieldLanguageHint => '只取歸檔在某種語言下的音訊';
