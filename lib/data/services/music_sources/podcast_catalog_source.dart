@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -169,10 +170,16 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
         : wanted.isNotEmpty
         ? '$_directoryHost/api/2/tag/$wanted/$limit.json'
         : '$_directoryHost/toplist.json';
-    final response = await _dio.get<String>(
-      path,
-      queryParameters: {'q': ?keyword},
-      options: Options(responseType: ResponseType.plain),
+    // The directory drops a request now and then when several sources ask at
+    // the same time; the listing is given a few more tries before a scan of the
+    // catalogue counts as empty.
+    final response = await retrySourceRead(
+      () => _dio.get<String>(
+        path,
+        queryParameters: {'q': ?keyword},
+        options: Options(responseType: ResponseType.plain),
+      ),
+      answered: (answer) => (answer.data ?? '').trim().isNotEmpty,
     );
     final body = response.data;
     if (body == null || body.trim().isEmpty) return const [];
