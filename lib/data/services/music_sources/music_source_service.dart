@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/ampache_source.dart';
+import 'package:tune/data/services/music_sources/itunes_source.dart';
 import 'package:tune/data/services/music_sources/kodi_source.dart';
 import 'package:tune/data/services/music_sources/koel_source.dart';
 import 'package:tune/data/services/music_sources/peertube_source.dart';
@@ -90,6 +91,7 @@ class MusicSourceService implements StreamUrlResolver {
       'ampache': AmpacheSourceAdapter(dio: dio),
       'koel': KoelSourceAdapter(dio: dio),
       'kodi': KodiSourceAdapter(dio: dio),
+      'itunes': ItunesSourceAdapter(dio: dio),
       'peertube': PeerTubeSourceAdapter(dio: dio),
       'audius': AudiusSourceAdapter(dio: dio),
       'radio': RadioSourceAdapter(dio: dio),

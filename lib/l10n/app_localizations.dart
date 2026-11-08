@@ -3143,6 +3143,60 @@ abstract class AppLocalizations {
   /// **'Koel 账号开启了两步验证，此音源无法登录'**
   String get koelTwoFactor;
 
+  /// No description provided for @sourceItunesName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'iTunes 试听'**
+  String get sourceItunesName;
+
+  /// No description provided for @sourceItunesDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'iTunes 商店里每首歌的 30 秒试听'**
+  String get sourceItunesDescription;
+
+  /// No description provided for @itunesHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写关键词：商店没有自己的列表'**
+  String get itunesHint;
+
+  /// No description provided for @itunesFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 miles davis、kind of blue'**
+  String get itunesFieldQueryHint;
+
+  /// No description provided for @itunesFieldCountry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'国家/地区'**
+  String get itunesFieldCountry;
+
+  /// No description provided for @itunesFieldCountryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'两位国家代码，例如 US、JP'**
+  String get itunesFieldCountryHint;
+
+  /// No description provided for @itunesEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'iTunes 商店返回了空响应'**
+  String get itunesEmptyResponse;
+
+  /// No description provided for @itunesNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'iTunes 商店里没有匹配的歌曲'**
+  String get itunesNoMatch;
+
+  /// No description provided for @itunesPreviewNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这首歌的 30 秒试听'**
+  String get itunesPreviewNote;
+
   /// No description provided for @sourceKodiName.
   ///
   /// In zh_CN, this message translates to:

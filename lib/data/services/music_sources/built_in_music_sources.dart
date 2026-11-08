@@ -127,6 +127,12 @@ class BuiltInMusicSources {
       ),
       _instance(
         types,
+        'itunes',
+        enabled: false,
+        settings: {'query': '', 'country': 'US'},
+      ),
+      _instance(
+        types,
         'kodi',
         enabled: false,
         settings: {'server': '', 'user': '', 'password': '', 'query': ''},
@@ -345,6 +351,9 @@ class BuiltInMusicSources {
 
   /// The source of the music library of a Kodi media centre.
   static MusicSourceConfig get kodi => _entry('kodi');
+
+  /// The source of the previews of the iTunes store.
+  static MusicSourceConfig get itunes => _entry('itunes');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

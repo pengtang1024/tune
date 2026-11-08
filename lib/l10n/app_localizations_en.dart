@@ -1892,6 +1892,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Koel account uses two-factor sign-in, which this source cannot do';
 
   @override
+  String get sourceItunesName => 'iTunes previews';
+
+  @override
+  String get sourceItunesDescription =>
+      'Thirty-second previews of the songs of the iTunes store';
+
+  @override
+  String get itunesHint => 'Type a keyword: the store has no list of its own';
+
+  @override
+  String get itunesFieldQueryHint => 'e.g. miles davis, kind of blue';
+
+  @override
+  String get itunesFieldCountry => 'Country';
+
+  @override
+  String get itunesFieldCountryHint => 'Two-letter code, e.g. US, JP';
+
+  @override
+  String get itunesEmptyResponse =>
+      'The iTunes store returned an empty response';
+
+  @override
+  String get itunesNoMatch => 'No matching song in the iTunes store';
+
+  @override
+  String get itunesPreviewNote => 'Thirty-second preview of the song';
+
+  @override
   String get sourceKodiName => 'Kodi';
 
   @override

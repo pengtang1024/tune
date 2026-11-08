@@ -8,7 +8,7 @@
 
 ## 1. 为什么要改
 
-现状是「30 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「31 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -101,8 +101,8 @@ MusicSourceConfig（实例 · 数据）
 
 **哪些类型站在顶层**：本地目录、网络电台，以及六个明确开放授权的曲库
 （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-其余的内置类型（iTunes、播客 RSS、网易云 API、Subsonic、Jellyfin）要么要凭据，
-要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
+其余的内置类型（iTunes 试听、播客 RSS、网易云 API、Subsonic、Kodi 等自建服务器）
+要么要凭据，要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
 `featured`），界面不按 id 硬编码。
 
 `json_api` 与 `graphql` 是同一件事的两档：JSON 接口够用时就用 JSON 接口，
@@ -111,14 +111,14 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-30 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+31 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。
 - **顶层**：本地目录、网络电台，以及明确开放授权的曲库
   （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-- **「更多音源」（折叠）**：iTunes（30 秒试听）、播客 RSS、网易云 API、
-  Subsonic、Jellyfin —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
+- **「更多音源」（折叠）**：iTunes 试听（30 秒）、播客 RSS、网易云 API、
+  Subsonic、Kodi 等自建服务器 —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
 - **用户添加的实例**：默认权重 `700`，进主列表；它和其他实例一样可以被后移，
   也可以折叠到「更多音源」，不再是永远显示的一段。
 
@@ -156,7 +156,7 @@ MusicSourceConfig（实例 · 数据）
 | `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
-| `itunes` | 无 | `term` 是必填的，接口不提供无词列表 | — |
+| `itunes` | 无 | `term` 是必填的，接口不提供无词列表；拿到的 `previewUrl` 是 30 秒试听，曲目时长按 30 秒算 | ✅ |
 
 **浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
 浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。

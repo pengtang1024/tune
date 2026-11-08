@@ -1704,6 +1704,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourceItunesName => 'iTunes 试听';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
+
+  @override
+  String get itunesHint => '填写关键词：商店没有自己的列表';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '国家/地区';
+
+  @override
+  String get itunesFieldCountryHint => '两位国家代码，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店返回了空响应';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店里没有匹配的歌曲';
+
+  @override
+  String get itunesPreviewNote => '这首歌的 30 秒试听';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -4753,6 +4780,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourceItunesName => 'iTunes 试听';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
+
+  @override
+  String get itunesHint => '填写关键词：商店没有自己的列表';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '国家/地区';
+
+  @override
+  String get itunesFieldCountryHint => '两位国家代码，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店返回了空响应';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店里没有匹配的歌曲';
+
+  @override
+  String get itunesPreviewNote => '这首歌的 30 秒试听';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -7800,6 +7854,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get koelTwoFactor => 'Koel 帳號開啟了兩步驗證，此音源無法登入';
+
+  @override
+  String get sourceItunesName => 'iTunes 試聽';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店裡每首歌的 30 秒試聽';
+
+  @override
+  String get itunesHint => '填寫關鍵字：商店沒有自己的列表';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '國家/地區';
+
+  @override
+  String get itunesFieldCountryHint => '兩位國家代碼，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店傳回了空回應';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店裡沒有符合的歌曲';
+
+  @override
+  String get itunesPreviewNote => '這首歌的 30 秒試聽';
 
   @override
   String get sourceKodiName => '自架 Kodi 媒體庫';

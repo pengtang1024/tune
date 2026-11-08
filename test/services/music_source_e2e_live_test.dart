@@ -267,6 +267,46 @@ void main() async {
   );
 
   test(
+    'the service reads the previews of the iTunes store',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The store answers only a keyword, so the instance is given one.
+      final source = BuiltInMusicSources.itunes.copyWith(
+        enabled: true,
+        settings: const {
+          'query': 'miles davis',
+          'country': 'US',
+          'limit': '2',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.artist, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      // The playable file is a preview, so the track lasts thirty seconds.
+      expect(song.duration, 30000);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service reads the Apple podcast directory',
     () async {
       final service = MusicSourceService(
