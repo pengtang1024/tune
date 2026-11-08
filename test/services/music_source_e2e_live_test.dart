@@ -621,6 +621,47 @@ void main() async {
   );
 
   test(
+    'the artist mode of the store reads an artist catalogue',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.itunes.copyWith(
+            enabled: true,
+            settings: const {
+              'query': 'miles davis',
+              'country': 'US',
+              'limit': '4',
+              'mode': 'artists',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes artists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // The mode reads the catalogue of the artists the keyword names, so the
+      // songs carry a record and a performer.
+      expect(
+        result.songs.every((song) => song.album.isNotEmpty && song.artist.isNotEmpty),
+        isTrue,
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the album mode of the store hands over whole records',
     () async {
       final service = MusicSourceService(

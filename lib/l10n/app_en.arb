@@ -976,6 +976,7 @@
   "itunesFieldModeHint": "Single songs, or whole albums of the keyword",
   "itunesModeSongs": "Songs",
   "itunesModeAlbums": "Albums",
+  "itunesModeArtists": "Artists",
   "sourceDeezerName": "Deezer previews",
   "sourceDeezerDescription": "Thirty-second previews of the songs of the Deezer catalogue",
   "deezerHint": "Type a keyword, or leave it empty to read the charts",

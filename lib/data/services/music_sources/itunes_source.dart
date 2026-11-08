@@ -33,6 +33,12 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// The keyword of the album mode, kept next to the mode it belongs to.
   static const _modeAlbums = 'albums';
 
+  /// The name of the artist mode.
+  static const _modeArtists = 'artists';
+
+  /// How many artists the artist mode reads in one scan.
+  static const _artistsPerScan = 3;
+
   static const _searchUrl = 'https://itunes.apple.com/search';
   static const _lookupUrl = 'https://itunes.apple.com/lookup';
 
@@ -86,6 +92,10 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
           _modeAlbums,
           AppStrings.instance.itunesModeAlbums,
         ),
+        MusicSourceChoice(
+          _modeArtists,
+          AppStrings.instance.itunesModeArtists,
+        ),
       ],
     ),
     MusicSourceField(
@@ -130,6 +140,12 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
               query: query,
               country: country,
               sourceId: config.id,
+              limit: limit,
+            )
+          : config.setting('mode') == _modeArtists
+          ? await _artistSongs(
+              query: query,
+              country: country,
               limit: limit,
             )
           : await _songSearch(
@@ -183,6 +199,55 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       options: Options(responseType: ResponseType.plain),
     );
     return _resultsOf(response.data);
+  }
+
+
+  /// The songs of the artists the keyword names.
+  ///
+  /// The store answers the keyword with artists, so the songs of each artist
+  /// are read from the artist's own catalogue: one lookup per artist, and the
+  /// artist row of the answer is not a song because it carries no preview.
+  Future<List<Map>?> _artistSongs({
+    required String query,
+    required String country,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      _searchUrl,
+      queryParameters: {
+        'media': 'music',
+        'entity': 'musicArtist',
+        'term': query,
+        'limit': '${limit < _artistsPerScan ? limit : _artistsPerScan}',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final artists = _resultsOf(search.data);
+    if (artists == null) return null;
+
+    final songs = <Map>[];
+    for (final artist in artists) {
+      final id = artist['artistId']?.toString();
+      if (id == null || id.isEmpty) continue;
+
+      final lookup = await _dio.get<String>(
+        _lookupUrl,
+        queryParameters: {
+          'id': id,
+          'entity': 'song',
+          'limit': '$limit',
+          'country': country,
+        },
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _resultsOf(lookup.data);
+      if (entries == null) continue;
+      // The first row of a lookup is the artist itself; songOf drops it
+      // because it carries no preview.
+      songs.addAll(entries);
+    }
+    return songs;
   }
 
   /// The songs of the albums the keyword names.

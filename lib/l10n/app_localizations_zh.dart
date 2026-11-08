@@ -1828,6 +1828,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get itunesModeAlbums => '专辑';
 
   @override
+  String get itunesModeArtists => '艺人';
+
+  @override
   String get sourceDeezerName => 'Deezer 试听';
 
   @override
@@ -5079,6 +5082,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get itunesModeAlbums => '专辑';
 
   @override
+  String get itunesModeArtists => '艺人';
+
+  @override
   String get sourceDeezerName => 'Deezer 试听';
 
   @override
@@ -8328,6 +8334,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get itunesModeAlbums => '專輯';
+
+  @override
+  String get itunesModeArtists => '藝人';
 
   @override
   String get sourceDeezerName => 'Deezer 試聽';

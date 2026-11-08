@@ -976,6 +976,7 @@
   "itunesFieldModeHint": "单曲，或按关键词把整张专辑读进来",
   "itunesModeSongs": "单曲",
   "itunesModeAlbums": "专辑",
+  "itunesModeArtists": "艺人",
   "sourceDeezerName": "Deezer 试听",
   "sourceDeezerDescription": "Deezer 曲库里每首歌的 30 秒试听",
   "deezerHint": "填关键词，留空则读排行榜",

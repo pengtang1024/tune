@@ -83,7 +83,7 @@ MusicSourceConfig（实例 · 数据）
 | `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、目录、数量 |
 | `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
 | `deezer` | Deezer | `openCatalog` | `deezer` | 排行 | 关键词（可留空）、读取方式（单曲 / 专辑）、风格（可留空）、数量 |
-| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、读取方式（单曲 / 专辑）、国家/地区、数量 |
+| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、读取方式（单曲 / 专辑 / 艺人）、国家/地区、数量 |
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
 | `podcast_catalog` | 播客目录 | `openCatalog` | `podcast_catalog` | 排行 | 关键词（可留空）、数量 |
 | `podcast_apple` | Apple Podcasts | `openCatalog` | `podcast_apple` | 排行 | 关键词（可留空）、国家/地区、数量 |

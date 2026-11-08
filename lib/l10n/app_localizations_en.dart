@@ -2022,6 +2022,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itunesModeAlbums => 'Albums';
 
   @override
+  String get itunesModeArtists => 'Artists';
+
+  @override
   String get sourceDeezerName => 'Deezer previews';
 
   @override

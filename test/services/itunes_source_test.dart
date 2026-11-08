@@ -87,6 +87,46 @@ void main() {
       expect(server.requests.single.uri.queryParameters['country'], 'JP');
     });
 
+    test('the artist mode reads the songs of the artists', () async {
+      final server = _ItunesServer(artists: true);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'miles davis', 'mode': 'artists'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(1));
+      expect(result.songs.single.title, 'So What');
+      expect(result.songs.single.duration, 30000);
+
+      final search = server.requests.first;
+      expect(search.uri.path, '/search');
+      expect(search.uri.queryParameters['entity'], 'musicArtist');
+      expect(search.uri.queryParameters['term'], 'miles davis');
+
+      final lookup = server.requests.last;
+      expect(lookup.uri.path, '/lookup');
+      expect(lookup.uri.queryParameters['id'], '44984');
+      expect(lookup.uri.queryParameters['entity'], 'song');
+    });
+
+    test('the artist row of a lookup is not a song', () async {
+      final server = _ItunesServer(artists: true);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'miles davis', 'mode': 'artists'}),
+        ),
+      );
+
+      // The lookup answers the artist first; it carries no preview, so it
+      // never reaches the library.
+      expect(result.songs.map((song) => song.title), isNot(contains('Miles Davis')));
+    });
     test('the album mode reads the albums the keyword names', () async {
       final server = _ItunesServer(albums: true);
       final adapter = ItunesSourceAdapter(dio: server.dio);
@@ -254,6 +294,7 @@ class _ItunesServer {
     this.broken = false,
     this.albums = false,
     this.withCollectionRow = false,
+    this.artists = false,
   }) : results = results ?? [_songJson()],
        albumResults =
            albumResults ??
@@ -272,6 +313,9 @@ class _ItunesServer {
   final bool broken;
   final bool albums;
   final bool withCollectionRow;
+
+  /// Answers the artist search and the artist lookup instead of the songs.
+  final bool artists;
   final requests = <RequestOptions>[];
 
   Dio get dio {
@@ -283,6 +327,26 @@ class _ItunesServer {
           final Map<String, dynamic> body;
           if (broken) {
             body = {'resultCount': 0};
+          } else if (artists && options.uri.queryParameters['entity'] == 'musicArtist') {
+            body = {
+              'resultCount': 1,
+              'results': [
+                {
+                  'wrapperType': 'artist',
+                  'artistType': 'Artist',
+                  'artistId': 44984,
+                  'artistName': 'Miles Davis',
+                },
+              ],
+            };
+          } else if (artists && options.uri.path == '/lookup') {
+            body = {
+              'resultCount': 2,
+              'results': [
+                {'wrapperType': 'artist', 'artistId': 44984, 'artistName': 'Miles Davis'},
+                _songJson(),
+              ],
+            };
           } else if (albums && options.uri.path == '/search') {
             body = {
               'resultCount': albumResults.length,
