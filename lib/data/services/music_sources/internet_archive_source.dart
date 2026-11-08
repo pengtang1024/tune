@@ -104,6 +104,16 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'sort',
+      AppStrings.instance.internetArchiveFieldSort,
+      AppStrings.instance.internetArchiveFieldSortHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.internetArchiveSortBrowse),
+        for (final entry in _sorts.entries)
+          MusicSourceChoice(entry.key, _sortLabel(entry.key)),
+      ],
+    ),
+    MusicSourceField(
       'decade',
       AppStrings.instance.internetArchiveFieldDecade,
       AppStrings.instance.internetArchiveFieldDecadeHint,
@@ -148,6 +158,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final perItem = _tracksPerItem.read(request.config.setting('perItem'));
       final language = request.config.setting('language')?.trim() ?? '';
       final decade = _decadeOf(request.config.setting('decade'));
+      final sort = _sortOf(request.config.setting('sort'));
       final base = query ?? 'mediatype:audio';
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
@@ -163,9 +174,13 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         'rows': limit,
         'page': request.offset ~/ limit + 1,
         'output': 'json',
-        'sort[]': browseModeOf(request.config) == BrowseMode.latest
-            ? 'publicdate desc'
-            : 'downloads desc',
+        // A sort the reader picked takes precedence over the one a browsing
+        // mode would ask for.
+        'sort[]':
+            sort ??
+            (browseModeOf(request.config) == BrowseMode.latest
+                ? 'publicdate desc'
+                : 'downloads desc'),
       });
 
       if (docs.docs == null) {
@@ -280,6 +295,31 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     return version.isEmpty ? 'CC $code' : 'CC $code $version';
   }
 
+
+
+  /// The sorts the archive reads, by the name the reader picks.
+  ///
+  /// The archive answers an unknown sort with an error rather than with an
+  /// order of its own, so only the sorts that were read from it are offered.
+  static const _sorts = <String, String>{
+    'title': 'titleSorter asc',
+    'added': 'addeddate desc',
+  };
+
+  /// The order the archive sorts by, or null when the browsing mode decides.
+  static String? _sortOf(String? raw) {
+    final value = raw?.trim() ?? '';
+    return value.isEmpty ? null : _sorts[value];
+  }
+
+  /// The name of a sort in the language of the reader.
+  static String _sortLabel(String sort) {
+    final strings = AppStrings.instance;
+    return switch (sort) {
+      'title' => strings.internetArchiveSortTitle,
+      _ => strings.internetArchiveSortAdded,
+    };
+  }
 
   /// The decades the archive holds audio of, by the year they start.
   static const _decades = <int>[

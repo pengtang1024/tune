@@ -1343,6 +1343,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveFieldDecade => '年代';
 
   @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get internetArchiveSortBrowse => '按浏览方式';
+
+  @override
+  String get internetArchiveSortTitle => '按标题';
+
+  @override
+  String get internetArchiveSortAdded => '最近入库';
+
+  @override
   String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
 
   @override
@@ -5002,6 +5017,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveFieldDecade => '年代';
 
   @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get internetArchiveSortBrowse => '按浏览方式';
+
+  @override
+  String get internetArchiveSortTitle => '按标题';
+
+  @override
+  String get internetArchiveSortAdded => '最近入库';
+
+  @override
   String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
 
   @override
@@ -8659,6 +8689,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先讀什麼；不選就按瀏覽方式決定';
+
+  @override
+  String get internetArchiveSortBrowse => '按瀏覽方式';
+
+  @override
+  String get internetArchiveSortTitle => '按標題';
+
+  @override
+  String get internetArchiveSortAdded => '最近入庫';
 
   @override
   String get internetArchiveFieldDecadeHint => '只取歸檔在某個年代的音訊';

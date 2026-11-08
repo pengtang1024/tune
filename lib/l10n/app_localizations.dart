@@ -2435,6 +2435,36 @@ abstract class AppLocalizations {
   /// **'年代'**
   String get internetArchiveFieldDecade;
 
+  /// No description provided for @internetArchiveFieldSort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排序'**
+  String get internetArchiveFieldSort;
+
+  /// No description provided for @internetArchiveFieldSortHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'先读什么；不选就按浏览方式决定'**
+  String get internetArchiveFieldSortHint;
+
+  /// No description provided for @internetArchiveSortBrowse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按浏览方式'**
+  String get internetArchiveSortBrowse;
+
+  /// No description provided for @internetArchiveSortTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按标题'**
+  String get internetArchiveSortTitle;
+
+  /// No description provided for @internetArchiveSortAdded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最近入库'**
+  String get internetArchiveSortAdded;
+
   /// No description provided for @internetArchiveFieldDecadeHint.
   ///
   /// In zh_CN, this message translates to:

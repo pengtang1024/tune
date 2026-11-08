@@ -318,6 +318,35 @@ void main() {
       expect(result.songs.last.title, 'Part 40');
     });
 
+    test('a sort the reader picked is asked for', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'sort': 'title'}),
+      );
+
+      expect(adapter.uris.first.queryParameters['sort[]'], 'titleSorter asc');
+    });
+
+    test('a sort the archive does not read leaves the browsing mode to decide', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'sort': 'bogus'}),
+      );
+
+      // The archive answers an unknown order with an error, so a name it does
+      // not read never reaches it.
+      expect(adapter.uris.first.queryParameters['sort[]'], 'downloads desc');
+    });
     test('a decade narrows the query to the years of it', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

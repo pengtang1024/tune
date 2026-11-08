@@ -1488,6 +1488,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get internetArchiveFieldDecade => 'Decade';
 
   @override
+  String get internetArchiveFieldSort => 'Order';
+
+  @override
+  String get internetArchiveFieldSortHint =>
+      'What the scan reads first; a browsing mode decides when nothing is picked';
+
+  @override
+  String get internetArchiveSortBrowse => 'According to the browsing';
+
+  @override
+  String get internetArchiveSortTitle => 'By title';
+
+  @override
+  String get internetArchiveSortAdded => 'Last added';
+
+  @override
   String get internetArchiveFieldDecadeHint =>
       'Only the audio filed under one decade';
 
