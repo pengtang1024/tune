@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -43,7 +44,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
 
   /// The chart service of the store: it names the albums of a storefront
   /// without a keyword.
-  static const _chartHost = 'https://rss.applemarketingtools.com/api/v2';
+  static const _chartHost = 'https://rss.marketingtools.apple.com/api/v2';
   static const _lookupUrl = 'https://itunes.apple.com/lookup';
 
   final Dio _dio;
@@ -324,25 +325,22 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
     return entries.whereType<Map>().toList(growable: false);
   }
 
-  /// The body of a chart answer, tried twice.
+  /// The body of a chart answer, tried a few times.
   ///
-  /// The chart service of the store answers 502 every so often; a second try a
-  /// moment later usually lands, so a scan is not failed by one bad gateway.
-  Future<String?> _chartBody(String url) async {
-    for (var attempt = 0; ; attempt++) {
-      try {
+  /// The chart service of the store answers 502 or drops the connection about
+  /// half the time; a moment later it usually answers, so a scan is not failed
+  /// by one bad gateway.
+  Future<String?> _chartBody(String url) {
+    return retrySourceRead(
+      () async {
         final response = await _dio.get<String>(
           url,
           options: Options(responseType: ResponseType.plain),
         );
         return response.data;
-      } on DioException catch (error) {
-        final status = error.response?.statusCode ?? 0;
-        final retriable = status == 0 || status >= 500;
-        if (!retriable || attempt >= 1) rethrow;
-        await Future<void>.delayed(const Duration(milliseconds: 400));
-      }
-    }
+      },
+      answered: (body) => _decode(body)?['feed'] != null,
+    );
   }
 
   /// The entries of the answer, when the answer holds a list.

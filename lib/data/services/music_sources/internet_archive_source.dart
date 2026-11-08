@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -174,10 +175,9 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   /// so the tries keep a scan from failing on a busy moment.
   Future<({List<dynamic>? docs, bool busy})> _search(
     Map<String, Object> query,
-  ) async {
-    const delays = [Duration(milliseconds: 600), Duration(milliseconds: 1500)];
-    for (var attempt = 0; ; attempt++) {
-      try {
+  ) {
+    return retrySourceRead(
+      () async {
         final response = await _dio.get<Map<String, dynamic>>(
           'https://archive.org/advancedsearch.php',
           queryParameters: query,
@@ -185,16 +185,14 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         final data = response.data;
         final answer = data?['response'];
         final docs = answer is Map ? answer['docs'] : null;
-        if (docs is List) return (docs: docs, busy: false);
         // The archive answers with an error of its own when its search
         // backend is down, which is a busy moment rather than a wrong query.
         final busy = data?['error'] != null;
-        if (attempt >= delays.length) return (docs: null, busy: busy);
-      } catch (_) {
-        if (attempt >= delays.length) rethrow;
-      }
-      await Future<void>.delayed(delays[attempt]);
-    }
+        return (docs: docs is List ? docs : null, busy: busy);
+      },
+      answered: (answer) => answer.docs != null,
+      delays: const [Duration(milliseconds: 600), Duration(milliseconds: 1500)],
+    );
   }
 
   /// The tracks of one archive item.
