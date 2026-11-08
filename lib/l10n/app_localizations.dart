@@ -3326,7 +3326,7 @@ abstract class AppLocalizations {
   /// No description provided for @itunesHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'填写关键词：商店没有自己的列表'**
+  /// **'填写关键词，或选「读取方式 = 专辑」读商店的专辑榜'**
   String get itunesHint;
 
   /// No description provided for @itunesFieldQueryHint.

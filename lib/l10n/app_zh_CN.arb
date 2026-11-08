@@ -965,7 +965,7 @@
   "koelTwoFactor": "Koel 账号开启了两步验证，此音源无法登录",
   "sourceItunesName": "iTunes 试听",
   "sourceItunesDescription": "iTunes 商店里每首歌的 30 秒试听",
-  "itunesHint": "填写关键词：商店没有自己的列表",
+  "itunesHint": "填写关键词，或选「读取方式 = 专辑」读商店的专辑榜",
   "itunesFieldQueryHint": "例如 miles davis、kind of blue",
   "itunesFieldCountry": "国家/地区",
   "itunesFieldCountryHint": "两位国家代码，例如 US、JP",

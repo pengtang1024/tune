@@ -40,6 +40,10 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   static const _artistsPerScan = 3;
 
   static const _searchUrl = 'https://itunes.apple.com/search';
+
+  /// The chart service of the store: it names the albums of a storefront
+  /// without a keyword.
+  static const _chartHost = 'https://rss.applemarketingtools.com/api/v2';
   static const _lookupUrl = 'https://itunes.apple.com/lookup';
 
   final Dio _dio;
@@ -62,11 +66,12 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   @override
   List<String> get browseModes => const [];
 
-  /// The store answers only a keyword, so the source is ready once one is
-  /// written.
+  /// The store answers a keyword, or serves a chart of albums by itself, so
+  /// the source is ready once one of the two is chosen.
   @override
   bool isConfigured(MusicSourceConfig config) =>
-      (config.setting('query')?.trim() ?? '').isNotEmpty;
+      (config.setting('query')?.trim() ?? '').isNotEmpty ||
+      config.setting('mode') == _modeAlbums;
 
   @override
   String get configurationHint => AppStrings.instance.itunesHint;
@@ -122,7 +127,11 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final config = request.config;
     final query = config.setting('query')?.trim() ?? '';
-    if (query.isEmpty) {
+    final albums = config.setting('mode') == _modeAlbums;
+    // The store has no list of its own for songs or artists, so one of them
+    // needs a keyword. The album mode reads the chart of the store instead,
+    // which is a list the store serves by itself.
+    if (query.isEmpty && !albums) {
       return SourceScanResult(
         sourceId: config.id,
         status: SourceScanStatus.needsConfiguration,
@@ -133,7 +142,6 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final country = _countryOf(config);
-      final albums = config.setting('mode') == _modeAlbums;
 
       final decoded = albums
           ? await _albumSongs(
@@ -250,34 +258,40 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
     return songs;
   }
 
-  /// The songs of the albums the keyword names.
+  /// The songs of the albums the keyword names, or of the chart of the store.
   ///
   /// The search answers with albums rather than songs, so the albums are
   /// looked up together: one request carries every chosen album id and returns
-  /// the tracks of all of them, which keeps a whole record together.
+  /// the tracks of all of them, which keeps a whole record together. Without a
+  /// keyword the albums come from the chart the store serves itself.
   Future<List<Map>?> _albumSongs({
     required String query,
     required String country,
     required String sourceId,
     required int limit,
   }) async {
-    final search = await _dio.get<String>(
-      _searchUrl,
-      queryParameters: {
-        'media': 'music',
-        'entity': 'album',
-        'term': query,
-        'limit': '${limit.clamp(1, _albumsPerScan)}',
-        'country': country,
-      },
-      options: Options(responseType: ResponseType.plain),
-    );
-    final albums = _resultsOf(search.data);
+    final List<Map>? albums;
+    if (query.isEmpty) {
+      albums = await _chartAlbums(country, limit);
+    } else {
+      final search = await _dio.get<String>(
+        _searchUrl,
+        queryParameters: {
+          'media': 'music',
+          'entity': 'album',
+          'term': query,
+          'limit': '${limit.clamp(1, _albumsPerScan)}',
+          'country': country,
+        },
+        options: Options(responseType: ResponseType.plain),
+      );
+      albums = _resultsOf(search.data);
+    }
     if (albums == null) return null;
 
     final ids = <String>[];
     for (final album in albums) {
-      final id = album['collectionId']?.toString();
+      final id = (album['collectionId'] ?? album['id'])?.toString();
       if (id != null && id.isNotEmpty && !ids.contains(id)) ids.add(id);
     }
     if (ids.isEmpty) return const [];
@@ -293,6 +307,22 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       options: Options(responseType: ResponseType.plain),
     );
     return _resultsOf(lookup.data);
+  }
+
+  /// The albums the store ranks highest in a storefront.
+  ///
+  /// The chart answers with the ids of the albums; the songs of those albums
+  /// are read from the lookup like the songs of a searched album.
+  Future<List<Map>?> _chartAlbums(String country, int limit) async {
+    final count = limit.clamp(1, _albumsPerScan);
+    final response = await _dio.get<String>(
+      '$_chartHost/${country.toLowerCase()}/music/most-played/$count/albums.json',
+      options: Options(responseType: ResponseType.plain),
+    );
+    final feed = _decode(response.data)?['feed'];
+    final entries = feed is Map ? feed['results'] : null;
+    if (entries is! List) return null;
+    return entries.whereType<Map>().toList(growable: false);
   }
 
   /// The entries of the answer, when the answer holds a list.

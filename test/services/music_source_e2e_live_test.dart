@@ -662,6 +662,48 @@ void main() async {
   );
 
   test(
+    'the album modes of the stores read the album chart without a keyword',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final albums = BuiltInMusicSources.defaults
+          .where((config) => const {'itunes', 'deezer'}.contains(config.id))
+          .map(
+            (config) => config.copyWith(
+              enabled: true,
+              settings: {'query': '', 'mode': 'albums', 'limit': '6'},
+            ),
+          )
+          .toList();
+
+      final results = await service.scanAll(
+        sources: albums,
+        localPaths: const [],
+      );
+
+      for (final result in results) {
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '${result.sourceId} failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: result.sourceId);
+        // The chart is read as albums, so the songs come with their record.
+        expect(
+          result.songs.every((song) => song.album.isNotEmpty),
+          isTrue,
+          reason: result.sourceId,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the album mode of the store hands over whole records',
     () async {
       final service = MusicSourceService(

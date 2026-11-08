@@ -965,7 +965,7 @@
   "koelTwoFactor": "The Koel account uses two-factor sign-in, which this source cannot do",
   "sourceItunesName": "iTunes previews",
   "sourceItunesDescription": "Thirty-second previews of the songs of the iTunes store",
-  "itunesHint": "Type a keyword: the store has no list of its own",
+  "itunesHint": "Type a keyword, or pick the album mode to read the store chart",
   "itunesFieldQueryHint": "e.g. miles davis, kind of blue",
   "itunesFieldCountry": "Country",
   "itunesFieldCountryHint": "Two-letter code, e.g. US, JP",

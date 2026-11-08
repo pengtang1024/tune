@@ -1987,7 +1987,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Thirty-second previews of the songs of the iTunes store';
 
   @override
-  String get itunesHint => 'Type a keyword: the store has no list of its own';
+  String get itunesHint =>
+      'Type a keyword, or pick the album mode to read the store chart';
 
   @override
   String get itunesFieldQueryHint => 'e.g. miles davis, kind of blue';

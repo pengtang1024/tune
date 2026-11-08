@@ -186,18 +186,20 @@ void main() {
       expect(server.requests[1].uri.path, '/album/1441464');
     });
 
-    test('the album mode asks for nothing without a keyword', () async {
-      final server = _DeezerServer(albums: true);
+    test('the album mode reads the chart of albums without a keyword', () async {
+      final server = _DeezerServer(albums: true, albumsWithoutKeyword: true);
       final adapter = DeezerSourceAdapter(dio: server.dio);
 
       final result = await adapter.scan(
         MusicSourceScanRequest(config: _config(settings: const {'mode': 'albums'})),
       );
 
-      // Without a keyword the catalogue has nothing to look the albums up by,
-      // so the charts are read instead of failing the scan.
+      // The catalogue serves a chart of albums, so the album mode works
+      // without a keyword too.
       expect(result.status, SourceScanStatus.success);
-      expect(server.requests.single.uri.path, '/chart/0/tracks');
+      expect(server.requests.first.uri.path, '/chart/0/albums');
+      expect(server.requests[1].uri.path, '/album/1441464');
+      expect(result.songs, isNotEmpty);
     });
     test('a song without a preview is left out', () async {
       final server = _DeezerServer(
@@ -293,6 +295,7 @@ class _DeezerServer {
     List<Map<String, dynamic>>? data,
     this.broken = false,
     this.albums = false,
+    this.albumsWithoutKeyword = false,
     this.artists = false,
     this.playlists = false,
     this.emptyPlaylist = false,
@@ -304,6 +307,9 @@ class _DeezerServer {
 
   /// Answers the album search and the album detail instead of the charts.
   final bool albums;
+
+  /// Answers the chart of albums; the album mode may run without a keyword.
+  final bool albumsWithoutKeyword;
 
   /// Answers the artist search and the top songs instead of the charts.
   final bool artists;
@@ -393,6 +399,20 @@ class _DeezerServer {
                           _albumTrack('So What', 3818963601, 'Miles Davis'),
                           _albumTrack('Blue In Green', 3818963602, 'Miles Davis'),
                         ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (albums && albumsWithoutKeyword && path == '/chart/0/albums') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 1441464, 'title': 'Kind of Blue'},
+                  ],
                 }),
                 statusCode: 200,
               ),

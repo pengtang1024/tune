@@ -1795,7 +1795,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
 
   @override
-  String get itunesHint => '填写关键词：商店没有自己的列表';
+  String get itunesHint => '填写关键词，或选「读取方式 = 专辑」读商店的专辑榜';
 
   @override
   String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
@@ -5049,7 +5049,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
 
   @override
-  String get itunesHint => '填写关键词：商店没有自己的列表';
+  String get itunesHint => '填写关键词，或选「读取方式 = 专辑」读商店的专辑榜';
 
   @override
   String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
@@ -8303,7 +8303,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceItunesDescription => 'iTunes 商店裡每首歌的 30 秒試聽';
 
   @override
-  String get itunesHint => '填寫關鍵字：商店沒有自己的列表';
+  String get itunesHint => '填寫關鍵字，或選「讀取方式 = 專輯」讀商店的專輯榜';
 
   @override
   String get itunesFieldQueryHint => '例如 miles davis、kind of blue';

@@ -87,6 +87,35 @@ void main() {
       expect(server.requests.single.uri.queryParameters['country'], 'JP');
     });
 
+    test('the album mode reads the chart of albums without a keyword', () async {
+      final server = _ItunesServer(chartAlbums: true);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': '', 'mode': 'albums'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, isNotEmpty);
+      expect(server.requests.first.uri.host, 'rss.applemarketingtools.com');
+      expect(server.requests.first.uri.path, contains('/music/most-played/'));
+      expect(server.requests.last.uri.path, '/lookup');
+      expect(server.requests.last.uri.queryParameters['id'], '6823820064');
+    });
+
+    test('a source without a keyword still asks for its settings for songs', () async {
+      final server = _ItunesServer();
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(config: _config(settings: const {'query': ''})),
+      );
+
+      expect(result.status, SourceScanStatus.needsConfiguration);
+      expect(server.requests, isEmpty);
+    });
     test('the artist mode reads the songs of the artists', () async {
       final server = _ItunesServer(artists: true);
       final adapter = ItunesSourceAdapter(dio: server.dio);
@@ -295,6 +324,7 @@ class _ItunesServer {
     this.albums = false,
     this.withCollectionRow = false,
     this.artists = false,
+    this.chartAlbums = false,
   }) : results = results ?? [_songJson()],
        albumResults =
            albumResults ??
@@ -316,6 +346,9 @@ class _ItunesServer {
 
   /// Answers the artist search and the artist lookup instead of the songs.
   final bool artists;
+
+  /// Answers the chart of albums instead of the song search.
+  final bool chartAlbums;
   final requests = <RequestOptions>[];
 
   Dio get dio {
@@ -324,6 +357,22 @@ class _ItunesServer {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           requests.add(options);
+          if (chartAlbums && options.uri.host == 'rss.applemarketingtools.com') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'feed': {
+                    'results': [
+                      {'id': '6823820064', 'name': 'FRESH'},
+                    ],
+                  },
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
           final Map<String, dynamic> body;
           if (broken) {
             body = {'resultCount': 0};

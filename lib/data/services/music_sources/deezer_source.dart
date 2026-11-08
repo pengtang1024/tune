@@ -196,7 +196,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final wantsAlbums = keyword.isNotEmpty && mode == _modeAlbums;
+      final wantsAlbums = mode == _modeAlbums;
 
       if (wantsAlbums) {
         final songs = await _albumSongs(
@@ -363,26 +363,38 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     return songs;
   }
 
-  /// The songs of the albums the keyword names.
+  /// The songs of the albums the keyword names, or of the chart of albums.
   ///
   /// The catalogue answers the keyword with albums rather than songs, so each
   /// album is read whole: one request per album, and the tracks keep the name
-  /// of their record even when the track entry names none.
+  /// of their record even when the track entry names none. Without a keyword
+  /// the albums come from the chart the catalogue serves itself.
   Future<List<Song>?> _albumSongs({
     required String keyword,
     required String sourceId,
     required int limit,
   }) async {
-    final search = await _dio.get<String>(
-      'https://api.deezer.com/search/album',
-      queryParameters: {
-        'q': keyword,
-        'limit': '${limit < _albumsPerScan ? limit : _albumsPerScan}',
-      },
-      options: Options(responseType: ResponseType.plain),
-    );
-    final albums = _decode(search.data)?['data'];
-    if (albums is! List) return null;
+    final count = limit < _albumsPerScan ? limit : _albumsPerScan;
+    final List<dynamic> albums;
+    if (keyword.isEmpty) {
+      final chart = await _dio.get<String>(
+        'https://api.deezer.com/chart/0/albums',
+        queryParameters: {'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(chart.data)?['data'];
+      if (entries is! List) return null;
+      albums = entries;
+    } else {
+      final search = await _dio.get<String>(
+        'https://api.deezer.com/search/album',
+        queryParameters: {'q': keyword, 'limit': '$count'},
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _decode(search.data)?['data'];
+      if (entries is! List) return null;
+      albums = entries;
+    }
 
     final songs = <Song>[];
     for (final album in albums) {
