@@ -90,12 +90,16 @@ abstract class RadioStationProvider {
   ///
   /// An empty [query] returns the stations the directory considers its
   /// highlights. [limit] caps the number of stations. [country] narrows the
-  /// stations to a two-letter country code when the directory knows one.
+  /// stations to a two-letter country code when the directory knows one;
+  /// [tag] and [language] narrow the stations to a reach and a tongue. A
+  /// directory that does not know one of the narrowings answers as if it was
+  /// not written.
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
     String? country,
     int offset = 0,
     String? tag,
+    String? language,
   });
 }

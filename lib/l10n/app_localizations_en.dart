@@ -1752,6 +1752,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works';
 
   @override
+  String get radioFieldLanguage => 'Language';
+
+  @override
+  String get radioFieldLanguageHint =>
+      'A tongue of the directory, e.g. english, spanish';
+
+  @override
   String get radioFieldTag => 'Tag';
 
   @override

@@ -1584,6 +1584,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
 
   @override
+  String get radioFieldLanguage => '语言';
+
+  @override
+  String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
+
+  @override
   String get radioFieldTag => '标签';
 
   @override
@@ -4819,6 +4825,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
 
   @override
+  String get radioFieldLanguage => '语言';
+
+  @override
+  String get radioFieldLanguageHint => '目录里的语言，例如 english、spanish';
+
+  @override
   String get radioFieldTag => '标签';
 
   @override
@@ -8052,6 +8064,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldCountryHint => '兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填';
+
+  @override
+  String get radioFieldLanguage => '語言';
+
+  @override
+  String get radioFieldLanguageHint => '目錄裡的語言，例如 english、spanish';
 
   @override
   String get radioFieldTag => '標籤';

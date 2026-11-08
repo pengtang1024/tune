@@ -455,6 +455,53 @@ void main() async {
   );
 
   test(
+    'the radio source reads a language of the directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final radio = BuiltInMusicSources.radio;
+
+      final names = <String>{};
+      for (final language in const ['spanish', 'japanese', 'french']) {
+        final result = (await service.scanAll(
+          sources: [
+            radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'language': language,
+                'tag': '',
+                'query': '',
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$language failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$language returned nothing');
+        // The tongues are separate reaches of the directory, so a scan of one
+        // tongue must not answer with the stations of another.
+        for (final song in result.songs) {
+          expect(
+            names.add(song.title),
+            isTrue,
+            reason: '$language repeated ${song.title}',
+          );
+        }
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the radio source reads a tag of the directory',
     () async {
       final service = MusicSourceService(

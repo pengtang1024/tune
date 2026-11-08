@@ -2903,6 +2903,18 @@ abstract class AppLocalizations {
   /// **'两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填'**
   String get radioFieldCountryHint;
 
+  /// No description provided for @radioFieldLanguage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'语言'**
+  String get radioFieldLanguage;
+
+  /// No description provided for @radioFieldLanguageHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'目录里的语言，例如 english、spanish'**
+  String get radioFieldLanguageHint;
+
   /// No description provided for @radioFieldTag.
   ///
   /// In zh_CN, this message translates to:

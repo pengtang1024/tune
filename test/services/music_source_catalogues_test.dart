@@ -232,6 +232,35 @@ void main() {
       );
     });
 
+    test('a language narrows the directory', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, language: 'Spanish');
+
+      final uri = captured.uris.first;
+      expect(uri.queryParameters['language'], 'spanish');
+      expect(uri.queryParameters.containsKey('name'), isFalse);
+    });
+
+    test('a reach, a country and a language narrow together', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'FR',
+        tag: 'jazz',
+        language: 'french',
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.queryParameters['countrycode'], 'FR');
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters['language'], 'french');
+    });
+
     test('an unreachable mirror falls back to another one', () async {
       final captured = _FailoverStations();
       final provider = RadioBrowserProvider(dio: captured.dio);
