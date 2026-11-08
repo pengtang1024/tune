@@ -2005,6 +2005,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
 
   @override
+  String get lmsHint => 'Logitech Media Server 地址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '服务器地址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '服务器账号，需要登录时填';
+
+  @override
+  String get lmsFieldPasswordHint => '该账号的密码';
+
+  @override
+  String get lmsFieldQueryHint => '用关键词缩小范围（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '服务器没有返回曲目列表';
+
+  @override
+  String get lmsNoMatch => '服务器里没有匹配的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '局域网里 Squeezebox 服务器的曲库';
+
+  @override
   String get kodiFieldServerHint => '例如 http://localhost:8080';
 
   @override
@@ -5376,6 +5403,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
 
   @override
+  String get lmsHint => 'Logitech Media Server 地址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '服务器地址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '服务器账号，需要登录时填';
+
+  @override
+  String get lmsFieldPasswordHint => '该账号的密码';
+
+  @override
+  String get lmsFieldQueryHint => '用关键词缩小范围（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '服务器没有返回曲目列表';
+
+  @override
+  String get lmsNoMatch => '服务器里没有匹配的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '局域网里 Squeezebox 服务器的曲库';
+
+  @override
   String get kodiFieldServerHint => '例如 http://localhost:8080';
 
   @override
@@ -8745,6 +8799,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get kodiHint => '填寫 Kodi Web 伺服器位址；伺服器要求登入時再填帳號';
+
+  @override
+  String get lmsHint => 'Logitech Media Server 位址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '伺服器位址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '伺服器帳號，需要登入時填';
+
+  @override
+  String get lmsFieldPasswordHint => '該帳號的密碼';
+
+  @override
+  String get lmsFieldQueryHint => '用關鍵字縮小範圍（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '伺服器沒有回傳曲目清單';
+
+  @override
+  String get lmsNoMatch => '伺服器裡沒有符合的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '區域網路裡 Squeezebox 伺服器的曲庫';
 
   @override
   String get kodiFieldServerHint => '例如 http://localhost:8080';

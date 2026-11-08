@@ -197,6 +197,12 @@ class BuiltInMusicSources {
       ),
       _instance(
         types,
+        'lms',
+        enabled: false,
+        settings: {'server': '', 'user': '', 'password': '', 'query': ''},
+      ),
+      _instance(
+        types,
         'peertube',
         settings: {
           'server': 'https://framatube.org',
@@ -422,6 +428,9 @@ class BuiltInMusicSources {
 
   /// The source of the music library of a Kodi media centre.
   static MusicSourceConfig get kodi => _entry('kodi');
+
+  /// The source of the library of a Logitech Media Server.
+  static MusicSourceConfig get lms => _entry('lms');
 
   /// The source of the previews of the iTunes store.
   static MusicSourceConfig get itunes => _entry('itunes');

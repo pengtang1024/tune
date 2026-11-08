@@ -19,6 +19,7 @@ const List<String> properNames = [
   'Koel',
   'PeerTube',
   'Kodi',
+  'Logitech Media Server',
   'AzuraCast',
   'Jellyfin',
   'Emby',

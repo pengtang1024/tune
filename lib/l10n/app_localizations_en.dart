@@ -2209,6 +2209,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type the address of the Kodi web server, and the account when it asks for one';
 
   @override
+  String get lmsHint =>
+      'Address of a Logitech Media Server: e.g. http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint =>
+      'Address of the server, e.g. http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => 'Account of the server, when it asks for one';
+
+  @override
+  String get lmsFieldPasswordHint => 'Password of that account';
+
+  @override
+  String get lmsFieldQueryHint => 'Narrow the library by a word (optional)';
+
+  @override
+  String get lmsEmptyResponse => 'The server answered without a list of tracks';
+
+  @override
+  String get lmsNoMatch => 'No track of the server matches';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription =>
+      'The library of a Squeezebox server on your network';
+
+  @override
   String get kodiFieldServerHint => 'e.g. http://localhost:8080';
 
   @override

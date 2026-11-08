@@ -3737,6 +3737,60 @@ abstract class AppLocalizations {
   /// **'填写 Kodi Web 服务器地址；服务器要求登录时再填账号'**
   String get kodiHint;
 
+  /// No description provided for @lmsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Logitech Media Server 地址：例如 http://192.168.1.10:9000'**
+  String get lmsHint;
+
+  /// No description provided for @lmsFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器地址，例如 http://192.168.1.10:9000'**
+  String get lmsFieldServerHint;
+
+  /// No description provided for @lmsFieldUserHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器账号，需要登录时填'**
+  String get lmsFieldUserHint;
+
+  /// No description provided for @lmsFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'该账号的密码'**
+  String get lmsFieldPasswordHint;
+
+  /// No description provided for @lmsFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'用关键词缩小范围（可留空）'**
+  String get lmsFieldQueryHint;
+
+  /// No description provided for @lmsEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器没有返回曲目列表'**
+  String get lmsEmptyResponse;
+
+  /// No description provided for @lmsNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'服务器里没有匹配的曲目'**
+  String get lmsNoMatch;
+
+  /// No description provided for @sourceLmsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Logitech Media Server'**
+  String get sourceLmsName;
+
+  /// No description provided for @sourceLmsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'局域网里 Squeezebox 服务器的曲库'**
+  String get sourceLmsDescription;
+
   /// No description provided for @kodiFieldServerHint.
   ///
   /// In zh_CN, this message translates to:

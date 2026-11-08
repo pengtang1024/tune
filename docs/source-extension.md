@@ -8,7 +8,7 @@
 
 ## 1. 为什么要改
 
-现状是「36 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「37 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -92,6 +92,7 @@ MusicSourceConfig（实例 · 数据）
 | `ampache` | Ampache | `openApi` | `ampache` | 排行 / 最新 | 服务器、API Key、关键词、数量 |
 | `koel` | Koel | `openApi` | `koel` | 排行 / 最新 | 服务器、邮箱、密码、关键词、数量 |
 | `kodi` | Kodi | `openApi` | `kodi` | 最新 / 专辑 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
+| `lms` | Logitech Media Server | `openApi` | `lms` | 曲库 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
 | `jellyfin` | Jellyfin | `openApi` | `jellyfin` | — | 服务器、账号、密码、数量 |
 | `direct_url` | 直链音频 | `custom` | — | — | 一组音频地址（每行一条） |
 | `m3u` | 播放列表 | `custom` | — | — | 播放列表地址（`.m3u` / `.pls`） |
@@ -112,7 +113,7 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-36 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+37 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。
@@ -154,10 +155,12 @@ MusicSourceConfig（实例 · 数据）
 | `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
 | `internet_archive` | `charts` / `latest` | `q` 只留 `mediatype:audio`，`sort[]` 按浏览流取 `downloads desc` 或 `publicdate desc` | ✅ |
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
-| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（7 个音频分类） | ✅ |
-| `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
+| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（20 个分类：音乐 15 类，另加演讲 / 音效 / 访谈 / 诗歌 / 有声条目；最后一个的分类名是 `Category:Spoken Wikipedia`） | ✅ |
+| `openverse` | `latest` | 去掉 `q` 参数；「来源」按目录收窄（`source=jamendo` / `freesound`） | ✅ |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
-| `itunes` | 无（关键词必填） | `term` 必填，接口不提供无词列表；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算；「读取方式=专辑」时先 `entity=album` 搜专辑，再用一次多点 `lookup` 取整张曲目 | ✅ |
+| `deezer` | `charts` | 无词读 `/chart/0/tracks`；四种读取方式各有自己的榜：专辑 `/chart/0/albums`、艺人 `/chart/0/artists`、歌单 `/chart/0/playlists`；风格编号取自 `/genre` | ✅ |
+| `lms` | `charts` | 无词时 `titles` 走整库；有关键词加 `search:` 前缀 | 代码已支持（无 LMS 服务器，未验证） |
+| `itunes` | 单曲与艺人要关键词，专辑可无词 | 单曲与艺人方式 `term` 必填；「读取方式=专辑」无词时读 `rss.marketingtools.apple.com` 的音乐专辑榜（该服务约一半请求回 502，适配器隔 0.4s / 0.9s 各重试一次）；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算 | ✅ |
 
 **浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
 浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。

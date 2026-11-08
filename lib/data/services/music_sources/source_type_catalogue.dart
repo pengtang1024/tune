@@ -146,6 +146,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'lms',
+        name: 'Logitech Media Server',
+        localizedName: strings.sourceLmsName,
+        description: strings.sourceLmsDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
         type: 'peertube',
         name: 'PeerTube',
         localizedName: strings.sourcePeerTubeName,
