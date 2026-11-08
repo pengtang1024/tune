@@ -53,6 +53,10 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     'interviews': 'Category:Audio files of interviews',
     'poetry': 'Category:Audio files of poetry',
     'spoken': 'Category:Spoken Wikipedia',
+    'house': 'Category:Audio files of house music',
+    'dnb': 'Category:Audio files of drum and bass',
+    'ambient': 'Category:Audio files of ambient music',
+    'world': 'Category:Audio files of world music',
   };
 
   /// The category a scan browses when the reader names no keyword.
@@ -139,6 +143,10 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       'interviews' => strings.wikimediaCategoryInterviews,
       'poetry' => strings.wikimediaCategoryPoetry,
       'spoken' => strings.wikimediaCategorySpoken,
+      'house' => strings.wikimediaCategoryHouse,
+      'dnb' => strings.wikimediaCategoryDnb,
+      'ambient' => strings.wikimediaCategoryAmbient,
+      'world' => strings.wikimediaCategoryWorld,
       _ => strings.wikimediaCategoryAll,
     };
   }

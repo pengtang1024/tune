@@ -868,6 +868,10 @@ void main() async {
         'reggae',
         'choral',
         'organ',
+        'house',
+        'dnb',
+        'ambient',
+        'world',
       ]) {
         final result = (await service.scanAll(
           sources: [

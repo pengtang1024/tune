@@ -2005,6 +2005,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wikimediaCategorySpoken => 'Spoken articles';
 
   @override
+  String get wikimediaCategoryHouse => 'House';
+
+  @override
+  String get wikimediaCategoryDnb => 'Drum and bass';
+
+  @override
+  String get wikimediaCategoryAmbient => 'Ambient';
+
+  @override
+  String get wikimediaCategoryWorld => 'World music';
+
+  @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
 
   @override

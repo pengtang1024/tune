@@ -1830,6 +1830,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wikimediaCategorySpoken => '有声条目';
 
   @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打贝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛围';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音乐';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -5335,6 +5347,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get wikimediaCategorySpoken => '有声条目';
 
   @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打贝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛围';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音乐';
+
+  @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
 
   @override
@@ -8838,6 +8862,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get wikimediaCategorySpoken => '有聲條目';
+
+  @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打貝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛圍';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音樂';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';

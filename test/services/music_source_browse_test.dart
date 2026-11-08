@@ -149,6 +149,19 @@ void main() {
       );
     });
 
+    test('a genre of the commons is walked by its own name', () async {
+      final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
+
+      await WikimediaSourceAdapter(dio: captured.dio).scan(
+        _request('wikimedia', const {'category': 'dnb'}),
+      );
+
+      expect(
+        captured.uri?.queryParameters['gcmtitle'],
+        'Category:Audio files of drum and bass',
+      );
+    });
+
     test('Wikimedia walks a category the reader picked from the newer ones', () async {
       final captured = _Captured(body: {'query': {'pages': <String, dynamic>{}}});
 

@@ -3383,6 +3383,30 @@ abstract class AppLocalizations {
   /// **'有声条目'**
   String get wikimediaCategorySpoken;
 
+  /// No description provided for @wikimediaCategoryHouse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'浩室'**
+  String get wikimediaCategoryHouse;
+
+  /// No description provided for @wikimediaCategoryDnb.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'鼓打贝斯'**
+  String get wikimediaCategoryDnb;
+
+  /// No description provided for @wikimediaCategoryAmbient.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'氛围'**
+  String get wikimediaCategoryAmbient;
+
+  /// No description provided for @wikimediaCategoryWorld.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'世界音乐'**
+  String get wikimediaCategoryWorld;
+
   /// No description provided for @wikimediaFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

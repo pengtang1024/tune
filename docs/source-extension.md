@@ -155,7 +155,7 @@ MusicSourceConfig（实例 · 数据）
 | `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
 | `internet_archive` | `charts` / `latest` | `q` 只留 `mediatype:audio`，`sort[]` 按浏览流取 `downloads desc` 或 `publicdate desc` | ✅ |
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
-| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（20 个分类：音乐 15 类，另加演讲 / 音效 / 访谈 / 诗歌 / 有声条目；最后一个的分类名是 `Category:Spoken Wikipedia`） | ✅ |
+| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（24 个分类：音乐 19 类，另加演讲 / 音效 / 访谈 / 诗歌 / 有声条目；最后一个的分类名是 `Category:Spoken Wikipedia`） | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数；「来源」按目录收窄（`source=jamendo` / `freesound`） | ✅ |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
 | `deezer` | `charts` | 无词读 `/chart/0/tracks`；四种读取方式各有自己的榜：专辑 `/chart/0/albums`、艺人 `/chart/0/artists`、歌单 `/chart/0/playlists`；风格编号取自 `/genre` | ✅ |
