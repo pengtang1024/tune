@@ -357,6 +357,26 @@ void main() {
       // The site answers a word it cannot read with an error, not a list.
       expect(captured.uri?.queryParameters.containsKey('lic'), isFalse);
     });
+    test('a window of dates is asked of the archive itself', () async {
+      final captured = _CapturedArchive();
+
+      await InternetArchiveSourceAdapter(dio: captured.dio).scan(
+        _request('internet_archive', const {'since': '30'}),
+      );
+
+      // The archive leaves the older items out; the app never sees them.
+      expect(captured.query?['q'], contains('addeddate:['));
+    });
+
+    test('a window the app does not offer is not sent', () async {
+      final captured = _CapturedArchive();
+
+      await InternetArchiveSourceAdapter(dio: captured.dio).scan(
+        _request('internet_archive', const {'since': '45'}),
+      );
+
+      expect(captured.query?['q'], isNot(contains('addeddate:')));
+    });
     test('the reader decides how many albums one scan reads', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 
@@ -578,6 +598,32 @@ class _Captured {
             Response(
               requestOptions: options,
               data: _body,
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
+/// A Dio that answers the archive with an empty page and keeps the query.
+class _CapturedArchive {
+  Map<String, dynamic>? query;
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          query = options.uri.queryParameters;
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: {
+                'response': {'numFound': 0, 'docs': <dynamic>[]},
+              },
               statusCode: 200,
             ),
           );

@@ -912,17 +912,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browseModeAlbums => 'Albums';
 
   @override
-  String get mediaServerFieldSince => 'Added since';
+  String get recentWindowField => 'Recently added';
 
   @override
-  String get mediaServerFieldSinceHint =>
-      'Only the tracks the server added inside this window';
+  String get recentWindowFieldHint => 'Only what came in inside this window';
 
   @override
-  String get mediaServerSinceAll => 'Everything on the server';
+  String get recentWindowAll => 'Everything';
 
   @override
-  String mediaServerSinceDays(String days) {
+  String recentWindowDays(String days) {
     return 'The last $days days';
   }
 

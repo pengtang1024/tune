@@ -1571,29 +1571,29 @@ abstract class AppLocalizations {
   /// **'专辑'**
   String get browseModeAlbums;
 
-  /// No description provided for @mediaServerFieldSince.
+  /// No description provided for @recentWindowField.
   ///
   /// In zh_CN, this message translates to:
   /// **'只看最近入库'**
-  String get mediaServerFieldSince;
+  String get recentWindowField;
 
-  /// No description provided for @mediaServerFieldSinceHint.
+  /// No description provided for @recentWindowFieldHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'只收这段时间内加进服务器的曲目'**
-  String get mediaServerFieldSinceHint;
+  /// **'只收这段时间内加进来的内容'**
+  String get recentWindowFieldHint;
 
-  /// No description provided for @mediaServerSinceAll.
+  /// No description provided for @recentWindowAll.
   ///
   /// In zh_CN, this message translates to:
-  /// **'服务器上的全部'**
-  String get mediaServerSinceAll;
+  /// **'不限时间'**
+  String get recentWindowAll;
 
-  /// No description provided for @mediaServerSinceDays.
+  /// No description provided for @recentWindowDays.
   ///
   /// In zh_CN, this message translates to:
   /// **'最近 {days} 天'**
-  String mediaServerSinceDays(String days);
+  String recentWindowDays(String days);
 
   /// No description provided for @fieldLimit.
   ///

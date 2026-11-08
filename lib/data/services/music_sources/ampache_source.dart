@@ -91,14 +91,14 @@ class AmpacheSourceAdapter extends MusicSourceAdapter {
     ),
     MusicSourceField(
       'since',
-      AppStrings.instance.mediaServerFieldSince,
-      AppStrings.instance.mediaServerFieldSinceHint,
+      AppStrings.instance.recentWindowField,
+      AppStrings.instance.recentWindowFieldHint,
       choices: [
-        MusicSourceChoice('', AppStrings.instance.mediaServerSinceAll),
+        MusicSourceChoice('', AppStrings.instance.recentWindowAll),
         for (final days in RecentWindow.days)
           MusicSourceChoice(
             '$days',
-            AppStrings.instance.mediaServerSinceDays('$days'),
+            AppStrings.instance.recentWindowDays('$days'),
           ),
       ],
     ),

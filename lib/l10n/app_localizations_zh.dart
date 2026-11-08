@@ -843,16 +843,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browseModeAlbums => '专辑';
 
   @override
-  String get mediaServerFieldSince => '只看最近入库';
+  String get recentWindowField => '只看最近入库';
 
   @override
-  String get mediaServerFieldSinceHint => '只收这段时间内加进服务器的曲目';
+  String get recentWindowFieldHint => '只收这段时间内加进来的内容';
 
   @override
-  String get mediaServerSinceAll => '服务器上的全部';
+  String get recentWindowAll => '不限时间';
 
   @override
-  String mediaServerSinceDays(String days) {
+  String recentWindowDays(String days) {
     return '最近 $days 天';
   }
 
@@ -4659,16 +4659,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get browseModeAlbums => '专辑';
 
   @override
-  String get mediaServerFieldSince => '只看最近入库';
+  String get recentWindowField => '只看最近入库';
 
   @override
-  String get mediaServerFieldSinceHint => '只收这段时间内加进服务器的曲目';
+  String get recentWindowFieldHint => '只收这段时间内加进来的内容';
 
   @override
-  String get mediaServerSinceAll => '服务器上的全部';
+  String get recentWindowAll => '不限时间';
 
   @override
-  String mediaServerSinceDays(String days) {
+  String recentWindowDays(String days) {
     return '最近 $days 天';
   }
 
@@ -8475,16 +8475,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get browseModeAlbums => '專輯';
 
   @override
-  String get mediaServerFieldSince => '只看最近入庫';
+  String get recentWindowField => '只看最近入庫';
 
   @override
-  String get mediaServerFieldSinceHint => '只收這段時間內加進伺服器的曲目';
+  String get recentWindowFieldHint => '只收這段時間內加進來的內容';
 
   @override
-  String get mediaServerSinceAll => '伺服器上的全部';
+  String get recentWindowAll => '不限時間';
 
   @override
-  String mediaServerSinceDays(String days) {
+  String recentWindowDays(String days) {
     return '最近 $days 天';
   }
 

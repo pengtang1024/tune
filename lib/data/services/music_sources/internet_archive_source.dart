@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
@@ -138,6 +139,19 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.recentWindowField,
+      AppStrings.instance.recentWindowFieldHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.recentWindowAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.recentWindowDays('$days'),
+          ),
+      ],
+    ),
   ];
 
   @override
@@ -160,6 +174,10 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       final decade = _decadeOf(request.config.setting('decade'));
       final sort = _sortOf(request.config.setting('sort'));
       final base = query ?? 'mediatype:audio';
+      // The archive stamps every item with the moment it took it in; a window
+      // is a clause of the query, so the archive does the leaving out.
+      final since = RecentWindow.cutoff(request.config.setting('since'));
+      final now = DateTime.now().toUtc();
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
         // named: what everybody downloaded most, or what was uploaded last.
@@ -169,6 +187,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           base,
           if (language.isNotEmpty) 'language:($language)',
           if (decade != null) 'year:[$decade TO ${decade + 9}]',
+          if (since != null) 'addeddate:[${_day(since)} TO ${_day(now)}]',
         ].join(' AND '),
         'fl[]': ['identifier', 'title', 'creator', 'date'],
         'rows': limit,
@@ -259,6 +278,13 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     );
   }
 
+
+
+  /// The day of an instant, written the way the archive writes a date.
+  static String _day(DateTime at) =>
+      '${at.year.toString().padLeft(4, '0')}-'
+      '${at.month.toString().padLeft(2, '0')}-'
+      '${at.day.toString().padLeft(2, '0')}';
 
   /// The description of an item, as plain text.
   ///
