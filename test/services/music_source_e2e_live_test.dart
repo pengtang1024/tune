@@ -267,6 +267,48 @@ void main() async {
   );
 
   test(
+    'the album mode of Deezer hands over whole records',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'kind of blue',
+              'genre': '',
+              'mode': 'albums',
+              'limit': '6',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer albums failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      // The songs of a record arrive together, with the name of their album.
+      final albums = result.songs.map((song) => song.album).toSet();
+      expect(albums, isNotEmpty);
+      expect(
+        result.songs.where((song) => song.album == albums.first).length,
+        greaterThan(1),
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the Deezer charts answer with playable previews',
     () async {
       final service = MusicSourceService(

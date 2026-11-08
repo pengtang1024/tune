@@ -128,7 +128,7 @@ class BuiltInMusicSources {
       _instance(
         types,
         'deezer',
-        settings: {'query': '', 'genre': ''},
+        settings: {'query': '', 'genre': '', 'mode': 'songs'},
       ),
       _instance(
         types,

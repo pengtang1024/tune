@@ -2041,6 +2041,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deezerPreviewNote => 'Thirty-second preview of the song';
 
   @override
+  String get deezerFieldMode => 'Read';
+
+  @override
+  String get deezerFieldModeHint =>
+      'Single songs, or whole albums of the keyword';
+
+  @override
+  String get deezerModeSongs => 'Songs';
+
+  @override
+  String get deezerModeAlbums => 'Albums';
+
+  @override
   String get sourceKodiName => 'Kodi';
 
   @override

@@ -1845,6 +1845,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deezerPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get deezerFieldMode => '读取方式';
+
+  @override
+  String get deezerFieldModeHint => '单曲，或按关键词把整张专辑读进来';
+
+  @override
+  String get deezerModeSongs => '单曲';
+
+  @override
+  String get deezerModeAlbums => '专辑';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -5065,6 +5077,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deezerPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get deezerFieldMode => '读取方式';
+
+  @override
+  String get deezerFieldModeHint => '单曲，或按关键词把整张专辑读进来';
+
+  @override
+  String get deezerModeSongs => '单曲';
+
+  @override
+  String get deezerModeAlbums => '专辑';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -8283,6 +8307,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deezerPreviewNote => '這首歌的 30 秒試聽';
+
+  @override
+  String get deezerFieldMode => '讀取方式';
+
+  @override
+  String get deezerFieldModeHint => '單曲，或按關鍵字把整張專輯讀進來';
+
+  @override
+  String get deezerModeSongs => '單曲';
+
+  @override
+  String get deezerModeAlbums => '專輯';
 
   @override
   String get sourceKodiName => '自架 Kodi 媒體庫';

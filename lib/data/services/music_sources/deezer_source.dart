@@ -24,6 +24,16 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// The length of a preview, in milliseconds.
   static const _previewLength = 30000;
 
+  /// How many albums the album mode reads in one scan.
+  ///
+  /// An album is read whole, so a scan that walked many of them would fill the
+  /// library with one reader's keyword; three albums keep the scan readable
+  /// while still handing over complete records.
+  static const _albumsPerScan = 3;
+
+  /// The name of the album mode.
+  static const _modeAlbums = 'albums';
+
   /// The reaches the charts are read for, by the name the reader picks.
   ///
   /// The catalogue names a reach by a number, so the numbers live here and
@@ -82,6 +92,15 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.deezerFieldQueryHint,
     ),
     MusicSourceField(
+      'mode',
+      AppStrings.instance.deezerFieldMode,
+      AppStrings.instance.deezerFieldModeHint,
+      choices: [
+        MusicSourceChoice('songs', AppStrings.instance.deezerModeSongs),
+        MusicSourceChoice(_modeAlbums, AppStrings.instance.deezerModeAlbums),
+      ],
+    ),
+    MusicSourceField(
       'genre',
       AppStrings.instance.deezerFieldGenre,
       AppStrings.instance.deezerFieldGenreHint,
@@ -113,6 +132,29 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
+      final wantsAlbums =
+          keyword.isNotEmpty && config.setting('mode') == _modeAlbums;
+
+      if (wantsAlbums) {
+        final songs = await _albumSongs(
+          keyword: keyword,
+          sourceId: config.id,
+          limit: limit,
+        );
+        if (songs == null) {
+          return SourceScanResult(
+            sourceId: config.id,
+            status: SourceScanStatus.failed,
+            message: AppStrings.instance.deezerEmptyResponse,
+          );
+        }
+        return SourceScanResult(
+          sourceId: config.id,
+          status: SourceScanStatus.success,
+          songs: songs,
+          message: songs.isEmpty ? AppStrings.instance.deezerNoMatch : null,
+        );
+      }
 
       final String path;
       if (keyword.isNotEmpty) {
@@ -159,6 +201,75 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(config.id, error);
     }
+  }
+
+
+  /// The songs of the albums the keyword names.
+  ///
+  /// The catalogue answers the keyword with albums rather than songs, so each
+  /// album is read whole: one request per album, and the tracks keep the name
+  /// of their record even when the track entry names none.
+  Future<List<Song>?> _albumSongs({
+    required String keyword,
+    required String sourceId,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      'https://api.deezer.com/search/album',
+      queryParameters: {
+        'q': keyword,
+        'limit': '${limit < _albumsPerScan ? limit : _albumsPerScan}',
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final albums = _decode(search.data)?['data'];
+    if (albums is! List) return null;
+
+    final songs = <Song>[];
+    for (final album in albums) {
+      if (album is! Map) continue;
+      final id = album['id']?.toString();
+      if (id == null || id.isEmpty) continue;
+
+      final detail = await _dio.get<String>(
+        'https://api.deezer.com/album/$id',
+        options: Options(responseType: ResponseType.plain),
+      );
+      final data = _decode(detail.data);
+      if (data == null) continue;
+      final tracks = data['tracks'];
+      final entries = tracks is Map ? tracks['data'] : null;
+      if (entries is! List) continue;
+
+      for (final entry in entries) {
+        if (entry is! Map) continue;
+        final song = songOf(_withAlbum(entry, data), sourceId: sourceId);
+        if (song != null) songs.add(song);
+      }
+    }
+    return songs;
+  }
+
+  /// The track entry with what its album knows and the entry does not.
+  ///
+  /// A track of an album answer carries no album of its own, so the name and
+  /// the cover of the record are filled in from the album.
+  static Map _withAlbum(Map entry, Map<String, dynamic> album) {
+    final merged = Map<String, dynamic>.from(entry);
+    final current = merged['album'];
+    final albumMap = current is Map ? Map<String, dynamic>.from(current) : <String, dynamic>{};
+    albumMap['title'] ??= album['title'];
+    albumMap['id'] ??= album['id'];
+    albumMap['cover_xl'] ??= album['cover_xl'];
+    albumMap['cover_big'] ??= album['cover_big'];
+    albumMap['cover_medium'] ??= album['cover_medium'];
+    merged['album'] = albumMap;
+    final artist = merged['artist'];
+    if (artist is! Map || _text(artist['name']) == null) {
+      final owner = album['artist'];
+      if (owner is Map) merged['artist'] = owner;
+    }
+    return merged;
   }
 
   /// The preview address of a track, renewed when the stored one expired.

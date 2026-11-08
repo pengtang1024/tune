@@ -3425,6 +3425,30 @@ abstract class AppLocalizations {
   /// **'这首歌的 30 秒试听'**
   String get deezerPreviewNote;
 
+  /// No description provided for @deezerFieldMode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读取方式'**
+  String get deezerFieldMode;
+
+  /// No description provided for @deezerFieldModeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲，或按关键词把整张专辑读进来'**
+  String get deezerFieldModeHint;
+
+  /// No description provided for @deezerModeSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲'**
+  String get deezerModeSongs;
+
+  /// No description provided for @deezerModeAlbums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get deezerModeAlbums;
+
   /// No description provided for @sourceKodiName.
   ///
   /// In zh_CN, this message translates to:

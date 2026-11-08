@@ -94,6 +94,42 @@ void main() {
       expect(request.uri.queryParameters['index'], '10');
     });
 
+    test('the album mode reads the albums the keyword names', () async {
+      final server = _DeezerServer(albums: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'query': 'kind of blue', 'mode': 'albums'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(2));
+      // The tracks of an album carry no album of their own; the record fills
+      // the name and the cover in.
+      expect(result.songs.first.album, 'Kind of Blue');
+      expect(result.songs.first.artworkUrl, endsWith('/1000x1000-000000-80-0-0.jpg'));
+      expect(result.songs.first.duration, 30000);
+
+      expect(server.requests.first.uri.path, '/search/album');
+      expect(server.requests.first.uri.queryParameters['q'], 'kind of blue');
+      expect(server.requests[1].uri.path, '/album/1441464');
+    });
+
+    test('the album mode asks for nothing without a keyword', () async {
+      final server = _DeezerServer(albums: true);
+      final adapter = DeezerSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(config: _config(settings: const {'mode': 'albums'})),
+      );
+
+      // Without a keyword the catalogue has nothing to look the albums up by,
+      // so the charts are read instead of failing the scan.
+      expect(result.status, SourceScanStatus.success);
+      expect(server.requests.single.uri.path, '/chart/0/tracks');
+    });
     test('a song without a preview is left out', () async {
       final server = _DeezerServer(
         data: [
@@ -184,11 +220,17 @@ Map<String, dynamic> _songJson({String? preview}) {
 
 /// A catalogue that answers the calls the adapter makes.
 class _DeezerServer {
-  _DeezerServer({List<Map<String, dynamic>>? data, this.broken = false})
-    : data = data ?? [_songJson()];
+  _DeezerServer({
+    List<Map<String, dynamic>>? data,
+    this.broken = false,
+    this.albums = false,
+  }) : data = data ?? [_songJson()];
 
   final List<Map<String, dynamic>> data;
   final bool broken;
+
+  /// Answers the album search and the album detail instead of the charts.
+  final bool albums;
   final requests = <RequestOptions>[];
   String? preview;
 
@@ -202,13 +244,52 @@ class _DeezerServer {
             handler.resolve(
               Response(
                 requestOptions: options,
-                data: jsonEncode({'error': {'message': 'no data'}}),
+                data: jsonEncode({
+                  'error': {'message': 'no data'},
+                }),
                 statusCode: 200,
               ),
             );
             return;
           }
-          if (options.uri.path.startsWith('/track/')) {
+          final path = options.uri.path;
+          if (albums && path == '/search/album') {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'data': [
+                    {'id': 1441464, 'title': 'Kind of Blue', 'nb_tracks': 2},
+                  ],
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (albums && path.startsWith('/album/')) {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                data: jsonEncode({
+                  'id': 1441464,
+                  'title': 'Kind of Blue',
+                  'cover_xl':
+                      'https://cdn-images.example.com/cover/abc/1000x1000-000000-80-0-0.jpg',
+                  'artist': {'id': 44984, 'name': 'Miles Davis'},
+                  'tracks': {
+                    'data': [
+                      _albumTrack('So What', 3818963601),
+                      _albumTrack('Blue In Green', 3818963602),
+                    ],
+                  },
+                }),
+                statusCode: 200,
+              ),
+            );
+            return;
+          }
+          if (path.startsWith('/track/')) {
             handler.resolve(
               Response(
                 requestOptions: options,
@@ -233,5 +314,15 @@ class _DeezerServer {
       ),
     );
     return client;
+  }
+
+  /// A track of an album answer: no album of its own, no cover.
+  static Map<String, dynamic> _albumTrack(String title, int id) {
+    return {
+      'id': id,
+      'title': title,
+      'duration': 545,
+      'preview': 'https://cdnt-preview.example.com/$id.mp3',
+    };
   }
 }
