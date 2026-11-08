@@ -2489,6 +2489,48 @@ abstract class AppLocalizations {
   /// **'例如 jazz、ambient、electro'**
   String get ccmixterFieldQueryHint;
 
+  /// No description provided for @ccmixterFieldTag.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'风格'**
+  String get ccmixterFieldTag;
+
+  /// No description provided for @ccmixterFieldTagHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'站点的一个标签；关键词与风格会同时生效'**
+  String get ccmixterFieldTagHint;
+
+  /// No description provided for @ccmixterTagAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部风格'**
+  String get ccmixterTagAll;
+
+  /// No description provided for @ccmixterTagFunk.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'放克'**
+  String get ccmixterTagFunk;
+
+  /// No description provided for @ccmixterTagAmbient.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'氛围'**
+  String get ccmixterTagAmbient;
+
+  /// No description provided for @ccmixterTagChill.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'弛放'**
+  String get ccmixterTagChill;
+
+  /// No description provided for @ccmixterTagInstrumental.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'器乐'**
+  String get ccmixterTagInstrumental;
+
   /// No description provided for @ccmixterHint.
   ///
   /// In zh_CN, this message translates to:

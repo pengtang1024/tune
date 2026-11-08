@@ -62,12 +62,46 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.ccmixterFieldQueryHint,
     ),
     MusicSourceField(
+      'tag',
+      AppStrings.instance.ccmixterFieldTag,
+      AppStrings.instance.ccmixterFieldTagHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.ccmixterTagAll),
+        for (final entry in _tags.entries)
+          MusicSourceChoice(entry.key, entry.value),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+
+  /// The tags the site files its uploads under, by the name the reader picks.
+  ///
+  /// Only the tags that were found to hold uploads are offered; a tag the
+  /// site does not know answers with nothing at all.
+  static Map<String, String> get _tags {
+    final strings = AppStrings.instance;
+    return {
+      'jazz': strings.genreJazz,
+      'rock': strings.genreRock,
+      'pop': strings.genrePop,
+      'classical': strings.genreClassical,
+      'folk': strings.genreFolk,
+      'electronic': strings.audiusGenreElectronic,
+      'reggae': strings.genreReggae,
+      'funk': strings.ccmixterTagFunk,
+      'hip_hop': strings.audiusGenreHipHop,
+      'ambient': strings.ccmixterTagAmbient,
+      'chill': strings.ccmixterTagChill,
+      'instrumental': strings.ccmixterTagInstrumental,
+      'piano': strings.wikimediaCategoryPiano,
+    };
+  }
 
   @override
   bool get supportsPaging => true;
@@ -89,8 +123,15 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
         'limit': limit,
         if (request.offset > 0) 'offset': request.offset,
       };
-      if (query != null) {
-        parameters['tags'] = query;
+      final tag = request.config.setting('tag')?.trim() ?? '';
+      final tags = [
+        ?query,
+        if (tag.isNotEmpty) tag,
+      ].join(',');
+      if (tags.isNotEmpty) {
+        // The site reads the tags of an upload: several tags narrow together,
+        // so the keyword and the genre are asked for as one word.
+        parameters['tags'] = tags;
       } else if (browseModeOf(request.config) == BrowseMode.charts) {
         // The charts of the site: the uploads everybody downloaded most.
         parameters['sort'] = 'rank';

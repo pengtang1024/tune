@@ -1372,6 +1372,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
 
   @override
+  String get ccmixterFieldTag => '风格';
+
+  @override
+  String get ccmixterFieldTagHint => '站点的一个标签；关键词与风格会同时生效';
+
+  @override
+  String get ccmixterTagAll => '全部风格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛围';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器乐';
+
+  @override
   String get ccmixterHint => '填写 ccMixter 标签，例如 jazz、ambient 或 electro';
 
   @override
@@ -4856,6 +4877,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
 
   @override
+  String get ccmixterFieldTag => '风格';
+
+  @override
+  String get ccmixterFieldTagHint => '站点的一个标签；关键词与风格会同时生效';
+
+  @override
+  String get ccmixterTagAll => '全部风格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛围';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器乐';
+
+  @override
   String get ccmixterHint => '填写 ccMixter 标签，例如 jazz、ambient 或 electro';
 
   @override
@@ -8338,6 +8380,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
+
+  @override
+  String get ccmixterFieldTag => '風格';
+
+  @override
+  String get ccmixterFieldTagHint => '站點的一個標籤；關鍵字與風格會同時生效';
+
+  @override
+  String get ccmixterTagAll => '全部風格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛圍';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器樂';
 
   @override
   String get ccmixterHint => '填寫 ccMixter 標籤，例如 jazz、ambient 或 electro';

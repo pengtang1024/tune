@@ -72,6 +72,27 @@ void main() {
       expect(captured.uri?.queryParameters.containsKey('sort'), isFalse);
     });
 
+    test('ccMixter narrows the site by a genre', () async {
+      final captured = _Captured(body: '[]');
+
+      await CcMixterSourceAdapter(dio: captured.dio).scan(
+        _request('ccmixter', const {'tag': 'jazz'}),
+      );
+
+      expect(captured.uri?.queryParameters['tags'], 'jazz');
+    });
+
+    test('a keyword and a genre narrow together', () async {
+      final captured = _Captured(body: '[]');
+
+      await CcMixterSourceAdapter(dio: captured.dio).scan(
+        _request('ccmixter', const {'query': 'piano', 'tag': 'jazz'}),
+      );
+
+      // The site reads several tags as one word: both must match.
+      expect(captured.uri?.queryParameters['tags'], 'piano,jazz');
+    });
+
     test('the Internet Archive serves the audio everybody downloaded', () async {
       final captured = _Captured(body: {'response': {'docs': <dynamic>[]}});
 

@@ -1519,6 +1519,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterFieldQueryHint => 'e.g. jazz, ambient, electro';
 
   @override
+  String get ccmixterFieldTag => 'Genre';
+
+  @override
+  String get ccmixterFieldTagHint =>
+      'One tag of the site; a keyword and a tag narrow together';
+
+  @override
+  String get ccmixterTagAll => 'Every genre';
+
+  @override
+  String get ccmixterTagFunk => 'Funk';
+
+  @override
+  String get ccmixterTagAmbient => 'Ambient';
+
+  @override
+  String get ccmixterTagChill => 'Chill';
+
+  @override
+  String get ccmixterTagInstrumental => 'Instrumental';
+
+  @override
   String get ccmixterHint =>
       'Enter a ccMixter tag, e.g. jazz, ambient or electro';
 
