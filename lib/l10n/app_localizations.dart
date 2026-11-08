@@ -3125,6 +3125,30 @@ abstract class AppLocalizations {
   /// **'风格'**
   String get audiusFieldGenre;
 
+  /// No description provided for @audiusFieldMode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读取方式'**
+  String get audiusFieldMode;
+
+  /// No description provided for @audiusFieldModeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲，或站点上的歌单'**
+  String get audiusFieldModeHint;
+
+  /// No description provided for @audiusModeSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲'**
+  String get audiusModeSongs;
+
+  /// No description provided for @audiusModePlaylists.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌单'**
+  String get audiusModePlaylists;
+
   /// No description provided for @audiusFieldGenreHint.
   ///
   /// In zh_CN, this message translates to:

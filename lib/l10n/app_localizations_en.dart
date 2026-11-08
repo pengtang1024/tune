@@ -1870,6 +1870,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audiusFieldGenre => 'Reach';
 
   @override
+  String get audiusFieldMode => 'Reads';
+
+  @override
+  String get audiusFieldModeHint =>
+      'Single tracks, or the playlists of the site';
+
+  @override
+  String get audiusModeSongs => 'Single tracks';
+
+  @override
+  String get audiusModePlaylists => 'Playlists';
+
+  @override
   String get audiusFieldGenreHint =>
       'The kind of music the trending list is read for';
 

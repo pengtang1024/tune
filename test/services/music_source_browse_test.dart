@@ -39,6 +39,35 @@ void main() {
       expect(result.status, SourceScanStatus.success);
     });
 
+    test('Audius reads the playlists it ranks highest', () async {
+      final answers = _AudiusPlaylists();
+
+      final result = await AudiusSourceAdapter(dio: answers.dio).scan(
+        _request('audius', const {
+          'mode': 'playlists',
+          'window': 'week',
+          'limit': '4',
+        }),
+      );
+
+      expect(answers.uris.first.path, '/v1/playlists/trending');
+      expect(answers.uris.first.queryParameters['time'], 'week');
+      expect(answers.uris.last.path, '/v1/playlists/pl-1/tracks');
+      // A playlist holds dozens of tracks; the scan keeps the window.
+      expect(result.songs, hasLength(4));
+    });
+
+    test('a keyword reads the playlists it is found in', () async {
+      final answers = _AudiusPlaylists();
+
+      await AudiusSourceAdapter(dio: answers.dio).scan(
+        _request('audius', const {'mode': 'playlists', 'query': 'lo-fi'}),
+      );
+
+      expect(answers.uris.first.path, '/v1/playlists/search');
+      expect(answers.uris.first.queryParameters['query'], 'lo-fi');
+    });
+
     test('Audius searches when the reader names a keyword', () async {
       final captured = _Captured();
 
@@ -372,6 +401,49 @@ MusicSourceScanRequest _request(String sourceId, Map<String, String> settings) {
 
 /// A Dio that answers every request with the same body and remembers where
 /// the request went.
+
+/// Answers the playlist calls of Audius: one playlist, six tracks.
+class _AudiusPlaylists {
+  _AudiusPlaylists();
+
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          final path = options.uri.path;
+          final Object body;
+          if (path == '/v1/playlists/trending' || path == '/v1/playlists/search') {
+            body = {
+              'data': [
+                {'id': 'pl-1', 'playlist_name': 'One'},
+              ],
+            };
+          } else {
+            body = {
+              'data': [
+                for (var index = 1; index <= 6; index++)
+                  {
+                    'id': 'trk-$index',
+                    'title': 'Track $index',
+                    'user': {'name': 'Someone'},
+                  },
+              ],
+            };
+          }
+          handler.resolve(
+            Response(requestOptions: options, data: body, statusCode: 200),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
 class _Captured {
   _Captured({Object? body}) : _body = body ?? {'data': <dynamic>[]};
 

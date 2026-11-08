@@ -1700,6 +1700,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiusFieldGenre => '风格';
 
   @override
+  String get audiusFieldMode => '读取方式';
+
+  @override
+  String get audiusFieldModeHint => '单曲，或站点上的歌单';
+
+  @override
+  String get audiusModeSongs => '单曲';
+
+  @override
+  String get audiusModePlaylists => '歌单';
+
+  @override
   String get audiusFieldGenreHint => '排行榜按哪种风格读';
 
   @override
@@ -5259,6 +5271,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiusFieldGenre => '风格';
 
   @override
+  String get audiusFieldMode => '读取方式';
+
+  @override
+  String get audiusFieldModeHint => '单曲，或站点上的歌单';
+
+  @override
+  String get audiusModeSongs => '单曲';
+
+  @override
+  String get audiusModePlaylists => '歌单';
+
+  @override
   String get audiusFieldGenreHint => '排行榜按哪种风格读';
 
   @override
@@ -8816,6 +8840,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get audiusFieldGenre => '風格';
+
+  @override
+  String get audiusFieldMode => '讀取方式';
+
+  @override
+  String get audiusFieldModeHint => '單曲，或站點上的歌單';
+
+  @override
+  String get audiusModeSongs => '單曲';
+
+  @override
+  String get audiusModePlaylists => '歌單';
 
   @override
   String get audiusFieldGenreHint => '排行榜按哪種風格讀';

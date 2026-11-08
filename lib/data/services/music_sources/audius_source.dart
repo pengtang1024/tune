@@ -88,6 +88,15 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.audiusFieldQueryHint,
     ),
     MusicSourceField(
+      'mode',
+      AppStrings.instance.audiusFieldMode,
+      AppStrings.instance.audiusFieldModeHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusModeSongs),
+        MusicSourceChoice(_modePlaylists, AppStrings.instance.audiusModePlaylists),
+      ],
+    ),
+    MusicSourceField(
       'genre',
       AppStrings.instance.audiusFieldGenre,
       AppStrings.instance.audiusFieldGenreHint,
@@ -114,6 +123,76 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       numeric: true,
     ),
   ];
+
+
+  /// The name of the mode that reads playlists instead of single tracks.
+  static const _modePlaylists = 'playlists';
+
+  /// How many playlists one scan of the playlist mode reads.
+  static const _playlistsPerScan = 3;
+
+  /// The songs of the playlists the site ranks highest, or of the playlists a
+  /// keyword is found in.
+  ///
+  /// A playlist holds dozens of tracks, so the scan keeps the window of the
+  /// limit from each of them instead of handing the whole list over.
+  Future<SourceScanResult> _playlistsScan(
+    MusicSourceScanRequest request, {
+    required String? query,
+    required int limit,
+  }) async {
+    final config = request.config;
+    try {
+      final window = config.setting('window')?.trim() ?? '';
+      final catalogues = await _dio.get<Map<String, dynamic>>(
+        query == null
+            ? '$_discoveryHost/v1/playlists/trending'
+            : '$_discoveryHost/v1/playlists/search',
+        queryParameters: {
+          'app_name': _appName,
+          'limit': '$_playlistsPerScan',
+          'query': ?query,
+          if (query == null && window.isNotEmpty) 'time': window,
+        },
+      );
+      final playlists = catalogues.data?['data'];
+      if (playlists is! List) {
+        return failedResult(
+          config.id,
+          AppStrings.instance.audiusEmptyResponse,
+        );
+      }
+
+      final songs = <Song>[];
+      for (final playlist in playlists) {
+        if (playlist is! Map) continue;
+        final id = playlist['id']?.toString() ?? '';
+        if (id.isEmpty) continue;
+
+        final tracks = await _dio.get<Map<String, dynamic>>(
+          '$_discoveryHost/v1/playlists/$id/tracks',
+          queryParameters: {'app_name': _appName},
+        );
+        final entries = tracks.data?['data'];
+        if (entries is! List) continue;
+        final fromPlaylist = parseResults(
+          {'data': entries},
+          sourceId: config.id,
+          limit: limit,
+        );
+        songs.addAll(fromPlaylist);
+      }
+
+      return SourceScanResult(
+        sourceId: config.id,
+        status: SourceScanStatus.success,
+        songs: songs,
+        message: songs.isEmpty ? AppStrings.instance.audiusNoMatch : null,
+      );
+    } catch (error) {
+      return failedResult(config.id, error);
+    }
+  }
 
   /// The name of a reach in the language of the app.
   static String _genreLabel(String genre) {
@@ -158,6 +237,11 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
+    final limit = scanLimit.read(request.config.setting('limit'));
+
+    if (request.config.setting('mode') == _modePlaylists) {
+      return _playlistsScan(request, query: query, limit: limit);
+    }
 
     try {
       // Without a keyword the scan pulls the tracks everybody plays; with
@@ -186,7 +270,6 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final limit = scanLimit.read(request.config.setting('limit'));
       final songs = parseResults(
         data,
         sourceId: request.config.id,

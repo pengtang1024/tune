@@ -686,6 +686,45 @@ void main() async {
   );
 
   test(
+    'the playlist mode of Audius reads whole playlists',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final playlists = <String, Set<String>>{};
+      for (final settings in const [
+        {'query': '', 'mode': 'playlists', 'limit': '4'},
+        {'query': 'lo-fi', 'mode': 'playlists', 'limit': '4'},
+      ]) {
+        final label = settings['query']!.isEmpty ? 'trending' : settings['query']!;
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.audius.copyWith(settings: settings),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$label failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: label);
+        // Three playlists at most, the window of the limit from each.
+        expect(result.songs.length, lessThanOrEqualTo(12));
+        playlists[label] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The chart and the search are separate lists of the site.
+      expect(playlists['trending'], isNot(equals(playlists['lo-fi'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'a tongue of the archive answers audio of that tongue',
     () async {
       final service = MusicSourceService(
