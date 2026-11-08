@@ -267,6 +267,38 @@ void main() async {
   );
 
   test(
+    'the Deezer charts answer with playable previews',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final reach in const ['', 'jazz', 'classical']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {'query': '', 'genre': reach, 'limit': '3'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: 'Deezer $reach failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: 'Deezer $reach was empty');
+        expect(result.songs.first.streamUrl, contains('.mp3'));
+        expect(result.songs.first.duration, 30000);
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the reaches of Audius answer with tracks of that reach',
     () async {
       final service = MusicSourceService(

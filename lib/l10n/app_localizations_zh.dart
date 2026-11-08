@@ -1815,6 +1815,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get itunesModeAlbums => '专辑';
 
   @override
+  String get sourceDeezerName => 'Deezer 试听';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
+
+  @override
+  String get deezerHint => '填关键词，留空则读排行榜';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '风格';
+
+  @override
+  String get deezerFieldGenreHint => '不填关键词时读哪个榜单';
+
+  @override
+  String get deezerGenreAll => '全部榜单';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 返回了空响应';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上没有匹配的歌曲';
+
+  @override
+  String get deezerPreviewNote => '这首歌的 30 秒试听';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -5005,6 +5035,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get itunesModeAlbums => '专辑';
 
   @override
+  String get sourceDeezerName => 'Deezer 试听';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
+
+  @override
+  String get deezerHint => '填关键词，留空则读排行榜';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '风格';
+
+  @override
+  String get deezerFieldGenreHint => '不填关键词时读哪个榜单';
+
+  @override
+  String get deezerGenreAll => '全部榜单';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 返回了空响应';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上没有匹配的歌曲';
+
+  @override
+  String get deezerPreviewNote => '这首歌的 30 秒试听';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -8193,6 +8253,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get itunesModeAlbums => '專輯';
+
+  @override
+  String get sourceDeezerName => 'Deezer 試聽';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲庫裡每首歌的 30 秒試聽';
+
+  @override
+  String get deezerHint => '填關鍵字，留空則讀排行榜';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '風格';
+
+  @override
+  String get deezerFieldGenreHint => '不填關鍵字時讀哪個榜單';
+
+  @override
+  String get deezerGenreAll => '全部榜單';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 傳回了空回應';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上沒有符合的歌曲';
+
+  @override
+  String get deezerPreviewNote => '這首歌的 30 秒試聽';
 
   @override
   String get sourceKodiName => '自架 Kodi 媒體庫';

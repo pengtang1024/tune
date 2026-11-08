@@ -3365,6 +3365,66 @@ abstract class AppLocalizations {
   /// **'专辑'**
   String get itunesModeAlbums;
 
+  /// No description provided for @sourceDeezerName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Deezer 试听'**
+  String get sourceDeezerName;
+
+  /// No description provided for @sourceDeezerDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Deezer 曲库里每首歌的 30 秒试听'**
+  String get sourceDeezerDescription;
+
+  /// No description provided for @deezerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填关键词，留空则读排行榜'**
+  String get deezerHint;
+
+  /// No description provided for @deezerFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 miles davis、kind of blue'**
+  String get deezerFieldQueryHint;
+
+  /// No description provided for @deezerFieldGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'风格'**
+  String get deezerFieldGenre;
+
+  /// No description provided for @deezerFieldGenreHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不填关键词时读哪个榜单'**
+  String get deezerFieldGenreHint;
+
+  /// No description provided for @deezerGenreAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部榜单'**
+  String get deezerGenreAll;
+
+  /// No description provided for @deezerEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Deezer 返回了空响应'**
+  String get deezerEmptyResponse;
+
+  /// No description provided for @deezerNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Deezer 上没有匹配的歌曲'**
+  String get deezerNoMatch;
+
+  /// No description provided for @deezerPreviewNote.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这首歌的 30 秒试听'**
+  String get deezerPreviewNote;
+
   /// No description provided for @sourceKodiName.
   ///
   /// In zh_CN, this message translates to:

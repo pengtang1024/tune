@@ -125,6 +125,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'deezer',
+        name: 'Deezer',
+        localizedName: strings.sourceDeezerName,
+        description: strings.sourceDeezerDescription,
+        kind: MusicSourceKind.openCatalog,
+      ),
+      SourceTypeDescriptor(
         type: 'itunes',
         name: 'iTunes',
         localizedName: strings.sourceItunesName,

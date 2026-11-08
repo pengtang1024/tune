@@ -127,6 +127,11 @@ class BuiltInMusicSources {
       ),
       _instance(
         types,
+        'deezer',
+        settings: {'query': '', 'genre': ''},
+      ),
+      _instance(
+        types,
         'itunes',
         enabled: false,
         settings: {'query': '', 'country': 'US'},
@@ -354,6 +359,9 @@ class BuiltInMusicSources {
 
   /// The source of the previews of the iTunes store.
   static MusicSourceConfig get itunes => _entry('itunes');
+
+  /// The source of the previews of the Deezer catalogue.
+  static MusicSourceConfig get deezer => _entry('deezer');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

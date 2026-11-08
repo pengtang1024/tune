@@ -2008,6 +2008,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itunesModeAlbums => 'Albums';
 
   @override
+  String get sourceDeezerName => 'Deezer previews';
+
+  @override
+  String get sourceDeezerDescription =>
+      'Thirty-second previews of the songs of the Deezer catalogue';
+
+  @override
+  String get deezerHint =>
+      'Type a keyword, or leave it empty to read the charts';
+
+  @override
+  String get deezerFieldQueryHint => 'e.g. miles davis, kind of blue';
+
+  @override
+  String get deezerFieldGenre => 'Reach';
+
+  @override
+  String get deezerFieldGenreHint =>
+      'The chart to read when no keyword is written';
+
+  @override
+  String get deezerGenreAll => 'Every reach';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer returned an empty response';
+
+  @override
+  String get deezerNoMatch => 'No matching song on Deezer';
+
+  @override
+  String get deezerPreviewNote => 'Thirty-second preview of the song';
+
+  @override
   String get sourceKodiName => 'Kodi';
 
   @override
