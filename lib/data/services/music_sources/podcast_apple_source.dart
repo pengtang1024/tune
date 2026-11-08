@@ -26,6 +26,33 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
   static const _episodesPerPodcast = 3;
 
   static const _chartsHost = 'https://itunes.apple.com';
+
+  /// The categories the store ranks its podcasts in, by the id it files them
+  /// under. The ids are the ones `ws/genres?id=26` answers with.
+  static Map<String, String> get _genres {
+    final strings = AppStrings.instance;
+    return {
+      '1301': strings.podcastAppleGenreArts,
+      '1321': strings.podcastAppleGenreBusiness,
+      '1303': strings.podcastAppleGenreComedy,
+      '1304': strings.podcastAppleGenreEducation,
+      '1483': strings.podcastAppleGenreFiction,
+      '1511': strings.podcastAppleGenreGovernment,
+      '1512': strings.podcastAppleGenreHealth,
+      '1487': strings.podcastAppleGenreHistory,
+      '1305': strings.podcastAppleGenreKids,
+      '1502': strings.podcastAppleGenreLeisure,
+      '1310': strings.podcastAppleGenreMusic,
+      '1489': strings.podcastAppleGenreNews,
+      '1314': strings.podcastAppleGenreReligion,
+      '1533': strings.podcastAppleGenreScience,
+      '1545': strings.podcastAppleGenreSports,
+      '1309': strings.podcastAppleGenreFilm,
+      '1318': strings.podcastAppleGenreTechnology,
+      '1488': strings.podcastAppleGenreTrueCrime,
+      '1324': strings.podcastAppleGenreSociety,
+    };
+  }
   static const _searchHost = 'https://itunes.apple.com/search';
   static const _lookupHost = 'https://itunes.apple.com/lookup';
 
@@ -75,6 +102,16 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       defaultValue: 'US',
     ),
     MusicSourceField(
+      'genre',
+      AppStrings.instance.podcastAppleFieldGenre,
+      AppStrings.instance.podcastAppleFieldGenreHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.podcastAppleGenreAll),
+        for (final entry in _genres.entries)
+          MusicSourceChoice(entry.key, entry.value),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -98,7 +135,11 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
       final keyword = request.config.setting('query')?.trim() ?? '';
 
       final feeds = keyword.isEmpty
-          ? await _chartFeeds(country, limit)
+          ? await _chartFeeds(
+              country,
+              limit,
+              genre: request.config.setting('genre')?.trim() ?? '',
+            )
           : await _searchFeeds(keyword, country, limit);
       if (feeds.isEmpty) {
         return SourceScanResult(
@@ -143,10 +184,18 @@ class PodcastAppleSourceAdapter extends MusicSourceAdapter {
   ///
   /// The chart answer names the shows by their Apple id; the feed of a show
   /// comes from one lookup of those ids, and the chart order is kept so the
-  /// top show is read first.
-  Future<List<String>> _chartFeeds(String country, int limit) async {
+  /// top show is read first. A genre narrows the chart to one category of the
+  /// store; the id is one of [_genres], which are the ids the store answered
+  /// with rather than numbers guessed here.
+  Future<List<String>> _chartFeeds(
+    String country,
+    int limit, {
+    String genre = '',
+  }) async {
+    final wanted = _genres.containsKey(genre) ? 'genre=$genre/' : '';
     final response = await _dio.get<String>(
-      '$_chartsHost/${country.toLowerCase()}/rss/toppodcasts/limit=$limit/json',
+      '$_chartsHost/${country.toLowerCase()}/rss/toppodcasts/limit=$limit/'
+      '${wanted}json',
       options: Options(responseType: ResponseType.plain),
     );
     final ids = parseTopIds(_decode(response.data));

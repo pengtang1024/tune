@@ -80,6 +80,46 @@ void main() {
       );
     });
 
+    test('a category narrows the chart to one of its own', () async {
+      final server = _AppleServer();
+      final adapter = PodcastAppleSourceAdapter(dio: server.dio);
+
+      await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(
+            settings: const {'country': 'US', 'genre': '1318', 'limit': '2'},
+          ),
+        ),
+      );
+
+      // The store files a category under its own number, and the chart of
+      // that category is a path of its own.
+      expect(
+        server.requests.first.uri.path,
+        '/us/rss/toppodcasts/limit=2/genre=1318/json',
+      );
+    });
+
+    test('a number the store does not file is not put in the path', () async {
+      final server = _AppleServer();
+      final adapter = PodcastAppleSourceAdapter(dio: server.dio);
+
+      await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(
+            settings: const {'country': 'US', 'genre': '9999', 'limit': '2'},
+          ),
+        ),
+      );
+
+      // A number the store does not know would answer with another chart, so
+      // the whole chart is read instead of pretending to narrow it.
+      expect(
+        server.requests.first.uri.path,
+        '/us/rss/toppodcasts/limit=2/json',
+      );
+    });
+
     test('a broken feed leaves the other shows in the scan', () async {
       final server = _AppleServer(
         brokenFeed: 'https://feeds.example.com/one.xml',

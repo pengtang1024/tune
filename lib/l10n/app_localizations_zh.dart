@@ -1513,6 +1513,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
 
   @override
+  String get podcastAppleFieldGenre => '类别';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
+
+  @override
+  String get podcastAppleGenreAll => '全部类别';
+
+  @override
+  String get podcastAppleGenreArts => '艺术';
+
+  @override
+  String get podcastAppleGenreBusiness => '商业';
+
+  @override
+  String get podcastAppleGenreComedy => '喜剧';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虚构';
+
+  @override
+  String get podcastAppleGenreGovernment => '政务';
+
+  @override
+  String get podcastAppleGenreHealth => '健康与健身';
+
+  @override
+  String get podcastAppleGenreHistory => '历史';
+
+  @override
+  String get podcastAppleGenreKids => '儿童与家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休闲';
+
+  @override
+  String get podcastAppleGenreMusic => '音乐';
+
+  @override
+  String get podcastAppleGenreNews => '新闻';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教与心灵';
+
+  @override
+  String get podcastAppleGenreScience => '科学';
+
+  @override
+  String get podcastAppleGenreSports => '体育';
+
+  @override
+  String get podcastAppleGenreFilm => '影视';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真实犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社会与文化';
+
+  @override
   String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
 
   @override
@@ -4911,6 +4977,72 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
 
   @override
+  String get podcastAppleFieldGenre => '类别';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
+
+  @override
+  String get podcastAppleGenreAll => '全部类别';
+
+  @override
+  String get podcastAppleGenreArts => '艺术';
+
+  @override
+  String get podcastAppleGenreBusiness => '商业';
+
+  @override
+  String get podcastAppleGenreComedy => '喜剧';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虚构';
+
+  @override
+  String get podcastAppleGenreGovernment => '政务';
+
+  @override
+  String get podcastAppleGenreHealth => '健康与健身';
+
+  @override
+  String get podcastAppleGenreHistory => '历史';
+
+  @override
+  String get podcastAppleGenreKids => '儿童与家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休闲';
+
+  @override
+  String get podcastAppleGenreMusic => '音乐';
+
+  @override
+  String get podcastAppleGenreNews => '新闻';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教与心灵';
+
+  @override
+  String get podcastAppleGenreScience => '科学';
+
+  @override
+  String get podcastAppleGenreSports => '体育';
+
+  @override
+  String get podcastAppleGenreFilm => '影视';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真实犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社会与文化';
+
+  @override
   String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
 
   @override
@@ -8307,6 +8439,72 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastAppleFieldCountryHint => '兩位國家代碼，例如 US、CN';
+
+  @override
+  String get podcastAppleFieldGenre => '類別';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜單的一個類別';
+
+  @override
+  String get podcastAppleGenreAll => '全部類別';
+
+  @override
+  String get podcastAppleGenreArts => '藝術';
+
+  @override
+  String get podcastAppleGenreBusiness => '商業';
+
+  @override
+  String get podcastAppleGenreComedy => '喜劇';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虛構';
+
+  @override
+  String get podcastAppleGenreGovernment => '政務';
+
+  @override
+  String get podcastAppleGenreHealth => '健康與健身';
+
+  @override
+  String get podcastAppleGenreHistory => '歷史';
+
+  @override
+  String get podcastAppleGenreKids => '兒童與家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休閒';
+
+  @override
+  String get podcastAppleGenreMusic => '音樂';
+
+  @override
+  String get podcastAppleGenreNews => '新聞';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教與心靈';
+
+  @override
+  String get podcastAppleGenreScience => '科學';
+
+  @override
+  String get podcastAppleGenreSports => '體育';
+
+  @override
+  String get podcastAppleGenreFilm => '影視';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真實犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社會與文化';
 
   @override
   String get podcastAppleNoMatch => 'Apple 播客目錄裡沒有符合的節目';

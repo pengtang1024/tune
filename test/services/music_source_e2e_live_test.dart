@@ -686,6 +686,46 @@ void main() async {
   );
 
   test(
+    'the category of the podcast chart answers its own shows',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final charts = <String, Set<String>>{};
+      for (final genre in const ['1303', '1318', '1489']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.podcastApple.copyWith(
+              settings: {
+                'query': '',
+                'country': 'US',
+                'genre': genre,
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        charts[genre] = result.songs.map((song) => song.album).toSet();
+      }
+
+      // Comedy and News are separate charts of the store.
+      expect(charts['1303'], isNot(equals(charts['1489'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the spoken categories of the commons answer with their own audio',
     () async {
       final service = MusicSourceService(

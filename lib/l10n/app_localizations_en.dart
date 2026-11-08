@@ -1674,6 +1674,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get podcastAppleFieldCountryHint => 'Two-letter code, e.g. US, CN';
 
   @override
+  String get podcastAppleFieldGenre => 'Category';
+
+  @override
+  String get podcastAppleFieldGenreHint => 'One category of the store chart';
+
+  @override
+  String get podcastAppleGenreAll => 'All categories';
+
+  @override
+  String get podcastAppleGenreArts => 'Arts';
+
+  @override
+  String get podcastAppleGenreBusiness => 'Business';
+
+  @override
+  String get podcastAppleGenreComedy => 'Comedy';
+
+  @override
+  String get podcastAppleGenreEducation => 'Education';
+
+  @override
+  String get podcastAppleGenreFiction => 'Fiction';
+
+  @override
+  String get podcastAppleGenreGovernment => 'Government';
+
+  @override
+  String get podcastAppleGenreHealth => 'Health & fitness';
+
+  @override
+  String get podcastAppleGenreHistory => 'History';
+
+  @override
+  String get podcastAppleGenreKids => 'Kids & family';
+
+  @override
+  String get podcastAppleGenreLeisure => 'Leisure';
+
+  @override
+  String get podcastAppleGenreMusic => 'Music';
+
+  @override
+  String get podcastAppleGenreNews => 'News';
+
+  @override
+  String get podcastAppleGenreReligion => 'Religion & spirituality';
+
+  @override
+  String get podcastAppleGenreScience => 'Science';
+
+  @override
+  String get podcastAppleGenreSports => 'Sports';
+
+  @override
+  String get podcastAppleGenreFilm => 'TV & film';
+
+  @override
+  String get podcastAppleGenreTechnology => 'Technology';
+
+  @override
+  String get podcastAppleGenreTrueCrime => 'True crime';
+
+  @override
+  String get podcastAppleGenreSociety => 'Society & culture';
+
+  @override
   String get podcastAppleNoMatch => 'No matching show in the Apple directory';
 
   @override

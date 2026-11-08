@@ -2759,6 +2759,138 @@ abstract class AppLocalizations {
   /// **'两位国家代码，例如 US、CN'**
   String get podcastAppleFieldCountryHint;
 
+  /// No description provided for @podcastAppleFieldGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'类别'**
+  String get podcastAppleFieldGenre;
+
+  /// No description provided for @podcastAppleFieldGenreHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看商店榜单的一个类别'**
+  String get podcastAppleFieldGenreHint;
+
+  /// No description provided for @podcastAppleGenreAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部类别'**
+  String get podcastAppleGenreAll;
+
+  /// No description provided for @podcastAppleGenreArts.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'艺术'**
+  String get podcastAppleGenreArts;
+
+  /// No description provided for @podcastAppleGenreBusiness.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'商业'**
+  String get podcastAppleGenreBusiness;
+
+  /// No description provided for @podcastAppleGenreComedy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'喜剧'**
+  String get podcastAppleGenreComedy;
+
+  /// No description provided for @podcastAppleGenreEducation.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'教育'**
+  String get podcastAppleGenreEducation;
+
+  /// No description provided for @podcastAppleGenreFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'虚构'**
+  String get podcastAppleGenreFiction;
+
+  /// No description provided for @podcastAppleGenreGovernment.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'政务'**
+  String get podcastAppleGenreGovernment;
+
+  /// No description provided for @podcastAppleGenreHealth.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'健康与健身'**
+  String get podcastAppleGenreHealth;
+
+  /// No description provided for @podcastAppleGenreHistory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'历史'**
+  String get podcastAppleGenreHistory;
+
+  /// No description provided for @podcastAppleGenreKids.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'儿童与家庭'**
+  String get podcastAppleGenreKids;
+
+  /// No description provided for @podcastAppleGenreLeisure.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'休闲'**
+  String get podcastAppleGenreLeisure;
+
+  /// No description provided for @podcastAppleGenreMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐'**
+  String get podcastAppleGenreMusic;
+
+  /// No description provided for @podcastAppleGenreNews.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新闻'**
+  String get podcastAppleGenreNews;
+
+  /// No description provided for @podcastAppleGenreReligion.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'宗教与心灵'**
+  String get podcastAppleGenreReligion;
+
+  /// No description provided for @podcastAppleGenreScience.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科学'**
+  String get podcastAppleGenreScience;
+
+  /// No description provided for @podcastAppleGenreSports.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'体育'**
+  String get podcastAppleGenreSports;
+
+  /// No description provided for @podcastAppleGenreFilm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'影视'**
+  String get podcastAppleGenreFilm;
+
+  /// No description provided for @podcastAppleGenreTechnology.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科技'**
+  String get podcastAppleGenreTechnology;
+
+  /// No description provided for @podcastAppleGenreTrueCrime.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'真实犯罪'**
+  String get podcastAppleGenreTrueCrime;
+
+  /// No description provided for @podcastAppleGenreSociety.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社会与文化'**
+  String get podcastAppleGenreSociety;
+
   /// No description provided for @podcastAppleNoMatch.
   ///
   /// In zh_CN, this message translates to:
