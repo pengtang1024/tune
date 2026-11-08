@@ -71,6 +71,38 @@ void main() async {
   );
 
   test(
+    'the built-in PeerTube source plays audio files of the federation',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The instance the app ships with, in its music category.
+      final peers = await service.scanAll(
+        sources: [BuiltInMusicSources.peerTube],
+        localPaths: const [],
+      );
+
+      final result = peers.single;
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'peertube failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.title, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      expect(song.externalId, isNotNull);
+      expect(song.duration, greaterThan(0));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the built-in archive collections expand their items into tracks',
     () async {
       final service = MusicSourceService(

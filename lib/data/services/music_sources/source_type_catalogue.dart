@@ -118,6 +118,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'peertube',
+        name: 'PeerTube',
+        localizedName: strings.sourcePeerTubeName,
+        description: strings.sourcePeerTubeDescription,
+        kind: MusicSourceKind.openCatalog,
+      ),
+      SourceTypeDescriptor(
         type: 'audius',
         name: 'Audius',
         localizedName: strings.sourceAudiusName,

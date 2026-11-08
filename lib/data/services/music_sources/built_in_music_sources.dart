@@ -95,6 +95,15 @@ class BuiltInMusicSources {
         enabled: false,
         settings: {'server': '', 'email': '', 'password': '', 'query': ''},
       ),
+      _instance(
+        types,
+        'peertube',
+        settings: {
+          'server': 'https://framatube.org',
+          'query': '',
+          'category': 'music',
+        },
+      ),
       _instance(types, 'audius'),
       _instance(types, 'radio', settings: {'provider': 'all', 'query': ''}),
       _instance(
@@ -284,6 +293,9 @@ class BuiltInMusicSources {
   static MusicSourceConfig get ampache => _entry('ampache');
 
   static MusicSourceConfig get koel => _entry('koel');
+
+  /// The source of the music published on a PeerTube server.
+  static MusicSourceConfig get peerTube => _entry('peertube');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

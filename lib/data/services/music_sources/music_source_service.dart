@@ -6,6 +6,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/ampache_source.dart';
 import 'package:tune/data/services/music_sources/koel_source.dart';
+import 'package:tune/data/services/music_sources/peertube_source.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/azuracast_source.dart';
 import 'package:tune/data/services/music_sources/audiobookshelf_source.dart';
@@ -85,6 +86,7 @@ class MusicSourceService implements StreamUrlResolver {
       'subsonic': SubsonicSourceAdapter(dio: dio),
       'ampache': AmpacheSourceAdapter(dio: dio),
       'koel': KoelSourceAdapter(dio: dio),
+      'peertube': PeerTubeSourceAdapter(dio: dio),
       'audius': AudiusSourceAdapter(dio: dio),
       'radio': RadioSourceAdapter(dio: dio),
       'azuracast': AzuracastSourceAdapter(dio: dio),

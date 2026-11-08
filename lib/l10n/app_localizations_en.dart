@@ -1855,6 +1855,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Koel account uses two-factor sign-in, which this source cannot do';
 
   @override
+  String get sourcePeerTubeName => 'PeerTube music';
+
+  @override
+  String get sourcePeerTubeDescription =>
+      'Music and live sessions from federated PeerTube servers';
+
+  @override
+  String get peerTubeHint => 'Type the address of a PeerTube server';
+
+  @override
+  String get peerTubeFieldServerHint => 'e.g. https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get peerTubeCategory => 'Catalogue';
+
+  @override
+  String get peerTubeCategoryHint => 'Music only, or everything the server has';
+
+  @override
+  String get peerTubeCategoryMusic => 'Music only';
+
+  @override
+  String get peerTubeCategoryAll => 'Everything';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube returned an empty response';
+
+  @override
+  String get peerTubeNoMatch => 'No matching tracks on PeerTube';
+
+  @override
   String get sourcePlexName => 'Media library';
 
   @override

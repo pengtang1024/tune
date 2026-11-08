@@ -3077,6 +3077,72 @@ abstract class AppLocalizations {
   /// **'Koel 账号开启了两步验证，此音源无法登录'**
   String get koelTwoFactor;
 
+  /// No description provided for @sourcePeerTubeName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'PeerTube 音乐'**
+  String get sourcePeerTubeName;
+
+  /// No description provided for @sourcePeerTubeDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'联邦 PeerTube 服务器上的音乐与现场演出'**
+  String get sourcePeerTubeDescription;
+
+  /// No description provided for @peerTubeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 PeerTube 服务器地址'**
+  String get peerTubeHint;
+
+  /// No description provided for @peerTubeFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 https://framatube.org'**
+  String get peerTubeFieldServerHint;
+
+  /// No description provided for @peerTubeFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、钢琴'**
+  String get peerTubeFieldQueryHint;
+
+  /// No description provided for @peerTubeCategory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'目录'**
+  String get peerTubeCategory;
+
+  /// No description provided for @peerTubeCategoryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看音乐，或看服务器上的全部内容'**
+  String get peerTubeCategoryHint;
+
+  /// No description provided for @peerTubeCategoryMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看音乐'**
+  String get peerTubeCategoryMusic;
+
+  /// No description provided for @peerTubeCategoryAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部内容'**
+  String get peerTubeCategoryAll;
+
+  /// No description provided for @peerTubeEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'PeerTube 返回了空响应'**
+  String get peerTubeEmptyResponse;
+
+  /// No description provided for @peerTubeNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'PeerTube 上没有匹配的曲目'**
+  String get peerTubeNoMatch;
+
   /// No description provided for @sourcePlexName.
   ///
   /// In zh_CN, this message translates to:

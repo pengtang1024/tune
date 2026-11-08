@@ -1669,6 +1669,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourcePeerTubeName => 'PeerTube 音乐';
+
+  @override
+  String get sourcePeerTubeDescription => '联邦 PeerTube 服务器上的音乐与现场演出';
+
+  @override
+  String get peerTubeHint => '填写 PeerTube 服务器地址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get peerTubeCategory => '目录';
+
+  @override
+  String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音乐';
+
+  @override
+  String get peerTubeCategoryAll => '全部内容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 返回了空响应';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上没有匹配的曲目';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -4623,6 +4656,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourcePeerTubeName => 'PeerTube 音乐';
+
+  @override
+  String get sourcePeerTubeDescription => '联邦 PeerTube 服务器上的音乐与现场演出';
+
+  @override
+  String get peerTubeHint => '填写 PeerTube 服务器地址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get peerTubeCategory => '目录';
+
+  @override
+  String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音乐';
+
+  @override
+  String get peerTubeCategoryAll => '全部内容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 返回了空响应';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上没有匹配的曲目';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -7575,6 +7641,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get koelTwoFactor => 'Koel 帳號開啟了兩步驗證，此音源無法登入';
+
+  @override
+  String get sourcePeerTubeName => 'PeerTube 音樂';
+
+  @override
+  String get sourcePeerTubeDescription => '聯邦 PeerTube 伺服器上的音樂與現場演出';
+
+  @override
+  String get peerTubeHint => '填寫 PeerTube 伺服器位址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get peerTubeCategory => '目錄';
+
+  @override
+  String get peerTubeCategoryHint => '只看音樂，或看伺服器上的全部內容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音樂';
+
+  @override
+  String get peerTubeCategoryAll => '全部內容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 傳回了空回應';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上沒有符合的曲目';
 
   @override
   String get sourcePlexName => '自架媒體庫';

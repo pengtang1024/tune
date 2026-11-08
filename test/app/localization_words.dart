@@ -17,6 +17,7 @@ const List<String> properNames = [
   'Subsonic',
   'Ampache',
   'Koel',
+  'PeerTube',
   'AzuraCast',
   'Jellyfin',
   'Emby',
