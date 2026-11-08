@@ -2825,6 +2825,18 @@ abstract class AppLocalizations {
   /// **'档案里归在诗歌名下的朗读'**
   String get sourcePoetryDescription;
 
+  /// No description provided for @sourcePoetryBooksName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'诗集'**
+  String get sourcePoetryBooksName;
+
+  /// No description provided for @sourcePoetryBooksDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案里归在诗歌名下的整本朗读（不含 LibriVox）'**
+  String get sourcePoetryBooksDescription;
+
   /// No description provided for @sourceScienceTalksName.
   ///
   /// In zh_CN, this message translates to:

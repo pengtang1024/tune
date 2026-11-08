@@ -876,6 +876,8 @@
   "sourceNewsRecordingsDescription": "News broadcasts the archive keeps as recordings",
   "sourcePoetryName": "Poetry readings",
   "sourcePoetryDescription": "Poems read aloud, the ones the archive files under poetry",
+  "sourcePoetryBooksName": "Poetry books",
+  "sourcePoetryBooksDescription": "Books of poems read aloud, the ones the archive files under poetry",
   "sourceScienceTalksName": "Science talks",
   "sourceScienceTalksDescription": "Science programmes and talks the archive keeps as audio",
   "sourcePodcastRssDescription": "Turns any podcast RSS feed into playable episodes",

@@ -1550,6 +1550,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
 
   @override
+  String get sourcePoetryBooksName => '诗集';
+
+  @override
+  String get sourcePoetryBooksDescription => '档案里归在诗歌名下的整本朗读（不含 LibriVox）';
+
+  @override
   String get sourceScienceTalksName => '科学讲座';
 
   @override
@@ -5251,6 +5257,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
 
   @override
+  String get sourcePoetryBooksName => '诗集';
+
+  @override
+  String get sourcePoetryBooksDescription => '档案里归在诗歌名下的整本朗读（不含 LibriVox）';
+
+  @override
   String get sourceScienceTalksName => '科学讲座';
 
   @override
@@ -8950,6 +8962,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcePoetryDescription => '檔案裡歸在詩歌名下的朗讀';
+
+  @override
+  String get sourcePoetryBooksName => '詩集';
+
+  @override
+  String get sourcePoetryBooksDescription => '檔案裡歸在詩歌名下的整本朗讀（不含 LibriVox）';
 
   @override
   String get sourceScienceTalksName => '科學講座';

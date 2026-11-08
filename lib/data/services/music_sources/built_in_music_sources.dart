@@ -146,6 +146,20 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'poetry_books',
+        name: strings.sourcePoetryBooksName,
+        description: strings.sourcePoetryBooksDescription,
+        settings: {
+          // The books of poems the archive keeps are mostly the ones LibriVox
+          // recorded; the catalogue has an adapter of its own, so the reach
+          // leaves them out and keeps what only the archive holds.
+          'query': 'collection:audio_bookspoetry AND mediatype:audio '
+              'AND subject:(poetry) AND NOT collection:librivoxaudio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'science_talks',
         name: strings.sourceScienceTalksName,
         description: strings.sourceScienceTalksDescription,
@@ -445,6 +459,9 @@ class BuiltInMusicSources {
 
   /// The source of the news broadcasts the archive keeps.
   static MusicSourceConfig get newsRecordings => _entry('news_recordings');
+
+  /// The source of the books of poems the archive keeps outside LibriVox.
+  static MusicSourceConfig get poetryBooks => _entry('poetry_books');
 
   /// The source of the science programmes the archive keeps.
   static MusicSourceConfig get scienceTalks => _entry('science_talks');
