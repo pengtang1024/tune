@@ -160,6 +160,43 @@ void main() {
       expect(answers.uris.first.queryParameters.containsKey('title'), isFalse);
     });
 
+    test('a kind of book narrows the catalogue', () async {
+      final answers = _Replies([
+        {
+          'books': [_book()],
+        },
+        _feedXml(),
+      ]);
+
+      final result = await LibrivoxSourceAdapter(dio: answers.dio).scan(
+        _request('librivox', const {'genre': 'Poetry'}),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(2));
+      expect(answers.uris.first.queryParameters['genre'], 'Poetry');
+    });
+
+    test('a keyword searches inside the kind of book too', () async {
+      final answers = _Replies([
+        {
+          'books': [_book()],
+        },
+        {'error': 'Audiobooks could not be found'},
+        _feedXml(),
+      ]);
+
+      await LibrivoxSourceAdapter(dio: answers.dio).scan(
+        _request('librivox', const {'genre': 'Poetry', 'query': 'Dickens'}),
+      );
+
+      final searched = answers.uris.take(2);
+      expect(
+        searched.every((uri) => uri.queryParameters['genre'] == 'Poetry'),
+        isTrue,
+      );
+    });
+
     test('a scan with a keyword asks twice, by title and by author', () async {
       final answers = _Replies([
         {

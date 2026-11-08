@@ -3503,6 +3503,66 @@ abstract class AppLocalizations {
   /// **'输入书名或作者，留空则浏览最热门的有声书'**
   String get librivoxHint;
 
+  /// No description provided for @librivoxFieldGenre.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'书籍类型'**
+  String get librivoxFieldGenre;
+
+  /// No description provided for @librivoxFieldGenreHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'目录里的一个门类'**
+  String get librivoxFieldGenreHint;
+
+  /// No description provided for @librivoxGenreAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部门类'**
+  String get librivoxGenreAll;
+
+  /// No description provided for @librivoxGenreFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'小说'**
+  String get librivoxGenreFiction;
+
+  /// No description provided for @librivoxGenrePoetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'诗歌'**
+  String get librivoxGenrePoetry;
+
+  /// No description provided for @librivoxGenreHistory.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'历史'**
+  String get librivoxGenreHistory;
+
+  /// No description provided for @librivoxGenreRomance.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'爱情'**
+  String get librivoxGenreRomance;
+
+  /// No description provided for @librivoxGenreScienceFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科幻'**
+  String get librivoxGenreScienceFiction;
+
+  /// No description provided for @librivoxGenreBiography.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'传记'**
+  String get librivoxGenreBiography;
+
+  /// No description provided for @librivoxGenreEssays.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'随笔'**
+  String get librivoxGenreEssays;
+
   /// No description provided for @librivoxFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

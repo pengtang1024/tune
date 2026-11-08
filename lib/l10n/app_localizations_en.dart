@@ -2086,6 +2086,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a book or an author, or leave it empty to browse the most popular audiobooks';
 
   @override
+  String get librivoxFieldGenre => 'Kind of book';
+
+  @override
+  String get librivoxFieldGenreHint => 'The shelf of the catalogue to read';
+
+  @override
+  String get librivoxGenreAll => 'Every kind';
+
+  @override
+  String get librivoxGenreFiction => 'Fiction';
+
+  @override
+  String get librivoxGenrePoetry => 'Poetry';
+
+  @override
+  String get librivoxGenreHistory => 'History';
+
+  @override
+  String get librivoxGenreRomance => 'Romance';
+
+  @override
+  String get librivoxGenreScienceFiction => 'Science fiction';
+
+  @override
+  String get librivoxGenreBiography => 'Biography';
+
+  @override
+  String get librivoxGenreEssays => 'Essays';
+
+  @override
   String get librivoxFieldQueryHint =>
       'e.g. Alice in Wonderland, Dickens or fairy tales';
 

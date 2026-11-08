@@ -108,12 +108,52 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'genre',
+      AppStrings.instance.librivoxFieldGenre,
+      AppStrings.instance.librivoxFieldGenreHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.librivoxGenreAll),
+        for (final genre in _genres)
+          MusicSourceChoice(genre, _genreLabel(genre)),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitBooks,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+  /// The genres the catalogue answers with, in the names it uses.
+  ///
+  /// A name the catalogue does not know answers with nothing, so only the
+  /// names that hold books are offered; the list was read from the catalogue
+  /// and every entry was checked to return books.
+  static const _genres = [
+    'General Fiction',
+    'Poetry',
+    'History',
+    'Romance',
+    'Science Fiction',
+    'Biography',
+    'Essays',
+  ];
+
+  /// The name of a genre in the language of the app.
+  static String _genreLabel(String genre) {
+    final strings = AppStrings.instance;
+    return switch (genre) {
+      'General Fiction' => strings.librivoxGenreFiction,
+      'Poetry' => strings.librivoxGenrePoetry,
+      'History' => strings.librivoxGenreHistory,
+      'Romance' => strings.librivoxGenreRomance,
+      'Science Fiction' => strings.librivoxGenreScienceFiction,
+      'Biography' => strings.librivoxGenreBiography,
+      'Essays' => strings.librivoxGenreEssays,
+      _ => genre,
+    };
+  }
 
   /// A whole book is fetched for each of its chapters, so a scan runs
   /// longer than the scan of a song catalogue.
@@ -132,7 +172,12 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final keyword = config.setting('query');
-      final raw = await _rawAnswer(keyword, limit, request.offset);
+      final raw = await _rawAnswer(
+        keyword,
+        limit,
+        request.offset,
+        genre: _genreOf(config),
+      );
       final books = parseBookList(raw);
       if (books.isEmpty) {
         return SourceScanResult(
@@ -177,11 +222,16 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   /// A keyword asks the catalogue twice, by title and by author; both
   /// answers count. Without a keyword the scan reads the list the
   /// catalogue serves by itself.
-  Future<Object?> _rawAnswer(String? keyword, int limit, int offset) async {
+  Future<Object?> _rawAnswer(
+    String? keyword,
+    int limit,
+    int offset, {
+    String? genre,
+  }) async {
     if (keyword != null) {
       final pages = await Future.wait([
-        _searchPage('title', keyword, limit, offset),
-        _searchPage('author', keyword, limit, offset),
+        _searchPage('title', keyword, limit, offset, genre: genre),
+        _searchPage('author', keyword, limit, offset, genre: genre),
       ]);
       return {
         'books': [...pages[0], ...pages[1]],
@@ -193,9 +243,20 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
         'format': 'json',
         'limit': limit,
         if (offset > 0) 'offset': offset,
+        'genre': ?genre,
       },
     );
     return response.data;
+  }
+
+  /// The genre the instance walks, when the reader picked one.
+  ///
+  /// The catalogue matches the genre by its exact name, so the settings offer
+  /// the names the catalogue uses rather than free text: a spelling it does
+  /// not know answers with nothing.
+  static String? _genreOf(MusicSourceConfig config) {
+    final value = config.setting('genre')?.trim() ?? '';
+    return value.isEmpty ? null : value;
   }
 
   /// One page of the catalogue, an empty page when the keyword missed.
@@ -203,8 +264,9 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     String field,
     String value,
     int limit,
-    int offset,
-  ) async {
+    int offset, {
+    String? genre,
+  }) async {
     final response = await _dio.get(
       _apiHost,
       queryParameters: {
@@ -212,6 +274,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
         'limit': limit,
         if (offset > 0) 'offset': offset,
         field: value,
+        'genre': ?genre,
       },
     );
     return parseBookList(response.data);

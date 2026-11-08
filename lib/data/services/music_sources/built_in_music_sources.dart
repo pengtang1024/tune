@@ -161,7 +161,7 @@ class BuiltInMusicSources {
         enabled: false,
         settings: {'server': '', 'user': '', 'password': ''},
       ),
-      _instance(types, 'librivox'),
+      _instance(types, 'librivox', settings: {'genre': ''}),
       _instance(
         types,
         'emby',

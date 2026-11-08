@@ -267,6 +267,43 @@ void main() async {
   );
 
   test(
+    'the kinds of book of LibriVox answer with different books',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final books = BuiltInMusicSources.librivox;
+
+      final firstBooks = <String>{};
+      for (final genre in const ['Poetry', 'History', 'Science Fiction']) {
+        final result = (await service.scanAll(
+          sources: [
+            books.copyWith(
+              settings: {'genre': genre, 'limit': '1', 'language': ''},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        final album = result.songs.first.album;
+        expect(album, isNotEmpty);
+        // The kinds are shelves of the catalogue, so a scan of one kind must
+        // not answer with the book of another.
+        expect(firstBooks.add(album), isTrue, reason: '$genre repeated $album');
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
     'the radio source reads a tag of the directory',
     () async {
       final service = MusicSourceService(

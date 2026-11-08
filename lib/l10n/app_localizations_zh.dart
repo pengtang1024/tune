@@ -1886,6 +1886,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
 
   @override
+  String get librivoxFieldGenre => '书籍类型';
+
+  @override
+  String get librivoxFieldGenreHint => '目录里的一个门类';
+
+  @override
+  String get librivoxGenreAll => '全部门类';
+
+  @override
+  String get librivoxGenreFiction => '小说';
+
+  @override
+  String get librivoxGenrePoetry => '诗歌';
+
+  @override
+  String get librivoxGenreHistory => '历史';
+
+  @override
+  String get librivoxGenreRomance => '爱情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '传记';
+
+  @override
+  String get librivoxGenreEssays => '随笔';
+
+  @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
 
   @override
@@ -4998,6 +5028,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
 
   @override
+  String get librivoxFieldGenre => '书籍类型';
+
+  @override
+  String get librivoxFieldGenreHint => '目录里的一个门类';
+
+  @override
+  String get librivoxGenreAll => '全部门类';
+
+  @override
+  String get librivoxGenreFiction => '小说';
+
+  @override
+  String get librivoxGenrePoetry => '诗歌';
+
+  @override
+  String get librivoxGenreHistory => '历史';
+
+  @override
+  String get librivoxGenreRomance => '爱情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '传记';
+
+  @override
+  String get librivoxGenreEssays => '随笔';
+
+  @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
 
   @override
@@ -8108,6 +8168,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get librivoxHint => '輸入書名或作者，留空白則瀏覽最熱門的有聲書';
+
+  @override
+  String get librivoxFieldGenre => '書籍類型';
+
+  @override
+  String get librivoxFieldGenreHint => '目錄裡的一個門類';
+
+  @override
+  String get librivoxGenreAll => '全部門類';
+
+  @override
+  String get librivoxGenreFiction => '小說';
+
+  @override
+  String get librivoxGenrePoetry => '詩歌';
+
+  @override
+  String get librivoxGenreHistory => '歷史';
+
+  @override
+  String get librivoxGenreRomance => '愛情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '傳記';
+
+  @override
+  String get librivoxGenreEssays => '隨筆';
 
   @override
   String get librivoxFieldQueryHint => '例如愛麗絲夢遊仙境、狄更斯、童話';
