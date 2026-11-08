@@ -131,6 +131,8 @@ void main() async {
           'archive_podcasts',
           'radio_recordings',
           'free_music_archive',
+          'foreign_audio',
+          'news_recordings',
         ]),
       );
 

@@ -1539,6 +1539,18 @@ class AppLocalizationsZh extends AppLocalizations {
       'Free Music Archive 收在 Internet Archive 上的专辑';
 
   @override
+  String get sourceForeignAudioName => '外语有声书';
+
+  @override
+  String get sourceForeignAudioDescription => '英语之外的有声书与朗读，档案按语言分开收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新闻录音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '档案里保存下来的新闻广播录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -5110,6 +5122,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Free Music Archive 收在 Internet Archive 上的专辑';
 
   @override
+  String get sourceForeignAudioName => '外语有声书';
+
+  @override
+  String get sourceForeignAudioDescription => '英语之外的有声书与朗读，档案按语言分开收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新闻录音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '档案里保存下来的新闻广播录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -8679,6 +8703,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceFreeMusicArchiveDescription =>
       'Free Music Archive 收在 Internet Archive 上的專輯';
+
+  @override
+  String get sourceForeignAudioName => '外語有聲書';
+
+  @override
+  String get sourceForeignAudioDescription => '英語之外的有聲書與朗讀，檔案按語言分開收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新聞錄音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '檔案裡保存下來的新聞廣播錄音';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

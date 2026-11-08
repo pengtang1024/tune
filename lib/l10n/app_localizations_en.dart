@@ -1696,6 +1696,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'The albums the Free Music Archive keeps in the archive';
 
   @override
+  String get sourceForeignAudioName => 'Foreign-language audio';
+
+  @override
+  String get sourceForeignAudioDescription =>
+      'Audiobooks and readings the archive keeps outside English';
+
+  @override
+  String get sourceNewsRecordingsName => 'News recordings';
+
+  @override
+  String get sourceNewsRecordingsDescription =>
+      'News broadcasts the archive keeps as recordings';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

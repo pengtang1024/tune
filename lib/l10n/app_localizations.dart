@@ -2807,6 +2807,30 @@ abstract class AppLocalizations {
   /// **'Free Music Archive 收在 Internet Archive 上的专辑'**
   String get sourceFreeMusicArchiveDescription;
 
+  /// No description provided for @sourceForeignAudioName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'外语有声书'**
+  String get sourceForeignAudioName;
+
+  /// No description provided for @sourceForeignAudioDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'英语之外的有声书与朗读，档案按语言分开收藏'**
+  String get sourceForeignAudioDescription;
+
+  /// No description provided for @sourceNewsRecordingsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'新闻录音'**
+  String get sourceNewsRecordingsName;
+
+  /// No description provided for @sourceNewsRecordingsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案里保存下来的新闻广播录音'**
+  String get sourceNewsRecordingsDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:

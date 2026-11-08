@@ -110,6 +110,28 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'foreign_audio',
+        name: strings.sourceForeignAudioName,
+        description: strings.sourceForeignAudioDescription,
+        settings: {
+          // The archive files what it holds outside English under a
+          // collection of its own.
+          'query': 'collection:audio_foreign AND mediatype:audio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
+        id: 'news_recordings',
+        name: strings.sourceNewsRecordingsName,
+        description: strings.sourceNewsRecordingsDescription,
+        settings: {
+          'query': 'collection:audio_news AND mediatype:audio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'radio_recordings',
         name: strings.sourceRadioRecordingsName,
         description: strings.sourceRadioRecordingsDescription,
@@ -389,6 +411,12 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The source of the audio the archive files outside English.
+  static MusicSourceConfig get foreignAudio => _entry('foreign_audio');
+
+  /// The source of the news broadcasts the archive keeps.
+  static MusicSourceConfig get newsRecordings => _entry('news_recordings');
 
   /// The source of the albums of the Free Music Archive.
   static MusicSourceConfig get freeMusicArchive => _entry('free_music_archive');
