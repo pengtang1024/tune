@@ -8,7 +8,7 @@
 
 ## 1. 为什么要改
 
-现状是「28 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「29 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -84,6 +84,8 @@ MusicSourceConfig（实例 · 数据）
 | `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
 | `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、数量 |
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
+| `podcast_catalog` | 播客目录 | `openCatalog` | `podcast_catalog` | 排行 | 关键词（可留空）、数量 |
+| `podcast_apple` | Apple Podcasts | `openCatalog` | `podcast_apple` | 排行 | 关键词（可留空）、国家/地区、数量 |
 | `netease` | 网易云音乐 API | `openApi` | `netease` | 每日推荐 | API 地址、关键词（可留空）、数量 |
 | `subsonic` | Subsonic | `openApi` | `subsonic` | — | 服务器、账号、密码、关键词、音质、数量 |
 | `ampache` | Ampache | `openApi` | `ampache` | 排行 / 最新 | 服务器、API Key、关键词、数量 |
@@ -108,7 +110,7 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-28 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+29 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。

@@ -29,6 +29,7 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/funkwhale_source.dart';
 import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/podcast_apple_source.dart';
 import 'package:tune/data/services/music_sources/podcast_catalog_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
@@ -83,6 +84,7 @@ class MusicSourceService implements StreamUrlResolver {
       'ccmixter': CcMixterSourceAdapter(dio: dio),
       'podcast_rss': PodcastRssSourceAdapter(dio: dio),
       'podcast_catalog': PodcastCatalogSourceAdapter(dio: dio),
+      'podcast_apple': PodcastAppleSourceAdapter(dio: dio),
       'subsonic': SubsonicSourceAdapter(dio: dio),
       'ampache': AmpacheSourceAdapter(dio: dio),
       'koel': KoelSourceAdapter(dio: dio),

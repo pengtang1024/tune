@@ -267,6 +267,44 @@ void main() async {
   );
 
   test(
+    'the service reads the Apple podcast directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // Two shows are enough to prove the chart, the lookup and the feed of
+      // every show answer; the default of five makes the test slower.
+      final source = BuiltInMusicSources.podcastApple.copyWith(
+        settings: {
+          ...BuiltInMusicSources.podcastApple.settings,
+          'limit': '2',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Apple directory failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.album, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      expect(song.title, isNotEmpty);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service reads the podcast directory',
     () async {
       final service = MusicSourceService(

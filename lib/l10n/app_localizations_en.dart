@@ -1593,6 +1593,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get podcastCatalogNoMatch => 'No podcast found';
 
   @override
+  String get sourceApplePodcastsName => 'Apple Podcasts';
+
+  @override
+  String get sourceApplePodcastsDescription =>
+      'The shows Apple\'s directory ranks and searches, read from their own feeds';
+
+  @override
+  String get podcastAppleHint =>
+      'Type a keyword, or leave it empty to read Apple\'s top podcasts';
+
+  @override
+  String get podcastAppleFieldQueryHint => 'e.g. jazz, news, comedy';
+
+  @override
+  String get podcastAppleFieldCountry => 'Country';
+
+  @override
+  String get podcastAppleFieldCountryHint => 'Two-letter code, e.g. US, CN';
+
+  @override
+  String get podcastAppleNoMatch => 'No matching show in the Apple directory';
+
+  @override
   String get sourceSubsonicDescription =>
       'Connects to a self-hosted Navidrome or Subsonic library';
 

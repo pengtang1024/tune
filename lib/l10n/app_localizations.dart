@@ -2615,6 +2615,48 @@ abstract class AppLocalizations {
   /// **'没有找到播客'**
   String get podcastCatalogNoMatch;
 
+  /// No description provided for @sourceApplePodcastsName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Apple 播客'**
+  String get sourceApplePodcastsName;
+
+  /// No description provided for @sourceApplePodcastsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Apple 目录里排行的播客，单集从各自的订阅源读取'**
+  String get sourceApplePodcastsDescription;
+
+  /// No description provided for @podcastAppleHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填关键词，留空则读 Apple 的播客排行'**
+  String get podcastAppleHint;
+
+  /// No description provided for @podcastAppleFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 爵士、新闻、喜剧'**
+  String get podcastAppleFieldQueryHint;
+
+  /// No description provided for @podcastAppleFieldCountry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'国家/地区'**
+  String get podcastAppleFieldCountry;
+
+  /// No description provided for @podcastAppleFieldCountryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'两位国家代码，例如 US、CN'**
+  String get podcastAppleFieldCountryHint;
+
+  /// No description provided for @podcastAppleNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Apple 播客目录里没有匹配的节目'**
+  String get podcastAppleNoMatch;
+
   /// No description provided for @sourceSubsonicDescription.
   ///
   /// In zh_CN, this message translates to:

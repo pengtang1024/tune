@@ -36,6 +36,7 @@ const List<String> properNames = [
   'Radio Paradise Rock',
   'Radio Paradise World',
   'NTS',
+  'Apple Podcasts',
   'NeteaseCloudMusicApi',
   'MusicFree',
   'Freesound',

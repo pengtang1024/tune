@@ -1437,6 +1437,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastCatalogNoMatch => '没有找到播客';
 
   @override
+  String get sourceApplePodcastsName => 'Apple 播客';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目录里排行的播客，单集从各自的订阅源读取';
+
+  @override
+  String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
+
+  @override
+  String get podcastAppleFieldCountry => '国家/地区';
+
+  @override
+  String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
+
+  @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
 
   @override
@@ -4438,6 +4459,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastCatalogNoMatch => '没有找到播客';
 
   @override
+  String get sourceApplePodcastsName => 'Apple 播客';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目录里排行的播客，单集从各自的订阅源读取';
+
+  @override
+  String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
+
+  @override
+  String get podcastAppleFieldCountry => '国家/地区';
+
+  @override
+  String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
+
+  @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
 
   @override
@@ -7437,6 +7479,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastCatalogNoMatch => '沒有找到播客';
+
+  @override
+  String get sourceApplePodcastsName => 'Apple Podcasts';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目錄裡排行的播客，單集從各自的訂閱源讀取';
+
+  @override
+  String get podcastAppleHint => '填關鍵字，留空則讀 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新聞、喜劇';
+
+  @override
+  String get podcastAppleFieldCountry => '國家/地區';
+
+  @override
+  String get podcastAppleFieldCountryHint => '兩位國家代碼，例如 US、CN';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目錄裡沒有符合的節目';
 
   @override
   String get sourceSubsonicDescription => '連線自建的 Navidrome / Subsonic 音樂庫';

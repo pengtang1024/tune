@@ -99,6 +99,11 @@ class BuiltInMusicSources {
       _instance(types, 'podcast_catalog'),
       _instance(
         types,
+        'podcast_apple',
+        settings: {'query': '', 'country': 'US'},
+      ),
+      _instance(
+        types,
         'subsonic',
         enabled: false,
         settings: {
@@ -317,6 +322,9 @@ class BuiltInMusicSources {
 
   /// The source of the podcasts the directory lists.
   static MusicSourceConfig get podcastCatalog => _entry('podcast_catalog');
+
+  /// The source of the podcasts the Apple directory ranks.
+  static MusicSourceConfig get podcastApple => _entry('podcast_apple');
 
   /// The source of a self-hosted music server.
   static MusicSourceConfig get subsonic => _entry('subsonic');

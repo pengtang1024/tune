@@ -97,6 +97,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openCatalog,
       ),
       SourceTypeDescriptor(
+        type: 'podcast_apple',
+        name: 'Apple Podcasts',
+        localizedName: strings.sourceApplePodcastsName,
+        description: strings.sourceApplePodcastsDescription,
+        kind: MusicSourceKind.openCatalog,
+      ),
+      SourceTypeDescriptor(
         type: 'subsonic',
         name: 'Subsonic',
         localizedName: strings.sourceSubsonicName,
