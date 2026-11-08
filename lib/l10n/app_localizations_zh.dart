@@ -1704,6 +1704,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourceKodiName => '自建 Kodi 媒体库';
+
+  @override
+  String get sourceKodiDescription => '自建 Kodi 媒体中心的音乐库';
+
+  @override
+  String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 服务器的账号';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 服务器的密码';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 返回了空响应';
+
+  @override
+  String get kodiNoMatch => 'Kodi 库里没有匹配的曲目';
+
+  @override
   String get sourcePeerTubeName => 'PeerTube 音乐';
 
   @override
@@ -4726,6 +4753,33 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
 
   @override
+  String get sourceKodiName => '自建 Kodi 媒体库';
+
+  @override
+  String get sourceKodiDescription => '自建 Kodi 媒体中心的音乐库';
+
+  @override
+  String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 服务器的账号';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 服务器的密码';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 返回了空响应';
+
+  @override
+  String get kodiNoMatch => 'Kodi 库里没有匹配的曲目';
+
+  @override
   String get sourcePeerTubeName => 'PeerTube 音乐';
 
   @override
@@ -7746,6 +7800,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get koelTwoFactor => 'Koel 帳號開啟了兩步驗證，此音源無法登入';
+
+  @override
+  String get sourceKodiName => '自架 Kodi 媒體庫';
+
+  @override
+  String get sourceKodiDescription => '自架 Kodi 媒體中心的音樂庫';
+
+  @override
+  String get kodiHint => '填寫 Kodi Web 伺服器位址；伺服器要求登入時再填帳號';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 伺服器的帳號';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 伺服器的密碼';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 傳回了空回應';
+
+  @override
+  String get kodiNoMatch => 'Kodi 媒體庫裡沒有符合的曲目';
 
   @override
   String get sourcePeerTubeName => 'PeerTube 音樂';

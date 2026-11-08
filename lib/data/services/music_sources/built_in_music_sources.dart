@@ -127,6 +127,12 @@ class BuiltInMusicSources {
       ),
       _instance(
         types,
+        'kodi',
+        enabled: false,
+        settings: {'server': '', 'user': '', 'password': '', 'query': ''},
+      ),
+      _instance(
+        types,
         'peertube',
         settings: {
           'server': 'https://framatube.org',
@@ -336,6 +342,9 @@ class BuiltInMusicSources {
 
   /// The source of the music published on a PeerTube server.
   static MusicSourceConfig get peerTube => _entry('peertube');
+
+  /// The source of the music library of a Kodi media centre.
+  static MusicSourceConfig get kodi => _entry('kodi');
 
   /// The source of the tracks the artists publish themselves.
   static MusicSourceConfig get audius => _entry('audius');

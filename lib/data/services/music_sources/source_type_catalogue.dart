@@ -125,6 +125,13 @@ class SourceTypeCatalogue {
         kind: MusicSourceKind.openApi,
       ),
       SourceTypeDescriptor(
+        type: 'kodi',
+        name: 'Kodi',
+        localizedName: strings.sourceKodiName,
+        description: strings.sourceKodiDescription,
+        kind: MusicSourceKind.openApi,
+      ),
+      SourceTypeDescriptor(
         type: 'peertube',
         name: 'PeerTube',
         localizedName: strings.sourcePeerTubeName,

@@ -3143,6 +3143,60 @@ abstract class AppLocalizations {
   /// **'Koel 账号开启了两步验证，此音源无法登录'**
   String get koelTwoFactor;
 
+  /// No description provided for @sourceKodiName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Kodi 媒体库'**
+  String get sourceKodiName;
+
+  /// No description provided for @sourceKodiDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自建 Kodi 媒体中心的音乐库'**
+  String get sourceKodiDescription;
+
+  /// No description provided for @kodiHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'填写 Kodi Web 服务器地址；服务器要求登录时再填账号'**
+  String get kodiHint;
+
+  /// No description provided for @kodiFieldServerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 http://localhost:8080'**
+  String get kodiFieldServerHint;
+
+  /// No description provided for @kodiFieldUserHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Web 服务器的账号'**
+  String get kodiFieldUserHint;
+
+  /// No description provided for @kodiFieldPasswordHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Web 服务器的密码'**
+  String get kodiFieldPasswordHint;
+
+  /// No description provided for @kodiFieldQueryHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'例如 jazz、钢琴'**
+  String get kodiFieldQueryHint;
+
+  /// No description provided for @kodiEmptyResponse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Kodi 返回了空响应'**
+  String get kodiEmptyResponse;
+
+  /// No description provided for @kodiNoMatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Kodi 库里没有匹配的曲目'**
+  String get kodiNoMatch;
+
   /// No description provided for @sourcePeerTubeName.
   ///
   /// In zh_CN, this message translates to:

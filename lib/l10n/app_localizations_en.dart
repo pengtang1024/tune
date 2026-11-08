@@ -1892,6 +1892,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Koel account uses two-factor sign-in, which this source cannot do';
 
   @override
+  String get sourceKodiName => 'Kodi';
+
+  @override
+  String get sourceKodiDescription =>
+      'Music library of a self-hosted Kodi media centre';
+
+  @override
+  String get kodiHint =>
+      'Type the address of the Kodi web server, and the account when it asks for one';
+
+  @override
+  String get kodiFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'The account of the web server';
+
+  @override
+  String get kodiFieldPasswordHint => 'The password of the web server';
+
+  @override
+  String get kodiFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi returned an empty response';
+
+  @override
+  String get kodiNoMatch => 'No matching tracks in Kodi';
+
+  @override
   String get sourcePeerTubeName => 'PeerTube music';
 
   @override
