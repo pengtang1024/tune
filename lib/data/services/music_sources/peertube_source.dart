@@ -90,6 +90,16 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'sort',
+      AppStrings.instance.peerTubeFieldSort,
+      AppStrings.instance.peerTubeFieldSortHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.peerTubeSortDefault),
+        MusicSourceChoice(_sortNewest, AppStrings.instance.peerTubeSortNewest),
+        MusicSourceChoice(_sortViewed, AppStrings.instance.peerTubeSortViewed),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -99,6 +109,20 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
 
   @override
   bool get supportsPaging => true;
+
+
+  /// The sorts the server reads, by the name the reader picks.
+  ///
+  /// A search also knows the trending order, but that one answers with
+  /// nothing when there is a keyword to read, so it is not offered.
+  static const _sortNewest = '-publishedAt';
+  static const _sortViewed = '-views';
+
+  /// The sort the reader picked, if any.
+  static String? _sortOf(MusicSourceConfig config) {
+    final value = config.setting('sort')?.trim() ?? '';
+    return value.isEmpty ? null : value;
+  }
 
   @override
   Duration get autoScanInterval => const Duration(hours: 12);
@@ -130,6 +154,7 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
         limit: limit,
         charts: browseModeOf(config) == BrowseMode.charts,
         musicOnly: config.setting('category') != 'all',
+        sort: _sortOf(config),
       );
       if (answer == null) {
         return SourceScanResult(
@@ -171,6 +196,7 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
     required int limit,
     required bool charts,
     required bool musicOnly,
+    required String? sort,
   }) async {
     final parameters = <String, String>{
       'count': '$limit',
@@ -179,15 +205,19 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
       if (musicOnly) 'categoryOneOf': '$_musicCategory',
     };
 
+    // A sort the reader picked takes precedence over the one a browsing mode
+    // would ask for; without one the mode decides, and a search keeps the
+    // relevance order the server serves.
     final Map<String, dynamic>? answer;
     if (query != null) {
       parameters['search'] = query;
+      if (sort != null) parameters['sort'] = sort;
       answer = await _get(
         '$server/api/v1/search/videos',
         parameters: parameters,
       );
     } else {
-      parameters['sort'] = charts ? '-views' : '-publishedAt';
+      parameters['sort'] = sort ?? (charts ? _sortViewed : _sortNewest);
       answer = await _get('$server/api/v1/videos', parameters: parameters);
     }
 

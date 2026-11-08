@@ -14,6 +14,7 @@ import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
 import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/peertube_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -257,6 +258,47 @@ void main() {
       expect(captured.uri?.queryParameters.containsKey('gcmtitle'), isFalse);
     });
 
+    test('a sort the reader picked is asked for', () async {
+      final captured = _Captured(body: {'data': <dynamic>[]});
+
+      await PeerTubeSourceAdapter(dio: captured.dio).scan(
+        _request('peertube', const {
+          'server': 'https://framatube.org',
+          'query': 'jazz',
+          'sort': '-publishedAt',
+        }),
+      );
+
+      expect(captured.uri?.queryParameters['sort'], '-publishedAt');
+      expect(captured.uri?.path, '/api/v1/search/videos');
+    });
+
+    test('a search without a chosen sort keeps the order of the server', () async {
+      final captured = _Captured(body: {'data': <dynamic>[]});
+
+      await PeerTubeSourceAdapter(dio: captured.dio).scan(
+        _request('peertube', const {
+          'server': 'https://framatube.org',
+          'query': 'jazz',
+        }),
+      );
+
+      expect(captured.uri?.queryParameters.containsKey('sort'), isFalse);
+    });
+
+    test('a chosen sort takes precedence over the browsing mode', () async {
+      final captured = _Captured(body: {'data': <dynamic>[]});
+
+      await PeerTubeSourceAdapter(dio: captured.dio).scan(
+        _request('peertube', const {
+          'server': 'https://framatube.org',
+          'sort': '-views',
+        }),
+      );
+
+      expect(captured.uri?.path, '/api/v1/videos');
+      expect(captured.uri?.queryParameters['sort'], '-views');
+    });
     test('Jamendo serves its charts', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

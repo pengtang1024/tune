@@ -4319,6 +4319,36 @@ abstract class AppLocalizations {
   /// **'目录'**
   String get peerTubeCategory;
 
+  /// No description provided for @peerTubeFieldSort.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'排序'**
+  String get peerTubeFieldSort;
+
+  /// No description provided for @peerTubeFieldSortHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'先读什么；不选就按浏览方式决定'**
+  String get peerTubeFieldSortHint;
+
+  /// No description provided for @peerTubeSortDefault.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按浏览方式'**
+  String get peerTubeSortDefault;
+
+  /// No description provided for @peerTubeSortNewest.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最新优先'**
+  String get peerTubeSortNewest;
+
+  /// No description provided for @peerTubeSortViewed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播放最多'**
+  String get peerTubeSortViewed;
+
   /// No description provided for @peerTubeCategoryHint.
   ///
   /// In zh_CN, this message translates to:

@@ -2517,6 +2517,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get peerTubeCategory => 'Catalogue';
 
   @override
+  String get peerTubeFieldSort => 'Order';
+
+  @override
+  String get peerTubeFieldSortHint =>
+      'What the scan reads first; a browsing mode decides when nothing is picked';
+
+  @override
+  String get peerTubeSortDefault => 'According to the browsing';
+
+  @override
+  String get peerTubeSortNewest => 'Newest first';
+
+  @override
+  String get peerTubeSortViewed => 'Most watched';
+
+  @override
   String get peerTubeCategoryHint => 'Music only, or everything the server has';
 
   @override

@@ -2302,6 +2302,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get peerTubeCategory => '目录';
 
   @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get peerTubeSortDefault => '按浏览方式';
+
+  @override
+  String get peerTubeSortNewest => '最新优先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
+
+  @override
   String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
 
   @override
@@ -5934,6 +5949,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get peerTubeCategory => '目录';
 
   @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get peerTubeSortDefault => '按浏览方式';
+
+  @override
+  String get peerTubeSortNewest => '最新优先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
+
+  @override
   String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
 
   @override
@@ -9564,6 +9594,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get peerTubeCategory => '目錄';
+
+  @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先讀什麼；不選就按瀏覽方式決定';
+
+  @override
+  String get peerTubeSortDefault => '按瀏覽方式';
+
+  @override
+  String get peerTubeSortNewest => '最新優先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
 
   @override
   String get peerTubeCategoryHint => '只看音樂，或看伺服器上的全部內容';
