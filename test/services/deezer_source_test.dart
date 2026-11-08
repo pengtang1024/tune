@@ -13,6 +13,47 @@ import 'package:tune/domain/models/source_scan_result.dart';
 /// the request the adapter sends.
 void main() {
   group('Deezer adapter', () {
+    test('a refusal of the quota is asked again', () async {
+      var calls = 0;
+      final client = Dio();
+      client.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            calls++;
+            if (calls == 1) {
+              // Deezer answers a caller over its quota with a 429.
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  type: DioExceptionType.badResponse,
+                  response: Response(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                ),
+                true,
+              );
+              return;
+            }
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: '{"data":[]}',
+              ),
+            );
+          },
+        ),
+      );
+
+      final result = await DeezerSourceAdapter(dio: client).scan(
+        MusicSourceScanRequest(config: _config()),
+      );
+
+      expect(calls, 2);
+      // The retry happens after a pause, so this test is one wait long.
+      expect(result.status, isNot(SourceScanStatus.failed));
+    }, timeout: const Timeout(Duration(seconds: 30)));
     test('maps a song of the catalogue', () async {
       final server = _DeezerServer();
       final adapter = DeezerSourceAdapter(dio: server.dio);

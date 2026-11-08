@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/data/services/music_sources/store_read_mode.dart';
 import 'package:tune/domain/models/music_source.dart';
@@ -239,14 +240,13 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
         path = '/chart/0/tracks';
       }
 
-      final response = await _dio.get<String>(
+      final response = await _read(
         'https://api.deezer.com$path',
-        queryParameters: {
+        query: {
           if (keyword.isNotEmpty) 'q': keyword,
           'limit': '$limit',
           if (request.offset > 0) 'index': '${request.offset}',
         },
-        options: Options(responseType: ResponseType.plain),
       );
 
       final data = _decode(response.data);
@@ -280,6 +280,26 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
 
 
 
+  /// Reads one address of the service, giving a refusal a few more tries.
+  ///
+  /// Deezer answers a caller that asks too often with a 429 and a note about
+  /// its quota; a scan reads a chart and then a detail per entry, so a busy
+  /// moment would otherwise drop the whole scan.
+  Future<Response<String>> _read(
+    String url, {
+    Map<String, dynamic>? query,
+  }) {
+    return retrySourceRead(
+      () => _dio.get<String>(
+        url,
+        queryParameters: query,
+        options: Options(responseType: ResponseType.plain),
+      ),
+      answered: (answer) => answer.data != null,
+      delays: const [Duration(seconds: 2), Duration(seconds: 5)],
+    );
+  }
+
   /// The songs of the playlists the keyword names.
   ///
   /// The catalogue answers the keyword with playlists, so each playlist is
@@ -294,19 +314,17 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     final count = limit < batch ? limit : batch;
     final List<dynamic> playlists;
     if (keyword.isEmpty) {
-      final chart = await _dio.get<String>(
+      final chart = await _read(
         'https://api.deezer.com/chart/0/playlists',
-        queryParameters: {'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'limit': '$count'},
       );
       final entries = _decode(chart.data)?['data'];
       if (entries is! List) return null;
       playlists = entries;
     } else {
-      final search = await _dio.get<String>(
+      final search = await _read(
         'https://api.deezer.com/search/playlist',
-        queryParameters: {'q': keyword, 'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'q': keyword, 'limit': '$count'},
       );
       final entries = _decode(search.data)?['data'];
       if (entries is! List) return null;
@@ -319,10 +337,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       final id = playlist['id']?.toString();
       if (id == null || id.isEmpty) continue;
 
-      final detail = await _dio.get<String>(
-        'https://api.deezer.com/playlist/$id',
-        options: Options(responseType: ResponseType.plain),
-      );
+      final detail = await _read('https://api.deezer.com/playlist/$id');
       final tracks = _decode(detail.data)?['tracks'];
       final entries = tracks is Map ? tracks['data'] : null;
       if (entries is! List) continue;
@@ -356,19 +371,17 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     final count = limit < batch ? limit : batch;
     final List<dynamic> artists;
     if (keyword.isEmpty) {
-      final chart = await _dio.get<String>(
+      final chart = await _read(
         'https://api.deezer.com/chart/0/artists',
-        queryParameters: {'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'limit': '$count'},
       );
       final entries = _decode(chart.data)?['data'];
       if (entries is! List) return null;
       artists = entries;
     } else {
-      final search = await _dio.get<String>(
+      final search = await _read(
         'https://api.deezer.com/search/artist',
-        queryParameters: {'q': keyword, 'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'q': keyword, 'limit': '$count'},
       );
       final entries = _decode(search.data)?['data'];
       if (entries is! List) return null;
@@ -381,10 +394,9 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       final id = artist['id']?.toString();
       if (id == null || id.isEmpty) continue;
 
-      final top = await _dio.get<String>(
+      final top = await _read(
         'https://api.deezer.com/artist/$id/top',
-        queryParameters: {'limit': '$limit'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'limit': '$limit'},
       );
       final entries = _decode(top.data)?['data'];
       if (entries is! List) continue;
@@ -413,19 +425,17 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     final count = limit < batch ? limit : batch;
     final List<dynamic> albums;
     if (keyword.isEmpty) {
-      final chart = await _dio.get<String>(
+      final chart = await _read(
         'https://api.deezer.com/chart/0/albums',
-        queryParameters: {'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'limit': '$count'},
       );
       final entries = _decode(chart.data)?['data'];
       if (entries is! List) return null;
       albums = entries;
     } else {
-      final search = await _dio.get<String>(
+      final search = await _read(
         'https://api.deezer.com/search/album',
-        queryParameters: {'q': keyword, 'limit': '$count'},
-        options: Options(responseType: ResponseType.plain),
+        query: {'q': keyword, 'limit': '$count'},
       );
       final entries = _decode(search.data)?['data'];
       if (entries is! List) return null;
@@ -438,10 +448,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
       final id = album['id']?.toString();
       if (id == null || id.isEmpty) continue;
 
-      final detail = await _dio.get<String>(
-        'https://api.deezer.com/album/$id',
-        options: Options(responseType: ResponseType.plain),
-      );
+      final detail = await _read('https://api.deezer.com/album/$id');
       final data = _decode(detail.data);
       if (data == null) continue;
       final tracks = data['tracks'];
@@ -489,10 +496,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     final id = song.externalId;
     if (id == null || id.isEmpty) return null;
     try {
-      final response = await _dio.get<String>(
-        'https://api.deezer.com/track/$id',
-        options: Options(responseType: ResponseType.plain),
-      );
+      final response = await _read('https://api.deezer.com/track/$id');
       final data = _decode(response.data);
       if (data == null) return null;
       final preview = SourceSongFactory.normalizeUrl(_text(data['preview']));
