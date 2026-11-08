@@ -1713,6 +1713,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Poems read aloud, the ones the archive files under poetry';
 
   @override
+  String get sourceScienceTalksName => 'Science talks';
+
+  @override
+  String get sourceScienceTalksDescription =>
+      'Science programmes and talks the archive keeps as audio';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 

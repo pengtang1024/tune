@@ -146,6 +146,20 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'science_talks',
+        name: strings.sourceScienceTalksName,
+        description: strings.sourceScienceTalksDescription,
+        settings: {
+          // The collection of talks the archive keeps is a mix of science
+          // programmes and recordings of other kinds; the subject is what
+          // makes the reach a reach of science.
+          'query': 'collection:audio_tech AND mediatype:audio '
+              'AND subject:(science)',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'radio_recordings',
         name: strings.sourceRadioRecordingsName,
         description: strings.sourceRadioRecordingsDescription,
@@ -431,6 +445,9 @@ class BuiltInMusicSources {
 
   /// The source of the news broadcasts the archive keeps.
   static MusicSourceConfig get newsRecordings => _entry('news_recordings');
+
+  /// The source of the science programmes the archive keeps.
+  static MusicSourceConfig get scienceTalks => _entry('science_talks');
 
   /// The source of the poems the archive keeps as readings.
   static MusicSourceConfig get poetry => _entry('poetry');

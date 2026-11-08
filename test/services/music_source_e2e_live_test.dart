@@ -134,6 +134,7 @@ void main() async {
           'foreign_audio',
           'news_recordings',
           'poetry',
+          'science_talks',
         ]),
       );
 

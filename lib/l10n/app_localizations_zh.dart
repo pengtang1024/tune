@@ -1550,6 +1550,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
 
   @override
+  String get sourceScienceTalksName => '科学讲座';
+
+  @override
+  String get sourceScienceTalksDescription => '档案里归在科学名下的节目与讲座录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -5245,6 +5251,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
 
   @override
+  String get sourceScienceTalksName => '科学讲座';
+
+  @override
+  String get sourceScienceTalksDescription => '档案里归在科学名下的节目与讲座录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -8938,6 +8950,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcePoetryDescription => '檔案裡歸在詩歌名下的朗讀';
+
+  @override
+  String get sourceScienceTalksName => '科學講座';
+
+  @override
+  String get sourceScienceTalksDescription => '檔案裡歸在科學名下的節目與講座錄音';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

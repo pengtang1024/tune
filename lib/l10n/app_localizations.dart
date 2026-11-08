@@ -2825,6 +2825,18 @@ abstract class AppLocalizations {
   /// **'档案里归在诗歌名下的朗读'**
   String get sourcePoetryDescription;
 
+  /// No description provided for @sourceScienceTalksName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科学讲座'**
+  String get sourceScienceTalksName;
+
+  /// No description provided for @sourceScienceTalksDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档案里归在科学名下的节目与讲座录音'**
+  String get sourceScienceTalksDescription;
+
   /// No description provided for @sourcePodcastRssDescription.
   ///
   /// In zh_CN, this message translates to:
