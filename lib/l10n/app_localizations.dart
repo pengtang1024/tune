@@ -2273,6 +2273,66 @@ abstract class AppLocalizations {
   /// **'来源'**
   String get openverseFieldSource;
 
+  /// No description provided for @openverseFieldLicense.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'许可'**
+  String get openverseFieldLicense;
+
+  /// No description provided for @openverseFieldLicenseHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只取某一种许可下的音频'**
+  String get openverseFieldLicenseHint;
+
+  /// No description provided for @openverseLicenseAll.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'全部许可'**
+  String get openverseLicenseAll;
+
+  /// No description provided for @openverseLicenceCc0.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC0（公有领域）'**
+  String get openverseLicenceCc0;
+
+  /// No description provided for @openverseLicenceBy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY（署名）'**
+  String get openverseLicenceBy;
+
+  /// No description provided for @openverseLicenceBySa.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY-SA（相同方式共享）'**
+  String get openverseLicenceBySa;
+
+  /// No description provided for @openverseLicenceByNc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY-NC（非商业）'**
+  String get openverseLicenceByNc;
+
+  /// No description provided for @openverseLicenceByNd.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY-ND（禁止演绎）'**
+  String get openverseLicenceByNd;
+
+  /// No description provided for @openverseLicenceByNcSa.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY-NC-SA'**
+  String get openverseLicenceByNcSa;
+
+  /// No description provided for @openverseLicenceByNcNd.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'CC BY-NC-ND'**
+  String get openverseLicenceByNcNd;
+
   /// No description provided for @openverseFieldSourceHint.
   ///
   /// In zh_CN, this message translates to:

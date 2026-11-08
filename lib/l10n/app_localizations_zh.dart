@@ -1260,6 +1260,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get openverseFieldSource => '来源';
 
   @override
+  String get openverseFieldLicense => '许可';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一种许可下的音频';
+
+  @override
+  String get openverseLicenseAll => '全部许可';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有领域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（署名）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式共享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商业）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止演绎）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
   String get openverseFieldSourceHint => '只看一个目录，不混着来';
 
   @override
@@ -4843,6 +4873,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get openverseFieldSource => '来源';
 
   @override
+  String get openverseFieldLicense => '许可';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一种许可下的音频';
+
+  @override
+  String get openverseLicenseAll => '全部许可';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有领域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（署名）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式共享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商业）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止演绎）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
   String get openverseFieldSourceHint => '只看一个目录，不混着来';
 
   @override
@@ -8424,6 +8484,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get openverseFieldSource => '來源';
+
+  @override
+  String get openverseFieldLicense => '授權';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一種授權下的音訊';
+
+  @override
+  String get openverseLicenseAll => '全部授權';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有領域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（姓名標示）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式分享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商業）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止改作）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
 
   @override
   String get openverseFieldSourceHint => '只看一個目錄，不混著來';

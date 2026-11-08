@@ -688,6 +688,45 @@ void main() async {
   );
 
   test(
+    'a licence of the Openverse source answers its own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final licence in const ['cc0', 'by-sa']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.openverse.copyWith(
+              settings: {'query': '', 'license': licence},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$licence failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: licence);
+        // Every track the service answers for a licence carries it, so the
+        // filter is proved by the data rather than by the request alone.
+        for (final song in result.songs) {
+          expect(
+            song.license,
+            startsWith(licence == 'cc0' ? 'CC0' : 'CC BY-SA'),
+            reason: '${song.title} was answered for $licence',
+          );
+        }
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
     'the playlist mode of Audius reads whole playlists',
     () async {
       final service = MusicSourceService(

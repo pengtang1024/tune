@@ -11,6 +11,52 @@ import 'package:tune/domain/models/music_source.dart';
 /// answer would silently be the unfiltered list.
 void main() {
   group('Openverse source', () {
+    test('a licence narrows the answer', () async {
+      final answers = _OpenverseAnswers();
+
+      await OpenverseSourceAdapter(
+        dio: answers.dio,
+      ).scan(_request(const {'license': 'by-sa'}));
+
+      expect(answers.uris.single.queryParameters['license'], 'by-sa');
+    });
+
+    test('a licence the service does not file is not sent', () async {
+      final answers = _OpenverseAnswers();
+
+      await OpenverseSourceAdapter(
+        dio: answers.dio,
+      ).scan(_request(const {'license': 'pdm'}));
+
+      // The public domain mark answers with no audio, and the service would
+      // read an unknown name as no filter at all.
+      expect(answers.uris.single.queryParameters.containsKey('license'), isFalse);
+    });
+
+    test('the licence of a track is kept with it', () async {
+      final songs = OpenverseSourceAdapter.parseResults(
+        {
+          'results': [
+            {
+              'id': 'one',
+              'title': 'One',
+              'url': 'https://files.example.com/one.mp3',
+              'license': 'by-sa',
+            },
+            {
+              'id': 'two',
+              'title': 'Two',
+              'url': 'https://files.example.com/two.mp3',
+              'license': 'cc0',
+            },
+          ],
+        },
+        sourceId: 'openverse',
+      );
+
+      expect(songs.first.license, 'CC BY-SA');
+      expect(songs.last.license, 'CC0');
+    });
     test('a catalogue narrows the answer', () async {
       final answers = _OpenverseAnswers();
 

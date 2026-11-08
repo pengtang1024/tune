@@ -1398,6 +1398,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openverseFieldSource => 'Catalogue';
 
   @override
+  String get openverseFieldLicense => 'Licence';
+
+  @override
+  String get openverseFieldLicenseHint => 'Only the audio under one licence';
+
+  @override
+  String get openverseLicenseAll => 'Every licence';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0 (public domain)';
+
+  @override
+  String get openverseLicenceBy => 'CC BY (attribution)';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA (share alike)';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC (non commercial)';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND (no derivatives)';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
   String get openverseFieldSourceHint =>
       'One catalogue instead of every one at once';
 

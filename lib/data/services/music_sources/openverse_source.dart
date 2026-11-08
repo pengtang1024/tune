@@ -57,12 +57,36 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   /// browses its own categories.
   static const _sources = ['jamendo', 'freesound'];
 
+  /// The licences the service files its audio under, by the name it uses.
+  ///
+  /// Only the licences that were found to hold audio are offered: the public
+  /// domain mark answers with nothing for audio.
+  static const _licences = [
+    'cc0',
+    'by',
+    'by-sa',
+    'by-nc',
+    'by-nd',
+    'by-nc-sa',
+    'by-nc-nd',
+  ];
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.openverseFieldQueryHint,
+    ),
+    MusicSourceField(
+      'license',
+      AppStrings.instance.openverseFieldLicense,
+      AppStrings.instance.openverseFieldLicenseHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseLicenseAll),
+        for (final licence in _licences)
+          MusicSourceChoice(licence, _licenceLabel(licence)),
+      ],
     ),
     MusicSourceField(
       'source',
@@ -92,6 +116,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
     final source = request.config.setting('source')?.trim() ?? '';
+    final licence = request.config.setting('license')?.trim() ?? '';
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -102,6 +127,8 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
         queryParameters: {
           'q': ?query,
           if (source.isNotEmpty && _sources.contains(source)) 'source': source,
+          if (licence.isNotEmpty && _licences.contains(licence))
+            'license': licence,
           'page_size': 20,
           'page': request.offset ~/ 20 + 1,
         },
@@ -124,6 +151,30 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(request.config.id, error);
     }
+  }
+
+
+  /// The name of a licence in the language of the reader.
+  static String _licenceLabel(String licence) {
+    final strings = AppStrings.instance;
+    return switch (licence) {
+      'cc0' => strings.openverseLicenceCc0,
+      'by' => strings.openverseLicenceBy,
+      'by-sa' => strings.openverseLicenceBySa,
+      'by-nc' => strings.openverseLicenceByNc,
+      'by-nd' => strings.openverseLicenceByNd,
+      'by-nc-sa' => strings.openverseLicenceByNcSa,
+      _ => strings.openverseLicenceByNcNd,
+    };
+  }
+
+  /// The licence of a track, written the way the reader knows it.
+  static String? _licenceText(Object? raw) {
+    final code = raw?.toString().trim().toLowerCase() ?? '';
+    if (code.isEmpty) return null;
+    if (code == 'cc0') return 'CC0';
+    if (code == 'pdm') return 'Public domain';
+    return 'CC ${code.toUpperCase()}';
   }
 
   /// Kept static so JSON mapping can be tested without network access.
@@ -177,6 +228,9 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
               thumbnail ??
               'https://api.openverse.org/v1/audio/$externalId/thumb/',
           genre: genre,
+          // The licence travels with the track: a reader who wants to reuse
+          // what they hear sees it where the source tells it.
+          license: _licenceText(raw['license']),
         ),
       );
     }
