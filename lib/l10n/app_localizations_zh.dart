@@ -1340,6 +1340,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
 
   @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜索服务暂时不可用';
+
+  @override
   String get internetArchiveNoMatch => '没有找到可播放的归档音频';
 
   @override
@@ -1456,6 +1459,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get sourceRadioRecordingsDescription =>
       '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的专辑';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -4686,6 +4696,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
 
   @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜索服务暂时不可用';
+
+  @override
   String get internetArchiveNoMatch => '没有找到可播放的归档音频';
 
   @override
@@ -4802,6 +4815,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   @override
   String get sourceRadioRecordingsDescription =>
       '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的专辑';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
@@ -8032,6 +8052,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get internetArchiveInvalidResponse => 'Internet Archive 回傳了無法識別的回應';
 
   @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜尋服務暫時無法使用';
+
+  @override
   String get internetArchiveNoMatch => '沒有找到可播放的归檔音訊';
 
   @override
@@ -8148,6 +8171,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceRadioRecordingsDescription =>
       '老廣播劇收藏之外、Internet Archive 收錄的電台節目錄音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的專輯';
 
   @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';

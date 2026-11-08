@@ -1485,6 +1485,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Internet Archive returned an unreadable response';
 
   @override
+  String get internetArchiveBackendBusy =>
+      'The search service of Internet Archive is unavailable right now';
+
+  @override
   String get internetArchiveNoMatch => 'No playable archived audio found';
 
   @override
@@ -1610,6 +1614,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sourceRadioRecordingsDescription =>
       'Broadcasts the archive keeps outside its old time radio collection';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'The albums the Free Music Archive keeps in the archive';
 
   @override
   String get sourcePodcastRssDescription =>

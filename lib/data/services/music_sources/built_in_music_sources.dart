@@ -97,6 +97,19 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'free_music_archive',
+        name: strings.sourceFreeMusicArchiveName,
+        description: strings.sourceFreeMusicArchiveDescription,
+        settings: {
+          // The catalogue the Free Music Archive kept when it closed; its
+          // items sit in a collection of their own, apart from the community
+          // uploads of the archive.
+          'query': 'collection:freemusicarchive AND mediatype:audio',
+        },
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'radio_recordings',
         name: strings.sourceRadioRecordingsName,
         description: strings.sourceRadioRecordingsDescription,
@@ -370,6 +383,9 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The source of the albums of the Free Music Archive.
+  static MusicSourceConfig get freeMusicArchive => _entry('free_music_archive');
 
   /// The source of the broadcasts the archive keeps outside old time radio.
   static MusicSourceConfig get radioRecordings => _entry('radio_recordings');

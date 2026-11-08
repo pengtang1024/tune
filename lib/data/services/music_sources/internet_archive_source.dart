@@ -93,36 +93,36 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
-      final response = await _dio.get<Map<String, dynamic>>(
-        'https://archive.org/advancedsearch.php',
-        queryParameters: {
-          // Without a keyword the archive serves the stream the instance
-          // named: what everybody downloaded most, or what was uploaded last.
-          'q': query ?? 'mediatype:audio',
-          'fl[]': ['identifier', 'title', 'creator', 'date'],
-          'rows': limit,
-          'page': request.offset ~/ limit + 1,
-          'output': 'json',
-          'sort[]': browseModeOf(request.config) == BrowseMode.latest
-              ? 'publicdate desc'
-              : 'downloads desc',
-        },
-      );
+      final docs = await _search({
+        // Without a keyword the archive serves the stream the instance
+        // named: what everybody downloaded most, or what was uploaded last.
+        'q': query ?? 'mediatype:audio',
+        'fl[]': ['identifier', 'title', 'creator', 'date'],
+        'rows': limit,
+        'page': request.offset ~/ limit + 1,
+        'output': 'json',
+        'sort[]': browseModeOf(request.config) == BrowseMode.latest
+            ? 'publicdate desc'
+            : 'downloads desc',
+      });
 
-      final data = response.data;
-      final searchResponse = data?['response'];
-      final docs = searchResponse is Map ? searchResponse['docs'] : null;
-      if (docs is! List) {
+      if (docs.docs == null) {
         return failedResult(
           request.config.id,
-          AppStrings.instance.internetArchiveInvalidResponse,
+          docs.busy
+              ? AppStrings.instance.internetArchiveBackendBusy
+              : AppStrings.instance.internetArchiveInvalidResponse,
         );
       }
+      final documents = docs.docs!;
 
       final songs = <Song>[];
       const batchSize = 4;
-      for (var start = 0; start < docs.length; start += batchSize) {
-        final batch = docs.skip(start).take(batchSize).toList(growable: false);
+      for (var start = 0; start < documents.length; start += batchSize) {
+        final batch = documents
+            .skip(start)
+            .take(batchSize)
+            .toList(growable: false);
         final items = await Future.wait(
           batch.map((doc) => _fetchTracks(doc, request.config)),
         );
@@ -130,7 +130,9 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           songs.addAll(tracks);
         }
         request.onProgress?.call(
-          docs.isEmpty ? 1 : ((start + batch.length) / docs.length).clamp(0, 1),
+          documents.isEmpty
+              ? 1
+              : ((start + batch.length) / documents.length).clamp(0, 1),
         );
       }
 
@@ -149,6 +151,37 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       );
     } catch (error) {
       return failedResult(request.config.id, error);
+    }
+  }
+
+  /// The items the search answered with, tried three times.
+  ///
+  /// The archive answers a scan with an HTML page instead of JSON, or with a
+  /// JSON body that carries no items, when it is busy — which a scan of many
+  /// instances of the archive runs into. A moment later it answers properly,
+  /// so the tries keep a scan from failing on a busy moment.
+  Future<({List<dynamic>? docs, bool busy})> _search(
+    Map<String, Object> query,
+  ) async {
+    const delays = [Duration(milliseconds: 600), Duration(milliseconds: 1500)];
+    for (var attempt = 0; ; attempt++) {
+      try {
+        final response = await _dio.get<Map<String, dynamic>>(
+          'https://archive.org/advancedsearch.php',
+          queryParameters: query,
+        );
+        final data = response.data;
+        final answer = data?['response'];
+        final docs = answer is Map ? answer['docs'] : null;
+        if (docs is List) return (docs: docs, busy: false);
+        // The archive answers with an error of its own when its search
+        // backend is down, which is a busy moment rather than a wrong query.
+        final busy = data?['error'] != null;
+        if (attempt >= delays.length) return (docs: null, busy: busy);
+      } catch (_) {
+        if (attempt >= delays.length) rethrow;
+      }
+      await Future<void>.delayed(delays[attempt]);
     }
   }
 

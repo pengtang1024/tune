@@ -2429,6 +2429,12 @@ abstract class AppLocalizations {
   /// **'Internet Archive 返回了无法识别的响应'**
   String get internetArchiveInvalidResponse;
 
+  /// No description provided for @internetArchiveBackendBusy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 的搜索服务暂时不可用'**
+  String get internetArchiveBackendBusy;
+
   /// No description provided for @internetArchiveNoMatch.
   ///
   /// In zh_CN, this message translates to:
@@ -2650,6 +2656,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'老广播剧收藏之外、Internet Archive 收录的电台节目录音'**
   String get sourceRadioRecordingsDescription;
+
+  /// No description provided for @sourceFreeMusicArchiveName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Free Music Archive'**
+  String get sourceFreeMusicArchiveName;
+
+  /// No description provided for @sourceFreeMusicArchiveDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Free Music Archive 收在 Internet Archive 上的专辑'**
+  String get sourceFreeMusicArchiveDescription;
 
   /// No description provided for @sourcePodcastRssDescription.
   ///
