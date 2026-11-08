@@ -2388,6 +2388,51 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librivoxGenreEssays => '随笔';
 
   @override
+  String get librivoxGenreComedy => '喜剧';
+
+  @override
+  String get librivoxGenreDrama => '戏剧';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '历史小说';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲学';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文学小说';
+
+  @override
+  String get librivoxGenrePsychology => '心理学';
+
+  @override
+  String get librivoxGenreScience => '科学';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音乐';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '侦探小说';
+
+  @override
+  String get librivoxGenreSatire => '讽刺';
+
+  @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
 
   @override
@@ -6002,6 +6047,51 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get librivoxGenreEssays => '随笔';
 
   @override
+  String get librivoxGenreComedy => '喜剧';
+
+  @override
+  String get librivoxGenreDrama => '戏剧';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '历史小说';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲学';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文学小说';
+
+  @override
+  String get librivoxGenrePsychology => '心理学';
+
+  @override
+  String get librivoxGenreScience => '科学';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音乐';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '侦探小说';
+
+  @override
+  String get librivoxGenreSatire => '讽刺';
+
+  @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
 
   @override
@@ -9614,6 +9704,51 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get librivoxGenreEssays => '隨筆';
+
+  @override
+  String get librivoxGenreComedy => '喜劇';
+
+  @override
+  String get librivoxGenreDrama => '戲劇';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '歷史小說';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲學';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文學小說';
+
+  @override
+  String get librivoxGenrePsychology => '心理學';
+
+  @override
+  String get librivoxGenreScience => '科學';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音樂';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '偵探小說';
+
+  @override
+  String get librivoxGenreSatire => '諷刺';
 
   @override
   String get librivoxFieldQueryHint => '例如愛麗絲夢遊仙境、狄更斯、童話';

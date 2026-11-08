@@ -4487,6 +4487,96 @@ abstract class AppLocalizations {
   /// **'随笔'**
   String get librivoxGenreEssays;
 
+  /// No description provided for @librivoxGenreComedy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'喜剧'**
+  String get librivoxGenreComedy;
+
+  /// No description provided for @librivoxGenreDrama.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'戏剧'**
+  String get librivoxGenreDrama;
+
+  /// No description provided for @librivoxGenreHistoricalFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'历史小说'**
+  String get librivoxGenreHistoricalFiction;
+
+  /// No description provided for @librivoxGenreNature.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自然'**
+  String get librivoxGenreNature;
+
+  /// No description provided for @librivoxGenrePhilosophy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'哲学'**
+  String get librivoxGenrePhilosophy;
+
+  /// No description provided for @librivoxGenreReligion.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'宗教'**
+  String get librivoxGenreReligion;
+
+  /// No description provided for @librivoxGenreShortStories.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'短篇集'**
+  String get librivoxGenreShortStories;
+
+  /// No description provided for @librivoxGenreHumor.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'幽默'**
+  String get librivoxGenreHumor;
+
+  /// No description provided for @librivoxGenreLiteraryFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'文学小说'**
+  String get librivoxGenreLiteraryFiction;
+
+  /// No description provided for @librivoxGenrePsychology.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'心理学'**
+  String get librivoxGenrePsychology;
+
+  /// No description provided for @librivoxGenreScience.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'科学'**
+  String get librivoxGenreScience;
+
+  /// No description provided for @librivoxGenreWesterns.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'西部'**
+  String get librivoxGenreWesterns;
+
+  /// No description provided for @librivoxGenreMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐'**
+  String get librivoxGenreMusic;
+
+  /// No description provided for @librivoxGenreDetectiveFiction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'侦探小说'**
+  String get librivoxGenreDetectiveFiction;
+
+  /// No description provided for @librivoxGenreSatire.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'讽刺'**
+  String get librivoxGenreSatire;
+
   /// No description provided for @librivoxFieldQueryHint.
   ///
   /// In zh_CN, this message translates to:

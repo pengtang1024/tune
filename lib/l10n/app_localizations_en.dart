@@ -2609,6 +2609,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librivoxGenreEssays => 'Essays';
 
   @override
+  String get librivoxGenreComedy => 'Comedy';
+
+  @override
+  String get librivoxGenreDrama => 'Drama';
+
+  @override
+  String get librivoxGenreHistoricalFiction => 'Historical Fiction';
+
+  @override
+  String get librivoxGenreNature => 'Nature';
+
+  @override
+  String get librivoxGenrePhilosophy => 'Philosophy';
+
+  @override
+  String get librivoxGenreReligion => 'Religion';
+
+  @override
+  String get librivoxGenreShortStories => 'Short Stories';
+
+  @override
+  String get librivoxGenreHumor => 'Humor';
+
+  @override
+  String get librivoxGenreLiteraryFiction => 'Literary Fiction';
+
+  @override
+  String get librivoxGenrePsychology => 'Psychology';
+
+  @override
+  String get librivoxGenreScience => 'Science';
+
+  @override
+  String get librivoxGenreWesterns => 'Westerns';
+
+  @override
+  String get librivoxGenreMusic => 'Music';
+
+  @override
+  String get librivoxGenreDetectiveFiction => 'Detective Fiction';
+
+  @override
+  String get librivoxGenreSatire => 'Satire';
+
+  @override
   String get librivoxFieldQueryHint =>
       'e.g. Alice in Wonderland, Dickens or fairy tales';
 
