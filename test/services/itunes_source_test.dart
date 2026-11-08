@@ -87,6 +87,64 @@ void main() {
       expect(server.requests.single.uri.queryParameters['country'], 'JP');
     });
 
+    test('the album mode reads the albums the keyword names', () async {
+      final server = _ItunesServer(albums: true);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'mode': 'albums'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(1));
+      expect(result.songs.single.album, 'Kind of Blue');
+      expect(result.songs.single.duration, 30000);
+
+      expect(server.requests, hasLength(2));
+      final search = server.requests.first;
+      expect(search.uri.queryParameters['entity'], 'album');
+      expect(search.uri.queryParameters['limit'], '3');
+      expect(search.uri.queryParameters.containsKey('offset'), isFalse);
+
+      final lookup = server.requests.last;
+      expect(lookup.uri.path, '/lookup');
+      expect(lookup.uri.queryParameters['id'], '268443092');
+      expect(lookup.uri.queryParameters['entity'], 'song');
+    });
+
+    test('an album search that finds nothing asks for no lookup', () async {
+      final server = _ItunesServer(albums: true, albumResults: const []);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'mode': 'albums'}),
+        ),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, isEmpty);
+      expect(result.message, AppStrings.instance.itunesNoMatch);
+      expect(server.requests, hasLength(1));
+    });
+
+    test('the album rows of the lookup are not songs', () async {
+      final server = _ItunesServer(albums: true, withCollectionRow: true);
+      final adapter = ItunesSourceAdapter(dio: server.dio);
+
+      final result = await adapter.scan(
+        MusicSourceScanRequest(
+          config: _config(settings: const {'mode': 'albums'}),
+        ),
+      );
+
+      // The collection row carries no preview, so only the track is kept.
+      expect(result.songs, hasLength(1));
+      expect(result.songs.single.title, 'So What');
+    });
+
     test('a song without a preview is left out', () async {
       final server = _ItunesServer(
         results: [_songJson(), _songJson(preview: '')],
@@ -190,11 +248,30 @@ Map<String, dynamic> _songJson({String? preview}) {
 
 /// A store that answers the call the adapter makes.
 class _ItunesServer {
-  _ItunesServer({List<Map<String, dynamic>>? results, this.broken = false})
-    : results = results ?? [_songJson()];
+  _ItunesServer({
+    List<Map<String, dynamic>>? results,
+    List<Map<String, dynamic>>? albumResults,
+    this.broken = false,
+    this.albums = false,
+    this.withCollectionRow = false,
+  }) : results = results ?? [_songJson()],
+       albumResults =
+           albumResults ??
+           const [
+             {
+               'wrapperType': 'collection',
+               'collectionId': 268443092,
+               'collectionName': 'Kind of Blue',
+               'artistName': 'Miles Davis',
+               'trackCount': 5,
+             },
+           ];
 
   final List<Map<String, dynamic>> results;
+  final List<Map<String, dynamic>> albumResults;
   final bool broken;
+  final bool albums;
+  final bool withCollectionRow;
   final requests = <RequestOptions>[];
 
   Dio get dio {
@@ -203,9 +280,30 @@ class _ItunesServer {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           requests.add(options);
-          final body = broken
-              ? {'resultCount': 0}
-              : {'resultCount': results.length, 'results': results};
+          final Map<String, dynamic> body;
+          if (broken) {
+            body = {'resultCount': 0};
+          } else if (albums && options.uri.path == '/search') {
+            body = {
+              'resultCount': albumResults.length,
+              'results': albumResults,
+            };
+          } else if (albums) {
+            body = {
+              'resultCount': results.length + 1,
+              'results': [
+                if (withCollectionRow)
+                  {
+                    'wrapperType': 'collection',
+                    'collectionId': 268443092,
+                    'collectionName': 'Kind of Blue',
+                  },
+                ...results,
+              ],
+            };
+          } else {
+            body = {'resultCount': results.length, 'results': results};
+          }
           handler.resolve(
             Response(
               requestOptions: options,

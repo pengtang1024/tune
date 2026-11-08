@@ -307,6 +307,50 @@ void main() async {
   );
 
   test(
+    'the album mode of the store hands over whole records',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final source = BuiltInMusicSources.itunes.copyWith(
+        enabled: true,
+        settings: const {
+          'query': 'kind of blue miles davis',
+          'country': 'US',
+          'limit': '10',
+          'mode': 'albums',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes albums failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      // The songs of an album stay together: more than one track of the same
+      // record arrives in one scan.
+      final albums = result.songs.map((song) => song.album).toSet();
+      expect(albums, isNotEmpty);
+      expect(
+        result.songs.where((song) => song.album == albums.first).length,
+        greaterThan(1),
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service reads the Apple podcast directory',
     () async {
       final service = MusicSourceService(

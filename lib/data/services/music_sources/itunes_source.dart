@@ -23,7 +23,18 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// The length of a preview, in milliseconds.
   static const _previewLength = 30000;
 
+  /// How many albums the album mode reads in one scan.
+  ///
+  /// An album is read whole, so a scan that walked many of them would fill the
+  /// library with one reader's keyword; three albums keep the scan readable
+  /// while still handing over complete records.
+  static const _albumsPerScan = 3;
+
+  /// The keyword of the album mode, kept next to the mode it belongs to.
+  static const _modeAlbums = 'albums';
+
   static const _searchUrl = 'https://itunes.apple.com/search';
+  static const _lookupUrl = 'https://itunes.apple.com/lookup';
 
   final Dio _dio;
 
@@ -63,6 +74,21 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       required: true,
     ),
     MusicSourceField(
+      'mode',
+      AppStrings.instance.itunesFieldMode,
+      AppStrings.instance.itunesFieldModeHint,
+      choices: [
+        MusicSourceChoice(
+          'songs',
+          AppStrings.instance.itunesModeSongs,
+        ),
+        MusicSourceChoice(
+          _modeAlbums,
+          AppStrings.instance.itunesModeAlbums,
+        ),
+      ],
+    ),
+    MusicSourceField(
       'country',
       AppStrings.instance.itunesFieldCountry,
       AppStrings.instance.itunesFieldCountryHint,
@@ -96,22 +122,23 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(config.setting('limit'));
-      final response = await _dio.get<String>(
-        _searchUrl,
-        queryParameters: {
-          'media': 'music',
-          'entity': 'song',
-          'term': query,
-          'limit': '$limit',
-          'offset': '${request.offset}',
-          'country': _countryOf(config),
-        },
-        options: Options(responseType: ResponseType.plain),
-      );
+      final country = _countryOf(config);
+      final albums = config.setting('mode') == _modeAlbums;
 
-      final decoded = _decode(response.data);
-      final results = decoded?['results'];
-      if (results is! List) {
+      final decoded = albums
+          ? await _albumSongs(
+              query: query,
+              country: country,
+              sourceId: config.id,
+              limit: limit,
+            )
+          : await _songSearch(
+              query: query,
+              country: country,
+              offset: request.offset,
+              limit: limit,
+            );
+      if (decoded == null) {
         return SourceScanResult(
           sourceId: config.id,
           status: SourceScanStatus.failed,
@@ -120,8 +147,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       }
 
       final songs = <Song>[];
-      for (final raw in results) {
-        if (raw is! Map) continue;
+      for (final raw in decoded) {
         final song = songOf(raw, sourceId: config.id);
         if (song != null) songs.add(song);
       }
@@ -135,6 +161,81 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(config.id, error);
     }
+  }
+
+  /// The songs of the keyword, one entry each.
+  Future<List<Map>?> _songSearch({
+    required String query,
+    required String country,
+    required int offset,
+    required int limit,
+  }) async {
+    final response = await _dio.get<String>(
+      _searchUrl,
+      queryParameters: {
+        'media': 'music',
+        'entity': 'song',
+        'term': query,
+        'limit': '$limit',
+        'offset': '$offset',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    return _resultsOf(response.data);
+  }
+
+  /// The songs of the albums the keyword names.
+  ///
+  /// The search answers with albums rather than songs, so the albums are
+  /// looked up together: one request carries every chosen album id and returns
+  /// the tracks of all of them, which keeps a whole record together.
+  Future<List<Map>?> _albumSongs({
+    required String query,
+    required String country,
+    required String sourceId,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      _searchUrl,
+      queryParameters: {
+        'media': 'music',
+        'entity': 'album',
+        'term': query,
+        'limit': '${limit.clamp(1, _albumsPerScan)}',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final albums = _resultsOf(search.data);
+    if (albums == null) return null;
+
+    final ids = <String>[];
+    for (final album in albums) {
+      final id = album['collectionId']?.toString();
+      if (id != null && id.isNotEmpty && !ids.contains(id)) ids.add(id);
+    }
+    if (ids.isEmpty) return const [];
+
+    final lookup = await _dio.get<String>(
+      _lookupUrl,
+      queryParameters: {
+        'id': ids.join(','),
+        'entity': 'song',
+        'limit': '${limit * _albumsPerScan}',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    return _resultsOf(lookup.data);
+  }
+
+  /// The entries of the answer, when the answer holds a list.
+  static List<Map>? _resultsOf(String? body) {
+    final decoded = _decode(body);
+    final results = decoded?['results'];
+    if (results is! List) return null;
+    return results.whereType<Map>().toList(growable: false);
   }
 
   /// One song of the store, or null when it has no preview to play.

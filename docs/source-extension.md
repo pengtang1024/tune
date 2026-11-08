@@ -82,7 +82,7 @@ MusicSourceConfig（实例 · 数据）
 | `audius` | Audius | `openCatalog` | `audius` | 排行 | 关键词（可留空）、数量 |
 | `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、数量 |
 | `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
-| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、数量 |
+| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、读取方式（单曲 / 专辑）、国家/地区、数量 |
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
 | `podcast_catalog` | 播客目录 | `openCatalog` | `podcast_catalog` | 排行 | 关键词（可留空）、数量 |
 | `podcast_apple` | Apple Podcasts | `openCatalog` | `podcast_apple` | 排行 | 关键词（可留空）、国家/地区、数量 |
@@ -156,7 +156,7 @@ MusicSourceConfig（实例 · 数据）
 | `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
-| `itunes` | 无 | `term` 是必填的，接口不提供无词列表；拿到的 `previewUrl` 是 30 秒试听，曲目时长按 30 秒算 | ✅ |
+| `itunes` | 无（关键词必填） | `term` 必填，接口不提供无词列表；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算；「读取方式=专辑」时先 `entity=album` 搜专辑，再用一次多点 `lookup` 取整张曲目 | ✅ |
 
 **浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
 浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。

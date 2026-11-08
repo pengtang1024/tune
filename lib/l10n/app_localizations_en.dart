@@ -1924,6 +1924,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itunesPreviewNote => 'Thirty-second preview of the song';
 
   @override
+  String get itunesFieldMode => 'Read';
+
+  @override
+  String get itunesFieldModeHint =>
+      'Single songs, or whole albums of the keyword';
+
+  @override
+  String get itunesModeSongs => 'Songs';
+
+  @override
+  String get itunesModeAlbums => 'Albums';
+
+  @override
   String get sourceKodiName => 'Kodi';
 
   @override

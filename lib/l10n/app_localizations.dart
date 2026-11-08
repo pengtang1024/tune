@@ -3203,6 +3203,30 @@ abstract class AppLocalizations {
   /// **'这首歌的 30 秒试听'**
   String get itunesPreviewNote;
 
+  /// No description provided for @itunesFieldMode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'读取方式'**
+  String get itunesFieldMode;
+
+  /// No description provided for @itunesFieldModeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲，或按关键词把整张专辑读进来'**
+  String get itunesFieldModeHint;
+
+  /// No description provided for @itunesModeSongs.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'单曲'**
+  String get itunesModeSongs;
+
+  /// No description provided for @itunesModeAlbums.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'专辑'**
+  String get itunesModeAlbums;
+
   /// No description provided for @sourceKodiName.
   ///
   /// In zh_CN, this message translates to:

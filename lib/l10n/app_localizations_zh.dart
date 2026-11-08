@@ -1734,6 +1734,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get itunesPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get itunesFieldMode => '读取方式';
+
+  @override
+  String get itunesFieldModeHint => '单曲，或按关键词把整张专辑读进来';
+
+  @override
+  String get itunesModeSongs => '单曲';
+
+  @override
+  String get itunesModeAlbums => '专辑';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -4813,6 +4825,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get itunesPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get itunesFieldMode => '读取方式';
+
+  @override
+  String get itunesFieldModeHint => '单曲，或按关键词把整张专辑读进来';
+
+  @override
+  String get itunesModeSongs => '单曲';
+
+  @override
+  String get itunesModeAlbums => '专辑';
+
+  @override
   String get sourceKodiName => '自建 Kodi 媒体库';
 
   @override
@@ -7890,6 +7914,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get itunesPreviewNote => '這首歌的 30 秒試聽';
+
+  @override
+  String get itunesFieldMode => '讀取方式';
+
+  @override
+  String get itunesFieldModeHint => '單曲，或按關鍵字把整張專輯讀進來';
+
+  @override
+  String get itunesModeSongs => '單曲';
+
+  @override
+  String get itunesModeAlbums => '專輯';
 
   @override
   String get sourceKodiName => '自架 Kodi 媒體庫';
