@@ -30,7 +30,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// An album is read whole, so a scan that walked many of them would fill the
   /// library with one reader's keyword; three albums keep the scan readable
   /// while still handing over complete records.
-  static const _albumsPerScan = 3;
+  static final _batch = MusicSourceLimit(3, 10);
 
   /// The ways the store is read: its tracks, the records they belong to, and
   /// the artists who made them. The album mode is the only one the store
@@ -42,7 +42,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   ];
 
   /// How many artists the artist mode reads in one scan.
-  static const _artistsPerScan = 3;
+
 
   static const _searchUrl = 'https://itunes.apple.com/search';
 
@@ -91,6 +91,12 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
     ),
     StoreReadMode.field(_modes),
     MusicSourceField(
+      'batch',
+      AppStrings.instance.storeFieldBatch,
+      AppStrings.instance.storeFieldBatchHint(_batch.count, _batch.max),
+      numeric: true,
+    ),
+    MusicSourceField(
       'country',
       AppStrings.instance.itunesFieldCountry,
       AppStrings.instance.itunesFieldCountryHint,
@@ -129,6 +135,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(config.setting('limit'));
+      final batch = _batch.read(config.setting('batch'));
       final country = _countryOf(config);
 
       final decoded = albums
@@ -137,12 +144,14 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
               country: country,
               sourceId: config.id,
               limit: limit,
+              batch: batch,
             )
           : mode == StoreReadMode.artists
           ? await _artistSongs(
               query: query,
               country: country,
               limit: limit,
+              batch: batch,
             )
           : await _songSearch(
               query: query,
@@ -204,6 +213,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// are read from the artist's own catalogue: one lookup per artist, and the
   /// artist row of the answer is not a song because it carries no preview.
   Future<List<Map>?> _artistSongs({
+    required int batch,
     required String query,
     required String country,
     required int limit,
@@ -214,7 +224,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
         'media': 'music',
         'entity': 'musicArtist',
         'term': query,
-        'limit': '${limit < _artistsPerScan ? limit : _artistsPerScan}',
+        'limit': '${limit < batch ? limit : batch}',
         'country': country,
       },
       options: Options(responseType: ResponseType.plain),
@@ -253,6 +263,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   /// the tracks of all of them, which keeps a whole record together. Without a
   /// keyword the albums come from the chart the store serves itself.
   Future<List<Map>?> _albumSongs({
+    required int batch,
     required String query,
     required String country,
     required String sourceId,
@@ -260,7 +271,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   }) async {
     final List<Map>? albums;
     if (query.isEmpty) {
-      albums = await _chartAlbums(country, limit);
+      albums = await _chartAlbums(country, limit, batch: batch);
     } else {
       final search = await _dio.get<String>(
         _searchUrl,
@@ -268,7 +279,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
           'media': 'music',
           'entity': 'album',
           'term': query,
-          'limit': '${limit.clamp(1, _albumsPerScan)}',
+          'limit': '${limit.clamp(1, batch)}',
           'country': country,
         },
         options: Options(responseType: ResponseType.plain),
@@ -289,7 +300,7 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
       queryParameters: {
         'id': ids.join(','),
         'entity': 'song',
-        'limit': '${limit * _albumsPerScan}',
+        'limit': '${limit * batch}',
         'country': country,
       },
       options: Options(responseType: ResponseType.plain),
@@ -301,8 +312,12 @@ class ItunesSourceAdapter extends MusicSourceAdapter {
   ///
   /// The chart answers with the ids of the albums; the songs of those albums
   /// are read from the lookup like the songs of a searched album.
-  Future<List<Map>?> _chartAlbums(String country, int limit) async {
-    final count = limit.clamp(1, _albumsPerScan);
+  Future<List<Map>?> _chartAlbums(
+    String country,
+    int limit, {
+    required int batch,
+  }) async {
+    final count = limit.clamp(1, batch);
     final body = await _chartBody(
       '$_chartHost/${country.toLowerCase()}/music/most-played/$count/albums.json',
     );

@@ -30,7 +30,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// An album is read whole, so a scan that walked many of them would fill the
   /// library with one reader's keyword; three albums keep the scan readable
   /// while still handing over complete records.
-  static const _albumsPerScan = 3;
+  static final _batch = MusicSourceLimit(3, 10);
 
   /// The ways the store is read: its tracks, the records they belong to, the
   /// artists who made them, and the playlists that collect them.
@@ -42,10 +42,10 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   ];
 
   /// How many playlists the playlist mode reads in one scan.
-  static const _playlistsPerScan = 3;
+
 
   /// How many artists the artist mode reads in one scan.
-  static const _artistsPerScan = 3;
+
 
   /// The reaches the charts are read for, by the name the reader picks.
   ///
@@ -116,6 +116,15 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     ),
     StoreReadMode.field(_modes),
     MusicSourceField(
+      'batch',
+      AppStrings.instance.storeFieldBatch,
+      AppStrings.instance.storeFieldBatchHint(
+        _batch.count,
+        _batch.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
       'genre',
       AppStrings.instance.deezerFieldGenre,
       AppStrings.instance.deezerFieldGenreHint,
@@ -146,6 +155,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
 
     try {
       final limit = scanLimit.read(config.setting('limit'));
+      final batch = _batch.read(config.setting('batch'));
       final reach = _reaches[config.setting('genre')?.trim().toLowerCase()];
       final mode = StoreReadMode.of(config.setting('mode'), _modes);
       final wantsPlaylists = mode == StoreReadMode.playlists;
@@ -155,6 +165,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
           keyword: keyword,
           sourceId: config.id,
           limit: limit,
+          batch: batch,
         );
         if (songs == null) {
           return SourceScanResult(
@@ -178,6 +189,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
           keyword: keyword,
           sourceId: config.id,
           limit: limit,
+          batch: batch,
         );
         if (songs == null) {
           return SourceScanResult(
@@ -201,6 +213,7 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
           keyword: keyword,
           sourceId: config.id,
           limit: limit,
+          batch: batch,
         );
         if (songs == null) {
           return SourceScanResult(
@@ -276,8 +289,9 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
     required String keyword,
     required String sourceId,
     required int limit,
+    required int batch,
   }) async {
-    final count = limit < _playlistsPerScan ? limit : _playlistsPerScan;
+    final count = limit < batch ? limit : batch;
     final List<dynamic> playlists;
     if (keyword.isEmpty) {
       final chart = await _dio.get<String>(
@@ -334,11 +348,12 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// top songs of each artist are read: one request per artist, and an artist
   /// without a list is skipped instead of failing the scan.
   Future<List<Song>?> _artistSongs({
+    required int batch,
     required String keyword,
     required String sourceId,
     required int limit,
   }) async {
-    final count = limit < _artistsPerScan ? limit : _artistsPerScan;
+    final count = limit < batch ? limit : batch;
     final List<dynamic> artists;
     if (keyword.isEmpty) {
       final chart = await _dio.get<String>(
@@ -390,11 +405,12 @@ class DeezerSourceAdapter extends MusicSourceAdapter {
   /// of their record even when the track entry names none. Without a keyword
   /// the albums come from the chart the catalogue serves itself.
   Future<List<Song>?> _albumSongs({
+    required int batch,
     required String keyword,
     required String sourceId,
     required int limit,
   }) async {
-    final count = limit < _albumsPerScan ? limit : _albumsPerScan;
+    final count = limit < batch ? limit : batch;
     final List<dynamic> albums;
     if (keyword.isEmpty) {
       final chart = await _dio.get<String>(

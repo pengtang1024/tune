@@ -2415,6 +2415,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deezerPreviewNote => 'Thirty-second preview of the song';
 
   @override
+  String get storeFieldBatch => 'How many at once';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return 'The albums, artists or playlists one scan reads (1–$max, default $count); single tracks are not affected';
+  }
+
+  @override
   String get storeReadModeField => 'Reads';
 
   @override

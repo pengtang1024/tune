@@ -1100,6 +1100,8 @@
   "deezerEmptyResponse": "Deezer returned an empty response",
   "deezerNoMatch": "No matching song on Deezer",
   "deezerPreviewNote": "Thirty-second preview of the song",
+  "storeFieldBatch": "How many at once",
+  "storeFieldBatchHint": "The albums, artists or playlists one scan reads (1–{max}, default {count}); single tracks are not affected",
   "storeReadModeField": "Reads",
   "storeReadModeFieldHint": "The tracks themselves, or the records, artists and playlists behind them",
   "storeReadModeSongs": "Single tracks",

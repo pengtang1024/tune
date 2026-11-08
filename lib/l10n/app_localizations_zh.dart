@@ -2207,6 +2207,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deezerPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get storeFieldBatch => '每次取几个';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次扫描读几张专辑 / 几位艺人 / 几个歌单（1–$max，默认 $count）；单曲方式不受影响';
+  }
+
+  @override
   String get storeReadModeField => '读取方式';
 
   @override
@@ -5894,6 +5902,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deezerPreviewNote => '这首歌的 30 秒试听';
 
   @override
+  String get storeFieldBatch => '每次取几个';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次扫描读几张专辑 / 几位艺人 / 几个歌单（1–$max，默认 $count）；单曲方式不受影响';
+  }
+
+  @override
   String get storeReadModeField => '读取方式';
 
   @override
@@ -9579,6 +9595,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deezerPreviewNote => '這首歌的 30 秒試聽';
+
+  @override
+  String get storeFieldBatch => '每次取幾個';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次掃描讀幾張專輯 / 幾位藝人 / 幾個歌單（1–$max，預設 $count）；單曲方式不受影響';
+  }
 
   @override
   String get storeReadModeField => '讀取方式';

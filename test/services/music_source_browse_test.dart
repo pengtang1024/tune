@@ -8,6 +8,7 @@ import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
+import 'package:tune/data/services/music_sources/deezer_source.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/jamendo_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -310,6 +311,16 @@ void main() {
       expect(captured.uri?.queryParameters['order'], 'popularity_total');
     });
 
+    test('the reader decides how many albums one scan reads', () async {
+      final captured = _Captured(body: {'results': <dynamic>[]});
+
+      await DeezerSourceAdapter(dio: captured.dio).scan(
+        _request('deezer', const {'mode': 'albums', 'query': 'jazz', 'batch': '1'}),
+      );
+
+      // An album is read whole, so the batch sizes the chart it walks.
+      expect(captured.uri?.queryParameters['limit'], '1');
+    });
     test('Jamendo narrows the catalogue by a tag', () async {
       final captured = _Captured(body: {'results': <dynamic>[]});
 

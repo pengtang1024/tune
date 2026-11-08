@@ -1100,6 +1100,8 @@
   "deezerEmptyResponse": "Deezer 傳回了空回應",
   "deezerNoMatch": "Deezer 上沒有符合的歌曲",
   "deezerPreviewNote": "這首歌的 30 秒試聽",
+  "storeFieldBatch": "每次取幾個",
+  "storeFieldBatchHint": "一次掃描讀幾張專輯 / 幾位藝人 / 幾個歌單（1–{max}，預設 {count}）；單曲方式不受影響",
   "storeReadModeField": "讀取方式",
   "storeReadModeFieldHint": "讀單曲，還是讀曲目背後的專輯、藝人與歌單",
   "storeReadModeSongs": "單曲",

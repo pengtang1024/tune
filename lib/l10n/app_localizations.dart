@@ -4127,6 +4127,18 @@ abstract class AppLocalizations {
   /// **'这首歌的 30 秒试听'**
   String get deezerPreviewNote;
 
+  /// No description provided for @storeFieldBatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'每次取几个'**
+  String get storeFieldBatch;
+
+  /// No description provided for @storeFieldBatchHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'一次扫描读几张专辑 / 几位艺人 / 几个歌单（1–{max}，默认 {count}）；单曲方式不受影响'**
+  String storeFieldBatchHint(Object count, Object max);
+
   /// No description provided for @storeReadModeField.
   ///
   /// In zh_CN, this message translates to:
