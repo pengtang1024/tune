@@ -183,6 +183,52 @@ void main() {
       expect(captured.uris.first.path, '/json/stations/search');
     });
 
+    test('a country written by its name is read by its code', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'Germany');
+
+      // The directory filters by the code alone; the names it lists are read
+      // once and turned into the code the filter takes.
+      expect(captured.uris.last.queryParameters['countrycode'], 'DE');
+      expect(
+        captured.uris.map((uri) => uri.path),
+        contains('/json/countries'),
+      );
+    });
+
+    test('the name of a country is read whatever case it is written in', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'the united states of america',
+      );
+
+      expect(captured.uris.last.queryParameters['countrycode'], 'US');
+    });
+
+    test('a code is passed on without asking for the names', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'SG');
+
+      expect(captured.uris.single.queryParameters['countrycode'], 'SG');
+      expect(captured.uris.single.path, '/json/stations/search');
+    });
+
+    test('what is neither a name nor a code is passed on as it stands', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'Neverland');
+
+      expect(captured.uris.last.queryParameters['countrycode'], 'Neverland');
+    });
     test('a tag reads a reach of the whole directory', () async {
       final captured = _CapturedStations();
       final provider = RadioBrowserProvider(dio: captured.dio);
@@ -693,6 +739,41 @@ class _FailoverStations {
               data: <dynamic>[],
               statusCode: 200,
             ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
+
+/// Answers the country list of the directory, and nothing else.
+class _CountryStations {
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          final data = options.uri.path.endsWith('/countries')
+              ? <dynamic>[
+                  {
+                    'name': 'Germany',
+                    'iso_3166_1': 'DE',
+                    'stationcount': 6383,
+                  },
+                  {
+                    'name': 'The United States Of America',
+                    'iso_3166_1': 'US',
+                    'stationcount': 7965,
+                  },
+                ]
+              : <dynamic>[];
+          handler.resolve(
+            Response(requestOptions: options, data: data, statusCode: 200),
           );
         },
       ),

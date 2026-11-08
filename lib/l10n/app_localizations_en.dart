@@ -2025,7 +2025,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldCountryHint =>
-      'A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works';
+      'A country code such as SG, MY, AU, JP, or the name of a country such as Germany';
 
   @override
   String get radioFieldLanguage => 'Language';

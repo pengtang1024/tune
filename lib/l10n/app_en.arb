@@ -980,7 +980,7 @@
   "radioFieldProviderHint": "All directories, Radio Browser, SomaFM, Radio Paradise, NTS or Radio France",
   "radioProviderAll": "All directories",
   "radioFieldCountry": "Country or region",
-  "radioFieldCountryHint": "A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works",
+  "radioFieldCountryHint": "A country code such as SG, MY, AU, JP, or the name of a country such as Germany",
 "radioFieldLanguage": "Language",
   "radioFieldLanguageHint": "A tongue of the directory, e.g. english, spanish",
   "radioFieldOrder": "Order",

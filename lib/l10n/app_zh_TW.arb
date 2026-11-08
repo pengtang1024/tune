@@ -980,7 +980,7 @@
   "radioFieldProviderHint": "全部目錄、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France",
   "radioProviderAll": "全部目錄",
   "radioFieldCountry": "國家／地區",
-  "radioFieldCountryHint": "兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填",
+  "radioFieldCountryHint": "兩位國家代碼（如 SG、MY、AU、JP），或國名（如 Germany）",
 "radioFieldLanguage": "語言",
   "radioFieldLanguageHint": "目錄裡的語言，例如 english、spanish",
   "radioFieldOrder": "排序",

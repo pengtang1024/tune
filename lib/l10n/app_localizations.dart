@@ -3416,7 +3416,7 @@ abstract class AppLocalizations {
   /// No description provided for @radioFieldCountryHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填'**
+  /// **'两位国家代码（如 SG、MY、AU、JP），或国名（如 Germany）'**
   String get radioFieldCountryHint;
 
   /// No description provided for @radioFieldLanguage.

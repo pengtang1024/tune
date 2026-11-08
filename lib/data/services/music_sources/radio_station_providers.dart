@@ -61,7 +61,7 @@ class RadioBrowserProvider extends RadioStationProvider {
     // The directory knows two orders worth offering: the votes a station
     // gathered over the years, and how much it is listened to right now.
     final sort = order?.trim() == 'clickcount' ? 'clickcount' : 'votes';
-    final code = country?.trim() ?? '';
+    final code = await _countryCode(country ?? '');
     // The directory names its tag filter tag: a tagname parameter is ignored
     // and would answer with the unfiltered list.
     final wanted = tag?.trim().toLowerCase() ?? '';
@@ -127,6 +127,15 @@ class RadioBrowserProvider extends RadioStationProvider {
     String path, [
     Map<String, String> queryParameters = const {},
   ]) async {
+    final data = await _readList(path, queryParameters);
+    return data.isEmpty ? const [] : parseStations(data);
+  }
+
+  /// Reads a list from the directory, from whichever mirror answers.
+  Future<List<dynamic>> _readList(
+    String path, [
+    Map<String, String> queryParameters = const {},
+  ]) async {
     DioException? failure;
     final preferred = _base;
     final hosts = preferred == null
@@ -142,13 +151,57 @@ class RadioBrowserProvider extends RadioStationProvider {
         _base = host;
         final data = response.data;
         if (data is! List) return const [];
-        return parseStations(data);
+        return data;
       } on DioException catch (error) {
         failure = error;
         if (!_isUnreachable(error)) rethrow;
       }
     }
     throw failure!;
+  }
+
+  /// The names of the countries the directory lists, by their code.
+  Map<String, String>? _countryCodes;
+
+  /// The code the directory filters by, for the country the reader wrote.
+  ///
+  /// The directory filters by the two-letter code alone, so a reader who
+  /// writes the name of a country is answered with nothing. The names the
+  /// directory itself lists are read once and kept, and a name is turned into
+  /// its code; anything that is not a name is passed on as it was written.
+  Future<String> _countryCode(String raw) async {
+    final value = raw.trim();
+    if (value.isEmpty) return '';
+    // A code is written as the directory stores it: it is passed on as it
+    // stands rather than rewritten, so the filter keeps matching the stations.
+    if (value.length == 2) return value;
+    final codes = await _countryTable();
+    final key = value.toLowerCase().replaceFirst(RegExp('^the '), '');
+    return codes[key] ?? value;
+  }
+
+  Future<Map<String, String>> _countryTable() async {
+    final cached = _countryCodes;
+    if (cached != null) return cached;
+
+    final codes = <String, String>{};
+    try {
+      for (final raw in await _readList('/countries')) {
+        if (raw is! Map) continue;
+        final name = raw['name']?.toString().trim().toLowerCase() ?? '';
+        final code = raw['iso_3166_1']?.toString().trim() ?? '';
+        if (name.isEmpty || code.isEmpty) continue;
+        codes[name] = code;
+        codes[name.replaceFirst(RegExp('^the '), '')] = code;
+        codes[code] = code;
+      }
+    } catch (_) {
+      // The directory may be out of reach; the reader's own writing is then
+      // passed on as it stands, which is what the field accepted before.
+      return const {};
+    }
+    _countryCodes = codes;
+    return codes;
   }
 
   /// Whether a mirror could not be reached at all, as opposed to answering
