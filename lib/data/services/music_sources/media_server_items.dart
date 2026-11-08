@@ -1,4 +1,5 @@
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// The items of a self-hosted media server and the tracks they become.
@@ -136,6 +137,7 @@ class MediaServerItems {
           genre: genres?.first,
           genres: genres,
           year: yearOf(raw),
+          description: descriptionOf(raw),
           bitrate: kbpsOf(raw, media),
           sampleRate: khzOf(raw, media),
           trackNumber: positiveInt(raw['IndexNumber']),
@@ -149,6 +151,14 @@ class MediaServerItems {
     }
     return songs;
   }
+
+
+  /// The description of an item, as plain text.
+  ///
+  /// Jellyfin and Emby write the description as HTML under Overview; a track
+  /// keeps the readable beginning of it.
+  static String? descriptionOf(Map<dynamic, dynamic> raw) =>
+      shortDescription(raw['Overview']);
 
   /// The file behind a track, which holds the technical details.
   static Map<dynamic, dynamic> mediaSourceOf(Map<dynamic, dynamic> raw) {

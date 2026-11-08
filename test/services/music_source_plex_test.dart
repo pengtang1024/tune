@@ -33,6 +33,8 @@ void main() {
       expect(song.artist, 'Charles Dickens');
       expect(song.album, 'Bleak House');
       expect(song.duration, 1582000);
+      // The server writes the summary as an attribute of the track.
+      expect(song.description, 'Chapter one & the beginning.');
       expect(
         song.streamUrl,
         'http://localhost:32400/library/parts/1/file.mp3?X-Plex-Token=secret',
@@ -157,6 +159,7 @@ String _tracksXml() => '''
   <Track ratingKey="10" key="/library/metadata/10" title="In Chancery"
       grandparentTitle="Charles Dickens" parentTitle="Bleak House"
       duration="1582000" parentYear="1853" bitrate="320" index="1"
+      summary="Chapter one &amp; the beginning."
       thumb="/library/metadata/10/thumb/1">
     <Media id="1" duration="1582000" bitrate="320" audioCodec="mp3">
       <Part id="1" key="/library/parts/1/file.mp3" size="5105833" />

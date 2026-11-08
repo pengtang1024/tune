@@ -4,6 +4,7 @@ import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -246,6 +247,7 @@ class PlexSourceAdapter extends MusicSourceAdapter {
               ? null
               : '$server$thumb?X-Plex-Token=$token',
           year: _yearOf(track),
+          description: shortDescription(track.getAttribute('summary')),
           bitrate: _kbpsOf(track),
           trackNumber: _positiveInt(track.getAttribute('index')),
           discNumber: _positiveInt(track.getAttribute('parentIndex')),

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/emby_source.dart';
 import 'package:tune/data/services/music_sources/librivox_source.dart';
+import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -244,6 +245,43 @@ void main() {
     });
   });
 
+  group('The items of a media server', () {
+    test('the description of an item is read as plain text', () {
+      final songs = MediaServerItems.parseItems(
+        {
+          'Items': [
+            {
+              'Id': 'one',
+              'Name': 'One',
+              'Album': 'The Album',
+              'Overview': '<p>A note about <b>the</b> song.</p>',
+            },
+          ],
+        },
+        sourceId: 'jellyfin',
+        server: 'https://jf.example',
+        prefix: '/jellyfin',
+      );
+
+      // The server writes the description as HTML; the track keeps the words.
+      expect(songs.single.description, 'A note about the song.');
+    });
+
+    test('an item without a description keeps none', () {
+      final songs = MediaServerItems.parseItems(
+        {
+          'Items': [
+            {'Id': 'one', 'Name': 'One', 'Album': 'The Album'},
+          ],
+        },
+        sourceId: 'jellyfin',
+        server: 'https://jf.example',
+        prefix: '/jellyfin',
+      );
+
+      expect(songs.single.description, isNull);
+    });
+  });
   group('Emby adapter', () {
     test('the address of a server keeps its prefix out of the way', () {
       expect(
