@@ -326,6 +326,7 @@ void main() {
       final catalogue = BuiltInMusicSources.catalogueOf(AppStrings.instance);
 
       for (final id in const [
+        'internet_archive',
         'news_recordings',
         'poetry',
         'poetry_books',

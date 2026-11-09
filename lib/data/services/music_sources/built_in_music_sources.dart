@@ -28,7 +28,12 @@ class BuiltInMusicSources {
       _instance(types, 'local'),
       _instance(types, 'openverse'),
       _instance(types, 'jamendo', enabled: false, settings: {'format': 'mp32'}),
-      _instance(types, 'internet_archive'),
+      // The catch-all reach of the archive: every audio item it holds. Its
+      // head is whatever the archive counts as most downloaded (religious
+      // recitations) and its tail is whatever was uploaded last (unfinished
+      // uploads), so it waits in the folded group while the sixteen reaches
+      // that name a collection carry the main list.
+      _instance(types, 'internet_archive', weight: 400),
       _instance(
         types,
         'internet_archive',
