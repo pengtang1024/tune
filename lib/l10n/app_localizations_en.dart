@@ -1761,6 +1761,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The archive\'s community uploads of metal and punk: live sets, EPs and netlabel releases';
 
   @override
+  String get sourceCommunityHiphopName => 'Community Hip-Hop & Funk';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'The archive\'s community uploads of hip-hop and funk: mixtapes, beats and live grooves';
+
+  @override
   String get sourceIndependentAudiobooksName => 'Independent audiobooks';
 
   @override

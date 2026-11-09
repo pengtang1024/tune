@@ -464,6 +464,13 @@ void main() {
       expect(BuiltInMusicSources.communityMetal.weight, 400);
     });
 
+    test('the hip-hop list excludes every other community style', () {
+      final query = BuiltInMusicSources.communityHiphop.setting('query') ?? '';
+      expect(query, contains('subject:(hiphop OR funk)'));
+      expect(query, contains('metal OR punk'));
+      expect(BuiltInMusicSources.communityHiphop.weight, 400);
+    });
+
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

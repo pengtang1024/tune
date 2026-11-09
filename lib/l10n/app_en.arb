@@ -893,6 +893,8 @@
 "sourceCommunityWorldDescription": "The archive's community uploads of music from outside the English-speaking charts: regional styles, dub and reggae",
 "sourceCommunityMetalName": "Community Metal & Punk",
 "sourceCommunityMetalDescription": "The archive's community uploads of metal and punk: live sets, EPs and netlabel releases",
+"sourceCommunityHiphopName": "Community Hip-Hop & Funk",
+"sourceCommunityHiphopDescription": "The archive's community uploads of hip-hop and funk: mixtapes, beats and live grooves",
   "sourceIndependentAudiobooksName": "Independent audiobooks",
   "sourceIndependentAudiobooksDescription": "Audiobooks the archive keeps outside the LibriVox collection",
   "sourceArchivePodcastsName": "Archived podcasts",

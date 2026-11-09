@@ -2915,6 +2915,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行'**
   String get sourceCommunityMetalDescription;
 
+  /// No description provided for @sourceCommunityHiphopName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区嘻哈与放克'**
+  String get sourceCommunityHiphopName;
+
+  /// No description provided for @sourceCommunityHiphopDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的嘻哈与放克：混音带、节拍与现场律动'**
+  String get sourceCommunityHiphopDescription;
+
   /// No description provided for @sourceIndependentAudiobooksName.
   ///
   /// In zh_CN, this message translates to:

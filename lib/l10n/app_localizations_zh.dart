@@ -1599,6 +1599,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
 
   @override
+  String get sourceCommunityHiphopName => '社区嘻哈与放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社区上传的嘻哈与放克：混音带、节拍与现场律动';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -5446,6 +5453,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
 
   @override
+  String get sourceCommunityHiphopName => '社区嘻哈与放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社区上传的嘻哈与放克：混音带、节拍与现场律动';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -9291,6 +9305,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceCommunityMetalDescription =>
       'Internet Archive 社群上傳的金屬與龐克：現場、EP 與網路廠牌發行';
+
+  @override
+  String get sourceCommunityHiphopName => '社群嘻哈與放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社群上傳的嘻哈與放克：混音帶、節拍與現場律動';
 
   @override
   String get sourceIndependentAudiobooksName => '獨立有聲書';

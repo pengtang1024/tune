@@ -893,6 +893,8 @@
 "sourceCommunityWorldDescription": "Internet Archive 社群上傳的非英語主流音樂：各地民謠、Dub 與雷鬼",
 "sourceCommunityMetalName": "社群金屬與龐克",
 "sourceCommunityMetalDescription": "Internet Archive 社群上傳的金屬與龐克：現場、EP 與網路廠牌發行",
+"sourceCommunityHiphopName": "社群嘻哈與放克",
+"sourceCommunityHiphopDescription": "Internet Archive 社群上傳的嘻哈與放克：混音帶、節拍與現場律動",
   "sourceIndependentAudiobooksName": "獨立有聲書",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收錄的有聲書",
   "sourceArchivePodcastsName": "檔案播客",

@@ -172,6 +172,24 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'community_hiphop',
+        name: strings.sourceCommunityHiphopName,
+        description: strings.sourceCommunityHiphopDescription,
+        settings: {
+          // Hip-hop and funk, filed apart from the eight styles above. A
+          // country list is not offered: its most-downloaded head carries a
+          // racial slur among the first three titles.
+          'query':
+              'collection:opensource_audio AND mediatype:audio AND '
+              'subject:(hiphop OR funk) AND NOT '
+              'subject:(rock OR jazz OR blues OR electronic OR classical OR '
+              'ambient OR experimental OR world OR reggae OR metal OR punk)',
+        },
+        weight: 400,
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'free_music_archive',
         name: strings.sourceFreeMusicArchiveName,
         description: strings.sourceFreeMusicArchiveDescription,
@@ -550,6 +568,9 @@ class BuiltInMusicSources {
 
   /// The community uploads filed under metal or punk.
   static MusicSourceConfig get communityMetal => _entry('community_metal');
+
+  /// The community uploads filed under hip-hop or funk.
+  static MusicSourceConfig get communityHiphop => _entry('community_hiphop');
 
   /// The source of the audio the archive files outside English.
   static MusicSourceConfig get foreignAudio => _entry('foreign_audio');
