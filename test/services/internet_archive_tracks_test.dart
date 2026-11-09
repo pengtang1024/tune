@@ -153,6 +153,62 @@ void main() {
       // genre of their own; the list they came from is the honest answer.
       expect(result.songs.single.genre, 'Classical');
     });
+    test('a genre is taken from the subject when nothing else names one', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            'creator': 'The Band',
+            'subject': ['Jazz', 'music'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.genre, 'Jazz');
+    });
+
+    test('a subject that names no genre is not taken for one', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            // The archive sometimes splits a title into words and files them
+            // as subjects; none of these names a genre.
+            'subject': ['Bull', 'of', 'heaven', '333'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.genre ?? '', isEmpty);
+    });
     test('a disc that writes the performer into the title keeps one name', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/genre_dictionary.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/recent_window.dart';
@@ -79,6 +80,21 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     'hin': 'Hindi',
     'hindi': 'Hindi',
   };
+
+
+  /// The genre a tag list of the archive names, or null when none is known.
+  static String? _genreOfSubjects(Object? raw) {
+    final values = raw is List ? raw : [raw];
+    for (final value in values) {
+      final text = value?.toString() ?? '';
+      for (final part in text.split(RegExp(r'[;,]'))) {
+        final tag = part.trim();
+        if (tag.isEmpty) continue;
+        if (genreOf(tag) != null) return tag;
+      }
+    }
+    return null;
+  }
 
   /// The tongue of an item, read out of the shapes the archive writes.
   static String? _languageOf(Object? raw) {
@@ -232,7 +248,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           if (decade != null) 'year:[$decade TO ${decade + 9}]',
           if (since != null) 'addeddate:[${_day(since)} TO ${_day(now)}]',
         ].join(' AND '),
-        'fl[]': ['identifier', 'title', 'creator', 'date', 'language'],
+        'fl[]': ['identifier', 'title', 'creator', 'date', 'language', 'subject'],
         'rows': limit,
         'page': request.offset ~/ limit + 1,
         'output': 'json',
@@ -452,7 +468,14 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       // library's genre shelf stays empty for most of that list (measured:
       // 23–35% of the ambient, world and hip-hop items carry a genre of their
       // own).
-      final itemGenre = _firstText([metadata['genre'], theme]);
+      // The subject of an item is a list of tags the uploader chose; the ones
+      // that name a genre the app knows are a better answer than nothing, and
+      // the ones that do not ("bull", "of", "heaven" — a title split into
+      // words) are dropped by the lookup itself.
+      final subjectGenre = _genreOfSubjects(
+        metadata['subject'] ?? rawDoc['subject'],
+      );
+      final itemGenre = _firstText([metadata['genre'], theme, subjectGenre]);
       final year = _parseYear(
         SourceSongFactory.readString(metadata['date'] ?? metadata['publicdate']),
       );
