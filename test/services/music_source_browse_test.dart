@@ -367,6 +367,37 @@ void main() {
 
       expect(captured.query?['sort[]'], 'publicdate desc');
     });
+    test('every source opens with the stream the app intends', () {
+      final service = MusicSourceService(
+        scanner: CrossPlatformMusicScannerImpl(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      // The stream a source opens with is what a reader sees first, so it is
+      // pinned here: a change of it has to be a change of this list too.
+      const expected = {
+        'internet_archive': 'charts',
+        'librivox': 'charts',
+        'audius': 'charts',
+        'ccmixter': 'charts',
+        'deezer': 'charts',
+        'kodi': 'latest',
+        'audiobookshelf': 'latest',
+        'funkwhale': 'latest',
+      };
+
+      for (final source in BuiltInMusicSources.defaults) {
+        final adapter = service.adapters.firstWhere(
+          (adapter) => adapter.sourceType == source.sourceType,
+        );
+        if (adapter.browseModes.isEmpty) continue;
+        final mode = adapter.browseModeOf(source);
+        expect(adapter.browseModes, contains(mode), reason: source.id);
+        final pinned = expected[source.sourceType];
+        if (pinned != null) {
+          expect(mode, pinned, reason: '${source.id} (${source.sourceType})');
+        }
+      }
+    });
     test('a window of dates is asked of the archive itself', () async {
       final captured = _CapturedArchive();
 
