@@ -231,6 +231,10 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
             streamUrl: streamUrl,
             artworkUrl: _artworkUrl(item, podcastArtwork),
             year: year,
+            // A feed that numbers its episodes says so; the number is the
+            // only stable order there is.
+            trackNumber: _intOf(_firstText([item], 'episode')),
+            discNumber: _intOf(_firstText([item], 'season')),
             description: description,
             genre: genres.isEmpty ? null : genres.first,
             genres: genres.isEmpty ? null : genres,
@@ -241,20 +245,24 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     }
 
     // Newest first; an episode whose date could not be read keeps the place the
-    // feed gave it, at the end.
+    // feed gave it, at the end. The order is the feed's, not a number: a
+    // number invented from the batch would shift on every scan, and the older
+    // episodes that fell out of the batch would then share numbers with the
+    // new ones. A feed that states its own episode numbers is read instead.
     final dated = entries.where((entry) => entry.at != null).toList(growable: false)
       ..sort((a, b) => b.at!.compareTo(a.at!));
     final ordered = [...dated, ...entries.where((entry) => entry.at == null)];
-    return [
-      for (var index = 0; index < ordered.length; index++)
-        ordered[index].song.copyWith(
-          trackNumber: index + 1,
-          trackTotal: ordered.length,
-        ),
-    ];
+    return [for (final entry in ordered) entry.song];
   }
 
 
+
+
+  /// The number an episode states about itself, or null when it states none.
+  static int? _intOf(String value) {
+    final number = int.tryParse(value.trim());
+    return number == null || number <= 0 ? null : number;
+  }
 
   /// The categories a feed files its show under.
   ///

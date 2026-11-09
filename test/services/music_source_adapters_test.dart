@@ -182,11 +182,32 @@ void main() {
 
       final songs = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss');
 
-      // A show is a series: the newest episode is the first of the show, and
-      // one whose date could not be read sits at the end rather than in front.
+      // A show is a series: the newest episode comes first, and one whose date
+      // could not be read sits at the end rather than in front. The order is
+      // the feed's; an invented number would shift on every scan.
       expect(songs.map((song) => song.title), ['Newest', 'Older', 'Undated']);
-      expect(songs.map((song) => song.trackNumber), [1, 2, 3]);
-      expect(songs.first.trackTotal, 3);
+      expect(songs.map((song) => song.trackNumber), [null, null, null]);
+    });
+
+    test('the episode number of a feed that states one is kept', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>The Show</title>
+    <item>
+      <title>Season two opener</title>
+      <guid>ep-2-1</guid>
+      <itunes:season>2</itunes:season>
+      <itunes:episode>1</itunes:episode>
+      <enclosure url="https://cdn.example.com/s2e1.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final song = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss').single;
+
+      expect(song.trackNumber, 1);
+      expect(song.discNumber, 2);
     });
     test('the categories of a show travel with its episodes', () {
       final feed = '''<?xml version="1.0" encoding="UTF-8"?>
