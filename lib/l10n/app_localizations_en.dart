@@ -1747,6 +1747,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The archive\'s community uploads of ambient and experimental music: long forms, field recordings and one-off takes';
 
   @override
+  String get sourceCommunityWorldName => 'Community World & Reggae';
+
+  @override
+  String get sourceCommunityWorldDescription =>
+      'The archive\'s community uploads of music from outside the English-speaking charts: regional styles, dub and reggae';
+
+  @override
   String get sourceIndependentAudiobooksName => 'Independent audiobooks';
 
   @override

@@ -450,6 +450,13 @@ void main() {
       expect(instance.weight, 400);
     });
 
+    test('the world list excludes every other community style', () {
+      final query = BuiltInMusicSources.communityWorld.setting('query') ?? '';
+      expect(query, contains('subject:(world OR reggae)'));
+      expect(query, contains('ambient OR experimental'));
+      expect(BuiltInMusicSources.communityWorld.weight, 400);
+    });
+
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

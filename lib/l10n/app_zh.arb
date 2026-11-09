@@ -889,6 +889,8 @@
 "sourceCommunityClassicalDescription": "Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音",
 "sourceCommunityAmbientName": "社区氛围与实验",
 "sourceCommunityAmbientDescription": "Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试",
+"sourceCommunityWorldName": "社区世界与雷鬼",
+"sourceCommunityWorldDescription": "Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼",
   "sourceIndependentAudiobooksName": "独立有声书",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收录的有声书",
   "sourceArchivePodcastsName": "档案播客",

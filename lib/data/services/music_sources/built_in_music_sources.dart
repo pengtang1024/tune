@@ -137,6 +137,24 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'community_world',
+        name: strings.sourceCommunityWorldName,
+        description: strings.sourceCommunityWorldDescription,
+        settings: {
+          // The uploads from outside the styles above: regional music, dub
+          // and reggae. Each of the six styles offered so far is excluded, so
+          // a recording arrives through one list only.
+          'query':
+              'collection:opensource_audio AND mediatype:audio AND '
+              'subject:(world OR reggae) AND NOT '
+              'subject:(rock OR jazz OR blues OR electronic OR classical OR '
+              'ambient OR experimental)',
+        },
+        weight: 400,
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'free_music_archive',
         name: strings.sourceFreeMusicArchiveName,
         description: strings.sourceFreeMusicArchiveDescription,
@@ -509,6 +527,9 @@ class BuiltInMusicSources {
 
   /// The community uploads filed under ambient or experimental music.
   static MusicSourceConfig get communityAmbient => _entry('community_ambient');
+
+  /// The community uploads filed under world music or reggae.
+  static MusicSourceConfig get communityWorld => _entry('community_world');
 
   /// The source of the audio the archive files outside English.
   static MusicSourceConfig get foreignAudio => _entry('foreign_audio');

@@ -889,6 +889,8 @@
 "sourceCommunityClassicalDescription": "Internet Archive 社群上傳的古典音樂：管弦樂、室內樂與獨奏錄音",
 "sourceCommunityAmbientName": "社群氛圍與實驗",
 "sourceCommunityAmbientDescription": "Internet Archive 社群上傳的氛圍與實驗音樂：長曲、實地錄音與一次成型的嘗試",
+"sourceCommunityWorldName": "社群世界與雷鬼",
+"sourceCommunityWorldDescription": "Internet Archive 社群上傳的非英語主流音樂：各地民謠、Dub 與雷鬼",
   "sourceIndependentAudiobooksName": "獨立有聲書",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收錄的有聲書",
   "sourceArchivePodcastsName": "檔案播客",

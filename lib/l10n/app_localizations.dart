@@ -2891,6 +2891,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试'**
   String get sourceCommunityAmbientDescription;
 
+  /// No description provided for @sourceCommunityWorldName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区世界与雷鬼'**
+  String get sourceCommunityWorldName;
+
+  /// No description provided for @sourceCommunityWorldDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼'**
+  String get sourceCommunityWorldDescription;
+
   /// No description provided for @sourceIndependentAudiobooksName.
   ///
   /// In zh_CN, this message translates to:
