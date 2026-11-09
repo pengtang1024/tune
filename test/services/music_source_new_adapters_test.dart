@@ -25,6 +25,22 @@ void main() {
       // The track inside the window and the undated one stay.
       expect(songs.map((song) => song.title), ['New track', 'Undated track']);
     });
+    test('every style a file sits in is kept', () {
+      final answer = _commonsAnswer();
+      _imageInfo(answer)['extmetadata'] = {
+        'ObjectName': 'A tune',
+        'Categories':
+            'Audio files of jazz|Audio files of piano|CC-Zero|Audio files of jazz',
+      };
+
+      final song = WikimediaSourceAdapter.parseResults(
+        answer,
+        sourceId: 'wikimedia',
+      ).single;
+
+      expect(song.genre, 'jazz');
+      expect(song.genres, ['jazz', 'piano']);
+    });
     test('a window keeps only the files uploaded inside it', () {
       final answer = _commonsAnswer();
       _imageInfo(answer)['timestamp'] = '2026-11-01T10:00:00Z';

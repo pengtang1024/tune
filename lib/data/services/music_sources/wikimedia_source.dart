@@ -336,6 +336,11 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
         : file.replaceFirst('File:', '').trim();
     if (title.isEmpty) return null;
 
+    // A file sits in several categories at once, and more than one of them
+    // names a style ("Audio files of jazz", "Audio files of piano"): the
+    // track keeps them all and the first stands for its main style.
+    final genres = _genresOf(meta);
+
     return SourceSongFactory.create(
       sourceId: sourceId,
       externalId: file.isNotEmpty ? file : title,
@@ -343,7 +348,8 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       artist: _meta(meta, 'Artist'),
       duration: _durationOf(info['duration']),
       streamUrl: streamUrl,
-      genre: _genreOf(_meta(meta, 'Categories')),
+      genre: genres.isEmpty ? null : genres.first,
+      genres: genres.isEmpty ? null : genres,
       year: _yearOf(_meta(meta, 'DateTimeOriginal')),
       license: _licenseOf(meta),
       description: _emptyToNull(_meta(meta, 'ImageDescription')),
@@ -401,18 +407,22 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
   static int? _yearOf(String value) =>
       value.length < 4 ? null : int.tryParse(value.substring(0, 4));
 
-  /// The genre of a file, taken from its categories.
+
+  /// The styles a file is filed under, taken from its categories.
   ///
-  /// Commons names the genre in a category such as `Audio files of jazz`, so
-  /// the first matching category carries the genre.
-  static String? _genreOf(String categories) {
+  /// Commons files its audio under one category per reach ("Audio files of
+  /// jazz"); a file that sits in more than one of them is filed under all of
+  /// them, so the whole list is kept and the reader groups by any of it.
+  static List<String> _genresOf(Map<dynamic, dynamic> meta) {
+    final categories = _meta(meta, 'Categories');
+    final genres = <String>[];
     for (final part in categories.split('|')) {
       final index = part.toLowerCase().indexOf(_genreCategory.toLowerCase());
       if (index < 0) continue;
       final genre = part.substring(index + _genreCategory.length).trim();
-      if (genre.isNotEmpty) return genre;
+      if (genre.isNotEmpty && !genres.contains(genre)) genres.add(genre);
     }
-    return null;
+    return genres;
   }
 
   /// Removes the markup of the wiki markup.
