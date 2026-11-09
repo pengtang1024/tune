@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -471,6 +473,23 @@ void main() {
       expect(BuiltInMusicSources.communityHiphop.weight, 400);
     });
 
+    test('every built-in instance is written in the source table', () {
+      // The table in the design note is what a reader consults before adding
+      // a source: an instance that ships without a row there is one nobody
+      // can find.
+      final doc = File('需求/音源设计.md').readAsStringSync();
+      final documented = <String>{};
+      for (final line in doc.split('\n')) {
+        final match = RegExp(r'^\|\s*`([a-z0-9_-]+)`').firstMatch(line);
+        if (match != null) documented.add(match.group(1)!);
+      }
+
+      final missing = BuiltInMusicSources.defaults
+          .map((source) => source.id)
+          .where((id) => !documented.contains(id))
+          .toList();
+      expect(missing, isEmpty, reason: 'not in 需求/音源设计.md: $missing');
+    });
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),
