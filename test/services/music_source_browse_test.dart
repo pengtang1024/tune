@@ -433,6 +433,15 @@ void main() {
 
       expect(captured.query?['sort[]'], 'publicdate desc');
     });
+    test('the classical list is kept apart from the four community styles', () {
+      // Both list the same uploads; the second one excludes the first's
+      // styles so one recording does not arrive through both.
+      final instance = BuiltInMusicSources.communityClassical;
+      expect(instance.setting('query'), contains('subject:(classical)'));
+      expect(instance.setting('query'), contains('NOT'));
+      expect(instance.weight, 400);
+    });
+
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

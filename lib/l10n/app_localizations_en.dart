@@ -1733,6 +1733,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Music the archive\'s community uploads: rock, jazz, blues and electronic';
 
   @override
+  String get sourceCommunityClassicalName => 'Community Classical';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'The archive\'s community uploads of classical music: orchestras, chamber recordings and solo recitals';
+
+  @override
   String get sourceIndependentAudiobooksName => 'Independent audiobooks';
 
   @override

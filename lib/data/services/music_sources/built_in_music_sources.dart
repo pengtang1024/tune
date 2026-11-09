@@ -102,6 +102,25 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'community_classical',
+        name: strings.sourceCommunityClassicalName,
+        description: strings.sourceCommunityClassicalDescription,
+        settings: {
+          // The classical pool is the other half of the community uploads:
+          // it is kept apart from the four styles above, and those four are
+          // excluded here so one recording does not arrive twice.
+          'query':
+              'collection:opensource_audio AND mediatype:audio AND '
+              'subject:(classical) AND NOT '
+              'subject:(rock OR jazz OR blues OR electronic)',
+        },
+        // Half the size of the community list above and a fifth of it already
+        // arrives through the four styles; it waits in the folded group.
+        weight: 400,
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'free_music_archive',
         name: strings.sourceFreeMusicArchiveName,
         description: strings.sourceFreeMusicArchiveDescription,
@@ -467,6 +486,10 @@ class BuiltInMusicSources {
 
   /// The source of the music the archive's community uploads.
   static MusicSourceConfig get communityMusic => _entry('community_music');
+
+  /// The community uploads filed under classical music.
+  static MusicSourceConfig get communityClassical =>
+      _entry('community_classical');
 
   /// The source of the audio the archive files outside English.
   static MusicSourceConfig get foreignAudio => _entry('foreign_audio');

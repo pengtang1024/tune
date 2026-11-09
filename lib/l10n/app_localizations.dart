@@ -2867,6 +2867,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子'**
   String get sourceCommunityMusicDescription;
 
+  /// No description provided for @sourceCommunityClassicalName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区古典'**
+  String get sourceCommunityClassicalName;
+
+  /// No description provided for @sourceCommunityClassicalDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音'**
+  String get sourceCommunityClassicalDescription;
+
   /// No description provided for @sourceIndependentAudiobooksName.
   ///
   /// In zh_CN, this message translates to:

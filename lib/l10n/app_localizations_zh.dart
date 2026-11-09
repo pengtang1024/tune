@@ -1571,6 +1571,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
 
   @override
+  String get sourceCommunityClassicalName => '社区古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -5390,6 +5397,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
 
   @override
+  String get sourceCommunityClassicalName => '社区古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -9207,6 +9221,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceCommunityMusicDescription =>
       'Internet Archive 社群上傳的音樂：搖滾、爵士、藍調與電子';
+
+  @override
+  String get sourceCommunityClassicalName => '社群古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社群上傳的古典音樂：管弦樂、室內樂與獨奏錄音';
 
   @override
   String get sourceIndependentAudiobooksName => '獨立有聲書';

@@ -885,6 +885,8 @@
   "sourceUnlockedRecordingsDescription": "Unlocked Recordings 项目数字化的公版唱片",
   "sourceCommunityMusicName": "社区音乐",
   "sourceCommunityMusicDescription": "Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子",
+"sourceCommunityClassicalName": "社区古典",
+"sourceCommunityClassicalDescription": "Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音",
   "sourceIndependentAudiobooksName": "独立有声书",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收录的有声书",
   "sourceArchivePodcastsName": "档案播客",
