@@ -357,6 +357,15 @@ void main() {
       // The site answers a word it cannot read with an error, not a list.
       expect(captured.uri?.queryParameters.containsKey('lic'), isFalse);
     });
+    test('a sort the reader picks is passed to the archive', () async {
+      final captured = _CapturedArchive();
+
+      await InternetArchiveSourceAdapter(dio: captured.dio).scan(
+        _request('internet_archive', const {'sort': 'published'}),
+      );
+
+      expect(captured.query?['sort[]'], 'publicdate desc');
+    });
     test('a window of dates is asked of the archive itself', () async {
       final captured = _CapturedArchive();
 

@@ -2525,6 +2525,12 @@ abstract class AppLocalizations {
   /// **'最近入库'**
   String get internetArchiveSortAdded;
 
+  /// No description provided for @internetArchiveSortPublished.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最新发布'**
+  String get internetArchiveSortPublished;
+
   /// No description provided for @internetArchiveFieldDecadeHint.
   ///
   /// In zh_CN, this message translates to:

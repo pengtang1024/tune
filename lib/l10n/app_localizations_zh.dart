@@ -1390,6 +1390,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get internetArchiveSortAdded => '最近入库';
 
   @override
+  String get internetArchiveSortPublished => '最新发布';
+
+  @override
   String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
 
   @override
@@ -5206,6 +5209,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get internetArchiveSortAdded => '最近入库';
 
   @override
+  String get internetArchiveSortPublished => '最新发布';
+
+  @override
   String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
 
   @override
@@ -9020,6 +9026,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get internetArchiveSortAdded => '最近入庫';
+
+  @override
+  String get internetArchiveSortPublished => '最新發布';
 
   @override
   String get internetArchiveFieldDecadeHint => '只取歸檔在某個年代的音訊';

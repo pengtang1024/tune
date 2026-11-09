@@ -819,6 +819,7 @@
   "internetArchiveSortBrowse": "按浏览方式",
   "internetArchiveSortTitle": "按标题",
   "internetArchiveSortAdded": "最近入库",
+  "internetArchiveSortPublished": "最新发布",
   "internetArchiveFieldDecadeHint": "只取归档在某个年代的音频",
   "internetArchiveDecadeAll": "全部年代",
   "internetArchiveDecade": "{decade} 年代",

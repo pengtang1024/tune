@@ -819,6 +819,7 @@
   "internetArchiveSortBrowse": "According to the browsing",
   "internetArchiveSortTitle": "By title",
   "internetArchiveSortAdded": "Last added",
+  "internetArchiveSortPublished": "Newest published",
   "internetArchiveFieldDecadeHint": "Only the audio filed under one decade",
   "internetArchiveDecadeAll": "Every decade",
   "internetArchiveDecade": "{decade}s",

@@ -322,6 +322,10 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   static const _sorts = <String, String>{
     'title': 'titleSorter asc',
     'added': 'addeddate desc',
+    // The moment the item was published, which is the moment it came out
+    // rather than the moment the archive took it in — an old recording that
+    // was digitised last week is new by one and old by the other.
+    'published': 'publicdate desc',
   };
 
   /// The order the archive sorts by, or null when the browsing mode decides.
@@ -335,6 +339,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
     final strings = AppStrings.instance;
     return switch (sort) {
       'title' => strings.internetArchiveSortTitle,
+      'published' => strings.internetArchiveSortPublished,
       _ => strings.internetArchiveSortAdded,
     };
   }

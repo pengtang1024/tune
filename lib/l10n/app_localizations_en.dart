@@ -1536,6 +1536,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get internetArchiveSortAdded => 'Last added';
 
   @override
+  String get internetArchiveSortPublished => 'Newest published';
+
+  @override
   String get internetArchiveFieldDecadeHint =>
       'Only the audio filed under one decade';
 
