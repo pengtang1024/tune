@@ -73,7 +73,10 @@ class BuiltInMusicSources {
         id: 'old_time_radio',
         name: strings.sourceOldTimeRadioName,
         description: strings.sourceOldTimeRadioDescription,
-        settings: {'query': 'collection:oldtimeradio AND mediatype:audio'},
+        settings: {
+          // Two pages per scan; the second page of these pools is still the
+          // same kind of recording (checked against the archive's own page 2).
+          'pages': '2','query': 'collection:oldtimeradio AND mediatype:audio'},
       ),
       _instance(
         types,
@@ -81,7 +84,10 @@ class BuiltInMusicSources {
         id: 'archive_music',
         name: strings.sourceAudioMusicName,
         description: strings.sourceAudioMusicDescription,
-        settings: {'query': 'collection:audio_music AND mediatype:audio'},
+        settings: {
+          // Two pages per scan; the second page of these pools is still the
+          // same kind of recording (checked against the archive's own page 2).
+          'pages': '2','query': 'collection:audio_music AND mediatype:audio'},
       ),
       _instance(
         types,
@@ -331,6 +337,9 @@ class BuiltInMusicSources {
         name: strings.sourceArchivePodcastsName,
         description: strings.sourceArchivePodcastsDescription,
         settings: {
+          // Two pages per scan; the second page of these pools is still the
+          // same kind of recording (checked against the archive's own page 2).
+          'pages': '2',
           // The archive keeps podcasts after their feeds stop answering, which
           // the podcast directories can no longer show.
           'query': 'collection:podcasts AND mediatype:audio',

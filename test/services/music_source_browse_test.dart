@@ -507,6 +507,9 @@ void main() {
         'great78',
         'netlabels',
         'live_music_archive',
+        'archive_music',
+        'old_time_radio',
+        'archive_podcasts',
       ]) {
         expect(all[id]!.setting('pages'), '2', reason: id);
       }

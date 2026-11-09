@@ -237,6 +237,11 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       // is a clause of the query, so the archive does the leaving out.
       final since = RecentWindow.cutoff(request.config.setting('since'));
       final now = DateTime.now().toUtc();
+      // A page of the archive holds items, and one item may be a whole record:
+      // the offset the service counts in songs cannot say which page to read.
+      // The cursor counts the items read so far instead, so a second page is
+      // the second page and not the twentieth.
+      final itemsRead = int.tryParse(request.cursor ?? '') ?? 0;
       final docs = await _search({
         // Without a keyword the archive serves the stream the instance
         // named: what everybody downloaded most, or what was uploaded last.
@@ -250,7 +255,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         ].join(' AND '),
         'fl[]': ['identifier', 'title', 'creator', 'date', 'language', 'subject'],
         'rows': limit,
-        'page': request.offset ~/ limit + 1,
+        'page': itemsRead ~/ limit + 1,
         'output': 'json',
         // A sort the reader picked takes precedence over the one a browsing
         // mode would ask for.
@@ -310,6 +315,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
         message: unique.isEmpty
             ? AppStrings.instance.internetArchiveNoMatch
             : null,
+        cursor: '${itemsRead + documents.length}',
       );
     } catch (error) {
       return failedResult(request.config.id, error);

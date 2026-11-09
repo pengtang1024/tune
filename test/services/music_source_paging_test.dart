@@ -42,18 +42,35 @@ void main() {
       expect(captured.uri?.queryParameters['offset'], '40');
     });
 
-    test('the Internet Archive asks for the page of the offset', () async {
+    test('the Internet Archive asks for the page of the items it has read', () async {
       final captured = _Captured(
         body: {
           'response': {'docs': <dynamic>[]},
         },
       );
 
+      // Eight items read means the second page.
       await InternetArchiveSourceAdapter(
         dio: captured.dio,
-      ).scan(_request('internet_archive', offset: 8));
+      ).scan(_request('internet_archive', cursor: '8'));
 
       expect(captured.uri?.queryParameters['page'], '2');
+    });
+
+    test('the Internet Archive does not page by the songs it collected', () async {
+      final captured = _Captured(
+        body: {
+          'response': {'docs': <dynamic>[]},
+        },
+      );
+
+      // A page holds items and an item may hold thirty songs: 240 songs is
+      // one page of items, not the thirtieth page.
+      await InternetArchiveSourceAdapter(
+        dio: captured.dio,
+      ).scan(_request('internet_archive', offset: 240));
+
+      expect(captured.uri?.queryParameters['page'], '1');
     });
 
     test('LibriVox passes the offset to the catalogue', () async {

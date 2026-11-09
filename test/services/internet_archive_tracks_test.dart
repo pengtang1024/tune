@@ -209,6 +209,45 @@ void main() {
 
       expect(result.songs.single.genre ?? '', isEmpty);
     });
+    test('a second page is the second page, not one computed from songs', () async {
+      // One item may hold thirty songs: counting songs and dividing by the
+      // page size sent the scan to the twentieth page and the archive's
+      // deep tail with it.
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {'title': 'The Record', 'creator': 'The Band'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+            {'name': 'two.mp3', 'format': 'VBR MP3', 'title': 'Two'},
+            {'name': 'three.mp3', 'format': 'VBR MP3', 'title': 'Three'},
+          ],
+        },
+      });
+
+      final source = InternetArchiveSourceAdapter(dio: adapter.dio);
+      final first = await source.scan(_request({'limit': '8'}));
+      // Eight items read means the next page is the second, whatever the
+      // three songs those items happened to hold.
+      final second = await source.scan(
+        _request({'limit': '8'}, cursor: '8'),
+      );
+
+      expect(first.songs, hasLength(3));
+      expect(first.cursor, '1');
+      expect(second.cursor, '9');
+      final pages = adapter.uris
+          .where((uri) => uri.path == '/advancedsearch.php')
+          .map((uri) => uri.queryParameters['page'])
+          .toList();
+      expect(pages, ['1', '2']);
+    });
     test('a disc that writes the performer into the title keeps one name', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {
@@ -622,8 +661,9 @@ void main() {
   });
 }
 
-MusicSourceScanRequest _request(Map<String, String> settings) {
+MusicSourceScanRequest _request(Map<String, String> settings, {String? cursor}) {
   return MusicSourceScanRequest(
+    cursor: cursor,
     config: MusicSourceConfig(
       id: 'great78',
       type: 'internet_archive',
