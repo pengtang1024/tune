@@ -77,6 +77,25 @@ void main() {
       expect(songs.first.license, 'CC BY-SA');
       expect(songs.last.license, 'CC0');
     });
+    test('every style a track is filed under is kept', () {
+      final songs = OpenverseSourceAdapter.parseResults(
+        {
+          'results': [
+            {
+              'id': 'audio-1',
+              'title': 'A track',
+              'creator': 'A band',
+              'url': 'https://cdn.example.com/a.mp3',
+              'genres': ['chillout', 'jazz', '  '],
+            },
+          ],
+        },
+        sourceId: 'openverse',
+      );
+
+      expect(songs.single.genre, 'chillout');
+      expect(songs.single.genres, ['chillout', 'jazz']);
+    });
     test('a catalogue narrows the answer', () async {
       final answers = _OpenverseAnswers();
 

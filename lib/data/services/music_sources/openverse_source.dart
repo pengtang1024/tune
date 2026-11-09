@@ -226,10 +226,18 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
           ? (audioSet['title']?.toString() ?? '')
           : (raw['provider']?.toString() ?? '');
 
+      // The service files a track under several styles at once ("chillout",
+      // "jazz"); the library groups by all of them, so the whole list is kept
+      // and the first one stands for the track's main style.
       final rawGenres = raw['genres'];
-      final genre = rawGenres is List && rawGenres.isNotEmpty
-          ? rawGenres.first?.toString()
-          : null;
+      final genres = rawGenres is List
+          ? <String>[
+              for (final value in rawGenres)
+                if ((value?.toString().trim() ?? '').isNotEmpty)
+                  value.toString().trim(),
+            ]
+          : const <String>[];
+      final genre = genres.isEmpty ? null : genres.first;
 
       final thumbnail = SourceSongFactory.normalizeUrl(
         raw['thumbnail']?.toString(),
@@ -248,6 +256,7 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
               thumbnail ??
               'https://api.openverse.org/v1/audio/$externalId/thumb/',
           genre: genre,
+          genres: genres.isEmpty ? null : genres,
           // The licence travels with the track: a reader who wants to reuse
           // what they hear sees it where the source tells it.
           license: _licenceText(raw['license']),
