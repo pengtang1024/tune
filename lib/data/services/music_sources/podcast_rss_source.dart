@@ -20,6 +20,11 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 100);
 
+  /// A show runs backwards: the older episodes are the tail of the feed,
+  /// so a second page walks further back in time.
+  @override
+  bool get supportsPaging => true;
+
   final Dio _dio;
 
   PodcastRssSourceAdapter({Dio? dio})
@@ -118,6 +123,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
         body,
         sourceId: request.config.id,
         limit: limit,
+        offset: request.offset,
         since: since,
       );
       return SourceScanResult(
@@ -179,6 +185,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     String xml, {
     required String sourceId,
     int limit = 20,
+    int offset = 0,
     DateTime? since,
   }) {
     final document = XmlDocument.parse(xml);
@@ -199,7 +206,10 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final seen = <String>{};
 
     for (final item in document.findAllElements('item')) {
-      if (entries.length >= limit) break;
+      // The feed is not promised to be newest-first, so every item is read
+      // before the order is decided; the cap only keeps a runaway feed from
+      // being read forever.
+      if (entries.length >= _maxFeedItems) break;
 
       final title = _firstText([item], 'title');
       if (title.isEmpty) continue;
@@ -252,7 +262,12 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final dated = entries.where((entry) => entry.at != null).toList(growable: false)
       ..sort((a, b) => b.at!.compareTo(a.at!));
     final ordered = [...dated, ...entries.where((entry) => entry.at == null)];
-    return [for (final entry in ordered) entry.song];
+    // Older episodes are the tail of the show: a scan that asks for the next
+    // page walks further back, which is what a podcast needs and a chart does
+    // not.
+    return [
+      for (final entry in ordered.skip(offset).take(limit)) entry.song,
+    ];
   }
 
 
@@ -263,6 +278,9 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final number = int.tryParse(value.trim());
     return number == null || number <= 0 ? null : number;
   }
+
+  /// The most episodes one feed is read for, whatever the page asks.
+  static const _maxFeedItems = 2000;
 
   /// The categories a feed files its show under.
   ///

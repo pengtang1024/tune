@@ -209,6 +209,42 @@ void main() {
       expect(song.trackNumber, 1);
       expect(song.discNumber, 2);
     });
+    test('a second page of a show walks further back in time', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>The Show</title>
+    <item><title>Four</title><guid>e4</guid>
+      <pubDate>Thu, 05 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/4.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Two</title><guid>e2</guid>
+      <pubDate>Tue, 03 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/2.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Five</title><guid>e5</guid>
+      <pubDate>Fri, 06 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/5.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Three</title><guid>e3</guid>
+      <pubDate>Wed, 04 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/3.mp3" type="audio/mpeg" length="1"/></item>
+  </channel>
+</rss>''';
+
+      final first = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        limit: 2,
+      );
+      final second = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        limit: 2,
+        offset: 2,
+      );
+
+      expect(first.map((song) => song.title), ['Five', 'Four']);
+      // The tail of a show is its older episodes.
+      expect(second.map((song) => song.title), ['Three', 'Two']);
+    });
     test('the categories of a show travel with its episodes', () {
       final feed = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
