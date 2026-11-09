@@ -49,6 +49,49 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   /// whole of a long book raises it.
   static const _tracksPerItem = MusicSourceLimit(30, 200);
 
+
+  /// The tongues the archive files an item under, by the code or name it
+  /// writes, all of them a name the language filter offers.
+  static const _languageAliases = <String, String>{
+    'eng': 'English',
+    'english': 'English',
+    'ger': 'German',
+    'deu': 'German',
+    'german': 'German',
+    'fre': 'French',
+    'fra': 'French',
+    'french': 'French',
+    'spa': 'Spanish',
+    'spanish': 'Spanish',
+    'jpn': 'Japanese',
+    'japanese': 'Japanese',
+    'ara': 'Arabic',
+    'arabic': 'Arabic',
+    'kor': 'Korean',
+    'korean': 'Korean',
+    'rus': 'Russian',
+    'russian': 'Russian',
+    'por': 'Portuguese',
+    'portuguese': 'Portuguese',
+    'chi': 'Chinese',
+    'zho': 'Chinese',
+    'chinese': 'Chinese',
+    'hin': 'Hindi',
+    'hindi': 'Hindi',
+  };
+
+  /// The tongue of an item, read out of the shapes the archive writes.
+  static String? _languageOf(Object? raw) {
+    final values = raw is List ? raw : [raw];
+    for (final value in values) {
+      final text = value?.toString().trim().toLowerCase() ?? '';
+      if (text.isEmpty) continue;
+      final name = _languageAliases[text.split('|').first.split(':').first.trim()];
+      if (name != null) return name;
+    }
+    return null;
+  }
+
   static const _audioExtensions = ['.mp3', '.ogg', '.m4a', '.flac'];
 
   /// The suffixes the archive adds to name the quality of a copy.
@@ -189,7 +232,7 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
           if (decade != null) 'year:[$decade TO ${decade + 9}]',
           if (since != null) 'addeddate:[${_day(since)} TO ${_day(now)}]',
         ].join(' AND '),
-        'fl[]': ['identifier', 'title', 'creator', 'date'],
+        'fl[]': ['identifier', 'title', 'creator', 'date', 'language'],
         'rows': limit,
         'page': request.offset ~/ limit + 1,
         'output': 'json',
@@ -469,6 +512,11 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             trackTotal: track?.total ?? files.length,
             description: itemDescription,
             license: itemLicense,
+            // The archive writes the tongue of an item as a list of codes and
+            // names ("spa", "english") or as one name; the library groups by
+            // the name, so the values are read back into the name the filter
+            // offers instead of whatever shape the uploader left.
+            language: _languageOf(metadata['language'] ?? rawDoc['language']),
           ),
         );
       }

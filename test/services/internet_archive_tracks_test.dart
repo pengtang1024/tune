@@ -96,6 +96,38 @@ void main() {
       );
     });
 
+    test('the tongue of an item is read into the name the filter offers', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {
+                'identifier': 'the-record',
+                'title': 'The Record',
+                'language': ['spa', 'english'],
+              },
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            'creator': 'The Band',
+            'language': ['spa', 'english'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // The codes the uploader wrote become the name the filter offers.
+      expect(result.songs.single.language, 'Spanish');
+    });
     test('a disc that writes the performer into the title keeps one name', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {
