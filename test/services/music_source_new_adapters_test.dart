@@ -64,6 +64,27 @@ void main() {
       // The track inside the window and the undated one stay.
       expect(songs.map((song) => song.title), ['New', 'Undated']);
     });
+    test('the credits of a track are kept as a list', () {
+      final songs = MediaServerItems.parseItems(
+        {
+          'Items': [
+            {
+              'Id': 'a-1',
+              'Name': 'A duet',
+              'AlbumArtist': 'The Two',
+              'Artists': ['Singer One', 'Singer Two', 'Singer One'],
+              'RunTimeTicks': 1800000000,
+            },
+          ],
+        },
+        sourceId: 'jellyfin',
+        server: 'http://jelly.example',
+        prefix: '/Audio',
+      );
+
+      expect(songs.single.artist, 'The Two');
+      expect(songs.single.performers, ['Singer One', 'Singer Two']);
+    });
   group('Wikimedia adapter', () {
     test('maps the metadata of an audio file', () {
       final songs = WikimediaSourceAdapter.parseResults(

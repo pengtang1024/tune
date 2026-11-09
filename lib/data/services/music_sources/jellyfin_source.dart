@@ -120,7 +120,8 @@ class JellyfinSourceAdapter extends MusicSourceAdapter {
         queryParameters: {
           'Recursive': 'true',
           'IncludeItemTypes': 'Audio',
-          'Fields': 'Genres,MediaSources,Bitrate,SampleRate,DateCreated',
+          'Fields':
+              'Genres,MediaSources,Bitrate,SampleRate,DateCreated,Artists',
           'StartIndex': request.offset,
           'Limit': limit,
         },

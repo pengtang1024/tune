@@ -138,6 +138,7 @@ class MediaServerItems {
           title: title,
           artist: artistOf(raw),
           album: raw['Album']?.toString() ?? '',
+          performers: performersOf(raw),
           duration: durationFromTicks(raw['RunTimeTicks']),
           streamUrl: streamUrlFor(server, prefix, id),
           artworkUrl: artworkUrlFor(server, prefix, id, token: token),
@@ -191,6 +192,21 @@ class MediaServerItems {
       }
     }
     return '';
+  }
+
+  /// The performers of a track, as the server lists them.
+  ///
+  /// A server writes the credits of a track as a list; the track keeps the
+  /// whole list, so a duet is not filed under one of the two names.
+  static List<String>? performersOf(Map<dynamic, dynamic> raw) {
+    final artists = raw['Artists'];
+    if (artists is! List) return null;
+    final names = <String>[];
+    for (final artist in artists) {
+      final name = artist?.toString().trim() ?? '';
+      if (name.isNotEmpty && !names.contains(name)) names.add(name);
+    }
+    return names.isEmpty ? null : names;
   }
 
   static List<String>? genresOf(Map<dynamic, dynamic> raw) {
