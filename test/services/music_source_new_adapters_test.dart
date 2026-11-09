@@ -25,6 +25,27 @@ void main() {
       // The track inside the window and the undated one stay.
       expect(songs.map((song) => song.title), ['New track', 'Undated track']);
     });
+    test('a window keeps only the files uploaded inside it', () {
+      final answer = _commonsAnswer();
+      _imageInfo(answer)['timestamp'] = '2026-11-01T10:00:00Z';
+      final pages = answer['query']['pages'] as Map<String, dynamic>;
+      pages['2'] = _pageWith({
+        'mediatype': 'AUDIO',
+        'mime': 'audio/ogg',
+        'url': 'https://upload.wikimedia.org/old.ogg',
+        'timestamp': '2019-05-04T10:00:00Z',
+      }, title: 'File:Old.ogg');
+
+      final songs = WikimediaSourceAdapter.parseResults(
+        answer,
+        sourceId: 'wikimedia',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The file inside the window stays, the 2019 one goes.
+      expect(songs.map((song) => song.title), isNot(contains('Old.ogg')));
+      expect(songs, isNotEmpty);
+    });
     test('a window of stamps keeps only the tracks added inside it', () {
       final xml = '''<MediaContainer>
   <Track ratingKey="1" title="New" addedAt="1790000000"><Media><Part key="/library/parts/1" /></Media></Track>

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
@@ -114,6 +115,19 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
       ],
     ),
     MusicSourceField(
+      'since',
+      AppStrings.instance.recentWindowField,
+      AppStrings.instance.recentWindowFieldHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.recentWindowAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.recentWindowDays('$days'),
+          ),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitFiles,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -187,7 +201,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'gcmlimit': limit,
                 if (request.cursor != null) 'gcmcontinue': request.cursor,
                 'prop': 'imageinfo',
-                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
+                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata|timestamp',
               }
             : {
                 'action': 'query',
@@ -198,13 +212,16 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
                 'gsrlimit': limit,
                 if (request.offset > 0) 'gsroffset': request.offset,
                 'prop': 'imageinfo',
-                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata',
+                'iiprop': 'url|size|mime|mediatype|metadata|extmetadata|timestamp',
               },
         ),
         // The wiki answers with an empty page when it could not read the
         // request at all, which is worth one more try as well.
         answered: (answer) => answer.data != null,
-        delays: const [Duration(seconds: 1), Duration(seconds: 3)],
+        // A scan of the app walks the categories of the commons one after the
+        // other, and the wiki counts a caller per minute: the waits are long
+        // enough to step outside the window it closes.
+        delays: const [Duration(seconds: 2), Duration(seconds: 6)],
       );
       final data = response.data;
       if (data == null) {
@@ -217,6 +234,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
         data,
         sourceId: request.config.id,
         limit: limit,
+        since: RecentWindow.cutoff(request.config.setting('since')),
       );
       return SourceScanResult(
         sourceId: request.config.id,
@@ -261,6 +279,7 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     Map<String, dynamic> data, {
     required String sourceId,
     int limit = 15,
+    DateTime? since,
   }) {
     final query = data['query'];
     final pages = query is Map ? query['pages'] : null;
@@ -271,11 +290,27 @@ class WikimediaSourceAdapter extends MusicSourceAdapter {
     for (final page in pages.values) {
       if (songs.length >= limit) break;
       if (page is! Map) continue;
+      // The wiki stamps a file with the moment it was uploaded; a file older
+      // than the window is left out, one without the stamp is kept.
+      if (since != null) {
+        final added = RecentWindow.dateTimeOf(_uploadedAt(page));
+        if (added != null && added.isBefore(since)) continue;
+      }
       final song = _songOf(page, sourceId: sourceId);
       if (song == null || !seen.add(song.externalId ?? '')) continue;
       songs.add(song);
     }
     return songs;
+  }
+
+
+  /// The moment a file was uploaded, from the stamp of its image info.
+  static Object? _uploadedAt(Object? page) {
+    if (page is! Map) return null;
+    final infos = page['imageinfo'];
+    if (infos is! List || infos.isEmpty) return null;
+    final info = infos.first;
+    return info is Map ? info['timestamp'] : null;
   }
 
   /// Turns one page of the answer into a track.
