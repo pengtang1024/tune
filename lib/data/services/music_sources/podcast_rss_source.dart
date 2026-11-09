@@ -188,6 +188,10 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       'title',
     );
     final podcastArtwork = _channelArtwork(channel);
+    // The feed files the show under one or two categories of its own
+    // ("News", "Daily News"); the episodes carry them, so a library can group
+    // its podcasts by what they are about.
+    final genres = _categoriesOf(channel);
 
     final songs = <Song>[];
     final seen = <String>{};
@@ -225,6 +229,8 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
           artworkUrl: _artworkUrl(item, podcastArtwork),
           year: year,
           description: description,
+          genre: genres.isEmpty ? null : genres.first,
+          genres: genres.isEmpty ? null : genres,
         ),
       );
     }
@@ -232,6 +238,21 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     return songs;
   }
 
+
+
+  /// The categories a feed files its show under.
+  ///
+  /// The feed writes them as `<itunes:category text="News">`, sometimes with a
+  /// subcategory inside; both are what the show says about itself.
+  static List<String> _categoriesOf(XmlElement? channel) {
+    if (channel == null) return const [];
+    final genres = <String>[];
+    for (final category in channel.findAllElements('itunes:category')) {
+      final text = category.getAttribute('text')?.trim() ?? '';
+      if (text.isNotEmpty && !genres.contains(text)) genres.add(text);
+    }
+    return genres.take(5).toList(growable: false);
+  }
 
   /// Reads the audio file of an episode.
   ///

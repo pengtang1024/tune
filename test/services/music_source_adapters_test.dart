@@ -155,6 +155,25 @@ void main() {
   });
 
   group('podcast RSS adapter', () {
+    test('the categories of a show travel with its episodes', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>The Show</title>
+    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
+    <item>
+      <title>An episode</title>
+      <guid>ep-1</guid>
+      <enclosure url="https://cdn.example.com/one.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss');
+
+      expect(songs.single.genre, 'News');
+      expect(songs.single.genres, ['News', 'Daily News']);
+    });
     test('a window of dates drops the episodes older than it', () {
       final feed = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Show</title>
