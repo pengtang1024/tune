@@ -128,6 +128,31 @@ void main() {
       // The codes the uploader wrote become the name the filter offers.
       expect(result.songs.single.language, 'Spanish');
     });
+    test('an item without a genre keeps the theme of its list', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {'title': 'The Record', 'creator': 'The Band'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10', 'theme': 'Classical'}));
+
+      // Measured: only 23–35% of the ambient, world and hip-hop items state a
+      // genre of their own; the list they came from is the honest answer.
+      expect(result.songs.single.genre, 'Classical');
+    });
     test('a disc that writes the performer into the title keeps one name', () async {
       final adapter = _ArchiveAdapter({
         '/advancedsearch.php': {

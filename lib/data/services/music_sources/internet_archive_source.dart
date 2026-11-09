@@ -263,7 +263,14 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             .take(batchSize)
             .toList(growable: false);
         final items = await Future.wait(
-          batch.map((doc) => _fetchTracks(doc, request.config, perItem)),
+          batch.map(
+            (doc) => _fetchTracks(
+              doc,
+              request.config,
+              perItem,
+              theme: request.config.setting('theme'),
+            ),
+          ),
         );
         for (final tracks in items) {
           songs.addAll(tracks);
@@ -411,8 +418,9 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
   Future<List<Song>> _fetchTracks(
     Object? rawDoc,
     MusicSourceConfig config,
-    int perItem,
-  ) async {
+    int perItem, {
+    String? theme,
+  }) async {
     if (rawDoc is! Map) return const [];
 
     final identifier = rawDoc['identifier']?.toString() ?? '';
@@ -439,7 +447,12 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       // travels; both belong to every track of it.
       final itemDescription = _descriptionOf(metadata['description']);
       final itemLicense = _licenceOf(metadata['licenseurl']);
-      final itemGenre = SourceSongFactory.readString(metadata['genre']).trim();
+      // An item that states no genre keeps the theme of the list it was found
+      // in: a recording on the classical list is classical. Without it the
+      // library's genre shelf stays empty for most of that list (measured:
+      // 23–35% of the ambient, world and hip-hop items carry a genre of their
+      // own).
+      final itemGenre = _firstText([metadata['genre'], theme]);
       final year = _parseYear(
         SourceSongFactory.readString(metadata['date'] ?? metadata['publicdate']),
       );

@@ -113,6 +113,9 @@ class BuiltInMusicSources {
               'collection:opensource_audio AND mediatype:audio AND '
               'subject:(classical) AND NOT '
               'subject:(rock OR jazz OR blues OR electronic)',
+          // The list itself is the theme: an item that states no genre
+          // keeps this one.
+          'theme': 'Classical',
         },
         // Half the size of the community list above and a fifth of it already
         // arrives through the four styles; it waits in the folded group.
@@ -131,6 +134,9 @@ class BuiltInMusicSources {
               'collection:opensource_audio AND mediatype:audio AND '
               'subject:(ambient OR experimental) AND NOT '
               'subject:(rock OR jazz OR blues OR electronic OR classical)',
+          // The list itself is the theme: an item that states no genre
+          // keeps this one.
+          'theme': 'Ambient',
         },
         weight: 400,
       ),
@@ -149,6 +155,9 @@ class BuiltInMusicSources {
               'subject:(world OR reggae) AND NOT '
               'subject:(rock OR jazz OR blues OR electronic OR classical OR '
               'ambient OR experimental)',
+          // The list itself is the theme: an item that states no genre
+          // keeps this one.
+          'theme': 'World',
         },
         weight: 400,
       ),
@@ -166,6 +175,9 @@ class BuiltInMusicSources {
               'subject:(metal OR punk) AND NOT '
               'subject:(rock OR jazz OR blues OR electronic OR classical OR '
               'ambient OR experimental OR world OR reggae)',
+          // The list itself is the theme: an item that states no genre
+          // keeps this one.
+          'theme': 'Metal',
         },
         weight: 400,
       ),
@@ -184,6 +196,9 @@ class BuiltInMusicSources {
               'subject:(hiphop OR funk) AND NOT '
               'subject:(rock OR jazz OR blues OR electronic OR classical OR '
               'ambient OR experimental OR world OR reggae OR metal OR punk)',
+          // The list itself is the theme: an item that states no genre
+          // keeps this one.
+          'theme': 'Hip Hop',
         },
         weight: 400,
       ),
