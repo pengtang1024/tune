@@ -7,7 +7,7 @@ import 'localization_words.dart';
 
 /// Guards the localisation of the app.
 ///
-/// Six rules are checked:
+/// Seven rules are checked:
 ///
 /// * every locale ships the same catalogue, so no language falls back to
 ///   another one by accident,
@@ -36,6 +36,21 @@ void main() {
           .toList()
         ..sort();
 
+  test('every catalogue file is valid JSON', () {
+    // A missing comma makes the file unreadable, and the generator then keeps
+    // the getters it had: the build still passes, the new text is simply not
+    // in the app. The message names the file so the comma is easy to find.
+    for (final file in locales) {
+      try {
+        jsonDecode(File('$arbDirectory/$file').readAsStringSync());
+      } on FormatException catch (error) {
+        fail(
+          '$file is not valid JSON — a comma is missing at the end of a line '
+          'near offset ${error.offset}: ${error.message}',
+        );
+      }
+    }
+  });
   test('every locale shows its own catalogue', () {
     final failures = <String>[];
 
