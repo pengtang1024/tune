@@ -1754,6 +1754,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The archive\'s community uploads of music from outside the English-speaking charts: regional styles, dub and reggae';
 
   @override
+  String get sourceCommunityMetalName => 'Community Metal & Punk';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'The archive\'s community uploads of metal and punk: live sets, EPs and netlabel releases';
+
+  @override
   String get sourceIndependentAudiobooksName => 'Independent audiobooks';
 
   @override

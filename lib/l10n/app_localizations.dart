@@ -2903,6 +2903,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼'**
   String get sourceCommunityWorldDescription;
 
+  /// No description provided for @sourceCommunityMetalName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区金属与朋克'**
+  String get sourceCommunityMetalName;
+
+  /// No description provided for @sourceCommunityMetalDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行'**
+  String get sourceCommunityMetalDescription;
+
   /// No description provided for @sourceIndependentAudiobooksName.
   ///
   /// In zh_CN, this message translates to:

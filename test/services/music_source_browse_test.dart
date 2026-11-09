@@ -457,6 +457,13 @@ void main() {
       expect(BuiltInMusicSources.communityWorld.weight, 400);
     });
 
+    test('the metal list excludes every other community style', () {
+      final query = BuiltInMusicSources.communityMetal.setting('query') ?? '';
+      expect(query, contains('subject:(metal OR punk)'));
+      expect(query, contains('world OR reggae'));
+      expect(BuiltInMusicSources.communityMetal.weight, 400);
+    });
+
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

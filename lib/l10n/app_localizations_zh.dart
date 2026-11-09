@@ -1592,6 +1592,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼';
 
   @override
+  String get sourceCommunityMetalName => '社区金属与朋克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -5432,6 +5439,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼';
 
   @override
+  String get sourceCommunityMetalName => '社区金属与朋克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -9270,6 +9284,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceCommunityWorldDescription =>
       'Internet Archive 社群上傳的非英語主流音樂：各地民謠、Dub 與雷鬼';
+
+  @override
+  String get sourceCommunityMetalName => '社群金屬與龐克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社群上傳的金屬與龐克：現場、EP 與網路廠牌發行';
 
   @override
   String get sourceIndependentAudiobooksName => '獨立有聲書';

@@ -891,6 +891,8 @@
 "sourceCommunityAmbientDescription": "Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试",
 "sourceCommunityWorldName": "社区世界与雷鬼",
 "sourceCommunityWorldDescription": "Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼",
+"sourceCommunityMetalName": "社区金属与朋克",
+"sourceCommunityMetalDescription": "Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行",
   "sourceIndependentAudiobooksName": "独立有声书",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收录的有声书",
   "sourceArchivePodcastsName": "档案播客",

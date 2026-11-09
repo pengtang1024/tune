@@ -155,6 +155,23 @@ class BuiltInMusicSources {
       _instance(
         types,
         'internet_archive',
+        id: 'community_metal',
+        name: strings.sourceCommunityMetalName,
+        description: strings.sourceCommunityMetalDescription,
+        settings: {
+          // Metal and punk are filed apart from the nine styles above; the
+          // live sets and netlabel EPs sit here.
+          'query':
+              'collection:opensource_audio AND mediatype:audio AND '
+              'subject:(metal OR punk) AND NOT '
+              'subject:(rock OR jazz OR blues OR electronic OR classical OR '
+              'ambient OR experimental OR world OR reggae)',
+        },
+        weight: 400,
+      ),
+      _instance(
+        types,
+        'internet_archive',
         id: 'free_music_archive',
         name: strings.sourceFreeMusicArchiveName,
         description: strings.sourceFreeMusicArchiveDescription,
@@ -530,6 +547,9 @@ class BuiltInMusicSources {
 
   /// The community uploads filed under world music or reggae.
   static MusicSourceConfig get communityWorld => _entry('community_world');
+
+  /// The community uploads filed under metal or punk.
+  static MusicSourceConfig get communityMetal => _entry('community_metal');
 
   /// The source of the audio the archive files outside English.
   static MusicSourceConfig get foreignAudio => _entry('foreign_audio');
