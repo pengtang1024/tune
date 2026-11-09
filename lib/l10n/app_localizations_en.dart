@@ -1740,6 +1740,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The archive\'s community uploads of classical music: orchestras, chamber recordings and solo recitals';
 
   @override
+  String get sourceCommunityAmbientName => 'Community Ambient & Experimental';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'The archive\'s community uploads of ambient and experimental music: long forms, field recordings and one-off takes';
+
+  @override
   String get sourceIndependentAudiobooksName => 'Independent audiobooks';
 
   @override

@@ -2879,6 +2879,18 @@ abstract class AppLocalizations {
   /// **'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音'**
   String get sourceCommunityClassicalDescription;
 
+  /// No description provided for @sourceCommunityAmbientName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'社区氛围与实验'**
+  String get sourceCommunityAmbientName;
+
+  /// No description provided for @sourceCommunityAmbientDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试'**
+  String get sourceCommunityAmbientDescription;
+
   /// No description provided for @sourceIndependentAudiobooksName.
   ///
   /// In zh_CN, this message translates to:

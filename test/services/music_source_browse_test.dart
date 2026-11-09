@@ -442,6 +442,14 @@ void main() {
       expect(instance.weight, 400);
     });
 
+    test('the ambient list excludes the five styles already offered', () {
+      final instance = BuiltInMusicSources.communityAmbient;
+      final query = instance.setting('query') ?? '';
+      expect(query, contains('subject:(ambient OR experimental)'));
+      expect(query, contains('classical'));
+      expect(instance.weight, 400);
+    });
+
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

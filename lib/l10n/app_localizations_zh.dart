@@ -1578,6 +1578,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
 
   @override
+  String get sourceCommunityAmbientName => '社区氛围与实验';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -5404,6 +5411,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
 
   @override
+  String get sourceCommunityAmbientName => '社区氛围与实验';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试';
+
+  @override
   String get sourceIndependentAudiobooksName => '独立有声书';
 
   @override
@@ -9228,6 +9242,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get sourceCommunityClassicalDescription =>
       'Internet Archive 社群上傳的古典音樂：管弦樂、室內樂與獨奏錄音';
+
+  @override
+  String get sourceCommunityAmbientName => '社群氛圍與實驗';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社群上傳的氛圍與實驗音樂：長曲、實地錄音與一次成型的嘗試';
 
   @override
   String get sourceIndependentAudiobooksName => '獨立有聲書';

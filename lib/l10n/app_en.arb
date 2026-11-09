@@ -887,6 +887,8 @@
   "sourceCommunityMusicDescription": "Music the archive's community uploads: rock, jazz, blues and electronic",
 "sourceCommunityClassicalName": "Community Classical",
 "sourceCommunityClassicalDescription": "The archive's community uploads of classical music: orchestras, chamber recordings and solo recitals",
+"sourceCommunityAmbientName": "Community Ambient & Experimental",
+"sourceCommunityAmbientDescription": "The archive's community uploads of ambient and experimental music: long forms, field recordings and one-off takes",
   "sourceIndependentAudiobooksName": "Independent audiobooks",
   "sourceIndependentAudiobooksDescription": "Audiobooks the archive keeps outside the LibriVox collection",
   "sourceArchivePodcastsName": "Archived podcasts",

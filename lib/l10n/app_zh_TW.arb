@@ -887,6 +887,8 @@
   "sourceCommunityMusicDescription": "Internet Archive 社群上傳的音樂：搖滾、爵士、藍調與電子",
 "sourceCommunityClassicalName": "社群古典",
 "sourceCommunityClassicalDescription": "Internet Archive 社群上傳的古典音樂：管弦樂、室內樂與獨奏錄音",
+"sourceCommunityAmbientName": "社群氛圍與實驗",
+"sourceCommunityAmbientDescription": "Internet Archive 社群上傳的氛圍與實驗音樂：長曲、實地錄音與一次成型的嘗試",
   "sourceIndependentAudiobooksName": "獨立有聲書",
   "sourceIndependentAudiobooksDescription": "LibriVox 之外、Internet Archive 收錄的有聲書",
   "sourceArchivePodcastsName": "檔案播客",
