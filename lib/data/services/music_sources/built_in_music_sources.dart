@@ -40,7 +40,10 @@ class BuiltInMusicSources {
         id: 'live_music_archive',
         name: strings.sourceLiveMusicArchiveName,
         description: strings.sourceLiveMusicArchiveDescription,
-        settings: {'query': 'collection:etree AND mediatype:etree'},
+        settings: {
+          // The pool is tens of thousands of items deep and the second page
+          // is still the same era: two pages per scan (measured 182 → 269).
+          'pages': '2','query': 'collection:etree AND mediatype:etree'},
       ),
       _instance(
         types,
@@ -48,7 +51,10 @@ class BuiltInMusicSources {
         id: 'great78',
         name: strings.sourceGreat78Name,
         description: strings.sourceGreat78Description,
-        settings: {'query': 'collection:78rpm AND mediatype:audio'},
+        settings: {
+          // The pool is tens of thousands of items deep and the second page
+          // is still the same era: two pages per scan (measured 182 → 269).
+          'pages': '2','query': 'collection:78rpm AND mediatype:audio'},
       ),
       _instance(
         types,
@@ -56,7 +62,10 @@ class BuiltInMusicSources {
         id: 'netlabels',
         name: strings.sourceNetlabelsName,
         description: strings.sourceNetlabelsDescription,
-        settings: {'query': 'collection:netlabels AND mediatype:audio'},
+        settings: {
+          // The pool is tens of thousands of items deep and the second page
+          // is still the same era: two pages per scan (measured 182 → 269).
+          'pages': '2','query': 'collection:netlabels AND mediatype:audio'},
       ),
       _instance(
         types,

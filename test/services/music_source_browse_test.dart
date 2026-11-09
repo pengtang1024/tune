@@ -504,6 +504,9 @@ void main() {
         'community_world',
         'community_metal',
         'community_hiphop',
+        'great78',
+        'netlabels',
+        'live_music_archive',
       ]) {
         expect(all[id]!.setting('pages'), '2', reason: id);
       }
