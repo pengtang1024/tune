@@ -141,6 +141,18 @@ class RadioSourceAdapter extends MusicSourceAdapter {
     'reggae',
     'trance',
     'hiphop',
+    // Verified against the directory's own tag list (station counts in
+    // brackets); the ones below 200 stations stay out, an option that
+    // answers with a handful is not worth a line in the list.
+    'music', // 3642
+    'hits', // 1426
+    'classic rock', // 753
+    'retro', // 268
+    'edm', // 249
+    'smooth jazz', // 234
+    'latino', // 228
+    'world music', // 223
+    'deep house', // 211
   ];
 
   @override
