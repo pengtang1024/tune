@@ -285,6 +285,72 @@ void main() {
       expect(captured.uri?.path, '/api/v1/search/videos');
     });
 
+    test('a video is filed under its tags and its tongue', () async {
+      final captured = _CapturedRoutes({
+        '/api/v1/videos': jsonEncode({
+          'data': [
+            {
+              'uuid': 'v-1',
+              'name': 'A song',
+              'category': {'id': 1, 'label': 'Music'},
+              'language': {'id': 'de', 'label': 'German'},
+              'tags': ['chant', 'musique', 'chant'],
+              'duration': 180,
+              'files': [
+                {'fileUrl': 'https://tube.example/download/v-1.mp4'},
+              ],
+            },
+            {
+              'uuid': 'v-2',
+              'name': 'No tags',
+              'category': {'id': 1, 'label': 'Music'},
+              'language': {'id': 'zxx', 'label': 'Unknown'},
+              'tags': <dynamic>[],
+              'duration': 120,
+              'files': [
+                {'fileUrl': 'https://tube.example/download/v-2.mp4'},
+              ],
+            },
+          ],
+        }),
+        '/api/v1/videos/v-1': jsonEncode({
+          'uuid': 'v-1',
+          'name': 'A song',
+          'category': {'id': 1, 'label': 'Music'},
+          'language': {'id': 'de', 'label': 'German'},
+          'tags': ['chant', 'musique', 'chant'],
+          'duration': 180,
+          'files': [
+            {'fileUrl': 'https://tube.example/download/v-1.mp4'},
+          ],
+        }),
+        '/api/v1/videos/v-2': jsonEncode({
+          'uuid': 'v-2',
+          'name': 'No tags',
+          'category': {'id': 1, 'label': 'Music'},
+          'language': {'id': 'zxx', 'label': 'Unknown'},
+          'tags': <dynamic>[],
+          'duration': 120,
+          'files': [
+            {'fileUrl': 'https://tube.example/download/v-2.mp4'},
+          ],
+        }),
+      });
+
+      final result = await PeerTubeSourceAdapter(dio: captured.dio).scan(
+        _request('peertube', const {'server': 'https://tube.example', 'limit': '5'}),
+      );
+
+      final tagged = result.songs.first;
+      expect(tagged.genre, 'chant');
+      expect(tagged.genres, ['chant', 'musique']);
+      expect(tagged.language, 'German');
+
+      // A video without tags keeps its category; an unknown tongue is none.
+      final untagged = result.songs.last;
+      expect(untagged.genre, 'Music');
+      expect(untagged.language, isNull);
+    });
     test('a search without a chosen sort keeps the order of the server', () async {
       final captured = _Captured(body: {'data': <dynamic>[]});
 
@@ -665,6 +731,32 @@ class _CapturedArchive {
               data: {
                 'response': {'numFound': 0, 'docs': <dynamic>[]},
               },
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
+/// A Dio that answers each path of a PeerTube instance with its own body.
+class _CapturedRoutes {
+  _CapturedRoutes(this.bodies);
+
+  final Map<String, String> bodies;
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final body = bodies[options.uri.path];
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: body ?? '{}',
               statusCode: 200,
             ),
           );

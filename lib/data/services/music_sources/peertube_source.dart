@@ -286,6 +286,7 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
     final category = _map(raw['category']);
     final licence = _map(raw['licence']);
     final duration = _number(raw['duration']);
+    final genres = _genresOf(raw, category);
 
     return SourceSongFactory.create(
       sourceId: sourceId,
@@ -302,7 +303,13 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
         server,
         _string(raw['thumbnailPath']) ?? _string(raw['previewPath']),
       ),
-      genre: _string(category?['label']),
+      // The category of a music video is "Music" for all of them, which says
+      // nothing the library can group by; the tags the uploader wrote are the
+      // only style the video has, and the category stands in when they are
+      // empty.
+      genre: genres.isEmpty ? null : genres.first,
+      genres: genres.isEmpty ? null : genres,
+      language: _languageOf(raw['language']),
       year: _yearOf(_string(raw['publishedAt'])),
       size: _number(file?['size'])?.round(),
       license: licence == null || licence['id'] == null
@@ -314,6 +321,38 @@ class PeerTubeSourceAdapter extends MusicSourceAdapter {
         'views': _number(raw['views'])?.round(),
       },
     );
+  }
+
+
+  /// The styles a video is filed under, read out of its tags.
+  static List<String> _genresOf(
+    Map<dynamic, dynamic> raw,
+    Map<dynamic, dynamic>? category,
+  ) {
+    final genres = <String>[];
+    final tags = raw['tags'];
+    if (tags is List) {
+      for (final tag in tags) {
+        final name = tag?.toString().trim() ?? '';
+        if (name.isNotEmpty && !genres.contains(name)) genres.add(name);
+      }
+    }
+    if (genres.isEmpty) {
+      final label = _string(category?['label']);
+      if (label != null && label.isNotEmpty) genres.add(label);
+    }
+    return genres.take(5).toList(growable: false);
+  }
+
+  /// The tongue of a video, read out of the language the instance names.
+  ///
+  /// An instance writes the language as an object with a label; "Unknown" is
+  /// what it writes when nobody said, and a track with no known tongue is not
+  /// filed under one.
+  static String? _languageOf(Object? raw) {
+    final label = _string(_map(raw)?['label']);
+    if (label == null || label.isEmpty) return null;
+    return label.toLowerCase() == 'unknown' ? null : label;
   }
 
   /// The file to play: the audio-only version when the instance made one,
