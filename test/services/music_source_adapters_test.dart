@@ -155,6 +155,39 @@ void main() {
   });
 
   group('podcast RSS adapter', () {
+    test('the episodes of a show are numbered newest first', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>The Show</title>
+    <item>
+      <title>Older</title>
+      <guid>ep-old</guid>
+      <pubDate>Mon, 02 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/old.mp3" type="audio/mpeg" length="1"/>
+    </item>
+    <item>
+      <title>Newest</title>
+      <guid>ep-new</guid>
+      <pubDate>Sun, 08 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/new.mp3" type="audio/mpeg" length="1"/>
+    </item>
+    <item>
+      <title>Undated</title>
+      <guid>ep-none</guid>
+      <enclosure url="https://cdn.example.com/none.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss');
+
+      // A show is a series: the newest episode is the first of the show, and
+      // one whose date could not be read sits at the end rather than in front.
+      expect(songs.map((song) => song.title), ['Newest', 'Older', 'Undated']);
+      expect(songs.map((song) => song.trackNumber), [1, 2, 3]);
+      expect(songs.first.trackTotal, 3);
+    });
     test('the categories of a show travel with its episodes', () {
       final feed = '''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">

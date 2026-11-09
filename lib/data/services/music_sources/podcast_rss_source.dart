@@ -193,11 +193,13 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     // its podcasts by what they are about.
     final genres = _categoriesOf(channel);
 
-    final songs = <Song>[];
+    // A show is a series: the episodes are numbered newest first so that the
+    // show plays in the order a listener catches up on it.
+    final entries = <({Song song, DateTime? at})>[];
     final seen = <String>{};
 
     for (final item in document.findAllElements('item')) {
-      if (songs.length >= limit) break;
+      if (entries.length >= limit) break;
 
       final title = _firstText([item], 'title');
       if (title.isEmpty) continue;
@@ -217,25 +219,39 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       final year = _yearOf(published);
       final description = _descriptionOf(item);
 
-      songs.add(
-        SourceSongFactory.create(
-          sourceId: sourceId,
-          externalId: externalId,
-          title: title,
-          artist: _firstText([item], 'author', fallback: podcastTitle),
-          album: podcastTitle,
-          duration: _parseDuration(_firstText([item], 'duration')),
-          streamUrl: streamUrl,
-          artworkUrl: _artworkUrl(item, podcastArtwork),
-          year: year,
-          description: description,
-          genre: genres.isEmpty ? null : genres.first,
-          genres: genres.isEmpty ? null : genres,
+      entries.add(
+        (
+          song: SourceSongFactory.create(
+            sourceId: sourceId,
+            externalId: externalId,
+            title: title,
+            artist: _firstText([item], 'author', fallback: podcastTitle),
+            album: podcastTitle,
+            duration: _parseDuration(_firstText([item], 'duration')),
+            streamUrl: streamUrl,
+            artworkUrl: _artworkUrl(item, podcastArtwork),
+            year: year,
+            description: description,
+            genre: genres.isEmpty ? null : genres.first,
+            genres: genres.isEmpty ? null : genres,
+          ),
+          at: at,
         ),
       );
     }
 
-    return songs;
+    // Newest first; an episode whose date could not be read keeps the place the
+    // feed gave it, at the end.
+    final dated = entries.where((entry) => entry.at != null).toList(growable: false)
+      ..sort((a, b) => b.at!.compareTo(a.at!));
+    final ordered = [...dated, ...entries.where((entry) => entry.at == null)];
+    return [
+      for (var index = 0; index < ordered.length; index++)
+        ordered[index].song.copyWith(
+          trackNumber: index + 1,
+          trackTotal: ordered.length,
+        ),
+    ];
   }
 
 
