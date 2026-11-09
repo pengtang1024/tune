@@ -490,6 +490,24 @@ void main() {
           .toList();
       expect(missing, isEmpty, reason: 'not in 需求/音源设计.md: $missing');
     });
+    test('the community lists read two pages per scan', () {
+      // Measured: one page brings 132 songs from the classical list, two
+      // bring 256; the pools are thousands of items deep, so the second page
+      // is still on the theme.
+      final all = {
+        for (final source in BuiltInMusicSources.defaults) source.id: source,
+      };
+      for (final id in const [
+        'community_music',
+        'community_classical',
+        'community_ambient',
+        'community_world',
+        'community_metal',
+        'community_hiphop',
+      ]) {
+        expect(all[id]!.setting('pages'), '2', reason: id);
+      }
+    });
     test('every source opens with the stream the app intends', () {
       final service = MusicSourceService(
         scanner: CrossPlatformMusicScannerImpl(),

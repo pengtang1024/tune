@@ -91,6 +91,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityMusicName,
         description: strings.sourceCommunityMusicDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // The community uploads hold talks and poems next to music; the
           // subject narrows them to the four styles people upload most.
           'query':
@@ -106,6 +109,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityClassicalName,
         description: strings.sourceCommunityClassicalDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // The classical pool is the other half of the community uploads:
           // it is kept apart from the four styles above, and those four are
           // excluded here so one recording does not arrive twice.
@@ -128,6 +134,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityAmbientName,
         description: strings.sourceCommunityAmbientDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // The rest of the community uploads: the long forms and the one-off
           // takes the four styles and the classical pool both leave out.
           'query':
@@ -147,6 +156,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityWorldName,
         description: strings.sourceCommunityWorldDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // The uploads from outside the styles above: regional music, dub
           // and reggae. Each of the six styles offered so far is excluded, so
           // a recording arrives through one list only.
@@ -168,6 +180,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityMetalName,
         description: strings.sourceCommunityMetalDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // Metal and punk are filed apart from the nine styles above; the
           // live sets and netlabel EPs sit here.
           'query':
@@ -188,6 +203,9 @@ class BuiltInMusicSources {
         name: strings.sourceCommunityHiphopName,
         description: strings.sourceCommunityHiphopDescription,
         settings: {
+          // Two pages per scan: the pools here are thousands of items deep and
+          // a second page doubles what one scan brings (measured: 132 → 256).
+          'pages': '2',
           // Hip-hop and funk, filed apart from the eight styles above. A
           // country list is not offered: its most-downloaded head carries a
           // racial slur among the first three titles.
