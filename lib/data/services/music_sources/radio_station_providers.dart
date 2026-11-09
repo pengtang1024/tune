@@ -260,7 +260,12 @@ class RadioBrowserProvider extends RadioStationProvider {
           artworkUrl: SourceSongFactory.normalizeUrl(
             raw['favicon']?.toString(),
           ),
+          // The directory files a station under several styles. The row shows
+          // them joined, because one tag alone ("music", "california") says
+          // little; the list is kept as well, so a grouping by style does not
+          // have to split the line again.
           genre: tags.isEmpty ? null : tags.take(3).join(' / '),
+          genres: tags.isEmpty ? null : tags.take(5).toList(growable: false),
           language: languages.isEmpty ? null : languages.take(2).join(' / '),
           country: _text(raw['country']),
           codec: _text(raw['codec']),

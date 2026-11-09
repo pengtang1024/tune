@@ -20,7 +20,14 @@ class RadioStation {
   final String? artworkUrl;
 
   /// The musical style of the station.
+  ///
+  /// One style, not a list joined by a slash: the library groups its tracks by
+  /// this value, and every combination of styles would become a group of its
+  /// own. The whole list the directory gives is in [genres].
   final String? genre;
+
+  /// The styles the directory files the station under.
+  final List<String>? genres;
 
   /// The language the station broadcasts in.
   final String? language;
@@ -59,6 +66,7 @@ class RadioStation {
     required this.streamUrl,
     this.artworkUrl,
     this.genre,
+    this.genres,
     this.language,
     this.country,
     this.description,

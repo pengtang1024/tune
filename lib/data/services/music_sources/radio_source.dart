@@ -306,6 +306,7 @@ class RadioSourceAdapter extends MusicSourceAdapter {
           streamUrl: station.streamUrl,
           artworkUrl: station.artworkUrl,
           genre: station.genre,
+          genres: station.genres,
           language: station.language,
           year: station.nowPlayingYear,
           description: station.description,

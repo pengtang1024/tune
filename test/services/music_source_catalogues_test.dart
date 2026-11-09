@@ -148,6 +148,8 @@ void main() {
       expect(station.streamUrl, 'https://stream.example.com/jazz');
       expect(station.artworkUrl, 'https://cdn.example.com/jazz.png');
       expect(station.genre, 'jazz / soul');
+      // The line is for the reader; the list is for a grouping by style.
+      expect(station.genres, ['jazz', 'soul']);
       expect(station.language, 'english');
       expect(station.country, 'Germany');
       expect(station.codec, 'MP3');
