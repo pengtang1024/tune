@@ -87,8 +87,9 @@ class _QueuePanelState extends ConsumerState<QueuePanel> {
         ? -1
         : queue.indexWhere((song) => song.uri == currentUri);
     final controller = ref.read(playbackControllerProvider.notifier);
-    final favorites = ref.watch(favoritesControllerProvider);
-    final settings = ref.watch(settingsControllerProvider);
+    final onlyLikeOnDoubleClick = ref.watch(
+      settingsControllerProvider.select((value) => value.onlyLikeOnDoubleClick),
+    );
     final sourceLabels = sourceLabelsOf(
       context.loc,
       ref.watch(
@@ -176,12 +177,10 @@ class _QueuePanelState extends ConsumerState<QueuePanel> {
                         index: index,
                         selected: index == currentIndex,
                         playing: isPlaying && song.uri == currentUri,
-                        isFavorite: favorites.contains(song.uri),
                         source: sourceLabel(song, sourceLabels),
                         onTap: () => controller.playAt(index),
                         onDoubleTap: () => _markFavorite(song),
-                        waitsForDoubleClick:
-                            settings.onlyLikeOnDoubleClick,
+                        waitsForDoubleClick: onlyLikeOnDoubleClick,
                         onRemove: () => controller.removeFromQueue(index),
                         onToggleFavorite: () => _toggleFavorite(song),
                         dense: true,

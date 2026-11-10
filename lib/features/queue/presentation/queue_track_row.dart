@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
@@ -12,13 +14,14 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 /// A track of the play queue.
 ///
 /// The row owns the presentation of a queue entry; the page only decides
-/// what happens when it is played, moved or removed.
-class QueueTrackRow extends StatelessWidget {
+/// what happens when it is played, moved or removed. The heart is the row's
+/// own: a mark set anywhere else in the app rebuilds the one row that shows
+/// it, not the whole panel.
+class QueueTrackRow extends ConsumerWidget {
   final Song song;
   final int index;
   final bool selected;
   final bool playing;
-  final bool isFavorite;
   final SourceLabel? source;
   final VoidCallback onTap;
   final VoidCallback onDoubleTap;
@@ -44,7 +47,6 @@ class QueueTrackRow extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.playing,
-    required this.isFavorite,
     this.source,
     required this.onTap,
     required this.onDoubleTap,
@@ -55,9 +57,14 @@ class QueueTrackRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
+    final isFavorite = ref.watch(
+      favoritesControllerProvider.select(
+        (state) => state.contains(song.uri),
+      ),
+    );
 
     return Material(
       color: selected ? accent.withValues(alpha: 0.06) : Colors.transparent,

@@ -77,7 +77,15 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     // around the seek bar must not be rebuilt by the clock.
     final overview = ref.watch(playbackOverviewProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
-    final favorites = ref.watch(favoritesControllerProvider);
+    // The page shows the heart of the track that plays. A mark put on another
+    // track — from the library, the queue or the search — changes nothing
+    // here, so the page does not rebuild for it.
+    final isFavorite = ref.watch(
+      favoritesControllerProvider.select((state) {
+        final uri = overview.currentSong?.uri;
+        return uri == null ? false : state.contains(uri);
+      }),
+    );
     final currentUri = overview.currentSong?.uri;
     final sourceLabels = sourceLabelsOf(
       context.loc,
@@ -150,9 +158,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                           onToggleQueue: widget.queuePanelBuilder == null
                               ? null
                               : _toggleQueue,
-                          isFavorite:
-                              currentUri != null &&
-                              favorites.contains(currentUri),
+                          isFavorite: isFavorite,
                           onToggleFavorite: currentUri == null
                               ? null
                               : () => ref

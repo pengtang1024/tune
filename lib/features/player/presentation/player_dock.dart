@@ -41,7 +41,13 @@ class PlayerDock extends ConsumerWidget {
     final overview = ref.watch(playbackOverviewProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
     final song = overview.currentSong;
-    final favorites = ref.watch(favoritesControllerProvider);
+    // The heart says whether the track that plays is marked; a mark put on
+    // another track changes nothing on this card, so it does not rebuild it.
+    final isFavorite = ref.watch(
+      favoritesControllerProvider.select(
+        (state) => song == null ? false : state.contains(song.uri),
+      ),
+    );
 
     return Container(
       // The bar keeps the height of the token, but it grows when the text
@@ -201,25 +207,28 @@ class PlayerDock extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (!narrow) ...[
-                      TuneTooltip(
-                        message: overview.volume > 0
-                            ? context.loc.playerMute
-                            : context.loc.playerUnmute,
-                        child: IconButton(
-                          onPressed: () => controller.setVolume(
-                            overview.volume > 0 ? 0 : 1,
-                          ),
-                          icon: Icon(
-                            overview.volume == 0
-                                ? Icons.volume_off_rounded
-                                : Icons.volume_up_rounded,
-                            size: CompactTokens.icon18,
-                          ),
-                          color: theme.colorScheme.onSurfaceVariant,
-                          visualDensity: VisualDensity.compact,
+                    // The mute button stays in the narrow dock: it is the one
+                    // control of the volume that has to be reachable when the
+                    // slider no longer fits.
+                    TuneTooltip(
+                      message: overview.volume > 0
+                          ? context.loc.playerMute
+                          : context.loc.playerUnmute,
+                      child: IconButton(
+                        onPressed: () => controller.setVolume(
+                          overview.volume > 0 ? 0 : 1,
                         ),
+                        icon: Icon(
+                          overview.volume == 0
+                              ? Icons.volume_off_rounded
+                              : Icons.volume_up_rounded,
+                          size: CompactTokens.icon18,
+                        ),
+                        color: theme.colorScheme.onSurfaceVariant,
+                        visualDensity: VisualDensity.compact,
                       ),
+                    ),
+                    if (!narrow) ...[
                       SizedBox(
                         width: 74,
                         child: Slider(
@@ -234,7 +243,7 @@ class PlayerDock extends ConsumerWidget {
                     // there, so the mark is one click away from wherever the
                     // reader is.
                     FavoriteButton(
-                      isFavorite: song != null && favorites.contains(song.uri),
+                      isFavorite: isFavorite,
                       onPressed: song == null
                           ? null
                           : () => ref

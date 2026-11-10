@@ -39,8 +39,13 @@ class NowPlayingTrackInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final favorites = ref.watch(favoritesControllerProvider);
-    final isFavorite = favorites.contains(song.uri);
+    // The facts read the mark of this track alone; a mark put on another
+    // track does not touch them.
+    final isFavorite = ref.watch(
+      favoritesControllerProvider.select(
+        (state) => state.contains(song.uri),
+      ),
+    );
 
     void toggleFavorite() {
       ref.read(favoritesControllerProvider.notifier).toggle(song.uri);

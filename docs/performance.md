@@ -1,7 +1,8 @@
 # 性能：诊断与修复方案
 
-> 2026-10-24 实测，2026-10-25 补 D5，2026-10-28 补 D6/D7 与 D8。这一页是诊断与方案：
-> D1–D8 都已修完，每一节写着修之前与修之后的数字，以及守住这条线的判据。
+> 2026-10-24 实测，2026-10-25 补 D5，2026-10-28 补 D6/D7 与 D8，2026-11-04 补 D9。
+> 这一页是诊断与方案：D1–D9 都已修完，每一节写着修之前与修之后的数字，
+> 以及守住这条线的判据。
 
 ## 1. 结论
 
@@ -18,8 +19,9 @@
 | D6 | 曲库整库常驻内存，扫描时还要再建一份 | 已修：控制器只持 1000 行窗口，合并归数据库一家 | 常驻内存、扫描 |
 | D7 | 每操作路径写放大：整表往返、无防抖、不节流、重扫重写整库 | 已修：重扫 0 写、改名 1 写、单键 UPSERT、节流与防抖 | 切歌/扫描/搜索/收藏 |
 | D8 | 损坏标签的 GB 级帧声明把启动内存抬到 1.5GB | 已修：vendored 读包在 `Buffer.read` 按文件剩余收界，启动峰值 1578 → **316**MB | 启动、扫描 |
+| D9 | 收藏页、音源页与队列/底栏/播放页仍在整页订阅快慢混在一起的状态 | 已修：收藏页一次进度更新 2769 → **1**、音源页 329 → **39**、队列一次收藏 2272 → **89**、底栏/播放页另一首标记 280/304 → **1** | 扫描、收藏 |
 
-八个问题都已修完。下面每一节写着修法、判据与守住这条线的测试。
+九个问题都已修完。下面每一节写着修法、判据与守住这条线的测试。
 
 **这些不是新提的标准，项目自己已经写过：**
 
@@ -36,13 +38,14 @@
 
 ## 2. 怎么测的
 
-四个基准脚本在 `tool/perf/`，口径可复现：
+五个基准脚本在 `tool/perf/`，口径可复现：
 
 ```bash
 flutter test tool/perf/recommendation_bench_test.dart   # D4：发现页计算耗时
 flutter test tool/perf/rebuild_bench_test.dart           # D1：一次跳位置重建多少
 flutter test tool/perf/library_bench_test.dart           # D3：扫描进度一步的代价
 flutter test tool/perf/library_scroll_bench_test.dart    # D5：一行多重、滚动一步多久
+flutter test tool/perf/pages_bench_test.dart             # D9：收藏页/音源页/队列/底栏
 ```
 
 - D1/D3 用 `debugOnRebuildDirtyWidget` 数「这一帧重建了多少 element」，
@@ -584,7 +587,83 @@ GPU**：Flutter 没有这个 API，Linux 上由会话与 glvnd 决定（`prime-r
 - 升级 `audio_metadata_reader` 前先读本节的根因与
   `vendor/audio_metadata_reader/VENDORED.md` 的补丁清单。
 
-## 11. 四条硬规则（已写进 AGENTS.md §1.3）
+## 11. D9：收藏页、音源页与面板还在整页订阅（已修）
+
+### 现象
+
+2026-11-04 在 `develop` 上先复测既有四个基准，再补一组「页面与面板」的探针
+（合成库 2 万首，窗口 1000 行）：
+
+| 场景 | 一次更新重建 | 耗时（debug） |
+| --- | --- | --- |
+| 收藏页（500 个标记），一次扫描进度 | 2769 个 element | 39.2ms |
+| 收藏页，20 次扫描进度 | 55260 个 element（累加） | 784ms |
+| 设置里的音源区（5 个音源），一次扫描进度 | 329 个 element | 10.3ms |
+| 音源区，20 次扫描进度 | 6586 个 element（累加） | 206ms |
+| 队列面板（500 首），一次收藏 | 2272 个 element | — |
+| 底栏 / 正在播放页，标记**另一首** | 280 / 304 个 element | — |
+
+同一轮复测的四个旧基准都还在预算内（D1 18/20 个 element、8.1ms 一跳；
+D3 稳态进度一跳 3 个 element、1.6ms；D5 一行 104 个 element、滚动一步中位
+20.9ms；D4 2 万首 142ms、5 万首 307ms，机器波动范围内）。
+
+### 根因
+
+四处都和 D3/D5 同款——订阅粒度没有落到真正读它的地方：
+
+1. `FavoritesPane` 订阅整份库状态，只为读 `songs`。扫描进度只改
+   `scanProgress`，`songs` 还是同一个 list，页面却整页重建；可见行不是
+   Consumer，行也就跟着重建。
+2. `MusicSourcesSection` 的 select 里带着 `progress`，而它只喂给一条
+   2px 的进度线；其余音源卡片与健康度跟进度无关。
+3. `QueuePanel` 拿整份收藏逐行算 `contains`，行不是自己读心
+   （D5 第 7 条在队列里没落地）。
+4. `PlayerDock` / `NowPlayingPage` / `NowPlayingTrackInfo` 同样订阅整份收藏，
+   只为当前曲一个布尔；在别处标一首歌，屏幕上没有任何一处该变。
+
+### 修法
+
+- `FavoritesPane`：把库状态收成一个 record select（`songs` 身份 +
+  `loaded` / `loading` / `error`），设置只读 `favoritesDoubleClickPlays`。
+- `MusicSourcesSection`：`progress` 从 record 摘走，拆出 `_ScanProgressBar`
+  自己订阅进度；卡片的订阅只含 `scanning`、`loading`、`summaries`。
+- `QueueTrackRow` 改成 `ConsumerWidget`，自己 select `contains(song.uri)`；
+  `QueuePanel` 不再 watch 整份收藏，设置只读 `onlyLikeOnDoubleClick`。
+- 底栏、正在播放页与曲目信息：收藏订阅改成 `contains(currentUri)`。
+
+没有新增状态、没有复制事实来源、没有用延迟或 post-frame 补状态；收藏页仍
+由 `favoritesControllerProvider` 独家拥有，页面只是换了读法。
+
+### 修之后
+
+同一脚本（`flutter test tool/perf/pages_bench_test.dart`，debug）：
+
+| 场景 | 修之前 | 修之后 |
+| --- | --- | --- |
+| 收藏页，一次扫描进度 | 2769 个 element / 39.2ms | **1** 个 element / 0.4ms |
+| 收藏页，20 次扫描进度 | 784ms | **8ms** |
+| 音源区，一次扫描进度 | 329 个 element / 10.3ms | **39** 个 element / 1.4ms |
+| 音源区，20 次扫描进度 | 206ms | **27ms** |
+| 队列面板，一次收藏 | 2272 个 element | **89** 个 element |
+| 底栏 / 播放页，标记另一首 | 280 / 304 个 element | **1 / 1** 个 element |
+
+音源区剩下的 39 个 element 是进度线自己（`LinearProgressIndicator` 的
+theme 依赖），它本来就该随进度重建。
+
+**没有改的一项：** 在收藏页里取消一个标记，仍会重建 2794 个 element。这是
+列表成员变了，行要重排，属于结构变化不是订阅漏读；一次约 40ms（debug），
+release 下更短。修它要把列表结构拆成「成员列表」与「行内容」两条通道，
+收益低于风险，本轮不做，记为剩余风险。
+
+### 判据
+
+- `flutter test tool/perf/pages_bench_test.dart` 四组数字都要打印，
+  收藏页/音源区的扫描进度不得重建列表行（收藏页 ≤ 1 个 element）。
+- 队列面板一次收藏 ≤ 120 个 element（与 D5 的行预算一致）；
+  在别处标一首歌，底栏与播放页 ≤ 1 个 element。
+- 收藏页、音源区的页面级 select 不得再包含每秒或每百分比变化的值。
+
+## 12. 四条硬规则（已写进 AGENTS.md §1.3）
 
 1. **快值与慢值分两条订阅通道。** 一份状态里既有 5 Hz 的值又有 0.1 Hz 的值时，
    读它的界面必须按频率分开订阅；只订阅自己真正要显示的那部分。
@@ -610,9 +689,9 @@ AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式�
 - 不要把「进度条」整块搬进 `PlaybackState` 之外的新状态对象——它就该是
   `PlaybackState` 的一个字段，只是读法要分开。
 
-## 12. 落地顺序与风险
+## 13. 落地顺序与风险
 
-八件事互相独立，可以分开做、分开验（都已完成）：
+九件事互相独立，可以分开做、分开验（都已完成）：
 
 | 顺序 | 做什么 | 收益 | 状态 |
 | --- | --- | --- | --- |
@@ -624,14 +703,15 @@ AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式�
 | 6 | D6 库不入内存 | 常驻内存随库不封顶 | 已修：控制器只持 1000 行窗口，合并归数据库一家 |
 | 7 | D7 每操作写放大 | 切歌/搜索/收藏/扫描的卡顿与磁盘写 | 已修：重扫 0 写、改名 1 写、单键 UPSERT、防抖与节流 |
 | 8 | D8 损坏标签的 GB 级帧声明 | 启动、扫描的内存峰值 | 已修：vendored 读包收界，峰值 1578 → 316MB |
+| 9 | D9 页面/面板的订阅残留 | 扫描时收藏页与音源页、队列与底栏的收藏重建 | 已修：收藏页 2769 → 1、音源页 329 → 39、队列 2272 → 89、底栏/播放页 280/304 → 1 |
 
 回退：每一件都是独立改动，`git revert` 即可，没有数据迁移，没有存储格式变化。
 
-## 13. 相关文档
+## 14. 相关文档
 
 - `docs/architecture.md`：状态归属与「播放位置由 `PlaybackController` 独家持有」。
 - `docs/lyrics.md` §2 D5：同一个毛病在歌词面板上的先例（已修）。
 - `docs/recommendation.md` §7.8 与 §9.5 第 7 条：发现页的性能预算与验收标准。
 - `docs/verification.md`：门禁。
 - `docs/performance-row-design.md`：D5 的设计稿（归谁、预算、迁移顺序）。
-- `tool/perf/`：四个基准脚本，本文所有数字都出自它们。
+- `tool/perf/`：五个基准脚本，本文所有数字都出自它们。

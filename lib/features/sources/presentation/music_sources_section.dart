@@ -44,7 +44,6 @@ class MusicSourcesSection extends ConsumerWidget {
         return (
           scanning: state?.isScanning ?? false,
           loading: state?.isLoading ?? false,
-          progress: state?.scanProgress ?? 0.0,
           summaries:
               state?.sourceSummaries ?? const <String, SourceScanSummary>{},
         );
@@ -122,11 +121,7 @@ class MusicSourcesSection extends ConsumerWidget {
                 ),
                 if (scanning) ...[
                   const SizedBox(height: CompactTokens.space6),
-                  LinearProgressIndicator(
-                    value: library.progress,
-                    minHeight: 2,
-                    backgroundColor: theme.colorScheme.outlineVariant,
-                  ),
+                  const _ScanProgressBar(),
                 ],
               ],
             ),
@@ -709,4 +704,29 @@ String _formatTime(BuildContext context, DateTime time) {
   final clock = DateFormat.jm(locale).format(time);
   if (sameDay) return clock;
   return '${DateFormat.yMMMd(locale).format(time)} $clock';
+}
+
+/// The bar that moves with the scan.
+///
+/// Progress is the only value here that ticks every percent, so it is read
+/// on its own: the sources around it — their names, their switches and their
+/// health — do not depend on the clock.
+class _ScanProgressBar extends ConsumerWidget {
+  const _ScanProgressBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final progress = ref.watch(
+      libraryControllerProvider.select(
+        (value) => value.valueOrNull?.scanProgress ?? 0.0,
+      ),
+    );
+
+    return LinearProgressIndicator(
+      value: progress,
+      minHeight: 2,
+      backgroundColor: theme.colorScheme.outlineVariant,
+    );
+  }
 }

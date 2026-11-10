@@ -11,7 +11,6 @@ import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/favorites/presentation/favorites_track_row.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -59,9 +58,26 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
 
   @override
   Widget build(BuildContext context) {
-    final library = ref.watch(libraryControllerProvider);
+    // The page needs the tracks, not the scan: a progress tick changes only
+    // the scan fields of the library state, and subscribing to the whole
+    // state would rebuild every visible row for a number this page never
+    // shows.
+    final library = ref.watch(
+      libraryControllerProvider.select(
+        (value) => (
+          songs: value.valueOrNull?.songs ?? const <Song>[],
+          loaded: value.hasValue,
+          loading: value.isLoading && !value.hasValue,
+          error: value.hasError && !value.hasValue ? value.error : null,
+        ),
+      ),
+    );
     final favorites = ref.watch(favoritesControllerProvider);
-    final settings = ref.watch(settingsControllerProvider);
+    final favoritesDoubleClickPlays = ref.watch(
+      settingsControllerProvider.select(
+        (value) => value.favoritesDoubleClickPlays,
+      ),
+    );
     final playback = ref.watch(
       playbackControllerProvider.select(
         (value) => (value.currentSong?.uri, value.isPlaying),
@@ -76,17 +92,14 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
       ),
     );
 
-    final songs = _markedSongs(
-      library.valueOrNull?.songs ?? const [],
-      favorites,
-    );
+    final songs = _markedSongs(library.songs, favorites);
 
     // The marks the library cannot name: a track that was marked from the
     // online search and never scanned, or a track whose source is off now.
     // The marks are kept, so the page has to say that they are not here.
     // A library that did not load yet knows no track at all, so it may not
     // say that the marks are outside of it.
-    final outside = library.hasValue ? favorites.count - songs.length : 0;
+    final outside = library.loaded ? favorites.count - songs.length : 0;
 
     return Column(
       children: [
@@ -124,12 +137,13 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
           child: _body(
             context,
             ref,
-            library,
-            songs,
-            favorites,
-            playback,
-            sourceLabels,
-            settings.favoritesDoubleClickPlays,
+            loading: library.loading,
+            error: library.error,
+            songs: songs,
+            favorites: favorites,
+            playback: playback,
+            sourceLabels: sourceLabels,
+            favoritesDoubleClickPlays: favoritesDoubleClickPlays,
           ),
         ),
       ],
@@ -145,23 +159,24 @@ class _FavoritesPaneState extends ConsumerState<FavoritesPane> {
 
   Widget _body(
     BuildContext context,
-    WidgetRef ref,
-    AsyncValue<LibraryState> library,
-    List<Song> songs,
-    FavoritesState favorites,
-    (String?, bool) playback,
-    Map<String, SourceLabel> sourceLabels,
-    bool favoritesDoubleClickPlays,
-  ) {
-    if (library.isLoading && !library.hasValue) {
+    WidgetRef ref, {
+    required bool loading,
+    required Object? error,
+    required List<Song> songs,
+    required FavoritesState favorites,
+    required (String?, bool) playback,
+    required Map<String, SourceLabel> sourceLabels,
+    required bool favoritesDoubleClickPlays,
+  }) {
+    if (loading) {
       return const Center(child: CompactSpinner.large());
     }
 
-    if (library.hasError && !library.hasValue) {
+    if (error != null) {
       return EmptyStateView(
         icon: Icons.error_outline_rounded,
         title: context.loc.libraryLoadFailedTitle,
-        subtitle: '${library.error ?? context.loc.unknownError}',
+        subtitle: '$error',
         action: FilledButton(
           onPressed: () => ref.invalidate(libraryControllerProvider),
           child: Text(context.loc.retry),
