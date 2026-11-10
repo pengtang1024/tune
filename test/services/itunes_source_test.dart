@@ -101,7 +101,7 @@ void main() {
       // by one bad gateway.
       expect(result.status, SourceScanStatus.success);
       final chartRequests = server.requests
-          .where((request) => request.uri.host == 'rss.applemarketingtools.com')
+          .where((request) => request.uri.host == 'rss.marketingtools.apple.com')
           .length;
       expect(chartRequests, 2);
     });
@@ -117,7 +117,7 @@ void main() {
 
       expect(result.status, SourceScanStatus.success);
       expect(result.songs, isNotEmpty);
-      expect(server.requests.first.uri.host, 'rss.applemarketingtools.com');
+      expect(server.requests.first.uri.host, 'rss.marketingtools.apple.com');
       expect(server.requests.first.uri.path, contains('/music/most-played/'));
       expect(server.requests.last.uri.path, '/lookup');
       expect(server.requests.last.uri.queryParameters['id'], '6823820064');
@@ -379,9 +379,9 @@ class _ItunesServer {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           requests.add(options);
-          if (chartAlbums && options.uri.host == 'rss.applemarketingtools.com') {
+          if (chartAlbums && options.uri.host == 'rss.marketingtools.apple.com') {
             final chartAnswers = requests
-                .where((r) => r.uri.host == 'rss.applemarketingtools.com')
+                .where((r) => r.uri.host == 'rss.marketingtools.apple.com')
                 .length;
             if (chartAnswers <= chartFailures) {
               handler.reject(
