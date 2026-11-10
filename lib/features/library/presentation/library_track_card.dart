@@ -17,7 +17,8 @@ import 'package:tune/shared/utils/date_format.dart';
 ///
 /// The title, artist, album, added date and the 102px tail sit on the grid
 /// [LibraryRowMetrics] resolved once. The row is a pure composition; only
-/// the hover that brings the two extra actions out lives here.
+/// the hover or the keyboard focus that brings the two extra actions out
+/// lives here.
 class LibraryTrackCard extends StatefulWidget {
   final Song song;
   final int index;
@@ -64,6 +65,9 @@ class LibraryTrackCard extends StatefulWidget {
 class _LibraryTrackCardState extends State<LibraryTrackCard> {
   var _hovering = false;
 
+  /// Whether the row, or an action of its tail, holds the keyboard focus.
+  var _focused = false;
+
   @override
   Widget build(BuildContext context) {
     final song = widget.song;
@@ -81,6 +85,7 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
       onDoubleClick: widget.onDoubleTap,
       waitsForDoubleClick: widget.waitsForDoubleClick,
       hoverColor: accent.withValues(alpha: 0.04),
+      onFocusChange: (focused) => setState(() => _focused = focused),
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border(
@@ -201,7 +206,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                 song: song,
                 source: widget.source,
                 isFavorite: widget.isFavorite,
-                hovering: _hovering,
+                // A row reached with the keyboard shows the same actions as a
+                // row under the pointer, so the keyboard can walk into them.
+                hovering: _hovering || _focused,
                 onToggleFavorite: widget.onToggleFavorite,
                 onAddToQueue: widget.onAddToQueue,
               ),

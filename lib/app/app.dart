@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/app_shortcuts.dart';
 import 'package:tune/app/router/app_router.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
@@ -64,11 +65,16 @@ class TuneApp extends ConsumerWidget {
           routerConfig: router,
           builder: (context, child) {
             if (child == null) return const SizedBox.shrink();
-            return LocalizationBridge(
-              child: MediaQuery.withClampedTextScaling(
-                minScaleFactor: 1.0,
-                maxScaleFactor: 1.3,
-                child: HintLayer(child: child),
+            // The shortcuts of the player sit above every route: the now
+            // playing page is a route of the root navigator, not a page of
+            // the shell, and it needs the same keys.
+            return AppShortcuts(
+              child: LocalizationBridge(
+                child: MediaQuery.withClampedTextScaling(
+                  minScaleFactor: 1.0,
+                  maxScaleFactor: 1.3,
+                  child: HintLayer(child: child),
+                ),
               ),
             );
           },

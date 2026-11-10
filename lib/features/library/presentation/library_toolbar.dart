@@ -20,6 +20,13 @@ const String allSourcesFilterValue = '__all_sources__';
 /// queue all) live behind the menu of the header.
 class LibraryToolbar extends ConsumerWidget {
   final TextEditingController controller;
+
+  /// The keyboard focus of the search field.
+  ///
+  /// The app-wide shortcut that focuses the field lives above the page and
+  /// asks this node for the focus.
+  final FocusNode? focusNode;
+
   final String query;
   final int filteredCount;
   final List<String> sources;
@@ -38,6 +45,7 @@ class LibraryToolbar extends ConsumerWidget {
   const LibraryToolbar({
     super.key,
     required this.controller,
+    this.focusNode,
     required this.query,
     required this.filteredCount,
     required this.sources,
@@ -73,6 +81,7 @@ class LibraryToolbar extends ConsumerWidget {
                   width: double.infinity,
                   child: TextField(
                     controller: controller,
+                    focusNode: focusNode,
                     onChanged: onQueryChanged,
                     style: theme.textTheme.bodySmall,
                     decoration: InputDecoration(

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/shared/ui/shortcut_capture_scope.dart';
 
 /// A panel that floats over the content of a page without replacing it.
 ///
@@ -157,9 +158,13 @@ class _SidePanelHostState extends State<SidePanelHost>
                       opacity: _entrance,
                       child: SlideTransition(
                         position: _slide,
-                        child: Focus(
-                          autofocus: true,
-                          child: widget.panelBuilder(context),
+                        child: ShortcutCaptureScope(
+                          // The panel owns the keyboard while it floats over
+                          // the page: the shortcuts of the app stay out of it.
+                          child: Focus(
+                            autofocus: true,
+                            child: widget.panelBuilder(context),
+                          ),
                         ),
                       ),
                     ),

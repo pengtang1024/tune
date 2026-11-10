@@ -29,6 +29,13 @@ class TrackClickArea extends StatefulWidget {
   /// The time the area waits for a second click.
   final Duration window;
 
+  /// Reports whether the area, or an action inside it, holds the focus.
+  ///
+  /// A row shows the actions that only appear under the pointer while its
+  /// keyboard focus is inside it. The report covers the actions as well, so
+  /// the actions do not vanish when the keyboard walks into them.
+  final ValueChanged<bool>? onFocusChange;
+
   const TrackClickArea({
     super.key,
     required this.child,
@@ -38,6 +45,7 @@ class TrackClickArea extends StatefulWidget {
     this.borderRadius,
     this.waitsForDoubleClick = false,
     this.window = const Duration(milliseconds: 300),
+    this.onFocusChange,
   });
 
   @override
@@ -80,11 +88,18 @@ class _TrackClickAreaState extends State<TrackClickArea> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: _handleClick,
-      hoverColor: widget.hoverColor,
-      borderRadius: widget.borderRadius,
-      child: widget.child,
+    return Focus(
+      // The area is not a stop of the keyboard of its own: the ink below is
+      // the stop. The node is here to hear the ink and the actions beside it,
+      // and to keep the row lit while the focus walks through them.
+      canRequestFocus: false,
+      onFocusChange: widget.onFocusChange,
+      child: InkWell(
+        onTap: _handleClick,
+        hoverColor: widget.hoverColor,
+        borderRadius: widget.borderRadius,
+        child: widget.child,
+      ),
     );
   }
 }

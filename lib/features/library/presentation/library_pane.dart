@@ -10,6 +10,7 @@ import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/application/library_search_focus_provider.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_category.dart';
@@ -244,6 +245,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             ),
             child: LibraryToolbar(
               controller: _searchController,
+              focusNode: ref.watch(librarySearchFocusProvider),
               query: library.query,
               filteredCount: songs.length,
               sources: availableSources,

@@ -116,6 +116,9 @@ class _AlbumCard extends StatefulWidget {
 class _AlbumCardState extends State<_AlbumCard> {
   bool _hovered = false;
 
+  /// Whether the card, or the play button on it, holds the keyboard focus.
+  bool _focused = false;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -127,76 +130,88 @@ class _AlbumCardState extends State<_AlbumCard> {
         ? context.loc.playerUnknownArtist
         : album.artist;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: widget.onOpen,
-        onHover: (hovered) => setState(() => _hovered = hovered),
-        borderRadius: CompactTokens.borderRadius8,
-        hoverColor: theme.colorScheme.primary.withValues(alpha: 0.04),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                DecoratedBox(
-                  position: DecorationPosition.foreground,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      CompactTokens.radius8 + 2,
+    return Focus(
+      // The card is not a stop of its own: the ink below is the stop. The
+      // node hears the ink and the play button on the cover, so the keyboard
+      // reaches the same actions as the pointer.
+      canRequestFocus: false,
+      onFocusChange: (focused) => setState(() => _focused = focused),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onOpen,
+          onHover: (hovered) => setState(() => _hovered = hovered),
+          borderRadius: CompactTokens.borderRadius8,
+          hoverColor: theme.colorScheme.primary.withValues(alpha: 0.04),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  DecoratedBox(
+                    position: DecorationPosition.foreground,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        CompactTokens.radius8 + 2,
+                      ),
+                      border: widget.current
+                          ? Border.all(
+                              color: theme.colorScheme.primary,
+                              width: 2,
+                            )
+                          : null,
                     ),
-                    border: widget.current
-                        ? Border.all(color: theme.colorScheme.primary, width: 2)
-                        : null,
+                    child: ArtworkThumb(
+                      path: album.coverPath,
+                      imageUrl: album.coverUrl,
+                      size: widget.coverSize,
+                      radius: CompactTokens.radius8,
+                    ),
                   ),
-                  child: ArtworkThumb(
-                    path: album.coverPath,
-                    imageUrl: album.coverUrl,
-                    size: widget.coverSize,
-                    radius: CompactTokens.radius8,
-                  ),
+                  if (widget.current)
+                    Positioned(
+                      left: CompactTokens.space6,
+                      bottom: CompactTokens.space6,
+                      child: _NowPlayingMark(),
+                    ),
+                  if (_focused || _hovered)
+                    Positioned(
+                      right: CompactTokens.space6,
+                      bottom: CompactTokens.space6,
+                      child: _PlayButton(onPressed: widget.onPlay),
+                    ),
+                ],
+              ),
+              const SizedBox(height: CompactTokens.space6),
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: widget.current
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: widget.current ? theme.colorScheme.primary : null,
                 ),
-                if (widget.current)
-                  Positioned(
-                    left: CompactTokens.space6,
-                    bottom: CompactTokens.space6,
-                    child: _NowPlayingMark(),
-                  ),
-                if (_hovered)
-                  Positioned(
-                    right: CompactTokens.space6,
-                    bottom: CompactTokens.space6,
-                    child: _PlayButton(onPressed: widget.onPlay),
-                  ),
-              ],
-            ),
-            const SizedBox(height: CompactTokens.space6),
-            Text(
-              name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: widget.current ? FontWeight.w600 : FontWeight.w500,
-                color: widget.current ? theme.colorScheme.primary : null,
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              artist,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              const SizedBox(height: 2),
+              Text(
+                artist,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              context.loc.libraryTrackCount(album.trackCount),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              const SizedBox(height: 2),
+              Text(
+                context.loc.libraryTrackCount(album.trackCount),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
