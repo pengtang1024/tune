@@ -160,6 +160,13 @@ class AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_songs_has_lyrics ON songs(has_lyrics)',
       'CREATE INDEX IF NOT EXISTS idx_songs_language ON songs(language)',
       'CREATE INDEX IF NOT EXISTS idx_songs_format ON songs(format)',
+      // The two orders the library page reads most: the newest first, and the
+      // title. The index carries the same tie break as the query, so a window
+      // of a large library is read in order instead of sorted on every read.
+      'CREATE INDEX IF NOT EXISTS idx_songs_added_order '
+      'ON songs(date_added DESC, uri ASC) WHERE active = 1',
+      'CREATE INDEX IF NOT EXISTS idx_songs_title_order '
+      'ON songs(title_sort COLLATE NOCASE, uri) WHERE active = 1',
     ]) {
       db.execute(index);
     }

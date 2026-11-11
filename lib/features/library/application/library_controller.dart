@@ -385,7 +385,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     final filterActive = _current.query.isNotEmpty || _current.hasFilter;
     if (written > 0 || filterActive) {
-      await _reloadForFilter();
+      await _reloadForFilter(songsChanged: written > 0);
       return written > 0;
     }
     final total = await _storage.count();
@@ -448,7 +448,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     );
     await _storage.removeSource(sourceId);
     if (_disposed || !state.hasValue) return;
-    await _reloadForFilter();
+    await _reloadForFilter(songsChanged: true);
   }
 
   Future<void> setSourceFilter(String? sourceId) async {
@@ -522,7 +522,12 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   ///
   /// A read that a newer filter change supersedes drops its own answer, so
   /// the last word the reader typed is the one the page answers.
-  Future<void> _reloadForFilter() async {
+  ///
+  /// The album shelf is only read again when [songsChanged]: it is a grouping
+  /// of the whole table, it does not depend on the word, the filter or the
+  /// order, and a search that re-read it on every pause was paying a second
+  /// full scan per keystroke for a list that stayed the same.
+  Future<void> _reloadForFilter({bool songsChanged = false}) async {
     if (_disposed || !state.hasValue) return;
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
@@ -535,7 +540,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       offset: 0,
       limit: windowSize,
     );
-    final albums = await _storage.albumSummaries();
+    final albums = songsChanged
+        ? await _storage.albumSummaries()
+        : _current.albums;
     if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
       _current.copyWith(
