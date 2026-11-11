@@ -14,6 +14,7 @@ import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/data/services/database/app_database.dart';
+import 'package:tune/data/services/database/facets_worker.dart';
 import 'package:tune/features/library/data/library_document.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/utils/logger.dart';
@@ -355,6 +356,10 @@ class SqliteLibraryStorage implements LibraryStorage {
 
   AppDatabase? _database;
 
+  /// Where the database lives, when this storage opened it. A database handed
+  /// in by a factory has no path of its own.
+  String? _databasePath;
+
   Future<Directory> _directory() async {
     final base =
         await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
@@ -370,9 +375,14 @@ class SqliteLibraryStorage implements LibraryStorage {
     if (existing != null) return existing;
 
     final factory = _databaseFactory;
-    final database = factory != null
-        ? await factory()
-        : AppDatabase.open(path.join((await _directory()).path, _fileName));
+    final AppDatabase database;
+    if (factory != null) {
+      database = await factory();
+    } else {
+      final file = path.join((await _directory()).path, _fileName);
+      _databasePath = file;
+      database = AppDatabase.open(file);
+    }
     _database = database;
     // A database that the app opens itself owns its migrations; only a
     // database this storage opens on its own adopts the legacy document.
@@ -554,7 +564,14 @@ class SqliteLibraryStorage implements LibraryStorage {
   @override
   Future<LibraryFacets> facets({required LibraryFilter filter}) async {
     try {
-      return (await _db()).facets(filter: filter);
+      final database = await _db();
+      final path = _databasePath;
+      // A database this storage opened itself can be counted from a second
+      // connection, away from the thread that draws. A database handed in by
+      // a factory has no path; the small library it holds is cheap to count
+      // here.
+      if (path == null) return database.facets(filter: filter);
+      return await facetsInBackground(path: path, filter: filter);
     } catch (error, stackTrace) {
       Log.error('读取音乐库分面计数失败: $error\n$stackTrace');
       return LibraryFacets.empty;
