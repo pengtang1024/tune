@@ -5,14 +5,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app.dart';
 import 'package:tune/app/licenses.dart';
+import 'package:tune/data/services/impl/preference_store_io.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_auto_fill_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_leak_check_controller.dart';
+import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerThirdPartyLicenses();
+
+  // The preferences are read while the window is still warming up: the first
+  // screen asks for them, and waiting for the disk after the first frame
+  // spends the warm-up twice instead of once.
+  final persistence = createPersistenceService();
+  final persistenceReady = persistence.init();
+  persistenceReady.ignore();
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
@@ -27,7 +36,9 @@ Future<void> main() async {
     return true;
   };
 
-  final container = ProviderContainer();
+  final container = ProviderContainer(
+    overrides: [persistenceServiceProvider.overrideWithValue(persistence)],
+  );
   if (!await _claimThePlayerPlace(container)) {
     // Another player is already running; it got the files and the window.
     container.dispose();
