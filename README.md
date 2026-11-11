@@ -53,6 +53,18 @@ flutter run -d linux
 
 ## 构建
 
+仓库用 Git LFS 管理离线翻译的模型与 llama.cpp 运行时。第一次拉代码或换了机器：
+
+```bash
+git lfs install
+git lfs pull
+```
+
+没装 LFS 时 clone 下来的是约 130 B 的指针文件；`flutter run` 仍能启动，但设置页
+会把离线模型标为「缺失/校验失败」，翻译回退原文。打包时
+`tool/prepare_translation.sh` 会直接报错并提示上面两条命令，不会产出缺模型的包。
+只拉指针的 clone 额外体积接近 0，拉取实体后约 515 MB。
+
 Linux 是当前验收平台：
 
 ```bash

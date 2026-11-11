@@ -1847,5 +1847,48 @@
   "sourcesHealthGroupOutput": "新鮮與產出",
   "sourcesHealthGroupReliable": "可靠與穩定",
   "sourcesHealthGroupShow": "展示與活躍",
-  "sourcesHealthWeightsDone": "完成"
+  "sourcesHealthWeightsDone": "完成",
+  "settingsSectionLocalization": "本地化",
+  "settingsLocalizationTitle": "補齊缺失的本地化",
+  "settingsLocalizationDescription": "自動把曲名、專輯、簡介和電台文字翻成介面語言，並在小字裡保留原文。",
+  "settingsLocalizationEnable": "自動翻譯非介面語言文字",
+  "settingsLocalizationEnableHint": "缺失的譯文會自動產生；歌手名保持原樣。",
+  "settingsLocalizationShowOriginal": "在譯文下方顯示原文",
+  "settingsLocalizationShowOriginalHint": "小字保留音源裡的原始文字。",
+  "settingsLocalizationEngine": "翻譯引擎",
+  "settingsLocalizationEngineLocal": "內建離線",
+  "settingsLocalizationEngineApi": "外部 API",
+  "settingsLocalizationLocalReady": "離線模型已隨應用程式提供",
+  "settingsLocalizationLocalMissing": "離線模型遺失，請重新安裝應用程式",
+  "settingsLocalizationLocalCorrupt": "離線模型驗證失敗，請重新安裝應用程式",
+  "settingsLocalizationLocalBundled": "模型隨安裝包提供，首次翻譯時按需載入。",
+  "settingsLocalizationApiBaseUrl": "端點（Base URL）",
+  "settingsLocalizationApiKey": "API Key",
+  "settingsLocalizationApiModel": "模型",
+  "settingsLocalizationApiHint": "支援 OpenAI Chat 協定的端點。消耗 token 取自回應；僅對提供餘額介面的服務商顯示餘額。",
+  "settingsLocalizationUsage": "今日 tokens",
+  "settingsLocalizationCache": "已快取文字",
+  "settingsLocalizationBalance": "餘額",
+  "settingsLocalizationBalanceCheck": "查詢餘額",
+  "settingsLocalizationBalanceUnsupported": "該端點未提供餘額查詢",
+  "settingsLocalizationBalanceNoField": "回應裡沒有餘額欄位",
+  "settingsLocalizationBalanceDenied": "金鑰沒有權限查詢餘額",
+  "settingsLocalizationBalanceFailedStatus": "餘額查詢失敗（HTTP {status}）",
+  "@settingsLocalizationBalanceFailedStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationBalanceFailedNetwork": "餘額查詢失敗：{error}",
+  "@settingsLocalizationBalanceFailedNetwork": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationPrivacy": "只傳送需要翻譯的文字；音訊、歌詞和檔案路徑都留在本機。",
+  "settingsSearchKeywordsLocalization": "翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens"
 }

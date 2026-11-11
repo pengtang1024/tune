@@ -6,6 +6,7 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/data/services/database/library_query.dart';
+import 'package:tune/data/services/database/translation_tables.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
 import 'package:tune/features/library/domain/library_facets.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
@@ -23,6 +24,9 @@ class AppDatabase {
   final Database _db;
 
   late final LibraryQuery _libraryQuery = LibraryQuery(_db);
+
+  /// The translation cache and the token ledger of the offline engine.
+  late final TranslationTables translations = TranslationTables(_db);
 
   /// Opens the database at [path], creating the table the first time.
   static AppDatabase open(String path) =>
@@ -152,6 +156,7 @@ class AppDatabase {
         json TEXT NOT NULL
       )
     ''');
+    TranslationTables.ensureSchema(db);
     _migrateColumns(db);
     for (final index in const [
       'CREATE INDEX IF NOT EXISTS idx_songs_year ON songs(year)',

@@ -7240,6 +7240,180 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'完成'**
   String get sourcesHealthWeightsDone;
+
+  /// No description provided for @settingsSectionLocalization.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地化'**
+  String get settingsSectionLocalization;
+
+  /// No description provided for @settingsLocalizationTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'补齐缺失的本地化'**
+  String get settingsLocalizationTitle;
+
+  /// No description provided for @settingsLocalizationDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。'**
+  String get settingsLocalizationDescription;
+
+  /// No description provided for @settingsLocalizationEnable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自动翻译非界面语言文本'**
+  String get settingsLocalizationEnable;
+
+  /// No description provided for @settingsLocalizationEnableHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'缺失的译文会自动生成；歌手名保持原样。'**
+  String get settingsLocalizationEnableHint;
+
+  /// No description provided for @settingsLocalizationShowOriginal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在译文下方显示原文'**
+  String get settingsLocalizationShowOriginal;
+
+  /// No description provided for @settingsLocalizationShowOriginalHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'小字保留音源里的原始文本。'**
+  String get settingsLocalizationShowOriginalHint;
+
+  /// No description provided for @settingsLocalizationEngine.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译引擎'**
+  String get settingsLocalizationEngine;
+
+  /// No description provided for @settingsLocalizationEngineLocal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'内置离线'**
+  String get settingsLocalizationEngineLocal;
+
+  /// No description provided for @settingsLocalizationEngineApi.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'外部 API'**
+  String get settingsLocalizationEngineApi;
+
+  /// No description provided for @settingsLocalizationLocalReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'离线模型已随应用提供'**
+  String get settingsLocalizationLocalReady;
+
+  /// No description provided for @settingsLocalizationLocalMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'离线模型缺失，请重新安装应用'**
+  String get settingsLocalizationLocalMissing;
+
+  /// No description provided for @settingsLocalizationLocalCorrupt.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'离线模型校验失败，请重新安装应用'**
+  String get settingsLocalizationLocalCorrupt;
+
+  /// No description provided for @settingsLocalizationLocalBundled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'模型随安装包提供，首次翻译时按需加载。'**
+  String get settingsLocalizationLocalBundled;
+
+  /// No description provided for @settingsLocalizationApiBaseUrl.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'端点（Base URL）'**
+  String get settingsLocalizationApiBaseUrl;
+
+  /// No description provided for @settingsLocalizationApiKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'API Key'**
+  String get settingsLocalizationApiKey;
+
+  /// No description provided for @settingsLocalizationApiModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'模型'**
+  String get settingsLocalizationApiModel;
+
+  /// No description provided for @settingsLocalizationApiHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。'**
+  String get settingsLocalizationApiHint;
+
+  /// No description provided for @settingsLocalizationUsage.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'今日 tokens'**
+  String get settingsLocalizationUsage;
+
+  /// No description provided for @settingsLocalizationCache.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已缓存文本'**
+  String get settingsLocalizationCache;
+
+  /// No description provided for @settingsLocalizationBalance.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'余额'**
+  String get settingsLocalizationBalance;
+
+  /// No description provided for @settingsLocalizationBalanceCheck.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'查询余额'**
+  String get settingsLocalizationBalanceCheck;
+
+  /// No description provided for @settingsLocalizationBalanceUnsupported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'该端点未提供余额查询'**
+  String get settingsLocalizationBalanceUnsupported;
+
+  /// No description provided for @settingsLocalizationBalanceNoField.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'响应里没有余额字段'**
+  String get settingsLocalizationBalanceNoField;
+
+  /// No description provided for @settingsLocalizationBalanceDenied.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密钥没有权限查询余额'**
+  String get settingsLocalizationBalanceDenied;
+
+  /// No description provided for @settingsLocalizationBalanceFailedStatus.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'余额查询失败（HTTP {status}）'**
+  String settingsLocalizationBalanceFailedStatus(String status);
+
+  /// No description provided for @settingsLocalizationBalanceFailedNetwork.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'余额查询失败：{error}'**
+  String settingsLocalizationBalanceFailedNetwork(String error);
+
+  /// No description provided for @settingsLocalizationPrivacy.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只发送需要翻译的文本；音频、歌词和文件路径都留在本机。'**
+  String get settingsLocalizationPrivacy;
+
+  /// No description provided for @settingsSearchKeywordsLocalization.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译 机翻 本地化 语言 离线模型 api 余额 tokens'**
+  String get settingsSearchKeywordsLocalization;
 }
 
 class _AppLocalizationsDelegate

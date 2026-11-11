@@ -3856,6 +3856,100 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
+
+  @override
+  String get settingsLocalizationEngine => '翻译引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '内置离线';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已缓存文本';
+
+  @override
+  String get settingsLocalizationBalance => '余额';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查询余额';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '该端点未提供余额查询';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '响应里没有余额字段';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '密钥没有权限查询余额';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '余额查询失败（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '余额查询失败：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -7710,6 +7804,100 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
+
+  @override
+  String get settingsLocalizationEngine => '翻译引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '内置离线';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已缓存文本';
+
+  @override
+  String get settingsLocalizationBalance => '余额';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查询余额';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '该端点未提供余额查询';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '响应里没有余额字段';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '密钥没有权限查询余额';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '余额查询失败（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '余额查询失败：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11564,4 +11752,98 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '補齊缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自動把曲名、專輯、簡介和電台文字翻成介面語言，並在小字裡保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自動翻譯非介面語言文字';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的譯文會自動產生；歌手名保持原樣。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在譯文下方顯示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源裡的原始文字。';
+
+  @override
+  String get settingsLocalizationEngine => '翻譯引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '內建離線';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '離線模型已隨應用程式提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '離線模型遺失，請重新安裝應用程式';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '離線模型驗證失敗，請重新安裝應用程式';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型隨安裝包提供，首次翻譯時按需載入。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端點（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支援 OpenAI Chat 協定的端點。消耗 token 取自回應；僅對提供餘額介面的服務商顯示餘額。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已快取文字';
+
+  @override
+  String get settingsLocalizationBalance => '餘額';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查詢餘額';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '該端點未提供餘額查詢';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '回應裡沒有餘額欄位';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '金鑰沒有權限查詢餘額';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '餘額查詢失敗（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '餘額查詢失敗：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只傳送需要翻譯的文字；音訊、歌詞和檔案路徑都留在本機。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens';
 }

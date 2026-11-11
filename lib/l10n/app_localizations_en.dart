@@ -4135,4 +4135,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesHealthWeightsDone => 'Done';
+
+  @override
+  String get settingsSectionLocalization => 'Localization';
+
+  @override
+  String get settingsLocalizationTitle => 'Translate what is missing';
+
+  @override
+  String get settingsLocalizationDescription =>
+      'Turns titles, albums, descriptions and radio text into the language of the interface, and keeps the original in small type.';
+
+  @override
+  String get settingsLocalizationEnable => 'Translate non-interface text';
+
+  @override
+  String get settingsLocalizationEnableHint =>
+      'Missing translations are generated automatically; artist names are kept as written.';
+
+  @override
+  String get settingsLocalizationShowOriginal =>
+      'Show the original under the translation';
+
+  @override
+  String get settingsLocalizationShowOriginalHint =>
+      'The small line keeps the text that came from the source.';
+
+  @override
+  String get settingsLocalizationEngine => 'Translation engine';
+
+  @override
+  String get settingsLocalizationEngineLocal => 'Built-in offline';
+
+  @override
+  String get settingsLocalizationEngineApi => 'External API';
+
+  @override
+  String get settingsLocalizationLocalReady => 'Offline model is bundled';
+
+  @override
+  String get settingsLocalizationLocalMissing =>
+      'Offline model is missing. Please reinstall the app.';
+
+  @override
+  String get settingsLocalizationLocalCorrupt =>
+      'Offline model failed verification. Please reinstall the app.';
+
+  @override
+  String get settingsLocalizationLocalBundled =>
+      'The model ships with the app and loads on first use.';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => 'Endpoint (base URL)';
+
+  @override
+  String get settingsLocalizationApiKey => 'API key';
+
+  @override
+  String get settingsLocalizationApiModel => 'Model';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      'Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.';
+
+  @override
+  String get settingsLocalizationUsage => 'Tokens today';
+
+  @override
+  String get settingsLocalizationCache => 'Cached texts';
+
+  @override
+  String get settingsLocalizationBalance => 'Balance';
+
+  @override
+  String get settingsLocalizationBalanceCheck => 'Check balance';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported =>
+      'This endpoint does not publish a balance';
+
+  @override
+  String get settingsLocalizationBalanceNoField =>
+      'The response carries no balance field';
+
+  @override
+  String get settingsLocalizationBalanceDenied =>
+      'The key may not read the balance';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return 'Balance check failed (HTTP $status)';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return 'Balance check failed: $error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy =>
+      'Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      'translate translation localization language offline model api balance tokens';
 }

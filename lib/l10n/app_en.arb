@@ -1847,5 +1847,48 @@
   "sourcesHealthGroupOutput": "Freshness and output",
   "sourcesHealthGroupReliable": "Reliability and stability",
   "sourcesHealthGroupShow": "Presentation and activity",
-  "sourcesHealthWeightsDone": "Done"
+  "sourcesHealthWeightsDone": "Done",
+  "settingsSectionLocalization": "Localization",
+  "settingsLocalizationTitle": "Translate what is missing",
+  "settingsLocalizationDescription": "Turns titles, albums, descriptions and radio text into the language of the interface, and keeps the original in small type.",
+  "settingsLocalizationEnable": "Translate non-interface text",
+  "settingsLocalizationEnableHint": "Missing translations are generated automatically; artist names are kept as written.",
+  "settingsLocalizationShowOriginal": "Show the original under the translation",
+  "settingsLocalizationShowOriginalHint": "The small line keeps the text that came from the source.",
+  "settingsLocalizationEngine": "Translation engine",
+  "settingsLocalizationEngineLocal": "Built-in offline",
+  "settingsLocalizationEngineApi": "External API",
+  "settingsLocalizationLocalReady": "Offline model is bundled",
+  "settingsLocalizationLocalMissing": "Offline model is missing. Please reinstall the app.",
+  "settingsLocalizationLocalCorrupt": "Offline model failed verification. Please reinstall the app.",
+  "settingsLocalizationLocalBundled": "The model ships with the app and loads on first use.",
+  "settingsLocalizationApiBaseUrl": "Endpoint (base URL)",
+  "settingsLocalizationApiKey": "API key",
+  "settingsLocalizationApiModel": "Model",
+  "settingsLocalizationApiHint": "Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.",
+  "settingsLocalizationUsage": "Tokens today",
+  "settingsLocalizationCache": "Cached texts",
+  "settingsLocalizationBalance": "Balance",
+  "settingsLocalizationBalanceCheck": "Check balance",
+  "settingsLocalizationBalanceUnsupported": "This endpoint does not publish a balance",
+  "settingsLocalizationBalanceNoField": "The response carries no balance field",
+  "settingsLocalizationBalanceDenied": "The key may not read the balance",
+  "settingsLocalizationBalanceFailedStatus": "Balance check failed (HTTP {status})",
+  "@settingsLocalizationBalanceFailedStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationBalanceFailedNetwork": "Balance check failed: {error}",
+  "@settingsLocalizationBalanceFailedNetwork": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationPrivacy": "Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.",
+  "settingsSearchKeywordsLocalization": "translate translation localization language offline model api balance tokens"
 }

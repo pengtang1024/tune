@@ -1847,5 +1847,48 @@
   "sourcesHealthGroupOutput": "新鲜与产出",
   "sourcesHealthGroupReliable": "可靠与稳定",
   "sourcesHealthGroupShow": "展示与活跃",
-  "sourcesHealthWeightsDone": "完成"
+  "sourcesHealthWeightsDone": "完成",
+  "settingsSectionLocalization": "本地化",
+  "settingsLocalizationTitle": "补齐缺失的本地化",
+  "settingsLocalizationDescription": "自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。",
+  "settingsLocalizationEnable": "自动翻译非界面语言文本",
+  "settingsLocalizationEnableHint": "缺失的译文会自动生成；歌手名保持原样。",
+  "settingsLocalizationShowOriginal": "在译文下方显示原文",
+  "settingsLocalizationShowOriginalHint": "小字保留音源里的原始文本。",
+  "settingsLocalizationEngine": "翻译引擎",
+  "settingsLocalizationEngineLocal": "内置离线",
+  "settingsLocalizationEngineApi": "外部 API",
+  "settingsLocalizationLocalReady": "离线模型已随应用提供",
+  "settingsLocalizationLocalMissing": "离线模型缺失，请重新安装应用",
+  "settingsLocalizationLocalCorrupt": "离线模型校验失败，请重新安装应用",
+  "settingsLocalizationLocalBundled": "模型随安装包提供，首次翻译时按需加载。",
+  "settingsLocalizationApiBaseUrl": "端点（Base URL）",
+  "settingsLocalizationApiKey": "API Key",
+  "settingsLocalizationApiModel": "模型",
+  "settingsLocalizationApiHint": "支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。",
+  "settingsLocalizationUsage": "今日 tokens",
+  "settingsLocalizationCache": "已缓存文本",
+  "settingsLocalizationBalance": "余额",
+  "settingsLocalizationBalanceCheck": "查询余额",
+  "settingsLocalizationBalanceUnsupported": "该端点未提供余额查询",
+  "settingsLocalizationBalanceNoField": "响应里没有余额字段",
+  "settingsLocalizationBalanceDenied": "密钥没有权限查询余额",
+  "settingsLocalizationBalanceFailedStatus": "余额查询失败（HTTP {status}）",
+  "@settingsLocalizationBalanceFailedStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationBalanceFailedNetwork": "余额查询失败：{error}",
+  "@settingsLocalizationBalanceFailedNetwork": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationPrivacy": "只发送需要翻译的文本；音频、歌词和文件路径都留在本机。",
+  "settingsSearchKeywordsLocalization": "翻译 机翻 本地化 语言 离线模型 api 余额 tokens"
 }

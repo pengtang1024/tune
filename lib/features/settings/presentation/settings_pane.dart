@@ -12,6 +12,8 @@ import 'package:tune/data/services/desktop/audio_mime_types.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/features/localization/presentation/settings_localization_card.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
@@ -33,6 +35,7 @@ enum _SettingsSection {
   library,
   playback,
   lyrics,
+  localization,
   discovery,
   desktop,
   sourceHealth,
@@ -398,6 +401,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       _SettingsSection.library,
       _SettingsSection.playback,
       _SettingsSection.lyrics,
+      _SettingsSection.localization,
       _SettingsSection.discovery,
       _SettingsSection.desktop,
       _SettingsSection.sourceHealth,
@@ -785,6 +789,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
             ),
           ),
         ];
+      case _SettingsSection.localization:
+        return const [];
       case _SettingsSection.discovery:
         return [
           _Preset(
@@ -855,6 +861,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         if (!config.autoFill && !config.gapCheckEnabled) return 'manual';
         if (config.autoFill && config.gapCheckEnabled) return 'balanced';
         if (config.autoFill && !config.gapCheckEnabled) return 'saver';
+        return 'custom';
+      case _SettingsSection.localization:
         return 'custom';
       case _SettingsSection.discovery:
         return settings.useListeningHistory ? 'on' : 'off';
@@ -1070,6 +1078,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
             controller.setFavoritesDoubleClickPlays,
       ),
       _SettingsSection.lyrics => const SettingsSmartLyricsCard(),
+      _SettingsSection.localization => const SettingsLocalizationCard(),
       _SettingsSection.discovery => const SettingsDiscoveryCard(),
       _SettingsSection.desktop => SettingsDesktopCard(
         closeToTray: settings.closeToTray,
@@ -1143,6 +1152,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         await controller.setAutoResumeOnStartup(true);
       case _SettingsSection.lyrics:
         await controller.setSmartLyrics(const SmartLyricsConfig());
+      case _SettingsSection.localization:
+        await controller.setLocalization(const LocalizationConfig());
       case _SettingsSection.discovery:
         await controller.setUseListeningHistory(false);
       case _SettingsSection.desktop:
@@ -1165,6 +1176,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         _SettingsSection.library => context.loc.libraryTitle,
         _SettingsSection.playback => context.loc.settingsSectionPlayback,
         _SettingsSection.lyrics => context.loc.settingsSectionSmartLyrics,
+        _SettingsSection.localization =>
+          context.loc.settingsSectionLocalization,
         _SettingsSection.discovery => context.loc.settingsSectionDiscovery,
         _SettingsSection.desktop => context.loc.settingsSectionDesktop,
         _SettingsSection.sourceHealth => context.loc.settingsSectionSourceHealth,
@@ -1178,6 +1191,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         _SettingsSection.library => context.loc.settingsLibraryDescription,
         _SettingsSection.playback => context.loc.settingsPlaybackDescription,
         _SettingsSection.lyrics => context.loc.settingsSmartLyricsDescription,
+        _SettingsSection.localization =>
+          context.loc.settingsLocalizationDescription,
         _SettingsSection.discovery => context.loc.settingsDiscoveryDescription,
         _SettingsSection.desktop => context.loc.settingsDesktopDescription,
         _SettingsSection.sourceHealth =>
@@ -1193,6 +1208,8 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         _SettingsSection.playback =>
           context.loc.settingsSearchKeywordsPlayback,
         _SettingsSection.lyrics => context.loc.settingsSearchKeywordsLyrics,
+        _SettingsSection.localization =>
+          context.loc.settingsSearchKeywordsLocalization,
         _SettingsSection.discovery =>
           context.loc.settingsSearchKeywordsDiscovery,
         _SettingsSection.desktop => context.loc.settingsSearchKeywordsDesktop,
@@ -1207,6 +1224,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     _SettingsSection.library => Icons.library_music_rounded,
     _SettingsSection.playback => Icons.play_circle_outline_rounded,
     _SettingsSection.lyrics => Icons.lyrics_outlined,
+    _SettingsSection.localization => Icons.translate_rounded,
     _SettingsSection.discovery => Icons.explore_rounded,
     _SettingsSection.desktop => Icons.desktop_windows_outlined,
     _SettingsSection.sourceHealth => Icons.monitor_heart_outlined,

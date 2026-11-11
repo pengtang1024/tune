@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/localization/domain/localization_config.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 
 class SettingsState {
@@ -63,6 +64,9 @@ class SettingsState {
   /// What the reader pasted for the smart lyrics pipeline.
   final SmartLyricsConfig smartLyrics;
 
+  /// How missing metadata is translated into the language of the interface.
+  final LocalizationConfig localization;
+
   /// Whether the discover page may learn from the tracks that were played.
   ///
   /// It is off by default: the page works from the hearts and the metadata
@@ -87,6 +91,7 @@ class SettingsState {
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
     this.smartLyrics = const SmartLyricsConfig(),
+    this.localization = const LocalizationConfig(),
     this.useListeningHistory = false,
     this.libraryFolder,
     this.defaultLibraryFolder = '',
@@ -112,6 +117,7 @@ class SettingsState {
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
     SmartLyricsConfig? smartLyrics,
+    LocalizationConfig? localization,
     bool? useListeningHistory,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
@@ -133,6 +139,7 @@ class SettingsState {
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
       smartLyrics: smartLyrics ?? this.smartLyrics,
+      localization: localization ?? this.localization,
       useListeningHistory: useListeningHistory ?? this.useListeningHistory,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
