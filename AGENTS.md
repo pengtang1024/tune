@@ -34,7 +34,7 @@
 | 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
 | 新增依赖、字体或第三方素材：许可证边界与声明 | [`docs/licensing.md`](docs/licensing.md) |
-| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D8 已修） |
+| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D11 已修） |
 | 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
 
