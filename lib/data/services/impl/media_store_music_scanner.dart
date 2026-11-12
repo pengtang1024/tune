@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart'
     show MethodChannel, MissingPluginException, PlatformException;
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/impl/system_library_row.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
@@ -16,7 +17,9 @@ import 'package:tune/utils/logger.dart';
 /// system library is one library, and asking the reader to pick folders on a
 /// phone is E3's SAF step, not this one.
 class MediaStoreMusicScanner implements CrossPlatformMusicScanner {
-  static const MethodChannel _channel = MethodChannel('cn.iouf.tune/media_store');
+  static const MethodChannel _channel = MethodChannel(
+    'cn.iouf.tune/media_store',
+  );
 
   /// Logged once: a reader who denied the media permission would otherwise
   /// see the same failure on every startup scan.
@@ -90,7 +93,7 @@ class MediaStoreMusicScanner implements CrossPlatformMusicScanner {
         'listAudio',
       );
       if (rows == null) return const [];
-      return rows.map(_songOf).whereType<Song>().toList();
+      return rows.map(songOfSystemRow).whereType<Song>().toList();
     } on PlatformException catch (error) {
       if (error.code == 'permission_denied' && !_permissionReported) {
         _permissionReported = true;
@@ -103,25 +106,5 @@ class MediaStoreMusicScanner implements CrossPlatformMusicScanner {
       Log.error('MediaStore 通道不可用: $error');
       return const [];
     }
-  }
-
-  Song? _songOf(Map<Object?, Object?> row) {
-    final uri = row['uri'] as String?;
-    if (uri == null || uri.isEmpty) return null;
-    final addedSeconds = row['dateAddedSeconds'] as int? ?? 0;
-    final duration = row['durationMs'] as int? ?? 0;
-    return Song(
-      id: uri.hashCode,
-      title: row['title'] as String? ?? '',
-      artist: row['artist'] as String? ?? '',
-      album: row['album'] as String? ?? '',
-      duration: duration,
-      uri: uri,
-      dateAdded: addedSeconds * 1000,
-      year: row['year'] as int?,
-      size: row['size'] as int?,
-      type: 'audio',
-      externalId: '${row['mediaId']}',
-    );
   }
 }
