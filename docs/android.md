@@ -113,12 +113,19 @@ JAVA_HOME=~/.jdks/ms-21.0.12.1 /opt/flutter/bin/flutter build apk --debug
 - 模拟器证据：冷启动后 `library.db` 中 `source_id='local'` 的两条
   `content://media/external/audio/media/...` 行保持 `active=1`，界面显示 2 首本地曲目。
 
-未验（需真机 / 后续）：
+未验 / 已验（2026-11-12，AVD `tune-api35`）：
 
 - content:// 曲目在真机上的实际出声（模拟器 `-no-audio`，只能看到 `READY/PLAYING` 状态）；
-- 拔出/删除媒体后重扫能清掉行（机制已实现，需在真机或带外部存储的模拟器上触发）；
-- 500 首库的首屏交互与扫描耗时（模拟器只有两首测试音）；
-- SAF「指定文件夹」仍未做（后置）；
+- 删除媒体后重扫清行：**已验**。删掉 `/sdcard/Music/TuneBench/Tune_Bench_500.wav`，
+  `scan_volume` 后 MediaStore 从 502 行降到 501 行；重扫后 `library.db` 里该行 `active=0`，
+  `source_id='local'` 的 active 行从 502 降到 501，其余 499 首 bench 曲目保持 active。
+- 500 首库的首屏与扫描：**已测（模拟器）**。500 个 1 秒 WAV 推进 MediaStore 后共 501 首音乐，
+  加上历史库 5,380 行、窗口 1,000 行：冷启动 `am start -W` 1.84 s（两次 1,845 / 1,841 ms），
+  原生查询 501 行约 0.95 s（含 adb 启动开销，`content query` 三次 0.93–0.96 s），
+  启动后「Scanned 1 source, 5,380 songs in total」在 5.3 s 内出现（uiautomator 轮询，±1 s），
+  点行到 `音频播放成功` 198 ms。滚动帧率未取到：Flutter 在本模拟器上 `dumpsys gfxinfo`
+  与 SurfaceFlinger latency 都没有帧数据，需要真机或 perfetto 复核。
+- SAF「指定文件夹」仍未做（后置），设计见 §5。
 - 封面缓存已改到应用私有目录，见下节。
 
 #### 封面的落盘边界
@@ -134,7 +141,10 @@ JAVA_HOME=~/.jdks/ms-21.0.12.1 /opt/flutter/bin/flutter build apk --debug
 - `ArtworkCache.coverFileFor` 是给桌面媒体卡片读本机文件的同步接口；目录还没解析出来时返回
   null（卡片退回网络地址），不影响手机（手机不用 MPRIS）。
 
-未验：真机上应用私有目录的封面在重启后仍能命中（模拟器可验，见本轮记录）。
+AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/user/0/cn.iouf.tune/files/artwork/`
+下出现 6 个分桶、11 个封面文件（696 KB），logcat 没有 `保存封面失败`，也没有
+`封面缓存不可写`。重启后同一目录继续命中；目录不可写的回退由
+`test/services/artwork_cache_test.dart` 覆盖（用一个占位的同名文件模拟只读）。
 
 #### 移动端的本地工具边界（ffmpeg 与本地引擎）
 
@@ -199,3 +209,64 @@ JAVA_HOME=~/.jdks/ms-21.0.12.1 /opt/flutter/bin/flutter build apk --debug
    不做「每首歌失败一次」的降级。
 6. 封面缓存 Android 走应用私有目录，桌面保持 `<音乐库>/.tune/artwork`；目录不可写时只留内存，
    每进程一条 info。
+
+## 5. SAF「指定文件夹」设计（未实施）
+
+目标：让用户挑一个音乐文件夹，只扫这个文件夹，并能在音频旁写词稿与封面。MediaStore 仍是
+默认；SAF 是补充，不是替换。本轮只留设计，不改代码。
+
+### 5.1 数据与权限
+
+- 选择：原生 `ACTION_OPEN_DOCUMENT_TREE`，拿到 tree URI 后立刻
+  `takePersistableUriPermission(READ | WRITE)`；`WRITE` 拿不到就只登记为只读来源。
+- 持久化：tree URI 与「只读/可写」记在偏好里（`library_folder` 现在存文件路径，改为按平台
+  分叉：Android 存 tree URI）。授权被系统收回时（`SecurityException`）清掉记录并要求重选，
+  不回退成静默空库。
+- 去重：MediaStore 与 SAF 可能读到同一首歌。行的主键仍是 `uri`，SAF 行的 URI 是
+  `content://<tree>/document/<id>`，与 MediaStore 的 `media/<id>` 不同；同一物理文件会出现
+  两行。设计上按「同一来源内唯一」处理，扫描报告里给出两边的条数，不做跨来源指纹合并——
+  合并需要读文件哈希，成本进不了首屏预算。
+
+### 5.2 扫描
+
+- 原生新增 `MethodChannel('cn.iouf.tune/saf')`：`listTree(uri)` 用
+  `DocumentsContract.buildChildDocumentsUriUsingTree` 递归列出文件，只保留
+  `application/ogg`、`audio/*` 等 MIME，返回与 MediaStore 同一套行字段
+  （uri/mediaId/title/artist/album/durationMs/dateAdded/size/mimeType）。
+- Dart 新增 `SafMusicScanner implements CrossPlatformMusicScanner`，`addressesSystemLibrary`
+  为 true（一个树读到的 URI 全集就是答案）；`crossPlatformMusicScannerProvider` 在 Android
+  上按设置选择 MediaStore 或 SAF。
+- 目录扫描的进度上报与分批 upsert 复用现有管线，不新增第二套写库路径；树很深时按层分页，
+  每批不超过 500 行，避免一次性把整棵树读进内存。
+
+### 5.3 写入（词稿与封面）
+
+- 新增 `DocumentSheetWriter`：给定歌曲 URI 的 parent document id，用
+  `DocumentsContract.createDocument` 写 `<歌名>.lrc` / `<歌名>.smart.lrc` / `<歌名>.smart.json`。
+  `LibraryPaths` 仍只负责桌面文件系统，SAF 由这个 writer 单独承担，避免把两种地址塞进
+  同一个 `File`。
+- `lyricsSheetBesideAudio` 表达的是「平台默认能不能写」；SAF 就绪后，改成在运行期问
+  `DocumentSheetWriter.canWrite(song)`：有持久写权限的树为 true，MediaStore 行仍为 false。
+  自动补词与批量按这个结果逐首判断，不整体开关。
+- 封面仍写应用私有目录，不写回 SAF：封面是缓存，写进用户目录会污染音乐库。
+
+### 5.4 改动点
+
+| 位置 | 改动 |
+| --- | --- |
+| `android/app/src/main/java/cn/iouf/tune/MainActivity.java` | 新增 `pickDirectory` / `listTree` / `createDocument` 三个通道方法 |
+| `lib/data/services/impl/saf_music_scanner.dart`（新） | `CrossPlatformMusicScanner` 的 SAF 实现 |
+| `lib/data/services/providers/cross_platform_music_scanner_provider.dart` | Android 上按设置选 MediaStore 或 SAF |
+| `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart` | 根目录按平台分叉：文件路径 / tree URI |
+| `lib/data/services/impl/desktop/…`（新 `document_sheet_writer.dart`） | 词稿的 SAF 写入 |
+| `lib/core/config/app_capabilities.dart` | 只保留平台默认值；能否写改为运行期判断 |
+| `lib/features/settings/presentation/settings_desktop_card.dart` | Android 增加「音乐库文件夹」行与重选入口 |
+| `lib/features/smart_lyrics/application/*` | 批量与自动补词改按单曲 `canWrite` 过滤 |
+
+### 5.5 里程碑与风险
+
+- S1：选择器 + 只读扫描（可播放、可重扫）；S2：词稿写入；S3：封面不写 SAF 的确认与文档；
+  S4：授权被收回、树被删除、同名文件冲突的测试。
+- 风险：SAF 逐层列目录比 MediaStore 慢，500 首要先量；`DocumentsContract` 在不同厂商 ROM
+  上对 `mime_type` 的返回不一致；写权限被收回后不能继续把词稿标成成功。
+- 上线前必须先在真机验：选择器返回的 tree URI 能跨重启使用、写权限真的可用。
