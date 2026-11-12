@@ -27,16 +27,24 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> init() async {
     try {
-      // Linux 上 just_audio 没有官方实现，使用 media_kit（libmpv）作为后端。
-      if (Platform.isLinux) {
+      // Linux 与 Windows 上 just_audio 没有够用的官方实现，使用 media_kit
+      // （libmpv）作为后端。Windows 的 just_audio_windows 不支持自定义
+      // 请求头，需要 token 的音源会放不出来；media_kit 会带上它们。
+      if (Platform.isLinux || Platform.isWindows) {
         JustAudioMediaKit.title = 'Tune';
         // libmpv 的解复用缓存（demuxer-max-bytes 与 demuxer-max-back-bytes
         // 各取一份）默认 32MB，播一首本地曲就多驻留 ~35MB。音乐播放的
         // 采样率固定，8MB 足够缓存约 3 分钟的 320kbps 音频，也够网络流
         // 顶住常见的抖动。
         JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
-        JustAudioMediaKit.ensureInitialized(linux: true, windows: false);
-        Log.info('已注册 Linux 音频后端 (just_audio_media_kit)');
+        JustAudioMediaKit.ensureInitialized(
+          linux: Platform.isLinux,
+          windows: Platform.isWindows,
+        );
+        Log.info(
+          '已注册 ${Platform.isLinux ? 'Linux' : 'Windows'} 音频后端 '
+          '(just_audio_media_kit)',
+        );
       }
 
       final session = await AudioSession.instance;
@@ -113,13 +121,30 @@ class JustAudioPlayerService implements AudioPlayerService {
         await _audioPlayer!.stop();
         final source = _sourceFor(song, address, fromStore: stored != null);
         await _audioPlayer!.setAudioSource(source);
-        await _audioPlayer!.play();
+        // just_audio 的 play() 要等这一首播完才完成。这里若 await 它，
+        // 上层就把「开始播放」当成「播完才返回」，状态会一直停在 loading。
+        // 播放开始后由 playingStream / positionStream 推进状态。
+        _startPlayback();
       }
       Log.info('音频播放成功');
     } catch (e, stackTrace) {
       Log.error('播放音频失败: $e\nStack trace: $stackTrace');
       rethrow;
     }
+  }
+
+  /// 启动播放，但不等它自然结束。
+  ///
+  /// just_audio 的 `play()` 在整首播完（或被暂停/停止）时才完成，等到它的
+  /// 调用方会把「已经开始播」误当成「播完」，状态因此卡在 loading。
+  void _startPlayback() {
+    final player = _audioPlayer;
+    if (player == null) return;
+    unawaited(
+      player.play().catchError((Object error, StackTrace stackTrace) {
+        Log.error('播放失败: $error\nStack trace: $stackTrace');
+      }),
+    );
   }
 
   /// The source the backend loads.
@@ -147,9 +172,7 @@ class JustAudioPlayerService implements AudioPlayerService {
   @override
   Future<void> resume() async {
     try {
-      if (_audioPlayer != null) {
-        await _audioPlayer!.play();
-      }
+      if (_audioPlayer != null) _startPlayback();
     } catch (e, stackTrace) {
       Log.error('恢复播放失败: $e\nStack trace: $stackTrace');
       rethrow;

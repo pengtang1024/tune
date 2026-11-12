@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -5,14 +6,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app.dart';
 import 'package:tune/app/licenses.dart';
+import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/data/services/impl/preference_store_io.dart';
+import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/features/player/application/tune_audio_handler.dart';
+import 'package:tune/features/settings/application/mobile_permissions_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_auto_fill_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_leak_check_controller.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> arguments) async {
   WidgetsFlutterBinding.ensureInitialized();
   registerThirdPartyLicenses();
 
@@ -37,7 +42,12 @@ Future<void> main() async {
   };
 
   final container = ProviderContainer(
-    overrides: [persistenceServiceProvider.overrideWithValue(persistence)],
+    overrides: [
+      persistenceServiceProvider.overrideWithValue(persistence),
+      // The Windows runner hands the command line to `main`; Linux reads it
+      // from `/proc`, so the words are only used where they arrive.
+      startupArgumentsProvider.overrideWithValue(arguments),
+    ],
   );
   if (!await _claimThePlayerPlace(container)) {
     // Another player is already running; it got the files and the window.
@@ -48,9 +58,36 @@ Future<void> main() async {
     return;
   }
 
+  // Android keeps the sound alive after the interface is gone. The service
+  // has to exist before the first frame: it creates the media session and the
+  // notification channel, and the notification of a playing track cannot be
+  // shown without them.
+  final audioHandler = PlatformConstants.isAndroid
+      ? await TuneAudioHandler.start()
+      : null;
+
   runApp(
     UncontrolledProviderScope(container: container, child: const TuneApp()),
   );
+
+  // The handler mirrors the state after the first frame: the controller
+  // restores the session and reads the preferences, which are still warming
+  // up while the service starts.
+  audioHandler?.attach(container);
+
+  // Android 13 and newer hide the notification of the service until the
+  // reader allows it. The dialog needs a frame to sit on, so it is asked
+  // once after the first one; a refusal is remembered by the system and the
+  // settings page offers the way back.
+  if (PlatformConstants.isAndroid) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(
+        container
+            .read(mobilePermissionsControllerProvider.notifier)
+            .ensure(MobilePermission.notifications),
+      );
+    });
+  }
 
   // The free check of the smart lyrics pipeline (docs/smart-lyrics.md
   // §7.2): periodic, quiet, and free — the loop it lives in starts once,
