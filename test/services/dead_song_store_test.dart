@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/features/library/application/dead_songs_controller.dart';
-import 'package:tune/features/library/data/dead_song_store.dart';
+import 'package:tune/features/player/application/dead_songs_controller.dart';
+import 'package:tune/features/player/data/dead_song_store.dart';
 
 import 'fake_persistence.dart';
 

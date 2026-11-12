@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tune/features/library/data/dead_song_store.dart';
+import 'package:tune/features/player/data/dead_song_store.dart';
 import 'package:tune/providers/persistence_providers.dart';
 
 /// The tracks whose playback failed, by their canonical URI.

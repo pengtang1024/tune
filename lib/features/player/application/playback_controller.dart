@@ -11,8 +11,8 @@ import 'package:tune/data/services/providers/playback_session_store_provider.dar
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/audio_source_resolver.dart';
+import 'package:tune/features/player/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/playback_session_recorder.dart';
 import 'package:tune/features/player/data/playback_session_store.dart';
 import 'package:tune/features/player/application/track_prefetcher.dart';
