@@ -34,8 +34,7 @@ presentation → application → domain
 ## 硬约束
 
 1. `domain/`、`data/`、`core/` 不 import `features/`、`app/`、`shared/ui/`。
-2. `features/x/presentation` 不 import `features/y/presentation`。跨页面组合放 `app/router` 或 `features/shell`；可复用 widget 下沉到 `shared/ui`。
-   - 现存唯一例外：`lib/features/library/presentation/library_pane.dart` → `lib/features/search/presentation/online_search_sheet.dart`。这是待消除的历史例外，不要照抄扩散。
+2. `features/x/presentation` 不 import `features/y/presentation`。跨页面组合放 `app/router` 或 `features/shell`；可复用 widget 下沉到 `shared/ui`。仓库里没有例外：音乐库的在线搜索入口由 `app/router` 把回调交给 `LibraryPane`，页面自己不引用搜索的界面。
 3. `features/x/application` 可以 import 别的 feature 的 `application` / `domain`（library 调 playback 就是这样），但不 import 别人的 `presentation`。
 4. widget 只通过 provider 取状态、触发动作，不直接持有 service。
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。

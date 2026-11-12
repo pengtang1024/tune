@@ -35,7 +35,6 @@ import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/features/player/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/application/source_health_reports.dart';
@@ -50,7 +49,13 @@ import 'package:tune/shared/ui/source_label.dart';
 /// The page wires the controller to the widgets; a track is always rendered
 /// by [LibraryTrackCard].
 class LibraryPane extends ConsumerStatefulWidget {
-  const LibraryPane({super.key});
+  /// Opens the online search sheet.
+  ///
+  /// The sheet belongs to another feature, so the page does not reach for it
+  /// itself: the router hands the opener in and composes the two there.
+  final VoidCallback? onSearchOnline;
+
+  const LibraryPane({super.key, this.onSearchOnline});
 
   @override
   ConsumerState<LibraryPane> createState() => _LibraryPaneState();
@@ -225,7 +230,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onAddAll: songs.isEmpty ? null : () => _addAllToQueue(songs),
                   onScan: _scan,
                   scanning: library.isScanning,
-                  onSearchOnline: () => showOnlineSearchSheet(context),
+                  onSearchOnline: widget.onSearchOnline,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),

@@ -8,6 +8,7 @@ import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
+import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/smart_lyrics/presentation/marks_page.dart';
@@ -40,7 +41,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/library',
             pageBuilder: (context, state) =>
-                sectionPage(state, const LibraryPane()),
+                sectionPage(state, const _LibrarySectionPage()),
           ),
           GoRoute(
             path: '/discover',
@@ -145,6 +146,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+/// The library section, with the search sheet wired in.
+///
+/// The page of one feature does not reach into the presentation of another;
+/// the router is where the two are composed. The wrapping widget gives the
+/// opener a context under the navigator, which the sheet needs.
+class _LibrarySectionPage extends StatelessWidget {
+  const _LibrarySectionPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return LibraryPane(
+      onSearchOnline: () => showOnlineSearchSheet(context),
+    );
+  }
+}
 
 /// The page of a section of the shell.
 ///

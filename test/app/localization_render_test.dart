@@ -18,6 +18,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
+import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
@@ -203,7 +204,14 @@ Future<void> _drawEveryScreen(
     locale,
     size,
     'library',
-    const CompactShell(currentPath: '/library', child: LibraryPane()),
+    Builder(
+      builder: (context) => CompactShell(
+        currentPath: '/library',
+        child: LibraryPane(
+          onSearchOnline: () => showOnlineSearchSheet(context),
+        ),
+      ),
+    ),
   );
   _collect(tester, collect);
 
