@@ -1,5 +1,5 @@
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/domain/models/source_scan_health.dart';
 
 class MusicSourcesState {
   final List<MusicSourceConfig> sources;

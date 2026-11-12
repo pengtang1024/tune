@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/domain/models/source_scan_health.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Persists source configuration and auto-scan timestamps.

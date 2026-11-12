@@ -1,6 +1,6 @@
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/domain/models/source_scan_health.dart';
 
 /// One source's health, split into the dimensions that built the score.
 ///

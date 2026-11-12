@@ -7,7 +7,7 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/domain/models/source_scan_health.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/utils/logger.dart';
