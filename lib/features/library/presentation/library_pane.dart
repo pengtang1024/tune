@@ -192,7 +192,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       sourceLabels,
       orderedConfigs,
     );
-    final songs = library.filteredSongs;
+    final songs = filteredSongsOf(
+      songs: library.songs,
+      query: library.query,
+      sourceFilter: library.sourceFilter,
+    );
     final albumCount = library.songs
         .map((song) => song.album.trim())
         .where((album) => album.isNotEmpty)
@@ -803,7 +807,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 typedef _LibrarySlice = ({
   List<Song> songs,
   List<AlbumSummary> albums,
-  List<Song> filteredSongs,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -821,7 +824,6 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
   return (
     songs: state.songs,
     albums: state.albums,
-    filteredSongs: state.filteredSongs,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,
