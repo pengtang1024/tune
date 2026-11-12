@@ -34,6 +34,8 @@ class LibraryState {
   /// How many tracks the library holds on disk.
   ///
   /// It is larger than [songs] when the library is read a window at a time.
+  /// The search word and the filter do not change it: the result count beside
+  /// the sort menu reports those.
   final int total;
 
   /// Whether another window of the library is waiting on disk.

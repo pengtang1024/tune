@@ -197,11 +197,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       query: library.query,
       sourceFilter: library.sourceFilter,
     );
-    final albumCount = library.songs
-        .map((song) => song.album.trim())
-        .where((album) => album.isNotEmpty)
-        .toSet()
-        .length;
+    final albumCount = library.albums.length;
     // The albums are grouped only while the page is showing them: the songs
     // view has no use for the groups, and a library can hold thousands of
     // tracks.
@@ -220,7 +216,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           child: openAlbum == null
               ? LibraryHeader(
                   summary: context.loc.librarySummary(
-                    library.songs.length,
+                    library.total,
                     albumCount,
                     availableSources.length,
                   ),
@@ -807,6 +803,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 typedef _LibrarySlice = ({
   List<Song> songs,
   List<AlbumSummary> albums,
+  int total,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -824,6 +821,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
   return (
     songs: state.songs,
     albums: state.albums,
+    total: state.total,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,

@@ -70,7 +70,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final view = await _storage.loadView();
     final sort = view?.sort ?? LibrarySort.recent;
     final filter = view?.filter ?? LibraryFilter.empty;
-    final total = await _storage.countQuery(query: '', filter: filter);
+    final total = await _storage.count();
+    final matching = await _storage.countQuery(query: '', filter: filter);
     final songs = await _storage.query(
       query: '',
       filter: filter,
@@ -85,7 +86,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       sort: sort,
       sourceFilter: filter.sources.length == 1 ? filter.sources.first : null,
       total: total,
-      hasMore: songs.length < total,
+      hasMore: songs.length < matching,
       albums: albums,
       statusMessage: songs.isEmpty
           ? null
@@ -319,6 +320,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           .length;
 
       final total = await _storage.count();
+      final matching = await _storage.countQuery(
+        query: '',
+        filter: _current.filter,
+      );
       if (_disposed || generation != _scanGeneration) return;
       // A scan that changed nothing keeps the window it had: the list is the
       // input of the whole viewport, and a new list — even an equal one —
@@ -330,7 +335,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         _current.copyWith(
           songs: songs,
           total: total,
-          hasMore: songs.length < total,
+          hasMore: songs.length < matching,
           albums: saved ? await _storage.albumSummaries() : null,
           scanStatus: LibraryScanStatus.completed,
           scanProgress: 1,
@@ -532,7 +537,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
     final filter = _effectiveFilter();
-    final total = await _storage.countQuery(query: query, filter: filter);
+    final matching = await _storage.countQuery(query: query, filter: filter);
     final songs = await _storage.query(
       query: query,
       filter: filter,
@@ -543,12 +548,13 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final albums = songsChanged
         ? await _storage.albumSummaries()
         : _current.albums;
+    final total = songsChanged ? await _storage.count() : _current.total;
     if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
       _current.copyWith(
         songs: List.unmodifiable(songs),
         total: total,
-        hasMore: songs.length < total,
+        hasMore: songs.length < matching,
         albums: albums,
       ),
     );

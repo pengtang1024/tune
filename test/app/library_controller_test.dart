@@ -117,6 +117,31 @@ void main() {
     expect(rest.hasMore, isFalse);
   });
 
+  test('the total counts the library, not the search result', () async {
+    final container = buildContainer(
+      FakeLibraryStorage([
+        for (var index = 0; index <= LibraryController.windowSize; index++)
+          Song(
+            id: index,
+            title: 'Track $index',
+            uri: '/music/$index.mp3',
+          ),
+      ]),
+    );
+    await container.read(libraryControllerProvider.future);
+
+    await container
+        .read(libraryControllerProvider.notifier)
+        .setQuery('Track ${LibraryController.windowSize}');
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.songs, hasLength(1));
+    // The page header counts the library; the toolbar counts the search.
+    expect(state.total, LibraryController.windowSize + 1);
+    expect(state.hasMore, isFalse);
+  });
+
   test('scan adds to the library and persists sorted songs', () async {
     final storage = FakeLibraryStorage([songA]);
     final container = buildContainer(storage);
