@@ -25,7 +25,7 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_marks_controller.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
 import 'package:tune/l10n/app_localizations.dart';

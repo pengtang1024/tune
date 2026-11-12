@@ -29,7 +29,7 @@ import 'package:tune/features/settings/presentation/settings_permissions_card.da
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 import 'package:tune/features/settings/presentation/settings_update_card.dart';
 import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/utils/logger.dart';

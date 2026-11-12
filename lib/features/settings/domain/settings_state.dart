@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/domain/models/localization_config.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 
 class SettingsState {
   final ThemeMode themeMode;
