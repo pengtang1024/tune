@@ -14,7 +14,11 @@ import androidx.annotation.NonNull;
 import com.ryanheise.audioservice.AudioServiceActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -99,6 +103,28 @@ public class MainActivity extends AudioServiceActivity {
                             call.argument("songUri"),
                             call.argument("name"),
                             call.argument("content")));
+                  } catch (SecurityException error) {
+                    result.error("permission_lost", error.getMessage(), null);
+                  } catch (Exception error) {
+                    result.error("saf_failed", error.getMessage(), null);
+                  }
+                  break;
+                case "readSheet":
+                  try {
+                    result.success(
+                        readSheet(
+                            call.argument("treeUri"),
+                            call.argument("songUri"),
+                            call.argument("name")));
+                  } catch (SecurityException error) {
+                    result.error("permission_lost", error.getMessage(), null);
+                  } catch (Exception error) {
+                    result.error("saf_failed", error.getMessage(), null);
+                  }
+                  break;
+                case "copyAudio":
+                  try {
+                    result.success(copyAudio(call.argument("songUri")));
                   } catch (SecurityException error) {
                     result.error("permission_lost", error.getMessage(), null);
                   } catch (Exception error) {
@@ -442,6 +468,140 @@ public class MainActivity extends AudioServiceActivity {
       // that follows puts the sheet name back.
     }
     return null;
+  }
+
+  // Reads the sheet back out of the folder that holds the track. The panel
+  // shows what was written; a tree has no path the reader can open, so the
+  // document is found by name and read through the provider.
+  private String readSheet(String treeUri, String songUri, String name) throws IOException {
+    if (treeUri == null || treeUri.isEmpty()) {
+      throw new IllegalArgumentException("a tree is needed");
+    }
+    if (songUri == null || songUri.isEmpty()) {
+      throw new IllegalArgumentException("a track is needed");
+    }
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException("a sheet needs a name");
+    }
+    final Uri tree = Uri.parse(treeUri);
+    final Uri song = Uri.parse(songUri);
+    final String parentId =
+        parentDocumentId(
+            DocumentsContract.getDocumentId(song), DocumentsContract.getTreeDocumentId(tree));
+    final Uri children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, parentId);
+    final Uri target = findChild(tree, children, name);
+    if (target == null) return null;
+    try (InputStream in = getContentResolver().openInputStream(target)) {
+      if (in == null) return null;
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      final byte[] buffer = new byte[8 * 1024];
+      int read;
+      while ((read = in.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
+      }
+      out.flush();
+      return out.toString(StandardCharsets.UTF_8.name());
+    }
+  }
+
+  // Copies the audio of one track into the private cache of the app: the
+  // transcription engines read a file, and a tree only speaks content://
+  // URIs. The copy lives in a folder of its own, so the run that made it can
+  // delete the folder and leave nothing behind (docs/android.md §5.3).
+  private Map<String, Object> copyAudio(String songUri) throws IOException {
+    if (songUri == null || songUri.isEmpty()) {
+      throw new IllegalArgumentException("a track is needed");
+    }
+    final Uri song = Uri.parse(songUri);
+    final long now = System.currentTimeMillis();
+    // Folders of runs that were killed before they could clean up are
+    // removed here, so the cache does not grow with every crash.
+    cleanStaleAudio(now);
+    final String extension = extensionOf(song);
+    final File folder = new File(getCacheDir(), "tune_smart_audio_" + now);
+    if (!folder.mkdirs() && !folder.isDirectory()) {
+      throw new IOException("the cache folder could not be made");
+    }
+    final File target = new File(folder, "audio" + extension);
+    try (InputStream in = getContentResolver().openInputStream(song);
+        OutputStream out = new FileOutputStream(target)) {
+      if (in == null) throw new IOException("the provider did not open the track");
+      final byte[] buffer = new byte[64 * 1024];
+      int read;
+      while ((read = in.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
+      }
+      out.flush();
+    } catch (SecurityException error) {
+      // The permission was taken back between the check and the read: the
+      // channel reports that as a lost tree, not as a failed copy.
+      deleteFolder(folder);
+      throw error;
+    } catch (Exception error) {
+      deleteFolder(folder);
+      if (error instanceof IOException) throw (IOException) error;
+      throw new IOException(error);
+    }
+    final Map<String, Object> copied = new HashMap<>();
+    copied.put("path", target.getAbsolutePath());
+    copied.put("size", target.length());
+    return copied;
+  }
+
+  // The extension the engines read the format from: the name the provider
+  // shows, then the MIME type it declares.
+  private String extensionOf(Uri song) {
+    final String name = displayNameOf(song);
+    if (name != null) {
+      final int dot = name.lastIndexOf('.');
+      if (dot > 0 && dot < name.length() - 1) {
+        final String extension = name.substring(dot).toLowerCase();
+        if (extension.length() <= 8) return extension;
+      }
+    }
+    final String type = getContentResolver().getType(song);
+    if (type != null) {
+      switch (type) {
+        case "audio/mpeg":
+          return ".mp3";
+        case "audio/mp4":
+        case "audio/x-m4a":
+          return ".m4a";
+        case "audio/wav":
+        case "audio/x-wav":
+          return ".wav";
+        case "audio/flac":
+        case "audio/x-flac":
+          return ".flac";
+        case "audio/ogg":
+        case "application/ogg":
+          return ".ogg";
+        case "audio/opus":
+          return ".opus";
+        default:
+          break;
+      }
+    }
+    return "";
+  }
+
+  private void cleanStaleAudio(long now) {
+    final File[] entries = getCacheDir().listFiles();
+    if (entries == null) return;
+    for (File entry : entries) {
+      if (!entry.isDirectory()) continue;
+      if (!entry.getName().startsWith("tune_smart_audio_")) continue;
+      if (now - entry.lastModified() < 60 * 60 * 1000L) continue;
+      deleteFolder(entry);
+    }
+  }
+
+  private void deleteFolder(File folder) {
+    final File[] files = folder.listFiles();
+    if (files != null) {
+      for (File file : files) file.delete();
+    }
+    folder.delete();
   }
 
   private List<Map<String, Object>> listAudio() {
