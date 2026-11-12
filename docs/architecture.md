@@ -16,10 +16,12 @@ lib/
 ├── shared/ui/                # 跨 feature 复用的 widget（不含业务状态）
 ├── core/                     # 通用能力：l10n、常量、扩展、窗口服务
 ├── data/services/            # 全局服务：播放、扫描、音源适配器、持久化
+│   ├── providers/            # 服务的 provider：数据库、音源、托盘、本地模型…
 │   ├── mpris/                # 系统媒体控制的接口与快照模型
 │   ├── tray/                 # 系统托盘的接口与菜单项模型
 │   └── desktop/              # 默认播放器、单实例、启动参数
 ├── domain/models/            # 全局实体：Song、MusicSourceConfig
+├── providers/                # 跨 feature 的服务 provider：偏好与封面图
 ├── l10n/                     # ARB 源文件 + gen-l10n 产物（产物入库）
 └── utils/                    # logger 等
 ```
