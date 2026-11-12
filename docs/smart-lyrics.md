@@ -219,11 +219,11 @@ LyricsController._lyricsFor(song)
 | 能力位 | 指什么 | 为 false 时 |
 | --- | --- | --- |
 | `externalToolPipeline` | 能否调用本机外部程序（ffmpeg 转码、whisper / sherpa 二进制） | 跳过转码，原样喂引擎；不创建本地引擎通道，不逐首失败 |
-| `lyricsSheetBesideAudio` | 能否把词稿写到音频旁 | 自动补词与批量不启动；单曲生成直接返回 `unsupported`，面板写明原因 |
+| `lyricsSheetBesideAudio` | 非 SAF 曲目的默认落点（能否把词稿写到音频旁） | 自动补词与批量不启动；单曲生成改问 `LibraryPaths.canWriteSheet(song)`（S2） |
 
-Android 不能执行随包的外部二进制（`Process.run` 一律 `Permission denied`），共享存储对应用只读
-（没有 SAF，`.smart.lrc` 写不出去）。要在手机上做这条链路，先接 SAF 或把词稿改存应用私有目录。
-现场与验证见 [`docs/android.md`](android.md) 的 E3。
+Android 不能执行随包的外部二进制（`Process.run` 一律 `Permission denied`），共享存储对应用只读。
+S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeSheet`）；MediaStore 行仍没有
+落点。SAF 曲目的音频复制与词稿读回未做。现场与验证见 [`docs/android.md`](android.md) 的 §5。
 
 ## 6. 技术路线评估
 

@@ -125,7 +125,7 @@ JAVA_HOME=~/.jdks/ms-21.0.12.1 /opt/flutter/bin/flutter build apk --debug
   启动后「Scanned 1 source, 5,380 songs in total」在 5.3 s 内出现（uiautomator 轮询，±1 s），
   点行到 `音频播放成功` 198 ms。滚动帧率未取到：Flutter 在本模拟器上 `dumpsys gfxinfo`
   与 SurfaceFlinger latency 都没有帧数据，需要真机或 perfetto 复核。
-- SAF「指定文件夹」S1 已做（选择器 + 只读扫描），S2（词稿写入）待做，见 §5。
+- SAF「指定文件夹」S1（选择器 + 只读扫描）与 S2（智能词稿写入选中目录）已做，见 §5。
 - 封面缓存已改到应用私有目录，见下节。
 
 #### 封面的落盘边界
@@ -159,15 +159,16 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
   引擎），也不创建 `SherpaLocalEngine` / `WhisperLocalEngine`，进程内只记一条 info。
 - `ProcessException` 仍作为兜底：桌面缺 ffmpeg 时也只记一次、后续不再试。
 
-另一条同源的边界：词稿写在音频旁，Android 共享存储对应用只读（没有 SAF），每次生成都在
-最后一步写失败。能力位 `lyricsSheetBesideAudio` 表达这条边界，移动端为 false：
+另一条同源的边界：词稿写在音频旁，Android 共享存储对应用只读。能力位
+`lyricsSheetBesideAudio` 表达这条边界，移动端为 false：
 
 - 自动补词（`SmartLyricsAutoFillController`）与批量（`SmartLyricsBatchController`）不再启动，
   不会围着整个库空转；
-- 单曲「生成」直接返回 `SmartLyricsFailure.unsupported`，歌词面板显示
-  「此平台不能把词稿写到音频旁」，不先花网络请求再失败。
+- 单曲「生成」不再看这个能力位：S2 起改为逐曲问 `LibraryPaths.canWriteSheet(song)`。选了可写的
+  SAF 目录的曲目可以生成；MediaStore 行仍直接返回 `SmartLyricsFailure.unsupported`，歌词面板
+  显示「此平台不能把词稿写到音频旁」，不先花网络请求再失败（§5.3）。
 
-后续要做移动端歌词，需要先接 SAF 或把词稿改存应用私有目录，那是独立里程碑。
+SAF 曲目要真正生成词稿还差音频复制（见 §5.3 末尾），那与「词稿读回」一起算后续里程碑。
 
 ### E4 窄屏外壳
 
@@ -193,9 +194,9 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
   耳机实体按键、锁屏视觉、真实厂商 ROM 的行为只能在真机上验。
 - 通知与队列的双主风险：这是 E1 选 `audio_service` 的原因。
 - content URI 与现有文件路径假设的冲突：E3 的主要工作量，不是插件换一下就能完。
-- 共享存储只读：扫描能读，写（词稿、旁挂文件）要 SAF；在接上之前靠
-  `lyricsSheetBesideAudio` 明确关闭，不做「先跑再失败」。封面缓存已改到应用私有目录，
-  不在这一条里。
+- 共享存储只读：扫描能读，写（词稿、旁挂文件）要 SAF。S2 已把智能词稿写进 SAF 树，MediaStore
+  行仍由 `canWriteSheet` 判为无落点；SAF 曲目的音频复制与词稿读回未做。封面缓存已改到应用
+  私有目录，不在这一条里。
 - Android 构建的 JDK 版本：默认 Java 25 跑不了 Gradle 8.14.3，命令里带 `JAVA_HOME`。
 
 ## 4. 已拍板
@@ -205,16 +206,16 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
 3. 移动端只做 Android，iOS 保留工程入口但不排期；这条已写进 `README.md` 的已知限制。
 4. E2 走 `permission_handler`：`Permission.audio` + `Permission.storage` 一次申请，
    `POST_NOTIFICATIONS` 单申请；`permanentlyDenied` 走「去设置」，不扫空库。
-5. Android 上智能歌词整体停用（ffmpeg 不可执行、词稿无处落盘），等 SAF 或应用私有目录；
-   不做「每首歌失败一次」的降级。
+5. Android 上智能歌词：ffmpeg 不可执行，批量 / 自动补词整体停用；S2 起单曲生成按曲目的
+   落点判断（SAF 树可写）。不做「每首歌失败一次」的降级。
 6. 封面缓存 Android 走应用私有目录，桌面保持 `<音乐库>/.tune/artwork`；目录不可写时只留内存，
    每进程一条 info。
 
-## 5. SAF「指定文件夹」（S1 已实施，S2 待做）
+## 5. SAF「指定文件夹」（S1、S2 已实施）
 
 目标：让用户挑一个音乐文件夹，只扫这个文件夹，并能在音频旁写词稿与封面。MediaStore 仍是
-默认；SAF 是补充，不是替换。S1（选择器 + 只读扫描 + 写入落点判断）已实施，S2（词稿写入）
-未做。
+默认；SAF 是补充，不是替换。S1（选择器 + 只读扫描 + 写入落点判断）与 S2（智能词稿写入选中
+目录）已实施；S3/S4 未做。
 
 已实施（S1）：
 
@@ -226,9 +227,23 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
   `takePersistableUriPermission`）、`listTree(uri, offset, limit)`（500 行一页）、
   `canWrite(uri)`。
 - Dart：`SafMusicScanner` 无树时委托 MediaStore；`SafDocumentWriter.canWrite(song)` 只在
-  「歌曲 URI 位于已选树内且系统仍持有写权限」时为真（S2 接线用）。
+  「歌曲 URI 位于已选树内且系统仍持有写权限」时为真。
 - 权限被收回时扫描失败（`permission_lost`），不返回空列表，避免把本地行全部标成失效。
 - `FileLibraryPaths.root()` 忽略 `content://` 值并回退默认音乐目录：tree 不是文件系统路径。
+
+已实施（S2）：
+
+- 原生新增 `writeSheet(treeUri, songUri, name, content)`：在歌曲的 parent document 下查同名
+  子文档，有则截断重写、无则 `createDocument`；UTF-8；新建后写入失败会删掉刚建的文档，
+  不留半个词稿（与桌面一致）；`SecurityException` → `permission_lost`。系统 provider 新建
+  `text/plain` 文档时会按 MIME 补扩展名（`Saf_One.smart.lrc` → `...lrc.txt`），所以新建后
+  先核对 display name，不符就 `renameDocument` 回 `<歌名>.smart.lrc`，保证落点名字与桌面一致。
+- `SafDocumentWriter.writeSmartLyrics(song, lyrics)`：名字 `<safeFileName(title)>.smart.lrc`；
+  写前再问一次 `canWrite`，没有持久写权限时不发写入。
+- `LibraryPaths.canWriteSheet(song)`（默认 true）与 `FileLibraryPaths` 覆盖：树内曲目问原生，
+  其余曲目用 `lyricsSheetBesideAudio`；`saveSmartLyrics` 对树内曲目走通道，**不构造 `File`**。
+- `SmartLyricsService.generate` 的单曲入口改为运行期判断：无落点直接 `unsupported`，不发请求。
+- 批量与自动补词仍按平台能力整体停用，原因见 §5.3 末尾。
 
 ### 5.1 数据与权限
 
@@ -254,43 +269,74 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
 - 目录扫描的进度上报与分批 upsert 复用现有管线，不新增第二套写库路径；树很深时按层分页，
   每批不超过 500 行，避免一次性把整棵树读进内存。
 
-### 5.3 写入（词稿与封面）
+### 5.3 写入（词稿）
 
-- 新增 `SafDocumentWriter`：给定歌曲 URI 的 parent document id，用
-  `DocumentsContract.createDocument` 写 `<歌名>.lrc` / `<歌名>.smart.lrc` / `<歌名>.smart.json`。
-  `LibraryPaths` 仍只负责桌面文件系统，SAF 由这个 writer 单独承担，避免把两种地址塞进
-  同一个 `File`。S1 只落地落点判断 `canWrite(song)`；真正的写入在 S2。
-- `lyricsSheetBesideAudio` 表达的是「平台默认能不能写」；S2 起改为在运行期问
-  `SafDocumentWriter.canWrite(song)`：有持久写权限的树为 true，MediaStore 行仍为 false。
-  自动补词与批量按这个结果逐首判断，不整体开关。
+- 落点：`FileLibraryPaths.saveSmartLyrics` 先看 `SafDocumentWriter.owns(song)`。树内曲目交给
+  `writeSmartLyrics`，由原生 `createDocument` / 覆盖写入 `<歌名>.smart.lrc`，全程不出现
+  `File`；桌面与 MediaStore 行仍走文件系统。`LibraryPaths` 仍是「这份文件放哪」的唯一入口，
+  但 SAF 的通道逻辑只在 `SafDocumentWriter` 里。
+- 命名取自标签而不是路径：树没有应用可读的路径，`<歌名>` 来自 `song.title`
+  （`safeFileName` 兜底），与桌面按文件名取名的差别写在这里。
+- 覆盖语义：同名文档存在则截断重写，不存在则新建；新建时 provider 擅自补的扩展名会被改回，
+  新建后写入失败会删除该文档。
+- 可写性：`LibraryPaths.canWriteSheet(song)` 是单曲入口的唯一判断；`lyricsSheetBesideAudio`
+  只作为「非 SAF 曲目」的平台默认值。MediaStore 行没有落点，SAF 行问原生 `canWrite`。
 - 封面仍写应用私有目录，不写回 SAF：封面是缓存，写进用户目录会污染音乐库。
+- 批量与自动补词仍按平台能力整体停用：SAF 曲目目前拿不到可转写的音频（见下），批量跑起来
+  只会逐首失败，不值得先花请求。
+
+#### 写入失败与桌面端的差异
+
+| 场景 | 桌面 | Android |
+| --- | --- | --- |
+| 落点 | 音频旁的文件系统 | 选中 SAF 树的父文档下 |
+| 无落点 | 不会发生 | MediaStore 行 / 未选目录：`unsupported`，零请求 |
+| 授权收回 | 无此概念 | 生成前 `canWriteSheet` 为 false：`unsupported` + 一条 info「词稿无处可写…Android 请选一个可写的音乐库文件夹」，不重试；生成后写到一半才发现被收回：`unsupported` + 一条 info「写权限已被收回，请重新选择音乐库文件夹」 |
+| 写到一半失败 | 磁盘错误 → `uploadFailed` | 原生删掉刚建的文档，再 `uploadFailed` |
+| 读回 | 直接读文件 | 本版不读：`readSmartLyrics` 仍只读文件系统，写进树的词稿暂不在面板显示 |
+
+仍缺的边界：
+
+- **读回**要按 display name 找子文档再读内容；未接之前，写到树里的词稿只能由目录查看。
+- **音频**：SAF 曲目的 `uri` 是 `content://`，没有 `localFile`，`SmartLyricsService` 在取音频
+  处就返回 `noAudio`，走不到写入。写入通道已通；要让 SAF 曲目真正产出词稿，得先把音频复制
+  到应用可读的临时文件。
+- 真机仍需验：厂商 ROM 的 `createDocument` / `openOutputStream("wt")` 行为，以及授权被收回后
+  `canWrite` 的返回。
 
 ### 5.4 改动点
 
 | 位置 | 改动 |
 | --- | --- |
-| `android/app/src/main/java/cn/iouf/tune/MainActivity.java` | S1：`pickDirectory` / `listTree` / `canWrite`；S2：`createDocument` |
-| `lib/data/services/impl/saf_method_channel.dart`（新） | 通道封装：选择、分页、写权限查询 |
+| `android/app/src/main/java/cn/iouf/tune/MainActivity.java` | S1：`pickDirectory` / `listTree` / `canWrite`；S2：`writeSheet`（同名覆盖、新建、扩展名改回、半成品删除） |
+| `lib/data/services/impl/saf_method_channel.dart`（新） | 通道封装：选择、分页、写权限查询、写词稿 |
 | `lib/data/services/impl/saf_music_scanner.dart`（新） | S1：`CrossPlatformMusicScanner` 的 SAF 实现 |
 | `lib/data/services/impl/system_library_row.dart`（新） | MediaStore 与 SAF 共用的行映射 |
 | `lib/data/services/library/saf_tree_store.dart`（新） | tree URI 的只读偏好助手 |
 | `lib/data/services/providers/cross_platform_music_scanner_provider.dart` | Android 上按偏好选 MediaStore 或 SAF |
-| `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart` | 根目录忽略 tree URI，回退默认音乐目录 |
-| `lib/data/services/impl/saf_document_writer.dart`（新） | S1：`canWrite` 落点判断；S2：`createDocument` 写入 |
-| `lib/core/config/app_capabilities.dart` | S2：只保留平台默认值；能否写改为运行期判断 |
+| `lib/data/services/library/library_paths.dart` | S2：`SheetWriteException` 与默认 `canWriteSheet` |
+| `lib/data/services/impl/library_paths_io.dart` | 根目录忽略 tree URI；S2：树内曲目的 `saveSmartLyrics` 走通道 |
+| `lib/data/services/impl/saf_document_writer.dart`（新） | S1：`canWrite` 落点判断；S2：`writeSmartLyrics` |
+| `lib/data/services/smart_lyrics/smart_lyrics_service.dart` | S2：单曲入口改为运行期 `canWriteSheet`；授权收回映射为 `unsupported` |
+| `lib/features/smart_lyrics/application/*` | 未改：批量与自动补词仍按平台能力整体停用 |
 | `lib/features/settings/presentation/settings_pane.dart` | Android 的「更改音乐库文件夹」走 SAF 选择器 |
-| `lib/features/smart_lyrics/application/*` | S2：批量与自动补词改按单曲 `canWrite` 过滤 |
+| `integration_test/saf_sheet_write_test.dart`（新） | 设备上验证写入落点（仅 dev 依赖） |
 
 ### 5.5 里程碑与风险
 
-- S1：选择器 + 只读扫描（可播放、可重扫）；S2：词稿写入；S3：封面不写 SAF 的确认与文档；
-  S4：授权被收回、树被删除、同名文件冲突的测试。
+- S1：选择器 + 只读扫描（可播放、可重扫）；S2：智能词稿写入（已实施）；S3：词稿读回与
+  SAF 音频复制；S4：授权被收回、树被删除、同名文件冲突的测试。
 - S1 状态（2026-11-12，AVD `tune-api35`）：在设置页重选音乐库文件夹 → DocumentsUI →
   `Music/TuneSaf`，`dumpsys activity` 里出现该 tree 的持久授权；扫描后 `library.db` 中
   `source_id='local'` 的 2 条 SAF 行 `active=1`，界面显示 `Saf_One` / `Saf_Two`（0:01，
   时长来自 `MediaMetadataRetriever`）；`am force-stop` 后重启再扫，未重选仍读出这两首。
   日志无 SAF ERROR。已知实现细节：树根必须用 `getTreeDocumentId`，子目录用 cursor 的
   `document id` 递归——对 tree URI 调 `getDocumentId` 会抛异常并得到空列表。
+- S2 状态（2026-11-12，AVD `tune-api35`）：选 `Music/TuneSaf` 后跑
+  `flutter test integration_test/saf_sheet_write_test.dart -d emulator-5554`，测试通过；
+  `adb shell ls -l` 显示 `/sdcard/Music/TuneSaf/Saf_One.smart.lrc`（27 B），
+  `cat` 为 `[00:01.00] SAF 写入验证`，UTF-8。首轮验证暴露系统 provider 会给 `text/plain`
+  文档补 `.txt`，已按上文改为写后核对 display name 并改名，复跑名字正确。
 - 风险：SAF 逐层列目录比 MediaStore 慢，500 首要先量；`DocumentsContract` 在不同厂商 ROM
   上对 `mime_type` 的返回不一致；写权限被收回后不能继续把词稿标成成功。
 - 上线前必须先在真机验：选择器返回的 tree URI 能跨重启使用、写权限真的可用。
