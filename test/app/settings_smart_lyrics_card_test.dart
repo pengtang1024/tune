@@ -14,7 +14,7 @@ import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 import 'package:tune/features/settings/presentation/settings_smart_lyrics_card.dart';
-import 'package:tune/features/settings/presentation/settings_smart_lyrics_local_section.dart';
+import 'package:tune/data/services/providers/whisper_model_store_provider.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 import '../services/fake_persistence.dart';

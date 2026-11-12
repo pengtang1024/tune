@@ -1,21 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
+import 'package:tune/data/services/providers/whisper_model_store_provider.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/utils/logger.dart';
-
-/// The store the local models are downloaded through, on this machine.
-final whisperModelStoreProvider = FutureProvider<WhisperModelStore>((
-  ref,
-) async {
-  final assets = await WhisperAssets.appDefault();
-  return WhisperModelStore(root: Directory(assets.modelsFolder));
-});
 
 /// The free vote of the pool (docs/smart-lyrics.md §6.2, M4): the reader
 /// picks a whisper model, the app brings it home, and from then on one
