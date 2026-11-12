@@ -46,7 +46,11 @@ abstract class LibraryPaths {
   ///
   /// The covers live in one place, split over subfolders, so a single folder
   /// never holds more than a handful of pictures.
-  Directory coverCacheFolder();
+  ///
+  /// The desktop keeps them in the music library (`<音乐库>/.tune/artwork`).
+  /// A phone hands the app a read-only view of shared storage, so it answers
+  /// with a folder of its own (`docs/android.md`).
+  Future<Directory> coverCacheFolder();
 
   /// The lyrics of [song], when they were written down before.
   ///

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
@@ -103,7 +105,14 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Directory coverCacheFolder() {
+  Future<Directory> coverCacheFolder() async {
+    if (AppCapabilities.current.platform == AppPlatform.android) {
+      // Shared storage is read-only for the app: a cover written into the
+      // music library would fail once per picture. The private folder of the
+      // app is the one place Android lets it write (docs/android.md).
+      final support = await getApplicationSupportDirectory();
+      return Directory(path.join(support.path, artworkFolderName));
+    }
     return Directory(
       path.join(root().path, cacheFolderName, artworkFolderName),
     );
