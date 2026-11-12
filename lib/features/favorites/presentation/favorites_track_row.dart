@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 /// A track the user marked with a heart.
 ///

@@ -3,7 +3,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 /// One part of a track that is written out under a name.
 ///

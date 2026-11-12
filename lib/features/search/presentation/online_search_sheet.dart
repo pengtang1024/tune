@@ -8,7 +8,6 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/favorites/domain/favorites_state.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -22,6 +21,7 @@ import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 

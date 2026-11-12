@@ -5,7 +5,6 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
@@ -13,6 +12,7 @@ import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_addresses.dart';
 import 'package:tune/shared/ui/track_detail_block.dart';
 import 'package:tune/shared/ui/track_facts.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 /// Shows everything that is known about a track.
 ///

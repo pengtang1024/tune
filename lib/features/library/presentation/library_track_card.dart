@@ -7,10 +7,10 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_row_tail.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_position.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/date_format.dart';
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/l10n/app_localizations.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 void main() {
   testWidgets('the translation sits above the original line', (tester) async {

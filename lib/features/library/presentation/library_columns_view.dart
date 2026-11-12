@@ -8,7 +8,6 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/dead_songs_controller.dart';
-import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
@@ -19,6 +18,7 @@ import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_details_button.dart';
 import 'package:tune/shared/ui/track_position.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
 /// The wall of the library: two tracks per line.
