@@ -6,7 +6,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/locale_labels.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/features/settings/presentation/licenses_button.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 

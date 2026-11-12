@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_sample_provider.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_batch_section.dart';

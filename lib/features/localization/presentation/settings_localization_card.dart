@@ -7,8 +7,8 @@ import 'package:tune/features/localization/application/local_model_controller.da
 import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/localization/domain/localization_config.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
-import 'package:tune/features/settings/presentation/settings_switch_row.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_switch_row.dart';
 
 /// The switch and the engine of the automatic metadata translation.
 class SettingsLocalizationCard extends ConsumerStatefulWidget {

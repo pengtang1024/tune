@@ -20,7 +20,7 @@ import 'package:tune/features/localization/presentation/settings_localization_ca
 import 'package:tune/features/settings/application/mobile_permissions_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';

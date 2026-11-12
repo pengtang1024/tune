@@ -5,8 +5,8 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/discovery/application/discovery_controller.dart';
 import 'package:tune/features/discovery/application/discovery_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
-import 'package:tune/features/settings/presentation/settings_switch_row.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_switch_row.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 
 /// The settings of the discover page.
 ///

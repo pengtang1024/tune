@@ -6,7 +6,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 
 /// Settings card for the weights of the source health dimensions.
 ///
