@@ -197,7 +197,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       query: library.query,
       sourceFilter: library.sourceFilter,
     );
-    final albumCount = library.albums.length;
+    final albumCount = library.albums
+        .where((album) => album.name.isNotEmpty)
+        .length;
     // The albums are grouped only while the page is showing them: the songs
     // view has no use for the groups, and a library can hold thousands of
     // tracks.
