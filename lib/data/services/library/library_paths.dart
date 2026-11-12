@@ -2,6 +2,24 @@ import 'dart:io';
 
 import 'package:tune/domain/models/song.dart';
 
+/// A sheet that never reached its folder.
+///
+/// The desktop writes beside the audio; a phone has no writable path there,
+/// so the sheet goes into the tree the reader picked. Both ends speak the
+/// same failure: [permissionLost] marks the tree whose write permission was
+/// taken back, which is a report of its own (`docs/android.md` §5).
+class SheetWriteException implements Exception {
+  const SheetWriteException(this.message, {this.permissionLost = false});
+
+  final String message;
+
+  /// Whether the system no longer holds the write permission of the tree.
+  final bool permissionLost;
+
+  @override
+  String toString() => 'SheetWriteException: $message';
+}
+
 /// The folders of the music library.
 ///
 /// The app keeps the files it fetches in the music library of the machine,
@@ -75,6 +93,13 @@ abstract class LibraryPaths {
   /// tops the sheets the reader or the source brought; the reader of the
   /// lyrics falls through to it only when the three segments found nothing.
   Future<void> saveSmartLyrics(Song song, String lyrics);
+
+  /// Whether a sheet of [song] can be written anywhere at all.
+  ///
+  /// A build with a file system answers yes. A phone cannot write beside the
+  /// audio, so the answer comes from the tree the reader picked
+  /// (`docs/android.md` §5); a track of the system library has no landing.
+  Future<bool> canWriteSheet(Song song) async => true;
 
   /// Reads the machine sheet of [song], when one is there.
   Future<String?> readSmartLyrics(Song song);

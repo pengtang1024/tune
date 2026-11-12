@@ -77,6 +77,99 @@ void main() {
       expect(await writer.canWrite(_song('$tree/document/a')), isFalse);
     },
   );
+
+  test('the machine sheet lands in the folder of the track', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    final song = Song(
+      id: 1,
+      title: 'Saf One',
+      uri: '$tree/document/audio%3A7',
+    );
+    Map<Object?, Object?>? written;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      if (call.method == 'canWrite') return true;
+      expect(call.method, 'writeSheet');
+      written = call.arguments as Map<Object?, Object?>;
+      return {'uri': '$tree/document/sheet', 'replaced': false};
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+    await writer.writeSmartLyrics(song, '[00:01.00] 一句');
+
+    expect(written?['treeUri'], tree);
+    expect(written?['songUri'], song.uri);
+    expect(written?['name'], 'Saf One.smart.lrc');
+    expect(written?['content'], '[00:01.00] 一句');
+  });
+
+  test('a taken-back permission is reported and nothing is written', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    var wrote = false;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      if (call.method == 'canWrite') return false;
+      wrote = true;
+      return null;
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    await expectLater(
+      writer.writeSmartLyrics(_song('$tree/document/a'), 'words'),
+      throwsA(
+        isA<SheetWriteException>().having(
+          (error) => error.permissionLost,
+          'permissionLost',
+          isTrue,
+        ),
+      ),
+    );
+    expect(wrote, isFalse);
+  });
+
+  test('a native permission loss comes back as the same report', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      if (call.method == 'canWrite') return true;
+      throw PlatformException(code: 'permission_lost');
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    await expectLater(
+      writer.writeSmartLyrics(_song('$tree/document/a'), 'words'),
+      throwsA(
+        isA<SheetWriteException>().having(
+          (error) => error.permissionLost,
+          'permissionLost',
+          isTrue,
+        ),
+      ),
+    );
+  });
+
+  test('a track outside the tree has no sheet in it', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    var asked = false;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      asked = true;
+      return true;
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    await expectLater(
+      writer.writeSmartLyrics(
+        const Song(id: 1, title: 'Media', uri: 'content://media/external/audio/media/1'),
+        'words',
+      ),
+      throwsA(isA<SheetWriteException>()),
+    );
+    expect(asked, isFalse);
+  });
 }
 
 Song _song(String uri) => Song(id: uri.hashCode, uri: uri);

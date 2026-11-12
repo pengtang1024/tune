@@ -112,6 +112,9 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # 设备上的 SAF 写入验证（test 只能在主机跑，平台通道要在模拟器上验）
+  integration_test:
+    sdk: flutter
   flutter_launcher_icons: ^0.14.4
   # 生成 Linux 主题图标
   image: ^4.12.0

@@ -131,7 +131,19 @@ class SmartLyricsService {
   void _reportSheetGap() {
     if (_sheetGapReported) return;
     _sheetGapReported = true;
-    Log.info('本平台不能把词稿写到音频旁，智能歌词停用（docs/android.md）');
+    Log.info(
+      '词稿无处可写，智能歌词停用：桌面写到音频旁，Android 请选一个可写的音乐库文件夹'
+      '（docs/android.md §5）',
+    );
+  }
+
+  /// Whether the taken-back permission has been reported in the log.
+  static bool _permissionLostReported = false;
+
+  void _reportPermissionLost() {
+    if (_permissionLostReported) return;
+    _permissionLostReported = true;
+    Log.info('SAF 目录的写权限已被收回，请重新选择音乐库文件夹（docs/android.md §5）');
   }
 
   SmartLyricsService({
@@ -165,6 +177,15 @@ class SmartLyricsService {
         song,
         buildSmartLrc(consensus, origins: origins, at: DateTime.now()),
       );
+    } on SheetWriteException catch (error, stackTrace) {
+      if (error.permissionLost) {
+        // A tree the reader picked answers only while the permission holds;
+        // losing it is not a disk error but a place that is gone.
+        _reportPermissionLost();
+        return const SmartLyricsOutcome.failed(SmartLyricsFailure.unsupported);
+      }
+      Log.error('写入智能词稿失败: $error', stackTrace);
+      return const SmartLyricsOutcome.failed(SmartLyricsFailure.uploadFailed);
     } catch (error, stackTrace) {
       // A disk that refuses the sheet is a failed run, not a crash — and
       // never a half-written file.
@@ -186,10 +207,11 @@ class SmartLyricsService {
     bool Function()? cancelled,
     void Function(double progress)? onProgress,
   }) async {
-    // The sheet lands next to the audio; a platform that cannot write
-    // there has nowhere to put the words. Asking the channels first would
-    // only spend a request to lose the answer at the last step.
-    if (!AppCapabilities.current.lyricsSheetBesideAudio) {
+    // The sheet lands next to the audio; a platform that has nowhere to put
+    // the words says so before the channels are asked. On Android the answer
+    // is per track: a folder the reader picked is writable, the system
+    // library is not (docs/android.md §5).
+    if (!await paths.canWriteSheet(song)) {
       _reportSheetGap();
       return const SmartLyricsOutcome.failed(SmartLyricsFailure.unsupported);
     }

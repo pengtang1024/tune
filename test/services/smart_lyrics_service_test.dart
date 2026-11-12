@@ -55,9 +55,13 @@ class _Engine extends SmartLyricsEngine {
 
 class _Human implements LyricsProvider {
   final Map<int, String> sheets = {};
+  var calls = 0;
 
   @override
-  Future<String?> lookup(Song song) async => sheets[song.id];
+  Future<String?> lookup(Song song) async {
+    calls++;
+    return sheets[song.id];
+  }
 }
 
 /// A timed sheet with [words] as its lines, a second apart.
@@ -207,6 +211,37 @@ void main() {
 
     expect(outcome.saved, isFalse);
     expect(outcome.failure, SmartLyricsFailure.uploadFailed);
+  });
+
+  test('a sheet with nowhere to land is refused before the channels run', () async {
+    final engine = _ScriptedEngine('cloud:whisper-1', []);
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final nowhere = SmartLyricsService(
+      engines: [engine],
+      humanPool: [(name: 'lrclib', provider: human)],
+      paths: _NoLandingPaths(),
+    );
+
+    final outcome = await nowhere.generate(localSong());
+
+    expect(outcome.saved, isFalse);
+    expect(outcome.failure, SmartLyricsFailure.unsupported);
+    expect(engine.calls, 0, reason: 'no request is spent on a sheet that cannot land');
+    expect(human.calls, 0);
+  });
+
+  test('a taken-back tree permission is a failed run of its own', () async {
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final revoked = SmartLyricsService(
+      engines: const [],
+      humanPool: [(name: 'lrclib', provider: human)],
+      paths: _ThrowingPaths(permissionLost: true),
+    );
+
+    final outcome = await revoked.generate(localSong());
+
+    expect(outcome.saved, isFalse);
+    expect(outcome.failure, SmartLyricsFailure.unsupported);
   });
 
   test('the machine channels fill the gap; a failed correction keeps the draft', () async {
@@ -573,13 +608,30 @@ class _ScriptedEngine extends SmartLyricsEngine {
 
 /// Paths whose disk refuses every write.
 class _ThrowingPaths implements LibraryPaths {
+  _ThrowingPaths({this.permissionLost = false});
+
+  final bool permissionLost;
+
+  @override
+  Future<bool> canWriteSheet(Song song) async => true;
+
   @override
   Future<void> saveSmartLyrics(Song song, String lyrics) async =>
-      throw const FileSystemException('no space left');
+      throw SheetWriteException('refused', permissionLost: permissionLost);
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('the test only reaches the write');
+}
+
+/// Paths of a platform that has nowhere to put a sheet.
+class _NoLandingPaths implements LibraryPaths {
+  @override
+  Future<bool> canWriteSheet(Song song) async => false;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('nothing is written without a landing');
 }
 
 class _FakeLedger implements ChannelHealthLedger {

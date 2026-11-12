@@ -18,6 +18,17 @@ class SafPickedDirectory {
   final bool writable;
 }
 
+/// The sheet the native side wrote into a tree.
+class SafWrittenSheet {
+  const SafWrittenSheet({required this.uri, required this.replaced});
+
+  /// The document URI of the sheet that now holds the words.
+  final String uri;
+
+  /// Whether an older sheet of the same name was overwritten.
+  final bool replaced;
+}
+
 /// The SAF half of the Android platform channel (`cn.iouf.tune/saf`).
 ///
 /// A tree is not a path: its documents are addressed by `content://` URIs
@@ -67,5 +78,28 @@ class SafMethodChannel {
   Future<bool> canWrite(String uri) async {
     final value = await channel.invokeMethod<bool>('canWrite', {'uri': uri});
     return value ?? false;
+  }
+
+  /// Writes [content] as [name] into the folder of [songUri].
+  ///
+  /// The native side replaces a sheet of the same name, so a second run
+  /// leaves one sheet in the folder. A tree that lost its permission answers
+  /// with a `permission_lost` error, which the caller turns into a report.
+  Future<SafWrittenSheet> writeSheet({
+    required String treeUri,
+    required String songUri,
+    required String name,
+    required String content,
+  }) async {
+    final row = await channel.invokeMapMethod<Object?, Object?>('writeSheet', {
+      'treeUri': treeUri,
+      'songUri': songUri,
+      'name': name,
+      'content': content,
+    });
+    return SafWrittenSheet(
+      uri: row?['uri'] as String? ?? '',
+      replaced: row?['replaced'] == true,
+    );
   }
 }

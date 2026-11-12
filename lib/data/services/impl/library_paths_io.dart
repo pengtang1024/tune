@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/core/config/app_capabilities.dart';
+import 'package:tune/data/services/impl/saf_document_writer.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/library/saf_tree_store.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
@@ -40,6 +41,11 @@ class FileLibraryPaths implements LibraryPaths {
   static const int coversPerFolder = 256;
 
   final PersistenceService _persistence;
+
+  /// The one door to a sheet that belongs to a tree the reader picked.
+  late final SafDocumentWriter _saf = SafDocumentWriter(
+    tree: SafTreeStore(_persistence),
+  );
 
   @override
   Directory root() {
@@ -161,9 +167,23 @@ class FileLibraryPaths implements LibraryPaths {
 
   @override
   Future<void> saveSmartLyrics(Song song, String lyrics) async {
+    // A track of the picked tree has no path the app may write to: the sheet
+    // becomes a document of the same folder, through the native channel.
+    if (_saf.owns(song)) {
+      await _saf.writeSmartLyrics(song, lyrics);
+      return;
+    }
     final file = await _lyricsFile(song, manual: false, smart: true);
     await file.parent.create(recursive: true);
     await file.writeAsString(lyrics, flush: true);
+  }
+
+  @override
+  Future<bool> canWriteSheet(Song song) async {
+    if (_saf.owns(song)) return _saf.canWrite(song);
+    // A track of MediaStore has no folder the app may write to; a build with
+    // a file system writes beside the audio.
+    return AppCapabilities.current.lyricsSheetBesideAudio;
   }
 
   @override
