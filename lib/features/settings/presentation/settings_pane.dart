@@ -10,9 +10,9 @@ import 'package:tune/config/app_version.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
-import 'package:tune/data/services/impl/saf_method_channel.dart';
 import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/data/services/providers/saf_method_channel_provider.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/domain/models/localization_config.dart';
@@ -1341,7 +1341,9 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   Future<void> _pickSafLibraryFolder() async {
     try {
-      final picked = await const SafMethodChannel().pickDirectory();
+      final picked = await ref
+          .read(safMethodChannelProvider)
+          .pickDirectory();
       if (picked == null || !mounted) return;
       await ref
           .read(settingsControllerProvider.notifier)
