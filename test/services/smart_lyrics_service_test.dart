@@ -309,6 +309,37 @@ void main() {
     expect(engine.asked.single.path, audio.path);
   });
 
+  test('a tree track is read from a copy the run deletes', () async {
+    final folder = Directory(path.join(root.path, 'copy'))..createSync();
+    final copy = File(path.join(folder.path, 'audio.wav'))
+      ..writeAsStringSync('RIFF');
+    final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
+    final treePaths = _TreePaths(copy);
+    final saf = SmartLyricsService(
+      engines: [engine],
+      humanPool: const [],
+      paths: treePaths,
+      ffmpegBinary: '/no/such/ffmpeg',
+    );
+    const song = Song(
+      id: 3,
+      title: 'Saf One',
+      artist: 'A',
+      uri: 'content://tree/document/audio%3A7',
+    );
+
+    final outcome = await saf.generate(song);
+
+    expect(outcome.saved, isTrue);
+    expect(
+      engine.asked.single.path,
+      copy.path,
+      reason: '引擎拿到的是从 content:// 复制出来的可读文件',
+    );
+    expect(await folder.exists(), isFalse, reason: '跑完把复制目录删掉');
+    expect(treePaths.saved.single, contains('一句'));
+  });
+
   test('an m4a is turned into wav before the local engines read it',
       () async {
     final m4a = File(path.join(root.path, 'So What.m4a'))
@@ -632,6 +663,29 @@ class _NoLandingPaths implements LibraryPaths {
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('nothing is written without a landing');
+}
+
+/// Paths of a track that only exists inside a SAF tree: the audio is copied
+/// into a folder of the app, the sheet is written through the tree.
+class _TreePaths implements LibraryPaths {
+  _TreePaths(this.copy);
+
+  final File copy;
+  final List<String> saved = [];
+
+  @override
+  Future<bool> canWriteSheet(Song song) async => true;
+
+  @override
+  Future<File?> temporaryAudioFor(Song song) async => copy;
+
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async =>
+      saved.add(lyrics);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('the test only reaches audio and write');
 }
 
 class _FakeLedger implements ChannelHealthLedger {

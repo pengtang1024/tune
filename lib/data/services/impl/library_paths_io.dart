@@ -187,7 +187,19 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
+  Future<File?> temporaryAudioFor(Song song) {
+    // A track of the picked tree has no path an engine may read: the native
+    // side copies the document into the private cache, and the run deletes
+    // that copy when it is done (docs/android.md §5.3).
+    if (_saf.owns(song)) return _saf.copyAudio(song);
+    return Future<File?>.value();
+  }
+
+  @override
   Future<String?> readSmartLyrics(Song song) {
+    // The sheet written into the tree is a document, not a file: it is read
+    // back through the channel so the panel can show the words.
+    if (_saf.owns(song)) return _saf.readSmartLyrics(song);
     return _readLyricsFile(_lyricsFile(song, manual: false, smart: true));
   }
 

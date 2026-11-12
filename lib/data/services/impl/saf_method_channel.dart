@@ -102,4 +102,32 @@ class SafMethodChannel {
       replaced: row?['replaced'] == true,
     );
   }
+
+  /// Reads the sheet [name] out of the folder that holds [songUri].
+  ///
+  /// `null` when the folder has no such sheet: a track without words is not
+  /// an error. The content is the UTF-8 text the native side read.
+  Future<String?> readSheet({
+    required String treeUri,
+    required String songUri,
+    required String name,
+  }) => channel.invokeMethod<String>('readSheet', {
+    'treeUri': treeUri,
+    'songUri': songUri,
+    'name': name,
+  });
+
+  /// Copies the audio of [songUri] into a private folder of the app.
+  ///
+  /// The engines read files, and a tree only speaks `content://`: the native
+  /// side writes one copy and answers its path. The caller owns the folder
+  /// that holds the copy and deletes it when the run is done
+  /// (`docs/android.md` §5.3).
+  Future<String?> copyAudio(String songUri) async {
+    final row = await channel.invokeMapMethod<Object?, Object?>('copyAudio', {
+      'songUri': songUri,
+    });
+    final copied = row?['path'] as String?;
+    return copied == null || copied.isEmpty ? null : copied;
+  }
 }

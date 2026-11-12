@@ -170,6 +170,79 @@ void main() {
     );
     expect(asked, isFalse);
   });
+
+  test('the audio of a tree track is copied out of the tree', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    final song = Song(id: 1, title: 'Saf One', uri: '$tree/document/audio%3A7');
+    Map<Object?, Object?>? asked;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      expect(call.method, 'copyAudio');
+      asked = call.arguments as Map<Object?, Object?>;
+      return {
+        'path': '/data/user/0/cn.iouf.tune/cache/tune_smart_audio_1/audio.wav',
+        'size': 42,
+      };
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    final copy = await writer.copyAudio(song);
+
+    expect(asked?['songUri'], song.uri);
+    expect(
+      copy?.path,
+      '/data/user/0/cn.iouf.tune/cache/tune_smart_audio_1/audio.wav',
+    );
+  });
+
+  test('a copy the provider refuses is no audio', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      throw PlatformException(code: 'permission_lost');
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    expect(await writer.copyAudio(_song('$tree/document/a')), isNull);
+  });
+
+  test('the machine sheet is read back out of the tree', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    final song = Song(id: 1, title: 'Saf One', uri: '$tree/document/audio%3A7');
+    Map<Object?, Object?>? asked;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      expect(call.method, 'readSheet');
+      asked = call.arguments as Map<Object?, Object?>;
+      return '[00:01.00] 一句';
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+
+    expect(await writer.readSmartLyrics(song), '[00:01.00] 一句');
+    expect(asked?['treeUri'], tree);
+    expect(asked?['songUri'], song.uri);
+    expect(asked?['name'], 'Saf One.smart.lrc');
+  });
+
+  test('a track outside the tree has no copy and no sheet to read', () async {
+    final persistence = FakePersistenceService();
+    await persistence.setString(LibraryPaths.rootKey, tree);
+    var asked = false;
+    messenger.setMockMethodCallHandler(saf, (call) async {
+      asked = true;
+      return null;
+    });
+
+    final writer = SafDocumentWriter(tree: SafTreeStore(persistence));
+    const media = Song(id: 1, uri: 'content://media/external/audio/media/1');
+
+    expect(await writer.copyAudio(media), isNull);
+    expect(await writer.readSmartLyrics(media), isNull);
+    expect(asked, isFalse);
+  });
 }
 
 Song _song(String uri) => Song(id: uri.hashCode, uri: uri);

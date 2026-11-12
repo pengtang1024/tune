@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:tune/data/services/impl/saf_method_channel.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/library/saf_tree_store.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/file_name.dart';
+import 'package:tune/utils/logger.dart';
 
 /// Decides where a sheet (lyrics, contrasts) of a track belongs.
 ///
@@ -77,6 +80,45 @@ class SafDocumentWriter {
         'SAF sheet write failed: ${error.code} ${error.message}',
         permissionLost: error.code == 'permission_lost',
       );
+    }
+  }
+
+  /// Reads the machine sheet of [song] back out of the tree.
+  ///
+  /// The panel shows the words the run wrote; a tree has no path the reader
+  /// can open, so the sheet is found by its name under the track's folder.
+  /// `null` when it is not there or the provider refuses the read — a track
+  /// without words is not a failure of its own.
+  Future<String?> readSmartLyrics(Song song) async {
+    final tree = _tree.treeUri;
+    if (tree == null || !owns(song)) return null;
+    try {
+      return await _channel.readSheet(
+        treeUri: tree,
+        songUri: song.uri,
+        name: smartSheetName(song),
+      );
+    } on PlatformException catch (error, stackTrace) {
+      Log.error('SAF 词稿读回失败: ${error.code} ${error.message}', stackTrace);
+      return null;
+    }
+  }
+
+  /// Copies the audio of [song] into a folder the app may read.
+  ///
+  /// The engines read a file, and a tree only speaks `content://`. The copy
+  /// goes into the private cache; the caller owns its folder and deletes it
+  /// when the run is done. `null` for a track outside the tree, or when the
+  /// provider refuses the read — the run then reports `noAudio` as before.
+  Future<File?> copyAudio(Song song) async {
+    final tree = _tree.treeUri;
+    if (tree == null || !owns(song)) return null;
+    try {
+      final copied = await _channel.copyAudio(song.uri);
+      return copied == null ? null : File(copied);
+    } on PlatformException catch (error, stackTrace) {
+      Log.error('SAF 音频复制失败: ${error.code} ${error.message}', stackTrace);
+      return null;
     }
   }
 }

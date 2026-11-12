@@ -294,5 +294,53 @@ void main() {
         AppCapabilities.current.lyricsSheetBesideAudio,
       );
     });
+
+    test('its audio is copied out of the tree through the channel', () async {
+      const copied =
+          '/data/user/0/cn.iouf.tune/cache/tune_smart_audio_1/audio.wav';
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        expect(call.method, 'copyAudio');
+        final arguments = call.arguments as Map<Object?, Object?>;
+        expect(arguments['songUri'], safSong().uri);
+        return {'path': copied, 'size': 42};
+      });
+
+      final file = await treePaths.temporaryAudioFor(safSong());
+
+      expect(file?.path, copied);
+    });
+
+    test('its machine sheet reads back through the channel', () async {
+      final calls = <MethodCall>[];
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        calls.add(call);
+        return '[00:01] saf';
+      });
+
+      expect(await treePaths.readSmartLyrics(safSong()), '[00:01] saf');
+
+      expect(calls.single.method, 'readSheet');
+      final read = calls.single.arguments as Map<Object?, Object?>;
+      expect(read['treeUri'], tree);
+      expect(read['songUri'], safSong().uri);
+      expect(read['name'], 'Saf One.smart.lrc');
+      expect(root.listSync(), isEmpty, reason: 'a tree is not a path');
+    });
+
+    test('a track of the system library is neither copied nor read', () async {
+      var asked = false;
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        asked = true;
+        return null;
+      });
+      const media = Song(
+        id: 1,
+        uri: 'content://media/external/audio/media/1',
+      );
+
+      expect(await treePaths.temporaryAudioFor(media), isNull);
+      expect(await treePaths.readSmartLyrics(media), isNull);
+      expect(asked, isFalse, reason: 'a row of MediaStore is not in the tree');
+    });
   });
 }

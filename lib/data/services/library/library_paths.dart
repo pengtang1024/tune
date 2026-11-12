@@ -101,6 +101,17 @@ abstract class LibraryPaths {
   /// (`docs/android.md` §5); a track of the system library has no landing.
   Future<bool> canWriteSheet(Song song) async => true;
 
+  /// The audio of [song] copied into a folder the app may read.
+  ///
+  /// A track of a SAF tree exists only as a `content://` document, and the
+  /// transcription engines read files: the copy is the bridge
+  /// (`docs/android.md` §5.3). A build with a file system answers `null` —
+  /// the audio is already a file.
+  ///
+  /// The caller owns the copy: it deletes the folder of the returned file
+  /// when the run is done.
+  Future<File?> temporaryAudioFor(Song song) async => null;
+
   /// Reads the machine sheet of [song], when one is there.
   Future<String?> readSmartLyrics(Song song);
 

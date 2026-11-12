@@ -529,6 +529,11 @@ class SmartLyricsService {
     if (local != null && local.isNotEmpty) {
       return _decoded(song, File(local), false);
     }
+    // A track of a SAF tree has no path: the native side copies the audio
+    // into the private cache of the app, and the run deletes that folder
+    // when it is done (docs/android.md §5.3).
+    final copied = await paths.temporaryAudioFor(song);
+    if (copied != null) return _decoded(song, copied, true);
     // A live stream never ends: downloading it would fill the disk and
     // hang the batch on a song that has no fixed words.
     if (song.isLiveStream) return (null, false);
@@ -583,9 +588,12 @@ class SmartLyricsService {
     bool temporary,
   ) async {
     final source = song.localFile ?? song.streamUrl ?? song.uri;
-    final extension = path
-        .extension(Uri.tryParse(source)?.path ?? source)
-        .toLowerCase();
+    // The copy of a tree track carries its real extension in its name; a
+    // fetched stream is written without one and is named after its URL.
+    final fromFile = path.extension(audio.path).toLowerCase();
+    final extension = fromFile.isNotEmpty
+        ? fromFile
+        : path.extension(Uri.tryParse(source)?.path ?? source).toLowerCase();
     // A WAV the engines can read goes in as it is. The extension alone is not
     // the answer: a 44.1 kHz stereo recording is still a WAV, and the local
     // engines size their buffers from the header, so it has to be read.
