@@ -11,12 +11,10 @@ import 'package:tune/features/smart_lyrics/domain/smart_lyrics_reword.dart';
 
 /// The flags one track's open marks give the panel: the lines to fly a
 /// flag on, and the names the whole-track buttons wear.
-final songMarksProvider = FutureProvider.family<SmartLyricsSongFlags, int>((
-  ref,
-  songId,
-) {
-  return ref.watch(smartLyricsTaskStoreProvider).flagsOf(songId);
-});
+final songMarksProvider = FutureProvider.autoDispose
+    .family<SmartLyricsSongFlags, int>((ref, songId) {
+      return ref.watch(smartLyricsTaskStoreProvider).flagsOf(songId);
+    });
 
 /// The presses the panel makes (docs/smart-lyrics.md §7.4, M6): mark a
 /// line, mark the whole track, name it not-sung — each press writes one

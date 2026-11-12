@@ -46,10 +46,8 @@ final smartLyricsAssistProvider = Provider<SmartTextAssist?>((ref) {
 /// the record on the disk, matched against the sheet's own date — a
 /// regenerated sheet lets the old contrasts go quiet (docs/smart-lyrics.md
 /// §7.5).
-final songContrastProvider = FutureProvider.family<SmartSongContrast, Song>((
-  ref,
-  song,
-) async {
+final songContrastProvider = FutureProvider.autoDispose
+    .family<SmartSongContrast, Song>((ref, song) async {
   final paths = ref.watch(libraryPathsProvider);
   final record = contrastFromJson(await paths.readSmartContrast(song));
   if (record == null || record.isEmpty) return SmartSongContrast.empty;
