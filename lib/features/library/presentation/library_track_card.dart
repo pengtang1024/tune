@@ -7,6 +7,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_row_tail.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_position.dart';
@@ -125,10 +126,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                     Flexible(
                       child: TuneTooltip(
                         message: song.title.isEmpty ? unknownTitle : song.title,
-                        child: Text(
-                          song.title.isEmpty ? unknownTitle : song.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: TranslatedText(
+                          text: song.title.isEmpty ? unknownTitle : song.title,
+                          dense: true,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: widget.selected
                                 ? FontWeight.w600
@@ -177,10 +177,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                   flex: 3,
                   child: TuneTooltip(
                     message: album,
-                    child: Text(
-                      album,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: TranslatedText(
+                      text: album,
+                      dense: true,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

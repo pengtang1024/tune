@@ -32,6 +32,13 @@ class TrackMeta extends StatelessWidget {
   /// whether the track is liked. The row itself keeps no copy of the answer.
   final bool isFavorite;
 
+  /// Draws the title when the caller wants it in another language.
+  ///
+  /// The shared row stays free of the localisation provider; the page that
+  /// has it hands in a widget of its own and the row only decides where the
+  /// title goes and which style it wears.
+  final Widget Function(String text, TextStyle? style)? titleBuilder;
+
   /// What the heart in the details panel does.
   final VoidCallback? onToggleFavorite;
 
@@ -53,6 +60,7 @@ class TrackMeta extends StatelessWidget {
     this.isFavorite = false,
     this.onToggleFavorite,
     this.dense = false,
+    this.titleBuilder,
   });
 
   @override
@@ -75,15 +83,7 @@ class TrackMeta extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                song.title.isEmpty ? context.loc.trackUnknownTitle : song.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                  color: selected ? theme.colorScheme.primary : null,
-                ),
-              ),
+              _title(context, theme),
               const SizedBox(height: 2),
               if (dense)
                 Row(
@@ -155,6 +155,24 @@ class TrackMeta extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _title(BuildContext context, ThemeData theme) {
+    final text = song.title.isEmpty
+        ? context.loc.trackUnknownTitle
+        : song.title;
+    final style = theme.textTheme.bodyMedium?.copyWith(
+      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+      color: selected ? theme.colorScheme.primary : null,
+    );
+    final builder = titleBuilder;
+    if (builder != null) return builder(text, style);
+    return Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: style,
     );
   }
 }

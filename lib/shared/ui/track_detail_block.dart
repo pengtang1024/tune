@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 
 /// One part of a track that is written out under a name.
 ///
@@ -16,7 +17,17 @@ class TrackDetailBlock {
   /// The words of the part.
   final String text;
 
-  const TrackDetailBlock({required this.label, required this.text});
+  /// Whether the words are prose the app may translate.
+  ///
+  /// A description or a podcast note is read by a person; the raw payload
+  /// and the headers are looked up, so they stay as the source wrote them.
+  final bool translatable;
+
+  const TrackDetailBlock({
+    required this.label,
+    required this.text,
+    this.translatable = false,
+  });
 }
 
 /// The parts of a track that no mark can hold.
@@ -90,6 +101,10 @@ class TrackDetailBlockView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final style = CompactTypography.mono(
+      theme.colorScheme.onSurfaceVariant,
+      size: CompactTypeScale.mark,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,13 +120,19 @@ class TrackDetailBlockView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        SelectableText(
-          block.text,
-          style: CompactTypography.mono(
-            theme.colorScheme.onSurfaceVariant,
-            size: CompactTypeScale.mark,
-          ),
-        ),
+        if (block.translatable)
+          // A description is prose: the translation takes the paragraph and
+          // the original follows in small type, neither of them cut to a
+          // single line.
+          TranslatedText(
+            text: block.text,
+            style: style,
+            maxLines: null,
+            secondaryMaxLines: null,
+            selectable: true,
+          )
+        else
+          SelectableText(block.text, style: style),
       ],
     );
   }

@@ -175,6 +175,24 @@ abstract final class CompactTokens {
   /// everything it has to say in one line.
   static const double libraryRowHeight = 32;
 
+  /// Height of a row of the library table when the title carries a
+  /// translation and the original under it.
+  ///
+  /// The two lines are the title and the small original; the row grows just
+  /// enough to hold them, because a table of rows that all stand on the same
+  /// grid cannot let one row size itself.
+  static const double libraryRowHeightBilingual = 44;
+
+  /// Height of a cell of the two-column wall, and of the same cell when the
+  /// title and the album carry a translation.
+  ///
+  /// The bilingual cell holds three lines: the translated title, the small
+  /// original under it, and the byline with the album's translation and its
+  /// original. The wall has a fixed cell height, so the room is reserved for
+  /// the whole grid rather than discovered by each cell.
+  static const double libraryColumnHeight = 40;
+  static const double libraryColumnBilingual = 68;
+
   /// Artwork of a track in the library table.
   static const double libraryArtwork = 24;
 

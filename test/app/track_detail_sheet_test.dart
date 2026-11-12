@@ -1,9 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_meta.dart';
@@ -50,19 +52,31 @@ void main() {
     streamUrl: 'https://example.com/a.mp3',
   );
 
-  Widget app(Widget home) {
-    return MaterialApp(
-      theme: CompactTheme.light,
-      locale: const Locale('zh', 'CN'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(body: home),
+  Widget app(Widget home, {List<Override> overrides = const []}) {
+    return ProviderScope(
+      overrides: [
+        translatedTextProvider.overrideWith((ref, request) async => null),
+        ...overrides,
+      ],
+      child: MaterialApp(
+        theme: CompactTheme.light,
+        locale: const Locale('zh', 'CN'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: home),
+      ),
     );
   }
 
   /// Opens the details of a track and hands back the tree of the sheet.
-  Future<void> openSheet(WidgetTester tester, {Song track = song}) async {
-    await tester.pumpWidget(app(TrackMeta(song: track, index: 0)));
+  Future<void> openSheet(
+    WidgetTester tester, {
+    Song track = song,
+    List<Override> overrides = const [],
+  }) async {
+    await tester.pumpWidget(
+      app(TrackMeta(song: track, index: 0), overrides: overrides),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('查看详情'));
@@ -305,6 +319,30 @@ void main() {
       ),
       findsNothing,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a description shows the translation above the original', (
+    tester,
+  ) async {
+    await openSheet(
+      tester,
+      overrides: [
+        translatedTextProvider.overrideWith((ref, request) async {
+          return request.text == song.description ? '一段译好的简介。' : null;
+        }),
+      ],
+    );
+
+    // The two halves are paragraphs, not one line each: a description is
+    // prose and a reader compares the whole of it.
+    expect(find.text('一段译好的简介。'), findsOneWidget);
+    expect(find.text(song.description!), findsOneWidget);
+    for (final text in tester.widgetList<SelectableText>(
+      find.byType(SelectableText),
+    )) {
+      expect(text.maxLines, isNull);
+    }
     expect(tester.takeException(), isNull);
   });
 }

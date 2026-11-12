@@ -44,9 +44,14 @@ class LibraryRowMetrics {
   int get hashCode => Object.hash(showArtist, showAdded, showAlbum, extent);
 
   /// The metrics of a row that is [width] wide at [textScale].
+  ///
+  /// [bilingual] reserves the second line of a translated title. The table
+  /// uses one height for every row, so the room is decided here for the whole
+  /// viewport instead of by each row.
   factory LibraryRowMetrics.at({
     required double width,
     required double textScale,
+    bool bilingual = false,
   }) {
     return LibraryRowMetrics(
       // The album is the first column to go, then the added date. A narrow
@@ -56,7 +61,9 @@ class LibraryRowMetrics {
       showAdded: width >= 760,
       showAlbum: width >= 820,
       extent: (textScale - 1.0).abs() < 0.01
-          ? CompactTokens.libraryRowHeight
+          ? (bilingual
+                ? CompactTokens.libraryRowHeightBilingual
+                : CompactTokens.libraryRowHeight)
           : null,
     );
   }
@@ -65,12 +72,17 @@ class LibraryRowMetrics {
   ///
   /// The width is the width of a row, not of the page: the caller subtracts
   /// the gutter the list keeps on both sides.
-  factory LibraryRowMetrics.of(BuildContext context, double width) {
+  factory LibraryRowMetrics.of(
+    BuildContext context,
+    double width, {
+    bool bilingual = false,
+  }) {
     final scaler = MediaQuery.textScalerOf(context);
     final strong = CompactTypeScale.strong;
     return LibraryRowMetrics.at(
       width: width,
       textScale: scaler.scale(strong) / strong,
+      bilingual: bilingual,
     );
   }
 }

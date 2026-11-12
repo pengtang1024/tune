@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -26,6 +27,12 @@ class LibraryAlbumsView extends StatelessWidget {
   /// Plays the whole album without opening it.
   final ValueChanged<AlbumSummary> onPlay;
 
+  /// Whether an album name may carry a translation and its original.
+  ///
+  /// The grid has a fixed caption, so the room for the second line is
+  /// reserved by the grid and not by each card.
+  final bool bilingual;
+
   /// The longest side of a cover.
   ///
   /// The grid packs the covers as tightly as the window allows; a cover is
@@ -36,6 +43,7 @@ class LibraryAlbumsView extends StatelessWidget {
 
   /// The room under a cover for the name, the artist and the count.
   static const double _captionHeight = 60;
+  static const double _captionHeightBilingual = 76;
 
   const LibraryAlbumsView({
     super.key,
@@ -44,6 +52,7 @@ class LibraryAlbumsView extends StatelessWidget {
     required this.onPlay,
     this.currentAlbumKey,
     this.controller,
+    this.bilingual = false,
   });
 
   @override
@@ -61,7 +70,8 @@ class LibraryAlbumsView extends StatelessWidget {
         // The caption grows with the text of the desktop, like every other
         // box that holds words; the cover keeps the size the grid gave it.
         final caption =
-            _captionHeight * MediaQuery.textScalerOf(context).scale(1);
+            (bilingual ? _captionHeightBilingual : _captionHeight) *
+            MediaQuery.textScalerOf(context).scale(1);
 
         return GridView.builder(
           controller: controller,
@@ -183,10 +193,9 @@ class _AlbumCardState extends State<_AlbumCard> {
                 ],
               ),
               const SizedBox(height: CompactTokens.space6),
-              Text(
-                name,
+              TranslatedText(
+                text: name,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: widget.current
                       ? FontWeight.w600

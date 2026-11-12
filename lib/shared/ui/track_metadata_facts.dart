@@ -160,6 +160,7 @@ TrackFact? _descriptionFact(BuildContext context, Song song) {
     value: description,
     icon: Icons.notes_rounded,
     paragraph: true,
+    translatable: true,
   );
 }
 

@@ -8,6 +8,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/dead_songs_controller.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
@@ -32,12 +33,20 @@ class LibraryColumnsView extends StatelessWidget {
   final bool waitsForDoubleClick;
   final ScrollController? controller;
 
+  /// Whether a title may take a second line for the original.
+  ///
+  /// The grid has a fixed cell height, so the room has to be reserved here
+  /// rather than discovered by the row: a cell that is too short clips a
+  /// translation the reader asked for.
+  final bool bilingual;
+
   const LibraryColumnsView({
     super.key,
     required this.songs,
     required this.sourceLabels,
     required this.waitsForDoubleClick,
     this.controller,
+    this.bilingual = false,
   });
 
   @override
@@ -56,11 +65,13 @@ class LibraryColumnsView extends StatelessWidget {
             CompactTokens.pageGutter,
             CompactTokens.space8,
           ),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: CompactTokens.space8,
             mainAxisSpacing: 0,
-            mainAxisExtent: 40,
+            mainAxisExtent: bilingual
+                ? CompactTokens.libraryColumnBilingual
+                : CompactTokens.libraryColumnHeight,
           ),
           itemCount: songs.length,
           itemBuilder: (context, index) {
@@ -152,10 +163,9 @@ class _ColumnCardState extends State<_ColumnCard> {
         ? context.loc.playerUnknownArtist
         : song.artist;
     final album = song.album.trim();
-    final second = [
-      artist,
-      if (album.isNotEmpty) album,
-    ].join(' · ');
+    final bylineStyle = theme.textTheme.labelSmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
@@ -208,12 +218,11 @@ class _ColumnCardState extends State<_ColumnCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        song.title.isEmpty
+                      TranslatedText(
+                        text: song.title.isEmpty
                             ? context.loc.trackUnknownTitle
                             : song.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        dense: true,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: widget.selected
                               ? FontWeight.w600
@@ -224,14 +233,23 @@ class _ColumnCardState extends State<_ColumnCard> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              second,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
+                            child: album.isEmpty
+                                ? Text(
+                                    artist,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: bylineStyle,
+                                  )
+                                // The album is the name of the collection,
+                                // which a source may fill with a playlist
+                                // name. Only the album goes to the
+                                // translator; the artist keeps its words.
+                                : TranslatedText(
+                                    text: album,
+                                    prefix: '$artist · ',
+                                    dense: true,
+                                    style: bylineStyle,
+                                  ),
                           ),
                           if (widget.source != null) ...[
                             const SizedBox(width: CompactTokens.space4),

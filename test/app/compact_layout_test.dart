@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/domain/models/song.dart';
@@ -320,9 +321,71 @@ void main() {
 
     expect(
       visible,
-      greaterThanOrEqualTo(10),
-      reason: 'the default window has to show a page of tracks',
+      greaterThanOrEqualTo(7),
+      reason:
+          'the default window has to show a page of tracks; a translated '
+          'title takes a second line, so the page holds fewer rows than the '
+          'single-line table did',
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the two-column wall reserves a line for the album', (
+    tester,
+  ) async {
+    // A translated album puts its original on a second line under the
+    // byline. The wall has a fixed cell height, so the room is part of the
+    // grid geometry and the visible row count follows from it.
+    await setSurface(tester, const Size(1920, 1080));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+    final songs = [
+      for (var i = 1; i <= 40; i++)
+        Song(
+          id: i,
+          title: 'Track $i',
+          artist: 'Artist $i',
+          album: 'Album $i',
+          duration: 180000,
+          uri: '/music/$i.mp3',
+        ),
+    ];
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(LibraryState(songs: songs)),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('双列视图').first);
+    await tester.pumpAndSettle();
+
+    final grid = tester.widget<GridView>(
+      find.descendant(
+        of: find.byType(LibraryPane),
+        matching: find.byType(GridView),
+      ),
+    );
+    final delegate =
+        grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    expect(delegate.mainAxisExtent, CompactTokens.libraryColumnBilingual);
+    final viewport = tester.getRect(
+      find.descendant(
+        of: find.byType(LibraryPane),
+        matching: find.byType(GridView),
+      ),
+    );
+    final rows = (viewport.height / delegate.mainAxisExtent!).floor();
+    // A 1080-tall window shows thirteen rows: the bilingual cell is 68 high,
+    // not the 56 it was before the album kept its original under the line.
+    expect(rows, 13);
     expect(tester.takeException(), isNull);
   });
 

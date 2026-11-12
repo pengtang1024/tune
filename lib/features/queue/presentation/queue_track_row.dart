@@ -5,6 +5,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
@@ -110,6 +111,11 @@ class QueueTrackRow extends ConsumerWidget {
                         isFavorite: isFavorite,
                         onToggleFavorite: onToggleFavorite,
                         dense: dense,
+                        titleBuilder: (text, style) => TranslatedText(
+                          text: text,
+                          style: style,
+                          dense: true,
+                        ),
                       ),
                     ),
                     const SizedBox(width: CompactTokens.space4),

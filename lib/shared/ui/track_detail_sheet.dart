@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/localization/presentation/translated_text.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
@@ -68,7 +69,11 @@ class _TrackDetailSheet extends StatelessWidget {
     // under the name it has in the facts.
     final paragraphs = [
       for (final fact in facts.where((fact) => fact.paragraph))
-        TrackDetailBlock(label: fact.label, text: fact.value),
+        TrackDetailBlock(
+          label: fact.label,
+          text: fact.value,
+          translatable: fact.translatable,
+        ),
     ];
     final chips = [
       for (final fact in facts.where((fact) => !fact.paragraph))
@@ -159,10 +164,11 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                song.title.isEmpty ? context.loc.trackUnknownTitle : song.title,
+              TranslatedText(
+                text: song.title.isEmpty
+                    ? context.loc.trackUnknownTitle
+                    : song.title,
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: CompactTypography.asDisplay(
                   theme.textTheme.titleMedium,
                   size: CompactTypeScale.displaySmall,

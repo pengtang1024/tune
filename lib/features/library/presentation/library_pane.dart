@@ -291,6 +291,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   openAlbum,
                   sourceLabels,
                   settings.onlyLikeOnDoubleClick,
+                  settings.localization.enabled,
                 ),
         ),
         if (library.songs.isEmpty)
@@ -396,6 +397,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibraryAlbum? openAlbum,
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick,
+    bool bilingual,
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
@@ -422,6 +424,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         sourceLabels,
         onlyLikeOnDoubleClick,
         library.sort,
+        bilingual: bilingual,
       );
     }
 
@@ -452,6 +455,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               library.sort,
               controller: _songsScrollController,
               hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+              bilingual: bilingual,
             );
           }
           return LibraryColumnsView(
@@ -459,6 +463,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             sourceLabels: sourceLabels,
             waitsForDoubleClick: onlyLikeOnDoubleClick,
             controller: _columnsScrollController,
+            bilingual: bilingual,
           );
         },
       );
@@ -479,6 +484,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             albums: library.albums,
             currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
             controller: _albumsScrollController,
+            bilingual: bilingual,
             onOpen: _openAlbumByKey,
             onPlay: _playAlbumByKey,
           );
@@ -493,6 +499,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       library.sort,
       controller: _songsScrollController,
       hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+      bilingual: bilingual,
     );
   }
 
@@ -503,6 +510,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibrarySort sort, {
     ScrollController? controller,
     bool hasMore = false,
+    bool bilingual = false,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -512,6 +520,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         final metrics = LibraryRowMetrics.of(
           context,
           constraints.maxWidth - CompactTokens.pageGutter * 2,
+          bilingual: bilingual,
         );
 
         final cached = _cachedTracks;
