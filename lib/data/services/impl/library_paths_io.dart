@@ -4,6 +4,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/library/library_paths.dart';
+import 'package:tune/data/services/library/saf_tree_store.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
@@ -42,9 +43,14 @@ class FileLibraryPaths implements LibraryPaths {
 
   @override
   Directory root() {
-    final picked = _persistence.getString(LibraryPaths.rootKey);
-    if (picked != null && picked.trim().isNotEmpty) {
-      return Directory(picked.trim());
+    final picked = _persistence.getString(LibraryPaths.rootKey)?.trim();
+    // A tree picked on Android is an address of the document provider, not a
+    // folder of this process: no file of the app may be put under it by path
+    // (docs/android.md §5). The private folders answer for that platform.
+    if (picked != null &&
+        picked.isNotEmpty &&
+        !SafTreeStore.isTreeUri(picked)) {
+      return Directory(picked);
     }
     return defaultRoot();
   }
@@ -204,7 +210,6 @@ class FileLibraryPaths implements LibraryPaths {
     }
     return File(song.uri);
   }
-
 
   /// The folder of a track that is on the disk, when the track is one.
   Directory? _localFolderOf(Song song) {

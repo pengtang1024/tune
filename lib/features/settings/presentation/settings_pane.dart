@@ -10,6 +10,7 @@ import 'package:tune/config/app_version.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
+import 'package:tune/data/services/impl/saf_method_channel.dart';
 import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
@@ -31,6 +32,7 @@ import 'package:tune/features/settings/presentation/source_health_weights_sheet.
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
+import 'package:tune/utils/logger.dart';
 
 /// The sections of the settings page.
 enum _SettingsSection {
@@ -1322,12 +1324,34 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   }
 
   Future<void> _pickLibraryFolder() async {
+    // A phone has no folder path to hand over: the reader picks a tree in the
+    // system picker, and the permission is kept across restarts
+    // (docs/android.md §5.1).
+    if (_capabilities.platform == AppPlatform.android) {
+      await _pickSafLibraryFolder();
+      return;
+    }
     final path = await FilePicker.platform.getDirectoryPath(
       dialogTitle: context.loc.settingsChangeLibraryFolder,
     );
     if (path == null || !mounted) return;
 
     await ref.read(settingsControllerProvider.notifier).setLibraryFolder(path);
+  }
+
+  Future<void> _pickSafLibraryFolder() async {
+    try {
+      final picked = await const SafMethodChannel().pickDirectory();
+      if (picked == null || !mounted) return;
+      await ref
+          .read(settingsControllerProvider.notifier)
+          .setLibraryFolder(picked.uri);
+      if (!mounted) return;
+      Log.info('音乐库文件夹已选择: ${picked.name} (${picked.writable ? '可写' : '只读'})');
+      _showMessage(context.loc.settingsFolderAdded);
+    } catch (error) {
+      Log.error('选择音乐库文件夹失败: $error');
+    }
   }
 
   Future<void> _resetLibraryFolder() async {

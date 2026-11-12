@@ -816,7 +816,9 @@ class _LibraryFolderRow extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 24),
             child: Text(
-              folder.isEmpty ? context.loc.settingsNoLibraryFolder : folder,
+              folder.isEmpty
+                  ? context.loc.settingsNoLibraryFolder
+                  : _folderLabel(folder),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: CompactTypography.mono(
@@ -828,6 +830,26 @@ class _LibraryFolderRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// The label of a library folder.
+///
+/// A folder picked on Android is a SAF tree, and its address is long. The
+/// last segment of the tree id is the name the reader picked, so that is what
+/// the settings show.
+String _folderLabel(String folder) {
+  if (!folder.startsWith('content://')) return folder;
+  try {
+    final decoded = Uri.decodeComponent(folder);
+    final marker = decoded.indexOf('/tree/');
+    final id = marker >= 0 ? decoded.substring(marker + 6) : decoded;
+    final slash = id.lastIndexOf('/');
+    final name = slash >= 0 ? id.substring(slash + 1) : id;
+    final colon = name.indexOf(':');
+    return colon >= 0 ? name.substring(colon + 1) : name;
+  } catch (error) {
+    return folder;
   }
 }
 
