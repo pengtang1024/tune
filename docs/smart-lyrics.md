@@ -223,7 +223,9 @@ LyricsController._lyricsFor(song)
 
 Android 不能执行随包的外部二进制（`Process.run` 一律 `Permission denied`），共享存储对应用只读。
 S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeSheet`）；MediaStore 行仍没有
-落点。SAF 曲目的音频复制与词稿读回未做。现场与验证见 [`docs/android.md`](android.md) 的 §5。
+落点。S3 起 `content://` 曲目先经原生 `copyAudio` 整份复制到应用私有缓存再交给引擎，跑完删除
+副本；写进树的词稿经 `readSheet` 读回，面板能显示。单曲链路因此完整，批量与自动补词在 Android
+仍整体停用（逐首复制音频的代价未量）。现场与验证见 [`docs/android.md`](android.md) 的 §5。
 
 ## 6. 技术路线评估
 
