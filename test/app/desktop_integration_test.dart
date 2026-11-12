@@ -82,6 +82,9 @@ class _FakeScanner implements CrossPlatformMusicScanner {
   final Map<String, Song> songs;
 
   @override
+  bool get addressesSystemLibrary => false;
+
+  @override
   Future<Song?> scanMusicFile(String filePath) async {
     final song = songs[filePath];
     if (song == null) throw StateError('cannot read $filePath');

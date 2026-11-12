@@ -129,6 +129,7 @@ class FileLibraryStorage implements LibraryStorage {
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) async {
     // A document cannot hold an inactive row: the rows the scan does not
     // cover are dropped, and the next scan of their source writes them back.
@@ -138,6 +139,9 @@ class FileLibraryStorage implements LibraryStorage {
     bool covered(Song song) {
       final sourceId = song.sourceId ?? 'local';
       if (!enabledSourceIds.contains(sourceId)) return false;
+      if (localReadUris != null && sourceId == 'local') {
+        return localReadUris.contains(song.uri);
+      }
       if (sourceId == 'local' && coveredPrefixes.isNotEmpty) {
         return coveredPrefixes.any(
           (folder) =>
@@ -464,11 +468,13 @@ class SqliteLibraryStorage implements LibraryStorage {
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) async {
     try {
       return (await _db()).deactivateUncovered(
         enabledSourceIds: enabledSourceIds,
         localPaths: localPaths,
+        localReadUris: localReadUris,
       );
     } catch (error, stackTrace) {
       Log.error('收窄音乐库失败: $error\n$stackTrace');

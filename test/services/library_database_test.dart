@@ -313,6 +313,62 @@ void main() {
       expect(database.ingestBatch([song(1)]), 1);
       expect(database.count(), 1);
     });
+
+    test('a folder scan leaves the rows of the system library alone', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      const content = Song(
+        id: 1,
+        title: 'Phone track',
+        uri: 'content://media/external/audio/media/1',
+      );
+      const file = Song(id: 2, title: 'Disk track', uri: '/music/disk.mp3');
+      database.ingestBatch([content, file]);
+
+      // A `content://` address names the system library, not a folder, so
+      // the folders a scan reads cannot say the row is gone.
+      expect(
+        database.deactivateUncovered(
+          enabledSourceIds: {'local'},
+          localPaths: ['/music'],
+        ),
+        0,
+      );
+      expect(database.count(), 2);
+    });
+
+    test('a read of the system library answers for the local source', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      const kept = Song(
+        id: 1,
+        title: 'Kept',
+        uri: 'content://media/external/audio/media/1',
+      );
+      const gone = Song(
+        id: 2,
+        title: 'Gone',
+        uri: 'content://media/external/audio/media/2',
+      );
+      const legacy = Song(
+        id: 3,
+        title: 'Legacy',
+        uri: '/storage/emulated/0/Music/old.mp3',
+      );
+      database.ingestBatch([kept, gone, legacy]);
+
+      // The read is the whole library: a row it did not bring has left the
+      // phone, whatever address it carries.
+      expect(
+        database.deactivateUncovered(
+          enabledSourceIds: {'local'},
+          localPaths: const [],
+          localReadUris: {kept.uri},
+        ),
+        2,
+      );
+      expect(database.load().map((track) => track.uri), [kept.uri]);
+    });
   });
 
   group('sqlite storage', () {

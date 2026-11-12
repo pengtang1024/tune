@@ -642,6 +642,7 @@ class AppDatabase {
   int deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) {
     var marked = 0;
     _db.execute('BEGIN');
@@ -676,10 +677,35 @@ class AppDatabase {
         ];
         _db.execute(
           'UPDATE songs SET active = 0 WHERE active = 1 '
-          "AND source_id = 'local' AND NOT ($covered)",
+          "AND source_id = 'local' AND uri NOT LIKE 'content://%' "
+          "AND NOT ($covered)",
           patterns,
         );
         marked += _db.updatedRows;
+      }
+
+      // A read of the system library answers for every row of the local
+      // source: the ones it did not bring are tracks that left the phone.
+      // Their `content://` address says nothing about a folder, so the
+      // folder rule above cannot judge them.
+      if (localReadUris != null) {
+        final rows = _db.select(
+          "SELECT uri FROM songs WHERE source_id = 'local' AND active = 1",
+        );
+        final gone = [
+          for (final row in rows)
+            if (!localReadUris.contains(row['uri'] as String))
+              row['uri'] as String,
+        ];
+        for (var start = 0; start < gone.length; start += 500) {
+          final window = gone.skip(start).take(500).toList(growable: false);
+          final placeholders = List.filled(window.length, '?').join(', ');
+          _db.execute(
+            'UPDATE songs SET active = 0 WHERE uri IN ($placeholders)',
+            window,
+          );
+          marked += _db.updatedRows;
+        }
       }
       _db.execute('COMMIT');
     } catch (error) {

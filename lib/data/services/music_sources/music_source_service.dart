@@ -52,6 +52,7 @@ import 'package:tune/utils/logger.dart';
 /// controller owns progress and state, while this class only orchestrates I/O.
 class MusicSourceService implements StreamUrlResolver {
   final MusicSourceStore _store;
+  final CrossPlatformMusicScanner _scanner;
   final LyricsProvider _lyricsProvider;
   final Map<String, MusicSourceAdapter> _adapters;
 
@@ -62,6 +63,14 @@ class MusicSourceService implements StreamUrlResolver {
   /// lookup logic.
   LyricsProvider get lyricsProvider => _lyricsProvider;
 
+  /// Whether the built-in local source reads the library of the system
+  /// instead of folders.
+  ///
+  /// A phone has no folder to pick: the rows come from MediaStore and carry
+  /// `content://` addresses. The library then treats one read as the whole
+  /// truth about that source, instead of judging each row by a folder.
+  bool get localReadsSystemLibrary => _scanner.addressesSystemLibrary;
+
   MusicSourceService({
     required CrossPlatformMusicScanner scanner,
     required MusicSourceStore store,
@@ -69,6 +78,7 @@ class MusicSourceService implements StreamUrlResolver {
     LyricsProvider? lyricsProvider,
     Map<String, MusicSourceAdapter>? adapters,
   }) : _store = store,
+       _scanner = scanner,
        _lyricsProvider = lyricsProvider ?? LrclibLyricsProvider(dio: dio),
        _adapters = adapters ?? _registryOf(scanner, dio);
 

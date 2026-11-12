@@ -576,27 +576,38 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
   /// Marks the rows the scan does not cover as outside the library.
   ///
-  /// Marks the rows the scan does not cover as outside the library.
-  ///
   /// The sources that are off now, and the local files that no longer sit
   /// under one of the folders the scan reads, are not part of the library
   /// any more. A local scan that failed (the drive is away) keeps every
   /// local row — only a scan that reads its folders answers for them.
+  ///
+  /// A local source that reads the library of the system has no folders to
+  /// answer with: the read itself is the answer, and the tracks it did not
+  /// bring have left the phone.
   Future<int> _deactivateUncovered({
     required List<MusicSourceConfig> enabled,
     required List<SourceScanResult> results,
     required List<String> localPaths,
   }) {
     final enabledIds = {for (final source in enabled) source.id};
-    final localSources = enabled.where((source) => source.isLocal);
-    final localSucceeded = results.any(
-      (result) =>
-          result.isSuccess &&
-          localSources.any((source) => source.id == result.sourceId),
-    );
+    final localIds = {
+      for (final source in enabled)
+        if (source.isLocal) source.id,
+    };
+    final localReads = results
+        .where((result) => result.isSuccess && localIds.contains(result.sourceId))
+        .toList(growable: false);
+    final localSucceeded = localReads.isNotEmpty;
+    final systemLibrary = _sourceService.localReadsSystemLibrary;
     return _storage.deactivateUncovered(
       enabledSourceIds: enabledIds,
-      localPaths: localSucceeded ? localPaths : const [],
+      localPaths: localSucceeded && !systemLibrary ? localPaths : const [],
+      localReadUris: localSucceeded && systemLibrary
+          ? {
+              for (final result in localReads)
+                for (final song in result.songs) song.uri,
+            }
+          : null,
     );
   }
 

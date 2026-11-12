@@ -34,9 +34,15 @@ abstract class LibraryStorage {
   /// The rows of sources that are off now, and the local files that no
   /// longer sit under one of [localPaths], stay in the database but leave
   /// the page. Answers how many rows were marked.
+  ///
+  /// [localReadUris] is the whole library a read of the system library
+  /// brought. A local row that is not in it — whatever address it carries —
+  /// is not in the library any more, and folders are not asked about such
+  /// rows: `content://` says nothing about a folder.
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   });
 
   /// How many tracks the library holds.
