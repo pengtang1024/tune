@@ -5,8 +5,8 @@ import 'dart:math';
 
 import 'package:tune/data/services/translation/translation_assets.dart';
 import 'package:tune/data/services/translation/translation_prompt.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
-import 'package:tune/features/localization/domain/translation_engine.dart';
+import 'package:tune/domain/models/localization_config.dart';
+import 'package:tune/domain/models/translation_engine.dart';
 
 /// The offline engine: llama.cpp running a small Qwen model on the CPU.
 ///

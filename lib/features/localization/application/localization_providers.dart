@@ -8,9 +8,9 @@ import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/domain/models/translation_cache.dart';
 import 'package:tune/features/localization/application/translation_repository.dart';
 import 'package:tune/features/localization/data/translation_store.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/features/localization/domain/text_language.dart';
-import 'package:tune/features/localization/domain/translation_engine.dart';
+import 'package:tune/domain/models/translation_engine.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 
 /// One text that a widget asks to see in the language of the interface.

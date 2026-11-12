@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/localization/application/translation_repository.dart';
 import 'package:tune/features/localization/data/translation_store.dart';
-import 'package:tune/features/localization/domain/translation_engine.dart';
+import 'package:tune/domain/models/translation_engine.dart';
 
 void main() {
   test('rows that appear together travel as one batch', () async {

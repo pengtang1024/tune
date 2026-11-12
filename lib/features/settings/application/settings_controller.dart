@@ -9,7 +9,7 @@ import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';

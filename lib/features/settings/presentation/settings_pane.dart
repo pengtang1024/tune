@@ -15,7 +15,7 @@ import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/features/localization/presentation/settings_localization_card.dart';
 import 'package:tune/features/settings/application/mobile_permissions_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';

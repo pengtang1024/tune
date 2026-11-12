@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
 
 void main() {
   group('LocalizationConfig', () {

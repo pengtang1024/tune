@@ -5,7 +5,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/translation/translation_balance.dart';
 import 'package:tune/features/localization/application/local_model_controller.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
-import 'package:tune/features/localization/domain/localization_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/settings_switch_row.dart';

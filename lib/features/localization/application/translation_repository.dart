@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:tune/domain/models/translation_cache.dart';
 import 'package:tune/features/localization/data/translation_store.dart';
 import 'package:tune/features/localization/domain/text_language.dart';
-import 'package:tune/features/localization/domain/translation_engine.dart';
+import 'package:tune/domain/models/translation_engine.dart';
 
 /// Reads and writes translations behind one in-memory map.
 ///

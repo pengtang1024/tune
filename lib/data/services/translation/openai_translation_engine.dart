@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/translation/translation_prompt.dart';
-import 'package:tune/features/localization/domain/translation_engine.dart';
+import 'package:tune/domain/models/translation_engine.dart';
 
 /// The advanced engine: any endpoint that speaks the OpenAI chat dialect.
 class OpenAiTranslationEngine implements TranslationEngine {
