@@ -155,8 +155,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
     setState(() {
       _query = query;
       if (query.isEmpty) return;
-      if (_visible(_section)) return;
-      final first = _sections.where(_visible).firstOrNull;
+      if (settingsSectionMatches(context, _section, _query)) return;
+      final first = _sections
+          .where((section) => settingsSectionMatches(context, section, _query))
+          .firstOrNull;
       if (first != null) _section = first;
     });
   }
