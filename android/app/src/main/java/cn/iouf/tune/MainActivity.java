@@ -9,10 +9,14 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import com.ryanheise.audioservice.AudioServiceActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +89,20 @@ public class MainActivity extends AudioServiceActivity {
                     result.success(canWrite(call.argument("uri")));
                   } catch (Exception error) {
                     result.success(false);
+                  }
+                  break;
+                case "writeSheet":
+                  try {
+                    result.success(
+                        writeSheet(
+                            call.argument("treeUri"),
+                            call.argument("songUri"),
+                            call.argument("name"),
+                            call.argument("content")));
+                  } catch (SecurityException error) {
+                    result.error("permission_lost", error.getMessage(), null);
+                  } catch (Exception error) {
+                    result.error("saf_failed", error.getMessage(), null);
                   }
                   break;
                 default:
@@ -305,6 +323,125 @@ public class MainActivity extends AudioServiceActivity {
       }
     }
     return false;
+  }
+
+  // Writes one small text file — the sheet — into the folder that holds the
+  // track. The name is looked up first, so a second run replaces the sheet
+  // instead of leaving a copy behind; a document created for a write that
+  // then failed is removed, so no half sheet stays in the folder.
+  private Map<String, Object> writeSheet(String treeUri, String songUri, String name, String content)
+      throws IOException {
+    if (treeUri == null || treeUri.isEmpty()) {
+      throw new IllegalArgumentException("a tree is needed");
+    }
+    if (songUri == null || songUri.isEmpty()) {
+      throw new IllegalArgumentException("a track is needed");
+    }
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException("a sheet needs a name");
+    }
+    final Uri tree = Uri.parse(treeUri);
+    final Uri song = Uri.parse(songUri);
+    // The sibling of the track lives in the folder that holds it; the
+    // document id of the track ends with its own name, so the folder is the
+    // id without the last segment. Providers with opaque ids keep no path in
+    // the id: the picked folder is the only folder they name.
+    final String parentId =
+        parentDocumentId(
+            DocumentsContract.getDocumentId(song), DocumentsContract.getTreeDocumentId(tree));
+    final Uri children = DocumentsContract.buildChildDocumentsUriUsingTree(tree, parentId);
+    Uri target = findChild(tree, children, name);
+    final boolean replaced = target != null;
+    if (target == null) {
+      final Uri created =
+          DocumentsContract.createDocument(getContentResolver(), children, "text/plain", name);
+      if (created == null) {
+        throw new IOException("the provider did not create the sheet");
+      }
+      try {
+        target = keepName(created, name);
+      } catch (IOException error) {
+        try {
+          DocumentsContract.deleteDocument(getContentResolver(), created);
+        } catch (Exception ignored) {
+          // The provider may keep the unnamed document; the run still fails.
+        }
+        throw error;
+      }
+    }
+    try (OutputStream out = getContentResolver().openOutputStream(target, "wt")) {
+      if (out == null) throw new IOException("the provider did not open the sheet");
+      out.write(content == null ? new byte[0] : content.getBytes(StandardCharsets.UTF_8));
+      out.flush();
+    } catch (Exception error) {
+      if (!replaced) {
+        try {
+          DocumentsContract.deleteDocument(getContentResolver(), target);
+        } catch (Exception ignored) {
+          // The provider may keep the empty document; the run still fails.
+        }
+      }
+      if (error instanceof IOException) throw (IOException) error;
+      throw new IOException(error);
+    }
+    final Map<String, Object> written = new HashMap<>();
+    written.put("uri", target.toString());
+    written.put("replaced", replaced);
+    return written;
+  }
+
+  private static String parentDocumentId(String documentId, String treeId) {
+    if (documentId == null || documentId.isEmpty()) return treeId;
+    final int slash = documentId.lastIndexOf('/');
+    if (slash <= 0) return treeId;
+    return documentId.substring(0, slash);
+  }
+
+  private Uri findChild(Uri tree, Uri children, String name) {
+    final String[] projection = {
+      DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+      DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+    };
+    try (Cursor cursor = getContentResolver().query(children, projection, null, null, null)) {
+      if (cursor == null) return null;
+      while (cursor.moveToNext()) {
+        if (name.equals(cursor.getString(1))) {
+          return DocumentsContract.buildDocumentUriUsingTree(tree, cursor.getString(0));
+        }
+      }
+    }
+    return null;
+  }
+
+  // A provider may add an extension of its own when it creates a text
+  // document (`Saf_One.smart.lrc` became `...lrc.txt` on the system
+  // provider). The sheet name is the contract with the reader and with the
+  // desktop side, so the document is renamed back when that happened.
+  private Uri keepName(Uri document, String name) throws IOException {
+    if (name.equals(displayNameOf(document))) return document;
+    final Uri renamed;
+    try {
+      renamed = DocumentsContract.renameDocument(getContentResolver(), document, name);
+    } catch (Exception error) {
+      throw new IOException("the provider did not keep the sheet name", error);
+    }
+    if (renamed == null) {
+      throw new IOException("the provider did not rename the sheet");
+    }
+    return renamed;
+  }
+
+  private String displayNameOf(Uri document) {
+    final String[] projection = {OpenableColumns.DISPLAY_NAME};
+    try (Cursor cursor = getContentResolver().query(document, projection, null, null, null)) {
+      if (cursor != null && cursor.moveToFirst() && !cursor.isNull(0)) {
+        return cursor.getString(0);
+      }
+    } catch (Exception error) {
+      // Without a name there is no proof the provider kept it; the rename
+      // that follows puts the sheet name back.
+    }
+    return null;
   }
 
   private List<Map<String, Object>> listAudio() {
