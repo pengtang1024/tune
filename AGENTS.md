@@ -27,6 +27,7 @@
 | 改歌词（取词、解析、高亮、落盘） | [`docs/lyrics.md`](docs/lyrics.md) |
 | 查自动更新：数据源、产物命名、发布步骤 | [`docs/updates.md`](docs/updates.md) |
 | 查桌面集成（MPRIS、托盘、默认播放器） | [`需求/桌面集成方案.md`](需求/桌面集成方案.md) |
+| 做 Android：后台播放、通知、权限、MediaStore/SAF 扫描 | [`docs/android.md`](docs/android.md) |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
 | 继续查本地化覆盖、接着做审计 | [`docs/localization-audit.md`](docs/localization-audit.md) |

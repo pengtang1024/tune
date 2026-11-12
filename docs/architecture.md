@@ -112,6 +112,40 @@ presentation → application → domain
 - MPRIS、托盘、单实例都走**会话总线**（`DBusClient.session()`），不是系统总线。
 - 详细的协议与验收见 [桌面集成方案](../需求/桌面集成方案.md)。
 
+## 窗口形态与能力
+
+外壳按窗口宽度选形态，阈值只有一份（`lib/app/layout/layout_metrics.dart`）：
+
+| 宽度 | 类 | 桌面导航 | 触屏导航 |
+| --- | --- | --- | --- |
+| < 600 | `phone` | 图标侧栏 | 底部栏（小屏阶段实现） |
+| 600–799 | `compact` | 图标侧栏 | 底部栏（小屏阶段实现） |
+| 800–1179 | `regular` | 完整侧栏 | 完整侧栏 |
+| ≥ 1180 | `wide` | 完整侧栏（设置三列） | 完整侧栏 |
+
+- 底部栏只属于触屏：桌面窗口再窄也保留侧栏，鼠标够得到侧栏，窗口不会因为变小就变成手机。
+- 窗口形态是 `WindowForm`（`normal` / `mini` / `immersive`），读者改的那一份由 `windowFormProvider`（`lib/app/layout/window_form_controller.dart`）持有；尺寸、位置与最大化属于窗口本身，由 `WindowManagerService` 防抖写入，两者都经 `WindowLayoutStore`（`lib/data/services/window_layout_store.dart`），键为 `window_geometry_v1` 与 `window_form_v1`。最大化时保存的仍是普通形态的尺寸，取消最大化回到读者离开时的大小。
+- 平台能力读 `AppCapabilities`（`lib/core/config/app_capabilities.dart`），界面不再自己判断 `Platform.isLinux`：托盘、MPRIS、默认播放器、自动更新、外部工具管线今天只有 Linux 为真；单实例在 Linux 与 Windows 为真（Windows 走回环端口）；Windows 只开窗口管理与单实例，移动端只开触屏外壳，Android 另开后台播放（`audio_service`，真机验收未完成）。
+- 设置页按能力表渲染：桌面分组只在托盘 / 媒体控制 / 默认播放器至少有一项为真时出现，更新卡片跟随 `autoUpdate`；没有接线的开关不画，避免给出按了没反应的入口。
+- 形态切换不换外壳 widget：`CompactShell` 在同一个 `State` 内按形态分支，页面子树与滚动位置因此不重建。mini 时外壳整棵树 `Offstage`，页面只是不画、不被销毁。
+- `mini` 是 360×132（`PlatformConstants.desktopMiniWindowWidth/Height`），置顶、不进任务栏、不可缩放。入口是播放条右端的画中画按钮（窗口内容宽 ≥ 860 才出现，给音量条留位置），返回入口是 mini 条上的展开按钮。进入前先写一次普通形态的尺寸；mini 期间不写尺寸，退出时按保存的尺寸与位置还原。
+- `immersive` 是全屏 + 去窗口框，开关在正在播放页顶栏；离开该页（返回、Esc、收起按钮）即回到普通形态。Esc 先关队列面板，再关页面。
+- 启动时 `mini` 按保存的形态恢复；`immersive` 属于正在播放页，启动没有那页可回，因此按普通形态启动并写回 `window_form_v1`。
+- 形态切换由 `WindowManagerService.applyForm` 串行执行：读者在 resize 落地前又切回，最终停在最后选中的形态，而不是中间态。
+
+### Windows 桌面集成待办
+
+Windows 已落地窗口管理与单实例（回环端口 47321 + `hello`/`TUNE` 握手），托盘、SMTC、默认播放器、打开外部链接与自动更新仍未接线，能力表保持 `false`。按 B 方案等 Windows 环境或 CI 再上，验收通过后再逐个翻成 `true` 并同步 `test/app/app_capabilities_test.dart`。
+
+| 待办 | 验证条件 |
+| --- | --- |
+| 托盘图标与菜单，关窗进托盘 | Windows 11 上 `flutter run -d windows`：关窗后进程仍在、托盘菜单能播放/暂停/退出；Linux 构建不因此引入 libayatana 等依赖 |
+| SMTC 媒体会话 | 系统媒体浮层显示曲目、艺人、封面与进度；键盘媒体键、蓝牙耳机按键能播放/暂停/切歌；暂停后通知可恢复 |
+| 默认播放器与打开外部链接 | 设置页出现对应入口；系统“打开方式”能选中 Tune 并播放文件 |
+| 自动更新 | 能从发布产物检查版本、下载并替换；失败时保留可运行的旧版本 |
+
+统一门禁：`flutter analyze`、`flutter test`（Linux 主机即可），外加 `flutter build windows` 与上表手测；Windows 侧没有机器时只做静态检查，不把能力位提前打开。
+
 ## 持久化
 
 偏好与本地数据各有各的地方，同一份数据只有一份。
@@ -129,13 +163,13 @@ presentation → application → domain
 | 音乐库视图（排序、筛选） | `<应用支持目录>/library/view.json` | `LibraryStorage.saveView`；`LibraryController` 在 `setSort` / `setFilter` 后写一次 |
 | 下载的曲目 | `<音乐库>/<歌手>/<专辑>/<歌名>/<歌名>.<格式>` | `HttpSongDownloadService` |
 | 副本标记 | 曲目所在目录，`<歌名>.tune` | `CopyMarker`（`lib/data/services/library/copy_marker.dart`） |
-| 封面图 | `<音乐库>/.tune/artwork/` | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
+| 封面图 | `<音乐库>/.tune/artwork/`；Android 在 `<应用支持目录>/artwork/`（共享存储只读） | `FileArtworkCache`（`lib/data/services/impl/artwork_cache_io.dart`） |
 | 歌词 | 曲目所在目录，`<歌名>.lrc`（读者指定的写 `<歌名>.manual.lrc`） | `LyricsController` → `LibraryPaths` |
 | 智能歌词的机器稿与对照 | 曲目所在目录，`<歌名>.smart.lrc`（票池共识稿，读取顺序永远垫底）与 `<歌名>.smart.json`（翻译/音译对照，键入词稿日期——词稿重生成即作废） | `SmartLyricsService` / `SmartLyricsContrastController` → `LibraryPaths` |
 
 - **一个偏好一个文件**：两个进程同时开 app 时各写各的，不会互相抹掉。旧的整份 JSON 存储已经换掉，老的数据由 `LegacyPreferenceMigration` 搬一次。
 - **播放会话与进度分开存**：队列只在切歌/编辑时写，进度每 5 秒单独写，避免为了几秒钟的进度反复重写整条队列。恢复时一律停在暂停态，规则见 [playback-session.md](playback-session.md)。
-- **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。
+- **封面图落盘**：文件名是地址的稳定哈希，同一个地址只存一份，重启不用重拉；只有屏幕上看得到的封面才会去下载。桌面写在 `<音乐库>/.tune/artwork/`；Android 的共享存储对应用只读，写 `<应用支持目录>/artwork/`，目录不可写时封面只留在内存（每进程一条 info，见 `docs/android.md`）。
 - **桌面的媒体卡片读本机文件**：`mpris:artUrl` 给的是封面缓存里的那个文件（`ArtworkCache.coverFileFor`），不是网络地址——桌面只管显示，不会替应用去抓图，地址取不到时卡片上就是一个空格。缓存的布局只有 `ArtworkCache` 知道。
 - **音乐库索引存在 SQLite**：桌面把索引写在 `<应用支持目录>/library/library.db`。首次启动时如果旧版的 `scanned_songs.json` 还在，会导入数据库并改名为 `.migrated`。索引和音源的扫描时间必须落在同一个存储里：只存扫描时间而不存索引，下次打开就会跳过所有音源，索引也就空了。
 - **库按窗读取**：超过 1000 首时首帧只读第一窗，列表底部按需从 SQLite 取下一窗；保存是增量 upsert，写一窗不会删掉窗口外的行。
@@ -150,7 +184,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 
 ```text
 <音乐库>/
-├── .tune/artwork/<哈希前两位>/<哈希>.img   # 只浏览过、没下载的曲目的封面
+├── .tune/artwork/<哈希前两位>/<哈希>.img   # 只浏览过、没下载的曲目的封面（Android 改放应用支持目录）
 ├── <歌手>/<专辑>/<歌名>/
 │   ├── <歌名>.mp3                          # 下载的音频
 │   ├── <歌名>.jpg                          # 封面

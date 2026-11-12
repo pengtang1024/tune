@@ -113,8 +113,10 @@ flutter build linux --debug
 
 - 当前主要验收平台为 Linux 桌面端；macOS 与 Web 不再支持。
 - 远程播放依赖网络；桌面端边播边缓存，播放不等待下载。
-- Windows 使用 just_audio_windows 播放，不支持自定义请求头；需要请求头的音源（Jellyfin、ccMixter）可能无法播放，且没有托盘与 MPRIS 媒体控制。
-- Android / iOS 的本地扫描需要运行时存储权限，当前没有实现申请流程，移动端本地库可能为空；在线音源不受影响。
+- Windows 与 Linux 一样用 media_kit（libmpv）播放，自定义请求头随音频请求发出；需要 token 的音源可以播放。Windows 仍没有托盘与系统媒体控制（SMTC），这两项要等 Windows 原生实现，能力表里已标为不支持；待办与验证条件见 `docs/architecture.md` 的「Windows 桌面集成待办」。
+- Windows 的单实例用回环端口实现：第二个实例把文件交给正在运行的实例后退出；端口被其它程序占用时退化为独立运行。
+- 移动端只做 Android，iOS 保留工程入口但不排期。Android 的后台播放与通知已接 `audio_service`，队列仍由 `PlaybackController` 独占；真机验收尚未完成。
+- Android 的本地扫描先走 MediaStore，扫描前会在运行时申请媒体读取权限；拒绝后本地库为空，设置页给出重新允许的入口。SAF 指定文件夹后置。
 - 远程播放地址可能过期；网易云、Subsonic、播客订阅与 Jellyfin 支持单曲刷新，其余音源需重新扫描。
 - 网络电台是直播流，不缓存、不显示进度条。
 - 旧版移动端通知、歌词、均衡器、播放历史与账户功能已移出主链路。
