@@ -4,9 +4,9 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/data/services/database/library_facets_query.dart';
 import 'package:tune/data/services/database/library_filter_sql.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// The queries the library page and the filter panel read.
 ///

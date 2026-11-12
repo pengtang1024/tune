@@ -2,7 +2,7 @@ import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/features/library/data/impl/library_storage_io.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 
 /// A library storage over a database that lives only in memory.

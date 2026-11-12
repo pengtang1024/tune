@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/data/services/database/facets_worker.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 const _sizes = [20000, 50000];
 

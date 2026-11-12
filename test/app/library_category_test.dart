@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/features/library/domain/library_category.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/features/library/presentation/library_category_view.dart';
 import 'package:tune/l10n/app_localizations.dart';
 

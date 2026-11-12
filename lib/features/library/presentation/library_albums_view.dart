@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';

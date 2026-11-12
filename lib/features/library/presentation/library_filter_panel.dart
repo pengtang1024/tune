@@ -7,8 +7,8 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/features/library/presentation/library_filter_labels.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 

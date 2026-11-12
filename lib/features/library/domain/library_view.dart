@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// What the reader left the library looking like: the order and the filters.
 ///

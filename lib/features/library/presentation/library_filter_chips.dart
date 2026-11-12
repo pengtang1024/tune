@@ -3,7 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
 import 'package:tune/domain/models/music_source.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/features/library/presentation/library_filter_labels.dart';
 
 /// The filters that are in force, as removable chips under the toolbar.

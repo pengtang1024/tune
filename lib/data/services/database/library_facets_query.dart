@@ -1,7 +1,7 @@
 import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/data/services/database/library_filter_sql.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
 
 /// The counts of every facet group.
 ///

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_filter.dart';
 
 /// The counts the filter panel and the category cards read.
 ///

@@ -8,7 +8,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/features/library/domain/library_category.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
+import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/features/library/presentation/library_filter_labels.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 

@@ -6,8 +6,8 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// The filter and facet queries of the library (docs/library-browse.md):
 /// sets are OR inside a group and AND across groups, and the counts keep
