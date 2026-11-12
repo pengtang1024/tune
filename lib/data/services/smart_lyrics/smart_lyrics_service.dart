@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
@@ -29,6 +30,10 @@ enum SmartLyricsFailure {
 
   /// The channels heard no words — the silence of an instrumental.
   emptyResult,
+
+  /// The platform cannot write the sheet next to the audio: there is
+  /// nowhere for the words to land (docs/android.md).
+  unsupported,
 }
 
 /// How a run ended.
@@ -109,6 +114,26 @@ class SmartLyricsService {
   /// killed run left behind.
   Future<void>? _cleaned;
 
+  /// Set once a run found no usable transcoder. Every later song returns its
+  /// original audio straight away instead of failing the same process again.
+  bool _transcoderMissing = false;
+
+  /// Whether the missing transcoder has been reported in the log already.
+  ///
+  /// Static on purpose: one run builds a service per channel, and every one
+  /// of them would otherwise say the same sentence.
+  static bool _transcodeGapReported = false;
+
+  /// Whether the missing sheet location has been reported in the log.
+  /// Static for the same reason: one sentence per process is enough.
+  static bool _sheetGapReported = false;
+
+  void _reportSheetGap() {
+    if (_sheetGapReported) return;
+    _sheetGapReported = true;
+    Log.info('本平台不能把词稿写到音频旁，智能歌词停用（docs/android.md）');
+  }
+
   SmartLyricsService({
     required this.engines,
     required this.humanPool,
@@ -161,6 +186,13 @@ class SmartLyricsService {
     bool Function()? cancelled,
     void Function(double progress)? onProgress,
   }) async {
+    // The sheet lands next to the audio; a platform that cannot write
+    // there has nowhere to put the words. Asking the channels first would
+    // only spend a request to lose the answer at the last step.
+    if (!AppCapabilities.current.lyricsSheetBesideAudio) {
+      _reportSheetGap();
+      return const SmartLyricsOutcome.failed(SmartLyricsFailure.unsupported);
+    }
     final stopped = cancelled ?? () => false;
     onProgress?.call(0);
     final (audio, temporary) = await _audioFor(song);
@@ -540,6 +572,17 @@ class SmartLyricsService {
       if (wav != null && wav.isSpeechReady) return (audio, temporary);
     }
 
+    // A phone has no ffmpeg to run: an app may not execute an external
+    // binary. The attempt would fail per track and flood the log without
+    // ever producing a WAV, so it is skipped once and forever.
+    if (!AppCapabilities.current.externalToolPipeline || _transcoderMissing) {
+      if (!_transcodeGapReported) {
+        _transcodeGapReported = true;
+        Log.info('本地没有可用的 ffmpeg，转码跳过，原始音频直接交给引擎');
+      }
+      return (audio, temporary);
+    }
+
     final folder = temporary
         ? audio.parent
         : await Directory.systemTemp.createTemp('tune_smart_audio');
@@ -564,6 +607,15 @@ class SmartLyricsService {
         return (audio, temporary);
       }
       return (wav, true);
+    } on ProcessException {
+      // The binary is named but cannot be run on this machine. Stop asking.
+      _transcoderMissing = true;
+      if (!_transcodeGapReported) {
+        _transcodeGapReported = true;
+        Log.info('ffmpeg 不可执行，转码跳过，原始音频直接交给引擎');
+      }
+      if (!temporary) await _discardFolder(folder);
+      return (audio, temporary);
     } catch (error, stackTrace) {
       Log.error('音频转码失败: $error', stackTrace);
       if (!temporary) await _discardFolder(folder);

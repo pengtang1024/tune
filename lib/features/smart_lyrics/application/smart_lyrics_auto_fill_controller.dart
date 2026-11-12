@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 
@@ -35,6 +36,9 @@ class SmartLyricsAutoFillController {
 
   Future<void> _tick() async {
     if (_busy) return;
+    // A platform that cannot write a sheet next to the audio would grind
+    // through the whole library to lose every answer at the last step.
+    if (!AppCapabilities.current.lyricsSheetBesideAudio) return;
     final enabled = _ref.read(
       settingsControllerProvider.select((state) => state.smartLyrics.autoFill),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
@@ -88,6 +89,9 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
       if (model.trim().isNotEmpty) model.trim(),
   ];
   final assets = Future<WhisperAssets>.sync(WhisperAssets.appDefault);
+  // A phone cannot run the local engines at all: asking them once per song
+  // only wrote the same failure into the log and the health ledger.
+  final localEngines = AppCapabilities.current.externalToolPipeline;
 
   return SmartLyricsService(
     engines: [
@@ -99,24 +103,25 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
       // (sensevoice) is a different algorithm from whisper's, so the two
       // can cross-prove a line. Absent install: the channel fails soft
       // and the health rings park it.
-      SherpaLocalEngine(
-        model: 'sensevoice',
-        binaryOf: () async {
-          final file = File(
-            '${Platform.environment['HOME'] ?? ''}'
-            '/.local/opt/sherpa-onnx/bin/sherpa-onnx-offline',
-          );
-          return await file.exists() ? file : null;
-        },
-        modelDirOf: () async {
-          final dir = Directory(
-            '${Platform.environment['HOME'] ?? ''}'
-            '/.local/opt/sherpa-onnx/models/sense-voice',
-          );
-          return await dir.exists() ? dir : null;
-        },
-      ),
-      if (local.isNotEmpty)
+      if (localEngines)
+        SherpaLocalEngine(
+          model: 'sensevoice',
+          binaryOf: () async {
+            final file = File(
+              '${Platform.environment['HOME'] ?? ''}'
+              '/.local/opt/sherpa-onnx/bin/sherpa-onnx-offline',
+            );
+            return await file.exists() ? file : null;
+          },
+          modelDirOf: () async {
+            final dir = Directory(
+              '${Platform.environment['HOME'] ?? ''}'
+              '/.local/opt/sherpa-onnx/models/sense-voice',
+            );
+            return await dir.exists() ? dir : null;
+          },
+        ),
+      if (localEngines && local.isNotEmpty)
         WhisperLocalEngine(
           model: local,
           binaryOf: () async => (await assets).findBinary(),
