@@ -84,7 +84,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       songs: List.unmodifiable(songs),
       filter: filter,
       sort: sort,
-      sourceFilter: filter.sources.length == 1 ? filter.sources.first : null,
       total: total,
       hasMore: songs.length < matching,
       albums: albums,
@@ -107,7 +106,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final query = _current.query.trim();
     final next = await _storage.query(
       query: query,
-      filter: _effectiveFilter(),
+      filter: _current.filter,
       sort: _current.sort,
       offset: _current.songs.length,
       limit: windowSize,
@@ -185,7 +184,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(
       _current.copyWith(
         query: '',
-        sourceFilter: null,
         scanStatus: LibraryScanStatus.scanning,
         scanProgress: 0,
         statusMessage: AppStrings.instance.scanPreparing,
@@ -440,9 +438,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(
       _current.copyWith(
         sourceSummaries: Map.unmodifiable(summaries),
-        sourceFilter: _current.sourceFilter == sourceId
-            ? null
-            : _current.sourceFilter,
         filter: _current.filter.copyWith(
           sources: {
             for (final source in _current.filter.sources)
@@ -464,7 +459,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         : normalized;
     state = AsyncData(
       _current.copyWith(
-        sourceFilter: source,
         filter: _current.filter.copyWith(
           sources: source == null ? const {} : {source},
         ),
@@ -477,14 +471,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// Narrows the page to [filter]; the search word stays as it is.
   Future<void> setFilter(LibraryFilter filter) async {
     if (_disposed || !state.hasValue || _current.filter == filter) return;
-    state = AsyncData(
-      _current.copyWith(
-        filter: filter,
-        sourceFilter: filter.sources.length == 1
-            ? filter.sources.first
-            : null,
-      ),
-    );
+    state = AsyncData(_current.copyWith(filter: filter));
     _saveView();
     await _reloadForFilter();
   }
@@ -513,16 +500,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     );
   }
 
-  /// The filter the queries use: the state's filter plus the legacy source
-  /// field a hand-made state or an older toolbar may still set.
-  LibraryFilter _effectiveFilter() {
-    final source = _current.sourceFilter;
-    if (source == null || _current.filter.sources.isNotEmpty) {
-      return _current.filter;
-    }
-    return _current.filter.copyWith(sources: {source});
-  }
-
   /// Reads the window that matches the query and source filter.
   ///
   /// A read that a newer filter change supersedes drops its own answer, so
@@ -536,7 +513,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     if (_disposed || !state.hasValue) return;
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
-    final filter = _effectiveFilter();
+    final filter = _current.filter;
     final matching = await _storage.countQuery(query: query, filter: filter);
     final songs = await _storage.query(
       query: query,
@@ -624,7 +601,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// so its size never decides the cost of the frame.
   Future<List<Song>> _window() => _storage.query(
     query: _current.query.trim(),
-    filter: _effectiveFilter(),
+    filter: _current.filter,
     sort: _current.sort,
     offset: 0,
     limit: windowSize,

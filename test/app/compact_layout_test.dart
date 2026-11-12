@@ -6,6 +6,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
@@ -1509,7 +1510,11 @@ class FakeLibraryController extends LibraryController {
   @override
   Future<void> setSourceFilter(String? sourceId) async {
     state = AsyncData(
-      (state.valueOrNull ?? seed).copyWith(sourceFilter: sourceId),
+      (state.valueOrNull ?? seed).copyWith(
+        filter: LibraryFilter(
+          sources: sourceId == null ? const {} : {sourceId},
+        ),
+      ),
     );
   }
 }

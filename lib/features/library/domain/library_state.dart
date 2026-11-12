@@ -10,12 +10,6 @@ class LibraryState {
   final List<Song> songs;
   final String query;
 
-  /// `null` shows every source; otherwise only songs from this source id.
-  ///
-  /// The source is also part of [filter]; the field stays for the toolbar
-  /// that still reads it, and the controller folds both into one filter.
-  final String? sourceFilter;
-
   /// What the page narrows beyond the search word (docs/library-browse.md).
   final LibraryFilter filter;
 
@@ -47,7 +41,6 @@ class LibraryState {
   const LibraryState({
     this.songs = const [],
     this.query = '',
-    this.sourceFilter,
     this.filter = LibraryFilter.empty,
     this.sort = LibrarySort.recent,
     this.scanStatus = LibraryScanStatus.idle,
@@ -66,8 +59,15 @@ class LibraryState {
   bool get hasSongs => songs.isNotEmpty;
   bool get isScanning => scanStatus == LibraryScanStatus.scanning;
 
+  /// The one source the toolbar narrows by; `null` shows every source.
+  ///
+  /// Derived from [filter]: the filter is the only authority, so the page
+  /// cannot hold two answers that disagree.
+  String? get sourceFilter =>
+      filter.sources.length == 1 ? filter.sources.first : null;
+
   /// Whether the page is narrowed by something other than the search word.
-  bool get hasFilter => !filter.isEmpty || sourceFilter != null;
+  bool get hasFilter => !filter.isEmpty;
 
   /// The tracks the page shows.
   ///
@@ -84,7 +84,6 @@ class LibraryState {
   LibraryState copyWith({
     List<Song>? songs,
     String? query,
-    Object? sourceFilter = _unset,
     LibraryFilter? filter,
     LibrarySort? sort,
     LibraryScanStatus? scanStatus,
@@ -100,9 +99,6 @@ class LibraryState {
     return LibraryState(
       songs: songs ?? this.songs,
       query: query ?? this.query,
-      sourceFilter: identical(sourceFilter, _unset)
-          ? this.sourceFilter
-          : sourceFilter as String?,
       filter: filter ?? this.filter,
       sort: sort ?? this.sort,
       scanStatus: scanStatus ?? this.scanStatus,
