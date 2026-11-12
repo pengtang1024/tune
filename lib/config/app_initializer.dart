@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
-import 'package:tune/data/services/providers/playback_session_store_provider.dart';
+import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
 import 'package:tune/features/discovery/application/discovery_signal_observer.dart';

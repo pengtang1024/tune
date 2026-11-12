@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/data/services/update/update_release.dart';
-import 'package:tune/data/services/providers/playback_session_store_provider.dart';
+import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/update/update_service.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/utils/logger.dart';

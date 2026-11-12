@@ -7,7 +7,7 @@ import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/downloads/song_download_service.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
-import 'package:tune/data/services/providers/playback_session_store_provider.dart';
+import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
