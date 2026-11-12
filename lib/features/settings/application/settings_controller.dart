@@ -52,11 +52,11 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('favorites_double_click_plays') ?? true,
           autoResumeOnStartup:
               _persistence.getBool('auto_resume_on_startup') ??
-                  // The switch used to decide whether the queue was read at
-                  // all; its old value carries over so a reader who turned it
-                  // off still gets no surprise playback.
-                  _persistence.getBool('restore_playback_on_startup') ??
-                  true,
+              // The switch used to decide whether the queue was read at
+              // all; its old value carries over so a reader who turned it
+              // off still gets no surprise playback.
+              _persistence.getBool('restore_playback_on_startup') ??
+              true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
           smartLyrics: _readSmartLyrics(_persistence),
@@ -196,23 +196,16 @@ class SettingsController extends StateNotifier<SettingsState> {
   /// Sets how missing metadata is translated into the interface language.
   Future<void> setLocalization(LocalizationConfig config) async {
     state = state.copyWith(localization: config);
-    await _persistence.setString(
-      'localization',
-      jsonEncode(config.toJson()),
-    );
+    await _persistence.setString('localization', jsonEncode(config.toJson()));
   }
 
-  static LocalizationConfig _readLocalization(
-    PersistenceService persistence,
-  ) {
+  static LocalizationConfig _readLocalization(PersistenceService persistence) {
     final raw = persistence.getString('localization');
     if (raw == null || raw.trim().isEmpty) return const LocalizationConfig();
     try {
       final decoded = jsonDecode(raw);
       if (decoded is Map) {
-        return LocalizationConfig.fromJson(
-          Map<String, dynamic>.from(decoded),
-        );
+        return LocalizationConfig.fromJson(Map<String, dynamic>.from(decoded));
       }
     } catch (error, stackTrace) {
       Log.error('读取本地化配置失败: $error\n$stackTrace');

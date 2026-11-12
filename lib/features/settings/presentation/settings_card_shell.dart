@@ -21,7 +21,9 @@ class SettingsSheetScope extends InheritedWidget {
   });
 
   static bool of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SettingsSheetScope>()?.inSheet ??
+      context
+          .dependOnInheritedWidgetOfExactType<SettingsSheetScope>()
+          ?.inSheet ??
       false;
 
   @override
@@ -166,9 +168,7 @@ class SettingsPanel extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: CompactTokens.space8),
-              Expanded(
-                child: Text(title, style: theme.textTheme.titleSmall),
-              ),
+              Expanded(child: Text(title, style: theme.textTheme.titleSmall)),
               ?trailing,
             ],
           ),
