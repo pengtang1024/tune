@@ -91,13 +91,17 @@ dependencies:
   window_manager: ^0.5.0
 
   file_picker: ^10.3.1
-  # Windows audio backend.
-  just_audio_windows: ^0.2.2
-  # Linux audio backend for just_audio (media_kit + system libmpv).
+  # Linux and Windows audio backend for just_audio (media_kit + libmpv).
+  # The Windows backend carries the request headers that the sources with a
+  # token need; just_audio_windows drops them.
   just_audio_media_kit: ^2.1.0
   media_kit_libs_linux: ^1.2.1
+  media_kit_libs_windows_audio: ^1.0.9
   sqlite3: ^3.8.0
   sqlite3_flutter_libs: ^0.6.0+eol
+  audio_service: ^0.18.19
+  # Runtime permissions on Android: notification and media read.
+  permission_handler: ^12.0.3
 
 # 上游 Buffer.read 无界分配（损坏标签可声明 GB 级帧），本地补丁见
 # vendor/audio_metadata_reader/VENDORED.md。
