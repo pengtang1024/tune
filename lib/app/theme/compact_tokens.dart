@@ -106,6 +106,9 @@ abstract final class CompactTokens {
   /// Height of one entry of the navigation rail.
   static const double navItemHeight = 40;
 
+  /// Height of the navigation bar under the content on a touch screen.
+  static const double bottomBarHeight = 58;
+
   /// Height of the player dock and the space it keeps from the window edge.
   static const double dockHeight = 88;
   static const double dockMargin = 16;

@@ -3407,6 +3407,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsSmartFailedEmpty => '没有识别出人声';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用';
+
+  @override
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
@@ -3950,6 +3953,49 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settingsSearchKeywordsLocalization =>
       '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '权限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在应用外显示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒体文件';
+
+  @override
+  String get settingsPermissionMediaHint => '扫描时读取手机上的音频库。';
+
+  @override
+  String get settingsPermissionGranted => '已允许';
+
+  @override
+  String get settingsPermissionAllow => '允许';
+
+  @override
+  String get settingsPermissionOpenSettings => '去设置';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒绝。请到系统设置里允许。';
+
+  @override
+  String get settingsPermissionNeeded => '扫描前需要允许媒体读取权限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要权限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒体读取权限已被拒绝。请到系统设置里允许后再扫描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -7355,6 +7401,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsSmartFailedEmpty => '没有识别出人声';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用';
+
+  @override
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
@@ -7898,6 +7947,49 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   @override
   String get settingsSearchKeywordsLocalization =>
       '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '权限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在应用外显示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒体文件';
+
+  @override
+  String get settingsPermissionMediaHint => '扫描时读取手机上的音频库。';
+
+  @override
+  String get settingsPermissionGranted => '已允许';
+
+  @override
+  String get settingsPermissionAllow => '允许';
+
+  @override
+  String get settingsPermissionOpenSettings => '去设置';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒绝。请到系统设置里允许。';
+
+  @override
+  String get settingsPermissionNeeded => '扫描前需要允许媒体读取权限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要权限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒体读取权限已被拒绝。请到系统设置里允许后再扫描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11303,6 +11395,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get lyricsSmartFailedEmpty => '沒有識別出人聲';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把詞稿寫到音訊旁：支援寫入之前，智慧歌詞停用';
+
+  @override
   String get lyricsSmartNote => '機器稿：票池生成，重新查找可以找更好的詞';
 
   @override
@@ -11846,4 +11941,47 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get settingsSearchKeywordsLocalization =>
       '翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '權限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 會在執行時詢問這些權限；拒絕後應用仍可用，但對應功能會關閉。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在應用外顯示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒體檔案';
+
+  @override
+  String get settingsPermissionMediaHint => '掃描時讀取手機上的音訊庫。';
+
+  @override
+  String get settingsPermissionGranted => '已允許';
+
+  @override
+  String get settingsPermissionAllow => '允許';
+
+  @override
+  String get settingsPermissionOpenSettings => '去設定';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒絕。請到系統設定裡允許。';
+
+  @override
+  String get settingsPermissionNeeded => '掃描前需要允許媒體讀取權限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要權限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒體讀取權限已被拒絕。請到系統設定裡允許後再掃描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '權限 通知 媒體 儲存 android 允許';
 }

@@ -3670,6 +3670,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsSmartFailedEmpty => 'No voice was heard';
 
   @override
+  String get lyricsSmartFailedUnsupported =>
+      'This platform cannot write a sheet beside the audio: smart lyrics stays off until it can';
+
+  @override
   String get lyricsSmartNote =>
       'Machine sheet, from the vote pool — search again for better words';
 
@@ -4239,4 +4243,53 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsSearchKeywordsLocalization =>
       'translate translation localization language offline model api balance tokens';
+
+  @override
+  String get settingsPermissionsTitle => 'Permissions';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android asks for these while the app runs. Refusing keeps the app usable, but the matching feature stays off.';
+
+  @override
+  String get settingsPermissionNotifications => 'Notifications';
+
+  @override
+  String get settingsPermissionNotificationsHint =>
+      'Shows the playback controls outside the app.';
+
+  @override
+  String get settingsPermissionMedia => 'Media files';
+
+  @override
+  String get settingsPermissionMediaHint =>
+      'Reads the audio library of the phone when you scan.';
+
+  @override
+  String get settingsPermissionGranted => 'Allowed';
+
+  @override
+  String get settingsPermissionAllow => 'Allow';
+
+  @override
+  String get settingsPermissionOpenSettings => 'Open settings';
+
+  @override
+  String get settingsPermissionDeniedHint =>
+      'Refused. Allow it in the system settings.';
+
+  @override
+  String get settingsPermissionNeeded =>
+      'Allow the media permission before scanning.';
+
+  @override
+  String get settingsPermissionDialogTitle => 'Permission needed';
+
+  @override
+  String get settingsPermissionDialogBody =>
+      'The media permission was refused. Allow it in the system settings and scan again.';
+
+  @override
+  String get settingsSearchKeywordsPermissions =>
+      'permission permissions notification media storage android allow';
 }

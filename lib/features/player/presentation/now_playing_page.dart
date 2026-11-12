@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/app/layout/layout_metrics.dart';
+import 'package:tune/app/layout/window_form_controller.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
+import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
@@ -69,9 +73,23 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     setState(() => _showQueue = false);
   }
 
+  /// Takes the window to the whole screen, or gives it back its frame.
+  ///
+  /// The form lives above the page because the window is not a property of
+  /// this route; the page only asks for it.
+  void _toggleImmersive() {
+    final controller = ref.read(windowFormProvider.notifier);
+    final immersive = ref.read(windowFormProvider) == WindowForm.immersive;
+    controller.setForm(immersive ? WindowForm.normal : WindowForm.immersive);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // The immersive form belongs to this page: when the page leaves, the
+    // window returns to the shell instead of staying full screen.
+    final immersive = ref.watch(windowFormProvider) == WindowForm.immersive;
+    final formController = ref.read(windowFormProvider.notifier);
     // The page watches the slow half of the playback. The position moves
     // several times a second, and the cover, the facts and the buttons
     // around the seek bar must not be rebuilt by the clock.
@@ -115,13 +133,25 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
           // before it leaves the full view.
           canPop: !_showQueue,
           onPopInvokedWithResult: (didPop, result) {
-            if (!didPop) _closeQueue();
+            if (!didPop) {
+              _closeQueue();
+              return;
+            }
+            // Leaving the page gives the window its frame and its size back.
+            // The controller outlives this State, so it is safe to use here.
+            if (immersive) formController.setForm(WindowForm.normal);
           },
           child: Scaffold(
             backgroundColor: theme.colorScheme.surface,
             body: SidePanelHost(
               open: _showQueue && widget.queuePanelBuilder != null,
               onClose: _closeQueue,
+              // A phone has no room for a side sheet, so the queue rises from
+              // the bottom edge under the thumb that opened it.
+              bottomSheet: LayoutMetrics.of(
+                MediaQuery.sizeOf(context),
+                mobile: PlatformConstants.isMobile,
+              ).usesBottomNavigation,
               barrierLabel: context.loc.close,
               panelBuilder: (context) =>
                   widget.queuePanelBuilder!(context, _closeQueue),
@@ -158,6 +188,8 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                           onToggleQueue: widget.queuePanelBuilder == null
                               ? null
                               : _toggleQueue,
+                          immersive: immersive,
+                          onToggleImmersive: _toggleImmersive,
                           isFavorite: isFavorite,
                           onToggleFavorite: currentUri == null
                               ? null
@@ -188,9 +220,9 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                                     Duration(
                                       milliseconds:
                                           (controller
-                                                  .snapshot
-                                                  .duration
-                                                  .inMilliseconds *
+                                                      .snapshot
+                                                      .duration
+                                                      .inMilliseconds *
                                                   value)
                                               .round(),
                                     ),
@@ -219,6 +251,8 @@ class _TopBar extends StatelessWidget {
     required this.showLyrics,
     required this.onToggleLyrics,
     required this.onToggleQueue,
+    required this.immersive,
+    required this.onToggleImmersive,
     required this.isFavorite,
     required this.onToggleFavorite,
   });
@@ -227,6 +261,8 @@ class _TopBar extends StatelessWidget {
   final bool showLyrics;
   final VoidCallback onToggleLyrics;
   final VoidCallback? onToggleQueue;
+  final bool immersive;
+  final VoidCallback onToggleImmersive;
   final bool isFavorite;
   final VoidCallback? onToggleFavorite;
 
@@ -266,6 +302,16 @@ class _TopBar extends StatelessWidget {
         ),
         const Spacer(),
         _RoundButton(
+          icon: immersive
+              ? Icons.fullscreen_exit_rounded
+              : Icons.fullscreen_rounded,
+          tooltip: immersive
+              ? context.loc.playerCollapse
+              : context.loc.playerExpandNowPlaying,
+          onPressed: onToggleImmersive,
+        ),
+        const SizedBox(width: 8),
+        _RoundButton(
           icon: isFavorite
               ? Icons.favorite_rounded
               : Icons.favorite_border_rounded,
@@ -290,7 +336,6 @@ class _TopBar extends StatelessWidget {
       ],
     );
   }
-
 }
 
 /// Artwork and track information side by side.
@@ -319,6 +364,12 @@ class _TrackLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // A phone stacks the cover over the words instead of putting them
+        // side by side: the row of a desktop leaves two columns too narrow
+        // to read, and the thumb reaches the buttons at the bottom edge.
+        if (constraints.maxWidth < LayoutBreakpoints.phoneMaxWidth) {
+          return _portrait(constraints);
+        }
         // The cover and the text are one block that sits in the middle of the
         // page. The empty room falls on both sides of it instead of piling
         // up on the right, and the text keeps the width it needs to read.
@@ -372,6 +423,41 @@ class _TrackLayout extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  /// The stacked layout of a phone.
+  ///
+  /// The cover takes a third of the height at most, the words get the room
+  /// that is left, and the seek bar and the buttons stay at the bottom edge
+  /// where the thumb already is.
+  Widget _portrait(BoxConstraints constraints) {
+    final artworkSize = math
+        .min(constraints.maxWidth * 0.56, constraints.maxHeight * 0.34)
+        .clamp(96.0, 220.0);
+    return Column(
+      children: [
+        _Artwork(song: song, size: artworkSize),
+        const SizedBox(height: CompactTokens.space16),
+        Expanded(
+          child: showLyrics
+              ? const LyricsPanel()
+              : NowPlayingTrackInfo(
+                  song: song,
+                  source: source,
+                  status: overview.audioSourceStatus,
+                ),
+        ),
+        const SizedBox(height: CompactTokens.space12),
+        _ProgressRow(onSeek: onSeek),
+        const SizedBox(height: CompactTokens.space8),
+        _Transport(
+          status: overview.status,
+          onPrevious: onPrevious,
+          onNext: onNext,
+          onTogglePlay: onTogglePlay,
+        ),
+      ],
     );
   }
 }

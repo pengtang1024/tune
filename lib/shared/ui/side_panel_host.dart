@@ -30,6 +30,12 @@ class SidePanelHost extends StatefulWidget {
   /// Builds the panel while it is visible.
   final WidgetBuilder panelBuilder;
 
+  /// Whether the panel rises from the bottom edge instead of the right one.
+  ///
+  /// A phone has no room for a side sheet: the queue slides up over the lower
+  /// part of the page, under the thumb that opened it.
+  final bool bottomSheet;
+
   const SidePanelHost({
     super.key,
     required this.open,
@@ -37,6 +43,7 @@ class SidePanelHost extends StatefulWidget {
     required this.barrierLabel,
     required this.child,
     required this.panelBuilder,
+    this.bottomSheet = false,
   });
 
   @override
@@ -47,7 +54,6 @@ class _SidePanelHostState extends State<SidePanelHost>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final CurvedAnimation _entrance;
-  late final Animation<Offset> _slide;
 
   /// Whether the panel is in the tree, including the closing animation.
   bool _visible = false;
@@ -67,10 +73,6 @@ class _SidePanelHostState extends State<SidePanelHost>
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
-    _slide = Tween<Offset>(
-      begin: const Offset(0.08, 0),
-      end: Offset.zero,
-    ).animate(_entrance);
 
     _visible = widget.open;
     if (widget.open) _controller.value = 1;
@@ -123,6 +125,13 @@ class _SidePanelHostState extends State<SidePanelHost>
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = _width(constraints.maxWidth);
+        final height = _height(constraints.maxHeight);
+        final slide = Tween<Offset>(
+          begin: widget.bottomSheet
+              ? const Offset(0, 0.08)
+              : const Offset(0.08, 0),
+          end: Offset.zero,
+        ).animate(_entrance);
 
         return Stack(
           fit: StackFit.expand,
@@ -145,37 +154,55 @@ class _SidePanelHostState extends State<SidePanelHost>
                   ),
                 ),
               ),
-              Positioned(
-                top: CompactTokens.sidePanelGutter,
-                right: CompactTokens.sidePanelGutter,
-                bottom: CompactTokens.sidePanelGutter,
-                width: width,
-                child: IgnorePointer(
-                  ignoring: !widget.open,
-                  child: ExcludeFocus(
-                    excluding: !widget.open,
-                    child: FadeTransition(
-                      opacity: _entrance,
-                      child: SlideTransition(
-                        position: _slide,
-                        child: ShortcutCaptureScope(
-                          // The panel owns the keyboard while it floats over
-                          // the page: the shortcuts of the app stay out of it.
-                          child: Focus(
-                            autofocus: true,
-                            child: widget.panelBuilder(context),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+              if (widget.bottomSheet)
+                Positioned(
+                  left: CompactTokens.sidePanelGutter,
+                  right: CompactTokens.sidePanelGutter,
+                  bottom: CompactTokens.sidePanelGutter,
+                  height: height,
+                  child: _panel(context, slide),
+                )
+              else
+                Positioned(
+                  top: CompactTokens.sidePanelGutter,
+                  right: CompactTokens.sidePanelGutter,
+                  bottom: CompactTokens.sidePanelGutter,
+                  width: width,
+                  child: _panel(context, slide),
                 ),
-              ),
             ],
           ],
         );
       },
     );
+  }
+
+  Widget _panel(BuildContext context, Animation<Offset> slide) {
+    return IgnorePointer(
+      ignoring: !widget.open,
+      child: ExcludeFocus(
+        excluding: !widget.open,
+        child: FadeTransition(
+          opacity: _entrance,
+          child: SlideTransition(
+            position: slide,
+            child: ShortcutCaptureScope(
+              // The panel owns the keyboard while it floats over the page: the
+              // shortcuts of the app stay out of it.
+              child: Focus(
+                autofocus: true,
+                child: widget.panelBuilder(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  double _height(double available) {
+    final room = math.max(0.0, available - CompactTokens.sidePanelGutter * 2);
+    return math.min(room, math.max(280.0, available * 0.72));
   }
 
   double _width(double available) {

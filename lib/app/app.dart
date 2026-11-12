@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/app_shortcuts.dart';
+import 'package:tune/app/layout/window_form_controller.dart';
 import 'package:tune/app/router/app_router.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/config/app_initializer.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/localization_bridge.dart';
+import 'package:tune/core/services/window_manager_service.dart';
+import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/application/playback_notes_provider.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -52,6 +55,13 @@ class TuneApp extends ConsumerWidget {
         ref.watch(playbackNotesProvider);
         final settings = ref.watch(settingsControllerProvider);
         final router = ref.watch(appRouterProvider);
+
+        // The form is state of the app and the window is moved by its
+        // service. The listener sits above the router so a page only has to
+        // set the form; the size, the frame and the task bar follow here.
+        ref.listen<WindowForm>(windowFormProvider, (previous, next) {
+          WindowManagerService().applyForm(next);
+        });
 
         return MaterialApp.router(
           title: 'Tune',

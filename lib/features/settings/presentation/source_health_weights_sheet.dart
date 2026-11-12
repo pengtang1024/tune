@@ -128,70 +128,86 @@ class _SourceHealthWeightsSheetState extends State<SourceHealthWeightsSheet> {
                 CompactTokens.space8,
               ),
               children: [
-                _group(
-                  context,
-                  context.loc.sourcesHealthGroupCore,
-                  [
-                    _row(context, context.loc.sourcesHealthAvailability,
-                        _weights.availability,
-                        (v) => _weights = _weights.copyWith(availability: v)),
-                    _row(context, context.loc.sourcesHealthConfiguration,
-                        _weights.configuration,
-                        (v) => _weights = _weights.copyWith(configuration: v)),
-                    _row(context, context.loc.sourcesHealthScan,
-                        _weights.scan,
-                        (v) => _weights = _weights.copyWith(scan: v)),
-                  ],
-                  total,
-                ),
-                _group(
-                  context,
-                  context.loc.sourcesHealthGroupOutput,
-                  [
-                    _row(context, context.loc.sourcesHealthFreshness,
-                        _weights.freshness,
-                        (v) => _weights = _weights.copyWith(freshness: v)),
-                    _row(context, context.loc.sourcesHealthOutput,
-                        _weights.output,
-                        (v) => _weights = _weights.copyWith(output: v)),
-                    _row(context, context.loc.sourcesHealthSpeed,
-                        _weights.speed,
-                        (v) => _weights = _weights.copyWith(speed: v)),
-                  ],
-                  total,
-                ),
-                _group(
-                  context,
-                  context.loc.sourcesHealthGroupReliable,
-                  [
-                    _row(context, context.loc.sourcesHealthReliability,
-                        _weights.reliability,
-                        (v) => _weights = _weights.copyWith(reliability: v)),
-                    _row(context, context.loc.sourcesHealthStability,
-                        _weights.stability,
-                        (v) => _weights = _weights.copyWith(stability: v)),
-                    _row(context, context.loc.sourcesHealthPlayable,
-                        _weights.playable,
-                        (v) => _weights = _weights.copyWith(playable: v)),
-                  ],
-                  total,
-                ),
-                _group(
-                  context,
-                  context.loc.sourcesHealthGroupShow,
-                  [
-                    _row(context, context.loc.sourcesHealthArtwork,
-                        _weights.artwork,
-                        (v) => _weights = _weights.copyWith(artwork: v)),
-                    _row(context, context.loc.sourcesHealthMetadata,
-                        _weights.metadata,
-                        (v) => _weights = _weights.copyWith(metadata: v)),
-                    _row(context, context.loc.sourcesHealthActivity,
-                        _weights.activity,
-                        (v) => _weights = _weights.copyWith(activity: v)),
-                  ],
-                  total,
-                ),
+                _group(context, context.loc.sourcesHealthGroupCore, [
+                  _row(
+                    context,
+                    context.loc.sourcesHealthAvailability,
+                    _weights.availability,
+                    (v) => _weights = _weights.copyWith(availability: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthConfiguration,
+                    _weights.configuration,
+                    (v) => _weights = _weights.copyWith(configuration: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthScan,
+                    _weights.scan,
+                    (v) => _weights = _weights.copyWith(scan: v),
+                  ),
+                ], total),
+                _group(context, context.loc.sourcesHealthGroupOutput, [
+                  _row(
+                    context,
+                    context.loc.sourcesHealthFreshness,
+                    _weights.freshness,
+                    (v) => _weights = _weights.copyWith(freshness: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthOutput,
+                    _weights.output,
+                    (v) => _weights = _weights.copyWith(output: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthSpeed,
+                    _weights.speed,
+                    (v) => _weights = _weights.copyWith(speed: v),
+                  ),
+                ], total),
+                _group(context, context.loc.sourcesHealthGroupReliable, [
+                  _row(
+                    context,
+                    context.loc.sourcesHealthReliability,
+                    _weights.reliability,
+                    (v) => _weights = _weights.copyWith(reliability: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthStability,
+                    _weights.stability,
+                    (v) => _weights = _weights.copyWith(stability: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthPlayable,
+                    _weights.playable,
+                    (v) => _weights = _weights.copyWith(playable: v),
+                  ),
+                ], total),
+                _group(context, context.loc.sourcesHealthGroupShow, [
+                  _row(
+                    context,
+                    context.loc.sourcesHealthArtwork,
+                    _weights.artwork,
+                    (v) => _weights = _weights.copyWith(artwork: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthMetadata,
+                    _weights.metadata,
+                    (v) => _weights = _weights.copyWith(metadata: v),
+                  ),
+                  _row(
+                    context,
+                    context.loc.sourcesHealthActivity,
+                    _weights.activity,
+                    (v) => _weights = _weights.copyWith(activity: v),
+                  ),
+                ], total),
               ],
             ),
           ),
@@ -336,10 +352,7 @@ class _SourceHealthWeightsSheetState extends State<SourceHealthWeightsSheet> {
     );
   }
 
-  static String _presetLabel(
-    BuildContext context,
-    SourceHealthWeights preset,
-  ) {
+  static String _presetLabel(BuildContext context, SourceHealthWeights preset) {
     if (preset == SourceHealthWeights.balanced) {
       return context.loc.sourcesHealthPresetBalanced;
     }

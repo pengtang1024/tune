@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
 import 'package:tune/features/settings/presentation/settings_switch_row.dart';
@@ -10,6 +11,13 @@ import 'package:tune/features/settings/presentation/settings_switch_row.dart';
 /// the window is gone, and the action that makes Tune the program the
 /// desktop opens audio files with.
 class SettingsDesktopCard extends StatelessWidget {
+  /// What this build actually wires up.
+  ///
+  /// The rows are drawn from the capability table, not from the platform
+  /// name: a Windows build keeps the window and the single instance, but the
+  /// tray, the media controls and the default player are not there yet, so
+  /// the switches would do nothing.
+  final AppCapabilities capabilities;
   final bool closeToTray;
   final bool mediaControlsEnabled;
   final bool isDefaultPlayer;
@@ -25,6 +33,7 @@ class SettingsDesktopCard extends StatelessWidget {
 
   const SettingsDesktopCard({
     super.key,
+    required this.capabilities,
     required this.closeToTray,
     required this.mediaControlsEnabled,
     required this.isDefaultPlayer,
@@ -46,59 +55,65 @@ class SettingsDesktopCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsSwitchRow(
-            title: context.loc.settingsCloseToTray,
-            description: context.loc.settingsCloseToTrayHint,
-            value: closeToTray,
-            onChanged: onCloseToTrayChanged,
-          ),
-          const SizedBox(height: 8),
-          SettingsSwitchRow(
-            title: context.loc.settingsMediaControls,
-            description: context.loc.settingsMediaControlsHint,
-            value: mediaControlsEnabled,
-            onChanged: onMediaControlsChanged,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              OutlinedButton.icon(
-                onPressed: onSetDefaultPlayer,
-                icon: const Icon(
-                  Icons.album_outlined,
-                  size: CompactTokens.icon16,
-                ),
-                label: Text(context.loc.settingsSetDefaultPlayer),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, CompactTokens.controlDefault),
-                  padding: const EdgeInsets.symmetric(horizontal: 13),
-                ),
-              ),
-              if (isDefaultPlayer) ...[
-                const SizedBox(width: 10),
-                Icon(
-                  Icons.check_circle_outline,
-                  size: CompactTokens.icon14,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  context.loc.settingsDefaultPlayerActive,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+          if (capabilities.tray)
+            SettingsSwitchRow(
+              title: context.loc.settingsCloseToTray,
+              description: context.loc.settingsCloseToTrayHint,
+              value: closeToTray,
+              onChanged: onCloseToTrayChanged,
+            ),
+          if (capabilities.tray && capabilities.systemMediaControls)
+            const SizedBox(height: 8),
+          if (capabilities.systemMediaControls)
+            SettingsSwitchRow(
+              title: context.loc.settingsMediaControls,
+              description: context.loc.settingsMediaControlsHint,
+              value: mediaControlsEnabled,
+              onChanged: onMediaControlsChanged,
+            ),
+          if (capabilities.defaultPlayer) ...[
+            if (capabilities.tray || capabilities.systemMediaControls)
+              const SizedBox(height: 16),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: onSetDefaultPlayer,
+                  icon: const Icon(
+                    Icons.album_outlined,
+                    size: CompactTokens.icon16,
+                  ),
+                  label: Text(context.loc.settingsSetDefaultPlayer),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, CompactTokens.controlDefault),
+                    padding: const EdgeInsets.symmetric(horizontal: 13),
                   ),
                 ),
+                if (isDefaultPlayer) ...[
+                  const SizedBox(width: 10),
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: CompactTokens.icon14,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    context.loc.settingsDefaultPlayerActive,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ],
-            ],
-          ),
-          if (!desktopEntryInstalled) ...[
-            const SizedBox(height: 6),
-            Text(
-              context.loc.settingsDefaultPlayerMissingEntry,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
             ),
+            if (!desktopEntryInstalled) ...[
+              const SizedBox(height: 6),
+              Text(
+                context.loc.settingsDefaultPlayerMissingEntry,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ],
         ],
       ),

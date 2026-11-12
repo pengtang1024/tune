@@ -5,14 +5,19 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/localization/application/localization_providers.dart';
+import 'package:tune/features/localization/domain/text_language.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/application/playback_overview_provider.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/bilingual_text.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
@@ -30,7 +35,18 @@ class PlayerDock extends ConsumerWidget {
   /// Whether the queue panel that the button toggles is open.
   final bool queueOpen;
 
-  const PlayerDock({super.key, this.onToggleQueue, this.queueOpen = false});
+  /// Shrinks the window to the mini bar.
+  ///
+  /// A null callback hides the action, which keeps a dock drawn on its own in
+  /// a test from asking for a window it does not have.
+  final VoidCallback? onMini;
+
+  const PlayerDock({
+    super.key,
+    this.onToggleQueue,
+    this.queueOpen = false,
+    this.onMini,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,6 +95,10 @@ class PlayerDock extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final narrow = constraints.maxWidth < 720;
+          // The window actions sit at the end of the bar and the volume
+          // slider keeps its room before them: the shape of the window is
+          // the one action that can wait for a wider bar.
+          final roomForWindowActions = constraints.maxWidth >= 860;
           return Row(
             children: [
               // The two sides share the room evenly, so the transport in the
@@ -104,16 +124,7 @@ class PlayerDock extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              song?.title.isNotEmpty == true
-                                  ? song!.title
-                                  : context.loc.playerNoSongTitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            _DockTitle(song: song),
                             const SizedBox(height: 3),
                             Row(
                               children: [
@@ -266,6 +277,13 @@ class PlayerDock extends ConsumerWidget {
                           ? null
                           : () => context.push('/now-playing'),
                     ),
+                    if (onMini != null && roomForWindowActions)
+                      _DockIcon(
+                        icon: Icons.picture_in_picture_alt_rounded,
+                        tooltip: context.loc.playerCollapse,
+                        size: CompactTokens.icon18,
+                        onPressed: onMini,
+                      ),
                   ],
                 ),
               ),
@@ -474,6 +492,51 @@ class _ModeButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The dock title: the translation first, the original in small type.
+class _DockTitle extends ConsumerWidget {
+  const _DockTitle({required this.song});
+
+  final Song? song;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final original = song?.title.isNotEmpty == true
+        ? song!.title
+        : context.loc.playerNoSongTitle;
+    final target = targetLanguageOf(Localizations.localeOf(context));
+    final config = ref.watch(
+      settingsControllerProvider.select((settings) => settings.localization),
+    );
+    final translation = ref
+        .watch(
+          translatedTextProvider((
+            text: original,
+            targetLanguage: target,
+          )),
+        )
+        .value;
+    final style = theme.textTheme.bodyMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+    if (translation == null || translation == original) {
+      return Text(
+        original,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: style,
+      );
+    }
+    return BilingualText(
+      primary: translation,
+      secondary: config.showOriginal ? original : null,
+      maxLines: 1,
+      primaryStyle: style,
+      dense: true,
     );
   }
 }

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
-import 'package:tune/app/theme/compact_type_scale.dart';
-import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/library/domain/library_filter.dart';
 import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/features/library/presentation/library_search_field.dart';
+import 'package:tune/features/library/presentation/library_sort_button.dart';
+import 'package:tune/features/library/presentation/library_source_filter.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/features/library/presentation/library_view_switch.dart';
-import 'package:tune/shared/ui/tune_tooltip.dart';
-
-/// Value of the source filter that stands for "every source".
-const String allSourcesFilterValue = '__all_sources__';
 
 /// Search, source filter, result count, sort and view of the library.
 ///
@@ -42,6 +39,11 @@ class LibraryToolbar extends ConsumerWidget {
   final ValueChanged<LibraryViewMode> onViewChanged;
   final VoidCallback onFilter;
 
+  /// Below this width the search field and the controls cannot share a row:
+  /// the field ends up narrower than its own prefix icon and the row
+  /// overflows. A phone gets two rows instead.
+  static const double _twoRowBreakpoint = 560;
+
   const LibraryToolbar({
     super.key,
     required this.controller,
@@ -64,318 +66,114 @@ class LibraryToolbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
-    return SizedBox(
-      height: CompactTokens.controlDefault,
-      child: Row(
-        children: [
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: CompactTokens.searchFieldMaxWidth,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    onChanged: onQueryChanged,
-                    style: theme.textTheme.bodySmall,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      filled: true,
-                      fillColor: theme.colorScheme.surfaceContainer,
-                      hintText: context.loc.search,
-                      hintStyle: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search_rounded,
-                        size: CompactTokens.icon16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      prefixIconConstraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                      suffixIcon: query.isEmpty
-                          ? null
-                          : TuneTooltip(
-                              message: context.loc.libraryClearSearch,
-                              child: IconButton(
-                                onPressed: onClearQuery,
-                                icon: const Icon(
-                                  Icons.close_rounded,
-                                  size: CompactTokens.icon14,
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(
-                                  width: 28,
-                                  height: 28,
-                                ),
-                              ),
-                            ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: CompactTokens.space8,
-                        vertical: CompactTokens.space8,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: CompactTokens.borderRadius8,
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.outlineVariant,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: CompactTokens.borderRadius8,
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.outlineVariant,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: CompactTokens.borderRadius8,
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= _twoRowBreakpoint) {
+          return SizedBox(
+            height: CompactTokens.controlDefault,
+            child: Row(
+              children: [
+                Expanded(child: _searchField()),
+                ..._sourceAndCount(context),
+                const SizedBox(width: CompactTokens.space12),
+                ..._buttons(context, compact: false),
+              ],
             ),
-          ),
-          if (sources.length > 1) ...[
-            const SizedBox(width: CompactTokens.space8),
-            _SourceFilter(
-              sources: sources,
-              sourceLabels: sourceLabels,
-              sourceFilter: sourceFilter,
-              onSourceFilter: onSourceFilter,
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: CompactTokens.controlDefault,
+              child: _searchField(),
             ),
-          ],
-          const SizedBox(width: CompactTokens.space12),
-          if (query.trim().isNotEmpty || sourceFilter != null) ...[
-            Text(
-              context.loc.libraryTrackCount(filteredCount),
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(width: CompactTokens.space8),
-          ],
-          OutlinedButton.icon(
-            key: const ValueKey('library-filter'),
-            onPressed: onFilter,
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, CompactTokens.controlDefault),
-              padding: const EdgeInsets.symmetric(
-                horizontal: CompactTokens.space8,
-              ),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              visualDensity: VisualDensity.compact,
-              side: BorderSide(
-                color: filter.isEmpty
-                    ? theme.colorScheme.outlineVariant
-                    : theme.colorScheme.primary.withValues(alpha: 0.4),
-              ),
-              foregroundColor: filter.isEmpty
-                  ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.primary,
-            ),
-            icon: const Icon(
-              Icons.filter_alt_outlined,
-              size: CompactTokens.icon16,
-            ),
-            label: Text(
-              filter.activeGroups == 0
-                  ? context.loc.libraryFilter
-                  : '${context.loc.libraryFilter} ${filter.activeGroups}',
-            ),
-          ),
-          const SizedBox(width: CompactTokens.space8),
-          _SortButton(sort: sort, onSort: onSort),
-          const SizedBox(width: CompactTokens.space8),
-          LibraryViewSwitch(view: view, onChanged: onViewChanged),
-        ],
-      ),
-    );
-  }
-}
-
-/// The button that says how the list is ordered and opens the other orders.
-class _SortButton extends StatelessWidget {
-  final LibrarySort sort;
-  final ValueChanged<LibrarySort> onSort;
-
-  const _SortButton({required this.sort, required this.onSort});
-
-  static String labelOf(BuildContext context, LibrarySort sort) {
-    final strings = context.loc;
-    return switch (sort.field) {
-      LibrarySortField.title => strings.librarySortTitle,
-      LibrarySortField.addedAt => strings.librarySortRecent,
-      LibrarySortField.artist => strings.librarySortArtist,
-      LibrarySortField.album => strings.librarySortAlbum,
-      LibrarySortField.duration => strings.librarySortDuration,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return TuneTooltip(
-      message: context.loc.librarySortTooltip,
-      child: PopupMenuButton<LibrarySortField>(
-        key: const ValueKey('library-sort'),
-        padding: EdgeInsets.zero,
-        onSelected: (field) => onSort(sort.then(field)),
-        itemBuilder: (context) => [
-          for (final field in LibrarySortField.values)
-            PopupMenuItem<LibrarySortField>(
-              value: field,
-              height: 36,
+            const SizedBox(height: CompactTokens.space8),
+            SizedBox(
+              height: CompactTokens.controlDefault,
               child: Row(
                 children: [
-                  Icon(
-                    field == sort.field
-                        ? (sort.ascending
-                              ? Icons.arrow_upward_rounded
-                              : Icons.arrow_downward_rounded)
-                        : Icons.remove_rounded,
-                    size: CompactTokens.icon14,
-                    color: field == sort.field
-                        ? theme.colorScheme.primary
-                        : Colors.transparent,
-                  ),
-                  const SizedBox(width: CompactTokens.space8),
-                  Text(
-                    labelOf(
-                      context,
-                      LibrarySort(
-                        field: field,
-                        ascending: field != LibrarySortField.addedAt,
-                      ),
-                    ),
-                  ),
+                  ..._sourceAndCount(context),
+                  const Spacer(),
+                  ..._buttons(context, compact: true),
                 ],
               ),
             ),
-        ],
-        child: Container(
-          height: CompactTokens.controlDefault,
-          padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainer,
-            borderRadius: CompactTokens.borderRadius8,
-            border: Border.all(color: theme.colorScheme.outlineVariant),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                labelOf(context, sort),
-                style: CompactTypography.mono(
-                  theme.colorScheme.onSurfaceVariant,
-                  size: CompactTypeScale.mark,
-                ),
-              ),
-              const SizedBox(width: CompactTokens.space4),
-              Icon(
-                sort.ascending
-                    ? Icons.arrow_upward_rounded
-                    : Icons.arrow_downward_rounded,
-                size: CompactTokens.icon14,
-                color: theme.colorScheme.primary,
-              ),
-            ],
-          ),
-        ),
-      ),
+          ],
+        );
+      },
     );
   }
-}
 
-/// Chip that opens the source filter menu.
-class _SourceFilter extends StatelessWidget {
-  final List<String> sources;
-  final Map<String, SourceLabel> sourceLabels;
-  final String? sourceFilter;
-  final ValueChanged<String?> onSourceFilter;
+  Widget _searchField() {
+    return LibrarySearchField(
+      controller: controller,
+      focusNode: focusNode,
+      query: query,
+      onChanged: onQueryChanged,
+      onClear: onClearQuery,
+    );
+  }
 
-  const _SourceFilter({
-    required this.sources,
-    required this.sourceLabels,
-    required this.sourceFilter,
-    required this.onSourceFilter,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  List<Widget> _sourceAndCount(BuildContext context) {
     final theme = Theme.of(context);
-    final active = sourceFilter != null;
-    final label = sourceFilter == null
-        ? context.loc.libraryAllSources
-        : (sourceLabels[sourceFilter]?.name ?? sourceFilter!);
-
-    return TuneTooltip(
-      message: active
-          ? '${context.loc.libraryFilterSources} · $label'
-          : context.loc.libraryFilterSources,
-      child: PopupMenuButton<String>(
-        key: const ValueKey('library-source-filter'),
-        padding: EdgeInsets.zero,
-        initialValue: sourceFilter ?? allSourcesFilterValue,
-        onSelected: (value) {
-          onSourceFilter(value == allSourcesFilterValue ? null : value);
-        },
-        itemBuilder: (context) => [
-          PopupMenuItem<String>(
-            value: allSourcesFilterValue,
-            height: 36,
-            child: Text(context.loc.libraryAllSources),
-          ),
-          for (final sourceId in sources)
-            PopupMenuItem<String>(
-              value: sourceId,
-              height: 36,
-              child: Text(sourceLabels[sourceId]?.name ?? sourceId),
-            ),
-        ],
-        child: Container(
-          height: CompactTokens.controlDefault,
-          padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space8),
-          decoration: BoxDecoration(
-            color: active
-                ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                : theme.colorScheme.surfaceContainer,
-            borderRadius: CompactTokens.borderRadius8,
-            border: Border.all(
-              color: active
-                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                  : theme.colorScheme.outlineVariant,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.filter_list_rounded,
-                size: CompactTokens.icon16,
-                color: active
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: CompactTokens.space4),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                size: CompactTokens.icon14,
-              ),
-            ],
+    final showCount = query.trim().isNotEmpty || sourceFilter != null;
+    return [
+      if (sources.length > 1)
+        LibrarySourceFilter(
+          sources: sources,
+          sourceLabels: sourceLabels,
+          sourceFilter: sourceFilter,
+          onSourceFilter: onSourceFilter,
+        ),
+      if (showCount) ...[
+        if (sources.length > 1) const SizedBox(width: CompactTokens.space8),
+        Text(
+          context.loc.libraryTrackCount(filteredCount),
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
+      ],
+    ];
+  }
+
+  List<Widget> _buttons(BuildContext context, {required bool compact}) {
+    final theme = Theme.of(context);
+    return [
+      OutlinedButton.icon(
+        key: const ValueKey('library-filter'),
+        onPressed: onFilter,
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, CompactTokens.controlDefault),
+          padding: const EdgeInsets.symmetric(
+            horizontal: CompactTokens.space8,
+          ),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+          side: BorderSide(
+            color: filter.isEmpty
+                ? theme.colorScheme.outlineVariant
+                : theme.colorScheme.primary.withValues(alpha: 0.4),
+          ),
+          foregroundColor: filter.isEmpty
+              ? theme.colorScheme.onSurfaceVariant
+              : theme.colorScheme.primary,
+        ),
+        icon: const Icon(
+          Icons.filter_alt_outlined,
+          size: CompactTokens.icon16,
+        ),
+        label: Text(
+          filter.activeGroups == 0
+              ? context.loc.libraryFilter
+              : '${context.loc.libraryFilter} ${filter.activeGroups}',
+        ),
       ),
-    );
+      const SizedBox(width: CompactTokens.space8),
+      LibrarySortButton(sort: sort, onSort: onSort, compact: compact),
+      const SizedBox(width: CompactTokens.space8),
+      LibraryViewSwitch(view: view, onChanged: onViewChanged),
+    ];
   }
 }

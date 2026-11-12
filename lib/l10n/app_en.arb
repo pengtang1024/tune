@@ -1630,6 +1630,7 @@
   "lyricsSmartFailedAudio": "The audio never arrived: no local copy and no stream to pull",
   "lyricsSmartFailedUpload": "The channels did not answer: try again later, or check the key and the endpoint in Settings",
   "lyricsSmartFailedEmpty": "No voice was heard",
+  "lyricsSmartFailedUnsupported": "This platform cannot write a sheet beside the audio: smart lyrics stays off until it can",
   "lyricsSmartNote": "Machine sheet, from the vote pool — search again for better words",
   "lyricsMarkLine": "This line is wrong",
   "lyricsUnmarkLine": "Take the mark back",
@@ -1890,5 +1891,19 @@
     }
   },
   "settingsLocalizationPrivacy": "Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.",
-  "settingsSearchKeywordsLocalization": "translate translation localization language offline model api balance tokens"
+  "settingsSearchKeywordsLocalization": "translate translation localization language offline model api balance tokens",
+  "settingsPermissionsTitle": "Permissions",
+  "settingsPermissionsDescription": "Android asks for these while the app runs. Refusing keeps the app usable, but the matching feature stays off.",
+  "settingsPermissionNotifications": "Notifications",
+  "settingsPermissionNotificationsHint": "Shows the playback controls outside the app.",
+  "settingsPermissionMedia": "Media files",
+  "settingsPermissionMediaHint": "Reads the audio library of the phone when you scan.",
+  "settingsPermissionGranted": "Allowed",
+  "settingsPermissionAllow": "Allow",
+  "settingsPermissionOpenSettings": "Open settings",
+  "settingsPermissionDeniedHint": "Refused. Allow it in the system settings.",
+  "settingsPermissionNeeded": "Allow the media permission before scanning.",
+  "settingsPermissionDialogTitle": "Permission needed",
+  "settingsPermissionDialogBody": "The media permission was refused. Allow it in the system settings and scan again.",
+  "settingsSearchKeywordsPermissions": "permission permissions notification media storage android allow"
 }

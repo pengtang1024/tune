@@ -1630,6 +1630,7 @@
   "lyricsSmartFailedAudio": "取音訊失敗：曲目沒有本機副本，也沒拉到串流",
   "lyricsSmartFailedUpload": "通道沒有答上來：稍後再試，或到設定裡檢查金鑰與端點",
   "lyricsSmartFailedEmpty": "沒有識別出人聲",
+  "lyricsSmartFailedUnsupported": "此平台不能把詞稿寫到音訊旁：支援寫入之前，智慧歌詞停用",
   "lyricsSmartNote": "機器稿：票池生成，重新查找可以找更好的詞",
   "lyricsMarkLine": "這行不對",
   "lyricsUnmarkLine": "撤銷標記",
@@ -1890,5 +1891,19 @@
     }
   },
   "settingsLocalizationPrivacy": "只傳送需要翻譯的文字；音訊、歌詞和檔案路徑都留在本機。",
-  "settingsSearchKeywordsLocalization": "翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens"
+  "settingsSearchKeywordsLocalization": "翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens",
+  "settingsPermissionsTitle": "權限",
+  "settingsPermissionsDescription": "Android 會在執行時詢問這些權限；拒絕後應用仍可用，但對應功能會關閉。",
+  "settingsPermissionNotifications": "通知",
+  "settingsPermissionNotificationsHint": "在應用外顯示播放控制。",
+  "settingsPermissionMedia": "媒體檔案",
+  "settingsPermissionMediaHint": "掃描時讀取手機上的音訊庫。",
+  "settingsPermissionGranted": "已允許",
+  "settingsPermissionAllow": "允許",
+  "settingsPermissionOpenSettings": "去設定",
+  "settingsPermissionDeniedHint": "已被拒絕。請到系統設定裡允許。",
+  "settingsPermissionNeeded": "掃描前需要允許媒體讀取權限。",
+  "settingsPermissionDialogTitle": "需要權限",
+  "settingsPermissionDialogBody": "媒體讀取權限已被拒絕。請到系統設定裡允許後再掃描。",
+  "settingsSearchKeywordsPermissions": "權限 通知 媒體 儲存 android 允許"
 }

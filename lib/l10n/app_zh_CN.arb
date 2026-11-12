@@ -1630,6 +1630,7 @@
   "lyricsSmartFailedAudio": "取音频失败：曲目没有本地副本，也没拉到流",
   "lyricsSmartFailedUpload": "通道没有答上来：稍后再试，或到设置里检查钥匙与端点",
   "lyricsSmartFailedEmpty": "没有识别出人声",
+  "lyricsSmartFailedUnsupported": "此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用",
   "lyricsSmartNote": "机器稿：票池生成，重新查找可以找更好的词",
   "lyricsMarkLine": "这行不对",
   "lyricsUnmarkLine": "撤销标记",
@@ -1890,5 +1891,19 @@
     }
   },
   "settingsLocalizationPrivacy": "只发送需要翻译的文本；音频、歌词和文件路径都留在本机。",
-  "settingsSearchKeywordsLocalization": "翻译 机翻 本地化 语言 离线模型 api 余额 tokens"
+  "settingsSearchKeywordsLocalization": "翻译 机翻 本地化 语言 离线模型 api 余额 tokens",
+  "settingsPermissionsTitle": "权限",
+  "settingsPermissionsDescription": "Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。",
+  "settingsPermissionNotifications": "通知",
+  "settingsPermissionNotificationsHint": "在应用外显示播放控制。",
+  "settingsPermissionMedia": "媒体文件",
+  "settingsPermissionMediaHint": "扫描时读取手机上的音频库。",
+  "settingsPermissionGranted": "已允许",
+  "settingsPermissionAllow": "允许",
+  "settingsPermissionOpenSettings": "去设置",
+  "settingsPermissionDeniedHint": "已被拒绝。请到系统设置里允许。",
+  "settingsPermissionNeeded": "扫描前需要允许媒体读取权限。",
+  "settingsPermissionDialogTitle": "需要权限",
+  "settingsPermissionDialogBody": "媒体读取权限已被拒绝。请到系统设置里允许后再扫描。",
+  "settingsSearchKeywordsPermissions": "权限 通知 媒体 存储 android 允许"
 }

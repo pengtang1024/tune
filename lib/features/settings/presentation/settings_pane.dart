@@ -7,13 +7,16 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/desktop/audio_mime_types.dart';
+import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/localization/domain/localization_config.dart';
 import 'package:tune/features/localization/presentation/settings_localization_card.dart';
+import 'package:tune/features/settings/application/mobile_permissions_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/features/settings/presentation/settings_card_shell.dart';
@@ -21,6 +24,7 @@ import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
+import 'package:tune/features/settings/presentation/settings_permissions_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
 import 'package:tune/features/settings/presentation/settings_update_card.dart';
 import 'package:tune/features/settings/presentation/source_health_weights_sheet.dart';
@@ -38,18 +42,27 @@ enum _SettingsSection {
   localization,
   discovery,
   desktop,
+  permissions,
   sourceHealth,
   about,
 }
 
 class SettingsPane extends ConsumerStatefulWidget {
-  const SettingsPane({super.key});
+  /// The capabilities of the build being drawn.
+  ///
+  /// Tests pass a table of another platform; the app leaves it null and the
+  /// page reads the build it runs in.
+  final AppCapabilities? capabilities;
+
+  const SettingsPane({super.key, this.capabilities});
 
   @override
   ConsumerState<SettingsPane> createState() => _SettingsPaneState();
 }
 
 class _SettingsPaneState extends ConsumerState<SettingsPane> {
+  AppCapabilities get _capabilities =>
+      widget.capabilities ?? AppCapabilities.current;
   var _section = _SettingsSection.overview;
   final _search = TextEditingController();
   var _query = '';
@@ -124,9 +137,9 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
                       CompactTokens.pageGutter,
                     ),
                     child: _body(
-                    context,
-                    settings,
-                    controller,
+                      context,
+                      settings,
+                      controller,
                       libraryReady: library.$1,
                       scanning: library.$2,
                       clearing: library.$3,
@@ -146,9 +159,32 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   static const _sections = _SettingsSection.values;
 
+  /// Whether this build has anything to show under [section].
+  ///
+  /// The desktop group and the update card are drawn from the capability
+  /// table: on Windows the window works, but the tray, the media controls and
+  /// the updater are not there yet, so the page leaves them out instead of
+  /// offering switches that do nothing.
+  bool _supports(_SettingsSection section) {
+    final capabilities = _capabilities;
+    return switch (section) {
+      _SettingsSection.desktop =>
+        capabilities.tray ||
+            capabilities.systemMediaControls ||
+            capabilities.defaultPlayer,
+      // Only Android asks for the permissions at runtime.
+      _SettingsSection.permissions =>
+        capabilities.platform == AppPlatform.android,
+      _ => true,
+    };
+  }
+
+  bool _visible(_SettingsSection section) =>
+      _supports(section) && _matches(section);
+
   Widget _nav(BuildContext context, bool wide, SettingsState settings) {
     final theme = Theme.of(context);
-    final items = _sections.where((section) => _matches(section)).toList();
+    final items = _sections.where(_visible).toList();
     return Container(
       width: wide ? 176 : 56,
       decoration: BoxDecoration(
@@ -204,7 +240,9 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
             border: Border(
               left: BorderSide(
                 width: 2,
-                color: selected ? theme.colorScheme.primary : Colors.transparent,
+                color: selected
+                    ? theme.colorScheme.primary
+                    : Colors.transparent,
               ),
             ),
           ),
@@ -255,110 +293,134 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         CompactTokens.pageGutter,
         CompactTokens.space4,
       ),
-      child: Row(
-        children: [
-          Text(
-            context.loc.settingsTitle,
-            style: CompactTypography.asDisplay(
-              theme.textTheme.displayMedium,
-              size: CompactTypeScale.displayMedium,
-              height: 0.95,
-            ),
-          ),
-          const SizedBox(width: CompactTokens.space8),
-          Text(
-            'v${AppVersion.version}',
-            style: CompactTypography.mono(
-              theme.colorScheme.onSurfaceVariant,
-              size: CompactTypeScale.mark,
-            ),
-          ),
-          const Spacer(),
-          SizedBox(
-            width: wide ? 220 : 150,
-            child: TextField(
-              controller: _search,
-              onChanged: _onSearchChanged,
-              style: theme.textTheme.bodySmall,
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                fillColor: theme.colorScheme.surfaceContainer,
-                hintText: context.loc.settingsSearchHint,
-                hintStyle: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                prefixIcon: Icon(
-                  Icons.search_rounded,
-                  size: CompactTokens.icon16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 30,
-                  minHeight: 30,
-                ),
-                suffixIcon: _query.isEmpty
-                    ? null
-                    : IconButton(
-                        onPressed: () {
-                          _search.clear();
-                          _onSearchChanged('');
-                        },
-                        icon: const Icon(
-                          Icons.close_rounded,
-                          size: CompactTokens.icon14,
-                        ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints.tightFor(
-                          width: 26,
-                          height: 26,
-                        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // A phone cannot hold the title, the version, the search and the
+          // menu in one row, so the search drops to a row of its own.
+          final narrow = constraints.maxWidth < 560;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    context.loc.settingsTitle,
+                    style: CompactTypography.asDisplay(
+                      theme.textTheme.displayMedium,
+                      size: CompactTypeScale.displayMedium,
+                      height: 0.95,
+                    ),
+                  ),
+                  const SizedBox(width: CompactTokens.space8),
+                  if (!narrow)
+                    Text(
+                      'v${AppVersion.version}',
+                      style: CompactTypography.mono(
+                        theme.colorScheme.onSurfaceVariant,
+                        size: CompactTypeScale.mark,
                       ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: CompactTokens.space8,
-                  vertical: CompactTokens.space8,
+                    ),
+                  const Spacer(),
+                  if (!narrow) ...[
+                    SizedBox(
+                      width: wide ? 220 : 150,
+                      child: _searchField(context),
+                    ),
+                    const SizedBox(width: CompactTokens.space8),
+                  ],
+                  _moreButton(context),
+                ],
+              ),
+              if (narrow) ...[
+                const SizedBox(height: CompactTokens.space8),
+                _searchField(context),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _searchField(BuildContext context) {
+    final theme = Theme.of(context);
+    return TextField(
+      controller: _search,
+      onChanged: _onSearchChanged,
+      style: theme.textTheme.bodySmall,
+      decoration: InputDecoration(
+        isDense: true,
+        filled: true,
+        fillColor: theme.colorScheme.surfaceContainer,
+        hintText: context.loc.settingsSearchHint,
+        hintStyle: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        prefixIcon: Icon(
+          Icons.search_rounded,
+          size: CompactTokens.icon16,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 30,
+          minHeight: 30,
+        ),
+        suffixIcon: _query.isEmpty
+            ? null
+            : IconButton(
+                onPressed: () {
+                  _search.clear();
+                  _onSearchChanged('');
+                },
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: CompactTokens.icon14,
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: CompactTokens.borderRadius8,
-                  borderSide: BorderSide(color: theme.colorScheme.primary),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints.tightFor(
+                  width: 26,
+                  height: 26,
                 ),
               ),
-            ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: CompactTokens.space8,
+          vertical: CompactTokens.space8,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: CompactTokens.borderRadius8,
+          borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: CompactTokens.borderRadius8,
+          borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: CompactTokens.borderRadius8,
+          borderSide: BorderSide(color: theme.colorScheme.primary),
+        ),
+      ),
+    );
+  }
+
+  Widget _moreButton(BuildContext context) {
+    return TuneTooltip(
+      message: context.loc.libraryMoreActions,
+      child: PopupMenuButton<String>(
+        key: const ValueKey('settings-more'),
+        icon: const Icon(Icons.more_horiz),
+        onSelected: (value) {
+          if (value == 'resetSection') _confirmReset(all: false);
+          if (value == 'resetAll') _confirmReset(all: true);
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 'resetSection',
+            enabled: _section != _SettingsSection.overview,
+            child: Text(context.loc.settingsResetSection),
           ),
-          const SizedBox(width: CompactTokens.space8),
-          TuneTooltip(
-            message: context.loc.libraryMoreActions,
-            child: PopupMenuButton<String>(
-              key: const ValueKey('settings-more'),
-              icon: const Icon(Icons.more_horiz),
-              onSelected: (value) {
-                if (value == 'resetSection') _confirmReset(all: false);
-                if (value == 'resetAll') _confirmReset(all: true);
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'resetSection',
-                  enabled: _section != _SettingsSection.overview,
-                  child: Text(context.loc.settingsResetSection),
-                ),
-                PopupMenuItem(
-                  value: 'resetAll',
-                  child: Text(context.loc.settingsResetAll),
-                ),
-              ],
-            ),
+          PopupMenuItem(
+            value: 'resetAll',
+            child: Text(context.loc.settingsResetAll),
           ),
         ],
       ),
@@ -380,7 +442,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     if (_query.isEmpty) return true;
     final text =
         '${_labelOf(context, section)} ${_descriptionOf(context, section)} '
-        '${_keywordsOf(context, section)}'
+                '${_keywordsOf(context, section)}'
             .toLowerCase();
     return text.contains(_query);
   }
@@ -404,9 +466,10 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       _SettingsSection.localization,
       _SettingsSection.discovery,
       _SettingsSection.desktop,
+      _SettingsSection.permissions,
       _SettingsSection.sourceHealth,
       _SettingsSection.about,
-    ].where(_matches).toList();
+    ].where(_visible).toList();
     if (sections.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(CompactTokens.space16),
@@ -552,7 +615,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     final top = viewport.localToGlobal(Offset.zero).dy;
     _SettingsSection? active;
     for (final section in _SettingsSection.values) {
-      if (!_matches(section)) continue;
+      if (!_visible(section)) continue;
       final box =
           _sectionKeys[section]?.currentContext?.findRenderObject()
               as RenderBox?;
@@ -589,20 +652,24 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       key: ValueKey('settings-card-${section.name}'),
       icon: _iconOf(section),
       title: _labelOf(context, section),
-      trailing: TextButton(
-        key: ValueKey('settings-customize-${section.name}'),
-        onPressed: () => section == _SettingsSection.sourceHealth
-            ? _openHealthSheet(context)
-            : _openCustom(context, section),
-        style: TextButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text(context.loc.settingsCustomize),
-      ),
+      trailing: section == _SettingsSection.permissions
+          ? null
+          : TextButton(
+              key: ValueKey('settings-customize-${section.name}'),
+              onPressed: () => section == _SettingsSection.sourceHealth
+                  ? _openHealthSheet(context)
+                  : _openCustom(context, section),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(context.loc.settingsCustomize),
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (section == _SettingsSection.permissions)
+            const SettingsPermissionsCard(),
           if (section == _SettingsSection.sourceHealth)
             const SettingsSourceHealthCard(embedded: true),
           if (presets.isNotEmpty)
@@ -632,6 +699,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
 
   Widget _aboutCard(BuildContext context) {
     final about = SettingsAboutCard(version: AppVersion.version);
+    if (!_capabilities.autoUpdate) return about;
     const update = SettingsUpdateCard();
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -826,6 +894,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           ),
         ];
       case _SettingsSection.overview:
+      case _SettingsSection.permissions:
       case _SettingsSection.sourceHealth:
       case _SettingsSection.about:
         return const [];
@@ -869,6 +938,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
       case _SettingsSection.desktop:
         return settings.closeToTray ? 'tray' : 'quit';
       case _SettingsSection.overview:
+      case _SettingsSection.permissions:
       case _SettingsSection.sourceHealth:
       case _SettingsSection.about:
         return 'custom';
@@ -960,9 +1030,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   );
 
   Future<void> _openHealthSheet(BuildContext context) async {
-    final weights = ref
-        .read(settingsControllerProvider)
-        .sourceHealthWeights;
+    final weights = ref.read(settingsControllerProvider).sourceHealthWeights;
     final result = await showSourceHealthWeightsSheet(
       context,
       initial: weights,
@@ -1074,13 +1142,13 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         onAutoResumeOnStartup: controller.setAutoResumeOnStartup,
         onReplaceQueueOnClick: controller.setReplaceQueueOnClick,
         onOnlyLikeOnDoubleClick: controller.setOnlyLikeOnDoubleClick,
-        onFavoritesDoubleClickPlays:
-            controller.setFavoritesDoubleClickPlays,
+        onFavoritesDoubleClickPlays: controller.setFavoritesDoubleClickPlays,
       ),
       _SettingsSection.lyrics => const SettingsSmartLyricsCard(),
       _SettingsSection.localization => const SettingsLocalizationCard(),
       _SettingsSection.discovery => const SettingsDiscoveryCard(),
       _SettingsSection.desktop => SettingsDesktopCard(
+        capabilities: _capabilities,
         closeToTray: settings.closeToTray,
         mediaControlsEnabled: settings.mediaControlsEnabled,
         isDefaultPlayer: _isDefaultPlayer ?? false,
@@ -1090,6 +1158,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         onSetDefaultPlayer: _canSetDefaultPlayer ? _setDefaultPlayer : null,
       ),
       _SettingsSection.sourceHealth => const SettingsSourceHealthCard(),
+      _SettingsSection.permissions => const SettingsPermissionsCard(),
       _SettingsSection.overview ||
       _SettingsSection.about => const SizedBox.shrink(),
     };
@@ -1160,6 +1229,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
         await controller.setCloseToTray(true);
         await controller.setMediaControlsEnabled(true);
       case _SettingsSection.overview:
+      case _SettingsSection.permissions:
       case _SettingsSection.sourceHealth:
       case _SettingsSection.about:
         break;
@@ -1169,20 +1239,22 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   // ---------------------------------------------------------------------
   // Labels and icons
 
-  String _labelOf(BuildContext context, _SettingsSection section) =>
-      switch (section) {
-        _SettingsSection.overview => context.loc.settingsOverview,
-        _SettingsSection.appearance => context.loc.settingsSectionInterface,
-        _SettingsSection.library => context.loc.libraryTitle,
-        _SettingsSection.playback => context.loc.settingsSectionPlayback,
-        _SettingsSection.lyrics => context.loc.settingsSectionSmartLyrics,
-        _SettingsSection.localization =>
-          context.loc.settingsSectionLocalization,
-        _SettingsSection.discovery => context.loc.settingsSectionDiscovery,
-        _SettingsSection.desktop => context.loc.settingsSectionDesktop,
-        _SettingsSection.sourceHealth => context.loc.settingsSectionSourceHealth,
-        _SettingsSection.about => context.loc.about,
-      };
+  String _labelOf(
+    BuildContext context,
+    _SettingsSection section,
+  ) => switch (section) {
+    _SettingsSection.overview => context.loc.settingsOverview,
+    _SettingsSection.appearance => context.loc.settingsSectionInterface,
+    _SettingsSection.library => context.loc.libraryTitle,
+    _SettingsSection.playback => context.loc.settingsSectionPlayback,
+    _SettingsSection.lyrics => context.loc.settingsSectionSmartLyrics,
+    _SettingsSection.localization => context.loc.settingsSectionLocalization,
+    _SettingsSection.discovery => context.loc.settingsSectionDiscovery,
+    _SettingsSection.desktop => context.loc.settingsSectionDesktop,
+    _SettingsSection.permissions => context.loc.settingsPermissionsTitle,
+    _SettingsSection.sourceHealth => context.loc.settingsSectionSourceHealth,
+    _SettingsSection.about => context.loc.about,
+  };
 
   String _descriptionOf(BuildContext context, _SettingsSection section) =>
       switch (section) {
@@ -1195,28 +1267,31 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           context.loc.settingsLocalizationDescription,
         _SettingsSection.discovery => context.loc.settingsDiscoveryDescription,
         _SettingsSection.desktop => context.loc.settingsDesktopDescription,
+        _SettingsSection.permissions =>
+          context.loc.settingsPermissionsDescription,
         _SettingsSection.sourceHealth =>
           context.loc.settingsSourceHealthDescription,
         _SettingsSection.about => context.loc.appTagline,
       };
 
-  String _keywordsOf(BuildContext context, _SettingsSection section) =>
-      switch (section) {
-        _SettingsSection.appearance =>
-          context.loc.settingsSearchKeywordsAppearance,
-        _SettingsSection.library => context.loc.settingsSearchKeywordsLibrary,
-        _SettingsSection.playback =>
-          context.loc.settingsSearchKeywordsPlayback,
-        _SettingsSection.lyrics => context.loc.settingsSearchKeywordsLyrics,
-        _SettingsSection.localization =>
-          context.loc.settingsSearchKeywordsLocalization,
-        _SettingsSection.discovery =>
-          context.loc.settingsSearchKeywordsDiscovery,
-        _SettingsSection.desktop => context.loc.settingsSearchKeywordsDesktop,
-        _SettingsSection.sourceHealth =>
-          context.loc.settingsSearchKeywordsSourceHealth,
-        _SettingsSection.overview || _SettingsSection.about => '',
-      };
+  String _keywordsOf(
+    BuildContext context,
+    _SettingsSection section,
+  ) => switch (section) {
+    _SettingsSection.appearance => context.loc.settingsSearchKeywordsAppearance,
+    _SettingsSection.library => context.loc.settingsSearchKeywordsLibrary,
+    _SettingsSection.playback => context.loc.settingsSearchKeywordsPlayback,
+    _SettingsSection.lyrics => context.loc.settingsSearchKeywordsLyrics,
+    _SettingsSection.localization =>
+      context.loc.settingsSearchKeywordsLocalization,
+    _SettingsSection.discovery => context.loc.settingsSearchKeywordsDiscovery,
+    _SettingsSection.desktop => context.loc.settingsSearchKeywordsDesktop,
+    _SettingsSection.permissions =>
+      context.loc.settingsSearchKeywordsPermissions,
+    _SettingsSection.sourceHealth =>
+      context.loc.settingsSearchKeywordsSourceHealth,
+    _SettingsSection.overview || _SettingsSection.about => '',
+  };
 
   IconData _iconOf(_SettingsSection section) => switch (section) {
     _SettingsSection.overview => Icons.dashboard_customize_rounded,
@@ -1227,6 +1302,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
     _SettingsSection.localization => Icons.translate_rounded,
     _SettingsSection.discovery => Icons.explore_rounded,
     _SettingsSection.desktop => Icons.desktop_windows_outlined,
+    _SettingsSection.permissions => Icons.verified_user_outlined,
     _SettingsSection.sourceHealth => Icons.monitor_heart_outlined,
     _SettingsSection.about => Icons.info_outline_rounded,
   };
@@ -1259,6 +1335,20 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
   }
 
   Future<void> _scan() async {
+    // The files of a phone are behind a runtime permission. The first scan
+    // asks for it; a permission refused for good can only be allowed from the
+    // system settings, so the page says so instead of scanning an empty
+    // library.
+    if (_capabilities.platform == AppPlatform.android) {
+      final granted = await ref
+          .read(mobilePermissionsControllerProvider.notifier)
+          .ensure(MobilePermission.mediaAudio);
+      if (!mounted) return;
+      if (!granted) {
+        await _showPermissionRefused();
+        return;
+      }
+    }
     final settings = ref.read(settingsControllerProvider);
     await ref
         .read(libraryControllerProvider.notifier)
@@ -1270,6 +1360,31 @@ class _SettingsPaneState extends ConsumerState<SettingsPane> {
           state?.statusMessage ??
           context.loc.settingsScanDone,
     );
+  }
+
+  Future<void> _showPermissionRefused() async {
+    final open = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.loc.settingsPermissionDialogTitle),
+        content: Text(context.loc.settingsPermissionDialogBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.loc.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.loc.settingsPermissionOpenSettings),
+          ),
+        ],
+      ),
+    );
+    if (open == true) {
+      await ref
+          .read(mobilePermissionsControllerProvider.notifier)
+          .openSettings();
+    }
   }
 
   Future<void> _clearLibrary() async {

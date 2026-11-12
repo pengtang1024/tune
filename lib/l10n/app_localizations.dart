@@ -6389,6 +6389,12 @@ abstract class AppLocalizations {
   /// **'没有识别出人声'**
   String get lyricsSmartFailedEmpty;
 
+  /// No description provided for @lyricsSmartFailedUnsupported.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用'**
+  String get lyricsSmartFailedUnsupported;
+
   /// No description provided for @lyricsSmartNote.
   ///
   /// In zh_CN, this message translates to:
@@ -7414,6 +7420,90 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'翻译 机翻 本地化 语言 离线模型 api 余额 tokens'**
   String get settingsSearchKeywordsLocalization;
+
+  /// No description provided for @settingsPermissionsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'权限'**
+  String get settingsPermissionsTitle;
+
+  /// No description provided for @settingsPermissionsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。'**
+  String get settingsPermissionsDescription;
+
+  /// No description provided for @settingsPermissionNotifications.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'通知'**
+  String get settingsPermissionNotifications;
+
+  /// No description provided for @settingsPermissionNotificationsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'在应用外显示播放控制。'**
+  String get settingsPermissionNotificationsHint;
+
+  /// No description provided for @settingsPermissionMedia.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'媒体文件'**
+  String get settingsPermissionMedia;
+
+  /// No description provided for @settingsPermissionMediaHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描时读取手机上的音频库。'**
+  String get settingsPermissionMediaHint;
+
+  /// No description provided for @settingsPermissionGranted.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已允许'**
+  String get settingsPermissionGranted;
+
+  /// No description provided for @settingsPermissionAllow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'允许'**
+  String get settingsPermissionAllow;
+
+  /// No description provided for @settingsPermissionOpenSettings.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'去设置'**
+  String get settingsPermissionOpenSettings;
+
+  /// No description provided for @settingsPermissionDeniedHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已被拒绝。请到系统设置里允许。'**
+  String get settingsPermissionDeniedHint;
+
+  /// No description provided for @settingsPermissionNeeded.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'扫描前需要允许媒体读取权限。'**
+  String get settingsPermissionNeeded;
+
+  /// No description provided for @settingsPermissionDialogTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'需要权限'**
+  String get settingsPermissionDialogTitle;
+
+  /// No description provided for @settingsPermissionDialogBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'媒体读取权限已被拒绝。请到系统设置里允许后再扫描。'**
+  String get settingsPermissionDialogBody;
+
+  /// No description provided for @settingsSearchKeywordsPermissions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'权限 通知 媒体 存储 android 允许'**
+  String get settingsSearchKeywordsPermissions;
 }
 
 class _AppLocalizationsDelegate

@@ -7,8 +7,12 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/localization/application/localization_providers.dart';
+import 'package:tune/features/localization/domain/text_language.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/shared/ui/bilingual_text.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
@@ -93,44 +97,90 @@ class NowPlayingTrackInfo extends ConsumerWidget {
   }
 }
 
-/// The track title.
-class _Title extends StatelessWidget {
+/// The track title, translated when the reader asked for it.
+class _Title extends ConsumerWidget {
   const _Title({required this.song});
 
   final Song song;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    return Text(
-      song.title.isEmpty ? context.loc.nowPlayingUnnamedTrack : song.title,
+    final original = song.title.isEmpty
+        ? context.loc.nowPlayingUnnamedTrack
+        : song.title;
+    final target = targetLanguageOf(Localizations.localeOf(context));
+    final config = ref.watch(
+      settingsControllerProvider.select((settings) => settings.localization),
+    );
+    final translation = ref
+        .watch(
+          translatedTextProvider((
+            text: original,
+            targetLanguage: target,
+          )),
+        )
+        .value;
+    final style = CompactTypography.asDisplay(
+      theme.textTheme.displayMedium,
+      size: CompactTypeScale.displayLarge,
+      height: 1.06,
+    );
+    if (translation == null || translation == original) {
+      return Text(
+        original,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: style,
+      );
+    }
+    return BilingualText(
+      primary: translation,
+      secondary: config.showOriginal ? original : null,
       maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: CompactTypography.asDisplay(
-        theme.textTheme.displayMedium,
-        size: CompactTypeScale.displayLarge,
-        height: 1.06,
-      ),
+      primaryStyle: style,
     );
   }
 }
 
 /// The artist line with the album and the year.
-class _Artist extends StatelessWidget {
+class _Artist extends ConsumerWidget {
   const _Artist({required this.song});
 
   final Song song;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final artist = song.artist.isEmpty
         ? context.loc.playerUnknownArtist
         : song.artist;
+    final target = targetLanguageOf(Localizations.localeOf(context));
+    final config = ref.watch(
+      settingsControllerProvider.select((settings) => settings.localization),
+    );
+    final translatedAlbum = song.album.isEmpty
+        ? null
+        : ref
+              .watch(
+                translatedTextProvider((
+                  text: song.album,
+                  targetLanguage: target,
+                )),
+              )
+              .value;
+    final album = translatedAlbum ?? song.album;
     final details = <String>[
-      if (song.album.isNotEmpty) song.album,
+      if (album.isNotEmpty) album,
       if (song.year != null) song.year.toString(),
     ];
+    final originalDetails =
+        translatedAlbum != null && config.showOriginal && song.album.isNotEmpty
+        ? <String>[
+            song.album,
+            if (song.year != null) song.year.toString(),
+          ].join('  ·  ')
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,6 +205,17 @@ class _Artist extends StatelessWidget {
               letterSpacing: 0.4,
             ),
           ),
+          if (originalDetails != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              originalDetails,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ],
       ],
     );

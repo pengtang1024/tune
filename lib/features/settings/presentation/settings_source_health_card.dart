@@ -29,37 +29,37 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     final theme = Theme.of(context);
 
     final body = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: CompactTokens.space6,
-            runSpacing: CompactTokens.space6,
-            children: [
-              for (final preset in SourceHealthWeights.presets)
-                ChoiceChip(
-                  key: ValueKey('settings-health-preset-${_presetId(preset)}'),
-                  label: Text(_presetLabel(context, preset)),
-                  selected: weights == preset,
-                  onSelected: (_) => _apply(ref, preset),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-            ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: CompactTokens.space6,
+          runSpacing: CompactTokens.space6,
+          children: [
+            for (final preset in SourceHealthWeights.presets)
+              ChoiceChip(
+                key: ValueKey('settings-health-preset-${_presetId(preset)}'),
+                label: Text(_presetLabel(context, preset)),
+                selected: weights == preset,
+                onSelected: (_) => _apply(ref, preset),
+                visualDensity: VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+          ],
+        ),
+        const SizedBox(height: CompactTokens.space8),
+        _ShareTable(weights: weights),
+        const SizedBox(height: CompactTokens.space6),
+        Text(
+          context.loc.sourcesHealthWeightsTotal(weights.total),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: CompactTypography.mono(
+            theme.colorScheme.onSurfaceVariant,
+            size: CompactTypeScale.mark,
           ),
-          const SizedBox(height: CompactTokens.space8),
-          _ShareTable(weights: weights),
-          const SizedBox(height: CompactTokens.space6),
-          Text(
-            context.loc.sourcesHealthWeightsTotal(weights.total),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: CompactTypography.mono(
-              theme.colorScheme.onSurfaceVariant,
-              size: CompactTypeScale.mark,
-            ),
-          ),
-        ],
-      );
+        ),
+      ],
+    );
     if (embedded) return body;
     return SettingsCard(
       index: '05',
@@ -70,10 +70,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     );
   }
 
-  static Future<void> _apply(
-    WidgetRef ref,
-    SourceHealthWeights weights,
-  ) async {
+  static Future<void> _apply(WidgetRef ref, SourceHealthWeights weights) async {
     await ref
         .read(settingsControllerProvider.notifier)
         .setSourceHealthWeights(weights);
@@ -85,10 +82,7 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     return 'fresh';
   }
 
-  static String _presetLabel(
-    BuildContext context,
-    SourceHealthWeights preset,
-  ) {
+  static String _presetLabel(BuildContext context, SourceHealthWeights preset) {
     if (preset == SourceHealthWeights.balanced) {
       return context.loc.sourcesHealthPresetBalanced;
     }
