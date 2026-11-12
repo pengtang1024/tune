@@ -1,4 +1,4 @@
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 
 /// The sheet after one line was rewritten by hand (docs/smart-lyrics.md
 /// §7.4, M6): the reader's words replace the line, everything else stays —

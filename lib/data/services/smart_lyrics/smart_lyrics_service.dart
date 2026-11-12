@@ -14,10 +14,10 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/data/services/smart_lyrics/wav_file.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 import 'package:tune/data/services/stream_url_resolver.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Why a run came home without a sheet.

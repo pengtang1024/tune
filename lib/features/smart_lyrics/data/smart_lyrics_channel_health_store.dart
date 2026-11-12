@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:tune/data/services/persistence_service.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 import 'package:tune/utils/logger.dart';
 
 /// The channel health rings, kept where the other accounts of the sources

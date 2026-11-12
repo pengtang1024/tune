@@ -18,7 +18,7 @@ import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';

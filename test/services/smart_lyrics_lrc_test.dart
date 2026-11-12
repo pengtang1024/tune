@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_lrc.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
 
 /// The sheet the pipeline writes next to the audio (docs/smart-lyrics.md

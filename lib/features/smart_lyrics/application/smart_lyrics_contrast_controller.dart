@@ -5,7 +5,7 @@ import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_contrast.dart';
 import 'package:tune/utils/logger.dart';

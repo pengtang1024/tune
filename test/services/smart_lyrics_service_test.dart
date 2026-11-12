@@ -10,7 +10,7 @@ import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/domain/models/song.dart';
 

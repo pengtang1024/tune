@@ -3,7 +3,7 @@ import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_contrast_controller.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_mark.dart';
