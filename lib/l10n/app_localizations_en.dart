@@ -100,6 +100,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      'The check failed: GitHub may be rate limiting this address (60 requests an hour without a token). Try again later or add a token';
+
+  @override
+  String get updateFailedUnauthorized =>
+      'The check failed: the token is invalid or cannot read the release page';
+
+  @override
+  String get updateFailedNetwork =>
+      'The check failed: the request timed out or the network is unreachable';
+
+  @override
+  String get updateFailedServer =>
+      'The check failed: the release page answered with an unexpected response';
+
+  @override
   String get updateCheck => 'Check for updates';
 
   @override

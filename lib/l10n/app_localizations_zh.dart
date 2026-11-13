@@ -99,6 +99,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      '检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token';
+
+  @override
+  String get updateFailedUnauthorized => '检查失败：token 无效或没有读取发布页的权限';
+
+  @override
+  String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
+
+  @override
+  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -4132,6 +4145,19 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      '检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token';
+
+  @override
+  String get updateFailedUnauthorized => '检查失败：token 无效或没有读取发布页的权限';
+
+  @override
+  String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
+
+  @override
+  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -8163,6 +8189,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String updateFailed(String error) {
     return '檢查失敗：$error';
   }
+
+  @override
+  String get updateFailedRateLimited =>
+      '檢查失敗：GitHub 請求次數可能已超限（未登入每小時 60 次），請稍後再試或填寫 token';
+
+  @override
+  String get updateFailedUnauthorized => '檢查失敗：token 無效或沒有讀取發布頁的權限';
+
+  @override
+  String get updateFailedNetwork => '檢查失敗：網路請求逾時或無法連線';
+
+  @override
+  String get updateFailedServer => '檢查失敗：發布頁回傳了異常回應';
 
   @override
   String get updateCheck => '檢查更新';

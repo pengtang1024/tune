@@ -268,6 +268,30 @@ abstract class AppLocalizations {
   /// **'检查失败：{error}'**
   String updateFailed(String error);
 
+  /// No description provided for @updateFailedRateLimited.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token'**
+  String get updateFailedRateLimited;
+
+  /// No description provided for @updateFailedUnauthorized.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：token 无效或没有读取发布页的权限'**
+  String get updateFailedUnauthorized;
+
+  /// No description provided for @updateFailedNetwork.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：网络请求超时或无法连接'**
+  String get updateFailedNetwork;
+
+  /// No description provided for @updateFailedServer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：发布页返回了异常响应'**
+  String get updateFailedServer;
+
   /// No description provided for @updateCheck.
   ///
   /// In zh_CN, this message translates to:

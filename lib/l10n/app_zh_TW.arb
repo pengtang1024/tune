@@ -49,6 +49,10 @@
       }
     }
   },
+  "updateFailedRateLimited": "檢查失敗：GitHub 請求次數可能已超限（未登入每小時 60 次），請稍後再試或填寫 token",
+  "updateFailedUnauthorized": "檢查失敗：token 無效或沒有讀取發布頁的權限",
+  "updateFailedNetwork": "檢查失敗：網路請求逾時或無法連線",
+  "updateFailedServer": "檢查失敗：發布頁回傳了異常回應",
   "updateCheck": "檢查更新",
   "updateInstall": "下載並安裝",
   "updateRetry": "重試",

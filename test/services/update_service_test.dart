@@ -1,8 +1,80 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/update_service.dart';
+
+/// Serves one canned answer for every request.
+class _StubAdapter implements HttpClientAdapter {
+  _StubAdapter(this.status, [this.body = const {}]);
+
+  final int status;
+  final Map<String, dynamic> body;
+  int calls = 0;
+  RequestOptions? lastRequest;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    lastRequest = options;
+    return ResponseBody.fromString(
+      jsonEncode(body),
+      status,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+/// Fails the way a timeout does, without a response.
+class _TimeoutAdapter implements HttpClientAdapter {
+  int calls = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    throw DioException(
+      requestOptions: options,
+      type: DioExceptionType.connectionTimeout,
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+UpdateService _serviceWith(HttpClientAdapter adapter) {
+  final dio = Dio(
+    BaseOptions(headers: const {'Accept': 'application/vnd.github+json'}),
+  )..httpClientAdapter = adapter;
+  return UpdateService(dio: dio);
+}
+
+Matcher _failure(UpdateCheckFailure failure) {
+  return throwsA(
+    isA<UpdateCheckException>().having(
+      (error) => error.failure,
+      'failure',
+      failure,
+    ),
+  );
+}
 
 /// The update check compares versions, picks the archive of the machine and
 /// swaps the running bundle for the one the archive carries.
@@ -65,6 +137,66 @@ void main() {
     test('an answer without a version is no release', () {
       expect(UpdateService.parseRelease(null), isNull);
       expect(UpdateService.parseRelease({'tag_name': ''}), isNull);
+    });
+  });
+
+  group('check failures', () {
+    test('a rate limited answer is a failure, not an empty page', () async {
+      final service = _serviceWith(
+        _StubAdapter(403, const {'message': 'API rate limit exceeded'}),
+      );
+
+      await expectLater(
+        service.latest(),
+        _failure(UpdateCheckFailure.rateLimited),
+      );
+    });
+
+    test('a refused token is reported as unauthorized', () async {
+      final service = _serviceWith(_StubAdapter(401));
+
+      await expectLater(
+        service.latest(),
+        _failure(UpdateCheckFailure.unauthorized),
+      );
+    });
+
+    test('a timeout is a network failure', () async {
+      final service = _serviceWith(_TimeoutAdapter());
+
+      await expectLater(service.latest(), _failure(UpdateCheckFailure.network));
+    });
+
+    test('a failed check is not cached', () async {
+      final adapter = _StubAdapter(403);
+      final service = _serviceWith(adapter);
+
+      await expectLater(
+        service.latest(),
+        _failure(UpdateCheckFailure.rateLimited),
+      );
+      await expectLater(
+        service.latest(),
+        _failure(UpdateCheckFailure.rateLimited),
+      );
+
+      expect(adapter.calls, 2);
+    });
+
+    test('an empty page without a release is a server failure', () async {
+      final service = _serviceWith(_StubAdapter(200, const {'message': 'ok'}));
+
+      await expectLater(service.latest(), _failure(UpdateCheckFailure.server));
+    });
+
+    test('a project without a release stays an answer and is cached', () async {
+      final adapter = _StubAdapter(404);
+      final service = _serviceWith(adapter);
+
+      expect(await service.latest(), isNull);
+      expect(await service.latest(), isNull);
+
+      expect(adapter.calls, 1);
     });
   });
 

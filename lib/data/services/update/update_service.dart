@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -38,6 +39,10 @@ class UpdateService {
           );
 
   /// The newest release, or `null` when the project published none.
+  ///
+  /// Only an answer of the project page is cached; a failed check is not, so
+  /// the next attempt reaches the page again instead of repeating a failure
+  /// for ten minutes.
   Future<UpdateRelease?> latest() async {
     final cachedAt = _cachedAt;
     if (cachedAt != null && DateTime.now().difference(cachedAt) < _cacheFor) {
@@ -52,19 +57,80 @@ class UpdateService {
           validateStatus: (status) => status != null && status < 500,
         ),
       );
-      if (response.statusCode == 404) {
-        _cached = null;
-        _cachedAt = DateTime.now();
+      final status = response.statusCode ?? 0;
+      if (status == 404) {
+        _remember(null);
         return null;
       }
+      if (status == 403) {
+        _forgetCache();
+        throw const UpdateCheckException(
+          UpdateCheckFailure.rateLimited,
+          statusCode: 403,
+        );
+      }
+      if (status == 401) {
+        _forgetCache();
+        throw const UpdateCheckException(
+          UpdateCheckFailure.unauthorized,
+          statusCode: 401,
+        );
+      }
+      if (status < 200 || status >= 300) {
+        _forgetCache();
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
       final release = parseRelease(response.data);
-      _cached = release;
-      _cachedAt = DateTime.now();
+      if (release == null) {
+        _forgetCache();
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
+      _remember(release);
       return release;
-    } on DioException catch (error) {
-      if (error.response?.statusCode == 404) return null;
+    } on UpdateCheckException {
       rethrow;
+    } on DioException catch (error) {
+      final status = error.response?.statusCode;
+      if (status == 404) {
+        _remember(null);
+        return null;
+      }
+      _forgetCache();
+      if (status == 403) {
+        throw const UpdateCheckException(
+          UpdateCheckFailure.rateLimited,
+          statusCode: 403,
+        );
+      }
+      if (status == 401) {
+        throw const UpdateCheckException(
+          UpdateCheckFailure.unauthorized,
+          statusCode: 401,
+        );
+      }
+      if (status != null) {
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
+      throw const UpdateCheckException(UpdateCheckFailure.network);
     }
+  }
+
+  void _remember(UpdateRelease? release) {
+    _cached = release;
+    _cachedAt = DateTime.now();
+  }
+
+  void _forgetCache() {
+    _cachedAt = null;
   }
 
   /// Reads one release of the answer of the project page.

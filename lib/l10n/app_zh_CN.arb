@@ -49,6 +49,10 @@
       }
     }
   },
+  "updateFailedRateLimited": "检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token",
+  "updateFailedUnauthorized": "检查失败：token 无效或没有读取发布页的权限",
+  "updateFailedNetwork": "检查失败：网络请求超时或无法连接",
+  "updateFailedServer": "检查失败：发布页返回了异常响应",
   "updateCheck": "检查更新",
   "updateInstall": "下载并安装",
   "updateRetry": "重试",

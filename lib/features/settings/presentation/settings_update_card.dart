@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/features/settings/application/update_controller.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 
@@ -88,7 +89,13 @@ class SettingsUpdateCard extends ConsumerWidget {
         '${strings.updateDownloading} ${(state.progress * 100).round()}%',
       UpdateStatus.installing => strings.updateInstalling,
       UpdateStatus.ready => strings.updateReady,
-      UpdateStatus.failed => strings.updateFailed(state.error ?? ''),
+      UpdateStatus.failed => switch (state.failure) {
+        UpdateCheckFailure.rateLimited => strings.updateFailedRateLimited,
+        UpdateCheckFailure.unauthorized => strings.updateFailedUnauthorized,
+        UpdateCheckFailure.network => strings.updateFailedNetwork,
+        UpdateCheckFailure.server => strings.updateFailedServer,
+        null => strings.updateFailed(state.error ?? ''),
+      },
     };
   }
 }
