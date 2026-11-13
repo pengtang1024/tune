@@ -308,7 +308,7 @@ void main() {
 
     await tester.tap(find.byKey(const Key('smart-lyrics-local-model')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('small'));
+    await tester.tap(find.text('small').last);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('smart-lyrics-local-download')));
     await tester.pumpAndSettle();

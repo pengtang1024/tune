@@ -10,10 +10,13 @@ enum LocalComponentKind { runtime, model }
 enum LocalComponentLabel {
   translationRuntime,
   translationModel,
+  translationModelLow,
+  translationModelQuality,
   whisperRuntime,
   whisperModelTiny,
   whisperModelBase,
   whisperModelSmall,
+  whisperModelLargeTurbo,
   sherpaRuntime,
   sensevoiceModel,
   ffmpeg,

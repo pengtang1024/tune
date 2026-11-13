@@ -1,6 +1,10 @@
 # 验收清单
 
-- [x] 组件清单共 10 个（翻译 2、歌词 5、SenseVoice 2、FFmpeg 1），字节数与 sha256 全部钉死在 registry
+- [x] 组件清单共 12 个（翻译 4、歌词 7、FFmpeg 1），字节数与 sha256 全部钉死在 registry
+- [x] FFmpeg 由 `tool/build_ffmpeg.sh` 自建 8.0.1 GPL 静态归档并发布到本项目 Release；系统已装优先，组件兜底；registry 钉住字节数与 sha256
+- [x] GPL 义务齐全：归档内 `COPYING.GPLv2` + `README.tune.txt`（源码、sha256、configure），`docs/licensing.md` 与 `THIRD_PARTY_NOTICES.md` 均可追到源码与全文
+- [x] 翻译默认 Qwen3-0.6B，低配 Qwen2.5-0.5B、可选 Qwen2.5-1.5B；ASR 默认 Whisper small，large-v3-turbo 只作可选质量包
+- [x] SenseVoice 保持可选、不进默认两票；`docs/smart-lyrics.md` 写明运行时 Apache-2.0、权重 FunASR 模型开源协议 v1.1
 - [x] 下载后先校验字节数与 sha256，失败或缺失必需文件时不产生可用组件，暂存目录被清理
 - [x] 系统已安装（PATH、`~/.local/bin`、`~/bin`、`~/.local/opt/sherpa-onnx`）优先于组件，组件只做兜底
 - [x] 翻译、whisper、SenseVoice、ffmpeg 的运行时/模型解析都走同一个 `LocalComponents`

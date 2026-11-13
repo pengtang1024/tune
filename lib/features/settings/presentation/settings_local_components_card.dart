@@ -16,7 +16,7 @@ class SettingsLocalComponentsCard extends ConsumerWidget {
   static const Map<String, List<LocalComponentSpec>> _groups = {
     'translation': [
       LocalComponentRegistry.translationRuntime,
-      LocalComponentRegistry.translationModel,
+      ...LocalComponentRegistry.translationModels,
     ],
     'lyrics': [
       LocalComponentRegistry.whisperRuntime,
@@ -228,6 +228,10 @@ String componentLabel(BuildContext context, LocalComponentLabel label) {
       strings.settingsLocalComponentTranslationRuntime,
     LocalComponentLabel.translationModel =>
       strings.settingsLocalComponentTranslationModel,
+    LocalComponentLabel.translationModelLow =>
+      strings.settingsLocalComponentTranslationModelLow,
+    LocalComponentLabel.translationModelQuality =>
+      strings.settingsLocalComponentTranslationModelQuality,
     LocalComponentLabel.whisperRuntime =>
       strings.settingsLocalComponentWhisperRuntime,
     LocalComponentLabel.whisperModelTiny =>
@@ -236,6 +240,8 @@ String componentLabel(BuildContext context, LocalComponentLabel label) {
       strings.settingsLocalComponentWhisperBase,
     LocalComponentLabel.whisperModelSmall =>
       strings.settingsLocalComponentWhisperSmall,
+    LocalComponentLabel.whisperModelLargeTurbo =>
+      strings.settingsLocalComponentWhisperLargeTurbo,
     LocalComponentLabel.sherpaRuntime =>
       strings.settingsLocalComponentSherpaRuntime,
     LocalComponentLabel.sensevoiceModel =>

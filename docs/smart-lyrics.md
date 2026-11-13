@@ -33,9 +33,9 @@
 > **产品口径三改（2026-10-29，用户拍板「每首必须有词」，以上 M10 拦路闸降级）**：
 > 落盘地板改为**人写定夺·无人才弃·单源也写**（一致即写，只有机器自斗无人裁决才留白）；
 > 准入判据与留一审计保留为**高置信标注**与置信上界的测量，永不拦词；默认本地
-> `tiny` 随装开启、本地可用即免云钥匙；**自动补齐默认开**——批量自启直到库里
+> `small` 随装开启、本地可用即免云钥匙；**自动补齐默认开**——批量自启直到库里
 > 100% 有词；发布 v1.26.0–v1.26.2，播放页动作行瘦身（两项整曲标记 + ⋯ 菜单）。
-> M12 第二 ASR 家族（2026-10-30）：SenseVoice via sherpa-onnx（Apache/MIT、免费、离线），
+> M12 第二 ASR 家族（2026-10-30）：SenseVoice via sherpa-onnx（运行时 Apache-2.0；权重为 FunASR 模型开源协议 v1.1、免费、离线），
 > 词级时间戳 + 静默间隙切行，与 whisper 段模型是两种独立计时法；id `local:sensevoice`
 > 与 whisper 家族天然独立互证；未安装的机器该通道软失败、健康度挂起。
 > 人写共享库候选评估已量实并经法务口径复核（2026-10-29，见杠杆一表：**接入门槛=公开授权 API 或知识共享协议，一票否决**；网易云/酷我/酷狗/QQ 私有端点全部出局，Gecimi 已死；人写票池维持 LRCLIB + 读者自带词稿，中文流行曲缺口由知识票与读者贡献补）。人写票源不另起接口：直接用现有
@@ -244,12 +244,12 @@ S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeS
 
 | | |
 | --- | --- |
-| 形态 | 二进制 + ggml 模型（tiny/base/small 75–466 MB）由 app 下载到应用支持目录，含校验和；**系统已装 `whisper-cli` 则直接用，下载只是兜底**；不进 FFI，进程边界隔离崩溃 |
+| 形态 | 二进制 + ggml 模型（tiny/base/small 75–466 MB，large-v3-turbo 约 1.5 GB 可选）由 app 下载到应用支持目录，含校验和；**系统已装 `whisper-cli` 则直接用，下载只是兜底**；不进 FFI，进程边界隔离崩溃 |
 | 解码 | **2026-10-30 修正：不捆绑 ffmpeg，但系统已装时用它转 16k 单声道 WAV** 再喂本地引擎。原因：`whisper-cli` 能吃 flac/mp3/ogg/wav，却对 m4a/mp4 退出（exit 11）；sherpa-onnx 只认 WAV；读者库里约 16% 是 m4a，不转码这些歌永远没有本机票。没有 ffmpeg 的机器退回原样喂入：whisper 能读的照读，读不了的通道软失败、健康度熔断。不下载、不随包、不新增运行时依赖。 |
 | 速度 | CPU 上 4 分钟歌约 0.5–3 分钟（tiny→base）；批量 2000 首是「过夜」量级，GPU 快一个量级 |
 | 隐私 | 零外发；引擎与模型下载（含校验和）是唯一一次网络行为 |
 | M4 已落地 | `WhisperLocalEngine`（子进程转写，`requestCancel` 可中途杀掉，产物只在干净退出后读、成败都清理）+ `WhisperAssets`（系统 PATH 优先、可执行位判定、app 目录兜底）+ `WhisperModelStore`（从 whisper.cpp 官方模型仓下载，sha256 对照官方 tree API 的 LFS 清单，不符即销毁）；设置卡「本地引擎」下拉选模型 + 「下载模型」按钮，`local:<模型名>` 作为一张永远免费的机器票进池 |
-| M12 已落地 | **第二 ASR 家族（SenseVoice via sherpa-onnx，Apache/MIT）**：`SherpaLocalEngine` 子进程转 stdout JSON，按词级起止的**静默间隙切行**（与 whisper 段模型是两种独立计时法）；id `local:sensevoice` 与 whisper 家族天然独立互证；本机真音频验证 9 段带真实时刻；装于 `~/.local/opt/sherpa-onnx`，未装的机器该通道软失败、健康度挂起 |
+| M12 已落地 | **第二 ASR 家族（SenseVoice via sherpa-onnx）**：运行时 Apache-2.0，权重按 FunASR 模型开源协议 v1.1（不是 Apache/MIT，商用前需按该协议确认）；`SherpaLocalEngine` 子进程转 stdout JSON，按词级起止的**静默间隙切行**（与 whisper 段模型是两种独立计时法）；id `local:sensevoice` 与 whisper 家族天然独立互证；本机真音频验证 9 段带真实时刻；装于 `~/.local/opt/sherpa-onnx`，未装的机器该通道软失败、健康度挂起 |
 | M12 护栏（2026-10-30） | 编码器**非流式**：自注意力是 T×T，内存随时长**平方**增长。2549 s 的合法 16 kHz 单声道 WAV 让 `/encoder/encoders0.0/self_attn/MatMul` 要 28.9 GB（T=42483），ONNX Runtime 的 BFC arena 再向内核要 128 GiB，本机因此三次全局 OOM、桌面版 IPC 断链。现在两道墙：`WavFile` 先读 RIFF 头（`fmt`/`data` 长度必须与文件相符、必须 16 kHz 单声道 PCM，否则软失败）+ 按 5 分钟切片（2549 s 峰值 1.8 GB），每片跑在 `systemd-run --scope -p MemoryMax=4G -p MemorySwapMax=0` 里，越界只死自己。**长音频（>10 分钟）**先跑切片 SenseVoice，拿到词后跳过 whisper 段模型——一小时播客的 whisper 要数分钟 CPU，第二票的边际收益很低；sherpa 失败或无声时 whisper 仍作兜底 |
 | 结论 | **免费票**与异构第二票：一个按钮装好，装了就永远有一票不花钱 |
 

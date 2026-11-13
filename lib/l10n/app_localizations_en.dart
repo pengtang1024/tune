@@ -4251,7 +4251,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalComponentTranslationModel =>
-      'Translation model (Qwen2.5-0.5B)';
+      'Translation model (Qwen3-0.6B)';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      'Translation model (Qwen2.5-0.5B, low memory)';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      'Translation model (Qwen2.5-1.5B, high quality)';
 
   @override
   String get settingsLocalComponentWhisperRuntime =>
@@ -4265,6 +4273,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper model small';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper model large-v3-turbo';
 
   @override
   String get settingsLocalComponentSherpaRuntime =>

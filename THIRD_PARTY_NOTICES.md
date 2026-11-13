@@ -50,29 +50,46 @@ pub.dev release linked above.
 | --- | --- | --- | --- |
 | `audio_metadata_reader` | 1.8.1 | MIT | Vendored under `vendor/audio_metadata_reader` with a local patch: `Buffer.read` clamps declared sizes to the bytes the file actually holds, so one corrupt tag header cannot trigger a gigabyte allocation. MIT, Copyright (c) 2023 Clément Béal, kept in the vendored `LICENSE`. The patch list and upgrade steps live in `vendor/audio_metadata_reader/VENDORED.md`. |
 
-## Optional offline translation component
+## Optional local components
 
-The offline translation engine is distributed as an optional component package
-(`tune-translation-*`) that the user downloads from the settings page. It is not
-part of the default installer. Neither component is modified by Tune.
+The local capabilities below are downloaded one component at a time, directly
+from the publisher's release or asset URL, only when the user asks for them on
+the settings page. They are not part of the default installer and none is
+modified by Tune. The exact byte count and SHA-256 of every file are pinned in
+`LocalComponentRegistry`; a mismatch is destroyed instead of installed.
 
-| Component | Location | License | Notes |
+| Component | File | License | Notes |
 | --- | --- | --- | --- |
-| Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M) | `models/qwen2.5-0.5b-instruct-q4_k_m.gguf` in the component | Apache License 2.0 | Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF. Weights are redistributed unmodified; the Q4_K_M quantization is the official one published in that repository. Full text: `licenses/Qwen2.5-LICENSE.txt` in the component; attribution: `licenses/Qwen2.5-NOTICE.txt`. |
-| llama.cpp runtime (b12274, ubuntu-x64) | `bin/llama-b12274/` in the component | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/llama.cpp. Unmodified official release binaries. Full text: `licenses/llama.cpp-LICENSE.txt` in the component. |
+| Qwen3-0.6B (GGUF, Q8_0) | `Qwen3-0.6B-Q8_0.gguf` | Apache License 2.0 | Default translation model. Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen3-0.6B-GGUF. Weights are redistributed unmodified; Q8_0 is the official quantization published there. |
+| Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M) | `qwen2.5-0.5b-instruct-q4_k_m.gguf` | Apache License 2.0 | Low-memory translation tier. Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF. Q4_K_M is the official quantization published there. |
+| Qwen2.5-1.5B-Instruct (GGUF, Q4_K_M) | `qwen2.5-1.5b-instruct-q4_k_m.gguf` | Apache License 2.0 | Optional quality translation tier. Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF. Q4_K_M is the official quantization published there. |
+| llama.cpp runtime (b12274, ubuntu-x64) | `llama-b12274-bin-ubuntu-x64.tar.gz` | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/llama.cpp. Unmodified official release binaries. |
+| whisper.cpp runtime (b5454, ubuntu-x64) | `whisper-bin-ubuntu-x64.tar.gz` | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/whisper.cpp. Unmodified official release binaries. |
+| Whisper ggml models (tiny, base, small, large-v3-turbo) | `ggml-{tiny,base,small,large-v3-turbo}.bin` | MIT | Original Whisper weights by OpenAI (MIT), converted to ggml and published at https://huggingface.co/ggerganov/whisper.cpp. large-v3-turbo is an optional quality pack and is never downloaded by default. |
+| sherpa-onnx runtime (v2.0.1, linux-x64 static, no TTS) | `sherpa-onnx-v2.0.1-linux-x64-static-no-tts.tar.bz2` | Apache License 2.0 | Copyright 2023-2026 The k2-fsa team. Source: https://github.com/k2-fsa/sherpa-onnx. Unmodified official release. |
+| SenseVoice model (`model.int8.onnx`, `tokens.txt`) | `model.int8.onnx`, `tokens.txt` | FunASR Model Open Source License v1.1 | Copyright FunAudioLLM / Alibaba. Source: https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17 (mirror of the FunASR SenseVoice model). **Not Apache-2.0 or MIT**: the weights follow the FunASR model license; review that agreement before commercial use. |
+| FFmpeg component (8.0.1, ubuntu-x64 static, GPL build) | `ffmpeg` in `ffmpeg-8.0.1-linux-x64-gpl.tar.xz` | GPL-2.0-or-later | Copyright the FFmpeg developers. Built by `tool/build_ffmpeg.sh` from https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz with the `--enable-gpl` configure line recorded in the archive's `README.tune.txt`. The archive carries `COPYING.GPLv2`; full text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html. Tune only invokes the binary as a subprocess. |
 
-The model and the runtime are stored with Git LFS in the source repository and
-packed into the optional component; the default installer does not include
-them, and the app downloads the component only when the user asks for it. The
-license files are kept both inside the component package and under
-`translation/licenses/` in the repository. When the local engine is selected,
-no text leaves the machine.
+The Apache-2.0 text used by Qwen is kept at
+`translation/licenses/Qwen2.5-LICENSE.txt`; the llama.cpp MIT text is at
+`translation/licenses/llama.cpp-LICENSE.txt`. The whisper.cpp and sherpa-onnx
+MIT/Apache texts are the ones published in their repositories. When the local
+engine is selected, no text leaves the machine.
 
-## Linux audio backend: libmpv and FFmpeg
+The FFmpeg archive is hosted in Tune's own GitHub release so the license and
+source offer travel with the binary. Every upload must be the exact archive
+`tool/build_ffmpeg.sh` produced (including `COPYING.GPLv2` and
+`README.tune.txt`); upgrading the version means updating the source URL, the
+configure line, and the bytes/sha256 pinned in `LocalComponentRegistry` in the
+same change.
+
+## Linux audio backend: libmpv
 
 On Linux, Tune uses `just_audio_media_kit` → `media_kit` → the **system**
-`libmpv`. Tune does **not** bundle libmpv or FFmpeg. The Ubuntu packages are
-declared as follows:
+`libmpv`. Tune does **not** bundle libmpv in the default installer. FFmpeg is
+an optional component (see above) and is never required: when neither the
+system nor the component has `ffmpeg`, Tune skips transcoding and hands the
+original audio to the engine.
 
 | Component | Version | License | Notes |
 | --- | --- | --- | --- |

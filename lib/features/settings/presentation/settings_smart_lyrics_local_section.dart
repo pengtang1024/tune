@@ -16,7 +16,13 @@ class SmartLyricsLocalSection extends ConsumerWidget {
   const SmartLyricsLocalSection({super.key});
 
   /// The models the app offers; the names are the ones whisper.cpp uses.
-  static const List<String> models = ['tiny', 'base', 'small'];
+  /// large-v3-turbo is an optional quality pack and never the default.
+  static const List<String> models = [
+    'tiny',
+    'base',
+    'small',
+    'large-v3-turbo',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

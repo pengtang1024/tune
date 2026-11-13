@@ -54,9 +54,6 @@ class ProviderCredential {
 /// The switches live in [SettingsState] like every other preference: this
 /// object is the value of that field, not a second source of truth.
 class LocalizationConfig {
-  /// The model the offline engine runs.
-  static const String localModelId = 'qwen2.5-0.5b-instruct-q4_k_m';
-
   /// The backend that runs the optional local model.
   static const String localBackendId = 'local';
 

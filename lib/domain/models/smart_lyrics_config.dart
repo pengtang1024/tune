@@ -91,9 +91,10 @@ class SmartLyricsConfig {
     this.apiKey = '',
     this.asrModels = const ['whisper-1'],
     this.chatModel = 'gpt-4o-mini',
-    // tiny out of the box: the assets are one button away, and a machine
+    // small out of the box: the assets are one button away, and a machine
     // that lacks them fails soft — the health rings park the channel.
-    this.localModel = 'tiny',
+    // base is the low-memory tier, tiny the lowest-footprint one.
+    this.localModel = 'small',
     this.batchCloudBudget = 500,
     this.gapCheckEnabled = true,
     // The library fills itself: the batch runs on its own until every

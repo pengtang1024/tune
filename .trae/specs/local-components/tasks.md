@@ -40,3 +40,12 @@
 
 ## T8 提交
 - [x] 只暂存本线文件，提交 `refactor(components): 本地能力收敛为统一组件注册与安装器`，不 push
+
+## T9 档位与合规调整
+- [x] FFmpeg 作为可下载组件：`tool/build_ffmpeg.sh` 从 ffmpeg.org 源码构建 8.0.1 GPL 归档（含 `COPYING.GPLv2`、`README.tune.txt`），发布到本项目 GitHub Release；registry 钉住 6100948 字节与 sha256；系统已装仍优先
+- [x] GPL 义务：`docs/licensing.md` 允许随组件分发 GPL 二进制（全文 + 源码 + 构建配置），`THIRD_PARTY_NOTICES.md` 增 FFmpeg 条目；升级时源码、configure、bytes/sha256 必须同步
+- [x] 翻译模型三档：`translation-model`（Qwen3-0.6B，默认）、`translation-model-low`（Qwen2.5-0.5B）、`translation-model-quality`（Qwen2.5-1.5B）；引擎按默认 → 低配 → 高质量取第一个可用
+- [x] ASR 默认改 `small`；新增 `lyrics-whisper-model-large-v3-turbo` 可选质量包，不默认下载
+- [x] `docs/smart-lyrics.md` 修正 SenseVoice 许可证；`THIRD_PARTY_NOTICES.md` 补 whisper / sherpa-onnx / SenseVoice / Qwen3
+- [x] 4 个 arb + `flutter gen-l10n`；`flutter analyze`、非联网 `flutter test` 全绿
+- [x] 只提交本线文件，提交 `feat(components): 默认档位与 FFmpeg 合规调整`，不 push

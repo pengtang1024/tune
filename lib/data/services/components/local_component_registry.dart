@@ -8,8 +8,8 @@ import 'package:tune/data/services/components/local_component.dart';
 class LocalComponentRegistry {
   const LocalComponentRegistry._();
 
-  static const String translationModelFileName =
-      'qwen2.5-0.5b-instruct-q4_k_m.gguf';
+  /// The default offline model (docs/local-ai-evaluation.md §4.2).
+  static const String translationModelFileName = 'Qwen3-0.6B-Q8_0.gguf';
 
   static const LocalComponentSpec translationRuntime = LocalComponentSpec(
     id: 'translation-runtime',
@@ -31,6 +31,7 @@ class LocalComponentRegistry {
     legacyDirectories: ['translation/bin'],
   );
 
+  /// Qwen3-0.6B is the default: newer than 2.5-0.5B, still Apache-2.0.
   static const LocalComponentSpec translationModel = LocalComponentSpec(
     id: 'translation-model',
     kind: LocalComponentKind.model,
@@ -39,15 +40,58 @@ class LocalComponentRegistry {
       LocalComponentFile(
         fileName: translationModelFileName,
         url:
+            'https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/'
+            'Qwen3-0.6B-Q8_0.gguf',
+        bytes: 639446688,
+        sha256: '9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031',
+      ),
+    ],
+    requiredFiles: [translationModelFileName],
+  );
+
+  /// The low-memory tier; also the model the previous release downloaded.
+  static const LocalComponentSpec translationModelLow = LocalComponentSpec(
+    id: 'translation-model-low',
+    kind: LocalComponentKind.model,
+    label: LocalComponentLabel.translationModelLow,
+    files: [
+      LocalComponentFile(
+        fileName: 'qwen2.5-0.5b-instruct-q4_k_m.gguf',
+        url:
             'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/'
             'main/qwen2.5-0.5b-instruct-q4_k_m.gguf',
         bytes: 491400032,
         sha256: '74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db',
       ),
     ],
-    requiredFiles: [translationModelFileName],
-    legacyFiles: ['translation/models/$translationModelFileName'],
+    requiredFiles: ['qwen2.5-0.5b-instruct-q4_k_m.gguf'],
+    legacyFiles: ['translation/models/qwen2.5-0.5b-instruct-q4_k_m.gguf'],
   );
+
+  /// The optional quality tier, much slower on a small CPU.
+  static const LocalComponentSpec translationModelQuality = LocalComponentSpec(
+    id: 'translation-model-quality',
+    kind: LocalComponentKind.model,
+    label: LocalComponentLabel.translationModelQuality,
+    files: [
+      LocalComponentFile(
+        fileName: 'qwen2.5-1.5b-instruct-q4_k_m.gguf',
+        url:
+            'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/'
+            'main/qwen2.5-1.5b-instruct-q4_k_m.gguf',
+        bytes: 1117320736,
+        sha256: '6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e',
+      ),
+    ],
+    requiredFiles: ['qwen2.5-1.5b-instruct-q4_k_m.gguf'],
+  );
+
+  /// Default first, then the two alternatives the reader may download.
+  static const List<LocalComponentSpec> translationModels = [
+    translationModel,
+    translationModelLow,
+    translationModelQuality,
+  ];
 
   static const LocalComponentSpec whisperRuntime = LocalComponentSpec(
     id: 'lyrics-whisper-runtime',
@@ -124,6 +168,24 @@ class LocalComponentRegistry {
       requiredFiles: ['ggml-small.bin'],
       legacyFiles: ['whisper/models/ggml-small.bin'],
     ),
+    LocalComponentSpec(
+      id: 'lyrics-whisper-model-large-v3-turbo',
+      kind: LocalComponentKind.model,
+      label: LocalComponentLabel.whisperModelLargeTurbo,
+      files: [
+        LocalComponentFile(
+          fileName: 'ggml-large-v3-turbo.bin',
+          url:
+              'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/'
+              'ggml-large-v3-turbo.bin',
+          bytes: 1624555275,
+          sha256:
+              '1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69',
+        ),
+      ],
+      requiredFiles: ['ggml-large-v3-turbo.bin'],
+      legacyFiles: ['whisper/models/ggml-large-v3-turbo.bin'],
+    ),
   ];
 
   static const LocalComponentSpec sherpaRuntime = LocalComponentSpec(
@@ -176,20 +238,23 @@ class LocalComponentRegistry {
     systemPaths: ['~/.local/opt/sherpa-onnx/models/sense-voice'],
   );
 
+  /// GPL-2.0-or-later build, hosted in our own GitHub release so the
+  /// corresponding source and license travel with it (docs/licensing.md §3).
+  /// `tool/build_ffmpeg.sh` produces this exact archive.
   static const LocalComponentSpec ffmpeg = LocalComponentSpec(
     id: 'ffmpeg',
     kind: LocalComponentKind.runtime,
     label: LocalComponentLabel.ffmpeg,
-    archive: LocalComponentArchive.zip,
+    archive: LocalComponentArchive.tarXz,
     executable: 'ffmpeg',
     files: [
       LocalComponentFile(
-        fileName: 'ffmpeg-4.4.1-linux-64.zip',
+        fileName: 'ffmpeg-8.0.1-linux-x64-gpl.tar.xz',
         url:
-            'https://github.com/ffbinaries/ffbinaries-prebuilt/releases/'
-            'download/v4.4.1/ffmpeg-4.4.1-linux-64.zip',
-        bytes: 27072705,
-        sha256: '4348301b0d5e18174925e2022da1823aebbdb07282bbe9adb64b2485e1ef2df7',
+            'https://github.com/pengtang1024/tune/releases/download/'
+            'components-ffmpeg-8.0.1/ffmpeg-8.0.1-linux-x64-gpl.tar.xz',
+        bytes: 6100948,
+        sha256: 'd3358b749aaf4e4e40abda891e9a4628ff4cadfb02ed1352898fa322c6dd38b3',
       ),
     ],
     systemNames: ['ffmpeg'],
@@ -199,7 +264,7 @@ class LocalComponentRegistry {
   /// Everything the settings page lists, in display order.
   static const List<LocalComponentSpec> all = [
     translationRuntime,
-    translationModel,
+    ...translationModels,
     whisperRuntime,
     ...whisperModels,
     sherpaRuntime,

@@ -7400,8 +7400,20 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLocalComponentTranslationModel.
   ///
   /// In zh_CN, this message translates to:
-  /// **'翻译模型（Qwen2.5-0.5B）'**
+  /// **'翻译模型（Qwen3-0.6B）'**
   String get settingsLocalComponentTranslationModel;
+
+  /// No description provided for @settingsLocalComponentTranslationModelLow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译模型（Qwen2.5-0.5B，低配）'**
+  String get settingsLocalComponentTranslationModelLow;
+
+  /// No description provided for @settingsLocalComponentTranslationModelQuality.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译模型（Qwen2.5-1.5B，高质量）'**
+  String get settingsLocalComponentTranslationModelQuality;
 
   /// No description provided for @settingsLocalComponentWhisperRuntime.
   ///
@@ -7426,6 +7438,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'Whisper 模型 small'**
   String get settingsLocalComponentWhisperSmall;
+
+  /// No description provided for @settingsLocalComponentWhisperLargeTurbo.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 模型 large-v3-turbo'**
+  String get settingsLocalComponentWhisperLargeTurbo;
 
   /// No description provided for @settingsLocalComponentSherpaRuntime.
   ///

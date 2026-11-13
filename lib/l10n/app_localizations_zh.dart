@@ -3952,7 +3952,15 @@ class AppLocalizationsZh extends AppLocalizations {
       'llama.cpp 运行时（llama-cli）';
 
   @override
-  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen2.5-0.5B）';
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻译模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻译模型（Qwen2.5-1.5B，高质量）';
 
   @override
   String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
@@ -3965,6 +3973,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
@@ -8127,7 +8139,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       'llama.cpp 运行时（llama-cli）';
 
   @override
-  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen2.5-0.5B）';
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻译模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻译模型（Qwen2.5-1.5B，高质量）';
 
   @override
   String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
@@ -8140,6 +8160,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
@@ -12302,7 +12326,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       'llama.cpp 執行環境（llama-cli）';
 
   @override
-  String get settingsLocalComponentTranslationModel => '翻譯模型（Qwen2.5-0.5B）';
+  String get settingsLocalComponentTranslationModel => '翻譯模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻譯模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻譯模型（Qwen2.5-1.5B，高品質）';
 
   @override
   String get settingsLocalComponentWhisperRuntime =>
@@ -12316,6 +12348,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
 
   @override
   String get settingsLocalComponentSherpaRuntime =>

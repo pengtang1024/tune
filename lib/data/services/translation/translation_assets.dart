@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/components/local_components.dart';
 
@@ -27,19 +28,25 @@ class TranslationAssetStatus {
 class TranslationAssets {
   /// The release that was tested with this client.
   static const String binaryVersion = 'b12274';
-  static const String modelFileName =
-      LocalComponentRegistry.translationModelFileName;
-  static const String modelSha256 =
-      '74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db';
-  static const int modelBytes = 491400032;
+
+  /// The default model: what a fresh component download brings home.
+  static String get modelFileName =>
+      LocalComponentRegistry.translationModel.requiredFiles.first;
+  static String get modelSha256 =>
+      LocalComponentRegistry.translationModel.files.first.sha256;
+  static int get modelBytes =>
+      LocalComponentRegistry.translationModel.files.first.bytes;
 
   final Directory root;
   final String supportPath;
   final bool userInstalled;
-  final int expectedModelBytes;
-  final String expectedModelSha256;
+
+  /// Test overrides; production reads the digest from the registry.
+  final int? expectedModelBytes;
+  final String? expectedModelSha256;
 
   File? _componentModel;
+  LocalComponentSpec? _componentModelSpec;
   String? _componentBinary;
   Directory? _componentBinDirectory;
 
@@ -47,19 +54,25 @@ class TranslationAssets {
     this.root, {
     required this.supportPath,
     this.userInstalled = false,
-    this.expectedModelBytes = modelBytes,
-    this.expectedModelSha256 = modelSha256,
+    this.expectedModelBytes,
+    this.expectedModelSha256,
   });
 
   /// Lets an older copy stay the first choice while the downloaded component
   /// fills in when neither the folder nor the system has the file.
+  ///
+  /// Models are tried in tier order (default, low-memory, quality), so a
+  /// reader who downloaded one alternative still has a working engine.
   Future<void> useComponents(LocalComponents components) async {
-    final localModel = modelFile;
-    if (!await localModel.exists()) {
-      _componentModel = await components.file(
-        LocalComponentRegistry.translationModel,
-        modelFileName,
-      );
+    if (_localModel() == null) {
+      for (final spec in LocalComponentRegistry.translationModels) {
+        final found = await components.file(spec, spec.requiredFiles.first);
+        if (found != null) {
+          _componentModel = found;
+          _componentModelSpec = spec;
+          break;
+        }
+      }
     }
     final binary = await _binaryIn(binDirectory);
     final componentBinary = binary == null
@@ -113,9 +126,7 @@ class TranslationAssets {
     var cursor = executableDirectory;
     for (var depth = 0; depth < maxParents; depth++) {
       final candidate = Directory(path.join(cursor.path, 'translation'));
-      if (File(
-        path.join(candidate.path, 'models', modelFileName),
-      ).existsSync()) {
+      if (_containsModel(candidate)) {
         return TranslationAssets(candidate, supportPath: supportPath);
       }
       final parent = cursor.parent;
@@ -131,7 +142,18 @@ class TranslationAssets {
     if (File(path.join(directory.path, 'installed.json')).existsSync()) {
       return true;
     }
-    return File(path.join(directory.path, 'models', modelFileName)).existsSync();
+    return _containsModel(directory);
+  }
+
+  /// Whether any translation tier sits in `<directory>/models`.
+  static bool _containsModel(Directory directory) {
+    for (final spec in LocalComponentRegistry.translationModels) {
+      final file = File(
+        path.join(directory.path, 'models', spec.requiredFiles.first),
+      );
+      if (file.existsSync()) return true;
+    }
+    return false;
   }
 
   static Future<TranslationAssets> forApp() async {
@@ -145,9 +167,30 @@ class TranslationAssets {
   Directory get binDirectory =>
       _componentBinDirectory ?? Directory(path.join(root.path, 'bin'));
 
+  /// The model the engine runs: the first tier found under `models/`, or the
+  /// downloaded component, or the default path when neither exists.
   File get modelFile =>
-      _componentModel ??
+      _localModel()?.file ??
       File(path.join(root.path, 'models', modelFileName));
+
+  /// The engine's cache key follows the model that is actually loaded.
+  String get modelName => path.basename(modelFile.path);
+
+  _InstalledModel? _localModel() {
+    if (_componentModel != null) {
+      return _InstalledModel(
+        _componentModel!,
+        _componentModelSpec ?? LocalComponentRegistry.translationModel,
+      );
+    }
+    for (final spec in LocalComponentRegistry.translationModels) {
+      final file = File(
+        path.join(root.path, 'models', spec.requiredFiles.first),
+      );
+      if (file.existsSync()) return _InstalledModel(file, spec);
+    }
+    return null;
+  }
 
   /// The `llama-cli` the engine runs, or `null` when absent.
   Future<String?> findBinary() async {
@@ -167,17 +210,22 @@ class TranslationAssets {
 
   /// Checks presence and size, and the digest when [verifyDigest] is set.
   Future<TranslationAssetStatus> inspect({bool verifyDigest = false}) async {
-    final model = modelFile;
-    if (!await model.exists()) {
+    final installed = _localModel();
+    if (installed == null) {
       return const TranslationAssetStatus(TranslationAssetProblem.modelMissing);
     }
+    final model = installed.file;
     final length = await model.length();
-    if (length != expectedModelBytes) {
+    final expectedBytes =
+        expectedModelBytes ?? installed.spec.files.first.bytes;
+    if (length != expectedBytes) {
       return const TranslationAssetStatus(TranslationAssetProblem.modelCorrupt);
     }
     if (verifyDigest) {
+      final expectedSha =
+          expectedModelSha256 ?? installed.spec.files.first.sha256;
       final digest = await _digestOf(model.path, length);
-      if (digest != expectedModelSha256) {
+      if (digest != expectedSha) {
         return const TranslationAssetStatus(
           TranslationAssetProblem.modelCorrupt,
         );
@@ -200,6 +248,14 @@ class TranslationAssets {
     }
     return total;
   }
+}
+
+/// A model file together with the tier it came from.
+class _InstalledModel {
+  final File file;
+  final LocalComponentSpec spec;
+
+  const _InstalledModel(this.file, this.spec);
 }
 
 /// Digests keyed by path, size and mtime, so repeated checks stay cheap.

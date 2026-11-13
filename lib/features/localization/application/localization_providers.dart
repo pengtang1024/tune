@@ -54,11 +54,11 @@ Future<bool> _localTranslationReady(LocalComponents components) async {
     LocalComponentRegistry.translationRuntime,
   );
   if (runtime == null) return false;
-  final model = await components.file(
-    LocalComponentRegistry.translationModel,
-    LocalComponentRegistry.translationModelFileName,
-  );
-  return model != null;
+  for (final spec in LocalComponentRegistry.translationModels) {
+    final model = await components.file(spec, spec.requiredFiles.first);
+    if (model != null) return true;
+  }
+  return false;
 }
 
 final translationStoreProvider = FutureProvider<TranslationStore>((ref) async {

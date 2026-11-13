@@ -189,3 +189,14 @@ final localComponentStateProvider =
       return states.valueOrNull?[id] ??
           const LocalComponentState(LocalComponentPhase.checking);
     });
+
+/// The translation model the reader is actually using: the first tier that
+/// is usable, default first. A card reports this one, so downloading the
+/// low-memory tier instead of the default does not look like a missing model.
+final activeTranslationModelProvider = Provider<LocalComponentSpec>((ref) {
+  final states = ref.watch(localComponentsControllerProvider).valueOrNull;
+  for (final spec in LocalComponentRegistry.translationModels) {
+    if (states?[spec.id]?.usable ?? false) return spec;
+  }
+  return LocalComponentRegistry.translationModel;
+});

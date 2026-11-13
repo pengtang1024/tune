@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/translation/translation_provider_catalog.dart';
 import 'package:tune/domain/models/localization_config.dart';
@@ -94,6 +95,7 @@ class _SettingsLocalizationCardState
         ? ref.watch(ollamaModelsProvider).value ?? const <String>[]
         : const <String>[];
     final controller = ref.read(settingsControllerProvider.notifier);
+    final localModel = ref.watch(activeTranslationModelProvider);
 
     return SettingsCard(
       index: '08',
@@ -142,13 +144,11 @@ class _SettingsLocalizationCardState
                 ),
               ),
               model: ref.watch(
-                localComponentStateProvider(
-                  LocalComponentRegistry.translationModel.id,
-                ),
+                localComponentStateProvider(localModel.id),
               ),
-              onDownload: () => unawaited(_downloadLocalComponents()),
-              onCancel: _cancelLocalComponents,
-              onRemove: () => unawaited(_removeLocalComponents()),
+              onDownload: () => unawaited(_downloadLocalComponents(localModel)),
+              onCancel: () => _cancelLocalComponents(localModel),
+              onRemove: () => unawaited(_removeLocalComponents(localModel)),
             )
           else if (isVendor)
             SettingsLocalizationProviderBlock(
@@ -244,12 +244,12 @@ class _SettingsLocalizationCardState
     _applyCredential(next);
   }
 
-  Future<void> _downloadLocalComponents() async {
+  Future<void> _downloadLocalComponents(LocalComponentSpec model) async {
     final controller = ref.read(localComponentsControllerProvider.notifier);
     final states = ref.read(localComponentsControllerProvider).valueOrNull;
     for (final spec in [
       LocalComponentRegistry.translationRuntime,
-      LocalComponentRegistry.translationModel,
+      model,
     ]) {
       final current = states?[spec.id];
       if (current == null || current.usable || current.busy) continue;
@@ -257,16 +257,16 @@ class _SettingsLocalizationCardState
     }
   }
 
-  void _cancelLocalComponents() {
+  void _cancelLocalComponents(LocalComponentSpec model) {
     final controller = ref.read(localComponentsControllerProvider.notifier);
     controller.cancel(LocalComponentRegistry.translationRuntime.id);
-    controller.cancel(LocalComponentRegistry.translationModel.id);
+    controller.cancel(model.id);
   }
 
-  Future<void> _removeLocalComponents() async {
+  Future<void> _removeLocalComponents(LocalComponentSpec model) async {
     final controller = ref.read(localComponentsControllerProvider.notifier);
     await controller.remove(LocalComponentRegistry.translationRuntime.id);
-    await controller.remove(LocalComponentRegistry.translationModel.id);
+    await controller.remove(model.id);
   }
 
   Future<bool> _confirmPrivacy(String providerName) async {
