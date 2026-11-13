@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tune/app/layout/layout_metrics.dart';
 import 'package:tune/app/layout/window_form_controller.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
 import 'package:tune/data/services/window_layout_store.dart';
@@ -15,6 +17,7 @@ import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/shell/presentation/mini_player_bar.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/artwork_thumb.dart';
 
 import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
@@ -130,7 +133,7 @@ void main() {
     tester,
   ) async {
     persistence.values[WindowLayoutStore.formKey] = WindowForm.mini.name;
-    await setSurface(tester, const Size(360, 132));
+    await setSurface(tester, LayoutBreakpoints.miniWindowSize);
 
     await tester.pumpWidget(
       app(
@@ -141,6 +144,79 @@ void main() {
 
     expect(find.byType(MiniPlayerBar), findsOneWidget);
     expect(find.text('Window form', skipOffstage: false), findsWidgets);
+    expect(find.byKey(const ValueKey('mini-progress')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the mini window bar is the handle and draws the position', (
+    tester,
+  ) async {
+    await setSurface(tester, LayoutBreakpoints.miniWindowSize);
+    var dragged = false;
+
+    await tester.pumpWidget(
+      app(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox.fromSize(
+              size: LayoutBreakpoints.miniWindowSize,
+              child: MiniPlayerBar(
+                onRestore: () {},
+                onDrag: () => dragged = true,
+                showProgress: true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The frame of the mini window is gone, so the bar has to start the move.
+    await tester.drag(find.byType(MiniPlayerBar), const Offset(40, 0));
+    await tester.pumpAndSettle();
+    expect(dragged, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the mini bar spends its 88 pixels on cover, title and actions', (
+    tester,
+  ) async {
+    await setSurface(tester, LayoutBreakpoints.miniWindowSize);
+
+    await tester.pumpWidget(
+      app(
+        home: Scaffold(
+          body: SizedBox.fromSize(
+            size: LayoutBreakpoints.miniWindowSize,
+            child: MiniPlayerBar(onRestore: () {}, showProgress: true),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The bar is the window: it takes the whole height of the mini form and
+    // leaves two pixels of it to the progress line.
+    expect(
+      tester.getSize(find.byType(MiniPlayerBar)),
+      LayoutBreakpoints.miniWindowSize,
+    );
+    expect(tester.getSize(find.byKey(const ValueKey('mini-progress'))).height, 2);
+    // The cover is the size the dock gives it, so the two forms read alike.
+    expect(tester.getSize(find.byType(ArtworkThumb)).height, CompactTokens.artworkDock);
+    // Every action keeps a click target of at least 30, the size the dock uses.
+    for (final button in find
+        .descendant(
+          of: find.byType(MiniPlayerBar),
+          matching: find.byType(IconButton),
+        )
+        .evaluate()) {
+      final size = tester.getSize(find.byWidget(button.widget));
+      expect(size.width, greaterThanOrEqualTo(30));
+      expect(size.height, greaterThanOrEqualTo(30));
+    }
     expect(tester.takeException(), isNull);
   });
 

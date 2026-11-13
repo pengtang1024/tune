@@ -86,11 +86,11 @@ static void my_application_activate(GApplication* application) {
 
   gtk_window_set_default_size(window, 900, 600);
 
-  // Keep the compact two-pane layout usable when the window is resized.
-  GdkGeometry geometry;
-  geometry.min_width = 760;
-  geometry.min_height = 520;
-  gtk_window_set_geometry_hints(window, nullptr, &geometry, GDK_HINT_MIN_SIZE);
+  // The smallest size belongs to the form the window is in, not to the window:
+  // the shell wants room for two panes, the mini bar wants nothing but itself.
+  // The window manager service sets that size from the app, so this file pins
+  // no minimum of its own — a hint here wins over the one the bar sets, and
+  // the bar could never shrink to its own size.
 
   gtk_widget_show(GTK_WIDGET(window));
 

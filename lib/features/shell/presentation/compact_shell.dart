@@ -6,6 +6,7 @@ import 'package:tune/app/layout/layout_metrics.dart';
 import 'package:tune/app/layout/window_form_controller.dart';
 import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
@@ -217,7 +218,15 @@ class _CompactShellState extends ConsumerState<CompactShell> {
                   ),
                 ),
               ),
-              if (mini) SafeArea(child: MiniPlayerBar(onRestore: _leaveMini)),
+              if (mini)
+                SafeArea(
+                  child: MiniPlayerBar(
+                    onRestore: _leaveMini,
+                    onDrag: () =>
+                        WindowManagerService.startDragging().ignore(),
+                    showProgress: true,
+                  ),
+                ),
             ],
           ),
         ),

@@ -129,7 +129,7 @@ presentation → application → domain
 - 平台能力读 `AppCapabilities`（`lib/core/config/app_capabilities.dart`），界面不再自己判断 `Platform.isLinux`：托盘、MPRIS、默认播放器、自动更新、外部工具管线今天只有 Linux 为真；单实例在 Linux 与 Windows 为真（Windows 走回环端口）；Windows 只开窗口管理与单实例，移动端只开触屏外壳，Android 另开后台播放（`audio_service`，真机验收未完成）。
 - 设置页按能力表渲染：桌面分组只在托盘 / 媒体控制 / 默认播放器至少有一项为真时出现，更新卡片跟随 `autoUpdate`；没有接线的开关不画，避免给出按了没反应的入口。
 - 形态切换不换外壳 widget：`CompactShell` 在同一个 `State` 内按形态分支，页面子树与滚动位置因此不重建。mini 时外壳整棵树 `Offstage`，页面只是不画、不被销毁。
-- `mini` 是 360×132（`PlatformConstants.desktopMiniWindowWidth/Height`），置顶、不进任务栏、不可缩放。入口是播放条右端的画中画按钮（窗口内容宽 ≥ 860 才出现，给音量条留位置），返回入口是 mini 条上的展开按钮。进入前先写一次普通形态的尺寸；mini 期间不写尺寸，退出时按保存的尺寸与位置还原。
+- `mini` 是 360×88（`PlatformConstants.desktopMiniWindowWidth/Height`，高度等于底栏 `CompactTokens.dockHeight`），去窗口框与标题栏、置顶、不进任务栏、不可缩放；顺序必须是先去掉 CSD 再缩到 88 高并钉住 min=max，反过来会在 Wayland 上触发 GTK `sync_margin` 断言并把窗口塌成 248×1。入口是播放条右端的画中画按钮（窗口内容宽 ≥ 860 才出现，给音量条留位置），返回入口是 mini 条上的展开按钮。进入前先写一次普通形态的尺寸；mini 期间不写尺寸，退出时按保存的尺寸与位置还原。
 - `immersive` 是全屏 + 去窗口框，开关在正在播放页顶栏；离开该页（返回、Esc、收起按钮）即回到普通形态。Esc 先关队列面板，再关页面。
 - 启动时 `mini` 按保存的形态恢复；`immersive` 属于正在播放页，启动没有那页可回，因此按普通形态启动并写回 `window_form_v1`。
 - 形态切换由 `WindowManagerService.applyForm` 串行执行：读者在 resize 落地前又切回，最终停在最后选中的形态，而不是中间态。
