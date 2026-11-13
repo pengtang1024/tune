@@ -145,6 +145,31 @@ void main() {
     expect(album.trackCount, 2);
     expect(album.key, contains('src'));
     expect(album.key, contains('podcast_rss-1'));
+    expect(album.kind, ContentKind.podcast);
+  });
+
+  test('an album says whether it holds episodes or chapters', () {
+    const book = Song(
+      id: 1,
+      title: 'Chapter 1',
+      album: 'A Book',
+      sourceId: 'librivox',
+      uri: 'tune://librivox/1',
+    );
+
+    expect(libraryAlbumsOf([book]).single.kind, ContentKind.audiobook);
+    expect(
+      libraryAlbumsOf([
+        const Song(
+          id: 2,
+          title: 'Song',
+          artist: 'Artist',
+          album: 'Record',
+          uri: '/music/2.mp3',
+        ),
+      ]).single.kind,
+      ContentKind.music,
+    );
   });
 
   test('two sources of the same show are two albums', () {
@@ -204,7 +229,7 @@ void main() {
       contentKindOf(
         const Song(id: 2, sourceId: 'audiobookshelf-1', uri: 'tune://book/1'),
       ),
-      ContentKind.spokenWord,
+      ContentKind.audiobook,
     );
     expect(
       contentKindOf(const Song(id: 3, sourceId: 'local', uri: '/music/3.mp3')),

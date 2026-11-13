@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/utils/text_order.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -210,6 +211,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // tracks.
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
+    final radioActive = library.filter.kinds.contains(ContentKind.radio);
+    final hasRadio = library.songs.any((song) => song.isLiveStream);
 
     final content = Column(
       children: [
@@ -231,6 +234,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onScan: _scan,
                   scanning: library.isScanning,
                   onSearchOnline: widget.onSearchOnline,
+                  radioActive: radioActive,
+                  onRadio: (radioActive || hasRadio) ? _toggleRadio : null,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),
@@ -684,6 +689,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       key: summary.key,
       name: summary.name,
       artist: summary.artist,
+      kind: summary.kind,
       songs: songs,
       coverPath: summary.coverPath,
       coverUrl: summary.coverUrl,
@@ -741,7 +747,22 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       LibraryCategoryKind.formats => filter.copyWith(
         formats: {value as String},
       ),
+      LibraryCategoryKind.kinds => filter.copyWith(
+        kinds: {value as ContentKind},
+      ),
     };
+    setState(() => _view = LibraryViewMode.songs);
+    ref.read(libraryControllerProvider.notifier).setFilter(next);
+  }
+
+  /// Shows the stations through the same filter the panel writes, so the
+  /// page, the chips and the tree all agree on what is on screen.
+  void _toggleRadio() {
+    final filter = ref.read(libraryControllerProvider).requireValue.filter;
+    const radio = ContentKind.radio;
+    final next = filter.kinds.contains(radio)
+        ? filter.copyWith(kinds: {...filter.kinds}..remove(radio))
+        : filter.copyWith(kinds: {radio});
     setState(() => _view = LibraryViewMode.songs);
     ref.read(libraryControllerProvider.notifier).setFilter(next);
   }

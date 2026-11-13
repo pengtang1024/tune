@@ -388,6 +388,18 @@ abstract class AppLocalizations {
   /// **'{count} 首'**
   String libraryTrackCount(int count);
 
+  /// No description provided for @libraryEpisodeCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 集'**
+  String libraryEpisodeCount(int count);
+
+  /// No description provided for @libraryChapterCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 章'**
+  String libraryChapterCount(int count);
+
   /// No description provided for @libraryNoMatchTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -5357,6 +5369,18 @@ abstract class AppLocalizations {
   /// **'有声书'**
   String get contentKindAudiobook;
 
+  /// No description provided for @contentKindMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐'**
+  String get contentKindMusic;
+
+  /// No description provided for @contentKindRadio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台'**
+  String get contentKindRadio;
+
   /// No description provided for @trackFactPath.
   ///
   /// In zh_CN, this message translates to:
@@ -6802,6 +6826,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'格式'**
   String get libraryFilterFormats;
+
+  /// No description provided for @libraryFilterKinds.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'类型'**
+  String get libraryFilterKinds;
 
   /// No description provided for @libraryFilterDurations.
   ///

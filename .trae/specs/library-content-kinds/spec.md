@@ -42,7 +42,7 @@ P0 不引入新控件、不改行高：`LiveBadge` 的 18px 与现有 mono 时�
 新增 `lib/domain/models/content_kind.dart`：
 
 ```dart
-enum ContentKind { music, spokenWord, radio }
+enum ContentKind { music, podcast, audiobook, radio }
 
 const Set<String> spokenWordSourceTypes = {
   'podcast_rss', 'podcast_catalog', 'podcast_apple',
@@ -50,8 +50,12 @@ const Set<String> spokenWordSourceTypes = {
 };
 
 bool isSpokenWordSource(String? sourceId);
-ContentKind contentKindOf(Song song); // radio > spokenWord > music
+ContentKind contentKindOfSource({required String? sourceId, bool isLiveStream = false});
+ContentKind contentKindOf(Song song); // radio > podcast / audiobook > music
 ```
+
+> 2026-11-13：`spokenWord` 已拆成 `podcast` / `audiobook`；浏览层（筛选、分类视图、树、专辑墙分节、页头电台入口）见
+> `.trae/specs/library-browse-kinds/spec.md`。
 
 `lib/domain/models/music_source.dart` 新增 `String sourceTypeOfId(String id)`：id 末尾是数字（`<type>-<n>`）时取前缀，否则原样返回。与 `newSourceInstance` 共用同一套 id 约定。Internet Archive 的自定义内置 id 归 P3，不在本轮集合里。
 

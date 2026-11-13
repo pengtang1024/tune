@@ -93,6 +93,24 @@
       }
     }
   },
+  "libraryEpisodeCount": "{count, plural, =1{1 episode} other{{count} episodes}}",
+  "@libraryEpisodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryChapterCount": "{count, plural, =1{1 chapter} other{{count} chapters}}",
+  "@libraryChapterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "No matching songs",
   "libraryNoMatchSubtitle": "Try another keyword or clear the search",
   "librarySourceEmptyTitle": "No songs from this source",
@@ -1322,6 +1340,8 @@
   "trackFactContentKind": "Kind",
   "contentKindPodcast": "Podcast",
   "contentKindAudiobook": "Audiobook",
+  "contentKindMusic": "Music",
+  "contentKindRadio": "Radio",
   "trackFactPath": "File path",
   "trackFactAddress": "Online address",
   "trackDetailsTooltip": "Details",
@@ -1775,6 +1795,7 @@
   "libraryFilterArtists": "Artist",
   "libraryFilterLanguages": "Language",
   "libraryFilterFormats": "Format",
+  "libraryFilterKinds": "Kind",
   "libraryFilterDurations": "Duration",
   "libraryFilterAdded": "Added",
   "libraryFilterDurationShort": "<2 min",

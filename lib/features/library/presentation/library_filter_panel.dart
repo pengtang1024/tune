@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/domain/models/library_facets.dart';
@@ -102,6 +103,27 @@ class LibraryFilterPanel extends ConsumerWidget {
                   CompactTokens.space12,
                 ),
                 children: [
+                  if (facets.kinds.values.any((count) => count > 0))
+                    _section(
+                      context,
+                      context.loc.libraryFilterKinds,
+                      [
+                        for (final kind in ContentKind.values)
+                          if ((facets.kinds[kind] ?? 0) > 0)
+                            FilterChip(
+                              label: Text(
+                                '${filterKindLabel(context, kind)} · '
+                                '${facets.kinds[kind] ?? 0}',
+                              ),
+                              selected: filter.kinds.contains(kind),
+                              onSelected: (_) => setFilter(
+                                filter.copyWith(
+                                  kinds: _toggled(filter.kinds, kind),
+                                ),
+                              ),
+                            ),
+                      ],
+                    ),
                   _section(
                     context,
                     context.loc.libraryFilterStatus,

@@ -1,5 +1,6 @@
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// One album of the library: the songs of the album and the face of it.
@@ -28,6 +29,9 @@ class LibraryAlbum {
   /// The songs of the album, in the order of the album.
   final List<Song> songs;
 
+  /// What the album holds: songs, episodes of a show or chapters of a book.
+  final ContentKind kind;
+
   const LibraryAlbum({
     required this.key,
     required this.name,
@@ -35,6 +39,7 @@ class LibraryAlbum {
     required this.songs,
     this.coverPath,
     this.coverUrl,
+    this.kind = ContentKind.music,
   });
 
   int get trackCount => songs.length;
@@ -128,6 +133,7 @@ LibraryAlbum _albumOf(List<Song> songs) {
     key: libraryAlbumKeyOf(first),
     name: first.album.trim(),
     artist: first.artist.trim(),
+    kind: contentKindOf(first),
     coverPath: coverPath,
     coverUrl: coverUrl,
     songs: List.unmodifiable(ordered),

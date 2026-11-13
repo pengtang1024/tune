@@ -12,15 +12,16 @@ import 'package:tune/shared/ui/track_fact.dart';
 /// says the track is one. A station says it is live in its tail, so the mark
 /// is left for podcasts and audiobooks.
 String? contentKindLabelOf(BuildContext context, Song song) {
-  if (contentKindOf(song) != ContentKind.spokenWord) return null;
-  return isAudiobookSource(song.sourceId)
-      ? context.loc.contentKindAudiobook
-      : context.loc.contentKindPodcast;
+  return switch (contentKindOf(song)) {
+    ContentKind.podcast => context.loc.contentKindPodcast,
+    ContentKind.audiobook => context.loc.contentKindAudiobook,
+    _ => null,
+  };
 }
 
 /// The icon of the mark that names a speech track, or null for the rest.
 IconData? contentKindIconOf(Song song) {
-  if (contentKindOf(song) != ContentKind.spokenWord) return null;
+  if (!contentKindOf(song).isSpokenWord) return null;
   return Icons.record_voice_over_rounded;
 }
 

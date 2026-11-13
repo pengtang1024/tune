@@ -262,6 +262,7 @@ class FileLibraryStorage implements LibraryStorage {
           name: album.name,
           artist: album.artist,
           trackCount: album.trackCount,
+          kind: album.kind,
           coverPath: album.coverPath,
           coverUrl: album.coverUrl,
         ),

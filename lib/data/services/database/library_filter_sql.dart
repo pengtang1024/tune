@@ -1,3 +1,4 @@
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 
 /// The filter of the library page, as SQL.
@@ -17,6 +18,7 @@ class LibraryFilterSql {
     final args = <Object?>[];
     for (final clause in [
       search(query),
+      kind(filter.kinds),
       status(filter.status),
       genre(filter.genres),
       decade(filter.decades),
@@ -174,4 +176,47 @@ class LibraryFilterSql {
   };
 
   static String _marks(int count) => List.filled(count, '?').join(', ');
+
+  static const String _live =
+      "json_extract(songs.json, '\$.isLiveStream') = 1";
+  static const String _notLive =
+      "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) != 1";
+  static const List<String> _podcastTypes = [
+    'podcast_rss',
+    'podcast_catalog',
+    'podcast_apple',
+  ];
+  static const List<String> _audiobookTypes = ['librivox', 'audiobookshelf'];
+
+  /// The tracks of the chosen content kinds.
+  ///
+  /// A station wins over its source, exactly as [contentKindOfSource] does:
+  /// a live row never counts as a podcast episode or an audiobook chapter.
+  static ({String sql, List<Object?> args})? kind(Set<ContentKind> kinds) {
+    if (kinds.isEmpty) return null;
+    final speech = '($_notLive AND (${_sourcesOf([
+      ..._podcastTypes,
+      ..._audiobookTypes,
+    ])}))';
+    final conditions = [
+      for (final kind in kinds)
+        switch (kind) {
+          ContentKind.radio => _live,
+          ContentKind.music => '($_notLive AND NOT $speech)',
+          ContentKind.podcast =>
+            '($_notLive AND (${_sourcesOf(_podcastTypes)}))',
+          ContentKind.audiobook =>
+            '($_notLive AND (${_sourcesOf(_audiobookTypes)}))',
+        },
+    ];
+    return (sql: '(${conditions.join(' OR ')})', args: const []);
+  }
+
+  /// A built-in instance keeps the id of its type; a created one is
+  /// `<type>-<n>`. GLOB reads `_` as a literal, unlike LIKE, so the source
+  /// types need no escaping.
+  static String _sourcesOf(Iterable<String> types) => [
+    for (final type in types)
+      "(source_id = '$type' OR source_id GLOB '$type-[0-9]*')",
+  ].join(' OR ');
 }

@@ -93,6 +93,24 @@
       }
     }
   },
+  "libraryEpisodeCount": "{count} 集",
+  "@libraryEpisodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryChapterCount": "{count} 章",
+  "@libraryChapterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "沒有符合的歌曲",
   "libraryNoMatchSubtitle": "換個關鍵字，或清除搜尋條件",
   "librarySourceEmptyTitle": "該來源暫無歌曲",
@@ -1322,6 +1340,8 @@
   "trackFactContentKind": "類型",
   "contentKindPodcast": "播客",
   "contentKindAudiobook": "有聲書",
+  "contentKindMusic": "音樂",
+  "contentKindRadio": "電台",
   "trackFactPath": "檔案路徑",
   "trackFactAddress": "線上位址",
   "trackDetailsTooltip": "查看詳情",
@@ -1775,6 +1795,7 @@
   "libraryFilterArtists": "藝術家",
   "libraryFilterLanguages": "語言",
   "libraryFilterFormats": "格式",
+  "libraryFilterKinds": "類型",
   "libraryFilterDurations": "時長",
   "libraryFilterAdded": "加入時間",
   "libraryFilterDurationShort": "<2 分钟",

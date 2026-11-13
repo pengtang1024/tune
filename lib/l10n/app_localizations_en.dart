@@ -203,6 +203,36 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString episodes',
+      one: '1 episode',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString chapters',
+      one: '1 chapter',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get libraryNoMatchTitle => 'No matching songs';
 
   @override
@@ -3073,6 +3103,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contentKindAudiobook => 'Audiobook';
 
   @override
+  String get contentKindMusic => 'Music';
+
+  @override
+  String get contentKindRadio => 'Radio';
+
+  @override
   String get trackFactPath => 'File path';
 
   @override
@@ -3902,6 +3938,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryFilterFormats => 'Format';
+
+  @override
+  String get libraryFilterKinds => 'Kind';
 
   @override
   String get libraryFilterDurations => 'Duration';

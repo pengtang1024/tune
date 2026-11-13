@@ -29,6 +29,14 @@ class LibraryFilterChips extends StatelessWidget {
           filterStatusLabel(context, filter.status),
           () => onChanged(filter.copyWith(status: LibraryStatusFilter.all)),
         ),
+      for (final kind in filter.kinds)
+        _chip(
+          context,
+          filterKindLabel(context, kind),
+          () => onChanged(
+            filter.copyWith(kinds: {...filter.kinds}..remove(kind)),
+          ),
+        ),
       for (final genre in filter.genres)
         _chip(
           context,

@@ -12,6 +12,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
 import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 
@@ -49,7 +50,7 @@ void main() {
     ),
   ];
 
-  Widget app({required Widget home}) {
+  Widget app({required Widget home, List<Song> librarySongs = songs}) {
     return ProviderScope(
       overrides: [
         persistenceServiceProvider.overrideWithValue(FakePersistenceService()),
@@ -58,7 +59,7 @@ void main() {
         ),
         audioPlayerServiceProvider.overrideWithValue(FakeAudioPlayerService()),
         libraryControllerProvider.overrideWith(
-          () => FakeLibraryController(const LibraryState(songs: songs)),
+          () => FakeLibraryController(LibraryState(songs: librarySongs)),
         ),
       ],
       child: MaterialApp(
@@ -133,6 +134,87 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.equalizer_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('one kind of album needs no section header', (tester) async {
+    tester.view.physicalSize = const Size(900, 563);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('音乐 · '), findsNothing);
+    expect(find.text('Album A'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('songs, shows and books stand in three sections', (
+    tester,
+  ) async {
+    const mixed = [
+      Song(
+        id: 1,
+        title: 'Song',
+        artist: 'Artist',
+        album: 'Record',
+        duration: 1000,
+        uri: '/music/1.mp3',
+      ),
+      Song(
+        id: 2,
+        title: 'Episode 1',
+        album: 'The Show',
+        sourceId: 'podcast_rss-1',
+        uri: 'tune://podcast/1',
+      ),
+      Song(
+        id: 3,
+        title: 'Episode 2',
+        album: 'The Show',
+        sourceId: 'podcast_rss-1',
+        uri: 'tune://podcast/2',
+      ),
+      Song(
+        id: 4,
+        title: 'Chapter 1',
+        album: 'The Book',
+        sourceId: 'librivox',
+        uri: 'tune://librivox/1',
+      ),
+    ];
+    tester.view.physicalSize = const Size(900, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        librarySongs: mixed,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('音乐 · 1'), findsOneWidget);
+    expect(find.text('播客 · 1'), findsOneWidget);
+    expect(find.text('有声书 · 1'), findsOneWidget);
+    expect(find.text('1 首'), findsOneWidget);
+    expect(find.text('2 集'), findsOneWidget);
+    expect(find.text('1 章'), findsOneWidget);
+    expect(find.byType(MetaBadge), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
 }

@@ -32,6 +32,9 @@ class AlbumSummary {
   final String? coverPath;
   final String? coverUrl;
 
+  /// What the album holds: songs, episodes of a show or chapters of a book.
+  final ContentKind kind;
+
   const AlbumSummary({
     required this.key,
     required this.name,
@@ -39,6 +42,7 @@ class AlbumSummary {
     required this.trackCount,
     this.coverPath,
     this.coverUrl,
+    this.kind = ContentKind.music,
   });
 
   /// Whether the group holds the tracks that have no album at all.

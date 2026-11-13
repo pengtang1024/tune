@@ -36,14 +36,31 @@ void main() {
       contentKindOf(
         const Song(id: 2, uri: 'tune://podcast_rss/1', sourceId: 'podcast_rss-2'),
       ),
-      ContentKind.spokenWord,
+      ContentKind.podcast,
     );
     expect(
       contentKindOf(
         const Song(id: 3, uri: 'tune://librivox/1', sourceId: 'librivox'),
       ),
-      ContentKind.spokenWord,
+      ContentKind.audiobook,
     );
+    expect(ContentKind.podcast.isSpokenWord, isTrue);
+    expect(ContentKind.audiobook.isSpokenWord, isTrue);
+    expect(ContentKind.music.isSpokenWord, isFalse);
+    expect(ContentKind.radio.isSpokenWord, isFalse);
+  });
+
+  test('a row is classified from its source and live flag', () {
+    expect(
+      contentKindOfSource(sourceId: 'podcast_catalog-3'),
+      ContentKind.podcast,
+    );
+    expect(contentKindOfSource(sourceId: 'librivox'), ContentKind.audiobook);
+    expect(
+      contentKindOfSource(sourceId: 'podcast_rss-3', isLiveStream: true),
+      ContentKind.radio,
+    );
+    expect(contentKindOfSource(sourceId: null), ContentKind.music);
   });
 
   test('a local file is music', () {

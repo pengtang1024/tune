@@ -8,6 +8,7 @@ import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/data/services/database/library_query.dart';
 import 'package:tune/data/services/database/translation_tables.dart';
 import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
@@ -899,11 +900,15 @@ class AppDatabase {
       );
       final cover = _coverOfSample(row['sample']);
       final existing = albums[key];
+      final kind = contentKindOfSource(
+        sourceId: row['sourceId'] as String?,
+      );
       albums[key] = AlbumSummary(
         key: key,
         name: existing?.name ?? name,
         artist: existing?.artist ?? artist,
         trackCount: (existing?.trackCount ?? 0) + (row['count'] as int? ?? 0),
+        kind: existing?.kind ?? kind,
         coverPath: existing?.coverPath ?? cover.path,
         coverUrl: existing?.coverUrl ?? cover.url,
       );

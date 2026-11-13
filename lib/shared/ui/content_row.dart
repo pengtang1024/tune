@@ -21,7 +21,7 @@ enum RowShape {
 RowShape rowShapeOf(Song song) {
   return switch (contentKindOf(song)) {
     ContentKind.music => RowShape.track,
-    ContentKind.spokenWord => RowShape.spokenWord,
+    ContentKind.podcast || ContentKind.audiobook => RowShape.spokenWord,
     ContentKind.radio => RowShape.radio,
   };
 }

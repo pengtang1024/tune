@@ -93,6 +93,24 @@
       }
     }
   },
+  "libraryEpisodeCount": "{count} 集",
+  "@libraryEpisodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryChapterCount": "{count} 章",
+  "@libraryChapterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "没有匹配的歌曲",
   "libraryNoMatchSubtitle": "换个关键词，或清除搜索条件",
   "librarySourceEmptyTitle": "该来源暂无歌曲",
@@ -1322,6 +1340,8 @@
   "trackFactContentKind": "类型",
   "contentKindPodcast": "播客",
   "contentKindAudiobook": "有声书",
+  "contentKindMusic": "音乐",
+  "contentKindRadio": "电台",
   "trackFactPath": "文件路径",
   "trackFactAddress": "在线地址",
   "trackDetailsTooltip": "查看详情",
@@ -1775,6 +1795,7 @@
   "libraryFilterArtists": "艺术家",
   "libraryFilterLanguages": "语言",
   "libraryFilterFormats": "格式",
+  "libraryFilterKinds": "类型",
   "libraryFilterDurations": "时长",
   "libraryFilterAdded": "加入时间",
   "libraryFilterDurationShort": "<2 分钟",

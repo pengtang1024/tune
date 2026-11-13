@@ -177,6 +177,24 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -2843,6 +2861,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contentKindAudiobook => '有声书';
 
   @override
+  String get contentKindMusic => '音乐';
+
+  @override
+  String get contentKindRadio => '电台';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -3634,6 +3658,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterKinds => '类型';
 
   @override
   String get libraryFilterDurations => '时长';
@@ -4180,6 +4207,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -6846,6 +6891,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get contentKindAudiobook => '有声书';
 
   @override
+  String get contentKindMusic => '音乐';
+
+  @override
+  String get contentKindRadio => '电台';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -7639,6 +7690,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryFilterFormats => '格式';
 
   @override
+  String get libraryFilterKinds => '类型';
+
+  @override
   String get libraryFilterDurations => '时长';
 
   @override
@@ -8180,6 +8234,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 首';
+  }
+
+  @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
   }
 
   @override
@@ -10849,6 +10921,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get contentKindAudiobook => '有聲書';
 
   @override
+  String get contentKindMusic => '音樂';
+
+  @override
+  String get contentKindRadio => '電台';
+
+  @override
   String get trackFactPath => '檔案路徑';
 
   @override
@@ -11640,6 +11718,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterKinds => '類型';
 
   @override
   String get libraryFilterDurations => '時長';
