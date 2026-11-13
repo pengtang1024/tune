@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/features/library/data/impl/library_storage_io.dart';
@@ -368,6 +371,243 @@ void main() {
         2,
       );
       expect(database.load().map((track) => track.uri), [kept.uri]);
+    });
+
+    test('albums merge the episodes of a show and leave a station out', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Episode 1',
+          artist: 'Host A',
+          album: 'The Show',
+          uri: 'tune://podcast/1',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 2,
+          title: 'Episode 2',
+          artist: 'Host B',
+          album: 'The Show',
+          uri: 'tune://podcast/2',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 3,
+          title: 'Episode 1',
+          artist: 'Host C',
+          album: 'The Show',
+          uri: 'tune://podcast/3',
+          sourceId: 'podcast_rss-2',
+        ),
+        const Song(
+          id: 4,
+          title: 'Station',
+          artist: 'On air artist',
+          album: 'On air song',
+          uri: 'tune://radio/1',
+          sourceId: 'radio',
+          isLiveStream: true,
+        ),
+      ]);
+
+      final albums = database.albumSummaries();
+
+      expect(albums, hasLength(2));
+      expect(albums.any((album) => album.key.contains('radio')), isFalse);
+      final show = albums.firstWhere(
+        (album) => album.key.contains('podcast_rss-1'),
+      );
+      expect(show.trackCount, 2);
+      expect(show.kind, ContentKind.podcast);
+      expect(database.albumSongs(show.key).map((song) => song.title), [
+        'Episode 1',
+        'Episode 2',
+      ]);
+    });
+
+    test('a show carried by two sources becomes one album, one copy an episode', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Episode 1',
+          album: 'The Show',
+          sourceId: 'podcast_rss-1',
+          duration: 600000,
+          uri: 'tune://podcast/1',
+        ),
+        const Song(
+          id: 2,
+          title: 'Episode 2',
+          album: 'The Show',
+          sourceId: 'podcast_rss-1',
+          duration: 700000,
+          uri: 'tune://podcast/2',
+        ),
+        const Song(
+          id: 3,
+          title: 'Episode 1',
+          album: 'The Show',
+          sourceId: 'archive_podcasts',
+          duration: 601000,
+          uri: 'tune://archive/1',
+        ),
+        const Song(
+          id: 4,
+          title: 'Episode 2',
+          album: 'The Show',
+          sourceId: 'archive_podcasts',
+          duration: 700500,
+          uri: 'tune://archive/2',
+        ),
+      ]);
+
+      final album = database.albumSummaries().single;
+
+      expect(album.key, contains('show'));
+      expect(album.trackCount, 2);
+      expect(album.kind, ContentKind.podcast);
+      expect(database.albumSongs(album.key).map((song) => song.uri), [
+        'tune://podcast/1',
+        'tune://podcast/2',
+      ]);
+    });
+
+    test('an album carries the kind of its tracks', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Song',
+          artist: 'Artist',
+          album: 'Record',
+          uri: '/music/1.mp3',
+        ),
+        const Song(
+          id: 2,
+          title: 'Chapter',
+          album: 'Book',
+          uri: 'tune://librivox/1',
+          sourceId: 'librivox',
+        ),
+      ]);
+
+      final albums = database.albumSummaries();
+
+      expect(
+        albums.firstWhere((album) => album.name == 'Record').kind,
+        ContentKind.music,
+      );
+      expect(
+        albums.firstWhere((album) => album.name == 'Book').kind,
+        ContentKind.audiobook,
+      );
+    });
+
+    test('the filter counts the four kinds of track', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        song(1),
+        const Song(
+          id: 2,
+          title: 'Episode',
+          album: 'Show',
+          uri: 'tune://podcast/1',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 3,
+          title: 'Chapter',
+          album: 'Book',
+          uri: 'tune://librivox/1',
+          sourceId: 'librivox',
+        ),
+        const Song(
+          id: 4,
+          title: 'Station',
+          uri: 'tune://radio/1',
+          sourceId: 'radio-1',
+          isLiveStream: true,
+        ),
+      ]);
+
+      final facets = database.facets(filter: LibraryFilter.empty);
+
+      expect(facets.kinds, {
+        ContentKind.music: 1,
+        ContentKind.podcast: 1,
+        ContentKind.audiobook: 1,
+        ContentKind.radio: 1,
+      });
+    });
+
+    test('a kind filter keeps only the chosen kind', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        song(1),
+        const Song(
+          id: 2,
+          title: 'Episode',
+          album: 'Show',
+          uri: 'tune://podcast/1',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 3,
+          title: 'Station',
+          uri: 'tune://radio/1',
+          sourceId: 'radio-1',
+          isLiveStream: true,
+        ),
+      ]);
+
+      List<Song> read(ContentKind kind) => database.query(
+        query: '',
+        filter: LibraryFilter(kinds: {kind}),
+        sort: LibrarySort.recent,
+        offset: 0,
+        limit: 10,
+      );
+
+      expect(read(ContentKind.podcast).map((track) => track.title), [
+        'Episode',
+      ]);
+      expect(read(ContentKind.radio).map((track) => track.title), [
+        'Station',
+      ]);
+      expect(read(ContentKind.music).map((track) => track.title), ['Track 1']);
+    });
+
+    test('a music album still asks for its artist', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Left',
+          artist: 'Left Artist',
+          album: 'Greatest Hits',
+          uri: 'tune://openverse/l',
+        ),
+        const Song(
+          id: 2,
+          title: 'Right',
+          artist: 'Right Artist',
+          album: 'Greatest Hits',
+          uri: 'tune://openverse/r',
+        ),
+      ]);
+
+      final albums = database.albumSummaries();
+
+      expect(albums, hasLength(2));
+      expect(albums.map((album) => album.trackCount), [1, 1]);
     });
   });
 

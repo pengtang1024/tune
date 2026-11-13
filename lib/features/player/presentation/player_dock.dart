@@ -23,6 +23,7 @@ import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/live_badge.dart';
+import 'package:tune/shared/ui/track_facts.dart';
 
 class PlayerDock extends ConsumerWidget {
   /// Toggles the queue panel of the shell.
@@ -132,6 +133,8 @@ class PlayerDock extends ConsumerWidget {
                                   child: Text(
                                     song == null
                                         ? context.loc.playerDockReady
+                                        : song.isLiveStream
+                                        ? (onAirLineOf(context, song) ?? '')
                                         : (song.artist.isEmpty
                                               ? context.loc.playerUnknownArtist
                                               : song.artist),

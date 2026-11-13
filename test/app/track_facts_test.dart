@@ -18,6 +18,7 @@ import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
+import 'package:tune/shared/ui/track_metadata_facts.dart';
 import 'package:tune/shared/ui/track_meta.dart';
 
 import '../services/fake_persistence.dart';
@@ -657,6 +658,59 @@ void main() {
     expect(formatOf(fetched), 'MP3');
     // A track of a source without a file has no format of its own.
     expect(formatOf(remote), isNull);
+  });
+
+  group('what a station is airing', () {
+    test('the typed names are read', () {
+      const song = Song(
+        id: 1,
+        title: 'Jazz FM',
+        uri: 'tune://radio/one',
+        isLiveStream: true,
+        onAirArtist: 'Miles Davis',
+        onAirTitle: 'So What',
+      );
+
+      expect(onAirOf(song), 'Miles Davis - So What');
+    });
+
+    test('an older scan is read from the joined string', () {
+      const song = Song(
+        id: 1,
+        title: 'Jazz FM',
+        uri: 'tune://radio/one',
+        isLiveStream: true,
+        sourceData: {'nowPlaying': 'Miles Davis - So What'},
+      );
+
+      expect(onAirOf(song), 'Miles Davis - So What');
+    });
+
+    test('the typed names win over the joined string', () {
+      const song = Song(
+        id: 1,
+        title: 'Jazz FM',
+        uri: 'tune://radio/one',
+        isLiveStream: true,
+        onAirArtist: 'John Coltrane',
+        onAirTitle: 'Giant Steps',
+        sourceData: {'nowPlaying': 'Miles Davis - So What'},
+      );
+
+      expect(onAirOf(song), 'John Coltrane - Giant Steps');
+    });
+
+    test('a station with nothing on air names nothing', () {
+      const song = Song(
+        id: 1,
+        title: 'Jazz FM',
+        uri: 'tune://radio/one',
+        isLiveStream: true,
+        sourceData: {'nowPlaying': ''},
+      );
+
+      expect(onAirOf(song), isNull);
+    });
   });
 }
 

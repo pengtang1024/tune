@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 
 /// The counts the filter panel and the category cards read.
@@ -17,6 +18,7 @@ class LibraryFacets {
   final Map<LibraryDurationBucket, int> durations;
   final Map<LibraryAddedWindow, int> added;
   final Map<LibraryStatusFilter, int> statuses;
+  final Map<ContentKind, int> kinds;
 
   const LibraryFacets({
     this.genres = const {},
@@ -28,6 +30,7 @@ class LibraryFacets {
     this.durations = const {},
     this.added = const {},
     this.statuses = const {},
+    this.kinds = const {},
   });
 
   static const LibraryFacets empty = LibraryFacets();

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -19,9 +20,10 @@ class UpdateService {
 
   final Dio _dio;
 
-  /// The release read the last time, and when.
+  /// The release read the last time, when, and with which token.
   UpdateRelease? _cached;
   DateTime? _cachedAt;
+  String? _cachedToken;
 
   /// How long a check may reuse the last answer.
   static const _cacheFor = Duration(minutes: 10);
@@ -38,33 +40,133 @@ class UpdateService {
           );
 
   /// The newest release, or `null` when the project published none.
-  Future<UpdateRelease?> latest() async {
+  ///
+  /// [manualToken] is the token typed in the settings; it wins over the
+  /// environment. Without either the request is anonymous, which GitHub
+  /// limits to sixty an hour per address.
+  ///
+  /// Only an answer of the project page is cached; a failed check is not, so
+  /// the next attempt reaches the page again instead of repeating a failure
+  /// for ten minutes.
+  Future<UpdateRelease?> latest({
+    String? manualToken,
+    Map<String, String>? environment,
+  }) async {
+    final token = resolveToken(
+      manualToken: manualToken,
+      environment: environment,
+    );
     final cachedAt = _cachedAt;
-    if (cachedAt != null && DateTime.now().difference(cachedAt) < _cacheFor) {
+    if (cachedAt != null &&
+        token == _cachedToken &&
+        DateTime.now().difference(cachedAt) < _cacheFor) {
       return _cached;
     }
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '$_apiHost/repos/$_repo/releases/latest',
         options: Options(
+          headers: {if (token != null) 'Authorization': 'Bearer $token'},
           // A project without a release answers with 404; that is an answer,
           // not a failure of the network.
           validateStatus: (status) => status != null && status < 500,
         ),
       );
-      if (response.statusCode == 404) {
-        _cached = null;
-        _cachedAt = DateTime.now();
+      final status = response.statusCode ?? 0;
+      if (status == 404) {
+        _remember(null, token);
         return null;
       }
+      if (status == 403) {
+        _forgetCache();
+        throw const UpdateCheckException(
+          UpdateCheckFailure.rateLimited,
+          statusCode: 403,
+        );
+      }
+      if (status == 401) {
+        _forgetCache();
+        throw const UpdateCheckException(
+          UpdateCheckFailure.unauthorized,
+          statusCode: 401,
+        );
+      }
+      if (status < 200 || status >= 300) {
+        _forgetCache();
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
       final release = parseRelease(response.data);
-      _cached = release;
-      _cachedAt = DateTime.now();
+      if (release == null) {
+        _forgetCache();
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
+      _remember(release, token);
       return release;
-    } on DioException catch (error) {
-      if (error.response?.statusCode == 404) return null;
+    } on UpdateCheckException {
       rethrow;
+    } on DioException catch (error) {
+      final status = error.response?.statusCode;
+      if (status == 404) {
+        _remember(null, token);
+        return null;
+      }
+      _forgetCache();
+      if (status == 403) {
+        throw const UpdateCheckException(
+          UpdateCheckFailure.rateLimited,
+          statusCode: 403,
+        );
+      }
+      if (status == 401) {
+        throw const UpdateCheckException(
+          UpdateCheckFailure.unauthorized,
+          statusCode: 401,
+        );
+      }
+      if (status != null) {
+        throw UpdateCheckException(
+          UpdateCheckFailure.server,
+          statusCode: status,
+        );
+      }
+      throw const UpdateCheckException(UpdateCheckFailure.network);
     }
+  }
+
+  /// The token the check carries: the hand-typed one wins, then the
+  /// environment.
+  ///
+  /// Blank values count as absent, so clearing the settings field falls back
+  /// to `GITHUB_TOKEN` and then `GH_TOKEN`.
+  static String? resolveToken({
+    String? manualToken,
+    Map<String, String>? environment,
+  }) {
+    final manual = manualToken?.trim() ?? '';
+    if (manual.isNotEmpty) return manual;
+    final env = environment ?? Platform.environment;
+    for (final name in const ['GITHUB_TOKEN', 'GH_TOKEN']) {
+      final value = env[name]?.trim() ?? '';
+      if (value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  void _remember(UpdateRelease? release, String? token) {
+    _cached = release;
+    _cachedAt = DateTime.now();
+    _cachedToken = token;
+  }
+
+  void _forgetCache() {
+    _cachedAt = null;
+    _cachedToken = null;
   }
 
   /// Reads one release of the answer of the project page.

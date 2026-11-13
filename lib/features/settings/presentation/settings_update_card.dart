@@ -5,6 +5,8 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/application/update_controller.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 
@@ -70,6 +72,8 @@ class SettingsUpdateCard extends ConsumerWidget {
               ),
             ),
           ],
+          const SizedBox(height: 8),
+          const _TokenField(),
         ],
       ),
     );
@@ -88,7 +92,13 @@ class SettingsUpdateCard extends ConsumerWidget {
         '${strings.updateDownloading} ${(state.progress * 100).round()}%',
       UpdateStatus.installing => strings.updateInstalling,
       UpdateStatus.ready => strings.updateReady,
-      UpdateStatus.failed => strings.updateFailed(state.error ?? ''),
+      UpdateStatus.failed => switch (state.failure) {
+        UpdateCheckFailure.rateLimited => strings.updateFailedRateLimited,
+        UpdateCheckFailure.unauthorized => strings.updateFailedUnauthorized,
+        UpdateCheckFailure.network => strings.updateFailedNetwork,
+        UpdateCheckFailure.server => strings.updateFailedServer,
+        null => strings.updateFailed(state.error ?? ''),
+      },
     };
   }
 }
@@ -158,6 +168,59 @@ class _Actions extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+    );
+  }
+}
+
+/// The optional token the check sends: typed here wins over the environment.
+class _TokenField extends ConsumerStatefulWidget {
+  const _TokenField();
+
+  @override
+  ConsumerState<_TokenField> createState() => _TokenFieldState();
+}
+
+class _TokenFieldState extends ConsumerState<_TokenField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: ref.read(settingsControllerProvider).githubToken,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.loc;
+    final theme = Theme.of(context);
+
+    return TextField(
+      key: const ValueKey('settings-update-token'),
+      controller: _controller,
+      obscureText: true,
+      autocorrect: false,
+      enableSuggestions: false,
+      style: theme.textTheme.bodySmall,
+      decoration: InputDecoration(
+        isDense: true,
+        border: const OutlineInputBorder(),
+        labelText: strings.updateTokenLabel,
+        hintText: strings.updateTokenHint,
+        helperText: strings.updateTokenHelp,
+        helperStyle: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+      onChanged: (value) =>
+          ref.read(settingsControllerProvider.notifier).setGithubToken(value),
     );
   }
 }

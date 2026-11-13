@@ -1,3 +1,23 @@
+import 'package:tune/domain/models/content_kind.dart';
+
+/// The key an album is grouped by.
+///
+/// A song belongs to the album of its artist. A show or a book is one album
+/// even when every episode names a different artist, so a spoken track is
+/// grouped by the source that publishes it instead.
+String albumKeyOf({
+  required String album,
+  required String artist,
+  String? sourceId,
+}) {
+  final name = album.trim().toLowerCase();
+  if (name.isEmpty) return '\u0000unknown';
+  if (contentKindOfSource(sourceId: sourceId).isSpokenWord) {
+    return '$name\u0000src\u0000${sourceId ?? ''}';
+  }
+  return '$name\u0000${artist.trim().toLowerCase()}';
+}
+
 /// One album of the library, without its tracks.
 ///
 /// The album view only needs the name, the artist, the count and a cover to
@@ -12,6 +32,9 @@ class AlbumSummary {
   final String? coverPath;
   final String? coverUrl;
 
+  /// What the album holds: songs, episodes of a show or chapters of a book.
+  final ContentKind kind;
+
   const AlbumSummary({
     required this.key,
     required this.name,
@@ -19,6 +42,7 @@ class AlbumSummary {
     required this.trackCount,
     this.coverPath,
     this.coverUrl,
+    this.kind = ContentKind.music,
   });
 
   /// Whether the group holds the tracks that have no album at all.

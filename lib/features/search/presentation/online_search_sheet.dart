@@ -17,7 +17,9 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
+import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
@@ -729,10 +731,7 @@ class _SongRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final subtitle = [
-      song.artist,
-      song.album,
-    ].where((value) => value.trim().isNotEmpty).join(' · ');
+    final subtitle = rowSubtitleOf(context, song);
 
     return TrackClickArea(
       onClick: onPlay,
@@ -779,14 +778,17 @@ class _SongRow extends StatelessWidget {
             const SizedBox(width: CompactTokens.space8),
             TrackFactStrip(song: song),
             const SizedBox(width: CompactTokens.space8),
-            Text(
-              song.duration > 0
-                  ? formatDuration(Duration(milliseconds: song.duration))
-                  : '--:--',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            if (song.isLiveStream)
+              const LiveBadge()
+            else
+              Text(
+                song.duration > 0
+                    ? formatDuration(Duration(milliseconds: song.duration))
+                    : '--:--',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
             TuneTooltip(
               message: context.loc.trackDetailsTooltip,
               child: IconButton(

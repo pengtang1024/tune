@@ -32,6 +32,9 @@ class SourceSongFactory {
     String? language,
     int? size,
     bool isLiveStream = false,
+    String? onAirArtist,
+    String? onAirTitle,
+    int? onAirYear,
     String? license,
     String? description,
   }) {
@@ -66,6 +69,9 @@ class SourceSongFactory {
       language: language,
       size: size,
       isLiveStream: isLiveStream,
+      onAirArtist: onAirArtist,
+      onAirTitle: onAirTitle,
+      onAirYear: onAirYear,
       license: license,
       description: description,
     );

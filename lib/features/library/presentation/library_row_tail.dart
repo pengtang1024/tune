@@ -7,6 +7,7 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_details_button.dart';
 import 'package:tune/shared/utils/duration_format.dart';
@@ -68,7 +69,11 @@ class LibraryRowTail extends StatelessWidget {
                 SourceBadge(label: source!, dense: true),
                 const SizedBox(width: CompactTokens.space4),
               ],
-              if (!song.isLiveStream)
+              // A live stream never ends, so it has no duration to write
+              // down: the badge says what the track is instead.
+              if (song.isLiveStream)
+                const LiveBadge()
+              else
                 Text(
                   formatDuration(
                     Duration(milliseconds: song.durationInMillis),

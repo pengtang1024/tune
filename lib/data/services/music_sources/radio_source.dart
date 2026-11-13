@@ -293,9 +293,12 @@ class RadioSourceAdapter extends MusicSourceAdapter {
 
   /// Turns stations into tracks.
   ///
-  /// The station is the track: its name is the title, the track on air is the
-  /// album and its artist is the performer. The stream never ends, so the
-  /// tracks are marked as live.
+  /// The station is the track: its name is the title. The song on air is a
+  /// separate fact, kept in the typed `onAir` fields, so nothing reads it as
+  /// the artist or the album of the stream. The stream never ends, so the
+  /// tracks are marked as live. The joined `nowPlaying` string stays in
+  /// `sourceData` for one version, so a library cached by an older scan
+  /// still shows what a station is airing.
   static List<Song> buildSongs(
     List<RadioStation> stations, {
     required String sourceId,
@@ -317,19 +320,19 @@ class RadioSourceAdapter extends MusicSourceAdapter {
           sourceId: sourceId,
           externalId: externalId,
           title: station.name,
-          artist: station.nowPlayingArtist ?? station.country ?? '',
-          album: station.nowPlayingTitle ?? '',
           streamUrl: station.streamUrl,
           artworkUrl: station.artworkUrl,
           genre: station.genre,
           genres: station.genres,
           language: station.language,
-          year: station.nowPlayingYear,
           description: station.description,
           // The directory tells how fast a station streams; the track carries
           // it, so the bitrate a reader filters by is the one they see.
           bitrate: (station.bitrate ?? 0) > 0 ? station.bitrate : null,
           isLiveStream: true,
+          onAirArtist: station.nowPlayingArtist,
+          onAirTitle: station.nowPlayingTitle,
+          onAirYear: station.nowPlayingYear,
           sourceData: {
             'provider': station.provider,
             'stationId': station.id,

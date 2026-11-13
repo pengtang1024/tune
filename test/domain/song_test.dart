@@ -58,6 +58,24 @@ void main() {
       expect(restored.title, original.title);
       expect(restored.bitrate, original.bitrate);
     });
+
+    test('JSON round-trip keeps what a station is airing', () {
+      const original = Song(
+        id: 1,
+        title: 'Jazz FM',
+        uri: 'tune://radio/one',
+        isLiveStream: true,
+        onAirArtist: 'Miles Davis',
+        onAirTitle: 'So What',
+        onAirYear: 1959,
+      );
+
+      final restored = Song.fromMap(original.toJson());
+
+      expect(restored.onAirArtist, 'Miles Davis');
+      expect(restored.onAirTitle, 'So What');
+      expect(restored.onAirYear, 1959);
+    });
   });
 
   group('the file of a track', () {

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:tune/domain/models/content_kind.dart';
 
 /// What the library page shows beyond the search word.
 ///
@@ -24,6 +25,7 @@ class LibraryFilter {
   final Set<LibraryDurationBucket> durations;
   final Set<LibraryAddedWindow> added;
   final Set<String> languages;
+  final Set<ContentKind> kinds;
 
   const LibraryFilter({
     this.status = LibraryStatusFilter.all,
@@ -35,6 +37,7 @@ class LibraryFilter {
     this.durations = const {},
     this.added = const {},
     this.languages = const {},
+    this.kinds = const {},
   });
 
   static const LibraryFilter empty = LibraryFilter();
@@ -48,7 +51,8 @@ class LibraryFilter {
       formats.isEmpty &&
       durations.isEmpty &&
       added.isEmpty &&
-      languages.isEmpty;
+      languages.isEmpty &&
+      kinds.isEmpty;
 
   /// How many groups narrow the page; the filter button shows it.
   int get activeGroups => [
@@ -61,6 +65,7 @@ class LibraryFilter {
     durations.isNotEmpty,
     added.isNotEmpty,
     languages.isNotEmpty,
+    kinds.isNotEmpty,
   ].where((active) => active).length;
 
   LibraryFilter copyWith({
@@ -73,6 +78,7 @@ class LibraryFilter {
     Set<LibraryDurationBucket>? durations,
     Set<LibraryAddedWindow>? added,
     Set<String>? languages,
+    Set<ContentKind>? kinds,
   }) => LibraryFilter(
     status: status ?? this.status,
     genres: genres ?? this.genres,
@@ -83,6 +89,7 @@ class LibraryFilter {
     durations: durations ?? this.durations,
     added: added ?? this.added,
     languages: languages ?? this.languages,
+    kinds: kinds ?? this.kinds,
   );
 
   @override
@@ -96,7 +103,8 @@ class LibraryFilter {
       setEquals(other.formats, formats) &&
       setEquals(other.durations, durations) &&
       setEquals(other.added, added) &&
-      setEquals(other.languages, languages);
+      setEquals(other.languages, languages) &&
+      setEquals(other.kinds, kinds);
 
   @override
   int get hashCode => Object.hash(
@@ -109,5 +117,6 @@ class LibraryFilter {
     Object.hashAllUnordered(durations),
     Object.hashAllUnordered(added),
     Object.hashAllUnordered(languages),
+    Object.hashAllUnordered(kinds),
   );
 }

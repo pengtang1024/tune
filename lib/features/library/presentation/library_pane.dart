@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/utils/text_order.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/show_album.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -210,6 +212,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // tracks.
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
+    final radioActive = library.filter.kinds.contains(ContentKind.radio);
+    // A station is a kind, not only a live stream: a recording of a broadcast
+    // is a station too, so it opens the same entry.
+    final hasRadio = library.songs.any(
+      (song) => contentKindOf(song) == ContentKind.radio,
+    );
 
     final content = Column(
       children: [
@@ -231,6 +239,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onScan: _scan,
                   scanning: library.isScanning,
                   onSearchOnline: widget.onSearchOnline,
+                  radioActive: radioActive,
+                  onRadio: (radioActive || hasRadio) ? _toggleRadio : null,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),
@@ -489,7 +499,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           );
           return LibraryAlbumsView(
             albums: library.albums,
-            currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
+            currentAlbumKey: _currentAlbumKey(
+              library.albums,
+              library.songs,
+              currentUri,
+            ),
             controller: _albumsScrollController,
             bilingual: bilingual,
             onOpen: _openAlbumByKey,
@@ -684,16 +698,43 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       key: summary.key,
       name: summary.name,
       artist: summary.artist,
+      kind: summary.kind,
       songs: songs,
       coverPath: summary.coverPath,
       coverUrl: summary.coverUrl,
     );
   }
 
-  String? _currentAlbumKey(List<Song> librarySongs, String? currentUri) {
+  String? _currentAlbumKey(
+    List<AlbumSummary> albums,
+    List<Song> librarySongs,
+    String? currentUri,
+  ) {
     if (currentUri == null) return null;
+    Song? current;
     for (final song in librarySongs) {
-      if (song.uri == currentUri) return libraryAlbumKeyOf(song);
+      if (song.uri == currentUri) {
+        current = song;
+        break;
+      }
+    }
+    if (current == null) return null;
+    final ownKey = libraryAlbumKeyOf(current);
+    for (final album in albums) {
+      if (album.key == ownKey) return album.key;
+    }
+    // A show the library merged from several sources carries a key that names
+    // every source; the track belongs to that card when its source is one of
+    // them and the show name matches.
+    if (!contentKindOf(current).isSpokenWord) return null;
+    final name = normalizedShowNameOf(current.album);
+    final source = current.sourceId ?? 'local';
+    for (final album in albums) {
+      if (!isMergedShowKey(album.key)) continue;
+      final parts = album.key.split('\u0000');
+      if (parts.first != name) continue;
+      final sources = [for (final part in parts.skip(2)) ...part.split('\u0001')];
+      if (sources.contains(source)) return album.key;
     }
     return null;
   }
@@ -741,7 +782,22 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       LibraryCategoryKind.formats => filter.copyWith(
         formats: {value as String},
       ),
+      LibraryCategoryKind.kinds => filter.copyWith(
+        kinds: {value as ContentKind},
+      ),
     };
+    setState(() => _view = LibraryViewMode.songs);
+    ref.read(libraryControllerProvider.notifier).setFilter(next);
+  }
+
+  /// Shows the stations through the same filter the panel writes, so the
+  /// page, the chips and the tree all agree on what is on screen.
+  void _toggleRadio() {
+    final filter = ref.read(libraryControllerProvider).requireValue.filter;
+    const radio = ContentKind.radio;
+    final next = filter.kinds.contains(radio)
+        ? filter.copyWith(kinds: {...filter.kinds}..remove(radio))
+        : filter.copyWith(kinds: {radio});
     setState(() => _view = LibraryViewMode.songs);
     ref.read(libraryControllerProvider.notifier).setFilter(next);
   }

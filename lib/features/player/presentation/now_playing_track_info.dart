@@ -152,6 +152,20 @@ class _Artist extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // A station publishes what it is airing, not who made the stream: the
+    // line says so instead of passing the on-air song off as the artist.
+    if (song.isLiveStream) {
+      final onAir = onAirLineOf(context, song);
+      if (onAir == null) return const SizedBox.shrink();
+      return Text(
+        onAir,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      );
+    }
     final artist = song.artist.isEmpty
         ? context.loc.playerUnknownArtist
         : song.artist;

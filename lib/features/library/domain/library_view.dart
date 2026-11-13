@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
 
@@ -28,6 +29,7 @@ class LibraryView {
       'durations': [for (final value in filter.durations) value.name],
       'added': [for (final value in filter.added) value.name],
       'languages': filter.languages.toList(),
+      'kinds': [for (final kind in filter.kinds) kind.name],
     },
   };
 
@@ -63,6 +65,11 @@ class LibraryView {
                     LibraryAddedWindow.values.asNameMap()[name]!,
               },
               languages: _strings(filter['languages']),
+              kinds: {
+                for (final name in _strings(filter['kinds']))
+                  if (ContentKind.values.asNameMap()[name] != null)
+                    ContentKind.values.asNameMap()[name]!,
+              },
             )
           : LibraryFilter.empty,
     );

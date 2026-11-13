@@ -100,6 +100,33 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      'The check failed: GitHub may be rate limiting this address (60 requests an hour without a token). Try again later or add a token';
+
+  @override
+  String get updateFailedUnauthorized =>
+      'The check failed: the token is invalid or cannot read the release page';
+
+  @override
+  String get updateFailedNetwork =>
+      'The check failed: the request timed out or the network is unreachable';
+
+  @override
+  String get updateFailedServer =>
+      'The check failed: the release page answered with an unexpected response';
+
+  @override
+  String get updateTokenLabel => 'GitHub token (optional)';
+
+  @override
+  String get updateTokenHint =>
+      'Leave empty to use GITHUB_TOKEN / GH_TOKEN from the environment';
+
+  @override
+  String get updateTokenHelp =>
+      'Only used for update checks; never written to logs';
+
+  @override
   String get updateCheck => 'Check for updates';
 
   @override
@@ -198,6 +225,36 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$countString tracks',
       one: '1 track',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString episodes',
+      one: '1 episode',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString chapters',
+      one: '1 chapter',
     );
     return '$_temp0';
   }
@@ -2902,6 +2959,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerLiveBadge => 'LIVE';
 
   @override
+  String get playerRecordedBadge => 'Recording';
+
+  @override
   String get nowPlayingLiveStream => 'Live stream, no fixed length';
 
   @override
@@ -3062,6 +3122,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackFactLive => 'Live';
+
+  @override
+  String get trackFactContentKind => 'Kind';
+
+  @override
+  String get contentKindPodcast => 'Podcast';
+
+  @override
+  String get contentKindAudiobook => 'Audiobook';
+
+  @override
+  String get contentKindMusic => 'Music';
+
+  @override
+  String get contentKindRadio => 'Radio';
 
   @override
   String get trackFactPath => 'File path';
@@ -3893,6 +3968,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryFilterFormats => 'Format';
+
+  @override
+  String get libraryFilterKinds => 'Kind';
 
   @override
   String get libraryFilterDurations => 'Duration';

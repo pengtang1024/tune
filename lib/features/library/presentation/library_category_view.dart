@@ -4,6 +4,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
@@ -148,6 +149,12 @@ class LibraryCategoryView extends StatelessWidget {
         for (final entry in _top(facets.formats)) {
           add(entry.key, filterFormatLabel(entry.key), entry.value);
         }
+      case LibraryCategoryKind.kinds:
+        for (final contentKind in ContentKind.values) {
+          final count = facets.kinds[contentKind] ?? 0;
+          if (count == 0) continue;
+          add(contentKind, filterKindLabel(context, contentKind), count);
+        }
     }
     return entries.take(30).toList(growable: false);
   }
@@ -184,6 +191,7 @@ class LibraryCategoryView extends StatelessWidget {
       if (languageKeyOf(song) != null) languageKeyOf(song)!,
     ],
     LibraryCategoryKind.formats => [formatOfSong(song)],
+    LibraryCategoryKind.kinds => [contentKindOf(song)],
   };
 
   static List<MapEntry<String, int>> _top(Map<String, int> values) =>
@@ -206,6 +214,7 @@ class LibraryCategoryView extends StatelessWidget {
         LibraryCategoryKind.sources => context.loc.libraryFilterSources,
         LibraryCategoryKind.languages => context.loc.libraryFilterLanguages,
         LibraryCategoryKind.formats => context.loc.libraryFilterFormats,
+        LibraryCategoryKind.kinds => context.loc.libraryFilterKinds,
       };
 
   static IconData _kindIcon(LibraryCategoryKind kind) => switch (kind) {
@@ -215,6 +224,7 @@ class LibraryCategoryView extends StatelessWidget {
     LibraryCategoryKind.sources => Icons.podcasts_rounded,
     LibraryCategoryKind.languages => Icons.translate_rounded,
     LibraryCategoryKind.formats => Icons.audio_file_rounded,
+    LibraryCategoryKind.kinds => Icons.layers_rounded,
   };
 }
 

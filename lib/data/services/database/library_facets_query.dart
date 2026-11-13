@@ -1,5 +1,6 @@
 import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/data/services/database/library_filter_sql.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 
@@ -29,6 +30,7 @@ class LibraryFacetsQuery {
       statuses: _statusFacets(
         filter.copyWith(status: LibraryStatusFilter.all),
       ),
+      kinds: values.kinds,
     );
   }
 
@@ -46,6 +48,7 @@ class LibraryFacetsQuery {
     Map<String, int> formats,
     Map<LibraryDurationBucket, int> durations,
     Map<LibraryAddedWindow, int> added,
+    Map<ContentKind, int> kinds,
   })
   _valueFacets(LibraryFilter filter) {
     final clauses = <_FacetGroup, ({String sql, List<Object?> args})?>{
@@ -58,15 +61,20 @@ class LibraryFacetsQuery {
       _FacetGroup.formats: LibraryFilterSql.format(filter.formats),
       _FacetGroup.durations: LibraryFilterSql.durationFilter(filter.durations),
       _FacetGroup.added: LibraryFilterSql.addedFilter(filter.added),
+      _FacetGroup.kinds: LibraryFilterSql.kind(filter.kinds),
     };
     final columns = <String>[
       'songs.artist AS artist',
       "COALESCE(songs.source_id, 'local') AS source",
+      "json_extract(songs.json, '\$.isLiveStream') AS live",
       'songs.language AS language',
       'songs.format AS format',
       'songs.duration AS duration',
       'songs.date_added AS added',
       'songs.year AS year',
+      "json_extract(songs.json, '\$.uri') AS uri",
+      "json_extract(songs.json, '\$.localPath') AS localPath",
+      'songs.genre AS genre',
     ];
     final args = <Object?>[];
     for (final group in _FacetGroup.values) {
@@ -86,6 +94,7 @@ class LibraryFacetsQuery {
     final formats = <String, int>{};
     final durations = <LibraryDurationBucket, int>{};
     final added = <LibraryAddedWindow, int>{};
+    final kinds = <ContentKind, int>{};
     final now = DateTime.now().millisecondsSinceEpoch;
     final lastWeek = now - const Duration(days: 7).inMilliseconds;
     final lastMonth = now - const Duration(days: 30).inMilliseconds;
@@ -94,7 +103,7 @@ class LibraryFacetsQuery {
       var failures = 0;
       var failedAt = -1;
       for (var index = 0; index < _FacetGroup.values.length; index++) {
-        if ((row.columnAt(7 + index) as int?) == 0) {
+        if ((row.columnAt(11 + index) as int?) == 0) {
           failures++;
           failedAt = index;
           if (failures > 1) break;
@@ -111,6 +120,7 @@ class LibraryFacetsQuery {
       final keepsDurations =
           keepsAll || failedAt == _FacetGroup.durations.index;
       final keepsAdded = keepsAll || failedAt == _FacetGroup.added.index;
+      final keepsKinds = keepsAll || failedAt == _FacetGroup.kinds.index;
 
       if (keepsArtists) {
         final artist = row.columnAt(0) as String?;
@@ -125,24 +135,24 @@ class LibraryFacetsQuery {
         }
       }
       if (keepsLanguages) {
-        final language = row.columnAt(2) as String?;
+        final language = row.columnAt(3) as String?;
         if (language != null && language.trim().isNotEmpty) {
           languages[language] = (languages[language] ?? 0) + 1;
         }
       }
       if (keepsFormats) {
-        final format = row.columnAt(3) as String?;
+        final format = row.columnAt(4) as String?;
         if (format != null && format.trim().isNotEmpty) {
           formats[format] = (formats[format] ?? 0) + 1;
         }
       }
       if (keepsDurations) {
-        final bucket = _durationBucketOf(row.columnAt(4) as int?);
+        final bucket = _durationBucketOf(row.columnAt(5) as int?);
         if (bucket != null) durations[bucket] = (durations[bucket] ?? 0) + 1;
       }
       if (keepsAdded) {
         final window = _addedWindowOf(
-          row.columnAt(5) as int?,
+          row.columnAt(6) as int?,
           lastWeek,
           lastMonth,
           lastYear,
@@ -150,11 +160,21 @@ class LibraryFacetsQuery {
         if (window != null) added[window] = (added[window] ?? 0) + 1;
       }
       if (keepsDecades) {
-        final year = row.columnAt(6) as int?;
+        final year = row.columnAt(7) as int?;
         if (year != null && year > 0) {
           final decade = (year ~/ 10) * 10;
           decades[decade] = (decades[decade] ?? 0) + 1;
         }
+      }
+      if (keepsKinds) {
+        final kind = contentKindOfFields(
+          sourceId: row.columnAt(1) as String?,
+          isLiveStream: (row.columnAt(2) as int?) == 1,
+          uri: row.columnAt(8) as String?,
+          localPath: row.columnAt(9) as String?,
+          genre: row.columnAt(10) as String?,
+        );
+        kinds[kind] = (kinds[kind] ?? 0) + 1;
       }
     }
     return (
@@ -165,6 +185,7 @@ class LibraryFacetsQuery {
       formats: formats,
       durations: durations,
       added: added,
+      kinds: kinds,
     );
   }
 
@@ -262,4 +283,5 @@ enum _FacetGroup {
   formats,
   durations,
   added,
+  kinds,
 }

@@ -10,6 +10,9 @@ class MusicScannerConfig {
     '.flac',
     '.wav',
     '.m4a',
+    // The container of an audiobook: a chapter file of a book is still one
+    // chapter, and the library reads it as one.
+    '.m4b',
     '.aac',
     '.ogg',
   ];

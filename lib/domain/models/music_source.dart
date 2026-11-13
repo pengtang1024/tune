@@ -127,6 +127,15 @@ int? _instanceNumber(String id) {
   return int.tryParse(id.substring(separator + 1));
 }
 
+/// The type an instance id names.
+///
+/// An instance the app created for a type carries `<type>-<number>`; a
+/// built-in instance may carry an id of its own, and that id names itself.
+String sourceTypeOfId(String id) {
+  if (_instanceNumber(id) == null) return id;
+  return id.substring(0, id.lastIndexOf('-'));
+}
+
 /// The type of the sources the app used to run as scripts.
 ///
 /// The app does not run scripts any more, so a configuration of this type is

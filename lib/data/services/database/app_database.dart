@@ -6,11 +6,14 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/data/services/database/library_query.dart';
+import 'package:tune/data/services/database/library_filter_sql.dart';
 import 'package:tune/data/services/database/translation_tables.dart';
 import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
+import 'package:tune/domain/models/show_album.dart';
 
 /// The library of the app, kept in one SQLite file.
 ///
@@ -872,61 +875,82 @@ class AppDatabase {
     return (rows.first['count'] as int?) ?? 0;
   }
 
-  /// The albums of the library, one row per album and artist.
+  /// The albums of the library, one row per album.
+  ///
+  /// A song is grouped with the other songs of its artist. A show or a book
+  /// is grouped by the name it publishes under, across every source that
+  /// carries it: those are read back and merged in Dart, because whether two
+  /// sources really publish one show is a fact about their episodes, not
+  /// about their rows. A station is not an album, so it is left out.
   List<AlbumSummary> albumSummaries() {
     final rows = _db.select('''
-      SELECT album AS name, artist AS artist, COUNT(*) AS count,
-             MIN(json) AS sample
+      SELECT album AS name, artist AS artist, source_id AS sourceId,
+             COUNT(*) AS count, MIN(json) AS sample
       FROM songs
       WHERE album != ''
-      GROUP BY album, artist
+        AND NOT ${LibraryFilterSql.radio}
+        AND NOT ${LibraryFilterSql.spokenWord}
+      GROUP BY album, artist, source_id
       ORDER BY album COLLATE NOCASE, artist COLLATE NOCASE
     ''');
-    final albums = <AlbumSummary>[];
+    final albums = <String, AlbumSummary>{};
     for (final row in rows) {
       final name = row['name'] as String? ?? '';
       if (name.isEmpty) continue;
       final artist = row['artist'] as String? ?? '';
-      String? coverPath;
-      String? coverUrl;
-      try {
-        final decoded = jsonDecode(row['sample'] as String);
-        if (decoded is Map<String, dynamic>) {
-          final song = Song.fromMap(decoded);
-          coverPath = song.albumArtPath;
-          coverUrl = song.artworkUrl;
-        }
-      } catch (_) {
-        // A broken sample only costs the cover of the card.
-      }
-      albums.add(
-        AlbumSummary(
-          key: '\${name.trim().toLowerCase()}\u0000'
-              '\${artist.trim().toLowerCase()}',
-          name: name,
-          artist: artist,
-          trackCount: row['count'] as int? ?? 0,
-          coverPath: coverPath,
-          coverUrl: coverUrl,
+      final key = albumKeyOf(
+        album: name,
+        artist: artist,
+        sourceId: row['sourceId'] as String?,
+      );
+      final cover = _coverOfSample(row['sample']);
+      final existing = albums[key];
+      albums[key] = AlbumSummary(
+        key: key,
+        name: existing?.name ?? name,
+        artist: existing?.artist ?? artist,
+        trackCount: (existing?.trackCount ?? 0) + (row['count'] as int? ?? 0),
+        kind: existing?.kind ?? contentKindOfSource(
+          sourceId: row['sourceId'] as String?,
         ),
+        coverPath: existing?.coverPath ?? cover.path,
+        coverUrl: existing?.coverUrl ?? cover.url,
       );
     }
-    return albums;
+    for (final show in spokenAlbumsOf(_spokenSongs())) {
+      var coverPath = null as String?;
+      var coverUrl = null as String?;
+      for (final song in show.songs) {
+        coverPath ??= _nonEmpty(song.albumArtPath);
+        coverUrl ??= _nonEmpty(song.artworkUrl);
+        if (coverPath != null && coverUrl != null) break;
+      }
+      albums[show.key] = AlbumSummary(
+        key: show.key,
+        name: show.name,
+        artist: show.artist,
+        trackCount: show.songs.length,
+        kind: show.kind,
+        coverPath: coverPath,
+        coverUrl: coverUrl,
+      );
+    }
+    final ordered = albums.values.toList(growable: false);
+    ordered.sort((left, right) {
+      final byName = compareText(left.name, right.name);
+      if (byName != 0) return byName;
+      return compareText(left.artist, right.artist);
+    });
+    return ordered;
   }
 
-  /// The tracks of one album, in the order of the album.
-  List<Song> albumSongs(String key) {
-    final parts = key.split('\u0000');
-    final album = parts.isNotEmpty ? parts[0] : '';
-    final artist = parts.length > 1 ? parts[1] : '';
-    final rows = _db.select(
-      '''
+  /// The spoken tracks of the library, decoded so the show merge can read
+  /// their episode titles and lengths.
+  List<Song> _spokenSongs() {
+    final rows = _db.select('''
       SELECT json FROM songs
-      WHERE lower(trim(album)) = ? AND lower(trim(artist)) = ?
-      ORDER BY title COLLATE NOCASE
-      ''',
-      [album, artist],
-    );
+      WHERE album != '' AND ${LibraryFilterSql.spokenWord}
+    ''');
     final songs = <Song>[];
     for (final row in rows) {
       try {
@@ -937,15 +961,76 @@ class AppDatabase {
         // One broken row must not take the album down.
       }
     }
-    songs.sort((left, right) {
-      final disc = (left.discNumber ?? 1).compareTo(right.discNumber ?? 1);
-      if (disc != 0) return disc;
-      final track = (left.trackNumber ?? 0).compareTo(right.trackNumber ?? 0);
-      if (track != 0) return track;
-      return compareText(left.title, right.title);
-    });
     return songs;
   }
+
+  static String? _nonEmpty(String? value) =>
+      value == null || value.isEmpty ? null : value;
+
+  /// The cover the sample of an album row carries.
+  ({String? path, String? url}) _coverOfSample(Object? sample) {
+    try {
+      final decoded = jsonDecode(sample as String);
+      if (decoded is Map<String, dynamic>) {
+        final song = Song.fromMap(decoded);
+        return (path: song.albumArtPath, url: song.artworkUrl);
+      }
+    } catch (_) {
+      // A broken sample only costs the cover of the card.
+    }
+    return (path: null, url: null);
+  }
+
+  /// The tracks of one album, in the order of the album.
+  List<Song> albumSongs(String key) {
+    final parts = key.split('\u0000');
+    final album = parts.isNotEmpty ? parts[0] : '';
+    // A merged show names its sources in one field, joined by \u0001.
+    final mergedSources = parts.length >= 3 && parts[1] == 'show'
+        ? [for (final part in parts.skip(2)) ...part.split('\u0001')]
+        : const <String>[];
+    final rows = mergedSources.isNotEmpty
+        ? _db.select(
+            '''
+            SELECT json FROM songs
+            WHERE lower(trim(album)) = ?
+              AND COALESCE(source_id, 'local') IN (${_marks(mergedSources.length)})
+            ''',
+            [album, ...mergedSources],
+          )
+        : parts.length >= 3 && parts[1] == 'src'
+            ? _db.select(
+                '''
+                SELECT json FROM songs
+                WHERE lower(trim(album)) = ? AND source_id = ?
+                ''',
+                [album, parts[2]],
+              )
+            : _db.select(
+                '''
+                SELECT json FROM songs
+                WHERE lower(trim(album)) = ? AND lower(trim(artist)) = ?
+                ''',
+                [album, parts.length > 1 ? parts[1] : ''],
+              );
+    final songs = <Song>[];
+    for (final row in rows) {
+      try {
+        final decoded = jsonDecode(row['json'] as String);
+        if (decoded is! Map<String, dynamic>) continue;
+        songs.add(Song.fromMap(decoded));
+      } catch (_) {
+        // One broken row must not take the album down.
+      }
+    }
+    if (mergedSources.isNotEmpty) {
+      return dedupedEpisodesOf(songs)..sort(albumOrderOf);
+    }
+    songs.sort(albumOrderOf);
+    return songs;
+  }
+
+  static String _marks(int count) => List.filled(count, '?').join(', ');
 
   /// Removes the tracks of one source.
   void removeSource(String sourceId) {

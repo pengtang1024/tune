@@ -64,6 +64,7 @@ class SettingsController extends StateNotifier<SettingsState> {
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
+          githubToken: _persistence.getString('github_token') ?? '',
           libraryFolder: _persistence.getString(LibraryPaths.rootKey),
           defaultLibraryFolder:
               MusicScannerConfig.getDefaultMusicLibrary() ?? '',
@@ -95,6 +96,21 @@ class SettingsController extends StateNotifier<SettingsState> {
       await _persistence.remove('country_code');
     } else {
       await _persistence.setString('country_code', locale.countryCode!);
+    }
+  }
+
+  /// Sets the token the update check sends.
+  ///
+  /// An empty value removes the key, so the check falls back to
+  /// `GITHUB_TOKEN` and `GH_TOKEN` again.
+  Future<void> setGithubToken(String token) async {
+    final cleaned = token.trim();
+    if (state.githubToken == cleaned) return;
+    state = state.copyWith(githubToken: cleaned);
+    if (cleaned.isEmpty) {
+      await _persistence.remove('github_token');
+    } else {
+      await _persistence.setString('github_token', cleaned);
     }
   }
 

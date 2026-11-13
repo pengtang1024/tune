@@ -268,6 +268,48 @@ abstract class AppLocalizations {
   /// **'检查失败：{error}'**
   String updateFailed(String error);
 
+  /// No description provided for @updateFailedRateLimited.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token'**
+  String get updateFailedRateLimited;
+
+  /// No description provided for @updateFailedUnauthorized.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：token 无效或没有读取发布页的权限'**
+  String get updateFailedUnauthorized;
+
+  /// No description provided for @updateFailedNetwork.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：网络请求超时或无法连接'**
+  String get updateFailedNetwork;
+
+  /// No description provided for @updateFailedServer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：发布页返回了异常响应'**
+  String get updateFailedServer;
+
+  /// No description provided for @updateTokenLabel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'GitHub token（可选）'**
+  String get updateTokenLabel;
+
+  /// No description provided for @updateTokenHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN'**
+  String get updateTokenHint;
+
+  /// No description provided for @updateTokenHelp.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只用于更新检查，不会写入日志'**
+  String get updateTokenHelp;
+
   /// No description provided for @updateCheck.
   ///
   /// In zh_CN, this message translates to:
@@ -387,6 +429,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'{count} 首'**
   String libraryTrackCount(int count);
+
+  /// No description provided for @libraryEpisodeCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 集'**
+  String libraryEpisodeCount(int count);
+
+  /// No description provided for @libraryChapterCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 章'**
+  String libraryChapterCount(int count);
 
   /// No description provided for @libraryNoMatchTitle.
   ///
@@ -5015,6 +5069,12 @@ abstract class AppLocalizations {
   /// **'直播中'**
   String get playerLiveBadge;
 
+  /// No description provided for @playerRecordedBadge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'录音'**
+  String get playerRecordedBadge;
+
   /// No description provided for @nowPlayingLiveStream.
   ///
   /// In zh_CN, this message translates to:
@@ -5338,6 +5398,36 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'直播'**
   String get trackFactLive;
+
+  /// No description provided for @trackFactContentKind.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'类型'**
+  String get trackFactContentKind;
+
+  /// No description provided for @contentKindPodcast.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播客'**
+  String get contentKindPodcast;
+
+  /// No description provided for @contentKindAudiobook.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有声书'**
+  String get contentKindAudiobook;
+
+  /// No description provided for @contentKindMusic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音乐'**
+  String get contentKindMusic;
+
+  /// No description provided for @contentKindRadio.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电台'**
+  String get contentKindRadio;
 
   /// No description provided for @trackFactPath.
   ///
@@ -6784,6 +6874,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'格式'**
   String get libraryFilterFormats;
+
+  /// No description provided for @libraryFilterKinds.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'类型'**
+  String get libraryFilterKinds;
 
   /// No description provided for @libraryFilterDurations.
   ///

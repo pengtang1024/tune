@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_category.dart';
@@ -13,7 +14,7 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The category tree beside the library.
 ///
-/// Collapsed it is an icon rail; expanded it names the six ways into the
+/// Collapsed it is an icon rail; expanded it names the seven ways into the
 /// catalog and the first values of each. A click on a kind opens the
 /// category view; a click on a value narrows the song list to it.
 class LibraryCategoryTree extends ConsumerWidget {
@@ -234,6 +235,7 @@ class LibraryCategoryTree extends ConsumerWidget {
     LibraryCategoryKind.sources => filter.sources.contains(value),
     LibraryCategoryKind.languages => filter.languages.contains(value),
     LibraryCategoryKind.formats => filter.formats.contains(value),
+    LibraryCategoryKind.kinds => filter.kinds.contains(value),
   };
 
   Widget _iconButton(
@@ -271,6 +273,7 @@ class LibraryCategoryTree extends ConsumerWidget {
     LibraryCategoryKind.sources => Icons.podcasts_rounded,
     LibraryCategoryKind.languages => Icons.translate_rounded,
     LibraryCategoryKind.formats => Icons.audio_file_rounded,
+    LibraryCategoryKind.kinds => Icons.layers_rounded,
   };
 
   static String _labelOf(BuildContext context, LibraryCategoryKind kind) =>
@@ -281,6 +284,7 @@ class LibraryCategoryTree extends ConsumerWidget {
         LibraryCategoryKind.sources => context.loc.libraryFilterSources,
         LibraryCategoryKind.languages => context.loc.libraryFilterLanguages,
         LibraryCategoryKind.formats => context.loc.libraryFilterFormats,
+        LibraryCategoryKind.kinds => context.loc.libraryFilterKinds,
       };
 
   List<({Object key, String label, int count})> _valuesOf(
@@ -332,6 +336,16 @@ class LibraryCategoryTree extends ConsumerWidget {
             key: entry.key,
             label: filterFormatLabel(entry.key),
             count: entry.value,
+          ));
+        }
+      case LibraryCategoryKind.kinds:
+        for (final contentKind in ContentKind.values) {
+          final count = facets.kinds[contentKind] ?? 0;
+          if (count == 0) continue;
+          values.add((
+            key: contentKind,
+            label: filterKindLabel(context, contentKind),
+            count: count,
           ));
         }
     }

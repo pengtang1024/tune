@@ -161,6 +161,20 @@ void main() {
     expect(reloaded.state.useListeningHistory, isTrue);
   });
 
+  test('the update token survives and clearing it removes the key', () async {
+    final persistence = FakePersistenceService();
+    final controller = SettingsController(persistence);
+    addTearDown(controller.dispose);
+
+    await controller.setGithubToken(' ghp_example ');
+    expect(controller.state.githubToken, 'ghp_example');
+    expect(persistence.values['github_token'], 'ghp_example');
+
+    await controller.setGithubToken('   ');
+    expect(controller.state.githubToken, '');
+    expect(persistence.values.containsKey('github_token'), isFalse);
+  });
+
   test('the smart lyrics config survives a controller rebuild', () async {
     final persistence = FakePersistenceService();
     final controller = SettingsController(persistence);

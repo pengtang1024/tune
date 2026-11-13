@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/features/library/presentation/library_filter_labels.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/meta_badge.dart';
+import 'package:tune/shared/ui/track_fact.dart';
 import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
-/// The albums of the library as a grid of covers.
+/// The albums of the library as a grid of covers, in three sections.
 ///
 /// The grid is the browsing side of the library: a reader who does not know
 /// the name of a track can recognise the cover, and one card stands for a
-/// whole album instead of one row of its tracks. The songs view stays one
-/// click away for the reader who does know the name.
+/// whole album instead of one row of its tracks. Songs, shows and books are
+/// kept apart because a show is counted in episodes and a book in chapters;
+/// the section headers appear only while at least two of them hold anything.
+/// A station is not an album, so radio never reaches the wall.
 class LibraryAlbumsView extends StatelessWidget {
   final List<AlbumSummary> albums;
 
@@ -59,6 +65,21 @@ class LibraryAlbumsView extends StatelessWidget {
   Widget build(BuildContext context) {
     const spacing = CompactTokens.space12;
     const gutter = CompactTokens.pageGutter;
+    final sections = [
+      for (final kind in const [
+        ContentKind.music,
+        ContentKind.podcast,
+        ContentKind.audiobook,
+      ])
+        (
+          kind: kind,
+          albums: albums
+              .where((album) => album.kind == kind)
+              .toList(growable: false),
+        ),
+    ].where((section) => section.albums.isNotEmpty).toList(growable: false);
+    // One section needs no name: the wall already says what the library holds.
+    final showHeaders = sections.length >= 2;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -73,31 +94,53 @@ class LibraryAlbumsView extends StatelessWidget {
             (bilingual ? _captionHeightBilingual : _captionHeight) *
             MediaQuery.textScalerOf(context).scale(1);
 
-        return GridView.builder(
+        return CustomScrollView(
           controller: controller,
-          padding: const EdgeInsets.fromLTRB(
-            gutter,
-            0,
-            gutter,
-            CompactTokens.space8,
-          ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: spacing,
-            mainAxisSpacing: spacing,
-            mainAxisExtent: cell + caption,
-          ),
-          itemCount: albums.length,
-          itemBuilder: (context, index) {
-            final album = albums[index];
-            return _AlbumCard(
-              album: album,
-              coverSize: cell,
-              current: album.key == currentAlbumKey,
-              onOpen: () => onOpen(album),
-              onPlay: () => onPlay(album),
-            );
-          },
+          slivers: [
+            for (var index = 0; index < sections.length; index++) ...[
+              if (showHeaders)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      gutter,
+                      index == 0 ? 0 : CompactTokens.space12,
+                      gutter,
+                      CompactTokens.space8,
+                    ),
+                    child: Text(
+                      '${filterKindLabel(context, sections[index].kind)} · '
+                      '${sections[index].albums.length}',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: gutter),
+                sliver: SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: columns,
+                    crossAxisSpacing: spacing,
+                    mainAxisSpacing: spacing,
+                    mainAxisExtent: cell + caption,
+                  ),
+                  itemCount: sections[index].albums.length,
+                  itemBuilder: (context, itemIndex) {
+                    final album = sections[index].albums[itemIndex];
+                    return _AlbumCard(
+                      album: album,
+                      coverSize: cell,
+                      current: album.key == currentAlbumKey,
+                      onOpen: () => onOpen(album),
+                      onPlay: () => onPlay(album),
+                    );
+                  },
+                ),
+              ),
+            ],
+            const SliverToBoxAdapter(child: SizedBox(height: CompactTokens.space8)),
+          ],
         );
       },
     );
@@ -193,15 +236,32 @@ class _AlbumCardState extends State<_AlbumCard> {
                 ],
               ),
               const SizedBox(height: CompactTokens.space6),
-              TranslatedText(
-                text: name,
-                maxLines: 1,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: widget.current
-                      ? FontWeight.w600
-                      : FontWeight.w500,
-                  color: widget.current ? theme.colorScheme.primary : null,
-                ),
+              Row(
+                children: [
+                  Flexible(
+                    child: TranslatedText(
+                      text: name,
+                      maxLines: 1,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: widget.current
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        color: widget.current
+                            ? theme.colorScheme.primary
+                            : null,
+                      ),
+                    ),
+                  ),
+                  if (album.kind.isSpokenWord) ...[
+                    const SizedBox(width: CompactTokens.space4),
+                    MetaBadge(
+                      icon: Icons.record_voice_over_rounded,
+                      tooltip: filterKindLabel(context, album.kind),
+                      tone: FactTone.secondary,
+                      size: 12,
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 2),
               Text(
@@ -214,7 +274,15 @@ class _AlbumCardState extends State<_AlbumCard> {
               ),
               const SizedBox(height: 2),
               Text(
-                context.loc.libraryTrackCount(album.trackCount),
+                switch (album.kind) {
+                  ContentKind.podcast => context.loc.libraryEpisodeCount(
+                    album.trackCount,
+                  ),
+                  ContentKind.audiobook => context.loc.libraryChapterCount(
+                    album.trackCount,
+                  ),
+                  _ => context.loc.libraryTrackCount(album.trackCount),
+                },
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

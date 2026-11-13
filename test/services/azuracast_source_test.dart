@@ -42,8 +42,11 @@ void main() {
 
       final song = result.songs.first;
       expect(song.title, 'Night Jazz');
-      expect(song.artist, 'Miles Davis');
-      expect(song.album, 'So What');
+      // The station is the track; the song on air is a fact of its own.
+      expect(song.artist, '');
+      expect(song.album, '');
+      expect(song.onAirArtist, 'Miles Davis');
+      expect(song.onAirTitle, 'So What');
       expect(song.streamUrl, 'https://radio.local/listen/jazz/radio.mp3');
       expect(song.artworkUrl, 'https://radio.local/art/42.jpg');
       expect(song.genre, 'Jazz');
@@ -233,6 +236,7 @@ void main() {
       final song = result.songs.single;
       expect(song.title, 'Night Jazz');
       expect(song.artist, isEmpty);
+      expect(song.onAirArtist, isNull);
       expect(song.streamUrl, isNotEmpty);
     });
   });

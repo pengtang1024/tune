@@ -64,6 +64,7 @@ chip 由三样东西组成：
 - 图标按**类型**查（`sourceIconOf(type, kind)`）：同一类型的实例共用一个图标；目录里没有的类型按类别兜底。
 - 一个事实一个图标（格式、码率、画质、歌词、存储、直播……），行内靠图标就能分清。
 - 直播标记只有一份实现（`shared/ui/live_badge.dart`），底栏与正在播放页共用。
+- 内容类型只在有差别时挂标：语音行（播客 / 有声书）在标题旁挂 `ContentKindMark`（`shared/ui/content_kind_mark.dart`），tooltip 写类型；电台行用直播标记；曲目行不挂标。
 - **喜欢是控件，不是标识**：红心（`shared/ui/favorite_button.dart`）自己就是那个动作，标过与没标过一眼看得出来，所以它不进事实条。
 
 ## 地址：带动作的 chip 组

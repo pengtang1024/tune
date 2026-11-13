@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
@@ -33,6 +34,7 @@ void main() {
             decades: {1990: 2},
             languages: {'zh': 4},
             formats: {'mp3': 5},
+            kinds: {ContentKind.music: 5, ContentKind.podcast: 2},
           ),
         ),
         ...overrides,
@@ -69,12 +71,34 @@ void main() {
     );
   });
 
+  testWidgets('a kind chip narrows the filter at once', (tester) async {
+    await tester.pumpWidget(
+      app(
+        child: const LibraryFilterPanel(sourceLabels: {}),
+        overrides: [],
+      ),
+    );
+    await tester.pumpAndSettle();
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryFilterPanel)),
+    );
+
+    expect(find.text('类型'), findsOneWidget);
+    await tester.tap(find.textContaining('播客 · 2'));
+    await tester.pumpAndSettle();
+
+    expect(
+      container.read(libraryControllerProvider).requireValue.filter.kinds,
+      {ContentKind.podcast},
+    );
+  });
+
   testWidgets('a chip takes its value back out', (tester) async {
     LibraryFilter? next;
     await tester.pumpWidget(
       app(
         child: LibraryFilterChips(
-          filter: const LibraryFilter(genres: {'jazz'}),
+          filter: const LibraryFilter(kinds: {ContentKind.podcast}),
           sourceLabels: const {},
           onChanged: (value) => next = value,
         ),

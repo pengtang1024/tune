@@ -29,6 +29,15 @@ class LibraryHeader extends StatelessWidget {
   /// worse than one that is not there.
   final VoidCallback? onSearchOnline;
 
+  /// Whether the page is already narrowed to the stations.
+  final bool radioActive;
+
+  /// Narrows the page to the stations, or widens it again.
+  ///
+  /// The entry is left out when it is null, which is the case while the
+  /// library holds no station.
+  final VoidCallback? onRadio;
+
   /// Whether the category tree stands open.
   final bool treeExpanded;
   final VoidCallback onToggleTree;
@@ -40,6 +49,8 @@ class LibraryHeader extends StatelessWidget {
     required this.onScan,
     required this.scanning,
     required this.onSearchOnline,
+    required this.radioActive,
+    required this.onRadio,
     required this.treeExpanded,
     required this.onToggleTree,
   });
@@ -91,6 +102,38 @@ class LibraryHeader extends StatelessWidget {
               ),
             ),
           ),
+          if (onRadio != null) ...[
+            const SizedBox(width: CompactTokens.space12),
+            OutlinedButton.icon(
+              key: const ValueKey('library-radio'),
+              onPressed: onRadio,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, CompactTokens.controlDefault),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space12,
+                ),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+                foregroundColor: radioActive
+                    ? theme.colorScheme.primary
+                    : null,
+                backgroundColor: radioActive
+                    ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                    : null,
+                side: BorderSide(
+                  color: radioActive
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outlineVariant,
+                ),
+              ),
+              icon: Icon(
+                radioActive ? Icons.radio_rounded : Icons.podcasts_rounded,
+                size: CompactTokens.icon16,
+              ),
+              label: Text(context.loc.contentKindRadio),
+            ),
+            const SizedBox(width: CompactTokens.space8),
+          ],
           if (onSearchOnline != null) ...[
             const SizedBox(width: CompactTokens.space12),
             OutlinedButton.icon(

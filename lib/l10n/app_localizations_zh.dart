@@ -99,6 +99,28 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      '检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token';
+
+  @override
+  String get updateFailedUnauthorized => '检查失败：token 无效或没有读取发布页的权限';
+
+  @override
+  String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
+
+  @override
+  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（可选）';
+
+  @override
+  String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -174,6 +196,24 @@ class AppLocalizationsZh extends AppLocalizations {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 首';
+  }
+
+  @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
   }
 
   @override
@@ -2672,6 +2712,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerLiveBadge => '直播中';
 
   @override
+  String get playerRecordedBadge => '录音';
+
+  @override
   String get nowPlayingLiveStream => '直播流，没有固定时长';
 
   @override
@@ -2832,6 +2875,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trackFactLive => '直播';
+
+  @override
+  String get trackFactContentKind => '类型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有声书';
+
+  @override
+  String get contentKindMusic => '音乐';
+
+  @override
+  String get contentKindRadio => '电台';
 
   @override
   String get trackFactPath => '文件路径';
@@ -3625,6 +3683,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterKinds => '类型';
 
   @override
   String get libraryFilterDurations => '时长';
@@ -4093,6 +4154,28 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      '检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token';
+
+  @override
+  String get updateFailedUnauthorized => '检查失败：token 无效或没有读取发布页的权限';
+
+  @override
+  String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
+
+  @override
+  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（可选）';
+
+  @override
+  String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -4168,6 +4251,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 首';
+  }
+
+  @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
   }
 
   @override
@@ -6666,6 +6767,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get playerLiveBadge => '直播中';
 
   @override
+  String get playerRecordedBadge => '录音';
+
+  @override
   String get nowPlayingLiveStream => '直播流，没有固定时长';
 
   @override
@@ -6826,6 +6930,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get trackFactLive => '直播';
+
+  @override
+  String get trackFactContentKind => '类型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有声书';
+
+  @override
+  String get contentKindMusic => '音乐';
+
+  @override
+  String get contentKindRadio => '电台';
 
   @override
   String get trackFactPath => '文件路径';
@@ -7621,6 +7740,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryFilterFormats => '格式';
 
   @override
+  String get libraryFilterKinds => '类型';
+
+  @override
   String get libraryFilterDurations => '时长';
 
   @override
@@ -8087,6 +8209,28 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String get updateFailedRateLimited =>
+      '檢查失敗：GitHub 請求次數可能已超限（未登入每小時 60 次），請稍後再試或填寫 token';
+
+  @override
+  String get updateFailedUnauthorized => '檢查失敗：token 無效或沒有讀取發布頁的權限';
+
+  @override
+  String get updateFailedNetwork => '檢查失敗：網路請求逾時或無法連線';
+
+  @override
+  String get updateFailedServer => '檢查失敗：發布頁回傳了異常回應';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（選填）';
+
+  @override
+  String get updateTokenHint => '留空則讀取環境變數 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用於更新檢查，不會寫入日誌';
+
+  @override
   String get updateCheck => '檢查更新';
 
   @override
@@ -8162,6 +8306,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 首';
+  }
+
+  @override
+  String libraryEpisodeCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 集';
+  }
+
+  @override
+  String libraryChapterCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 章';
   }
 
   @override
@@ -10660,6 +10822,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get playerLiveBadge => '直播中';
 
   @override
+  String get playerRecordedBadge => '錄音';
+
+  @override
   String get nowPlayingLiveStream => '直播串流，沒有固定時長';
 
   @override
@@ -10820,6 +10985,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackFactLive => '直播';
+
+  @override
+  String get trackFactContentKind => '類型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有聲書';
+
+  @override
+  String get contentKindMusic => '音樂';
+
+  @override
+  String get contentKindRadio => '電台';
 
   @override
   String get trackFactPath => '檔案路徑';
@@ -11613,6 +11793,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryFilterFormats => '格式';
+
+  @override
+  String get libraryFilterKinds => '類型';
 
   @override
   String get libraryFilterDurations => '時長';

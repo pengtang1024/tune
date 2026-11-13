@@ -49,6 +49,13 @@
       }
     }
   },
+  "updateFailedRateLimited": "检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token",
+  "updateFailedUnauthorized": "检查失败：token 无效或没有读取发布页的权限",
+  "updateFailedNetwork": "检查失败：网络请求超时或无法连接",
+  "updateFailedServer": "检查失败：发布页返回了异常响应",
+  "updateTokenLabel": "GitHub token（可选）",
+  "updateTokenHint": "留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN",
+  "updateTokenHelp": "只用于更新检查，不会写入日志",
   "updateCheck": "检查更新",
   "updateInstall": "下载并安装",
   "updateRetry": "重试",
@@ -86,6 +93,24 @@
   "libraryLoadMore": "加载更多曲目",
   "libraryTrackCount": "{count} 首",
   "@libraryTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryEpisodeCount": "{count} 集",
+  "@libraryEpisodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryChapterCount": "{count} 章",
+  "@libraryChapterCount": {
     "placeholders": {
       "count": {
         "type": "int",
@@ -1265,6 +1290,7 @@
   "embyAuthFailed": "无法连接 Emby 服务器，请检查地址与账号",
   "audioSourceStreaming": "网络",
   "playerLiveBadge": "直播中",
+  "playerRecordedBadge": "录音",
   "nowPlayingLiveStream": "直播流，没有固定时长",
   "nowPlayingDetails": "曲目信息",
   "nowPlayingDetailAlbum": "专辑",
@@ -1319,6 +1345,11 @@
   "trackFactAdded": "添加时间",
   "trackFactDescription": "简介",
   "trackFactLive": "直播",
+  "trackFactContentKind": "类型",
+  "contentKindPodcast": "播客",
+  "contentKindAudiobook": "有声书",
+  "contentKindMusic": "音乐",
+  "contentKindRadio": "电台",
   "trackFactPath": "文件路径",
   "trackFactAddress": "在线地址",
   "trackDetailsTooltip": "查看详情",
@@ -1772,6 +1803,7 @@
   "libraryFilterArtists": "艺术家",
   "libraryFilterLanguages": "语言",
   "libraryFilterFormats": "格式",
+  "libraryFilterKinds": "类型",
   "libraryFilterDurations": "时长",
   "libraryFilterAdded": "加入时间",
   "libraryFilterDurationShort": "<2 分钟",

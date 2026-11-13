@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/config/app_version.dart';
+import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/update/update_service.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Where the update stands.
@@ -25,6 +27,9 @@ class UpdateState {
   final UpdateRelease? release;
   final String? error;
 
+  /// Why the last check failed, when the page could not be read.
+  final UpdateCheckFailure? failure;
+
   /// How much of the archive is downloaded, from 0 to 1.
   final double progress;
 
@@ -32,6 +37,7 @@ class UpdateState {
     this.status = UpdateStatus.idle,
     this.release,
     this.error,
+    this.failure,
     this.progress = 0,
   });
 
@@ -39,12 +45,14 @@ class UpdateState {
     UpdateStatus? status,
     UpdateRelease? release,
     String? error,
+    UpdateCheckFailure? failure,
     double? progress,
   }) {
     return UpdateState(
       status: status ?? this.status,
       release: release ?? this.release,
       error: error,
+      failure: failure,
       progress: progress ?? this.progress,
     );
   }
@@ -74,7 +82,8 @@ class UpdateController extends Notifier<UpdateState> {
   Future<void> check({String? currentVersion}) async {
     state = state.copyWith(status: UpdateStatus.checking);
     try {
-      final release = await _service.latest();
+      final token = ref.read(settingsControllerProvider).githubToken;
+      final release = await _service.latest(manualToken: token);
       if (release == null) {
         state = const UpdateState(status: UpdateStatus.upToDate);
         return;
@@ -85,6 +94,9 @@ class UpdateController extends Notifier<UpdateState> {
         return;
       }
       state = UpdateState(status: UpdateStatus.available, release: release);
+    } on UpdateCheckException catch (error) {
+      Log.error('检查更新失败: $error');
+      state = UpdateState(status: UpdateStatus.failed, failure: error.failure);
     } catch (error) {
       Log.error('检查更新失败: $error');
       state = UpdateState(status: UpdateStatus.failed, error: '$error');

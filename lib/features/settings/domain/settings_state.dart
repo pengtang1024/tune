@@ -73,6 +73,12 @@ class SettingsState {
   /// alone until the reader asks for the extra signal.
   final bool useListeningHistory;
 
+  /// The token the update check sends, when the reader typed one.
+  ///
+  /// It wins over `GITHUB_TOKEN` and `GH_TOKEN` in the environment; empty
+  /// means the check falls back to them.
+  final String githubToken;
+
   /// The music library of the machine.
   final String defaultLibraryFolder;
 
@@ -93,6 +99,7 @@ class SettingsState {
     this.smartLyrics = const SmartLyricsConfig(),
     this.localization = const LocalizationConfig(),
     this.useListeningHistory = false,
+    this.githubToken = '',
     this.libraryFolder,
     this.defaultLibraryFolder = '',
   });
@@ -119,6 +126,7 @@ class SettingsState {
     SmartLyricsConfig? smartLyrics,
     LocalizationConfig? localization,
     bool? useListeningHistory,
+    String? githubToken,
     Object? libraryFolder = _unset,
     String? defaultLibraryFolder,
   }) {
@@ -141,6 +149,7 @@ class SettingsState {
       smartLyrics: smartLyrics ?? this.smartLyrics,
       localization: localization ?? this.localization,
       useListeningHistory: useListeningHistory ?? this.useListeningHistory,
+      githubToken: githubToken ?? this.githubToken,
       libraryFolder: identical(libraryFolder, _unset)
           ? this.libraryFolder
           : libraryFolder as String?,
