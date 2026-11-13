@@ -1,0 +1,719 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/data/services/music_sources/internet_archive_source.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
+
+/// An archive item is often a record, not a track.
+///
+/// The metadata of an item lists every audio file it holds: a 78 rpm disc has
+/// two sides, a netlabel release has an album. The source reads those files as
+/// the tracks of the item, once per track, so the music is not hidden behind
+/// the cover.
+void main() {
+  group('the tracks of an archive item', () {
+    test('a record becomes its tracks, one copy of each', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            'creator': 'The Band',
+            'album': 'The Record',
+            'date': '1954-01-01',
+            'genre': 'Jazz',
+          },
+          'files': [
+            {
+              'name': 'side-a.mp3',
+              'format': 'VBR MP3',
+              'title': 'First Song',
+              'artist': 'The Band',
+              'album': 'The Record',
+              'track': '1/2',
+              'length': '181.5',
+            },
+            {
+              'name': 'side-a.ogg',
+              'format': 'Ogg Vorbis',
+              'title': 'First Song',
+              'artist': 'The Band',
+              'track': '1/2',
+            },
+            {
+              'name': 'side-b_64kb.mp3',
+              'format': '64Kbps MP3',
+              'title': 'Second Song',
+              'artist': 'The Band',
+              'track': '2/2',
+              'length': '200',
+            },
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.status, SourceScanStatus.success);
+      expect(result.songs, hasLength(2));
+
+      final first = result.songs.first;
+      expect(first.title, 'First Song');
+      expect(first.artist, 'The Band');
+      expect(first.album, 'The Record');
+      expect(first.trackNumber, 1);
+      expect(first.trackTotal, 2);
+      expect(first.year, 1954);
+      expect(first.genre, 'Jazz');
+      expect(first.duration, 181500);
+      expect(first.externalId, 'the-record/side-a.mp3');
+      expect(
+        first.streamUrl,
+        'https://archive.org/download/the-record/side-a.mp3',
+      );
+      expect(
+        first.artworkUrl,
+        'https://archive.org/services/img/the-record',
+      );
+
+      // The smaller copy of the second side is the one that plays.
+      expect(result.songs.last.title, 'Second Song');
+      expect(
+        result.songs.last.streamUrl,
+        endsWith('side-b_64kb.mp3'),
+      );
+    });
+
+    test('the tongue of an item is read into the name the filter offers', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {
+                'identifier': 'the-record',
+                'title': 'The Record',
+                'language': ['spa', 'english'],
+              },
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            'creator': 'The Band',
+            'language': ['spa', 'english'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // The codes the uploader wrote become the name the filter offers.
+      expect(result.songs.single.language, 'Spanish');
+    });
+    test('an item without a genre keeps the theme of its list', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {'title': 'The Record', 'creator': 'The Band'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10', 'theme': 'Classical'}));
+
+      // Measured: only 23–35% of the ambient, world and hip-hop items state a
+      // genre of their own; the list they came from is the honest answer.
+      expect(result.songs.single.genre, 'Classical');
+    });
+    test('a genre is taken from the subject when nothing else names one', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            'creator': 'The Band',
+            'subject': ['Jazz', 'music'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.genre, 'Jazz');
+    });
+
+    test('a subject that names no genre is not taken for one', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {
+            'title': 'The Record',
+            // The archive sometimes splits a title into words and files them
+            // as subjects; none of these names a genre.
+            'subject': ['Bull', 'of', 'heaven', '333'],
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.genre ?? '', isEmpty);
+    });
+    test('a second page is the second page, not one computed from songs', () async {
+      // One item may hold thirty songs: counting songs and dividing by the
+      // page size sent the scan to the twentieth page and the archive's
+      // deep tail with it.
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-record', 'title': 'The Record'},
+            ],
+          },
+        },
+        '/metadata/the-record': {
+          'metadata': {'title': 'The Record', 'creator': 'The Band'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+            {'name': 'two.mp3', 'format': 'VBR MP3', 'title': 'Two'},
+            {'name': 'three.mp3', 'format': 'VBR MP3', 'title': 'Three'},
+          ],
+        },
+      });
+
+      final source = InternetArchiveSourceAdapter(dio: adapter.dio);
+      final first = await source.scan(_request({'limit': '8'}));
+      // Eight items read means the next page is the second, whatever the
+      // three songs those items happened to hold.
+      final second = await source.scan(
+        _request({'limit': '8'}, cursor: '8'),
+      );
+
+      expect(first.songs, hasLength(3));
+      expect(first.cursor, '1');
+      expect(second.cursor, '9');
+      final pages = adapter.uris
+          .where((uri) => uri.path == '/advancedsearch.php')
+          .map((uri) => uri.queryParameters['page'])
+          .toList();
+      expect(pages, ['1', '2']);
+    });
+    test('a disc that writes the performer into the title keeps one name', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-disc', 'title': 'The Disc'},
+            ],
+          },
+        },
+        '/metadata/the-disc': {
+          'metadata': {'title': 'The Disc', 'creator': 'Barbie Gaye'},
+          'files': [
+            {
+              'name': 'a.mp3',
+              'format': 'VBR MP3',
+              'title': 'My Boy Lollypop - Barbie Gaye',
+              'track': '1',
+            },
+            {
+              'name': 'b.mp3',
+              'format': 'VBR MP3',
+              'title': 'Say You Understand - Barbie Gaye',
+              'track': '2',
+            },
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs, hasLength(2));
+      expect(result.songs.first.title, 'My Boy Lollypop');
+      expect(result.songs.first.artist, 'Barbie Gaye');
+      expect(result.songs.last.title, 'Say You Understand');
+    });
+
+    test('a tongue narrows the query of the archive', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'language': 'German'}),
+      );
+
+      // The archive files a tongue as a clause of the query, so a scan of one
+      // tongue asks the same search with that clause added.
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND language:(German)',
+      );
+    });
+
+    test('every tongue asks the query as it is', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(_request({}));
+
+      expect(adapter.uris.first.queryParameters['q'], 'mediatype:audio');
+    });
+    test('a record of several files is named after its item', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-show', 'title': 'The Show'},
+            ],
+          },
+        },
+        '/metadata/the-show': {
+          'metadata': {'title': 'The Show', 'creator': 'The Host'},
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'Episode One'},
+            {'name': 'two.mp3', 'format': 'VBR MP3', 'title': 'Episode Two'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // The item is the record: neither file names an album, so the tracks
+      // are grouped under the name of the item they belong to.
+      expect(
+        result.songs.map((song) => song.album).toSet(),
+        {'The Show'},
+      );
+    });
+    test('a one-track item is named after the item', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-single', 'title': 'The Single'},
+            ],
+          },
+        },
+        '/metadata/the-single': {
+          'metadata': {'title': 'The Single', 'creator': 'The Band'},
+          'files': [
+            {'name': 'track_01.mp3', 'format': 'VBR MP3'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.title, 'The Single');
+      expect(result.songs.single.trackNumber, 1);
+      expect(result.songs.single.trackTotal, 1);
+    });
+
+    test('the position orders an item whose track number repeats', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-set', 'title': 'The Set'},
+            ],
+          },
+        },
+        '/metadata/the-set': {
+          'metadata': {'title': 'The Set', 'creator': 'The Conet Project'},
+          'files': [
+            {'name': 'd1.mp3', 'format': 'VBR MP3', 'title': 'One', 'track': '1'},
+            {'name': 'd2.mp3', 'format': 'VBR MP3', 'title': 'Two', 'track': '1'},
+            {'name': 'd3.mp3', 'format': 'VBR MP3', 'title': 'Three', 'track': '2'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs, hasLength(3));
+      expect(
+        result.songs.map((song) => song.trackNumber),
+        [1, 2, 3],
+      );
+      expect(
+        result.songs.map((song) => song.trackTotal),
+        [3, 3, 3],
+      );
+    });
+
+    test('one item keeps at most thirty tracks', () async {
+      final files = [
+        for (var index = 1; index <= 40; index++)
+          {
+            'name': 'part$index.mp3',
+            'format': 'VBR MP3',
+            'title': 'Part $index',
+          },
+      ];
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-long-item', 'title': 'The Long Item'},
+            ],
+          },
+        },
+        '/metadata/the-long-item': {
+          'metadata': {'title': 'The Long Item'},
+          'files': files,
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs, hasLength(30));
+      expect(result.songs.first.title, 'Part 1');
+      expect(result.songs.last.title, 'Part 30');
+    });
+
+    test('a long book hands over as many chapters as asked for', () async {
+      final files = [
+        for (var index = 1; index <= 40; index++)
+          {
+            'name': 'part$index.mp3',
+            'format': 'VBR MP3',
+            'title': 'Part $index',
+          },
+      ];
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-book', 'title': 'The Book'},
+            ],
+          },
+        },
+        '/metadata/the-book': {
+          'metadata': {'title': 'The Book'},
+          'files': files,
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'limit': '10', 'perItem': '40'}),
+      );
+
+      // A book of forty chapters is read whole when the reader raises the
+      // limit; the default keeps an item from filling the library.
+      expect(result.songs, hasLength(40));
+      expect(result.songs.last.title, 'Part 40');
+    });
+
+    test('a sort the reader picked is asked for', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'sort': 'title'}),
+      );
+
+      expect(adapter.uris.first.queryParameters['sort[]'], 'titleSorter asc');
+    });
+
+    test('a sort the archive does not read leaves the browsing mode to decide', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'sort': 'bogus'}),
+      );
+
+      // The archive answers an unknown order with an error, so a name it does
+      // not read never reaches it.
+      expect(adapter.uris.first.queryParameters['sort[]'], 'downloads desc');
+    });
+    test('a decade narrows the query to the years of it', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'decade': '1990'}),
+      );
+
+      // The archive files a year, not a decade, so the decade is asked for as
+      // the range of its ten years.
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND year:[1990 TO 1999]',
+      );
+    });
+
+    test('a decade the archive does not file is not asked for', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'decade': '1890'}),
+      );
+
+      expect(adapter.uris.first.queryParameters['q'], 'mediatype:audio');
+    });
+
+    test('a tongue and a decade narrow together', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {'docs': <dynamic>[]},
+        },
+      });
+
+      await InternetArchiveSourceAdapter(dio: adapter.dio).scan(
+        _request({'language': 'German', 'decade': '1970'}),
+      );
+
+      expect(
+        adapter.uris.first.queryParameters['q'],
+        'mediatype:audio AND language:(German) AND year:[1970 TO 1979]',
+      );
+    });
+    test('an item hands its description and licence to its tracks', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-release', 'title': 'The Release'},
+            ],
+          },
+        },
+        '/metadata/the-release': {
+          'metadata': {
+            'title': 'The Release',
+            'description':
+                '<p>A record of <b>two</b> songs.</p><p>Recorded in 1954.</p>',
+            'licenseurl': 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      final song = result.songs.single;
+      // The description is HTML on the archive; the track keeps the words.
+      expect(song.description, 'A record of two songs. Recorded in 1954.');
+      // The licence is filed as the address of its deed, and read back into
+      // a name the reader knows.
+      expect(song.license, 'CC BY-NC-SA 3.0');
+    });
+
+    test('an item without a creative commons deed keeps no licence', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-plain', 'title': 'The Plain'},
+            ],
+          },
+        },
+        '/metadata/the-plain': {
+          'metadata': {
+            'title': 'The Plain',
+            'licenseurl': 'https://example.com/terms',
+          },
+          'files': [
+            {'name': 'one.mp3', 'format': 'VBR MP3', 'title': 'One'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      // A link that is not a deed is not shown as a licence.
+      expect(result.songs.single.license, isNull);
+    });
+    test('an item without playable audio adds nothing', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'the-scan', 'title': 'The Scan'},
+            ],
+          },
+        },
+        '/metadata/the-scan': {
+          'metadata': {'title': 'The Scan'},
+          'files': [
+            {'name': 'cover.jpg', 'format': 'JPEG'},
+            {'name': 'notes.txt', 'format': 'Text'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs, isEmpty);
+      expect(result.message, isNotNull);
+    });
+
+    test('an empty date is not a year', () async {
+      final adapter = _ArchiveAdapter({
+        '/advancedsearch.php': {
+          'response': {
+            'docs': [
+              {'identifier': 'undated', 'title': 'Undated'},
+            ],
+          },
+        },
+        '/metadata/undated': {
+          'metadata': {'title': 'Undated', 'date': '0000-00-00'},
+          'files': [
+            {'name': 'a.mp3', 'format': 'VBR MP3', 'title': 'A'},
+          ],
+        },
+      });
+
+      final result = await InternetArchiveSourceAdapter(
+        dio: adapter.dio,
+      ).scan(_request({'limit': '10'}));
+
+      expect(result.songs.single.year, isNull);
+    });
+  });
+}
+
+MusicSourceScanRequest _request(Map<String, String> settings, {String? cursor}) {
+  return MusicSourceScanRequest(
+    cursor: cursor,
+    config: MusicSourceConfig(
+      id: 'great78',
+      type: 'internet_archive',
+      name: 'Great 78 Project',
+      kind: MusicSourceKind.openCatalog,
+      settings: settings,
+    ),
+  );
+}
+
+/// Answers the archive search and the metadata of each item.
+class _ArchiveAdapter implements HttpClientAdapter {
+  _ArchiveAdapter(this.answers);
+
+  final Map<String, Object?> answers;
+  final List<Uri> uris = [];
+
+  Dio get dio {
+    final client = Dio();
+    client.httpClientAdapter = this;
+    return client;
+  }
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    uris.add(options.uri);
+
+    final answer = answers[options.uri.path];
+    if (answer == null) {
+      return _body('{}', 404);
+    }
+    return _body(jsonEncode(answer), 200);
+  }
+
+  ResponseBody _body(String text, int statusCode) {
+    final bytes = Uint8List.fromList(utf8.encode(text));
+    return ResponseBody(
+      Stream<Uint8List>.value(bytes),
+      statusCode,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+        Headers.contentLengthHeader: [bytes.length.toString()],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}

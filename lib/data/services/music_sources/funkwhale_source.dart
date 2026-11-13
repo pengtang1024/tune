@@ -178,6 +178,8 @@ class FunkwhaleSourceAdapter extends MusicSourceAdapter {
           duration: SourceSongFactory.parseInt(raw['duration']) * 1000,
           streamUrl: listen,
           artworkUrl: _coverOf(album),
+          license: _licenceOf(raw['license']),
+          year: _yearOf(raw['creation_date']),
           httpHeaders: token == null || token.isEmpty
               ? null
               : {'Authorization': 'Bearer $token'},
@@ -185,6 +187,40 @@ class FunkwhaleSourceAdapter extends MusicSourceAdapter {
       );
     }
     return songs;
+  }
+
+
+  /// The licence of a track, written the way the reader knows it.
+  ///
+  /// An instance files the licence of an upload as its code ("cc-by-sa-4.0",
+  /// "cc0-1.0"); the code is read back into a name. Anything that is not a
+  /// creative commons licence is left out rather than shown as a code.
+  static String? _licenceOf(Object? raw) {
+    final code = raw?.toString().trim().toLowerCase() ?? '';
+    if (!code.startsWith('cc')) return null;
+    if (code.startsWith('cc0')) {
+      final version = code.replaceFirst('cc0-', '');
+      return version.isEmpty ? 'CC0' : 'CC0 $version';
+    }
+    final parts = code.replaceFirst('cc-', '').split('-');
+    if (parts.isEmpty || parts.first.isEmpty) return null;
+    final name = StringBuffer('CC ${parts.first.toUpperCase()}');
+    for (final part in parts.skip(1)) {
+      if (RegExp(r'^\d').hasMatch(part)) {
+        name.write(' $part');
+      } else {
+        name.write('-${part.toUpperCase()}');
+      }
+    }
+    return name.toString();
+  }
+
+  /// The year a track was made, when the instance tells it.
+  static int? _yearOf(Object? raw) {
+    final text = raw?.toString().trim() ?? '';
+    if (text.length < 4) return null;
+    final year = int.tryParse(text.substring(0, 4));
+    return year == null || year <= 0 ? null : year;
   }
 
   /// The address of the audio file of a track.

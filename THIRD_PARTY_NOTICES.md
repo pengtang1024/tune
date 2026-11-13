@@ -50,6 +50,20 @@ pub.dev release linked above.
 | --- | --- | --- | --- |
 | `audio_metadata_reader` | 1.8.1 | MIT | Vendored under `vendor/audio_metadata_reader` with a local patch: `Buffer.read` clamps declared sizes to the bytes the file actually holds, so one corrupt tag header cannot trigger a gigabyte allocation. MIT, Copyright (c) 2023 Clément Béal, kept in the vendored `LICENSE`. The patch list and upgrade steps live in `vendor/audio_metadata_reader/VENDORED.md`. |
 
+## Bundled offline translation model and runtime
+
+The release archive ships an offline translation engine under `translation/`
+next to the executable. Neither component is modified by Tune.
+
+| Component | Location | License | Notes |
+| --- | --- | --- | --- |
+| Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M) | `translation/models/qwen2.5-0.5b-instruct-q4_k_m.gguf` | Apache License 2.0 | Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF. Weights are redistributed unmodified; the Q4_K_M quantization is the official one published in that repository. Full text: `translation/licenses/Qwen2.5-LICENSE.txt`; attribution: `translation/licenses/Qwen2.5-NOTICE.txt`. |
+| llama.cpp runtime (b12274, ubuntu-x64) | `translation/bin/llama-b12274/` | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/llama.cpp. Unmodified official release binaries. Full text: `translation/licenses/llama.cpp-LICENSE.txt`. |
+
+The model and the runtime are stored with Git LFS in the source repository and
+are included in the installer; the app does not download them at runtime. When
+the bundled local engine is selected, no text leaves the machine.
+
 ## Linux audio backend: libmpv and FFmpeg
 
 On Linux, Tune uses `just_audio_media_kit` → `media_kit` → the **system**

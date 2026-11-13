@@ -20,7 +20,14 @@ class RadioStation {
   final String? artworkUrl;
 
   /// The musical style of the station.
+  ///
+  /// One style, not a list joined by a slash: the library groups its tracks by
+  /// this value, and every combination of styles would become a group of its
+  /// own. The whole list the directory gives is in [genres].
   final String? genre;
+
+  /// The styles the directory files the station under.
+  final List<String>? genres;
 
   /// The language the station broadcasts in.
   final String? language;
@@ -59,6 +66,7 @@ class RadioStation {
     required this.streamUrl,
     this.artworkUrl,
     this.genre,
+    this.genres,
     this.language,
     this.country,
     this.description,
@@ -90,11 +98,21 @@ abstract class RadioStationProvider {
   ///
   /// An empty [query] returns the stations the directory considers its
   /// highlights. [limit] caps the number of stations. [country] narrows the
-  /// stations to a two-letter country code when the directory knows one.
+  /// stations to a two-letter country code when the directory knows one;
+  /// [tag] and [language] narrow the stations to a reach and a tongue. A
+  /// directory that does not know one of the narrowings answers as if it was
+  /// not written.
+  ///
+  /// [order] says which stations come first: `votes` is what listeners voted
+  /// for over the years, `clickcount` what is listened to the most right now.
   Future<List<RadioStation>> fetch({
     required String query,
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
   });
 }

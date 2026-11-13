@@ -9,7 +9,8 @@ import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/localization_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/utils/logger.dart';
@@ -51,14 +52,15 @@ class SettingsController extends StateNotifier<SettingsState> {
               _persistence.getBool('favorites_double_click_plays') ?? true,
           autoResumeOnStartup:
               _persistence.getBool('auto_resume_on_startup') ??
-                  // The switch used to decide whether the queue was read at
-                  // all; its old value carries over so a reader who turned it
-                  // off still gets no surprise playback.
-                  _persistence.getBool('restore_playback_on_startup') ??
-                  true,
+              // The switch used to decide whether the queue was read at
+              // all; its old value carries over so a reader who turned it
+              // off still gets no surprise playback.
+              _persistence.getBool('restore_playback_on_startup') ??
+              true,
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
           smartLyrics: _readSmartLyrics(_persistence),
+          localization: _readLocalization(_persistence),
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
@@ -189,6 +191,26 @@ class SettingsController extends StateNotifier<SettingsState> {
       Log.error('读取智能歌词配置失败: $error\n$stackTrace');
     }
     return SmartLyricsConfig();
+  }
+
+  /// Sets how missing metadata is translated into the interface language.
+  Future<void> setLocalization(LocalizationConfig config) async {
+    state = state.copyWith(localization: config);
+    await _persistence.setString('localization', jsonEncode(config.toJson()));
+  }
+
+  static LocalizationConfig _readLocalization(PersistenceService persistence) {
+    final raw = persistence.getString('localization');
+    if (raw == null || raw.trim().isEmpty) return const LocalizationConfig();
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        return LocalizationConfig.fromJson(Map<String, dynamic>.from(decoded));
+      }
+    } catch (error, stackTrace) {
+      Log.error('读取本地化配置失败: $error\n$stackTrace');
+    }
+    return const LocalizationConfig();
   }
 
   static SourceHealthWeights _readSourceHealthWeights(

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 
@@ -50,16 +51,27 @@ void main() {
     );
     const state = LibraryState(songs: [...songs, remote]);
 
-    expect(state.copyWith(sourceFilter: 'openverse').filteredSongs, [remote]);
-    expect(state.copyWith(sourceFilter: 'local').filteredSongs, songs);
     expect(
-      state.copyWith(sourceFilter: 'openverse', query: 'night').filteredSongs,
+      state.copyWith(filter: const LibraryFilter(sources: {'openverse'})).filteredSongs,
+      [remote],
+    );
+    expect(
+      state.copyWith(filter: const LibraryFilter(sources: {'local'})).filteredSongs,
+      songs,
+    );
+    expect(
+      state
+          .copyWith(
+            filter: const LibraryFilter(sources: {'openverse'}),
+            query: 'night',
+          )
+          .filteredSongs,
       isEmpty,
     );
     expect(
       state
-          .copyWith(sourceFilter: 'openverse')
-          .copyWith(sourceFilter: null)
+          .copyWith(filter: const LibraryFilter(sources: {'openverse'}))
+          .copyWith(filter: LibraryFilter.empty)
           .filteredSongs,
       hasLength(3),
     );

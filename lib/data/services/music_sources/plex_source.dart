@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/media_server_items.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -70,6 +72,19 @@ class PlexSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
+    MusicSourceField(
+      'since',
+      AppStrings.instance.recentWindowField,
+      AppStrings.instance.recentWindowFieldHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.recentWindowAll),
+        for (final days in RecentWindow.days)
+          MusicSourceChoice(
+            '$days',
+            AppStrings.instance.recentWindowDays('$days'),
+          ),
+      ],
+    ),
   ];
 
   @override
@@ -114,6 +129,7 @@ class PlexSourceAdapter extends MusicSourceAdapter {
         server: server,
         token: token,
         limit: limit,
+        since: RecentWindow.cutoff(config.setting('since')),
       );
       return SourceScanResult(
         sourceId: config.id,
@@ -210,12 +226,22 @@ class PlexSourceAdapter extends MusicSourceAdapter {
   }
 
   /// Kept static so XML mapping can be tested without network access.
+
+  /// The moment the server added a track, from its stamp in seconds.
+  static DateTime? _addedAtOf(XmlElement track) {
+    final raw = track.getAttribute('addedAt')?.trim() ?? '';
+    final seconds = int.tryParse(raw);
+    if (seconds == null || seconds <= 0) return null;
+    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true);
+  }
+
   static List<Song> parseTracks(
     String xml, {
     required String sourceId,
     required String server,
     required String token,
     int limit = 50,
+    DateTime? since,
   }) {
     final document = XmlDocument.parse(xml);
     final songs = <Song>[];
@@ -232,6 +258,11 @@ class PlexSourceAdapter extends MusicSourceAdapter {
       final partKey = part?.getAttribute('key')?.trim() ?? '';
       if (partKey.isEmpty) continue;
 
+      // A track the server added before the window is left out; a track
+      // without the stamp is kept, since nothing proves it is old.
+      final added = _addedAtOf(track);
+      if (since != null && added != null && added.isBefore(since)) continue;
+
       final thumb = track.getAttribute('thumb')?.trim() ?? '';
       songs.add(
         SourceSongFactory.create(
@@ -246,6 +277,7 @@ class PlexSourceAdapter extends MusicSourceAdapter {
               ? null
               : '$server$thumb?X-Plex-Token=$token',
           year: _yearOf(track),
+          description: shortDescription(track.getAttribute('summary')),
           bitrate: _kbpsOf(track),
           trackNumber: _positiveInt(track.getAttribute('index')),
           discNumber: _positiveInt(track.getAttribute('parentIndex')),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
+import 'package:tune/domain/models/library_filter.dart';
 
 String filterStatusLabel(BuildContext context, LibraryStatusFilter status) =>
     switch (status) {

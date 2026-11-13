@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_channel_health_store.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 
 import 'fake_persistence.dart';
 

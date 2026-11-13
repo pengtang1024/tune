@@ -6,14 +6,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/discovery/domain/track_listening.dart';
 import 'package:tune/data/services/database/app_database.dart';
+import 'package:tune/data/services/database/facets_worker.dart';
 import 'package:tune/features/library/data/library_document.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/utils/logger.dart';
@@ -128,6 +129,7 @@ class FileLibraryStorage implements LibraryStorage {
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) async {
     // A document cannot hold an inactive row: the rows the scan does not
     // cover are dropped, and the next scan of their source writes them back.
@@ -137,6 +139,9 @@ class FileLibraryStorage implements LibraryStorage {
     bool covered(Song song) {
       final sourceId = song.sourceId ?? 'local';
       if (!enabledSourceIds.contains(sourceId)) return false;
+      if (localReadUris != null && sourceId == 'local') {
+        return localReadUris.contains(song.uri);
+      }
       if (sourceId == 'local' && coveredPrefixes.isNotEmpty) {
         return coveredPrefixes.any(
           (folder) =>
@@ -355,6 +360,10 @@ class SqliteLibraryStorage implements LibraryStorage {
 
   AppDatabase? _database;
 
+  /// Where the database lives, when this storage opened it. A database handed
+  /// in by a factory has no path of its own.
+  String? _databasePath;
+
   Future<Directory> _directory() async {
     final base =
         await (_supportDirectory?.call() ?? getApplicationSupportDirectory());
@@ -370,9 +379,14 @@ class SqliteLibraryStorage implements LibraryStorage {
     if (existing != null) return existing;
 
     final factory = _databaseFactory;
-    final database = factory != null
-        ? await factory()
-        : AppDatabase.open(path.join((await _directory()).path, _fileName));
+    final AppDatabase database;
+    if (factory != null) {
+      database = await factory();
+    } else {
+      final file = path.join((await _directory()).path, _fileName);
+      _databasePath = file;
+      database = AppDatabase.open(file);
+    }
     _database = database;
     // A database that the app opens itself owns its migrations; only a
     // database this storage opens on its own adopts the legacy document.
@@ -454,11 +468,13 @@ class SqliteLibraryStorage implements LibraryStorage {
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) async {
     try {
       return (await _db()).deactivateUncovered(
         enabledSourceIds: enabledSourceIds,
         localPaths: localPaths,
+        localReadUris: localReadUris,
       );
     } catch (error, stackTrace) {
       Log.error('收窄音乐库失败: $error\n$stackTrace');
@@ -554,7 +570,14 @@ class SqliteLibraryStorage implements LibraryStorage {
   @override
   Future<LibraryFacets> facets({required LibraryFilter filter}) async {
     try {
-      return (await _db()).facets(filter: filter);
+      final database = await _db();
+      final path = _databasePath;
+      // A database this storage opened itself can be counted from a second
+      // connection, away from the thread that draws. A database handed in by
+      // a factory has no path; the small library it holds is cheap to count
+      // here.
+      if (path == null) return database.facets(filter: filter);
+      return await facetsInBackground(path: path, filter: filter);
     } catch (error, stackTrace) {
       Log.error('读取音乐库分面计数失败: $error\n$stackTrace');
       return LibraryFacets.empty;

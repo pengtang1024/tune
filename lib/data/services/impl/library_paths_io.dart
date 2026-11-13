@@ -1,7 +1,11 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:tune/core/config/app_capabilities.dart';
+import 'package:tune/data/services/impl/saf_document_writer.dart';
 import 'package:tune/data/services/library/library_paths.dart';
+import 'package:tune/data/services/library/saf_tree_store.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/domain/models/song.dart';
@@ -38,11 +42,21 @@ class FileLibraryPaths implements LibraryPaths {
 
   final PersistenceService _persistence;
 
+  /// The one door to a sheet that belongs to a tree the reader picked.
+  late final SafDocumentWriter _saf = SafDocumentWriter(
+    tree: SafTreeStore(_persistence),
+  );
+
   @override
   Directory root() {
-    final picked = _persistence.getString(LibraryPaths.rootKey);
-    if (picked != null && picked.trim().isNotEmpty) {
-      return Directory(picked.trim());
+    final picked = _persistence.getString(LibraryPaths.rootKey)?.trim();
+    // A tree picked on Android is an address of the document provider, not a
+    // folder of this process: no file of the app may be put under it by path
+    // (docs/android.md §5). The private folders answer for that platform.
+    if (picked != null &&
+        picked.isNotEmpty &&
+        !SafTreeStore.isTreeUri(picked)) {
+      return Directory(picked);
     }
     return defaultRoot();
   }
@@ -103,7 +117,14 @@ class FileLibraryPaths implements LibraryPaths {
   }
 
   @override
-  Directory coverCacheFolder() {
+  Future<Directory> coverCacheFolder() async {
+    if (AppCapabilities.current.platform == AppPlatform.android) {
+      // Shared storage is read-only for the app: a cover written into the
+      // music library would fail once per picture. The private folder of the
+      // app is the one place Android lets it write (docs/android.md).
+      final support = await getApplicationSupportDirectory();
+      return Directory(path.join(support.path, artworkFolderName));
+    }
     return Directory(
       path.join(root().path, cacheFolderName, artworkFolderName),
     );
@@ -146,13 +167,39 @@ class FileLibraryPaths implements LibraryPaths {
 
   @override
   Future<void> saveSmartLyrics(Song song, String lyrics) async {
+    // A track of the picked tree has no path the app may write to: the sheet
+    // becomes a document of the same folder, through the native channel.
+    if (_saf.owns(song)) {
+      await _saf.writeSmartLyrics(song, lyrics);
+      return;
+    }
     final file = await _lyricsFile(song, manual: false, smart: true);
     await file.parent.create(recursive: true);
     await file.writeAsString(lyrics, flush: true);
   }
 
   @override
+  Future<bool> canWriteSheet(Song song) async {
+    if (_saf.owns(song)) return _saf.canWrite(song);
+    // A track of MediaStore has no folder the app may write to; a build with
+    // a file system writes beside the audio.
+    return AppCapabilities.current.lyricsSheetBesideAudio;
+  }
+
+  @override
+  Future<File?> temporaryAudioFor(Song song) {
+    // A track of the picked tree has no path an engine may read: the native
+    // side copies the document into the private cache, and the run deletes
+    // that copy when it is done (docs/android.md §5.3).
+    if (_saf.owns(song)) return _saf.copyAudio(song);
+    return Future<File?>.value();
+  }
+
+  @override
   Future<String?> readSmartLyrics(Song song) {
+    // The sheet written into the tree is a document, not a file: it is read
+    // back through the channel so the panel can show the words.
+    if (_saf.owns(song)) return _saf.readSmartLyrics(song);
     return _readLyricsFile(_lyricsFile(song, manual: false, smart: true));
   }
 
@@ -195,7 +242,6 @@ class FileLibraryPaths implements LibraryPaths {
     }
     return File(song.uri);
   }
-
 
   /// The folder of a track that is on the disk, when the track is one.
   Directory? _localFolderOf(Song song) {

@@ -5,6 +5,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_meta.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 /// A track the user marked with a heart.
 ///
@@ -73,6 +74,8 @@ class FavoritesTrackRow extends StatelessWidget {
                     source: source,
                     selected: selected,
                     playing: playing,
+                    titleBuilder: (text, style) =>
+                        TranslatedText(text: text, style: style, dense: true),
                   ),
                 ),
                 const SizedBox(width: CompactTokens.space4),

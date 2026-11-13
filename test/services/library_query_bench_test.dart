@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// The filter and facet budget of docs/library-browse.md §6, measured on a
 /// library of twenty thousand tracks.

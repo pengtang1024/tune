@@ -32,8 +32,15 @@ class FilePersistenceService implements PersistenceService {
 
   Directory? _root;
 
+  Future<void>? _loading;
+
   @override
-  Future<void> init() async {
+  Future<void> init() => _loading ??= _load();
+
+  /// Reads the store once. A start may ask for the preferences while the
+  /// window is still warming up; the second ask joins the read in flight
+  /// instead of starting another one.
+  Future<void> _load() async {
     _root = await _resolveRoot();
     await _readAll();
     await LegacyPreferenceMigration.migrateInto(this);
@@ -112,13 +119,22 @@ class FilePersistenceService implements PersistenceService {
   }
 
   /// Reads every preference that is already on disk.
+  ///
+  /// The reads are issued together: one file is a few hundred bytes, and a
+  /// reader that waits for each of them in turn pays the round trip of the
+  /// event loop once per key instead of once for all of them.
   Future<void> _readAll() async {
     final entries = await _root!.list().toList();
-    for (final entry in entries) {
-      if (entry is! File) continue;
-      final key = _keyOf(entry.path);
-      if (key == null) continue;
-      final preference = await _readFile(entry);
+    final files = <(String, File)>[
+      for (final entry in entries)
+        if (entry is File)
+          if (_keyOf(entry.path) case final key?) (key, entry),
+    ];
+    final loaded = await Future.wait([
+      for (final (key, file) in files)
+        _readFile(file).then((preference) => (key, preference)),
+    ]);
+    for (final (key, preference) in loaded) {
       if (preference != null) _preferences[key] = preference;
     }
   }

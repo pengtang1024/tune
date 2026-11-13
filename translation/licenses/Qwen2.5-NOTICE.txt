@@ -1,0 +1,19 @@
+Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M)
+====================================
+
+This application bundles the quantized model file
+`qwen2.5-0.5b-instruct-q4_k_m.gguf` for offline metadata translation.
+
+- Model: Qwen2.5-0.5B-Instruct
+- Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF
+- Upstream: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct
+- License: Apache License 2.0 (see Qwen2.5-LICENSE.txt in this directory)
+- Copyright: Alibaba Cloud / Qwen team
+
+The model weights are redistributed unmodified. The GGUF Q4_K_M quantization
+is the one published in the official Qwen Hugging Face repository above; this
+application does not re-quantize or fine-tune the weights.
+
+The model runs locally through llama.cpp (see llama.cpp-LICENSE.txt). No model
+input or output is sent to a remote service when the bundled local engine is
+selected.

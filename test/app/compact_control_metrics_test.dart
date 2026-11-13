@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
@@ -57,30 +58,32 @@ void main() {
   testWidgets('a row of a track list is as tall as the token', (tester) async {
     await onLinux(() async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: CompactTheme.light,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: LibraryTrackCard(
-                song: Song(
-                  id: 1,
-                  title: 'A title',
-                  artist: 'An artist',
-                  duration: 1000,
-                  uri: '/music/a.mp3',
+        ProviderScope(
+          child: MaterialApp(
+            theme: CompactTheme.light,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: LibraryTrackCard(
+                  song: Song(
+                    id: 1,
+                    title: 'A title',
+                    artist: 'An artist',
+                    duration: 1000,
+                    uri: '/music/a.mp3',
+                  ),
+                  index: 0,
+                  selected: false,
+                  playing: false,
+                  isFavorite: false,
+                  metrics: LibraryRowMetrics.at(width: 800, textScale: 1),
+                  onTap: _noop,
+                  onDoubleTap: _noop,
+                  waitsForDoubleClick: false,
+                  onAddToQueue: _noop,
+                  onToggleFavorite: _noop,
                 ),
-                index: 0,
-                selected: false,
-                playing: false,
-                isFavorite: false,
-                metrics: LibraryRowMetrics.at(width: 800, textScale: 1),
-                onTap: _noop,
-                onDoubleTap: _noop,
-                waitsForDoubleClick: false,
-                onAddToQueue: _noop,
-                onToggleFavorite: _noop,
               ),
             ),
           ),

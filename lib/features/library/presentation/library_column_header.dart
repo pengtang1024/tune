@@ -3,7 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 
 /// The header of the library table.

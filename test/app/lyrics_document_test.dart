@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 
 void main() {
   test('reads the time stamps of a lyric sheet', () {

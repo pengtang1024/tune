@@ -9,6 +9,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 import 'package:tune/features/sources/presentation/music_sources_section.dart';
@@ -61,12 +62,17 @@ void main() {
   );
 
   Widget app(Widget home) {
-    return MaterialApp(
-      theme: CompactTheme.light,
-      locale: const Locale('zh', 'CN'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(body: home),
+    return ProviderScope(
+      overrides: [
+        translatedTextProvider.overrideWith((ref, request) async => null),
+      ],
+      child: MaterialApp(
+        theme: CompactTheme.light,
+        locale: const Locale('zh', 'CN'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: home),
+      ),
     );
   }
 
@@ -386,10 +392,8 @@ void main() {
     );
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: app(
-          const TrackMeta(song: withCover, index: 0),
-        ),
+      app(
+        const TrackMeta(song: withCover, index: 0),
       ),
     );
     await tester.pumpAndSettle();

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -77,6 +78,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   /// budget is spent.
   Future<void> start() async {
     if (state.running) return;
+    if (!_canWriteSheets()) return;
     final lock = ref.read(smartLyricsRunLockProvider);
     if (!lock.claimBatch()) return;
     _stopped = false;
@@ -102,6 +104,7 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   /// a new source or a new model was configured.
   Future<void> retryFailed() async {
     if (state.running) return;
+    if (!_canWriteSheets()) return;
     final lock = ref.read(smartLyricsRunLockProvider);
     if (!lock.claimBatch()) return;
     _stopped = false;
@@ -122,6 +125,14 @@ class SmartLyricsBatchController extends Notifier<SmartLyricsBatchProgress> {
   /// Stops between two tracks; the track in flight is stopped with the
   /// single-song cancel, and its task goes back to pending.
   void stop() => _stopped = true;
+
+  /// Whether a sheet has anywhere to land: the batch writes beside the
+  /// audio, so a platform without that right has no batch to run.
+  bool _canWriteSheets() {
+    if (AppCapabilities.current.lyricsSheetBesideAudio) return true;
+    Log.info('本平台不能把词稿写到音频旁，批量不启动（docs/android.md）');
+    return false;
+  }
 
   Future<void> _drain(SmartLyricsTaskStore store) async {
     final budget = ref.read(

@@ -8,14 +8,14 @@ import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
-import 'package:tune/features/library/application/dead_songs_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
+import 'package:tune/features/library/application/library_search_focus_provider.dart';
+import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_category.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
 import 'package:tune/features/library/presentation/library_album_header.dart';
@@ -32,9 +32,9 @@ import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
+import 'package:tune/features/player/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/search/presentation/online_search_sheet.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/application/source_health_reports.dart';
@@ -49,7 +49,13 @@ import 'package:tune/shared/ui/source_label.dart';
 /// The page wires the controller to the widgets; a track is always rendered
 /// by [LibraryTrackCard].
 class LibraryPane extends ConsumerStatefulWidget {
-  const LibraryPane({super.key});
+  /// Opens the online search sheet.
+  ///
+  /// The sheet belongs to another feature, so the page does not reach for it
+  /// itself: the router hands the opener in and composes the two there.
+  final VoidCallback? onSearchOnline;
+
+  const LibraryPane({super.key, this.onSearchOnline});
 
   @override
   ConsumerState<LibraryPane> createState() => _LibraryPaneState();
@@ -191,11 +197,13 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       sourceLabels,
       orderedConfigs,
     );
-    final songs = library.filteredSongs;
-    final albumCount = library.songs
-        .map((song) => song.album.trim())
-        .where((album) => album.isNotEmpty)
-        .toSet()
+    final songs = filteredSongsOf(
+      songs: library.songs,
+      query: library.query,
+      sourceFilter: library.sourceFilter,
+    );
+    final albumCount = library.albums
+        .where((album) => album.name.isNotEmpty)
         .length;
     // The albums are grouped only while the page is showing them: the songs
     // view has no use for the groups, and a library can hold thousands of
@@ -215,14 +223,14 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           child: openAlbum == null
               ? LibraryHeader(
                   summary: context.loc.librarySummary(
-                    library.songs.length,
+                    library.total,
                     albumCount,
                     availableSources.length,
                   ),
                   onAddAll: songs.isEmpty ? null : () => _addAllToQueue(songs),
                   onScan: _scan,
                   scanning: library.isScanning,
-                  onSearchOnline: () => showOnlineSearchSheet(context),
+                  onSearchOnline: widget.onSearchOnline,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),
@@ -244,6 +252,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             ),
             child: LibraryToolbar(
               controller: _searchController,
+              focusNode: ref.watch(librarySearchFocusProvider),
               query: library.query,
               filteredCount: songs.length,
               sources: availableSources,
@@ -289,6 +298,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   openAlbum,
                   sourceLabels,
                   settings.onlyLikeOnDoubleClick,
+                  settings.localization.enabled,
                 ),
         ),
         if (library.songs.isEmpty)
@@ -394,6 +404,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibraryAlbum? openAlbum,
     Map<String, SourceLabel> sourceLabels,
     bool onlyLikeOnDoubleClick,
+    bool bilingual,
   ) {
     if (songs.isEmpty) {
       return LibraryEmptyState(
@@ -420,6 +431,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         sourceLabels,
         onlyLikeOnDoubleClick,
         library.sort,
+        bilingual: bilingual,
       );
     }
 
@@ -450,6 +462,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               library.sort,
               controller: _songsScrollController,
               hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+              bilingual: bilingual,
             );
           }
           return LibraryColumnsView(
@@ -457,6 +470,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             sourceLabels: sourceLabels,
             waitsForDoubleClick: onlyLikeOnDoubleClick,
             controller: _columnsScrollController,
+            bilingual: bilingual,
           );
         },
       );
@@ -477,6 +491,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             albums: library.albums,
             currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
             controller: _albumsScrollController,
+            bilingual: bilingual,
             onOpen: _openAlbumByKey,
             onPlay: _playAlbumByKey,
           );
@@ -491,6 +506,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       library.sort,
       controller: _songsScrollController,
       hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+      bilingual: bilingual,
     );
   }
 
@@ -501,6 +517,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibrarySort sort, {
     ScrollController? controller,
     bool hasMore = false,
+    bool bilingual = false,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -510,6 +527,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         final metrics = LibraryRowMetrics.of(
           context,
           constraints.maxWidth - CompactTokens.pageGutter * 2,
+          bilingual: bilingual,
         );
 
         final cached = _cachedTracks;
@@ -792,7 +810,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 typedef _LibrarySlice = ({
   List<Song> songs,
   List<AlbumSummary> albums,
-  List<Song> filteredSongs,
+  int total,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -810,7 +828,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
   return (
     songs: state.songs,
     albums: state.albums,
-    filteredSongs: state.filteredSongs,
+    total: state.total,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,

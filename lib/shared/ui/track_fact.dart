@@ -44,6 +44,13 @@ class TrackFact {
   /// keeps the words.
   final bool identifier;
 
+  /// Whether the value is prose the app may translate.
+  ///
+  /// A description or a podcast note is written for a reader, not a key, so
+  /// it goes through the same translator as a title. A licence, a date or an
+  /// identifier does not.
+  final bool translatable;
+
   final String? _sentence;
 
   const TrackFact({
@@ -55,6 +62,7 @@ class TrackFact {
     this.compact = false,
     this.paragraph = false,
     this.identifier = false,
+    this.translatable = false,
     String? sentence,
   }) : _sentence = sentence;
 

@@ -6,7 +6,7 @@ import 'package:tune/features/sources/domain/source_health.dart';
 import 'package:tune/features/sources/domain/source_health_facts.dart';
 import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
-import 'package:tune/features/sources/domain/source_scan_health.dart';
+import 'package:tune/domain/models/source_scan_health.dart';
 import 'package:tune/features/sources/domain/source_weights.dart';
 
 void main() {

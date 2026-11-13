@@ -152,7 +152,8 @@ void main() {
 
     expect(
       tester.widget<ListView>(find.byType(ListView).first).itemExtent,
-      CompactTokens.libraryRowHeight,
+      CompactTokens.libraryRowHeightBilingual,
+      reason: 'the translation is on by default and the title takes two lines',
     );
 
     tester.platformDispatcher.textScaleFactorTestValue = 1.5;

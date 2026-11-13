@@ -909,6 +909,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browseModeDaily => 'Daily picks';
 
   @override
+  String get browseModeAlbums => 'Albums';
+
+  @override
+  String get recentWindowField => 'Recently added';
+
+  @override
+  String get recentWindowFieldHint => 'Only what came in inside this window';
+
+  @override
+  String get recentWindowAll => 'Everything';
+
+  @override
+  String recentWindowDays(String days) {
+    return 'The last $days days';
+  }
+
+  @override
   String get fieldLimit => 'Tracks per scan';
 
   @override
@@ -939,43 +956,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldLimitBooks => 'Books per scan';
 
   @override
-  String get fieldLanguage => 'Language';
-
-  @override
-  String get fieldLanguageHint => 'Only keep the audiobooks of one language';
-
-  @override
-  String get fieldLanguageAll => 'All languages';
-
-  @override
-  String get fieldLanguageEnglish => 'English';
-
-  @override
-  String get fieldLanguageChinese => 'Chinese';
-
-  @override
-  String get fieldLanguageFrench => 'French';
-
-  @override
-  String get fieldLanguageGerman => 'German';
-
-  @override
-  String get fieldLanguageSpanish => 'Spanish';
-
-  @override
-  String get fieldLanguageItalian => 'Italian';
-
-  @override
-  String get fieldLanguageJapanese => 'Japanese';
-
-  @override
-  String get fieldLanguageRussian => 'Russian';
-
-  @override
-  String get fieldLanguagePortuguese => 'Portuguese';
-
-  @override
   String get fieldServer => 'Server address';
+
+  @override
+  String get fieldEmail => 'Email';
 
   @override
   String get fieldUser => 'User name';
@@ -1389,6 +1373,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localSourceNotConfigured => 'No local music folder configured';
 
   @override
+  String get openverseFieldSource => 'Catalogue';
+
+  @override
+  String get openverseFieldLength => 'Length';
+
+  @override
+  String get openverseFieldLengthHint => 'Only the audio of one length';
+
+  @override
+  String get openverseLengthAll => 'Every length';
+
+  @override
+  String get openverseLengthShort => 'Short (under 2 minutes)';
+
+  @override
+  String get openverseLengthMedium => 'Medium (up to 10 minutes)';
+
+  @override
+  String get openverseLengthLong => 'Long (over 10 minutes)';
+
+  @override
+  String get openverseFieldLicense => 'Licence';
+
+  @override
+  String get openverseFieldLicenseHint => 'Only the audio under one licence';
+
+  @override
+  String get openverseLicenseAll => 'Every licence';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0 (public domain)';
+
+  @override
+  String get openverseLicenceBy => 'CC BY (attribution)';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA (share alike)';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC (non commercial)';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND (no derivatives)';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
+  String get openverseFieldSourceHint =>
+      'One catalogue instead of every one at once';
+
+  @override
+  String get openverseSourceAll => 'Every catalogue';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => 'Wikimedia Commons';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint =>
       'Enter a search keyword, e.g. piano, ambient or jazz';
 
@@ -1443,6 +1494,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jamendoFieldQueryHint => 'e.g. jazz, electronic';
 
   @override
+  String get jamendoFieldTag => 'Tag';
+
+  @override
+  String get jamendoFieldTagHint =>
+      'A genre or a mood of the catalogue, e.g. jazz, electronic, piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo returned an empty response';
 
   @override
@@ -1453,11 +1511,64 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter an Internet Archive query, e.g. collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => 'Tracks per item';
+
+  @override
+  String get internetArchiveFieldLanguage => 'Language';
+
+  @override
+  String get internetArchiveFieldDecade => 'Decade';
+
+  @override
+  String get internetArchiveFieldSort => 'Order';
+
+  @override
+  String get internetArchiveFieldSortHint =>
+      'What the scan reads first; a browsing mode decides when nothing is picked';
+
+  @override
+  String get internetArchiveSortBrowse => 'According to the browsing';
+
+  @override
+  String get internetArchiveSortTitle => 'By title';
+
+  @override
+  String get internetArchiveSortAdded => 'Last added';
+
+  @override
+  String get internetArchiveSortPublished => 'Newest published';
+
+  @override
+  String get internetArchiveFieldDecadeHint =>
+      'Only the audio filed under one decade';
+
+  @override
+  String get internetArchiveDecadeAll => 'Every decade';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '${decade}s';
+  }
+
+  @override
+  String get internetArchiveFieldLanguageHint =>
+      'Only the audio filed under one tongue';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return 'How many tracks one item may give (1–$max, default $count)';
+  }
+
+  @override
   String get internetArchiveFieldQuery => 'Query';
 
   @override
   String get internetArchiveInvalidResponse =>
       'Internet Archive returned an unreadable response';
+
+  @override
+  String get internetArchiveBackendBusy =>
+      'The search service of Internet Archive is unavailable right now';
 
   @override
   String get internetArchiveNoMatch => 'No playable archived audio found';
@@ -1479,7 +1590,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ccmixterFieldQuery => 'Search tag';
 
   @override
+  String get ccmixterFieldLicence => 'Licence';
+
+  @override
+  String get ccmixterFieldLicenceHint =>
+      'Only the uploads published under this licence';
+
+  @override
+  String get ccmixterLicenceAll => 'Every licence';
+
+  @override
+  String get ccmixterLicenceBy => 'Attribution only';
+
+  @override
+  String get ccmixterLicenceNc => 'Noncommercial';
+
+  @override
+  String get ccmixterLicencePd => 'Public domain';
+
+  @override
   String get ccmixterFieldQueryHint => 'e.g. jazz, ambient, electro';
+
+  @override
+  String get ccmixterFieldTag => 'Genre';
+
+  @override
+  String get ccmixterFieldTagHint =>
+      'One tag of the site; a keyword and a tag narrow together';
+
+  @override
+  String get ccmixterTagAll => 'Every genre';
+
+  @override
+  String get ccmixterTagFunk => 'Funk';
+
+  @override
+  String get ccmixterTagAmbient => 'Ambient';
+
+  @override
+  String get ccmixterTagChill => 'Chill';
+
+  @override
+  String get ccmixterTagInstrumental => 'Instrumental';
 
   @override
   String get ccmixterHint =>
@@ -1494,6 +1646,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get podcastRssFieldFeed => 'Feed address';
+
+  @override
+  String get podcastRssFieldSince => 'Episodes from';
+
+  @override
+  String get podcastRssFieldSinceHint =>
+      'Only the episodes published inside this window';
+
+  @override
+  String get podcastRssSinceAll => 'Every episode';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return 'The last $days days';
+  }
 
   @override
   String get podcastRssFieldFeedHint => 'e.g. https://example.com/podcast.xml';
@@ -1524,6 +1691,146 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceLiveMusicArchiveName => 'Live Music Archive';
 
   @override
+  String get sourceGreat78Description =>
+      'The public-domain 78 rpm records the Internet Archive digitises';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription =>
+      'The albums the netlabels released for free';
+
+  @override
+  String get sourceNetlabelsName => 'Netlabels';
+
+  @override
+  String get sourceOldTimeRadioDescription =>
+      'Radio dramas and shows from the golden age of broadcasting';
+
+  @override
+  String get sourceOldTimeRadioName => 'Old Time Radio';
+
+  @override
+  String get sourceAudioMusicDescription =>
+      'The music recordings the Internet Archive keeps in its audio collection';
+
+  @override
+  String get sourceAudioMusicName => 'Archive Music';
+
+  @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'The public-domain records the Unlocked Recordings project digitises';
+
+  @override
+  String get sourceCommunityMusicName => 'Community Music';
+
+  @override
+  String get sourceCommunityMusicDescription =>
+      'Music the archive\'s community uploads: rock, jazz, blues and electronic';
+
+  @override
+  String get sourceCommunityClassicalName => 'Community Classical';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'The archive\'s community uploads of classical music: orchestras, chamber recordings and solo recitals';
+
+  @override
+  String get sourceCommunityAmbientName => 'Community Ambient & Experimental';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'The archive\'s community uploads of ambient and experimental music: long forms, field recordings and one-off takes';
+
+  @override
+  String get sourceCommunityWorldName => 'Community World & Reggae';
+
+  @override
+  String get sourceCommunityWorldDescription =>
+      'The archive\'s community uploads of music from outside the English-speaking charts: regional styles, dub and reggae';
+
+  @override
+  String get sourceCommunityMetalName => 'Community Metal & Punk';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'The archive\'s community uploads of metal and punk: live sets, EPs and netlabel releases';
+
+  @override
+  String get sourceCommunityHiphopName => 'Community Hip-Hop & Funk';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'The archive\'s community uploads of hip-hop and funk: mixtapes, beats and live grooves';
+
+  @override
+  String get sourceIndependentAudiobooksName => 'Independent audiobooks';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'Audiobooks the archive keeps outside the LibriVox collection';
+
+  @override
+  String get sourceArchivePodcastsName => 'Archived podcasts';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      'Podcast episodes the archive keeps after the feeds go quiet';
+
+  @override
+  String get sourceRadioRecordingsName => 'Radio recordings';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      'Broadcasts the archive keeps outside its old time radio collection';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'The albums the Free Music Archive keeps in the archive';
+
+  @override
+  String get sourceForeignAudioName => 'Foreign-language audio';
+
+  @override
+  String get sourceForeignAudioDescription =>
+      'Audiobooks and readings the archive keeps outside English';
+
+  @override
+  String get sourceNewsRecordingsName => 'News recordings';
+
+  @override
+  String get sourceNewsRecordingsDescription =>
+      'News broadcasts the archive keeps as recordings';
+
+  @override
+  String get sourcePoetryName => 'Poetry readings';
+
+  @override
+  String get sourcePoetryDescription =>
+      'Poems read aloud, the ones the archive files under poetry';
+
+  @override
+  String get sourcePoetryBooksName => 'Poetry books';
+
+  @override
+  String get sourcePoetryBooksDescription =>
+      'Books of poems read aloud, the ones the archive files under poetry';
+
+  @override
+  String get sourceScienceTalksName => 'Science talks';
+
+  @override
+  String get sourceScienceTalksDescription =>
+      'Science programmes and talks the archive keeps as audio';
+
+  @override
   String get sourcePodcastRssDescription =>
       'Turns any podcast RSS feed into playable episodes';
 
@@ -1542,10 +1849,131 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a keyword to find podcasts, or leave it empty to browse the directory';
 
   @override
+  String get podcastCatalogFieldTag => 'Tag';
+
+  @override
+  String get podcastCatalogFieldTagHint =>
+      'Shows of one tag, e.g. comedy, news, technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => 'e.g. jazz, history or technology';
 
   @override
   String get podcastCatalogNoMatch => 'No podcast found';
+
+  @override
+  String get sourceApplePodcastsName => 'Apple Podcasts';
+
+  @override
+  String get sourceApplePodcastsDescription =>
+      'The shows Apple\'s directory ranks and searches, read from their own feeds';
+
+  @override
+  String get podcastAppleHint =>
+      'Type a keyword, or leave it empty to read Apple\'s top podcasts';
+
+  @override
+  String get podcastAppleFieldMode => 'Reads';
+
+  @override
+  String get podcastAppleFieldModeHint =>
+      'The shows of the charts, or the episodes a keyword is found in';
+
+  @override
+  String get podcastAppleModeShows => 'Shows';
+
+  @override
+  String get podcastAppleModeEpisodes => 'Episodes';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired =>
+      'The episode mode needs a keyword: the store has no chart of episodes.';
+
+  @override
+  String get podcastAppleFieldQueryHint => 'e.g. jazz, news, comedy';
+
+  @override
+  String get podcastAppleFieldCountry => 'Country';
+
+  @override
+  String get podcastAppleFieldCountryHint => 'Two-letter code, e.g. US, CN';
+
+  @override
+  String get podcastAppleFieldGenre => 'Category';
+
+  @override
+  String get podcastAppleFieldGenreHint => 'One category of the store chart';
+
+  @override
+  String get podcastFieldEpisodes => 'Episodes per show';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return 'How many episodes of one show to read (1–$max, default $count)';
+  }
+
+  @override
+  String get podcastAppleGenreAll => 'All categories';
+
+  @override
+  String get podcastAppleGenreArts => 'Arts';
+
+  @override
+  String get podcastAppleGenreBusiness => 'Business';
+
+  @override
+  String get podcastAppleGenreComedy => 'Comedy';
+
+  @override
+  String get podcastAppleGenreEducation => 'Education';
+
+  @override
+  String get podcastAppleGenreFiction => 'Fiction';
+
+  @override
+  String get podcastAppleGenreGovernment => 'Government';
+
+  @override
+  String get podcastAppleGenreHealth => 'Health & fitness';
+
+  @override
+  String get podcastAppleGenreHistory => 'History';
+
+  @override
+  String get podcastAppleGenreKids => 'Kids & family';
+
+  @override
+  String get podcastAppleGenreLeisure => 'Leisure';
+
+  @override
+  String get podcastAppleGenreMusic => 'Music';
+
+  @override
+  String get podcastAppleGenreNews => 'News';
+
+  @override
+  String get podcastAppleGenreReligion => 'Religion & spirituality';
+
+  @override
+  String get podcastAppleGenreScience => 'Science';
+
+  @override
+  String get podcastAppleGenreSports => 'Sports';
+
+  @override
+  String get podcastAppleGenreFilm => 'TV & film';
+
+  @override
+  String get podcastAppleGenreTechnology => 'Technology';
+
+  @override
+  String get podcastAppleGenreTrueCrime => 'True crime';
+
+  @override
+  String get podcastAppleGenreSociety => 'Society & culture';
+
+  @override
+  String get podcastAppleNoMatch => 'No matching show in the Apple directory';
 
   @override
   String get sourceSubsonicDescription =>
@@ -1599,6 +2027,76 @@ class AppLocalizationsEn extends AppLocalizations {
       'Type a search keyword, e.g. jazz, ambient or electronic';
 
   @override
+  String get audiusFieldGenre => 'Reach';
+
+  @override
+  String get audiusFieldPlaylists => 'Playlists per scan';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return 'How many playlists the playlist mode reads (1–$max, default $count)';
+  }
+
+  @override
+  String get audiusFieldMode => 'Reads';
+
+  @override
+  String get audiusFieldModeHint =>
+      'Single tracks, or the playlists of the site';
+
+  @override
+  String get audiusModeSongs => 'Single tracks';
+
+  @override
+  String get audiusModePlaylists => 'Playlists';
+
+  @override
+  String get audiusFieldGenreHint =>
+      'The kind of music the trending list is read for';
+
+  @override
+  String get audiusGenreAll => 'Every kind';
+
+  @override
+  String get audiusGenreElectronic => 'Electronic';
+
+  @override
+  String get audiusGenreHipHop => 'Hip-hop';
+
+  @override
+  String get audiusGenreSoul => 'R&B and soul';
+
+  @override
+  String get audiusGenreAmbient => 'Ambient';
+
+  @override
+  String get audiusGenreTechno => 'Techno';
+
+  @override
+  String get audiusGenreHouse => 'House';
+
+  @override
+  String get audiusGenreDubstep => 'Dubstep';
+
+  @override
+  String get audiusFieldWindow => 'Window';
+
+  @override
+  String get audiusFieldWindowHint => 'How far back the trending list reaches';
+
+  @override
+  String get audiusWindowDefault => 'The network\'s default';
+
+  @override
+  String get audiusWindowWeek => 'Last week';
+
+  @override
+  String get audiusWindowMonth => 'Last month';
+
+  @override
+  String get audiusWindowAllTime => 'All time';
+
+  @override
   String get audiusFieldQueryHint => 'e.g. jazz, ambient, electronic';
 
   @override
@@ -1619,7 +2117,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      'All directories, Radio Browser, SomaFM or Radio Paradise';
+      'All directories, Radio Browser, SomaFM, Radio Paradise, NTS or Radio France';
 
   @override
   String get radioProviderAll => 'All directories';
@@ -1629,7 +2127,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radioFieldCountryHint =>
-      'A two-letter country code, e.g. SG, MY, AU or JP; any country the directory lists works';
+      'A country code such as SG, MY, AU, JP, or the name of a country such as Germany';
+
+  @override
+  String get radioFieldLanguage => 'Language';
+
+  @override
+  String get radioFieldLanguageHint =>
+      'A tongue: english, spanish, chinese, or the name in the language of the app';
+
+  @override
+  String get languageNameAll => 'Every language';
+
+  @override
+  String get languageNameEnglish => 'English';
+
+  @override
+  String get languageNameSpanish => 'Spanish';
+
+  @override
+  String get languageNameGerman => 'German';
+
+  @override
+  String get languageNameFrench => 'French';
+
+  @override
+  String get languageNameChinese => 'Chinese';
+
+  @override
+  String get languageNameRussian => 'Russian';
+
+  @override
+  String get languageNameItalian => 'Italian';
+
+  @override
+  String get languageNameGreek => 'Greek';
+
+  @override
+  String get languageNamePortuguese => 'Portuguese';
+
+  @override
+  String get languageNameTurkish => 'Turkish';
+
+  @override
+  String get languageNameJapanese => 'Japanese';
+
+  @override
+  String get languageNamePolish => 'Polish';
+
+  @override
+  String get languageNameKorean => 'Korean';
+
+  @override
+  String get languageNameArabic => 'Arabic';
+
+  @override
+  String get languageNameHindi => 'Hindi';
+
+  @override
+  String get radioFieldBitrate => 'Bitrate';
+
+  @override
+  String get radioFieldBitrateHint =>
+      'Only the stations that stream at least this fast';
+
+  @override
+  String get radioBitrateAll => 'Every bitrate';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return 'At least $floor kbit/s';
+  }
+
+  @override
+  String get radioFieldOrder => 'Order';
+
+  @override
+  String get radioFieldOrderHint => 'Which stations come first';
+
+  @override
+  String get radioOrderVotes => 'Most voted';
+
+  @override
+  String get radioOrderListened => 'Most listened to';
+
+  @override
+  String get radioFieldTag => 'Tag';
+
+  @override
+  String get radioFieldTagHint =>
+      'One of the reaches the directory files a few hundred stations under; a word of your own reaches the rest';
+
+  @override
+  String get radioTagAll => 'Every reach';
 
   @override
   String get radioFieldQuery => 'Station keyword';
@@ -1649,6 +2239,72 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get wikimediaHint =>
       'Type a search keyword, e.g. piano, lecture or birdsong';
+
+  @override
+  String get wikimediaFieldCategory => 'Catalogue';
+
+  @override
+  String get wikimediaFieldCategoryHint => 'The reach of the wiki to walk';
+
+  @override
+  String get wikimediaCategoryAll => 'All music';
+
+  @override
+  String get wikimediaCategoryPiano => 'Piano';
+
+  @override
+  String get wikimediaCategoryGuitar => 'Guitar';
+
+  @override
+  String get wikimediaCategoryRock => 'Rock';
+
+  @override
+  String get wikimediaCategoryPop => 'Pop';
+
+  @override
+  String get wikimediaCategoryHipHop => 'Hip hop';
+
+  @override
+  String get wikimediaCategoryCountry => 'Country';
+
+  @override
+  String get wikimediaCategoryBlues => 'Blues';
+
+  @override
+  String get wikimediaCategoryReggae => 'Reggae';
+
+  @override
+  String get wikimediaCategoryChoral => 'Choral';
+
+  @override
+  String get wikimediaCategoryOrgan => 'Organ';
+
+  @override
+  String get wikimediaCategorySpeeches => 'Speeches';
+
+  @override
+  String get wikimediaCategoryEffects => 'Sound effects';
+
+  @override
+  String get wikimediaCategoryInterviews => 'Interviews';
+
+  @override
+  String get wikimediaCategoryPoetry => 'Poetry';
+
+  @override
+  String get wikimediaCategorySpoken => 'Spoken articles';
+
+  @override
+  String get wikimediaCategoryHouse => 'House';
+
+  @override
+  String get wikimediaCategoryDnb => 'Drum and bass';
+
+  @override
+  String get wikimediaCategoryAmbient => 'Ambient';
+
+  @override
+  String get wikimediaCategoryWorld => 'World music';
 
   @override
   String get wikimediaFieldQueryHint => 'e.g. piano, lecture, birdsong';
@@ -1722,6 +2378,337 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audiobookshelfNoMatch => 'No audiobook found';
 
   @override
+  String get sourceAmpacheName => 'Ampache';
+
+  @override
+  String get sourceAmpacheDescription =>
+      'Music library of a self-hosted Ampache server';
+
+  @override
+  String get ampacheHint =>
+      'Type the address and the API key of your Ampache server';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API key';
+
+  @override
+  String get ampacheFieldApiKeyHint =>
+      'The API key of an Ampache account (Preferences → API keys)';
+
+  @override
+  String get ampacheFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache returned an empty response';
+
+  @override
+  String get ampacheNoMatch => 'No matching tracks on Ampache';
+
+  @override
+  String get ampacheAuthFailed =>
+      'Cannot reach the Ampache server, check the address and the API key';
+
+  @override
+  String get sourceAzuracastName => 'AzuraCast';
+
+  @override
+  String get sourceAzuracastDescription =>
+      'Stations of a self-hosted AzuraCast radio server';
+
+  @override
+  String get azuracastHint =>
+      'Type the address of your AzuraCast server to listen to its stations';
+
+  @override
+  String get azuracastFieldServerHint => 'e.g. https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API key (optional)';
+
+  @override
+  String get azuracastFieldApiKeyHint =>
+      'Only needed when the server keeps its stations private';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast returned an empty response';
+
+  @override
+  String get azuracastNoMatch => 'No matching stations on AzuraCast';
+
+  @override
+  String get azuracastAuthFailed =>
+      'Cannot reach the AzuraCast server, check the address and the API key';
+
+  @override
+  String get sourceKoelName => 'Koel';
+
+  @override
+  String get sourceKoelDescription =>
+      'Music library of a self-hosted Koel server';
+
+  @override
+  String get koelHint =>
+      'Type the address, the email and the password of your Koel server';
+
+  @override
+  String get koelFieldServerHint => 'e.g. http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'The email of a Koel account';
+
+  @override
+  String get koelFieldPasswordHint => 'The password of the Koel account';
+
+  @override
+  String get koelFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get koelEmptyResponse => 'Koel returned an empty response';
+
+  @override
+  String get koelNoMatch => 'No matching tracks on Koel';
+
+  @override
+  String get koelAuthFailed =>
+      'Cannot sign in to the Koel server, check the address, the email and the password';
+
+  @override
+  String get koelTwoFactor =>
+      'The Koel account uses two-factor sign-in, which this source cannot do';
+
+  @override
+  String get sourceItunesName => 'iTunes previews';
+
+  @override
+  String get sourceItunesDescription =>
+      'Thirty-second previews of the songs of the iTunes store';
+
+  @override
+  String get itunesHint =>
+      'Type a keyword, or pick the album mode to read the store chart';
+
+  @override
+  String get itunesFieldQueryHint => 'e.g. miles davis, kind of blue';
+
+  @override
+  String get itunesFieldCountry => 'Country';
+
+  @override
+  String get itunesFieldCountryHint => 'Two-letter code, e.g. US, JP';
+
+  @override
+  String get itunesEmptyResponse =>
+      'The iTunes store returned an empty response';
+
+  @override
+  String get itunesNoMatch => 'No matching song in the iTunes store';
+
+  @override
+  String get itunesPreviewNote => 'Thirty-second preview of the song';
+
+  @override
+  String get sourceDeezerName => 'Deezer previews';
+
+  @override
+  String get sourceDeezerDescription =>
+      'Thirty-second previews of the songs of the Deezer catalogue';
+
+  @override
+  String get deezerHint =>
+      'Type a keyword, or leave it empty to read the charts of the store';
+
+  @override
+  String get deezerFieldQueryHint => 'e.g. miles davis, kind of blue';
+
+  @override
+  String get deezerFieldGenre => 'Reach';
+
+  @override
+  String get deezerFieldGenreHint =>
+      'The chart to read when no keyword is written';
+
+  @override
+  String get deezerGenreAll => 'Every reach';
+
+  @override
+  String get deezerGenreAlternative => 'Alternative';
+
+  @override
+  String get deezerGenreFilms => 'Films & games';
+
+  @override
+  String get deezerGenreSoulFunk => 'Soul & funk';
+
+  @override
+  String get deezerGenreAfrican => 'African music';
+
+  @override
+  String get deezerGenreAsian => 'Asian music';
+
+  @override
+  String get deezerGenreBlues => 'Blues';
+
+  @override
+  String get deezerGenreBrazilian => 'Brazilian music';
+
+  @override
+  String get deezerGenreIndian => 'Indian music';
+
+  @override
+  String get deezerGenreKids => 'Kids';
+
+  @override
+  String get deezerGenreLatin => 'Latin music';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer returned an empty response';
+
+  @override
+  String get deezerNoMatch => 'No matching song on Deezer';
+
+  @override
+  String get deezerPreviewNote => 'Thirty-second preview of the song';
+
+  @override
+  String get storeFieldBatch => 'How many at once';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return 'The albums, artists or playlists one scan reads (1–$max, default $count); single tracks are not affected';
+  }
+
+  @override
+  String get storeReadModeField => 'Reads';
+
+  @override
+  String get storeReadModeFieldHint =>
+      'The tracks themselves, or the records, artists and playlists behind them';
+
+  @override
+  String get storeReadModeSongs => 'Single tracks';
+
+  @override
+  String get storeReadModeAlbums => 'Albums';
+
+  @override
+  String get storeReadModeArtists => 'Artists';
+
+  @override
+  String get storeReadModePlaylists => 'Playlists';
+
+  @override
+  String get sourceKodiName => 'Kodi';
+
+  @override
+  String get sourceKodiDescription =>
+      'Music library of a self-hosted Kodi media centre';
+
+  @override
+  String get kodiHint =>
+      'Type the address of the Kodi web server, and the account when it asks for one';
+
+  @override
+  String get lmsHint =>
+      'Address of a Logitech Media Server: e.g. http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint =>
+      'Address of the server, e.g. http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => 'Account of the server, when it asks for one';
+
+  @override
+  String get lmsFieldPasswordHint => 'Password of that account';
+
+  @override
+  String get lmsFieldQueryHint => 'Narrow the library by a word (optional)';
+
+  @override
+  String get lmsEmptyResponse => 'The server answered without a list of tracks';
+
+  @override
+  String get lmsNoMatch => 'No track of the server matches';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription =>
+      'The library of a Squeezebox server on your network';
+
+  @override
+  String get kodiFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'The account of the web server';
+
+  @override
+  String get kodiFieldPasswordHint => 'The password of the web server';
+
+  @override
+  String get kodiFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi returned an empty response';
+
+  @override
+  String get kodiNoMatch => 'No matching tracks in Kodi';
+
+  @override
+  String get sourcePeerTubeName => 'PeerTube music';
+
+  @override
+  String get sourcePeerTubeDescription =>
+      'Music and live sessions from federated PeerTube servers';
+
+  @override
+  String get peerTubeHint => 'Type the address of a PeerTube server';
+
+  @override
+  String get peerTubeFieldServerHint => 'e.g. https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => 'e.g. jazz, piano';
+
+  @override
+  String get peerTubeCategory => 'Catalogue';
+
+  @override
+  String get peerTubeFieldSort => 'Order';
+
+  @override
+  String get peerTubeFieldSortHint =>
+      'What the scan reads first; a browsing mode decides when nothing is picked';
+
+  @override
+  String get peerTubeSortDefault => 'According to the browsing';
+
+  @override
+  String get peerTubeSortNewest => 'Newest first';
+
+  @override
+  String get peerTubeSortViewed => 'Most watched';
+
+  @override
+  String get peerTubeCategoryHint => 'Music only, or everything the server has';
+
+  @override
+  String get peerTubeCategoryMusic => 'Music only';
+
+  @override
+  String get peerTubeCategoryAll => 'Everything';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube returned an empty response';
+
+  @override
+  String get peerTubeNoMatch => 'No matching tracks on PeerTube';
+
+  @override
   String get sourcePlexName => 'Media library';
 
   @override
@@ -1784,6 +2771,89 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get librivoxHint =>
       'Type a book or an author, or leave it empty to browse the most popular audiobooks';
+
+  @override
+  String get librivoxFieldChapters => 'Chapters per book';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return 'How many chapters of one book to read (1–$max, default $count)';
+  }
+
+  @override
+  String get librivoxFieldGenre => 'Kind of book';
+
+  @override
+  String get librivoxFieldGenreHint => 'The shelf of the catalogue to read';
+
+  @override
+  String get librivoxGenreAll => 'Every kind';
+
+  @override
+  String get librivoxGenreFiction => 'Fiction';
+
+  @override
+  String get librivoxGenrePoetry => 'Poetry';
+
+  @override
+  String get librivoxGenreHistory => 'History';
+
+  @override
+  String get librivoxGenreRomance => 'Romance';
+
+  @override
+  String get librivoxGenreScienceFiction => 'Science fiction';
+
+  @override
+  String get librivoxGenreBiography => 'Biography';
+
+  @override
+  String get librivoxGenreEssays => 'Essays';
+
+  @override
+  String get librivoxGenreComedy => 'Comedy';
+
+  @override
+  String get librivoxGenreDrama => 'Drama';
+
+  @override
+  String get librivoxGenreHistoricalFiction => 'Historical Fiction';
+
+  @override
+  String get librivoxGenreNature => 'Nature';
+
+  @override
+  String get librivoxGenrePhilosophy => 'Philosophy';
+
+  @override
+  String get librivoxGenreReligion => 'Religion';
+
+  @override
+  String get librivoxGenreShortStories => 'Short Stories';
+
+  @override
+  String get librivoxGenreHumor => 'Humor';
+
+  @override
+  String get librivoxGenreLiteraryFiction => 'Literary Fiction';
+
+  @override
+  String get librivoxGenrePsychology => 'Psychology';
+
+  @override
+  String get librivoxGenreScience => 'Science';
+
+  @override
+  String get librivoxGenreWesterns => 'Westerns';
+
+  @override
+  String get librivoxGenreMusic => 'Music';
+
+  @override
+  String get librivoxGenreDetectiveFiction => 'Detective Fiction';
+
+  @override
+  String get librivoxGenreSatire => 'Satire';
 
   @override
   String get librivoxFieldQueryHint =>
@@ -2600,6 +3670,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lyricsSmartFailedEmpty => 'No voice was heard';
 
   @override
+  String get lyricsSmartFailedUnsupported =>
+      'This platform cannot write a sheet beside the audio: smart lyrics stays off until it can';
+
+  @override
   String get lyricsSmartNote =>
       'Machine sheet, from the vote pool — search again for better words';
 
@@ -3065,4 +4139,157 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesHealthWeightsDone => 'Done';
+
+  @override
+  String get settingsSectionLocalization => 'Localization';
+
+  @override
+  String get settingsLocalizationTitle => 'Translate what is missing';
+
+  @override
+  String get settingsLocalizationDescription =>
+      'Turns titles, albums, descriptions and radio text into the language of the interface, and keeps the original in small type.';
+
+  @override
+  String get settingsLocalizationEnable => 'Translate non-interface text';
+
+  @override
+  String get settingsLocalizationEnableHint =>
+      'Missing translations are generated automatically; artist names are kept as written.';
+
+  @override
+  String get settingsLocalizationShowOriginal =>
+      'Show the original under the translation';
+
+  @override
+  String get settingsLocalizationShowOriginalHint =>
+      'The small line keeps the text that came from the source.';
+
+  @override
+  String get settingsLocalizationEngine => 'Translation engine';
+
+  @override
+  String get settingsLocalizationEngineLocal => 'Built-in offline';
+
+  @override
+  String get settingsLocalizationEngineApi => 'External API';
+
+  @override
+  String get settingsLocalizationLocalReady => 'Offline model is bundled';
+
+  @override
+  String get settingsLocalizationLocalMissing =>
+      'Offline model is missing. Please reinstall the app.';
+
+  @override
+  String get settingsLocalizationLocalCorrupt =>
+      'Offline model failed verification. Please reinstall the app.';
+
+  @override
+  String get settingsLocalizationLocalBundled =>
+      'The model ships with the app and loads on first use.';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => 'Endpoint (base URL)';
+
+  @override
+  String get settingsLocalizationApiKey => 'API key';
+
+  @override
+  String get settingsLocalizationApiModel => 'Model';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      'Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.';
+
+  @override
+  String get settingsLocalizationUsage => 'Tokens today';
+
+  @override
+  String get settingsLocalizationCache => 'Cached texts';
+
+  @override
+  String get settingsLocalizationBalance => 'Balance';
+
+  @override
+  String get settingsLocalizationBalanceCheck => 'Check balance';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported =>
+      'This endpoint does not publish a balance';
+
+  @override
+  String get settingsLocalizationBalanceNoField =>
+      'The response carries no balance field';
+
+  @override
+  String get settingsLocalizationBalanceDenied =>
+      'The key may not read the balance';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return 'Balance check failed (HTTP $status)';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return 'Balance check failed: $error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy =>
+      'Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      'translate translation localization language offline model api balance tokens';
+
+  @override
+  String get settingsPermissionsTitle => 'Permissions';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android asks for these while the app runs. Refusing keeps the app usable, but the matching feature stays off.';
+
+  @override
+  String get settingsPermissionNotifications => 'Notifications';
+
+  @override
+  String get settingsPermissionNotificationsHint =>
+      'Shows the playback controls outside the app.';
+
+  @override
+  String get settingsPermissionMedia => 'Media files';
+
+  @override
+  String get settingsPermissionMediaHint =>
+      'Reads the audio library of the phone when you scan.';
+
+  @override
+  String get settingsPermissionGranted => 'Allowed';
+
+  @override
+  String get settingsPermissionAllow => 'Allow';
+
+  @override
+  String get settingsPermissionOpenSettings => 'Open settings';
+
+  @override
+  String get settingsPermissionDeniedHint =>
+      'Refused. Allow it in the system settings.';
+
+  @override
+  String get settingsPermissionNeeded =>
+      'Allow the media permission before scanning.';
+
+  @override
+  String get settingsPermissionDialogTitle => 'Permission needed';
+
+  @override
+  String get settingsPermissionDialogBody =>
+      'The media permission was refused. Allow it in the system settings and scan again.';
+
+  @override
+  String get settingsSearchKeywordsPermissions =>
+      'permission permissions notification media storage android allow';
 }

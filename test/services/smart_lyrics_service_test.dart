@@ -10,7 +10,7 @@ import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -55,9 +55,13 @@ class _Engine extends SmartLyricsEngine {
 
 class _Human implements LyricsProvider {
   final Map<int, String> sheets = {};
+  var calls = 0;
 
   @override
-  Future<String?> lookup(Song song) async => sheets[song.id];
+  Future<String?> lookup(Song song) async {
+    calls++;
+    return sheets[song.id];
+  }
 }
 
 /// A timed sheet with [words] as its lines, a second apart.
@@ -209,6 +213,37 @@ void main() {
     expect(outcome.failure, SmartLyricsFailure.uploadFailed);
   });
 
+  test('a sheet with nowhere to land is refused before the channels run', () async {
+    final engine = _ScriptedEngine('cloud:whisper-1', []);
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final nowhere = SmartLyricsService(
+      engines: [engine],
+      humanPool: [(name: 'lrclib', provider: human)],
+      paths: _NoLandingPaths(),
+    );
+
+    final outcome = await nowhere.generate(localSong());
+
+    expect(outcome.saved, isFalse);
+    expect(outcome.failure, SmartLyricsFailure.unsupported);
+    expect(engine.calls, 0, reason: 'no request is spent on a sheet that cannot land');
+    expect(human.calls, 0);
+  });
+
+  test('a taken-back tree permission is a failed run of its own', () async {
+    final human = _Human()..sheets[1] = _sheetText(['一句']);
+    final revoked = SmartLyricsService(
+      engines: const [],
+      humanPool: [(name: 'lrclib', provider: human)],
+      paths: _ThrowingPaths(permissionLost: true),
+    );
+
+    final outcome = await revoked.generate(localSong());
+
+    expect(outcome.saved, isFalse);
+    expect(outcome.failure, SmartLyricsFailure.unsupported);
+  });
+
   test('the machine channels fill the gap; a failed correction keeps the draft', () async {
     final whisper = _Engine('cloud:whisper-1', answer: segmentsOf(['一句', '两句']));
     final paraformer = _Engine('cloud:paraformer', answer: segmentsOf(['一句', '两句']));
@@ -272,6 +307,37 @@ void main() {
     await service(engines: [engine]).generate(local);
 
     expect(engine.asked.single.path, audio.path);
+  });
+
+  test('a tree track is read from a copy the run deletes', () async {
+    final folder = Directory(path.join(root.path, 'copy'))..createSync();
+    final copy = File(path.join(folder.path, 'audio.wav'))
+      ..writeAsStringSync('RIFF');
+    final engine = _Engine('cloud:whisper-1', answer: segmentsOf(['一句']));
+    final treePaths = _TreePaths(copy);
+    final saf = SmartLyricsService(
+      engines: [engine],
+      humanPool: const [],
+      paths: treePaths,
+      ffmpegBinary: '/no/such/ffmpeg',
+    );
+    const song = Song(
+      id: 3,
+      title: 'Saf One',
+      artist: 'A',
+      uri: 'content://tree/document/audio%3A7',
+    );
+
+    final outcome = await saf.generate(song);
+
+    expect(outcome.saved, isTrue);
+    expect(
+      engine.asked.single.path,
+      copy.path,
+      reason: '引擎拿到的是从 content:// 复制出来的可读文件',
+    );
+    expect(await folder.exists(), isFalse, reason: '跑完把复制目录删掉');
+    expect(treePaths.saved.single, contains('一句'));
   });
 
   test('an m4a is turned into wav before the local engines read it',
@@ -573,13 +639,53 @@ class _ScriptedEngine extends SmartLyricsEngine {
 
 /// Paths whose disk refuses every write.
 class _ThrowingPaths implements LibraryPaths {
+  _ThrowingPaths({this.permissionLost = false});
+
+  final bool permissionLost;
+
+  @override
+  Future<bool> canWriteSheet(Song song) async => true;
+
   @override
   Future<void> saveSmartLyrics(Song song, String lyrics) async =>
-      throw const FileSystemException('no space left');
+      throw SheetWriteException('refused', permissionLost: permissionLost);
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('the test only reaches the write');
+}
+
+/// Paths of a platform that has nowhere to put a sheet.
+class _NoLandingPaths implements LibraryPaths {
+  @override
+  Future<bool> canWriteSheet(Song song) async => false;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('nothing is written without a landing');
+}
+
+/// Paths of a track that only exists inside a SAF tree: the audio is copied
+/// into a folder of the app, the sheet is written through the tree.
+class _TreePaths implements LibraryPaths {
+  _TreePaths(this.copy);
+
+  final File copy;
+  final List<String> saved = [];
+
+  @override
+  Future<bool> canWriteSheet(Song song) async => true;
+
+  @override
+  Future<File?> temporaryAudioFor(Song song) async => copy;
+
+  @override
+  Future<void> saveSmartLyrics(Song song, String lyrics) async =>
+      saved.add(lyrics);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('the test only reaches audio and write');
 }
 
 class _FakeLedger implements ChannelHealthLedger {

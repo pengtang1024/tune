@@ -119,6 +119,22 @@ void main() {
     expect(stored, isEmpty);
   });
 
+  test('a store that cannot be written falls back to memory once', () async {
+    // A file sits where the artwork folder belongs: the folder can never be
+    // created, which is what a read-only store looks like to the cache.
+    File(path.join(folder.path, '.tune', 'artwork')).createSync(recursive: true);
+    final adapter = FakeAdapter();
+    final cache = cacheWith(adapter);
+
+    final first = await cache.imageFor('https://example.com/one.png');
+    final second = await cache.imageFor('https://example.com/two.png');
+
+    expect(first.bytes, FakeAdapter.bytes);
+    expect(second.bytes, FakeAdapter.bytes);
+    expect(adapter.calls, 2, reason: 'nothing is stored, so nothing is read');
+    expect(cache.coverFileFor('https://example.com/one.png'), isNull);
+  });
+
 }
 
 /// The files in a folder and in the folders below it.

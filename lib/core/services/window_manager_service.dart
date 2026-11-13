@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:tune/core/config/platform_constants.dart';
+import 'package:tune/data/services/persistence_service.dart';
+import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/utils/logger.dart';
 
 /// 窗口管理服务
@@ -17,8 +21,40 @@ class WindowManagerService with WindowListener {
   /// service does not decide on its own.
   static Future<void> Function()? _closeHandler;
 
+  /// The document the window writes its size, place and form into.
+  WindowLayoutStore? _layout;
+
+  /// The form read at start. A mini or immersive window must not write its
+  /// own size over the size the normal form returns to.
+  WindowForm _form = WindowForm.normal;
+
+  /// Whether the window is maximized right now.
+  bool _maximized = false;
+
+  /// The last geometry of the normal form, kept while the window is
+  /// maximized: unmaximizing returns to it instead of to the screen size.
+  WindowGeometry? _lastNormal;
+
+  Timer? _persistTimer;
+
+  /// The form asked for while the previous move was still landing.
+  ///
+  /// A reader who leaves mini before the resize has landed must end in the
+  /// size of the form they chose last, not of the one in the middle.
+  WindowForm? _pendingForm;
+
+  /// Whether a move is running.
+  bool _applying = false;
+
+  /// The size of the mini window, kept here so this layer does not read the
+  /// layout breakpoints of the app layer.
+  static const Size _miniSize = Size(
+    PlatformConstants.desktopMiniWindowWidth,
+    PlatformConstants.desktopMiniWindowHeight,
+  );
+
   /// 初始化窗口管理器
-  static Future<void> init() async {
+  static Future<void> init(PersistenceService persistence) async {
     // 仅在桌面端初始化
     if (!PlatformConstants.isDesktop) return;
 
@@ -28,18 +64,35 @@ class WindowManagerService with WindowListener {
       Log.info('窗口管理器初始化完成');
 
       final instance = WindowManagerService();
+      final layout = WindowLayoutStore(persistence);
+      final saved = layout.readGeometry();
+      instance._layout = layout;
+      instance._form = layout.readForm();
+      instance._lastNormal = saved;
+      instance._maximized = saved?.maximized ?? false;
+
+      // Immersive belongs to the now playing page, and a start has no page to
+      // return to: a window saved in that form comes back as a normal one.
+      if (instance._form == WindowForm.immersive) {
+        instance._form = WindowForm.normal;
+        await layout.saveForm(WindowForm.normal);
+      }
 
       // 设置窗口选项
       WindowOptions windowOptions = WindowOptions(
-        size: const Size(
-          PlatformConstants.desktopWindowWidth,
-          PlatformConstants.desktopWindowHeight,
-        ),
+        size:
+            saved?.size ??
+            const Size(
+              PlatformConstants.desktopWindowWidth,
+              PlatformConstants.desktopWindowHeight,
+            ),
         minimumSize: const Size(
           PlatformConstants.desktopWindowMinWidth,
           PlatformConstants.desktopWindowMinHeight,
         ),
-        center: true,
+        // A window the reader moved comes back where they left it; a first
+        // start lands in the middle of the screen.
+        center: saved?.position == null,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.normal,
       );
@@ -53,12 +106,23 @@ class WindowManagerService with WindowListener {
 
       // 等待窗口准备就绪后显示
       await windowManager.waitUntilReadyToShow(windowOptions, () async {
+        final position = saved?.position;
+        if (position != null) await windowManager.setPosition(position);
         await windowManager.show();
         await windowManager.focus();
         Log.info('窗口显示和聚焦完成');
 
         // 显式设置最小窗口尺寸
         await WindowManagerService.setMinimumSize();
+
+        // A mini window comes back as the bar it was. A maximized window comes
+        // back maximized; its saved size stays the size the reader left, so
+        // unmaximizing returns to it.
+        if (instance._form == WindowForm.mini) {
+          await instance._applyMini();
+        } else if (instance._maximized) {
+          await windowManager.maximize();
+        }
       });
     } catch (e, stackTrace) {
       Log.error('窗口管理器初始化失败: $e', stackTrace);
@@ -69,16 +133,34 @@ class WindowManagerService with WindowListener {
 
   @override
   void onWindowResize() {
-    // 窗口大小变化由 CompactShell 的 LayoutBuilder 自动响应。
+    // The shell rebuilds itself from the width it is given; the window only
+    // has to remember the size the reader stopped at.
+    _scheduleGeometrySave();
+  }
+
+  @override
+  void onWindowMove() {
+    _scheduleGeometrySave();
+  }
+
+  @override
+  void onWindowRestore() {
+    _scheduleGeometrySave();
   }
 
   @override
   void onWindowMaximize() {
+    _maximized = true;
+    _persistGeometry().ignore();
     Log.info('窗口已最大化');
   }
 
   @override
   void onWindowUnmaximize() {
+    _maximized = false;
+    // The window may report the old size for another frame, so the write
+    // waits for the edge to settle like every other one.
+    _scheduleGeometrySave();
     Log.info('窗口已取消最大化');
   }
 
@@ -95,6 +177,146 @@ class WindowManagerService with WindowListener {
       return;
     }
     handler();
+  }
+
+  /// Waits for the reader to let go of the edge of the window.
+  ///
+  /// A drag sends an event several times a second; a file per event would put
+  /// the disk in the middle of the gesture. The last event of the drag is the
+  /// one that decides, so only it is written.
+  void _scheduleGeometrySave() {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(const Duration(milliseconds: 600), _persistGeometry);
+  }
+
+  /// Writes the geometry of the normal form.
+  ///
+  /// A mini or immersive window is not the size the reader chose for the
+  /// normal form, so it never writes here.
+  Future<void> _persistGeometry() async {
+    final layout = _layout;
+    if (layout == null || _form != WindowForm.normal) return;
+    try {
+      if (_maximized) {
+        final normal = _lastNormal;
+        if (normal == null) return;
+        await layout.saveGeometry(normal.copyWith(maximized: true));
+        return;
+      }
+      final size = await windowManager.getSize();
+      final position = await windowManager.getPosition();
+      final geometry = WindowGeometry(
+        width: size.width,
+        height: size.height,
+        left: position.dx,
+        top: position.dy,
+      );
+      _lastNormal = geometry;
+      await layout.saveGeometry(geometry);
+    } catch (error, stackTrace) {
+      Log.error('保存窗口尺寸失败: $error\n$stackTrace');
+    }
+  }
+
+  // ========== 形态切换 ==========
+
+  /// Gives the window the size, the chrome and the place on the desktop that
+  /// [form] needs.
+  ///
+  /// The form is state of the app, so the move happens here instead of in the
+  /// widget that asked for it. The calls are serialized: a reader who leaves
+  /// mini before the last resize has landed ends in the size of the form they
+  /// chose last.
+  Future<void> applyForm(WindowForm form) async {
+    if (!PlatformConstants.isDesktop) return;
+    if (_form == form && !_applying && _pendingForm == null) return;
+    _pendingForm = form;
+    if (_applying) return;
+    _applying = true;
+    try {
+      while (_pendingForm != null) {
+        final next = _pendingForm!;
+        _pendingForm = null;
+        if (next == _form) continue;
+        // The size the reader chose belongs to the normal form. It is read
+        // before the window leaves it, so returning does not measure the bar.
+        if (_form == WindowForm.normal) await _persistGeometry();
+        _form = next;
+        await _applyWindow(next);
+      }
+    } catch (error, stackTrace) {
+      Log.error('切换窗口形态失败: $error\n$stackTrace');
+    } finally {
+      _applying = false;
+    }
+  }
+
+  Future<void> _applyWindow(WindowForm form) async {
+    switch (form) {
+      case WindowForm.normal:
+        await _applyNormal();
+      case WindowForm.mini:
+        await _applyMini();
+      case WindowForm.immersive:
+        await _applyImmersive();
+    }
+  }
+
+  /// Returns the window to the size, the place and the frame of the normal
+  /// form.
+  Future<void> _applyNormal() async {
+    final geometry = _lastNormal ?? _layout?.readGeometry();
+    await windowManager.setFullScreen(false);
+    await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+    await windowManager.setResizable(true);
+    await windowManager.setAlwaysOnTop(false);
+    await windowManager.setSkipTaskbar(false);
+    await windowManager.setMinimumSize(
+      const Size(
+        PlatformConstants.desktopWindowMinWidth,
+        PlatformConstants.desktopWindowMinHeight,
+      ),
+    );
+    if (geometry == null) return;
+    await windowManager.setSize(geometry.size);
+    final position = geometry.position;
+    if (position != null) await windowManager.setPosition(position);
+    if (geometry.maximized) {
+      await windowManager.maximize();
+      _maximized = true;
+    }
+  }
+
+  /// Shrinks the window to the bar, keeps it above the other windows and out
+  /// of the task bar.
+  Future<void> _applyMini() async {
+    if (await windowManager.isMaximized()) {
+      await windowManager.unmaximize();
+      _maximized = false;
+    }
+    await windowManager.setFullScreen(false);
+    await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+    await windowManager.setMinimumSize(_miniSize);
+    await windowManager.setResizable(false);
+    await windowManager.setSize(_miniSize);
+    await windowManager.setAlwaysOnTop(true);
+    await windowManager.setSkipTaskbar(true);
+  }
+
+  /// Drops the frame and takes the whole screen, which is what the now
+  /// playing page asks for.
+  Future<void> _applyImmersive() async {
+    await windowManager.setAlwaysOnTop(false);
+    await windowManager.setSkipTaskbar(false);
+    await windowManager.setResizable(true);
+    await windowManager.setMinimumSize(
+      const Size(
+        PlatformConstants.desktopWindowMinWidth,
+        PlatformConstants.desktopWindowMinHeight,
+      ),
+    );
+    await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
+    await windowManager.setFullScreen(true);
   }
 
   // ========== 公开 API ==========

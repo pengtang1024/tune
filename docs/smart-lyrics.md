@@ -212,6 +212,21 @@ LyricsController._lyricsFor(song)
 | 每操作不做写放大 | 单曲成功写一个 `.smart.lrc` + 任务表一行状态更新；标记是任务表一行更新，不碰词稿文件 |
 | 库不入内存 | 批量队列、账本与标记存 SQLite（`smart_lyrics_tasks` / `smart_lyrics_marks` 表），按需取，统计在数据库里算 |
 
+### 5.3 平台边界（2026-11-12）
+
+这条流水线要两样移动端没有的东西，由 `AppCapabilities` 两个能力位表达，Android 上均为 false：
+
+| 能力位 | 指什么 | 为 false 时 |
+| --- | --- | --- |
+| `externalToolPipeline` | 能否调用本机外部程序（ffmpeg 转码、whisper / sherpa 二进制） | 跳过转码，原样喂引擎；不创建本地引擎通道，不逐首失败 |
+| `lyricsSheetBesideAudio` | 非 SAF 曲目的默认落点（能否把词稿写到音频旁） | 自动补词与批量不启动；单曲生成改问 `LibraryPaths.canWriteSheet(song)`（S2） |
+
+Android 不能执行随包的外部二进制（`Process.run` 一律 `Permission denied`），共享存储对应用只读。
+S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeSheet`）；MediaStore 行仍没有
+落点。S3 起 `content://` 曲目先经原生 `copyAudio` 整份复制到应用私有缓存再交给引擎，跑完删除
+副本；写进树的词稿经 `readSheet` 读回，面板能显示。单曲链路因此完整，批量与自动补词在 Android
+仍整体停用（逐首复制音频的代价未量）。现场与验证见 [`docs/android.md`](android.md) 的 §5。
+
 ## 6. 技术路线评估
 
 ### 6.1 云端：OpenAI 兼容接口（先行）

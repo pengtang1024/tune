@@ -12,6 +12,7 @@ import 'package:tune/shared/ui/meta_badge.dart';
 import 'package:tune/shared/ui/track_addresses.dart';
 import 'package:tune/shared/ui/track_detail_block.dart';
 import 'package:tune/shared/ui/track_facts.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 
 /// Shows everything that is known about a track.
 ///
@@ -68,7 +69,11 @@ class _TrackDetailSheet extends StatelessWidget {
     // under the name it has in the facts.
     final paragraphs = [
       for (final fact in facts.where((fact) => fact.paragraph))
-        TrackDetailBlock(label: fact.label, text: fact.value),
+        TrackDetailBlock(
+          label: fact.label,
+          text: fact.value,
+          translatable: fact.translatable,
+        ),
     ];
     final chips = [
       for (final fact in facts.where((fact) => !fact.paragraph))
@@ -159,10 +164,11 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                song.title.isEmpty ? context.loc.trackUnknownTitle : song.title,
+              TranslatedText(
+                text: song.title.isEmpty
+                    ? context.loc.trackUnknownTitle
+                    : song.title,
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: CompactTypography.asDisplay(
                   theme.textTheme.titleMedium,
                   size: CompactTypeScale.displaySmall,

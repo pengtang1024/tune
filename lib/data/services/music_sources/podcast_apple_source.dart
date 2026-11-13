@@ -1,0 +1,472 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/browse_mode.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/utils/logger.dart';
+
+/// The podcast directory of Apple.
+///
+/// The directory answers two questions without a key: which shows are ranked
+/// highest in a storefront, and which shows match a keyword. A show is not an
+/// episode, so the adapter takes the feed of every show it found and reads the
+/// newest episodes of the feed: the episodes themselves always come from the
+/// broadcaster, never from Apple.
+class PodcastAppleSourceAdapter extends MusicSourceAdapter {
+  /// How many shows a scan fetches, and the most it may fetch.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(5, 10);
+
+  /// How many episodes of one show a scan reads, and the most it may.
+  ///
+  /// A show may publish hundreds of episodes; the cap keeps one of them from
+  /// filling the library, and the reader who wants more raises it.
+  static const _episodesPerPodcast = MusicSourceLimit(3, 20);
+
+  static const _chartsHost = 'https://itunes.apple.com';
+
+  /// The categories the store ranks its podcasts in, by the id it files them
+  /// under. The ids are the ones `ws/genres?id=26` answers with.
+  static Map<String, String> get _genres {
+    final strings = AppStrings.instance;
+    return {
+      '1301': strings.podcastAppleGenreArts,
+      '1321': strings.podcastAppleGenreBusiness,
+      '1303': strings.podcastAppleGenreComedy,
+      '1304': strings.podcastAppleGenreEducation,
+      '1483': strings.podcastAppleGenreFiction,
+      '1511': strings.podcastAppleGenreGovernment,
+      '1512': strings.podcastAppleGenreHealth,
+      '1487': strings.podcastAppleGenreHistory,
+      '1305': strings.podcastAppleGenreKids,
+      '1502': strings.podcastAppleGenreLeisure,
+      '1310': strings.podcastAppleGenreMusic,
+      '1489': strings.podcastAppleGenreNews,
+      '1314': strings.podcastAppleGenreReligion,
+      '1533': strings.podcastAppleGenreScience,
+      '1545': strings.podcastAppleGenreSports,
+      '1309': strings.podcastAppleGenreFilm,
+      '1318': strings.podcastAppleGenreTechnology,
+      '1488': strings.podcastAppleGenreTrueCrime,
+      '1324': strings.podcastAppleGenreSociety,
+    };
+  }
+  static const _searchHost = 'https://itunes.apple.com/search';
+  static const _lookupHost = 'https://itunes.apple.com/lookup';
+
+  final Dio _dio;
+
+  PodcastAppleSourceAdapter({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 30),
+              headers: const {'Accept': 'application/json'},
+            ),
+          );
+
+  @override
+  String get sourceType => 'podcast_apple';
+
+  /// The directory asks nothing of the reader, so it belongs to the top of
+  /// the list.
+  @override
+  bool get featured => true;
+
+  /// Without a keyword the scan reads the shows Apple ranks highest, so the
+  /// source is ready as it is: a keyword is a choice, not a requirement.
+  @override
+  List<String> get browseModes => const [BrowseMode.charts];
+
+  @override
+  bool isConfigured(MusicSourceConfig config) => true;
+
+  @override
+  String get configurationHint => AppStrings.instance.podcastAppleHint;
+
+  @override
+  List<MusicSourceField> get configurationFields => [
+    MusicSourceField(
+      'query',
+      AppStrings.instance.fieldQueryOptional,
+      AppStrings.instance.podcastAppleFieldQueryHint,
+    ),
+    MusicSourceField(
+      'mode',
+      AppStrings.instance.podcastAppleFieldMode,
+      AppStrings.instance.podcastAppleFieldModeHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.podcastAppleModeShows),
+        MusicSourceChoice(_modeEpisodes, AppStrings.instance.podcastAppleModeEpisodes),
+      ],
+    ),
+    MusicSourceField(
+      'country',
+      AppStrings.instance.podcastAppleFieldCountry,
+      AppStrings.instance.podcastAppleFieldCountryHint,
+      defaultValue: 'US',
+    ),
+    MusicSourceField(
+      'genre',
+      AppStrings.instance.podcastAppleFieldGenre,
+      AppStrings.instance.podcastAppleFieldGenreHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.podcastAppleGenreAll),
+        for (final entry in _genres.entries)
+          MusicSourceChoice(entry.key, entry.value),
+      ],
+    ),
+    MusicSourceField(
+      'episodes',
+      AppStrings.instance.podcastFieldEpisodes,
+      AppStrings.instance.podcastFieldEpisodesHint(
+        _episodesPerPodcast.count,
+        _episodesPerPodcast.max,
+      ),
+      numeric: true,
+    ),
+    PodcastRssSourceAdapter.sinceField(),
+    MusicSourceField(
+      'limit',
+      AppStrings.instance.fieldLimitPodcasts,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
+      numeric: true,
+    ),
+  ];
+
+  @override
+  Duration get autoScanInterval => const Duration(hours: 12);
+
+  /// A scan reads the feed of every show it found, so it runs longer than a
+  /// scan of one catalogue.
+  @override
+  Duration get scanTimeout => const Duration(seconds: 90);
+
+  @override
+  Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
+    try {
+      final limit = scanLimit.read(request.config.setting('limit'));
+      final country = _countryOf(request.config);
+      final keyword = request.config.setting('query')?.trim() ?? '';
+      final since = PodcastRssSourceAdapter.sinceOf(
+        request.config.setting('since'),
+      );
+
+      // The episode mode searches the episodes themselves: the store answers
+      // with the newest ones it holds, each of them playable as it is.
+      if (request.config.setting('mode') == _modeEpisodes) {
+        if (keyword.isEmpty) {
+          return SourceScanResult(
+            sourceId: request.config.id,
+            status: SourceScanStatus.needsConfiguration,
+            message: AppStrings.instance.podcastAppleEpisodeQueryRequired,
+          );
+        }
+        final episodes = await _searchEpisodes(
+          keyword,
+          country,
+          limit,
+          request.config.id,
+        );
+        return SourceScanResult(
+          sourceId: request.config.id,
+          status: SourceScanStatus.success,
+          songs: episodes,
+          message: episodes.isEmpty
+              ? AppStrings.instance.podcastAppleNoMatch
+              : null,
+        );
+      }
+
+      final feeds = keyword.isEmpty
+          ? await _chartFeeds(
+              country,
+              limit,
+              genre: request.config.setting('genre')?.trim() ?? '',
+            )
+          : await _searchFeeds(keyword, country, limit);
+      if (feeds.isEmpty) {
+        return SourceScanResult(
+          sourceId: request.config.id,
+          status: SourceScanStatus.success,
+          message: AppStrings.instance.podcastAppleNoMatch,
+        );
+      }
+
+      final songs = <String, Song>{};
+      const batchSize = 3;
+      for (var start = 0; start < feeds.length; start += batchSize) {
+        final batch = feeds.skip(start).take(batchSize).toList(growable: false);
+        final episodes = await Future.wait([
+          for (final feed in batch)
+            _episodesOf(
+              feed,
+              request.config.id,
+              _episodesPerPodcast.read(request.config.setting('episodes')),
+              since,
+            ),
+        ]);
+        for (final episode in episodes) {
+          for (final song in episode) {
+            songs[song.uri] = song;
+          }
+        }
+        request.onProgress?.call(
+          ((start + batch.length) / feeds.length).clamp(0, 1),
+        );
+      }
+
+      final archive = songs.values.toList(growable: false);
+      return SourceScanResult(
+        sourceId: request.config.id,
+        status: SourceScanStatus.success,
+        songs: archive,
+        message: archive.isEmpty
+            ? AppStrings.instance.podcastAppleNoMatch
+            : null,
+      );
+    } catch (error) {
+      return failedResult(request.config.id, error);
+    }
+  }
+
+  /// The feeds of the shows Apple ranks highest in a storefront.
+  ///
+  /// The chart answer names the shows by their Apple id; the feed of a show
+  /// comes from one lookup of those ids, and the chart order is kept so the
+  /// top show is read first. A genre narrows the chart to one category of the
+  /// store; the id is one of [_genres], which are the ids the store answered
+  /// with rather than numbers guessed here.
+  Future<List<String>> _chartFeeds(
+    String country,
+    int limit, {
+    String genre = '',
+  }) async {
+    final wanted = _genres.containsKey(genre) ? 'genre=$genre/' : '';
+    final response = await _dio.get<String>(
+      '$_chartsHost/${country.toLowerCase()}/rss/toppodcasts/limit=$limit/'
+      '${wanted}json',
+      options: Options(responseType: ResponseType.plain),
+    );
+    final ids = parseTopIds(_decode(response.data));
+    if (ids.isEmpty) return const [];
+
+    final lookup = await _dio.get<String>(
+      _lookupHost,
+      queryParameters: {'id': ids.join(',')},
+      options: Options(responseType: ResponseType.plain),
+    );
+    return parseLookupFeeds(_decode(lookup.data), order: ids);
+  }
+
+  /// The feeds of the shows that match a keyword in a storefront.
+  /// The name of the mode that reads episodes instead of shows.
+  static const _modeEpisodes = 'episodes';
+
+  /// The year an episode came out, from the date the store gives it.
+  static int? _yearOf(Object? raw) {
+    final text = raw?.toString().trim() ?? '';
+    if (text.length < 4) return null;
+    final year = int.tryParse(text.substring(0, 4));
+    return year == null || year <= 0 ? null : year;
+  }
+
+  /// The episodes the store holds for a keyword.
+  ///
+  /// The answer carries the file of every episode, so the mode reads them
+  /// without walking the feeds of the shows.
+  Future<List<Song>> _searchEpisodes(
+    String keyword,
+    String country,
+    int limit,
+    String sourceId,
+  ) async {
+    final response = await _dio.get<String>(
+      '$_chartsHost/search',
+      queryParameters: {
+        'media': 'podcast',
+        'entity': 'podcastEpisode',
+        'term': keyword,
+        'limit': '$limit',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final decoded = _decode(response.data);
+    final results = decoded?['results'];
+    if (results is! List) return const [];
+
+    final songs = <Song>[];
+    final seen = <String>{};
+    for (final raw in results) {
+      if (raw is! Map) continue;
+      if (songs.length >= limit) break;
+      final title = raw['trackName']?.toString().trim() ?? '';
+      final stream = SourceSongFactory.normalizeUrl(
+        raw['episodeUrl']?.toString(),
+      );
+      if (title.isEmpty || stream == null || !seen.add(stream)) continue;
+
+      final show = raw['collectionName']?.toString().trim() ?? '';
+      songs.add(
+        SourceSongFactory.create(
+          sourceId: sourceId,
+          externalId: stream,
+          title: title,
+          artist: show,
+          album: show,
+          duration: SourceSongFactory.parseInt(raw['trackTimeMillis']),
+          streamUrl: stream,
+          artworkUrl: SourceSongFactory.normalizeUrl(
+            raw['artworkUrl600']?.toString() ??
+                raw['artworkUrl160']?.toString(),
+          ),
+          description: shortDescription(raw['description']),
+          year: _yearOf(raw['releaseDate']),
+        ),
+      );
+    }
+    return songs;
+  }
+
+  Future<List<String>> _searchFeeds(
+    String keyword,
+    String country,
+    int limit,
+  ) async {
+    final response = await _dio.get<String>(
+      _searchHost,
+      queryParameters: {
+        'media': 'podcast',
+        'term': keyword,
+        'limit': '$limit',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    return parseSearchFeeds(_decode(response.data)).take(limit).toList(
+      growable: false,
+    );
+  }
+
+  /// The newest episodes of one feed.
+  Future<List<Song>> _episodesOf(
+    String feed,
+    String sourceId,
+    int episodes,
+    DateTime? since,
+  ) async {
+    try {
+      final response = await _dio.get<String>(
+        feed,
+        // A feed that does not answer within a few seconds is not worth the
+        // wait of the whole scan.
+        options: Options(receiveTimeout: const Duration(seconds: 15)),
+      );
+      final body = response.data;
+      if (body == null || body.trim().isEmpty) return const [];
+      return PodcastRssSourceAdapter.parseFeed(
+        body,
+        sourceId: sourceId,
+        limit: episodes,
+        since: since,
+      );
+    } catch (error) {
+      // One broken feed should not fail the whole directory.
+      Log.error('Apple 播客读取单集失败: $error');
+      return const [];
+    }
+  }
+
+  /// The ids of the shows of a chart answer, in the order of the chart.
+  static List<String> parseTopIds(Map<String, dynamic>? data) {
+    final feed = data?['feed'];
+    final entries = feed is Map ? feed['entry'] : null;
+    if (entries is! List) return const [];
+
+    final ids = <String>[];
+    final seen = <String>{};
+    for (final raw in entries) {
+      if (raw is! Map) continue;
+      final id = raw['id'];
+      final attributes = id is Map ? id['attributes'] : null;
+      final value = attributes is Map ? attributes['im:id']?.toString() : null;
+      final trimmed = value?.trim();
+      if (trimmed == null || trimmed.isEmpty || !seen.add(trimmed)) continue;
+      ids.add(trimmed);
+    }
+    return ids;
+  }
+
+  /// The feeds of a lookup answer, in the order of [order] when it is known.
+  static List<String> parseLookupFeeds(
+    Map<String, dynamic>? data, {
+    List<String>? order,
+  }) {
+    final results = data?['results'];
+    if (results is! List) return const [];
+
+    final byId = <String, String>{};
+    for (final raw in results) {
+      if (raw is! Map) continue;
+      final id = raw['collectionId']?.toString();
+      final feed = _feedOf(raw);
+      if (id == null || feed == null) continue;
+      byId[id] = feed;
+    }
+
+    if (order == null) return byId.values.toList(growable: false);
+    return [
+      for (final id in order)
+        if (byId[id] != null) byId[id]!,
+    ];
+  }
+
+  /// The feeds of a search answer.
+  static List<String> parseSearchFeeds(Map<String, dynamic>? data) {
+    final results = data?['results'];
+    if (results is! List) return const [];
+
+    final feeds = <String>[];
+    final seen = <String>{};
+    for (final raw in results) {
+      if (raw is! Map) continue;
+      final feed = _feedOf(raw);
+      if (feed == null || !seen.add(feed)) continue;
+      feeds.add(feed);
+    }
+    return feeds;
+  }
+
+  static String? _feedOf(Map raw) {
+    final feed = raw['feedUrl']?.toString().trim() ?? '';
+    return feed.startsWith('http://') || feed.startsWith('https://')
+        ? feed
+        : null;
+  }
+
+  static Map<String, dynamic>? _decode(String? body) {
+    if (body == null || body.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(body);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// The storefront the reader picked, US when none was picked.
+  static String _countryOf(MusicSourceConfig config) {
+    final value = config.setting('country')?.trim().toUpperCase() ?? '';
+    return value.isEmpty ? 'US' : value;
+  }
+}

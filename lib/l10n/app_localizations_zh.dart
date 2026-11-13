@@ -840,6 +840,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browseModeDaily => '每日推荐';
 
   @override
+  String get browseModeAlbums => '专辑';
+
+  @override
+  String get recentWindowField => '只看最近入库';
+
+  @override
+  String get recentWindowFieldHint => '只收这段时间内加进来的内容';
+
+  @override
+  String get recentWindowAll => '不限时间';
+
+  @override
+  String recentWindowDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -869,43 +886,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fieldLimitBooks => '每次扫描书数';
 
   @override
-  String get fieldLanguage => '语言';
-
-  @override
-  String get fieldLanguageHint => '只保留一种语言的有声书';
-
-  @override
-  String get fieldLanguageAll => '不限制语言';
-
-  @override
-  String get fieldLanguageEnglish => '英语';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法语';
-
-  @override
-  String get fieldLanguageGerman => '德语';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙语';
-
-  @override
-  String get fieldLanguageItalian => '意大利语';
-
-  @override
-  String get fieldLanguageJapanese => '日语';
-
-  @override
-  String get fieldLanguageRussian => '俄语';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙语';
-
-  @override
   String get fieldServer => '服务器地址';
+
+  @override
+  String get fieldEmail => '邮箱';
 
   @override
   String get fieldUser => '用户名';
@@ -1251,6 +1235,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
+  String get openverseFieldSource => '来源';
+
+  @override
+  String get openverseFieldLength => '时长';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一档时长的音频';
+
+  @override
+  String get openverseLengthAll => '全部时长';
+
+  @override
+  String get openverseLengthShort => '短（2 分钟内）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分钟内）';
+
+  @override
+  String get openverseLengthLong => '长（10 分钟以上）';
+
+  @override
+  String get openverseFieldLicense => '许可';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一种许可下的音频';
+
+  @override
+  String get openverseLicenseAll => '全部许可';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有领域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（署名）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式共享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商业）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止演绎）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
+  String get openverseFieldSourceHint => '只看一个目录，不混着来';
+
+  @override
+  String get openverseSourceAll => '全部目录';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '维基共享资源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -1300,6 +1350,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
+  String get jamendoFieldTag => '标签';
+
+  @override
+  String get jamendoFieldTagHint => '目录的风格或情绪标签，例如 jazz、electronic、piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo 返回了空响应';
 
   @override
@@ -1310,10 +1366,59 @@ class AppLocalizationsZh extends AppLocalizations {
       '填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => '每项曲目上限';
+
+  @override
+  String get internetArchiveFieldLanguage => '语言';
+
+  @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get internetArchiveSortBrowse => '按浏览方式';
+
+  @override
+  String get internetArchiveSortTitle => '按标题';
+
+  @override
+  String get internetArchiveSortAdded => '最近入库';
+
+  @override
+  String get internetArchiveSortPublished => '最新发布';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一个条目最多取多少首（1–$max，默认 $count）';
+  }
+
+  @override
   String get internetArchiveFieldQuery => '收录条件';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
+
+  @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜索服务暂时不可用';
 
   @override
   String get internetArchiveNoMatch => '没有找到可播放的归档音频';
@@ -1334,7 +1439,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
+  String get ccmixterFieldLicence => '许可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以这类许可发布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限许可';
+
+  @override
+  String get ccmixterLicenceBy => '仅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商业';
+
+  @override
+  String get ccmixterLicencePd => '公共领域';
+
+  @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
+
+  @override
+  String get ccmixterFieldTag => '风格';
+
+  @override
+  String get ccmixterFieldTagHint => '站点的一个标签；关键词与风格会同时生效';
+
+  @override
+  String get ccmixterTagAll => '全部风格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛围';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器乐';
 
   @override
   String get ccmixterHint => '填写 ccMixter 标签，例如 jazz、ambient 或 electro';
@@ -1347,6 +1491,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get podcastRssFieldFeed => '订阅地址';
+
+  @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收这段时间内发布的单集';
+
+  @override
+  String get podcastRssSinceAll => '全部单集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
@@ -1375,6 +1533,137 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 数字化归档的公版 78 转唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '网络厂牌免费发布的专辑';
+
+  @override
+  String get sourceNetlabelsName => '网络厂牌';
+
+  @override
+  String get sourceOldTimeRadioDescription => '广播黄金年代的广播剧与综艺节目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式广播剧';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音频收藏里的音乐录音';
+
+  @override
+  String get sourceAudioMusicName => '档案音乐';
+
+  @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 项目数字化的公版唱片';
+
+  @override
+  String get sourceCommunityMusicName => '社区音乐';
+
+  @override
+  String get sourceCommunityMusicDescription =>
+      'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
+
+  @override
+  String get sourceCommunityClassicalName => '社区古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
+
+  @override
+  String get sourceCommunityAmbientName => '社区氛围与实验';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试';
+
+  @override
+  String get sourceCommunityWorldName => '社区世界与雷鬼';
+
+  @override
+  String get sourceCommunityWorldDescription =>
+      'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼';
+
+  @override
+  String get sourceCommunityMetalName => '社区金属与朋克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
+
+  @override
+  String get sourceCommunityHiphopName => '社区嘻哈与放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社区上传的嘻哈与放克：混音带、节拍与现场律动';
+
+  @override
+  String get sourceIndependentAudiobooksName => '独立有声书';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收录的有声书';
+
+  @override
+  String get sourceArchivePodcastsName => '档案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '节目停更后仍留在 Internet Archive 上的播客单集';
+
+  @override
+  String get sourceRadioRecordingsName => '电台录音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的专辑';
+
+  @override
+  String get sourceForeignAudioName => '外语有声书';
+
+  @override
+  String get sourceForeignAudioDescription => '英语之外的有声书与朗读，档案按语言分开收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新闻录音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '档案里保存下来的新闻广播录音';
+
+  @override
+  String get sourcePoetryName => '诗歌朗读';
+
+  @override
+  String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
+
+  @override
+  String get sourcePoetryBooksName => '诗集';
+
+  @override
+  String get sourcePoetryBooksDescription => '档案里归在诗歌名下的整本朗读（不含 LibriVox）';
+
+  @override
+  String get sourceScienceTalksName => '科学讲座';
+
+  @override
+  String get sourceScienceTalksDescription => '档案里归在科学名下的节目与讲座录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -1390,10 +1679,126 @@ class AppLocalizationsZh extends AppLocalizations {
   String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
 
   @override
+  String get podcastCatalogFieldTag => '标签';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按标签找节目，例如 comedy、news、technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
 
   @override
   String get podcastCatalogNoMatch => '没有找到播客';
+
+  @override
+  String get sourceApplePodcastsName => 'Apple 播客';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目录里排行的播客，单集从各自的订阅源读取';
+
+  @override
+  String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldMode => '读取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '读榜单上的节目，还是读关键词搜到的单集';
+
+  @override
+  String get podcastAppleModeShows => '节目';
+
+  @override
+  String get podcastAppleModeEpisodes => '单集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '单集方式需要关键词：商店没有单集榜单。';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
+
+  @override
+  String get podcastAppleFieldCountry => '国家/地区';
+
+  @override
+  String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
+
+  @override
+  String get podcastAppleFieldGenre => '类别';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
+
+  @override
+  String get podcastFieldEpisodes => '每档集数';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每档播客读多少集（1–$max，默认 $count）';
+  }
+
+  @override
+  String get podcastAppleGenreAll => '全部类别';
+
+  @override
+  String get podcastAppleGenreArts => '艺术';
+
+  @override
+  String get podcastAppleGenreBusiness => '商业';
+
+  @override
+  String get podcastAppleGenreComedy => '喜剧';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虚构';
+
+  @override
+  String get podcastAppleGenreGovernment => '政务';
+
+  @override
+  String get podcastAppleGenreHealth => '健康与健身';
+
+  @override
+  String get podcastAppleGenreHistory => '历史';
+
+  @override
+  String get podcastAppleGenreKids => '儿童与家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休闲';
+
+  @override
+  String get podcastAppleGenreMusic => '音乐';
+
+  @override
+  String get podcastAppleGenreNews => '新闻';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教与心灵';
+
+  @override
+  String get podcastAppleGenreScience => '科学';
+
+  @override
+  String get podcastAppleGenreSports => '体育';
+
+  @override
+  String get podcastAppleGenreFilm => '影视';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真实犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社会与文化';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
@@ -1440,6 +1845,74 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
+  String get audiusFieldGenre => '风格';
+
+  @override
+  String get audiusFieldPlaylists => '每次取几个歌单';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌单方式下一次读几个歌单（1–$max，默认 $count）';
+  }
+
+  @override
+  String get audiusFieldMode => '读取方式';
+
+  @override
+  String get audiusFieldModeHint => '单曲，或站点上的歌单';
+
+  @override
+  String get audiusModeSongs => '单曲';
+
+  @override
+  String get audiusModePlaylists => '歌单';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪种风格读';
+
+  @override
+  String get audiusGenreAll => '全部风格';
+
+  @override
+  String get audiusGenreElectronic => '电子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 与灵魂';
+
+  @override
+  String get audiusGenreAmbient => '氛围';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '回响贝斯';
+
+  @override
+  String get audiusFieldWindow => '时间窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '网络默认';
+
+  @override
+  String get audiusWindowWeek => '最近一周';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部时间';
+
+  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
 
   @override
@@ -1459,7 +1932,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -1468,7 +1941,97 @@ class AppLocalizationsZh extends AppLocalizations {
   String get radioFieldCountry => '国家/地区';
 
   @override
-  String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
+  String get radioFieldCountryHint => '两位国家代码（如 SG、MY、AU、JP），或国名（如 Germany）';
+
+  @override
+  String get radioFieldLanguage => '语言';
+
+  @override
+  String get radioFieldLanguageHint =>
+      '语言：可写中文、日语、法语，也可写 english、spanish 这样的英文名';
+
+  @override
+  String get languageNameAll => '全部语言';
+
+  @override
+  String get languageNameEnglish => '英语';
+
+  @override
+  String get languageNameSpanish => '西班牙语';
+
+  @override
+  String get languageNameGerman => '德语';
+
+  @override
+  String get languageNameFrench => '法语';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄语';
+
+  @override
+  String get languageNameItalian => '意大利语';
+
+  @override
+  String get languageNameGreek => '希腊语';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙语';
+
+  @override
+  String get languageNameTurkish => '土耳其语';
+
+  @override
+  String get languageNameJapanese => '日语';
+
+  @override
+  String get languageNamePolish => '波兰语';
+
+  @override
+  String get languageNameKorean => '韩语';
+
+  @override
+  String get languageNameArabic => '阿拉伯语';
+
+  @override
+  String get languageNameHindi => '印地语';
+
+  @override
+  String get radioFieldBitrate => '最低码率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留码率不低于这一档的台站';
+
+  @override
+  String get radioBitrateAll => '不限码率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
+
+  @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收听最多';
+
+  @override
+  String get radioFieldTag => '标签';
+
+  @override
+  String get radioFieldTagHint => '目录里实测有几百个台站的分类；想按冷门标签找，把它写进关键词';
+
+  @override
+  String get radioTagAll => '全部分类';
 
   @override
   String get radioFieldQuery => '电台关键词';
@@ -1487,6 +2050,72 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldCategory => '目录';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要浏览的维基音频分类';
+
+  @override
+  String get wikimediaCategoryAll => '全部音乐';
+
+  @override
+  String get wikimediaCategoryPiano => '钢琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
+
+  @override
+  String get wikimediaCategoryRock => '摇滚';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '乡村';
+
+  @override
+  String get wikimediaCategoryBlues => '蓝调';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管风琴';
+
+  @override
+  String get wikimediaCategorySpeeches => '演讲';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '访谈';
+
+  @override
+  String get wikimediaCategoryPoetry => '诗歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有声条目';
+
+  @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打贝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛围';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音乐';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
@@ -1552,6 +2181,311 @@ class AppLocalizationsZh extends AppLocalizations {
   String get audiobookshelfNoMatch => '没有找到有声书';
 
   @override
+  String get sourceAmpacheName => '自建 Ampache 音乐库';
+
+  @override
+  String get sourceAmpacheDescription => '自建 Ampache 服务器里的音乐库';
+
+  @override
+  String get ampacheHint => '填写 Ampache 服务器的地址与 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 账号的 API Key（首选项 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 返回了空响应';
+
+  @override
+  String get ampacheNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceAzuracastName => '自建 AzuraCast 电台';
+
+  @override
+  String get sourceAzuracastDescription => '自建 AzuraCast 电台服务器上的电台';
+
+  @override
+  String get azuracastHint => '填写 AzuraCast 服务器的地址，收听它上面的电台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（可选）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '服务器把电台设为私有时才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 返回了空响应';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上没有匹配的电台';
+
+  @override
+  String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceKoelName => '自建 Koel 音乐库';
+
+  @override
+  String get sourceKoelDescription => '自建 Koel 服务器的音乐库';
+
+  @override
+  String get koelHint => '填写 Koel 服务器的地址、邮箱与密码';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 账号的邮箱';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 账号的密码';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 返回了空响应';
+
+  @override
+  String get koelNoMatch => 'Koel 上没有匹配的曲目';
+
+  @override
+  String get koelAuthFailed => '无法登录 Koel 服务器，请检查地址、邮箱与密码';
+
+  @override
+  String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
+
+  @override
+  String get sourceItunesName => 'iTunes 试听';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
+
+  @override
+  String get itunesHint => '填写关键词，或选「读取方式 = 专辑」读商店的专辑榜';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '国家/地区';
+
+  @override
+  String get itunesFieldCountryHint => '两位国家代码，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店返回了空响应';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店里没有匹配的歌曲';
+
+  @override
+  String get itunesPreviewNote => '这首歌的 30 秒试听';
+
+  @override
+  String get sourceDeezerName => 'Deezer 试听';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
+
+  @override
+  String get deezerHint => '填关键词，留空则读商店的榜单';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '风格';
+
+  @override
+  String get deezerFieldGenreHint => '不填关键词时读哪个榜单';
+
+  @override
+  String get deezerGenreAll => '全部榜单';
+
+  @override
+  String get deezerGenreAlternative => '另类';
+
+  @override
+  String get deezerGenreFilms => '影视与游戏';
+
+  @override
+  String get deezerGenreSoulFunk => '灵魂与放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音乐';
+
+  @override
+  String get deezerGenreAsian => '亚洲音乐';
+
+  @override
+  String get deezerGenreBlues => '蓝调';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音乐';
+
+  @override
+  String get deezerGenreIndian => '印度音乐';
+
+  @override
+  String get deezerGenreKids => '儿童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音乐';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 返回了空响应';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上没有匹配的歌曲';
+
+  @override
+  String get deezerPreviewNote => '这首歌的 30 秒试听';
+
+  @override
+  String get storeFieldBatch => '每次取几个';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次扫描读几张专辑 / 几位艺人 / 几个歌单（1–$max，默认 $count）；单曲方式不受影响';
+  }
+
+  @override
+  String get storeReadModeField => '读取方式';
+
+  @override
+  String get storeReadModeFieldHint => '读单曲，还是读曲目背后的专辑、艺人与歌单';
+
+  @override
+  String get storeReadModeSongs => '单曲';
+
+  @override
+  String get storeReadModeAlbums => '专辑';
+
+  @override
+  String get storeReadModeArtists => '艺人';
+
+  @override
+  String get storeReadModePlaylists => '歌单';
+
+  @override
+  String get sourceKodiName => '自建 Kodi 媒体库';
+
+  @override
+  String get sourceKodiDescription => '自建 Kodi 媒体中心的音乐库';
+
+  @override
+  String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
+
+  @override
+  String get lmsHint => 'Logitech Media Server 地址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '服务器地址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '服务器账号，需要登录时填';
+
+  @override
+  String get lmsFieldPasswordHint => '该账号的密码';
+
+  @override
+  String get lmsFieldQueryHint => '用关键词缩小范围（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '服务器没有返回曲目列表';
+
+  @override
+  String get lmsNoMatch => '服务器里没有匹配的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '局域网里 Squeezebox 服务器的曲库';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 服务器的账号';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 服务器的密码';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 返回了空响应';
+
+  @override
+  String get kodiNoMatch => 'Kodi 库里没有匹配的曲目';
+
+  @override
+  String get sourcePeerTubeName => 'PeerTube 音乐';
+
+  @override
+  String get sourcePeerTubeDescription => '联邦 PeerTube 服务器上的音乐与现场演出';
+
+  @override
+  String get peerTubeHint => '填写 PeerTube 服务器地址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get peerTubeCategory => '目录';
+
+  @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get peerTubeSortDefault => '按浏览方式';
+
+  @override
+  String get peerTubeSortNewest => '最新优先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
+
+  @override
+  String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音乐';
+
+  @override
+  String get peerTubeCategoryAll => '全部内容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 返回了空响应';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上没有匹配的曲目';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -1609,6 +2543,89 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
+
+  @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本书读多少章（1–$max，默认 $count）';
+  }
+
+  @override
+  String get librivoxFieldGenre => '书籍类型';
+
+  @override
+  String get librivoxFieldGenreHint => '目录里的一个门类';
+
+  @override
+  String get librivoxGenreAll => '全部门类';
+
+  @override
+  String get librivoxGenreFiction => '小说';
+
+  @override
+  String get librivoxGenrePoetry => '诗歌';
+
+  @override
+  String get librivoxGenreHistory => '历史';
+
+  @override
+  String get librivoxGenreRomance => '爱情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '传记';
+
+  @override
+  String get librivoxGenreEssays => '随笔';
+
+  @override
+  String get librivoxGenreComedy => '喜剧';
+
+  @override
+  String get librivoxGenreDrama => '戏剧';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '历史小说';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲学';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文学小说';
+
+  @override
+  String get librivoxGenrePsychology => '心理学';
+
+  @override
+  String get librivoxGenreScience => '科学';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音乐';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '侦探小说';
+
+  @override
+  String get librivoxGenreSatire => '讽刺';
 
   @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
@@ -2390,6 +3407,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lyricsSmartFailedEmpty => '没有识别出人声';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用';
+
+  @override
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
@@ -2839,6 +3859,143 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
+
+  @override
+  String get settingsLocalizationEngine => '翻译引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '内置离线';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已缓存文本';
+
+  @override
+  String get settingsLocalizationBalance => '余额';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查询余额';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '该端点未提供余额查询';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '响应里没有余额字段';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '密钥没有权限查询余额';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '余额查询失败（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '余额查询失败：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '权限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在应用外显示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒体文件';
+
+  @override
+  String get settingsPermissionMediaHint => '扫描时读取手机上的音频库。';
+
+  @override
+  String get settingsPermissionGranted => '已允许';
+
+  @override
+  String get settingsPermissionAllow => '允许';
+
+  @override
+  String get settingsPermissionOpenSettings => '去设置';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒绝。请到系统设置里允许。';
+
+  @override
+  String get settingsPermissionNeeded => '扫描前需要允许媒体读取权限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要权限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒体读取权限已被拒绝。请到系统设置里允许后再扫描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3677,6 +4834,23 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get browseModeDaily => '每日推荐';
 
   @override
+  String get browseModeAlbums => '专辑';
+
+  @override
+  String get recentWindowField => '只看最近入库';
+
+  @override
+  String get recentWindowFieldHint => '只收这段时间内加进来的内容';
+
+  @override
+  String get recentWindowAll => '不限时间';
+
+  @override
+  String recentWindowDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get fieldLimit => '每次扫描数量';
 
   @override
@@ -3706,43 +4880,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get fieldLimitBooks => '每次扫描书数';
 
   @override
-  String get fieldLanguage => '语言';
-
-  @override
-  String get fieldLanguageHint => '只保留一种语言的有声书';
-
-  @override
-  String get fieldLanguageAll => '不限制语言';
-
-  @override
-  String get fieldLanguageEnglish => '英语';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法语';
-
-  @override
-  String get fieldLanguageGerman => '德语';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙语';
-
-  @override
-  String get fieldLanguageItalian => '意大利语';
-
-  @override
-  String get fieldLanguageJapanese => '日语';
-
-  @override
-  String get fieldLanguageRussian => '俄语';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙语';
-
-  @override
   String get fieldServer => '服务器地址';
+
+  @override
+  String get fieldEmail => '邮箱';
 
   @override
   String get fieldUser => '用户名';
@@ -4088,6 +5229,72 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get localSourceNotConfigured => '未配置本地音乐目录';
 
   @override
+  String get openverseFieldSource => '来源';
+
+  @override
+  String get openverseFieldLength => '时长';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一档时长的音频';
+
+  @override
+  String get openverseLengthAll => '全部时长';
+
+  @override
+  String get openverseLengthShort => '短（2 分钟内）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分钟内）';
+
+  @override
+  String get openverseLengthLong => '长（10 分钟以上）';
+
+  @override
+  String get openverseFieldLicense => '许可';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一种许可下的音频';
+
+  @override
+  String get openverseLicenseAll => '全部许可';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有领域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（署名）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式共享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商业）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止演绎）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
+  String get openverseFieldSourceHint => '只看一个目录，不混着来';
+
+  @override
+  String get openverseSourceAll => '全部目录';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '维基共享资源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint => '填写搜索关键词，例如 piano、ambient 或 jazz';
 
   @override
@@ -4137,6 +5344,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
+  String get jamendoFieldTag => '标签';
+
+  @override
+  String get jamendoFieldTagHint => '目录的风格或情绪标签，例如 jazz、electronic、piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo 返回了空响应';
 
   @override
@@ -4147,10 +5360,59 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '填写 Internet Archive 收录条件，例如 collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => '每项曲目上限';
+
+  @override
+  String get internetArchiveFieldLanguage => '语言';
+
+  @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get internetArchiveSortBrowse => '按浏览方式';
+
+  @override
+  String get internetArchiveSortTitle => '按标题';
+
+  @override
+  String get internetArchiveSortAdded => '最近入库';
+
+  @override
+  String get internetArchiveSortPublished => '最新发布';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取归档在某个年代的音频';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取归档在某种语言下的音频';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一个条目最多取多少首（1–$max，默认 $count）';
+  }
+
+  @override
   String get internetArchiveFieldQuery => '收录条件';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 返回了无法识别的响应';
+
+  @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜索服务暂时不可用';
 
   @override
   String get internetArchiveNoMatch => '没有找到可播放的归档音频';
@@ -4171,7 +5433,46 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get ccmixterFieldQuery => '搜索标签';
 
   @override
+  String get ccmixterFieldLicence => '许可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以这类许可发布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限许可';
+
+  @override
+  String get ccmixterLicenceBy => '仅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商业';
+
+  @override
+  String get ccmixterLicencePd => '公共领域';
+
+  @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
+
+  @override
+  String get ccmixterFieldTag => '风格';
+
+  @override
+  String get ccmixterFieldTagHint => '站点的一个标签；关键词与风格会同时生效';
+
+  @override
+  String get ccmixterTagAll => '全部风格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛围';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器乐';
 
   @override
   String get ccmixterHint => '填写 ccMixter 标签，例如 jazz、ambient 或 electro';
@@ -4184,6 +5485,20 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get podcastRssFieldFeed => '订阅地址';
+
+  @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收这段时间内发布的单集';
+
+  @override
+  String get podcastRssSinceAll => '全部单集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
@@ -4212,6 +5527,137 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourceLiveMusicArchiveName => '现场音乐档案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 数字化归档的公版 78 转唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '网络厂牌免费发布的专辑';
+
+  @override
+  String get sourceNetlabelsName => '网络厂牌';
+
+  @override
+  String get sourceOldTimeRadioDescription => '广播黄金年代的广播剧与综艺节目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式广播剧';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音频收藏里的音乐录音';
+
+  @override
+  String get sourceAudioMusicName => '档案音乐';
+
+  @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 项目数字化的公版唱片';
+
+  @override
+  String get sourceCommunityMusicName => '社区音乐';
+
+  @override
+  String get sourceCommunityMusicDescription =>
+      'Internet Archive 社区上传的音乐：摇滚、爵士、蓝调与电子';
+
+  @override
+  String get sourceCommunityClassicalName => '社区古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社区上传的古典音乐：管弦乐、室内乐与独奏录音';
+
+  @override
+  String get sourceCommunityAmbientName => '社区氛围与实验';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社区上传的氛围与实验音乐：长曲、实地录音与一次成型的尝试';
+
+  @override
+  String get sourceCommunityWorldName => '社区世界与雷鬼';
+
+  @override
+  String get sourceCommunityWorldDescription =>
+      'Internet Archive 社区上传的非英语主流音乐：各地民谣、Dub 与雷鬼';
+
+  @override
+  String get sourceCommunityMetalName => '社区金属与朋克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社区上传的金属与朋克：现场、EP 与网络厂牌发行';
+
+  @override
+  String get sourceCommunityHiphopName => '社区嘻哈与放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社区上传的嘻哈与放克：混音带、节拍与现场律动';
+
+  @override
+  String get sourceIndependentAudiobooksName => '独立有声书';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收录的有声书';
+
+  @override
+  String get sourceArchivePodcastsName => '档案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '节目停更后仍留在 Internet Archive 上的播客单集';
+
+  @override
+  String get sourceRadioRecordingsName => '电台录音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老广播剧收藏之外、Internet Archive 收录的电台节目录音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的专辑';
+
+  @override
+  String get sourceForeignAudioName => '外语有声书';
+
+  @override
+  String get sourceForeignAudioDescription => '英语之外的有声书与朗读，档案按语言分开收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新闻录音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '档案里保存下来的新闻广播录音';
+
+  @override
+  String get sourcePoetryName => '诗歌朗读';
+
+  @override
+  String get sourcePoetryDescription => '档案里归在诗歌名下的朗读';
+
+  @override
+  String get sourcePoetryBooksName => '诗集';
+
+  @override
+  String get sourcePoetryBooksDescription => '档案里归在诗歌名下的整本朗读（不含 LibriVox）';
+
+  @override
+  String get sourceScienceTalksName => '科学讲座';
+
+  @override
+  String get sourceScienceTalksDescription => '档案里归在科学名下的节目与讲座录音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS 播客订阅变成可播放的单集';
 
   @override
@@ -4227,10 +5673,126 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get podcastCatalogHint => '输入关键词找播客，留空则浏览目录';
 
   @override
+  String get podcastCatalogFieldTag => '标签';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按标签找节目，例如 comedy、news、technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => '例如爵士、历史、科技';
 
   @override
   String get podcastCatalogNoMatch => '没有找到播客';
+
+  @override
+  String get sourceApplePodcastsName => 'Apple 播客';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目录里排行的播客，单集从各自的订阅源读取';
+
+  @override
+  String get podcastAppleHint => '填关键词，留空则读 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldMode => '读取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '读榜单上的节目，还是读关键词搜到的单集';
+
+  @override
+  String get podcastAppleModeShows => '节目';
+
+  @override
+  String get podcastAppleModeEpisodes => '单集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '单集方式需要关键词：商店没有单集榜单。';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新闻、喜剧';
+
+  @override
+  String get podcastAppleFieldCountry => '国家/地区';
+
+  @override
+  String get podcastAppleFieldCountryHint => '两位国家代码，例如 US、CN';
+
+  @override
+  String get podcastAppleFieldGenre => '类别';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜单的一个类别';
+
+  @override
+  String get podcastFieldEpisodes => '每档集数';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每档播客读多少集（1–$max，默认 $count）';
+  }
+
+  @override
+  String get podcastAppleGenreAll => '全部类别';
+
+  @override
+  String get podcastAppleGenreArts => '艺术';
+
+  @override
+  String get podcastAppleGenreBusiness => '商业';
+
+  @override
+  String get podcastAppleGenreComedy => '喜剧';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虚构';
+
+  @override
+  String get podcastAppleGenreGovernment => '政务';
+
+  @override
+  String get podcastAppleGenreHealth => '健康与健身';
+
+  @override
+  String get podcastAppleGenreHistory => '历史';
+
+  @override
+  String get podcastAppleGenreKids => '儿童与家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休闲';
+
+  @override
+  String get podcastAppleGenreMusic => '音乐';
+
+  @override
+  String get podcastAppleGenreNews => '新闻';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教与心灵';
+
+  @override
+  String get podcastAppleGenreScience => '科学';
+
+  @override
+  String get podcastAppleGenreSports => '体育';
+
+  @override
+  String get podcastAppleGenreFilm => '影视';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真实犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社会与文化';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目录里没有匹配的节目';
 
   @override
   String get sourceSubsonicDescription => '连接自建的 Navidrome / Subsonic 音乐库';
@@ -4277,6 +5839,74 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiusHint => '填写搜索关键词，例如 jazz、ambient 或 electronic';
 
   @override
+  String get audiusFieldGenre => '风格';
+
+  @override
+  String get audiusFieldPlaylists => '每次取几个歌单';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌单方式下一次读几个歌单（1–$max，默认 $count）';
+  }
+
+  @override
+  String get audiusFieldMode => '读取方式';
+
+  @override
+  String get audiusFieldModeHint => '单曲，或站点上的歌单';
+
+  @override
+  String get audiusModeSongs => '单曲';
+
+  @override
+  String get audiusModePlaylists => '歌单';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪种风格读';
+
+  @override
+  String get audiusGenreAll => '全部风格';
+
+  @override
+  String get audiusGenreElectronic => '电子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 与灵魂';
+
+  @override
+  String get audiusGenreAmbient => '氛围';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '回响贝斯';
+
+  @override
+  String get audiusFieldWindow => '时间窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '网络默认';
+
+  @override
+  String get audiusWindowWeek => '最近一周';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部时间';
+
+  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
 
   @override
@@ -4296,7 +5926,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目录、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目录、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目录';
@@ -4305,7 +5935,97 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get radioFieldCountry => '国家/地区';
 
   @override
-  String get radioFieldCountryHint => '两位国家代码，例如 SG、MY、AU、JP；目录里有的国家都可以填';
+  String get radioFieldCountryHint => '两位国家代码（如 SG、MY、AU、JP），或国名（如 Germany）';
+
+  @override
+  String get radioFieldLanguage => '语言';
+
+  @override
+  String get radioFieldLanguageHint =>
+      '语言：可写中文、日语、法语，也可写 english、spanish 这样的英文名';
+
+  @override
+  String get languageNameAll => '全部语言';
+
+  @override
+  String get languageNameEnglish => '英语';
+
+  @override
+  String get languageNameSpanish => '西班牙语';
+
+  @override
+  String get languageNameGerman => '德语';
+
+  @override
+  String get languageNameFrench => '法语';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄语';
+
+  @override
+  String get languageNameItalian => '意大利语';
+
+  @override
+  String get languageNameGreek => '希腊语';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙语';
+
+  @override
+  String get languageNameTurkish => '土耳其语';
+
+  @override
+  String get languageNameJapanese => '日语';
+
+  @override
+  String get languageNamePolish => '波兰语';
+
+  @override
+  String get languageNameKorean => '韩语';
+
+  @override
+  String get languageNameArabic => '阿拉伯语';
+
+  @override
+  String get languageNameHindi => '印地语';
+
+  @override
+  String get radioFieldBitrate => '最低码率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留码率不低于这一档的台站';
+
+  @override
+  String get radioBitrateAll => '不限码率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
+
+  @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收听最多';
+
+  @override
+  String get radioFieldTag => '标签';
+
+  @override
+  String get radioFieldTagHint => '目录里实测有几百个台站的分类；想按冷门标签找，把它写进关键词';
+
+  @override
+  String get radioTagAll => '全部分类';
 
   @override
   String get radioFieldQuery => '电台关键词';
@@ -4324,6 +6044,72 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get wikimediaHint => '填写搜索关键词，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldCategory => '目录';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要浏览的维基音频分类';
+
+  @override
+  String get wikimediaCategoryAll => '全部音乐';
+
+  @override
+  String get wikimediaCategoryPiano => '钢琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
+
+  @override
+  String get wikimediaCategoryRock => '摇滚';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '乡村';
+
+  @override
+  String get wikimediaCategoryBlues => '蓝调';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管风琴';
+
+  @override
+  String get wikimediaCategorySpeeches => '演讲';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '访谈';
+
+  @override
+  String get wikimediaCategoryPoetry => '诗歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有声条目';
+
+  @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打贝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛围';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音乐';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
@@ -4389,6 +6175,311 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get audiobookshelfNoMatch => '没有找到有声书';
 
   @override
+  String get sourceAmpacheName => '自建 Ampache 音乐库';
+
+  @override
+  String get sourceAmpacheDescription => '自建 Ampache 服务器里的音乐库';
+
+  @override
+  String get ampacheHint => '填写 Ampache 服务器的地址与 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 账号的 API Key（首选项 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 返回了空响应';
+
+  @override
+  String get ampacheNoMatch => '没有找到匹配的曲目';
+
+  @override
+  String get ampacheAuthFailed => '无法连接 Ampache 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceAzuracastName => '自建 AzuraCast 电台';
+
+  @override
+  String get sourceAzuracastDescription => '自建 AzuraCast 电台服务器上的电台';
+
+  @override
+  String get azuracastHint => '填写 AzuraCast 服务器的地址，收听它上面的电台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（可选）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '服务器把电台设为私有时才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 返回了空响应';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上没有匹配的电台';
+
+  @override
+  String get azuracastAuthFailed => '无法连接 AzuraCast 服务器，请检查地址与 API Key';
+
+  @override
+  String get sourceKoelName => '自建 Koel 音乐库';
+
+  @override
+  String get sourceKoelDescription => '自建 Koel 服务器的音乐库';
+
+  @override
+  String get koelHint => '填写 Koel 服务器的地址、邮箱与密码';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 账号的邮箱';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 账号的密码';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 返回了空响应';
+
+  @override
+  String get koelNoMatch => 'Koel 上没有匹配的曲目';
+
+  @override
+  String get koelAuthFailed => '无法登录 Koel 服务器，请检查地址、邮箱与密码';
+
+  @override
+  String get koelTwoFactor => 'Koel 账号开启了两步验证，此音源无法登录';
+
+  @override
+  String get sourceItunesName => 'iTunes 试听';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店里每首歌的 30 秒试听';
+
+  @override
+  String get itunesHint => '填写关键词，或选「读取方式 = 专辑」读商店的专辑榜';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '国家/地区';
+
+  @override
+  String get itunesFieldCountryHint => '两位国家代码，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店返回了空响应';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店里没有匹配的歌曲';
+
+  @override
+  String get itunesPreviewNote => '这首歌的 30 秒试听';
+
+  @override
+  String get sourceDeezerName => 'Deezer 试听';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲库里每首歌的 30 秒试听';
+
+  @override
+  String get deezerHint => '填关键词，留空则读商店的榜单';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '风格';
+
+  @override
+  String get deezerFieldGenreHint => '不填关键词时读哪个榜单';
+
+  @override
+  String get deezerGenreAll => '全部榜单';
+
+  @override
+  String get deezerGenreAlternative => '另类';
+
+  @override
+  String get deezerGenreFilms => '影视与游戏';
+
+  @override
+  String get deezerGenreSoulFunk => '灵魂与放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音乐';
+
+  @override
+  String get deezerGenreAsian => '亚洲音乐';
+
+  @override
+  String get deezerGenreBlues => '蓝调';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音乐';
+
+  @override
+  String get deezerGenreIndian => '印度音乐';
+
+  @override
+  String get deezerGenreKids => '儿童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音乐';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 返回了空响应';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上没有匹配的歌曲';
+
+  @override
+  String get deezerPreviewNote => '这首歌的 30 秒试听';
+
+  @override
+  String get storeFieldBatch => '每次取几个';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次扫描读几张专辑 / 几位艺人 / 几个歌单（1–$max，默认 $count）；单曲方式不受影响';
+  }
+
+  @override
+  String get storeReadModeField => '读取方式';
+
+  @override
+  String get storeReadModeFieldHint => '读单曲，还是读曲目背后的专辑、艺人与歌单';
+
+  @override
+  String get storeReadModeSongs => '单曲';
+
+  @override
+  String get storeReadModeAlbums => '专辑';
+
+  @override
+  String get storeReadModeArtists => '艺人';
+
+  @override
+  String get storeReadModePlaylists => '歌单';
+
+  @override
+  String get sourceKodiName => '自建 Kodi 媒体库';
+
+  @override
+  String get sourceKodiDescription => '自建 Kodi 媒体中心的音乐库';
+
+  @override
+  String get kodiHint => '填写 Kodi Web 服务器地址；服务器要求登录时再填账号';
+
+  @override
+  String get lmsHint => 'Logitech Media Server 地址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '服务器地址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '服务器账号，需要登录时填';
+
+  @override
+  String get lmsFieldPasswordHint => '该账号的密码';
+
+  @override
+  String get lmsFieldQueryHint => '用关键词缩小范围（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '服务器没有返回曲目列表';
+
+  @override
+  String get lmsNoMatch => '服务器里没有匹配的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '局域网里 Squeezebox 服务器的曲库';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 服务器的账号';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 服务器的密码';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 返回了空响应';
+
+  @override
+  String get kodiNoMatch => 'Kodi 库里没有匹配的曲目';
+
+  @override
+  String get sourcePeerTubeName => 'PeerTube 音乐';
+
+  @override
+  String get sourcePeerTubeDescription => '联邦 PeerTube 服务器上的音乐与现场演出';
+
+  @override
+  String get peerTubeHint => '填写 PeerTube 服务器地址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、钢琴';
+
+  @override
+  String get peerTubeCategory => '目录';
+
+  @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先读什么；不选就按浏览方式决定';
+
+  @override
+  String get peerTubeSortDefault => '按浏览方式';
+
+  @override
+  String get peerTubeSortNewest => '最新优先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
+
+  @override
+  String get peerTubeCategoryHint => '只看音乐，或看服务器上的全部内容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音乐';
+
+  @override
+  String get peerTubeCategoryAll => '全部内容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 返回了空响应';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上没有匹配的曲目';
+
+  @override
   String get sourcePlexName => '自建媒体库';
 
   @override
@@ -4446,6 +6537,89 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get librivoxHint => '输入书名或作者，留空则浏览最热门的有声书';
+
+  @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本书读多少章（1–$max，默认 $count）';
+  }
+
+  @override
+  String get librivoxFieldGenre => '书籍类型';
+
+  @override
+  String get librivoxFieldGenreHint => '目录里的一个门类';
+
+  @override
+  String get librivoxGenreAll => '全部门类';
+
+  @override
+  String get librivoxGenreFiction => '小说';
+
+  @override
+  String get librivoxGenrePoetry => '诗歌';
+
+  @override
+  String get librivoxGenreHistory => '历史';
+
+  @override
+  String get librivoxGenreRomance => '爱情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '传记';
+
+  @override
+  String get librivoxGenreEssays => '随笔';
+
+  @override
+  String get librivoxGenreComedy => '喜剧';
+
+  @override
+  String get librivoxGenreDrama => '戏剧';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '历史小说';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲学';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文学小说';
+
+  @override
+  String get librivoxGenrePsychology => '心理学';
+
+  @override
+  String get librivoxGenreScience => '科学';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音乐';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '侦探小说';
+
+  @override
+  String get librivoxGenreSatire => '讽刺';
 
   @override
   String get librivoxFieldQueryHint => '例如爱丽丝梦游仙境、狄更斯、童话';
@@ -5227,6 +7401,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get lyricsSmartFailedEmpty => '没有识别出人声';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把词稿写到音频旁：支持写入之前，智能歌词停用';
+
+  @override
   String get lyricsSmartNote => '机器稿：票池生成，重新查找可以找更好的词';
 
   @override
@@ -5676,6 +7853,143 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
+
+  @override
+  String get settingsLocalizationEngine => '翻译引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '内置离线';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已缓存文本';
+
+  @override
+  String get settingsLocalizationBalance => '余额';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查询余额';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '该端点未提供余额查询';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '响应里没有余额字段';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '密钥没有权限查询余额';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '余额查询失败（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '余额查询失败：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻译 机翻 本地化 语言 离线模型 api 余额 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '权限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在应用外显示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒体文件';
+
+  @override
+  String get settingsPermissionMediaHint => '扫描时读取手机上的音频库。';
+
+  @override
+  String get settingsPermissionGranted => '已允许';
+
+  @override
+  String get settingsPermissionAllow => '允许';
+
+  @override
+  String get settingsPermissionOpenSettings => '去设置';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒绝。请到系统设置里允许。';
+
+  @override
+  String get settingsPermissionNeeded => '扫描前需要允许媒体读取权限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要权限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒体读取权限已被拒绝。请到系统设置里允许后再扫描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -6514,6 +8828,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get browseModeDaily => '每日推薦';
 
   @override
+  String get browseModeAlbums => '專輯';
+
+  @override
+  String get recentWindowField => '只看最近入庫';
+
+  @override
+  String get recentWindowFieldHint => '只收這段時間內加進來的內容';
+
+  @override
+  String get recentWindowAll => '不限時間';
+
+  @override
+  String recentWindowDays(String days) {
+    return '最近 $days 天';
+  }
+
+  @override
   String get fieldLimit => '每次掃描數量';
 
   @override
@@ -6543,43 +8874,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get fieldLimitBooks => '每次掃描書數';
 
   @override
-  String get fieldLanguage => '語言';
-
-  @override
-  String get fieldLanguageHint => '只保留一種語言的有聲書';
-
-  @override
-  String get fieldLanguageAll => '不限制語言';
-
-  @override
-  String get fieldLanguageEnglish => '英語';
-
-  @override
-  String get fieldLanguageChinese => '中文';
-
-  @override
-  String get fieldLanguageFrench => '法語';
-
-  @override
-  String get fieldLanguageGerman => '德語';
-
-  @override
-  String get fieldLanguageSpanish => '西班牙語';
-
-  @override
-  String get fieldLanguageItalian => '義大利語';
-
-  @override
-  String get fieldLanguageJapanese => '日語';
-
-  @override
-  String get fieldLanguageRussian => '俄語';
-
-  @override
-  String get fieldLanguagePortuguese => '葡萄牙語';
-
-  @override
   String get fieldServer => '伺服器位址';
+
+  @override
+  String get fieldEmail => '電子郵件';
 
   @override
   String get fieldUser => '使用者名稱';
@@ -6925,6 +9223,72 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get localSourceNotConfigured => '未設定本機音樂目錄';
 
   @override
+  String get openverseFieldSource => '來源';
+
+  @override
+  String get openverseFieldLength => '時長';
+
+  @override
+  String get openverseFieldLengthHint => '只取某一檔時長的音訊';
+
+  @override
+  String get openverseLengthAll => '全部時長';
+
+  @override
+  String get openverseLengthShort => '短（2 分鐘內）';
+
+  @override
+  String get openverseLengthMedium => '中（10 分鐘內）';
+
+  @override
+  String get openverseLengthLong => '長（10 分鐘以上）';
+
+  @override
+  String get openverseFieldLicense => '授權';
+
+  @override
+  String get openverseFieldLicenseHint => '只取某一種授權下的音訊';
+
+  @override
+  String get openverseLicenseAll => '全部授權';
+
+  @override
+  String get openverseLicenceCc0 => 'CC0（公有領域）';
+
+  @override
+  String get openverseLicenceBy => 'CC BY（姓名標示）';
+
+  @override
+  String get openverseLicenceBySa => 'CC BY-SA（相同方式分享）';
+
+  @override
+  String get openverseLicenceByNc => 'CC BY-NC（非商業）';
+
+  @override
+  String get openverseLicenceByNd => 'CC BY-ND（禁止改作）';
+
+  @override
+  String get openverseLicenceByNcSa => 'CC BY-NC-SA';
+
+  @override
+  String get openverseLicenceByNcNd => 'CC BY-NC-ND';
+
+  @override
+  String get openverseFieldSourceHint => '只看一個目錄，不混著來';
+
+  @override
+  String get openverseSourceAll => '全部目錄';
+
+  @override
+  String get openverseSourceJamendo => 'Jamendo';
+
+  @override
+  String get openverseSourceWikimedia => '維基共享資源';
+
+  @override
+  String get openverseSourceFreesound => 'Freesound';
+
+  @override
   String get openverseHint => '填寫搜尋關鍵字，例如 piano、ambient 或 jazz';
 
   @override
@@ -6974,6 +9338,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get jamendoFieldQueryHint => '例如 jazz、electronic';
 
   @override
+  String get jamendoFieldTag => '標籤';
+
+  @override
+  String get jamendoFieldTagHint => '目錄的風格或情緒標籤，例如 jazz、electronic、piano';
+
+  @override
   String get jamendoEmptyResponse => 'Jamendo 回傳了空回應';
 
   @override
@@ -6984,10 +9354,59 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       '填寫 Internet Archive 收錄條件，例如 collection:netlabels AND mediatype:audio';
 
   @override
+  String get internetArchiveFieldPerItem => '每項曲目上限';
+
+  @override
+  String get internetArchiveFieldLanguage => '語言';
+
+  @override
+  String get internetArchiveFieldDecade => '年代';
+
+  @override
+  String get internetArchiveFieldSort => '排序';
+
+  @override
+  String get internetArchiveFieldSortHint => '先讀什麼；不選就按瀏覽方式決定';
+
+  @override
+  String get internetArchiveSortBrowse => '按瀏覽方式';
+
+  @override
+  String get internetArchiveSortTitle => '按標題';
+
+  @override
+  String get internetArchiveSortAdded => '最近入庫';
+
+  @override
+  String get internetArchiveSortPublished => '最新發布';
+
+  @override
+  String get internetArchiveFieldDecadeHint => '只取歸檔在某個年代的音訊';
+
+  @override
+  String get internetArchiveDecadeAll => '全部年代';
+
+  @override
+  String internetArchiveDecade(String decade) {
+    return '$decade 年代';
+  }
+
+  @override
+  String get internetArchiveFieldLanguageHint => '只取歸檔在某種語言下的音訊';
+
+  @override
+  String internetArchiveFieldPerItemHint(Object count, Object max) {
+    return '一個條目最多取多少首（1–$max，預設 $count）';
+  }
+
+  @override
   String get internetArchiveFieldQuery => '收錄條件';
 
   @override
   String get internetArchiveInvalidResponse => 'Internet Archive 回傳了無法識別的回應';
+
+  @override
+  String get internetArchiveBackendBusy => 'Internet Archive 的搜尋服務暫時無法使用';
 
   @override
   String get internetArchiveNoMatch => '沒有找到可播放的归檔音訊';
@@ -7008,7 +9427,46 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get ccmixterFieldQuery => '搜尋標籤';
 
   @override
+  String get ccmixterFieldLicence => '許可';
+
+  @override
+  String get ccmixterFieldLicenceHint => '只收以這類許可發布的曲目';
+
+  @override
+  String get ccmixterLicenceAll => '不限許可';
+
+  @override
+  String get ccmixterLicenceBy => '僅需署名';
+
+  @override
+  String get ccmixterLicenceNc => '非商業';
+
+  @override
+  String get ccmixterLicencePd => '公共領域';
+
+  @override
   String get ccmixterFieldQueryHint => '例如 jazz、ambient、electro';
+
+  @override
+  String get ccmixterFieldTag => '風格';
+
+  @override
+  String get ccmixterFieldTagHint => '站點的一個標籤；關鍵字與風格會同時生效';
+
+  @override
+  String get ccmixterTagAll => '全部風格';
+
+  @override
+  String get ccmixterTagFunk => '放克';
+
+  @override
+  String get ccmixterTagAmbient => '氛圍';
+
+  @override
+  String get ccmixterTagChill => '弛放';
+
+  @override
+  String get ccmixterTagInstrumental => '器樂';
 
   @override
   String get ccmixterHint => '填寫 ccMixter 標籤，例如 jazz、ambient 或 electro';
@@ -7021,6 +9479,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get podcastRssFieldFeed => '訂閱網址';
+
+  @override
+  String get podcastRssFieldSince => '只看最近';
+
+  @override
+  String get podcastRssFieldSinceHint => '只收這段時間內發布的單集';
+
+  @override
+  String get podcastRssSinceAll => '全部單集';
+
+  @override
+  String podcastRssSinceDays(String days) {
+    return '最近 $days 天';
+  }
 
   @override
   String get podcastRssFieldFeedHint => '例如 https://example.com/podcast.xml';
@@ -7049,6 +9521,137 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceLiveMusicArchiveName => '現場音樂檔案';
 
   @override
+  String get sourceGreat78Description => 'Internet Archive 數位化歸檔的公版 78 轉唱片';
+
+  @override
+  String get sourceGreat78Name => 'Great 78 Project';
+
+  @override
+  String get sourceNetlabelsDescription => '網路廠牌免費發佈的專輯';
+
+  @override
+  String get sourceNetlabelsName => '網路廠牌';
+
+  @override
+  String get sourceOldTimeRadioDescription => '廣播黃金年代的廣播劇與綜藝節目';
+
+  @override
+  String get sourceOldTimeRadioName => '老式廣播劇';
+
+  @override
+  String get sourceAudioMusicDescription => 'Internet Archive 音訊收藏裡的音樂錄音';
+
+  @override
+  String get sourceAudioMusicName => '檔案音樂';
+
+  @override
+  String get sourceUnlockedRecordingsName => 'Unlocked Recordings';
+
+  @override
+  String get sourceUnlockedRecordingsDescription =>
+      'Unlocked Recordings 專案數位化的公版唱片';
+
+  @override
+  String get sourceCommunityMusicName => '社群音樂';
+
+  @override
+  String get sourceCommunityMusicDescription =>
+      'Internet Archive 社群上傳的音樂：搖滾、爵士、藍調與電子';
+
+  @override
+  String get sourceCommunityClassicalName => '社群古典';
+
+  @override
+  String get sourceCommunityClassicalDescription =>
+      'Internet Archive 社群上傳的古典音樂：管弦樂、室內樂與獨奏錄音';
+
+  @override
+  String get sourceCommunityAmbientName => '社群氛圍與實驗';
+
+  @override
+  String get sourceCommunityAmbientDescription =>
+      'Internet Archive 社群上傳的氛圍與實驗音樂：長曲、實地錄音與一次成型的嘗試';
+
+  @override
+  String get sourceCommunityWorldName => '社群世界與雷鬼';
+
+  @override
+  String get sourceCommunityWorldDescription =>
+      'Internet Archive 社群上傳的非英語主流音樂：各地民謠、Dub 與雷鬼';
+
+  @override
+  String get sourceCommunityMetalName => '社群金屬與龐克';
+
+  @override
+  String get sourceCommunityMetalDescription =>
+      'Internet Archive 社群上傳的金屬與龐克：現場、EP 與網路廠牌發行';
+
+  @override
+  String get sourceCommunityHiphopName => '社群嘻哈與放克';
+
+  @override
+  String get sourceCommunityHiphopDescription =>
+      'Internet Archive 社群上傳的嘻哈與放克：混音帶、節拍與現場律動';
+
+  @override
+  String get sourceIndependentAudiobooksName => '獨立有聲書';
+
+  @override
+  String get sourceIndependentAudiobooksDescription =>
+      'LibriVox 之外、Internet Archive 收錄的有聲書';
+
+  @override
+  String get sourceArchivePodcastsName => '檔案播客';
+
+  @override
+  String get sourceArchivePodcastsDescription =>
+      '節目停更後仍留在 Internet Archive 上的播客單集';
+
+  @override
+  String get sourceRadioRecordingsName => '電台錄音';
+
+  @override
+  String get sourceRadioRecordingsDescription =>
+      '老廣播劇收藏之外、Internet Archive 收錄的電台節目錄音';
+
+  @override
+  String get sourceFreeMusicArchiveName => 'Free Music Archive';
+
+  @override
+  String get sourceFreeMusicArchiveDescription =>
+      'Free Music Archive 收在 Internet Archive 上的專輯';
+
+  @override
+  String get sourceForeignAudioName => '外語有聲書';
+
+  @override
+  String get sourceForeignAudioDescription => '英語之外的有聲書與朗讀，檔案按語言分開收藏';
+
+  @override
+  String get sourceNewsRecordingsName => '新聞錄音';
+
+  @override
+  String get sourceNewsRecordingsDescription => '檔案裡保存下來的新聞廣播錄音';
+
+  @override
+  String get sourcePoetryName => '詩歌朗讀';
+
+  @override
+  String get sourcePoetryDescription => '檔案裡歸在詩歌名下的朗讀';
+
+  @override
+  String get sourcePoetryBooksName => '詩集';
+
+  @override
+  String get sourcePoetryBooksDescription => '檔案裡歸在詩歌名下的整本朗讀（不含 LibriVox）';
+
+  @override
+  String get sourceScienceTalksName => '科學講座';
+
+  @override
+  String get sourceScienceTalksDescription => '檔案裡歸在科學名下的節目與講座錄音';
+
+  @override
   String get sourcePodcastRssDescription => '把任意 RSS podcast 訂閱變成可播放的單集';
 
   @override
@@ -7064,10 +9667,126 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get podcastCatalogHint => '輸入關鍵字找播客，留空則瀏覽目錄';
 
   @override
+  String get podcastCatalogFieldTag => '標籤';
+
+  @override
+  String get podcastCatalogFieldTagHint => '按標籤找節目，例如 comedy、news、technology';
+
+  @override
   String get podcastCatalogFieldQueryHint => '例如爵士、歷史、科技';
 
   @override
   String get podcastCatalogNoMatch => '沒有找到播客';
+
+  @override
+  String get sourceApplePodcastsName => 'Apple Podcasts';
+
+  @override
+  String get sourceApplePodcastsDescription => 'Apple 目錄裡排行的播客，單集從各自的訂閱源讀取';
+
+  @override
+  String get podcastAppleHint => '填關鍵字，留空則讀 Apple 的播客排行';
+
+  @override
+  String get podcastAppleFieldMode => '讀取方式';
+
+  @override
+  String get podcastAppleFieldModeHint => '讀榜單上的節目，還是讀關鍵詞搜到的單集';
+
+  @override
+  String get podcastAppleModeShows => '節目';
+
+  @override
+  String get podcastAppleModeEpisodes => '單集';
+
+  @override
+  String get podcastAppleEpisodeQueryRequired => '單集方式需要關鍵詞：商店沒有單集榜單。';
+
+  @override
+  String get podcastAppleFieldQueryHint => '例如 爵士、新聞、喜劇';
+
+  @override
+  String get podcastAppleFieldCountry => '國家/地區';
+
+  @override
+  String get podcastAppleFieldCountryHint => '兩位國家代碼，例如 US、CN';
+
+  @override
+  String get podcastAppleFieldGenre => '類別';
+
+  @override
+  String get podcastAppleFieldGenreHint => '只看商店榜單的一個類別';
+
+  @override
+  String get podcastFieldEpisodes => '每檔集數';
+
+  @override
+  String podcastFieldEpisodesHint(Object count, Object max) {
+    return '每檔播客讀多少集（1–$max，預設 $count）';
+  }
+
+  @override
+  String get podcastAppleGenreAll => '全部類別';
+
+  @override
+  String get podcastAppleGenreArts => '藝術';
+
+  @override
+  String get podcastAppleGenreBusiness => '商業';
+
+  @override
+  String get podcastAppleGenreComedy => '喜劇';
+
+  @override
+  String get podcastAppleGenreEducation => '教育';
+
+  @override
+  String get podcastAppleGenreFiction => '虛構';
+
+  @override
+  String get podcastAppleGenreGovernment => '政務';
+
+  @override
+  String get podcastAppleGenreHealth => '健康與健身';
+
+  @override
+  String get podcastAppleGenreHistory => '歷史';
+
+  @override
+  String get podcastAppleGenreKids => '兒童與家庭';
+
+  @override
+  String get podcastAppleGenreLeisure => '休閒';
+
+  @override
+  String get podcastAppleGenreMusic => '音樂';
+
+  @override
+  String get podcastAppleGenreNews => '新聞';
+
+  @override
+  String get podcastAppleGenreReligion => '宗教與心靈';
+
+  @override
+  String get podcastAppleGenreScience => '科學';
+
+  @override
+  String get podcastAppleGenreSports => '體育';
+
+  @override
+  String get podcastAppleGenreFilm => '影視';
+
+  @override
+  String get podcastAppleGenreTechnology => '科技';
+
+  @override
+  String get podcastAppleGenreTrueCrime => '真實犯罪';
+
+  @override
+  String get podcastAppleGenreSociety => '社會與文化';
+
+  @override
+  String get podcastAppleNoMatch => 'Apple 播客目錄裡沒有符合的節目';
 
   @override
   String get sourceSubsonicDescription => '連線自建的 Navidrome / Subsonic 音樂庫';
@@ -7114,6 +9833,74 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get audiusHint => '填寫搜尋關鍵字，例如 jazz、ambient 或 electronic';
 
   @override
+  String get audiusFieldGenre => '風格';
+
+  @override
+  String get audiusFieldPlaylists => '每次取幾個歌單';
+
+  @override
+  String audiusFieldPlaylistsHint(Object count, Object max) {
+    return '歌單方式下一次讀幾個歌單（1–$max，預設 $count）';
+  }
+
+  @override
+  String get audiusFieldMode => '讀取方式';
+
+  @override
+  String get audiusFieldModeHint => '單曲，或站點上的歌單';
+
+  @override
+  String get audiusModeSongs => '單曲';
+
+  @override
+  String get audiusModePlaylists => '歌單';
+
+  @override
+  String get audiusFieldGenreHint => '排行榜按哪種風格讀';
+
+  @override
+  String get audiusGenreAll => '全部風格';
+
+  @override
+  String get audiusGenreElectronic => '電子';
+
+  @override
+  String get audiusGenreHipHop => '嘻哈';
+
+  @override
+  String get audiusGenreSoul => 'R&B 與靈魂';
+
+  @override
+  String get audiusGenreAmbient => '氛圍';
+
+  @override
+  String get audiusGenreTechno => '科技舞曲';
+
+  @override
+  String get audiusGenreHouse => '浩室';
+
+  @override
+  String get audiusGenreDubstep => '迴響貝斯';
+
+  @override
+  String get audiusFieldWindow => '時間窗';
+
+  @override
+  String get audiusFieldWindowHint => '排行榜回溯多久';
+
+  @override
+  String get audiusWindowDefault => '網路預設';
+
+  @override
+  String get audiusWindowWeek => '最近一週';
+
+  @override
+  String get audiusWindowMonth => '最近一月';
+
+  @override
+  String get audiusWindowAllTime => '全部時間';
+
+  @override
   String get audiusFieldQueryHint => '例如 jazz、ambient、electronic';
 
   @override
@@ -7133,7 +9920,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radioFieldProviderHint =>
-      '全部目錄、Radio Browser、SomaFM 或 Radio Paradise';
+      '全部目錄、Radio Browser、SomaFM、Radio Paradise、NTS 或 Radio France';
 
   @override
   String get radioProviderAll => '全部目錄';
@@ -7142,7 +9929,97 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get radioFieldCountry => '國家／地區';
 
   @override
-  String get radioFieldCountryHint => '兩位國家代碼，例如 SG、MY、AU、JP；目錄裡有的國家都可以填';
+  String get radioFieldCountryHint => '兩位國家代碼（如 SG、MY、AU、JP），或國名（如 Germany）';
+
+  @override
+  String get radioFieldLanguage => '語言';
+
+  @override
+  String get radioFieldLanguageHint =>
+      '語言：可寫中文、日語、法語，也可寫 english、spanish 這樣的英文名';
+
+  @override
+  String get languageNameAll => '全部語言';
+
+  @override
+  String get languageNameEnglish => '英語';
+
+  @override
+  String get languageNameSpanish => '西班牙語';
+
+  @override
+  String get languageNameGerman => '德語';
+
+  @override
+  String get languageNameFrench => '法語';
+
+  @override
+  String get languageNameChinese => '中文';
+
+  @override
+  String get languageNameRussian => '俄語';
+
+  @override
+  String get languageNameItalian => '義大利語';
+
+  @override
+  String get languageNameGreek => '希臘語';
+
+  @override
+  String get languageNamePortuguese => '葡萄牙語';
+
+  @override
+  String get languageNameTurkish => '土耳其語';
+
+  @override
+  String get languageNameJapanese => '日語';
+
+  @override
+  String get languageNamePolish => '波蘭語';
+
+  @override
+  String get languageNameKorean => '韓語';
+
+  @override
+  String get languageNameArabic => '阿拉伯語';
+
+  @override
+  String get languageNameHindi => '印地語';
+
+  @override
+  String get radioFieldBitrate => '最低碼率';
+
+  @override
+  String get radioFieldBitrateHint => '只保留碼率不低於這一檔的台站';
+
+  @override
+  String get radioBitrateAll => '不限碼率';
+
+  @override
+  String radioBitrateAtLeast(String floor) {
+    return '$floor kbit/s 以上';
+  }
+
+  @override
+  String get radioFieldOrder => '排序';
+
+  @override
+  String get radioFieldOrderHint => '哪些台排在前面';
+
+  @override
+  String get radioOrderVotes => '得票最多';
+
+  @override
+  String get radioOrderListened => '正在收聽最多';
+
+  @override
+  String get radioFieldTag => '標籤';
+
+  @override
+  String get radioFieldTagHint => '目錄裡實測有幾百個台站的分類；想按冷門標籤找，把它寫進關鍵詞';
+
+  @override
+  String get radioTagAll => '全部分類';
 
   @override
   String get radioFieldQuery => '電台關鍵字';
@@ -7161,6 +10038,72 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get wikimediaHint => '填寫搜尋關鍵字，例如 piano、lecture 或 birdsong';
+
+  @override
+  String get wikimediaFieldCategory => '目錄';
+
+  @override
+  String get wikimediaFieldCategoryHint => '要瀏覽的維基音訊分類';
+
+  @override
+  String get wikimediaCategoryAll => '全部音樂';
+
+  @override
+  String get wikimediaCategoryPiano => '鋼琴';
+
+  @override
+  String get wikimediaCategoryGuitar => '吉他';
+
+  @override
+  String get wikimediaCategoryRock => '搖滾';
+
+  @override
+  String get wikimediaCategoryPop => '流行';
+
+  @override
+  String get wikimediaCategoryHipHop => '嘻哈';
+
+  @override
+  String get wikimediaCategoryCountry => '鄉村';
+
+  @override
+  String get wikimediaCategoryBlues => '藍調';
+
+  @override
+  String get wikimediaCategoryReggae => '雷鬼';
+
+  @override
+  String get wikimediaCategoryChoral => '合唱';
+
+  @override
+  String get wikimediaCategoryOrgan => '管風琴';
+
+  @override
+  String get wikimediaCategorySpeeches => '演講';
+
+  @override
+  String get wikimediaCategoryEffects => '音效';
+
+  @override
+  String get wikimediaCategoryInterviews => '訪談';
+
+  @override
+  String get wikimediaCategoryPoetry => '詩歌';
+
+  @override
+  String get wikimediaCategorySpoken => '有聲條目';
+
+  @override
+  String get wikimediaCategoryHouse => '浩室';
+
+  @override
+  String get wikimediaCategoryDnb => '鼓打貝斯';
+
+  @override
+  String get wikimediaCategoryAmbient => '氛圍';
+
+  @override
+  String get wikimediaCategoryWorld => '世界音樂';
 
   @override
   String get wikimediaFieldQueryHint => '例如 piano、lecture、birdsong';
@@ -7226,6 +10169,311 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get audiobookshelfNoMatch => '沒有找到有聲書';
 
   @override
+  String get sourceAmpacheName => '自架 Ampache 音樂庫';
+
+  @override
+  String get sourceAmpacheDescription => '自架 Ampache 伺服器裡的音樂庫';
+
+  @override
+  String get ampacheHint => '填寫 Ampache 伺服器的位址與 API Key';
+
+  @override
+  String get ampacheFieldServerHint => 'e.g. http://localhost:8080';
+
+  @override
+  String get ampacheFieldApiKey => 'API Key';
+
+  @override
+  String get ampacheFieldApiKeyHint => 'Ampache 帳號的 API Key（偏好設定 → API keys）';
+
+  @override
+  String get ampacheFieldQueryHint => '例如 jazz、piano';
+
+  @override
+  String get ampacheEmptyResponse => 'Ampache 傳回了空回應';
+
+  @override
+  String get ampacheNoMatch => '沒有找到符合的曲目';
+
+  @override
+  String get ampacheAuthFailed => '無法連線 Ampache 伺服器，請檢查位址與 API Key';
+
+  @override
+  String get sourceAzuracastName => '自架 AzuraCast 電台';
+
+  @override
+  String get sourceAzuracastDescription => '自架 AzuraCast 電台伺服器上的電台';
+
+  @override
+  String get azuracastHint => '填寫 AzuraCast 伺服器的位址，收聽它上面的電台';
+
+  @override
+  String get azuracastFieldServerHint => '例如 https://radio.example.com';
+
+  @override
+  String get azuracastFieldApiKey => 'API Key（選填）';
+
+  @override
+  String get azuracastFieldApiKeyHint => '伺服器把電台設為私有時才需要';
+
+  @override
+  String get azuracastEmptyResponse => 'AzuraCast 傳回了空回應';
+
+  @override
+  String get azuracastNoMatch => 'AzuraCast 上沒有符合的電台';
+
+  @override
+  String get azuracastAuthFailed => '無法連線 AzuraCast 伺服器，請檢查位址與 API Key';
+
+  @override
+  String get sourceKoelName => '自架 Koel 音樂庫';
+
+  @override
+  String get sourceKoelDescription => '自架 Koel 伺服器的音樂庫';
+
+  @override
+  String get koelHint => '填寫 Koel 伺服器的位址、電子郵件與密碼';
+
+  @override
+  String get koelFieldServerHint => '例如 http://localhost:8000';
+
+  @override
+  String get koelFieldEmailHint => 'Koel 帳號的電子郵件';
+
+  @override
+  String get koelFieldPasswordHint => 'Koel 帳號的密碼';
+
+  @override
+  String get koelFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get koelEmptyResponse => 'Koel 傳回了空回應';
+
+  @override
+  String get koelNoMatch => 'Koel 上沒有符合的曲目';
+
+  @override
+  String get koelAuthFailed => '無法登入 Koel 伺服器，請檢查位址、電子郵件與密碼';
+
+  @override
+  String get koelTwoFactor => 'Koel 帳號開啟了兩步驗證，此音源無法登入';
+
+  @override
+  String get sourceItunesName => 'iTunes 試聽';
+
+  @override
+  String get sourceItunesDescription => 'iTunes 商店裡每首歌的 30 秒試聽';
+
+  @override
+  String get itunesHint => '填寫關鍵字，或選「讀取方式 = 專輯」讀商店的專輯榜';
+
+  @override
+  String get itunesFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get itunesFieldCountry => '國家/地區';
+
+  @override
+  String get itunesFieldCountryHint => '兩位國家代碼，例如 US、JP';
+
+  @override
+  String get itunesEmptyResponse => 'iTunes 商店傳回了空回應';
+
+  @override
+  String get itunesNoMatch => 'iTunes 商店裡沒有符合的歌曲';
+
+  @override
+  String get itunesPreviewNote => '這首歌的 30 秒試聽';
+
+  @override
+  String get sourceDeezerName => 'Deezer 試聽';
+
+  @override
+  String get sourceDeezerDescription => 'Deezer 曲庫裡每首歌的 30 秒試聽';
+
+  @override
+  String get deezerHint => '填關鍵字，留空則讀商店的榜單';
+
+  @override
+  String get deezerFieldQueryHint => '例如 miles davis、kind of blue';
+
+  @override
+  String get deezerFieldGenre => '風格';
+
+  @override
+  String get deezerFieldGenreHint => '不填關鍵字時讀哪個榜單';
+
+  @override
+  String get deezerGenreAll => '全部榜單';
+
+  @override
+  String get deezerGenreAlternative => '另類';
+
+  @override
+  String get deezerGenreFilms => '影視與遊戲';
+
+  @override
+  String get deezerGenreSoulFunk => '靈魂與放克';
+
+  @override
+  String get deezerGenreAfrican => '非洲音樂';
+
+  @override
+  String get deezerGenreAsian => '亞洲音樂';
+
+  @override
+  String get deezerGenreBlues => '藍調';
+
+  @override
+  String get deezerGenreBrazilian => '巴西音樂';
+
+  @override
+  String get deezerGenreIndian => '印度音樂';
+
+  @override
+  String get deezerGenreKids => '兒童';
+
+  @override
+  String get deezerGenreLatin => '拉丁音樂';
+
+  @override
+  String get deezerEmptyResponse => 'Deezer 傳回了空回應';
+
+  @override
+  String get deezerNoMatch => 'Deezer 上沒有符合的歌曲';
+
+  @override
+  String get deezerPreviewNote => '這首歌的 30 秒試聽';
+
+  @override
+  String get storeFieldBatch => '每次取幾個';
+
+  @override
+  String storeFieldBatchHint(Object count, Object max) {
+    return '一次掃描讀幾張專輯 / 幾位藝人 / 幾個歌單（1–$max，預設 $count）；單曲方式不受影響';
+  }
+
+  @override
+  String get storeReadModeField => '讀取方式';
+
+  @override
+  String get storeReadModeFieldHint => '讀單曲，還是讀曲目背後的專輯、藝人與歌單';
+
+  @override
+  String get storeReadModeSongs => '單曲';
+
+  @override
+  String get storeReadModeAlbums => '專輯';
+
+  @override
+  String get storeReadModeArtists => '藝人';
+
+  @override
+  String get storeReadModePlaylists => '歌單';
+
+  @override
+  String get sourceKodiName => '自架 Kodi 媒體庫';
+
+  @override
+  String get sourceKodiDescription => '自架 Kodi 媒體中心的音樂庫';
+
+  @override
+  String get kodiHint => '填寫 Kodi Web 伺服器位址；伺服器要求登入時再填帳號';
+
+  @override
+  String get lmsHint => 'Logitech Media Server 位址：例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldServerHint => '伺服器位址，例如 http://192.168.1.10:9000';
+
+  @override
+  String get lmsFieldUserHint => '伺服器帳號，需要登入時填';
+
+  @override
+  String get lmsFieldPasswordHint => '該帳號的密碼';
+
+  @override
+  String get lmsFieldQueryHint => '用關鍵字縮小範圍（可留空）';
+
+  @override
+  String get lmsEmptyResponse => '伺服器沒有回傳曲目清單';
+
+  @override
+  String get lmsNoMatch => '伺服器裡沒有符合的曲目';
+
+  @override
+  String get sourceLmsName => 'Logitech Media Server';
+
+  @override
+  String get sourceLmsDescription => '區域網路裡 Squeezebox 伺服器的曲庫';
+
+  @override
+  String get kodiFieldServerHint => '例如 http://localhost:8080';
+
+  @override
+  String get kodiFieldUserHint => 'Web 伺服器的帳號';
+
+  @override
+  String get kodiFieldPasswordHint => 'Web 伺服器的密碼';
+
+  @override
+  String get kodiFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get kodiEmptyResponse => 'Kodi 傳回了空回應';
+
+  @override
+  String get kodiNoMatch => 'Kodi 媒體庫裡沒有符合的曲目';
+
+  @override
+  String get sourcePeerTubeName => 'PeerTube 音樂';
+
+  @override
+  String get sourcePeerTubeDescription => '聯邦 PeerTube 伺服器上的音樂與現場演出';
+
+  @override
+  String get peerTubeHint => '填寫 PeerTube 伺服器位址';
+
+  @override
+  String get peerTubeFieldServerHint => '例如 https://framatube.org';
+
+  @override
+  String get peerTubeFieldQueryHint => '例如 jazz、鋼琴';
+
+  @override
+  String get peerTubeCategory => '目錄';
+
+  @override
+  String get peerTubeFieldSort => '排序';
+
+  @override
+  String get peerTubeFieldSortHint => '先讀什麼；不選就按瀏覽方式決定';
+
+  @override
+  String get peerTubeSortDefault => '按瀏覽方式';
+
+  @override
+  String get peerTubeSortNewest => '最新優先';
+
+  @override
+  String get peerTubeSortViewed => '播放最多';
+
+  @override
+  String get peerTubeCategoryHint => '只看音樂，或看伺服器上的全部內容';
+
+  @override
+  String get peerTubeCategoryMusic => '只看音樂';
+
+  @override
+  String get peerTubeCategoryAll => '全部內容';
+
+  @override
+  String get peerTubeEmptyResponse => 'PeerTube 傳回了空回應';
+
+  @override
+  String get peerTubeNoMatch => 'PeerTube 上沒有符合的曲目';
+
+  @override
   String get sourcePlexName => '自架媒體庫';
 
   @override
@@ -7283,6 +10531,89 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get librivoxHint => '輸入書名或作者，留空白則瀏覽最熱門的有聲書';
+
+  @override
+  String get librivoxFieldChapters => '每本上限';
+
+  @override
+  String librivoxFieldChaptersHint(Object count, Object max) {
+    return '每本書讀多少章（1–$max，預設 $count）';
+  }
+
+  @override
+  String get librivoxFieldGenre => '書籍類型';
+
+  @override
+  String get librivoxFieldGenreHint => '目錄裡的一個門類';
+
+  @override
+  String get librivoxGenreAll => '全部門類';
+
+  @override
+  String get librivoxGenreFiction => '小說';
+
+  @override
+  String get librivoxGenrePoetry => '詩歌';
+
+  @override
+  String get librivoxGenreHistory => '歷史';
+
+  @override
+  String get librivoxGenreRomance => '愛情';
+
+  @override
+  String get librivoxGenreScienceFiction => '科幻';
+
+  @override
+  String get librivoxGenreBiography => '傳記';
+
+  @override
+  String get librivoxGenreEssays => '隨筆';
+
+  @override
+  String get librivoxGenreComedy => '喜劇';
+
+  @override
+  String get librivoxGenreDrama => '戲劇';
+
+  @override
+  String get librivoxGenreHistoricalFiction => '歷史小說';
+
+  @override
+  String get librivoxGenreNature => '自然';
+
+  @override
+  String get librivoxGenrePhilosophy => '哲學';
+
+  @override
+  String get librivoxGenreReligion => '宗教';
+
+  @override
+  String get librivoxGenreShortStories => '短篇集';
+
+  @override
+  String get librivoxGenreHumor => '幽默';
+
+  @override
+  String get librivoxGenreLiteraryFiction => '文學小說';
+
+  @override
+  String get librivoxGenrePsychology => '心理學';
+
+  @override
+  String get librivoxGenreScience => '科學';
+
+  @override
+  String get librivoxGenreWesterns => '西部';
+
+  @override
+  String get librivoxGenreMusic => '音樂';
+
+  @override
+  String get librivoxGenreDetectiveFiction => '偵探小說';
+
+  @override
+  String get librivoxGenreSatire => '諷刺';
 
   @override
   String get librivoxFieldQueryHint => '例如愛麗絲夢遊仙境、狄更斯、童話';
@@ -8064,6 +11395,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get lyricsSmartFailedEmpty => '沒有識別出人聲';
 
   @override
+  String get lyricsSmartFailedUnsupported => '此平台不能把詞稿寫到音訊旁：支援寫入之前，智慧歌詞停用';
+
+  @override
   String get lyricsSmartNote => '機器稿：票池生成，重新查找可以找更好的詞';
 
   @override
@@ -8513,4 +11847,141 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '補齊缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自動把曲名、專輯、簡介和電台文字翻成介面語言，並在小字裡保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自動翻譯非介面語言文字';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的譯文會自動產生；歌手名保持原樣。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在譯文下方顯示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源裡的原始文字。';
+
+  @override
+  String get settingsLocalizationEngine => '翻譯引擎';
+
+  @override
+  String get settingsLocalizationEngineLocal => '內建離線';
+
+  @override
+  String get settingsLocalizationEngineApi => '外部 API';
+
+  @override
+  String get settingsLocalizationLocalReady => '離線模型已隨應用程式提供';
+
+  @override
+  String get settingsLocalizationLocalMissing => '離線模型遺失，請重新安裝應用程式';
+
+  @override
+  String get settingsLocalizationLocalCorrupt => '離線模型驗證失敗，請重新安裝應用程式';
+
+  @override
+  String get settingsLocalizationLocalBundled => '模型隨安裝包提供，首次翻譯時按需載入。';
+
+  @override
+  String get settingsLocalizationApiBaseUrl => '端點（Base URL）';
+
+  @override
+  String get settingsLocalizationApiKey => 'API Key';
+
+  @override
+  String get settingsLocalizationApiModel => '模型';
+
+  @override
+  String get settingsLocalizationApiHint =>
+      '支援 OpenAI Chat 協定的端點。消耗 token 取自回應；僅對提供餘額介面的服務商顯示餘額。';
+
+  @override
+  String get settingsLocalizationUsage => '今日 tokens';
+
+  @override
+  String get settingsLocalizationCache => '已快取文字';
+
+  @override
+  String get settingsLocalizationBalance => '餘額';
+
+  @override
+  String get settingsLocalizationBalanceCheck => '查詢餘額';
+
+  @override
+  String get settingsLocalizationBalanceUnsupported => '該端點未提供餘額查詢';
+
+  @override
+  String get settingsLocalizationBalanceNoField => '回應裡沒有餘額欄位';
+
+  @override
+  String get settingsLocalizationBalanceDenied => '金鑰沒有權限查詢餘額';
+
+  @override
+  String settingsLocalizationBalanceFailedStatus(String status) {
+    return '餘額查詢失敗（HTTP $status）';
+  }
+
+  @override
+  String settingsLocalizationBalanceFailedNetwork(String error) {
+    return '餘額查詢失敗：$error';
+  }
+
+  @override
+  String get settingsLocalizationPrivacy => '只傳送需要翻譯的文字；音訊、歌詞和檔案路徑都留在本機。';
+
+  @override
+  String get settingsSearchKeywordsLocalization =>
+      '翻譯 機翻 本地化 語言 離線模型 api 餘額 tokens';
+
+  @override
+  String get settingsPermissionsTitle => '權限';
+
+  @override
+  String get settingsPermissionsDescription =>
+      'Android 會在執行時詢問這些權限；拒絕後應用仍可用，但對應功能會關閉。';
+
+  @override
+  String get settingsPermissionNotifications => '通知';
+
+  @override
+  String get settingsPermissionNotificationsHint => '在應用外顯示播放控制。';
+
+  @override
+  String get settingsPermissionMedia => '媒體檔案';
+
+  @override
+  String get settingsPermissionMediaHint => '掃描時讀取手機上的音訊庫。';
+
+  @override
+  String get settingsPermissionGranted => '已允許';
+
+  @override
+  String get settingsPermissionAllow => '允許';
+
+  @override
+  String get settingsPermissionOpenSettings => '去設定';
+
+  @override
+  String get settingsPermissionDeniedHint => '已被拒絕。請到系統設定裡允許。';
+
+  @override
+  String get settingsPermissionNeeded => '掃描前需要允許媒體讀取權限。';
+
+  @override
+  String get settingsPermissionDialogTitle => '需要權限';
+
+  @override
+  String get settingsPermissionDialogBody => '媒體讀取權限已被拒絕。請到系統設定裡允許後再掃描。';
+
+  @override
+  String get settingsSearchKeywordsPermissions => '權限 通知 媒體 儲存 android 允許';
 }

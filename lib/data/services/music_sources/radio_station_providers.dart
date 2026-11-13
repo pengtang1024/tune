@@ -11,7 +11,17 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 /// the information a listener needs: the working stream address, the codec,
 /// the bitrate, the country, the language and the station logo.
 class RadioBrowserProvider extends RadioStationProvider {
-  static const _base = 'https://all.api.radio-browser.info/json';
+  /// The directory answers through any of its mirrors. The aggregate name is
+  /// tried first, then two mirrors, so a network that cannot reach one of
+  /// them (a broken IPv6 route, a blocked name) still reads the directory.
+  static const _hosts = [
+    'https://all.api.radio-browser.info/json',
+    'https://de1.api.radio-browser.info/json',
+    'https://de2.api.radio-browser.info/json',
+  ];
+
+  /// The mirror that answered last, tried first on the next request.
+  String? _base;
 
   final Dio _dio;
 
@@ -43,57 +53,72 @@ class RadioBrowserProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
   }) async {
     final trimmed = query.trim();
-    final code = country?.trim() ?? '';
+    // The directory knows two orders worth offering: the votes a station
+    // gathered over the years, and how much it is listened to right now.
+    final sort = order?.trim() == 'clickcount' ? 'clickcount' : 'votes';
+    final code = await _countryCode(country ?? '');
+    // The directory names its tag filter tag: a tagname parameter is ignored
+    // and would answer with the unfiltered list.
+    final wanted = tag?.trim().toLowerCase() ?? '';
+    final tongue = _languageOf(language);
     final stations = <RadioStation>[];
 
-    if (code.isNotEmpty) {
+    // Every narrowing the reader wrote is one filter of the directory, so a
+    // reach, a country and a language narrow together instead of excluding
+    // one another.
+    final filters = <String, String>{
+      if (code.isNotEmpty) 'countrycode': code,
+      if (wanted.isNotEmpty) 'tag': wanted,
+      if (tongue.isNotEmpty) 'language': tongue,
+      // A floor the directory reads as a number: it answers only the stations
+      // that stream at least that fast. A floor it cannot read would answer
+      // with the whole list, so only the floors the app offers are sent.
+      if (_kbpsOf(bitrate) case final floor?) 'bitrateMin': '$floor',
+    };
+
+    Map<String, String> page(Map<String, String> extra) => {
+      ...extra,
+      'limit': '$limit',
+      if (offset > 0) 'offset': '$offset',
+      'order': sort,
+      'reverse': 'true',
+      'hidebroken': 'true',
+    };
+
+    if (filters.isNotEmpty) {
       stations.addAll(
-        await _read('/stations/search', {
-          'countrycode': code,
+        await _read('/stations/search', page({
+          ...filters,
           if (trimmed.isNotEmpty) 'name': trimmed,
-          'limit': '$limit',
-          if (offset > 0) 'offset': '$offset',
-          'order': 'votes',
-          'reverse': 'true',
-        }),
+        })),
       );
-      if (trimmed.isNotEmpty) {
+      // A keyword also searches the tag axis, unless the reader already
+      // picked the reach themselves.
+      if (trimmed.isNotEmpty && wanted.isEmpty) {
         stations.addAll(
-          await _read('/stations/search', {
-            'countrycode': code,
-            'tagname': trimmed,
-            'limit': '$limit',
-            if (offset > 0) 'offset': '$offset',
-            'order': 'votes',
-            'reverse': 'true',
-          }),
+          await _read('/stations/search', page({
+            ...filters,
+            'tag': trimmed.toLowerCase(),
+          })),
         );
       }
     } else if (trimmed.isEmpty) {
-      stations.addAll(
-        await _read('/stations/topclick/$limit', {
-          if (offset > 0) 'offset': '$offset',
-        }),
-      );
+      // The highlights of the directory are its stations ordered by the
+      // reader's choice: the votes of the years, or the listening of the day.
+      stations.addAll(await _read('/stations/search', page({})));
     } else {
-      final byName = await _read('/stations/search', {
-        'name': trimmed,
-        'limit': '$limit',
-        if (offset > 0) 'offset': '$offset',
-        'order': 'votes',
-        'reverse': 'true',
-      });
-      final byTag = await _read('/stations/search', {
-        'tagname': trimmed,
-        'limit': '$limit',
-        if (offset > 0) 'offset': '$offset',
-        'order': 'votes',
-        'reverse': 'true',
-      });
-      stations.addAll(byName);
-      stations.addAll(byTag);
+      stations.addAll(
+        await _read('/stations/search', page({'name': trimmed})),
+      );
+      stations.addAll(
+        await _read('/stations/search', page({'tag': trimmed.toLowerCase()})),
+      );
     }
 
     final seen = <String>{};
@@ -107,14 +132,104 @@ class RadioBrowserProvider extends RadioStationProvider {
     String path, [
     Map<String, String> queryParameters = const {},
   ]) async {
-    final response = await _dio.get<List<dynamic>>(
-      '$_base$path',
-      queryParameters: {'hideuuid': 'true', ...queryParameters},
-    );
-    final data = response.data;
-    if (data is! List) return const [];
-    return parseStations(data);
+    final data = await _readList(path, queryParameters);
+    return data.isEmpty ? const [] : parseStations(data);
   }
+
+  /// Reads a list from the directory, from whichever mirror answers.
+  Future<List<dynamic>> _readList(
+    String path, [
+    Map<String, String> queryParameters = const {},
+  ]) async {
+    DioException? failure;
+    final preferred = _base;
+    final hosts = preferred == null
+        ? _hosts
+        : [preferred, ..._hosts.where((host) => host != preferred)];
+
+    for (final host in hosts) {
+      try {
+        final response = await _dio.get<List<dynamic>>(
+          '$host$path',
+          queryParameters: {'hideuuid': 'true', ...queryParameters},
+        );
+        _base = host;
+        final data = response.data;
+        if (data is! List) return const [];
+        return data;
+      } on DioException catch (error) {
+        failure = error;
+        if (!_isUnreachable(error)) rethrow;
+      }
+    }
+    throw failure!;
+  }
+
+
+  /// The floor of the bitrate the reader picked, as a number.
+  static int? _kbpsOf(String? raw) {
+    final value = int.tryParse(raw?.trim() ?? '');
+    if (value == null || value < 32 || value > 320) return null;
+    return value;
+  }
+
+  /// The name the directory files a tongue under.
+  ///
+  /// The directory names its tongues in English and in lower case, which is
+  /// what the setting carries; a name it does not know is passed on as it was
+  /// written, so a tongue the list does not hold still reaches the directory.
+  static String _languageOf(String? raw) => raw?.trim().toLowerCase() ?? '';
+
+  /// The names of the countries the directory lists, by their code.
+  Map<String, String>? _countryCodes;
+
+  /// The code the directory filters by, for the country the reader wrote.
+  ///
+  /// The directory filters by the two-letter code alone, so a reader who
+  /// writes the name of a country is answered with nothing. The names the
+  /// directory itself lists are read once and kept, and a name is turned into
+  /// its code; anything that is not a name is passed on as it was written.
+  Future<String> _countryCode(String raw) async {
+    final value = raw.trim();
+    if (value.isEmpty) return '';
+    // A code is written as the directory stores it: it is passed on as it
+    // stands rather than rewritten, so the filter keeps matching the stations.
+    if (value.length == 2) return value;
+    final codes = await _countryTable();
+    final key = value.toLowerCase().replaceFirst(RegExp('^the '), '');
+    return codes[key] ?? value;
+  }
+
+  Future<Map<String, String>> _countryTable() async {
+    final cached = _countryCodes;
+    if (cached != null) return cached;
+
+    final codes = <String, String>{};
+    try {
+      for (final raw in await _readList('/countries')) {
+        if (raw is! Map) continue;
+        final name = raw['name']?.toString().trim().toLowerCase() ?? '';
+        final code = raw['iso_3166_1']?.toString().trim() ?? '';
+        if (name.isEmpty || code.isEmpty) continue;
+        codes[name] = code;
+        codes[name.replaceFirst(RegExp('^the '), '')] = code;
+        codes[code] = code;
+      }
+    } catch (_) {
+      // The directory may be out of reach; the reader's own writing is then
+      // passed on as it stands, which is what the field accepted before.
+      return const {};
+    }
+    _countryCodes = codes;
+    return codes;
+  }
+
+  /// Whether a mirror could not be reached at all, as opposed to answering
+  /// with an error of its own. Only the former is worth trying elsewhere.
+  static bool _isUnreachable(DioException error) =>
+      error.type == DioExceptionType.connectionError ||
+      error.type == DioExceptionType.connectionTimeout ||
+      error.type == DioExceptionType.unknown;
 
   /// Kept static so the mapping can be tested without network access.
   static List<RadioStation> parseStations(List<dynamic> data) {
@@ -145,7 +260,12 @@ class RadioBrowserProvider extends RadioStationProvider {
           artworkUrl: SourceSongFactory.normalizeUrl(
             raw['favicon']?.toString(),
           ),
+          // The directory files a station under several styles. The row shows
+          // them joined, because one tag alone ("music", "california") says
+          // little; the list is kept as well, so a grouping by style does not
+          // have to split the line again.
           genre: tags.isEmpty ? null : tags.take(3).join(' / '),
+          genres: tags.isEmpty ? null : tags.take(5).toList(growable: false),
           language: languages.isEmpty ? null : languages.take(2).join(' / '),
           country: _text(raw['country']),
           codec: _text(raw['codec']),
@@ -209,6 +329,10 @@ class SomaFmProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(_channelsUrl);
     final data = response.data;
@@ -344,6 +468,10 @@ class RadioParadiseProvider extends RadioStationProvider {
     required int limit,
     String? country,
     int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
   }) async {
     final trimmed = query.trim().toLowerCase();
     final selected = _stations.entries
@@ -404,4 +532,370 @@ class RadioParadiseProvider extends RadioStationProvider {
       homepage: 'https://radioparadise.com/',
     );
   }
+}
+
+/// The live channels of NTS.
+///
+/// The station publishes what is on air right now: the show, its genres, its
+/// moods and the picture of the show. A live answer names a show rather than a
+/// track, so the show stands where the performer stands in a station that
+/// knows its record.
+class NtsProvider extends RadioStationProvider {
+  static const _liveUrl = 'https://www.nts.live/api/v2/live';
+
+  /// The address of the stream of each channel.
+  static const _streams = <String, String>{
+    '1': 'https://stream-relay-geo.ntslive.net/stream',
+    '2': 'https://stream-relay-geo.ntslive.net/stream2',
+  };
+
+  final Dio _dio;
+
+  NtsProvider({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 20),
+              headers: sourceRequestHeaders(
+                extra: const {'Accept': 'application/json'},
+              ),
+            ),
+          );
+
+  @override
+  String get id => 'nts';
+
+  @override
+  String get displayName => 'NTS';
+
+  @override
+  Future<List<RadioStation>> fetch({
+    required String query,
+    required int limit,
+    String? country,
+    int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
+  }) async {
+    // Both channels are broadcast from London; a scan of another country has
+    // nothing to take from them.
+    final code = country?.trim().toUpperCase() ?? '';
+    if (code.isNotEmpty && code != 'GB' && code != 'UK') return const [];
+
+    final response = await _dio.get<Map<String, dynamic>>(_liveUrl);
+    final data = response.data;
+    if (data == null) {
+      throw MusicSourceFailure(AppStrings.instance.radioNoChannelList);
+    }
+
+    final stations = parseLive(data);
+    final trimmed = query.trim().toLowerCase();
+    final filtered = trimmed.isEmpty
+        ? stations
+        : stations.where((station) => _matches(station, trimmed)).toList();
+
+    return filtered.take(limit).toList(growable: false);
+  }
+
+  static bool _matches(RadioStation station, String query) {
+    final haystack = [
+      station.name,
+      station.genre ?? '',
+      station.description ?? '',
+      station.nowPlayingArtist ?? '',
+      station.country ?? '',
+    ].join(' ').toLowerCase();
+    return haystack.contains(query);
+  }
+
+  /// Kept static so the mapping can be tested without network access.
+  static List<RadioStation> parseLive(Map<String, dynamic> data) {
+    final results = data['results'];
+    if (results is! List) return const [];
+
+    final stations = <RadioStation>[];
+
+    for (final raw in results) {
+      if (raw is! Map) continue;
+
+      final channel = raw['channel_name']?.toString().trim() ?? '';
+      final streamUrl = _streams[channel];
+      if (streamUrl == null) continue;
+
+      final now = raw['now'];
+      final nowMap = now is Map ? now : const <dynamic, dynamic>{};
+      final embeds = nowMap['embeds'];
+      final embedsMap = embeds is Map ? embeds : const <dynamic, dynamic>{};
+      final details = embedsMap['details'];
+      final detailsMap = details is Map
+          ? details
+          : const <dynamic, dynamic>{};
+      final media = detailsMap['media'];
+      final mediaMap = media is Map ? media : const <dynamic, dynamic>{};
+
+      final show =
+          _text(detailsMap['name']) ?? _text(nowMap['broadcast_title']);
+      final genres = _values(detailsMap['genres']);
+
+      stations.add(
+        RadioStation(
+          provider: 'nts',
+          id: channel,
+          name: 'NTS $channel',
+          streamUrl: streamUrl,
+          artworkUrl: SourceSongFactory.normalizeUrl(
+            _text(mediaMap['background_large']) ??
+                _text(mediaMap['background_medium']),
+          ),
+          genre: genres.isEmpty ? null : genres.take(3).join(' / '),
+          language: 'English',
+          country: 'United Kingdom',
+          description: _text(detailsMap['description']),
+          nowPlayingArtist: show,
+          codec: 'MP3',
+          homepage: 'https://www.nts.live/',
+        ),
+      );
+    }
+
+    return stations;
+  }
+
+  static List<String> _values(Object? value) {
+    if (value is! List) return const [];
+    return value
+        .map((entry) => entry is Map ? _text(entry['value']) : null)
+        .whereType<String>()
+        .toList(growable: false);
+  }
+
+  static String? _text(Object? value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty ? null : text;
+  }
+}
+
+/// The music stations of Radio France.
+///
+/// FIP, France Musique and Mouv' broadcast a fixed set of channels, each of
+/// them a direct icecast stream. There is no directory request and no key, so
+/// the channel list lives in the code and a scan is a local operation.
+class RadioFranceProvider extends RadioStationProvider {
+  static const _streamBase = 'https://icecast.radiofrance.fr';
+
+  /// The channels of the network, in the order the network lists them.
+  static const List<_RadioFranceChannel> _channels = [
+    _RadioFranceChannel(
+      'fip',
+      'FIP',
+      'eclectic',
+      'Jazz, rock, electronic and world music',
+      'https://www.radiofrance.fr/fip',
+    ),
+    _RadioFranceChannel(
+      'fipjazz',
+      'FIP Jazz',
+      'jazz',
+      'Jazz of every era',
+      'https://www.radiofrance.fr/fip/radio-jazz',
+    ),
+    _RadioFranceChannel(
+      'fipgroove',
+      'FIP Groove',
+      'soul',
+      'Soul, funk and groove',
+      'https://www.radiofrance.fr/fip/radio-groove',
+    ),
+    _RadioFranceChannel(
+      'fiprock',
+      'FIP Rock',
+      'rock',
+      'Rock of every decade',
+      'https://www.radiofrance.fr/fip/radio-rock',
+    ),
+    _RadioFranceChannel(
+      'fipelectro',
+      'FIP Electro',
+      'electronic',
+      'Electronic music and club sounds',
+      'https://www.radiofrance.fr/fip/radio-electro',
+    ),
+    _RadioFranceChannel(
+      'fipreggae',
+      'FIP Reggae',
+      'reggae',
+      'Reggae, dub and roots',
+      'https://www.radiofrance.fr/fip/radio-reggae',
+    ),
+    _RadioFranceChannel(
+      'fipmetal',
+      'FIP Metal',
+      'metal',
+      'Metal and its neighbours',
+      'https://www.radiofrance.fr/fip/radio-metal',
+    ),
+    _RadioFranceChannel(
+      'fiphiphop',
+      'FIP Hip-Hop',
+      'hip hop',
+      'Hip-hop and rap',
+      'https://www.radiofrance.fr/fip/radio-hip-hop',
+    ),
+    _RadioFranceChannel(
+      'fippop',
+      'FIP Pop',
+      'pop',
+      'Pop songs and their writers',
+      'https://www.radiofrance.fr/fip/radio-pop',
+    ),
+    _RadioFranceChannel(
+      'fipworld',
+      'FIP World',
+      'world',
+      'Music from every continent',
+      'https://www.radiofrance.fr/fip/radio-world',
+    ),
+    _RadioFranceChannel(
+      'fipnouveautes',
+      'FIP Nouveautés',
+      'new releases',
+      'The records of the moment',
+      'https://www.radiofrance.fr/fip/radio-nouveautes',
+    ),
+    _RadioFranceChannel(
+      'fipsacrefrancais',
+      'FIP Sacré Français',
+      'chanson',
+      'French song of every generation',
+      'https://www.radiofrance.fr/fip/radio-sacre-francais',
+    ),
+    _RadioFranceChannel(
+      'francemusique',
+      'France Musique',
+      'classical',
+      'Classical music, concerts and opera',
+      'https://www.radiofrance.fr/francemusique',
+    ),
+    _RadioFranceChannel(
+      'francemusiquebaroque',
+      'France Musique Baroque',
+      'baroque',
+      'Baroque music from its sources',
+      'https://www.radiofrance.fr/francemusique/radio-baroque',
+    ),
+    _RadioFranceChannel(
+      'francemusiqueopera',
+      'France Musique Opéra',
+      'opera',
+      'Opera and its voices',
+      'https://www.radiofrance.fr/francemusique/radio-opera',
+    ),
+    _RadioFranceChannel(
+      'francemusiquelajazz',
+      'France Musique La Jazz',
+      'jazz',
+      'Jazz heard by France Musique',
+      'https://www.radiofrance.fr/francemusique/radio-jazz',
+    ),
+    _RadioFranceChannel(
+      'francemusiquelacontemporaine',
+      'France Musique Contemporaine',
+      'contemporary classical',
+      'Music written today',
+      'https://www.radiofrance.fr/francemusique/radio-contemporaine',
+    ),
+    _RadioFranceChannel(
+      'mouv',
+      'Mouv\'',
+      'hip hop',
+      'Hip-hop and youth culture',
+      'https://www.radiofrance.fr/mouv',
+    ),
+  ];
+
+  @override
+  String get id => 'radiofrance';
+
+  @override
+  String get displayName => 'Radio France';
+
+  @override
+  Future<List<RadioStation>> fetch({
+    required String query,
+    required int limit,
+    String? country,
+    int offset = 0,
+    String? tag,
+    String? language,
+    String? bitrate,
+    String? order,
+  }) async {
+    // Every channel is broadcast from Paris; a scan of another country has
+    // nothing to take from the network.
+    final code = country?.trim().toUpperCase() ?? '';
+    if (code.isNotEmpty && code != 'FR' && code != 'FRA' && code != 'FRANCE') {
+      return const [];
+    }
+
+    final trimmed = query.trim().toLowerCase();
+    final selected = trimmed.isEmpty
+        ? _channels
+        : _channels
+              .where((channel) => _matches(channel, trimmed))
+              .toList(growable: false);
+
+    return selected
+        .skip(offset)
+        .take(limit)
+        .map(_station)
+        .toList(growable: false);
+  }
+
+  static bool _matches(_RadioFranceChannel channel, String query) {
+    final haystack = [
+      channel.name,
+      channel.genre,
+      channel.description,
+    ].join(' ').toLowerCase();
+    return haystack.contains(query);
+  }
+
+  static RadioStation _station(_RadioFranceChannel channel) {
+    return RadioStation(
+      provider: 'radiofrance',
+      id: channel.slug,
+      name: channel.name,
+      streamUrl: '$_streamBase/${channel.slug}-midfi.mp3',
+      genre: channel.genre,
+      language: 'French',
+      country: 'France',
+      description: channel.description,
+      codec: 'MP3',
+      homepage: channel.homepage,
+    );
+  }
+}
+
+/// One channel of Radio France.
+///
+/// The fields are positional on purpose: the catalogue is data a broadcaster
+/// publishes, not interface text, so it stays out of the translated strings.
+class _RadioFranceChannel {
+  const _RadioFranceChannel(
+    this.slug,
+    this.name,
+    this.genre,
+    this.description,
+    this.homepage,
+  );
+
+  final String slug;
+  final String name;
+  final String genre;
+  final String description;
+  final String homepage;
 }

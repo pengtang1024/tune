@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
-import 'package:tune/features/settings/presentation/settings_switch_row.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_switch_row.dart';
 
 /// The settings of the playback.
 ///

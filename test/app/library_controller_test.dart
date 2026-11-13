@@ -10,8 +10,8 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
@@ -115,6 +115,31 @@ void main() {
     final rest = container.read(libraryControllerProvider).requireValue;
     expect(rest.songs, hasLength(LibraryController.windowSize + 1));
     expect(rest.hasMore, isFalse);
+  });
+
+  test('the total counts the library, not the search result', () async {
+    final container = buildContainer(
+      FakeLibraryStorage([
+        for (var index = 0; index <= LibraryController.windowSize; index++)
+          Song(
+            id: index,
+            title: 'Track $index',
+            uri: '/music/$index.mp3',
+          ),
+      ]),
+    );
+    await container.read(libraryControllerProvider.future);
+
+    await container
+        .read(libraryControllerProvider.notifier)
+        .setQuery('Track ${LibraryController.windowSize}');
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.songs, hasLength(1));
+    // The page header counts the library; the toolbar counts the search.
+    expect(state.total, LibraryController.windowSize + 1);
+    expect(state.hasMore, isFalse);
   });
 
   test('scan adds to the library and persists sorted songs', () async {

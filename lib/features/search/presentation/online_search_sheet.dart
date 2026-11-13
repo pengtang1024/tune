@@ -21,6 +21,7 @@ import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_detail_sheet.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
+import 'package:tune/shared/ui/translated_text.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 
@@ -756,10 +757,9 @@ class _SongRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    song.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  TranslatedText(
+                    text: song.title,
+                    dense: true,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),

@@ -10,6 +10,7 @@ import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/subsonic_source.dart';
 import 'package:tune/data/services/music_sources/wikimedia_source.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/data/services/music_sources/internet_archive_source.dart';
 import 'package:tune/data/services/music_sources/librivox_source.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
@@ -41,18 +42,35 @@ void main() {
       expect(captured.uri?.queryParameters['offset'], '40');
     });
 
-    test('the Internet Archive asks for the page of the offset', () async {
+    test('the Internet Archive asks for the page of the items it has read', () async {
       final captured = _Captured(
         body: {
           'response': {'docs': <dynamic>[]},
         },
       );
 
+      // Eight items read means the second page.
       await InternetArchiveSourceAdapter(
         dio: captured.dio,
-      ).scan(_request('internet_archive', offset: 8));
+      ).scan(_request('internet_archive', cursor: '8'));
 
       expect(captured.uri?.queryParameters['page'], '2');
+    });
+
+    test('the Internet Archive does not page by the songs it collected', () async {
+      final captured = _Captured(
+        body: {
+          'response': {'docs': <dynamic>[]},
+        },
+      );
+
+      // A page holds items and an item may hold thirty songs: 240 songs is
+      // one page of items, not the thirtieth page.
+      await InternetArchiveSourceAdapter(
+        dio: captured.dio,
+      ).scan(_request('internet_archive', offset: 240));
+
+      expect(captured.uri?.queryParameters['page'], '1');
     });
 
     test('LibriVox passes the offset to the catalogue', () async {
@@ -130,6 +148,48 @@ void main() {
       expect(result.cursor, 'token-2');
     });
 
+    test('a wiki that asks to slow down is asked once more', () async {
+      var calls = 0;
+      final client = Dio();
+      client.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            calls++;
+            if (calls == 1) {
+              // The wiki answers a request it finds too frequent this way.
+              handler.reject(
+                DioException(
+                  requestOptions: options,
+                  type: DioExceptionType.badResponse,
+                  response: Response(
+                    requestOptions: options,
+                    statusCode: 429,
+                  ),
+                ),
+                true,
+              );
+              return;
+            }
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: {
+                  'query': {'pages': <dynamic>{}},
+                },
+              ),
+            );
+          },
+        ),
+      );
+
+      final result = await WikimediaSourceAdapter(
+        dio: client,
+      ).scan(_request('wikimedia', settings: {'query': 'jazz'}));
+
+      expect(calls, 2);
+      expect(result.status, SourceScanStatus.success);
+    });
     test('Jellyfin asks for the window at the offset', () async {
       final routed = _RoutedDio({
         '/Users/AuthenticateByName': {'AccessToken': 'tok'},

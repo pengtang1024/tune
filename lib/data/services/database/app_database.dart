@@ -6,10 +6,11 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/data/services/database/library_query.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/data/services/database/translation_tables.dart';
+import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// The library of the app, kept in one SQLite file.
 ///
@@ -23,6 +24,9 @@ class AppDatabase {
   final Database _db;
 
   late final LibraryQuery _libraryQuery = LibraryQuery(_db);
+
+  /// The translation cache and the token ledger of the offline engine.
+  late final TranslationTables translations = TranslationTables(_db);
 
   /// Opens the database at [path], creating the table the first time.
   static AppDatabase open(String path) =>
@@ -152,6 +156,7 @@ class AppDatabase {
         json TEXT NOT NULL
       )
     ''');
+    TranslationTables.ensureSchema(db);
     _migrateColumns(db);
     for (final index in const [
       'CREATE INDEX IF NOT EXISTS idx_songs_year ON songs(year)',
@@ -160,6 +165,13 @@ class AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_songs_has_lyrics ON songs(has_lyrics)',
       'CREATE INDEX IF NOT EXISTS idx_songs_language ON songs(language)',
       'CREATE INDEX IF NOT EXISTS idx_songs_format ON songs(format)',
+      // The two orders the library page reads most: the newest first, and the
+      // title. The index carries the same tie break as the query, so a window
+      // of a large library is read in order instead of sorted on every read.
+      'CREATE INDEX IF NOT EXISTS idx_songs_added_order '
+      'ON songs(date_added DESC, uri ASC) WHERE active = 1',
+      'CREATE INDEX IF NOT EXISTS idx_songs_title_order '
+      'ON songs(title_sort COLLATE NOCASE, uri) WHERE active = 1',
     ]) {
       db.execute(index);
     }
@@ -630,6 +642,7 @@ class AppDatabase {
   int deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   }) {
     var marked = 0;
     _db.execute('BEGIN');
@@ -664,10 +677,35 @@ class AppDatabase {
         ];
         _db.execute(
           'UPDATE songs SET active = 0 WHERE active = 1 '
-          "AND source_id = 'local' AND NOT ($covered)",
+          "AND source_id = 'local' AND uri NOT LIKE 'content://%' "
+          "AND NOT ($covered)",
           patterns,
         );
         marked += _db.updatedRows;
+      }
+
+      // A read of the system library answers for every row of the local
+      // source: the ones it did not bring are tracks that left the phone.
+      // Their `content://` address says nothing about a folder, so the
+      // folder rule above cannot judge them.
+      if (localReadUris != null) {
+        final rows = _db.select(
+          "SELECT uri FROM songs WHERE source_id = 'local' AND active = 1",
+        );
+        final gone = [
+          for (final row in rows)
+            if (!localReadUris.contains(row['uri'] as String))
+              row['uri'] as String,
+        ];
+        for (var start = 0; start < gone.length; start += 500) {
+          final window = gone.skip(start).take(500).toList(growable: false);
+          final placeholders = List.filled(window.length, '?').join(', ');
+          _db.execute(
+            'UPDATE songs SET active = 0 WHERE uri IN ($placeholders)',
+            window,
+          );
+          marked += _db.updatedRows;
+        }
       }
       _db.execute('COMMIT');
     } catch (error) {

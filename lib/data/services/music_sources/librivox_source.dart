@@ -6,7 +6,6 @@ import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
-import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/utils/plain_text.dart';
 import 'package:tune/utils/logger.dart';
 import 'package:xml/xml.dart';
@@ -23,37 +22,6 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
 
   /// The catalogue endpoint of LibriVox.
   static const _apiHost = 'https://librivox.org/api/feed/audiobooks/';
-
-  /// The languages the catalogue lists on its own pages.
-  ///
-  /// The catalogue API keeps no language filter, so the scan narrows the
-  /// books on the spot; these are the names the books carry as values.
-  static const _languages = [
-    'English',
-    'Chinese',
-    'French',
-    'German',
-    'Spanish',
-    'Italian',
-    'Japanese',
-    'Russian',
-    'Portuguese',
-  ];
-
-  /// The label of one language, written in the language of the app.
-  static String _languageLabel(String language, AppLocalizations strings) =>
-      switch (language) {
-        'English' => strings.fieldLanguageEnglish,
-        'Chinese' => strings.fieldLanguageChinese,
-        'French' => strings.fieldLanguageFrench,
-        'German' => strings.fieldLanguageGerman,
-        'Spanish' => strings.fieldLanguageSpanish,
-        'Italian' => strings.fieldLanguageItalian,
-        'Japanese' => strings.fieldLanguageJapanese,
-        'Russian' => strings.fieldLanguageRussian,
-        'Portuguese' => strings.fieldLanguagePortuguese,
-        _ => language,
-      };
 
   final Dio _dio;
 
@@ -95,16 +63,22 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.librivoxFieldQueryHint,
     ),
     MusicSourceField(
-      'language',
-      AppStrings.instance.fieldLanguage,
-      AppStrings.instance.fieldLanguageHint,
+      'chapters',
+      AppStrings.instance.librivoxFieldChapters,
+      AppStrings.instance.librivoxFieldChaptersHint(
+        _chaptersPerBook.count,
+        _chaptersPerBook.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
+      'genre',
+      AppStrings.instance.librivoxFieldGenre,
+      AppStrings.instance.librivoxFieldGenreHint,
       choices: [
-        MusicSourceChoice('', AppStrings.instance.fieldLanguageAll),
-        for (final language in _languages)
-          MusicSourceChoice(
-            language,
-            _languageLabel(language, AppStrings.instance),
-          ),
+        MusicSourceChoice('', AppStrings.instance.librivoxGenreAll),
+        for (final genre in _genres)
+          MusicSourceChoice(genre, _genreLabel(genre)),
       ],
     ),
     MusicSourceField(
@@ -114,6 +88,73 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       numeric: true,
     ),
   ];
+
+  /// The genres the catalogue answers with, in the names it uses.
+  ///
+  /// A name the catalogue does not know answers with nothing, so only the
+  /// names that hold books are offered; the list was read from the catalogue
+  /// and every entry was checked to return books.
+  static const _genres = [
+    'General Fiction',
+    'Poetry',
+    'History',
+    'Romance',
+    'Science Fiction',
+    'Biography',
+    'Essays',
+    'Comedy',
+    'Drama',
+    'Historical Fiction',
+    'Nature',
+    'Philosophy',
+    'Religion',
+    'Short Stories',
+    'Humor',
+    'Literary Fiction',
+    'Psychology',
+    'Science',
+    'Westerns',
+    'Music',
+    'Detective Fiction',
+    'Satire',
+  ];
+
+  /// The name of a genre in the language of the app.
+  static String _genreLabel(String genre) {
+    final strings = AppStrings.instance;
+    return switch (genre) {
+      'General Fiction' => strings.librivoxGenreFiction,
+      'Poetry' => strings.librivoxGenrePoetry,
+      'History' => strings.librivoxGenreHistory,
+      'Romance' => strings.librivoxGenreRomance,
+      'Science Fiction' => strings.librivoxGenreScienceFiction,
+      'Biography' => strings.librivoxGenreBiography,
+      'Essays' => strings.librivoxGenreEssays,
+      'Comedy' => strings.librivoxGenreComedy,
+      'Drama' => strings.librivoxGenreDrama,
+      'Historical Fiction' => strings.librivoxGenreHistoricalFiction,
+      'Nature' => strings.librivoxGenreNature,
+      'Philosophy' => strings.librivoxGenrePhilosophy,
+      'Religion' => strings.librivoxGenreReligion,
+      'Short Stories' => strings.librivoxGenreShortStories,
+      'Humor' => strings.librivoxGenreHumor,
+      'Literary Fiction' => strings.librivoxGenreLiteraryFiction,
+      'Psychology' => strings.librivoxGenrePsychology,
+      'Science' => strings.librivoxGenreScience,
+      'Westerns' => strings.librivoxGenreWesterns,
+      'Music' => strings.librivoxGenreMusic,
+      'Detective Fiction' => strings.librivoxGenreDetectiveFiction,
+      'Satire' => strings.librivoxGenreSatire,
+      _ => genre,
+    };
+  }
+
+  /// How many chapters of one book a scan reads, and the most it may.
+  ///
+  /// A whole book lands in the library; a long one holds hundreds of chapters,
+  /// so a scan keeps a window of them and the reader who wants the rest raises
+  /// it.
+  static const _chaptersPerBook = MusicSourceLimit(60, 300);
 
   /// A whole book is fetched for each of its chapters, so a scan runs
   /// longer than the scan of a song catalogue.
@@ -132,7 +173,12 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     try {
       final limit = scanLimit.read(config.setting('limit'));
       final keyword = config.setting('query');
-      final raw = await _rawAnswer(keyword, limit, request.offset);
+      final raw = await _rawAnswer(
+        keyword,
+        limit,
+        request.offset,
+        genre: _genreOf(config),
+      );
       final books = parseBookList(raw);
       if (books.isEmpty) {
         return SourceScanResult(
@@ -143,7 +189,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
               : AppStrings.instance.librivoxEmptyResponse,
         );
       }
-      final wanted = wantedBooks(books, language: config.setting('language'));
+      final wanted = books;
       if (wanted.isEmpty) {
         return SourceScanResult(
           sourceId: config.id,
@@ -154,6 +200,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       final songs = await _chaptersOf(
         wanted,
         config: config,
+        chapters: _chaptersPerBook.read(config.setting('chapters')),
         onProgress: request.onProgress,
       );
       return SourceScanResult(
@@ -177,11 +224,16 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   /// A keyword asks the catalogue twice, by title and by author; both
   /// answers count. Without a keyword the scan reads the list the
   /// catalogue serves by itself.
-  Future<Object?> _rawAnswer(String? keyword, int limit, int offset) async {
+  Future<Object?> _rawAnswer(
+    String? keyword,
+    int limit,
+    int offset, {
+    String? genre,
+  }) async {
     if (keyword != null) {
       final pages = await Future.wait([
-        _searchPage('title', keyword, limit, offset),
-        _searchPage('author', keyword, limit, offset),
+        _searchPage('title', keyword, limit, offset, genre: genre),
+        _searchPage('author', keyword, limit, offset, genre: genre),
       ]);
       return {
         'books': [...pages[0], ...pages[1]],
@@ -193,9 +245,20 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
         'format': 'json',
         'limit': limit,
         if (offset > 0) 'offset': offset,
+        'genre': ?genre,
       },
     );
     return response.data;
+  }
+
+  /// The genre the instance walks, when the reader picked one.
+  ///
+  /// The catalogue matches the genre by its exact name, so the settings offer
+  /// the names the catalogue uses rather than free text: a spelling it does
+  /// not know answers with nothing.
+  static String? _genreOf(MusicSourceConfig config) {
+    final value = config.setting('genre')?.trim() ?? '';
+    return value.isEmpty ? null : value;
   }
 
   /// One page of the catalogue, an empty page when the keyword missed.
@@ -203,8 +266,9 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
     String field,
     String value,
     int limit,
-    int offset,
-  ) async {
+    int offset, {
+    String? genre,
+  }) async {
     final response = await _dio.get(
       _apiHost,
       queryParameters: {
@@ -212,6 +276,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
         'limit': limit,
         if (offset > 0) 'offset': offset,
         field: value,
+        'genre': ?genre,
       },
     );
     return parseBookList(response.data);
@@ -221,6 +286,7 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
   Future<List<Song>> _chaptersOf(
     List<Map<dynamic, dynamic>> books, {
     required MusicSourceConfig config,
+    required int chapters,
     void Function(double progress)? onProgress,
   }) async {
     final songs = <Song>[];
@@ -233,8 +299,15 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       for (var i = 0; i < batch.length; i++) {
         final feed = feeds[i];
         if (feed == null || feed.trim().isEmpty) continue;
+        // A whole book lands in the library: a long one holds hundreds of
+        // chapters, so a scan keeps the window the reader asked for and the
+        // book's own chapter count stays as it is.
         songs.addAll(
-          parseChapterFeed(feed, sourceId: config.id, book: batch[i]),
+          parseChapterFeed(
+            feed,
+            sourceId: config.id,
+            book: batch[i],
+          ).take(chapters),
         );
       }
       onProgress?.call(((start + batch.length) / books.length).clamp(0, 1));
@@ -272,25 +345,6 @@ class LibrivoxSourceAdapter extends MusicSourceAdapter {
       books.add(item);
     }
     return books;
-  }
-
-  /// The books the language of the scan asks for.
-  ///
-  /// The catalogue keeps no language filter, so the scan narrows the books
-  /// itself; a configuration without a language keeps them all.
-  static List<Map<dynamic, dynamic>> wantedBooks(
-    List<Map<dynamic, dynamic>> books, {
-    String? language,
-  }) {
-    final wanted = language?.trim() ?? '';
-    if (wanted.isEmpty) return books;
-    return books
-        .where(
-          (book) =>
-              '${book['language'] ?? ''}'.trim().toLowerCase() ==
-              wanted.toLowerCase(),
-        )
-        .toList(growable: false);
   }
 
   /// The name of the author of a book.

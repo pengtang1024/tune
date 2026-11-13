@@ -11,7 +11,7 @@ import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_contro
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_run_lock.dart';
 import 'package:tune/features/smart_lyrics/data/smart_lyrics_task_store.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 
 import '../services/fake_persistence.dart';

@@ -23,7 +23,11 @@ class LibraryHeader extends StatelessWidget {
   /// Whether a scan is already running; the menu item waits then.
   final bool scanning;
 
-  final VoidCallback onSearchOnline;
+  /// Opens the online search sheet, when the page was given an opener.
+  ///
+  /// The entry is left out when it is null: a button that does nothing is
+  /// worse than one that is not there.
+  final VoidCallback? onSearchOnline;
 
   /// Whether the category tree stands open.
   final bool treeExpanded;
@@ -87,25 +91,27 @@ class LibraryHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: CompactTokens.space12),
-          OutlinedButton.icon(
-            onPressed: onSearchOnline,
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, CompactTokens.controlDefault),
-              padding: const EdgeInsets.symmetric(
-                horizontal: CompactTokens.space12,
+          if (onSearchOnline != null) ...[
+            const SizedBox(width: CompactTokens.space12),
+            OutlinedButton.icon(
+              onPressed: onSearchOnline,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, CompactTokens.controlDefault),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space12,
+                ),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+                side: BorderSide(color: theme.colorScheme.outlineVariant),
               ),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              visualDensity: VisualDensity.compact,
-              side: BorderSide(color: theme.colorScheme.outlineVariant),
+              icon: const Icon(
+                Icons.travel_explore_rounded,
+                size: CompactTokens.icon16,
+              ),
+              label: Text(context.loc.searchOnlineTitle),
             ),
-            icon: const Icon(
-              Icons.travel_explore_rounded,
-              size: CompactTokens.icon16,
-            ),
-            label: Text(context.loc.searchOnlineTitle),
-          ),
-          const SizedBox(width: CompactTokens.space8),
+            const SizedBox(width: CompactTokens.space8),
+          ],
           TuneTooltip(
             message: context.loc.libraryMoreActions,
             child: PopupMenuButton<String>(

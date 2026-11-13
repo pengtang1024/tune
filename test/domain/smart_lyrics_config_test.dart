@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/features/smart_lyrics/domain/smart_lyrics_config.dart';
+import 'package:tune/domain/models/smart_lyrics_config.dart';
 
 /// What the reader pasted for the smart pipeline (docs/smart-lyrics.md §7.1).
 ///

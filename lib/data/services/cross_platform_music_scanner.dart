@@ -42,6 +42,14 @@ Future<List<Song?>> _songsOfFiles(List<String> filePaths) async {
 
 /// 跨平台音乐扫描服务接口
 abstract class CrossPlatformMusicScanner {
+  /// Whether the tracks are addressed through the library of the system
+  /// (`content://`) instead of the file system.
+  ///
+  /// Such a scan answers for every track of its source: a row it did not
+  /// bring is a track that is gone, and the folders it was asked to read say
+  /// nothing about a `content://` address.
+  bool get addressesSystemLibrary => false;
+
   Future<void> init();
   Future<List<Song>> scanMusic();
   Future<List<Song>> scanMusicInDirectory(String directoryPath);
@@ -60,6 +68,11 @@ abstract class CrossPlatformMusicScanner {
 /// 跨平台音乐扫描服务实现
 class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   CrossPlatformMusicScannerImpl();
+
+  /// The file system names a track by its path: the folders a scan was
+  /// asked to read are the answer about its rows.
+  @override
+  bool get addressesSystemLibrary => false;
 
   /// How many batches read their tags at the same time.
   static const int _maxWorkers = 8;

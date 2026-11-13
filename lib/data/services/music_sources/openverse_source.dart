@@ -48,12 +48,76 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.openverseHint;
 
+  /// The catalogues Openverse audio comes from, by the name the service knows
+  /// them by.
+  ///
+  /// Wikimedia Commons is a catalogue of the service too, but its audio is
+  /// mostly pronunciation samples rather than music, so it is not offered
+  /// here: the music of the commons is read by the wikimedia source, which
+  /// browses its own categories.
+  static const _sources = ['jamendo', 'freesound'];
+
+  /// The lengths the service buckets its audio in.
+  ///
+  /// The service answers a bucket with the tracks of it — short under two
+  /// minutes, medium up to ten, long beyond — so the bucket is the whole
+  /// filter and the tracks are never cut by it.
+  static const _lengths = ['short', 'medium', 'long'];
+
+  /// The licences the service files its audio under, by the name it uses.
+  ///
+  /// Only the licences that were found to hold audio are offered: the public
+  /// domain mark answers with nothing for audio.
+  static const _licences = [
+    'cc0',
+    'by',
+    'by-sa',
+    'by-nc',
+    'by-nd',
+    'by-nc-sa',
+    'by-nc-nd',
+  ];
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
       'query',
       AppStrings.instance.fieldQueryOptional,
       AppStrings.instance.openverseFieldQueryHint,
+    ),
+    MusicSourceField(
+      'length',
+      AppStrings.instance.openverseFieldLength,
+      AppStrings.instance.openverseFieldLengthHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseLengthAll),
+        MusicSourceChoice('short', AppStrings.instance.openverseLengthShort),
+        MusicSourceChoice('medium', AppStrings.instance.openverseLengthMedium),
+        MusicSourceChoice('long', AppStrings.instance.openverseLengthLong),
+      ],
+    ),
+    MusicSourceField(
+      'license',
+      AppStrings.instance.openverseFieldLicense,
+      AppStrings.instance.openverseFieldLicenseHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseLicenseAll),
+        for (final licence in _licences)
+          MusicSourceChoice(licence, _licenceLabel(licence)),
+      ],
+    ),
+    MusicSourceField(
+      'source',
+      AppStrings.instance.openverseFieldSource,
+      AppStrings.instance.openverseFieldSourceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.openverseSourceAll),
+        MusicSourceChoice(_sources[0], AppStrings.instance.openverseSourceJamendo),
+        MusicSourceChoice(
+          _sources[1],
+          AppStrings.instance.openverseSourceFreesound,
+        ),
+      ],
     ),
   ];
 
@@ -69,13 +133,22 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
+    final source = request.config.setting('source')?.trim() ?? '';
+    final licence = request.config.setting('license')?.trim() ?? '';
+    final length = request.config.setting('length')?.trim() ?? '';
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         'https://api.openverse.org/v1/audio/',
         // Without a keyword the service serves the audio it published last.
+        // A source narrows the answer to one catalogue, which the service
+        // filters on without a keyword.
         queryParameters: {
           'q': ?query,
+          if (source.isNotEmpty && _sources.contains(source)) 'source': source,
+          if (licence.isNotEmpty && _licences.contains(licence))
+            'license': licence,
+          if (length.isNotEmpty && _lengths.contains(length)) 'length': length,
           'page_size': 20,
           'page': request.offset ~/ 20 + 1,
         },
@@ -98,6 +171,30 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
     } catch (error) {
       return failedResult(request.config.id, error);
     }
+  }
+
+
+  /// The name of a licence in the language of the reader.
+  static String _licenceLabel(String licence) {
+    final strings = AppStrings.instance;
+    return switch (licence) {
+      'cc0' => strings.openverseLicenceCc0,
+      'by' => strings.openverseLicenceBy,
+      'by-sa' => strings.openverseLicenceBySa,
+      'by-nc' => strings.openverseLicenceByNc,
+      'by-nd' => strings.openverseLicenceByNd,
+      'by-nc-sa' => strings.openverseLicenceByNcSa,
+      _ => strings.openverseLicenceByNcNd,
+    };
+  }
+
+  /// The licence of a track, written the way the reader knows it.
+  static String? _licenceText(Object? raw) {
+    final code = raw?.toString().trim().toLowerCase() ?? '';
+    if (code.isEmpty) return null;
+    if (code == 'cc0') return 'CC0';
+    if (code == 'pdm') return 'Public domain';
+    return 'CC ${code.toUpperCase()}';
   }
 
   /// Kept static so JSON mapping can be tested without network access.
@@ -129,10 +226,18 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
           ? (audioSet['title']?.toString() ?? '')
           : (raw['provider']?.toString() ?? '');
 
+      // The service files a track under several styles at once ("chillout",
+      // "jazz"); the library groups by all of them, so the whole list is kept
+      // and the first one stands for the track's main style.
       final rawGenres = raw['genres'];
-      final genre = rawGenres is List && rawGenres.isNotEmpty
-          ? rawGenres.first?.toString()
-          : null;
+      final genres = rawGenres is List
+          ? <String>[
+              for (final value in rawGenres)
+                if ((value?.toString().trim() ?? '').isNotEmpty)
+                  value.toString().trim(),
+            ]
+          : const <String>[];
+      final genre = genres.isEmpty ? null : genres.first;
 
       final thumbnail = SourceSongFactory.normalizeUrl(
         raw['thumbnail']?.toString(),
@@ -151,6 +256,10 @@ class OpenverseSourceAdapter extends MusicSourceAdapter {
               thumbnail ??
               'https://api.openverse.org/v1/audio/$externalId/thumb/',
           genre: genre,
+          genres: genres.isEmpty ? null : genres,
+          // The licence travels with the track: a reader who wants to reuse
+          // what they hear sees it where the source tells it.
+          license: _licenceText(raw['license']),
         ),
       );
     }

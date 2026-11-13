@@ -1,0 +1,436 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
+import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/data/services/music_sources/store_read_mode.dart';
+import 'package:tune/domain/models/music_source.dart';
+import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_scan_result.dart';
+
+/// The catalogue of the iTunes store.
+///
+/// The store answers a keyword with the songs of its whole catalogue. What it
+/// hands out is a thirty-second preview of each song rather than the song, so
+/// the tracks of this source are previews: the duration of a track is the
+/// length of the preview, and the album and the full length ride along in the
+/// details of the track.
+class ItunesSourceAdapter extends MusicSourceAdapter {
+  /// How many songs one scan reads, and the most it may read.
+  @override
+  MusicSourceLimit get scanLimit => const MusicSourceLimit(10, 50);
+
+  /// The length of a preview, in milliseconds.
+  static const _previewLength = 30000;
+
+  /// How many albums the album mode reads in one scan.
+  ///
+  /// An album is read whole, so a scan that walked many of them would fill the
+  /// library with one reader's keyword; three albums keep the scan readable
+  /// while still handing over complete records.
+  static final _batch = MusicSourceLimit(3, 10);
+
+  /// The ways the store is read: its tracks, the records they belong to, and
+  /// the artists who made them. The album mode is the only one the store
+  /// serves without a keyword, because it reads the chart of the store.
+  static const _modes = [
+    StoreReadMode.songs,
+    StoreReadMode.albums,
+    StoreReadMode.artists,
+  ];
+
+  /// How many artists the artist mode reads in one scan.
+
+
+  static const _searchUrl = 'https://itunes.apple.com/search';
+
+  /// The chart service of the store: it names the albums of a storefront
+  /// without a keyword.
+  static const _chartHost = 'https://rss.marketingtools.apple.com/api/v2';
+  static const _lookupUrl = 'https://itunes.apple.com/lookup';
+
+  final Dio _dio;
+
+  ItunesSourceAdapter({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 20),
+              headers: const {'Accept': 'application/json'},
+            ),
+          );
+
+  @override
+  String get sourceType => 'itunes';
+
+  /// The store has no list of its own: the interface asks for a keyword.
+  @override
+  List<String> get browseModes => const [];
+
+  /// The store answers a keyword, or serves a chart of albums by itself, so
+  /// the source is ready once one of the two is chosen.
+  @override
+  bool isConfigured(MusicSourceConfig config) =>
+      (config.setting('query')?.trim() ?? '').isNotEmpty ||
+      StoreReadMode.of(config.setting('mode'), _modes) == StoreReadMode.albums;
+
+  @override
+  String get configurationHint => AppStrings.instance.itunesHint;
+
+  @override
+  List<MusicSourceField> get configurationFields => [
+    MusicSourceField(
+      'query',
+      AppStrings.instance.fieldQuery,
+      AppStrings.instance.itunesFieldQueryHint,
+      required: true,
+    ),
+    StoreReadMode.field(_modes),
+    MusicSourceField(
+      'batch',
+      AppStrings.instance.storeFieldBatch,
+      AppStrings.instance.storeFieldBatchHint(_batch.count, _batch.max),
+      numeric: true,
+    ),
+    MusicSourceField(
+      'country',
+      AppStrings.instance.itunesFieldCountry,
+      AppStrings.instance.itunesFieldCountryHint,
+      defaultValue: 'US',
+    ),
+    MusicSourceField(
+      'limit',
+      AppStrings.instance.fieldLimit,
+      AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
+      numeric: true,
+    ),
+  ];
+
+  @override
+  bool get supportsPaging => true;
+
+  @override
+  Duration get autoScanInterval => const Duration(hours: 6);
+
+  @override
+  Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
+    final config = request.config;
+    final query = config.setting('query')?.trim() ?? '';
+    final mode = StoreReadMode.of(config.setting('mode'), _modes);
+    final albums = mode == StoreReadMode.albums;
+    // The store has no list of its own for songs or artists, so one of them
+    // needs a keyword. The album mode reads the chart of the store instead,
+    // which is a list the store serves by itself.
+    if (query.isEmpty && !albums) {
+      return SourceScanResult(
+        sourceId: config.id,
+        status: SourceScanStatus.needsConfiguration,
+        message: configurationHint,
+      );
+    }
+
+    try {
+      final limit = scanLimit.read(config.setting('limit'));
+      final batch = _batch.read(config.setting('batch'));
+      final country = _countryOf(config);
+
+      final decoded = albums
+          ? await _albumSongs(
+              query: query,
+              country: country,
+              sourceId: config.id,
+              limit: limit,
+              batch: batch,
+            )
+          : mode == StoreReadMode.artists
+          ? await _artistSongs(
+              query: query,
+              country: country,
+              limit: limit,
+              batch: batch,
+            )
+          : await _songSearch(
+              query: query,
+              country: country,
+              offset: request.offset,
+              limit: limit,
+            );
+      if (decoded == null) {
+        return SourceScanResult(
+          sourceId: config.id,
+          status: SourceScanStatus.failed,
+          message: AppStrings.instance.itunesEmptyResponse,
+        );
+      }
+
+      final songs = <Song>[];
+      for (final raw in decoded) {
+        final song = songOf(raw, sourceId: config.id);
+        if (song != null) songs.add(song);
+      }
+
+      return SourceScanResult(
+        sourceId: config.id,
+        status: SourceScanStatus.success,
+        songs: songs,
+        message: songs.isEmpty ? AppStrings.instance.itunesNoMatch : null,
+      );
+    } catch (error) {
+      return failedResult(config.id, error);
+    }
+  }
+
+  /// The songs of the keyword, one entry each.
+  Future<List<Map>?> _songSearch({
+    required String query,
+    required String country,
+    required int offset,
+    required int limit,
+  }) async {
+    final response = await _dio.get<String>(
+      _searchUrl,
+      queryParameters: {
+        'media': 'music',
+        'entity': 'song',
+        'term': query,
+        'limit': '$limit',
+        'offset': '$offset',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    return _resultsOf(response.data);
+  }
+
+
+  /// The songs of the artists the keyword names.
+  ///
+  /// The store answers the keyword with artists, so the songs of each artist
+  /// are read from the artist's own catalogue: one lookup per artist, and the
+  /// artist row of the answer is not a song because it carries no preview.
+  Future<List<Map>?> _artistSongs({
+    required int batch,
+    required String query,
+    required String country,
+    required int limit,
+  }) async {
+    final search = await _dio.get<String>(
+      _searchUrl,
+      queryParameters: {
+        'media': 'music',
+        'entity': 'musicArtist',
+        'term': query,
+        'limit': '${limit < batch ? limit : batch}',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    final artists = _resultsOf(search.data);
+    if (artists == null) return null;
+
+    final songs = <Map>[];
+    for (final artist in artists) {
+      final id = artist['artistId']?.toString();
+      if (id == null || id.isEmpty) continue;
+
+      final lookup = await _dio.get<String>(
+        _lookupUrl,
+        queryParameters: {
+          'id': id,
+          'entity': 'song',
+          'limit': '$limit',
+          'country': country,
+        },
+        options: Options(responseType: ResponseType.plain),
+      );
+      final entries = _resultsOf(lookup.data);
+      if (entries == null) continue;
+      // The first row of a lookup is the artist itself; songOf drops it
+      // because it carries no preview.
+      songs.addAll(entries);
+    }
+    return songs;
+  }
+
+  /// The songs of the albums the keyword names, or of the chart of the store.
+  ///
+  /// The search answers with albums rather than songs, so the albums are
+  /// looked up together: one request carries every chosen album id and returns
+  /// the tracks of all of them, which keeps a whole record together. Without a
+  /// keyword the albums come from the chart the store serves itself.
+  Future<List<Map>?> _albumSongs({
+    required int batch,
+    required String query,
+    required String country,
+    required String sourceId,
+    required int limit,
+  }) async {
+    final List<Map>? albums;
+    if (query.isEmpty) {
+      albums = await _chartAlbums(country, limit, batch: batch);
+    } else {
+      final search = await _dio.get<String>(
+        _searchUrl,
+        queryParameters: {
+          'media': 'music',
+          'entity': 'album',
+          'term': query,
+          'limit': '${limit.clamp(1, batch)}',
+          'country': country,
+        },
+        options: Options(responseType: ResponseType.plain),
+      );
+      albums = _resultsOf(search.data);
+    }
+    if (albums == null) return null;
+
+    final ids = <String>[];
+    for (final album in albums) {
+      final id = (album['collectionId'] ?? album['id'])?.toString();
+      if (id != null && id.isNotEmpty && !ids.contains(id)) ids.add(id);
+    }
+    if (ids.isEmpty) return const [];
+
+    final lookup = await _dio.get<String>(
+      _lookupUrl,
+      queryParameters: {
+        'id': ids.join(','),
+        'entity': 'song',
+        'limit': '${limit * batch}',
+        'country': country,
+      },
+      options: Options(responseType: ResponseType.plain),
+    );
+    return _resultsOf(lookup.data);
+  }
+
+  /// The albums the store ranks highest in a storefront.
+  ///
+  /// The chart answers with the ids of the albums; the songs of those albums
+  /// are read from the lookup like the songs of a searched album.
+  Future<List<Map>?> _chartAlbums(
+    String country,
+    int limit, {
+    required int batch,
+  }) async {
+    final count = limit.clamp(1, batch);
+    final body = await _chartBody(
+      '$_chartHost/${country.toLowerCase()}/music/most-played/$count/albums.json',
+    );
+    final feed = _decode(body)?['feed'];
+    final entries = feed is Map ? feed['results'] : null;
+    if (entries is! List) return null;
+    return entries.whereType<Map>().toList(growable: false);
+  }
+
+  /// The body of a chart answer, tried a few times.
+  ///
+  /// The chart service of the store answers 502 or drops the connection about
+  /// half the time; a moment later it usually answers, so a scan is not failed
+  /// by one bad gateway.
+  Future<String?> _chartBody(String url) {
+    return retrySourceRead(
+      () async {
+        final response = await _dio.get<String>(
+          url,
+          options: Options(responseType: ResponseType.plain),
+        );
+        return response.data;
+      },
+      answered: (body) => _decode(body)?['feed'] != null,
+    );
+  }
+
+  /// The entries of the answer, when the answer holds a list.
+  static List<Map>? _resultsOf(String? body) {
+    final decoded = _decode(body);
+    final results = decoded?['results'];
+    if (results is! List) return null;
+    return results.whereType<Map>().toList(growable: false);
+  }
+
+  /// One song of the store, or null when it has no preview to play.
+  ///
+  /// Kept static so the mapping can be tested without network access.
+  static Song? songOf(Map raw, {required String sourceId}) {
+    final title = _text(raw['trackName']) ?? _text(raw['collectionName']);
+    final preview = SourceSongFactory.normalizeUrl(
+      _text(raw['previewUrl']),
+    );
+    if (title == null || preview == null) return null;
+
+    final id = raw['trackId']?.toString() ?? preview;
+    final year = _yearOf(_text(raw['releaseDate']));
+    final track = SourceSongFactory.parseInt(raw['trackNumber']);
+    final total = SourceSongFactory.parseInt(raw['trackCount']);
+    final disc = SourceSongFactory.parseInt(raw['discNumber']);
+    final discs = SourceSongFactory.parseInt(raw['discCount']);
+
+    return SourceSongFactory.create(
+      sourceId: sourceId,
+      externalId: id,
+      title: title,
+      artist: _text(raw['artistName']) ?? '',
+      album: _text(raw['collectionName']) ?? '',
+      // The playable file is a preview, so the track lasts as long as one.
+      duration: _previewLength,
+      streamUrl: preview,
+      artworkUrl: _artworkOf(_text(raw['artworkUrl100'])),
+      genre: _text(raw['primaryGenreName']),
+      year: year,
+      trackNumber: track > 0 ? track : null,
+      trackTotal: total > 0 ? total : null,
+      discNumber: disc > 0 ? disc : null,
+      totalDisc: discs > 0 ? discs : null,
+      description: AppStrings.instance.itunesPreviewNote,
+      sourceData: {
+        'isPreview': true,
+        'fullDurationMs': SourceSongFactory.parseInt(raw['trackTimeMillis']),
+        'collectionId': raw['collectionId'],
+        'trackViewUrl': _text(raw['trackViewUrl']),
+      },
+    );
+  }
+
+  /// The artwork of a song at a size a player shows.
+  ///
+  /// The store names the picture at a hundred pixels; the same picture is
+  /// served at six hundred when the size in its address is changed.
+  static String? _artworkOf(String? raw) {
+    final url = SourceSongFactory.normalizeUrl(raw);
+    if (url == null) return null;
+    return url.replaceAll('100x100bb', '600x600bb');
+  }
+
+  static int? _yearOf(String? releaseDate) {
+    if (releaseDate == null || releaseDate.length < 4) return null;
+    final year = int.tryParse(releaseDate.substring(0, 4));
+    return year == null || year <= 0 ? null : year;
+  }
+
+  /// The storefront the reader picked, US when none was picked.
+  static String _countryOf(MusicSourceConfig config) {
+    final value = config.setting('country')?.trim().toUpperCase() ?? '';
+    return value.isEmpty ? 'US' : value;
+  }
+
+  static Map<String, dynamic>? _decode(String? body) {
+    if (body == null || body.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(body);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  static String? _text(Object? raw) {
+    if (raw is! String) return null;
+    final trimmed = raw.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+}

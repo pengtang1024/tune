@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/impl/library_paths_io.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/domain/models/song.dart';
@@ -10,6 +12,12 @@ import 'fake_persistence.dart';
 
 /// The files of the app live in the music library, one folder per track.
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  const saf = MethodChannel('cn.iouf.tune/saf');
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
   late Directory root;
   late FileLibraryPaths paths;
 
@@ -21,6 +29,7 @@ void main() {
   });
 
   tearDown(() async {
+    messenger.setMockMethodCallHandler(saf, null);
     if (await root.exists()) await root.delete(recursive: true);
   });
 
@@ -105,8 +114,8 @@ void main() {
     expect(cover.parent.path, lyrics.parent.path);
   });
 
-  test('the covers of the tracks that were not fetched go into one place', () {
-    final folder = paths.coverCacheFolder();
+  test('the covers of the tracks that were not fetched go into one place', () async {
+    final folder = await paths.coverCacheFolder();
 
     expect(folder.path, path.join(root.path, '.tune', 'artwork'));
   });
@@ -216,5 +225,122 @@ void main() {
     expect(await paths.readLyrics(song), '[00:00] chosen');
     final matched = await paths.lyricsFileFor(song);
     expect(await matched.readAsString(), '[00:00] matched');
+  });
+
+  group('a track of the picked tree', () {
+    const tree =
+        'content://com.android.externalstorage.documents/tree/primary%3AMusic';
+    late FileLibraryPaths treePaths;
+
+    setUp(() {
+      final persistence = FakePersistenceService()
+        ..values[LibraryPaths.rootKey] = tree;
+      treePaths = FileLibraryPaths(persistence);
+    });
+
+    Song safSong() =>
+        Song(id: 7, title: 'Saf One', uri: '$tree/document/audio%3A7');
+
+    test('its sheet goes through the channel and never through a file', () async {
+      final calls = <MethodCall>[];
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        calls.add(call);
+        if (call.method == 'canWrite') return true;
+        return {'uri': '$tree/document/sheet', 'replaced': false};
+      });
+
+      expect(await treePaths.canWriteSheet(safSong()), isTrue);
+      await treePaths.saveSmartLyrics(safSong(), '[00:01] saf');
+
+      expect(calls.first.method, 'canWrite');
+      expect(calls.last.method, 'writeSheet');
+      final written = calls.last.arguments as Map<Object?, Object?>;
+      expect(written['treeUri'], tree);
+      expect(written['name'], 'Saf One.smart.lrc');
+      expect(written['content'], '[00:01] saf');
+      expect(root.listSync(), isEmpty, reason: 'a tree is not a path');
+    });
+
+    test('a taken-back permission is not a writable place', () async {
+      var wrote = false;
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        if (call.method == 'canWrite') return false;
+        wrote = true;
+        return null;
+      });
+
+      expect(await treePaths.canWriteSheet(safSong()), isFalse);
+      await expectLater(
+        treePaths.saveSmartLyrics(safSong(), '[00:01] saf'),
+        throwsA(
+          isA<SheetWriteException>().having(
+            (error) => error.permissionLost,
+            'permissionLost',
+            isTrue,
+          ),
+        ),
+      );
+      expect(wrote, isFalse);
+    });
+
+    test('a track of the system library keeps the platform answer', () async {
+      const media = Song(
+        id: 1,
+        uri: 'content://media/external/audio/media/1',
+      );
+
+      expect(
+        await treePaths.canWriteSheet(media),
+        AppCapabilities.current.lyricsSheetBesideAudio,
+      );
+    });
+
+    test('its audio is copied out of the tree through the channel', () async {
+      const copied =
+          '/data/user/0/cn.iouf.tune/cache/tune_smart_audio_1/audio.wav';
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        expect(call.method, 'copyAudio');
+        final arguments = call.arguments as Map<Object?, Object?>;
+        expect(arguments['songUri'], safSong().uri);
+        return {'path': copied, 'size': 42};
+      });
+
+      final file = await treePaths.temporaryAudioFor(safSong());
+
+      expect(file?.path, copied);
+    });
+
+    test('its machine sheet reads back through the channel', () async {
+      final calls = <MethodCall>[];
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        calls.add(call);
+        return '[00:01] saf';
+      });
+
+      expect(await treePaths.readSmartLyrics(safSong()), '[00:01] saf');
+
+      expect(calls.single.method, 'readSheet');
+      final read = calls.single.arguments as Map<Object?, Object?>;
+      expect(read['treeUri'], tree);
+      expect(read['songUri'], safSong().uri);
+      expect(read['name'], 'Saf One.smart.lrc');
+      expect(root.listSync(), isEmpty, reason: 'a tree is not a path');
+    });
+
+    test('a track of the system library is neither copied nor read', () async {
+      var asked = false;
+      messenger.setMockMethodCallHandler(saf, (call) async {
+        asked = true;
+        return null;
+      });
+      const media = Song(
+        id: 1,
+        uri: 'content://media/external/audio/media/1',
+      );
+
+      expect(await treePaths.temporaryAudioFor(media), isNull);
+      expect(await treePaths.readSmartLyrics(media), isNull);
+      expect(asked, isFalse, reason: 'a row of MediaStore is not in the tree');
+    });
   });
 }

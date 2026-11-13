@@ -1,4 +1,6 @@
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// The items of a self-hosted media server and the tracks they become.
@@ -107,6 +109,7 @@ class MediaServerItems {
     required String prefix,
     String? token,
     int limit = 50,
+    DateTime? since,
   }) {
     final rawItems = data['Items'];
     if (rawItems is! List) return const [];
@@ -121,6 +124,11 @@ class MediaServerItems {
       final title = raw['Name']?.toString().trim() ?? '';
       if (id.isEmpty || title.isEmpty || !seen.add(id)) continue;
 
+      // A track the server added before the window is left out; a track whose
+      // date the server did not send is kept, since nothing proves it is old.
+      final added = RecentWindow.dateTimeOf(raw['DateCreated']);
+      if (since != null && added != null && added.isBefore(since)) continue;
+
       final media = mediaSourceOf(raw);
       final genres = genresOf(raw);
       songs.add(
@@ -130,12 +138,14 @@ class MediaServerItems {
           title: title,
           artist: artistOf(raw),
           album: raw['Album']?.toString() ?? '',
+          performers: performersOf(raw),
           duration: durationFromTicks(raw['RunTimeTicks']),
           streamUrl: streamUrlFor(server, prefix, id),
           artworkUrl: artworkUrlFor(server, prefix, id, token: token),
           genre: genres?.first,
           genres: genres,
           year: yearOf(raw),
+          description: descriptionOf(raw),
           bitrate: kbpsOf(raw, media),
           sampleRate: khzOf(raw, media),
           trackNumber: positiveInt(raw['IndexNumber']),
@@ -149,6 +159,14 @@ class MediaServerItems {
     }
     return songs;
   }
+
+
+  /// The description of an item, as plain text.
+  ///
+  /// Jellyfin and Emby write the description as HTML under Overview; a track
+  /// keeps the readable beginning of it.
+  static String? descriptionOf(Map<dynamic, dynamic> raw) =>
+      shortDescription(raw['Overview']);
 
   /// The file behind a track, which holds the technical details.
   static Map<dynamic, dynamic> mediaSourceOf(Map<dynamic, dynamic> raw) {
@@ -174,6 +192,21 @@ class MediaServerItems {
       }
     }
     return '';
+  }
+
+  /// The performers of a track, as the server lists them.
+  ///
+  /// A server writes the credits of a track as a list; the track keeps the
+  /// whole list, so a duet is not filed under one of the two names.
+  static List<String>? performersOf(Map<dynamic, dynamic> raw) {
+    final artists = raw['Artists'];
+    if (artists is! List) return null;
+    final names = <String>[];
+    for (final artist in artists) {
+      final name = artist?.toString().trim() ?? '';
+      if (name.isNotEmpty && !names.contains(name)) names.add(name);
+    }
+    return names.isEmpty ? null : names;
   }
 
   static List<String>? genresOf(Map<dynamic, dynamic> raw) {

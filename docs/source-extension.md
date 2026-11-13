@@ -8,7 +8,7 @@
 
 ## 1. 为什么要改
 
-现状是「18 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「42 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -73,17 +73,26 @@ MusicSourceConfig（实例 · 数据）
 | type | 名称 | kind | 内置实例 | 浏览流 | 用户要填的参数 |
 | --- | --- | --- | --- | --- | --- |
 | `local` | 本地音乐 | `localDirectory` | `local` | — | 扫描目录（走全局设置） |
-| `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 台站目录、关键词、数量 |
-| `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空） |
+| `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 电台目录、标签、语言、国家/地区、关键词、数量 |
+| `azuracast` | AzuraCast | `openApi` | `azuracast` | — | 服务器地址、API Key（可选）、关键词、数量 |
+| `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空）、来源（可留空） |
 | `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 | Client ID、关键词（可留空）、音质 |
-| `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 | 查询条件（可留空）、数量 |
+| `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 / 最新 | 查询条件（可留空）、数量 |
 | `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 | 标签（可留空）、数量 |
 | `audius` | Audius | `openCatalog` | `audius` | 排行 | 关键词（可留空）、数量 |
-| `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、数量 |
-| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、数量 |
+| `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、目录、数量 |
+| `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
+| `deezer` | Deezer | `openCatalog` | `deezer` | 排行 | 关键词（可留空）、读取方式（单曲 / 专辑）、风格（可留空）、数量 |
+| `itunes` | iTunes | `openCatalog` | `itunes` | — | 关键词（必填）、读取方式（单曲 / 专辑 / 艺人）、国家/地区、数量 |
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
+| `podcast_catalog` | 播客目录 | `openCatalog` | `podcast_catalog` | 排行 | 关键词（可留空）、数量 |
+| `podcast_apple` | Apple Podcasts | `openCatalog` | `podcast_apple` | 排行 | 关键词（可留空）、国家/地区、数量 |
 | `netease` | 网易云音乐 API | `openApi` | `netease` | 每日推荐 | API 地址、关键词（可留空）、数量 |
 | `subsonic` | Subsonic | `openApi` | `subsonic` | — | 服务器、账号、密码、关键词、音质、数量 |
+| `ampache` | Ampache | `openApi` | `ampache` | 排行 / 最新 | 服务器、API Key、关键词、数量 |
+| `koel` | Koel | `openApi` | `koel` | 排行 / 最新 | 服务器、邮箱、密码、关键词、数量 |
+| `kodi` | Kodi | `openApi` | `kodi` | 最新 / 专辑 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
+| `lms` | Logitech Media Server | `openApi` | `lms` | 曲库 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
 | `jellyfin` | Jellyfin | `openApi` | `jellyfin` | — | 服务器、账号、密码、数量 |
 | `direct_url` | 直链音频 | `custom` | — | — | 一组音频地址（每行一条） |
 | `m3u` | 播放列表 | `custom` | — | — | 播放列表地址（`.m3u` / `.pls`） |
@@ -94,8 +103,8 @@ MusicSourceConfig（实例 · 数据）
 
 **哪些类型站在顶层**：本地目录、网络电台，以及六个明确开放授权的曲库
 （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-其余的内置类型（iTunes、播客 RSS、网易云 API、Subsonic、Jellyfin）要么要凭据，
-要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
+其余的内置类型（iTunes 试听、播客 RSS、网易云 API、Subsonic、Kodi 等自建服务器）
+要么要凭据，要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
 `featured`），界面不按 id 硬编码。
 
 `json_api` 与 `graphql` 是同一件事的两档：JSON 接口够用时就用 JSON 接口，
@@ -104,14 +113,14 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-18 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+42 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。
 - **顶层**：本地目录、网络电台，以及明确开放授权的曲库
   （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-- **「更多音源」（折叠）**：iTunes（30 秒试听）、播客 RSS、网易云 API、
-  Subsonic、Jellyfin —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
+- **「更多音源」（折叠）**：iTunes 试听（30 秒）、播客 RSS、网易云 API、
+  Subsonic、Kodi 等自建服务器 —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
 - **用户添加的实例**：默认权重 `700`，进主列表；它和其他实例一样可以被后移，
   也可以折叠到「更多音源」，不再是永远显示的一段。
 
@@ -144,12 +153,14 @@ MusicSourceConfig（实例 · 数据）
 | --- | --- | --- | --- |
 | `audius` | `charts` | 换成 `/v1/tracks/trending` | ✅ |
 | `ccmixter` | `charts` / `latest` | 去掉 `tags`；排行加 `sort=rank`，最新什么都不加（接口自己给最新的） | ✅ |
-| `internet_archive` | `charts` | `q` 只留 `mediatype:audio`，`sort[]=downloads desc` 已经就位 | ✅ |
+| `internet_archive` | `charts` / `latest` | `q` 只留 `mediatype:audio`，`sort[]` 按浏览流取 `downloads desc` 或 `publicdate desc` | ✅ |
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
-| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file` | ✅ |
-| `openverse` | `latest` | 去掉 `q` 参数 | ⚠️ 本机连不上，未验证 |
+| `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（24 个分类：音乐 19 类，另加演讲 / 音效 / 访谈 / 诗歌 / 有声条目；最后一个的分类名是 `Category:Spoken Wikipedia`） | ✅ |
+| `openverse` | `latest` | 去掉 `q` 参数；「来源」按目录收窄（`source=jamendo` / `freesound`） | ✅ |
 | `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
-| `itunes` | 无 | `term` 是必填的，接口不提供无词列表 | — |
+| `deezer` | `charts` | 无词读 `/chart/0/tracks`；四种读取方式各有自己的榜：专辑 `/chart/0/albums`、艺人 `/chart/0/artists`、歌单 `/chart/0/playlists`；风格编号取自 `/genre` | ✅ |
+| `lms` | `charts` | 无词时 `titles` 走整库；有关键词加 `search:` 前缀 | 代码已支持（无 LMS 服务器，未验证） |
+| `itunes` | 单曲与艺人要关键词，专辑可无词 | 单曲与艺人方式 `term` 必填；「读取方式=专辑」无词时读 `rss.marketingtools.apple.com` 的音乐专辑榜（该服务约一半请求回 502，适配器隔 0.4s / 0.9s 各重试一次）；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算 | ✅ |
 
 **浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
 浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。
@@ -400,3 +411,25 @@ flutter test
 | `需求/多语言设计.md` | 音源名字规则（实例名 vs 类型名） |
 | `README.md` | 已知限制：删插件相关，写明「不支持任意脚本插件」 |
 | `CHANGELOG` | 记录插件能力下线与迁移行为 |
+
+## 11. 新增音源时的字段检查单
+
+下面六条是 2026-11 那批加源/改映射时逐条踩出来的，写在这里是为了下一次照单核对，
+而不是再踩一遍。每一条都配了当时的事实，不是空泛提醒。
+
+1. **请求里要了没有？** 映射写对不等于拿得到：Jellyfin/Emby 的演唱者在 `Artists` 里，
+   `Fields` 不写这个字段服务器就不回，`performers` 永远为空。加字段时同时改 `Fields`。
+2. **服务端给的是列表还是单值？** 语言（`["spa","english"]`）、风格（`["chillout","jazz"]`）、
+   演唱者（`["Singer One","Singer Two"]`）都是多值，只取第一个会让音乐库的分组少掉大半。
+   多值字段一律收整份（去重保序）放进 `genres` / `performers`，单值字段取第一个。
+3. **多值要不要归一？** 同一门语言可能写成 `eng` / `english` / `English`；原样存会把筛选项
+   碎成三份。映射时读回「筛选用的那套名字」。
+4. **显示和分组能不能共用一份？** 不能。电台的风格行显示「jazz / soul」更好读，但分组要用
+   `genres` 列表；只留一行会让分组碎、只留单个标签会让行里显示「music」这种空话。
+5. **有空窗口吗？** 一次扫描能无界增长的地方都要有可调上限（每档集数、每次取几个、每本
+   上限），并且 `trackTotal` 之类的总量字段不能被上限改掉。
+6. **用默认排序验收过吗？** 抽样用随机、验收用**应用里的默认排序**：曾经有一个「科学播客」
+   实例随机抽样全是真科学播客，按下载量排的前两条却是古兰经诵读。
+
+另外两条与限流有关：服务端有配额的（Deezer 每 5 秒 50 次、共享资源按分钟计）读取要带
+退避重试；扫描与在线搜索都走 `MusicSourceService._walk` 的并发上限，别另开一条并发路径。

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/data/services/music_sources/radio_source.dart';
 import 'package:tune/data/services/music_sources/radio_station.dart';
 import 'package:tune/data/services/music_sources/radio_station_providers.dart';
@@ -89,6 +91,48 @@ void main() {
     });
   });
 
+  group('Audius reaches', () {
+    test('a reach and a window are sent to the trending list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(
+        _audiusRequest(const {'genre': 'Jazz', 'window': 'week'}),
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.path, '/v1/tracks/trending');
+      expect(uri.queryParameters['genre'], 'Jazz');
+      expect(uri.queryParameters['time'], 'week');
+    });
+
+    test('a scan without a reach asks for the whole list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(_audiusRequest(const {}));
+
+      final uri = captured.uris.single;
+      expect(uri.queryParameters.containsKey('genre'), isFalse);
+      expect(uri.queryParameters.containsKey('time'), isFalse);
+    });
+
+    test('a keyword searches instead of walking the trending list', () async {
+      final captured = _CapturedLive(const {'data': <dynamic>[]});
+      final provider = AudiusSourceAdapter(dio: captured.dio);
+
+      await provider.scan(
+        _audiusRequest(const {'query': 'nova', 'genre': 'Jazz'}),
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.path, '/v1/tracks/search');
+      expect(uri.queryParameters['query'], 'nova');
+      // The search endpoint has no reach: the setting belongs to the list.
+      expect(uri.queryParameters.containsKey('genre'), isFalse);
+    });
+  });
+
   group('Radio Browser directory', () {
     test('maps the stations of the answer', () {
       final stations = RadioBrowserProvider.parseStations(
@@ -104,6 +148,8 @@ void main() {
       expect(station.streamUrl, 'https://stream.example.com/jazz');
       expect(station.artworkUrl, 'https://cdn.example.com/jazz.png');
       expect(station.genre, 'jazz / soul');
+      // The line is for the reader; the list is for a grouping by style.
+      expect(station.genres, ['jazz', 'soul']);
       expect(station.language, 'english');
       expect(station.country, 'Germany');
       expect(station.codec, 'MP3');
@@ -138,6 +184,235 @@ void main() {
       expect(captured.uris.first.queryParameters['countrycode'], 'SG');
       expect(captured.uris.first.path, '/json/stations/search');
     });
+
+    test('the tongue of the radio directory is chosen from its tongues', () {
+      final field = RadioSourceAdapter()
+          .configurationFields
+          .firstWhere((field) => field.key == 'language');
+
+      final values = field.choices.map((choice) => choice.value).toList();
+      expect(values.first, isEmpty);
+      expect(values, contains('chinese'));
+      expect(values.length, greaterThan(10));
+      for (final choice in field.choices) {
+        expect(choice.label.trim(), isNotEmpty);
+      }
+    });
+
+    test('a tongue the list does not hold is passed on as written', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, language: 'Klingon');
+
+      // The choices are what the form offers, not what the directory reads.
+      expect(captured.uris.first.queryParameters['language'], 'klingon');
+    });
+    test('a bitrate floor narrows the stations', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, bitrate: '192');
+
+      expect(captured.uris.first.queryParameters['bitrateMin'], '192');
+    });
+
+    test('a floor the directory cannot read is not sent', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, bitrate: '12');
+
+      // The directory would read a floor it cannot use as no floor at all.
+      expect(
+        captured.uris.first.queryParameters.containsKey('bitrateMin'),
+        isFalse,
+      );
+    });
+    test('a country written by its name is read by its code', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'Germany');
+
+      // The directory filters by the code alone; the names it lists are read
+      // once and turned into the code the filter takes.
+      expect(captured.uris.last.queryParameters['countrycode'], 'DE');
+      expect(
+        captured.uris.map((uri) => uri.path),
+        contains('/json/countries'),
+      );
+    });
+
+    test('the name of a country is read whatever case it is written in', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'the united states of america',
+      );
+
+      expect(captured.uris.last.queryParameters['countrycode'], 'US');
+    });
+
+    test('a code is passed on without asking for the names', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'SG');
+
+      expect(captured.uris.single.queryParameters['countrycode'], 'SG');
+      expect(captured.uris.single.path, '/json/stations/search');
+    });
+
+    test('what is neither a name nor a code is passed on as it stands', () async {
+      final captured = _CountryStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'Neverland');
+
+      expect(captured.uris.last.queryParameters['countrycode'], 'Neverland');
+    });
+    test('the reach of the radio directory is chosen from its reaches', () {
+      final field = RadioSourceAdapter()
+          .configurationFields
+          .firstWhere((field) => field.key == 'tag');
+
+      final values = field.choices.map((choice) => choice.value).toList();
+      // The first choice is no reach at all, and every reach was counted on
+      // the directory: an option nothing is filed under answers with nothing.
+      expect(values.first, isEmpty);
+      expect(values, contains('jazz'));
+      expect(values.length, greaterThan(20));
+      expect(values.toSet().length, values.length);
+    });
+
+    test('a reach written before the list stays in use', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, tag: 'moi merino');
+
+      // The choices are what the form offers, not what the directory reads.
+      expect(captured.uris.first.queryParameters['tag'], 'moi merino');
+    });
+    test('a tag reads a reach of the whole directory', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, tag: 'Jazz');
+
+      final uri = captured.uris.first;
+      expect(uri.path, '/json/stations/search');
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters.containsKey('name'), isFalse);
+    });
+
+    test('a tag and a country narrow together', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, country: 'SG', tag: 'jazz');
+
+      final uri = captured.uris.first;
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters['countrycode'], 'SG');
+    });
+
+    test('a keyword searches by the tag parameter the directory reads', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: 'jazz', limit: 5);
+
+      // The directory ignores a tagname parameter and would answer with the
+      // unfiltered list, so neither request may use it.
+      for (final uri in captured.uris) {
+        expect(uri.queryParameters.containsKey('tagname'), isFalse);
+      }
+      // One request searches the names, the other the tag.
+      expect(
+        captured.uris
+            .where((uri) => uri.queryParameters['tag'] == 'jazz')
+            .length,
+        1,
+      );
+      expect(
+        captured.uris
+            .where((uri) => uri.queryParameters['name'] == 'jazz')
+            .length,
+        1,
+      );
+    });
+
+    test('a language narrows the directory', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, language: 'Spanish');
+
+      final uri = captured.uris.first;
+      expect(uri.queryParameters['language'], 'spanish');
+      expect(uri.queryParameters.containsKey('name'), isFalse);
+    });
+
+    test('a reach, a country and a language narrow together', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'FR',
+        tag: 'jazz',
+        language: 'french',
+      );
+
+      final uri = captured.uris.single;
+      expect(uri.queryParameters['countrycode'], 'FR');
+      expect(uri.queryParameters['tag'], 'jazz');
+      expect(uri.queryParameters['language'], 'french');
+    });
+
+    test('the order of the directory is asked for', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, order: 'clickcount');
+
+      final uri = captured.uris.first;
+      expect(uri.path, '/json/stations/search');
+      expect(uri.queryParameters['order'], 'clickcount');
+    });
+
+    test('an order the directory does not know falls back to votes', () async {
+      final captured = _CapturedStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      await provider.fetch(query: '', limit: 5, order: 'clicktrend');
+
+      // The directory answers clicktrend with the clickcount chart, so an
+      // order it does not honour is not asked for: the votes are read.
+      expect(captured.uris.first.queryParameters['order'], 'votes');
+    });
+    test('an unreachable mirror falls back to another one', () async {
+      final captured = _FailoverStations();
+      final provider = RadioBrowserProvider(dio: captured.dio);
+
+      final stations = await provider.fetch(
+        query: '',
+        limit: 5,
+        country: 'SG',
+      );
+
+      expect(stations, isEmpty);
+      expect(
+        captured.uris.map((uri) => uri.host),
+        contains('de1.api.radio-browser.info'),
+      );
+    });
   });
 
   group('SomaFM directory', () {
@@ -170,6 +445,128 @@ void main() {
 
     test('answers an empty answer with no station', () {
       expect(SomaFmProvider.parseChannels(const {}), isEmpty);
+    });
+  });
+
+  group('NTS directory', () {
+    test('maps the live channels of the answer', () {
+      final stations = NtsProvider.parseLive(_ntsAnswer());
+
+      expect(stations, hasLength(2));
+
+      final station = stations.first;
+      expect(station.provider, 'nts');
+      expect(station.id, '1');
+      expect(station.name, 'NTS 1');
+      expect(
+        station.streamUrl,
+        'https://stream-relay-geo.ntslive.net/stream',
+      );
+      expect(station.artworkUrl, 'https://cdn.example.com/nts1.jpg');
+      expect(station.genre, 'Ambient / Jazz / Experimental');
+      expect(station.description, 'Freeform radio from the NTS studio.');
+      expect(station.nowPlayingArtist, 'Soup to Nuts');
+      expect(station.country, 'United Kingdom');
+      expect(station.codec, 'MP3');
+
+      expect(stations.last.name, 'NTS 2');
+      expect(stations.last.streamUrl, endsWith('/stream2'));
+    });
+
+    test('skips a channel whose stream is not known', () {
+      final answer = _ntsAnswer();
+      (answer['results'] as List).add({
+        'channel_name': '3',
+        'now': {
+          'embeds': {
+            'details': {'name': 'A channel without a stream'},
+          },
+        },
+      });
+
+      expect(NtsProvider.parseLive(answer), hasLength(2));
+    });
+
+    test('answers an empty answer with no station', () {
+      expect(NtsProvider.parseLive(const {}), isEmpty);
+    });
+
+    test('a keyword narrows the shows on air', () async {
+      final captured = _CapturedLive(_ntsAnswer());
+      final provider = NtsProvider(dio: captured.dio);
+
+      final stations = await provider.fetch(query: 'jazz', limit: 5);
+
+      expect(captured.uris.single.path, '/api/v2/live');
+      expect(stations, hasLength(1));
+      expect(stations.single.name, 'NTS 1');
+    });
+  });
+
+  group('Radio France directory', () {
+    test('lists the channels of the network', () async {
+      final provider = RadioFranceProvider();
+
+      expect(provider.id, 'radiofrance');
+      expect(provider.displayName, 'Radio France');
+
+      final stations = await provider.fetch(query: '', limit: 100);
+
+      expect(stations, hasLength(18));
+      expect(stations.map((station) => station.id).toSet(), hasLength(18));
+
+      final station = stations.first;
+      expect(station.provider, 'radiofrance');
+      expect(station.id, 'fip');
+      expect(station.name, 'FIP');
+      expect(station.streamUrl, 'https://icecast.radiofrance.fr/fip-midfi.mp3');
+      expect(station.genre, 'eclectic');
+      expect(station.language, 'French');
+      expect(station.country, 'France');
+      expect(station.codec, 'MP3');
+      expect(station.homepage, 'https://www.radiofrance.fr/fip');
+
+      for (final channel in stations) {
+        expect(
+          channel.streamUrl,
+          startsWith('https://icecast.radiofrance.fr/'),
+          reason: channel.id,
+        );
+        expect(channel.streamUrl, endsWith('-midfi.mp3'), reason: channel.id);
+      }
+    });
+
+    test('a keyword narrows the channels by name and by reach', () async {
+      final provider = RadioFranceProvider();
+
+      final byName = await provider.fetch(query: 'baroque', limit: 100);
+      expect(byName.single.name, 'France Musique Baroque');
+
+      final byGenre = await provider.fetch(query: 'reggae', limit: 100);
+      expect(byGenre.single.name, 'FIP Reggae');
+    });
+
+    test('a window after the first one skips what it saw', () async {
+      final provider = RadioFranceProvider();
+
+      final stations = await provider.fetch(query: '', limit: 6, offset: 12);
+
+      expect(stations, hasLength(6));
+      expect(stations.first.id, 'francemusique');
+      expect(stations.last.id, 'mouv');
+    });
+
+    test('a scan of another country has nothing to take', () async {
+      final provider = RadioFranceProvider();
+
+      expect(await provider.fetch(query: '', limit: 100, country: 'GB'), isEmpty);
+
+      final france = await provider.fetch(
+        query: '',
+        limit: 100,
+        country: 'fr',
+      );
+      expect(france, hasLength(18));
     });
   });
 
@@ -311,7 +708,149 @@ Map<String, dynamic> _somaFmAnswer() {
   };
 }
 
+/// The live answer of NTS for its two channels.
+Map<String, dynamic> _ntsAnswer() {
+  return {
+    'results': [
+      {
+        'channel_name': '1',
+        'now': {
+          'broadcast_title': 'Soup to Nuts',
+          'embeds': {
+            'details': {
+              'name': 'Soup to Nuts',
+              'description': 'Freeform radio from the NTS studio.',
+              'genres': [
+                {'id': 1, 'value': 'Ambient'},
+                {'id': 2, 'value': 'Jazz'},
+                {'id': 3, 'value': 'Experimental'},
+                {'id': 4, 'value': 'Soul'},
+              ],
+              'moods': [
+                {'id': 1, 'value': 'Chilled'},
+              ],
+              'media': {
+                'background_large': 'https://cdn.example.com/nts1.jpg',
+              },
+            },
+          },
+        },
+      },
+      {
+        'channel_name': '2',
+        'now': {
+          'embeds': {
+            'details': {
+              'name': 'Rave Cave',
+              'genres': [
+                {'id': 1, 'value': 'Techno'},
+              ],
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
+/// A Dio that answers with the live answer of NTS and keeps the requests.
+class _CapturedLive {
+  _CapturedLive(this.body);
+
+  final Map<String, dynamic> body;
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: body,
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
 /// A Dio that answers with an empty station list and keeps the requests.
+/// A client whose aggregate mirror cannot be reached, as on a network that
+/// resolves it to an address it cannot route to.
+class _FailoverStations {
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          if (options.uri.host == 'all.api.radio-browser.info') {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                type: DioExceptionType.connectionError,
+                message: 'unreachable',
+              ),
+            );
+            return;
+          }
+          handler.resolve(
+            Response(
+              requestOptions: options,
+              data: <dynamic>[],
+              statusCode: 200,
+            ),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
+
+/// Answers the country list of the directory, and nothing else.
+class _CountryStations {
+  final uris = <Uri>[];
+
+  Dio get dio {
+    final client = Dio();
+    client.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          uris.add(options.uri);
+          final data = options.uri.path.endsWith('/countries')
+              ? <dynamic>[
+                  {
+                    'name': 'Germany',
+                    'iso_3166_1': 'DE',
+                    'stationcount': 6383,
+                  },
+                  {
+                    'name': 'The United States Of America',
+                    'iso_3166_1': 'US',
+                    'stationcount': 7965,
+                  },
+                ]
+              : <dynamic>[];
+          handler.resolve(
+            Response(requestOptions: options, data: data, statusCode: 200),
+          );
+        },
+      ),
+    );
+    return client;
+  }
+}
+
 class _CapturedStations {
   final uris = <Uri>[];
 
@@ -333,4 +872,16 @@ class _CapturedStations {
     );
     return client;
   }
+}
+
+MusicSourceScanRequest _audiusRequest(Map<String, String> settings) {
+  return MusicSourceScanRequest(
+    config: MusicSourceConfig(
+      id: 'audius',
+      type: 'audius',
+      name: 'Audius',
+      kind: MusicSourceKind.openCatalog,
+      settings: settings,
+    ),
+  );
 }

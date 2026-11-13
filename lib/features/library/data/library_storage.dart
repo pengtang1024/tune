@@ -1,9 +1,9 @@
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/discovery/domain/taste_aggregates.dart';
-import 'package:tune/features/library/domain/album_summary.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 
 /// The library of the app, as the songs it holds.
@@ -34,9 +34,15 @@ abstract class LibraryStorage {
   /// The rows of sources that are off now, and the local files that no
   /// longer sit under one of [localPaths], stay in the database but leave
   /// the page. Answers how many rows were marked.
+  ///
+  /// [localReadUris] is the whole library a read of the system library
+  /// brought. A local row that is not in it — whatever address it carries —
+  /// is not in the library any more, and folders are not asked about such
+  /// rows: `content://` says nothing about a folder.
   Future<int> deactivateUncovered({
     required Set<String> enabledSourceIds,
     required List<String> localPaths,
+    Set<String>? localReadUris,
   });
 
   /// How many tracks the library holds.

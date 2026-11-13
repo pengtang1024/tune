@@ -6,7 +6,7 @@ import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/utils/logger.dart';
 
 /// The lyrics of the track that plays.

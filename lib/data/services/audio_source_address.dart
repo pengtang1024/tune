@@ -14,5 +14,11 @@ Uri audioSourceAddress(Song song, String address, {required bool fromStore}) {
   if (!fromStore && song.isRemote) {
     return Uri.parse(address);
   }
+  // A MediaStore track is addressed by its content:// URI: the backend can
+  // open it as it is, and turning it into a file path would lose the track.
+  final parsed = Uri.tryParse(address);
+  if (parsed != null && parsed.scheme == 'content') {
+    return parsed;
+  }
   return Uri.file(File(address).absolute.path);
 }

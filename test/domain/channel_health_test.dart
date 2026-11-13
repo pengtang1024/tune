@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/features/smart_lyrics/domain/channel_health.dart';
+import 'package:tune/domain/models/channel_health.dart';
 
 /// The health of the smart lyrics channels (docs/smart-lyrics.md §7.2):
 /// the same mechanism the music sources live by — recent outcomes weigh

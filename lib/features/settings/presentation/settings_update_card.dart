@@ -6,7 +6,7 @@ import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/config/app_version.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/settings/application/update_controller.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 
 /// The card that checks the project page and installs a newer release.
 ///

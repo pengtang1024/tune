@@ -5,8 +5,9 @@
 #   ./tool/package_linux.sh 1.4.0           # 指定版本号
 #
 # 产物写到 dist/tune-linux-x64-<version>.tar.gz，根目录就是 bundle 的内容，
-# 与 UpdateService.installLinux 读取的形状一致。把产物上传到同版本的
-# GitHub Release，应用就能自己发现并安装。
+# 与 UpdateService.installLinux 读取的形状一致。离线翻译的模型与 llama.cpp
+# 运行时从仓库的 translation/ 直接追加进归档，不再复制一份。
+# 把产物上传到同版本的 GitHub Release，应用就能自己发现并安装。
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -28,8 +29,19 @@ if [[ ! -x "$bundle/tune" ]]; then
   exit 1
 fi
 
+"$here/prepare_translation.sh"
+
 mkdir -p "$root/dist"
 out="$root/dist/tune-linux-x64-$version.tar.gz"
-rm -f "$out"
-tar -czf "$out" -C "$bundle" .
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+tar -cf "$tmp/bundle.tar" -C "$bundle" .
+tar -rf "$tmp/bundle.tar" -C "$root" \
+  translation/models/qwen2.5-0.5b-instruct-q4_k_m.gguf \
+  translation/bin/llama-b12274 \
+  translation/licenses
+gzip -c "$tmp/bundle.tar" > "$out"
+
 echo "$out"
+echo "归档体积：$(stat -c%s "$out") B"

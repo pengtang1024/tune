@@ -1,8 +1,9 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
-import 'package:tune/data/services/providers/playback_session_store_provider.dart';
+import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
 import 'package:tune/features/discovery/application/discovery_signal_observer.dart';
@@ -28,8 +29,8 @@ class AppInitializer {
       await _initPlaybackSession(ref);
       await _initAudioPlayerService(ref);
       await _initMusicScannerService(ref);
-      await WindowManagerService.init();
-      await _initDesktopIntegration(ref);
+      await WindowManagerService.init(ref.read(persistenceServiceProvider));
+      _startDesktopIntegrationAfterFirstFrame(ref);
       _initDiscoverySignals(ref);
 
       Log.info('应用核心服务初始化完成');
@@ -131,6 +132,20 @@ class AppInitializer {
       Log.error('初始化推荐播放观察器失败: $error\n$stackTrace');
       Log.info('推荐播放观察器初始化失败，但应用将继续运行');
     }
+  }
+
+  /// Connects the player with the desktop, once the interface is on screen.
+  ///
+  /// Joining the session bus, creating the tray icon and taking over the close
+  /// button together cost about 120ms on a cold start, and none of them changes
+  /// what the first frame draws. They wait for the first frame instead of
+  /// holding it back. Waiting changes no behaviour: the close button cannot be
+  /// reached before the takeover runs, and the files the desktop hands over are
+  /// kept by the single instance service until this starts listening.
+  static void _startDesktopIntegrationAfterFirstFrame(Ref ref) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initDesktopIntegration(ref).ignore();
+    });
   }
 
   /// Connects the player with the desktop.

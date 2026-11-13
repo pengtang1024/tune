@@ -13,9 +13,9 @@ import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
-import 'package:tune/features/library/domain/library_facets.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -70,7 +70,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final view = await _storage.loadView();
     final sort = view?.sort ?? LibrarySort.recent;
     final filter = view?.filter ?? LibraryFilter.empty;
-    final total = await _storage.countQuery(query: '', filter: filter);
+    final total = await _storage.count();
+    final matching = await _storage.countQuery(query: '', filter: filter);
     final songs = await _storage.query(
       query: '',
       filter: filter,
@@ -83,9 +84,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       songs: List.unmodifiable(songs),
       filter: filter,
       sort: sort,
-      sourceFilter: filter.sources.length == 1 ? filter.sources.first : null,
       total: total,
-      hasMore: songs.length < total,
+      hasMore: songs.length < matching,
       albums: albums,
       statusMessage: songs.isEmpty
           ? null
@@ -106,7 +106,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final query = _current.query.trim();
     final next = await _storage.query(
       query: query,
-      filter: _effectiveFilter(),
+      filter: _current.filter,
       sort: _current.sort,
       offset: _current.songs.length,
       limit: windowSize,
@@ -184,7 +184,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(
       _current.copyWith(
         query: '',
-        sourceFilter: null,
         scanStatus: LibraryScanStatus.scanning,
         scanProgress: 0,
         statusMessage: AppStrings.instance.scanPreparing,
@@ -319,6 +318,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           .length;
 
       final total = await _storage.count();
+      final matching = await _storage.countQuery(
+        query: '',
+        filter: _current.filter,
+      );
       if (_disposed || generation != _scanGeneration) return;
       // A scan that changed nothing keeps the window it had: the list is the
       // input of the whole viewport, and a new list — even an equal one —
@@ -330,7 +333,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         _current.copyWith(
           songs: songs,
           total: total,
-          hasMore: songs.length < total,
+          hasMore: songs.length < matching,
           albums: saved ? await _storage.albumSummaries() : null,
           scanStatus: LibraryScanStatus.completed,
           scanProgress: 1,
@@ -385,7 +388,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     final filterActive = _current.query.isNotEmpty || _current.hasFilter;
     if (written > 0 || filterActive) {
-      await _reloadForFilter();
+      await _reloadForFilter(songsChanged: written > 0);
       return written > 0;
     }
     final total = await _storage.count();
@@ -435,9 +438,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     state = AsyncData(
       _current.copyWith(
         sourceSummaries: Map.unmodifiable(summaries),
-        sourceFilter: _current.sourceFilter == sourceId
-            ? null
-            : _current.sourceFilter,
         filter: _current.filter.copyWith(
           sources: {
             for (final source in _current.filter.sources)
@@ -448,7 +448,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     );
     await _storage.removeSource(sourceId);
     if (_disposed || !state.hasValue) return;
-    await _reloadForFilter();
+    await _reloadForFilter(songsChanged: true);
   }
 
   Future<void> setSourceFilter(String? sourceId) async {
@@ -459,7 +459,6 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         : normalized;
     state = AsyncData(
       _current.copyWith(
-        sourceFilter: source,
         filter: _current.filter.copyWith(
           sources: source == null ? const {} : {source},
         ),
@@ -472,14 +471,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// Narrows the page to [filter]; the search word stays as it is.
   Future<void> setFilter(LibraryFilter filter) async {
     if (_disposed || !state.hasValue || _current.filter == filter) return;
-    state = AsyncData(
-      _current.copyWith(
-        filter: filter,
-        sourceFilter: filter.sources.length == 1
-            ? filter.sources.first
-            : null,
-      ),
-    );
+    state = AsyncData(_current.copyWith(filter: filter));
     _saveView();
     await _reloadForFilter();
   }
@@ -508,26 +500,21 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     );
   }
 
-  /// The filter the queries use: the state's filter plus the legacy source
-  /// field a hand-made state or an older toolbar may still set.
-  LibraryFilter _effectiveFilter() {
-    final source = _current.sourceFilter;
-    if (source == null || _current.filter.sources.isNotEmpty) {
-      return _current.filter;
-    }
-    return _current.filter.copyWith(sources: {source});
-  }
-
   /// Reads the window that matches the query and source filter.
   ///
   /// A read that a newer filter change supersedes drops its own answer, so
   /// the last word the reader typed is the one the page answers.
-  Future<void> _reloadForFilter() async {
+  ///
+  /// The album shelf is only read again when [songsChanged]: it is a grouping
+  /// of the whole table, it does not depend on the word, the filter or the
+  /// order, and a search that re-read it on every pause was paying a second
+  /// full scan per keystroke for a list that stayed the same.
+  Future<void> _reloadForFilter({bool songsChanged = false}) async {
     if (_disposed || !state.hasValue) return;
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
-    final filter = _effectiveFilter();
-    final total = await _storage.countQuery(query: query, filter: filter);
+    final filter = _current.filter;
+    final matching = await _storage.countQuery(query: query, filter: filter);
     final songs = await _storage.query(
       query: query,
       filter: filter,
@@ -535,13 +522,16 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       offset: 0,
       limit: windowSize,
     );
-    final albums = await _storage.albumSummaries();
+    final albums = songsChanged
+        ? await _storage.albumSummaries()
+        : _current.albums;
+    final total = songsChanged ? await _storage.count() : _current.total;
     if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
       _current.copyWith(
         songs: List.unmodifiable(songs),
         total: total,
-        hasMore: songs.length < total,
+        hasMore: songs.length < matching,
         albums: albums,
       ),
     );
@@ -569,27 +559,38 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
   /// Marks the rows the scan does not cover as outside the library.
   ///
-  /// Marks the rows the scan does not cover as outside the library.
-  ///
   /// The sources that are off now, and the local files that no longer sit
   /// under one of the folders the scan reads, are not part of the library
   /// any more. A local scan that failed (the drive is away) keeps every
   /// local row — only a scan that reads its folders answers for them.
+  ///
+  /// A local source that reads the library of the system has no folders to
+  /// answer with: the read itself is the answer, and the tracks it did not
+  /// bring have left the phone.
   Future<int> _deactivateUncovered({
     required List<MusicSourceConfig> enabled,
     required List<SourceScanResult> results,
     required List<String> localPaths,
   }) {
     final enabledIds = {for (final source in enabled) source.id};
-    final localSources = enabled.where((source) => source.isLocal);
-    final localSucceeded = results.any(
-      (result) =>
-          result.isSuccess &&
-          localSources.any((source) => source.id == result.sourceId),
-    );
+    final localIds = {
+      for (final source in enabled)
+        if (source.isLocal) source.id,
+    };
+    final localReads = results
+        .where((result) => result.isSuccess && localIds.contains(result.sourceId))
+        .toList(growable: false);
+    final localSucceeded = localReads.isNotEmpty;
+    final systemLibrary = _sourceService.localReadsSystemLibrary;
     return _storage.deactivateUncovered(
       enabledSourceIds: enabledIds,
-      localPaths: localSucceeded ? localPaths : const [],
+      localPaths: localSucceeded && !systemLibrary ? localPaths : const [],
+      localReadUris: localSucceeded && systemLibrary
+          ? {
+              for (final result in localReads)
+                for (final song in result.songs) song.uri,
+            }
+          : null,
     );
   }
 
@@ -600,7 +601,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
   /// so its size never decides the cost of the frame.
   Future<List<Song>> _window() => _storage.query(
     query: _current.query.trim(),
-    filter: _effectiveFilter(),
+    filter: _current.filter,
     sort: _current.sort,
     offset: 0,
     limit: windowSize,

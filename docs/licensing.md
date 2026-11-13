@@ -13,6 +13,9 @@
 - **Linux 播放后端**：`libmpv` / FFmpeg 是系统组件，Ubuntu 打包为 GPL-3+ / GPL-2+。
   Tune 不打包它们；如果发行版把 Tune 和它们装进同一个自包含包，那个包必须按 GPL
   处理。
+- **随包分发的离线翻译资产**：Qwen2.5-0.5B-Instruct 模型是 Apache-2.0，llama.cpp
+  运行时是 MIT，两者都允许随包再分发；必须同时带上各自的 LICENSE 与版权/NOTICE，
+  不改名、不暗示原作者背书。
 - **GPL/AGPL/LGPL/SSPL/BUSL/Commons Clause**：不得进入 Tune 随包分发的代码。
   LGPL 系统库（GTK/GLib）只以动态链接方式使用，不随包分发。
 
@@ -25,6 +28,8 @@
 | Dart 依赖 | `pubspec.lock` | MIT/BSD/Apache/MPL/Unlicense | 安装包内 `NOTICES` |
 | Flutter engine | 随 Flutter SDK | BSD-3 | 安装包内 `NOTICES` |
 | libmpv / FFmpeg | 系统库 | GPL-3+ / GPL-2+ | `THIRD_PARTY_NOTICES.md`（仅说明，不随包） |
+| Qwen2.5-0.5B-Instruct 模型 | `translation/models/*.gguf`（随包） | Apache-2.0 | `translation/licenses/Qwen2.5-*`、`THIRD_PARTY_NOTICES.md` |
+| llama.cpp 运行时 | `translation/bin/llama-b12274/`（随包） | MIT | `translation/licenses/llama.cpp-LICENSE.txt`、`THIRD_PARTY_NOTICES.md` |
 | 应用图标 | `branding/`、`assets/icons/` | 项目自有（推定 MIT） | 来源待补，见 §4 |
 
 `THIRD_PARTY_NOTICES.md` 会作为 asset 打进安装包，并通过
@@ -41,7 +46,11 @@
    来源的素材不要提交。
 5. 新增 Dart 依赖：`flutter pub get` 后确认 `NOTICES` 仍会生成；非 MIT/BSD/Apache
    的依赖要补进 `THIRD_PARTY_NOTICES.md`。
-6. 改完运行：
+6. 随包分发大文件（离线模型、运行时归档）走 Git LFS：文件放 `translation/`，在
+   `.gitattributes` 里按类型登记 LFS，许可证全文放在 `translation/licenses/`。
+   构建前必须 `git lfs pull`，否则 `tool/prepare_translation.sh` 会直接失败，
+   不会产出缺模型的包。
+7. 改完运行：
 
 ```bash
 dart run tool/check_licenses.dart

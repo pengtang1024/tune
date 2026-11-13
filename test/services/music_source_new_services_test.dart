@@ -24,6 +24,26 @@ void main() {
       expect(song.artworkUrl, 'https://fw.example/media/cover-large.jpg');
       expect(song.streamUrl, 'https://fw.example/api/v1/listen/upload-1/');
       expect(song.externalId, '1');
+      // The instance files the licence as its code; the reader sees its name.
+      expect(song.license, 'CC BY-SA 4.0');
+      expect(song.year, 2019);
+    });
+
+    test('a licence that is not a creative commons one is left out', () {
+      final answer = _funkwhaleAnswer();
+      final track = (answer['results'] as List).first as Map<String, dynamic>;
+      track['license'] = 'all-rights-reserved';
+      track.remove('creation_date');
+
+      final song = FunkwhaleSourceAdapter.parseResults(
+        answer,
+        sourceId: 'funkwhale',
+        server: 'https://fw.example',
+      ).single;
+
+      // A code the reader cannot act on is worse than no licence at all.
+      expect(song.license, isNull);
+      expect(song.year, isNull);
     });
 
     test('a relative listen address is read on the server', () {
@@ -60,6 +80,12 @@ void main() {
       expect(first.duration, 900000);
       expect(first.trackNumber, 1);
       expect(first.trackTotal, 2);
+      // The book tells what it is about, its kinds and its year; every chapter
+      // carries that.
+      expect(first.description, 'A novel about a court case.');
+      expect(first.genre, 'Classics');
+      expect(first.genres, ['Classics', 'Fiction']);
+      expect(first.year, 1853);
       expect(
         first.streamUrl,
         'http://abs.example/api/items/book-1/file/0?token=token',
@@ -104,6 +130,8 @@ Map<String, dynamic> _funkwhaleAnswer() => {
           },
         },
       },
+      'license': 'cc-by-sa-4.0',
+      'creation_date': '2019-05-04T10:00:00Z',
       'uploads': [
         {'listen_url': 'https://fw.example/api/v1/listen/upload-1/'},
       ],
@@ -116,7 +144,13 @@ Map<String, dynamic> _audiobookshelfAnswer() => {
     {
       'id': 'book-1',
       'media': {
-        'metadata': {'title': 'Bleak House', 'authorName': 'Charles Dickens'},
+        'metadata': {
+          'title': 'Bleak House',
+          'authorName': 'Charles Dickens',
+          'description': '<p>A novel about <b>a court case</b>.</p>',
+          'genres': ['Classics', 'Fiction'],
+          'publishedYear': '1853',
+        },
         'tracks': [
           {
             'index': 0,

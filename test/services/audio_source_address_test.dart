@@ -58,5 +58,20 @@ void main() {
       expect(address.scheme, 'file');
       expect(address.path, endsWith('openverse/two.mp3'));
     });
+
+    test('a MediaStore track keeps its content address', () {
+      final address = audioSourceAddress(
+        const Song(
+          id: 3,
+          title: 'Three',
+          uri: 'content://media/external/audio/media/42',
+        ),
+        'content://media/external/audio/media/42',
+        fromStore: false,
+      );
+
+      expect(address.scheme, 'content');
+      expect(address.toString(), 'content://media/external/audio/media/42');
+    });
   });
 }

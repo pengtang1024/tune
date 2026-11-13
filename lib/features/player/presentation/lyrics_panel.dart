@@ -258,6 +258,8 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
         SmartLyricsFailure.noAudio => context.loc.lyricsSmartFailedAudio,
         SmartLyricsFailure.uploadFailed => context.loc.lyricsSmartFailedUpload,
         SmartLyricsFailure.emptyResult => context.loc.lyricsSmartFailedEmpty,
+        SmartLyricsFailure.unsupported =>
+          context.loc.lyricsSmartFailedUnsupported,
         null => context.loc.lyricsFailed,
       };
 

@@ -1,0 +1,2 @@
+translation/models/*.gguf filter=lfs diff=lfs merge=lfs -text
+translation/bin/*.tar.gz filter=lfs diff=lfs merge=lfs -text

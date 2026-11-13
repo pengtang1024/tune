@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
 import 'package:tune/data/services/music_sources/built_in_music_sources.dart';
 import 'package:tune/data/services/music_sources/music_source_service.dart';
@@ -71,6 +72,161 @@ void main() async {
   );
 
   test(
+    'the built-in PeerTube source plays audio files of the federation',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The instance the app ships with, in its music category.
+      final peers = await service.scanAll(
+        sources: [BuiltInMusicSources.peerTube],
+        localPaths: const [],
+      );
+
+      final result = peers.single;
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'peertube failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.title, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      expect(song.externalId, isNotNull);
+      expect(song.duration, greaterThan(0));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the built-in archive collections expand their items into tracks',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The queries the app ships with. A collection name alone returns the
+      // directory page of the collection, which reads as an item with no
+      // audio files, so this catches a keyword that lost its type filter.
+      final sources = BuiltInMusicSources.defaults
+          .where((config) => config.sourceType == 'internet_archive')
+          .toList(growable: false);
+      expect(
+        sources.map((config) => config.id),
+        containsAll([
+          'live_music_archive',
+          'great78',
+          'netlabels',
+          'old_time_radio',
+          'archive_music',
+          'unlocked_recordings',
+          'community_music',
+          'independent_audiobooks',
+          'archive_podcasts',
+          'radio_recordings',
+          'free_music_archive',
+          'foreign_audio',
+          'news_recordings',
+          'poetry',
+          'poetry_books',
+          'science_talks',
+        ]),
+      );
+
+      // The search of the archive drops out for a few seconds now and then
+      // (it answers BACKEND_ERROR instead of items), so a scan that fails
+      // that way is given one more chance before it counts as a failure.
+      var results = await service.scanAll(
+        sources: sources,
+        localPaths: const [],
+      );
+      if (results.any((result) => result.status == SourceScanStatus.failed)) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        results = await service.scanAll(
+          sources: sources,
+          localPaths: const [],
+        );
+      }
+
+      for (final result in results) {
+        if (result.status == SourceScanStatus.failed &&
+            (result.message?.contains(
+                  AppStrings.instance.internetArchiveBackendBusy,
+                ) ??
+                false)) {
+          // The search backend of the archive goes down for minutes at a
+          // time; that is its outage, not a broken query of ours, and it is
+          // reported as such instead of as an empty success.
+          continue;
+        }
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '${result.sourceId} failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: result.sourceId);
+        expect(
+          result.songs.first.streamUrl ?? '',
+          startsWith('https://'),
+          reason: result.sourceId,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 240)),
+  );
+
+  test(
+    'the service reads the stations of an AzuraCast server',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The public demo server of AzuraCast; its stations need no key.
+      final azuracast = BuiltInMusicSources.azuracast.copyWith(
+        enabled: true,
+        settings: {
+          'server': 'https://demo.azuracast.com',
+          'apiKey': '',
+          'query': '',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [azuracast],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'AzuraCast failed: ${result.message}',
+      );
+      expect(
+        result.songs,
+        isNotEmpty,
+        reason: 'AzuraCast returned nothing: ${result.message}',
+      );
+
+      final song = result.songs.first;
+      expect(song.isLiveStream, isTrue);
+      expect(song.title, isNotEmpty);
+      expect(song.streamUrl, startsWith('http'));
+      expect(song.sourceId, azuracast.id);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
     'the service scans LibriVox into whole chapters',
     () async {
       final service = MusicSourceService(
@@ -131,10 +287,1054 @@ void main() async {
         expect(
           result.status,
           SourceScanStatus.success,
-          reason: '\$country failed: \${result.message}',
+          reason: '$country failed: ${result.message}',
         );
-        expect(result.songs, isNotEmpty, reason: '\$country returned nothing');
+        expect(result.songs, isNotEmpty, reason: '$country returned nothing');
       }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the playlist mode of Deezer reads the songs of a playlist',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'smooth jazz',
+              'genre': '',
+              'mode': 'playlists',
+              'limit': '4',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer playlists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // A playlist may hold hundreds of songs; the scan keeps the window of
+      // the limit, three playlists at most.
+      expect(result.songs.length, lessThanOrEqualTo(12));
+      expect(
+        result.songs.every((song) => song.artist.isNotEmpty && song.album.isNotEmpty),
+        isTrue,
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the artist mode of Deezer reads the top songs of an artist',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'miles davis',
+              'genre': '',
+              'mode': 'artists',
+              'limit': '5',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer artists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // The artist mode reads the top songs of the artist the keyword names.
+      expect(
+        result.songs.every((song) => song.artist.contains('Miles Davis')),
+        isTrue,
+        reason: 'artists were ${result.songs.map((s) => s.artist).toSet()}',
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the album mode of Deezer hands over whole records',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.deezer.copyWith(
+            settings: {
+              'query': 'kind of blue',
+              'genre': '',
+              'mode': 'albums',
+              'limit': '6',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Deezer albums failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      // The songs of a record arrive together, with the name of their album.
+      final albums = result.songs.map((song) => song.album).toSet();
+      expect(albums, isNotEmpty);
+      expect(
+        result.songs.where((song) => song.album == albums.first).length,
+        greaterThan(1),
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the Deezer charts answer with playable previews',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final reach in const ['', 'jazz', 'classical']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {'query': '', 'genre': reach, 'limit': '3'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: 'Deezer $reach failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: 'Deezer $reach was empty');
+        expect(result.songs.first.streamUrl, contains('.mp3'));
+        expect(result.songs.first.duration, 30000);
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the reaches of Audius answer with tracks of that reach',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final genre in const ['Jazz', 'Classical', 'Ambient']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.audius.copyWith(
+              settings: {'genre': genre, 'window': 'week', 'limit': '3'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        // The network filters by the reach itself, so every track of the
+        // answer must carry the reach that was asked for.
+        expect(
+          result.songs.every((song) => song.genre == genre),
+          isTrue,
+          reason: '$genre answered ${result.songs.map((s) => s.genre).toSet()}',
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the kinds of book of LibriVox answer with different books',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final books = BuiltInMusicSources.librivox;
+
+      final firstBooks = <String>{};
+      for (final genre in const ['Poetry', 'History', 'Science Fiction']) {
+        final result = (await service.scanAll(
+          sources: [
+            books.copyWith(
+              settings: {'genre': genre, 'limit': '1', 'language': ''},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        final album = result.songs.first.album;
+        expect(album, isNotEmpty);
+        // The kinds are shelves of the catalogue, so a scan of one kind must
+        // not answer with the book of another.
+        expect(firstBooks.add(album), isTrue, reason: '$genre repeated $album');
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the radio source reads a language of the directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final radio = BuiltInMusicSources.radio;
+
+      final names = <String>{};
+      for (final language in const ['spanish', 'japanese', 'french']) {
+        final result = (await service.scanAll(
+          sources: [
+            radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'language': language,
+                'tag': '',
+                'query': '',
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$language failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$language returned nothing');
+        // The tongues are separate reaches of the directory, so a scan of one
+        // tongue must not answer with the stations of another.
+        for (final song in result.songs) {
+          expect(
+            names.add(song.title),
+            isTrue,
+            reason: '$language repeated ${song.title}',
+          );
+        }
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the radio source reads a tag of the directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+      final radio = BuiltInMusicSources.radio;
+
+      for (final tag in const ['jazz', 'classical', 'news']) {
+        final result = (await service.scanAll(
+          sources: [
+            radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'tag': tag,
+                'query': '',
+                'limit': '5',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$tag failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$tag returned nothing');
+        expect(result.songs.first.streamUrl, startsWith('http'));
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the service reads the previews of the iTunes store',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // The store answers only a keyword, so the instance is given one.
+      final source = BuiltInMusicSources.itunes.copyWith(
+        enabled: true,
+        settings: const {
+          'query': 'miles davis',
+          'country': 'US',
+          'limit': '2',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.artist, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      // The playable file is a preview, so the track lasts thirty seconds.
+      expect(song.duration, 30000);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the artist mode of the store reads an artist catalogue',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.itunes.copyWith(
+            enabled: true,
+            settings: const {
+              'query': 'miles davis',
+              'country': 'US',
+              'limit': '4',
+              'mode': 'artists',
+            },
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes artists failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+      // The mode reads the catalogue of the artists the keyword names, so the
+      // songs carry a record and a performer.
+      expect(
+        result.songs.every((song) => song.album.isNotEmpty && song.artist.isNotEmpty),
+        isTrue,
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'a decade of the archive answers audio of those years',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.liveMusicArchive.copyWith(
+            settings: {'decade': '1990', 'limit': '3'},
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: result.message,
+      );
+      expect(result.songs, isNotEmpty);
+      // The archive files a year on every track, so the decade is proved by
+      // the years of the tracks rather than by the request alone.
+      for (final song in result.songs) {
+        final year = song.year;
+        if (year == null) continue;
+        expect(
+          year,
+          allOf(greaterThanOrEqualTo(1990), lessThanOrEqualTo(1999)),
+          reason: '${song.title} was answered for the nineties',
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
+    'the episodes of the podcast directory carry their show notes',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final result = (await service.scanAll(
+        sources: [
+          BuiltInMusicSources.podcastCatalog.copyWith(
+            settings: {'tag': '', 'episodes': '3', 'limit': '2'},
+          ),
+        ],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: result.message,
+      );
+      expect(result.songs, isNotEmpty);
+      // The notes ride on the episode: every episode of the feed has them, and
+      // the directory reads the feed whole.
+      final noted = result.songs
+          .where((song) => (song.description ?? '').trim().isNotEmpty)
+          .length;
+      expect(noted, greaterThanOrEqualTo(result.songs.length ~/ 2));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
+    'a licence of the Openverse source answers its own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final licence in const ['cc0', 'by-sa']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.openverse.copyWith(
+              settings: {'query': '', 'license': licence},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$licence failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: licence);
+        // Every track the service answers for a licence carries it, so the
+        // filter is proved by the data rather than by the request alone.
+        for (final song in result.songs) {
+          expect(
+            song.license,
+            startsWith(licence == 'cc0' ? 'CC0' : 'CC BY-SA'),
+            reason: '${song.title} was answered for $licence',
+          );
+        }
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 150)),
+  );
+
+  test(
+    'the playlist mode of Audius reads whole playlists',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final playlists = <String, Set<String>>{};
+      for (final settings in const [
+        {'query': '', 'mode': 'playlists', 'limit': '4'},
+        {'query': 'lo-fi', 'mode': 'playlists', 'limit': '4'},
+      ]) {
+        final label = settings['query']!.isEmpty ? 'trending' : settings['query']!;
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.audius.copyWith(settings: settings),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$label failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: label);
+        // Three playlists at most, the window of the limit from each.
+        expect(result.songs.length, lessThanOrEqualTo(12));
+        playlists[label] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The chart and the search are separate lists of the site.
+      expect(playlists['trending'], isNot(equals(playlists['lo-fi'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'a tongue of the archive answers audio of that tongue',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final albums = <String, Set<String>>{};
+      for (final language in const ['German', 'French']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.archiveMusic.copyWith(
+              settings: {
+                'query': 'collection:audio_music AND mediatype:audio',
+                'language': language,
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$language failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$language returned nothing');
+        albums[language] = result.songs.map((song) => song.album).toSet();
+      }
+
+      // The tongues are separate reaches of the archive.
+      expect(albums['German'], isNot(equals(albums['French'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the order of the radio directory answers another list',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final order in const ['votes', 'clickcount']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.radio.copyWith(
+              settings: {
+                'provider': 'browser',
+                'order': order,
+                'tag': '',
+                'language': '',
+                'query': '',
+                'limit': '5',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$order failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$order returned nothing');
+        seen[order] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The votes of the years and the listening of the day are two lists of
+      // the directory, not one list under two names.
+      expect(seen['votes'], isNot(equals(seen['clickcount'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the category of the podcast chart answers its own shows',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final charts = <String, Set<String>>{};
+      for (final genre in const ['1303', '1318', '1489']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.podcastApple.copyWith(
+              settings: {
+                'query': '',
+                'country': 'US',
+                'genre': genre,
+                'limit': '3',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        charts[genre] = result.songs.map((song) => song.album).toSet();
+      }
+
+      // Comedy and News are separate charts of the store.
+      expect(charts['1303'], isNot(equals(charts['1489'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the spoken categories of the commons answer with their own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final category in const ['speeches', 'effects', 'interviews']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.wikimedia.copyWith(
+              settings: {'query': '', 'category': category, 'limit': '6'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$category failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$category returned nothing');
+        seen[category] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // Speech, sound effects and interviews are separate reaches: a reader
+      // who picks one must not get the others.
+      expect(seen['speeches'], isNot(equals(seen['effects'])));
+      expect(seen['interviews'], isNot(equals(seen['speeches'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'every reach of Deezer answers its own chart',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final genre in const [
+        'alternative',
+        'latin',
+        'indian',
+        'brazilian',
+        'blues',
+      ]) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {
+                'query': '',
+                'genre': genre,
+                'mode': 'songs',
+                'limit': '4',
+              },
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$genre failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$genre returned nothing');
+        seen[genre] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The reaches are separate charts of the catalogue.
+      expect(seen['latin'], isNot(equals(seen['indian'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'each new category of the commons answers with its own audio',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final category in const [
+        'rock',
+        'hiphop',
+        'country',
+        'blues',
+        'reggae',
+        'choral',
+        'organ',
+        'house',
+        'dnb',
+        'ambient',
+        'world',
+      ]) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.wikimedia.copyWith(
+              settings: {'query': '', 'category': category, 'limit': '6'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$category failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$category returned nothing');
+        seen[category] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The categories are separate reaches of the commons.
+      expect(seen['rock'], isNot(equals(seen['organ'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 240)),
+  );
+
+  test(
+    'the Openverse source reads one catalogue at a time',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final seen = <String, Set<String>>{};
+      for (final source in const ['jamendo', 'freesound']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.openverse.copyWith(
+              settings: {'query': '', 'source': source},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$source failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$source returned nothing');
+        seen[source] = result.songs.map((song) => song.title).toSet();
+      }
+
+      // The catalogues are separate: a music catalogue and a sound effect
+      // catalogue must not answer with the same tracks.
+      expect(seen['jamendo'], isNot(equals(seen['freesound'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the podcast directory reads a tag of its own',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final showsOfTag = <String, Set<String>>{};
+      for (final tag in const ['comedy', 'technology']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.podcastCatalog.copyWith(
+              settings: {'tag': tag, 'limit': '2'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$tag failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$tag returned nothing');
+        final shows = result.songs
+            .map((song) => song.album)
+            .where((album) => album.isNotEmpty)
+            .toSet();
+        expect(shows, isNotEmpty, reason: tag);
+        showsOfTag[tag] = shows;
+      }
+      // The tags are separate reaches of the directory, so the two scans must
+      // not answer with the same shows.
+      expect(showsOfTag['comedy'], isNot(equals(showsOfTag['technology'])));
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'every read mode of Deezer works without a keyword',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      for (final mode in const ['songs', 'albums', 'artists', 'playlists']) {
+        final result = (await service.scanAll(
+          sources: [
+            BuiltInMusicSources.deezer.copyWith(
+              settings: {'query': '', 'genre': '', 'mode': mode, 'limit': '4'},
+            ),
+          ],
+          localPaths: const [],
+        )).single;
+
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '$mode failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: '$mode returned nothing');
+        expect(
+          result.songs.every((song) => song.artist.isNotEmpty),
+          isTrue,
+          reason: mode,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the album modes of the stores read the album chart without a keyword',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final albums = BuiltInMusicSources.defaults
+          .where((config) => const {'itunes', 'deezer'}.contains(config.id))
+          .map(
+            (config) => config.copyWith(
+              enabled: true,
+              settings: {'query': '', 'mode': 'albums', 'limit': '6'},
+            ),
+          )
+          .toList();
+
+      final results = await service.scanAll(
+        sources: albums,
+        localPaths: const [],
+      );
+
+      for (final result in results) {
+        if (result.sourceId == 'itunes' &&
+            result.status == SourceScanStatus.failed) {
+          // The chart service of the store drops about half of its answers;
+          // the scan is allowed to say so rather than to fail this test, but
+          // it must never report an empty success.
+          expect(
+            result.message,
+            contains('HTTP'),
+            reason: 'the store failed for another reason: ${result.message}',
+          );
+          continue;
+        }
+        expect(
+          result.status,
+          SourceScanStatus.success,
+          reason: '${result.sourceId} failed: ${result.message}',
+        );
+        expect(result.songs, isNotEmpty, reason: result.sourceId);
+        // The chart is read as albums, so the songs come with their record.
+        expect(
+          result.songs.every((song) => song.album.isNotEmpty),
+          isTrue,
+          reason: result.sourceId,
+        );
+      }
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 180)),
+  );
+
+  test(
+    'the album mode of the store hands over whole records',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      final source = BuiltInMusicSources.itunes.copyWith(
+        enabled: true,
+        settings: const {
+          'query': 'kind of blue miles davis',
+          'country': 'US',
+          'limit': '10',
+          'mode': 'albums',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'iTunes albums failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      // The songs of an album stay together: more than one track of the same
+      // record arrives in one scan.
+      final albums = result.songs.map((song) => song.album).toSet();
+      expect(albums, isNotEmpty);
+      expect(
+        result.songs.where((song) => song.album == albums.first).length,
+        greaterThan(1),
+      );
+      expect(result.songs.every((song) => song.duration == 30000), isTrue);
+    },
+    skip: online ? false : offline,
+    timeout: const Timeout(Duration(seconds: 120)),
+  );
+
+  test(
+    'the service reads the Apple podcast directory',
+    () async {
+      final service = MusicSourceService(
+        scanner: _NoopScanner(),
+        store: MusicSourceStore(FakePersistenceService()),
+      );
+
+      // Two shows are enough to prove the chart, the lookup and the feed of
+      // every show answer; the default of five makes the test slower.
+      final source = BuiltInMusicSources.podcastApple.copyWith(
+        settings: {
+          ...BuiltInMusicSources.podcastApple.settings,
+          'limit': '2',
+        },
+      );
+
+      final result = (await service.scanAll(
+        sources: [source],
+        localPaths: const [],
+      )).single;
+
+      expect(
+        result.status,
+        SourceScanStatus.success,
+        reason: 'Apple directory failed: ${result.message}',
+      );
+      expect(result.songs, isNotEmpty);
+
+      final song = result.songs.first;
+      expect(song.album, isNotEmpty);
+      expect(song.streamUrl, startsWith('https://'));
+      expect(song.title, isNotEmpty);
     },
     skip: online ? false : offline,
     timeout: const Timeout(Duration(seconds: 120)),
@@ -184,21 +1384,37 @@ class _NoopScanner extends CrossPlatformMusicScannerImpl {
   ) async => const [];
 }
 
+/// Whether this machine reaches the catalogues the live tests read.
+///
+/// The live tests ask several services, so a probe of one of them that fails
+/// says nothing about the others: a slow store would skip every test in the
+/// file, hiding real failures as harmless skips. The probe visits one host of
+/// each kind and counts the machine as online when any of them answers.
 Future<bool> _isOnline() async {
+  const probes = [
+    'https://archive.org/advancedsearch.php?q=mediatype%3Aaudio&rows=1&output=json',
+    'https://itunes.apple.com/search?term=tune&media=music&limit=1',
+    'https://api.deezer.com/chart/0/tracks?limit=1',
+    'https://api.audius.co/v1/tracks/trending?app_name=Tune&limit=1',
+  ];
   final dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 8),
-      receiveTimeout: const Duration(seconds: 8),
+      connectTimeout: const Duration(seconds: 6),
+      receiveTimeout: const Duration(seconds: 6),
     ),
   );
   try {
-    final response = await dio.get<String>(
-      'https://itunes.apple.com/search',
-      queryParameters: {'term': 'tune', 'media': 'music', 'limit': 1},
-      options: Options(responseType: ResponseType.plain),
-    );
-    return response.statusCode == 200;
-  } catch (_) {
+    for (final probe in probes) {
+      try {
+        final response = await dio.get<String>(
+          probe,
+          options: Options(responseType: ResponseType.plain),
+        );
+        if (response.statusCode == 200) return true;
+      } catch (_) {
+        // One host that does not answer says nothing about the next one.
+      }
+    }
     return false;
   } finally {
     dio.close(force: true);

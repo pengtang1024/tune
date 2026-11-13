@@ -258,8 +258,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('配置 网络电台'), findsOneWidget);
-    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    // The directory, the reach of the directory, the tongue of its stations,
+    // the bitrate floor and the order of them are five dropdowns.
+    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(5));
     expect(find.text('全部目录'), findsOneWidget);
+    expect(find.text('得票最多'), findsOneWidget);
 
     await tester.tap(find.text('全部目录'));
     await tester.pumpAndSettle();
@@ -267,6 +270,8 @@ void main() {
     expect(find.text('Radio Browser'), findsOneWidget);
     expect(find.text('SomaFM'), findsOneWidget);
     expect(find.text('Radio Paradise'), findsOneWidget);
+    expect(find.text('NTS'), findsOneWidget);
+    expect(find.text('Radio France'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -286,8 +291,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('配置 Subsonic'), findsOneWidget);
-    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    // The quality and the window of dates are two dropdowns.
+    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(2));
     expect(find.text('原始音质'), findsOneWidget);
+    expect(find.text('只看最近入库'), findsOneWidget);
 
     await tester.tap(find.text('原始音质'));
     await tester.pumpAndSettle();

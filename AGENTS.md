@@ -27,6 +27,7 @@
 | 改歌词（取词、解析、高亮、落盘） | [`docs/lyrics.md`](docs/lyrics.md) |
 | 查自动更新：数据源、产物命名、发布步骤 | [`docs/updates.md`](docs/updates.md) |
 | 查桌面集成（MPRIS、托盘、默认播放器） | [`需求/桌面集成方案.md`](需求/桌面集成方案.md) |
+| 做 Android：后台播放、通知、权限、MediaStore/SAF 扫描 | [`docs/android.md`](docs/android.md) |
 | 加文案、改文案、切语言 | [`docs/i18n.md`](docs/i18n.md) |
 | 查流派名怎么翻、认不出的怎么办 | [`docs/genre-localization.md`](docs/genre-localization.md) |
 | 继续查本地化覆盖、接着做审计 | [`docs/localization-audit.md`](docs/localization-audit.md) |
@@ -34,7 +35,7 @@
 | 加 chip、加标识、加事实：图标、颜色、tooltip、详情面板 | [`docs/chips.md`](docs/chips.md) |
 | 写测试、跑门禁、截图对比 | [`docs/verification.md`](docs/verification.md) |
 | 新增依赖、字体或第三方素材：许可证边界与声明 | [`docs/licensing.md`](docs/licensing.md) |
-| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D8 已修） |
+| 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D11 已修） |
 | 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
 

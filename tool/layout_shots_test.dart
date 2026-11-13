@@ -26,7 +26,7 @@ import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
-import 'package:tune/features/player/domain/lyrics_document.dart';
+import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';

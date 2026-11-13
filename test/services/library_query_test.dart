@@ -6,8 +6,8 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:tune/data/services/database/app_database.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
-import 'package:tune/features/library/domain/library_filter.dart';
-import 'package:tune/features/library/domain/library_sort.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
 
 /// The filter and facet queries of the library (docs/library-browse.md):
 /// sets are OR inside a group and AND across groups, and the counts keep
@@ -176,6 +176,29 @@ void main() {
     expect(facets.added[LibraryAddedWindow.lastWeek], 1);
     expect(facets.statuses[LibraryStatusFilter.liked], 1);
     expect(facets.statuses[LibraryStatusFilter.withLyrics], 1);
+  });
+
+  test('a chosen group keeps its options, through the other groups', () {
+    final facets = db.facets(
+      filter: const LibraryFilter(
+        genres: {'jazz'},
+        durations: {LibraryDurationBucket.medium},
+      ),
+    );
+
+    // The genre group ignores its own selection, so the other genres stay
+    // on screen while jazz is chosen.
+    expect(facets.genres['jazz'], 1);
+    expect(facets.genres['rock'], 1);
+    // The artist group keeps both selections: only the jazz track survives,
+    // and it is Artist A's.
+    expect(facets.artists, {'Artist A': 1});
+    // The duration group ignores only its own selection: the jazz track is
+    // still the only one that counts.
+    expect(facets.durations, {LibraryDurationBucket.medium: 1});
+    // The status counts keep both selections as well.
+    expect(facets.statuses[LibraryStatusFilter.all], 1);
+    expect(facets.statuses[LibraryStatusFilter.liked], 1);
   });
 
   test('an old database gets the new columns and their facts backfilled',

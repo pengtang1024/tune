@@ -16,6 +16,28 @@ import 'package:tune/domain/models/source_scan_result.dart';
 
 void main() {
   group('ccMixter adapter', () {
+    test('a window of stamps keeps only the songs added inside it', () {
+      final payload = {
+        'search3': {
+          'result': {
+            'song': [
+              {..._subsonicSong(), 'id': 'new', 'title': 'New', 'created': '2026-11-01T10:00:00Z'},
+              {..._subsonicSong(), 'id': 'old', 'title': 'Old', 'created': '2019-05-04T10:00:00Z'},
+              {..._subsonicSong(), 'id': 'undated', 'title': 'Undated'},
+            ],
+          },
+        },
+      };
+
+      final songs = SubsonicSourceAdapter.parseSearchResults(
+        payload,
+        config: _subsonicConfig(8096, 'secret'),
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The song inside the window and the undated one stay.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
+    });
     test('maps uploads, prefers mp3 and keeps the referer header', () async {
       final server = await _startServer((request) async {
         expect(request.uri.queryParameters['tags'], 'jazz');
@@ -27,6 +49,7 @@ void main() {
             'user_name': 'JeffSpeed68',
             'upload_extra': {'usertags': 'chill,guitar,jazz'},
             'license_name': 'Attribution Noncommercial (4.0)',
+            'upload_description_plain': '  A note   about the mix.  ',
             'files': [
               {
                 'file_name': 'a.zip',
@@ -83,6 +106,10 @@ void main() {
       expect(song.streamUrl, 'https://ccmixter.org/content/a.mp3');
       expect(song.httpHeaders?['Referer'], 'https://ccmixter.org/');
       expect(song.sourceData?['license'], 'Attribution Noncommercial (4.0)');
+      // The name the site gives the licence is the one the reader sees.
+      expect(song.license, 'Attribution Noncommercial (4.0)');
+      // The description arrives as plain text, with its spacing tidied.
+      expect(song.description, 'A note about the mix.');
       expect(song.sourceId, 'ccmixter');
       expect(server.port, greaterThan(0));
     });
@@ -128,6 +155,136 @@ void main() {
   });
 
   group('podcast RSS adapter', () {
+    test('the episodes of a show are numbered newest first', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>The Show</title>
+    <item>
+      <title>Older</title>
+      <guid>ep-old</guid>
+      <pubDate>Mon, 02 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/old.mp3" type="audio/mpeg" length="1"/>
+    </item>
+    <item>
+      <title>Newest</title>
+      <guid>ep-new</guid>
+      <pubDate>Sun, 08 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/new.mp3" type="audio/mpeg" length="1"/>
+    </item>
+    <item>
+      <title>Undated</title>
+      <guid>ep-none</guid>
+      <enclosure url="https://cdn.example.com/none.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss');
+
+      // A show is a series: the newest episode comes first, and one whose date
+      // could not be read sits at the end rather than in front. The order is
+      // the feed's; an invented number would shift on every scan.
+      expect(songs.map((song) => song.title), ['Newest', 'Older', 'Undated']);
+      expect(songs.map((song) => song.trackNumber), [null, null, null]);
+    });
+
+    test('the episode number of a feed that states one is kept', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>The Show</title>
+    <item>
+      <title>Season two opener</title>
+      <guid>ep-2-1</guid>
+      <itunes:season>2</itunes:season>
+      <itunes:episode>1</itunes:episode>
+      <enclosure url="https://cdn.example.com/s2e1.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final song = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss').single;
+
+      expect(song.trackNumber, 1);
+      expect(song.discNumber, 2);
+    });
+    test('a second page of a show walks further back in time', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>The Show</title>
+    <item><title>Four</title><guid>e4</guid>
+      <pubDate>Thu, 05 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/4.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Two</title><guid>e2</guid>
+      <pubDate>Tue, 03 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/2.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Five</title><guid>e5</guid>
+      <pubDate>Fri, 06 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/5.mp3" type="audio/mpeg" length="1"/></item>
+    <item><title>Three</title><guid>e3</guid>
+      <pubDate>Wed, 04 Nov 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://cdn.example.com/3.mp3" type="audio/mpeg" length="1"/></item>
+  </channel>
+</rss>''';
+
+      final first = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        limit: 2,
+      );
+      final second = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        limit: 2,
+        offset: 2,
+      );
+
+      expect(first.map((song) => song.title), ['Five', 'Four']);
+      // The tail of a show is its older episodes.
+      expect(second.map((song) => song.title), ['Three', 'Two']);
+    });
+    test('the categories of a show travel with its episodes', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>The Show</title>
+    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
+    <item>
+      <title>An episode</title>
+      <guid>ep-1</guid>
+      <enclosure url="https://cdn.example.com/one.mp3" type="audio/mpeg" length="1"/>
+    </item>
+  </channel>
+</rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(feed, sourceId: 'podcast_rss');
+
+      expect(songs.single.genre, 'News');
+      expect(songs.single.genres, ['News', 'Daily News']);
+    });
+    test('a window of dates drops the episodes older than it', () {
+      final feed = '''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Show</title>
+  <item><title>Old</title><enclosure url="https://e.com/old.mp3"/>
+    <guid>old</guid><pubDate>Tue, 06 Oct 2020 09:00:00 +0000</pubDate></item>
+  <item><title>New</title><enclosure url="https://e.com/new.mp3"/>
+    <guid>new</guid><pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate></item>
+  <item><title>Undated</title><enclosure url="https://e.com/undated.mp3"/>
+    <guid>undated</guid></item>
+</channel></rss>''';
+
+      final songs = PodcastRssSourceAdapter.parseFeed(
+        feed,
+        sourceId: 'podcast_rss',
+        since: DateTime.utc(2026, 1, 1),
+      );
+
+      // The dated episode inside the window and the undated one stay; the
+      // dated one outside it goes.
+      expect(songs.map((song) => song.title), ['New', 'Undated']);
+    });
     test('turns the episodes of a feed into tracks', () async {
       final server = await _startServer((request) async {
         request.response.headers.contentType = ContentType(
@@ -154,6 +311,8 @@ void main() {
       expect(song.streamUrl, 'https://example.com/ep1.mp3');
       expect(song.artworkUrl, 'https://example.com/episode.jpg');
       expect(song.year, 2026);
+      // The show notes are HTML in the feed; the track keeps the words.
+      expect(song.description, 'Show notes of the episode.');
       expect(song.sourceId, 'podcast_rss');
       expect(server.port, greaterThan(0));
     });
@@ -568,6 +727,7 @@ const _podcastFeed = '''<?xml version="1.0" encoding="UTF-8"?>
       <itunes:image href="https://example.com/episode.jpg"/>
       <pubDate>Tue, 06 Oct 2026 09:00:00 +0000</pubDate>
       <guid isPermaLink="false">ep-1</guid>
+      <description><![CDATA[<p>Show notes   of the<br>episode.</p>]]></description>
     </item>
     <item>
       <title>Episode without audio</title>
@@ -575,3 +735,13 @@ const _podcastFeed = '''<?xml version="1.0" encoding="UTF-8"?>
   </channel>
 </rss>
 ''';
+
+/// One song of the Subsonic answer.
+Map<String, dynamic> _subsonicSong() => {
+  'id': 'tr-x',
+  'title': 'A song',
+  'artist': 'Artist',
+  'album': 'Album',
+  'duration': 212,
+  'suffix': 'mp3',
+};

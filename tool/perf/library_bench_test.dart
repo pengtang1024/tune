@@ -74,7 +74,9 @@ void main() {
           locale: const Locale('zh', 'CN'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const LibraryPane(),
+          // The app draws the page inside a Scaffold (the router wraps it),
+          // and the toolbar needs the Material ancestor it provides.
+          home: const Scaffold(body: LibraryPane()),
         ),
       ),
     );

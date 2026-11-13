@@ -5,7 +5,7 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
-import 'package:tune/features/settings/presentation/settings_card_shell.dart';
+import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 /// The screens have to survive the text scale of the desktop.

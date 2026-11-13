@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
+import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -23,8 +24,11 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(5, 10);
 
-  /// How many episodes of one podcast a scan reads.
-  static const _episodesPerPodcast = 3;
+  /// How many episodes of one podcast a scan reads, and the most it may.
+  ///
+  /// A show may publish hundreds of episodes; the cap keeps one of them from
+  /// filling the library, and the reader who wants more raises it.
+  static const _episodesPerPodcast = MusicSourceLimit(3, 20);
 
   static const _directoryHost = 'https://gpodder.net';
 
@@ -68,6 +72,21 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.podcastCatalogFieldQueryHint,
     ),
     MusicSourceField(
+      'tag',
+      AppStrings.instance.podcastCatalogFieldTag,
+      AppStrings.instance.podcastCatalogFieldTagHint,
+    ),
+    MusicSourceField(
+      'episodes',
+      AppStrings.instance.podcastFieldEpisodes,
+      AppStrings.instance.podcastFieldEpisodesHint(
+        _episodesPerPodcast.count,
+        _episodesPerPodcast.max,
+      ),
+      numeric: true,
+    ),
+    PodcastRssSourceAdapter.sinceField(),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimitPodcasts,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
@@ -85,8 +104,15 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     try {
       final limit = scanLimit.read(request.config.setting('limit'));
+      final since = PodcastRssSourceAdapter.sinceOf(
+        request.config.setting('since'),
+      );
       final keyword = request.config.setting('query');
-      final feeds = await _feeds(keyword, limit);
+      final feeds = await _feeds(
+        keyword,
+        limit,
+        tag: request.config.setting('tag'),
+      );
       if (feeds.isEmpty) {
         return SourceScanResult(
           sourceId: request.config.id,
@@ -100,7 +126,13 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
       for (var start = 0; start < feeds.length; start += batchSize) {
         final batch = feeds.skip(start).take(batchSize).toList(growable: false);
         final episodes = await Future.wait([
-          for (final feed in batch) _episodesOf(feed, request.config.id),
+          for (final feed in batch)
+            _episodesOf(
+              feed,
+              request.config.id,
+              _episodesPerPodcast.read(request.config.setting('episodes')),
+              since,
+            ),
         ]);
         for (final episode in episodes) {
           for (final song in episode) {
@@ -129,14 +161,25 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   /// The feeds the directory answers with.
   ///
   /// Without a keyword the directory serves the shows everybody subscribes
-  /// to, so the source is ready as it is.
-  Future<List<String>> _feeds(String? keyword, int limit) async {
-    final response = await _dio.get<String>(
-      keyword == null
-          ? '$_directoryHost/toplist.json'
-          : '$_directoryHost/search.json',
-      queryParameters: {'q': ?keyword},
-      options: Options(responseType: ResponseType.plain),
+  /// to, or the shows of one tag when the reader wrote one; with a keyword it
+  /// searches the whole directory.
+  Future<List<String>> _feeds(String? keyword, int limit, {String? tag}) async {
+    final wanted = tag?.trim().toLowerCase() ?? '';
+    final path = keyword != null
+        ? '$_directoryHost/search.json'
+        : wanted.isNotEmpty
+        ? '$_directoryHost/api/2/tag/$wanted/$limit.json'
+        : '$_directoryHost/toplist.json';
+    // The directory drops a request now and then when several sources ask at
+    // the same time; the listing is given a few more tries before a scan of the
+    // catalogue counts as empty.
+    final response = await retrySourceRead(
+      () => _dio.get<String>(
+        path,
+        queryParameters: {'q': ?keyword},
+        options: Options(responseType: ResponseType.plain),
+      ),
+      answered: (answer) => (answer.data ?? '').trim().isNotEmpty,
     );
     final body = response.data;
     if (body == null || body.trim().isEmpty) return const [];
@@ -147,7 +190,12 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
   }
 
   /// The newest episodes of one feed.
-  Future<List<Song>> _episodesOf(String feed, String sourceId) async {
+  Future<List<Song>> _episodesOf(
+    String feed,
+    String sourceId,
+    int episodes,
+    DateTime? since,
+  ) async {
     try {
       final response = await _dio.get<String>(
         feed,
@@ -160,7 +208,8 @@ class PodcastCatalogSourceAdapter extends MusicSourceAdapter {
       return PodcastRssSourceAdapter.parseFeed(
         body,
         sourceId: sourceId,
-        limit: _episodesPerPodcast,
+        limit: episodes,
+        since: since,
       );
     } catch (error) {
       // One broken feed should not fail the whole catalogue.

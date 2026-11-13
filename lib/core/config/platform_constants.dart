@@ -41,4 +41,10 @@ class PlatformConstants {
 
   /// 桌面端窗口最小高度
   static const double desktopWindowMinHeight = 520;
+
+  /// mini 形态的窗口宽度：只留播放条
+  static const double desktopMiniWindowWidth = 360;
+
+  /// mini 形态的窗口高度：播放条加它的外边距
+  static const double desktopMiniWindowHeight = 132;
 }

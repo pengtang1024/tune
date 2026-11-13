@@ -5,6 +5,7 @@ import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -54,6 +55,18 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.ccmixterHint;
 
+  /// The licences the site narrows by, as the values of the field.
+  ///
+  /// The site files an upload under the licence it was published with and
+  /// narrows by that word; the three values here were read back from it, and a
+  /// word it does not know is answered with an error instead of the list.
+  static const _licences = {'by', 'nc', 'pd'};
+
+  static String? _licenceFilterOf(String? raw) {
+    final value = raw?.trim() ?? '';
+    return _licences.contains(value) ? value : null;
+  }
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
@@ -62,12 +75,57 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.ccmixterFieldQueryHint,
     ),
     MusicSourceField(
+      'licence',
+      AppStrings.instance.ccmixterFieldLicence,
+      AppStrings.instance.ccmixterFieldLicenceHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.ccmixterLicenceAll),
+        MusicSourceChoice('by', AppStrings.instance.ccmixterLicenceBy),
+        MusicSourceChoice('nc', AppStrings.instance.ccmixterLicenceNc),
+        MusicSourceChoice('pd', AppStrings.instance.ccmixterLicencePd),
+      ],
+    ),
+    MusicSourceField(
+      'tag',
+      AppStrings.instance.ccmixterFieldTag,
+      AppStrings.instance.ccmixterFieldTagHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.ccmixterTagAll),
+        for (final entry in _tags.entries)
+          MusicSourceChoice(entry.key, entry.value),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+
+  /// The tags the site files its uploads under, by the name the reader picks.
+  ///
+  /// Only the tags that were found to hold uploads are offered; a tag the
+  /// site does not know answers with nothing at all.
+  static Map<String, String> get _tags {
+    final strings = AppStrings.instance;
+    return {
+      'jazz': strings.genreJazz,
+      'rock': strings.genreRock,
+      'pop': strings.genrePop,
+      'classical': strings.genreClassical,
+      'folk': strings.genreFolk,
+      'electronic': strings.audiusGenreElectronic,
+      'reggae': strings.genreReggae,
+      'funk': strings.ccmixterTagFunk,
+      'hip_hop': strings.audiusGenreHipHop,
+      'ambient': strings.ccmixterTagAmbient,
+      'chill': strings.ccmixterTagChill,
+      'instrumental': strings.ccmixterTagInstrumental,
+      'piano': strings.wikimediaCategoryPiano,
+    };
+  }
 
   @override
   bool get supportsPaging => true;
@@ -89,12 +147,25 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
         'limit': limit,
         if (request.offset > 0) 'offset': request.offset,
       };
-      if (query != null) {
-        parameters['tags'] = query;
+      final tag = request.config.setting('tag')?.trim() ?? '';
+      final tags = [
+        ?query,
+        if (tag.isNotEmpty) tag,
+      ].join(',');
+      if (tags.isNotEmpty) {
+        // The site reads the tags of an upload: several tags narrow together,
+        // so the keyword and the genre are asked for as one word.
+        parameters['tags'] = tags;
       } else if (browseModeOf(request.config) == BrowseMode.charts) {
         // The charts of the site: the uploads everybody downloaded most.
         parameters['sort'] = 'rank';
       }
+
+      // The site narrows by licence through the same word it files the upload
+      // under; the values are read back from it, and a word it does not know
+      // is answered with no upload at all.
+      final licence = _licenceFilterOf(request.config.setting('licence'));
+      if (licence != null) parameters['lic'] = licence;
 
       final response = await _dio.get<String>(
         _endpoint,
@@ -131,6 +202,30 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
     }
   }
 
+
+  /// The description of an upload, as plain text.
+  ///
+  /// The site offers both the plain text and the HTML of an upload; the plain
+  /// text is used as it is, and the HTML when there is no plain text.
+  static String? _descriptionOf(Map raw) {
+    final plain = raw['upload_description_plain']?.toString() ?? '';
+    return plain.trim().isEmpty
+        ? shortDescription(raw['upload_description_html'])
+        : shorten(plain);
+  }
+
+  /// The licence of an upload, read back from the address of its deed.
+  static String? _licenceOf(String? raw) {
+    final value = raw?.trim().toLowerCase() ?? '';
+    if (value.isEmpty || !value.contains('creativecommons.org')) return null;
+    final segments = Uri.tryParse(value)?.pathSegments ?? const <String>[];
+    final index = segments.indexOf('licenses');
+    if (index < 0 || index + 1 >= segments.length) return null;
+    final code = segments[index + 1].toUpperCase();
+    final version = index + 2 < segments.length ? segments[index + 2] : '';
+    return version.isEmpty ? 'CC $code' : 'CC $code $version';
+  }
+
   /// Kept static so JSON mapping can be tested without network access.
   static List<Song> parseResults(
     List<dynamic> data, {
@@ -158,7 +253,8 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
       final extraMap = extra is Map ? extra : const <dynamic, dynamic>{};
       final tags = extraMap['usertags']?.toString() ?? '';
       final genre = _firstTag(tags);
-      final license = raw['license_name']?.toString() ?? '';
+      final license = raw['license_name']?.toString().trim() ?? '';
+      final description = _descriptionOf(raw);
 
       songs.add(
         SourceSongFactory.create(
@@ -170,6 +266,12 @@ class CcMixterSourceAdapter extends MusicSourceAdapter {
           streamUrl: streamUrl,
           genre: genre,
           httpHeaders: const {'Referer': _referer},
+          // The site names the licence of every upload; the name it gives is
+          // the one the reader sees, and the deed address is the fallback.
+          license: license.isNotEmpty
+              ? license
+              : _licenceOf(raw['license_url']?.toString()),
+          description: description,
           sourceData: {
             'uploadId': uploadId,
             if (license.isNotEmpty) 'license': license,

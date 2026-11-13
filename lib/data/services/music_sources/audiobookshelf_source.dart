@@ -4,6 +4,7 @@ import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/media_server_items.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -200,6 +201,12 @@ class AudiobookshelfSourceAdapter extends MusicSourceAdapter {
           : '';
       if (bookTitle.isEmpty) continue;
 
+      final description = metadata is Map
+          ? shortDescription(metadata['description'])
+          : null;
+      final genres = _genresOf(metadata);
+      final year = _yearOf(metadata);
+
       final tracks = media['tracks'];
       if (tracks is! List) continue;
       for (final track in tracks) {
@@ -229,11 +236,44 @@ class AudiobookshelfSourceAdapter extends MusicSourceAdapter {
                 : null,
             trackNumber: index + 1,
             trackTotal: tracks.length,
+            // The book tells what it is about, under which kinds it is filed
+            // and when it came out; every chapter of it carries that.
+            description: description,
+            genre: genres?.first,
+            genres: genres,
+            year: year,
           ),
         );
       }
     }
     return songs.take(limit * 32).toList(growable: false);
+  }
+
+
+  /// The kinds a book is filed under.
+  static List<String>? _genresOf(Object? raw) {
+    if (raw is! Map) return null;
+    final genres = raw['genres'];
+    if (genres is! List) return null;
+    final names = genres
+        .map((genre) => genre?.toString().trim() ?? '')
+        .where((genre) => genre.isNotEmpty)
+        .toList(growable: false);
+    return names.isEmpty ? null : names;
+  }
+
+  /// The year a book came out.
+  ///
+  /// The server keeps the year as a field of its own on newer books, and as
+  /// the date it was published on on older ones.
+  static int? _yearOf(Object? raw) {
+    if (raw is! Map) return null;
+    final year = SourceSongFactory.parseInt(raw['publishedYear']);
+    if (year > 0) return year;
+    final date = raw['publishedDate']?.toString().trim() ?? '';
+    if (date.length < 4) return null;
+    final parsed = int.tryParse(date.substring(0, 4));
+    return parsed == null || parsed <= 0 ? null : parsed;
   }
 
   static List<dynamic> _itemsOf(Map<String, dynamic> data) {

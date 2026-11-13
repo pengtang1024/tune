@@ -4,7 +4,15 @@ import 'dart:math' as math;
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/cross_platform_music_scanner.dart';
+import 'package:tune/data/services/music_sources/ampache_source.dart';
+import 'package:tune/data/services/music_sources/deezer_source.dart';
+import 'package:tune/data/services/music_sources/itunes_source.dart';
+import 'package:tune/data/services/music_sources/kodi_source.dart';
+import 'package:tune/data/services/music_sources/koel_source.dart';
+import 'package:tune/data/services/music_sources/lms_source.dart';
+import 'package:tune/data/services/music_sources/peertube_source.dart';
 import 'package:tune/data/services/music_sources/audius_source.dart';
+import 'package:tune/data/services/music_sources/azuracast_source.dart';
 import 'package:tune/data/services/music_sources/audiobookshelf_source.dart';
 import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/ccmixter_source.dart';
@@ -25,6 +33,7 @@ import 'package:tune/data/services/music_sources/music_source_store.dart';
 import 'package:tune/data/services/music_sources/funkwhale_source.dart';
 import 'package:tune/data/services/music_sources/plex_source.dart';
 import 'package:tune/data/services/music_sources/openverse_source.dart';
+import 'package:tune/data/services/music_sources/podcast_apple_source.dart';
 import 'package:tune/data/services/music_sources/podcast_catalog_source.dart';
 import 'package:tune/data/services/music_sources/podcast_rss_source.dart';
 import 'package:tune/data/services/music_sources/source_type_catalogue.dart';
@@ -43,6 +52,7 @@ import 'package:tune/utils/logger.dart';
 /// controller owns progress and state, while this class only orchestrates I/O.
 class MusicSourceService implements StreamUrlResolver {
   final MusicSourceStore _store;
+  final CrossPlatformMusicScanner _scanner;
   final LyricsProvider _lyricsProvider;
   final Map<String, MusicSourceAdapter> _adapters;
 
@@ -53,6 +63,14 @@ class MusicSourceService implements StreamUrlResolver {
   /// lookup logic.
   LyricsProvider get lyricsProvider => _lyricsProvider;
 
+  /// Whether the built-in local source reads the library of the system
+  /// instead of folders.
+  ///
+  /// A phone has no folder to pick: the rows come from MediaStore and carry
+  /// `content://` addresses. The library then treats one read as the whole
+  /// truth about that source, instead of judging each row by a folder.
+  bool get localReadsSystemLibrary => _scanner.addressesSystemLibrary;
+
   MusicSourceService({
     required CrossPlatformMusicScanner scanner,
     required MusicSourceStore store,
@@ -60,6 +78,7 @@ class MusicSourceService implements StreamUrlResolver {
     LyricsProvider? lyricsProvider,
     Map<String, MusicSourceAdapter>? adapters,
   }) : _store = store,
+       _scanner = scanner,
        _lyricsProvider = lyricsProvider ?? LrclibLyricsProvider(dio: dio),
        _adapters = adapters ?? _registryOf(scanner, dio);
 
@@ -79,9 +98,18 @@ class MusicSourceService implements StreamUrlResolver {
       'ccmixter': CcMixterSourceAdapter(dio: dio),
       'podcast_rss': PodcastRssSourceAdapter(dio: dio),
       'podcast_catalog': PodcastCatalogSourceAdapter(dio: dio),
+      'podcast_apple': PodcastAppleSourceAdapter(dio: dio),
       'subsonic': SubsonicSourceAdapter(dio: dio),
+      'ampache': AmpacheSourceAdapter(dio: dio),
+      'koel': KoelSourceAdapter(dio: dio),
+      'kodi': KodiSourceAdapter(dio: dio),
+      'lms': LmsSourceAdapter(dio: dio),
+      'itunes': ItunesSourceAdapter(dio: dio),
+      'deezer': DeezerSourceAdapter(dio: dio),
+      'peertube': PeerTubeSourceAdapter(dio: dio),
       'audius': AudiusSourceAdapter(dio: dio),
       'radio': RadioSourceAdapter(dio: dio),
+      'azuracast': AzuracastSourceAdapter(dio: dio),
       'wikimedia': WikimediaSourceAdapter(dio: dio),
       'jellyfin': JellyfinSourceAdapter(dio: dio),
       'librivox': LibrivoxSourceAdapter(dio: dio),
@@ -331,8 +359,10 @@ class MusicSourceService implements StreamUrlResolver {
         .toList(growable: false);
     if (candidates.isEmpty) return const [];
 
-    return Future.wait(
-      candidates.map((config) async {
+    // The same rule as a scan: a search that fans out to forty services at
+    // once reads as a burst to them, and a burst is answered with a refusal.
+    return _walk(candidates, (config) async {
+      {
         onProgress?.call(config.id, 0);
         final MusicSourceAdapter? adapter;
         try {
@@ -378,9 +408,42 @@ class MusicSourceService implements StreamUrlResolver {
         } catch (error) {
           return failedResult(config.id, error);
         }
-      }),
-    );
+      }
+    });
   }
+
+
+  /// Runs [run] over [configs], a few at a time, and answers in their order.
+  ///
+  /// A library of forty sources read all at once looks like a burst to the
+  /// services: Deezer counts the requests of a caller per five seconds and the
+  /// wiki per minute, and both answer a burst with a refusal. The results keep
+  /// the order of the configs rather than the order they happened to finish in.
+  Future<List<T>> _walk<T>(
+    List<MusicSourceConfig> configs,
+    Future<T> Function(MusicSourceConfig config) run,
+  ) async {
+    final results = List<T?>.filled(configs.length, null);
+    var next = 0;
+    Future<void> worker() async {
+      while (true) {
+        final index = next++;
+        if (index >= configs.length) return;
+        results[index] = await run(configs[index]);
+      }
+    }
+
+    await Future.wait([
+      for (var i = 0; i < maxConcurrentScans; i++) worker(),
+    ]);
+    return results.whereType<T>().toList(growable: false);
+  }
+
+  /// How many sources are read at the same time.
+  ///
+  /// Enough to keep a library of forty sources moving, few enough that the
+  /// services do not read the app as a burst.
+  static const maxConcurrentScans = 6;
 
   Future<List<SourceScanResult>> scanAll({
     required List<MusicSourceConfig> sources,
@@ -397,14 +460,13 @@ class MusicSourceService implements StreamUrlResolver {
       onProgress?.call(config.id, 0);
     }
 
-    final results = await Future.wait(
-      enabled.map(
-        (config) => _scanOne(
-          config,
-          localPaths: localPaths,
-          respectAutoScanInterval: respectAutoScanInterval,
-          onProgress: (progress) => onProgress?.call(config.id, progress),
-        ),
+    final results = await _walk(
+      enabled,
+      (config) => _scanOne(
+        config,
+        localPaths: localPaths,
+        respectAutoScanInterval: respectAutoScanInterval,
+        onProgress: (progress) => onProgress?.call(config.id, progress),
       ),
     );
 

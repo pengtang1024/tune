@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
@@ -29,7 +30,9 @@ class _FakeLibraryController extends LibraryController {
   Future<void> setSourceFilter(String? sourceId) async {
     state = AsyncData(
       (state.valueOrNull ?? LibraryState(songs: songs)).copyWith(
-        sourceFilter: sourceId,
+        filter: LibraryFilter(
+          sources: sourceId == null ? const {} : {sourceId},
+        ),
       ),
     );
   }

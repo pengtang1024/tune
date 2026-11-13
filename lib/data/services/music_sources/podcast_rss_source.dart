@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
+import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -17,6 +19,11 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   /// How many tracks a scan fetches, and the most it may fetch.
   @override
   MusicSourceLimit get scanLimit => const MusicSourceLimit(20, 100);
+
+  /// A show runs backwards: the older episodes are the tail of the feed,
+  /// so a second page walks further back in time.
+  @override
+  bool get supportsPaging => true;
 
   final Dio _dio;
 
@@ -41,6 +48,31 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
   @override
   String get configurationHint => AppStrings.instance.podcastRssHint;
 
+  /// The windows an episode may have come out in, by their days.
+  ///
+  /// A window is a filter of the reader's, not a guess of the app's: the feed
+  /// is read whole and the episodes outside the window are dropped, so the
+  /// ones that stay are the ones the feed published inside it.
+  static const sinceDays = RecentWindow.days;
+
+  /// The field the three podcast sources share for the window.
+  ///
+  /// The parsing of a feed is shared by all of them, so the window is offered
+  /// by all of them rather than by the subscription alone.
+  static MusicSourceField sinceField() => MusicSourceField(
+    'since',
+    AppStrings.instance.podcastRssFieldSince,
+    AppStrings.instance.podcastRssFieldSinceHint,
+    choices: [
+      MusicSourceChoice('', AppStrings.instance.podcastRssSinceAll),
+      for (final days in sinceDays)
+        MusicSourceChoice('$days', AppStrings.instance.podcastRssSinceDays('$days')),
+    ],
+  );
+
+  /// The day the window starts, or nothing when the reader asked for all.
+  static DateTime? sinceOf(String? raw) => RecentWindow.cutoff(raw);
+
   @override
   List<MusicSourceField> get configurationFields => [
     MusicSourceField(
@@ -55,6 +87,7 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
+    sinceField(),
   ];
 
   @override
@@ -85,7 +118,14 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final songs = parseFeed(body, sourceId: request.config.id, limit: limit);
+      final since = sinceOf(request.config.setting('since'));
+      final songs = parseFeed(
+        body,
+        sourceId: request.config.id,
+        limit: limit,
+        offset: request.offset,
+        since: since,
+      );
       return SourceScanResult(
         sourceId: request.config.id,
         status: SourceScanStatus.success,
@@ -145,6 +185,8 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     String xml, {
     required String sourceId,
     int limit = 20,
+    int offset = 0,
+    DateTime? since,
   }) {
     final document = XmlDocument.parse(xml);
     final channel = _first(document.findAllElements('channel'));
@@ -153,12 +195,21 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       'title',
     );
     final podcastArtwork = _channelArtwork(channel);
+    // The feed files the show under one or two categories of its own
+    // ("News", "Daily News"); the episodes carry them, so a library can group
+    // its podcasts by what they are about.
+    final genres = _categoriesOf(channel);
 
-    final songs = <Song>[];
+    // A show is a series: the episodes are numbered newest first so that the
+    // show plays in the order a listener catches up on it.
+    final entries = <({Song song, DateTime? at})>[];
     final seen = <String>{};
 
     for (final item in document.findAllElements('item')) {
-      if (songs.length >= limit) break;
+      // The feed is not promised to be newest-first, so every item is read
+      // before the order is decided; the cap only keeps a runaway feed from
+      // being read forever.
+      if (entries.length >= _maxFeedItems) break;
 
       final title = _firstText([item], 'title');
       if (title.isEmpty) continue;
@@ -171,24 +222,78 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
       if (!seen.add(externalId)) continue;
 
       final published = _firstText([item], 'pubDate');
+      // An episode older than the window is left out; an episode without a
+      // date it can be read from is kept, since nothing proves it is old.
+      final at = RecentWindow.dateTimeOf(published);
+      if (since != null && at != null && at.isBefore(since)) continue;
       final year = _yearOf(published);
+      final description = _descriptionOf(item);
 
-      songs.add(
-        SourceSongFactory.create(
-          sourceId: sourceId,
-          externalId: externalId,
-          title: title,
-          artist: _firstText([item], 'author', fallback: podcastTitle),
-          album: podcastTitle,
-          duration: _parseDuration(_firstText([item], 'duration')),
-          streamUrl: streamUrl,
-          artworkUrl: _artworkUrl(item, podcastArtwork),
-          year: year,
+      entries.add(
+        (
+          song: SourceSongFactory.create(
+            sourceId: sourceId,
+            externalId: externalId,
+            title: title,
+            artist: _firstText([item], 'author', fallback: podcastTitle),
+            album: podcastTitle,
+            duration: _parseDuration(_firstText([item], 'duration')),
+            streamUrl: streamUrl,
+            artworkUrl: _artworkUrl(item, podcastArtwork),
+            year: year,
+            // A feed that numbers its episodes says so; the number is the
+            // only stable order there is.
+            trackNumber: _intOf(_firstText([item], 'episode')),
+            discNumber: _intOf(_firstText([item], 'season')),
+            description: description,
+            genre: genres.isEmpty ? null : genres.first,
+            genres: genres.isEmpty ? null : genres,
+          ),
+          at: at,
         ),
       );
     }
 
-    return songs;
+    // Newest first; an episode whose date could not be read keeps the place the
+    // feed gave it, at the end. The order is the feed's, not a number: a
+    // number invented from the batch would shift on every scan, and the older
+    // episodes that fell out of the batch would then share numbers with the
+    // new ones. A feed that states its own episode numbers is read instead.
+    final dated = entries.where((entry) => entry.at != null).toList(growable: false)
+      ..sort((a, b) => b.at!.compareTo(a.at!));
+    final ordered = [...dated, ...entries.where((entry) => entry.at == null)];
+    // Older episodes are the tail of the show: a scan that asks for the next
+    // page walks further back, which is what a podcast needs and a chart does
+    // not.
+    return [
+      for (final entry in ordered.skip(offset).take(limit)) entry.song,
+    ];
+  }
+
+
+
+
+  /// The number an episode states about itself, or null when it states none.
+  static int? _intOf(String value) {
+    final number = int.tryParse(value.trim());
+    return number == null || number <= 0 ? null : number;
+  }
+
+  /// The most episodes one feed is read for, whatever the page asks.
+  static const _maxFeedItems = 2000;
+
+  /// The categories a feed files its show under.
+  ///
+  /// The feed writes them as `<itunes:category text="News">`, sometimes with a
+  /// subcategory inside; both are what the show says about itself.
+  static List<String> _categoriesOf(XmlElement? channel) {
+    if (channel == null) return const [];
+    final genres = <String>[];
+    for (final category in channel.findAllElements('itunes:category')) {
+      final text = category.getAttribute('text')?.trim() ?? '';
+      if (text.isNotEmpty && !genres.contains(text)) genres.add(text);
+    }
+    return genres.take(5).toList(growable: false);
   }
 
   /// Reads the audio file of an episode.
@@ -231,6 +336,15 @@ class PodcastRssSourceAdapter extends MusicSourceAdapter {
     final url = _first(cover?.findElements('url') ?? const <XmlElement>[]);
     return SourceSongFactory.normalizeUrl(url?.innerText.trim());
   }
+
+
+  /// The show notes of an episode, as plain text.
+  ///
+  /// Feeds write the notes as HTML under `description`, or under the summary
+  /// of the podcast namespace; the track keeps the readable beginning of them.
+  static String? _descriptionOf(XmlElement item) => shortDescription(
+    _firstText([item], 'summary', fallback: _firstText([item], 'description')),
+  );
 
   /// Reads the first matching text of a list of elements.
   static String _firstText(

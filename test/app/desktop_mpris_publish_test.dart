@@ -188,6 +188,9 @@ class _FakeSingleInstanceService implements SingleInstanceService {
 /// A scanner that finds nothing.
 class _FakeScanner implements CrossPlatformMusicScanner {
   @override
+  bool get addressesSystemLibrary => false;
+
+  @override
   Future<Song?> scanMusicFile(String filePath) async => null;
 
   @override

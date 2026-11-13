@@ -4,6 +4,7 @@ import 'package:tune/data/services/music_sources/browse_mode.dart';
 import 'package:tune/data/services/music_sources/music_source_adapter.dart';
 import 'package:tune/data/services/music_sources/source_request_headers.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
@@ -23,6 +24,28 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
 
   /// The public discovery API asks every caller to name itself.
   static const _appName = 'tune';
+
+  /// The reaches of the trending list, in the names the network uses.
+  ///
+  /// The name is matched by the network itself, so only the reaches that were
+  /// read from it are offered; an unknown name answers with the whole list.
+  static const _genres = [
+    'Electronic',
+    'Hip-Hop/Rap',
+    'Jazz',
+    'Rock',
+    'Pop',
+    'R&B/Soul',
+    'Classical',
+    'Ambient',
+    'Techno',
+    'House',
+    'Dubstep',
+    'Folk',
+  ];
+
+  /// The windows the trending list may be read over.
+  static const _windows = ['week', 'month', 'allTime'];
 
   final Dio _dio;
 
@@ -66,12 +89,152 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
       AppStrings.instance.audiusFieldQueryHint,
     ),
     MusicSourceField(
+      'playlists',
+      AppStrings.instance.audiusFieldPlaylists,
+      AppStrings.instance.audiusFieldPlaylistsHint(
+        _playlistsPerScan.count,
+        _playlistsPerScan.max,
+      ),
+      numeric: true,
+    ),
+    MusicSourceField(
+      'mode',
+      AppStrings.instance.audiusFieldMode,
+      AppStrings.instance.audiusFieldModeHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusModeSongs),
+        MusicSourceChoice(_modePlaylists, AppStrings.instance.audiusModePlaylists),
+      ],
+    ),
+    MusicSourceField(
+      'genre',
+      AppStrings.instance.audiusFieldGenre,
+      AppStrings.instance.audiusFieldGenreHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusGenreAll),
+        for (final genre in _genres)
+          MusicSourceChoice(genre, _genreLabel(genre)),
+      ],
+    ),
+    MusicSourceField(
+      'window',
+      AppStrings.instance.audiusFieldWindow,
+      AppStrings.instance.audiusFieldWindowHint,
+      choices: [
+        MusicSourceChoice('', AppStrings.instance.audiusWindowDefault),
+        for (final window in _windows)
+          MusicSourceChoice(window, _windowLabel(window)),
+      ],
+    ),
+    MusicSourceField(
       'limit',
       AppStrings.instance.fieldLimit,
       AppStrings.instance.fieldLimitHint(scanLimit.count, scanLimit.max),
       numeric: true,
     ),
   ];
+
+
+  /// The name of the mode that reads playlists instead of single tracks.
+  static const _modePlaylists = 'playlists';
+
+  /// How many playlists one scan of the playlist mode reads, and the most it
+  /// may: a playlist holds dozens of tracks, so the window is the limit.
+  static final _playlistsPerScan = MusicSourceLimit(3, 10);
+
+  /// The songs of the playlists the site ranks highest, or of the playlists a
+  /// keyword is found in.
+  ///
+  /// A playlist holds dozens of tracks, so the scan keeps the window of the
+  /// limit from each of them instead of handing the whole list over.
+  Future<SourceScanResult> _playlistsScan(
+    MusicSourceScanRequest request, {
+    required String? query,
+    required int limit,
+  }) async {
+    final config = request.config;
+    try {
+      final window = config.setting('window')?.trim() ?? '';
+      final catalogues = await _dio.get<Map<String, dynamic>>(
+        query == null
+            ? '$_discoveryHost/v1/playlists/trending'
+            : '$_discoveryHost/v1/playlists/search',
+        queryParameters: {
+          'app_name': _appName,
+          'limit': '${_playlistsPerScan.read(config.setting('playlists'))}',
+          'query': ?query,
+          if (query == null && window.isNotEmpty) 'time': window,
+        },
+      );
+      final playlists = catalogues.data?['data'];
+      if (playlists is! List) {
+        return failedResult(
+          config.id,
+          AppStrings.instance.audiusEmptyResponse,
+        );
+      }
+
+      final songs = <Song>[];
+      for (final playlist in playlists) {
+        if (playlist is! Map) continue;
+        final id = playlist['id']?.toString() ?? '';
+        if (id.isEmpty) continue;
+
+        final tracks = await _dio.get<Map<String, dynamic>>(
+          '$_discoveryHost/v1/playlists/$id/tracks',
+          queryParameters: {'app_name': _appName},
+        );
+        final entries = tracks.data?['data'];
+        if (entries is! List) continue;
+        final fromPlaylist = parseResults(
+          {'data': entries},
+          sourceId: config.id,
+          limit: limit,
+        );
+        songs.addAll(fromPlaylist);
+      }
+
+      return SourceScanResult(
+        sourceId: config.id,
+        status: SourceScanStatus.success,
+        songs: songs,
+        message: songs.isEmpty ? AppStrings.instance.audiusNoMatch : null,
+      );
+    } catch (error) {
+      return failedResult(config.id, error);
+    }
+  }
+
+  /// The name of a reach in the language of the app.
+  static String _genreLabel(String genre) {
+    final strings = AppStrings.instance;
+    return switch (genre) {
+      'Electronic' => strings.audiusGenreElectronic,
+      'Hip-Hop/Rap' => strings.audiusGenreHipHop,
+      'Jazz' => strings.genreJazz,
+      'Rock' => strings.genreRock,
+      'Pop' => strings.genrePop,
+      'R&B/Soul' => strings.audiusGenreSoul,
+      'Classical' => strings.genreClassical,
+      'Ambient' => strings.audiusGenreAmbient,
+      'Techno' => strings.audiusGenreTechno,
+      'House' => strings.audiusGenreHouse,
+      'Dubstep' => strings.audiusGenreDubstep,
+      'Folk' => strings.genreFolk,
+      _ => genre,
+    };
+  }
+
+  /// The name of a window in the language of the app.
+  static String _windowLabel(String window) {
+    final strings = AppStrings.instance;
+    return switch (window) {
+      'week' => strings.audiusWindowWeek,
+      'month' => strings.audiusWindowMonth,
+      'allTime' => strings.audiusWindowAllTime,
+      _ => window,
+    };
+  }
 
   @override
   bool get supportsPaging => true;
@@ -85,17 +248,29 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
   @override
   Future<SourceScanResult> scan(MusicSourceScanRequest request) async {
     final query = request.config.setting('query');
+    final limit = scanLimit.read(request.config.setting('limit'));
+
+    if (request.config.setting('mode') == _modePlaylists) {
+      return _playlistsScan(request, query: query, limit: limit);
+    }
 
     try {
       // Without a keyword the scan pulls the tracks everybody plays; with
       // one it searches for it.
       final browsing = query == null;
+      final genre = request.config.setting('genre')?.trim() ?? '';
+      final window = request.config.setting('window')?.trim() ?? '';
       final response = await _dio.get<Map<String, dynamic>>(
         browsing
             ? '$_discoveryHost/v1/tracks/trending'
             : '$_discoveryHost/v1/tracks/search',
         queryParameters: browsing
-            ? {'app_name': _appName, 'offset': request.offset}
+            ? {
+                'app_name': _appName,
+                'offset': request.offset,
+                if (genre.isNotEmpty) 'genre': genre,
+                if (window.isNotEmpty) 'time': window,
+              }
             : {'query': query, 'app_name': _appName, 'offset': request.offset},
       );
       final data = response.data;
@@ -106,7 +281,6 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
         );
       }
 
-      final limit = scanLimit.read(request.config.setting('limit'));
       final songs = parseResults(
         data,
         sourceId: request.config.id,
@@ -198,10 +372,8 @@ class AudiusSourceAdapter extends MusicSourceAdapter {
     return null;
   }
 
-  static String? _descriptionOf(Map<Object?, Object?> raw) {
-    final description = raw['description']?.toString().trim() ?? '';
-    return description.isEmpty ? null : description;
-  }
+  static String? _descriptionOf(Map<Object?, Object?> raw) =>
+      shortDescription(raw['description']);
 
   /// The licence of a track, when the network states one.
   static String? _licenseOf(Object? value) {

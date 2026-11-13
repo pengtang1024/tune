@@ -49,6 +49,74 @@ void main() {
       expect(answers.uris.first.queryParameters['q'], 'jazz');
     });
 
+    test('a window of dates keeps the episodes published inside it', () async {
+      final dio = _CatalogDio(
+        search: '[{"url":"https://f1.example/feed.xml"}]',
+        feeds: {'https://f1.example/feed.xml': _datedFeedWith('One', 'f1')},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: dio.dio).scan(
+        _request('podcast_catalog', const {'since': '7'}),
+      );
+
+      // The feed holds two episodes, one of them from 2020.
+      expect(result.songs.map((song) => song.title), ['New episode of One']);
+    });
+    test('a tag reads the shows of that tag', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedXml('Show A', 'a')},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'tag': 'Comedy', 'limit': '8'}),
+      );
+
+      expect(result.status, SourceScanStatus.success);
+      expect(answers.uris.first.path, '/api/2/tag/comedy/8.json');
+      expect(result.songs.single.album, 'Show A');
+    });
+
+    test('a keyword still searches the whole directory', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedXml('Show A', 'a')},
+      );
+
+      await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'tag': 'comedy', 'query': 'jazz'}),
+      );
+
+      // The keyword wins over the tag: the search covers the whole directory.
+      expect(answers.uris.first.path, '/search.json');
+      expect(answers.uris.first.queryParameters['q'], 'jazz');
+    });
+    test('the reader decides how many episodes one show gives', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedWith('Show A', 'a', 6)},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {'episodes': '5'}),
+      );
+
+      // The show publishes six episodes; the scan reads the window asked for.
+      expect(result.songs, hasLength(5));
+    });
+
+    test('a show gives three episodes unless the reader asks otherwise', () async {
+      final answers = _CatalogDio(
+        search: _searchAnswer(),
+        feeds: {'https://a.example/feed.xml': _feedWith('Show A', 'a', 6)},
+      );
+
+      final result = await PodcastCatalogSourceAdapter(dio: answers.dio).scan(
+        _request('podcast_catalog', const {}),
+      );
+
+      expect(result.songs, hasLength(3));
+    });
     test('one broken feed does not fail the whole directory', () async {
       final answers = _CatalogDio(
         search: _searchAnswer(),
@@ -82,6 +150,31 @@ String _searchAnswer() =>
     '[{"url":"https://a.example/feed.xml"},'
     '{"url":"https://b.example/feed.xml"}]';
 
+/// The feed of one show, with an episode of today and one of 2020.
+String _datedFeedWith(String title, String id) {
+  final today = DateTime.now().toUtc();
+  String stamp(DateTime at) =>
+      '${_weekdays[at.weekday - 1]}, ${at.day.toString().padLeft(2, '0')} '
+      '${_months[at.month - 1]} ${at.year} '
+      '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}:00 +0000';
+  return '<?xml version="1.0" encoding="UTF-8"?>'
+      '<rss version="2.0"><channel><title>$title</title>'
+      '<item><title>New episode of $title</title>'
+      '<guid>new-$id</guid>'
+      '<enclosure url="https://cdn.example/$id-new.mp3" length="0" type="audio/mpeg" />'
+      '<pubDate>${stamp(today)}</pubDate></item>'
+      '<item><title>Old episode of $title</title>'
+      '<guid>old-$id</guid>'
+      '<enclosure url="https://cdn.example/$id-old.mp3" length="0" type="audio/mpeg" />'
+      '<pubDate>${stamp(DateTime.utc(2020, 1, 2, 9))}</pubDate></item>'
+      '</channel></rss>';
+}
+
+const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
 /// The feed of one show, with one episode.
 String _feedXml(String title, String id) =>
     '''
@@ -98,6 +191,23 @@ String _feedXml(String title, String id) =>
 </channel>
 </rss>
 ''';
+
+
+/// The feed of one show, with [episodes] episodes of its own.
+String _feedWith(String title, String id, int episodes) {
+  final items = [
+    for (var index = 1; index <= episodes; index++)
+      '  <item>'
+          '<title>Episode $index of $title</title>'
+          '<guid>episode-$id-$index</guid>'
+          '<enclosure url="https://cdn.example/$id-$index.mp3" length="0" type="audio/mpeg" />'
+          '<itunes:duration>00:12:30</itunes:duration>'
+          '</item>',
+  ].join();
+  return '<?xml version="1.0" encoding="UTF-8"?>'
+      '<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">'
+      '<channel><title>$title</title>$items</channel></rss>';
+}
 
 /// One scan of the directory.
 MusicSourceScanRequest _request(String id, Map<String, String> settings) {
