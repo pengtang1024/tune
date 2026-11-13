@@ -427,6 +427,55 @@ void main() {
       ]);
     });
 
+    test('a show carried by two sources becomes one album, one copy an episode', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Episode 1',
+          album: 'The Show',
+          sourceId: 'podcast_rss-1',
+          duration: 600000,
+          uri: 'tune://podcast/1',
+        ),
+        const Song(
+          id: 2,
+          title: 'Episode 2',
+          album: 'The Show',
+          sourceId: 'podcast_rss-1',
+          duration: 700000,
+          uri: 'tune://podcast/2',
+        ),
+        const Song(
+          id: 3,
+          title: 'Episode 1',
+          album: 'The Show',
+          sourceId: 'archive_podcasts',
+          duration: 601000,
+          uri: 'tune://archive/1',
+        ),
+        const Song(
+          id: 4,
+          title: 'Episode 2',
+          album: 'The Show',
+          sourceId: 'archive_podcasts',
+          duration: 700500,
+          uri: 'tune://archive/2',
+        ),
+      ]);
+
+      final album = database.albumSummaries().single;
+
+      expect(album.key, contains('show'));
+      expect(album.trackCount, 2);
+      expect(album.kind, ContentKind.podcast);
+      expect(database.albumSongs(album.key).map((song) => song.uri), [
+        'tune://podcast/1',
+        'tune://podcast/2',
+      ]);
+    });
+
     test('an album carries the kind of its tracks', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);

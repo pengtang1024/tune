@@ -7,6 +7,7 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/show_album.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -212,7 +213,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
     final radioActive = library.filter.kinds.contains(ContentKind.radio);
-    final hasRadio = library.songs.any((song) => song.isLiveStream);
+    // A station is a kind, not only a live stream: a recording of a broadcast
+    // is a station too, so it opens the same entry.
+    final hasRadio = library.songs.any(
+      (song) => contentKindOf(song) == ContentKind.radio,
+    );
 
     final content = Column(
       children: [
@@ -494,7 +499,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           );
           return LibraryAlbumsView(
             albums: library.albums,
-            currentAlbumKey: _currentAlbumKey(library.songs, currentUri),
+            currentAlbumKey: _currentAlbumKey(
+              library.albums,
+              library.songs,
+              currentUri,
+            ),
             controller: _albumsScrollController,
             bilingual: bilingual,
             onOpen: _openAlbumByKey,
@@ -696,10 +705,36 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
-  String? _currentAlbumKey(List<Song> librarySongs, String? currentUri) {
+  String? _currentAlbumKey(
+    List<AlbumSummary> albums,
+    List<Song> librarySongs,
+    String? currentUri,
+  ) {
     if (currentUri == null) return null;
+    Song? current;
     for (final song in librarySongs) {
-      if (song.uri == currentUri) return libraryAlbumKeyOf(song);
+      if (song.uri == currentUri) {
+        current = song;
+        break;
+      }
+    }
+    if (current == null) return null;
+    final ownKey = libraryAlbumKeyOf(current);
+    for (final album in albums) {
+      if (album.key == ownKey) return album.key;
+    }
+    // A show the library merged from several sources carries a key that names
+    // every source; the track belongs to that card when its source is one of
+    // them and the show name matches.
+    if (!contentKindOf(current).isSpokenWord) return null;
+    final name = normalizedShowNameOf(current.album);
+    final source = current.sourceId ?? 'local';
+    for (final album in albums) {
+      if (!isMergedShowKey(album.key)) continue;
+      final parts = album.key.split('\u0000');
+      if (parts.first != name) continue;
+      final sources = [for (final part in parts.skip(2)) ...part.split('\u0001')];
+      if (sources.contains(source)) return album.key;
     }
     return null;
   }

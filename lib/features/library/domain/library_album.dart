@@ -1,6 +1,7 @@
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/show_album.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// One album of the library: the songs of the album and the face of it.
@@ -78,15 +79,25 @@ class LibraryAlbum {
 /// was published.
 List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
   final groups = <String, List<Song>>{};
+  final spoken = <Song>[];
   for (final song in songs) {
+    final kind = contentKindOf(song);
     // A station is not an album: it never ends, and the names it carries
-    // describe the song that happens to air, not the stream itself.
-    if (song.isLiveStream) continue;
+    // describe the song that happens to air, not the stream itself. A
+    // recording of a broadcast is read as a station too, so it stays out.
+    if (kind == ContentKind.radio) continue;
+    if (kind.isSpokenWord) {
+      spoken.add(song);
+      continue;
+    }
     groups.putIfAbsent(libraryAlbumKeyOf(song), () => []).add(song);
+  }
+  for (final show in spokenAlbumsOf(spoken)) {
+    groups.putIfAbsent(show.key, () => []).addAll(show.songs);
   }
 
   final albums = <LibraryAlbum>[
-    for (final group in groups.values) _albumOf(group),
+    for (final group in groups.entries) _albumOf(group.value, key: group.key),
   ];
   albums.sort((left, right) {
     if (left.name.isEmpty != right.name.isEmpty) {
@@ -111,8 +122,8 @@ String libraryAlbumKeyOf(Song song) {
   );
 }
 
-LibraryAlbum _albumOf(List<Song> songs) {
-  final ordered = List<Song>.of(songs)..sort(_byAlbumOrder);
+LibraryAlbum _albumOf(List<Song> songs, {String? key}) {
+  final ordered = List<Song>.of(songs)..sort(albumOrderOf);
   final first = ordered.first;
 
   String? coverPath;
@@ -130,7 +141,7 @@ LibraryAlbum _albumOf(List<Song> songs) {
   }
 
   return LibraryAlbum(
-    key: libraryAlbumKeyOf(first),
+    key: key ?? libraryAlbumKeyOf(first),
     name: first.album.trim(),
     artist: first.artist.trim(),
     kind: contentKindOf(first),
@@ -138,12 +149,4 @@ LibraryAlbum _albumOf(List<Song> songs) {
     coverUrl: coverUrl,
     songs: List.unmodifiable(ordered),
   );
-}
-
-int _byAlbumOrder(Song left, Song right) {
-  final disc = (left.discNumber ?? 1).compareTo(right.discNumber ?? 1);
-  if (disc != 0) return disc;
-  final track = (left.trackNumber ?? 0).compareTo(right.trackNumber ?? 0);
-  if (track != 0) return track;
-  return compareText(left.title, right.title);
 }

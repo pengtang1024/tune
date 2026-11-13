@@ -12,7 +12,7 @@ String albumKeyOf({
 }) {
   final name = album.trim().toLowerCase();
   if (name.isEmpty) return '\u0000unknown';
-  if (isSpokenWordSource(sourceId)) {
+  if (contentKindOfSource(sourceId: sourceId).isSpokenWord) {
     return '$name\u0000src\u0000${sourceId ?? ''}';
   }
   return '$name\u0000${artist.trim().toLowerCase()}';
