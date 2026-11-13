@@ -227,8 +227,16 @@ class LibraryFilter {
 }
 ```
 
-- `ContentKind` 四值：`music / podcast / audiobook / radio`；`contentKindOfSource(sourceId, isLiveStream)` 是唯一判据，
-  live 优先归电台，其次按音源类型分播客 / 有声书，其余是音乐。
+- `ContentKind` 四值：`music / podcast / audiobook / radio`。判据按顺序读：
+  1. `isLiveStream` 为真 → 电台；
+  2. 实例声明表 `declaredContentKinds`（按完整实例 id）→ 该类型；
+  3. 非本地音源按类型集合（`podcastSourceTypes` / `audiobookSourceTypes`）；
+  4. 本地文件按 `localContentKindOf`：显式 `genre` / `genres` 标签 > `.m4b` > 路径文件夹段 > 音乐。
+- 声明表就是同适配器不同语义的落点：`archive_podcasts` → 播客，`independent_audiobooks` → 有声书，
+  `old_time_radio` / `radio_recordings` → 电台，`foreign_audio` 不声明（按类型即音乐）。
+- 电台的「直播 / 录音」不再新增字段：`ContentKind.radio` 且 `isLiveStream == false` 就是录音；
+  行副标题据此写「直播中」或「录音」。
+- 本地规则只用中英名单，**不用时长猜**：标签与文件夹名见 `content_kind.dart` 的四个常量集合。
 - 与 `LibrarySort` 同属 library domain；`LibraryState.filter` 是唯一来源。
 - `filteredSongsOf` 保留为测试/缓存状态的兜底；生产路径由 SQL 返回已筛选的窗口。
 
@@ -241,9 +249,13 @@ class LibraryFilter {
 - 音源：`COALESCE(source_id,'local') IN (…)`。
 - 语言：入库时把 `language` 归一（小写 ISO-639-1，认不出保留原值）写入 `songs.language` 真实列；
   旧库启动时一次性回填；`songs.language IN (…)`。
-- 类型：`radio` = `json_extract(json,'$.isLiveStream') = 1`；`podcast` / `audiobook` = 非 live 且
-  `source_id` 等于该类型名或 `GLOB '<type>-[0-9]*'`（新建实例的 id）；`music` = 非 live 且不属于前两者。
-  与 `contentKindOfSource` 同序，live 优先。
+- 类型：三条谓词由 domain 常量生成，与 `contentKindOfFields` 同序：
+  - `LibraryFilterSql.radio` = `COALESCE(isLiveStream,0)=1` OR 声明为电台的实例；
+  - `LibraryFilterSql.spokenWord` = 非无线电、非电台实例，且（播客源 / 播客实例 / 本地有声书或播客规则）；
+  - `music` = 非无线电、非电台实例、非播客、非有声书；
+  - `podcast` / `audiobook` = `spokenWord` 各自的一半；
+  - 本地规则用 `genre` / `genres` 的 LIKE 与 `localPath` 的目录段复刻 Dart 侧优先级，
+    `.m4b` 单独判断；两侧都由 `content_kind.dart` 的同一组常量生成。
 - 格式：入库时把 `type` / URI 扩展名归一成 `mp3/flac/ogg/m4a/wav/other` 写入 `songs.format` 真实列；
   旧库同样回填；`songs.format IN (…)`。
 - 时长：`duration` 毫秒分桶。
@@ -269,6 +281,19 @@ class LibraryFilter {
 - 分类视图一次只查当前分段（不是七组一起），首屏 ≤ 150ms；切换分段再查。
 - 封面样本只取路径，不读图；无封面用首字母/格式图标。
 - 分类视图与筛选面板共用同一份计数缓存；扫描/增删后失效。
+
+### 5.5 跨源同名节目合并
+
+- 语音节目（播客 / 有声书）按 `normalizedShowNameOf(album)`（trim + 小写）分组，同组内再按来源聚类。
+- **保险闸门**：两个来源只有在节目名归一化后完全相等、且至少两条证据对得上时才合并——
+  两个集名归一化后相同，或两个时长差 ≤ 2 秒（`_showsOverlap`）。只有一条相同仍分卡。
+- 合并后的卡键为 `<节目名>\0show\0<来源 id 列表，\u0001 分隔>`；未合并的单源卡保持
+  `albumKeyOf` 的 `name\0src\0sourceId`（或音乐的 `name\0artist`）。
+- 卡内单集按 `sameEpisode`（集名相同，且任一缺失时长或差 ≤ 2 秒）去重，保留
+  `playbackPriorityOf` 最高的一条：本地 0 > 自建 feed（`podcast_rss` / `librivox` / `audiobookshelf`）1 >
+  目录（`podcast_catalog` / `podcast_apple`）2 > 档案（`internet_archive`）3。
+- SQL 路径的专辑摘要照旧是 SQL 聚合（音乐）；语音部分读回 `json` 交给 `spokenAlbumsOf`，
+  打开合并卡时 `albumSongs` 按 `\0show\0` 的来源集合取单集再去重排序。
 
 ## 6. 性能预算
 
@@ -350,6 +375,10 @@ class LibraryFilter {
 - 分类视图点卡 → 列表带上正确筛选；再点「分类」回到分类视图（不保留原来的网格滚动位置）。
 - 七类分类都在：流派 / 年代 / 艺术家 / 音源 / 语言 / 格式 / 类型；语言/格式/类型计数正确。
 - 页头「电台」只在本库有台站时出现；点击后只剩台站，再点只移除电台一项。
+- 电台行副行：真直播写「直播中」（有在播信息时写在播信息），录音写「录音」。
+- 本地文件：`.m4b` 或 `genre`/`genres` 带中英有声书标签、或多级文件夹命中中英名单 → 有声书；
+  播客标签 / 文件夹 → 播客；其余音乐。只用名单，不看时长。
+- 跨源同名节目：两条证据才合并成一张卡；只有一条证据仍分卡；合并卡里重复集只留优先级最高的一条。
 - 专辑墙：单节无节头；音乐 + 播客时两节都有节头；节目「集」、书「章」、音乐「首」；电台不入墙、不改专辑数。
 - 900×600 与 1120×760：分类树默认收起；打开时浮动在页面上，表格不被挤窄。
 - 空结果、无封面、无流派、`year=0`、`dateAdded=0`、无语言、未知格式都有确定表现。
