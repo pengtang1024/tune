@@ -11,7 +11,7 @@ set -euo pipefail
 
 version=8.0.1
 channel=components-ffmpeg-$version
-out_dir=${1:-dist}
+out_dir=$(realpath -m "${1:-dist}")
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
