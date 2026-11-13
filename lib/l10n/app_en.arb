@@ -1283,6 +1283,7 @@
   "embyAuthFailed": "Cannot reach the Emby server, check the address and the account",
   "audioSourceStreaming": "Network",
   "playerLiveBadge": "LIVE",
+  "playerRecordedBadge": "Recording",
   "nowPlayingLiveStream": "Live stream, no fixed length",
   "nowPlayingDetails": "Track details",
   "nowPlayingDetailAlbum": "Album",

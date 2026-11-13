@@ -72,6 +72,9 @@ class LibraryFacetsQuery {
       'songs.duration AS duration',
       'songs.date_added AS added',
       'songs.year AS year',
+      "json_extract(songs.json, '\$.uri') AS uri",
+      "json_extract(songs.json, '\$.localPath') AS localPath",
+      'songs.genre AS genre',
     ];
     final args = <Object?>[];
     for (final group in _FacetGroup.values) {
@@ -100,7 +103,7 @@ class LibraryFacetsQuery {
       var failures = 0;
       var failedAt = -1;
       for (var index = 0; index < _FacetGroup.values.length; index++) {
-        if ((row.columnAt(8 + index) as int?) == 0) {
+        if ((row.columnAt(11 + index) as int?) == 0) {
           failures++;
           failedAt = index;
           if (failures > 1) break;
@@ -164,9 +167,12 @@ class LibraryFacetsQuery {
         }
       }
       if (keepsKinds) {
-        final kind = contentKindOfSource(
+        final kind = contentKindOfFields(
           sourceId: row.columnAt(1) as String?,
           isLiveStream: (row.columnAt(2) as int?) == 1,
+          uri: row.columnAt(8) as String?,
+          localPath: row.columnAt(9) as String?,
+          genre: row.columnAt(10) as String?,
         );
         kinds[kind] = (kinds[kind] ?? 0) + 1;
       }

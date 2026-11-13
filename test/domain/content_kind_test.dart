@@ -69,4 +69,50 @@ void main() {
       ContentKind.music,
     );
   });
+
+  test('a book on this machine is read from its tag, container or folder', () {
+    ContentKind kindOf(String path, {String? genre}) => localContentKindOf(
+      path: path,
+      genre: genre,
+    );
+
+    expect(kindOf('/books/one.m4b'), ContentKind.audiobook);
+    expect(kindOf('/books/one.mp3', genre: '有声书'), ContentKind.audiobook);
+    expect(kindOf('/books/one.mp3', genre: 'Podcast; Audiobook'), ContentKind.audiobook);
+    expect(kindOf('/Music/audiobooks/one.mp3'), ContentKind.audiobook);
+    expect(kindOf('/Music/听书/one.mp3'), ContentKind.audiobook);
+    expect(kindOf('/Music/podcasts/one.mp3'), ContentKind.podcast);
+    expect(kindOf('/Music/播客/one.mp3'), ContentKind.podcast);
+    expect(kindOf('/Music/one.mp3', genre: 'Jazz'), ContentKind.music);
+    expect(kindOf('/Music/albums/one.flac'), ContentKind.music);
+  });
+
+  test('a book folder beats a podcast folder below it', () {
+    expect(
+      localContentKindOf(path: '/Music/audiobooks/podcasts/one.mp3'),
+      ContentKind.audiobook,
+    );
+  });
+
+  test('a built-in instance declares the kind its adapter cannot tell', () {
+    expect(contentKindOfSource(sourceId: 'archive_podcasts'), ContentKind.podcast);
+    expect(
+      contentKindOfSource(sourceId: 'independent_audiobooks'),
+      ContentKind.audiobook,
+    );
+    expect(contentKindOfSource(sourceId: 'old_time_radio'), ContentKind.radio);
+    expect(contentKindOfSource(sourceId: 'radio_recordings'), ContentKind.radio);
+    expect(contentKindOfSource(sourceId: 'foreign_audio'), ContentKind.music);
+  });
+
+  test('a recording of a station is a station, not a live stream', () {
+    const recording = Song(
+      id: 5,
+      uri: 'tune://internet_archive/old-time-radio/1',
+      sourceId: 'radio_recordings',
+    );
+
+    expect(contentKindOf(recording), ContentKind.radio);
+    expect(recording.isLiveStream, isFalse);
+  });
 }

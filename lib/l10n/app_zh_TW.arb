@@ -1283,6 +1283,7 @@
   "embyAuthFailed": "無法連線 Emby 伺服器，請檢查位址與帳號",
   "audioSourceStreaming": "網路",
   "playerLiveBadge": "直播中",
+  "playerRecordedBadge": "錄音",
   "nowPlayingLiveStream": "直播串流，沒有固定時長",
   "nowPlayingDetails": "曲目資訊",
   "nowPlayingDetailAlbum": "專輯",

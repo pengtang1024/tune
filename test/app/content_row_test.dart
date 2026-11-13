@@ -149,6 +149,25 @@ void main() {
     expect(subtitle, '直播中');
   });
 
+  testWidgets('a recording of a station says it is a recording', (
+    tester,
+  ) async {
+    const recording = Song(
+      id: 9,
+      title: 'Old Time Radio',
+      uri: 'tune://internet_archive/old-time-radio/1',
+      sourceId: 'radio_recordings',
+    );
+
+    expect(rowShapeOf(recording), RowShape.radio);
+    final subtitle = await read(
+      tester,
+      (context) => rowSubtitleOf(context, recording),
+    );
+
+    expect(subtitle, '录音');
+  });
+
   testWidgets('a station writes nothing into the artist and album columns', (
     tester,
   ) async {

@@ -5027,6 +5027,12 @@ abstract class AppLocalizations {
   /// **'直播中'**
   String get playerLiveBadge;
 
+  /// No description provided for @playerRecordedBadge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'录音'**
+  String get playerRecordedBadge;
+
   /// No description provided for @nowPlayingLiveStream.
   ///
   /// In zh_CN, this message translates to:

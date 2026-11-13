@@ -2932,6 +2932,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerLiveBadge => 'LIVE';
 
   @override
+  String get playerRecordedBadge => 'Recording';
+
+  @override
   String get nowPlayingLiveStream => 'Live stream, no fixed length';
 
   @override

@@ -34,7 +34,11 @@ RowShape rowShapeOf(Song song) {
 /// names it publishes are not its own artist and album.
 String rowSubtitleOf(BuildContext context, Song song) {
   return switch (rowShapeOf(song)) {
-    RowShape.radio => onAirLineOf(context, song) ?? context.loc.playerLiveBadge,
+    // A station that is airing right now names what plays; one that is only
+    // a recording of a broadcast says so, because nothing is live.
+    RowShape.radio => song.isLiveStream
+        ? (onAirLineOf(context, song) ?? context.loc.playerLiveBadge)
+        : context.loc.playerRecordedBadge,
     RowShape.spokenWord => _spokenSubtitle(context, song),
     RowShape.track => _trackSubtitle(context, song),
   };

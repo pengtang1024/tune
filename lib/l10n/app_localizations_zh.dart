@@ -2690,6 +2690,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerLiveBadge => '直播中';
 
   @override
+  String get playerRecordedBadge => '录音';
+
+  @override
   String get nowPlayingLiveStream => '直播流，没有固定时长';
 
   @override
@@ -6720,6 +6723,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get playerLiveBadge => '直播中';
 
   @override
+  String get playerRecordedBadge => '录音';
+
+  @override
   String get nowPlayingLiveStream => '直播流，没有固定时长';
 
   @override
@@ -10748,6 +10754,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get playerLiveBadge => '直播中';
+
+  @override
+  String get playerRecordedBadge => '錄音';
 
   @override
   String get nowPlayingLiveStream => '直播串流，沒有固定時長';

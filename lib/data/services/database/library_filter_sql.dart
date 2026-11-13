@@ -178,45 +178,111 @@ class LibraryFilterSql {
   static String _marks(int count) => List.filled(count, '?').join(', ');
 
   static const String _live =
-      "json_extract(songs.json, '\$.isLiveStream') = 1";
+      "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) = 1";
   static const String _notLive =
       "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) != 1";
-  static const List<String> _podcastTypes = [
-    'podcast_rss',
-    'podcast_catalog',
-    'podcast_apple',
-  ];
-  static const List<String> _audiobookTypes = ['librivox', 'audiobookshelf'];
 
-  /// The tracks of the chosen content kinds.
+  /// A station or a recording of one: a live row, or a row of a built-in
+  /// instance that declares itself a station.
+  static String get radio => '($_live OR ${_declaredOf(ContentKind.radio)})';
+
+  /// Speech: an episode of a show or a chapter of a book.
   ///
   /// A station wins over its source, exactly as [contentKindOfSource] does:
-  /// a live row never counts as a podcast episode or an audiobook chapter.
+  /// a stream of a feed is a station, not an episode.
+  static String get spokenWord =>
+      '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
+      'AND ($_podcastWhere OR $_audiobookWhere))';
+
+  /// The tracks of the chosen content kinds.
   static ({String sql, List<Object?> args})? kind(Set<ContentKind> kinds) {
     if (kinds.isEmpty) return null;
-    final speech = '($_notLive AND (${_sourcesOf([
-      ..._podcastTypes,
-      ..._audiobookTypes,
-    ])}))';
     final conditions = [
       for (final kind in kinds)
         switch (kind) {
-          ContentKind.radio => _live,
-          ContentKind.music => '($_notLive AND NOT $speech)',
+          ContentKind.radio => radio,
+          ContentKind.music =>
+            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
+                'AND NOT $_podcastWhere AND NOT $_audiobookWhere)',
           ContentKind.podcast =>
-            '($_notLive AND (${_sourcesOf(_podcastTypes)}))',
+            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
+                'AND $_podcastWhere)',
           ContentKind.audiobook =>
-            '($_notLive AND (${_sourcesOf(_audiobookTypes)}))',
+            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
+                'AND $_audiobookWhere)',
         },
     ];
     return (sql: '(${conditions.join(' OR ')})', args: const []);
   }
+
+  static String get _podcastWhere =>
+      '(${_sourcesOf(podcastSourceTypes)} OR '
+      '${_declaredOf(ContentKind.podcast)} OR $_localPodcast)';
+
+  static String get _audiobookWhere =>
+      '(${_sourcesOf(audiobookSourceTypes)} OR '
+      '${_declaredOf(ContentKind.audiobook)} OR $_localAudiobook)';
+
+  /// The built-in instances that publish one kind under an adapter shared
+  /// with instances that publish another.
+  static String _declaredOf(ContentKind kind) {
+    final ids = [
+      for (final entry in declaredContentKinds.entries)
+        if (entry.value == kind) entry.key,
+    ];
+    if (ids.isEmpty) return '0';
+    return '(${ids.map((id) => "COALESCE(songs.source_id, '') = '$id'").join(' OR ')})';
+  }
+
+  static const String _localSource =
+      "(COALESCE(songs.source_id, 'local') = 'local')";
+
+  /// The path of a local file, with the separators of every platform written
+  /// the same way.
+  static const String _localPath =
+      "REPLACE(LOWER(COALESCE("
+      "json_extract(songs.json, '\$.localPath'), "
+      "json_extract(songs.json, '\$.uri'), '')), '\\', '/')";
+
+  static final String _hasAudiobookTag = _tagOf(audiobookGenreTags);
+  static final String _hasPodcastTag = _tagOf(podcastGenreTags);
+
+  static String _tagOf(Set<String> tags) {
+    final column = [
+      for (final tag in tags) "COALESCE(LOWER(songs.genre) LIKE '%$tag%', 0)",
+    ].join(' OR ');
+    final list = [
+      for (final tag in tags) "LOWER(g.value) LIKE '%$tag%'",
+    ].join(' OR ');
+    return '(($column) OR EXISTS ('
+        "SELECT 1 FROM json_each(songs.json, '\$.genres') g "
+        'WHERE $list))';
+  }
+
+  static String _foldersOf(Set<String> names) => [
+    for (final name in names) "$_localPath LIKE '%/$name/%'",
+  ].join(' OR ');
+
+  /// A book, read aloud, sitting on this machine.
+  ///
+  /// The order is the order of confidence of [localContentKindOf]: an
+  /// explicit tag first, then the container of a book, then the folder.
+  static final String _localAudiobook =
+      '($_localSource AND ($_hasAudiobookTag OR '
+      '(NOT $_hasPodcastTag AND '
+      "($_localPath LIKE '%.m4b' OR ${_foldersOf(audiobookFolderNames)}))))";
+
+  static final String _localPodcast =
+      '($_localSource AND NOT $_hasAudiobookTag AND '
+      '($_hasPodcastTag OR '
+      "(NOT $_localPath LIKE '%.m4b' AND ${_foldersOf(podcastFolderNames)})))";
 
   /// A built-in instance keeps the id of its type; a created one is
   /// `<type>-<n>`. GLOB reads `_` as a literal, unlike LIKE, so the source
   /// types need no escaping.
   static String _sourcesOf(Iterable<String> types) => [
     for (final type in types)
-      "(source_id = '$type' OR source_id GLOB '$type-[0-9]*')",
+      "(COALESCE(songs.source_id, '') = '$type' "
+          "OR songs.source_id GLOB '$type-[0-9]*')",
   ].join(' OR ');
 }
