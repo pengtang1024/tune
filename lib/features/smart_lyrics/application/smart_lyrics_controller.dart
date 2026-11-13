@@ -17,6 +17,7 @@ import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_local_engine.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -102,6 +103,17 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
   // A phone cannot run the local engines at all: asking them once per song
   // only wrote the same failure into the log and the health ledger.
   final localEngines = AppCapabilities.current.externalToolPipeline;
+  // The optional third family joins only after its model was downloaded
+  // (or found on the machine). Nothing is fetched by default, so the
+  // default pool stays Whisper small + SenseVoice (D12).
+  final funasrReady = ref.watch(
+    localComponentsControllerProvider.select(
+      (states) =>
+          states.valueOrNull?[LocalComponentRegistry.funasrNanoModel.id]
+              ?.usable ??
+          false,
+    ),
+  );
 
   return SmartLyricsService(
     engines: [
@@ -121,6 +133,19 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
           ),
           modelDirOf: () async => (await components()).directory(
             LocalComponentRegistry.sensevoiceModel,
+          ),
+        ),
+      // The optional quality pack: same binary, a different family, and no
+      // vote until the reader brings its model home.
+      if (localEngines && funasrReady)
+        SherpaLocalEngine(
+          model: 'funasr-nano',
+          family: SherpaModelFamily.funAsrNano,
+          binaryOf: () async => (await components()).executable(
+            LocalComponentRegistry.sherpaRuntime,
+          ),
+          modelDirOf: () async => (await components()).directory(
+            LocalComponentRegistry.funasrNanoModel,
           ),
         ),
       if (localEngines && local.isNotEmpty)

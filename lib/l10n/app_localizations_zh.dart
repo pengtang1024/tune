@@ -3980,10 +3980,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
-      'Sherpa-onnx 运行时（SenseVoice）';
+      'Sherpa-onnx 运行时（SenseVoice / Fun-ASR-Nano）';
 
   @override
   String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可选）';
 
   @override
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
@@ -8167,10 +8170,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
-      'Sherpa-onnx 运行时（SenseVoice）';
+      'Sherpa-onnx 运行时（SenseVoice / Fun-ASR-Nano）';
 
   @override
   String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可选）';
 
   @override
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
@@ -12355,10 +12361,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
-      'Sherpa-onnx 執行環境（SenseVoice）';
+      'Sherpa-onnx 執行環境（SenseVoice / Fun-ASR-Nano）';
 
   @override
   String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可選）';
 
   @override
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式轉碼）';

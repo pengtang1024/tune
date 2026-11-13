@@ -19,6 +19,7 @@ enum LocalComponentLabel {
   whisperModelLargeTurbo,
   sherpaRuntime,
   sensevoiceModel,
+  funasrNanoModel,
   ffmpeg,
 }
 

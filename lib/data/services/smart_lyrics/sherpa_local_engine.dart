@@ -10,12 +10,17 @@ import 'package:tune/utils/logger.dart';
 
 export 'package:tune/data/services/smart_lyrics/sherpa_local_exception.dart';
 
-/// The binary, the model and the tokens of one channel.
-typedef _Target = ({File binary, File tokens, File onnx});
+/// The model family the shared `sherpa-onnx-offline` binary recognizes.
+enum SherpaModelFamily { sensevoice, funAsrNano }
 
-/// The second ASR family the confidence story needs (M12): SenseVoice via
-/// sherpa-onnx — Apache/MIT licensed, free, offline, and a **different
-/// algorithm** from whisper, so the two can cross-prove a line.
+/// The binary and the model arguments of one channel.
+typedef _Target = ({File binary, List<String> args});
+
+/// The independent ASR family the confidence story needs (M12): SenseVoice
+/// via sherpa-onnx — Apache-2.0 runtime, free, offline, and a **different
+/// algorithm** from whisper, so the two can cross-prove a line. The same
+/// binary also runs the optional Fun-ASR-Nano model (D12), which is a third
+/// family the reader may install.
 ///
 /// The binary prints one JSON of token-level timestamps to stdout; the
 /// engine cuts the text into lines at the silences between tokens — a
@@ -28,14 +33,16 @@ typedef _Target = ({File binary, File tokens, File onnx});
 /// again: the audio is cut into [chunk] long pieces, and every piece runs
 /// under a 4 GB memory ceiling ([SherpaProcessLimit]).
 class SherpaLocalEngine extends SmartLyricsEngine {
-  /// The model name the channel votes under — `sensevoice`.
+  /// The model name the channel votes under — `sensevoice` or `funasr-nano`.
   final String model;
+
+  /// The family whose files and flags the model folder holds.
+  final SherpaModelFamily family;
 
   /// The `sherpa-onnx-offline` binary; `null` means not installed.
   final Future<File?> Function() binaryOf;
 
-  /// The folder holding `tokens.txt` and the model onnx; `null` means the
-  /// model is not downloaded.
+  /// The folder holding the model; `null` means it is not downloaded.
   final Future<Directory?> Function() modelDirOf;
 
   /// The longest piece handed to the recognizer at once.
@@ -52,6 +59,7 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     required this.model,
     required this.binaryOf,
     required this.modelDirOf,
+    this.family = SherpaModelFamily.sensevoice,
     this.chunk = const Duration(minutes: 5),
     this.longestTrack = const Duration(hours: 6),
   });
@@ -87,7 +95,8 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     }
   }
 
-  /// The channel's files, or the reason there is no channel to run.
+  /// The channel's binary and model flags, or the reason there is no
+  /// channel to run.
   Future<_Target> _target() async {
     final binary = await binaryOf();
     if (binary == null) {
@@ -95,16 +104,57 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     }
     final modelDir = await modelDirOf();
     if (modelDir == null) {
-      throw const SherpaLocalException(
-        'the sensevoice model is not downloaded',
+      throw SherpaLocalException(
+        'the $_modelName model is not downloaded',
       );
     }
+    final args = switch (family) {
+      SherpaModelFamily.sensevoice => await _senseVoiceArgs(modelDir),
+      SherpaModelFamily.funAsrNano => await _funAsrNanoArgs(modelDir),
+    };
+    return (binary: binary, args: args);
+  }
+
+  String get _modelName => switch (family) {
+    SherpaModelFamily.sensevoice => 'sensevoice',
+    SherpaModelFamily.funAsrNano => 'funasr-nano',
+  };
+
+  Future<List<String>> _senseVoiceArgs(Directory modelDir) async {
     final tokens = File('${modelDir.path}/tokens.txt');
     final onnx = File('${modelDir.path}/model.int8.onnx');
     if (!await tokens.exists() || !await onnx.exists()) {
       throw const SherpaLocalException('the model folder is incomplete');
     }
-    return (binary: binary, tokens: tokens, onnx: onnx);
+    return [
+      '--tokens=${tokens.path}',
+      '--sense-voice-model=${onnx.path}',
+    ];
+  }
+
+  Future<List<String>> _funAsrNanoArgs(Directory modelDir) async {
+    final root = modelDir.path;
+    final encoder = File('$root/encoder_adaptor.int8.onnx');
+    final llm = File('$root/llm.int8.onnx');
+    final embedding = File('$root/embedding.int8.onnx');
+    // The tokenizer flag names a folder; the binary reads these three out of
+    // it and ignores the model files that sit beside them.
+    for (final name in const ['vocab.json', 'merges.txt', 'tokenizer.json']) {
+      if (!await File('$root/$name').exists()) {
+        throw const SherpaLocalException('the model folder is incomplete');
+      }
+    }
+    if (!await encoder.exists() ||
+        !await llm.exists() ||
+        !await embedding.exists()) {
+      throw const SherpaLocalException('the model folder is incomplete');
+    }
+    return [
+      '--funasr-nano-encoder-adaptor=${encoder.path}',
+      '--funasr-nano-llm=${llm.path}',
+      '--funasr-nano-embedding=${embedding.path}',
+      '--funasr-nano-tokenizer=$root',
+    ];
   }
 
   /// The audio, or the reason the binary must not see it.
@@ -159,8 +209,7 @@ class SherpaLocalEngine extends SmartLyricsEngine {
 
   /// One piece through the binary, inside its memory ceiling.
   Future<String> _run(_Target target, File audio) => _runner.run(target.binary, [
-    '--tokens=${target.tokens.path}',
-    '--sense-voice-model=${target.onnx.path}',
+    ...target.args,
     '--num-threads=${Platform.numberOfProcessors.clamp(1, 4)}',
     audio.path,
   ]);

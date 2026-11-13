@@ -29,9 +29,12 @@
 | 翻译 | `translation-runtime`（llama.cpp）、`translation-model`（Qwen3-0.6B，默认）、`translation-model-low`（Qwen2.5-0.5B，低配）、`translation-model-quality`（Qwen2.5-1.5B，可选） |
 | 歌词 | `lyrics-whisper-runtime`（whisper-cli）、`lyrics-whisper-model-{tiny,base,small,large-v3-turbo}`（ggml） |
 | 歌词第二票 | `lyrics-sherpa-runtime`（sherpa-onnx）、`lyrics-sensevoice-model` |
+| 歌词可选第三家族 | `lyrics-funasr-nano-model`（Fun-ASR-Nano，复用上面的 sherpa-onnx 运行时） |
 | 转码 | `ffmpeg`（GPL-2.0-or-later 构建，由本项目自己发布） |
 
 运行时与模型分开下载、分开校验、分开删除。翻译模型按默认、低配、高质量三档并列；引擎取第一个可用的档位，下载仍从默认档开始。SenseVoice 体积大且权重协议需单独确认，只在读者点击时下载，不进默认安装。
+
+Fun-ASR-Nano 是可选的第三 ASR 家族（`docs/local-ai-evaluation.md` D12），不新增运行时：同一份 `sherpa-onnx-offline` 用 `--funasr-nano-encoder-adaptor` / `--funasr-nano-llm` / `--funasr-nano-embedding` / `--funasr-nano-tokenizer` 识别它。模型约 948 MB（int8），六个文件平铺在组件根目录；根目录同时作为 tokenizer 目录（`vocab.json`、`merges.txt`、`tokenizer.json`）。**默认不下载，也不进默认两票**：只有读者在设置页装了它，票池才会多出 `local:funasr-nano` 这一票。它的 token 时间是等间隔近似，不是真实词级对齐，长音频仍按 5 分钟分片。
 
 FFmpeg 由本项目自己构建并发布：`tool/build_ffmpeg.sh` 从 ffmpeg.org 源码编译 8.0.1，归档内固定带 `COPYING.GPLv2` 与写明源码地址、源码 sha256、configure 行的 `README.tune.txt`，上传到 GitHub Release 后由 app 下载。系统已装的 `ffmpeg` 仍然优先；两者都没有时跳过转码，原音频直接交给引擎。GPL 义务见 `docs/licensing.md` §1、§3。
 
@@ -64,6 +67,7 @@ checking ──> notInstalled ──> downloading ──> verifying ──> read
 - 翻译：`llama-cli` 先在 PATH 找；模型先认 `TUNE_TRANSLATION_DIR`、旧 `translation/models/`，再按默认 → 低配 → 高质量找 `components/translation-model*`。
 - 歌词：`whisper-cli` / `whisper-cpp` / `whisper` 先在 PATH、`~/.local/bin`、`~/bin` 找；模型先认旧 `whisper/models/`，再用组件。
 - SenseVoice：`~/.local/opt/sherpa-onnx/bin` 与 `.../models/sense-voice` 优先，组件兜底。
+- Fun-ASR-Nano：同一份 `~/.local/opt/sherpa-onnx/bin`；模型先认 `.../models/funasr-nano`，再用 `components/lyrics-funasr-nano-model`。
 - FFmpeg：先找 PATH 与 `/usr/bin`、`/usr/local/bin`，没有再用 `components/ffmpeg`；两者都没有时保持现有行为——跳过转码，原音频直接交给引擎。
 
 组件下载只负责“没有系统版本时也能用”，不改变已有系统的优先级。
@@ -95,7 +99,7 @@ Future<int> installedBytes(LocalComponentSpec spec);
 
 ## 6. 上游与校验
 
-组件源固定写在 registry：GitHub Release 资产与 HuggingFace 文件都使用发布方公布的字节数与 sha256（HF LFS 的 `oid` 就是文件 sha256）。Whisper 的 `ggml-*.bin` 与 SenseVoice 的 `tokens.txt` 在实现时取一次清单并钉死，避免运行时再依赖远端清单。
+组件源固定写在 registry：GitHub Release 资产与 HuggingFace 文件都使用发布方公布的字节数与 sha256（HF LFS 的 `oid` 就是文件 sha256）。Whisper 的 `ggml-*.bin` 与 SenseVoice 的 `tokens.txt` 在实现时取一次清单并钉死，避免运行时再依赖远端清单。Fun-ASR-Nano 的六个文件取自 `csukuangfj/sherpa-onnx-funasr-nano-int8-2025-12-30`，总大小约 1,009,605,061 字节。
 
 FFmpeg 是唯一由本项目自建的组件：源码与构建配置写进 `tool/build_ffmpeg.sh`，归档上传到自己的 GitHub Release；升级版本时源码地址、configure 行、字节数与 sha256 必须同一次提交一起改。
 

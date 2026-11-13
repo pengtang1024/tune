@@ -49,3 +49,15 @@
 - [x] `docs/smart-lyrics.md` 修正 SenseVoice 许可证；`THIRD_PARTY_NOTICES.md` 补 whisper / sherpa-onnx / SenseVoice / Qwen3
 - [x] 4 个 arb + `flutter gen-l10n`；`flutter analyze`、非联网 `flutter test` 全绿
 - [x] 只提交本线文件，提交 `feat(components): 默认档位与 FFmpeg 合规调整`，不 push
+
+## T10 Fun-ASR-Nano 可选第三家族（D12）
+- [x] `local_component.dart` 增加 `LocalComponentLabel.funasrNanoModel`
+- [x] `local_component_registry.dart` 增加 `funasrNanoModel`：id `lyrics-funasr-nano-model`，6 个文件平铺，字节数与 sha256 钉死；加入 `all` 的歌词组
+- [x] `sherpa_local_engine.dart` 增加 `SherpaModelFamily`（默认 `sensevoice`），`_Target` 改为带参数列表，Fun-ASR-Nano 传 `--funasr-nano-*`
+- [x] `smart_lyrics_controller.dart` 仅在组件 `usable` 时注册 `local:funasr-nano`，默认两票不变
+- [x] `settings_local_components_card.dart` 歌词组追加该组件
+- [x] 4 个 ARB + `flutter gen-l10n`（新键与共享 sherpa 运行时标签）
+- [x] `docs/local-components.md`、`docs/smart-lyrics.md`、`THIRD_PARTY_NOTICES.md` 补家族清单/许可
+- [x] `sherpa_local_engine_test.dart` 增加 Fun-ASR-Nano 参数分支测试
+- [x] `flutter analyze` 与非联网 `flutter test` 全绿（联网 `music_source_e2e_live_test.dart` 外部服务失败，与本线无关）
+- [x] 只提交本线文件（不碰 `docs/local-ai-evaluation.md` 与壳层改动）

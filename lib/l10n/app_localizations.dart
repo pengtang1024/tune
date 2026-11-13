@@ -7448,7 +7448,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLocalComponentSherpaRuntime.
   ///
   /// In zh_CN, this message translates to:
-  /// **'Sherpa-onnx 运行时（SenseVoice）'**
+  /// **'Sherpa-onnx 运行时（SenseVoice / Fun-ASR-Nano）'**
   String get settingsLocalComponentSherpaRuntime;
 
   /// No description provided for @settingsLocalComponentSensevoiceModel.
@@ -7456,6 +7456,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'SenseVoice 模型'**
   String get settingsLocalComponentSensevoiceModel;
+
+  /// No description provided for @settingsLocalComponentFunasrNanoModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Fun-ASR-Nano 模型（可选）'**
+  String get settingsLocalComponentFunasrNanoModel;
 
   /// No description provided for @settingsLocalComponentFfmpeg.
   ///

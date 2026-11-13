@@ -13,3 +13,11 @@
 - [x] 4 个 arb 的新文案与 `flutter gen-l10n` 产物同步
 - [x] `flutter analyze` 无问题
 - [x] 非联网测试全绿（1643 通过）；联网用例仍依赖外部服务，按 docs/verification.md 单独判断
+
+## T10 Fun-ASR-Nano
+- [x] 组件 `lyrics-funasr-nano-model` 归「歌词」组，6 个文件字节数与 sha256 全部钉死
+- [x] 运行时复用 `lyrics-sherpa-runtime`，不新增运行时；参数与 sherpa-onnx v2.0.1 源码一致
+- [x] 默认不下载：未安装时票池仍只有 Whisper small + SenseVoice；下载后才出现 `local:funasr-nano`
+- [x] 设置页可下载、取消、删除、重试，走统一 installer
+- [x] 文档与 `THIRD_PARTY_NOTICES.md` 补 Fun-ASR-Nano（Apache-2.0，时间戳为近似）
+- [x] `flutter analyze` 与非联网 `flutter test` 全绿

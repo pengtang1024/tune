@@ -4280,10 +4280,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalComponentSherpaRuntime =>
-      'Sherpa-onnx runtime (SenseVoice)';
+      'Sherpa-onnx runtime (SenseVoice / Fun-ASR-Nano)';
 
   @override
   String get settingsLocalComponentSensevoiceModel => 'SenseVoice model';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel =>
+      'Fun-ASR-Nano model (optional)';
 
   @override
   String get settingsLocalComponentFfmpeg => 'FFmpeg (m4a and other formats)';

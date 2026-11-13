@@ -23,6 +23,7 @@ class SettingsLocalComponentsCard extends ConsumerWidget {
       ...LocalComponentRegistry.whisperModels,
       LocalComponentRegistry.sherpaRuntime,
       LocalComponentRegistry.sensevoiceModel,
+      LocalComponentRegistry.funasrNanoModel,
     ],
     'transcode': [LocalComponentRegistry.ffmpeg],
   };
@@ -246,6 +247,8 @@ String componentLabel(BuildContext context, LocalComponentLabel label) {
       strings.settingsLocalComponentSherpaRuntime,
     LocalComponentLabel.sensevoiceModel =>
       strings.settingsLocalComponentSensevoiceModel,
+    LocalComponentLabel.funasrNanoModel =>
+      strings.settingsLocalComponentFunasrNanoModel,
     LocalComponentLabel.ffmpeg => strings.settingsLocalComponentFfmpeg,
   };
 }

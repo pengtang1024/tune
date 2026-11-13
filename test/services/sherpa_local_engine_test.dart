@@ -101,6 +101,84 @@ JSON
     expect(answer.segments, isEmpty);
   });
 
+  group('the optional third family', () {
+    late Directory nanoDir;
+
+    setUp(() {
+      nanoDir = Directory('${root.path}/funasr-nano')..createSync();
+      for (final name in const [
+        'encoder_adaptor.int8.onnx',
+        'llm.int8.onnx',
+        'embedding.int8.onnx',
+        'vocab.json',
+        'merges.txt',
+        'tokenizer.json',
+      ]) {
+        File('${nanoDir.path}/$name').writeAsBytesSync([0]);
+      }
+    });
+
+    SherpaLocalEngine nanoEngine(File binary) => SherpaLocalEngine(
+      model: 'funasr-nano',
+      family: SherpaModelFamily.funAsrNano,
+      binaryOf: () async => binary,
+      modelDirOf: () async => nanoDir,
+    );
+
+    test('the shared binary gets the four --funasr-nano flags', () async {
+      final args = File('${root.path}/nano-args');
+      final binary = await installBinary('''
+printf '%s\\n' "\$@" > ${args.path}
+cat <<'JSON'
+{"tokens": ["你", "好"], "timestamps": [0.5, 0.8]}
+JSON
+''');
+
+      final answer = await nanoEngine(binary).runTranscription(
+        SmartAudioInput(audio: audio, title: 'One', artist: 'Artist'),
+      );
+
+      final passed = args.readAsLinesSync();
+      expect(
+        passed,
+        contains(
+          '--funasr-nano-encoder-adaptor='
+          '${nanoDir.path}/encoder_adaptor.int8.onnx',
+        ),
+      );
+      expect(
+        passed,
+        contains('--funasr-nano-llm=${nanoDir.path}/llm.int8.onnx'),
+      );
+      expect(
+        passed,
+        contains('--funasr-nano-embedding=${nanoDir.path}/embedding.int8.onnx'),
+      );
+      expect(passed, contains('--funasr-nano-tokenizer=${nanoDir.path}'));
+      expect(
+        passed.any((arg) => arg.startsWith('--num-threads=')),
+        isTrue,
+        reason: 'both families run under the same thread ceiling',
+      );
+      expect(answer.segments, isNotEmpty);
+    });
+
+    test('a folder without the tokenizer files fails before any process '
+        'starts', () async {
+      File('${nanoDir.path}/tokenizer.json').deleteSync();
+      final marker = File('${root.path}/nano-started');
+      final binary = await installBinary('touch ${marker.path}; exit 0');
+
+      await expectLater(
+        nanoEngine(binary).runTranscription(
+          SmartAudioInput(audio: audio, title: 'One', artist: 'Artist'),
+        ),
+        throwsA(isA<SherpaLocalException>()),
+      );
+      expect(marker.existsSync(), isFalse);
+    });
+  });
+
   test('a failing binary is a failed channel, not a crash', () async {
     final binary = await installBinary('echo boom >&2; exit 3');
 
