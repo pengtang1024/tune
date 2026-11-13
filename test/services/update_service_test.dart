@@ -76,6 +76,18 @@ Matcher _failure(UpdateCheckFailure failure) {
   );
 }
 
+final _releaseBody = <String, dynamic>{
+  'tag_name': 'v1.31.0',
+  'body': 'notes',
+  'assets': [
+    {
+      'name': 'tune-linux-x64-1.31.0.tar.gz',
+      'size': 100,
+      'browser_download_url': 'https://example.com/tune.tar.gz',
+    },
+  ],
+};
+
 /// The update check compares versions, picks the archive of the machine and
 /// swaps the running bundle for the one the archive carries.
 void main() {
@@ -137,6 +149,83 @@ void main() {
     test('an answer without a version is no release', () {
       expect(UpdateService.parseRelease(null), isNull);
       expect(UpdateService.parseRelease({'tag_name': ''}), isNull);
+    });
+  });
+
+  group('token', () {
+    test('the typed token wins over the environment', () {
+      expect(
+        UpdateService.resolveToken(
+          manualToken: ' typed ',
+          environment: const {
+            'GITHUB_TOKEN': 'from-github',
+            'GH_TOKEN': 'from-gh',
+          },
+        ),
+        'typed',
+      );
+    });
+
+    test('a blank field falls back to GITHUB_TOKEN before GH_TOKEN', () {
+      expect(
+        UpdateService.resolveToken(
+          manualToken: '  ',
+          environment: const {
+            'GITHUB_TOKEN': 'from-github',
+            'GH_TOKEN': 'from-gh',
+          },
+        ),
+        'from-github',
+      );
+    });
+
+    test('GH_TOKEN is used when GITHUB_TOKEN is blank', () {
+      expect(
+        UpdateService.resolveToken(
+          environment: const {'GITHUB_TOKEN': ' ', 'GH_TOKEN': 'from-gh'},
+        ),
+        'from-gh',
+      );
+    });
+
+    test('no token anywhere means an anonymous check', () {
+      expect(UpdateService.resolveToken(environment: const {}), isNull);
+    });
+
+    test('a token rides on the request as a bearer header', () async {
+      final adapter = _StubAdapter(200, _releaseBody);
+      final service = _serviceWith(adapter);
+
+      await service.latest(manualToken: 'secret', environment: const {});
+
+      expect(adapter.lastRequest?.headers['Authorization'], 'Bearer secret');
+    });
+
+    test('an environment token is used when the field is empty', () async {
+      final adapter = _StubAdapter(200, _releaseBody);
+      final service = _serviceWith(adapter);
+
+      await service.latest(
+        manualToken: '',
+        environment: const {'GITHUB_TOKEN': 'from-github'},
+      );
+
+      expect(
+        adapter.lastRequest?.headers['Authorization'],
+        'Bearer from-github',
+      );
+    });
+
+    test('an anonymous check carries no authorization header', () async {
+      final adapter = _StubAdapter(200, _releaseBody);
+      final service = _serviceWith(adapter);
+
+      await service.latest(environment: const {});
+
+      expect(
+        adapter.lastRequest?.headers.containsKey('Authorization'),
+        isFalse,
+      );
     });
   });
 

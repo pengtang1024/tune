@@ -112,6 +112,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateFailedServer => '检查失败：发布页返回了异常响应';
 
   @override
+  String get updateTokenLabel => 'GitHub token（可选）';
+
+  @override
+  String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -4158,6 +4167,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get updateFailedServer => '检查失败：发布页返回了异常响应';
 
   @override
+  String get updateTokenLabel => 'GitHub token（可选）';
+
+  @override
+  String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+
+  @override
   String get updateCheck => '检查更新';
 
   @override
@@ -8202,6 +8220,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get updateFailedServer => '檢查失敗：發布頁回傳了異常回應';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（選填）';
+
+  @override
+  String get updateTokenHint => '留空則讀取環境變數 GITHUB_TOKEN / GH_TOKEN';
+
+  @override
+  String get updateTokenHelp => '只用於更新檢查，不會寫入日誌';
 
   @override
   String get updateCheck => '檢查更新';

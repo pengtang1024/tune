@@ -116,6 +116,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'The check failed: the release page answered with an unexpected response';
 
   @override
+  String get updateTokenLabel => 'GitHub token (optional)';
+
+  @override
+  String get updateTokenHint =>
+      'Leave empty to use GITHUB_TOKEN / GH_TOKEN from the environment';
+
+  @override
+  String get updateTokenHelp =>
+      'Only used for update checks; never written to logs';
+
+  @override
   String get updateCheck => 'Check for updates';
 
   @override

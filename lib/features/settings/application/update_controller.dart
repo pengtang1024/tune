@@ -7,6 +7,7 @@ import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/update/update_service.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Where the update stands.
@@ -81,7 +82,8 @@ class UpdateController extends Notifier<UpdateState> {
   Future<void> check({String? currentVersion}) async {
     state = state.copyWith(status: UpdateStatus.checking);
     try {
-      final release = await _service.latest();
+      final token = ref.read(settingsControllerProvider).githubToken;
+      final release = await _service.latest(manualToken: token);
       if (release == null) {
         state = const UpdateState(status: UpdateStatus.upToDate);
         return;

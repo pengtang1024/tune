@@ -292,6 +292,24 @@ abstract class AppLocalizations {
   /// **'检查失败：发布页返回了异常响应'**
   String get updateFailedServer;
 
+  /// No description provided for @updateTokenLabel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'GitHub token（可选）'**
+  String get updateTokenLabel;
+
+  /// No description provided for @updateTokenHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN'**
+  String get updateTokenHint;
+
+  /// No description provided for @updateTokenHelp.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只用于更新检查，不会写入日志'**
+  String get updateTokenHelp;
+
   /// No description provided for @updateCheck.
   ///
   /// In zh_CN, this message translates to:
