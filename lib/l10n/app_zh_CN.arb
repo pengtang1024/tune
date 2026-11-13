@@ -1888,17 +1888,51 @@
   "settingsLocalizationEnableHint": "缺失的译文会自动生成；歌手名保持原样。",
   "settingsLocalizationShowOriginal": "在译文下方显示原文",
   "settingsLocalizationShowOriginalHint": "小字保留音源里的原始文本。",
-  "settingsLocalizationEngine": "翻译引擎",
-  "settingsLocalizationEngineLocal": "内置离线",
-  "settingsLocalizationEngineApi": "外部 API",
-  "settingsLocalizationLocalReady": "离线模型已随应用提供",
-  "settingsLocalizationLocalMissing": "离线模型缺失，请重新安装应用",
-  "settingsLocalizationLocalCorrupt": "离线模型校验失败，请重新安装应用",
-  "settingsLocalizationLocalBundled": "模型随安装包提供，首次翻译时按需加载。",
+  "settingsLocalizationProvider": "翻译服务",
+  "settingsLocalizationProviderNone": "未配置",
+  "settingsLocalizationProviderLocal": "本地模型（可选下载）",
+  "settingsLocalizationProviderCustom": "自定义 OpenAI 兼容",
+  "settingsLocalizationLocalReady": "本地模型已安装",
+  "settingsLocalizationLocalMissing": "本地模型未安装，可下载",
+  "settingsLocalizationLocalCorrupt": "本地模型校验失败，可重新下载",
+  "settingsLocalizationLocalDownload": "下载",
+  "settingsLocalizationLocalDownloading": "正在下载",
+  "settingsLocalizationLocalVerifying": "正在校验",
+  "settingsLocalizationLocalDelete": "删除模型",
+  "settingsLocalizationLocalDeleteConfirm": "删除本地模型？之后可以重新下载。",
+  "settingsLocalizationLocalSize": "占用 {size}",
+  "@settingsLocalizationLocalSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationLocalDownloadHint": "约 470 MB，只有选择本地模型时才需要。",
+  "settingsLocalizationLocalLicense": "Qwen2.5-0.5B-Instruct（Apache-2.0）与 llama.cpp（MIT），许可证随组件包提供。",
   "settingsLocalizationApiBaseUrl": "端点（Base URL）",
   "settingsLocalizationApiKey": "API Key",
   "settingsLocalizationApiModel": "模型",
-  "settingsLocalizationApiHint": "支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。",
+  "settingsLocalizationModelSuggestions": "常用模型",
+  "settingsLocalizationKeyHint": "密钥以明文保存在本机配置目录，仅当前用户可读。",
+  "settingsLocalizationApiHint": "支持 OpenAI Chat、Anthropic Messages 与 Gemini 三类协议。用量取自响应；只有提供余额接口的服务商显示余额。",
+  "settingsLocalizationAvailabilityNeedsProvider": "未配置翻译服务，翻译已暂停。",
+  "settingsLocalizationAvailabilityNeedsKey": "缺少密钥，翻译已暂停。",
+  "settingsLocalizationAvailabilityNeedsModel": "缺少模型名，翻译已暂停。",
+  "settingsLocalizationAvailabilityLocalMissing": "本地模型未安装（约 470 MB），可在下方下载。",
+  "settingsLocalizationPrivacyTitle": "会发送哪些内容",
+  "settingsLocalizationPrivacySend": "发送：曲名、专辑名、歌单名、简介/播客正文、电台文本、部分搜索结果。",
+  "settingsLocalizationPrivacyKeep": "不发送：音频、歌词、文件路径、歌手名、播放历史、账号信息。",
+  "settingsLocalizationConfirmTitle": "把文本发送到 {provider}？",
+  "@settingsLocalizationConfirmTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationConfirmBody": "曲名、专辑与歌单名、简介、电台文本和部分搜索结果会发送到该服务商进行翻译。",
+  "settingsLocalizationConfirmAccept": "启用",
   "settingsLocalizationUsage": "今日 tokens",
   "settingsLocalizationCache": "已缓存文本",
   "settingsLocalizationBalance": "余额",
@@ -1922,7 +1956,6 @@
       }
     }
   },
-  "settingsLocalizationPrivacy": "只发送需要翻译的文本；音频、歌词和文件路径都留在本机。",
   "settingsSearchKeywordsLocalization": "翻译 机翻 本地化 语言 离线模型 api 余额 tokens",
   "settingsPermissionsTitle": "权限",
   "settingsPermissionsDescription": "Android 会在运行时询问这些权限；拒绝后应用仍可用，但对应功能会关闭。",

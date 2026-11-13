@@ -4244,28 +4244,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'The small line keeps the text that came from the source.';
 
   @override
-  String get settingsLocalizationEngine => 'Translation engine';
+  String get settingsLocalizationProvider => 'Translation service';
 
   @override
-  String get settingsLocalizationEngineLocal => 'Built-in offline';
+  String get settingsLocalizationProviderNone => 'Not configured';
 
   @override
-  String get settingsLocalizationEngineApi => 'External API';
+  String get settingsLocalizationProviderLocal =>
+      'Local model (optional download)';
 
   @override
-  String get settingsLocalizationLocalReady => 'Offline model is bundled';
+  String get settingsLocalizationProviderCustom => 'Custom OpenAI-compatible';
+
+  @override
+  String get settingsLocalizationLocalReady => 'Local model is installed';
 
   @override
   String get settingsLocalizationLocalMissing =>
-      'Offline model is missing. Please reinstall the app.';
+      'Local model is not installed. You can download it.';
 
   @override
   String get settingsLocalizationLocalCorrupt =>
-      'Offline model failed verification. Please reinstall the app.';
+      'Local model failed verification. Download it again.';
 
   @override
-  String get settingsLocalizationLocalBundled =>
-      'The model ships with the app and loads on first use.';
+  String get settingsLocalizationLocalDownload => 'Download';
+
+  @override
+  String get settingsLocalizationLocalDownloading => 'Downloading';
+
+  @override
+  String get settingsLocalizationLocalVerifying => 'Verifying';
+
+  @override
+  String get settingsLocalizationLocalDelete => 'Delete model';
+
+  @override
+  String get settingsLocalizationLocalDeleteConfirm =>
+      'Delete the local model? You can download it again later.';
+
+  @override
+  String settingsLocalizationLocalSize(String size) {
+    return 'Uses $size';
+  }
+
+  @override
+  String get settingsLocalizationLocalDownloadHint =>
+      'About 470 MB, only needed when you choose the local model.';
+
+  @override
+  String get settingsLocalizationLocalLicense =>
+      'Qwen2.5-0.5B-Instruct (Apache-2.0) and llama.cpp (MIT); the licenses ship with the download.';
 
   @override
   String get settingsLocalizationApiBaseUrl => 'Endpoint (base URL)';
@@ -4277,8 +4306,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalizationApiModel => 'Model';
 
   @override
+  String get settingsLocalizationModelSuggestions => 'Suggested models';
+
+  @override
+  String get settingsLocalizationKeyHint =>
+      'The key is stored in plain text in this device\'s config folder and readable only by the current user.';
+
+  @override
   String get settingsLocalizationApiHint =>
-      'Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.';
+      'Supports OpenAI Chat, Anthropic Messages and Gemini. Usage comes from the response; a balance is shown only for providers that publish one.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsProvider =>
+      'Translation is paused until a provider is chosen.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsKey =>
+      'Translation is paused until the key is filled in.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsModel =>
+      'Translation is paused until a model is chosen.';
+
+  @override
+  String get settingsLocalizationAvailabilityLocalMissing =>
+      'The local model is not installed (about 470 MB). Download it below.';
+
+  @override
+  String get settingsLocalizationPrivacyTitle => 'What leaves this device';
+
+  @override
+  String get settingsLocalizationPrivacySend =>
+      'Sent: track titles, album names, playlist names, descriptions and podcast text, radio text, and some search results.';
+
+  @override
+  String get settingsLocalizationPrivacyKeep =>
+      'Kept on this device: audio, lyrics, file paths, artist names, play history, and account information.';
+
+  @override
+  String settingsLocalizationConfirmTitle(String provider) {
+    return 'Send text to $provider?';
+  }
+
+  @override
+  String get settingsLocalizationConfirmBody =>
+      'Track, album and playlist names, descriptions, radio text and some search results will be sent to this provider for translation.';
+
+  @override
+  String get settingsLocalizationConfirmAccept => 'Enable';
 
   @override
   String get settingsLocalizationUsage => 'Tokens today';
@@ -4313,10 +4388,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsLocalizationBalanceFailedNetwork(String error) {
     return 'Balance check failed: $error';
   }
-
-  @override
-  String get settingsLocalizationPrivacy =>
-      'Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.';
 
   @override
   String get settingsSearchKeywordsLocalization =>

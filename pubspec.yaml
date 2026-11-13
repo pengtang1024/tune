@@ -74,6 +74,9 @@ dependencies:
   # Token signing for the Subsonic source
   crypto: ^3.0.7
 
+  # Extracts the optional local translation component
+  archive: ^4.6.0
+
   # Routing
   go_router: ^16.1.0
 

@@ -7385,47 +7385,95 @@ abstract class AppLocalizations {
   /// **'小字保留音源里的原始文本。'**
   String get settingsLocalizationShowOriginalHint;
 
-  /// No description provided for @settingsLocalizationEngine.
+  /// No description provided for @settingsLocalizationProvider.
   ///
   /// In zh_CN, this message translates to:
-  /// **'翻译引擎'**
-  String get settingsLocalizationEngine;
+  /// **'翻译服务'**
+  String get settingsLocalizationProvider;
 
-  /// No description provided for @settingsLocalizationEngineLocal.
+  /// No description provided for @settingsLocalizationProviderNone.
   ///
   /// In zh_CN, this message translates to:
-  /// **'内置离线'**
-  String get settingsLocalizationEngineLocal;
+  /// **'未配置'**
+  String get settingsLocalizationProviderNone;
 
-  /// No description provided for @settingsLocalizationEngineApi.
+  /// No description provided for @settingsLocalizationProviderLocal.
   ///
   /// In zh_CN, this message translates to:
-  /// **'外部 API'**
-  String get settingsLocalizationEngineApi;
+  /// **'本地模型（可选下载）'**
+  String get settingsLocalizationProviderLocal;
+
+  /// No description provided for @settingsLocalizationProviderCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义 OpenAI 兼容'**
+  String get settingsLocalizationProviderCustom;
 
   /// No description provided for @settingsLocalizationLocalReady.
   ///
   /// In zh_CN, this message translates to:
-  /// **'离线模型已随应用提供'**
+  /// **'本地模型已安装'**
   String get settingsLocalizationLocalReady;
 
   /// No description provided for @settingsLocalizationLocalMissing.
   ///
   /// In zh_CN, this message translates to:
-  /// **'离线模型缺失，请重新安装应用'**
+  /// **'本地模型未安装，可下载'**
   String get settingsLocalizationLocalMissing;
 
   /// No description provided for @settingsLocalizationLocalCorrupt.
   ///
   /// In zh_CN, this message translates to:
-  /// **'离线模型校验失败，请重新安装应用'**
+  /// **'本地模型校验失败，可重新下载'**
   String get settingsLocalizationLocalCorrupt;
 
-  /// No description provided for @settingsLocalizationLocalBundled.
+  /// No description provided for @settingsLocalizationLocalDownload.
   ///
   /// In zh_CN, this message translates to:
-  /// **'模型随安装包提供，首次翻译时按需加载。'**
-  String get settingsLocalizationLocalBundled;
+  /// **'下载'**
+  String get settingsLocalizationLocalDownload;
+
+  /// No description provided for @settingsLocalizationLocalDownloading.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在下载'**
+  String get settingsLocalizationLocalDownloading;
+
+  /// No description provided for @settingsLocalizationLocalVerifying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'正在校验'**
+  String get settingsLocalizationLocalVerifying;
+
+  /// No description provided for @settingsLocalizationLocalDelete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除模型'**
+  String get settingsLocalizationLocalDelete;
+
+  /// No description provided for @settingsLocalizationLocalDeleteConfirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除本地模型？之后可以重新下载。'**
+  String get settingsLocalizationLocalDeleteConfirm;
+
+  /// No description provided for @settingsLocalizationLocalSize.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'占用 {size}'**
+  String settingsLocalizationLocalSize(String size);
+
+  /// No description provided for @settingsLocalizationLocalDownloadHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'约 470 MB，只有选择本地模型时才需要。'**
+  String get settingsLocalizationLocalDownloadHint;
+
+  /// No description provided for @settingsLocalizationLocalLicense.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Qwen2.5-0.5B-Instruct（Apache-2.0）与 llama.cpp（MIT），许可证随组件包提供。'**
+  String get settingsLocalizationLocalLicense;
 
   /// No description provided for @settingsLocalizationApiBaseUrl.
   ///
@@ -7445,11 +7493,83 @@ abstract class AppLocalizations {
   /// **'模型'**
   String get settingsLocalizationApiModel;
 
+  /// No description provided for @settingsLocalizationModelSuggestions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'常用模型'**
+  String get settingsLocalizationModelSuggestions;
+
+  /// No description provided for @settingsLocalizationKeyHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密钥以明文保存在本机配置目录，仅当前用户可读。'**
+  String get settingsLocalizationKeyHint;
+
   /// No description provided for @settingsLocalizationApiHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。'**
+  /// **'支持 OpenAI Chat、Anthropic Messages 与 Gemini 三类协议。用量取自响应；只有提供余额接口的服务商显示余额。'**
   String get settingsLocalizationApiHint;
+
+  /// No description provided for @settingsLocalizationAvailabilityNeedsProvider.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未配置翻译服务，翻译已暂停。'**
+  String get settingsLocalizationAvailabilityNeedsProvider;
+
+  /// No description provided for @settingsLocalizationAvailabilityNeedsKey.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'缺少密钥，翻译已暂停。'**
+  String get settingsLocalizationAvailabilityNeedsKey;
+
+  /// No description provided for @settingsLocalizationAvailabilityNeedsModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'缺少模型名，翻译已暂停。'**
+  String get settingsLocalizationAvailabilityNeedsModel;
+
+  /// No description provided for @settingsLocalizationAvailabilityLocalMissing.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地模型未安装（约 470 MB），可在下方下载。'**
+  String get settingsLocalizationAvailabilityLocalMissing;
+
+  /// No description provided for @settingsLocalizationPrivacyTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'会发送哪些内容'**
+  String get settingsLocalizationPrivacyTitle;
+
+  /// No description provided for @settingsLocalizationPrivacySend.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'发送：曲名、专辑名、歌单名、简介/播客正文、电台文本、部分搜索结果。'**
+  String get settingsLocalizationPrivacySend;
+
+  /// No description provided for @settingsLocalizationPrivacyKeep.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不发送：音频、歌词、文件路径、歌手名、播放历史、账号信息。'**
+  String get settingsLocalizationPrivacyKeep;
+
+  /// No description provided for @settingsLocalizationConfirmTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'把文本发送到 {provider}？'**
+  String settingsLocalizationConfirmTitle(String provider);
+
+  /// No description provided for @settingsLocalizationConfirmBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'曲名、专辑与歌单名、简介、电台文本和部分搜索结果会发送到该服务商进行翻译。'**
+  String get settingsLocalizationConfirmBody;
+
+  /// No description provided for @settingsLocalizationConfirmAccept.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用'**
+  String get settingsLocalizationConfirmAccept;
 
   /// No description provided for @settingsLocalizationUsage.
   ///
@@ -7504,12 +7624,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'余额查询失败：{error}'**
   String settingsLocalizationBalanceFailedNetwork(String error);
-
-  /// No description provided for @settingsLocalizationPrivacy.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'只发送需要翻译的文本；音频、歌词和文件路径都留在本机。'**
-  String get settingsLocalizationPrivacy;
 
   /// No description provided for @settingsSearchKeywordsLocalization.
   ///

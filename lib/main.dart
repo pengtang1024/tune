@@ -10,6 +10,7 @@ import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/data/services/impl/preference_store_io.dart';
 import 'package:tune/data/services/mobile_permissions_service.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/data/services/translation/translation_key_store.dart';
 import 'package:tune/features/player/application/tune_audio_handler.dart';
 import 'package:tune/features/settings/application/mobile_permissions_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_auto_fill_controller.dart';
@@ -28,6 +29,12 @@ Future<void> main(List<String> arguments) async {
   final persistenceReady = persistence.init();
   persistenceReady.ignore();
 
+  // The keys of the translation vendors live in their own file, and the
+  // settings are built from them: reading the file first closes the gap
+  // between a settings object and its keys, and the file is a few lines.
+  final keyStore = TranslationKeyStore();
+  await keyStore.init();
+
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     Log.error(
@@ -44,6 +51,7 @@ Future<void> main(List<String> arguments) async {
   final container = ProviderContainer(
     overrides: [
       persistenceServiceProvider.overrideWithValue(persistence),
+      translationKeyStoreProvider.overrideWithValue(keyStore),
       // The Windows runner hands the command line to `main`; Linux reads it
       // from `/proc`, so the words are only used where they arrive.
       startupArgumentsProvider.overrideWithValue(arguments),

@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-/// Whether the bundled offline translation files can be used.
+/// Whether the offline translation files can be used.
 enum TranslationAssetProblem { none, modelMissing, modelCorrupt, binaryMissing }
 
 class TranslationAssetStatus {
@@ -18,9 +18,10 @@ class TranslationAssetStatus {
 
 /// The files the offline engine needs, and where the installer put them.
 ///
-/// The model and the llama.cpp runtime ship inside the release archive under
-/// `translation/`, next to the executable (or in the repository root during
-/// `flutter run`). Nothing is downloaded at runtime.
+/// The model and the llama.cpp runtime are an optional component now. They
+/// are downloaded into the application support directory; the copies that an
+/// older release unpacked next to the executable are still read so an upgrade
+/// does not break a working install.
 class TranslationAssets {
   /// The release that was tested with this client.
   static const String binaryVersion = 'b12274';
@@ -30,19 +31,24 @@ class TranslationAssets {
   static const int modelBytes = 491400032;
 
   final Directory root;
+  final String supportPath;
+  final bool userInstalled;
   final int expectedModelBytes;
   final String expectedModelSha256;
 
   TranslationAssets(
     this.root, {
+    required this.supportPath,
+    this.userInstalled = false,
     this.expectedModelBytes = modelBytes,
     this.expectedModelSha256 = modelSha256,
   });
 
-  /// Finds the `translation/` directory that ships with this build.
+  /// Finds the `translation/` directory to use.
   ///
-  /// Order: explicit override, the archive next to the executable, the repo
-  /// when running from `flutter run`, then the old support-directory layout.
+  /// Order: explicit override, the copy the reader downloaded, the copy next
+  /// to the executable from an older release, the repository when running
+  /// from `flutter run`, then the support directory as a fallback.
   /// An explicit override is returned as-is so a broken path stays visible
   /// instead of silently falling back to another copy.
   static TranslationAssets resolve({
@@ -54,14 +60,28 @@ class TranslationAssets {
     final env = environment ?? Platform.environment;
     final override = env['TUNE_TRANSLATION_DIR']?.trim();
     if (override != null && override.isNotEmpty) {
-      return TranslationAssets(Directory(override));
+      return TranslationAssets(
+        Directory(override),
+        supportPath: supportPath,
+      );
+    }
+
+    final installed = Directory(path.join(supportPath, 'translation'));
+    if (_looksInstalled(installed)) {
+      return TranslationAssets(
+        installed,
+        supportPath: supportPath,
+        userInstalled: true,
+      );
     }
 
     final executableDirectory = Directory(path.dirname(executablePath));
     final packaged = Directory(
       path.join(executableDirectory.path, 'translation'),
     );
-    if (packaged.existsSync()) return TranslationAssets(packaged);
+    if (packaged.existsSync()) {
+      return TranslationAssets(packaged, supportPath: supportPath);
+    }
 
     var cursor = executableDirectory;
     for (var depth = 0; depth < maxParents; depth++) {
@@ -69,14 +89,22 @@ class TranslationAssets {
       if (File(
         path.join(candidate.path, 'models', modelFileName),
       ).existsSync()) {
-        return TranslationAssets(candidate);
+        return TranslationAssets(candidate, supportPath: supportPath);
       }
       final parent = cursor.parent;
       if (parent.path == cursor.path) break;
       cursor = parent;
     }
 
-    return TranslationAssets(Directory(path.join(supportPath, 'translation')));
+    return TranslationAssets(installed, supportPath: supportPath);
+  }
+
+  static bool _looksInstalled(Directory directory) {
+    if (!directory.existsSync()) return false;
+    if (File(path.join(directory.path, 'installed.json')).existsSync()) {
+      return true;
+    }
+    return File(path.join(directory.path, 'models', modelFileName)).existsSync();
   }
 
   static Future<TranslationAssets> forApp() async {
@@ -104,9 +132,6 @@ class TranslationAssets {
   }
 
   /// Checks presence and size, and the digest when [verifyDigest] is set.
-  ///
-  /// A Git LFS pointer is a ~130-byte text file, so the size check already
-  /// catches the "cloned without LFS" case before hashing half a gigabyte.
   Future<TranslationAssetStatus> inspect({bool verifyDigest = false}) async {
     final model = modelFile;
     if (!await model.exists()) {
@@ -130,6 +155,16 @@ class TranslationAssets {
       );
     }
     return const TranslationAssetStatus(TranslationAssetProblem.none);
+  }
+
+  /// Bytes the installed component takes on disk.
+  Future<int> installedSize() async {
+    if (!await root.exists()) return 0;
+    var total = 0;
+    await for (final entity in root.list(recursive: true)) {
+      if (entity is File) total += await entity.length();
+    }
+    return total;
   }
 }
 

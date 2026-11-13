@@ -1,18 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/translation/translation_prompt.dart';
+import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/domain/models/translation_engine.dart';
+import 'package:tune/domain/models/translation_provider.dart';
 
-/// The advanced engine: any endpoint that speaks the OpenAI chat dialect.
+/// The OpenAI chat dialect and the many endpoints that copy it.
 class OpenAiTranslationEngine implements TranslationEngine {
-  final String baseUrl;
-  final String apiKey;
-  final String model;
+  final TranslationProvider provider;
+  final ProviderCredential credential;
   final Dio _dio;
 
   OpenAiTranslationEngine({
-    required this.baseUrl,
-    required this.apiKey,
-    required this.model,
+    required this.provider,
+    required this.credential,
     Dio? dio,
   }) : _dio =
            dio ??
@@ -23,11 +23,21 @@ class OpenAiTranslationEngine implements TranslationEngine {
              ),
            );
 
-  @override
-  String get id {
-    final host = Uri.tryParse(baseUrl)?.host ?? baseUrl;
-    return 'api:$host:$model';
+  String get _baseUrl {
+    final override = credential.baseUrl.trim();
+    final value = override.isNotEmpty ? override : provider.baseUrl.trim();
+    return value.replaceFirst(RegExp(r'/+$'), '');
   }
+
+  String get _model {
+    final typed = credential.model.trim();
+    return typed.isNotEmpty ? typed : provider.defaultModel.trim();
+  }
+
+  String get _apiKey => credential.apiKey.trim();
+
+  @override
+  String get id => 'api:${provider.id}:$_model';
 
   @override
   Future<TranslationBatch> translate(
@@ -35,17 +45,23 @@ class OpenAiTranslationEngine implements TranslationEngine {
     required String targetLanguage,
   }) async {
     if (texts.isEmpty) return const TranslationBatch(translations: {});
-    if (baseUrl.trim().isEmpty || model.trim().isEmpty) {
+    if (_baseUrl.isEmpty || _model.isEmpty) {
       throw const TranslationException(
         'the translation endpoint is not configured',
         unavailable: true,
       );
     }
+    if (!provider.allowsEmptyKey && _apiKey.isEmpty) {
+      throw const TranslationException(
+        'the translation endpoint needs a key',
+        unavailable: true,
+      );
+    }
 
     final response = await _dio.post<Map<String, dynamic>>(
-      '${baseUrl.trim().replaceFirst(RegExp(r'/+$'), '')}/chat/completions',
+      '$_baseUrl${provider.chatPath}',
       data: {
-        'model': model.trim(),
+        'model': _model,
         'temperature': 0,
         'messages': [
           {
@@ -57,8 +73,8 @@ class OpenAiTranslationEngine implements TranslationEngine {
       },
       options: Options(
         headers: {
-          if (apiKey.trim().isNotEmpty)
-            'Authorization': 'Bearer ${apiKey.trim()}',
+          if (_apiKey.isNotEmpty) 'Authorization': 'Bearer $_apiKey',
+          ...provider.extraHeaders,
         },
       ),
     );
@@ -80,7 +96,9 @@ class OpenAiTranslationEngine implements TranslationEngine {
     final usage = data?['usage'];
     return TranslationBatch(
       translations: translations,
-      promptTokens: usage is Map ? (usage['prompt_tokens'] as num?)?.toInt() ?? 0 : 0,
+      promptTokens: usage is Map
+          ? (usage['prompt_tokens'] as num?)?.toInt() ?? 0
+          : 0,
       completionTokens: usage is Map
           ? (usage['completion_tokens'] as num?)?.toInt() ?? 0
           : 0,

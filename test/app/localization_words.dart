@@ -46,6 +46,18 @@ const List<String> properNames = [
   'Client ID',
   'OpenAI',
   'Groq',
+  // The vendors of the translation API keep the name they trade under.
+  'Anthropic',
+  'Google Gemini',
+  'DeepSeek',
+  'Moonshot / Kimi',
+  'Alibaba DashScope',
+  'Zhipu GLM',
+  'OpenRouter',
+  'SiliconFlow',
+  'Ollama (local)',
+  'Custom',
+  'Bundled model',
   // The whisper.cpp model names the local engine menu shows — they are
   // model identifiers, not interface language.
   'tiny',

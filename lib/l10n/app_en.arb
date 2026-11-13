@@ -1888,17 +1888,51 @@
   "settingsLocalizationEnableHint": "Missing translations are generated automatically; artist names are kept as written.",
   "settingsLocalizationShowOriginal": "Show the original under the translation",
   "settingsLocalizationShowOriginalHint": "The small line keeps the text that came from the source.",
-  "settingsLocalizationEngine": "Translation engine",
-  "settingsLocalizationEngineLocal": "Built-in offline",
-  "settingsLocalizationEngineApi": "External API",
-  "settingsLocalizationLocalReady": "Offline model is bundled",
-  "settingsLocalizationLocalMissing": "Offline model is missing. Please reinstall the app.",
-  "settingsLocalizationLocalCorrupt": "Offline model failed verification. Please reinstall the app.",
-  "settingsLocalizationLocalBundled": "The model ships with the app and loads on first use.",
+  "settingsLocalizationProvider": "Translation service",
+  "settingsLocalizationProviderNone": "Not configured",
+  "settingsLocalizationProviderLocal": "Local model (optional download)",
+  "settingsLocalizationProviderCustom": "Custom OpenAI-compatible",
+  "settingsLocalizationLocalReady": "Local model is installed",
+  "settingsLocalizationLocalMissing": "Local model is not installed. You can download it.",
+  "settingsLocalizationLocalCorrupt": "Local model failed verification. Download it again.",
+  "settingsLocalizationLocalDownload": "Download",
+  "settingsLocalizationLocalDownloading": "Downloading",
+  "settingsLocalizationLocalVerifying": "Verifying",
+  "settingsLocalizationLocalDelete": "Delete model",
+  "settingsLocalizationLocalDeleteConfirm": "Delete the local model? You can download it again later.",
+  "settingsLocalizationLocalSize": "Uses {size}",
+  "@settingsLocalizationLocalSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationLocalDownloadHint": "About 470 MB, only needed when you choose the local model.",
+  "settingsLocalizationLocalLicense": "Qwen2.5-0.5B-Instruct (Apache-2.0) and llama.cpp (MIT); the licenses ship with the download.",
   "settingsLocalizationApiBaseUrl": "Endpoint (base URL)",
   "settingsLocalizationApiKey": "API key",
   "settingsLocalizationApiModel": "Model",
-  "settingsLocalizationApiHint": "Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.",
+  "settingsLocalizationModelSuggestions": "Suggested models",
+  "settingsLocalizationKeyHint": "The key is stored in plain text in this device's config folder and readable only by the current user.",
+  "settingsLocalizationApiHint": "Supports OpenAI Chat, Anthropic Messages and Gemini. Usage comes from the response; a balance is shown only for providers that publish one.",
+  "settingsLocalizationAvailabilityNeedsProvider": "Translation is paused until a provider is chosen.",
+  "settingsLocalizationAvailabilityNeedsKey": "Translation is paused until the key is filled in.",
+  "settingsLocalizationAvailabilityNeedsModel": "Translation is paused until a model is chosen.",
+  "settingsLocalizationAvailabilityLocalMissing": "The local model is not installed (about 470 MB). Download it below.",
+  "settingsLocalizationPrivacyTitle": "What leaves this device",
+  "settingsLocalizationPrivacySend": "Sent: track titles, album names, playlist names, descriptions and podcast text, radio text, and some search results.",
+  "settingsLocalizationPrivacyKeep": "Kept on this device: audio, lyrics, file paths, artist names, play history, and account information.",
+  "settingsLocalizationConfirmTitle": "Send text to {provider}?",
+  "@settingsLocalizationConfirmTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalizationConfirmBody": "Track, album and playlist names, descriptions, radio text and some search results will be sent to this provider for translation.",
+  "settingsLocalizationConfirmAccept": "Enable",
   "settingsLocalizationUsage": "Tokens today",
   "settingsLocalizationCache": "Cached texts",
   "settingsLocalizationBalance": "Balance",
@@ -1922,7 +1956,6 @@
       }
     }
   },
-  "settingsLocalizationPrivacy": "Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.",
   "settingsSearchKeywordsLocalization": "translate translation localization language offline model api balance tokens",
   "settingsPermissionsTitle": "Permissions",
   "settingsPermissionsDescription": "Android asks for these while the app runs. Refusing keeps the app usable, but the matching feature stays off.",
