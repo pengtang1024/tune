@@ -1,7 +1,7 @@
 # 本地 AI 选型评估（ASR / 翻译 / 音频解码）
 
 > 评估日期：2026-11-13。范围：只评估，不改代码。
-> 结论见 §1，逐项对比见 §3–§5，许可证清单见 §6，需要拍板的见 §7。
+> 结论见 §1，逐项对比见 §3–§5，许可证清单见 §6，阿里 ASR 对照见 §7，拍板结果见 §8。
 > 体积与内存是公开资料的量级估算，**不是本文档实测值**；落地前须在目标机与目标机型上量一遍。
 
 ## 1. 结论速览
@@ -10,14 +10,16 @@
 | --- | --- | --- | --- |
 | ASR 运行时 | `whisper-cli` 子进程 + `sherpa-onnx-offline` 子进程 | **Linux 保留子进程**（崩溃隔离、系统优先）；**Android 新增 `sherpa_onnx` FFI 后端**；是否两端统一 FFI 由 D1 拍板 | 子进程在 Android 上不成立；Linux 的隔离层不必为了 Android 删掉 |
 | ASR 模型 | 默认 `tiny`，可选 `base` / `small` | 默认两票：**Whisper `small`（质量锚）+ SenseVoice-Small int8（中文快锚）**；低配 `base`；`large-v3-turbo` 作为可选质量包 | `tiny` 是占用下限，不是质量档；两票算法不同，互证关系保留 |
+| 云端 ASR（可选） | 现有 OpenAI 兼容云端通道 | **不新增阿里云通道**；若要做，用百炼 DashScope 原生异步或实时 WebSocket，用户自备 key，逐次确认 | 阿里的兼容模式不收 multipart，接它要新增适配链路；整首歌上传的隐私成本高于收益 |
 | 翻译 | `llama-cli` 子进程 + Qwen2.5-0.5B q4_k_m | **Linux 保留子进程；Android 用 llama.cpp FFI**；模型换 Qwen3-0.6B（默认）/ Qwen2.5-0.5B（低配）/ 1.5B（可选） | Android 没有可执行文件；Qwen3-0.6B 更新、仍是 Apache-2.0 |
 | 解码 | Linux 系统 FFmpeg，不随包 | Linux 保持系统 FFmpeg；**Android 走 MediaCodec**；仍不随包 FFmpeg | 许可证最干净；Android 没有 ffmpeg 可执行文件 |
 
-### 1.1 三个必须纠正的点
+### 1.1 四个必须纠正的点
 
 1. **SenseVoice 的权重不是 Apache/MIT。** [smart-lyrics.md](smart-lyrics.md) 的 M12 摘要与 §6.2 写「SenseVoice via sherpa-onnx（Apache/MIT）」，这混淆了运行时与权重：sherpa-onnx 运行时是 Apache-2.0，SenseVoiceSmall 权重是阿里自定义的《FunASR 模型开源协议》v1.1。详见 §6.1。
 2. **whisper.cpp 有词级时间戳，只是现在没打开。** 当前 [whisper_local_engine.dart](../lib/data/services/smart_lyrics/whisper_local_engine.dart) 的转写调用只传 `-oj`，拿到的是 segment 级 `offsets`；whisper.cpp 支持 `-ml 1` 词级切分与 `--dtw` 更准的时间对齐。因此「whisper 无词级时间戳」不成立，准确说法是「当前调用没有启用」。
 3. **默认 `tiny` 不是可辩护的质量档。** 它适合「低占用可用」，不适合作为中文歌词/播客的默认；`base` 也只是过渡。中文场景应把默认两票提到 Whisper `small` + SenseVoice-Small int8，`tiny` 只留作最低占用档；内存不足的机器再退到 `base`。
+4. **阿里云 ASR 不能按现有云端通道直接接。** 现有通道是 OpenAI `/audio/transcriptions` 多段上传；阿里 `paraformer-v2` 只收公网 URL，`qwen3-asr-flash` 虽支持 Base64 Data URL（编码后 ≤10MB），也不是 multipart（§7.1）。「加个 baseUrl 就能用」不成立。
 
 ## 2. 评估口径与现状
 
@@ -149,8 +151,9 @@
 | 组件 | 许可证 | 能否随包 | 必须做什么 / 风险 |
 | --- | --- | --- | --- |
 | OpenAI Whisper 权重（tiny/base/small/large-v3-turbo） | MIT | **能** | 保留版权与许可文本；无署名以外的义务 |
-| SenseVoiceSmall 权重 | **FunASR 模型开源协议 v1.1**（阿里自定义） | **有条件** | 注明出处与作者、保留 `SenseVoice` 模型名；协议写「仅作为参考和学习使用」，且有「诋毁即可终止许可」条款；协议里的管辖地还是占位符 `[国家/地区]`。建议法务确认，或改用 Paraformer |
+| SenseVoiceSmall 权重 | **FunASR 模型开源协议 v1.1**（阿里自定义） | **有条件** | 注明出处与作者、保留 `SenseVoice` 模型名；协议写「仅作为参考和学习使用」，且有「诋毁即可终止许可」条款；协议里的管辖地还是占位符 `[国家/地区]`。建议法务确认，或改用 Fun-ASR-Nano（Apache-2.0；Paraformer 会丢时间戳，见 §7.3） |
 | Paraformer 权重 | Apache-2.0 | **能** | 保留 LICENSE/NOTICE；商标不随许可授予 |
+| Fun-ASR-Nano 权重（2512） | Apache-2.0 | **能** | 保留 LICENSE/NOTICE；sherpa-onnx 转换版沿用同一权重许可 |
 | Zipformer / icefall 权重 | Apache-2.0（逐模型核对） | **能** | 同上；sherpa-onnx 文档明确要求逐个模型看许可证 |
 | Silero VAD | MIT | **能** | 保留版权与许可文本 |
 | Qwen2.5 / Qwen3 | Apache-2.0 | **能** | 保留 LICENSE/NOTICE；不要暗示 Qwen 背书 |
@@ -178,6 +181,7 @@
 - `THIRD_PARTY_NOTICES.md` 已列 Qwen、llama.cpp、libmpv/FFmpeg，但**没有** whisper.cpp、Whisper 权重、sherpa-onnx、SenseVoice、Paraformer 的条目。模型是运行时下载的，不等于可以不告知；至少应在设置页与 notices 里列出模型名、来源、许可证。
 - [check_licenses.dart](../tool/check_licenses.dart) 只扫源码文本与 `pubspec.yaml`，**不覆盖模型文件与组件包内的权重**；建议给模型清单加一个 `license` 字段，让门禁能查到。
 - [smart-lyrics.md](smart-lyrics.md) 的「Apache/MIT」表述需要在下一次改动时修正为「运行时 Apache-2.0 / 权重 FunASR 自定义协议」。
+- 若接入阿里云 ASR，`THIRD_PARTY_NOTICES.md` 不需要加模型条目（不重分发），但设置页与隐私说明必须写清「整首音频会上传到阿里云百炼」、地域、用户自备 key 与费用归属；不做默认开启。
 
 ### 6.4 与 `.trae/specs/local-components` 的关系
 
@@ -185,21 +189,77 @@
 - spec §4.3 计划下载 `ffmpeg-4.4.1-linux-64.zip`（ffbinaries）：这是 2021 年的旧版，且常见 Linux 静态构建是 **GPL**（需核对具体构建配置）。若确认是 GPL，Tune 自托管或打进组件包会撞上 [licensing.md](licensing.md) 的红线；即使只从第三方 URL 下载，也应在 UI/notices 说明这是 GPL 程序。建议不要把它做成 Tune 托管的组件，或改用当前版本的 LGPL 动态构建。
 - spec §3 的「不为 Android 增加可执行外部程序」与 D1 一致：FFI 方案不需要下载可执行文件，Android 反而因此成立。
 
-## 7. 需要拍板的选项
+## 7. 阿里 ASR 补充评估（云端 + FunASR 开源）
 
-| 编号 | 选项 | 建议 | 影响 |
-| --- | --- | --- | --- |
-| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 |
-| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 |
-| D3 | 是否接受 SenseVoice 的自定义权重协议 | 接受则补署名与法务确认；不接受则第二家族换 Paraformer | 影响默认中文模型与许可证姿态 |
-| D4 | 默认 ASR 档位 | Whisper small + SenseVoice int8 常开；低配 `base`；`tiny` 只作最低占用 | 影响首包体积、内存与识别质量 |
-| D5 | 是否提供 `large-v3-turbo` 可选质量包 | 提供，默认不下载 | 影响质量上限与大文件下载体验 |
-| D6 | 翻译默认模型 | Qwen3-0.6B 先 A/B；保留 0.5B 低配；1.5B 可选 | 影响质量、内存与组件包大小 |
-| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 |
-| D8 | Linux 是否随包 FFmpeg | 不随包；若做 AppImage/Flatpak 再按 LGPL 构建 | 决定包体与 GPL/LGPL 义务 |
-| D9 | 是否引入 Opus-MT 快车道 | 暂不 | 避免逐语言对模型组合与双引擎维护 |
+> 目标：回答「阿里云 ASR 能否作为可选引擎」与「换 Paraformer 能否解决 SenseVoice 的许可证问题」。
+> 结论：云端不接；开源侧保持现状，Fun-ASR-Nano 只作可选第三家族。
 
-## 8. 参考来源
+### 7.1 云端（百炼 / 智能语音交互）
+
+| 产品 | 鉴权 | 接口 | 词级时间戳 | 本地文件 | 结论 |
+| --- | --- | --- | --- | --- | --- |
+| 百炼 `paraformer-v2`（非实时） | DashScope `sk-` key | 异步 REST：提交 + 轮询 | 有，`sentences[].words[]` 带起止 | **不收**，只要公网 URL | 质量与价格都合适，但先解决上传 |
+| 百炼 `paraformer-realtime-v2` | 同上 | WebSocket 流式 | 有，`words[]` 带起止 | 可流式发送 | 能绕开公网 URL，但要把整首当流推 |
+| 百炼 `fun-asr` / `fun-asr-flash` | 同上 | 异步 REST | 有 | 文件 URL | 新旗舰，0.00022 元/秒 |
+| 百炼 `qwen3-asr-flash` | 同上 | DashScope 同步 / OpenAI 兼容 `/chat/completions` | `enable_words` 后有 | 兼容模式支持 Base64 Data URL（编码后 ≤10MB）；不收 multipart | 本地文件可走 base64，但整首歌常超限 |
+| ISI 录音文件识别 | AccessKey 换 Token | REST + 轮询 | 有，需 `enable_words=true&version=4.0` | 公网 URL | 鉴权更重，不建议 |
+| Tune 现有云端通道 | 用户 key | OpenAI `/audio/transcriptions` 多段上传 | 有 segment | 直接上传 | 阿里不兼容这个形态 |
+
+- **用户自备 key 可行，但不能直接复用现有通道**：DashScope key 可以按现有云端通道的方式保存与调用；现有通道走 OpenAI 的 `/audio/transcriptions` 多段上传，而阿里 `paraformer-v2` 只接受公网 URL，`qwen3-asr-flash` 的兼容模式走 `/chat/completions` + Base64 Data URL（编码后 ≤10MB），都不是同一种形态。要接就得新增 DashScope 适配器：要么解决「本地文件 → 可访问 URL」，要么走 WebSocket 流，要么把音频 base64 塞进同步接口（受 10MB 限制）。
+- **付费与红线**：`paraformer-v2` 0.00008 元/秒（约 0.29 元/小时），`fun-asr` 0.00022 元/秒，实时版 0.00024–0.00033 元/秒；百炼有免费额度，但需要账号、实名且有时效。用户自备 key 时 Tune 不付钱，但仍应在每次云端转写前明确提示「这会消耗你自己的额度」。
+- **隐私与版权**：云端转写要把整首歌的音频上传，和现有「云端翻译只发文本」不是一个量级；必须逐次显式同意，并在设置页写清数据去向与地域。音乐文件还可能涉及版权，不能默认开启。
+- **结论：现在不接。** 收益是「难曲的识别上限 + 真正的词级起止」，成本是「新适配器 + 上传链路 + 隐私/版权说明 + 用户付费」。若将来要做，选 DashScope 原生异步（或实时 WebSocket），不用 ISI 的 AccessKey；作为一个显式开启的「云端增强」通道，不做默认票。
+
+### 7.2 开源（FunASR 生态）
+
+| 模型 | 许可证 | 体积 | 内存 | 词/字级时间戳 | 中文歌词/播客 | 结论 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Whisper small（现状） | MIT | 466 MiB | 0.8–1.2 GB | 有（`-ml 1` / `--dtw`） | 音乐底噪下较稳 | 保留质量锚 |
+| SenseVoice-Small（现状） | 权重自定义协议 | 228 MB int8 | 0.8–1.2 GB | token 起始，无结束 | 中文/粤/英/日/韩，快 | 保留中文快锚 |
+| Paraformer-zh | Apache-2.0 | 约 230 MB int8 | 0.7–1.0 GB | **FunASR 运行时**有字符级；**sherpa-onnx 导出 `timestamps: []`** | 普通话强，非自回归 | 不替换：换它丢时间戳 |
+| Fun-ASR-Nano-2512 | **Apache-2.0** | 948 MB int8；1.5 GB fp16 | 1.5–2.5 GB | token 起始；示例为等间隔近似（0.00/0.33/…），不是真实对齐 | 官方称支持歌词/说唱；中文 CER 8.06% | 可选第三家族，不默认 |
+| Paraformer 带时间戳变体 | Apache-2.0 | 约 230 MB | 0.7–1.0 GB | 仅 FunASR Python 路径可靠 | 同上 | 不引入 Python 运行时 |
+
+- **不用新增运行时**：sherpa-onnx 已覆盖 SenseVoice、Paraformer、Fun-ASR-Nano（`sherpa-onnx-offline` 的 `--funasr-nano-*` 参数，Android 用 `sherpa_onnx` FFI）。换模型不等于换运行时。
+- **时间戳是决定性差异**：Paraformer 的字符级 `[start, end]` 只在 FunASR 的 Python 推理路径里可靠；sherpa-onnx 转换的 Paraformer 输出 `timestamps: []`（官方示例实测），而 Tune 的歌词切行正依赖 token 起始时间。Fun-ASR-Nano 的 `timestamps` 是等间距近似（示例 `0.00, 0.33, 0.66, …`），不能当词级对齐用。
+- **质量口径要谨慎**：FunASR 官方博客给出的中文 CER 是 SenseVoice 7.81% / Fun-ASR-Nano 8.06% / Paraformer 10.18%，Whisper 约 20%；这些是读语音测试集，不是唱歌。sherpa-onnx 文档明确写 Fun-ASR-Nano「支持歌词识别和说唱语音识别」，所以它是三者里最贴合 Tune 场景的，但体积是 SenseVoice 的 4 倍、RTF 约 0.165（2 线程），只能当可选质量包。
+- **长音频**：三者都要 VAD/分片（建议 30 秒段），和现状一致；Fun-ASR-Nano 官方也要求长音频配 VAD。
+
+### 7.3 许可证结论
+
+- **Paraformer 确实是 Apache-2.0**：HF `funasr/paraformer-zh`（220M，中英）标注 Apache-2.0；FunASR 代码是 MIT。可以随包，保留 LICENSE/NOTICE 即可。
+- **Fun-ASR-Nano-2512 也是 Apache-2.0**：HF 模型卡标注 Apache-2.0；sherpa-onnx 的转换版应沿用同一权重许可。可以随包。
+- **SenseVoice 的自定义协议与 Apache-2.0 差在哪**：必须注明出处/作者并保留模型名；协议写「仅作为参考和学习使用」；有「诋毁即可终止许可」条款；管辖地是占位符 `[国家/地区]`；协议可单方修订并自动生效。Apache-2.0 没有这些限制，只要求保留版权/许可与 NOTICE。
+- **换 Paraformer 能解决许可证，但会引入时间戳回退**：在 sherpa-onnx 路径下 Paraformer 没有时间戳，歌词切行会退化成段级/静音间隙，等于丢掉现在的 token 切行能力。更干净的替代是 Fun-ASR-Nano（Apache-2.0、支持歌词、时间戳近似），代价是 948 MB 与更慢；否则就保留 SenseVoice，补署名与法务确认。
+- 云端不涉及权重再分发，不需要进 `THIRD_PARTY_NOTICES.md`；一旦接入，需要的是隐私说明与数据上传告知。
+
+### 7.4 推荐
+
+**保持现状**：Whisper small + SenseVoice 两票不变；阿里云 ASR 不接；FunASR 侧只把 Fun-ASR-Nano 列为「可选第三家族/质量包」；Paraformer 因时间戳缺失不替换 SenseVoice。要动许可证，优先走 Fun-ASR-Nano，而不是 Paraformer。
+
+**已拍板（2026-11-13）**：按上述推荐执行——D10/D11 否决（不接阿里云 ASR）、D13 否决（不用 Paraformer 换 SenseVoice）、D12 接受（Fun-ASR-Nano 作可选第三家族，不默认下载、不进默认两票），见 §8。
+
+## 8. 拍板项与结论
+
+> D10–D13 已于 2026-11-13 拍板，结论见「结论」列；D1–D9 仍待拍板。
+
+| 编号 | 选项 | 建议 | 影响 | 结论 |
+| --- | --- | --- | --- | --- |
+| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 | 待拍板 |
+| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 | 待拍板 |
+| D3 | 是否接受 SenseVoice 的自定义权重协议 | 接受则补署名与法务确认；不接受则换 Fun-ASR-Nano（推荐）或 Paraformer（会丢时间戳，见 D13） | 影响默认中文模型与许可证姿态 | 待拍板 |
+| D4 | 默认 ASR 档位 | Whisper small + SenseVoice int8 常开；低配 `base`；`tiny` 只作最低占用 | 影响首包体积、内存与识别质量 | 待拍板 |
+| D5 | 是否提供 `large-v3-turbo` 可选质量包 | 提供，默认不下载 | 影响质量上限与大文件下载体验 | 待拍板 |
+| D6 | 翻译默认模型 | Qwen3-0.6B 先 A/B；保留 0.5B 低配；1.5B 可选 | 影响质量、内存与组件包大小 | 待拍板 |
+| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 | 待拍板 |
+| D8 | Linux 是否随包 FFmpeg | 不随包；若做 AppImage/Flatpak 再按 LGPL 构建 | 决定包体与 GPL/LGPL 义务 | 待拍板 |
+| D9 | 是否引入 Opus-MT 快车道 | 暂不 | 避免逐语言对模型组合与双引擎维护 | 待拍板 |
+| D10 | 是否接入阿里云 ASR | **暂不接**；保持现有云端通道 | 接它要新增 DashScope 适配器与上传链路，且要处理整首歌上传的隐私/版权 | **已否决**：不接入阿里云 ASR；云端仍走现有 OpenAI 兼容通道 |
+| D11 | 若接云端，选哪个接口 | DashScope 原生异步或实时 WebSocket；不用 ISI AccessKey | 异步要解决公网 URL；实时要自己流式推本地音频 | **已否决**（随 D10）：不新增 DashScope 适配器，此项不适用 |
+| D12 | 第二 ASR 家族是否换 Fun-ASR-Nano | 先作为可选第三家族；不默认替换 SenseVoice | 换 Apache-2.0 的代价是 948 MB、更慢、时间戳近似 | **已接受**：Fun-ASR-Nano 作为可选第三家族（质量包），不默认下载，不进默认两票 |
+| D13 | 是否用 Paraformer 换掉 SenseVoice | 不换（sherpa-onnx 路径没有时间戳） | 会丢掉歌词切行依赖的 token 时间戳 | **已否决**：SenseVoice 保留为中文快锚，不用 Paraformer 替换 |
+
+## 9. 参考来源
 
 - whisper.cpp（MIT、词级时间戳 `-ml 1` / `--dtw`）：https://github.com/ggml-org/whisper.cpp
 - OpenAI Whisper large-v3-turbo 模型卡（MIT）：https://huggingface.co/openai/whisper-large-v3-turbo
@@ -221,3 +281,13 @@
 - Android MediaCodec：https://developer.android.com/reference/android/media/MediaCodec
 - Symphonia（MPL-2.0）：https://github.com/pdeljanov/Symphonia
 - llama.cpp Dart FFI 绑定（示例，非官方）：https://pub.dev/packages/llama_cpp_dart
+- 百炼 `paraformer-v2`（能力/价格）：https://help.aliyun.com/zh/model-studio/paraformer-v2
+- 百炼非实时语音识别限制（只收公网 URL）：https://help.aliyun.com/zh/model-studio/qwen-speech-recognition
+- ISI 录音文件识别（`enable_words` / `version=4.0`）：https://help.aliyun.com/zh/isi/user-guide/api-reference-2
+- 百炼语音识别价格与免费额度：https://docs.bailian.console.aliyun.com/zh/model-studio/model-pricing
+- FunASR 模型选择（2026 指南）：https://www.funasr.com/en/blog/which-funasr-model.html
+- Fun-ASR-Nano 指南（时间戳边界）：https://www.funasr.com/en/blog/fun-asr-nano-guide.html
+- sherpa-onnx FunASR Nano 模型页（歌词/说唱、体积、RTF）：https://csukuangfj.github.io/sherpa/onnx/funasr-nano/pretrained.html
+- sherpa-onnx Paraformer 模型页（部分导出不支持时间戳）：https://k2-fsa.github.io/sherpa/onnx/pretrained_models/offline-paraformer/paraformer-models.html
+- Paraformer-zh 模型卡（Apache-2.0）：https://huggingface.co/funasr/paraformer-zh
+- Fun-ASR-Nano-2512 模型卡（Apache-2.0）：https://huggingface.co/FunAudioLLM/Fun-ASR-Nano-2512
