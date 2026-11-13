@@ -156,29 +156,60 @@ class _CompactShellState extends ConsumerState<CompactShell> {
                         );
                       }
 
-                      return Column(
+                      // The rail reaches the bottom edge of the window, under
+                      // the floating dock. The dock is a card with margins,
+                      // so without this strip the height of the bar and the
+                      // gap under it would show the page's backdrop where the
+                      // rail should still be.
+                      return Stack(
+                        fit: StackFit.expand,
                         children: [
-                          Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                AppSidebar(
-                                  currentPath: widget.currentPath,
-                                  compact: metrics.usesCompactNavigation,
-                                  // The page below the scrim should not change
-                                  // while the panel hides it. A navigation
-                                  // closes the panel first and then goes to the
-                                  // page the reader chose.
-                                  onNavigate: _closeQueue,
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: AppSidebar.widthFor(
+                              compact: metrics.usesCompactNavigation,
+                            ),
+                            child: DecoratedBox(
+                              key: const ValueKey('shell-rail-backdrop'),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerLow,
+                                border: Border(
+                                  right: BorderSide(
+                                    color: theme.colorScheme.outlineVariant,
+                                  ),
                                 ),
-                                Expanded(child: page),
-                              ],
+                              ),
                             ),
                           ),
-                          PlayerDock(
-                            onToggleQueue: _toggleQueue,
-                            queueOpen: _queueOpen,
-                            onMini: _enterMini,
+                          Column(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    AppSidebar(
+                                      currentPath: widget.currentPath,
+                                      compact: metrics.usesCompactNavigation,
+                                      // The page below the scrim should not
+                                      // change while the panel hides it. A
+                                      // navigation closes the panel first and
+                                      // then goes to the page the reader
+                                      // chose.
+                                      onNavigate: _closeQueue,
+                                    ),
+                                    Expanded(child: page),
+                                  ],
+                                ),
+                              ),
+                              PlayerDock(
+                                onToggleQueue: _toggleQueue,
+                                queueOpen: _queueOpen,
+                                onMini: _enterMini,
+                              ),
+                            ],
                           ),
                         ],
                       );
