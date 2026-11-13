@@ -7343,6 +7343,108 @@ abstract class AppLocalizations {
   /// **'完成'**
   String get sourcesHealthWeightsDone;
 
+  /// No description provided for @settingsSectionComponents.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地组件'**
+  String get settingsSectionComponents;
+
+  /// No description provided for @settingsComponentsDescription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按需下载翻译与歌词的本地运行时、模型，以及转码用的 FFmpeg'**
+  String get settingsComponentsDescription;
+
+  /// No description provided for @settingsSearchKeywordsComponents.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地组件 插件 下载 模型 运行时 占用 删除 ffmpeg whisper llama 歌词 翻译'**
+  String get settingsSearchKeywordsComponents;
+
+  /// No description provided for @settingsLocalComponentsGroupTranslation.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译'**
+  String get settingsLocalComponentsGroupTranslation;
+
+  /// No description provided for @settingsLocalComponentsGroupLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'歌词'**
+  String get settingsLocalComponentsGroupLyrics;
+
+  /// No description provided for @settingsLocalComponentsGroupTranscode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'转码'**
+  String get settingsLocalComponentsGroupTranscode;
+
+  /// No description provided for @settingsLocalComponentsSystemHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'使用系统已安装版本'**
+  String get settingsLocalComponentsSystemHint;
+
+  /// No description provided for @settingsLocalComponentsHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'组件只在需要时下载；系统里已装好的程序优先使用。'**
+  String get settingsLocalComponentsHint;
+
+  /// No description provided for @settingsLocalComponentTranslationRuntime.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'llama.cpp 运行时（llama-cli）'**
+  String get settingsLocalComponentTranslationRuntime;
+
+  /// No description provided for @settingsLocalComponentTranslationModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译模型（Qwen2.5-0.5B）'**
+  String get settingsLocalComponentTranslationModel;
+
+  /// No description provided for @settingsLocalComponentWhisperRuntime.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 运行时（whisper-cli）'**
+  String get settingsLocalComponentWhisperRuntime;
+
+  /// No description provided for @settingsLocalComponentWhisperTiny.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 模型 tiny'**
+  String get settingsLocalComponentWhisperTiny;
+
+  /// No description provided for @settingsLocalComponentWhisperBase.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 模型 base'**
+  String get settingsLocalComponentWhisperBase;
+
+  /// No description provided for @settingsLocalComponentWhisperSmall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 模型 small'**
+  String get settingsLocalComponentWhisperSmall;
+
+  /// No description provided for @settingsLocalComponentSherpaRuntime.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Sherpa-onnx 运行时（SenseVoice）'**
+  String get settingsLocalComponentSherpaRuntime;
+
+  /// No description provided for @settingsLocalComponentSensevoiceModel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'SenseVoice 模型'**
+  String get settingsLocalComponentSensevoiceModel;
+
+  /// No description provided for @settingsLocalComponentFfmpeg.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'FFmpeg（m4a 等格式转码）'**
+  String get settingsLocalComponentFfmpeg;
+
   /// No description provided for @settingsSectionLocalization.
   ///
   /// In zh_CN, this message translates to:

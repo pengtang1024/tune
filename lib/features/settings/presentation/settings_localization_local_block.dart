@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/services/translation/translation_assets.dart';
-import 'package:tune/features/localization/application/local_model_controller.dart';
+import 'package:tune/data/services/components/local_component.dart';
 
-/// The download, size and removal of the optional local model.
+/// The state of the two translation components, without a second installer.
+///
+/// The runtime and the model are downloaded one by one on the components
+/// page; here the card only reports the pair and offers the missing halves
+/// (docs/local-components.md §5).
 class SettingsLocalizationLocalBlock extends StatelessWidget {
-  final LocalModelState state;
+  final LocalComponentState runtime;
+  final LocalComponentState model;
   final VoidCallback onDownload;
   final VoidCallback onCancel;
   final VoidCallback onRemove;
 
   const SettingsLocalizationLocalBlock({
     super.key,
-    required this.state,
+    required this.runtime,
+    required this.model,
     required this.onDownload,
     required this.onCancel,
     required this.onRemove,
@@ -26,34 +31,38 @@ class SettingsLocalizationLocalBlock extends StatelessWidget {
     final muted = theme.textTheme.labelSmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
+    final downloading = runtime.phase == LocalComponentPhase.downloading
+        ? runtime
+        : model.phase == LocalComponentPhase.downloading
+        ? model
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        switch (state.phase) {
-          LocalModelPhase.checking => _Busy(
-            text: strings.settingsLocalizationLocalDownloadHint,
-          ),
-          LocalModelPhase.notInstalled => _NotInstalled(
+        if (downloading != null)
+          _Downloading(state: downloading, onCancel: onCancel)
+        else if (runtime.usable && model.usable)
+          _Ready(
+            state: LocalComponentState(
+              LocalComponentPhase.ready,
+              installedBytes: runtime.installedBytes + model.installedBytes,
+              systemAvailable: runtime.systemAvailable || model.systemAvailable,
+              canDelete: runtime.canDelete || model.canDelete,
+            ),
+            onRemove: () => _confirmRemove(context, onRemove),
+          )
+        else if (runtime.phase == LocalComponentPhase.failed ||
+            model.phase == LocalComponentPhase.failed)
+          _Failed(onDownload: onDownload)
+        else if (runtime.phase == LocalComponentPhase.checking ||
+            model.phase == LocalComponentPhase.checking)
+          _Busy(text: strings.settingsLocalizationLocalDownloadHint)
+        else
+          _NotInstalled(
             hint: strings.settingsLocalizationLocalDownloadHint,
             onDownload: onDownload,
           ),
-          LocalModelPhase.downloading => _Downloading(
-            state: state,
-            onCancel: onCancel,
-          ),
-          LocalModelPhase.verifying => _Busy(
-            text: strings.settingsLocalizationLocalVerifying,
-          ),
-          LocalModelPhase.ready => _Ready(
-            state: state,
-            onRemove: () => _confirmRemove(context, onRemove),
-          ),
-          LocalModelPhase.failed => _Failed(
-            state: state,
-            onDownload: onDownload,
-          ),
-        },
         const SizedBox(height: CompactTokens.space8),
         Text(strings.settingsLocalizationLocalLicense, style: muted),
       ],
@@ -122,7 +131,7 @@ class _NotInstalled extends StatelessWidget {
 }
 
 class _Downloading extends StatelessWidget {
-  final LocalModelState state;
+  final LocalComponentState state;
   final VoidCallback onCancel;
 
   const _Downloading({required this.state, required this.onCancel});
@@ -144,10 +153,10 @@ class _Downloading extends StatelessWidget {
             const SizedBox(width: CompactTokens.space8),
             Text(
               progress == null
-                  ? _formatBytes(state.received)
+                  ? formatComponentBytes(state.received)
                   : '${(progress * 100).round()}% · '
-                        '${_formatBytes(state.received)}'
-                        ' / ${_formatBytes(state.total)}',
+                        '${formatComponentBytes(state.received)}'
+                        ' / ${formatComponentBytes(state.total)}',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -164,7 +173,7 @@ class _Downloading extends StatelessWidget {
 }
 
 class _Ready extends StatelessWidget {
-  final LocalModelState state;
+  final LocalComponentState state;
   final VoidCallback onRemove;
 
   const _Ready({required this.state, required this.onRemove});
@@ -181,15 +190,26 @@ class _Ready extends StatelessWidget {
           color: theme.colorScheme.primary,
           text: strings.settingsLocalizationLocalReady,
         ),
-        const SizedBox(height: CompactTokens.space4),
-        Text(
-          strings.settingsLocalizationLocalSize(
-            _formatBytes(state.installedBytes),
+        if (state.systemAvailable) ...[
+          const SizedBox(height: CompactTokens.space4),
+          Text(
+            strings.settingsLocalComponentsSystemHint,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+        ],
+        if (state.installedBytes > 0) ...[
+          const SizedBox(height: CompactTokens.space4),
+          Text(
+            strings.settingsLocalizationLocalSize(
+              formatComponentBytes(state.installedBytes),
+            ),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
+        ],
         if (state.canDelete) ...[
           const SizedBox(height: CompactTokens.space4),
           TextButton(
@@ -203,25 +223,21 @@ class _Ready extends StatelessWidget {
 }
 
 class _Failed extends StatelessWidget {
-  final LocalModelState state;
   final VoidCallback onDownload;
 
-  const _Failed({required this.state, required this.onDownload});
+  const _Failed({required this.onDownload});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = context.loc;
-    final text = state.problem == TranslationAssetProblem.modelCorrupt
-        ? strings.settingsLocalizationLocalCorrupt
-        : state.message ?? strings.settingsLocalizationLocalMissing;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _Line(
           icon: Icons.error_outline,
           color: theme.colorScheme.error,
-          text: text,
+          text: strings.settingsLocalizationLocalCorrupt,
         ),
         const SizedBox(height: CompactTokens.space8),
         FilledButton(
@@ -240,16 +256,17 @@ class _Busy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Row(
       children: [
-        const SizedBox(
-          width: 14,
-          height: 14,
-          child: CircularProgressIndicator(strokeWidth: 2),
+        Icon(
+          Icons.hourglass_empty,
+          size: 14,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: CompactTokens.space8),
-        Expanded(child: Text(text, style: theme.textTheme.bodySmall)),
+        Expanded(
+          child: Text(text, style: Theme.of(context).textTheme.bodySmall),
+        ),
       ],
     );
   }
@@ -275,7 +292,8 @@ class _Line extends StatelessWidget {
   }
 }
 
-String _formatBytes(int bytes) {
+/// Human bytes, shared by the translation block and the components card.
+String formatComponentBytes(int bytes) {
   if (bytes <= 0) return '0 MB';
   const unit = 1024 * 1024;
   if (bytes < 1024 * unit) return '${(bytes / unit).toStringAsFixed(1)} MB';

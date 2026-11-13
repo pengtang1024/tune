@@ -150,6 +150,8 @@ List<SettingsPreset> settingsPresetsFor({
       ];
     case SettingsSection.localization:
       return const [];
+    case SettingsSection.components:
+      return const [];
     case SettingsSection.discovery:
       return [
         SettingsPreset(
@@ -227,6 +229,8 @@ String settingsSelectedPreset(
       if (config.autoFill && !config.gapCheckEnabled) return 'saver';
       return 'custom';
     case SettingsSection.localization:
+      return 'custom';
+    case SettingsSection.components:
       return 'custom';
     case SettingsSection.discovery:
       return settings.useListeningHistory ? 'on' : 'off';

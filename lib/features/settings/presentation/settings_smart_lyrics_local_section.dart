@@ -2,39 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/data/services/providers/whisper_model_store_provider.dart';
-import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
+import 'package:tune/data/services/components/local_component.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
-import 'package:tune/utils/logger.dart';
+import 'package:tune/features/settings/presentation/settings_localization_local_block.dart'
+    show formatComponentBytes;
 
 /// The free vote of the pool (docs/smart-lyrics.md §6.2, M4): the reader
-/// picks a whisper model, the app brings it home, and from then on one
-/// machine vote costs nothing and sends nothing.
-class SmartLyricsLocalSection extends ConsumerStatefulWidget {
+/// picks a whisper model, the shared installer brings it home, and from then
+/// on one machine vote costs nothing and sends nothing.
+class SmartLyricsLocalSection extends ConsumerWidget {
   const SmartLyricsLocalSection({super.key});
 
-  @override
-  ConsumerState<SmartLyricsLocalSection> createState() =>
-      _SmartLyricsLocalSectionState();
-}
-
-class _SmartLyricsLocalSectionState
-    extends ConsumerState<SmartLyricsLocalSection> {
   /// The models the app offers; the names are the ones whisper.cpp uses.
-  static const List<String> _models = ['tiny', 'base', 'small'];
-
-  bool _downloading = false;
-
-  /// The words the last download ended with; `null` while nothing was tried.
-  String? _result;
+  static const List<String> models = ['tiny', 'base', 'small'];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final config = ref.watch(settingsControllerProvider).smartLyrics;
     final strings = context.loc;
     final model = config.localModel;
-    final result = _result;
+    final state = model.isEmpty
+        ? null
+        : ref.watch(
+            localComponentStateProvider(
+              LocalComponentRegistry.whisperModel(model).id,
+            ),
+          );
+    final downloading = state?.phase == LocalComponentPhase.downloading;
+    final canDelete = state?.canDelete ?? false;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +56,7 @@ class _SmartLyricsLocalSectionState
                     value: '',
                     child: Text(strings.settingsSmartLyricsLocalOff),
                   ),
-                  for (final name in _models)
+                  for (final name in models)
                     DropdownMenuItem(value: name, child: Text(name)),
                 ],
                 onChanged: (selected) {
@@ -72,25 +70,34 @@ class _SmartLyricsLocalSectionState
             const SizedBox(width: CompactTokens.space12),
             TextButton(
               key: const ValueKey('smart-lyrics-local-download'),
-              onPressed: model.isEmpty || _downloading
+              onPressed: state == null
                   ? null
-                  : () => _download(model),
+                  : downloading
+                  ? () => _cancel(ref, model)
+                  : state.busy
+                  ? null
+                  : canDelete
+                  ? () => _remove(ref, model)
+                  : () => _download(ref, model),
               child: Text(
-                _downloading
+                downloading
                     ? strings.settingsSmartLyricsLocalBusy
+                    : state != null && state.ready && canDelete
+                    ? strings.settingsLocalizationLocalDelete
                     : strings.settingsSmartLyricsLocalDownload,
               ),
             ),
           ],
         ),
-        // The words the last download ended with: a success the reader
-        // can act on, or a failure they can press through.
-        if (result != null) ...[
+        if (state != null) ...[
           const SizedBox(height: CompactTokens.space6),
           Text(
-            result,
+            _statusText(context, state),
+            key: const ValueKey('smart-lyrics-local-status'),
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: state.phase == LocalComponentPhase.failed
+                  ? theme.colorScheme.error
+                  : theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -98,23 +105,47 @@ class _SmartLyricsLocalSectionState
     );
   }
 
-  Future<void> _download(String model) async {
+  String _statusText(BuildContext context, LocalComponentState state) {
     final strings = context.loc;
-    setState(() {
-      _downloading = true;
-      _result = null;
-    });
-    try {
-      final store = await ref.read(whisperModelStoreProvider.future);
-      final checksum = await store.checksumOf(model);
-      if (checksum == null) throw WhisperModelException('no checksum');
-      await store.download(model, checksum: checksum);
-      setState(() => _result = strings.settingsSmartLyricsLocalReady);
-    } catch (error, stackTrace) {
-      Log.error('本地模型下载失败: $error', stackTrace);
-      setState(() => _result = strings.settingsSmartLyricsLocalFailed);
-    } finally {
-      if (mounted) setState(() => _downloading = false);
+    switch (state.phase) {
+      case LocalComponentPhase.checking:
+        return '';
+      case LocalComponentPhase.downloading:
+      case LocalComponentPhase.verifying:
+        final progress = state.progress;
+        return progress == null
+            ? strings.settingsSmartLyricsLocalBusy
+            : '${(progress * 100).round()}% · '
+                  '${formatComponentBytes(state.received)}'
+                  ' / ${formatComponentBytes(state.total)}';
+      case LocalComponentPhase.ready:
+        return strings.settingsLocalizationLocalSize(
+          formatComponentBytes(state.installedBytes),
+        );
+      case LocalComponentPhase.failed:
+        return strings.settingsSmartLyricsLocalFailed;
+      case LocalComponentPhase.notInstalled:
+        return state.systemAvailable
+            ? strings.settingsLocalComponentsSystemHint
+            : strings.settingsLocalizationLocalMissing;
     }
+  }
+
+  void _download(WidgetRef ref, String model) {
+    ref
+        .read(localComponentsControllerProvider.notifier)
+        .download(LocalComponentRegistry.whisperModel(model).id);
+  }
+
+  void _cancel(WidgetRef ref, String model) {
+    ref
+        .read(localComponentsControllerProvider.notifier)
+        .cancel(LocalComponentRegistry.whisperModel(model).id);
+  }
+
+  Future<void> _remove(WidgetRef ref, String model) async {
+    await ref
+        .read(localComponentsControllerProvider.notifier)
+        .remove(LocalComponentRegistry.whisperModel(model).id);
   }
 }

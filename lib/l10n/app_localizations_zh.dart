@@ -3922,6 +3922,61 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesHealthWeightsDone => '完成';
 
   @override
+  String get settingsSectionComponents => '本地组件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '按需下载翻译与歌词的本地运行时、模型，以及转码用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本地组件 插件 下载 模型 运行时 占用 删除 ffmpeg whisper llama 歌词 翻译';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻译';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌词';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '转码';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalComponentsHint => '组件只在需要时下载；系统里已装好的程序优先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 运行时（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen2.5-0.5B）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 运行时（SenseVoice）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
+
+  @override
   String get settingsSectionLocalization => '本地化';
 
   @override
@@ -8042,6 +8097,61 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesHealthWeightsDone => '完成';
 
   @override
+  String get settingsSectionComponents => '本地组件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '按需下载翻译与歌词的本地运行时、模型，以及转码用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本地组件 插件 下载 模型 运行时 占用 删除 ffmpeg whisper llama 歌词 翻译';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻译';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌词';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '转码';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalComponentsHint => '组件只在需要时下载；系统里已装好的程序优先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 运行时（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen2.5-0.5B）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 运行时（SenseVoice）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
+
+  @override
   String get settingsSectionLocalization => '本地化';
 
   @override
@@ -12160,6 +12270,62 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sourcesHealthWeightsDone => '完成';
+
+  @override
+  String get settingsSectionComponents => '本機元件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '依需要下載翻譯與歌詞的本機執行環境、模型，以及轉碼用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本機元件 外掛 下載 模型 執行環境 佔用 刪除 ffmpeg whisper llama 歌詞 翻譯';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻譯';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌詞';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '轉碼';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系統已安裝版本';
+
+  @override
+  String get settingsLocalComponentsHint => '元件只在需要時下載；系統裡已裝好的程式優先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 執行環境（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻譯模型（Qwen2.5-0.5B）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime =>
+      'Whisper 執行環境（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 執行環境（SenseVoice）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式轉碼）';
 
   @override
   String get settingsSectionLocalization => '本地化';

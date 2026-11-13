@@ -4,6 +4,8 @@ import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_components.dart';
 
 /// Whether the offline translation files can be used.
 enum TranslationAssetProblem { none, modelMissing, modelCorrupt, binaryMissing }
@@ -25,7 +27,8 @@ class TranslationAssetStatus {
 class TranslationAssets {
   /// The release that was tested with this client.
   static const String binaryVersion = 'b12274';
-  static const String modelFileName = 'qwen2.5-0.5b-instruct-q4_k_m.gguf';
+  static const String modelFileName =
+      LocalComponentRegistry.translationModelFileName;
   static const String modelSha256 =
       '74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db';
   static const int modelBytes = 491400032;
@@ -36,6 +39,10 @@ class TranslationAssets {
   final int expectedModelBytes;
   final String expectedModelSha256;
 
+  File? _componentModel;
+  String? _componentBinary;
+  Directory? _componentBinDirectory;
+
   TranslationAssets(
     this.root, {
     required this.supportPath,
@@ -43,6 +50,26 @@ class TranslationAssets {
     this.expectedModelBytes = modelBytes,
     this.expectedModelSha256 = modelSha256,
   });
+
+  /// Lets an older copy stay the first choice while the downloaded component
+  /// fills in when neither the folder nor the system has the file.
+  Future<void> useComponents(LocalComponents components) async {
+    final localModel = modelFile;
+    if (!await localModel.exists()) {
+      _componentModel = await components.file(
+        LocalComponentRegistry.translationModel,
+        modelFileName,
+      );
+    }
+    final binary = await _binaryIn(binDirectory);
+    final componentBinary = binary == null
+        ? await components.executable(LocalComponentRegistry.translationRuntime)
+        : null;
+    _componentBinary = binary ?? componentBinary?.path;
+    if (componentBinary != null) {
+      _componentBinDirectory = componentBinary.parent;
+    }
+  }
 
   /// Finds the `translation/` directory to use.
   ///
@@ -115,13 +142,20 @@ class TranslationAssets {
     );
   }
 
-  Directory get binDirectory => Directory(path.join(root.path, 'bin'));
+  Directory get binDirectory =>
+      _componentBinDirectory ?? Directory(path.join(root.path, 'bin'));
 
-  File get modelFile => File(path.join(root.path, 'models', modelFileName));
+  File get modelFile =>
+      _componentModel ??
+      File(path.join(root.path, 'models', modelFileName));
 
-  /// The `llama-cli` inside the unpacked runtime, or `null` when absent.
+  /// The `llama-cli` the engine runs, or `null` when absent.
   Future<String?> findBinary() async {
-    final directory = binDirectory;
+    if (_componentBinary != null) return _componentBinary;
+    return _binaryIn(binDirectory);
+  }
+
+  static Future<String?> _binaryIn(Directory directory) async {
     if (!await directory.exists()) return null;
     await for (final entity in directory.list(recursive: true)) {
       if (entity is File && path.basename(entity.path) == 'llama-cli') {

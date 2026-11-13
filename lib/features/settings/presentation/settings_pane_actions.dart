@@ -257,6 +257,8 @@ mixin SettingsPaneActions<T extends ConsumerStatefulWidget> on ConsumerState<T> 
         await controller.setSmartLyrics(const SmartLyricsConfig());
       case SettingsSection.localization:
         await controller.setLocalization(const LocalizationConfig());
+      case SettingsSection.components:
+        break;
       case SettingsSection.discovery:
         await controller.setUseListeningHistory(false);
       case SettingsSection.desktop:

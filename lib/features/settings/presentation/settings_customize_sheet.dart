@@ -11,6 +11,7 @@ import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
 import 'package:tune/features/settings/presentation/settings_discovery_card.dart';
+import 'package:tune/features/settings/presentation/settings_local_components_card.dart';
 import 'package:tune/features/settings/presentation/settings_localization_card.dart';
 import 'package:tune/features/settings/presentation/settings_permissions_card.dart';
 import 'package:tune/features/settings/presentation/settings_playback_card.dart';
@@ -153,6 +154,7 @@ class SettingsCustomizeCard extends ConsumerWidget {
       ),
       SettingsSection.lyrics => const SettingsSmartLyricsCard(),
       SettingsSection.localization => const SettingsLocalizationCard(),
+      SettingsSection.components => const SettingsLocalComponentsCard(),
       SettingsSection.discovery => const SettingsDiscoveryCard(),
       SettingsSection.desktop => SettingsDesktopCard(
         capabilities: capabilities,

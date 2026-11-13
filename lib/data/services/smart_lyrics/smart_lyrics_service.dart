@@ -110,6 +110,10 @@ class SmartLyricsService {
   /// then try the original file and fail soft.
   final String ffmpegBinary;
 
+  /// Resolves the transcoder when it may come from a downloaded component.
+  /// `null` means neither the system nor a component has one.
+  final Future<String?> Function()? ffmpegBinaryOf;
+
   /// Set once the first download of this service cleaned the folders a
   /// killed run left behind.
   Future<void>? _cleaned;
@@ -155,6 +159,7 @@ class SmartLyricsService {
     this.resolver,
     this.health,
     this.ffmpegBinary = 'ffmpeg',
+    this.ffmpegBinaryOf,
     Dio? dio,
   }) : _dio = dio ?? Dio();
 
@@ -617,8 +622,20 @@ class SmartLyricsService {
         ? audio.parent
         : await Directory.systemTemp.createTemp('tune_smart_audio');
     final wav = File(path.join(folder.path, 'decoded.wav'));
+    final binary = ffmpegBinaryOf == null
+        ? ffmpegBinary
+        : await ffmpegBinaryOf!.call();
+    if (binary == null) {
+      _transcoderMissing = true;
+      if (!_transcodeGapReported) {
+        _transcodeGapReported = true;
+        Log.info('本地没有可用的 ffmpeg，转码跳过，原始音频直接交给引擎');
+      }
+      if (!temporary) await _discardFolder(folder);
+      return (audio, temporary);
+    }
     try {
-      final result = await Process.run(ffmpegBinary, [
+      final result = await Process.run(binary, [
         '-y',
         '-loglevel',
         'error',

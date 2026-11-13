@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/data/services/translation/translation_assets.dart';
+import 'package:tune/data/services/components/local_components.dart';
+import 'package:tune/data/services/providers/local_components_provider.dart';
 import 'package:tune/domain/models/localization_config.dart';
-import 'package:tune/features/localization/application/local_model_controller.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
@@ -78,7 +78,8 @@ void main() {
     expect(availabilityOf(config), TranslationAvailability.available);
   });
 
-  test('the bundled model that is not installed is reported missing', () async {
+  test('a local backend whose components are not installed is reported '
+      'missing', () async {
     final temp = await Directory.systemTemp.createTemp('tune-local-model');
     addTearDown(() async {
       if (await temp.exists()) await temp.delete(recursive: true);
@@ -87,34 +88,26 @@ void main() {
     final container = containerFor(
       const LocalizationConfig(backendId: LocalizationConfig.localBackendId),
       overrides: [
-        translationAssetsProvider.overrideWith(
-          (ref) async =>
-              TranslationAssets(Directory(temp.path), supportPath: temp.path),
-        ),
-        localModelControllerProvider.overrideWith(
-          (ref) => LocalModelController(
-            resolveAssets: () => ref.watch(translationAssetsProvider.future),
+        localComponentsProvider.overrideWith(
+          (ref) async => LocalComponents(
+            supportDirectory: temp,
+            environment: {'HOME': temp.path},
           ),
         ),
       ],
     );
     addTearDown(container.dispose);
 
-    // Both providers are auto-disposed; keep them alive while the first
-    // check of the empty directory runs.
-    container.listen(localModelControllerProvider, (_, _) {});
+    // The availability provider reads the check; keep it alive while the
+    // first scan of the empty machine runs.
+    container.listen(localTranslationReadyProvider, (_, _) {});
     container.listen(translationAvailabilityProvider, (_, _) {});
 
     await _waitUntil(
-      () =>
-          container.read(localModelControllerProvider).phase !=
-          LocalModelPhase.checking,
+      () => !container.read(localTranslationReadyProvider).isLoading,
     );
 
-    expect(
-      container.read(localModelControllerProvider).phase,
-      LocalModelPhase.notInstalled,
-    );
+    expect(container.read(localTranslationReadyProvider).valueOrNull, isFalse);
     expect(
       container.read(translationAvailabilityProvider),
       TranslationAvailability.localNotInstalled,

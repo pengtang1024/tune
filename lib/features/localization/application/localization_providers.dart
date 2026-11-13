@@ -8,9 +8,11 @@ import 'package:tune/data/services/translation/openai_translation_engine.dart';
 import 'package:tune/data/services/translation/translation_assets.dart';
 import 'package:tune/data/services/translation/translation_balance.dart';
 import 'package:tune/data/services/translation/translation_provider_catalog.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_components.dart';
+import 'package:tune/data/services/providers/local_components_provider.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/domain/models/translation_cache.dart';
-import 'package:tune/features/localization/application/local_model_controller.dart';
 import 'package:tune/features/localization/application/translation_repository.dart';
 import 'package:tune/features/localization/data/translation_store.dart';
 import 'package:tune/domain/models/localization_config.dart';
@@ -31,9 +33,33 @@ enum TranslationAvailability {
   localNotInstalled,
 }
 
-final translationAssetsProvider = FutureProvider<TranslationAssets>((ref) {
-  return TranslationAssets.forApp();
+final translationAssetsProvider = FutureProvider<TranslationAssets>((ref) async {
+  ref.watch(localComponentsRevisionProvider);
+  final assets = await TranslationAssets.forApp();
+  final components = await ref.watch(localComponentsProvider.future);
+  await assets.useComponents(components);
+  return assets;
 });
+
+/// Whether the offline engine has both halves it needs: a llama.cpp runtime
+/// and the model, from the system or from a downloaded component.
+final localTranslationReadyProvider = FutureProvider<bool>((ref) async {
+  ref.watch(localComponentsRevisionProvider);
+  final components = await ref.watch(localComponentsProvider.future);
+  return _localTranslationReady(components);
+});
+
+Future<bool> _localTranslationReady(LocalComponents components) async {
+  final runtime = await components.executable(
+    LocalComponentRegistry.translationRuntime,
+  );
+  if (runtime == null) return false;
+  final model = await components.file(
+    LocalComponentRegistry.translationModel,
+    LocalComponentRegistry.translationModelFileName,
+  );
+  return model != null;
+}
 
 final translationStoreProvider = FutureProvider<TranslationStore>((ref) async {
   final database = await ref.watch(appDatabaseProvider.future);
@@ -57,8 +83,8 @@ final translationAvailabilityProvider = Provider<TranslationAvailability>((
   if (backendId.isEmpty) return TranslationAvailability.needsProvider;
 
   if (backendId == LocalizationConfig.localBackendId) {
-    final model = ref.watch(localModelControllerProvider);
-    return model.ready
+    final ready = ref.watch(localTranslationReadyProvider);
+    return ready.valueOrNull == true
         ? TranslationAvailability.available
         : TranslationAvailability.localNotInstalled;
   }

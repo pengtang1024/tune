@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/translation/translation_provider_catalog.dart';
 import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/domain/models/translation_provider.dart';
-import 'package:tune/features/localization/application/local_model_controller.dart';
+import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_localization_ledger.dart';
@@ -135,13 +136,19 @@ class _SettingsLocalizationCardState
           const SizedBox(height: CompactTokens.space16),
           if (isLocal)
             SettingsLocalizationLocalBlock(
-              state: ref.watch(localModelControllerProvider),
-              onDownload: () =>
-                  ref.read(localModelControllerProvider.notifier).download(),
-              onCancel: () =>
-                  ref.read(localModelControllerProvider.notifier).cancelDownload(),
-              onRemove: () =>
-                  ref.read(localModelControllerProvider.notifier).remove(),
+              runtime: ref.watch(
+                localComponentStateProvider(
+                  LocalComponentRegistry.translationRuntime.id,
+                ),
+              ),
+              model: ref.watch(
+                localComponentStateProvider(
+                  LocalComponentRegistry.translationModel.id,
+                ),
+              ),
+              onDownload: () => unawaited(_downloadLocalComponents()),
+              onCancel: _cancelLocalComponents,
+              onRemove: () => unawaited(_removeLocalComponents()),
             )
           else if (isVendor)
             SettingsLocalizationProviderBlock(
@@ -235,6 +242,31 @@ class _SettingsLocalizationCardState
         .copyWith(backendId: provider.id, privacyAccepted: accepted);
     controller.setLocalization(next);
     _applyCredential(next);
+  }
+
+  Future<void> _downloadLocalComponents() async {
+    final controller = ref.read(localComponentsControllerProvider.notifier);
+    final states = ref.read(localComponentsControllerProvider).valueOrNull;
+    for (final spec in [
+      LocalComponentRegistry.translationRuntime,
+      LocalComponentRegistry.translationModel,
+    ]) {
+      final current = states?[spec.id];
+      if (current == null || current.usable || current.busy) continue;
+      await controller.download(spec.id);
+    }
+  }
+
+  void _cancelLocalComponents() {
+    final controller = ref.read(localComponentsControllerProvider.notifier);
+    controller.cancel(LocalComponentRegistry.translationRuntime.id);
+    controller.cancel(LocalComponentRegistry.translationModel.id);
+  }
+
+  Future<void> _removeLocalComponents() async {
+    final controller = ref.read(localComponentsControllerProvider.notifier);
+    await controller.remove(LocalComponentRegistry.translationRuntime.id);
+    await controller.remove(LocalComponentRegistry.translationModel.id);
   }
 
   Future<bool> _confirmPrivacy(String providerName) async {

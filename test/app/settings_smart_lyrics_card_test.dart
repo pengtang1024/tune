@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
+import 'package:tune/data/services/components/local_component.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_batch_controller.dart';
 import 'package:tune/features/smart_lyrics/application/smart_lyrics_ledger_provider.dart';
@@ -14,7 +15,6 @@ import 'package:tune/features/smart_lyrics/domain/smart_lyrics_ledger.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_sample.dart';
 import 'package:tune/features/smart_lyrics/domain/smart_lyrics_task.dart';
 import 'package:tune/features/settings/presentation/settings_smart_lyrics_card.dart';
-import 'package:tune/data/services/providers/whisper_model_store_provider.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 import '../services/fake_persistence.dart';
@@ -37,23 +37,28 @@ class _RecordingStore extends SmartLyricsSampleStore {
       SmartLyricsSampleAccount.empty;
 }
 
-/// The store the local section downloads through: it records the call and
-/// answers the checksum the home would publish, without a network.
-class _FakeModelStore extends WhisperModelStore {
-  _FakeModelStore() : super(root: Directory('/does/not/exist'));
-
+/// The shared controller the local section downloads through: it records the
+/// component id and answers a ready state, without a network or a disk.
+class _FakeComponentsController extends LocalComponentsController {
   final List<String> downloaded = [];
 
   @override
-  Future<String?> checksumOf(String name) async => 'fake-checksum';
+  Future<Map<String, LocalComponentState>> build() async => {
+    for (final spec in LocalComponentRegistry.all)
+      spec.id: const LocalComponentState(LocalComponentPhase.notInstalled),
+  };
 
   @override
-  Future<void> download(
-    String name, {
-    required String checksum,
-    void Function(double progress)? onProgress,
-  }) async {
-    downloaded.add(name);
+  Future<void> download(String id) async {
+    downloaded.add(id);
+    state = AsyncData({
+      ...?state.valueOrNull,
+      id: const LocalComponentState(
+        LocalComponentPhase.ready,
+        installedBytes: 1024 * 1024,
+        canDelete: true,
+      ),
+    });
   }
 }
 
@@ -290,15 +295,14 @@ void main() {
     expect(controller.state.smartLyrics.localModel, 'base');
   });
 
-  testWidgets('the download button brings the model home through the store', (
-    tester,
-  ) async {
-    final store = _FakeModelStore();
+  testWidgets('the download button brings the model home through the shared '
+      'components controller', (tester) async {
+    final controller = _FakeComponentsController();
     await pumpCard(
       tester,
       ledger: Future.value(SmartLyricsLedger.empty),
       extra: [
-        whisperModelStoreProvider.overrideWith((ref) => Future.value(store)),
+        localComponentsControllerProvider.overrideWith(() => controller),
       ],
     );
 
@@ -309,8 +313,11 @@ void main() {
     await tester.tap(find.byKey(const Key('smart-lyrics-local-download')));
     await tester.pumpAndSettle();
 
-    expect(store.downloaded, ['small']);
-    expect(find.text('模型已就绪'), findsOneWidget);
+    expect(controller.downloaded, [
+      LocalComponentRegistry.whisperModel('small').id,
+    ]);
+    expect(find.textContaining('1.0 MB'), findsOneWidget,
+        reason: 'the ready line reports the bytes the component takes');
   });
 
   testWidgets('the batch line says the account and the presses run their '

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/data/services/providers/local_components_provider.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
 
@@ -8,6 +9,11 @@ import 'package:tune/data/services/smart_lyrics/whisper_model_store.dart';
 final whisperModelStoreProvider = FutureProvider<WhisperModelStore>((
   ref,
 ) async {
-  final assets = await WhisperAssets.appDefault();
-  return WhisperModelStore(root: Directory(assets.modelsFolder));
+  ref.watch(localComponentsRevisionProvider);
+  final components = await ref.watch(localComponentsProvider.future);
+  final assets = await WhisperAssets.appDefault(components: components);
+  return WhisperModelStore(
+    root: Directory(assets.modelsFolder),
+    components: components,
+  );
 });

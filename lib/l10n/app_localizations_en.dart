@@ -4219,6 +4219,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesHealthWeightsDone => 'Done';
 
   @override
+  String get settingsSectionComponents => 'Local components';
+
+  @override
+  String get settingsComponentsDescription =>
+      'Download the local runtimes and models for translation and lyrics, plus FFmpeg for transcoding, only when needed';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      'local components plugin download model runtime size delete ffmpeg whisper llama lyrics translation';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => 'Translation';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => 'Lyrics';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => 'Transcoding';
+
+  @override
+  String get settingsLocalComponentsSystemHint => 'Using the system install';
+
+  @override
+  String get settingsLocalComponentsHint =>
+      'Components download only when you ask; a program the system already has is used first.';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp runtime (llama-cli)';
+
+  @override
+  String get settingsLocalComponentTranslationModel =>
+      'Translation model (Qwen2.5-0.5B)';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime =>
+      'Whisper runtime (whisper-cli)';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper model tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper model base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper model small';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx runtime (SenseVoice)';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice model';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg (m4a and other formats)';
+
+  @override
   String get settingsSectionLocalization => 'Localization';
 
   @override
