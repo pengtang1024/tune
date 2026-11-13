@@ -29,12 +29,21 @@ final appInitializationProvider = FutureProvider<void>((ref) async {
 /// serves cached songs while remote sources refresh in the background.
 void _scheduleStartupScan(Ref ref) {
   final settings = ref.read(settingsControllerProvider);
-  if (!settings.autoScanOnStartup) return;
-
   final localPaths = settings.effectiveScanPaths;
+
   Future<void>.microtask(() async {
+    final library = ref.read(libraryControllerProvider.notifier);
+    // The typed on-air fields arrived after the first scans: refresh the
+    // stations once so their rows carry them. Until then the old rows stay
+    // readable through `sourceData['nowPlaying']`.
     try {
-      await ref.read(libraryControllerProvider.notifier).autoScan(localPaths);
+      await library.migrateRadioOnAir();
+    } catch (error, stackTrace) {
+      Log.error('电台在播信息重扫失败: $error', stackTrace);
+    }
+    if (!settings.autoScanOnStartup) return;
+    try {
+      await library.autoScan(localPaths);
     } catch (error, stackTrace) {
       Log.error('启动自动扫描失败: $error', stackTrace);
     }

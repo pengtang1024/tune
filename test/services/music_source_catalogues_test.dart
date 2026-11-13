@@ -597,12 +597,17 @@ void main() {
 
       final song = songs.single;
       expect(song.title, 'Jazz FM');
-      expect(song.artist, 'Miles Davis');
-      expect(song.album, 'So What');
+      // The station is the track: what is on air is a fact of its own, not
+      // the artist or the album of the stream.
+      expect(song.artist, '');
+      expect(song.album, '');
+      expect(song.onAirArtist, 'Miles Davis');
+      expect(song.onAirTitle, 'So What');
+      expect(song.onAirYear, 1959);
       expect(song.streamUrl, 'https://stream.example.com/jazz');
       expect(song.genre, 'jazz');
       expect(song.language, 'english');
-      expect(song.year, 1959);
+      expect(song.year, isNull);
       expect(song.description, 'Jazz around the clock');
       expect(song.isLiveStream, isTrue);
       expect(song.sourceId, 'radio');
@@ -612,7 +617,7 @@ void main() {
       expect(song.sourceData?['bitrate'], 128);
     });
 
-    test('falls back to the country when nothing is on air', () {
+    test('keeps the station without a name when nothing is on air', () {
       final songs = RadioSourceAdapter.buildSongs(const [
         RadioStation(
           provider: 'somafm',
@@ -624,8 +629,10 @@ void main() {
       ], sourceId: 'radio');
 
       final song = songs.single;
-      expect(song.artist, 'Canada');
+      expect(song.artist, '');
       expect(song.album, '');
+      expect(song.onAirArtist, isNull);
+      expect(song.onAirTitle, isNull);
       expect(song.sourceData?['nowPlaying'], '');
     });
 

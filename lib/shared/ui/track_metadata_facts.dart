@@ -164,13 +164,29 @@ TrackFact? _descriptionFact(BuildContext context, Song song) {
   );
 }
 
+/// What a station is airing, from the typed fields or an older scan.
+///
+/// The typed names were added after the first library scans, so a row cached
+/// before them still carries the joined `nowPlaying` string. The typed
+/// fields win when both are present.
+String? onAirOf(Song song) {
+  final artist = song.onAirArtist?.trim() ?? '';
+  final title = song.onAirTitle?.trim() ?? '';
+  final typed = [artist, title].where((part) => part.isNotEmpty).join(' - ');
+  if (typed.isNotEmpty) return typed;
+  final legacy = song.sourceData?['nowPlaying']?.toString().trim() ?? '';
+  return legacy.isEmpty ? null : legacy;
+}
+
 TrackFact? _onAirFact(BuildContext context, Song song) {
-  final onAir = song.sourceData?['nowPlaying']?.toString() ?? '';
-  if (onAir.trim().isEmpty) return null;
+  final onAir = onAirOf(song);
+  if (onAir == null) return null;
+  final year = song.onAirYear;
+  final value = year == null ? onAir : '$onAir ($year)';
 
   return TrackFact(
     label: context.loc.nowPlayingDetailNowPlaying,
-    value: onAir,
+    value: value,
     icon: Icons.radio_rounded,
   );
 }

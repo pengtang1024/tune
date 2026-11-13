@@ -164,6 +164,65 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     await scan(localPaths, auto: true);
   }
 
+  /// The flag of the one-time rescan that types the on-air fields.
+  static const radioOnAirMigrationKey = 'radio_typed_on_air_migrated';
+
+  /// Rescans the radio sources once, so stations cached before the on-air
+  /// fields were typed gain them.
+  ///
+  /// A library scanned before those fields existed stays readable: the
+  /// interface falls back to `sourceData['nowPlaying']`. The scan replaces
+  /// the rows, so the typed fields win from then on. The flag is written
+  /// before the scan, so a station that is unreachable does not make every
+  /// start fetch the directory again.
+  Future<void> migrateRadioOnAir() async {
+    await future;
+    if (_disposed || !state.hasValue) return;
+    if (_current.isScanning || _current.isLoading) return;
+
+    final persistence = ref.read(persistenceServiceProvider);
+    if (persistence.getBool(radioOnAirMigrationKey) ?? false) return;
+    await persistence.setBool(radioOnAirMigrationKey, true);
+    if (_disposed) return;
+
+    final sourcesState = await ref.read(
+      musicSourcesControllerProvider.future,
+    );
+    if (_disposed) return;
+    final radio = sourcesState.enabled
+        .where((source) => source.sourceType == 'radio')
+        .toList(growable: false);
+    if (radio.isEmpty) return;
+
+    try {
+      final results = await _sourceService.scanAll(
+        sources: radio,
+        localPaths: const [],
+      );
+      if (_disposed) return;
+      var written = 0;
+      for (final result in results) {
+        if (!result.isSuccess) continue;
+        written += await _storage.ingest(result.songs);
+      }
+      if (_disposed || written == 0) return;
+      await ref
+          .read(musicSourcesControllerProvider.notifier)
+          .recordScanResults(results);
+      if (_disposed) return;
+      state = AsyncData(
+        _current.copyWith(
+          songs: List<Song>.unmodifiable(await _window()),
+          albums: await _storage.albumSummaries(),
+        ),
+      );
+    } catch (error, stackTrace) {
+      // The typed fields are an improvement over the compat read, not a
+      // requirement: a failed scan leaves the library as it was.
+      Log.error('电台在播信息重扫失败: $error\n$stackTrace');
+    }
+  }
+
   Future<void> scan(List<String> paths, {bool auto = false}) async {
     if (_disposed ||
         !state.hasValue ||

@@ -34,3 +34,15 @@
 
 - [x] D1 `git status` 只含本步文件；不 push。
 - [x] D2 汇报：P0/P1 证据、门禁结果，以及第 3 项（电台类型化字段）的 P3 落点与重扫/兼容取舍。
+
+## E. P3 电台类型化在播字段
+
+- [x] E1 `song.dart`：新增 `onAirArtist` / `onAirTitle` / `onAirYear`，接入 `fromMap`、`copyWith`、`toJson`。
+- [x] E2 `source_song_factory.dart`：`create` 透传三个在播字段。
+- [x] E3 `radio_source.dart`：`buildSongs` 不再写 `artist`/`album`/`year`，改写 typed 字段；`sourceData['nowPlaying']` 保留一版。
+- [x] E4 `track_metadata_facts.dart`：新增 `onAirOf(song)`，typed 优先、`nowPlaying` 回退；`_onAirFact` 读它。
+- [x] E5 `track_facts.dart`：`onAirLineOf` 改用 `onAirOf`。
+- [x] E6 `library_controller.dart`：新增 `migrateRadioOnAir()`，只重扫 enabled 的 radio 源，flag 先写。
+- [x] E7 `app.dart`：启动时先迁移电台字段，再按设置决定是否自动扫描。
+- [x] E8 测试：电台/ AzuraCast 断言改为 artist/album 空 + typed 字段；`Song` JSON round-trip；`onAirOf` 兼容读四条。
+- [x] E9 `flutter analyze`（No issues found）与 `flutter test`（除网络用例 1526 项全绿）。

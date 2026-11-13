@@ -62,6 +62,15 @@ class Song {
   /// position inside it.
   final bool isLiveStream;
 
+  /// The performer and the song a station is airing, when the source says.
+  ///
+  /// A station is not a recording: these names describe the song on air when
+  /// the scan ran. They are typed so the interface never passes them off as
+  /// the artist and the album of the stream itself.
+  final String? onAirArtist;
+  final String? onAirTitle;
+  final int? onAirYear;
+
   /// The licence the track is published under, when the source states one.
   final String? license;
 
@@ -107,6 +116,9 @@ class Song {
     this.sourceData,
     this.httpHeaders,
     this.isLiveStream = false,
+    this.onAirArtist,
+    this.onAirTitle,
+    this.onAirYear,
     this.license,
     this.description,
     this.localPath,
@@ -152,6 +164,9 @@ class Song {
             )
           : null,
       isLiveStream: data['isLiveStream'] == true,
+      onAirArtist: data['onAirArtist'],
+      onAirTitle: data['onAirTitle'],
+      onAirYear: data['onAirYear'],
       license: data['license'],
       description: data['description'],
       localPath: data['localPath'],
@@ -189,6 +204,9 @@ class Song {
     Map<String, dynamic>? sourceData,
     Map<String, String>? httpHeaders,
     bool? isLiveStream,
+    String? onAirArtist,
+    String? onAirTitle,
+    int? onAirYear,
     String? license,
     String? description,
     String? localPath,
@@ -224,6 +242,9 @@ class Song {
       sourceData: sourceData ?? this.sourceData,
       httpHeaders: httpHeaders ?? this.httpHeaders,
       isLiveStream: isLiveStream ?? this.isLiveStream,
+      onAirArtist: onAirArtist ?? this.onAirArtist,
+      onAirTitle: onAirTitle ?? this.onAirTitle,
+      onAirYear: onAirYear ?? this.onAirYear,
       license: license ?? this.license,
       description: description ?? this.description,
       localPath: localPath ?? this.localPath,
@@ -388,6 +409,9 @@ class Song {
     'sourceData': sourceData,
     'httpHeaders': httpHeaders,
     'isLiveStream': isLiveStream,
+    'onAirArtist': onAirArtist,
+    'onAirTitle': onAirTitle,
+    'onAirYear': onAirYear,
     'license': license,
     'description': description,
     'localPath': localPath,
