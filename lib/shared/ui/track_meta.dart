@@ -6,6 +6,8 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/content_kind_mark.dart';
+import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_details_button.dart';
@@ -91,9 +93,7 @@ class TrackMeta extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        song.artist.isEmpty
-                            ? context.loc.playerUnknownArtist
-                            : song.artist,
+                        _denseByline(context, song),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelMedium?.copyWith(
@@ -123,7 +123,7 @@ class TrackMeta extends StatelessWidget {
                 )
               else
                 Text(
-                  _byline(context, song),
+                  rowSubtitleOf(context, song),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium?.copyWith(
@@ -170,28 +170,35 @@ class TrackMeta extends StatelessWidget {
       color: selected ? theme.colorScheme.primary : null,
     );
     final builder = titleBuilder;
-    if (builder != null) return builder(text, style);
-    return Text(
-      text,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: style,
+    final Widget title = builder != null
+        ? builder(text, style)
+        : Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          );
+    // The dense row keeps no fact strip, so it wears the kind itself. The
+    // full row leaves the mark to the strip to say it only once.
+    if (!dense) return title;
+    return Row(
+      children: [
+        Flexible(child: title),
+        ContentKindMark(song: song),
+      ],
     );
   }
 }
 
-/// The line under the title of a row: who made the track, and the album it
-/// belongs to.
+/// The short line of a dense row.
 ///
-/// The album was only written down in the details panel, which left a list
-/// of long names without the other half of what tells two tracks apart. The
-/// line keeps the artist first because that is what a reader looks for, and
-/// the album follows the same secondary voice.
-String _byline(BuildContext context, Song song) {
-  final artist = song.artist.trim().isEmpty
-      ? context.loc.playerUnknownArtist
-      : song.artist;
-  final album = song.album.trim();
-  if (album.isEmpty) return artist;
-  return '$artist · $album';
+/// A song has room for its artist only. Speech starts with the show and a
+/// station writes what is airing, because neither has a usable artist.
+String _denseByline(BuildContext context, Song song) {
+  if (rowShapeOf(song) == RowShape.track) {
+    return song.artist.trim().isEmpty
+        ? context.loc.playerUnknownArtist
+        : song.artist;
+  }
+  return rowSubtitleOf(context, song);
 }

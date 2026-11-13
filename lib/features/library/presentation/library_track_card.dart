@@ -8,6 +8,8 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_row_tail.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/content_kind_mark.dart';
+import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
 import 'package:tune/shared/ui/track_position.dart';
 import 'package:tune/shared/ui/translated_text.dart';
@@ -76,10 +78,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
     final theme = Theme.of(context);
     final accent = theme.colorScheme.primary;
     final unknownTitle = context.loc.trackUnknownTitle;
-    final artist = song.artist.trim().isEmpty
-        ? context.loc.playerUnknownArtist
-        : song.artist;
-    final album = song.album.trim();
+    // A station has no artist and no album of its own; a speech track may
+    // have no voice. The row writes the shape its kind asks for.
+    final columns = rowColumnsOf(context, song);
 
     Widget row = TrackClickArea(
       onClick: widget.onTap,
@@ -140,6 +141,7 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                         ),
                       ),
                     ),
+                    ContentKindMark(song: song),
                     if (widget.unavailable) ...[
                       const SizedBox(width: CompactTokens.space4),
                       TuneTooltip(
@@ -159,9 +161,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                 Expanded(
                   flex: 3,
                   child: TuneTooltip(
-                    message: artist,
+                    message: columns.artist,
                     child: Text(
-                      artist,
+                      columns.artist,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelMedium?.copyWith(
@@ -176,9 +178,9 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                 Expanded(
                   flex: 3,
                   child: TuneTooltip(
-                    message: album,
+                    message: columns.album,
                     child: TranslatedText(
-                      text: album,
+                      text: columns.album,
                       dense: true,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,

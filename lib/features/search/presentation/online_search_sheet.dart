@@ -17,6 +17,7 @@ import 'package:tune/features/sources/application/music_sources_controller.dart'
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_sheet.dart';
+import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
@@ -730,10 +731,7 @@ class _SongRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final subtitle = [
-      song.artist,
-      song.album,
-    ].where((value) => value.trim().isNotEmpty).join(' · ');
+    final subtitle = rowSubtitleOf(context, song);
 
     return TrackClickArea(
       onClick: onPlay,

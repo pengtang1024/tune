@@ -46,3 +46,19 @@
 - [x] E7 `app.dart`：启动时先迁移电台字段，再按设置决定是否自动扫描。
 - [x] E8 测试：电台/ AzuraCast 断言改为 artist/album 空 + typed 字段；`Song` JSON round-trip；`onAirOf` 兼容读四条。
 - [x] E9 `flutter analyze`（No issues found）与 `flutter test`（除网络用例 1526 项全绿）。
+
+## F. P4 三种行形态与类型标识
+
+- [x] F1 `content_kind.dart`：新增播客 / 有声书集合与 `isPodcastSource` / `isAudiobookSource`。
+- [x] F2 新增 `lib/shared/ui/content_kind_mark.dart`：`contentKindLabelOf`、`contentKindIconOf`、`ContentKindMark`。
+- [x] F3 新增 `lib/shared/ui/content_row.dart`：`RowShape`、`rowShapeOf`、`rowSubtitleOf`、`rowColumnsOf`。
+- [x] F4 `track_metadata_facts.dart`：`metadataFactsOf` 首项加 `_contentKindFact`（仅语音，compact）。
+- [x] F5 `library_track_card.dart`：两列改 `rowColumnsOf`，标题旁挂 `ContentKindMark`。
+- [x] F6 `library_columns_view.dart`：标题挂标；副行按曲目 / 语音 / 电台分流。
+- [x] F7 `track_meta.dart`：`_byline` 改 `rowSubtitleOf`；dense 副行与标题挂标。
+- [x] F8 `online_search_sheet.dart`：`_SongRow` 副行改 `rowSubtitleOf`。
+- [x] F9 四份 ARB 新增三键并 `flutter gen-l10n`。
+- [x] F10 `docs/chips.md` 补「内容类型」一段。
+- [x] F11 新增 `test/domain/content_kind_test.dart` 与 `test/app/content_row_test.dart`。
+- [ ] F12 `flutter analyze` 与过滤网络 e2e 的 `flutter test` 全绿；提交（不 push）。
+

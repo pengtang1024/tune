@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/l10n/genre_label.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/content_kind_mark.dart';
 import 'package:tune/shared/ui/track_fact.dart';
 
 /// The facts the metadata of a track carries.
@@ -12,6 +13,7 @@ import 'package:tune/shared/ui/track_fact.dart';
 /// everything else a track can say about itself.
 List<TrackFact?> metadataFactsOf(BuildContext context, Song song) {
   return [
+    _contentKindFact(context, song),
     _albumFact(context, song),
     _yearFact(context, song),
     _genreFact(context, song),
@@ -25,6 +27,20 @@ List<TrackFact?> metadataFactsOf(BuildContext context, Song song) {
     _descriptionFact(context, song),
     _onAirFact(context, song),
   ];
+}
+
+TrackFact? _contentKindFact(BuildContext context, Song song) {
+  final label = contentKindLabelOf(context, song);
+  final icon = contentKindIconOf(song);
+  if (label == null || icon == null) return null;
+
+  return TrackFact(
+    label: context.loc.trackFactContentKind,
+    value: label,
+    icon: icon,
+    tone: FactTone.secondary,
+    compact: true,
+  );
 }
 
 TrackFact? _albumFact(BuildContext context, Song song) {

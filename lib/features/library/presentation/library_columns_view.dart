@@ -11,6 +11,8 @@ import 'package:tune/features/player/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/content_kind_mark.dart';
+import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/live_badge.dart';
@@ -164,6 +166,7 @@ class _ColumnCardState extends State<_ColumnCard> {
         ? context.loc.playerUnknownArtist
         : song.artist;
     final album = song.album.trim();
+    final shape = rowShapeOf(song);
     final bylineStyle = theme.textTheme.labelSmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
@@ -219,38 +222,62 @@ class _ColumnCardState extends State<_ColumnCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TranslatedText(
-                        text: song.title.isEmpty
-                            ? context.loc.trackUnknownTitle
-                            : song.title,
-                        dense: true,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: widget.selected
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                          color: widget.selected ? accent : null,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TranslatedText(
+                              text: song.title.isEmpty
+                                  ? context.loc.trackUnknownTitle
+                                  : song.title,
+                              dense: true,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: widget.selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: widget.selected ? accent : null,
+                              ),
+                            ),
+                          ),
+                          ContentKindMark(song: song),
+                        ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: album.isEmpty
-                                ? Text(
-                                    artist,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: bylineStyle,
-                                  )
-                                // The album is the name of the collection,
-                                // which a source may fill with a playlist
-                                // name. Only the album goes to the
-                                // translator; the artist keeps its words.
-                                : TranslatedText(
-                                    text: album,
-                                    prefix: '$artist · ',
-                                    dense: true,
-                                    style: bylineStyle,
-                                  ),
+                            child: switch (shape) {
+                              // A station has no artist or album of its own:
+                              // what plays is the only line it can write.
+                              RowShape.radio => Text(
+                                  rowSubtitleOf(context, song),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: bylineStyle,
+                                ),
+                              // A show is a collection, so its name is
+                              // translated like an album.
+                              RowShape.spokenWord => TranslatedText(
+                                  text: rowSubtitleOf(context, song),
+                                  dense: true,
+                                  style: bylineStyle,
+                                ),
+                              // The album is the name of the collection,
+                              // which a source may fill with a playlist
+                              // name. Only the album goes to the
+                              // translator; the artist keeps its words.
+                              RowShape.track => album.isEmpty
+                                  ? Text(
+                                      artist,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: bylineStyle,
+                                    )
+                                  : TranslatedText(
+                                      text: album,
+                                      prefix: '$artist · ',
+                                      dense: true,
+                                      style: bylineStyle,
+                                    ),
+                            },
                           ),
                           if (widget.source != null) ...[
                             const SizedBox(width: CompactTokens.space4),

@@ -112,6 +112,85 @@ String albumKeyOf({required String album, required String artist, String? source
 
 推荐 A；重扫沿用现有扫描（按 `uri` 覆盖），不需要迁移脚本，也不改 SQLite 表结构。
 
+## P4：三种行形态与类型标识（本轮，已实施）
+
+> 状态：已实现并通过门禁。P0 / P1 / P3 已提交并推送（`6d6479a`、`3f1e135`）。
+
+### 结论先行
+
+- 行形态只由 `contentKindOf(song)` 决定，共三种：**曲目行 / 语音行 / 电台行**。
+- 三种形态只在**副行**与**库表格的两列**上不同；尾部（时长 / 直播徽标）沿用 P0，不再改。
+- 类型标识只有两种可见形态，不新增第四种：
+  - **语音行**：`ContentKindMark`（人声图标 + tooltip「播客」/「有声书」）；
+  - **电台行**：既有 `LiveBadge`（`docs/chips.md` 规定直播标记只有一份实现）；
+  - **曲目行**：不挂标（库里大多数是曲目，标等于噪声）。
+- 类型标识同时是一条 compact 事实，进 `metadataFactsOf`。因此搜索结果、队列、喜欢、正在播放、详情面板自动一致；只有**没有事实条**的三处（库表格行、双列墙、dense 队列行）在标题旁显式挂 `ContentKindMark`，不重复。
+
+### 三种行形态
+
+| 形态 | 判定 | 标题 | 副行 | 库表格 作者 / 专辑列 | 尾部 |
+| --- | --- | --- | --- | --- | --- |
+| 曲目行 | 非 live 且非语音源 | 曲名 | `艺人 · 专辑`；艺人空 → 未知艺术家 | 艺人 / 专辑 | 时长 |
+| 语音行 | `isSpokenWordSource` | 单集 / 章节名 | `节目或书名 · 声音`；两者相同只写一次；都空 → 未知艺术家 | 声音 / 节目或书名；声音空则留空，**不写未知艺术家** | 时长 |
+| 电台行 | `isLiveStream` | 台名 | `正在播出 · 在播内容`；无在播内容 → `直播中` | **两列都留空** | 直播徽标 |
+
+电台行不把在播信息写进作者 / 专辑列——这是 P3「`onAir*` 不是作者与专辑」的语义边界；在播信息只出现在副行、事实面板、正在播放页与播放条。
+
+### 文件与改动
+
+1. `lib/domain/models/content_kind.dart`
+   - 新增 `podcastSourceTypes = {podcast_rss, podcast_catalog, podcast_apple}`、`audiobookSourceTypes = {librivox, audiobookshelf}`；
+   - 新增 `bool isPodcastSource(String? sourceId)`、`bool isAudiobookSource(String? sourceId)`（都先走 `sourceTypeOfId`，实例 id `podcast_rss-2` 可识别）；
+   - `spokenWordSourceTypes` 保持字面量，作为两集合的并集，不改既有调用。
+2. 新文件 `lib/shared/ui/content_kind_mark.dart`
+   - `String? contentKindLabelOf(BuildContext, Song)`：仅语音行返回 `contentKindAudiobook` / `contentKindPodcast`，其余 `null`；
+   - `IconData? contentKindIconOf(Song)`：语音行 `Icons.record_voice_over_rounded`，其余 `null`；
+   - `class ContentKindMark`：`MetaBadge(icon, tooltip: label, tone: FactTone.secondary, size: 14)`，自带 `space4` 左距；曲目 / 电台返回 `SizedBox.shrink()`。
+3. 新文件 `lib/shared/ui/content_row.dart`
+   - `enum RowShape { track, spokenWord, radio }`、`RowShape rowShapeOf(Song)`；
+   - `String rowSubtitleOf(BuildContext, Song)`：按上表生成副行（电台复用 `onAirLineOf`，语音行「节目 → 声音」去重）；
+   - `({String artist, String album}) rowColumnsOf(BuildContext, Song)`：按上表生成库表格两列。
+4. `lib/shared/ui/track_metadata_facts.dart`
+   - `metadataFactsOf` 首项加 `_contentKindFact`：仅语音行；`label: context.loc.trackFactContentKind`、`value: contentKindLabelOf(...)`、`icon: contentKindIconOf(...)`、`tone: FactTone.secondary`、`compact: true`。
+5. `lib/features/library/presentation/library_track_card.dart`
+   - `artist` / `album` 改读 `rowColumnsOf(context, song)`（电台空白、语音行不写未知艺术家）；
+   - 标题 `Flexible` 后加 `ContentKindMark(song: song)`（在「不可用」图标之前）。
+6. `lib/features/library/presentation/library_columns_view.dart`（`_ColumnCardState`）
+   - 标题改为 `Row [Flexible(TranslatedText), ContentKindMark]`；
+   - 副行：曲目行保持 `TranslatedText(album, prefix: '$artist · ')`；语音行 `TranslatedText(rowSubtitleOf(...))`；电台行 `Text(rowSubtitleOf(...))`（在播内容是别人的曲名，不交给翻译）。
+7. `lib/shared/ui/track_meta.dart`
+   - `_byline` 改调 `rowSubtitleOf`；
+   - `dense` 副行：曲目行保持艺人；语音 / 电台用 `rowSubtitleOf`（队列面板不再把电台写成「未知艺术家」）；
+   - `dense` 时标题旁挂 `ContentKindMark`（非 dense 由事实条承担）。
+8. `lib/features/search/presentation/online_search_sheet.dart`（`_SongRow`）
+   - 副行由 `artist · album` 改调 `rowSubtitleOf`；不另挂标（`TrackFactStrip` 已含类型事实）。
+9. l10n 四份 ARB（`app_en` / `app_zh` / `app_zh_CN` / `app_zh_TW`）新增并在改完后跑 `flutter gen-l10n`：
+   - `trackFactContentKind`：类型 / Kind / 類型；
+   - `contentKindPodcast`：播客 / Podcast / 播客；
+   - `contentKindAudiobook`：有声书 / Audiobook / 有聲書。
+10. `docs/chips.md` 增一段「内容类型」：语音行挂 `ContentKindMark`，电台行用 `LiveBadge`，曲目行不挂标；不新造 chip。
+11. 测试
+    - 新 `test/domain/content_kind_test.dart`：播客 / 有声书集合、实例 id、`contentKindOf` 的 radio 优先。
+    - 新 `test/app/content_row_test.dart`（`MaterialApp` + `zh_CN`，参考 `track_facts_test.dart`）：
+      - `rowShapeOf` 三形态；
+      - `rowSubtitleOf`：曲目、语音（节目在前、去重）、电台（typed 在播 / 无在播 → 直播中）；
+      - `rowColumnsOf`：电台两列为空、语音行声音空不写未知艺术家；
+      - `ContentKindMark`：播客 tooltip「播客」、有声书 tooltip「有声书」、曲目/电台不渲染；
+      - `metadataFactsOf` / `trackFactsOf` 含「类型 · 播客」。
+
+### 明确不做（本轮）
+
+- 专辑墙卡片的类型标识：`AlbumSummary` 不带来源，需要扩模型，另开一轮。
+- 正在播放页语音行的副行顺序（本轮只收敛到堆叠行、库表格、双列墙、搜索、队列 / 喜欢）。
+- 视频 / 试听的差异化呈现、电台独立入口：仍归 P2。
+
+### 验收
+
+- `flutter gen-l10n` 产物一并提交；`flutter analyze` 无问题。
+- `flutter test` 全绿（排除两个网络 e2e：`music_source_e2e_live_test.dart`、`music_source_live_test.dart`）。
+- 手工抽查（Linux 桌面）：库表格、双列墙、搜索结果、队列、喜欢页、正在播放、播放条各看一条曲目 / 语音 / 电台；确认电台行不出现「未知艺术家」、语音行节目在前、类型图标 tooltip 正确。
+- 不 push；提交信息建议 `feat(library): 三种行形态与内容类型标识`。
+
 ## 验收
 
 - `flutter analyze` 无问题；`flutter test` 全绿。

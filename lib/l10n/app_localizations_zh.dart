@@ -2834,6 +2834,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackFactLive => '直播';
 
   @override
+  String get trackFactContentKind => '类型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有声书';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -6828,6 +6837,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trackFactLive => '直播';
 
   @override
+  String get trackFactContentKind => '类型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有声书';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -10820,6 +10838,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trackFactLive => '直播';
+
+  @override
+  String get trackFactContentKind => '類型';
+
+  @override
+  String get contentKindPodcast => '播客';
+
+  @override
+  String get contentKindAudiobook => '有聲書';
 
   @override
   String get trackFactPath => '檔案路徑';

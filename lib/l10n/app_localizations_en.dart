@@ -3064,6 +3064,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackFactLive => 'Live';
 
   @override
+  String get trackFactContentKind => 'Kind';
+
+  @override
+  String get contentKindPodcast => 'Podcast';
+
+  @override
+  String get contentKindAudiobook => 'Audiobook';
+
+  @override
   String get trackFactPath => 'File path';
 
   @override

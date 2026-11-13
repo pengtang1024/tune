@@ -17,19 +17,41 @@ enum ContentKind {
   radio,
 }
 
-/// The source types whose tracks are speech.
-const Set<String> spokenWordSourceTypes = {
+/// The source types that publish shows: episodes of one feed.
+const Set<String> podcastSourceTypes = {
   'podcast_rss',
   'podcast_catalog',
   'podcast_apple',
+};
+
+/// The source types that publish books.
+const Set<String> audiobookSourceTypes = {
   'librivox',
   'audiobookshelf',
+};
+
+/// The source types whose tracks are speech.
+const Set<String> spokenWordSourceTypes = {
+  ...podcastSourceTypes,
+  ...audiobookSourceTypes,
 };
 
 /// Whether the source of [sourceId] publishes speech.
 bool isSpokenWordSource(String? sourceId) {
   if (sourceId == null || sourceId.isEmpty) return false;
   return spokenWordSourceTypes.contains(sourceTypeOfId(sourceId));
+}
+
+/// Whether the source of [sourceId] publishes a show of episodes.
+bool isPodcastSource(String? sourceId) {
+  if (sourceId == null || sourceId.isEmpty) return false;
+  return podcastSourceTypes.contains(sourceTypeOfId(sourceId));
+}
+
+/// Whether the source of [sourceId] publishes a book.
+bool isAudiobookSource(String? sourceId) {
+  if (sourceId == null || sourceId.isEmpty) return false;
+  return audiobookSourceTypes.contains(sourceTypeOfId(sourceId));
 }
 
 /// What the track is, read from the track alone.

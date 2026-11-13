@@ -5339,6 +5339,24 @@ abstract class AppLocalizations {
   /// **'直播'**
   String get trackFactLive;
 
+  /// No description provided for @trackFactContentKind.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'类型'**
+  String get trackFactContentKind;
+
+  /// No description provided for @contentKindPodcast.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'播客'**
+  String get contentKindPodcast;
+
+  /// No description provided for @contentKindAudiobook.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'有声书'**
+  String get contentKindAudiobook;
+
   /// No description provided for @trackFactPath.
   ///
   /// In zh_CN, this message translates to:
