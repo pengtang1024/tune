@@ -60,5 +60,5 @@
 - [x] F9 四份 ARB 新增三键并 `flutter gen-l10n`。
 - [x] F10 `docs/chips.md` 补「内容类型」一段。
 - [x] F11 新增 `test/domain/content_kind_test.dart` 与 `test/app/content_row_test.dart`。
-- [ ] F12 `flutter analyze` 与过滤网络 e2e 的 `flutter test` 全绿；提交（不 push）。
+- [x] F12 `flutter analyze` 与过滤网络 e2e 的 `flutter test` 全绿；提交（不 push）。
 
