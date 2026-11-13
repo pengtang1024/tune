@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# 准备随包分发的离线翻译资产。
+# 准备离线包（tool/package_linux.sh --offline）使用的本地翻译资产。
 #
 #   ./tool/prepare_translation.sh
 #
-# 模型与 llama.cpp 运行时归档都由 Git LFS 管理。本脚本只校验、解包，不联网：
-#   1. 确认 git-lfs 可用，且两个文件不是未拉取的 LFS 指针；
-#   2. 校验大小与 sha256；
-#   3. 把运行时归档解包到 translation/bin/llama-b12274/（幂等）。
+# 默认发布包不再包含这些资产：模型与运行时作为可选组件包单独发布，由应用在设置页
+# 按需下载。本脚本只给维护者本地打离线包时调用。
+#
+# 模型与 llama.cpp 运行时归档不再入库（原先由 Git LFS 管理），改为 Release 上的
+# 可选组件包。本脚本只校验、解包，不联网，需要维护者先把组件包里的
+# translation/models/ 与 translation/bin/ 放到仓库的 translation/ 下：
+#   1. 校验大小与 sha256；
+#   2. 把运行时归档解包到 translation/bin/llama-b12274/（幂等）。
 # 任何一步失败都直接退出，避免打出缺模型的坏包。
 set -euo pipefail
 
@@ -23,24 +27,16 @@ archive_bytes=23287295
 archive_sha=5f9de4d104502b38fdb1081d00087683ca224ca5c450eaba4eeb436b9a1bcd94
 runtime="$translation/bin/llama-b12274"
 
-hint="请先运行：git lfs install && git lfs pull"
+hint="请先从同版本的 Release 下载组件包（tune-translation-*.zip）并解压到 translation/"
 
 fail() {
   echo "$1" >&2
   exit 1
 }
 
-is_lfs_pointer() {
-  [[ -f "$1" && "$(stat -c%s "$1")" -lt 1024 ]] &&
-    grep -q '^version https://git-lfs.github.com/spec/v1' "$1"
-}
-
 verify() {
   local path="$1" expected_bytes="$2" expected_sha="$3" label="$4"
   [[ -f "$path" ]] || fail "缺少$label：$path。$hint"
-  if is_lfs_pointer "$path"; then
-    fail "$label 还是 Git LFS 指针，没有拉取实体文件。$hint"
-  fi
   local actual_bytes
   actual_bytes="$(stat -c%s "$path")"
   [[ "$actual_bytes" == "$expected_bytes" ]] ||
@@ -51,9 +47,6 @@ verify() {
     fail "$label sha256 不符：$actual_sha。$hint"
   echo "$label 校验通过（$actual_bytes B，sha256 $actual_sha）"
 }
-
-command -v git-lfs >/dev/null 2>&1 ||
-  fail "缺少 git-lfs。请安装后运行：git lfs install"
 
 verify "$model" "$model_bytes" "$model_sha" "离线翻译模型"
 verify "$archive" "$archive_bytes" "$archive_sha" "llama.cpp 运行时归档"

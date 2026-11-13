@@ -50,19 +50,23 @@ pub.dev release linked above.
 | --- | --- | --- | --- |
 | `audio_metadata_reader` | 1.8.1 | MIT | Vendored under `vendor/audio_metadata_reader` with a local patch: `Buffer.read` clamps declared sizes to the bytes the file actually holds, so one corrupt tag header cannot trigger a gigabyte allocation. MIT, Copyright (c) 2023 Clément Béal, kept in the vendored `LICENSE`. The patch list and upgrade steps live in `vendor/audio_metadata_reader/VENDORED.md`. |
 
-## Bundled offline translation model and runtime
+## Optional offline translation component
 
-The release archive ships an offline translation engine under `translation/`
-next to the executable. Neither component is modified by Tune.
+The offline translation engine is distributed as an optional component package
+(`tune-translation-*`) that the user downloads from the settings page. It is not
+part of the default installer. Neither component is modified by Tune.
 
 | Component | Location | License | Notes |
 | --- | --- | --- | --- |
-| Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M) | `translation/models/qwen2.5-0.5b-instruct-q4_k_m.gguf` | Apache License 2.0 | Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF. Weights are redistributed unmodified; the Q4_K_M quantization is the official one published in that repository. Full text: `translation/licenses/Qwen2.5-LICENSE.txt`; attribution: `translation/licenses/Qwen2.5-NOTICE.txt`. |
-| llama.cpp runtime (b12274, ubuntu-x64) | `translation/bin/llama-b12274/` | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/llama.cpp. Unmodified official release binaries. Full text: `translation/licenses/llama.cpp-LICENSE.txt`. |
+| Qwen2.5-0.5B-Instruct (GGUF, Q4_K_M) | `models/qwen2.5-0.5b-instruct-q4_k_m.gguf` in the component | Apache License 2.0 | Copyright Alibaba Cloud / Qwen team. Source: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF. Weights are redistributed unmodified; the Q4_K_M quantization is the official one published in that repository. Full text: `licenses/Qwen2.5-LICENSE.txt` in the component; attribution: `licenses/Qwen2.5-NOTICE.txt`. |
+| llama.cpp runtime (b12274, ubuntu-x64) | `bin/llama-b12274/` in the component | MIT | Copyright (c) 2023-2026 The ggml authors. Source: https://github.com/ggml-org/llama.cpp. Unmodified official release binaries. Full text: `licenses/llama.cpp-LICENSE.txt` in the component. |
 
 The model and the runtime are stored with Git LFS in the source repository and
-are included in the installer; the app does not download them at runtime. When
-the bundled local engine is selected, no text leaves the machine.
+packed into the optional component; the default installer does not include
+them, and the app downloads the component only when the user asks for it. The
+license files are kept both inside the component package and under
+`translation/licenses/` in the repository. When the local engine is selected,
+no text leaves the machine.
 
 ## Linux audio backend: libmpv and FFmpeg
 
