@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 
@@ -115,5 +117,98 @@ void main() {
 
     expect(album.coverPath, isNull);
     expect(album.coverUrl, 'https://example.com/cover.jpg');
+  });
+
+  test('the episodes of a show are one album, whatever artist they name', () {
+    const songs = [
+      Song(
+        id: 1,
+        title: 'Episode 1',
+        artist: 'Host A',
+        album: 'The Show',
+        sourceId: 'podcast_rss-1',
+        uri: 'tune://podcast/1',
+      ),
+      Song(
+        id: 2,
+        title: 'Episode 2',
+        artist: 'Host B',
+        album: 'The Show',
+        sourceId: 'podcast_rss-1',
+        uri: 'tune://podcast/2',
+      ),
+    ];
+
+    final album = libraryAlbumsOf(songs).single;
+
+    expect(album.name, 'The Show');
+    expect(album.trackCount, 2);
+    expect(album.key, contains('src'));
+    expect(album.key, contains('podcast_rss-1'));
+  });
+
+  test('two sources of the same show are two albums', () {
+    const songs = [
+      Song(
+        id: 1,
+        title: 'One',
+        album: 'The Show',
+        sourceId: 'podcast_rss-1',
+        uri: 'tune://podcast/1',
+      ),
+      Song(
+        id: 2,
+        title: 'Two',
+        album: 'The Show',
+        sourceId: 'podcast_rss-2',
+        uri: 'tune://podcast/2',
+      ),
+    ];
+
+    expect(libraryAlbumsOf(songs), hasLength(2));
+  });
+
+  test('a station is not an album', () {
+    const songs = [
+      Song(
+        id: 1,
+        title: 'Station',
+        artist: 'On air artist',
+        album: 'On air song',
+        sourceId: 'radio',
+        isLiveStream: true,
+        uri: 'tune://radio/1',
+      ),
+    ];
+
+    expect(libraryAlbumsOf(songs), isEmpty);
+  });
+
+  test('a source instance id names the type of the source', () {
+    expect(sourceTypeOfId('podcast_rss-2'), 'podcast_rss');
+    expect(sourceTypeOfId('librivox'), 'librivox');
+    expect(isSpokenWordSource('podcast_rss-2'), isTrue);
+    expect(isSpokenWordSource('audiobookshelf-1'), isTrue);
+    expect(isSpokenWordSource('local'), isFalse);
+    expect(isSpokenWordSource(null), isFalse);
+  });
+
+  test('a track is classified by what it is', () {
+    expect(
+      contentKindOf(
+        const Song(id: 1, isLiveStream: true, uri: 'tune://radio/1'),
+      ),
+      ContentKind.radio,
+    );
+    expect(
+      contentKindOf(
+        const Song(id: 2, sourceId: 'audiobookshelf-1', uri: 'tune://book/1'),
+      ),
+      ContentKind.spokenWord,
+    );
+    expect(
+      contentKindOf(const Song(id: 3, sourceId: 'local', uri: '/music/3.mp3')),
+      ContentKind.music,
+    );
   });
 }

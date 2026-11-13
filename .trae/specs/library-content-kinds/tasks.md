@@ -1,0 +1,36 @@
+# 任务：库内内容类型 P0/P1
+
+> 依据：`spec.md`。每项完成即勾选。
+
+## A. P0 展示层（直播不再伪装歌曲）
+
+- [x] A1 `library_row_tail.dart`：直播用 `LiveBadge` 替代时长。
+- [x] A2 `library_columns_view.dart`：`_ColumnCard` 直播用 `LiveBadge`，去掉零时长。
+- [x] A3 `online_search_sheet.dart`：`_SongRow` 直播用 `LiveBadge` 替代 `--:--`。
+- [x] A4 `track_meta.dart`：`dense` 分行直播用 `LiveBadge`。
+- [x] A5 `track_facts.dart`：新增 `onAirLineOf(context, song)`。
+- [x] A6 `now_playing_track_info.dart`：电台副行改为「正在播出 · …」，收起 artist 与「专辑 · 年份」。
+- [x] A7 `player_dock.dart`：电台副行改为「正在播出 · …」。
+- [x] A8 `library_album.dart`：`libraryAlbumsOf` 跳过 live。
+- [x] A9 `app_database.dart`：`albumSummaries()` 的 `WHERE` 剔除 live。
+- [x] A10 `flutter analyze` + 测试通过。
+
+## B. P1 领域与存储（语音专辑归并）
+
+- [x] B1 `music_source.dart`：新增 `sourceTypeOfId`。
+- [x] B2 新增 `lib/domain/models/content_kind.dart`：`ContentKind`、`spokenWordSourceTypes`、`isSpokenWordSource`、`contentKindOf`。
+- [x] B3 `album_summary.dart`：新增 `albumKeyOf(...)`。
+- [x] B4 `library_album.dart`：`libraryAlbumKeyOf` 委托 `albumKeyOf`。
+- [x] B5 `app_database.dart`：`albumSummaries()` 按 `album, artist, source_id` 分组后按新键合并；`albumSongs(key)` 支持 `album\0src\0<sourceId>`。
+- [x] B6 提交 P1（`library_album.dart` 与 `app_database.dart` 同时含 P0 改动，无法按文件拆分，P0/P1 合为一个提交）。
+
+## C. 测试
+
+- [x] C1 `test/domain/library_album_test.dart`：语音归并、live 剔除、音乐不变、分类器用例。
+- [x] C2 `test/services/library_database_test.dart`：SQL 路径的合并、剔除与按新键取曲。
+- [x] C3 `flutter analyze`（No issues found）与 `flutter test`（除网络用例 1521 项全绿）。
+
+## D. 收尾
+
+- [x] D1 `git status` 只含本步文件；不 push。
+- [x] D2 汇报：P0/P1 证据、门禁结果，以及第 3 项（电台类型化字段）的 P3 落点与重扫/兼容取舍。

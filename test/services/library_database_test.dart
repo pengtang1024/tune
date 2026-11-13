@@ -369,6 +369,85 @@ void main() {
       );
       expect(database.load().map((track) => track.uri), [kept.uri]);
     });
+
+    test('albums merge the episodes of a show and leave a station out', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Episode 1',
+          artist: 'Host A',
+          album: 'The Show',
+          uri: 'tune://podcast/1',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 2,
+          title: 'Episode 2',
+          artist: 'Host B',
+          album: 'The Show',
+          uri: 'tune://podcast/2',
+          sourceId: 'podcast_rss-1',
+        ),
+        const Song(
+          id: 3,
+          title: 'Episode 1',
+          artist: 'Host C',
+          album: 'The Show',
+          uri: 'tune://podcast/3',
+          sourceId: 'podcast_rss-2',
+        ),
+        const Song(
+          id: 4,
+          title: 'Station',
+          artist: 'On air artist',
+          album: 'On air song',
+          uri: 'tune://radio/1',
+          sourceId: 'radio',
+          isLiveStream: true,
+        ),
+      ]);
+
+      final albums = database.albumSummaries();
+
+      expect(albums, hasLength(2));
+      expect(albums.any((album) => album.key.contains('radio')), isFalse);
+      final show = albums.firstWhere(
+        (album) => album.key.contains('podcast_rss-1'),
+      );
+      expect(show.trackCount, 2);
+      expect(database.albumSongs(show.key).map((song) => song.title), [
+        'Episode 1',
+        'Episode 2',
+      ]);
+    });
+
+    test('a music album still asks for its artist', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Left',
+          artist: 'Left Artist',
+          album: 'Greatest Hits',
+          uri: 'tune://openverse/l',
+        ),
+        const Song(
+          id: 2,
+          title: 'Right',
+          artist: 'Right Artist',
+          album: 'Greatest Hits',
+          uri: 'tune://openverse/r',
+        ),
+      ]);
+
+      final albums = database.albumSummaries();
+
+      expect(albums, hasLength(2));
+      expect(albums.map((album) => album.trackCount), [1, 1]);
+    });
   });
 
   group('sqlite storage', () {

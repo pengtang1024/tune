@@ -1,4 +1,5 @@
 import 'package:tune/core/utils/text_order.dart';
+import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// One album of the library: the songs of the album and the face of it.
@@ -73,6 +74,9 @@ class LibraryAlbum {
 List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
   final groups = <String, List<Song>>{};
   for (final song in songs) {
+    // A station is not an album: it never ends, and the names it carries
+    // describe the song that happens to air, not the stream itself.
+    if (song.isLiveStream) continue;
     groups.putIfAbsent(libraryAlbumKeyOf(song), () => []).add(song);
   }
 
@@ -95,9 +99,11 @@ List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
 /// The library view uses it to tell which album holds the track that plays,
 /// and the grouping uses it to keep the tracks of one album together.
 String libraryAlbumKeyOf(Song song) {
-  final album = song.album.trim().toLowerCase();
-  if (album.isEmpty) return '\u0000unknown';
-  return '$album\u0000${song.artist.trim().toLowerCase()}';
+  return albumKeyOf(
+    album: song.album,
+    artist: song.artist,
+    sourceId: song.sourceId,
+  );
 }
 
 LibraryAlbum _albumOf(List<Song> songs) {

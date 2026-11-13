@@ -88,6 +88,18 @@ TrackFact? _liveFact(BuildContext context, Song song) {
   );
 }
 
+/// The line under the title of a live track: what the station is airing.
+///
+/// A station has no artist and no album of its own. The two names it
+/// publishes describe the song that happens to play, so they are read as one
+/// line instead of being written into the slots of the artist and the album.
+String? onAirLineOf(BuildContext context, Song song) {
+  if (!song.isLiveStream) return null;
+  final onAir = song.sourceData?['nowPlaying']?.toString().trim() ?? '';
+  if (onAir.isEmpty) return null;
+  return '${context.loc.nowPlayingDetailNowPlaying} · $onAir';
+}
+
 /// The facts of the file the track plays from.
 List<TrackFact?> fileFactsOf(BuildContext context, Song song) {
   return [

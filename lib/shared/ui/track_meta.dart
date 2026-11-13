@@ -6,6 +6,7 @@ import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/track_details_button.dart';
 import 'package:tune/shared/ui/track_fact_strip.dart';
@@ -104,7 +105,9 @@ class TrackMeta extends StatelessWidget {
                       const SizedBox(width: CompactTokens.space4),
                       SourceBadge(label: source!, dense: true),
                     ],
-                    if (!song.isLiveStream) ...[
+                    if (song.isLiveStream)
+                      const LiveBadge()
+                    else ...[
                       const SizedBox(width: CompactTokens.space6),
                       Text(
                         formatDuration(

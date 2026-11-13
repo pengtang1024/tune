@@ -872,61 +872,86 @@ class AppDatabase {
     return (rows.first['count'] as int?) ?? 0;
   }
 
-  /// The albums of the library, one row per album and artist.
+  /// The albums of the library, one row per album.
+  ///
+  /// A song is grouped with the other songs of its artist. A show or a book
+  /// is grouped by its source instead, because every episode may name a
+  /// different artist. A station is not an album, so it is left out.
   List<AlbumSummary> albumSummaries() {
     final rows = _db.select('''
-      SELECT album AS name, artist AS artist, COUNT(*) AS count,
-             MIN(json) AS sample
+      SELECT album AS name, artist AS artist, source_id AS sourceId,
+             COUNT(*) AS count, MIN(json) AS sample
       FROM songs
       WHERE album != ''
-      GROUP BY album, artist
+        AND json_extract(json, '\$.isLiveStream') IS NOT 1
+      GROUP BY album, artist, source_id
       ORDER BY album COLLATE NOCASE, artist COLLATE NOCASE
     ''');
-    final albums = <AlbumSummary>[];
+    final albums = <String, AlbumSummary>{};
     for (final row in rows) {
       final name = row['name'] as String? ?? '';
       if (name.isEmpty) continue;
       final artist = row['artist'] as String? ?? '';
-      String? coverPath;
-      String? coverUrl;
-      try {
-        final decoded = jsonDecode(row['sample'] as String);
-        if (decoded is Map<String, dynamic>) {
-          final song = Song.fromMap(decoded);
-          coverPath = song.albumArtPath;
-          coverUrl = song.artworkUrl;
-        }
-      } catch (_) {
-        // A broken sample only costs the cover of the card.
-      }
-      albums.add(
-        AlbumSummary(
-          key: '\${name.trim().toLowerCase()}\u0000'
-              '\${artist.trim().toLowerCase()}',
-          name: name,
-          artist: artist,
-          trackCount: row['count'] as int? ?? 0,
-          coverPath: coverPath,
-          coverUrl: coverUrl,
-        ),
+      final key = albumKeyOf(
+        album: name,
+        artist: artist,
+        sourceId: row['sourceId'] as String?,
+      );
+      final cover = _coverOfSample(row['sample']);
+      final existing = albums[key];
+      albums[key] = AlbumSummary(
+        key: key,
+        name: existing?.name ?? name,
+        artist: existing?.artist ?? artist,
+        trackCount: (existing?.trackCount ?? 0) + (row['count'] as int? ?? 0),
+        coverPath: existing?.coverPath ?? cover.path,
+        coverUrl: existing?.coverUrl ?? cover.url,
       );
     }
-    return albums;
+    final ordered = albums.values.toList(growable: false);
+    ordered.sort((left, right) {
+      final byName = compareText(left.name, right.name);
+      if (byName != 0) return byName;
+      return compareText(left.artist, right.artist);
+    });
+    return ordered;
+  }
+
+  /// The cover the sample of an album row carries.
+  ({String? path, String? url}) _coverOfSample(Object? sample) {
+    try {
+      final decoded = jsonDecode(sample as String);
+      if (decoded is Map<String, dynamic>) {
+        final song = Song.fromMap(decoded);
+        return (path: song.albumArtPath, url: song.artworkUrl);
+      }
+    } catch (_) {
+      // A broken sample only costs the cover of the card.
+    }
+    return (path: null, url: null);
   }
 
   /// The tracks of one album, in the order of the album.
   List<Song> albumSongs(String key) {
     final parts = key.split('\u0000');
     final album = parts.isNotEmpty ? parts[0] : '';
-    final artist = parts.length > 1 ? parts[1] : '';
-    final rows = _db.select(
-      '''
-      SELECT json FROM songs
-      WHERE lower(trim(album)) = ? AND lower(trim(artist)) = ?
-      ORDER BY title COLLATE NOCASE
-      ''',
-      [album, artist],
-    );
+    final rows = parts.length >= 3 && parts[1] == 'src'
+        ? _db.select(
+            '''
+            SELECT json FROM songs
+            WHERE lower(trim(album)) = ? AND source_id = ?
+            ORDER BY title COLLATE NOCASE
+            ''',
+            [album, parts[2]],
+          )
+        : _db.select(
+            '''
+            SELECT json FROM songs
+            WHERE lower(trim(album)) = ? AND lower(trim(artist)) = ?
+            ORDER BY title COLLATE NOCASE
+            ''',
+            [album, parts.length > 1 ? parts[1] : ''],
+          );
     final songs = <Song>[];
     for (final row in rows) {
       try {

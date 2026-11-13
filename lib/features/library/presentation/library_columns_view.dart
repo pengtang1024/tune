@@ -13,6 +13,7 @@ import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/dense_icon_action.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
+import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/source_badge.dart';
 import 'package:tune/shared/ui/source_label.dart';
 import 'package:tune/shared/ui/track_click_area.dart';
@@ -300,17 +301,20 @@ class _ColumnCardState extends State<_ColumnCard> {
                         : Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                formatDuration(
-                                  Duration(
-                                    milliseconds: song.durationInMillis,
+                              if (song.isLiveStream)
+                                const LiveBadge()
+                              else
+                                Text(
+                                  formatDuration(
+                                    Duration(
+                                      milliseconds: song.durationInMillis,
+                                    ),
+                                  ),
+                                  style: CompactTypography.mono(
+                                    theme.colorScheme.onSurfaceVariant,
+                                    size: CompactTypeScale.mark,
                                   ),
                                 ),
-                                style: CompactTypography.mono(
-                                  theme.colorScheme.onSurfaceVariant,
-                                  size: CompactTypeScale.mark,
-                                ),
-                              ),
                               const SizedBox(width: CompactTokens.space4),
                               FavoriteButton(
                                 isFavorite: widget.isFavorite,
