@@ -241,23 +241,32 @@
 
 ## 8. 拍板项与结论
 
-> D10–D13 已于 2026-11-13 拍板，结论见「结论」列；D1–D9 仍待拍板。
+> D1–D9 与 D10–D13 均已拍板。默认值（D4–D6、D8 等）已在代码中落地，Android FFI 与 MediaCodec（D1、D2、D7）已接受但尚未实施；见下表「结论」列与表后说明。
 
 | 编号 | 选项 | 建议 | 影响 | 结论 |
 | --- | --- | --- | --- | --- |
-| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 | 待拍板 |
-| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 | 待拍板 |
-| D3 | 是否接受 SenseVoice 的自定义权重协议 | 接受则补署名与法务确认；不接受则换 Fun-ASR-Nano（推荐）或 Paraformer（会丢时间戳，见 D13） | 影响默认中文模型与许可证姿态 | 待拍板 |
-| D4 | 默认 ASR 档位 | Whisper small + SenseVoice int8 常开；低配 `base`；`tiny` 只作最低占用 | 影响首包体积、内存与识别质量 | 待拍板 |
-| D5 | 是否提供 `large-v3-turbo` 可选质量包 | 提供，默认不下载 | 影响质量上限与大文件下载体验 | 待拍板 |
-| D6 | 翻译默认模型 | Qwen3-0.6B 先 A/B；保留 0.5B 低配；1.5B 可选 | 影响质量、内存与组件包大小 | 待拍板 |
-| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 | 待拍板 |
-| D8 | Linux 是否随包 FFmpeg | 不随包；若做 AppImage/Flatpak 再按 LGPL 构建 | 决定包体与 GPL/LGPL 义务 | 待拍板 |
-| D9 | 是否引入 Opus-MT 快车道 | 暂不 | 避免逐语言对模型组合与双引擎维护 | 待拍板 |
+| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 | **已接受**：Linux 保持子进程；Android 走 FFI（尚未实施） |
+| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 | **已接受**：Android ASR 用 `sherpa_onnx`（尚未实施） |
+| D3 | 是否接受 SenseVoice 的自定义权重协议 | 接受则补署名与法务确认；不接受则换 Fun-ASR-Nano（推荐）或 Paraformer（会丢时间戳，见 D13） | 影响默认中文模型与许可证姿态 | **已接受**：接受 SenseVoice 自定义协议并保留为默认中文快锚，补署名与法务确认 |
+| D4 | 默认 ASR 档位 | Whisper small + SenseVoice int8 常开；低配 `base`；`tiny` 只作最低占用 | 影响首包体积、内存与识别质量 | **已接受，已落地**：Whisper `small` 为默认 ASR，`base`/`tiny` 作为低配档可选 |
+| D5 | 是否提供 `large-v3-turbo` 可选质量包 | 提供，默认不下载 | 影响质量上限与大文件下载体验 | **已接受，已落地**：`large-v3-turbo` 仅作可选组件，不默认下载 |
+| D6 | 翻译默认模型 | Qwen3-0.6B 先 A/B；保留 0.5B 低配；1.5B 可选 | 影响质量、内存与组件包大小 | **已接受，已落地**：翻译默认 Qwen3-0.6B，Qwen2.5-0.5B 低配、1.5B 质量包可选 |
+| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 | **已接受**：Android 解码走 MediaCodec（尚未实施） |
+| D8 | Linux 是否随包 FFmpeg | 不随包；若做 AppImage/Flatpak 再按 LGPL 构建 | 决定包体与 GPL/LGPL 义务 | **已接受，已落地**：Linux 解码维持系统 FFmpeg，不随包 |
+| D9 | 是否引入 Opus-MT 快车道 | 暂不 | 避免逐语言对模型组合与双引擎维护 | **已接受**：不引入 Opus-MT |
 | D10 | 是否接入阿里云 ASR | **暂不接**；保持现有云端通道 | 接它要新增 DashScope 适配器与上传链路，且要处理整首歌上传的隐私/版权 | **已否决**：不接入阿里云 ASR；云端仍走现有 OpenAI 兼容通道 |
 | D11 | 若接云端，选哪个接口 | DashScope 原生异步或实时 WebSocket；不用 ISI AccessKey | 异步要解决公网 URL；实时要自己流式推本地音频 | **已否决**（随 D10）：不新增 DashScope 适配器，此项不适用 |
 | D12 | 第二 ASR 家族是否换 Fun-ASR-Nano | 先作为可选第三家族；不默认替换 SenseVoice | 换 Apache-2.0 的代价是 948 MB、更慢、时间戳近似 | **已接受**：Fun-ASR-Nano 作为可选第三家族（质量包），不默认下载，不进默认两票 |
 | D13 | 是否用 Paraformer 换掉 SenseVoice | 不换（sherpa-onnx 路径没有时间戳） | 会丢掉歌词切行依赖的 token 时间戳 | **已否决**：SenseVoice 保留为中文快锚，不用 Paraformer 替换 |
+
+### 8.1 与代码的对应关系
+
+D4–D6、D8 的默认值已经是代码的现状，文档不再停在「建议」层：
+
+- **D4 默认 ASR**：[smart_lyrics_config.dart](../lib/domain/models/smart_lyrics_config.dart) 的 `localModel` 默认 `small`；`base` / `tiny` 仍在可选档位里，只作低配与最低占用。
+- **D5 可选质量包**：[local_component_registry.dart](../lib/data/services/components/local_component_registry.dart) 把 `ggml-large-v3-turbo.bin` 注册为独立组件；[settings_smart_lyrics_local_section.dart](../lib/features/settings/presentation/settings_smart_lyrics_local_section.dart) 注明它「never the default」。
+- **D6 翻译默认**：同一注册表里 `translationModel` 默认 Qwen3-0.6B（`Qwen3-0.6B-Q8_0.gguf`），`translationModelLow` 保留 Qwen2.5-0.5B，`translationModelQuality` 为 1.5B。
+- **D8 Linux 解码**：仍走系统 FFmpeg，不随包；Android 的 MediaCodec（D7）与新 FFI 后端（D1、D2）尚未实施，等 Android 里程碑落代码时再补对应实现说明。
 
 ## 9. 参考来源
 
