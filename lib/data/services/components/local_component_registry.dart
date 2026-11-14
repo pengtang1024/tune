@@ -245,6 +245,19 @@ class LocalComponentRegistry {
   /// component folder is also the tokenizer directory `--funasr-nano-tokenizer`
   /// asks for, which only reads `vocab.json`, `merges.txt` and
   /// `tokenizer.json` out of it.
+  ///
+  /// The canonical repo, tried first.
+  static const String _funasrNanoUrl =
+      'https://huggingface.co/csukuangfj/'
+      'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main';
+
+  /// Mainland networks often cannot reach huggingface.co. The mirror serves
+  /// the same bytes and must pass the same pinned length and sha256 — a
+  /// mirror can save the download, never weaken the check.
+  static const String _funasrNanoMirror =
+      'https://hf-mirror.com/csukuangfj/'
+      'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main';
+
   static const LocalComponentSpec funasrNanoModel = LocalComponentSpec(
     id: 'lyrics-funasr-nano-model',
     kind: LocalComponentKind.model,
@@ -252,60 +265,48 @@ class LocalComponentRegistry {
     files: [
       LocalComponentFile(
         fileName: 'encoder_adaptor.int8.onnx',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'encoder_adaptor.int8.onnx',
+        url: '$_funasrNanoUrl/encoder_adaptor.int8.onnx',
+        mirrors: ['$_funasrNanoMirror/encoder_adaptor.int8.onnx'],
         bytes: 237792748,
         sha256:
             'f36dea2e30fbc33b5db1d7a7265cc976c5e5586c77b042d5adb1ad27c72db422',
       ),
       LocalComponentFile(
         fileName: 'llm.int8.onnx',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'llm.int8.onnx',
+        url: '$_funasrNanoUrl/llm.int8.onnx',
+        mirrors: ['$_funasrNanoMirror/llm.int8.onnx'],
         bytes: 600356593,
         sha256:
             'dfbf9aa3be41bccc257587f151e15c63fbe1b549f2b517f5ccd5bdce3bf4322a',
       ),
       LocalComponentFile(
         fileName: 'embedding.int8.onnx',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'embedding.int8.onnx',
+        url: '$_funasrNanoUrl/embedding.int8.onnx',
+        mirrors: ['$_funasrNanoMirror/embedding.int8.onnx'],
         bytes: 155584380,
         sha256:
             '95e61cd0c9c3b9543339a4cf973c95c116815e745ccc1e0285cbd81f76d18644',
       ),
       LocalComponentFile(
         fileName: 'vocab.json',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'Qwen3-0.6B/vocab.json',
+        url: '$_funasrNanoUrl/Qwen3-0.6B/vocab.json',
+        mirrors: ['$_funasrNanoMirror/Qwen3-0.6B/vocab.json'],
         bytes: 2776833,
         sha256:
             'ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910',
       ),
       LocalComponentFile(
         fileName: 'merges.txt',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'Qwen3-0.6B/merges.txt',
+        url: '$_funasrNanoUrl/Qwen3-0.6B/merges.txt',
+        mirrors: ['$_funasrNanoMirror/Qwen3-0.6B/merges.txt'],
         bytes: 1671853,
         sha256:
             '8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5',
       ),
       LocalComponentFile(
         fileName: 'tokenizer.json',
-        url:
-            'https://huggingface.co/csukuangfj/'
-            'sherpa-onnx-funasr-nano-int8-2025-12-30/resolve/main/'
-            'Qwen3-0.6B/tokenizer.json',
+        url: '$_funasrNanoUrl/Qwen3-0.6B/tokenizer.json',
+        mirrors: ['$_funasrNanoMirror/Qwen3-0.6B/tokenizer.json'],
         bytes: 11422654,
         sha256:
             'aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4',

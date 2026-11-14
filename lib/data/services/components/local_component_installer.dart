@@ -50,12 +50,20 @@ class LocalComponentInstaller {
   Directory _stagingOf(LocalComponentSpec spec) =>
       Directory(path.join(componentsRoot.path, '.${spec.id}.staging'));
 
-  /// Where [file] is fetched from. A mirror may redirect every component to
-  /// `<base>/<id>/<file name>` through `TUNE_COMPONENT_BASE_URL`.
-  String urlOf(LocalComponentSpec spec, LocalComponentFile file) {
+  /// Where [file] is fetched from, in order.
+  ///
+  /// `TUNE_COMPONENT_BASE_URL` replaces every source with
+  /// `<base>/<id>/<file name>` — one self-hosted address, no fallbacks. With
+  /// no override the canonical URL comes first and the mirrors after it, and
+  /// all of them must match the same pinned bytes and sha256.
+  List<String> sourcesOf(LocalComponentSpec spec, LocalComponentFile file) {
     final base = _environment['TUNE_COMPONENT_BASE_URL']?.trim();
-    if (base == null || base.isEmpty) return file.url;
-    return '${base.replaceFirst(RegExp(r'/+$'), '')}/${spec.id}/${file.fileName}';
+    if (base != null && base.isNotEmpty) {
+      return [
+        '${base.replaceFirst(RegExp(r'/+$'), '')}/${spec.id}/${file.fileName}',
+      ];
+    }
+    return file.sources;
   }
 
   /// Fetches, checks and swaps in [spec].
@@ -75,16 +83,15 @@ class LocalComponentInstaller {
       final total = spec.totalBytes;
       var before = 0;
       for (final file in spec.files) {
-        final target = File(path.join(downloads.path, file.fileName));
-        await _dio.download(
-          urlOf(spec, file),
-          target.path,
+        await _downloadOne(
+          spec: spec,
+          file: file,
+          target: File(path.join(downloads.path, file.fileName)),
           cancelToken: cancelToken,
-          onReceiveProgress: (received, _) {
-            onProgress?.call(before + received, total);
-          },
+          onProgress: onProgress,
+          before: before,
+          total: total,
         );
-        await _verifyFile(file, target);
         before += file.bytes;
       }
 
@@ -135,6 +142,55 @@ class LocalComponentInstaller {
     final complete = await _payloadComplete(spec, directory);
     if (!complete) return (installed: false, bytes: 0);
     return (installed: true, bytes: await _sizeOf(directory));
+  }
+
+  /// Tries every source of one file until one passes the pinned length and
+  /// digest. A cancellation stops the loop at once; every other failure is
+  /// collected so the last error names the hosts that were tried.
+  Future<void> _downloadOne({
+    required LocalComponentSpec spec,
+    required LocalComponentFile file,
+    required File target,
+    required CancelToken? cancelToken,
+    required void Function(int received, int total)? onProgress,
+    required int before,
+    required int total,
+  }) async {
+    final failures = <String>[];
+    for (final url in sourcesOf(spec, file)) {
+      try {
+        if (await target.exists()) await target.delete();
+        await _dio.download(
+          url,
+          target.path,
+          cancelToken: cancelToken,
+          deleteOnError: true,
+          onReceiveProgress: (received, _) {
+            onProgress?.call(before + received, total);
+          },
+        );
+        await _verifyFile(file, target);
+        return;
+      } on LocalComponentInstallException catch (error) {
+        failures.add('${_sourceName(url)}: ${error.message}');
+      } on DioException catch (error) {
+        if (CancelToken.isCancel(error)) rethrow;
+        failures.add('${_sourceName(url)}: ${_dioReason(error)}');
+      }
+    }
+    throw LocalComponentInstallException(
+      '${file.fileName} could not be downloaded from any source'
+      '${failures.isEmpty ? '' : ' (${failures.join('; ')})'}',
+    );
+  }
+
+  /// The host as the reader sees it; a malformed URL stays whole.
+  static String _sourceName(String url) => Uri.tryParse(url)?.host ?? url;
+
+  static String _dioReason(DioException error) {
+    final status = error.response?.statusCode;
+    if (status != null) return 'HTTP $status';
+    return error.message ?? error.type.name;
   }
 
   Future<void> _verifyFile(

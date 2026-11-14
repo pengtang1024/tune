@@ -14,7 +14,7 @@
 | `id` | 稳定标识，同时是安装目录名，如 `translation-runtime` |
 | `kind` | `runtime` / `model` |
 | `label` | 展示枚举，由设置页映射文案，不把中文写进数据层 |
-| `files` | `fileName`、`url`、`bytes`、`sha256`；模型可以是多个文件 |
+| `files` | `fileName`、`url`、`mirrors`、`bytes`、`sha256`；模型可以是多个文件 |
 | `archive` | `none` / `zip` / `tarGz` / `tarBz2` / `tarXz` |
 | `executable` | 运行时解包后的相对路径，校验存在并 `chmod +x` |
 | `requiredFiles` | 模型组件必须存在的文件 |
@@ -101,6 +101,8 @@ Future<int> installedBytes(LocalComponentSpec spec);
 
 组件源固定写在 registry：GitHub Release 资产与 HuggingFace 文件都使用发布方公布的字节数与 sha256（HF LFS 的 `oid` 就是文件 sha256）。Whisper 的 `ggml-*.bin` 与 SenseVoice 的 `tokens.txt` 在实现时取一次清单并钉死，避免运行时再依赖远端清单。Fun-ASR-Nano 的六个文件取自 `csukuangfj/sherpa-onnx-funasr-nano-int8-2025-12-30`，总大小约 1,009,605,061 字节。
 
+**下载源容错**：每个文件按 `url` → `mirrors` 的顺序逐个尝试，任一下载成功的文件都必须通过与主源完全相同的字节数与 sha256 校验才算 ready；镜像只能提高可达性，不能降低校验强度。一个源在连接、HTTP 或校验上失败就换下一个；全部源失败时只抛一个错误，里面列出试过的域名与各自原因，不无限重试。取消下载会立刻停止，不进入下一个源。Fun-ASR-Nano 的主源是 `huggingface.co`，镜像为同路径的 `hf-mirror.com`；1 GB 的模型不走 GitHub 附件。
+
 FFmpeg 是唯一由本项目自建的组件：源码与构建配置写进 `tool/build_ffmpeg.sh`，归档上传到自己的 GitHub Release；升级版本时源码地址、configure 行、字节数与 sha256 必须同一次提交一起改。
 
 发布前核对：
@@ -110,7 +112,7 @@ curl -sI <url>            # 字节数
 sha256sum <downloaded>    # 与 registry 常量比对
 ```
 
-镜像或测试环境可用 `TUNE_COMPONENT_BASE_URL` 覆盖下载基址；组件本身已是绝对 URL 时不覆盖。
+镜像或测试环境可用 `TUNE_COMPONENT_BASE_URL` 覆盖下载基址：设置后所有文件只从 `<base>/<id>/<file name>` 取，不再尝试 registry 里的主源与镜像。
 
 ## 7. 设置页
 

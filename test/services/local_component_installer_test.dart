@@ -73,6 +73,92 @@ void main() {
     expect((await installer.inspect(spec)).installed, isFalse);
   });
 
+  LocalComponentSpec mirroredSpec() => LocalComponentSpec(
+    id: 'test-model',
+    kind: LocalComponentKind.model,
+    label: LocalComponentLabel.translationModel,
+    files: [
+      LocalComponentFile(
+        fileName: 'model.bin',
+        url: 'https://example.test/model.bin',
+        mirrors: const ['https://mirror.test/model.bin'],
+        bytes: body.length,
+        sha256: _sha256Of(body),
+      ),
+    ],
+    requiredFiles: const ['model.bin'],
+  );
+
+  test('an unreachable canonical host falls through to the mirror', () async {
+    final adapter = FakeHttpAdapter()
+      ..body = body
+      ..failingUrls.add('https://example.test/model.bin');
+    final installer = installerWith(adapter);
+
+    await installer.install(mirroredSpec());
+
+    expect((await installer.inspect(mirroredSpec())).installed, isTrue);
+    expect(adapter.requestedUrls, [
+      'https://example.test/model.bin',
+      'https://mirror.test/model.bin',
+    ]);
+  });
+
+  test('a mirror with different bytes fails the same digest check', () async {
+    final adapter = FakeHttpAdapter()
+      ..body = body
+      ..bodiesByUrl['https://example.test/model.bin'] = 'tampered bytes';
+    final installer = installerWith(adapter);
+
+    await installer.install(mirroredSpec());
+
+    expect(adapter.requestedUrls, [
+      'https://example.test/model.bin',
+      'https://mirror.test/model.bin',
+    ]);
+    final payload = File(
+      '${installer.directoryOf(mirroredSpec()).path}/model.bin',
+    );
+    expect(await payload.readAsString(), body);
+  });
+
+  test('every source failing leaves one error naming the hosts', () async {
+    final adapter = FakeHttpAdapter()
+      ..failingUrls.addAll([
+        'https://example.test/model.bin',
+        'https://mirror.test/model.bin',
+      ]);
+    final installer = installerWith(adapter);
+
+    await expectLater(
+      installer.install(mirroredSpec()),
+      throwsA(
+        isA<LocalComponentInstallException>().having(
+          (error) => error.message,
+          'message',
+          allOf(contains('example.test'), contains('mirror.test')),
+        ),
+      ),
+    );
+    expect((await installer.inspect(mirroredSpec())).installed, isFalse);
+  });
+
+  test('TUNE_COMPONENT_BASE_URL replaces the source list', () async {
+    final installer = LocalComponentInstaller(
+      supportDirectory: root,
+      environment: const {
+        'TUNE_COMPONENT_BASE_URL': 'https://self.host/components/',
+      },
+      dio: Dio(BaseOptions(responseType: ResponseType.plain))
+        ..httpClientAdapter = FakeHttpAdapter(),
+    );
+
+    final mirrored = mirroredSpec();
+    expect(installer.sourcesOf(mirrored, mirrored.files.single), [
+      'https://self.host/components/test-model/model.bin',
+    ]);
+  });
+
   test('a component missing a required file is rejected', () async {
     final installer = installerWith(FakeHttpAdapter()..body = body);
     final broken = LocalComponentSpec(

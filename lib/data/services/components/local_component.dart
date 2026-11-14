@@ -41,16 +41,27 @@ enum LocalComponentPhase {
 class LocalComponentFile {
   /// The name the file carries on disk and in the URL.
   final String fileName;
+
+  /// The canonical source, tried first.
   final String url;
+
+  /// Same file, same digest, tried in order when [url] is unreachable.
+  final List<String> mirrors;
+
   final int bytes;
   final String sha256;
 
   const LocalComponentFile({
     required this.fileName,
     required this.url,
+    this.mirrors = const [],
     required this.bytes,
     required this.sha256,
   });
+
+  /// Every source, canonical first. The digest is the one pinned for all of
+  /// them, so a mirror cannot weaken the check.
+  List<String> get sources => [url, ...mirrors];
 }
 
 /// The declaration of a component.
