@@ -17,6 +17,12 @@ class FakeHttpAdapter implements HttpClientAdapter {
   /// When it is null the answer is a filler of the same size.
   String? body;
 
+  /// Answers a given address with its own body, falling back to [body].
+  final Map<String, String> bodiesByUrl = {};
+
+  /// Addresses that fail before a body is sent.
+  final Set<String> failingUrls = {};
+
   /// The addresses that were requested.
   final List<String> requestedUrls = [];
 
@@ -54,7 +60,14 @@ class FakeHttpAdapter implements HttpClientAdapter {
     if (failure != null) {
       throw failure;
     }
-    final body = this.body;
+    if (failingUrls.contains(options.uri.toString())) {
+      throw DioException(
+        requestOptions: options,
+        message: 'the mirror is down',
+        type: DioExceptionType.connectionError,
+      );
+    }
+    final body = bodiesByUrl[options.uri.toString()] ?? this.body;
     final bytes = body == null
         ? Uint8List.fromList(List<int>.filled(1024, 7))
         : Uint8List.fromList(utf8.encode(body));

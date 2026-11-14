@@ -3922,6 +3922,80 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourcesHealthWeightsDone => '完成';
 
   @override
+  String get settingsSectionComponents => '本地组件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '按需下载翻译与歌词的本地运行时、模型，以及转码用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本地组件 插件 下载 模型 运行时 占用 删除 ffmpeg whisper llama 歌词 翻译';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻译';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌词';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '转码';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalComponentsHint => '组件只在需要时下载；系统里已装好的程序优先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 运行时（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻译模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻译模型（Qwen2.5-1.5B，高质量）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，应用内）';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 运行时（SenseVoice / Fun-ASR-Nano）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可选）';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
+
+  @override
   String get settingsSectionLocalization => '本地化';
 
   @override
@@ -3944,25 +4018,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
 
   @override
-  String get settingsLocalizationEngine => '翻译引擎';
+  String get settingsLocalizationProvider => '翻译服务';
 
   @override
-  String get settingsLocalizationEngineLocal => '内置离线';
+  String get settingsLocalizationProviderNone => '未配置';
 
   @override
-  String get settingsLocalizationEngineApi => '外部 API';
+  String get settingsLocalizationProviderLocal => '本地模型（可选下载）';
 
   @override
-  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+  String get settingsLocalizationProviderCustom => '自定义 OpenAI 兼容';
 
   @override
-  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+  String get settingsLocalizationLocalReady => '本地模型已安装';
 
   @override
-  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+  String get settingsLocalizationLocalMissing => '本地模型未安装，可下载';
 
   @override
-  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+  String get settingsLocalizationLocalCorrupt => '本地模型校验失败，可重新下载';
+
+  @override
+  String get settingsLocalizationLocalDownload => '下载';
+
+  @override
+  String get settingsLocalizationLocalDownloading => '正在下载';
+
+  @override
+  String get settingsLocalizationLocalVerifying => '正在校验';
+
+  @override
+  String get settingsLocalizationLocalDelete => '删除模型';
+
+  @override
+  String get settingsLocalizationLocalDeleteConfirm => '删除本地模型？之后可以重新下载。';
+
+  @override
+  String settingsLocalizationLocalSize(String size) {
+    return '占用 $size';
+  }
+
+  @override
+  String get settingsLocalizationLocalDownloadHint => '约 470 MB，只有选择本地模型时才需要。';
+
+  @override
+  String get settingsLocalizationLocalLicense =>
+      'Qwen2.5-0.5B-Instruct（Apache-2.0）与 llama.cpp（MIT），许可证随组件包提供。';
 
   @override
   String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
@@ -3974,8 +4075,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationApiModel => '模型';
 
   @override
+  String get settingsLocalizationModelSuggestions => '常用模型';
+
+  @override
+  String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
+
+  @override
   String get settingsLocalizationApiHint =>
-      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+      '支持 OpenAI Chat、Anthropic Messages 与 Gemini 三类协议。用量取自响应；只有提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsProvider => '未配置翻译服务，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsKey => '缺少密钥，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsModel => '缺少模型名，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityLocalMissing =>
+      '本地模型未安装（约 470 MB），可在下方下载。';
+
+  @override
+  String get settingsLocalizationPrivacyTitle => '会发送哪些内容';
+
+  @override
+  String get settingsLocalizationPrivacySend =>
+      '发送：曲名、专辑名、歌单名、简介/播客正文、电台文本、部分搜索结果。';
+
+  @override
+  String get settingsLocalizationPrivacyKeep => '不发送：音频、歌词、文件路径、歌手名、播放历史、账号信息。';
+
+  @override
+  String settingsLocalizationConfirmTitle(String provider) {
+    return '把文本发送到 $provider？';
+  }
+
+  @override
+  String get settingsLocalizationConfirmBody =>
+      '曲名、专辑与歌单名、简介、电台文本和部分搜索结果会发送到该服务商进行翻译。';
+
+  @override
+  String get settingsLocalizationConfirmAccept => '启用';
 
   @override
   String get settingsLocalizationUsage => '今日 tokens';
@@ -4007,9 +4149,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String settingsLocalizationBalanceFailedNetwork(String error) {
     return '余额查询失败：$error';
   }
-
-  @override
-  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
 
   @override
   String get settingsSearchKeywordsLocalization =>
@@ -7977,6 +8116,80 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sourcesHealthWeightsDone => '完成';
 
   @override
+  String get settingsSectionComponents => '本地组件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '按需下载翻译与歌词的本地运行时、模型，以及转码用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本地组件 插件 下载 模型 运行时 占用 删除 ffmpeg whisper llama 歌词 翻译';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻译';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌词';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '转码';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalComponentsHint => '组件只在需要时下载；系统里已装好的程序优先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 运行时（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻译模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻译模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻译模型（Qwen2.5-1.5B，高质量）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime => 'Whisper 运行时（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，应用内）';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 运行时（SenseVoice / Fun-ASR-Nano）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可选）';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
+
+  @override
   String get settingsSectionLocalization => '本地化';
 
   @override
@@ -7999,25 +8212,52 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
 
   @override
-  String get settingsLocalizationEngine => '翻译引擎';
+  String get settingsLocalizationProvider => '翻译服务';
 
   @override
-  String get settingsLocalizationEngineLocal => '内置离线';
+  String get settingsLocalizationProviderNone => '未配置';
 
   @override
-  String get settingsLocalizationEngineApi => '外部 API';
+  String get settingsLocalizationProviderLocal => '本地模型（可选下载）';
 
   @override
-  String get settingsLocalizationLocalReady => '离线模型已随应用提供';
+  String get settingsLocalizationProviderCustom => '自定义 OpenAI 兼容';
 
   @override
-  String get settingsLocalizationLocalMissing => '离线模型缺失，请重新安装应用';
+  String get settingsLocalizationLocalReady => '本地模型已安装';
 
   @override
-  String get settingsLocalizationLocalCorrupt => '离线模型校验失败，请重新安装应用';
+  String get settingsLocalizationLocalMissing => '本地模型未安装，可下载';
 
   @override
-  String get settingsLocalizationLocalBundled => '模型随安装包提供，首次翻译时按需加载。';
+  String get settingsLocalizationLocalCorrupt => '本地模型校验失败，可重新下载';
+
+  @override
+  String get settingsLocalizationLocalDownload => '下载';
+
+  @override
+  String get settingsLocalizationLocalDownloading => '正在下载';
+
+  @override
+  String get settingsLocalizationLocalVerifying => '正在校验';
+
+  @override
+  String get settingsLocalizationLocalDelete => '删除模型';
+
+  @override
+  String get settingsLocalizationLocalDeleteConfirm => '删除本地模型？之后可以重新下载。';
+
+  @override
+  String settingsLocalizationLocalSize(String size) {
+    return '占用 $size';
+  }
+
+  @override
+  String get settingsLocalizationLocalDownloadHint => '约 470 MB，只有选择本地模型时才需要。';
+
+  @override
+  String get settingsLocalizationLocalLicense =>
+      'Qwen2.5-0.5B-Instruct（Apache-2.0）与 llama.cpp（MIT），许可证随组件包提供。';
 
   @override
   String get settingsLocalizationApiBaseUrl => '端点（Base URL）';
@@ -8029,8 +8269,49 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsLocalizationApiModel => '模型';
 
   @override
+  String get settingsLocalizationModelSuggestions => '常用模型';
+
+  @override
+  String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
+
+  @override
   String get settingsLocalizationApiHint =>
-      '支持 OpenAI Chat 协议的端点。消耗 token 取自响应；仅对提供余额接口的服务商显示余额。';
+      '支持 OpenAI Chat、Anthropic Messages 与 Gemini 三类协议。用量取自响应；只有提供余额接口的服务商显示余额。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsProvider => '未配置翻译服务，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsKey => '缺少密钥，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsModel => '缺少模型名，翻译已暂停。';
+
+  @override
+  String get settingsLocalizationAvailabilityLocalMissing =>
+      '本地模型未安装（约 470 MB），可在下方下载。';
+
+  @override
+  String get settingsLocalizationPrivacyTitle => '会发送哪些内容';
+
+  @override
+  String get settingsLocalizationPrivacySend =>
+      '发送：曲名、专辑名、歌单名、简介/播客正文、电台文本、部分搜索结果。';
+
+  @override
+  String get settingsLocalizationPrivacyKeep => '不发送：音频、歌词、文件路径、歌手名、播放历史、账号信息。';
+
+  @override
+  String settingsLocalizationConfirmTitle(String provider) {
+    return '把文本发送到 $provider？';
+  }
+
+  @override
+  String get settingsLocalizationConfirmBody =>
+      '曲名、专辑与歌单名、简介、电台文本和部分搜索结果会发送到该服务商进行翻译。';
+
+  @override
+  String get settingsLocalizationConfirmAccept => '启用';
 
   @override
   String get settingsLocalizationUsage => '今日 tokens';
@@ -8062,9 +8343,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String settingsLocalizationBalanceFailedNetwork(String error) {
     return '余额查询失败：$error';
   }
-
-  @override
-  String get settingsLocalizationPrivacy => '只发送需要翻译的文本；音频、歌词和文件路径都留在本机。';
 
   @override
   String get settingsSearchKeywordsLocalization =>
@@ -12032,6 +12310,81 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourcesHealthWeightsDone => '完成';
 
   @override
+  String get settingsSectionComponents => '本機元件';
+
+  @override
+  String get settingsComponentsDescription =>
+      '依需要下載翻譯與歌詞的本機執行環境、模型，以及轉碼用的 FFmpeg';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      '本機元件 外掛 下載 模型 執行環境 佔用 刪除 ffmpeg whisper llama 歌詞 翻譯';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => '翻譯';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => '歌詞';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => '轉碼';
+
+  @override
+  String get settingsLocalComponentsSystemHint => '使用系統已安裝版本';
+
+  @override
+  String get settingsLocalComponentsHint => '元件只在需要時下載；系統裡已裝好的程式優先使用。';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp 執行環境（llama-cli）';
+
+  @override
+  String get settingsLocalComponentTranslationModel => '翻譯模型（Qwen3-0.6B）';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      '翻譯模型（Qwen2.5-0.5B，低配）';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      '翻譯模型（Qwen2.5-1.5B，高品質）';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime =>
+      'Whisper 執行環境（whisper-cli）';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper 模型 tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper 模型 base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，應用內）';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper 模型 large-v3-turbo';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx 執行環境（SenseVoice / Fun-ASR-Nano）';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice 模型';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel => 'Fun-ASR-Nano 模型（可選）';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式轉碼）';
+
+  @override
   String get settingsSectionLocalization => '本地化';
 
   @override
@@ -12054,25 +12407,52 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsLocalizationShowOriginalHint => '小字保留音源裡的原始文字。';
 
   @override
-  String get settingsLocalizationEngine => '翻譯引擎';
+  String get settingsLocalizationProvider => '翻譯服務';
 
   @override
-  String get settingsLocalizationEngineLocal => '內建離線';
+  String get settingsLocalizationProviderNone => '未設定';
 
   @override
-  String get settingsLocalizationEngineApi => '外部 API';
+  String get settingsLocalizationProviderLocal => '本機模型（可選下載）';
 
   @override
-  String get settingsLocalizationLocalReady => '離線模型已隨應用程式提供';
+  String get settingsLocalizationProviderCustom => '自訂 OpenAI 相容';
 
   @override
-  String get settingsLocalizationLocalMissing => '離線模型遺失，請重新安裝應用程式';
+  String get settingsLocalizationLocalReady => '本機模型已安裝';
 
   @override
-  String get settingsLocalizationLocalCorrupt => '離線模型驗證失敗，請重新安裝應用程式';
+  String get settingsLocalizationLocalMissing => '本機模型尚未安裝，可下載';
 
   @override
-  String get settingsLocalizationLocalBundled => '模型隨安裝包提供，首次翻譯時按需載入。';
+  String get settingsLocalizationLocalCorrupt => '本機模型驗證失敗，可重新下載';
+
+  @override
+  String get settingsLocalizationLocalDownload => '下載';
+
+  @override
+  String get settingsLocalizationLocalDownloading => '正在下載';
+
+  @override
+  String get settingsLocalizationLocalVerifying => '正在驗證';
+
+  @override
+  String get settingsLocalizationLocalDelete => '刪除模型';
+
+  @override
+  String get settingsLocalizationLocalDeleteConfirm => '刪除本機模型？之後可以重新下載。';
+
+  @override
+  String settingsLocalizationLocalSize(String size) {
+    return '佔用 $size';
+  }
+
+  @override
+  String get settingsLocalizationLocalDownloadHint => '約 470 MB，只有選擇本機模型時才需要。';
+
+  @override
+  String get settingsLocalizationLocalLicense =>
+      'Qwen2.5-0.5B-Instruct（Apache-2.0）與 llama.cpp（MIT），授權條款隨元件包提供。';
 
   @override
   String get settingsLocalizationApiBaseUrl => '端點（Base URL）';
@@ -12084,8 +12464,49 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsLocalizationApiModel => '模型';
 
   @override
+  String get settingsLocalizationModelSuggestions => '常用模型';
+
+  @override
+  String get settingsLocalizationKeyHint => '金鑰以明文保存在本機設定目錄，僅目前使用者可讀。';
+
+  @override
   String get settingsLocalizationApiHint =>
-      '支援 OpenAI Chat 協定的端點。消耗 token 取自回應；僅對提供餘額介面的服務商顯示餘額。';
+      '支援 OpenAI Chat、Anthropic Messages 與 Gemini 三類協定。用量取自回應；只有提供餘額介面的服務商顯示餘額。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsProvider => '尚未設定翻譯服務，翻譯已暫停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsKey => '缺少金鑰，翻譯已暫停。';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsModel => '缺少模型名稱，翻譯已暫停。';
+
+  @override
+  String get settingsLocalizationAvailabilityLocalMissing =>
+      '本機模型尚未安裝（約 470 MB），可在下方下載。';
+
+  @override
+  String get settingsLocalizationPrivacyTitle => '會傳送哪些內容';
+
+  @override
+  String get settingsLocalizationPrivacySend =>
+      '傳送：曲名、專輯名、歌單名、簡介/播客正文、電台文字、部分搜尋結果。';
+
+  @override
+  String get settingsLocalizationPrivacyKeep => '不傳送：音訊、歌詞、檔案路徑、歌手名、播放歷史、帳號資訊。';
+
+  @override
+  String settingsLocalizationConfirmTitle(String provider) {
+    return '要把文字傳送到 $provider？';
+  }
+
+  @override
+  String get settingsLocalizationConfirmBody =>
+      '曲名、專輯與歌單名、簡介、電台文字和部分搜尋結果會傳送到該服務商進行翻譯。';
+
+  @override
+  String get settingsLocalizationConfirmAccept => '啟用';
 
   @override
   String get settingsLocalizationUsage => '今日 tokens';
@@ -12117,9 +12538,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String settingsLocalizationBalanceFailedNetwork(String error) {
     return '餘額查詢失敗：$error';
   }
-
-  @override
-  String get settingsLocalizationPrivacy => '只傳送需要翻譯的文字；音訊、歌詞和檔案路徑都留在本機。';
 
   @override
   String get settingsSearchKeywordsLocalization =>

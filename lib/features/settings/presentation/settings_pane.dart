@@ -177,6 +177,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
       SettingsSection.playback,
       SettingsSection.lyrics,
       SettingsSection.localization,
+      SettingsSection.components,
       SettingsSection.discovery,
       SettingsSection.desktop,
       SettingsSection.permissions,

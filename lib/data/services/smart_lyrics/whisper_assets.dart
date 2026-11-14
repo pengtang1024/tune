@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_components.dart';
 
 /// Where the local channel finds what it needs (docs/smart-lyrics.md §6.2,
 /// M4).
@@ -20,10 +22,15 @@ class WhisperAssets {
   /// The folder the models live in.
   final String modelsFolder;
 
+  /// The unified component resolver, when the app has one. An explicit
+  /// construction without it keeps the old folder-only behaviour.
+  final LocalComponents? components;
+
   const WhisperAssets({
     required this.systemFolders,
     required this.appFolder,
     required this.modelsFolder,
+    this.components,
   });
 
   /// The names a whisper binary answers to across the versions.
@@ -35,6 +42,7 @@ class WhisperAssets {
     required String appFolder,
     required String modelsFolder,
     Map<String, String>? environment,
+    LocalComponents? components,
   }) {
     final env = environment ?? Platform.environment;
     final home = env['HOME'] ?? '';
@@ -50,18 +58,20 @@ class WhisperAssets {
       systemFolders: folders.toList(),
       appFolder: appFolder,
       modelsFolder: modelsFolder,
+      components: components,
     );
   }
 
   /// The assets the app opens for itself, under the application support
   /// directory — one folder for the binary the reader may bring and the
   /// models the app downloads.
-  static Future<WhisperAssets> appDefault() async {
+  static Future<WhisperAssets> appDefault({LocalComponents? components}) async {
     final base = await getApplicationSupportDirectory();
     final root = Directory(path.join(base.path, 'whisper'));
     return WhisperAssets.ofMachine(
       appFolder: path.join(root.path, 'bin'),
       modelsFolder: path.join(root.path, 'models'),
+      components: components,
     );
   }
 
@@ -81,14 +91,21 @@ class WhisperAssets {
         if (await _isRunnable(file)) return file;
       }
     }
-    return null;
+    final components = this.components;
+    if (components == null) return null;
+    return components.executable(LocalComponentRegistry.whisperRuntime);
   }
 
   /// The model of [name], when it was downloaded.
   Future<File?> findModel(String name) async {
     final file = File('$modelsFolder/ggml-$name.bin');
-    if (!await file.exists()) return null;
-    return file;
+    if (await file.exists()) return file;
+    final components = this.components;
+    if (components == null) return null;
+    return components.file(
+      LocalComponentRegistry.whisperModel(name),
+      LocalComponentRegistry.whisperModelFile(name),
+    );
   }
 
   /// Whether the file is there and the machine may run it.

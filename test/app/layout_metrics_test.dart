@@ -45,10 +45,12 @@ void main() {
     );
   });
 
-  test('the mini window keeps room for the dock', () {
+  test('the mini window is exactly the dock', () {
+    // The bar is the whole window: no title bar above it, and the progress
+    // line is drawn inside this height rather than added to it.
     expect(
       LayoutBreakpoints.miniWindowSize.height,
-      greaterThan(CompactTokens.dockHeight),
+      CompactTokens.dockHeight,
     );
     expect(
       LayoutBreakpoints.miniWindowSize.width,

@@ -45,6 +45,9 @@ class PlatformConstants {
   /// mini 形态的窗口宽度：只留播放条
   static const double desktopMiniWindowWidth = 360;
 
-  /// mini 形态的窗口高度：播放条加它的外边距
-  static const double desktopMiniWindowHeight = 132;
+  /// mini 形态的窗口高度：与底栏同高，另加底部一条 2px 的进度线。
+  ///
+  /// 迷你窗口没有原生标题栏，这 88 全是播放条本身；旧值 132 是给标题栏
+  /// 留的余量，真用了标题栏，条就只能缩在窗口中间。
+  static const double desktopMiniWindowHeight = 88;
 }

@@ -53,6 +53,12 @@ class WindowManagerService with WindowListener {
     PlatformConstants.desktopMiniWindowHeight,
   );
 
+  /// A maximum the window will never reach, used to lift the mini limit.
+  ///
+  /// The plugin can clear a maximum on Linux but not on Windows, so the normal
+  /// and immersive forms ask for a bound larger than any screen instead.
+  static const Size _noMaximum = Size(100000, 100000);
+
   /// 初始化窗口管理器
   static Future<void> init(PersistenceService persistence) async {
     // 仅在桌面端初始化
@@ -271,6 +277,7 @@ class WindowManagerService with WindowListener {
     await windowManager.setResizable(true);
     await windowManager.setAlwaysOnTop(false);
     await windowManager.setSkipTaskbar(false);
+    await windowManager.setMaximumSize(_noMaximum);
     await windowManager.setMinimumSize(
       const Size(
         PlatformConstants.desktopWindowMinWidth,
@@ -289,18 +296,47 @@ class WindowManagerService with WindowListener {
 
   /// Shrinks the window to the bar, keeps it above the other windows and out
   /// of the task bar.
+  ///
+  /// The bar is the whole window, so the frame has to go before the size is
+  /// asked for: a frame keeps room for a shadow and a title bar, and a limit
+  /// that lands while the frame is still there squeezes the bar into what is
+  /// left over. The size is then pinned by equal minimum and maximum hints
+  /// rather than by `setResizable(false)`, which GTK reads as "ignore the
+  /// resize".
   Future<void> _applyMini() async {
     if (await windowManager.isMaximized()) {
       await windowManager.unmaximize();
       _maximized = false;
     }
     await windowManager.setFullScreen(false);
-    await windowManager.setTitleBarStyle(TitleBarStyle.normal);
-    await windowManager.setMinimumSize(_miniSize);
-    await windowManager.setResizable(false);
+    // The bar is the window, so the frame goes before anything else. A frame
+    // keeps room for its own shadow and its title bar, and a window that still
+    // holds them cannot be the size of the bar: GTK ends up squeezing the bar
+    // into whatever is left over.
+    if (PlatformConstants.isLinux) await windowManager.setAsFrameless();
+    await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
+    await windowManager.setResizable(true);
+    // Shrink first, pin afterwards, so the limit meets a window that is
+    // already the size of the bar.
     await windowManager.setSize(_miniSize);
+    await _awaitSize(_miniSize);
+    await windowManager.setMinimumSize(_miniSize);
+    await windowManager.setMaximumSize(_miniSize);
     await windowManager.setAlwaysOnTop(true);
     await windowManager.setSkipTaskbar(true);
+  }
+
+  /// Waits until the compositor has actually given the window the size.
+  ///
+  /// A resize is a request. Resizing on Wayland lands some frames later, and
+  /// asking for a limit before it lands measures the old window instead of the
+  /// bar.
+  Future<void> _awaitSize(Size target) async {
+    for (var i = 0; i < 15; i++) {
+      final Size current = await windowManager.getSize();
+      if (current == target) return;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
   }
 
   /// Drops the frame and takes the whole screen, which is what the now
@@ -309,6 +345,7 @@ class WindowManagerService with WindowListener {
     await windowManager.setAlwaysOnTop(false);
     await windowManager.setSkipTaskbar(false);
     await windowManager.setResizable(true);
+    await windowManager.setMaximumSize(_noMaximum);
     await windowManager.setMinimumSize(
       const Size(
         PlatformConstants.desktopWindowMinWidth,

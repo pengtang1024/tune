@@ -53,17 +53,16 @@ flutter run -d linux
 
 ## 构建
 
-仓库用 Git LFS 管理离线翻译的模型与 llama.cpp 运行时。第一次拉代码或换了机器：
+默认安装包不含本地翻译模型，Linux 归档体积回到约 41 MiB。翻译默认走设置页配置的
+厂商 API；本地模型是可选组件，在设置页按需下载（约 470 MB）。升级替换应用不会删除
+已下载的本地模型。
 
-```bash
-git lfs install
-git lfs pull
-```
-
-没装 LFS 时 clone 下来的是约 130 B 的指针文件；`flutter run` 仍能启动，但设置页
-会把离线模型标为「缺失/校验失败」，翻译回退原文。打包时
-`tool/prepare_translation.sh` 会直接报错并提示上面两条命令，不会产出缺模型的包。
-只拉指针的 clone 额外体积接近 0，拉取实体后约 515 MB。
+模型与 llama.cpp 运行时不再入库，改为 Release 上的组件包
+`tune-translation-qwen2.5-0.5b-b12274.zip`（约 470 MB），应用在设置页按需下载并校验
+大小与 sha256。需要打离线包时，先从同版本 Release 下载组件包，把其中的
+`translation/models/`、`translation/bin/` 与 `translation/licenses/` 解压到仓库的
+`translation/` 下，再运行 `./tool/package_linux.sh --offline`；缺文件时脚本会直接
+报错，不会产出缺模型的离线包。离线包的用途见 [docs/updates.md](docs/updates.md)。
 
 Linux 是当前验收平台：
 
@@ -86,7 +85,8 @@ Android 的 release 签名从 `android/key.properties` 读取 `storeFile`、`sto
 ## 自动更新
 
 设置页「关于」下方有「检查更新」：桌面端从 GitHub 的 release 读最新版本，
-发现新版本后下载对应平台的归档并换掉正在运行的 bundle，重启后生效。
+发现新版本后下载对应平台的归档并换掉正在运行的 bundle，重启后生效。整包更新只替换
+应用本身，用户目录里已下载的本地翻译模型不会被删除。
 Linux 的打包与发布步骤见 [docs/updates.md](docs/updates.md)。
 
 ```bash

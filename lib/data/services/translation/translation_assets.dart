@@ -4,8 +4,11 @@ import 'dart:isolate';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:tune/data/services/components/local_component.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_components.dart';
 
-/// Whether the bundled offline translation files can be used.
+/// Whether the offline translation files can be used.
 enum TranslationAssetProblem { none, modelMissing, modelCorrupt, binaryMissing }
 
 class TranslationAssetStatus {
@@ -18,31 +21,74 @@ class TranslationAssetStatus {
 
 /// The files the offline engine needs, and where the installer put them.
 ///
-/// The model and the llama.cpp runtime ship inside the release archive under
-/// `translation/`, next to the executable (or in the repository root during
-/// `flutter run`). Nothing is downloaded at runtime.
+/// The model and the llama.cpp runtime are an optional component now. They
+/// are downloaded into the application support directory; the copies that an
+/// older release unpacked next to the executable are still read so an upgrade
+/// does not break a working install.
 class TranslationAssets {
   /// The release that was tested with this client.
   static const String binaryVersion = 'b12274';
-  static const String modelFileName = 'qwen2.5-0.5b-instruct-q4_k_m.gguf';
-  static const String modelSha256 =
-      '74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db';
-  static const int modelBytes = 491400032;
+
+  /// The default model: what a fresh component download brings home.
+  static String get modelFileName =>
+      LocalComponentRegistry.translationModel.requiredFiles.first;
+  static String get modelSha256 =>
+      LocalComponentRegistry.translationModel.files.first.sha256;
+  static int get modelBytes =>
+      LocalComponentRegistry.translationModel.files.first.bytes;
 
   final Directory root;
-  final int expectedModelBytes;
-  final String expectedModelSha256;
+  final String supportPath;
+  final bool userInstalled;
+
+  /// Test overrides; production reads the digest from the registry.
+  final int? expectedModelBytes;
+  final String? expectedModelSha256;
+
+  File? _componentModel;
+  LocalComponentSpec? _componentModelSpec;
+  String? _componentBinary;
+  Directory? _componentBinDirectory;
 
   TranslationAssets(
     this.root, {
-    this.expectedModelBytes = modelBytes,
-    this.expectedModelSha256 = modelSha256,
+    required this.supportPath,
+    this.userInstalled = false,
+    this.expectedModelBytes,
+    this.expectedModelSha256,
   });
 
-  /// Finds the `translation/` directory that ships with this build.
+  /// Lets an older copy stay the first choice while the downloaded component
+  /// fills in when neither the folder nor the system has the file.
   ///
-  /// Order: explicit override, the archive next to the executable, the repo
-  /// when running from `flutter run`, then the old support-directory layout.
+  /// Models are tried in tier order (default, low-memory, quality), so a
+  /// reader who downloaded one alternative still has a working engine.
+  Future<void> useComponents(LocalComponents components) async {
+    if (_localModel() == null) {
+      for (final spec in LocalComponentRegistry.translationModels) {
+        final found = await components.file(spec, spec.requiredFiles.first);
+        if (found != null) {
+          _componentModel = found;
+          _componentModelSpec = spec;
+          break;
+        }
+      }
+    }
+    final binary = await _binaryIn(binDirectory);
+    final componentBinary = binary == null
+        ? await components.executable(LocalComponentRegistry.translationRuntime)
+        : null;
+    _componentBinary = binary ?? componentBinary?.path;
+    if (componentBinary != null) {
+      _componentBinDirectory = componentBinary.parent;
+    }
+  }
+
+  /// Finds the `translation/` directory to use.
+  ///
+  /// Order: explicit override, the copy the reader downloaded, the copy next
+  /// to the executable from an older release, the repository when running
+  /// from `flutter run`, then the support directory as a fallback.
   /// An explicit override is returned as-is so a broken path stays visible
   /// instead of silently falling back to another copy.
   static TranslationAssets resolve({
@@ -54,29 +100,60 @@ class TranslationAssets {
     final env = environment ?? Platform.environment;
     final override = env['TUNE_TRANSLATION_DIR']?.trim();
     if (override != null && override.isNotEmpty) {
-      return TranslationAssets(Directory(override));
+      return TranslationAssets(
+        Directory(override),
+        supportPath: supportPath,
+      );
+    }
+
+    final installed = Directory(path.join(supportPath, 'translation'));
+    if (_looksInstalled(installed)) {
+      return TranslationAssets(
+        installed,
+        supportPath: supportPath,
+        userInstalled: true,
+      );
     }
 
     final executableDirectory = Directory(path.dirname(executablePath));
     final packaged = Directory(
       path.join(executableDirectory.path, 'translation'),
     );
-    if (packaged.existsSync()) return TranslationAssets(packaged);
+    if (packaged.existsSync()) {
+      return TranslationAssets(packaged, supportPath: supportPath);
+    }
 
     var cursor = executableDirectory;
     for (var depth = 0; depth < maxParents; depth++) {
       final candidate = Directory(path.join(cursor.path, 'translation'));
-      if (File(
-        path.join(candidate.path, 'models', modelFileName),
-      ).existsSync()) {
-        return TranslationAssets(candidate);
+      if (_containsModel(candidate)) {
+        return TranslationAssets(candidate, supportPath: supportPath);
       }
       final parent = cursor.parent;
       if (parent.path == cursor.path) break;
       cursor = parent;
     }
 
-    return TranslationAssets(Directory(path.join(supportPath, 'translation')));
+    return TranslationAssets(installed, supportPath: supportPath);
+  }
+
+  static bool _looksInstalled(Directory directory) {
+    if (!directory.existsSync()) return false;
+    if (File(path.join(directory.path, 'installed.json')).existsSync()) {
+      return true;
+    }
+    return _containsModel(directory);
+  }
+
+  /// Whether any translation tier sits in `<directory>/models`.
+  static bool _containsModel(Directory directory) {
+    for (final spec in LocalComponentRegistry.translationModels) {
+      final file = File(
+        path.join(directory.path, 'models', spec.requiredFiles.first),
+      );
+      if (file.existsSync()) return true;
+    }
+    return false;
   }
 
   static Future<TranslationAssets> forApp() async {
@@ -87,13 +164,41 @@ class TranslationAssets {
     );
   }
 
-  Directory get binDirectory => Directory(path.join(root.path, 'bin'));
+  Directory get binDirectory =>
+      _componentBinDirectory ?? Directory(path.join(root.path, 'bin'));
 
-  File get modelFile => File(path.join(root.path, 'models', modelFileName));
+  /// The model the engine runs: the first tier found under `models/`, or the
+  /// downloaded component, or the default path when neither exists.
+  File get modelFile =>
+      _localModel()?.file ??
+      File(path.join(root.path, 'models', modelFileName));
 
-  /// The `llama-cli` inside the unpacked runtime, or `null` when absent.
+  /// The engine's cache key follows the model that is actually loaded.
+  String get modelName => path.basename(modelFile.path);
+
+  _InstalledModel? _localModel() {
+    if (_componentModel != null) {
+      return _InstalledModel(
+        _componentModel!,
+        _componentModelSpec ?? LocalComponentRegistry.translationModel,
+      );
+    }
+    for (final spec in LocalComponentRegistry.translationModels) {
+      final file = File(
+        path.join(root.path, 'models', spec.requiredFiles.first),
+      );
+      if (file.existsSync()) return _InstalledModel(file, spec);
+    }
+    return null;
+  }
+
+  /// The `llama-cli` the engine runs, or `null` when absent.
   Future<String?> findBinary() async {
-    final directory = binDirectory;
+    if (_componentBinary != null) return _componentBinary;
+    return _binaryIn(binDirectory);
+  }
+
+  static Future<String?> _binaryIn(Directory directory) async {
     if (!await directory.exists()) return null;
     await for (final entity in directory.list(recursive: true)) {
       if (entity is File && path.basename(entity.path) == 'llama-cli') {
@@ -104,21 +209,23 @@ class TranslationAssets {
   }
 
   /// Checks presence and size, and the digest when [verifyDigest] is set.
-  ///
-  /// A Git LFS pointer is a ~130-byte text file, so the size check already
-  /// catches the "cloned without LFS" case before hashing half a gigabyte.
   Future<TranslationAssetStatus> inspect({bool verifyDigest = false}) async {
-    final model = modelFile;
-    if (!await model.exists()) {
+    final installed = _localModel();
+    if (installed == null) {
       return const TranslationAssetStatus(TranslationAssetProblem.modelMissing);
     }
+    final model = installed.file;
     final length = await model.length();
-    if (length != expectedModelBytes) {
+    final expectedBytes =
+        expectedModelBytes ?? installed.spec.files.first.bytes;
+    if (length != expectedBytes) {
       return const TranslationAssetStatus(TranslationAssetProblem.modelCorrupt);
     }
     if (verifyDigest) {
+      final expectedSha =
+          expectedModelSha256 ?? installed.spec.files.first.sha256;
       final digest = await _digestOf(model.path, length);
-      if (digest != expectedModelSha256) {
+      if (digest != expectedSha) {
         return const TranslationAssetStatus(
           TranslationAssetProblem.modelCorrupt,
         );
@@ -131,6 +238,24 @@ class TranslationAssets {
     }
     return const TranslationAssetStatus(TranslationAssetProblem.none);
   }
+
+  /// Bytes the installed component takes on disk.
+  Future<int> installedSize() async {
+    if (!await root.exists()) return 0;
+    var total = 0;
+    await for (final entity in root.list(recursive: true)) {
+      if (entity is File) total += await entity.length();
+    }
+    return total;
+  }
+}
+
+/// A model file together with the tier it came from.
+class _InstalledModel {
+  final File file;
+  final LocalComponentSpec spec;
+
+  const _InstalledModel(this.file, this.spec);
 }
 
 /// Digests keyed by path, size and mtime, so repeated checks stay cheap.

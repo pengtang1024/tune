@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:tune/data/services/translation/translation_assets.dart';
 import 'package:tune/data/services/translation/translation_prompt.dart';
-import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/domain/models/translation_engine.dart';
 
 /// The offline engine: llama.cpp running a small Qwen model on the CPU.
@@ -25,7 +24,7 @@ class LlamaLocalTranslationEngine implements TranslationEngine {
   }) : threads = threads ?? max(1, min(4, Platform.numberOfProcessors));
 
   @override
-  String get id => 'local:${LocalizationConfig.localModelId}';
+  String get id => 'local:${assets.modelName}';
 
   @override
   Future<TranslationBatch> translate(
@@ -33,22 +32,22 @@ class LlamaLocalTranslationEngine implements TranslationEngine {
     required String targetLanguage,
   }) async {
     if (texts.isEmpty) return const TranslationBatch(translations: {});
-    final status = await assets.inspect(verifyDigest: true);
+    final status = await assets.inspect();
     if (!status.ready) {
       throw TranslationException(switch (status.problem) {
         TranslationAssetProblem.modelMissing =>
-          'the bundled offline model is missing',
+          'the local model is not installed',
         TranslationAssetProblem.modelCorrupt =>
-          'the bundled offline model failed verification',
+          'the local model failed verification',
         TranslationAssetProblem.binaryMissing =>
-          'the bundled llama.cpp runtime is missing',
-        TranslationAssetProblem.none => 'the offline model is unavailable',
+          'the local llama.cpp runtime is missing',
+        TranslationAssetProblem.none => 'the local model is unavailable',
       }, unavailable: true);
     }
     final binary = await assets.findBinary();
     if (binary == null) {
       throw const TranslationException(
-        'the bundled llama.cpp runtime is missing',
+        'the local llama.cpp runtime is missing',
         unavailable: true,
       );
     }

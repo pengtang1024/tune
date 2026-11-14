@@ -136,6 +136,8 @@ public class MainActivity extends AudioServiceActivity {
                   break;
               }
             });
+    new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), AudioDecodeChannel.CHANNEL)
+        .setMethodCallHandler(new AudioDecodeChannel(this));
   }
 
   @Override

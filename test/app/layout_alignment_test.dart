@@ -17,6 +17,7 @@ import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/queue/presentation/queue_track_row.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/shell/presentation/app_sidebar.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/sources/presentation/sources_pane.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -369,6 +370,41 @@ void main() {
       ),
       reason:
           'the field of the search starts where the heading of the page starts',
+    );
+  });
+
+  testWidgets('the rail of the shell reaches the bottom of the window', (
+    tester,
+  ) async {
+    await surface(tester, const Size(1280, 800));
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(
+          currentPath: '/library',
+          child: SizedBox.shrink(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final backdrop = tester.getRect(
+      find.byKey(const ValueKey('shell-rail-backdrop')),
+    );
+    final rail = tester.getRect(find.byType(AppSidebar));
+    final dock = tester.getRect(find.byType(PlayerDock));
+
+    expect(backdrop.left, 0);
+    expect(backdrop.width, CompactTokens.sidebarWidth);
+    expect(
+      backdrop.bottom,
+      800,
+      reason: 'the rail keeps its colour under the dock, down to the edge',
+    );
+    expect(
+      dock.left,
+      lessThan(rail.right),
+      reason: 'the floating dock starts inside the rail, so the rail is the '
+          'surface behind it',
     );
   });
 }

@@ -146,6 +146,21 @@ void main() {
       expect(asset, isNull);
     });
 
+    test('offline and translation archives are not platform updates', () {
+      final asset = UpdateService.assetFor(const [
+        UpdateAsset(
+          name: 'tune-linux-x64-1.0.0-offline.tar.gz',
+          url: 'https://example.com/offline.tar.gz',
+        ),
+        UpdateAsset(
+          name: 'tune-translation-qwen2.5-0.5b-b12274.zip',
+          url: 'https://example.com/translation.zip',
+        ),
+      ], platform: 'linux');
+
+      expect(asset, isNull);
+    });
+
     test('an answer without a version is no release', () {
       expect(UpdateService.parseRelease(null), isNull);
       expect(UpdateService.parseRelease({'tag_name': ''}), isNull);

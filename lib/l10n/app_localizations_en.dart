@@ -4219,6 +4219,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourcesHealthWeightsDone => 'Done';
 
   @override
+  String get settingsSectionComponents => 'Local components';
+
+  @override
+  String get settingsComponentsDescription =>
+      'Download the local runtimes and models for translation and lyrics, plus FFmpeg for transcoding, only when needed';
+
+  @override
+  String get settingsSearchKeywordsComponents =>
+      'local components plugin download model runtime size delete ffmpeg whisper llama lyrics translation';
+
+  @override
+  String get settingsLocalComponentsGroupTranslation => 'Translation';
+
+  @override
+  String get settingsLocalComponentsGroupLyrics => 'Lyrics';
+
+  @override
+  String get settingsLocalComponentsGroupTranscode => 'Transcoding';
+
+  @override
+  String get settingsLocalComponentsSystemHint => 'Using the system install';
+
+  @override
+  String get settingsLocalComponentsHint =>
+      'Components download only when you ask; a program the system already has is used first.';
+
+  @override
+  String get settingsLocalComponentTranslationRuntime =>
+      'llama.cpp runtime (llama-cli)';
+
+  @override
+  String get settingsLocalComponentTranslationModel =>
+      'Translation model (Qwen3-0.6B)';
+
+  @override
+  String get settingsLocalComponentTranslationModelLow =>
+      'Translation model (Qwen2.5-0.5B, low memory)';
+
+  @override
+  String get settingsLocalComponentTranslationModelQuality =>
+      'Translation model (Qwen2.5-1.5B, high quality)';
+
+  @override
+  String get settingsLocalComponentWhisperRuntime =>
+      'Whisper runtime (whisper-cli)';
+
+  @override
+  String get settingsLocalComponentWhisperTiny => 'Whisper model tiny';
+
+  @override
+  String get settingsLocalComponentWhisperBase => 'Whisper model base';
+
+  @override
+  String get settingsLocalComponentWhisperSmall => 'Whisper model small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper model small (ONNX, in-app)';
+
+  @override
+  String get settingsLocalComponentWhisperLargeTurbo =>
+      'Whisper model large-v3-turbo';
+
+  @override
+  String get settingsLocalComponentSherpaRuntime =>
+      'Sherpa-onnx runtime (SenseVoice / Fun-ASR-Nano)';
+
+  @override
+  String get settingsLocalComponentSensevoiceModel => 'SenseVoice model';
+
+  @override
+  String get settingsLocalComponentFunasrNanoModel =>
+      'Fun-ASR-Nano model (optional)';
+
+  @override
+  String get settingsLocalComponentFfmpeg => 'FFmpeg (m4a and other formats)';
+
+  @override
   String get settingsSectionLocalization => 'Localization';
 
   @override
@@ -4244,28 +4322,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'The small line keeps the text that came from the source.';
 
   @override
-  String get settingsLocalizationEngine => 'Translation engine';
+  String get settingsLocalizationProvider => 'Translation service';
 
   @override
-  String get settingsLocalizationEngineLocal => 'Built-in offline';
+  String get settingsLocalizationProviderNone => 'Not configured';
 
   @override
-  String get settingsLocalizationEngineApi => 'External API';
+  String get settingsLocalizationProviderLocal =>
+      'Local model (optional download)';
 
   @override
-  String get settingsLocalizationLocalReady => 'Offline model is bundled';
+  String get settingsLocalizationProviderCustom => 'Custom OpenAI-compatible';
+
+  @override
+  String get settingsLocalizationLocalReady => 'Local model is installed';
 
   @override
   String get settingsLocalizationLocalMissing =>
-      'Offline model is missing. Please reinstall the app.';
+      'Local model is not installed. You can download it.';
 
   @override
   String get settingsLocalizationLocalCorrupt =>
-      'Offline model failed verification. Please reinstall the app.';
+      'Local model failed verification. Download it again.';
 
   @override
-  String get settingsLocalizationLocalBundled =>
-      'The model ships with the app and loads on first use.';
+  String get settingsLocalizationLocalDownload => 'Download';
+
+  @override
+  String get settingsLocalizationLocalDownloading => 'Downloading';
+
+  @override
+  String get settingsLocalizationLocalVerifying => 'Verifying';
+
+  @override
+  String get settingsLocalizationLocalDelete => 'Delete model';
+
+  @override
+  String get settingsLocalizationLocalDeleteConfirm =>
+      'Delete the local model? You can download it again later.';
+
+  @override
+  String settingsLocalizationLocalSize(String size) {
+    return 'Uses $size';
+  }
+
+  @override
+  String get settingsLocalizationLocalDownloadHint =>
+      'About 470 MB, only needed when you choose the local model.';
+
+  @override
+  String get settingsLocalizationLocalLicense =>
+      'Qwen2.5-0.5B-Instruct (Apache-2.0) and llama.cpp (MIT); the licenses ship with the download.';
 
   @override
   String get settingsLocalizationApiBaseUrl => 'Endpoint (base URL)';
@@ -4277,8 +4384,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalizationApiModel => 'Model';
 
   @override
+  String get settingsLocalizationModelSuggestions => 'Suggested models';
+
+  @override
+  String get settingsLocalizationKeyHint =>
+      'The key is stored in plain text in this device\'s config folder and readable only by the current user.';
+
+  @override
   String get settingsLocalizationApiHint =>
-      'Any endpoint that speaks the OpenAI chat dialect. Usage tokens come from its response; a balance is shown only for providers that publish one.';
+      'Supports OpenAI Chat, Anthropic Messages and Gemini. Usage comes from the response; a balance is shown only for providers that publish one.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsProvider =>
+      'Translation is paused until a provider is chosen.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsKey =>
+      'Translation is paused until the key is filled in.';
+
+  @override
+  String get settingsLocalizationAvailabilityNeedsModel =>
+      'Translation is paused until a model is chosen.';
+
+  @override
+  String get settingsLocalizationAvailabilityLocalMissing =>
+      'The local model is not installed (about 470 MB). Download it below.';
+
+  @override
+  String get settingsLocalizationPrivacyTitle => 'What leaves this device';
+
+  @override
+  String get settingsLocalizationPrivacySend =>
+      'Sent: track titles, album names, playlist names, descriptions and podcast text, radio text, and some search results.';
+
+  @override
+  String get settingsLocalizationPrivacyKeep =>
+      'Kept on this device: audio, lyrics, file paths, artist names, play history, and account information.';
+
+  @override
+  String settingsLocalizationConfirmTitle(String provider) {
+    return 'Send text to $provider?';
+  }
+
+  @override
+  String get settingsLocalizationConfirmBody =>
+      'Track, album and playlist names, descriptions, radio text and some search results will be sent to this provider for translation.';
+
+  @override
+  String get settingsLocalizationConfirmAccept => 'Enable';
 
   @override
   String get settingsLocalizationUsage => 'Tokens today';
@@ -4313,10 +4466,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsLocalizationBalanceFailedNetwork(String error) {
     return 'Balance check failed: $error';
   }
-
-  @override
-  String get settingsLocalizationPrivacy =>
-      'Only the text that needs translating is sent; audio, lyrics and file paths stay on this device.';
 
   @override
   String get settingsSearchKeywordsLocalization =>

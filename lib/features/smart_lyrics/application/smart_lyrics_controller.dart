@@ -4,17 +4,24 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/config/app_capabilities.dart';
+import 'package:tune/data/services/components/local_component.dart';
+import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_components.dart';
+import 'package:tune/data/services/providers/local_components_provider.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
+import 'package:tune/data/services/impl/media_codec_audio_decoder.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/sherpa_local_engine.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_local_engine.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/local_components/application/local_components_controller.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
@@ -39,7 +46,10 @@ final smartLyricsChannelHealthProvider = Provider<SmartLyricsChannelHealthStore>
 /// correction and the knowledge vote, the shared libraries as the human
 /// pool. A change of the config builds the next run on the new voices.
 SmartLyricsService _buildSmartLyricsService(Ref ref) {
-  // Watch the fields the service actually reads: watching the whole
+  // A new component changes what the local engines can find: rebuild the
+  // service once, not on every song.
+  ref.watch(localComponentsRevisionProvider);
+  // The fields the service actually reads: watching the whole
   // config rebuilt the service on every unrelated keystroke.
   final (baseUrl, apiKey, asrModels, chatModel, localModel) = ref.watch(
     settingsControllerProvider.select(
@@ -88,10 +98,76 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
     for (final model in chatModel.split(','))
       if (model.trim().isNotEmpty) model.trim(),
   ];
-  final assets = Future<WhisperAssets>.sync(WhisperAssets.appDefault);
-  // A phone cannot run the local engines at all: asking them once per song
-  // only wrote the same failure into the log and the health ledger.
-  final localEngines = AppCapabilities.current.externalToolPipeline;
+  final assets = Future<WhisperAssets>.sync(() async {
+    final components = await ref.read(localComponentsProvider.future);
+    return WhisperAssets.appDefault(components: components);
+  });
+  Future<LocalComponents> components() =>
+      ref.read(localComponentsProvider.future);
+  // How the local engines run is one capability, not a platform check in
+  // every branch: the desktop starts the downloaded binary, Android links
+  // the same runtime into the app (docs/android.md E5).
+  final asrBackend = AppCapabilities.current.localAsrBackend;
+  final localEngines = asrBackend != LocalAsrBackend.none;
+
+  /// The same channel on whichever backend this platform has.
+  SherpaLocalEngine sherpaChannel({
+    required String model,
+    required SherpaModelFamily family,
+    required LocalComponentSpec spec,
+  }) {
+    Future<Directory?> dir() async => (await components()).directory(spec);
+    if (asrBackend == LocalAsrBackend.process) {
+      return SherpaLocalEngine(
+        model: model,
+        family: family,
+        binaryOf: () async => (await components()).executable(
+          LocalComponentRegistry.sherpaRuntime,
+        ),
+        modelDirOf: dir,
+      );
+    }
+    return SherpaLocalEngine.ffi(
+      model: model,
+      family: family,
+      modelDirOf: dir,
+    );
+  }
+
+  /// Whisper's channel: the ggml model beside the desktop binary, or the
+  /// ONNX export the in-app runtime reads. Both are the same MIT weights;
+  /// the packaging follows the backend, not a second decision.
+  SmartLyricsEngine? whisperChannel() {
+    if (!localEngines || local.isEmpty) return null;
+    if (asrBackend == LocalAsrBackend.ffi) {
+      return SherpaLocalEngine.ffi(
+        model: local,
+        family: SherpaModelFamily.whisper,
+        modelDirOf: () async => (await components()).directory(
+          LocalComponentRegistry.whisperOnnxModelSmall,
+        ),
+      );
+    }
+    return WhisperLocalEngine(
+      model: local,
+      binaryOf: () async => (await assets).findBinary(),
+      modelOf: () async => (await assets).findModel(local),
+      workspaceOf: () async => (await assets).workspace(),
+    );
+  }
+
+  final whisper = whisperChannel();
+  // The optional third family joins only after its model was downloaded
+  // (or found on the machine). Nothing is fetched by default, so the
+  // default pool stays Whisper small + SenseVoice (D12).
+  final funasrReady = ref.watch(
+    localComponentsControllerProvider.select(
+      (states) =>
+          states.valueOrNull?[LocalComponentRegistry.funasrNanoModel.id]
+              ?.usable ??
+          false,
+    ),
+  );
 
   return SmartLyricsService(
     engines: [
@@ -104,34 +180,27 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
       // can cross-prove a line. Absent install: the channel fails soft
       // and the health rings park it.
       if (localEngines)
-        SherpaLocalEngine(
+        sherpaChannel(
           model: 'sensevoice',
-          binaryOf: () async {
-            final file = File(
-              '${Platform.environment['HOME'] ?? ''}'
-              '/.local/opt/sherpa-onnx/bin/sherpa-onnx-offline',
-            );
-            return await file.exists() ? file : null;
-          },
-          modelDirOf: () async {
-            final dir = Directory(
-              '${Platform.environment['HOME'] ?? ''}'
-              '/.local/opt/sherpa-onnx/models/sense-voice',
-            );
-            return await dir.exists() ? dir : null;
-          },
+          family: SherpaModelFamily.sensevoice,
+          spec: LocalComponentRegistry.sensevoiceModel,
         ),
-      if (localEngines && local.isNotEmpty)
-        WhisperLocalEngine(
-          model: local,
-          binaryOf: () async => (await assets).findBinary(),
-          modelOf: () async => (await assets).findModel(local),
-          workspaceOf: () async => (await assets).workspace(),
+      // The optional quality pack: same runtime, a different family, and no
+      // vote until the reader brings its model home.
+      if (localEngines && funasrReady)
+        sherpaChannel(
+          model: 'funasr-nano',
+          family: SherpaModelFamily.funAsrNano,
+          spec: LocalComponentRegistry.funasrNanoModel,
         ),
+      ?whisper,
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
     health: ref.watch(smartLyricsChannelHealthProvider),
+    nativeDecoder: AppCapabilities.current.nativeAudioDecoder
+        ? const MediaCodecAudioDecoder()
+        : null,
     // The correction runs on the first model; every listed model casts a
     // knowledge ballot — two families make the class speak (§7.6).
     assist: !cloud || chatModelList.isEmpty
@@ -139,6 +208,12 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
         : SmartTextAssist(client: client, model: chatModelList.first),
     knowledgeModels: cloud ? chatModelList : const [],
     resolver: resolver,
+    ffmpegBinaryOf: () async {
+      final file = await (await components()).executable(
+        LocalComponentRegistry.ffmpeg,
+      );
+      return file?.path;
+    },
   );
 }
 

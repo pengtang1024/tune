@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/domain/models/localization_config.dart';
+import 'package:tune/domain/models/translation_provider.dart';
 
 /// What the endpoint could say about the account behind the key.
 ///
@@ -24,15 +26,22 @@ class TranslationBalance {
   });
 }
 
-/// Asks the known providers for the balance of their account.
+/// Asks the chosen provider for the balance of its account.
 Future<TranslationBalance> probeTranslationBalance({
-  required String baseUrl,
-  required String apiKey,
+  required TranslationProvider provider,
+  required ProviderCredential credential,
   Dio? dio,
 }) async {
   final now = DateTime.now();
-  final uri = Uri.tryParse(baseUrl.trim());
-  final host = uri?.host ?? '';
+  final api = provider.balance;
+  if (api == null) {
+    return TranslationBalance(
+      supported: false,
+      checkedAt: now,
+      message: AppStrings.instance.settingsLocalizationBalanceUnsupported,
+    );
+  }
+
   final client =
       dio ??
       Dio(
@@ -41,98 +50,18 @@ Future<TranslationBalance> probeTranslationBalance({
           receiveTimeout: const Duration(seconds: 15),
         ),
       );
+  final key = credential.apiKey.trim();
   final headers = {
-    if (apiKey.trim().isNotEmpty) 'Authorization': 'Bearer ${apiKey.trim()}',
+    if (key.isNotEmpty) 'Authorization': 'Bearer $key',
+    ...provider.extraHeaders,
   };
 
   try {
-    if (host.contains('deepseek')) {
-      final response = await client.get<Map<String, dynamic>>(
-        'https://api.deepseek.com/user/balance',
-        options: Options(headers: headers),
-      );
-      final infos = response.data?['balance_infos'];
-      final first = infos is List && infos.isNotEmpty ? infos.first : null;
-      if (first is Map) {
-        return TranslationBalance(
-          supported: true,
-          checkedAt: now,
-          amount: '${first['total_balance'] ?? ''}',
-          currency: '${first['currency'] ?? ''}',
-        );
-      }
-      return TranslationBalance(
-        supported: true,
-        checkedAt: now,
-        message: AppStrings.instance.settingsLocalizationBalanceNoField,
-      );
-    }
-
-    if (host.contains('moonshot')) {
-      final response = await client.get<Map<String, dynamic>>(
-        '${_root(baseUrl)}/users/me/balance',
-        options: Options(headers: headers),
-      );
-      final data = response.data?['data'];
-      if (data is Map) {
-        return TranslationBalance(
-          supported: true,
-          checkedAt: now,
-          amount: '${data['available_balance'] ?? ''}',
-          currency: 'CNY',
-        );
-      }
-      return TranslationBalance(
-        supported: true,
-        checkedAt: now,
-        message: AppStrings.instance.settingsLocalizationBalanceNoField,
-      );
-    }
-
-    if (host.contains('openrouter')) {
-      final response = await client.get<Map<String, dynamic>>(
-        'https://openrouter.ai/api/v1/credits',
-        options: Options(headers: headers),
-      );
-      final data = response.data?['data'];
-      if (data is Map) {
-        final total = (data['total_credits'] as num?)?.toDouble() ?? 0;
-        final used = (data['total_usage'] as num?)?.toDouble() ?? 0;
-        return TranslationBalance(
-          supported: true,
-          checkedAt: now,
-          amount: (total - used).toStringAsFixed(2),
-          currency: 'USD',
-        );
-      }
-      return TranslationBalance(
-        supported: true,
-        checkedAt: now,
-        message: AppStrings.instance.settingsLocalizationBalanceNoField,
-      );
-    }
-
-    if (host.contains('siliconflow')) {
-      final response = await client.get<Map<String, dynamic>>(
-        '${_root(baseUrl)}/user/info',
-        options: Options(headers: headers),
-      );
-      final data = response.data?['data'];
-      if (data is Map) {
-        final value = data['balance'] ?? data['totalBalance'];
-        return TranslationBalance(
-          supported: true,
-          checkedAt: now,
-          amount: '${value ?? ''}',
-          currency: 'CNY',
-        );
-      }
-      return TranslationBalance(
-        supported: true,
-        checkedAt: now,
-        message: AppStrings.instance.settingsLocalizationBalanceNoField,
-      );
-    }
+    final response = await client.get<Map<String, dynamic>>(
+      api.url,
+      options: Options(headers: headers),
+    );
+    return _read(api.parser, response.data, now);
   } on DioException catch (error) {
     return TranslationBalance(
       supported: true,
@@ -140,16 +69,73 @@ Future<TranslationBalance> probeTranslationBalance({
       message: _describe(error),
     );
   }
-
-  return TranslationBalance(
-    supported: false,
-    checkedAt: now,
-    message: AppStrings.instance.settingsLocalizationBalanceUnsupported,
-  );
 }
 
-String _root(String baseUrl) =>
-    baseUrl.trim().replaceFirst(RegExp(r'/+$'), '');
+TranslationBalance _read(
+  TranslationBalanceParser parser,
+  Map<String, dynamic>? data,
+  DateTime now,
+) {
+  switch (parser) {
+    case TranslationBalanceParser.deepseek:
+      {
+        final infos = data?['balance_infos'];
+        final first = infos is List && infos.isNotEmpty ? infos.first : null;
+        if (first is Map) {
+          return TranslationBalance(
+            supported: true,
+            checkedAt: now,
+            amount: '${first['total_balance'] ?? ''}',
+            currency: '${first['currency'] ?? ''}',
+          );
+        }
+      }
+    case TranslationBalanceParser.moonshot:
+      {
+        final payload = data?['data'];
+        if (payload is Map) {
+          return TranslationBalance(
+            supported: true,
+            checkedAt: now,
+            amount: '${payload['available_balance'] ?? ''}',
+            currency: 'CNY',
+          );
+        }
+      }
+    case TranslationBalanceParser.openrouter:
+      {
+        final payload = data?['data'];
+        if (payload is Map) {
+          final total = (payload['total_credits'] as num?)?.toDouble() ?? 0;
+          final used = (payload['total_usage'] as num?)?.toDouble() ?? 0;
+          return TranslationBalance(
+            supported: true,
+            checkedAt: now,
+            amount: (total - used).toStringAsFixed(2),
+            currency: 'USD',
+          );
+        }
+      }
+    case TranslationBalanceParser.siliconflow:
+      {
+        final payload = data?['data'];
+        if (payload is Map) {
+          final value = payload['balance'] ?? payload['totalBalance'];
+          return TranslationBalance(
+            supported: true,
+            checkedAt: now,
+            amount: '${value ?? ''}',
+            currency: 'CNY',
+          );
+        }
+      }
+  }
+  return TranslationBalance(
+    supported: true,
+    checkedAt: now,
+    message: AppStrings.instance.settingsLocalizationBalanceNoField,
+  );
+}
 
 String _describe(DioException error) {
   final strings = AppStrings.instance;

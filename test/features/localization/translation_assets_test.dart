@@ -24,6 +24,7 @@ void main() {
     model.writeAsStringSync(body);
     return TranslationAssets(
       root,
+      supportPath: temp.path,
       expectedModelBytes: bytes ?? model.lengthSync(),
       expectedModelSha256:
           sha ?? sha256.convert(model.readAsBytesSync()).toString(),
@@ -39,6 +40,7 @@ void main() {
   test('missing model is reported as missing', () async {
     final assets = TranslationAssets(
       Directory(path.join(temp.path, 'translation')),
+      supportPath: temp.path,
       expectedModelBytes: 4,
       expectedModelSha256: 'unused',
     );
@@ -90,15 +92,67 @@ void main() {
   });
 
   group('resolve', () {
-    test('prefers TUNE_TRANSLATION_DIR', () {
-      final override = path.join(temp.path, 'elsewhere');
+    test(
+      'returns TUNE_TRANSLATION_DIR as-is, even when a copy is installed',
+      () {
+        final override = path.join(temp.path, 'elsewhere');
+        final support = path.join(temp.path, 'support');
+        File(
+          path.join(support, 'translation', 'installed.json'),
+        ).createSync(recursive: true);
+
+        final assets = TranslationAssets.resolve(
+          executablePath: path.join(temp.path, 'app', 'tune'),
+          supportPath: support,
+          environment: {'TUNE_TRANSLATION_DIR': override},
+        );
+
+        expect(assets.root.path, override);
+        expect(assets.supportPath, support);
+        expect(assets.userInstalled, isFalse);
+      },
+    );
+
+    test('prefers an installed copy in the support directory', () {
+      final support = path.join(temp.path, 'support');
+      final installed = Directory(path.join(support, 'translation'))
+        ..createSync(recursive: true);
+      File(path.join(installed.path, 'installed.json')).writeAsStringSync('{}');
+      final executableDirectory = path.join(temp.path, 'bundle');
+      Directory(
+        path.join(executableDirectory, 'translation'),
+      ).createSync(recursive: true);
+
       final assets = TranslationAssets.resolve(
-        executablePath: path.join(temp.path, 'app', 'tune'),
-        supportPath: path.join(temp.path, 'support'),
-        environment: {'TUNE_TRANSLATION_DIR': override},
+        executablePath: path.join(executableDirectory, 'tune'),
+        supportPath: support,
+        environment: const {},
       );
 
-      expect(assets.root.path, override);
+      expect(assets.root.path, installed.path);
+      expect(assets.userInstalled, isTrue);
+    });
+
+    test('a model in the support directory counts as installed', () {
+      final support = path.join(temp.path, 'support');
+      final installed = Directory(path.join(support, 'translation'))
+        ..createSync(recursive: true);
+      File(
+        path.join(installed.path, 'models', TranslationAssets.modelFileName),
+      ).createSync(recursive: true);
+      final executableDirectory = path.join(temp.path, 'bundle');
+      Directory(
+        path.join(executableDirectory, 'translation'),
+      ).createSync(recursive: true);
+
+      final assets = TranslationAssets.resolve(
+        executablePath: path.join(executableDirectory, 'tune'),
+        supportPath: support,
+        environment: const {},
+      );
+
+      expect(assets.root.path, installed.path);
+      expect(assets.userInstalled, isTrue);
     });
 
     test('prefers the translation directory next to the executable', () {

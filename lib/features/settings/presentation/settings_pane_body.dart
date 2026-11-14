@@ -50,6 +50,7 @@ class SettingsSectionsBody extends StatelessWidget {
             : 1;
         final gap = CompactTokens.space8;
         final fullWidth = {
+          SettingsSection.components,
           SettingsSection.sourceHealth,
           SettingsSection.about,
         };

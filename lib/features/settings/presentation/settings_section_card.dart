@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/settings/presentation/settings_local_components_card.dart';
 import 'package:tune/features/settings/presentation/settings_permissions_card.dart';
 import 'package:tune/features/settings/presentation/settings_presets.dart';
 import 'package:tune/features/settings/presentation/settings_section_catalog.dart';
@@ -33,7 +34,8 @@ class SettingsSectionCard extends StatelessWidget {
       key: ValueKey('settings-card-${section.name}'),
       icon: settingsSectionIcon(section),
       title: settingsSectionLabel(context, section),
-      trailing: section == SettingsSection.permissions
+      trailing: section == SettingsSection.permissions ||
+              section == SettingsSection.components
           ? null
           : TextButton(
               key: ValueKey('settings-customize-${section.name}'),
@@ -49,6 +51,8 @@ class SettingsSectionCard extends StatelessWidget {
         children: [
           if (section == SettingsSection.permissions)
             const SettingsPermissionsCard(),
+          if (section == SettingsSection.components)
+            const SettingsLocalComponentsCard(),
           if (section == SettingsSection.sourceHealth)
             const SettingsSourceHealthCard(embedded: true),
           if (presets.isNotEmpty)

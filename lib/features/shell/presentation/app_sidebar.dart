@@ -24,12 +24,18 @@ class AppSidebar extends StatelessWidget {
     this.onNavigate,
   });
 
+  /// The width the rail takes in the shell.
+  ///
+  /// The shell paints the rail down to the bottom of the window, under the
+  /// dock, so it asks here for the width the rail itself uses.
+  static double widthFor({required bool compact}) => compact
+      ? CompactTokens.sidebarWidthCompact
+      : CompactTokens.sidebarWidth;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final width = compact
-        ? CompactTokens.sidebarWidthCompact
-        : CompactTokens.sidebarWidth;
+    final width = widthFor(compact: compact);
     final short = MediaQuery.sizeOf(context).height < 560;
 
     final cross = compact

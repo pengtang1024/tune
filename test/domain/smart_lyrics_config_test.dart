@@ -17,7 +17,7 @@ void main() {
       expect(config.asrModels, ['whisper-1']);
       expect(config.chatModel, 'gpt-4o-mini');
       expect(config.apiKey, isEmpty);
-      expect(config.localModel, 'tiny',
+      expect(config.localModel, 'small',
           reason: 'the local vote answers without any key or cloud');
       expect(config.isConfigured, isTrue,
           reason: 'a key is for the cloud, not a toll gate — the local '
@@ -107,7 +107,7 @@ void main() {
     });
 
     test('the local channel ships on and the reader may turn it off', () {
-      expect(const SmartLyricsConfig().localModel, 'tiny');
+      expect(const SmartLyricsConfig().localModel, 'small');
       expect(const SmartLyricsConfig(localModel: '').localModel, '');
       expect(
         const SmartLyricsConfig(localModel: 'base').localModel,

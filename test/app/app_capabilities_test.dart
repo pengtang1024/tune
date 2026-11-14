@@ -20,6 +20,10 @@ void main() {
     ], everyElement(isTrue));
     expect(capabilities.touchShell, isFalse);
     expect(capabilities.backgroundPlayback, isFalse);
+    // The desktop runs the downloaded binary in a child process and lets
+    // the system ffmpeg decode (docs/android.md E5).
+    expect(capabilities.localAsrBackend, LocalAsrBackend.process);
+    expect(capabilities.nativeAudioDecoder, isFalse);
   });
 
   test('Windows keeps the window and the one player on the machine', () {
@@ -63,6 +67,18 @@ void main() {
       // The notification that keeps the sound alive is part of the Android
       // milestone; iOS is not scheduled.
       expect(capabilities.backgroundPlayback, platform == AppPlatform.android);
+      // Android links the speech runtime into the app and decodes with
+      // MediaCodec; iOS has neither scheduled (docs/android.md E5).
+      expect(
+        capabilities.localAsrBackend,
+        platform == AppPlatform.android
+            ? LocalAsrBackend.ffi
+            : LocalAsrBackend.none,
+      );
+      expect(
+        capabilities.nativeAudioDecoder,
+        platform == AppPlatform.android,
+      );
     }
   });
 
@@ -72,6 +88,8 @@ void main() {
     expect(capabilities.platform, AppPlatform.other);
     expect(capabilities.isDesktop, isFalse);
     expect(capabilities.touchShell, isFalse);
+    expect(capabilities.localAsrBackend, LocalAsrBackend.none);
+    expect(capabilities.nativeAudioDecoder, isFalse);
   });
 
   test('the running build reports the platform it was built for', () {

@@ -222,13 +222,17 @@ class UpdateService {
   /// The archive of a release that belongs to [platform].
   ///
   /// The release names its archives after the platform they run on, so the
-  /// check never downloads a Windows build on a Linux machine.
+  /// check never downloads a Windows build on a Linux machine. Maintainer
+  /// offline archives end in `-offline` and are skipped: they are not update
+  /// attachments.
   static UpdateAsset? assetFor(
     List<UpdateAsset> assets, {
     required String platform,
   }) {
+    final needle = platform.toLowerCase();
     for (final asset in assets) {
-      if (asset.name.toLowerCase().contains(platform.toLowerCase())) {
+      final name = asset.name.toLowerCase();
+      if (name.contains(needle) && !name.contains('-offline')) {
         return asset;
       }
     }

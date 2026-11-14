@@ -7,6 +7,7 @@ import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_scanner_config.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/data/services/theme_service.dart';
+import 'package:tune/data/services/translation/translation_key_store.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
 import 'package:tune/domain/models/localization_config.dart';
@@ -18,7 +19,8 @@ import 'package:tune/utils/logger.dart';
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, SettingsState>((ref) {
       final persistence = ref.watch(persistenceServiceProvider);
-      return SettingsController(persistence);
+      final keyStore = ref.watch(translationKeyStoreProvider);
+      return SettingsController(persistence, keyStore: keyStore);
     });
 
 /// Owns user preferences that affect the app shell.
@@ -27,8 +29,9 @@ final settingsControllerProvider =
 /// preferences. This controller keeps only the settings that actually drive
 /// the compact player: theme, locale and custom scan paths.
 class SettingsController extends StateNotifier<SettingsState> {
-  SettingsController(this._persistence)
-    : _themeService = ThemeService(persistenceService: _persistence),
+  SettingsController(this._persistence, {TranslationKeyStore? keyStore})
+    : _keyStore = keyStore ?? TranslationKeyStore(),
+      _themeService = ThemeService(persistenceService: _persistence),
       super(
         SettingsState(
           themeMode: ThemeService(
@@ -60,7 +63,10 @@ class SettingsController extends StateNotifier<SettingsState> {
           sourcesMoreExpanded:
               _persistence.getBool('sources_more_expanded') ?? false,
           smartLyrics: _readSmartLyrics(_persistence),
-          localization: _readLocalization(_persistence),
+          localization: _readLocalization(
+            _persistence,
+            keyStore?.keys ?? const {},
+          ),
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
@@ -78,6 +84,7 @@ class SettingsController extends StateNotifier<SettingsState> {
 
   final PersistenceService _persistence;
   final ThemeService _themeService;
+  final TranslationKeyStore _keyStore;
 
   Future<void> setThemeMode(ThemeMode mode) async {
     if (state.themeMode == mode) return;
@@ -210,23 +217,34 @@ class SettingsController extends StateNotifier<SettingsState> {
   }
 
   /// Sets how missing metadata is translated into the interface language.
+  ///
+  /// The settings file keeps the switches and the chosen vendor; the keys go
+  /// to their own file, so the plain document never carries one.
   Future<void> setLocalization(LocalizationConfig config) async {
     state = state.copyWith(localization: config);
     await _persistence.setString('localization', jsonEncode(config.toJson()));
+    await _keyStore.write(config.keyMap);
   }
 
-  static LocalizationConfig _readLocalization(PersistenceService persistence) {
+  static LocalizationConfig _readLocalization(
+    PersistenceService persistence,
+    Map<String, String> keys,
+  ) {
     final raw = persistence.getString('localization');
-    if (raw == null || raw.trim().isEmpty) return const LocalizationConfig();
+    if (raw == null || raw.trim().isEmpty) {
+      return const LocalizationConfig().withKeys(keys);
+    }
     try {
       final decoded = jsonDecode(raw);
       if (decoded is Map) {
-        return LocalizationConfig.fromJson(Map<String, dynamic>.from(decoded));
+        return LocalizationConfig.fromJson(
+          Map<String, dynamic>.from(decoded),
+        ).withKeys(keys);
       }
     } catch (error, stackTrace) {
       Log.error('读取本地化配置失败: $error\n$stackTrace');
     }
-    return const LocalizationConfig();
+    return const LocalizationConfig().withKeys(keys);
   }
 
   static SourceHealthWeights _readSourceHealthWeights(

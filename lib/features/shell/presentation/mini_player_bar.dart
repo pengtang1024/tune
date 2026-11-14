@@ -13,10 +13,14 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The whole surface of the mini window.
 ///
-/// The bar keeps the track, the three actions of the transport and the way
-/// back to the normal form. It reads the slow half of the playback, so the
-/// clock does not rebuild it, and it draws no page: the pages of the shell
-/// stay mounted underneath while the window is small.
+/// The bar keeps the track, the three actions of the transport, the way back
+/// to the normal form and, in the mini window, the line that shows how far
+/// the track has come. It reads the slow half of the playback, so the clock
+/// does not rebuild it, and it draws no page: the pages of the shell stay
+/// mounted underneath while the window is small.
+///
+/// The mini window has no frame, so the bar is also the handle: a pointer
+/// drag on it moves the window.
 class MiniPlayerBar extends ConsumerWidget {
   /// Leaves the mini form and returns the window to the shell.
   final VoidCallback onRestore;
@@ -26,7 +30,22 @@ class MiniPlayerBar extends ConsumerWidget {
   /// leaves it null.
   final VoidCallback? onQueue;
 
-  const MiniPlayerBar({super.key, required this.onRestore, this.onQueue});
+  /// Starts moving the window. Only the mini window passes it: the bar is the
+  /// only place left to grab once the frame is gone.
+  final VoidCallback? onDrag;
+
+  /// Draws the progress line along the bottom edge. Only the mini window
+  /// passes true; on a phone the bar sits above the navigation bar, which
+  /// already shows where the track is going.
+  final bool showProgress;
+
+  const MiniPlayerBar({
+    super.key,
+    required this.onRestore,
+    this.onQueue,
+    this.onDrag,
+    this.showProgress = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,84 +62,140 @@ class MiniPlayerBar extends ConsumerWidget {
               ? context.loc.playerUnknownArtist
               : song.artist);
 
-    return Material(
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: CompactTokens.space12,
+        vertical: CompactTokens.space8,
+      ),
+      child: Row(
+        children: [
+          ArtworkThumb(
+            path: song?.albumArtPath,
+            imageUrl: song?.artworkUrl,
+            size: CompactTokens.artworkDock,
+            radius: CompactTokens.radius12,
+          ),
+          const SizedBox(width: CompactTokens.space10),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  artist,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CompactTypography.mono(
+                    theme.colorScheme.onSurfaceVariant,
+                    size: CompactTypeScale.mark,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: CompactTokens.space4),
+          _MiniIcon(
+            icon: Icons.skip_previous_rounded,
+            tooltip: context.loc.playerPrevious,
+            onPressed: overview.hasTrack ? controller.previous : null,
+          ),
+          _MiniPlayButton(
+            status: overview.status,
+            onPressed: overview.hasTrack && !overview.isLoading
+                ? controller.togglePlayPause
+                : null,
+          ),
+          _MiniIcon(
+            icon: Icons.skip_next_rounded,
+            tooltip: context.loc.playerNext,
+            onPressed: overview.hasTrack ? controller.next : null,
+          ),
+          if (onQueue != null)
+            _MiniIcon(
+              key: const ValueKey('mini-queue'),
+              icon: Icons.queue_music_rounded,
+              tooltip: context.loc.queueTitle,
+              onPressed: onQueue,
+            ),
+          _MiniIcon(
+            key: const ValueKey('mini-expand'),
+            icon: Icons.open_in_full_rounded,
+            tooltip: context.loc.playerExpandNowPlaying,
+            onPressed: onRestore,
+          ),
+        ],
+      ),
+    );
+
+    Widget bar = Material(
       color: theme.colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: CompactTokens.space12,
-          vertical: CompactTokens.space8,
-        ),
-        child: Row(
-          children: [
-            ArtworkThumb(
-              path: song?.albumArtPath,
-              imageUrl: song?.artworkUrl,
-              size: CompactTokens.artworkDock,
-              radius: CompactTokens.radius12,
-            ),
-            const SizedBox(width: CompactTokens.space10),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: CompactTypography.mono(
-                      theme.colorScheme.onSurfaceVariant,
-                      size: CompactTypeScale.mark,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: CompactTokens.space4),
-            _MiniIcon(
-              icon: Icons.skip_previous_rounded,
-              tooltip: context.loc.playerPrevious,
-              onPressed: overview.hasTrack ? controller.previous : null,
-            ),
-            _MiniPlayButton(
-              status: overview.status,
-              onPressed: overview.hasTrack && !overview.isLoading
-                  ? controller.togglePlayPause
-                  : null,
-            ),
-            _MiniIcon(
-              icon: Icons.skip_next_rounded,
-              tooltip: context.loc.playerNext,
-              onPressed: overview.hasTrack ? controller.next : null,
-            ),
-            if (onQueue != null)
-              _MiniIcon(
-                key: const ValueKey('mini-queue'),
-                icon: Icons.queue_music_rounded,
-                tooltip: context.loc.queueTitle,
-                onPressed: onQueue,
-              ),
-            _MiniIcon(
-              key: const ValueKey('mini-expand'),
-              icon: Icons.open_in_full_rounded,
-              tooltip: context.loc.playerExpandNowPlaying,
-              onPressed: onRestore,
-            ),
-          ],
+      child: showProgress
+          ? Column(
+              children: [
+                Expanded(child: row),
+                const _MiniProgress(),
+              ],
+            )
+          : row,
+    );
+
+    final drag = onDrag;
+    if (drag != null) {
+      bar = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onPanStart: (_) => drag(),
+        child: bar,
+      );
+    }
+    return bar;
+  }
+}
+
+/// How far the track has come, drawn as a hairline along the bottom edge.
+///
+/// The position moves several times a second, so this strip is the only thing
+/// that watches it: the title and the buttons above must not be rebuilt by
+/// the clock.
+class _MiniProgress extends ConsumerWidget {
+  const _MiniProgress();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final clock = ref.watch(
+      playbackControllerProvider.select(
+        (state) => (state.position, state.duration),
+      ),
+    );
+    return SizedBox(
+      key: const ValueKey('mini-progress'),
+      height: 2,
+      width: double.infinity,
+      child: ColoredBox(
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: FractionallySizedBox(
+          alignment: AlignmentDirectional.centerStart,
+          widthFactor: _progressOf(clock.$1, clock.$2),
+          child: ColoredBox(color: theme.colorScheme.primary),
         ),
       ),
     );
   }
+}
+
+double _progressOf(Duration position, Duration duration) {
+  if (duration.inMilliseconds <= 0) return 0;
+  return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
 }
 
 class _MiniPlayButton extends StatelessWidget {
