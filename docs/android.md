@@ -17,11 +17,12 @@
 | --- | --- | --- |
 | 工程入口 | 完整，可 `flutter build apk` | `android/` |
 | 权限声明 | `INTERNET`、`READ_MEDIA_AUDIO`、`READ_EXTERNAL_STORAGE(maxSdk 32)`、`POST_NOTIFICATIONS`、`WAKE_LOCK`、`FOREGROUND_SERVICE(_MEDIA_PLAYBACK)`；运行时申请走 `permission_handler` | `android/app/src/main/AndroidManifest.xml`、`lib/data/services/impl/permission_handler_mobile_permissions_service.dart` |
-| 能力表 | 移动端开 `touchShell` 与 `backgroundPlayback`；`externalToolPipeline` 与 `lyricsSheetBesideAudio` 为 false（见 §2 E3） | `lib/core/config/app_capabilities.dart` |
+| 能力表 | 移动端开 `touchShell` 与 `backgroundPlayback`；`externalToolPipeline` 与 `lyricsSheetBesideAudio` 为 false；本地 ASR 走 `localAsrBackend: ffi`，解码走 `nativeAudioDecoder: true`（见 §2 E3 / E5） | `lib/core/config/app_capabilities.dart` |
 | 后台播放 | `audio_service` 已接：前台服务、媒体按钮、通知与锁屏控制；队列仍由 `PlaybackController` 独占。模拟器上已验证通知、前台服务与媒体按键；重复播放与真机耳机键仍待验 | `lib/features/player/application/tune_audio_handler.dart`、`lib/main.dart`、`AndroidManifest.xml` |
 | 播放后端 | 官方 `just_audio`（ExoPlayer）；`audio_session` 已配播放类别与音频焦点 | `lib/data/services/impl/just_audio_player_service.dart` |
 | 本地扫描 | MediaStore：`MethodChannel('cn.iouf.tune/media_store')` 查系统媒体库，行转 `Song` 时 `uri` 保 `content://`；目录遍历在 Android 上不再使用。读者选了文件夹时改读 SAF 树（`cn.iouf.tune/saf`） | `lib/data/services/impl/media_store_music_scanner.dart`、`lib/data/services/impl/saf_music_scanner.dart`、`android/app/src/main/java/cn/iouf/tune/MainActivity.java` |
 | 窄屏外壳 | 手机宽度走底部导航 + 紧凑播放条；队列是底部抽屉；正在播放页竖排 | `lib/features/shell/presentation/compact_shell.dart`、`app_bottom_bar.dart` |
+| 本地智能歌词 | `localAsrBackend: ffi` + `nativeAudioDecoder: true`；SenseVoice / whisper ONNX 已在 AVD 出词，解码走 MediaCodec，不随包 FFmpeg（见 §2 E5） | `lib/data/services/smart_lyrics/sherpa_ffi_transcriber.dart`、`android/app/src/main/java/cn/iouf/tune/AudioDecodeChannel.java` |
 | 单实例 | 移动端不参与：`AppCapabilities.singleInstance` 为 false | `lib/data/services/providers/desktop_service_providers.dart` |
 
 构建注意：本机默认 Java 25 与 Gradle 8.14.3 不兼容，Android 构建要显式换 JDK 21：
@@ -64,8 +65,9 @@ JAVA_HOME=~/.jdks/ms-21.0.12.1 /opt/flutter/bin/flutter build apk --debug
 已知环境限制：本机 AVD 用 `-no-audio` 起，`PlaybackState` 已是 `PLAYING`、
 控制按钮正确，但位置不推进（音频渲染停顿），「进度是否走完」需真机或带音频的模拟器复核。
 
-另见（不属 E1，已在 E3 处理）：智能歌词的 ffmpeg 与本地引擎在 Android 上不可用，现由能力位
-`externalToolPipeline` 一次性关掉，见 §2 E3 的「移动端的本地工具边界」。
+另见（不属 E1，已在 E3 / E5 处理）：智能歌词的 ffmpeg 与本地可执行程序在 Android 上不可用，
+现由能力位 `externalToolPipeline` 一次性关掉；本地 ASR 改走应用内 FFI，解码改走 MediaCodec，
+见 §2 E5。
 
 ### E2 权限
 
@@ -148,15 +150,19 @@ AVD 证据（2026-11-12）：切到专辑视图拉取远程封面后，`/data/us
 
 #### 移动端的本地工具边界（ffmpeg 与本地引擎）
 
-结论：**Android 上 ffmpeg 根本不可用**，不是路径或权限写错。应用不能执行随包附带的
-外部二进制（`Process.run` 一律 `Permission denied`），系统也不带 ffmpeg；每次转码都是一次
-必败尝试，于是每首歌刷一遍 logcat 并吃掉 CPU。
+结论：**Android 上外部程序不可执行**，不是路径或权限写错。应用不能执行随包附带的外部二进制
+（`Process.run` 一律 `Permission denied`），系统也不带 ffmpeg；每次转码都是一次必败尝试，于是
+每首歌刷一遍 logcat 并吃掉 CPU。
 
 处理：
 
-- 已有能力位 `externalToolPipeline`（今天只有 Linux 为真）现在真正接成了「能不能调用本机
-  外部程序」的唯一事实来源。智能歌词在它为 false 时直接跳过转码（WAV 才转，其余原样交给
-  引擎），也不创建 `SherpaLocalEngine` / `WhisperLocalEngine`，进程内只记一条 info。
+- 能力位 `externalToolPipeline`（今天只有 Linux 为真）是「能不能调用本机外部程序」的唯一事实
+  来源。智能歌词在它为 false 时不走 `whisper-cli` / `sherpa-onnx-offline` 子进程，也不做
+  ffmpeg 转码。
+- 本地 ASR 不走外部程序：E5 起 Android 用 `localAsrBackend: ffi`（`sherpa_onnx` 包）在进程内
+  跑同一批模型；子进程后端仍只服务 Linux / Windows。
+- 需要解码的音频不再交给 ffmpeg：E5 起 Android 用 `nativeAudioDecoder: true`
+  （MediaCodec → 16 kHz 单声道 WAV）承担「转码后才能喂模型」的那一段。
 - `ProcessException` 仍作为兜底：桌面缺 ffmpeg 时也只记一次、后续不再试。
 
 另一条同源的边界：词稿写在音频旁，Android 共享存储对应用只读。能力位
@@ -188,15 +194,72 @@ SAF 曲目要真正生成词稿还差音频复制（见 §5.3 末尾），那与
   来源筛选/计数/筛选/排序/视图切换在第二行，排序按钮只留箭头图标。表格列头不再被裁切。
 - 遗留：无。
 
+### E5 本地 ASR 与系统解码（2026-11-14）
+
+目标：Android 上没有外部程序，本地智能歌词仍要能出词；需要转码的曲目不再依赖 ffmpeg。
+
+能力位（唯一判断入口，UI 与控制器不散写平台判断）：
+
+| 能力位 | Linux | Android | 作用 |
+| --- | --- | --- | --- |
+| `localAsrBackend` | `process` | `ffi` | 选本地 ASR 后端：子进程（`sherpa-onnx-offline` / `whisper-cli`）或应用内 FFI（`sherpa_onnx` 包） |
+| `nativeAudioDecoder` | false | true | 是否需要把压缩音频交给系统解码器转 16 kHz 单声道 WAV |
+| `externalToolPipeline` | true | false | 桌面专用编码/子进程路径，语义不变 |
+
+两条链路：
+
+- **ASR**：`SherpaFfiTranscriber`（`lib/data/services/smart_lyrics/`）懒建
+  `sherpa.OfflineRecognizer`，模型直接从统一组件目录读：SenseVoice（默认中文快锚）、
+  Fun-ASR-Nano（可选第三家族）、whisper ONNX（Android 专用组件）。桌面仍走
+  `SherpaProcessTranscriber` / `WhisperLocalEngine`，行为未改。
+- **解码**：`MediaCodecAudioDecoder` 走 `MethodChannel('cn.iouf.tune/audio_decode')`，
+  原生 `AudioDecodeChannel` 用 MediaExtractor + MediaCodec 解出 PCM，下混单声道，
+  线性插值重采样到 16 kHz，写 44 字节 WAV 头。支持 `content://` 与普通路径；
+  120 s 看门狗，解不出来就返回 false，由服务记一条 `系统解码失败` 并把原始音频交给引擎
+  （不静默当成功）。不随包 FFmpeg。
+
+组件（全部走既有 registry / installer / `<support>/components/<id>`）：
+
+- `lyrics-whisper-onnx-model`（仅 Android）：`small-encoder.int8.onnx` 112,442,483 B、
+  `small-decoder.int8.onnx` 262,226,114 B、`small-tokens.txt` 816,730 B，sha256 与
+  registry 常量逐一对上（下载后本地 `sha256sum` 核对）。
+- `lyrics-sensevoice-model`、`lyrics-funasr-nano-model` 两端共用；`lyrics-sherpa-runtime`
+  与 4 个 ggml whisper 模型标为 Linux / Windows 专用，Android 设置页不再列出。
+
+AVD 实测（2026-11-14，`tune-api35` API 35 x86_64，`-no-window -no-audio
+-gpu swiftshader_indirect`，debug 构建，集成测试 `integration_test/android_local_asr_test.dart`）：
+
+| 步骤 | 音频 | 耗时 | 结果 |
+| --- | --- | --- | --- |
+| MediaCodec 解码 | AAC 44.1 kHz 单声道 5.5 s | 221 ms | 176,100 B PCM（16 kHz / 单声道 / 16-bit） |
+| SenseVoice FFI | 同上 WAV | 1,257 ms | 出词「开班时间早上九点至 / 下午五点」，语言标签 `<|yue|>` |
+| whisper ONNX FFI | 同上 WAV | 4,022 ms | 出词「(時間早上起午點,至下午五點)」，语言 `zh` |
+
+已知限制与失败点：
+
+- **whisper ONNX 没有词级时间**：sherpa-onnx 发布的 whisper 模型不带 cross-attention 输出，
+  `enableTokenTimestamps` 返回空数组（桌面 CLI 同样为空）。当前按音频时长等间隔近似，
+  与 Fun-ASR-Nano 同口径；文本仍是有效票，时间只作弱证据。已如实写进
+  [`docs/smart-lyrics.md`](smart-lyrics.md) M13，没有把它当真实对齐。
+- **SenseVoice 语言标签是模型输出，不是我们的映射**：同一模型、同一音频在桌面 CLI 上
+  也返回 `"lang": "<|yue|>"`；Dart 侧原样透传，且 `TranscriptionResult.language` 目前没有
+  消费方（不参与分票、不写词稿头注、不触发翻译），没有行为影响。
+- 未验：Fun-ASR-Nano 在 Android 上的 FFI 实跑（模型 948 MB，本轮未推）；真机
+  （非模拟器）上的耗时与内存；MediaStore 行仍无词稿落点，本地票只在 SAF 曲目上跑通。
+- FFI 的代价是失去进程隔离：原生崩溃会带走应用。D1 已按 Android 接受这一点；
+  Linux 继续保留子进程。
+
 ## 3. 风险
 
 - 真机缺口：本机有本地 AVD（`/dev/kvm` 可用），能验通知、前台服务、媒体按键与权限弹窗；
   耳机实体按键、锁屏视觉、真实厂商 ROM 的行为只能在真机上验。
 - 通知与队列的双主风险：这是 E1 选 `audio_service` 的原因。
 - content URI 与现有文件路径假设的冲突：E3 的主要工作量，不是插件换一下就能完。
-- 共享存储只读：扫描能读，写（词稿、旁挂文件）要 SAF。S2 已把智能词稿写进 SAF 树，MediaStore
-  行仍由 `canWriteSheet` 判为无落点；SAF 曲目的音频复制与词稿读回未做。封面缓存已改到应用
-  私有目录，不在这一条里。
+- 共享存储只读：扫描能读，写（词稿、旁挂文件）要 SAF。S2 已把智能词稿写进 SAF 树，S3 已补
+  `content://` 音频复制与词稿读回；MediaStore 行仍由 `canWriteSheet` 判为无落点。封面缓存
+  已改到应用私有目录，不在这一条里。
+- FFI 失去崩溃隔离：Android 上的本地 ASR 与应用同进程，坏模型或原生越界会直接杀应用；
+  子进程隔离只在 Linux / Windows 保留（D1）。
 - Android 构建的 JDK 版本：默认 Java 25 跑不了 Gradle 8.14.3，命令里带 `JAVA_HOME`。
 
 ## 4. 已拍板
@@ -364,8 +427,9 @@ SAF 曲目要真正生成词稿还差音频复制（见 §5.3 末尾），那与
   `readSheet` 读回词稿，并断言缓存里没有残留的 `tune_smart_audio_*` 目录。
   `adb shell ls -l` 显示 `/sdcard/Music/TuneSaf/Saf_One.smart.lrc`（113 B），`cat` 为
   `[tune:smart]` / `[votes:1]` / `[src:cloud:test-asr]` / `[00:00.50]SAF 生成验证`。
-  已知限制：模拟器没有云端 ASR key，也没有本地引擎，真实转写结果只能在配好 key 的机器上核；
-  本步验的是「复制 → 上行 → 投票 → 落盘 → 读回」这条链路，不是识别质量。
+  已知限制：该测试用设备内网页端点代替云端 ASR（模拟器没有云端 ASR key），验的是
+  「复制 → 上行 → 投票 → 落盘 → 读回」这条链路，不是识别质量；本地引擎的真实出词已由
+  §2 E5 的 `integration_test/android_local_asr_test.dart` 在同一 AVD 上补齐。
 - 风险：SAF 逐层列目录比 MediaStore 慢，500 首要先量；`DocumentsContract` 在不同厂商 ROM
   上对 `mime_type` 的返回不一致；写权限被收回后不能继续把词稿标成成功；数十分钟的播客
   整份复制进缓存的时间与空间占用未在真机量过。

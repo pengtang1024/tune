@@ -241,17 +241,19 @@
 
 ## 8. 拍板项与结论
 
-> D1–D9 与 D10–D13 均已拍板。默认值（D4–D6、D8 等）已在代码中落地，Android FFI 与 MediaCodec（D1、D2、D7）已接受但尚未实施；见下表「结论」列与表后说明。
+> D1–D9 与 D10–D13 均已拍板。默认值（D4–D6、D8 等）已在代码中落地；D1、D2、D7 已于
+> 2026-11-14 在 Android 上落地（`sherpa_onnx` FFI + MediaCodec，AVD 实测），见下表「结论」列
+> 与表后说明。
 
 | 编号 | 选项 | 建议 | 影响 | 结论 |
 | --- | --- | --- | --- | --- |
-| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 | **已接受**：Linux 保持子进程；Android 走 FFI（尚未实施） |
-| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 | **已接受**：Android ASR 用 `sherpa_onnx`（尚未实施） |
+| D1 | ASR/翻译的运行时形态 | **Linux 保留子进程 + Android 新增 FFI**；若追求单一代码路径，再考虑两端统一 FFI | 决定 Android 能否有本地 AI；决定是否牺牲 Linux 的崩溃隔离 | **已接受，已落地（Android）**：Linux 保持子进程；Android 走 `localAsrBackend: ffi`，桌面路径未改 |
+| D2 | Android ASR 用哪个 FFI 运行时 | `sherpa_onnx`（一个包覆盖 Whisper/SenseVoice/Paraformer/Zipformer/VAD） | 少一个原生依赖 vs whisper.cpp 的极限性能 | **已接受，已落地**：`sherpa_onnx` 2.0.1；SenseVoice 1.26 s / whisper ONNX 4.02 s（5.5 s 音频，AVD） |
 | D3 | 是否接受 SenseVoice 的自定义权重协议 | 接受则补署名与法务确认；不接受则换 Fun-ASR-Nano（推荐）或 Paraformer（会丢时间戳，见 D13） | 影响默认中文模型与许可证姿态 | **已接受**：接受 SenseVoice 自定义协议并保留为默认中文快锚，补署名与法务确认 |
 | D4 | 默认 ASR 档位 | Whisper small + SenseVoice int8 常开；低配 `base`；`tiny` 只作最低占用 | 影响首包体积、内存与识别质量 | **已接受，已落地**：Whisper `small` 为默认 ASR，`base`/`tiny` 作为低配档可选 |
 | D5 | 是否提供 `large-v3-turbo` 可选质量包 | 提供，默认不下载 | 影响质量上限与大文件下载体验 | **已接受，已落地**：`large-v3-turbo` 仅作可选组件，不默认下载 |
 | D6 | 翻译默认模型 | Qwen3-0.6B 先 A/B；保留 0.5B 低配；1.5B 可选 | 影响质量、内存与组件包大小 | **已接受，已落地**：翻译默认 Qwen3-0.6B，Qwen2.5-0.5B 低配、1.5B 质量包可选 |
-| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 | **已接受**：Android 解码走 MediaCodec（尚未实施） |
+| D7 | Android 解码是否现在做 MediaCodec | 现在做 | 决定 Android 上 m4a（约 16% 库）能否有本地票 | **已接受，已落地**：`nativeAudioDecoder: true`，MediaCodec → 16 kHz WAV；5.5 s AAC 解码 221 ms（AVD） |
 | D8 | Linux 是否随包 FFmpeg | 不随包；若做 AppImage/Flatpak 再按 LGPL 构建 | 决定包体与 GPL/LGPL 义务 | **已接受，已落地**：Linux 解码维持系统 FFmpeg，不随包 |
 | D9 | 是否引入 Opus-MT 快车道 | 暂不 | 避免逐语言对模型组合与双引擎维护 | **已接受**：不引入 Opus-MT |
 | D10 | 是否接入阿里云 ASR | **暂不接**；保持现有云端通道 | 接它要新增 DashScope 适配器与上传链路，且要处理整首歌上传的隐私/版权 | **已否决**：不接入阿里云 ASR；云端仍走现有 OpenAI 兼容通道 |
@@ -266,7 +268,17 @@ D4–D6、D8 的默认值已经是代码的现状，文档不再停在「建议�
 - **D4 默认 ASR**：[smart_lyrics_config.dart](../lib/domain/models/smart_lyrics_config.dart) 的 `localModel` 默认 `small`；`base` / `tiny` 仍在可选档位里，只作低配与最低占用。
 - **D5 可选质量包**：[local_component_registry.dart](../lib/data/services/components/local_component_registry.dart) 把 `ggml-large-v3-turbo.bin` 注册为独立组件；[settings_smart_lyrics_local_section.dart](../lib/features/settings/presentation/settings_smart_lyrics_local_section.dart) 注明它「never the default」。
 - **D6 翻译默认**：同一注册表里 `translationModel` 默认 Qwen3-0.6B（`Qwen3-0.6B-Q8_0.gguf`），`translationModelLow` 保留 Qwen2.5-0.5B，`translationModelQuality` 为 1.5B。
-- **D8 Linux 解码**：仍走系统 FFmpeg，不随包；Android 的 MediaCodec（D7）与新 FFI 后端（D1、D2）尚未实施，等 Android 里程碑落代码时再补对应实现说明。
+- **D8 Linux 解码**：仍走系统 FFmpeg，不随包。
+- **D1 / D2 Android FFI**：[app_capabilities.dart](../lib/core/config/app_capabilities.dart) 暴露
+  `localAsrBackend`（Linux `process` / Android `ffi`），控制器只按这个能力位选
+  `SherpaProcessTranscriber` 或 `SherpaFfiTranscriber`；模型仍走统一组件目录。AVD 实测
+  SenseVoice 5.5 s 音频 1,257 ms、whisper ONNX 4,022 ms。
+- **D7 Android MediaCodec**：`nativeAudioDecoder` 为真的平台注入
+  `MediaCodecAudioDecoder`（`cn.iouf.tune/audio_decode`），解到 16 kHz 单声道 WAV 再喂 ASR；
+  失败记一条日志后把原始音频交给引擎，不静默降级。5.5 s AAC 解码 221 ms。
+- **whisper ONNX 的时间轴**：sherpa-onnx 发布的 whisper ONNX 模型不带 cross-attention 输出，
+  `enableTokenTimestamps` 为空（桌面 CLI 同样为空）；Android 侧按音频时长等间隔近似，
+  与 Fun-ASR-Nano 同口径，只作弱证据。详见 [`docs/android.md`](android.md) E5。
 
 ## 9. 参考来源
 

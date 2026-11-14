@@ -1,6 +1,6 @@
 # 智能歌词（字幕）方案
 
-> 状态：**方案已评审通过，M0–M12 已实施 + 产品口径三改（2026-10-30 收口）**（2026-10-28：M0 `has_lyrics` 基线账本 +
+> 状态：**方案已评审通过，M0–M13 已实施 + 产品口径三改（2026-10-30 收口）**（2026-10-28：M0 `has_lyrics` 基线账本 +
 > 设置卡「歌词覆盖」；M1 引擎接口、票池共识纯逻辑、贴钥匙配置与「智能生成」置灰态；
 > M2 单曲闭环——凑票共识（人写票先问，一致即写——每首有词）、云端 ASR 通道
 > （OpenAI 兼容 `verbose_json`，草稿纠错失败按原稿入池）、知识票（重建不落时间）、
@@ -41,6 +41,11 @@
 > 可选第三家族（D12 已接受）：Fun-ASR-Nano 复用同一 sherpa-onnx 运行时与分片逻辑，
 > 模型作为独立组件 `lyrics-funasr-nano-model` 由读者手动下载；**不默认下载、不进默认两票**，
 > 装好后票池才多出 `local:funasr-nano`。它的 token 时间是等间隔近似，不是真实词级对齐。
+> M13 Android 本地票（2026-11-14）：新增 `localAsrBackend`（Linux `process` / Android `ffi`）与
+> `nativeAudioDecoder` 两个能力位；Android 用随包 `sherpa_onnx` FFI 跑 SenseVoice / Fun-ASR-Nano /
+> whisper ONNX，压缩音频由 MediaCodec 解到 16 kHz WAV（不随包 FFmpeg）。whisper 的 ONNX 导出
+> 没有 cross-attention，token 时间按音频时长等间隔近似，只作弱证据；文本票照常参与共识。
+> 桌面路径完全未改（仍子进程 + 系统 FFmpeg）。AVD 实测见 [`docs/android.md`](android.md) E5。
 > 人写共享库候选评估已量实并经法务口径复核（2026-10-29，见杠杆一表：**接入门槛=公开授权 API 或知识共享协议，一票否决**；网易云/酷我/酷狗/QQ 私有端点全部出局，Gecimi 已死；人写票池维持 LRCLIB + 读者自带词稿，中文流行曲缺口由知识票与读者贡献补）。人写票源不另起接口：直接用现有
 > `LyricsProvider`（§5.1 的先例），新共享库只加实现，不改三段取词。
 > 上位文档：[架构契约](architecture.md)、[歌词](lyrics.md)、[音源设计](../需求/音源设计.md)、
@@ -211,24 +216,28 @@ LyricsController._lyricsFor(song)
 | 跨 feature 不碰 presentation | `features/smart_lyrics` 只 import player 的 application/domain；面板上的标记动作由 player 侧的挂点回调 |
 | service 不依赖 Riverpod、不 import `features/` | `SmartLyricsService` 放 `data/services/smart_lyrics/`，只编排 I/O，状态归 controller |
 | 状态只有一个主人 | 生成/批量的**结果**经 `LyricsController` 进 `LyricsState`；不持有第二份歌词状态，`SmartLyricsController` 只持有进度；标记归 `SmartLyricsTaskStore` |
-| UI 线程不做同步 I/O / 重活 | 云端走 dio 异步；本地引擎是子进程；共识对齐在主 isolate 直接算（纯逻辑，毫秒级，未用 isolate）；批量 3 路 worker 全程后台，下载与转写重叠 |
+| UI 线程不做同步 I/O / 重活 | 云端走 dio 异步；本地引擎是子进程（桌面）/ FFI（Android）；共识对齐在主 isolate 直接算（纯逻辑，毫秒级，未用 isolate）；批量 3 路 worker 全程后台，下载与转写重叠 |
 | 每操作不做写放大 | 单曲成功写一个 `.smart.lrc` + 任务表一行状态更新；标记是任务表一行更新，不碰词稿文件 |
 | 库不入内存 | 批量队列、账本与标记存 SQLite（`smart_lyrics_tasks` / `smart_lyrics_marks` 表），按需取，统计在数据库里算 |
 
-### 5.3 平台边界（2026-11-12）
+### 5.3 平台边界（2026-11-12，2026-11-14 补 Android 本地票）
 
-这条流水线要两样移动端没有的东西，由 `AppCapabilities` 两个能力位表达，Android 上均为 false：
+这条流水线在桌面上依赖本机外部程序，Android 上没有。用 `AppCapabilities` 的能力位表达，
+平台判断只出现一次：
 
-| 能力位 | 指什么 | 为 false 时 |
+| 能力位 | 指什么 | Android |
 | --- | --- | --- |
-| `externalToolPipeline` | 能否调用本机外部程序（ffmpeg 转码、whisper / sherpa 二进制） | 跳过转码，原样喂引擎；不创建本地引擎通道，不逐首失败 |
-| `lyricsSheetBesideAudio` | 非 SAF 曲目的默认落点（能否把词稿写到音频旁） | 自动补词与批量不启动；单曲生成改问 `LibraryPaths.canWriteSheet(song)`（S2） |
+| `externalToolPipeline` | 能否调用本机外部程序（ffmpeg 转码、whisper / sherpa 二进制） | false：不创建子进程引擎；桌面专用路径 |
+| `lyricsSheetBesideAudio` | 非 SAF 曲目的默认落点（能否把词稿写到音频旁） | false：自动补词与批量不启动；单曲生成改问 `LibraryPaths.canWriteSheet(song)`（S2） |
+| `localAsrBackend` | 本地 ASR 的后端形态（`none` / `process` / `ffi`） | `ffi`：随包 `sherpa_onnx` 进程内识别（M13） |
+| `nativeAudioDecoder` | 是否需要系统解码器把压缩音频转 16 kHz WAV | true：MediaCodec（M13），不随包 FFmpeg |
 
 Android 不能执行随包的外部二进制（`Process.run` 一律 `Permission denied`），共享存储对应用只读。
 S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeSheet`）；MediaStore 行仍没有
 落点。S3 起 `content://` 曲目先经原生 `copyAudio` 整份复制到应用私有缓存再交给引擎，跑完删除
-副本；写进树的词稿经 `readSheet` 读回，面板能显示。单曲链路因此完整，批量与自动补词在 Android
-仍整体停用（逐首复制音频的代价未量）。现场与验证见 [`docs/android.md`](android.md) 的 §5。
+副本；写进树的词稿经 `readSheet` 读回，面板能显示。M13 起本地票在 Android 上可出词：FFI 引擎
+读统一组件目录，解码走 MediaCodec。单曲链路因此完整，批量与自动补词在 Android 仍整体停用
+（逐首复制音频的代价未量）。现场与验证见 [`docs/android.md`](android.md) 的 §5 与 §2 E5。
 
 ## 6. 技术路线评估
 
@@ -247,11 +256,12 @@ S2 起词稿可以写进用户选中的 SAF 树（`cn.iouf.tune/saf` 的 `writeS
 
 | | |
 | --- | --- |
-| 形态 | 二进制 + ggml 模型（tiny/base/small 75–466 MB，large-v3-turbo 约 1.5 GB 可选）由 app 下载到应用支持目录，含校验和；**系统已装 `whisper-cli` 则直接用，下载只是兜底**；不进 FFI，进程边界隔离崩溃 |
+| 形态 | 二进制 + ggml 模型（tiny/base/small 75–466 MB，large-v3-turbo 约 1.5 GB 可选）由 app 下载到应用支持目录，含校验和；**系统已装 `whisper-cli` 则直接用，下载只是兜底**；桌面不进 FFI，进程边界隔离崩溃（Android 例外，见下行） |
 | 解码 | **2026-10-30 修正：不捆绑 ffmpeg，但系统已装时用它转 16k 单声道 WAV** 再喂本地引擎。原因：`whisper-cli` 能吃 flac/mp3/ogg/wav，却对 m4a/mp4 退出（exit 11）；sherpa-onnx 只认 WAV；读者库里约 16% 是 m4a，不转码这些歌永远没有本机票。没有 ffmpeg 的机器退回原样喂入：whisper 能读的照读，读不了的通道软失败、健康度熔断。不下载、不随包、不新增运行时依赖。 |
 | 速度 | CPU 上 4 分钟歌约 0.5–3 分钟（tiny→base）；批量 2000 首是「过夜」量级，GPU 快一个量级 |
 | 隐私 | 零外发；引擎与模型下载（含校验和）是唯一一次网络行为 |
 | M4 已落地 | `WhisperLocalEngine`（子进程转写，`requestCancel` 可中途杀掉，产物只在干净退出后读、成败都清理）+ `WhisperAssets`（系统 PATH 优先、可执行位判定、app 目录兜底）+ `WhisperModelStore`（从 whisper.cpp 官方模型仓下载，sha256 对照官方 tree API 的 LFS 清单，不符即销毁）；设置卡「本地引擎」下拉选模型 + 「下载模型」按钮，`local:<模型名>` 作为一张永远免费的机器票进池 |
+| Android（M13） | 没有 `whisper-cli` 可执行文件，改走 `sherpa_onnx` FFI + ONNX whisper（`lyrics-whisper-onnx-model`）：编码/解码器 int8 合计约 375 MB，`localAsrBackend: ffi` 选后端，解码由 MediaCodec 转 16 kHz WAV。该导出没有 cross-attention，拿不到 token 时间，按音频时长等间隔近似（弱证据，文本票照常参与共识）。AVD 实测 5.5 s 音频 4.0 s 出词。桌面仍用本节的子进程路径，行为不变 |
 | M12 已落地 | **第二 ASR 家族（SenseVoice via sherpa-onnx）**：运行时 Apache-2.0，权重按 FunASR 模型开源协议 v1.1（不是 Apache/MIT，商用前需按该协议确认）；`SherpaLocalEngine` 子进程转 stdout JSON，按词级起止的**静默间隙切行**（与 whisper 段模型是两种独立计时法）；id `local:sensevoice` 与 whisper 家族天然独立互证；本机真音频验证 9 段带真实时刻；装于 `~/.local/opt/sherpa-onnx`，未装的机器该通道软失败、健康度挂起 |
 | M12 护栏（2026-10-30） | 编码器**非流式**：自注意力是 T×T，内存随时长**平方**增长。2549 s 的合法 16 kHz 单声道 WAV 让 `/encoder/encoders0.0/self_attn/MatMul` 要 28.9 GB（T=42483），ONNX Runtime 的 BFC arena 再向内核要 128 GiB，本机因此三次全局 OOM、桌面版 IPC 断链。现在两道墙：`WavFile` 先读 RIFF 头（`fmt`/`data` 长度必须与文件相符、必须 16 kHz 单声道 PCM，否则软失败）+ 按 5 分钟切片（2549 s 峰值 1.8 GB），每片跑在 `systemd-run --scope -p MemoryMax=4G -p MemorySwapMax=0` 里，越界只死自己。**长音频（>10 分钟）**先跑切片 SenseVoice，拿到词后跳过 whisper 段模型——一小时播客的 whisper 要数分钟 CPU，第二票的边际收益很低；sherpa 失败或无声时 whisper 仍作兜底 |
 | 结论 | **免费票**与异构第二票：一个按钮装好，装了就永远有一票不花钱 |
