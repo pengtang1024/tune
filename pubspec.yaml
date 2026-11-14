@@ -105,6 +105,7 @@ dependencies:
   audio_service: ^0.18.19
   # Runtime permissions on Android: notification and media read.
   permission_handler: ^12.0.3
+  sherpa_onnx: ^2.0.1
 
 # 上游 Buffer.read 无界分配（损坏标签可声明 GB 级帧），本地补丁见
 # vendor/audio_metadata_reader/VENDORED.md。
@@ -141,6 +142,9 @@ flutter:
   # 添加assets配置
   assets:
     - assets/icons/
+    # 5.5 s of Mandarin speech; the Android integration test decodes it with
+    # MediaCodec and transcribes it locally (docs/android.md E5). ~24 KB.
+    - assets/test/
     - LICENSE
     - THIRD_PARTY_NOTICES.md
     - assets/fonts/Fraunces/OFL.txt

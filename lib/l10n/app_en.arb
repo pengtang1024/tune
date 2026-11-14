@@ -1897,6 +1897,7 @@
   "settingsLocalComponentWhisperTiny": "Whisper model tiny",
   "settingsLocalComponentWhisperBase": "Whisper model base",
   "settingsLocalComponentWhisperSmall": "Whisper model small",
+  "settingsLocalComponentWhisperOnnxSmall": "Whisper model small (ONNX, in-app)",
   "settingsLocalComponentWhisperLargeTurbo": "Whisper model large-v3-turbo",
   "settingsLocalComponentSherpaRuntime": "Sherpa-onnx runtime (SenseVoice / Fun-ASR-Nano)",
   "settingsLocalComponentSensevoiceModel": "SenseVoice model",

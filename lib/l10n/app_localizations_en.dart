@@ -4275,6 +4275,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalComponentWhisperSmall => 'Whisper model small';
 
   @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper model small (ONNX, in-app)';
+
+  @override
   String get settingsLocalComponentWhisperLargeTurbo =>
       'Whisper model large-v3-turbo';
 

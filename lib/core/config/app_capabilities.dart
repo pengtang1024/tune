@@ -3,6 +3,14 @@ import 'package:tune/core/config/platform_constants.dart';
 /// The platform a build runs on, as far as the shell cares.
 enum AppPlatform { linux, windows, android, ios, other }
 
+/// How this build runs a local speech engine.
+///
+/// `process` starts the downloaded binary for every piece of audio and keeps
+/// a crash on the other side of a process boundary; `ffi` loads the runtime
+/// into the app because a phone may not execute an external binary; `none`
+/// leaves the local votes to the other channels.
+enum LocalAsrBackend { none, process, ffi }
+
 /// What this build actually wires up on the platform it runs on.
 ///
 /// A capability is not a promise of the platform: it says whether the code in
@@ -22,6 +30,8 @@ class AppCapabilities {
     required this.defaultPlayer,
     required this.autoUpdate,
     required this.externalToolPipeline,
+    required this.localAsrBackend,
+    required this.nativeAudioDecoder,
     required this.lyricsSheetBesideAudio,
     required this.touchShell,
     required this.backgroundPlayback,
@@ -41,6 +51,8 @@ class AppCapabilities {
           defaultPlayer: true,
           autoUpdate: true,
           externalToolPipeline: true,
+          localAsrBackend: LocalAsrBackend.process,
+          nativeAudioDecoder: false,
           lyricsSheetBesideAudio: true,
           touchShell: false,
           backgroundPlayback: false,
@@ -57,6 +69,8 @@ class AppCapabilities {
           defaultPlayer: false,
           autoUpdate: false,
           externalToolPipeline: false,
+          localAsrBackend: LocalAsrBackend.none,
+          nativeAudioDecoder: false,
           lyricsSheetBesideAudio: true,
           touchShell: false,
           backgroundPlayback: false,
@@ -72,6 +86,8 @@ class AppCapabilities {
           defaultPlayer: false,
           autoUpdate: false,
           externalToolPipeline: false,
+          localAsrBackend: LocalAsrBackend.ffi,
+          nativeAudioDecoder: true,
           lyricsSheetBesideAudio: false,
           touchShell: true,
           // audio_service keeps the sound and its notification alive after
@@ -89,6 +105,8 @@ class AppCapabilities {
           defaultPlayer: false,
           autoUpdate: false,
           externalToolPipeline: false,
+          localAsrBackend: LocalAsrBackend.none,
+          nativeAudioDecoder: false,
           lyricsSheetBesideAudio: false,
           touchShell: true,
           // iOS is not scheduled; nothing of the mobile milestone targets it.
@@ -105,6 +123,8 @@ class AppCapabilities {
           defaultPlayer: false,
           autoUpdate: false,
           externalToolPipeline: false,
+          localAsrBackend: LocalAsrBackend.none,
+          nativeAudioDecoder: false,
           lyricsSheetBesideAudio: false,
           touchShell: false,
           backgroundPlayback: false,
@@ -157,6 +177,17 @@ class AppCapabilities {
   /// ships with the system. The pipeline therefore reads the audio as it is
   /// there and asks only the network channels (docs/android.md).
   final bool externalToolPipeline;
+
+  /// How the local speech engines run on this platform: the downloaded
+  /// binary in a child process on the desktop, the runtime loaded into the
+  /// app on Android, nowhere else (docs/android.md E5).
+  final LocalAsrBackend localAsrBackend;
+
+  /// Whether the system decoder (Android MediaCodec) can turn a compressed
+  /// track into the 16 kHz mono WAV the engines read. The desktop keeps its
+  /// system ffmpeg, so this is false there and `externalToolPipeline` still
+  /// decides.
+  final bool nativeAudioDecoder;
 
   /// Whether a lyrics sheet can be written next to the audio file it
   /// belongs to.

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/components/local_components.dart';
@@ -51,9 +52,16 @@ void main() {
       localComponentsControllerProvider.future,
     );
 
+    // Only what this platform can actually run is listed; the desktop build
+    // used by the test never offers the phone's in-app runtime (docs/android.md
+    // E5).
     expect(
       states.keys,
-      containsAll(LocalComponentRegistry.all.map((spec) => spec.id)),
+      containsAll(
+        LocalComponentRegistry.all
+            .where((spec) => spec.supports(AppCapabilities.current.platform))
+            .map((spec) => spec.id),
+      ),
     );
     for (final state in states.values) {
       expect(state.phase, LocalComponentPhase.notInstalled);

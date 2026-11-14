@@ -7439,6 +7439,12 @@ abstract class AppLocalizations {
   /// **'Whisper 模型 small'**
   String get settingsLocalComponentWhisperSmall;
 
+  /// No description provided for @settingsLocalComponentWhisperOnnxSmall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Whisper 模型 small（ONNX，应用内）'**
+  String get settingsLocalComponentWhisperOnnxSmall;
+
   /// No description provided for @settingsLocalComponentWhisperLargeTurbo.
   ///
   /// In zh_CN, this message translates to:

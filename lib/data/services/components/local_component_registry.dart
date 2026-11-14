@@ -1,3 +1,4 @@
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/components/local_component.dart';
 
 /// The single list of local components (docs/local-components.md §1).
@@ -111,6 +112,7 @@ class LocalComponentRegistry {
     ],
     systemNames: ['whisper-cli', 'whisper-cpp', 'whisper'],
     legacyDirectories: ['whisper/bin'],
+    platforms: {AppPlatform.linux, AppPlatform.windows},
   );
 
   static const List<LocalComponentSpec> whisperModels = [
@@ -131,6 +133,7 @@ class LocalComponentRegistry {
       ],
       requiredFiles: ['ggml-tiny.bin'],
       legacyFiles: ['whisper/models/ggml-tiny.bin'],
+      platforms: {AppPlatform.linux, AppPlatform.windows},
     ),
     LocalComponentSpec(
       id: 'lyrics-whisper-model-base',
@@ -149,6 +152,7 @@ class LocalComponentRegistry {
       ],
       requiredFiles: ['ggml-base.bin'],
       legacyFiles: ['whisper/models/ggml-base.bin'],
+      platforms: {AppPlatform.linux, AppPlatform.windows},
     ),
     LocalComponentSpec(
       id: 'lyrics-whisper-model-small',
@@ -167,6 +171,7 @@ class LocalComponentRegistry {
       ],
       requiredFiles: ['ggml-small.bin'],
       legacyFiles: ['whisper/models/ggml-small.bin'],
+      platforms: {AppPlatform.linux, AppPlatform.windows},
     ),
     LocalComponentSpec(
       id: 'lyrics-whisper-model-large-v3-turbo',
@@ -185,6 +190,7 @@ class LocalComponentRegistry {
       ],
       requiredFiles: ['ggml-large-v3-turbo.bin'],
       legacyFiles: ['whisper/models/ggml-large-v3-turbo.bin'],
+      platforms: {AppPlatform.linux, AppPlatform.windows},
     ),
   ];
 
@@ -206,6 +212,54 @@ class LocalComponentRegistry {
     ],
     systemNames: ['sherpa-onnx-offline'],
     systemPaths: ['~/.local/opt/sherpa-onnx/bin/sherpa-onnx-offline'],
+    platforms: {AppPlatform.linux, AppPlatform.windows},
+  );
+
+  /// Whisper small as ONNX for the in-app runtime (docs/android.md E5).
+  ///
+  /// A phone runs the sherpa-onnx runtime in-process, which reads the ONNX
+  /// export, not the ggml file the desktop binary reads. Same model, same
+  /// MIT weights; only the packaging differs, so it is its own component
+  /// and the desktop list is untouched.
+  static const LocalComponentSpec whisperOnnxModelSmall = LocalComponentSpec(
+    id: 'lyrics-whisper-onnx-model-small',
+    kind: LocalComponentKind.model,
+    label: LocalComponentLabel.whisperOnnxModelSmall,
+    platforms: {AppPlatform.android},
+    files: [
+      LocalComponentFile(
+        fileName: 'small-encoder.int8.onnx',
+        url:
+            'https://huggingface.co/csukuangfj/sherpa-onnx-whisper-small/'
+            'resolve/main/small-encoder.int8.onnx',
+        bytes: 112442483,
+        sha256:
+            '4cbe7b22fa9026b843b60a68640c747de05bafb1a11b57edc0e66c232d9f33a9',
+      ),
+      LocalComponentFile(
+        fileName: 'small-decoder.int8.onnx',
+        url:
+            'https://huggingface.co/csukuangfj/sherpa-onnx-whisper-small/'
+            'resolve/main/small-decoder.int8.onnx',
+        bytes: 262226114,
+        sha256:
+            'acad50b5c782696e91b55914cc5ab4f756f1532f76e22aa6fc615f39fb69a8ee',
+      ),
+      LocalComponentFile(
+        fileName: 'small-tokens.txt',
+        url:
+            'https://huggingface.co/csukuangfj/sherpa-onnx-whisper-small/'
+            'resolve/main/small-tokens.txt',
+        bytes: 816730,
+        sha256:
+            'b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126',
+      ),
+    ],
+    requiredFiles: [
+      'small-encoder.int8.onnx',
+      'small-decoder.int8.onnx',
+      'small-tokens.txt',
+    ],
   );
 
   static const LocalComponentSpec sensevoiceModel = LocalComponentSpec(
@@ -344,6 +398,7 @@ class LocalComponentRegistry {
     ],
     systemNames: ['ffmpeg'],
     systemPaths: ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'],
+    platforms: {AppPlatform.linux, AppPlatform.windows},
   );
 
   /// Everything the settings page lists, in display order.
@@ -352,6 +407,7 @@ class LocalComponentRegistry {
     ...translationModels,
     whisperRuntime,
     ...whisperModels,
+    whisperOnnxModelSmall,
     sherpaRuntime,
     sensevoiceModel,
     funasrNanoModel,

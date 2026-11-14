@@ -1,3 +1,5 @@
+import 'package:tune/core/config/app_capabilities.dart';
+
 /// One local capability, downloaded and removed on its own.
 ///
 /// The registry owns the list ([LocalComponentSpec]); the installer owns how
@@ -17,6 +19,7 @@ enum LocalComponentLabel {
   whisperModelBase,
   whisperModelSmall,
   whisperModelLargeTurbo,
+  whisperOnnxModelSmall,
   sherpaRuntime,
   sensevoiceModel,
   funasrNanoModel,
@@ -93,6 +96,11 @@ class LocalComponentSpec {
   /// executable), searched for [executable].
   final List<String> legacyDirectories;
 
+  /// Platforms the component is usable on; `null` means all of them. A
+  /// runtime that only exists as a desktop binary must not be offered on a
+  /// phone, where it could never run (docs/android.md E5).
+  final Set<AppPlatform>? platforms;
+
   const LocalComponentSpec({
     required this.id,
     required this.kind,
@@ -105,7 +113,11 @@ class LocalComponentSpec {
     this.systemPaths = const [],
     this.legacyFiles = const [],
     this.legacyDirectories = const [],
+    this.platforms,
   });
+
+  bool supports(AppPlatform platform) =>
+      platforms == null || platforms!.contains(platform);
 
   bool get isRuntime => kind == LocalComponentKind.runtime;
 

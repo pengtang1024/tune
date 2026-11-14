@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:tune/data/services/smart_lyrics/sherpa_ffi_transcriber.dart';
 import 'package:tune/data/services/smart_lyrics/sherpa_local_exception.dart';
-import 'package:tune/data/services/smart_lyrics/sherpa_runner.dart';
+import 'package:tune/data/services/smart_lyrics/sherpa_process_transcriber.dart';
+import 'package:tune/data/services/smart_lyrics/sherpa_transcriber.dart';
 import 'package:tune/data/services/smart_lyrics/sherpa_transcript.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/wav_file.dart';
@@ -9,29 +11,28 @@ import 'package:tune/data/services/smart_lyrics/wav_splitter.dart';
 import 'package:tune/utils/logger.dart';
 
 export 'package:tune/data/services/smart_lyrics/sherpa_local_exception.dart';
-
-/// The model family the shared `sherpa-onnx-offline` binary recognizes.
-enum SherpaModelFamily { sensevoice, funAsrNano }
-
-/// The binary and the model arguments of one channel.
-typedef _Target = ({File binary, List<String> args});
+export 'package:tune/data/services/smart_lyrics/sherpa_process_transcriber.dart'
+    show SherpaModelFamily;
 
 /// The independent ASR family the confidence story needs (M12): SenseVoice
 /// via sherpa-onnx — Apache-2.0 runtime, free, offline, and a **different
 /// algorithm** from whisper, so the two can cross-prove a line. The same
-/// binary also runs the optional Fun-ASR-Nano model (D12), which is a third
+/// runtime also runs the optional Fun-ASR-Nano model (D12), which is a third
 /// family the reader may install.
 ///
-/// The binary prints one JSON of token-level timestamps to stdout; the
-/// engine cuts the text into lines at the silences between tokens — a
-/// timing method genuinely independent of whisper's segment model.
+/// The answer is a list of token-level timestamps; the engine cuts the text
+/// into lines at the silences between tokens — a timing method genuinely
+/// independent of whisper's segment model. On the desktop the answer comes
+/// from the downloaded binary in a child process; on Android the same
+/// runtime is linked into the app (docs/android.md E5). The engine does not
+/// care which: [SherpaTranscriber] is the seam.
 ///
 /// The encoder is not streaming: it builds a T×T self-attention map from the
 /// whole file, so memory grows with the square of the length. A 42-minute
 /// track asked for 28.9 GB in one buffer and 128 GiB from the kernel, which
 /// took the desktop down (2026-10-30). Two walls keep that from happening
-/// again: the audio is cut into [chunk] long pieces, and every piece runs
-/// under a 4 GB memory ceiling ([SherpaProcessLimit]).
+/// again: the audio is cut into [chunk] long pieces, and every desktop piece
+/// runs under a 4 GB memory ceiling ([SherpaProcessLimit]).
 class SherpaLocalEngine extends SmartLyricsEngine {
   /// The model name the channel votes under — `sensevoice` or `funasr-nano`.
   final String model;
@@ -39,8 +40,9 @@ class SherpaLocalEngine extends SmartLyricsEngine {
   /// The family whose files and flags the model folder holds.
   final SherpaModelFamily family;
 
-  /// The `sherpa-onnx-offline` binary; `null` means not installed.
-  final Future<File?> Function() binaryOf;
+  /// The `sherpa-onnx-offline` binary; `null` means not installed, or that
+  /// this engine answers in-process instead.
+  final Future<File?> Function()? binaryOf;
 
   /// The folder holding the model; `null` means it is not downloaded.
   final Future<Directory?> Function() modelDirOf;
@@ -55,27 +57,48 @@ class SherpaLocalEngine extends SmartLyricsEngine {
   /// file. Both soft-fail the channel.
   final Duration longestTrack;
 
+  late final SherpaTranscriber _transcriber;
+
   SherpaLocalEngine({
     required this.model,
-    required this.binaryOf,
+    required Future<File?> Function() binaryOf,
     required this.modelDirOf,
     this.family = SherpaModelFamily.sensevoice,
     this.chunk = const Duration(minutes: 5),
     this.longestTrack = const Duration(hours: 6),
-  });
+  }) : binaryOf = binaryOf {
+    _transcriber = SherpaProcessTranscriber(
+      family: family,
+      binaryOf: binaryOf,
+      modelDirOf: modelDirOf,
+    );
+  }
+
+  /// The Android backend: the runtime is inside the app, so there is no
+  /// binary to find and no process to box.
+  SherpaLocalEngine.ffi({
+    required this.model,
+    required this.modelDirOf,
+    this.family = SherpaModelFamily.sensevoice,
+    this.chunk = const Duration(minutes: 5),
+    this.longestTrack = const Duration(hours: 6),
+  }) : binaryOf = null {
+    _transcriber = SherpaFfiTranscriber(
+      model: model,
+      family: family,
+      modelDirOf: modelDirOf,
+    );
+  }
 
   @override
   String get id => 'local:$model';
-
-  final SherpaRunner _runner = SherpaRunner();
 
   @override
   Future<TranscriptionResult> runTranscription(
     SmartAudioInput input, {
     void Function(double progress)? onProgress,
   }) async {
-    _runner.reset();
-    final target = await _target();
+    _transcriber.reset();
     final wav = await _readableAudio(input.audio);
 
     final folder = await Directory.systemTemp.createTemp('tune_sherpa_parts');
@@ -83,81 +106,19 @@ class SherpaLocalEngine extends SmartLyricsEngine {
       return await _transcribe(
         wav: wav,
         folder: folder,
-        target: target,
         onProgress: onProgress,
       );
     } catch (error, stackTrace) {
       Log.error('本地 sherpa 转写失败: $error', stackTrace);
       if (error is SherpaLocalException) rethrow;
-      throw SherpaLocalException('the binary could not run: $error');
+      throw SherpaLocalException('the recognizer could not run: $error');
     } finally {
       await _discard(folder);
+      await _transcriber.dispose();
     }
   }
 
-  /// The channel's binary and model flags, or the reason there is no
-  /// channel to run.
-  Future<_Target> _target() async {
-    final binary = await binaryOf();
-    if (binary == null) {
-      throw const SherpaLocalException('sherpa-onnx is not installed');
-    }
-    final modelDir = await modelDirOf();
-    if (modelDir == null) {
-      throw SherpaLocalException(
-        'the $_modelName model is not downloaded',
-      );
-    }
-    final args = switch (family) {
-      SherpaModelFamily.sensevoice => await _senseVoiceArgs(modelDir),
-      SherpaModelFamily.funAsrNano => await _funAsrNanoArgs(modelDir),
-    };
-    return (binary: binary, args: args);
-  }
-
-  String get _modelName => switch (family) {
-    SherpaModelFamily.sensevoice => 'sensevoice',
-    SherpaModelFamily.funAsrNano => 'funasr-nano',
-  };
-
-  Future<List<String>> _senseVoiceArgs(Directory modelDir) async {
-    final tokens = File('${modelDir.path}/tokens.txt');
-    final onnx = File('${modelDir.path}/model.int8.onnx');
-    if (!await tokens.exists() || !await onnx.exists()) {
-      throw const SherpaLocalException('the model folder is incomplete');
-    }
-    return [
-      '--tokens=${tokens.path}',
-      '--sense-voice-model=${onnx.path}',
-    ];
-  }
-
-  Future<List<String>> _funAsrNanoArgs(Directory modelDir) async {
-    final root = modelDir.path;
-    final encoder = File('$root/encoder_adaptor.int8.onnx');
-    final llm = File('$root/llm.int8.onnx');
-    final embedding = File('$root/embedding.int8.onnx');
-    // The tokenizer flag names a folder; the binary reads these three out of
-    // it and ignores the model files that sit beside them.
-    for (final name in const ['vocab.json', 'merges.txt', 'tokenizer.json']) {
-      if (!await File('$root/$name').exists()) {
-        throw const SherpaLocalException('the model folder is incomplete');
-      }
-    }
-    if (!await encoder.exists() ||
-        !await llm.exists() ||
-        !await embedding.exists()) {
-      throw const SherpaLocalException('the model folder is incomplete');
-    }
-    return [
-      '--funasr-nano-encoder-adaptor=${encoder.path}',
-      '--funasr-nano-llm=${llm.path}',
-      '--funasr-nano-embedding=${embedding.path}',
-      '--funasr-nano-tokenizer=$root',
-    ];
-  }
-
-  /// The audio, or the reason the binary must not see it.
+  /// The audio, or the reason the recognizer must not see it.
   ///
   /// The header is read before the binary does: the header is what sizes its
   /// buffers, and a file that promises more samples than it holds turns into
@@ -186,7 +147,6 @@ class SherpaLocalEngine extends SmartLyricsEngine {
   Future<TranscriptionResult> _transcribe({
     required WavFile wav,
     required Directory folder,
-    required _Target target,
     required void Function(double progress)? onProgress,
   }) async {
     final total = wav.partCount(chunk);
@@ -195,10 +155,7 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     var done = 0;
     await for (final part in wav.parts(folder: folder, chunk: chunk)) {
       if (_cancelled) throw const SherpaLocalException('the run was cancelled');
-      final answer = decodeSherpaAnswer(await _run(target, part.file));
-      if (answer == null) {
-        throw const SherpaLocalException('the answer has no json');
-      }
+      final answer = await _transcriber.listen(part.file);
       language ??= answer.language;
       words.addAll(answer.words.map((word) => word.shifted(part.offset)));
       await part.file.delete();
@@ -207,19 +164,12 @@ class SherpaLocalEngine extends SmartLyricsEngine {
     return TranscriptionResult(segments: linesOf(words), language: language);
   }
 
-  /// One piece through the binary, inside its memory ceiling.
-  Future<String> _run(_Target target, File audio) => _runner.run(target.binary, [
-    ...target.args,
-    '--num-threads=${Platform.numberOfProcessors.clamp(1, 4)}',
-    audio.path,
-  ]);
-
   /// Stops the run; nothing half-written stays because nothing is written.
   @override
-  void requestCancel() => _runner.cancel();
+  void requestCancel() => _transcriber.cancel();
 
   /// Whether the run was cancelled between two pieces.
-  bool get _cancelled => _runner.cancelled;
+  bool get _cancelled => _transcriber.cancelled;
 
   static Future<void> _discard(Directory folder) async {
     try {

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/components/local_components.dart';
@@ -36,7 +37,10 @@ class LocalComponentsController
     LocalComponents components,
   ) async {
     final states = <String, LocalComponentState>{};
+    final platform = AppCapabilities.current.platform;
     for (final spec in LocalComponentRegistry.all) {
+      // A desktop binary is not offered on a phone it could never run on.
+      if (!spec.supports(platform)) continue;
       states[spec.id] = await _inspect(spec, components);
     }
     return states;

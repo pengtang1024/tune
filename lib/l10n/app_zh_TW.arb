@@ -1897,6 +1897,7 @@
   "settingsLocalComponentWhisperTiny": "Whisper 模型 tiny",
   "settingsLocalComponentWhisperBase": "Whisper 模型 base",
   "settingsLocalComponentWhisperSmall": "Whisper 模型 small",
+  "settingsLocalComponentWhisperOnnxSmall": "Whisper 模型 small（ONNX，應用內）",
   "settingsLocalComponentWhisperLargeTurbo": "Whisper 模型 large-v3-turbo",
   "settingsLocalComponentSherpaRuntime": "Sherpa-onnx 執行環境（SenseVoice / Fun-ASR-Nano）",
   "settingsLocalComponentSensevoiceModel": "SenseVoice 模型",

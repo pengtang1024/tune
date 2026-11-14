@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
@@ -21,6 +22,7 @@ class SettingsLocalComponentsCard extends ConsumerWidget {
     'lyrics': [
       LocalComponentRegistry.whisperRuntime,
       ...LocalComponentRegistry.whisperModels,
+      LocalComponentRegistry.whisperOnnxModelSmall,
       LocalComponentRegistry.sherpaRuntime,
       LocalComponentRegistry.sensevoiceModel,
       LocalComponentRegistry.funasrNanoModel,
@@ -43,10 +45,11 @@ class SettingsLocalComponentsCard extends ConsumerWidget {
         for (final group in _groups.entries) ...[
           _GroupTitle(text: _groupTitle(context, group.key)),
           for (final spec in group.value)
-            _ComponentRow(
-              spec: spec,
-              state: ref.watch(localComponentStateProvider(spec.id)),
-            ),
+            if (spec.supports(AppCapabilities.current.platform))
+              _ComponentRow(
+                spec: spec,
+                state: ref.watch(localComponentStateProvider(spec.id)),
+              ),
           const SizedBox(height: CompactTokens.space8),
         ],
         Text(
@@ -241,6 +244,8 @@ String componentLabel(BuildContext context, LocalComponentLabel label) {
       strings.settingsLocalComponentWhisperBase,
     LocalComponentLabel.whisperModelSmall =>
       strings.settingsLocalComponentWhisperSmall,
+    LocalComponentLabel.whisperOnnxModelSmall =>
+      strings.settingsLocalComponentWhisperOnnxSmall,
     LocalComponentLabel.whisperModelLargeTurbo =>
       strings.settingsLocalComponentWhisperLargeTurbo,
     LocalComponentLabel.sherpaRuntime =>

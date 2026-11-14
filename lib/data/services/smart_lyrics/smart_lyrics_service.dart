@@ -6,6 +6,7 @@ import 'package:path/path.dart' as path;
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/library/library_paths.dart';
 import 'package:tune/data/services/music_sources/lyrics_provider.dart';
+import 'package:tune/data/services/smart_lyrics/audio_decoder.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_ballot.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_admission_audit.dart';
@@ -114,6 +115,12 @@ class SmartLyricsService {
   /// `null` means neither the system nor a component has one.
   final Future<String?> Function()? ffmpegBinaryOf;
 
+  /// The system decoder when the platform has one (Android MediaCodec).
+  /// `null` on the desktop, where [ffmpegBinary] / [ffmpegBinaryOf] decide
+  /// (docs/android.md E5). A phone may not execute ffmpeg, and it does not
+  /// need to: the platform decodes the track into the same WAV.
+  final AudioDecoder? nativeDecoder;
+
   /// Set once the first download of this service cleaned the folders a
   /// killed run left behind.
   Future<void>? _cleaned;
@@ -160,6 +167,7 @@ class SmartLyricsService {
     this.health,
     this.ffmpegBinary = 'ffmpeg',
     this.ffmpegBinaryOf,
+    this.nativeDecoder,
     Dio? dio,
   }) : _dio = dio ?? Dio();
 
@@ -605,6 +613,25 @@ class SmartLyricsService {
     if (extension == '.wav') {
       final wav = await WavFile.read(audio);
       if (wav != null && wav.isSpeechReady) return (audio, temporary);
+    }
+
+    // A phone answers with a platform decoder instead of ffmpeg: MediaCodec
+    // decodes the track and resamples it to the same WAV the engines read
+    // (docs/android.md E5). A failure is logged and falls through — never
+    // counted as a decoded track.
+    final decoder = nativeDecoder;
+    if (decoder != null) {
+      final folder = temporary
+          ? audio.parent
+          : await Directory.systemTemp.createTemp('tune_smart_audio');
+      try {
+        final decoded = await decoder.decodeToWav(audio, folder: folder);
+        if (decoded != null && await decoded.exists()) return (decoded, true);
+        Log.error('系统解码失败，原始音频交给引擎: ${audio.path}');
+      } catch (error, stackTrace) {
+        Log.error('系统解码失败: $error', stackTrace);
+      }
+      if (!temporary) await _discardFolder(folder);
     }
 
     // A phone has no ffmpeg to run: an app may not execute an external

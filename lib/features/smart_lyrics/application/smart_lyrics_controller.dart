@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/config/app_capabilities.dart';
+import 'package:tune/data/services/components/local_component.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
 import 'package:tune/data/services/components/local_components.dart';
 import 'package:tune/data/services/providers/local_components_provider.dart';
@@ -10,8 +12,10 @@ import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/library_paths_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/stream_url_resolver_provider.dart';
+import 'package:tune/data/services/impl/media_codec_audio_decoder.dart';
 import 'package:tune/data/services/smart_lyrics/openai_compatible_engine.dart';
 import 'package:tune/data/services/smart_lyrics/sherpa_local_engine.dart';
+import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_service.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_text.dart';
 import 'package:tune/data/services/smart_lyrics/whisper_assets.dart';
@@ -100,9 +104,59 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
   });
   Future<LocalComponents> components() =>
       ref.read(localComponentsProvider.future);
-  // A phone cannot run the local engines at all: asking them once per song
-  // only wrote the same failure into the log and the health ledger.
-  final localEngines = AppCapabilities.current.externalToolPipeline;
+  // How the local engines run is one capability, not a platform check in
+  // every branch: the desktop starts the downloaded binary, Android links
+  // the same runtime into the app (docs/android.md E5).
+  final asrBackend = AppCapabilities.current.localAsrBackend;
+  final localEngines = asrBackend != LocalAsrBackend.none;
+
+  /// The same channel on whichever backend this platform has.
+  SherpaLocalEngine sherpaChannel({
+    required String model,
+    required SherpaModelFamily family,
+    required LocalComponentSpec spec,
+  }) {
+    Future<Directory?> dir() async => (await components()).directory(spec);
+    if (asrBackend == LocalAsrBackend.process) {
+      return SherpaLocalEngine(
+        model: model,
+        family: family,
+        binaryOf: () async => (await components()).executable(
+          LocalComponentRegistry.sherpaRuntime,
+        ),
+        modelDirOf: dir,
+      );
+    }
+    return SherpaLocalEngine.ffi(
+      model: model,
+      family: family,
+      modelDirOf: dir,
+    );
+  }
+
+  /// Whisper's channel: the ggml model beside the desktop binary, or the
+  /// ONNX export the in-app runtime reads. Both are the same MIT weights;
+  /// the packaging follows the backend, not a second decision.
+  SmartLyricsEngine? whisperChannel() {
+    if (!localEngines || local.isEmpty) return null;
+    if (asrBackend == LocalAsrBackend.ffi) {
+      return SherpaLocalEngine.ffi(
+        model: local,
+        family: SherpaModelFamily.whisper,
+        modelDirOf: () async => (await components()).directory(
+          LocalComponentRegistry.whisperOnnxModelSmall,
+        ),
+      );
+    }
+    return WhisperLocalEngine(
+      model: local,
+      binaryOf: () async => (await assets).findBinary(),
+      modelOf: () async => (await assets).findModel(local),
+      workspaceOf: () async => (await assets).workspace(),
+    );
+  }
+
+  final whisper = whisperChannel();
   // The optional third family joins only after its model was downloaded
   // (or found on the machine). Nothing is fetched by default, so the
   // default pool stays Whisper small + SenseVoice (D12).
@@ -126,39 +180,27 @@ SmartLyricsService _buildSmartLyricsService(Ref ref) {
       // can cross-prove a line. Absent install: the channel fails soft
       // and the health rings park it.
       if (localEngines)
-        SherpaLocalEngine(
+        sherpaChannel(
           model: 'sensevoice',
-          binaryOf: () async => (await components()).executable(
-            LocalComponentRegistry.sherpaRuntime,
-          ),
-          modelDirOf: () async => (await components()).directory(
-            LocalComponentRegistry.sensevoiceModel,
-          ),
+          family: SherpaModelFamily.sensevoice,
+          spec: LocalComponentRegistry.sensevoiceModel,
         ),
-      // The optional quality pack: same binary, a different family, and no
+      // The optional quality pack: same runtime, a different family, and no
       // vote until the reader brings its model home.
       if (localEngines && funasrReady)
-        SherpaLocalEngine(
+        sherpaChannel(
           model: 'funasr-nano',
           family: SherpaModelFamily.funAsrNano,
-          binaryOf: () async => (await components()).executable(
-            LocalComponentRegistry.sherpaRuntime,
-          ),
-          modelDirOf: () async => (await components()).directory(
-            LocalComponentRegistry.funasrNanoModel,
-          ),
+          spec: LocalComponentRegistry.funasrNanoModel,
         ),
-      if (localEngines && local.isNotEmpty)
-        WhisperLocalEngine(
-          model: local,
-          binaryOf: () async => (await assets).findBinary(),
-          modelOf: () async => (await assets).findModel(local),
-          workspaceOf: () async => (await assets).workspace(),
-        ),
+      ?whisper,
     ],
     humanPool: [(name: 'lrclib', provider: sources.lyricsProvider)],
     paths: paths,
     health: ref.watch(smartLyricsChannelHealthProvider),
+    nativeDecoder: AppCapabilities.current.nativeAudioDecoder
+        ? const MediaCodecAudioDecoder()
+        : null,
     // The correction runs on the first model; every listed model casts a
     // knowledge ballot — two families make the class speak (§7.6).
     assist: !cloud || chatModelList.isEmpty

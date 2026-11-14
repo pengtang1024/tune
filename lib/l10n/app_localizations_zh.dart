@@ -3975,6 +3975,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
 
   @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，应用内）';
+
+  @override
   String get settingsLocalComponentWhisperLargeTurbo =>
       'Whisper 模型 large-v3-turbo';
 
@@ -8163,6 +8167,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，应用内）';
 
   @override
   String get settingsLocalComponentWhisperLargeTurbo =>
@@ -12354,6 +12362,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalComponentWhisperSmall => 'Whisper 模型 small';
+
+  @override
+  String get settingsLocalComponentWhisperOnnxSmall =>
+      'Whisper 模型 small（ONNX，應用內）';
 
   @override
   String get settingsLocalComponentWhisperLargeTurbo =>

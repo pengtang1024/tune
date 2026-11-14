@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:tune/data/services/smart_lyrics/sherpa_ffi_pcm.dart';
 import 'package:tune/data/services/smart_lyrics/smart_lyrics_engine.dart';
 
 /// One word the model heard, with the second it began.
@@ -43,24 +44,10 @@ SherpaAnswer? decodeSherpaAnswer(String stdoutText) {
   if (tokens is! List || timestamps is! List) {
     return SherpaAnswer(const [], language);
   }
-  // SenseVoice prints no durations, only starts; a token without a time has
-  // nowhere to go, so the shorter of the two lists bounds the words.
-  final count = tokens.length < timestamps.length
-      ? tokens.length
-      : timestamps.length;
-  final words = <SherpaWord>[];
-  for (var i = 0; i < count; i++) {
-    final rawToken = '${tokens[i]}';
-    // Language, emotion and event tags are not words.
-    if (rawToken.startsWith('<|') || rawToken == '</s>') continue;
-    final start = timestamps[i];
-    words.add(
-      SherpaWord(
-        rawToken.replaceAll('▁', ' '),
-        start is num ? start.toDouble() : 0,
-      ),
-    );
-  }
+  final words = wordsFromTokens(
+    tokens.map((raw) => '$raw').toList(),
+    timestamps.map((raw) => raw is num ? raw.toDouble() : 0.0).toList(),
+  );
   return SherpaAnswer(words, language);
 }
 
