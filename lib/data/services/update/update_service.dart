@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/version_manifest.dart';
+import 'package:tune/data/services/update/version_manifest_cache.dart';
 import 'package:tune/data/services/update/version_manifest_source.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -52,7 +53,12 @@ class UpdateService {
   }) : _dio = dio ?? _defaultDio(),
        _source =
            source ??
-           VersionManifestSource(dio: dio ?? _defaultManifestDio()),
+           VersionManifestSource(
+             dio: dio ?? _defaultManifestDio(),
+             // The validators outlive the process, so the first round after a
+             // restart is conditional too (docs/update-cdn.md §4.2).
+             cache: VersionManifestCache(),
+           ),
        _clock = clock ?? DateTime.now;
 
   static Dio _defaultDio() => Dio(

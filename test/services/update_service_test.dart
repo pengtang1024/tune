@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/update_service.dart';
+import 'package:tune/data/services/update/version_manifest_cache.dart';
 import 'package:tune/data/services/update/version_manifest_source.dart';
 
 /// Answers each host of the check, so the tiers can be told apart.
@@ -87,7 +88,16 @@ Map<String, dynamic> _manifest({
 ) {
   final adapter = _RoutingAdapter(routes);
   final dio = Dio()..httpClientAdapter = adapter;
-  return (UpdateService(dio: dio), adapter);
+  return (
+    UpdateService(
+      dio: dio,
+      source: VersionManifestSource(
+        dio: dio,
+        cache: VersionManifestCache.memory(),
+      ),
+    ),
+    adapter,
+  );
 }
 
 Matcher _failure(UpdateCheckFailure failure) {
@@ -245,7 +255,14 @@ void main() {
         _raw: (_) => _body(jsonEncode(_manifest())),
       });
       final dio = Dio()..httpClientAdapter = adapter;
-      final service = UpdateService(dio: dio, clock: () => now);
+      final service = UpdateService(
+        dio: dio,
+        source: VersionManifestSource(
+          dio: dio,
+          cache: VersionManifestCache.memory(),
+        ),
+        clock: () => now,
+      );
 
       await service.latest(environment: const {});
       expect(adapter.requests.length, 2);

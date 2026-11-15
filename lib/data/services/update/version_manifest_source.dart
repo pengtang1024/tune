@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/version_manifest.dart';
+import 'package:tune/data/services/update/version_manifest_cache.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Reads `version.json` from the addresses that publish it.
@@ -10,9 +11,13 @@ import 'package:tune/utils/logger.dart';
 /// read every time: when both answer they must agree, because the list
 /// decides what the app downloads and installs (docs/update-cdn.md §7).
 class VersionManifestSource {
-  VersionManifestSource({required Dio dio, List<String>? urls})
-    : _dio = dio,
-      urls = urls ?? defaultUrls;
+  VersionManifestSource({
+    required Dio dio,
+    List<String>? urls,
+    VersionManifestCache? cache,
+  }) : _dio = dio,
+       urls = urls ?? defaultUrls,
+       _cache = cache ?? VersionManifestCache.memory();
 
   /// CDN first; the raw host is the second address and the cross-check.
   ///
@@ -27,10 +32,9 @@ class VersionManifestSource {
   final Dio _dio;
   final List<String> urls;
 
-  /// The validator of each address and the list it belongs to, so a repeated
-  /// read costs one conditional request instead of the whole file.
-  final Map<String, String> _etags = {};
-  final Map<String, VersionManifest> _seen = {};
+  /// The validator and the list of each address, keyed by address. It keeps
+  /// the two sources apart and survives a restart (see [VersionManifestCache]).
+  final VersionManifestCache _cache;
 
   /// The newest list, or `null` when no address publishes one.
   ///
@@ -42,7 +46,7 @@ class VersionManifestSource {
 
     for (final url in urls) {
       try {
-        final manifest = await _read(url);
+        final manifest = await _read(url, await _cache.entryFor(url));
         if (manifest == null) continue;
         if (chosen == null) {
           chosen = manifest;
@@ -66,8 +70,11 @@ class VersionManifestSource {
     return null;
   }
 
-  Future<VersionManifest?> _read(String url) async {
-    final etag = _seen[url] == null ? null : _etags[url];
+  Future<VersionManifest?> _read(
+    String url,
+    VersionManifestCacheEntry? entry,
+  ) async {
+    final etag = entry?.etag;
     final host = Uri.tryParse(url)?.host ?? url;
     final watch = Stopwatch()..start();
     // One line per address per round, after it is spent: a retry belongs to
@@ -87,7 +94,7 @@ class VersionManifestSource {
       // The list did not change since the last read; the parsed copy stands.
       if (status == 304) {
         Log.info('清单 $host：304，沿用上次解析（${cost}ms）');
-        return _seen[url];
+        return entry?.manifest;
       }
       // The address does not publish a list yet, or never did.
       if (status == 404) {
@@ -110,9 +117,7 @@ class VersionManifestSource {
         );
       }
       Log.info('清单 $host：命中 ${_describe(manifest)}（${cost}ms）');
-      final validator = response.headers.value('etag');
-      if (validator != null) _etags[url] = validator;
-      _seen[url] = manifest;
+      await _cache.put(url, response.headers.value('etag'), manifest);
       return manifest;
     } on UpdateCheckException {
       rethrow;
