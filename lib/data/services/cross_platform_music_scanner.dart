@@ -84,8 +84,6 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
   @override
   Future<List<Song>> scanMusic() async {
-    Log.info('CrossPlatformMusicScanner: Starting cross-platform music scan');
-
     if (Platform.isAndroid || Platform.isIOS) {
       Log.debug('CrossPlatformMusicScanner: Running on mobile platform');
       try {
@@ -109,31 +107,41 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   }
 
   @override
-  Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) async {
-    Log.info(
-      'CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories',
-    );
-    return await scanMusicInDirectoriesWithProgress(
-      directoryPaths,
-      (progress) {},
-    );
+  Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) {
+    return _scanDirectories(directoryPaths, onProgress: null);
   }
 
   @override
   Future<List<Song>> scanMusicInDirectoriesWithProgress(
     List<String> directoryPaths,
     Function(double) onProgress,
-  ) async {
+  ) {
+    return _scanDirectories(directoryPaths, onProgress: onProgress);
+  }
+
+  /// The one place a batch of directories is read.
+  ///
+  /// Both entries land here, so a batch writes exactly one start line and one
+  /// finish line whatever called it; the mode tells the two entrances apart.
+  Future<List<Song>> _scanDirectories(
+    List<String> directoryPaths, {
+    required Function(double)? onProgress,
+  }) async {
     final watch = Stopwatch()..start();
     final allSongs = <Song>[];
     var skipped = 0;
+
+    Log.info(
+      'CrossPlatformMusicScanner: Scan started: ${directoryPaths.length} '
+      'directories, ${onProgress == null ? 'background' : 'progress'} mode',
+    );
 
     for (int i = 0; i < directoryPaths.length; i++) {
       final dirPath = directoryPaths[i];
       try {
         final songs = await _scanDirectory(dirPath, (progress) {
           final overallProgress = (i + progress) / directoryPaths.length;
-          onProgress(overallProgress);
+          onProgress?.call(overallProgress);
         });
         allSongs.addAll(songs);
       } catch (e) {
@@ -142,7 +150,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
           'CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e',
         );
       }
-      onProgress((i + 1) / directoryPaths.length);
+      onProgress?.call((i + 1) / directoryPaths.length);
     }
 
     Log.info(
