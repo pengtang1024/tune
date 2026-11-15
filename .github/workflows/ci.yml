@@ -1,5 +1,9 @@
 # Tune CI：静态检查 + 单元测试
 #
+# 门禁命令只写在 ./tool/check.sh 里，CI 和本地跑的是同一份脚本，避免两处漂移。
+# 本地等价命令：./tool/check.sh --l10n
+#   它依次做：flutter gen-l10n 并断言生成产物已提交 → flutter analyze → flutter test（排除联网用例）。
+#
 # 为什么这里没有 `flutter build linux`：
 #   当前工作树里有并发进行中的改动，Linux 桌面构建（GTK + libmpv + ninja）在 CI 上还不稳定，
 #   构建红了会掩盖真正的 analyze / test 问题。等构建路径稳定后再加，届时需要：
@@ -7,16 +11,14 @@
 #     flutter build linux --release
 #
 # Flutter 版本：pubspec.yaml 要求 `sdk: ^3.8.1`；本地实测 Flutter 3.47.7 / Dart 3.13.5（stable）。
-# 这里**钉死 3.47.7**，而不是跟随 stable：下面 gen-l10n 会断言生成产物与提交一致，
+# 这里**钉死 3.47.7**，而不是跟随 stable：check.sh --l10n 会断言 gen-l10n 生成产物与提交一致，
 # 而生成产物的格式随 SDK 版本变化——浮动版本会让 CI 在别人升级 SDK 后无故变红。
-# 升级 Flutter 时，改这里的版本号、本地跑一遍 gen-l10n 并提交产物，再一起提 PR。
+# 升级 Flutter 时，改这里的版本号、本地跑一遍 ./tool/check.sh --l10n 并提交产物，再一起提 PR。
 #
-# 关于 `flutter test`：
-#   本地全量 `flutter test` 会跑 test/services/music_source_live_test.dart 与
-#   music_source_e2e_live_test.dart，它们访问真实外部服务；失败可能只是网络或对方站点的问题，
-#   与代码改动无关（排查用 ./tool/live_sources.sh）。
-#   CI 机器网络不可控，所以下面的 test 步骤**排除**这两个联网用例，只跑其余用例，
-#   否则会因外部 404 / 超时误报变红。
+# 关于联网测试：
+#   test/services/music_source_live_test.dart 与 music_source_e2e_live_test.dart 访问真实外部服务，
+#   失败可能只是网络或对方站点的问题，与改动无关。CI 网络不可控，check.sh 默认**排除**它们；
+#   本地要把它们串起来跑，用 ./tool/live_sources.sh（逐个文件，便于分辨网络噪声）。
 
 name: CI
 
@@ -57,26 +59,12 @@ jobs:
       - name: flutter pub get
         run: flutter pub get
 
-      - name: flutter gen-l10n（并断言生成产物已提交）
-        run: |
-          # lib/l10n/app_localizations*.dart 是入库文件，不是构建垃圾。
-          # 改过 ARB 却没提交生成产物，会让别人的工作树变脏、也让本地化测试和代码对不上。
-          # 注意：生成产物的格式随 Flutter SDK 版本变化。若某次 flutter stable 升级后
-          # 这里开始「无辜变红」，先确认是不是 SDK 换了输出格式，再决定把这步降级为「只跑不比对」。
-          flutter gen-l10n
-          if [ -n "$(git status --porcelain -- lib/l10n)" ]; then
-            echo '::error::lib/l10n 的生成产物与提交内容不一致：请在本地跑 flutter gen-l10n 并提交 lib/l10n 下的改动。'
-            git --no-pager diff --stat -- lib/l10n || true
-            exit 1
-          fi
-
-      - name: flutter analyze
-        run: flutter analyze
-
-      - name: flutter test（排除联网测试）
-        run: |
-          # 排除 test/services/music_source_live_test.dart 与 music_source_e2e_live_test.dart：
-          # 它们要真实网络与外部服务，CI 上失败多半是网络问题。
-          # 当前 204 个用例文件（共 206 个 *_test.dart，减掉 2 个联网用例），本地实测全绿。
-          # 本地想连着联网用例一起跑，直接用 `flutter test`；只想跑联网用例用 ./tool/live_sources.sh。
-          flutter test $(find test -name '*_test.dart' ! -name '*live*' | sort)
+      # --l10n 的那一步会检查 git status：lib/l10n/app_localizations*.dart 是入库文件，
+      # 改过 ARB 却没提交生成产物，会让别人的工作树变脏、也让本地化测试和代码对不上。
+      # 若某次 flutter stable 升级后这里「无辜变红」，先确认是不是 SDK 换了输出格式。
+      #
+      # 用 `bash ./tool/check.sh` 而不是 `./tool/check.sh`：脚本可能因为某些平台
+      # 丢掉可执行位（Windows 检出、手工复制都会），那样报的是 Permission denied，
+      # 不像门禁失败，容易被误判成 CI 配置坏了。
+      - name: 门禁（gen-l10n 一致性 + analyze + test）
+        run: bash ./tool/check.sh --l10n
