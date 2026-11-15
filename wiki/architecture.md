@@ -94,7 +94,7 @@ presentation → application → domain
 | 封面图 | `<音乐库>/.tune/artwork/<哈希前两位>/<哈希>.img` | `FileArtworkCache` |
 | 歌词 | 曲目目录内 `<歌名>.lrc` / `<歌名>.manual.lrc` / `<歌名>.smart.lrc` + `.smart.json` | `LyricsController` / `SmartLyricsService` → `LibraryPaths` |
 
-11 张表各自的列、约束与索引见主仓 [`docs/data-model.md`](https://github.com/pengtang1024/tune/blob/develop/docs/data-model.md)。
+11 张表各自的列、约束与索引见主仓 [`docs/data-model.md`](../docs/data-model.md)。
 
 要点：
 
