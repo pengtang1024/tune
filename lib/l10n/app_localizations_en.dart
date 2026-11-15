@@ -4398,6 +4398,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalFeatureSystemReady => 'Using the system install';
 
   @override
+  String get settingsLocalFeatureSystemInUse =>
+      'The system install is in use and still comes first; a bundled copy is only a fallback.';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return 'Or download a bundled copy (about $size)';
+  }
+
+  @override
   String settingsLocalFeaturePartial(int done, int total) {
     return 'Partly installed · $done/$total';
   }

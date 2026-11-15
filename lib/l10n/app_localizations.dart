@@ -7607,6 +7607,18 @@ abstract class AppLocalizations {
   /// **'使用系统已安装版本'**
   String get settingsLocalFeatureSystemReady;
 
+  /// No description provided for @settingsLocalFeatureSystemInUse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前用的是系统已安装的版本，系统优先；自带的副本只作备用。'**
+  String get settingsLocalFeatureSystemInUse;
+
+  /// No description provided for @settingsLocalFeatureDownloadBundled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'也可以下载一份自带的（约 {size}）'**
+  String settingsLocalFeatureDownloadBundled(String size);
+
   /// No description provided for @settingsLocalFeaturePartial.
   ///
   /// In zh_CN, this message translates to:

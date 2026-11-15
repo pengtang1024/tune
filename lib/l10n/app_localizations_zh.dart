@@ -4083,6 +4083,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
 
   @override
+  String get settingsLocalFeatureSystemInUse => '当前用的是系统已安装的版本，系统优先；自带的副本只作备用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下载一份自带的（约 $size）';
+  }
+
+  @override
   String settingsLocalFeaturePartial(int done, int total) {
     return '部分完成 · 已完成 $done/$total';
   }
@@ -8467,6 +8475,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalFeatureSystemInUse => '当前用的是系统已安装的版本，系统优先；自带的副本只作备用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下载一份自带的（约 $size）';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {
@@ -12854,6 +12870,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureSystemReady => '使用系統已安裝版本';
+
+  @override
+  String get settingsLocalFeatureSystemInUse => '目前用的是系統已安裝的版本，系統優先；自帶的副本只作備用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下載一份自帶的（約 $size）';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {

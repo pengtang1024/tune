@@ -1941,6 +1941,8 @@
   "settingsLocalFeatureVerifying": "校驗中",
   "settingsLocalFeatureReady": "可用 · 佔用 {size}",
   "settingsLocalFeatureSystemReady": "使用系統已安裝版本",
+  "settingsLocalFeatureSystemInUse": "目前用的是系統已安裝的版本，系統優先；自帶的副本只作備用。",
+  "settingsLocalFeatureDownloadBundled": "也可以下載一份自帶的（約 {size}）",
   "settingsLocalFeaturePartial": "部分完成 · 已完成 {done}/{total}",
   "settingsLocalFeatureFailed": "失敗：{message}",
   "settingsLocalFeatureNeedDownload": "需要下載約 {size}",

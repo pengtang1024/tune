@@ -1941,6 +1941,8 @@
   "settingsLocalFeatureVerifying": "Verifying",
   "settingsLocalFeatureReady": "Ready · {size} used",
   "settingsLocalFeatureSystemReady": "Using the system install",
+  "settingsLocalFeatureSystemInUse": "The system install is in use and still comes first; a bundled copy is only a fallback.",
+  "settingsLocalFeatureDownloadBundled": "Or download a bundled copy (about {size})",
   "settingsLocalFeaturePartial": "Partly installed · {done}/{total}",
   "settingsLocalFeatureFailed": "Failed: {message}",
   "settingsLocalFeatureNeedDownload": "About {size} to download",
