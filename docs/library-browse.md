@@ -1,9 +1,24 @@
 # 音乐库分类与筛选（已实施）
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 2026-10-31。回答「音乐库除了搜索还能怎么找歌」：分类怎么分、筛选怎么叠、视觉上怎么读。
 > 相关：[library-redesign.md](library-redesign.md)（页头/列头/排序/密度）、[chips.md](chips.md)（标识）、
 > [genre-localization.md](genre-localization.md)（流派名）、[performance.md](performance.md)（查询预算）。
-> 状态：**M0–M4 已实施**。文中保留当时的设计提案，实现与原提案不一致处已在 §4/§8 就地改正，最终以代码为准。
+> 实施记录：**M0–M4 已实施**。文中保留当时的设计提案，实现与原提案不一致处已在 §4/§8 就地改正，最终以代码为准。
+
+## 目录
+
+- [1. 问题与目标](#1-问题与目标)
+- [2. 方案](#2-方案)
+- [3. 约束](#3-约束)
+- [4. 设计：分类视图 + 左侧树 + 分面筛选](#4-设计分类视图--左侧树--分面筛选)
+- [5. 数据与查询](#5-数据与查询)
+- [6. 性能预算](#6-性能预算)
+- [7. 与 library-redesign 的联合落地](#7-与-library-redesign-的联合落地)
+- [8. 已拍板与实施后定案](#8-已拍板与实施后定案)
+- [9. 不在范围](#9-不在范围)
+- [10. 验收](#10-验收)
 
 ## 1. 问题与目标
 
@@ -232,6 +247,24 @@
 
 默认视图仍是「歌曲」：列表是本产品的密度特征，专辑墙是并列入口而不是新的首页。
 
+### 4.9 脏数据：零时长与极短轨（2026-11-15）
+
+「分类」回答这是不是歌；「脏数据」回答这条能不能读。两者不混：脏数据不改 `ContentKind`。
+
+- **零时长默认隐藏。** `duration` 为 0 或缺失的条目不进列表（本地与在线一致），
+  但不做暗过滤：工具条下方出现一行「已隐藏 N 条时长缺失的曲目」与「显示」按钮，
+  点一下就关掉这条隐藏。计数按当前搜索与筛选现算，只描述时长缺失这一条规则。
+- **只在歌曲作用域生效。** 电台直播流天然没有时长，播客与有声书的条目也可能缺，
+  它们仍按内容类型保留；这条规则只为「歌曲」列表清掉脏行，不跨作用域。
+- **极短轨默认不隐藏。** 3 秒以内仍是音频，只在筛选面板的「极短轨」组里由读者勾选
+  「3 秒以内」后才排除，默认关闭。它算一个筛选组，进入 `activeGroups` 与「清除全部」。
+- **两条规则都持久化。** 与其它筛选一起写进 `view.json`（`hideMissingDuration` 缺省为
+  `true`，`excludeShortTracks` 缺省为 `false`）；「清除全部」只清筛选组，
+  保留读者对零时长隐藏的选择。
+- 判据只有时长字段：不看标题、不看来源、不看后缀。零时长是数据缺失，不是内容类型。
+- 规则在 SQL 的 `where` 里统一生效（`LibraryFilterSql.hiddenDuration` /
+  `shortTracks`），计数用 `missingDurationCount`，与列表同一份 `WHERE`。
+
 ## 5. 数据与查询
 
 ### 5.1 模型
@@ -257,21 +290,65 @@ class LibraryFilter {
 }
 ```
 
-- `ContentKind` 四值：`music / podcast / audiobook / radio`。判据按顺序读：
+- `ContentKind` 五值：`music / podcast / audiobook / radio / soundEffect`。判据按顺序读：
   1. `isLiveStream` 为真 → 电台；
-  2. 实例声明表 `declaredContentKinds`（按完整实例 id）→ 该类型；
-  3. 非本地音源按类型集合（`podcastSourceTypes` / `audiobookSourceTypes`）；
-  4. 本地文件按 `localContentKindOf`：显式 `genre` / `genres` 标签 > `.m4b` > 路径文件夹段 > 音乐。
+  2. 条目自带声明 `sourceData.contentKind`（IA 扫描时读条目 `collection` 得来）→ 该类型；
+  3. 口语 genre 前缀（`audiobook` / `audio book` / `books and spoken` / `books & spoken` /
+     `poetry` → 有声书，`speech` / `comedy` → 播客）→ 该类型。只读 genre 字符串的**第一个标签**；
+     普通音乐流派（Blues、Gospel…）一律不许覆盖实例；
+  4. 专辑例外表 `declaredAlbumKinds`（**对已声明实例也生效**）→ 该类型；
+  5. 实例声明表 `declaredContentKinds`（按完整实例 id）→ 该类型；
+  6. 非本地音源的 `genre` / `genres` 有标签以 `non-music` 开头 → 音效；
+  7. 非本地音源按类型集合（`podcastSourceTypes` / `audiobookSourceTypes`）；
+  8. 本地文件按 `localContentKindOf`：显式 `genre` / `genres` 标签 > `.m4b` > 路径文件夹段 > 音乐。
 - 声明表就是同适配器不同语义的落点：`archive_podcasts` / `science_talks` → 播客，
-  `independent_audiobooks` / `poetry_books` / `poetry` → 有声书，
+  `independent_audiobooks` / `poetry_books` / `poetry` / `foreign_audio` → 有声书，
   `old_time_radio` / `radio_recordings` / `news_recordings` → 电台，
-  `foreign_audio` / `unlocked_recordings` 不声明（按类型即音乐）。
+  `unlocked_recordings` 不声明（按类型即音乐）。
+- 条目自带声明来自 IA 的 `collection` 数组（`librivox` / `audio_foreign` → 有声书，
+  `podcasts` → 播客，`oldtimeradio` → 电台），是来源自己的话，不是启发式；
+  只在命中时写入 `sourceData.contentKind`，音乐条目不写，免得盖住专辑例外。
+- 专辑例外只用于「一个实例里有一张专辑是另一种内容」：`declaredAlbumKinds` 按「实例 id → 归一化专辑名（小写、去首尾空白、内部空白折叠）→ 类型」书写，目前六处：
+  - `unlocked_recordings` 的 `death of a salesman` → 有声书（整场话剧 7 条）。
+  - `community_world` 的两本书 → 有声书（上传者把书名写成带 `Full Audiobook` / `Unabridged Audiobook` 的条目名，genre 却仍标 World，genre 标签救不了它们）。
+  - `archive_podcasts` 的 `Sleep Safe & Calm… Delta Waves`、`pIANO` → 音乐。
+  - `RelicRadio.com` → 电台（老广播剧，不是播客）。
+- 专辑例外也改写已声明的实例：实例声明描述整个 collection，专辑名描述那一条被放错架子的条目。
+- 音效只由**显式元数据**判定：IA 的 `Non-Music` genre 前缀。不用时长、不用标题关键词，
+  也不看艺术家——1–3 秒的鼓循环仍是音乐，30 分钟的整面音轨也可能是音乐。
+- `foreign_audio`（IA `collection:audio_foreign`）收的是非英语音频，实测 194 条全是
+  越南语/法语小说的分章（`chuong-NN`、`ChapitreNN`，专辑名即书名，genre 全空），
+  所以整实例按有声书判定；它此前落进音乐作用域是漏判。
 - 声明表按**完整实例 id** 读，新增 IA 实例时先看它的语义再决定是否声明；不声明的实例落回音源类型集合。
+  这是 **H1 的临时机制**，可持续做法见 §5.1.1。
 - 电台的「直播 / 录音」不再新增字段：`ContentKind.radio` 且 `isLiveStream == false` 就是录音；
   行副标题据此写「直播中」或「录音」。
 - 本地规则只用中英名单，**不用时长猜**：标签与文件夹名见 `content_kind.dart` 的四个常量集合。
 - 与 `LibrarySort` 同属 library domain；`LibraryState.filter` 是唯一来源。
 - `filteredSongsOf` 保留为测试/缓存状态的兜底；生产路径由 SQL 返回已筛选的窗口。
+
+#### 5.1.1 已知的疑似项（不改，记在这里）
+
+下面这些有线索但五类里没有合适位置，或者证据只有推断，**保持现状**：
+
+| 位置 | 条数 | 线索 | 为什么不改 |
+|---|---:|---|---|
+| `great78` / `Party Record` | 28 | 双关/novelty 段子，genre 多为 `Party Record` 或空 | 五类无「novelty」位置，不加第 6 类；另有 2 条 genre 明确写 `Comedy`，按 §5.1 第 3 条归播客 |
+| `great78` / Edison 蜡筒政治演讲 | 1 | genre 明说 documentary recordings & political speeches | 前缀是 Documentary，不匹配任何口语标签；不加第 6 类 |
+| `archive_podcasts` / `TASCAM DR-05` | 2 | 录音笔型号作专辑名，疑现场录音 | 无 genre、无声明，纯推断 |
+| `internet_archive` / `Reading1Volume6.mp3` | 1 | URI 落在 Reading 文件 | 实例无声明、无 genre，纯推断 |
+| `peertube` / «C'est qui Picasso ?» | 1 | 教育视频却带 Music 标签 | 来源没有语音映射，推断不可靠 |
+| `radio_recordings` / 访谈与音乐混排 | 约 25–30 | 部分是 Blues/Instrumental 专辑，部分是访谈 | 无逐条显式标签；能靠 genre 定的已定，其余留电台 |
+| `old_time_radio` / 少量非广播条目 | 2 | genre 与节目不符 | 同实例声明，证据不足 |
+
+**可持续机制（本版实现第二层）：**
+
+- **第一层（后续候选，未纳入本版）**：把 `contentKind` 与 `albumOverrides` 写进音源实例配置，设置页可改；
+  内置实例用现有常量做种子。新实例是数据编辑，不是改代码。
+- **第二层（已实现）**：IA 扫描时读条目 `collection`，命中已知集合就写入条目级声明；
+  新增 IA 实例不需要改代码，只要它在已知 collection 里。
+- **第三层（后续候选，未纳入本版）**：把 `declaredAlbumKinds` 从代码常量搬成 `(instance, normalized_album, kind)`
+  小表，界面可加可删；`Non-Music` genre 保留为唯一自动条目级细化。
 
 ### 5.2 SQL
 
@@ -282,13 +359,10 @@ class LibraryFilter {
 - 音源：`COALESCE(source_id,'local') IN (…)`。
 - 语言：入库时把 `language` 归一（小写 ISO-639-1，认不出保留原值）写入 `songs.language` 真实列；
   旧库启动时一次性回填；`songs.language IN (…)`。
-- 类型：三条谓词由 domain 常量生成，与 `contentKindOfFields` 同序：
-  - `LibraryFilterSql.radio` = `COALESCE(isLiveStream,0)=1` OR 声明为电台的实例；
-  - `LibraryFilterSql.spokenWord` = 非无线电、非电台实例，且（播客源 / 播客实例 / 本地有声书或播客规则）；
-  - `music` = 非无线电、非电台实例、非播客、非有声书；
-  - `podcast` / `audiobook` = `spokenWord` 各自的一半；
-  - 本地规则用 `genre` / `genres` 的 LIKE 与 `localPath` 的目录段复刻 Dart 侧优先级，
-    `.m4b` 单独判断；两侧都由 `content_kind.dart` 的同一组常量生成。
+- 类型：一个 `CASE` 表达式（`LibraryFilterSql._kindOf`）按 §5.1 的顺序逐条匹配，每种类型都变成 `(_kindOf = '…')`，所以分面、计数与列表不可能各说一套：
+  - 依次为 `json_extract(songs.json,'$.sourceData.contentKind')` → 口语 genre 前缀（`LIKE 'audiobook%'` 等，只对 genre 首位与 `json_each(genres)` 的每个值）→ 专辑例外 (`source_id` + 归一化 `album`) → 实例声明 (`source_id`) → `Non-Music` 前缀 → 类型集合 / 本地规则 → `ELSE 'music'`。
+  - `spokenWord` = `_kindOf IN ('podcast','audiobook')`；`radio` = `_kindOf = 'radio'`。
+  - 本地规则用 `genre` / `genres` 的 LIKE 与 `localPath` 的目录段复刻 Dart 侧优先级，`.m4b` 单独判断；两侧都由 `content_kind.dart` 的同一组常量生成。
 - 格式：入库时把 `type` / URI 扩展名归一成 `mp3/flac/ogg/m4a/wav/other` 写入 `songs.format` 真实列；
   旧库同样回填；`songs.format IN (…)`。
 - 时长：`duration` 毫秒分桶。
@@ -372,7 +446,7 @@ class LibraryFilter {
 
 10. 四语文案、空态、加载/错误、筛选持久化（`view.json`）、截图与性能基准、文档与 AGENTS 地图。
 
-## 8. 已拍板与仍待定
+## 8. 已拍板与实施后定案
 
 ### 已拍板
 
@@ -421,3 +495,11 @@ class LibraryFilter {
 - 空结果、无封面、无流派、`year=0`、`dateAdded=0`、无语言、未知格式都有确定表现。
 - 页头 / 列头 / 行尾 / 排序 / 双列与分类筛选同批验收。
 - `flutter analyze` 无 issue；`flutter test` 全绿。
+
+## 相关文档
+
+- [library-redesign.md](library-redesign.md) — 库页的页头、列头、排序与多列
+- [data-model.md](data-model.md) — `songs` 表的列、索引与写库纪律
+- [architecture.md](architecture.md) — 筛选与分类状态归谁
+- [performance.md](performance.md) — 查询与列表的性能预算
+- [conventions.md](conventions.md) — 尺寸与 token

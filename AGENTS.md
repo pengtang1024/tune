@@ -1,17 +1,31 @@
 # Tune 工程规范
 
+> 状态：契约 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 给 AI 协作代理的**文档地图**：先读本页，再按表跳到需要的那份文档，最后才动手改。
 > 规则只维护一份（本页 + `docs/`）；`.lingma/rules/project_rule.md` 与 `.trae/rules/project_rules.md` 只指向这里。
 > 与代码冲突时以代码为准，并顺手修正对应文档。
+
+## 目录
+
+- [文档地图](#文档地图)
+- [0. 项目快照](#0-项目快照)
+- [1. 最高优先级：架构优化优先于代码优化](#1-最高优先级架构优化优先于代码优化)
+- [2. 验证门禁](#2-验证门禁)
+- [3. Git](#3-git)
+- [4. 不在当前范围](#4-不在当前范围)
 
 ## 文档地图
 
 | 要做的事 | 读哪份 |
 | --- | --- |
+| 不知道某份文档该不该读、算不算规范 | [`docs/README.md`](docs/README.md)（文档索引与状态约定） |
+| 写文档、改文档结构、加目录或状态行 | [`docs/document-style.md`](docs/document-style.md)（文档写法契约，`tool/check_docs.py` 执行） |
 | 判断改动优先级、要不要先动架构 | 本页 §1 |
 | 加文件、放哪一层、能不能跨 feature 引用 | [`docs/architecture.md`](docs/architecture.md) |
 | 查某个状态归谁、谁在改它 | [`docs/architecture.md`](docs/architecture.md) |
 | 查偏好和本地数据存在哪、谁在写 | [`docs/architecture.md`](docs/architecture.md) 的「持久化」 |
+| 加表、加列、改索引、写 SQL 前查列与约束 | [`docs/data-model.md`](docs/data-model.md) |
 | 加音源 / 加页面 | [`docs/architecture.md`](docs/architecture.md) 的「扩展路径」 |
 | 查推荐 / 发现页的模型、入口、隐私边界 | [`docs/recommendation.md`](docs/recommendation.md)（M1–M5 已实施） |
 | 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M13 已实施；产品口径：每首有词，准入降级为高置信标注） |
@@ -40,13 +54,20 @@
 | 查卡顿、重建风暴、性能预算 | [`docs/performance.md`](docs/performance.md)（D1–D11 已修） |
 | 查列表行为什么这么画（表格列、提示层、行高） | [`docs/performance-row-design.md`](docs/performance-row-design.md) |
 | 了解产品、需求与验收范围 | [`需求/README.md`](需求/README.md) |
+| 想贡献代码：分支、门禁、提 PR | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
+| 想知道谁负责、怎么决策 | [`GOVERNANCE.md`](GOVERNANCE.md) |
+| 发现安全漏洞 / 要报敏感问题 | [`SECURITY.md`](SECURITY.md) |
+| 用不了、要排障（现象 → 原因 → 怎么确认 → 怎么处理） | [`docs/troubleshooting.md`](docs/troubleshooting.md) |
+| 提问、讨论、求助 | [`SUPPORT.md`](SUPPORT.md) |
+| 参与前要遵守的社区规范 | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) |
+| 改平台设置、发版、同步镜像与标签 | [`docs/oss-maintenance.md`](docs/oss-maintenance.md) |
 
 ## 0. 项目快照
 
-- 产品：紧凑的桌面音乐播放器（Flutter）。壳层是左侧导航（音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是底栏和正在播放页打开的非模态侧栏，不是一级导航页；它只遮住内容区，底栏和侧栏仍可用。
-- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux 走 just_audio_media_kit）· dio · shared_preferences（仅旧数据迁移）· gen-l10n。
+- 产品：紧凑的桌面音乐播放器（Flutter）。壳层是左侧导航（发现 / 音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是底栏和正在播放页打开的非模态侧栏，不是一级导航页；它只遮住内容区，底栏和侧栏仍可用。
+- 技术栈：Flutter 3 / Dart 3.8+ · Riverpod 2 · go_router · just_audio（Linux/Windows 走 just_audio_media_kit + media_kit_libs_*）· dio · SQLite（sqlite3 + sqlite3_flutter_libs）· shared_preferences（仅旧数据迁移）· audio_service · permission_handler · sherpa_onnx · gen-l10n。
 - 验收平台：Linux 桌面优先；Windows / Android / iOS 保留工程入口，但不是 v1 验收目标。**macOS 与 Web 不再支持**，平台工程入口与相关代码已移除。
-- 需求文档：`需求/README.md` 是入口，那里列的四份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。
+- 需求文档：`需求/README.md` 是入口，那里列的五份是现行权威：`紧凑播放器重构方案.md`（架构现状与验收）、`音源设计.md`（音源扩展）、`队列模型方案.md`（队列模型）、`桌面集成方案.md`（桌面集成）、`多语言设计.md`（文案规则）。
 - **旧稿在 [`需求/历史/`](需求/历史/README.md)**：2025 年 12 月那版的架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范都在那里。它们描述的是当时的目录与调色板，**只当历史读，不作规范**。
 - `.trae/documents/` 是历史迭代计划，其中还引用 `lib/ui`、`PlaylistService` 等已删除的结构——只当历史读，不当规范。
 
@@ -115,11 +136,10 @@
 ## 2. 验证门禁
 
 ```bash
-flutter analyze          # 必须 No issues found
-flutter test             # 全绿
+./tool/check.sh --l10n --tools --docs   # 同 CI：gen-l10n 一致性 + analyze + 用例 + 截图探针 + 文档结构
 ```
 
-改过文案还要 `flutter gen-l10n` 并提交产物。细节与测试布局见 [`docs/verification.md`](docs/verification.md)。
+`flutter` 不在 PATH 时用 `export PATH="/opt/flutter/bin:$PATH"`。分步等价：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过文案再 `flutter gen-l10n` 并提交产物。细节与测试布局见 [`docs/verification.md`](docs/verification.md)。
 
 ## 3. Git
 
@@ -129,5 +149,12 @@ flutter test             # 全绿
 
 ## 4. 不在当前范围
 
-- 移动端通知栏 / 锁屏控制、均衡器、播放历史、账号系统已移出主链路，不要顺手加回来。
+- 移动端通知栏 / 锁屏控制、均衡器、播放历史、账号系统不在 v1 桌面主链路内，不要顺手加回来；Android 的后台播放 / 通知 / 锁屏控制已由 audio_service 单独实现（见 [docs/android.md](docs/android.md)），不属于桌面主链路。
 - 主要验收平台是 Linux 桌面端；其它保留入口的平台行为可以不同，但差异要写进 README 的「已知限制」。macOS 与 Web 不在支持范围。
+
+## 相关文档
+
+- [文档索引](docs/README.md) — 每份设计文档的状态与适用范围
+- [架构](docs/architecture.md) — 分层、状态归属与依赖方向
+- [参与贡献](CONTRIBUTING.md) — 分支、门禁与提交流程
+- [验证](docs/verification.md) — 门禁命令与测试布局

@@ -86,7 +86,7 @@ class TrayServiceImpl implements TrayService {
         return false;
       }
 
-      Log.info('系统托盘图标已注册: $busName');
+      Log.debug('系统托盘图标已注册: $busName');
       return true;
     } catch (error, stackTrace) {
       Log.error('创建系统托盘图标失败: $error\n$stackTrace');
@@ -143,7 +143,7 @@ class TrayServiceImpl implements TrayService {
       );
       return true;
     } catch (error) {
-      Log.info('托盘监视器不接受路径形式，改用服务名形式');
+      Log.debug('托盘监视器不接受路径形式，改用服务名形式');
     }
 
     try {

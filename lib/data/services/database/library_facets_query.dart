@@ -75,6 +75,8 @@ class LibraryFacetsQuery {
       "json_extract(songs.json, '\$.uri') AS uri",
       "json_extract(songs.json, '\$.localPath') AS localPath",
       'songs.genre AS genre',
+      'songs.album AS album',
+      "json_extract(songs.json, '\$.sourceData.contentKind') AS statedKind",
     ];
     final args = <Object?>[];
     for (final group in _FacetGroup.values) {
@@ -103,7 +105,7 @@ class LibraryFacetsQuery {
       var failures = 0;
       var failedAt = -1;
       for (var index = 0; index < _FacetGroup.values.length; index++) {
-        if ((row.columnAt(11 + index) as int?) == 0) {
+        if ((row.columnAt(13 + index) as int?) == 0) {
           failures++;
           failedAt = index;
           if (failures > 1) break;
@@ -173,6 +175,8 @@ class LibraryFacetsQuery {
           uri: row.columnAt(8) as String?,
           localPath: row.columnAt(9) as String?,
           genre: row.columnAt(10) as String?,
+          album: row.columnAt(11) as String?,
+          statedKind: row.columnAt(12) as String?,
         );
         kinds[kind] = (kinds[kind] ?? 0) + 1;
       }

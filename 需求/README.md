@@ -1,10 +1,26 @@
 # 🎵 Tune 音乐播放器项目需求文档
 
+> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-3.0+-blue.svg" alt="Flutter Version">
+  <img src="https://img.shields.io/badge/Flutter-3-blue.svg" alt="Flutter Version">
   <img src="https://img.shields.io/badge/License-MIT%20(code)-green.svg" alt="License: MIT (source code)">
   <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20Linux-brightgreen" alt="Supported Platforms">
 </p>
+
+## 目录
+
+- [📋 项目概述](#-项目概述)
+- [📁 需求文档目录](#-需求文档目录)
+- [🛠️ 技术栈](#-技术栈)
+- [📱 平台适配要求](#-平台适配要求)
+- [📐 开发原则](#-开发原则)
+- [🎯 主要功能模块](#-主要功能模块)
+- [🧪 测试策略](#-测试策略)
+- [📈 扩展性考虑](#-扩展性考虑)
+- [📄 许可证](#-许可证)
+- [👥 贡献](#-贡献)
+- [📞 联系方式](#-联系方式)
 
 ## 📋 项目概述
 
@@ -12,17 +28,17 @@
 
 ### 🎯 核心目标
 
-- 在 900×600（最小 760×520）窗口内提供高信息密度的播放体验
+- 以 900×600 紧凑布局为设计验收基准，提供高信息密度的播放体验；运行时首次启动默认 1120×760、最小 760×520，首帧 900×600（GTK runner）
 - 高效扫描、搜索、分类浏览与分面筛选本地与在线歌曲
 - 通过适配器接入开放曲库和自建 API 音源
 - 每首有词：人写票池优先，本地 / 云端 ASR 自动补齐歌词
 - 保持主题、语言、扫描目录、排序筛选和音源配置可持久化
 
-> 说明：本页列出的四份文档是**现行**的需求与设计。2025 年 12 月那版旧稿（架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范）已经移到 [历史/](历史/README.md)，只当历史读，不作规范。
+> 说明：本页列出的五份文档是**现行**的需求与设计。2025 年 12 月那版旧稿（架构、框架、功能、账号、ai 架构、旧配色、旧界面风格、默认配置、功能规范）已经移到 [历史/](历史/README.md)，只当历史读，不作规范。
 
 ## 📁 需求文档目录
 
-> 只有下面这四份是现行的。别的需求文档要么在这里，要么在 [历史/](历史/README.md) 里——不要在别处找依据。
+> 只有下面这五份是现行的。别的需求文档要么在这里，要么在 [历史/](历史/README.md) 里——不要在别处找依据。
 
 ### 1. 🎵 现行需求与设计
 - [紧凑播放器重构方案](紧凑播放器重构方案.md) - 当前桌面播放器的架构、验收与清理记录
@@ -40,10 +56,10 @@
 
 | 类别 | 技术/工具 |
 |------|----------|
-| 核心框架 | Flutter 3.8+ / Dart 3 |
+| 核心框架 | Flutter 3 / Dart 3.8+ |
 | 状态管理 | Riverpod |
 | 路由管理 | go_router |
-| 音频播放 | just_audio；Linux 使用 just_audio_media_kit + 系统 libmpv |
+| 音频播放 | just_audio；Linux/Windows 走 just_audio_media_kit（media_kit_libs_linux / media_kit_libs_windows_audio）+ 系统 libmpv，自定义请求头随请求发出 |
 | 本地存储 | SQLite（`library.db`）+ 单键偏好文件（`settings/`）；shared_preferences 仅旧数据迁移 |
 | 网络请求 | dio |
 | 文件选择 | file_picker |
@@ -52,7 +68,7 @@
 ## 📱 平台适配要求
 
 ### 桌面端（Linux 优先）
-- ✅ 900×600 默认窗口与 760×520 最小窗口
+- ✅ 首帧 900×600（GTK runner）；运行时首次启动默认 1120×760、最小 760×520；紧凑布局按 900×600 设计验收
 - ✅ 窗口管理、左侧导航 + 内容区 + 底部播放条
 - ✅ 本地文件与在线音源统一播放
 
@@ -103,13 +119,13 @@
 - 扫描失败按音源隔离，保留缓存
 
 ### 音源模块
-- 内置本地目录、Openverse、Jamendo、Internet Archive、Netease API 适配器
+- 内置本地目录、Openverse、Jamendo、Internet Archive 等公开曲库适配器，以及自建 / 自托管服务（Subsonic / Navidrome、Jellyfin、Emby、Plex、Ampache、Koel、Funkwhale 等）
 - 音源开关、配置校验、自动扫描间隔
 - 启动自动扫描，失败保留缓存
 
 ### UI/UX 模块
 - 紧凑桌面壳层：左侧导航 + 右侧内容区 + 底部播放条
-- 音乐库 / 喜欢 / 音源 / 设置作为导航页；播放队列是底栏和正在播放页打开的侧栏
+- 发现 / 音乐库 / 喜欢 / 音源 / 设置作为导航页；播放队列是底栏和正在播放页打开的侧栏
 - 浅色 / 深色 / 系统主题
 - 多语言选择：简体中文、繁體中文、中文（通用）、English
 

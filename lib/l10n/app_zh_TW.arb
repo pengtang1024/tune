@@ -129,6 +129,15 @@
       }
     }
   },
+  "libraryEffectCount": "{count} 段",
+  "@libraryEffectCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "沒有符合的歌曲",
   "libraryNoMatchSubtitle": "換個關鍵字，或清除搜尋條件",
   "librarySourceEmptyTitle": "該來源暫無歌曲",
@@ -1362,6 +1371,7 @@
   "contentKindAudiobook": "有聲書",
   "contentKindMusic": "音樂",
   "contentKindRadio": "電台",
+  "contentKindSoundEffect": "音效",
   "trackFactPath": "檔案路徑",
   "trackFactAddress": "線上位址",
   "trackDetailsTooltip": "查看詳情",
@@ -1822,6 +1832,18 @@
   "libraryFilterDurationMedium": "2–5 分钟",
   "libraryFilterDurationLong": "5–10 分钟",
   "libraryFilterDurationEpic": ">10 分钟",
+  "libraryFilterShortTracks": "極短軌",
+  "libraryFilterShortTracksOption": "3 秒以內",
+  "libraryHiddenMissingDuration": "已隱藏 {count} 條時長缺失的曲目",
+  "@libraryHiddenMissingDuration": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryShowHiddenDuration": "顯示",
   "libraryFilterAddedWeek": "最近 7 天",
   "libraryFilterAddedMonth": "最近 30 天",
   "libraryFilterAddedYear": "最近一年",
@@ -1931,6 +1953,8 @@
   "settingsLocalFeatureVerifying": "校驗中",
   "settingsLocalFeatureReady": "可用 · 佔用 {size}",
   "settingsLocalFeatureSystemReady": "使用系統已安裝版本",
+  "settingsLocalFeatureSystemInUse": "目前用的是系統已安裝的版本，系統優先；自帶的副本只作備用。",
+  "settingsLocalFeatureDownloadBundled": "也可以下載一份自帶的（約 {size}）",
   "settingsLocalFeaturePartial": "部分完成 · 已完成 {done}/{total}",
   "settingsLocalFeatureFailed": "失敗：{message}",
   "settingsLocalFeatureNeedDownload": "需要下載約 {size}",

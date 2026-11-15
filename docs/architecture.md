@@ -1,8 +1,54 @@
 # 架构契约
 
+> 状态：契约 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > AGENTS.md 的展开文档。改目录、加文件、动依赖前读这份。
 
+## 目录
+
+- [目录结构](#目录结构)
+- [依赖方向](#依赖方向)
+- [硬约束](#硬约束)
+- [运行时链路](#运行时链路)
+- [状态归属](#状态归属)
+- [桌面集成](#桌面集成)
+- [窗口形态与能力](#窗口形态与能力)
+- [持久化](#持久化)
+- [音乐库的目录](#音乐库的目录)
+- [曲目事实（track facts）](#曲目事实track-facts)
+- [chip 的样子](#chip-的样子)
+- [提示（tooltip）](#提示tooltip)
+- [底部浮层（sheet）](#底部浮层sheet)
+- [扩展路径](#扩展路径)
+- [相关文档](#相关文档)
+
 ## 目录结构
+
+目录只是层的落点。箭头是允许的依赖方向，反过来一律禁止：
+
+```mermaid
+flowchart TB
+  APP["app：router / theme / 启动（组装根）"]
+  P["features/*/presentation"]
+  A["features/*/application"]
+  D["features/*/domain"]
+  FD["features/*/data"]
+  S["data/services"]
+  M["domain/models"]
+  SH["shared/ui：跨 feature 复用的 widget"]
+  C["core：各层可用的通用能力"]
+
+  APP --> P
+  APP --> A
+  P --> A
+  A --> D
+  A --> FD
+  A --> S
+  D --> M
+  S --> M
+  P -. 复用 .-> SH
+  SH -.-> C
+```
 
 ```text
 lib/
@@ -42,6 +88,38 @@ presentation → application → domain
 5. provider 与 controller 不持有 `BuildContext`；controller 需要文案时用 `AppStrings.instance`。
 6. 页面之间的切换只有路由一处：外壳（`features/shell`）把路由的导航器交给页面区，不在页面区再切一次。切两次会同时留下两个导航器，而路由的 key 只属于其中一个。侧栏不是页面：播放队列由 `SidePanelHost` 在页面区内组合，不注册路由。内容区用遮罩挡住并移出焦点，壳层的底栏和侧栏在宿主外仍可操作；关闭走面板按钮、Esc、内容区遮罩、返回键或侧栏切页。详见 [queue-panel.md](queue-panel.md)。
 
+## 运行时链路
+
+启动只装配一次：进程起来后按顺序打开存储与播放，再进首屏。
+
+```mermaid
+flowchart TB
+  M["main()<br/>绑定 · 单实例 · ProviderContainer"] --> T["TuneApp<br/>appInitializationProvider"]
+  T --> I["AppInitializer.initialize"]
+  I --> P["FilePersistenceService.init()"]
+  P --> DB["AppDatabase.open()<br/>library/library.db"]
+  I --> PS["PlaybackSessionStore.init()"]
+  I --> A["AudioPlayerService.init()<br/>just_audio + media_kit"]
+  I --> W["WindowManagerService.init()"]
+  I -. 首帧后 .-> D["DesktopIntegration.start()"]
+  T --> R["MaterialApp.router<br/>appRouterProvider"]
+  R --> L["CompactShell + /library<br/>LibraryPane"]
+```
+
+播放由同一条 provider 链驱动，一次点击最终落到播放条与正在播放页：
+
+```mermaid
+flowchart LR
+  ROW["曲目行（library_columns_view / favorites_pane）"] -->|ListPlayback.play| LP["ListPlayback"]
+  LP -->|playSong / playQueue| PC["PlaybackController"]
+  PC -->|play · pause · seek| APS["AudioPlayerService"]
+  APS --> JA["JustAudioPlayerService"]
+  JA --> MK["just_audio_media_kit<br/>media_kit / libmpv"]
+  PC -->|PlaybackState| OV["playbackOverviewProvider<br/>慢值切片"]
+  OV --> DOCK["PlayerDock 底部播放条"]
+  OV --> NP["NowPlayingPage 正在播放页"]
+```
+
 ## 状态归属
 
 | 状态 | 唯一来源 | 职责 |
@@ -76,13 +154,15 @@ presentation → application → domain
 - 注册表是 `type → adapter` 的数据（`MusicSourceService`），可以注入，测试因此不用改全局状态。
 - 名称、品牌图标与浏览流都按类型查，界面不按 id 硬编码。
 - 每个实例有一个 `weight`：越大越靠前。本地音乐固定 `1000`；其他实例默认
-  `featured` 为 `800`、读者添加为 `700`、需要凭据的为 `400`。`weight >= 500`
-  在主列表，低于 `500` 折叠进「更多音源」；行尾菜单可以上移、下移、移入或移出
-  更多音源。健康度再守一道门：它由可用、配置、扫描、新鲜、产出、速度、可靠、
-  稳定、可播放、封面、元数据、活跃十二个维度合成 0–100 分，维度权重可在设置页的「音源 / 健康度权重」
-  里调整；不支持、已关闭、配置不完整、最近扫描失败或有曲目但没有任何封面（低于
-  `60` 分）也进更多音源，恢复后自动回来。主列表先按健康度分档（`85+` / `70–84` /
-  `60–69`），档内按 `weight`；上下移动只在同一档内生效。分组与排序不按 id 硬编码。
+  `featured` 为 `800`、读者添加为 `700`、需要凭据的为 `400`。
+  - `weight >= 500` 在主列表，低于 `500` 折叠进「更多音源」；行尾菜单可以上移、
+    下移、移入或移出更多音源。
+  - 健康度再守一道门：它由可用、配置、扫描、新鲜、产出、速度、可靠、稳定、
+    可播放、封面、元数据、活跃十二个维度合成 0–100 分，维度权重可在设置页的
+    「音源 / 健康度权重」里调整；不支持、已关闭、配置不完整、最近扫描失败或有
+    曲目但没有任何封面（低于 `60` 分）也进更多音源，恢复后自动回来。
+  - 主列表先按健康度分档（`85+` / `70–84` / `60–69`），档内按 `weight`；上下
+    移动只在同一档内生效。分组与排序不按 id 硬编码。
 - 内置实例的检索词一律留空：平台自己有浏览流（最新、排行、每日推荐），应用不替读者挑口味。
 - 不执行读者带来的任何脚本：自定义音源只接受声明式的参数，没有表达式，也没有求值器。
 
@@ -237,14 +317,13 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 有主副内容的事实，副也等在提示气泡里：音源的主是它叫自己的名字（`Wikimedia Commons`），
 副是应用叫它什么（`自由授权媒体`）。
 
-四条地址不写出来：地址比一行长，写出来就拉成一条。每条地址是一个 **chip 组**
-（`ChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字
-（文件路径、在线地址、封面地址、规范身份），小的一半是动作。名字半穿它所属那一
-类的语气色（文件路径是本机的，中性；两条远端地址是次色；规范身份是应用自己给它
-的名字，三色），动作半穿外壳的强调色。动作按地址的种类来：本机的文件是**打开**
-（桌面知道用什么程序打开它），远端的地址是**复制**。鼠标移上去才看见真正的地
-址。地址写成读者写的样子：`file://` 与 `%20` 这类符号换成正常的写法
-（`lib/shared/utils/readable_address.dart`）。
+四条地址不写出来：地址比一行长，写出来就拉成一条。
+
+- 每条地址是一个 **chip 组**（`ChipGroup`），两半连在一起，像按钮组那样是一个东西：宽的一半写自己的名字（文件路径、在线地址、封面地址、规范身份），小的一半是动作。
+- 名字半穿它所属那一类的语气色（文件路径是本机的，中性；两条远端地址是次色；规范身份是应用自己给它的名字，三色），动作半穿外壳的强调色。
+- 动作按地址的种类来：本机的文件是**打开**（桌面知道用什么程序打开它），远端的地址是**复制**。
+  鼠标移上去才看见真正的地址。
+- 地址写成读者写的样子：`file://` 与 `%20` 这类符号换成正常的写法（`lib/shared/utils/readable_address.dart`）。
 
 两样东西不是 chip：简介那样的一段话（`TrackFact.paragraph`）写出来，不进 chip——挤进
 一个 chip 里会把整排 chip 撑变形；来源编号那样的**键**（`TrackFact.identifier`）只留一
@@ -339,3 +418,11 @@ shell 里如果同时留着旧页签和新页签（`AnimatedSwitcher` + `KeyedSu
 ### 加一条文案
 
 见 [i18n.md](i18n.md)。
+
+## 相关文档
+
+- [代码约定](conventions.md) — 命名、日志、主题与体积的写法约束
+- [数据模型](data-model.md) — 有哪几张表、每列的约束、谁在写
+- [测试与验证](verification.md) — 门禁命令与测试布局
+- [标识（chip）](chips.md) — 音源、事实与状态在界面上的呈现规则
+- [性能](performance.md) — 重建风暴、订阅粒度与性能预算的诊断数字

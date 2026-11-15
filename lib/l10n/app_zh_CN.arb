@@ -129,6 +129,15 @@
       }
     }
   },
+  "libraryEffectCount": "{count} 段",
+  "@libraryEffectCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "没有匹配的歌曲",
   "libraryNoMatchSubtitle": "换个关键词，或清除搜索条件",
   "librarySourceEmptyTitle": "该来源暂无歌曲",
@@ -1362,6 +1371,7 @@
   "contentKindAudiobook": "有声书",
   "contentKindMusic": "音乐",
   "contentKindRadio": "电台",
+  "contentKindSoundEffect": "音效",
   "trackFactPath": "文件路径",
   "trackFactAddress": "在线地址",
   "trackDetailsTooltip": "查看详情",
@@ -1822,6 +1832,18 @@
   "libraryFilterDurationMedium": "2–5 分钟",
   "libraryFilterDurationLong": "5–10 分钟",
   "libraryFilterDurationEpic": ">10 分钟",
+  "libraryFilterShortTracks": "极短轨",
+  "libraryFilterShortTracksOption": "3 秒以内",
+  "libraryHiddenMissingDuration": "已隐藏 {count} 条时长缺失的曲目",
+  "@libraryHiddenMissingDuration": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryShowHiddenDuration": "显示",
   "libraryFilterAddedWeek": "最近 7 天",
   "libraryFilterAddedMonth": "最近 30 天",
   "libraryFilterAddedYear": "最近一年",
@@ -1952,6 +1974,15 @@
     }
   },
   "settingsLocalFeatureSystemReady": "使用系统已安装版本",
+  "settingsLocalFeatureSystemInUse": "当前用的是系统已安装的版本，系统优先；自带的副本只作备用。",
+  "settingsLocalFeatureDownloadBundled": "也可以下载一份自带的（约 {size}）",
+  "@settingsLocalFeatureDownloadBundled": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "settingsLocalFeaturePartial": "部分完成 · 已完成 {done}/{total}",
   "@settingsLocalFeaturePartial": {
     "placeholders": {

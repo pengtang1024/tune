@@ -281,6 +281,22 @@ class LibraryFilterPanel extends ConsumerWidget {
                   ),
                   _section(
                     context,
+                    context.loc.libraryFilterShortTracks,
+                    [
+                      FilterChip(
+                        key: const ValueKey('library-filter-short-tracks'),
+                        label: Text(
+                          context.loc.libraryFilterShortTracksOption,
+                        ),
+                        selected: filter.excludeShortTracks,
+                        onSelected: (selected) => setFilter(
+                          filter.copyWith(excludeShortTracks: selected),
+                        ),
+                      ),
+                    ],
+                  ),
+                  _section(
+                    context,
                     context.loc.libraryFilterAdded,
                     [
                       for (final window in LibraryAddedWindow.values)

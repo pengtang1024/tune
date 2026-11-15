@@ -821,7 +821,7 @@ class PlaybackController extends StateNotifier<PlaybackState> {
       final refreshed = await _resolver.refresh(song);
       if (!mounted || request != _loadRequest) return null;
       if (refreshed == null) return null;
-      Log.info('已刷新播放地址: ${song.title}');
+      Log.debug('已刷新播放地址: ${song.title}');
       return refreshed;
     } catch (error, stackTrace) {
       Log.error('刷新播放地址失败: $error\n$stackTrace');

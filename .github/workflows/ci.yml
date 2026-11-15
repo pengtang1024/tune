@@ -1,0 +1,82 @@
+# Tune CI：静态检查 + 单元测试
+#
+# 门禁命令只写在 ./tool/check.sh 里，CI 和本地跑的是同一份脚本，避免两处漂移。
+# 本地等价命令：./tool/check.sh --l10n --tools --docs
+#   它依次做：flutter gen-l10n 并断言生成产物已提交 → flutter analyze → flutter test（排除联网用例）
+#            → tool/ 下的截图探针 → Markdown 结构检查（docs/document-style.md）。
+#
+# 为什么这里没有 `flutter build linux`：
+#   当前工作树里有并发进行中的改动，Linux 桌面构建（GTK + libmpv + ninja）在 CI 上还不稳定，
+#   构建红了会掩盖真正的 analyze / test 问题。等构建路径稳定后再加，届时需要：
+#     sudo apt-get install -y libmpv-dev mpv ninja-build libgtk-3-dev
+#     flutter build linux --release
+#
+# Flutter 版本：pubspec.yaml 要求 `sdk: ^3.8.1`；本地实测 Flutter 3.47.7 / Dart 3.13.5（stable）。
+# 这里**钉死 3.47.7**，而不是跟随 stable：check.sh --l10n 会断言 gen-l10n 生成产物与提交一致，
+# 而生成产物的格式随 SDK 版本变化——浮动版本会让 CI 在别人升级 SDK 后无故变红。
+# 升级 Flutter 时，改这里的版本号、本地跑一遍 ./tool/check.sh --l10n 并提交产物，再一起提 PR。
+#
+# 关于联网测试：
+#   test/services/music_source_live_test.dart 与 music_source_e2e_live_test.dart 访问真实外部服务，
+#   失败可能只是网络或对方站点的问题，与改动无关。CI 网络不可控，check.sh 默认**排除**它们；
+#   本地要把它们串起来跑，用 ./tool/live_sources.sh（逐个文件，便于分辨网络噪声）。
+
+name: CI
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+    branches: [develop, master]
+  workflow_dispatch:
+
+# 同一分支连续推送时取消上一次未跑完的构建，省 runner。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    name: analyze + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 安装 Flutter（3.47.7，启用缓存）
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+          cache: true
+
+      - name: flutter pub get
+        run: flutter pub get
+
+      # --l10n 的那一步会检查 git status：lib/l10n/app_localizations*.dart 是入库文件，
+      # 改过 ARB 却没提交生成产物，会让别人的工作树变脏、也让本地化测试和代码对不上。
+      # 若某次 flutter stable 升级后这里「无辜变红」，先确认是不是 SDK 换了输出格式。
+      #
+      # 用 `bash ./tool/check.sh` 而不是 `./tool/check.sh`：脚本可能因为某些平台
+      # 丢掉可执行位（Windows 检出、手工复制都会），那样报的是 Permission denied，
+      # 不像门禁失败，容易被误判成 CI 配置坏了。
+      # --tools 额外跑 tool/layout_shots_test.dart 与 tool/local_feature_shots_test.dart。
+      # 为什么必须跑：这两个工具是 README 配图与设置页视觉的探针，但它们不在 test/ 下，
+      # 常规 `flutter test` 碰不到——上一轮就是这样烂掉的（专辑墙读的是 LibraryState.albums，
+      # fixture 只填了 songs，测试红了两周没人知道）。加了这一步，界面一改就会当场红。
+      #
+      # 为什么不含 tool/tooltip_shots_test.dart：它对比的基准图写在 build/tooltip-shots/
+      # （不入库），干净检出上必然报 "non-existent file"；它是本地目检工具，不是门禁。
+      #
+      # --docs 用 tool/check_docs.py 检查每份 Markdown：唯一 H1、状态行、长页目录与锚点、
+      # 标题不跳级、代码块标语言、无绝对路径、站内链接可达、表格列数一致、末尾相关文档。
+      # 规则本身写在 docs/document-style.md，检查器只是它的执行者。
+      - name: 门禁（gen-l10n 一致性 + analyze + test + 工具探针 + 文档结构）
+        run: bash ./tool/check.sh --l10n --tools --docs

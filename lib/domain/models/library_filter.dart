@@ -27,6 +27,23 @@ class LibraryFilter {
   final Set<String> languages;
   final Set<ContentKind> kinds;
 
+  /// Whether tracks whose duration is unknown stay out of the list.
+  ///
+  /// A row with no duration is dirty data rather than a track the reader can
+  /// play or time; it is hidden by default, and the toolbar says how many are
+  /// hidden and offers to show them. This is a display rule, not a group: it
+  /// is not counted by [isEmpty] and survives a "clear all".
+  final bool hideMissingDuration;
+
+  /// Whether tracks of three seconds or less are left out on request.
+  ///
+  /// Unlike a missing duration, a very short track is still audio; it is only
+  /// narrowed away when the reader ticks the group.
+  final bool excludeShortTracks;
+
+  /// The longest track the "very short" group leaves out, in milliseconds.
+  static const int veryShortMilliseconds = 3000;
+
   const LibraryFilter({
     this.status = LibraryStatusFilter.all,
     this.genres = const {},
@@ -38,6 +55,8 @@ class LibraryFilter {
     this.added = const {},
     this.languages = const {},
     this.kinds = const {},
+    this.hideMissingDuration = true,
+    this.excludeShortTracks = false,
   });
 
   static const LibraryFilter empty = LibraryFilter();
@@ -64,7 +83,8 @@ class LibraryFilter {
       formats.isEmpty &&
       durations.isEmpty &&
       added.isEmpty &&
-      languages.isEmpty;
+      languages.isEmpty &&
+      !excludeShortTracks;
 
   /// How many groups narrow the page; the filter button shows it.
   int get activeGroups => [
@@ -77,10 +97,27 @@ class LibraryFilter {
     durations.isNotEmpty,
     added.isNotEmpty,
     languages.isNotEmpty,
+    excludeShortTracks,
   ].where((active) => active).length;
 
+  /// Whether this scope is the song list and the reader keeps dirty rows out.
+  ///
+  /// A live radio stream carries no duration by nature, so the rule only
+  /// applies when the scope is exactly the songs; the podcast, audiobook and
+  /// radio scopes keep their rows whatever their duration says.
+  bool get hidesMissingDuration =>
+      hideMissingDuration &&
+      kinds.length == 1 &&
+      kinds.contains(ContentKind.music);
+
   /// The same filter with every group cleared but the content scope.
-  LibraryFilter withoutGroups() => LibraryFilter(kinds: kinds);
+  ///
+  /// The missing-duration hiding is a display rule rather than a group, so a
+  /// reader who turned it off keeps it off after clearing the groups.
+  LibraryFilter withoutGroups() => LibraryFilter(
+    kinds: kinds,
+    hideMissingDuration: hideMissingDuration,
+  );
 
   LibraryFilter copyWith({
     LibraryStatusFilter? status,
@@ -93,6 +130,8 @@ class LibraryFilter {
     Set<LibraryAddedWindow>? added,
     Set<String>? languages,
     Set<ContentKind>? kinds,
+    bool? hideMissingDuration,
+    bool? excludeShortTracks,
   }) => LibraryFilter(
     status: status ?? this.status,
     genres: genres ?? this.genres,
@@ -104,6 +143,8 @@ class LibraryFilter {
     added: added ?? this.added,
     languages: languages ?? this.languages,
     kinds: kinds ?? this.kinds,
+    hideMissingDuration: hideMissingDuration ?? this.hideMissingDuration,
+    excludeShortTracks: excludeShortTracks ?? this.excludeShortTracks,
   );
 
   @override
@@ -118,7 +159,9 @@ class LibraryFilter {
       setEquals(other.durations, durations) &&
       setEquals(other.added, added) &&
       setEquals(other.languages, languages) &&
-      setEquals(other.kinds, kinds);
+      setEquals(other.kinds, kinds) &&
+      other.hideMissingDuration == hideMissingDuration &&
+      other.excludeShortTracks == excludeShortTracks;
 
   @override
   int get hashCode => Object.hash(
@@ -132,5 +175,7 @@ class LibraryFilter {
     Object.hashAllUnordered(added),
     Object.hashAllUnordered(languages),
     Object.hashAllUnordered(kinds),
+    hideMissingDuration,
+    excludeShortTracks,
   );
 }

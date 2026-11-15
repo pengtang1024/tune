@@ -268,6 +268,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               focusNode: ref.watch(librarySearchFocusProvider),
               query: library.query,
               count: library.matching,
+              hiddenMissingDuration: library.hiddenMissingDuration,
               kind: selectedKind,
               sources: availableSources,
               sourceLabels: sourceLabels,
@@ -292,6 +293,13 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 context,
                 sourceLabels: sourceLabels,
               ),
+              onShowMissingDuration: () {
+                ref
+                    .read(libraryControllerProvider.notifier)
+                    .setFilter(
+                      library.filter.copyWith(hideMissingDuration: false),
+                    );
+              },
             ),
           ),
         if (!library.filter.isEmpty)
@@ -880,6 +888,7 @@ typedef _LibrarySlice = ({
   int total,
   int matching,
   int otherKindCount,
+  int hiddenMissingDuration,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -900,6 +909,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     total: state.total,
     matching: state.matching,
     otherKindCount: state.otherKindCount,
+    hiddenMissingDuration: state.hiddenMissingDuration,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,

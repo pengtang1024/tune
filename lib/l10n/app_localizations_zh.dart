@@ -232,6 +232,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -2910,6 +2919,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contentKindRadio => '电台';
 
   @override
+  String get contentKindSoundEffect => '音效';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -3724,6 +3736,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryFilterDurationEpic => '>10 分钟';
 
   @override
+  String get libraryFilterShortTracks => '极短轨';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以内';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隐藏 $countString 条时长缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '显示';
+
+  @override
   String get libraryFilterAddedWeek => '最近 7 天';
 
   @override
@@ -4069,6 +4099,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalFeatureSystemInUse => '当前用的是系统已安装的版本，系统优先；自带的副本只作备用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下载一份自带的（约 $size）';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {
@@ -4606,6 +4644,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -7284,6 +7331,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get contentKindRadio => '电台';
 
   @override
+  String get contentKindSoundEffect => '音效';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -8098,6 +8148,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryFilterDurationEpic => '>10 分钟';
 
   @override
+  String get libraryFilterShortTracks => '极短轨';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以内';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隐藏 $countString 条时长缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '显示';
+
+  @override
   String get libraryFilterAddedWeek => '最近 7 天';
 
   @override
@@ -8443,6 +8511,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
+
+  @override
+  String get settingsLocalFeatureSystemInUse => '当前用的是系统已安装的版本，系统优先；自带的副本只作备用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下载一份自带的（约 $size）';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {
@@ -8977,6 +9053,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 臺';
+  }
+
+  @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
   }
 
   @override
@@ -11658,6 +11743,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get contentKindRadio => '電台';
 
   @override
+  String get contentKindSoundEffect => '音效';
+
+  @override
   String get trackFactPath => '檔案路徑';
 
   @override
@@ -12472,6 +12560,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get libraryFilterDurationEpic => '>10 分钟';
 
   @override
+  String get libraryFilterShortTracks => '極短軌';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以內';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隱藏 $countString 條時長缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '顯示';
+
+  @override
   String get libraryFilterAddedWeek => '最近 7 天';
 
   @override
@@ -12818,6 +12924,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureSystemReady => '使用系統已安裝版本';
+
+  @override
+  String get settingsLocalFeatureSystemInUse => '目前用的是系統已安裝的版本，系統優先；自帶的副本只作備用。';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return '也可以下載一份自帶的（約 $size）';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {

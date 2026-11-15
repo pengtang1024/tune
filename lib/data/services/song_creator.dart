@@ -73,7 +73,7 @@ class SongCreator {
 
       return Song.fromMap(songData);
     } catch (e) {
-      Log.info('SongCreator: Failed to read metadata for $filePath: $e');
+      Log.debug('SongCreator: Failed to read metadata for $filePath: $e');
       return await createBasicSong(file, fileName, filePath, copyUri: copyUri);
     }
   }

@@ -93,7 +93,7 @@ class DesktopIntegrationController {
     });
 
     await _window.takeOverClose();
-    Log.info('桌面集成已启动');
+    Log.debug('桌面集成已启动');
   }
 
   /// Stops the parts of the desktop the player talks to.

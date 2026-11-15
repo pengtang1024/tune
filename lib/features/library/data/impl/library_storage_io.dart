@@ -207,6 +207,13 @@ class FileLibraryStorage implements LibraryStorage {
     sourceId: filter.sources.length == 1 ? filter.sources.first : null,
   );
 
+  /// The plain file build keeps every track it has, so it hides none.
+  @override
+  Future<int> missingDurationCount({
+    required String query,
+    required LibraryFilter filter,
+  }) async => 0;
+
   @override
   Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
       LibraryFacets.empty;
@@ -338,7 +345,7 @@ class FileLibraryStorage implements LibraryStorage {
       return await file.exists() ? file : null;
     } catch (error) {
       // A platform without a documents folder simply has no older library.
-      Log.info('没有旧音乐库可迁移: $error');
+      Log.debug('没有旧音乐库可迁移: $error');
       return null;
     }
   }
@@ -564,6 +571,19 @@ class SqliteLibraryStorage implements LibraryStorage {
       return (await _db()).countQuery(query: query, filter: filter);
     } catch (error, stackTrace) {
       Log.error('统计音乐库筛选结果失败: $error\n$stackTrace');
+      return 0;
+    }
+  }
+
+  @override
+  Future<int> missingDurationCount({
+    required String query,
+    required LibraryFilter filter,
+  }) async {
+    try {
+      return (await _db()).missingDurationCount(query: query, filter: filter);
+    } catch (error, stackTrace) {
+      Log.error('统计时长缺失曲目失败: $error\n$stackTrace');
       return 0;
     }
   }

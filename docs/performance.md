@@ -1,9 +1,30 @@
 # 性能：诊断与修复方案
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 2026-10-24 实测，2026-10-25 补 D5，2026-10-28 补 D6/D7 与 D8，2026-11-04 补 D9，
 > 2026-11-11 补 D10，同日补 D11。
 > 这一页是诊断与方案：D1–D11 都已修完，每一节写着修之前与修之后的数字，
 > 以及守住这条线的判据。
+
+## 目录
+
+- [1. 结论](#1-结论)
+- [2. 怎么测的](#2-怎么测的)
+- [3. D1：播放位置带翻了整页](#3-d1播放位置带翻了整页)
+- [4. D2：MPRIS 每跳一次快照，还顺手读了一次磁盘](#4-d2mpris-每跳一次快照还顺手读了一次磁盘)
+- [5. D3：扫描进度每 1% 重建整个列表](#5-d3扫描进度每-1-重建整个列表)
+- [6. D4：推荐引擎在 UI 线程同步算全库](#6-d4推荐引擎在-ui-线程同步算全库)
+- [7. D5：一行 293 个 element（已修）](#7-d5一行-293-个-element已修)
+- [8. D6：整库常驻内存（已修）](#8-d6整库常驻内存已修)
+- [9. D7：每个操作都在重写整库（已修）](#9-d7每个操作都在重写整库已修)
+- [10. D8：一个损坏的标签把启动内存抬到 1.5GB（已修）](#10-d8一个损坏的标签把启动内存抬到-15gb已修)
+- [11. D9：收藏页、音源页与面板还在整页订阅（已修）](#11-d9收藏页音源页与面板还在整页订阅已修)
+- [12. D10：启动的偏好读取，与大库的每次读窗口（已修）](#12-d10启动的偏好读取与大库的每次读窗口已修)
+- [13. D11：facets 的九次全表分组，与桌面集成挡在首帧前（已修）](#13-d11facets-的九次全表分组与桌面集成挡在首帧前已修)
+- [14. 四条硬规则（已写进 AGENTS.md §1.3）](#14-四条硬规则已写进-agentsmd-13)
+- [15. 落地顺序与风险](#15-落地顺序与风险)
+- [16. 相关文档](#16-相关文档)
 
 ## 1. 结论
 
@@ -525,27 +546,17 @@ D4 的耗时分解（2 万首 / 5 万首）：
 
 ### 根因
 
-曲库里的 `2014-02-12 Bigwords.mp3`（文件 4,146,688 字节）的 ID3v2 标签
-损坏：合法的 tag 头声明 51,142 字节，内部却有一个 id 为 `\x00COM` 的坏帧，
-帧头声明 size=**1,291,845,632**（~1.2GB）。上游读包
-`audio_metadata_reader 1.8.1`（当时已是最新版）的 `Buffer.read(size)` 对
-声明大小无条件 `Uint8List(size)`，不做文件边界校验——4MB 的文件按声明
-分配了 1.2GB 的零填充缓冲，再解码成一个常驻大字符串。FLAC
-（`buffer.read(block.length)`）与 MP4（`buffer.read(box.payloadSize)`）
-共用同一个无界读，属同一类 bug；RIFF/AIFF 的解析器倒是自己做了
-`remainingBytes` 防护，说明包里本就有这个原语（`readAtMost`），只是
-ID3v2/FLAC/MP4 没用上。
+曲库里的 `2014-02-12 Bigwords.mp3`（文件 4,146,688 字节）的 ID3v2 标签损坏：合法的 tag 头声明 51,142 字节，内部却有一个 id 为 `\x00COM` 的坏帧，帧头声明 size=**1,291,845,632**（~1.2GB）。
+
+上游读包 `audio_metadata_reader 1.8.1`（当时已是最新版）的 `Buffer.read(size)` 对声明大小无条件 `Uint8List(size)`，不做文件边界校验——4MB 的文件按声明分配了 1.2GB 的零填充缓冲，再解码成一个常驻大字符串。FLAC（`buffer.read(block.length)`）与 MP4（`buffer.read(box.payloadSize)`）共用同一个无界读，属同一类 bug；RIFF/AIFF 的解析器倒是自己做了 `remainingBytes` 防护，说明包里本就有这个原语（`readAtMost`），只是 ID3v2/FLAC/MP4 没用上。
 
 ### 修法
 
-上游没有修复，把包复制到 `vendor/audio_metadata_reader`（MIT，保留
-LICENSE，走 `dependency_overrides` 接入），在 `Buffer.read` 一处收界：
-读取前把 `size` 收到 `remainingBytes`（文件真实剩余）内，非正数请求返回
-空列表。只影响分配大小，不改变各解析器的游标推进；这一处补丁同时修掉
-mp3/flac/mp4 整类「声明超界」问题。补丁清单与升级步骤见
-`vendor/audio_metadata_reader/VENDORED.md`。回归测试在
-`test/services/song_creator_test.dart`：自造一个帧声明 1.29GB 的损坏文件，
-断言解析完成且 RSS 增量 < 100MB（修之前是 +1.2GB）。
+上游没有修复，把包复制到 `vendor/audio_metadata_reader`（MIT，保留 LICENSE，走 `dependency_overrides` 接入），在 `Buffer.read` 一处收界：读取前把 `size` 收到 `remainingBytes`（文件真实剩余）内，非正数请求返回空列表。
+
+只影响分配大小，不改变各解析器的游标推进；这一处补丁同时修掉 mp3/flac/mp4 整类「声明超界」问题。补丁清单与升级步骤见 `vendor/audio_metadata_reader/VENDORED.md`。
+
+回归测试在 `test/services/song_creator_test.dart`：自造一个帧声明 1.29GB 的损坏文件，断言解析完成且 RSS 增量 < 100MB（修之前是 +1.2GB）。
 
 顺手把 `JustAudioMediaKit.bufferSize` 从默认 32MB 下调到 8MB
 （`demuxer-max-bytes` 与 `demuxer-max-back-bytes` 各取一份）：本地小文件
@@ -573,14 +584,11 @@ glibc 堆 ~60MB。**「稳态 200MB」在这台机器上达不到**：光图形�
 - 字体是设计语言的一部分（Serif 是壳层 display 字级），且为文件映射页
   可回收，不砍。
 
-GPU 栈的口径（2026-10-28 消融）：这台机器是 NVIDIA 独显 + Intel 核显双
-卡，但核显被 `vfio-pci` 接管（直通给虚拟机），宿主机没有它的渲染节点。
-强制走 Mesa（`__EGL_VENDOR_LIBRARY_FILENAMES=50_mesa.json`）只会落到
-llvmpipe 软渲染，RSS 反升到 404MB——不是核显的真实数字。纯核显（Mesa
-ANV/iris）机器上，NVIDIA 专属驻留（`nvidiactl` 48MB + `eglcore` 10MB +
-`gpucomp` 18MB ≈ 76MB）会消失，同构建稳态按此外推 ~230MB。应用**不自选
-GPU**：Flutter 没有这个 API，Linux 上由会话与 glvnd 决定（`prime-run`、
-`DRI_PRIME`），覆盖用户的选择得不偿失；核显机器自然继承轻驱动栈。
+GPU 栈的口径（2026-10-28 消融）：这台机器是 NVIDIA 独显 + Intel 核显双卡，但核显被 `vfio-pci` 接管（直通给虚拟机），宿主机没有它的渲染节点。
+
+强制走 Mesa（`__EGL_VENDOR_LIBRARY_FILENAMES=50_mesa.json`）只会落到 llvmpipe 软渲染，RSS 反升到 404MB——不是核显的真实数字。纯核显（Mesa ANV/iris）机器上，NVIDIA 专属驻留（`nvidiactl` 48MB + `eglcore` 10MB + `gpucomp` 18MB ≈ 76MB）会消失，同构建稳态按此外推 ~230MB。
+
+应用**不自选 GPU**：Flutter 没有这个 API，Linux 上由会话与 glvnd 决定（`prime-run`、`DRI_PRIME`），覆盖用户的选择得不偿失；核显机器自然继承轻驱动栈。
 
 ### 判据
 
@@ -874,3 +882,11 @@ AGENTS.md §1.3「性能：订阅粒度与计算预算」是这四条的正式�
 - `docs/verification.md`：门禁。
 - `docs/performance-row-design.md`：D5 的设计稿（归谁、预算、迁移顺序）。
 - `tool/perf/`：六个基准脚本，本文所有数字都出自它们。
+
+## 相关文档
+
+- [performance-row-design.md](performance-row-design.md) — 列表行的 element / overlay 预算（D5）
+- [architecture.md](architecture.md) — 订阅粒度与状态归属
+- [verification.md](verification.md) — 基准怎么跑、回归测试放在哪
+- [conventions.md](conventions.md) — `RepaintBoundary`、主题与尺寸约定
+- [data-model.md](data-model.md) — 写库放大、索引与批量更新

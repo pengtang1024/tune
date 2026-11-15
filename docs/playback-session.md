@@ -1,5 +1,7 @@
 # 启动继续上次播放
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 重启 Tune 后恢复上次的队列、曲目、播放模式和进度，**恢复是无条件的**。
 > 入口在设置 → 播放 →「启动时继续上次播放」，默认开启：开着时恢复后自动
 > 从上次进度继续播放，关掉则停在暂停状态等读者按播放。
@@ -74,3 +76,10 @@ volume         上次的音量
 - `test/app/playback_session_provider_test.dart`：Provider 是否把续播开关传给控制器。
 - `test/app/settings_controller_test.dart`：开关默认值与持久化。
 - `test/app/compact_layout_test.dart`：设置页开关可见、可切换。
+
+## 相关文档
+
+- [播放队列浮层](queue-panel.md) — 队列在界面上怎么呈现
+- [队列模型](../需求/队列模型方案.md) — 游标、随机重排与上一首
+- [数据模型](data-model.md) — 偏好与本地数据存在哪
+- [测试与验证](verification.md) — 恢复链路的那几个用例

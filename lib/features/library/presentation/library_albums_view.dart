@@ -70,6 +70,7 @@ class LibraryAlbumsView extends StatelessWidget {
         ContentKind.music,
         ContentKind.podcast,
         ContentKind.audiobook,
+        ContentKind.soundEffect,
       ])
         (
           kind: kind,
@@ -279,6 +280,9 @@ class _AlbumCardState extends State<_AlbumCard> {
                     album.trackCount,
                   ),
                   ContentKind.audiobook => context.loc.libraryChapterCount(
+                    album.trackCount,
+                  ),
+                  ContentKind.soundEffect => context.loc.libraryEffectCount(
                     album.trackCount,
                   ),
                   _ => context.loc.libraryTrackCount(album.trackCount),

@@ -18,7 +18,7 @@ class ThemeService {
         themeMode.index,
       );
     } catch (e) {
-      Log.info('Failed to save theme mode: $e'); // 应该使用本地化字符串
+      Log.error('Failed to save theme mode: $e'); // 应该使用本地化字符串
     }
   }
 
@@ -42,7 +42,7 @@ class ThemeService {
           return ThemeMode.system;
       }
     } catch (e) {
-      Log.info('Failed to get theme mode: $e'); // 应该使用本地化字符串
+      Log.error('Failed to get theme mode: $e'); // 应该使用本地化字符串
       return ThemeMode.system;
     }
   }

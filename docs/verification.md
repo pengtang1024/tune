@@ -1,8 +1,34 @@
 # 测试与验证
 
+> 状态：契约 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > AGENTS.md 的展开文档。写测试、跑门禁前读这份。
 
+## 目录
+
+- [提交前门禁](#提交前门禁)
+- [测试目录](#测试目录)
+- [替身与隔离](#替身与隔离)
+- [语言守卫](#语言守卫)
+- [截图对比](#截图对比)
+- [对齐守卫](#对齐守卫)
+- [联网测试](#联网测试)
+- [相关文档](#相关文档)
+
 ## 提交前门禁
+
+一条命令跑完确定性部分（CI 跑的就是它）：
+
+```bash
+./tool/check.sh                  # analyze + 全部确定性用例
+./tool/check.sh --l10n            # 另外断言 lib/l10n 生成产物已提交
+./tool/check.sh --l10n --tools --docs   # 再加截图探针与文档结构检查（CI 跑的就是这条）
+./tool/check.sh --live            # 连联网用例一起跑（失败先怀疑网络）
+```
+
+`--tools` 跑 `tool/layout_shots_test.dart` 与 `tool/local_feature_shots_test.dart`——这两个探针渲染整页并把 PNG 写进 `build/`，所以默认不开；它们**不在 `test/` 下**，常规 `flutter test` 碰不到，不加这一步就会悄悄失效（2026-11 就这样烂过一次）。`tool/tooltip_shots_test.dart` 比的是 `build/tooltip-shots/` 里的基准图（不入库），干净检出上必然失败，因此只作本地目检，不进 CI。
+
+分步等价：
 
 ```bash
 flutter analyze          # 必须 No issues found
@@ -66,6 +92,8 @@ flutter --version
 - 它在 `tool/` 下，常规 `flutter test` 不会跑到它。
 - 它把平台钉成 Linux：测试套件默认假装是 Android，而 Android 用另一套密度和更大的点击区，不钉的话截图里的按钮比用户看到的矮 8 像素。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。
+- `build/layout-shots/library.png` 与 `library_albums.png` 同时是两份 README「界面 / Screens」用图的来源：界面改动后重跑，把这两张（1280 宽）覆盖到 `docs/images/`，README 不用改。
+- 工具里的 `_FakeLibraryController` 必须覆盖 `albumSongs()`：真实控制器从 storage 读专辑曲目，替身不建 storage，缺这个方法会在打开专辑时抛 `LateInitializationError`。库里有专辑后页头也会出现一个网格图标，所以点视图开关要用 `find.descendant(of: find.byType(LibraryViewSwitch), ...)` 限定，不能只用 `find.byIcon`。
 - `tool/tooltip_shots_test.dart` 同理，写提示的两张图到 `build/tooltip-shots/`；改了提示样式后跑它。
 - `tool/local_feature_shots_test.dart` 写本地功能项的四张图到 `build/local-feature-shots/`
   （默认态、技术明细、推荐标记、部分完成）；改了本地组件卡片后跑它。
@@ -92,3 +120,10 @@ flutter --version
 26 秒的情况，那种时候失败是服务的问题，不是映射的问题。
 
 新增或调整音源时，另有一条**只能用真实服务做的验收**：用该实例**应用里的默认排序**取前几条，逐条看标题对不对得上这个音源的说明。抽样用随机、验收用默认排序——这两者会给出不同答案（曾经有一个「科学播客」实例，随机抽样全是真科学播客，按下载量排的前两条却是古兰经诵读）。
+
+## 相关文档
+
+- [代码约定](conventions.md) — 写测试时的命名与可见性约束
+- [架构契约](architecture.md) — 测试要守的那些边界
+- [国际化](i18n.md) — 改过文案后要重新生成产物
+- [开源基建与维护清单](oss-maintenance.md) — CI 与门禁脚本的维护点

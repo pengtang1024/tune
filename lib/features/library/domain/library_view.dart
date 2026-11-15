@@ -30,6 +30,8 @@ class LibraryView {
       'added': [for (final value in filter.added) value.name],
       'languages': filter.languages.toList(),
       'kinds': [for (final kind in filter.kinds) kind.name],
+      'hideMissingDuration': filter.hideMissingDuration,
+      'excludeShortTracks': filter.excludeShortTracks,
     },
   };
 
@@ -70,6 +72,10 @@ class LibraryView {
                   if (ContentKind.values.asNameMap()[name] != null)
                     ContentKind.values.asNameMap()[name]!,
               },
+              // A view written before the rule existed carries no key; it
+              // opens with the same default as a fresh library.
+              hideMissingDuration: filter['hideMissingDuration'] != false,
+              excludeShortTracks: filter['excludeShortTracks'] == true,
             )
           : LibraryFilter.empty,
     );

@@ -33,7 +33,7 @@ Future<List<Song?>> _songsOfFiles(List<String> filePaths) async {
     try {
       songs.add(await SongCreator.createFromFile(File(filePath)));
     } catch (error) {
-      Log.info('CrossPlatformMusicScanner: Failed to create song from file $filePath: $error');
+      Log.debug('CrossPlatformMusicScanner: Failed to create song from file $filePath: $error');
       songs.add(null);
     }
   }
@@ -79,15 +79,13 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
   @override
   Future<void> init() async {
-    Log.info('CrossPlatformMusicScannerImpl: 初始化完成');
+    Log.debug('CrossPlatformMusicScannerImpl: 初始化完成');
   }
 
   @override
   Future<List<Song>> scanMusic() async {
-    Log.info('CrossPlatformMusicScanner: Starting cross-platform music scan');
-
     if (Platform.isAndroid || Platform.isIOS) {
-      Log.info('CrossPlatformMusicScanner: Running on mobile platform');
+      Log.debug('CrossPlatformMusicScanner: Running on mobile platform');
       try {
         final paths = MusicScannerConfig.getMobileMusicPaths();
         return await scanMusicInDirectories(paths);
@@ -96,7 +94,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         return [];
       }
     } else {
-      Log.info('CrossPlatformMusicScanner: Running on desktop platform');
+      Log.debug('CrossPlatformMusicScanner: Running on desktop platform');
       final defaultPaths = getDefaultMusicPaths();
       return await scanMusicInDirectories(defaultPaths);
     }
@@ -104,60 +102,75 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
 
   @override
   Future<List<Song>> scanMusicInDirectory(String directoryPath) async {
-    Log.info('CrossPlatformMusicScanner: Scanning directory: $directoryPath');
+    Log.debug('CrossPlatformMusicScanner: Scanning directory: $directoryPath');
     return await _scanDirectory(directoryPath, (progress) {});
   }
 
   @override
-  Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) async {
-    Log.info(
-      'CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories',
-    );
-    return await scanMusicInDirectoriesWithProgress(
-      directoryPaths,
-      (progress) {},
-    );
+  Future<List<Song>> scanMusicInDirectories(List<String> directoryPaths) {
+    return _scanDirectories(directoryPaths, onProgress: null);
   }
 
   @override
   Future<List<Song>> scanMusicInDirectoriesWithProgress(
     List<String> directoryPaths,
     Function(double) onProgress,
-  ) async {
-    Log.info(
-      'CrossPlatformMusicScanner: Scanning ${directoryPaths.length} directories with progress',
-    );
+  ) {
+    return _scanDirectories(directoryPaths, onProgress: onProgress);
+  }
+
+  /// The one place a batch of directories is read.
+  ///
+  /// Both entries land here, so a batch writes exactly one start line and one
+  /// finish line whatever called it; the mode tells the two entrances apart.
+  Future<List<Song>> _scanDirectories(
+    List<String> directoryPaths, {
+    required Function(double)? onProgress,
+  }) async {
+    final watch = Stopwatch()..start();
     final allSongs = <Song>[];
+    var skipped = 0;
+
+    Log.info(
+      'CrossPlatformMusicScanner: Scan started: ${directoryPaths.length} '
+      'directories, ${onProgress == null ? 'background' : 'progress'} mode',
+    );
 
     for (int i = 0; i < directoryPaths.length; i++) {
       final dirPath = directoryPaths[i];
       try {
         final songs = await _scanDirectory(dirPath, (progress) {
           final overallProgress = (i + progress) / directoryPaths.length;
-          onProgress(overallProgress);
+          onProgress?.call(overallProgress);
         });
         allSongs.addAll(songs);
       } catch (e) {
-        Log.info(
+        skipped++;
+        Log.debug(
           'CrossPlatformMusicScanner: Failed to scan directory $dirPath: $e',
         );
       }
-      onProgress((i + 1) / directoryPaths.length);
+      onProgress?.call((i + 1) / directoryPaths.length);
     }
 
+    Log.info(
+      'CrossPlatformMusicScanner: Scan finished: ${directoryPaths.length} '
+      'directories, ${allSongs.length} songs, $skipped skipped, '
+      '${watch.elapsedMilliseconds} ms',
+    );
     return allSongs;
   }
 
   @override
   Future<Song?> scanMusicFile(String filePath) async {
-    Log.info('CrossPlatformMusicScanner: Scanning single file: $filePath');
+    Log.debug('CrossPlatformMusicScanner: Scanning single file: $filePath');
     try {
       final file = File(filePath);
       if (await file.exists()) {
         return await _readSongWorker(filePath);
       }
     } catch (e) {
-      Log.info('CrossPlatformMusicScanner: Failed to scan file $filePath: $e');
+      Log.debug('CrossPlatformMusicScanner: Failed to scan file $filePath: $e');
     }
     return null;
   }
@@ -194,7 +207,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
     final directory = Directory(directoryPath);
 
     if (!await directory.exists()) {
-      Log.info(
+      Log.debug(
         'CrossPlatformMusicScanner: Directory does not exist: $directoryPath',
       );
       return songs;
@@ -211,7 +224,7 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         }
       }
 
-      Log.info(
+      Log.debug(
         'CrossPlatformMusicScanner: Found ${files.length} audio files in directory: $directoryPath',
       );
 
@@ -252,12 +265,12 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
           if (result != null) ...result.whereType<Song>(),
       ]);
     } catch (e) {
-      Log.info(
+      Log.debug(
         'CrossPlatformMusicScanner: Error scanning directory $directoryPath: $e',
       );
     }
 
-    Log.info(
+    Log.debug(
       'CrossPlatformMusicScanner: Found ${songs.length} songs in directory: $directoryPath',
     );
     return songs;
@@ -266,36 +279,42 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
   @override
   Future<List<Song>> scanCustomPaths(List<String> paths) async {
     try {
-      Log.info('开始扫描自定义路径: $paths');
+      final watch = Stopwatch()..start();
       final allSongs = <Song>[];
+      var skipped = 0;
+      Log.info('开始扫描自定义路径（${paths.length} 个）');
 
       if (paths.isEmpty) {
-        Log.info('自定义扫描路径列表为空');
+        Log.debug('自定义扫描路径列表为空');
         return allSongs;
       }
 
       for (final dirPath in paths) {
         try {
-          Log.info('扫描路径: $dirPath');
+          Log.debug('扫描路径: $dirPath');
           if (dirPath.isEmpty) {
-            Log.info('跳过空路径');
+            skipped++;
+            Log.debug('跳过空路径');
             continue;
           }
 
           if (!MusicScannerConfig.isValidPath(dirPath)) {
-            Log.info('无效路径，跳过: $dirPath');
+            skipped++;
+            Log.debug('无效路径，跳过: $dirPath');
             continue;
           }
 
           final dir = Directory(dirPath);
           if (!await dir.exists()) {
-            Log.info('目录不存在，跳过: $dirPath');
+            skipped++;
+            Log.debug('目录不存在，跳过: $dirPath');
             continue;
           }
 
           final stat = await dir.stat();
           if (stat.type != FileSystemEntityType.directory) {
-            Log.info('路径不是目录，跳过: $dirPath');
+            skipped++;
+            Log.debug('路径不是目录，跳过: $dirPath');
             continue;
           }
 
@@ -306,7 +325,8 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
             try {
               if (file is File) {
                 if (!MusicScannerConfig.isValidPath(file.path)) {
-                  Log.info('无效文件路径，跳过: ${file.path}');
+                  skipped++;
+                  Log.debug('无效文件路径，跳过: ${file.path}');
                   continue;
                 }
 
@@ -328,7 +348,10 @@ class CrossPlatformMusicScannerImpl implements CrossPlatformMusicScanner {
         }
       }
 
-      Log.info('扫描完成，共找到 ${allSongs.length} 首歌曲');
+      Log.info(
+        '扫描完成：${paths.length} 个路径，找到 ${allSongs.length} 首，'
+        '跳过 $skipped 项，耗时 ${watch.elapsedMilliseconds} ms',
+      );
       return allSongs;
     } catch (e, stackTrace) {
       Log.error('扫描自定义路径时发生严重错误: $e', stackTrace);

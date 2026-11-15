@@ -173,6 +173,25 @@ class _SettingsLocalFeatureCardState
               ],
             ],
           ),
+          if (_showsBundledOffer(feature, state)) ...[
+            const SizedBox(height: CompactTokens.space4),
+            Text(
+              strings.settingsLocalFeatureSystemInUse,
+              key: ValueKey('feature-system-note-${feature.id.name}'),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            TextButton(
+              key: ValueKey('feature-bundled-${feature.id.name}'),
+              onPressed: () => _installBundled(tier),
+              child: Text(
+                strings.settingsLocalFeatureDownloadBundled(
+                  formatComponentBytes(tier.downloadBytes),
+                ),
+              ),
+            ),
+          ],
           TextButton.icon(
             key: ValueKey('feature-details-${feature.id.name}'),
             onPressed: () => setState(() => _expanded = !_expanded),
@@ -306,11 +325,33 @@ class _SettingsLocalFeatureCardState
     }
   }
 
+  /// Transcoding keeps working on the system binary; the bundled copy is only
+  /// an offer, so the card says where the binary comes from and shows what a
+  /// self-contained install would cost.
+  bool _showsBundledOffer(LocalFeatureSpec feature, LocalFeatureState state) =>
+      feature.id == LocalFeatureId.transcode &&
+      state.phase == LocalFeaturePhase.ready &&
+      state.systemOnly;
+
   Future<void> _install(LocalFeatureTier tier) async {
     _rememberTier(tier);
     await ref
         .read(localComponentsControllerProvider.notifier)
         .installFeature(widget.feature, tier);
+  }
+
+  /// Installs the bundled copy even though the system one already covers the
+  /// feature. A normal feature install skips anything usable, so this goes
+  /// through the same per-component download and verification instead.
+  Future<void> _installBundled(LocalFeatureTier tier) async {
+    final controller = ref.read(localComponentsControllerProvider.notifier);
+    final states =
+        ref.read(localComponentsControllerProvider).valueOrNull ??
+        const <String, LocalComponentState>{};
+    for (final spec in tier.components) {
+      if (states[spec.id]?.phase == LocalComponentPhase.ready) continue;
+      await controller.download(spec.id);
+    }
   }
 
   Future<void> _confirmRemove(LocalFeatureState state) async {

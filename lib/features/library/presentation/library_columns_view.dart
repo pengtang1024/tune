@@ -264,6 +264,15 @@ class _ColumnCardState extends State<_ColumnCard> {
                               // which a source may fill with a playlist
                               // name. Only the album goes to the
                               // translator; the artist keeps its words.
+                              // An effect names its collection and nothing
+                              // else: there is no artist to write before it.
+                              RowShape.soundEffect => album.isEmpty
+                                  ? const SizedBox.shrink()
+                                  : TranslatedText(
+                                      text: album,
+                                      dense: true,
+                                      style: bylineStyle,
+                                    ),
                               RowShape.track => album.isEmpty
                                   ? Text(
                                       artist,

@@ -92,6 +92,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       offset: 0,
       limit: windowSize,
     );
+    final hiddenMissingDuration = filter.hidesMissingDuration
+        ? await _storage.missingDurationCount(query: '', filter: filter)
+        : 0;
     final albums = await _storage.albumSummaries();
     return LibraryState(
       songs: List.unmodifiable(songs),
@@ -100,6 +103,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       total: total,
       matching: matching,
       otherKindCount: otherKindCount,
+      hiddenMissingDuration: hiddenMissingDuration,
       hasMore: songs.length < matching,
       albums: albums,
       statusMessage: songs.isEmpty
@@ -128,9 +132,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       ? filter
       : filter.copyWith(kinds: const {ContentKind.music});
 
-  /// What the page counts as speech or station, for the content menu.
+  /// What the page counts as speech, station or effect, for the menu.
   static const LibraryFilter _otherKinds = LibraryFilter(
-    kinds: {ContentKind.podcast, ContentKind.audiobook, ContentKind.radio},
+    kinds: {
+      ContentKind.podcast,
+      ContentKind.audiobook,
+      ContentKind.radio,
+      ContentKind.soundEffect,
+    },
   );
 
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
@@ -633,6 +642,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final albums = songsChanged
         ? await _storage.albumSummaries()
         : _current.albums;
+    final hiddenMissingDuration = filter.hidesMissingDuration
+        ? await _storage.missingDurationCount(query: query, filter: filter)
+        : 0;
     final total = songsChanged ? await _storage.count() : _current.total;
     final otherKindCount = songsChanged
         ? await _storage.countQuery(query: '', filter: _otherKinds)
@@ -644,6 +656,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         total: total,
         matching: matching,
         otherKindCount: otherKindCount,
+        hiddenMissingDuration: hiddenMissingDuration,
         hasMore: songs.length < matching,
         albums: albums,
       ),

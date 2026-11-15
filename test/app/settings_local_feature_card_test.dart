@@ -17,9 +17,16 @@ class _FakeController extends LocalComponentsController {
   _FakeController(this.states);
 
   final Map<String, LocalComponentState> states;
+  final List<String> downloaded = [];
 
   @override
   Future<Map<String, LocalComponentState>> build() async => states;
+
+  @override
+  Future<bool> download(String id) async {
+    downloaded.add(id);
+    return true;
+  }
 }
 
 Map<String, LocalComponentState> allMissing() => {
@@ -40,13 +47,13 @@ void main() {
     WidgetTester tester, {
     required Map<String, LocalComponentState> states,
     MachineProfile profile = strong,
+    _FakeController? controller,
   }) async {
+    final fake = controller ?? _FakeController(states);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          localComponentsControllerProvider.overrideWith(
-            () => _FakeController(states),
-          ),
+          localComponentsControllerProvider.overrideWith(() => fake),
           settingsControllerProvider.overrideWith(
             (ref) => SettingsController(FakePersistenceService()),
           ),
@@ -194,5 +201,41 @@ void main() {
       find.byKey(const ValueKey('component-status-lyrics-sherpa-runtime')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('a system ffmpeg still offers a bundled copy', (tester) async {
+    final states = allMissing();
+    states[LocalComponentRegistry.ffmpeg.id] = const LocalComponentState(
+      LocalComponentPhase.notInstalled,
+      systemAvailable: true,
+    );
+    final controller = _FakeController(states);
+    await pump(tester, states: states, controller: controller);
+
+    expect(find.text('使用系统已安装版本'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('feature-system-note-transcode')),
+      findsOneWidget,
+      reason: 'the card says the system binary comes first',
+    );
+    expect(
+      find.byKey(const ValueKey('feature-action-transcode')),
+      findsNothing,
+      reason: 'nothing is missing, so there is no install to repeat',
+    );
+
+    final bundled = find.byKey(const ValueKey('feature-bundled-transcode'));
+    await tester.ensureVisible(bundled);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: bundled, matching: find.textContaining('自带的')),
+      findsOneWidget,
+    );
+
+    await tester.tap(bundled);
+    await tester.pumpAndSettle();
+
+    expect(controller.downloaded, ['ffmpeg'],
+        reason: 'the fallback goes through the same download and check');
   });
 }

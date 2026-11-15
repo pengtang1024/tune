@@ -28,6 +28,12 @@ class VersionManifestAsset {
 
   bool sameAs(VersionManifestAsset other) =>
       url == other.url && size == other.size && sha256 == other.sha256;
+
+  Map<String, dynamic> toJson() => {
+    'url': url,
+    'size': size,
+    'sha256': sha256,
+  };
 }
 
 /// The static list a release publishes, read instead of the GitHub API.
@@ -119,6 +125,20 @@ class VersionManifest {
     }
     return true;
   }
+
+  /// Writes the fields [fromJson] reads, so the cached copy round-trips.
+  Map<String, dynamic> toJson() => {
+    'schema': schema,
+    'version': version,
+    'build': build,
+    'released_at': releasedAt,
+    'release_url': releaseUrl,
+    'notes': notes,
+    'min_supported': minSupported,
+    'assets': {
+      for (final entry in assets.entries) entry.key: entry.value.toJson(),
+    },
+  };
 
   /// The platform key of the manifest, `linux` → `linux-x64`.
   static String platformKey(String platform) => switch (platform.toLowerCase()) {

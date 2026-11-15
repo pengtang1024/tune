@@ -30,6 +30,9 @@ class LibraryToolbar extends ConsumerWidget {
   /// How many tracks the word, the scope and the filter match.
   final int count;
 
+  /// How many matching tracks the list leaves out for having no duration.
+  final int hiddenMissingDuration;
+
   /// The content the page is scoped to, when it names one kind; the count
   /// then counts shows, chapters or stations instead of songs.
   final ContentKind? kind;
@@ -47,6 +50,9 @@ class LibraryToolbar extends ConsumerWidget {
   final ValueChanged<LibraryViewMode> onViewChanged;
   final VoidCallback onFilter;
 
+  /// Shows the tracks whose duration is unknown again.
+  final VoidCallback onShowMissingDuration;
+
   /// Below this width the search field and the controls cannot share a row:
   /// the field ends up narrower than its own prefix icon and the row
   /// overflows. A phone gets two rows instead.
@@ -58,6 +64,7 @@ class LibraryToolbar extends ConsumerWidget {
     this.focusNode,
     required this.query,
     required this.count,
+    required this.hiddenMissingDuration,
     required this.kind,
     required this.sources,
     required this.sourceLabels,
@@ -71,11 +78,12 @@ class LibraryToolbar extends ConsumerWidget {
     required this.onSort,
     required this.onViewChanged,
     required this.onFilter,
+    required this.onShowMissingDuration,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return LayoutBuilder(
+    final content = LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= _twoRowBreakpoint) {
           return SizedBox(
@@ -111,6 +119,56 @@ class LibraryToolbar extends ConsumerWidget {
           ],
         );
       },
+    );
+    if (hiddenMissingDuration <= 0) return content;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        content,
+        const SizedBox(height: CompactTokens.space4),
+        _missingDurationNote(context),
+      ],
+    );
+  }
+
+  /// States that dirty rows are out of the list, and offers to show them.
+  ///
+  /// A filter the reader cannot see is the thing this line exists to avoid:
+  /// the count and the way back are both on the toolbar.
+  Widget _missingDurationNote(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      key: const ValueKey('library-hidden-missing-duration'),
+      children: [
+        Icon(
+          Icons.info_outline_rounded,
+          size: CompactTokens.icon14,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: CompactTokens.space6),
+        Expanded(
+          child: Text(
+            context.loc.libraryHiddenMissingDuration(hiddenMissingDuration),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        TextButton(
+          key: const ValueKey('library-show-missing-duration'),
+          onPressed: onShowMissingDuration,
+          style: TextButton.styleFrom(
+            minimumSize: const Size(0, 28),
+            padding: const EdgeInsets.symmetric(
+              horizontal: CompactTokens.space8,
+            ),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+          child: Text(context.loc.libraryShowHiddenDuration),
+        ),
+      ],
     );
   }
 
@@ -149,6 +207,7 @@ class LibraryToolbar extends ConsumerWidget {
     ContentKind.podcast => context.loc.libraryEpisodeCount(count),
     ContentKind.audiobook => context.loc.libraryChapterCount(count),
     ContentKind.radio => context.loc.libraryStationCount(count),
+    ContentKind.soundEffect => context.loc.libraryEffectCount(count),
     _ => context.loc.libraryTrackCount(count),
   };
 

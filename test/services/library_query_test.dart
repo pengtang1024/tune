@@ -52,6 +52,7 @@ void main() {
     album: 'Album Z',
     uri: 'tune://source.test/gamma.m4a',
     sourceId: 'source.test',
+    duration: 60000,
   );
 
   setUp(() {

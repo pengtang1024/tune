@@ -1,9 +1,21 @@
 # 本地组件（本地能力插件）
 
-> 状态：设计已定，实施中（Android 的 FFI 模型已接入，见 §1.1）
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
+> 实施记录：1.32.0 起，见 CHANGELOG；Android 的 FFI 模型见 §1.1
 > 适用范围：翻译的本地模型、智能歌词的本地引擎、转码用的 FFmpeg
 
 本地能力不再各自维护下载与安装状态。所有需要“下载一个可执行文件或模型”的东西，都登记成同一种**组件**，由同一份清单、同一个安装器、同一个控制器管理。
+
+## 目录
+
+- [1. 组件模型](#1-组件模型)
+- [2. 状态机](#2-状态机)
+- [3. 存放路径与取用顺序](#3-存放路径与取用顺序)
+- [4. feature 怎么取用](#4-feature-怎么取用)
+- [5. 只有一套事实来源](#5-只有一套事实来源)
+- [6. 上游与校验](#6-上游与校验)
+- [7. 设置页：功能项 → 档位 → 技术清单](#7-设置页功能项--档位--技术清单)
 
 ## 1. 组件模型
 
@@ -31,7 +43,7 @@
 | 歌词 | `lyrics-whisper-runtime`（whisper-cli）、`lyrics-whisper-model-{tiny,base,small,large-v3-turbo}`（ggml） |
 | 歌词第二票 | `lyrics-sherpa-runtime`（sherpa-onnx）、`lyrics-sensevoice-model` |
 | 歌词可选第三家族 | `lyrics-funasr-nano-model`（Fun-ASR-Nano，复用上面的 sherpa-onnx 运行时） |
-| 歌词（Android） | `lyrics-whisper-onnx-model`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
+| 歌词（Android） | `lyrics-whisper-onnx-model-small`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
 | 转码 | `ffmpeg`（GPL-2.0-or-later 构建，由本项目自己发布） |
 
 运行时与模型分开下载、分开校验、分开删除。翻译模型按默认、低配、高质量三档并列；引擎取第一个可用的档位，下载仍从默认档开始。SenseVoice 体积大且权重协议需单独确认，只在读者点击时下载，不进默认安装。
@@ -42,14 +54,14 @@ Fun-ASR-Nano 是可选的第三 ASR 家族（`docs/local-ai-evaluation.md` D12�
 
 `platforms` 只决定「这个组件在哪些平台上被列出、被检查」。控制器与设置页都调
 `spec.supports(platform)` 过滤，桌面列表因此保持原样：Android 不会看到 `lyrics-sherpa-runtime`
-与 4 个 ggml whisper 模型，桌面也不会看到 `lyrics-whisper-onnx-model`。
+与 4 个 ggml whisper 模型，桌面也不会看到 `lyrics-whisper-onnx-model-small`。
 
 Android 的运行时不是组件：`sherpa_onnx` 2.0.1 是随包的原生库，`localAsrBackend: ffi`
 直接用它，不下载可执行文件。只有模型是组件：
 
 | 组件 | 文件 | 字节 | 用途 |
 | --- | --- | --- | --- |
-| `lyrics-whisper-onnx-model` | `small-encoder.int8.onnx` | 112,442,483 | whisper-small ONNX encoder |
+| `lyrics-whisper-onnx-model-small` | `small-encoder.int8.onnx` | 112,442,483 | whisper-small ONNX encoder |
 | | `small-decoder.int8.onnx` | 262,226,114 | whisper-small ONNX decoder |
 | | `small-tokens.txt` | 816,730 | 词表 |
 
@@ -61,7 +73,7 @@ FFmpeg 由本项目自己构建并发布：`tool/build_ffmpeg.sh` 从 ffmpeg.org
 
 ## 2. 状态机
 
-```
+```text
 checking ──> notInstalled ──> downloading ──> verifying ──> ready
                   ^                 |                          |
                   └── 取消/失败 <────┘                          |
@@ -76,7 +88,7 @@ checking ──> notInstalled ──> downloading ──> verifying ──> read
 
 ## 3. 存放路径与取用顺序
 
-```
+```text
 <support>/components/<id>/            组件本体（可删除）
 <support>/components/.<id>.staging/   下载与解包暂存（失败即清）
 <support>/translation/                旧版翻译目录（只读兼容）
@@ -156,6 +168,12 @@ sha256sum <downloaded>    # 与 registry 常量比对
    每个文件的名称、字节数与来源域名。
 
 点一次主按钮 = 把该档位所需的运行时与模型按顺序装齐；系统已有的组件跳过并在状态里注明。
+
+系统副本已经覆盖整个功能项时（目前只有音频转码会出现：PATH 或 `/usr/bin`、`/usr/local/bin`
+里已有 `ffmpeg`），卡片写「使用系统已安装版本」，主按钮隐藏，下面再给一行说明与一个次级按钮
+「也可以下载一份自带的（约 X）」。次级按钮走同一个 `download`（相同的下载、字节数与 sha256
+校验、解压与原子替换），只是不走「已可用就跳过」的批次逻辑；系统优先的顺序不变，这只是可选
+的自带副本。
 
 ### 7.2 数据模型
 
@@ -272,6 +290,10 @@ Windows 目前三个功能的二进制都是 linux-x64 构建，因此整卡不�
 | 歌词 | 第三引擎 | 8 GB | 8 | 960 MB | 1 GB |
 | 转码 | — | — | — | 6 MB | 100 MB |
 
+翻译档位口径：本表「轻量 / 标准 / 高质量」对应注册表的「低配 / 默认 / 高质量」
+（`translation-model-low` / `translation-model` / `translation-model-quality`）；
+「标准」即默认档，默认档是 Qwen3-0.6B（约 610 MB），下载从默认档开始。
+
 选择顺序（纯函数，可单测）：
 
 1. 可推荐集合 = 内存、核数、磁盘都达标的档位；未知值不参与过滤。
@@ -330,3 +352,11 @@ Windows 目前三个功能的二进制都是 linux-x64 构建，因此整卡不�
 1. SenseVoice（585 MB）随歌词每一档主安装一起装，因为它就是默认的两票之一；入口下载量如实包含它。
 2. 删除功能项时连未选中的档位一起删，弹窗写明总占用；系统自带副本不动。
 3. 跨平台按实际能力显示：Linux 三项齐全，Android 只有歌词，Windows 等装不了的平台连分区都不出现。
+
+## 相关文档
+
+- [settings-redesign.md](settings-redesign.md) — 设置页的分区导航与入口
+- [smart-lyrics.md](smart-lyrics.md) — 歌词引擎怎么用这些组件
+- [licensing.md](licensing.md) — 随包与下载模型的许可证边界
+- [troubleshooting.md](troubleshooting.md) — 下载或校验失败时的现象与处理
+- [architecture.md](architecture.md) — 组件注册与状态归属

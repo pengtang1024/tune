@@ -35,7 +35,7 @@ void main() {
     });
   });
 
-  test('a successful check waits about six hours', () {
+  test('a successful check waits about an hour', () {
     fakeAsync((async) {
       var calls = 0;
       final scheduler = UpdateScheduler(
@@ -50,10 +50,12 @@ void main() {
       _advance(async, UpdateScheduler.firstDelay + const Duration(seconds: 1));
       expect(calls, 1);
 
-      _advance(async, const Duration(hours: 5, minutes: 20));
+      // The wait is an hour with ten percent either way, so fifty minutes is
+      // still a wait.
+      _advance(async, const Duration(minutes: 50));
       expect(calls, 1);
 
-      _advance(async, const Duration(hours: 1, minutes: 30));
+      _advance(async, const Duration(minutes: 20));
       expect(calls, 2);
 
       scheduler.stop();
@@ -116,7 +118,7 @@ void main() {
     });
   });
 
-  test('two automatic checks are never closer than half an hour', () {
+  test('two automatic checks are never closer than fifteen minutes', () {
     fakeAsync((async) {
       var calls = 0;
       final scheduler = UpdateScheduler(
@@ -137,6 +139,13 @@ void main() {
       _advance(async, const Duration(seconds: 61));
       expect(calls, 1);
 
+      // The earliest the guard lets the next check run.
+      _advance(async, const Duration(minutes: 13, seconds: 57));
+      expect(calls, 1);
+
+      _advance(async, const Duration(seconds: 2));
+      expect(calls, 2);
+
       scheduler.stop();
     });
   });
@@ -147,21 +156,52 @@ void main() {
         check: () async => true,
         random: Random(seed),
       ).nextDelay();
-      expect(
-        delay,
-        greaterThanOrEqualTo(const Duration(hours: 5, minutes: 24)),
-      );
-      expect(delay, lessThanOrEqualTo(const Duration(hours: 6, minutes: 36)));
+      expect(delay, greaterThanOrEqualTo(const Duration(minutes: 54)));
+      expect(delay, lessThanOrEqualTo(const Duration(minutes: 66)));
     }
   });
 
-  test('the backoff grows until it reaches the normal interval', () {
+  test('the backoff grows until it reaches the two hour cap', () {
     expect(UpdateScheduler.delayAfterFailure(1), const Duration(minutes: 30));
     expect(UpdateScheduler.delayAfterFailure(2), const Duration(hours: 1));
     expect(UpdateScheduler.delayAfterFailure(3), const Duration(hours: 2));
-    expect(UpdateScheduler.delayAfterFailure(4), const Duration(hours: 4));
-    expect(UpdateScheduler.delayAfterFailure(5), const Duration(hours: 6));
-    expect(UpdateScheduler.delayAfterFailure(9), const Duration(hours: 6));
+    expect(UpdateScheduler.delayAfterFailure(9), const Duration(hours: 2));
     expect(UpdateScheduler.delayAfterFailure(0), UpdateScheduler.interval);
+  });
+
+  test('a success after the cap returns to the hourly rhythm', () {
+    fakeAsync((async) {
+      var calls = 0;
+      var succeed = false;
+      final scheduler = UpdateScheduler(
+        check: () async {
+          calls++;
+          return succeed;
+        },
+        clock: () => _clock(async),
+        random: Random(7),
+      )..start();
+
+      _advance(async, UpdateScheduler.firstDelay + const Duration(seconds: 1));
+      expect(calls, 1);
+
+      // 30 min, then 1 h, then the cap of 2 h.
+      _advance(async, const Duration(minutes: 30, seconds: 2));
+      expect(calls, 2);
+      _advance(async, const Duration(hours: 1, seconds: 2));
+      expect(calls, 3);
+
+      succeed = true;
+      _advance(async, const Duration(hours: 2, seconds: 2));
+      expect(calls, 4);
+
+      // The next check is the normal interval again, not the cap.
+      _advance(async, const Duration(minutes: 53));
+      expect(calls, 4);
+      _advance(async, const Duration(minutes: 14));
+      expect(calls, 5);
+
+      scheduler.stop();
+    });
   });
 }

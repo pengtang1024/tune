@@ -46,6 +46,26 @@ class LibraryQuery {
     return (rows.first['count'] as int?) ?? 0;
   }
 
+  /// How many tracks match [query] and [filter], and hold a missing duration
+  /// that [LibraryFilter.hideMissingDuration] keeps out of the page.
+  int missingDurationCount({
+    required String query,
+    required LibraryFilter filter,
+  }) {
+    // Another scope keeps its rows: a live stream has no duration to miss.
+    if (!filter.hidesMissingDuration) return 0;
+    final where = LibraryFilterSql.where(
+      query,
+      filter.copyWith(hideMissingDuration: false, excludeShortTracks: false),
+    );
+    final rows = _db.select(
+      'SELECT COUNT(*) AS count FROM songs ${where.sql} '
+      'AND ${LibraryFilterSql.missingDuration}',
+      where.args,
+    );
+    return (rows.first['count'] as int?) ?? 0;
+  }
+
   /// The counts of every facet group, each counted without its own group's
   /// selection so the other options stay visible while one is chosen.
   LibraryFacets facets({required LibraryFilter filter}) =>

@@ -129,6 +129,15 @@
       }
     }
   },
+  "libraryEffectCount": "{count, plural, =1{1 clip} other{{count} clips}}",
+  "@libraryEffectCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "No matching songs",
   "libraryNoMatchSubtitle": "Try another keyword or clear the search",
   "librarySourceEmptyTitle": "No songs from this source",
@@ -1362,6 +1371,7 @@
   "contentKindAudiobook": "Audiobook",
   "contentKindMusic": "Music",
   "contentKindRadio": "Radio",
+  "contentKindSoundEffect": "Sound effects",
   "trackFactPath": "File path",
   "trackFactAddress": "Online address",
   "trackDetailsTooltip": "Details",
@@ -1822,6 +1832,18 @@
   "libraryFilterDurationMedium": "2–5 min",
   "libraryFilterDurationLong": "5–10 min",
   "libraryFilterDurationEpic": ">10 min",
+  "libraryFilterShortTracks": "Very short tracks",
+  "libraryFilterShortTracksOption": "Under 3 seconds",
+  "libraryHiddenMissingDuration": "{count, plural, =1{1 track without a duration is hidden} other{{count} tracks without a duration are hidden}}",
+  "@libraryHiddenMissingDuration": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryShowHiddenDuration": "Show",
   "libraryFilterAddedWeek": "Last 7 days",
   "libraryFilterAddedMonth": "Last 30 days",
   "libraryFilterAddedYear": "Last year",
@@ -1931,6 +1953,8 @@
   "settingsLocalFeatureVerifying": "Verifying",
   "settingsLocalFeatureReady": "Ready · {size} used",
   "settingsLocalFeatureSystemReady": "Using the system install",
+  "settingsLocalFeatureSystemInUse": "The system install is in use and still comes first; a bundled copy is only a fallback.",
+  "settingsLocalFeatureDownloadBundled": "Or download a bundled copy (about {size})",
   "settingsLocalFeaturePartial": "Partly installed · {done}/{total}",
   "settingsLocalFeatureFailed": "Failed: {message}",
   "settingsLocalFeatureNeedDownload": "About {size} to download",

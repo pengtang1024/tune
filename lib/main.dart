@@ -111,7 +111,7 @@ Future<void> main(List<String> arguments) async {
   container.read(smartLyricsAutoFillControllerProvider).start();
 
   // The update check (docs/update-cdn.md §4.3): a minute after start, then
-  // every six hours with jitter, backing off when the sources cannot be
+  // every hour with jitter, backing off when the sources cannot be
   // reached. It reads the static list, so it no longer spends the anonymous
   // requests of the GitHub API.
   container.read(updateSchedulerProvider).start();
@@ -127,7 +127,7 @@ Future<bool> _claimThePlayerPlace(ProviderContainer container) async {
 
   final holdsPlace = await service.acquire();
   final files = service.startupFiles;
-  if (files.isNotEmpty) Log.info('命令行里的文件: $files');
+  if (files.isNotEmpty) Log.debug('命令行里的文件: $files');
 
   if (!holdsPlace) {
     Log.info('已有播放器在运行，把文件交给它');

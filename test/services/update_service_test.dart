@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -8,6 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/update_service.dart';
+import 'package:tune/data/services/update/version_manifest_cache.dart';
+import 'package:tune/data/services/update/version_manifest_source.dart';
 
 /// Answers each host of the check, so the tiers can be told apart.
 class _RoutingAdapter implements HttpClientAdapter {
@@ -85,7 +88,16 @@ Map<String, dynamic> _manifest({
 ) {
   final adapter = _RoutingAdapter(routes);
   final dio = Dio()..httpClientAdapter = adapter;
-  return (UpdateService(dio: dio), adapter);
+  return (
+    UpdateService(
+      dio: dio,
+      source: VersionManifestSource(
+        dio: dio,
+        cache: VersionManifestCache.memory(),
+      ),
+    ),
+    adapter,
+  );
 }
 
 Matcher _failure(UpdateCheckFailure failure) {
@@ -232,6 +244,39 @@ void main() {
       for (final request in adapter.requests) {
         expect(request.headers.containsKey('Authorization'), isFalse);
       }
+    });
+  });
+
+  group('reuse window', () {
+    test('a round an hour later asks again instead of reusing', () async {
+      var now = DateTime.utc(2026);
+      final adapter = _RoutingAdapter({
+        _cdn: (_) => _body(jsonEncode(_manifest())),
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+      final dio = Dio()..httpClientAdapter = adapter;
+      final service = UpdateService(
+        dio: dio,
+        source: VersionManifestSource(
+          dio: dio,
+          cache: VersionManifestCache.memory(),
+        ),
+        clock: () => now,
+      );
+
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 2);
+
+      // A second ask inside the same round reuses the answer.
+      now = now.add(const Duration(minutes: 5));
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 2);
+
+      // The next hourly round is past the window, so it asks again: an hour
+      // of waiting never ends in a cached answer.
+      now = now.add(const Duration(hours: 1));
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 4);
     });
   });
 
@@ -405,6 +450,34 @@ void main() {
     test('an answer without a version is no release', () {
       expect(UpdateService.parseRelease(null), isNull);
       expect(UpdateService.parseRelease({'tag_name': ''}), isNull);
+    });
+  });
+
+  group('source logging', () {
+    test('every address reports its host and result', () async {
+      final lines = <String>[];
+      final adapter = _RoutingAdapter({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+      final dio = Dio()..httpClientAdapter = adapter;
+      final source = VersionManifestSource(dio: dio);
+
+      // The lines the app itself writes, not a copy collected by a hook.
+      final manifest = await runZoned(
+        source.read,
+        zoneSpecification: ZoneSpecification(
+          print: (self, parent, zone, line) => lines.add(line),
+        ),
+      );
+
+      expect(manifest?.version, '1.33.0');
+      expect(lines, hasLength(2));
+      expect(lines.first, contains(_cdn));
+      expect(lines.first, contains('404'));
+      expect(lines.last, contains(_raw));
+      expect(lines.last, contains('命中 1.33.0+53'));
+      expect(lines.last, contains('ms'));
     });
   });
 

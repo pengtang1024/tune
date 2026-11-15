@@ -58,7 +58,7 @@ class MprisServiceImpl implements MprisService, MprisObjectDelegate {
         return false;
       }
 
-      Log.info('系统媒体控制已注册: $mprisBusName');
+      Log.debug('系统媒体控制已注册: $mprisBusName');
       return true;
     } catch (error, stackTrace) {
       Log.error('注册系统媒体控制失败: $error\n$stackTrace');

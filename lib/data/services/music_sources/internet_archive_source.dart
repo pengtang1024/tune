@@ -6,6 +6,7 @@ import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/core/l10n/app_strings.dart';
 import 'package:tune/domain/models/song.dart';
@@ -559,6 +560,17 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             // the name, so the values are read back into the name the filter
             // offers instead of whatever shape the uploader left.
             language: _languageOf(metadata['language'] ?? rawDoc['language']),
+            // An item carries the collections the archive files it under.
+            // When one of them names speech, that is the archive's own word
+            // about this item, and it is kept beside the track: a collection
+            // that holds a hundred songs and one book would otherwise file
+            // the book under songs.
+            sourceData: switch (contentKindOfCollections(
+              _textsOf(metadata['collection'] ?? rawDoc['collection']),
+            )) {
+              null => null,
+              final kind => {'contentKind': kind.name},
+            },
           ),
         );
       }
@@ -693,6 +705,16 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
       if (text.isNotEmpty) return text;
     }
     return '';
+  }
+
+  /// The values of a metadata field that is written as one value or as a
+  /// list, such as the collections an item is filed under.
+  static Iterable<String> _textsOf(Object? value) sync* {
+    final values = value is Iterable ? value : [value];
+    for (final item in values) {
+      final text = SourceSongFactory.readString(item).trim();
+      if (text.isNotEmpty) yield text;
+    }
   }
 
   int _parseDuration(Object? raw) {

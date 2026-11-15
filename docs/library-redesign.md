@@ -1,11 +1,29 @@
 # 音乐库改版（已实施）
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 2026-10-25。这一页回答三件事：音乐库改版前为什么挤、改成什么样、按什么顺序落地。
 > 文中保留当时的设计提案，落地偏差已就地改正（见 §2、§9、§10），最终以代码为准。
 > 相关：[conventions.md](conventions.md)（尺寸与字体）、[performance-row-design.md](performance-row-design.md)（行预算）、
 > [chips.md](chips.md)（标识）、[architecture.md](architecture.md)（状态归属）。
-> 状态：**M1a/M1b 已实施**（页头/工具条/列头/行尾/排序/双列）；分类与筛选见 library-browse M0–M4。线框稿见 [`mockups/library-redesign.html`](mockups/library-redesign.html)。
+> 实施记录：**M1a/M1b 已实施**（页头/工具条/列头/行尾/排序/双列）；分类与筛选见 library-browse M0–M4。线框稿见 [`mockups/library-redesign.html`](mockups/library-redesign.html)。
 > 分类、分面筛选与左侧分类树见 [`library-browse.md`](library-browse.md)；两件事**同一批落地**。
+
+## 目录
+
+- [1. 改版前的现状](#1-改版前的现状)
+- [2. 目标](#2-目标)
+- [3. 视觉方向：唱片目录（The Catalog）](#3-视觉方向唱片目录the-catalog)
+- [4. 布局](#4-布局)
+- [5. 排序](#5-排序)
+- [6. 状态与数据流](#6-状态与数据流)
+- [7. 性能预算](#7-性能预算)
+- [8. 可访问性与键盘](#8-可访问性与键盘)
+- [9. 落地顺序](#9-落地顺序)
+- [10. 拍板结果（2026-11-01）](#10-拍板结果2026-11-01)
+- [11. 不在范围](#11-不在范围)
+- [12. 验收](#12-验收)
+- [13. 影响面：哪些页面动，哪些不动](#13-影响面哪些页面动哪些不动)
 
 ## 1. 改版前的现状
 
@@ -306,3 +324,12 @@ class LibrarySort {
 3. **默认窗口是全局的**，但它只是给所有页面多一点空间，不算视觉改版。
 
 如果目标是「每个页面都统一到这套语言」，那要先写一份设计系统（页面型 × 组件），再逐页迁移；不建议在音乐库这一版里顺手改。那是另一个工程，不是这次的一批。
+
+## 相关文档
+
+- [library-browse.md](library-browse.md) — 分类树、分面筛选与浏览视图——与本页同一批落地
+- [performance-row-design.md](performance-row-design.md) — 列表行为什么这么画：element / overlay 预算与行高
+- [performance.md](performance.md) — 卡顿与重建风暴的诊断、预算与判据
+- [conventions.md](conventions.md) — 尺寸、字号与主题 token
+- [chips.md](chips.md) — chip 与标识的统一写法
+- [architecture.md](architecture.md) — 状态归谁、依赖方向

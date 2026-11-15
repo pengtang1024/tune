@@ -1,9 +1,20 @@
 # Android 立项（移动端第一个平台）
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 结论先行：Android 作为移动端第一个平台独立排期，Linux 仍是唯一验收平台；
 > 后台播放、通知、权限、扫描四件事分开做，不合成一次大改。
 > 本机已建好 AVD `tune-api35`（API 35，`-no-window` + swiftshader），通知、前台服务、
 > 媒体按键与窄屏外壳能在模拟器上验；耳机实体按键、锁屏视觉与「播完再点播」仍需真机复核。
+
+## 目录
+
+- [0. 范围](#0-范围)
+- [1. 现在的状态（代码依据）](#1-现在的状态代码依据)
+- [2. 里程碑](#2-里程碑)
+- [3. 风险](#3-风险)
+- [4. 已拍板](#4-已拍板)
+- [5. SAF「指定文件夹」（S1–S3 已实施）](#5-saf指定文件夹s1s3-已实施)
 
 ## 0. 范围
 
@@ -232,7 +243,7 @@ AVD 实测（2026-11-14，`tune-api35` API 35 x86_64，`-no-window -no-audio
 | 步骤 | 音频 | 耗时 | 结果 |
 | --- | --- | --- | --- |
 | MediaCodec 解码 | AAC 44.1 kHz 单声道 5.5 s | 221 ms | 176,100 B PCM（16 kHz / 单声道 / 16-bit） |
-| SenseVoice FFI | 同上 WAV | 1,257 ms | 出词「开班时间早上九点至 / 下午五点」，语言标签 `<|yue|>` |
+| SenseVoice FFI | 同上 WAV | 1,257 ms | 出词「开班时间早上九点至 / 下午五点」，语言标签 `\|yue\|` 包裹 |
 | whisper ONNX FFI | 同上 WAV | 4,022 ms | 出词「(時間早上起午點,至下午五點)」，语言 `zh` |
 
 已知限制与失败点：
@@ -422,16 +433,19 @@ AVD 实测（2026-11-14，`tune-api35` API 35 x86_64，`-no-window -no-audio
   文档补 `.txt`，已按上文改为写后核对 display name 并改名，复跑名字正确。
 - S3 状态（2026-11-12，AVD `tune-api35`）：选 `Music/TuneSaf` 后跑
   `flutter test integration_test/saf_smart_lyrics_test.dart -d emulator-5554`，测试通过。
-  该测试用设备内网页端点代替 ASR 服务，但走的是真实的 `OpenAiCompatibleEngine`：它断言
-  上行音频 > 1000 字节（说明拿到的是整份复制音频，不是空 `content://`），随后
-  `readSheet` 读回词稿，并断言缓存里没有残留的 `tune_smart_audio_*` 目录。
-  `adb shell ls -l` 显示 `/sdcard/Music/TuneSaf/Saf_One.smart.lrc`（113 B），`cat` 为
-  `[tune:smart]` / `[votes:1]` / `[src:cloud:test-asr]` / `[00:00.50]SAF 生成验证`。
-  已知限制：该测试用设备内网页端点代替云端 ASR（模拟器没有云端 ASR key），验的是
-  「复制 → 上行 → 投票 → 落盘 → 读回」这条链路，不是识别质量；本地引擎的真实出词已由
-  §2 E5 的 `integration_test/android_local_asr_test.dart` 在同一 AVD 上补齐。
+  - **断言**：该测试用设备内网页端点代替 ASR 服务，但走的是真实的 `OpenAiCompatibleEngine`：它断言上行音频 > 1000 字节（说明拿到的是整份复制音频，不是空 `content://`），随后 `readSheet` 读回词稿，并断言缓存里没有残留的 `tune_smart_audio_*` 目录。
+  - **落点**：`adb shell ls -l` 显示 `/sdcard/Music/TuneSaf/Saf_One.smart.lrc`（113 B），`cat` 为 `[tune:smart]` / `[votes:1]` / `[src:cloud:test-asr]` / `[00:00.50]SAF 生成验证`。
+  - **已知限制**：该测试用设备内网页端点代替云端 ASR（模拟器没有云端 ASR key），验的是「复制 → 上行 → 投票 → 落盘 → 读回」这条链路，不是识别质量；本地引擎的真实出词已由 §2 E5 的 `integration_test/android_local_asr_test.dart` 在同一 AVD 上补齐。
 - 风险：SAF 逐层列目录比 MediaStore 慢，500 首要先量；`DocumentsContract` 在不同厂商 ROM
   上对 `mime_type` 的返回不一致；写权限被收回后不能继续把词稿标成成功；数十分钟的播客
   整份复制进缓存的时间与空间占用未在真机量过。
 - 上线前必须先在真机验：选择器返回的 tree URI 能跨重启使用、写权限真的可用、大文件复制
   的耗时与缓存占用。
+
+## 相关文档
+
+- [smart-lyrics.md](smart-lyrics.md) — SAF 词稿落点与 Android 本地票
+- [local-components.md](local-components.md) — 本地 ASR 组件的下载与校验
+- [architecture.md](architecture.md) — 平台能力位与依赖方向
+- [verification.md](verification.md) — `integration_test` 怎么跑
+- [troubleshooting.md](troubleshooting.md) — 权限、扫描与播放失败的现象

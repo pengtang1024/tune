@@ -283,6 +283,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString clips',
+      one: '1 clip',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get libraryNoMatchTitle => 'No matching songs';
 
   @override
@@ -3165,6 +3180,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contentKindRadio => 'Radio';
 
   @override
+  String get contentKindSoundEffect => 'Sound effects';
+
+  @override
   String get trackFactPath => 'File path';
 
   @override
@@ -4017,6 +4035,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryFilterDurationEpic => '>10 min';
 
   @override
+  String get libraryFilterShortTracks => 'Very short tracks';
+
+  @override
+  String get libraryFilterShortTracksOption => 'Under 3 seconds';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString tracks without a duration are hidden',
+      one: '1 track without a duration is hidden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => 'Show';
+
+  @override
   String get libraryFilterAddedWeek => 'Last 7 days';
 
   @override
@@ -4378,6 +4420,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalFeatureSystemReady => 'Using the system install';
+
+  @override
+  String get settingsLocalFeatureSystemInUse =>
+      'The system install is in use and still comes first; a bundled copy is only a fallback.';
+
+  @override
+  String settingsLocalFeatureDownloadBundled(String size) {
+    return 'Or download a bundled copy (about $size)';
+  }
 
   @override
   String settingsLocalFeaturePartial(int done, int total) {

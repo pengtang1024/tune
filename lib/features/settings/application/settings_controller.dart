@@ -350,7 +350,7 @@ class SettingsController extends StateNotifier<SettingsState> {
 
   @override
   void dispose() {
-    Log.info('SettingsController disposed');
+    Log.debug('SettingsController disposed');
     super.dispose();
   }
 }

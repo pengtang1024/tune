@@ -460,6 +460,12 @@ abstract class AppLocalizations {
   /// **'{count} 台'**
   String libraryStationCount(int count);
 
+  /// No description provided for @libraryEffectCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 段'**
+  String libraryEffectCount(int count);
+
   /// No description provided for @libraryNoMatchTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -5453,6 +5459,12 @@ abstract class AppLocalizations {
   /// **'电台'**
   String get contentKindRadio;
 
+  /// No description provided for @contentKindSoundEffect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音效'**
+  String get contentKindSoundEffect;
+
   /// No description provided for @trackFactPath.
   ///
   /// In zh_CN, this message translates to:
@@ -6941,6 +6953,30 @@ abstract class AppLocalizations {
   /// **'>10 分钟'**
   String get libraryFilterDurationEpic;
 
+  /// No description provided for @libraryFilterShortTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'极短轨'**
+  String get libraryFilterShortTracks;
+
+  /// No description provided for @libraryFilterShortTracksOption.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'3 秒以内'**
+  String get libraryFilterShortTracksOption;
+
+  /// No description provided for @libraryHiddenMissingDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已隐藏 {count} 条时长缺失的曲目'**
+  String libraryHiddenMissingDuration(int count);
+
+  /// No description provided for @libraryShowHiddenDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'显示'**
+  String get libraryShowHiddenDuration;
+
   /// No description provided for @libraryFilterAddedWeek.
   ///
   /// In zh_CN, this message translates to:
@@ -7594,6 +7630,18 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'使用系统已安装版本'**
   String get settingsLocalFeatureSystemReady;
+
+  /// No description provided for @settingsLocalFeatureSystemInUse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'当前用的是系统已安装的版本，系统优先；自带的副本只作备用。'**
+  String get settingsLocalFeatureSystemInUse;
+
+  /// No description provided for @settingsLocalFeatureDownloadBundled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'也可以下载一份自带的（约 {size}）'**
+  String settingsLocalFeatureDownloadBundled(String size);
 
   /// No description provided for @settingsLocalFeaturePartial.
   ///

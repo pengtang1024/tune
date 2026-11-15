@@ -1,8 +1,22 @@
 # 本地 AI 选型评估（ASR / 翻译 / 音频解码）
 
+> 状态：快照（2026-11-13） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 评估日期：2026-11-13。范围：只评估，不改代码。
 > 结论见 §1，逐项对比见 §3–§5，许可证清单见 §6，阿里 ASR 对照见 §7，拍板结果见 §8。
 > 体积与内存是公开资料的量级估算，**不是本文档实测值**；落地前须在目标机与目标机型上量一遍。
+
+## 目录
+
+- [1. 结论速览](#1-结论速览)
+- [2. 评估口径与现状](#2-评估口径与现状)
+- [3. ASR 选型](#3-asr-选型)
+- [4. 翻译选型](#4-翻译选型)
+- [5. 音频解码与转码](#5-音频解码与转码)
+- [6. 许可证风险清单](#6-许可证风险清单)
+- [7. 阿里 ASR 补充评估（云端 + FunASR 开源）](#7-阿里-asr-补充评估云端--funasr-开源)
+- [8. 拍板项与结论](#8-拍板项与结论)
+- [9. 参考来源](#9-参考来源)
 
 ## 1. 结论速览
 
@@ -312,3 +326,11 @@ D4–D6、D8 的默认值已经是代码的现状，文档不再停在「建议�
 - sherpa-onnx Paraformer 模型页（部分导出不支持时间戳）：https://k2-fsa.github.io/sherpa/onnx/pretrained_models/offline-paraformer/paraformer-models.html
 - Paraformer-zh 模型卡（Apache-2.0）：https://huggingface.co/funasr/paraformer-zh
 - Fun-ASR-Nano-2512 模型卡（Apache-2.0）：https://huggingface.co/FunAudioLLM/Fun-ASR-Nano-2512
+
+## 相关文档
+
+- [smart-lyrics.md](smart-lyrics.md) — 歌词链路现在用的是哪套模型与票池
+- [local-components.md](local-components.md) — 评估里的模型如何注册、下载与校验
+- [licensing.md](licensing.md) — 模型权重的许可证边界
+- [android.md](android.md) — Android 上的 FFI 模型与解码边界
+- [performance.md](performance.md) — 本地推理的开销判据

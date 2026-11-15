@@ -1,6 +1,18 @@
 # 整体架构
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 本文是 `docs/architecture.md` 的导览版；硬约束与扩展步骤以那份为准。
+
+## 目录
+
+- [分层与依赖方向](#分层与依赖方向)
+- [路由结构](#路由结构)
+- [状态归属（单一事实来源）](#状态归属单一事实来源)
+- [性能架构（摘要）](#性能架构摘要)
+- [持久化地图](#持久化地图)
+- [音乐库磁盘目录](#音乐库磁盘目录)
+- [桌面集成架构](#桌面集成架构)
 
 ## 分层与依赖方向
 
@@ -82,6 +94,8 @@ presentation → application → domain
 | 封面图 | `<音乐库>/.tune/artwork/<哈希前两位>/<哈希>.img` | `FileArtworkCache` |
 | 歌词 | 曲目目录内 `<歌名>.lrc` / `<歌名>.manual.lrc` / `<歌名>.smart.lrc` + `.smart.json` | `LyricsController` / `SmartLyricsService` → `LibraryPaths` |
 
+11 张表各自的列、约束与索引见主仓 [`docs/data-model.md`](https://github.com/pengtang1024/tune/blob/develop/docs/data-model.md)。
+
 要点：
 
 - **一偏好一文件**：两个进程同时开 app 各写各的，不会互相抹掉；旧的整份 JSON 由 `LegacyPreferenceMigration` 搬一次。
@@ -126,3 +140,11 @@ presentation → application → domain
 | `opened_files_handler.dart` | 桌面交来的文件 → 扫描 → 入库并播放 |
 
 播放状态仍只有 `PlaybackController` 一个来源；MPRIS、托盘、单实例都走**会话总线**（`DBusClient.session()`）。
+
+## 相关文档
+
+- [主要模块职责](modules.md) — 13 个 feature 与全局服务层各自住哪
+- [关键类与函数](key-classes.md) — 状态机、service 接口与领域模型
+- [依赖关系](dependencies.md) — 第三方依赖清单与主要调用链
+- [架构契约](../docs/architecture.md) — 本文导览的硬约束、扩展路径与数据模型入口
+- [性能诊断](../docs/performance.md) — 重建风暴、性能预算与判据

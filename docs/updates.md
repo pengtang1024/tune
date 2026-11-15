@@ -1,6 +1,18 @@
 # 自动更新
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 桌面端从静态清单发现自己有新版本，下载并换掉正在运行的 bundle，重启后生效。
+
+## 目录
+
+- [数据源](#数据源)
+- [产物约定](#产物约定)
+- [发布步骤](#发布步骤)
+- [从旧版本升级一次](#从旧版本升级一次)
+- [安装行为](#安装行为)
+- [测试](#测试)
+- [限制](#限制)
 
 ## 数据源
 
@@ -30,10 +42,12 @@
 | Windows | `tune-windows-x64-<version>.zip` | `tune.exe` 及其依赖目录 |
 | Android | `tune-android-<version>.apk` | — |
 
-本地翻译模型不再随平台包分发。模型、llama.cpp 运行时与许可证打成一个可选组件包
-`tune-translation-qwen2.5-0.5b-b12274.zip`（约 500 MB），单独作为 Release 附件
-发布；应用在设置页按需下载，元数据见 `translation/manifest.json`。组件包文件名以
-`tune-translation-` 开头，不含平台名，因此不会被自动更新选中。
+- 本地翻译模型不再随平台包分发。模型、llama.cpp 运行时与许可证打成一个可选组件包
+  `tune-translation-qwen2.5-0.5b-b12274.zip`（约 500 MB），单独作为 Release 附件
+  发布；应用在设置页按需下载，元数据见 `translation/manifest.json`。
+- 组件包文件名以 `tune-translation-` 开头，不含平台名，因此不会被自动更新选中。
+- 1.32.0 起本地能力已收敛为统一组件注册表（[local-components.md](local-components.md)）：
+  这个 zip 是「离线打包用的翻译组件」，不再是唯一的本地组件；在线用户由设置页按需下载各组件。
 
 Linux 用打包脚本生成：
 
@@ -62,8 +76,9 @@ flutter build linux --release
 3. 把 `dist/version.json` 复制到仓库根 `version.json`（`--root` 参数会直接写）。
 4. 提交、打 tag：`git tag -a v1.4.1 -m "v1.4.1"`，推送 tag。
 5. 在 GitHub（与 Gitea）创建同名 release，把平台归档作为附件上传。
-6. 把组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台归档，
-   组件包由应用在设置页按需下载。
+6. 把离线打包用的翻译组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只
+   认平台归档，组件包由应用在设置页按需下载（1.32.0 起在线用户按统一组件注册表下载各组件，
+   见 [local-components.md](local-components.md)）。
 7. 失效 CDN 缓存并自检：
    `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`，
    再拉一次 CDN 地址确认 `version` 等于刚发的版本。
@@ -92,8 +107,9 @@ Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开
 - **Linux**：归档下载到临时目录，解压到 bundle 同级的 `.tune-update`，再把
   旧 bundle 换成 `.tune-previous`、新目录换入原位；旧目录随后删除。完成后
   提示「重启后生效」，按钮直接启动新进程并结束旧进程。
-  归档是整包替换，但只换应用 bundle；本地翻译组件装在应用支持目录
-  （`<support>/translation/`），升级不会被删除，更新协议不需要额外字段。
+  归档是整包替换，但只换应用 bundle；本地组件（翻译/歌词/FFmpeg）装在应用支持目录
+  `<support>/components/<id>/`（见 [local-components.md](local-components.md) §3），升级不会被删除，
+  更新协议不需要额外字段；`<support>/translation/` 只作旧版翻译组件的兼容读取。
 - **Windows / Android**：只显示版本与「到发布页手动下载」，不做替换
   （运行中的可执行文件在 Windows 上无法覆盖）。
 
@@ -116,8 +132,16 @@ Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开
 - 归档没有签名校验（第一阶段仅 `sha256` + `size` + 双源交叉核对）。
   需要更强保证时按 [update-cdn.md](update-cdn.md) §7 补签名。
 - Android 的 APK 安装需要系统 Intent，桌面端尚未接入。
-- Linux 平台归档约 41 MiB，组件包约 500 MB；后者由用户按需下载，不占更新
-  下载量，但 GitHub Release 附件上限要按这个量级预留。
-- 源码仓库用 Git LFS 存模型与运行时归档：普通 clone 只有指针，装好 LFS 后
-  clone/pull 会额外拉约 515 MB。GitHub 免费 LFS 配额是 1 GB 存储 / 1 GB 月流量，
-  发布前先确认余量；上传受限时改用 release 附件分发，另行确认。
+- Linux 平台归档约 51 MiB；离线打包用的翻译组件包约 500 MB，1.32.0 起在线用户改为
+  从统一组件注册表按需下载各组件（[local-components.md](local-components.md)）。这些下载
+  都不占平台归档的更新下载量，但 GitHub Release 附件上限要按各组件量级预留。
+- 源码仓库不入库模型与运行时，也没有启用 Git LFS（无 `.gitattributes`、
+  `git lfs ls-files` 为空）；本地模型/运行时走 Release 组件包，由应用在设置页按需下载
+  （[local-components.md](local-components.md)）。
+
+## 相关文档
+
+- [更新清单与 CDN](update-cdn.md) — `version.json`、取数与退避
+- [开源基建与维护清单](oss-maintenance.md) — 发版要同步的那几条线
+- [本地组件](local-components.md) — 组件包的下载与校验
+- [许可证与第三方声明](licensing.md) — 归档里必须带的声明
