@@ -1,6 +1,8 @@
 # 获取帮助
 
-先看这里该走哪个渠道——走对了，问题解决得快很多。
+> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
+先看这里该走哪个渠道——走对了，问题解决得快很多。**只是想把它用起来**（扫不到歌、播不出来、组件装不上、没有托盘图标这类），先翻 [`docs/troubleshooting.md`](docs/troubleshooting.md) 的「一分钟自查」，多数问题那里已经写明了怎么确认、怎么处理。
 
 ## 该走哪
 
@@ -9,7 +11,7 @@
 | 报告可复现的缺陷 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「缺陷报告」模板 |
 | 提功能需求或改进建议 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「功能需求」模板 |
 | 问用法、问配置、问某个音源怎么填 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「使用问题」模板（标题会自动带 `[问题]`） |
-| **报告安全漏洞**（凭据泄漏、路径穿越、更新链劫持等） | **不要开公开 issue**，按 [`SECURITY.md`](SECURITY.md) 私下发邮件 |
+| **报告安全漏洞**（凭据泄漏、路径穿越、更新链劫持等） | **不要开公开 issue**，按 [`SECURITY.md`](SECURITY.md) 走私密漏洞通报（或发邮件） |
 | 报告行为准则问题 | 按 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) 私下发邮件 |
 | 想知道谁负责、怎么决策 | [`GOVERNANCE.md`](GOVERNANCE.md) |
 | 想贡献代码 | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
@@ -24,10 +26,12 @@
 
 ## 提缺陷时请带上
 
-- **版本**：`设置 → 关于` 里的完整版本号与构建号。
-- **环境**：Linux 发行版与版本、桌面环境（GNOME / KDE / 其它）、是自行编译还是装了发行包。
-- **复现步骤**：越短越好，写清点了哪里、选了哪个音源、期望看到什么、实际看到什么。
-- **日志**：用 `flutter run -d linux` 跑一遍复现路径，把输出贴上来。
+| 字段 | 需要提供 |
+| --- | --- |
+| 版本 | `设置 → 关于` 里的完整版本号与构建号。 |
+| 环境 | Linux 发行版与版本、桌面环境（GNOME / KDE / 其它）、是自行编译还是装了发行包。 |
+| 复现步骤 | 越短越好，写清点了哪里、选了哪个音源、期望看到什么、实际看到什么。 |
+| 日志 | 用 `flutter run -d linux` 跑一遍复现路径，把输出贴上来。 |
 
 > **贴日志前先脱敏**：不要贴你的音源密码、API Key、token、Cookie，也不要贴完整家目录路径（把 `/home/你的名字` 替换成 `~`）。日志里出现凭据请直接删掉那行。
 
@@ -41,7 +45,7 @@
 | 翻译 / 歌词模型下载很慢或失败 | 走的是 GitHub Releases 的下载链路；网络受限时可换用离线包，见 `设置 → 组件` 与 `docs/local-components.md` |
 | 更新检查没反应 | 自动检查约每小时一轮，失败会退避（30 分钟 → 1 小时 → 2 小时封顶）；可在 `设置 → 关于` 手动触发一次，不受节流 |
 | 桌面启动后没有托盘图标 | 仅 Linux 桌面提供托盘与 MPRIS；Windows 无托盘、无 SMTC |
-| 打包成 AppImage 后插件加载失败 | 见 `README.md` 已知限制里的 AppImage 段，需要带 bundle 内的 `lib/` 目录 |
+| 解压发行包后启动报插件加载失败 | 发行包是 `tune-linux-x64-<version>.tar.gz`，里面除了 `tune` 还有 `lib/`、`data/`、`share/`；只把 `tune` 一个文件拷出来会缺插件，整个目录一起留着即可，见 `docs/updates.md` 的「产物约定」 |
 
 ## 响应时间
 
@@ -53,9 +57,18 @@
 
 | 想查 | 看 |
 | --- | --- |
+| **用不了**：现象、可能原因、怎么确认、怎么处理 | [`docs/troubleshooting.md`](docs/troubleshooting.md) |
 | 产品范围、验收口径 | [`需求/README.md`](需求/README.md) |
 | 代码结构、扩展路径、状态归属 | [`docs/architecture.md`](docs/architecture.md) |
 | 跑测试、截图对比 | [`docs/verification.md`](docs/verification.md) |
 | 自动更新与 `version.json` | [`docs/updates.md`](docs/updates.md)、[`docs/update-cdn.md`](docs/update-cdn.md) |
 | 本地组件（翻译 / 歌词模型 / FFmpeg） | [`docs/local-components.md`](docs/local-components.md) |
 | 全部文档地图 | [`AGENTS.md`](AGENTS.md) 开头的表格 |
+
+## 相关文档
+
+- [故障排查](docs/troubleshooting.md) — 现象、可能原因、怎么确认、怎么处理
+- [验证门禁](docs/verification.md) — 跑测试与截图对比
+- [参与贡献](CONTRIBUTING.md) — 分支、门禁与提交流程
+- [安全策略](SECURITY.md) — 安全漏洞的私密报告渠道
+- [文档地图](AGENTS.md) — 每类问题该读哪份文档
