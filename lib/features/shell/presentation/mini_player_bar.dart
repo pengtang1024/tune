@@ -11,6 +11,12 @@ import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
+/// The height of the progress strip along the bottom edge.
+const double _progressHeight = 2;
+
+/// The height the row of the bar needs: the artwork and the padding around it.
+const double _rowHeight = CompactTokens.artworkDock + CompactTokens.space8 * 2;
+
 /// The whole surface of the mini window.
 ///
 /// The bar keeps the track, the three actions of the transport, the way back
@@ -58,9 +64,7 @@ class MiniPlayerBar extends ConsumerWidget {
         : song.title;
     final artist = song == null
         ? context.loc.playerDockReady
-        : (song.artist.isEmpty
-              ? context.loc.playerUnknownArtist
-              : song.artist);
+        : (song.artist.isEmpty ? context.loc.playerUnknownArtist : song.artist);
 
     final row = Padding(
       padding: const EdgeInsets.symmetric(
@@ -140,11 +144,25 @@ class MiniPlayerBar extends ConsumerWidget {
     Widget bar = Material(
       color: theme.colorScheme.surfaceContainer,
       child: showProgress
-          ? Column(
-              children: [
-                Expanded(child: row),
-                const _MiniProgress(),
-              ],
+          ? LayoutBuilder(
+              builder: (context, constraints) {
+                // The window is resized after the form changes, so a frame on
+                // the way to or from the bar is shorter than the bar itself.
+                // The row needs the artwork and the padding; below that the
+                // strip is all that is drawn, and below the strip nothing.
+                final height = constraints.maxHeight;
+                if (height.isFinite && height < _rowHeight + _progressHeight) {
+                  return height >= _progressHeight
+                      ? const _MiniProgress()
+                      : const SizedBox.shrink();
+                }
+                return Column(
+                  children: [
+                    Expanded(child: row),
+                    const _MiniProgress(),
+                  ],
+                );
+              },
             )
           : row,
     );
@@ -179,7 +197,7 @@ class _MiniProgress extends ConsumerWidget {
     );
     return SizedBox(
       key: const ValueKey('mini-progress'),
-      height: 2,
+      height: _progressHeight,
       width: double.infinity,
       child: ColoredBox(
         color: theme.colorScheme.surfaceContainerHighest,

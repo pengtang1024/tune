@@ -62,6 +62,8 @@ const _mini = Size(360, 88);
 /// Every one of them is drawn as the bar; the shell only draws once the window
 /// can hold it.
 const _frames = [
+  Size(248, 1),
+  Size(248, 40),
   Size(360, 88),
   Size(480, 200),
   Size(700, 480),
@@ -69,6 +71,7 @@ const _frames = [
   Size(760, 249),
   Size(760, 250),
   Size(760, 520),
+  Size(900, 1),
   Size(900, 600),
   Size(1120, 815),
 ];
@@ -139,9 +142,7 @@ void main() {
     // The pages build their state in a microtask; the next frame lays out.
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    return ProviderScope.containerOf(
-      tester.element(find.byType(CompactShell)),
-    );
+    return ProviderScope.containerOf(tester.element(find.byType(CompactShell)));
   }
 
   Future<void> restoreAt(WidgetTester tester, Widget page, Size size) async {
