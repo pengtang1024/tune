@@ -1,5 +1,9 @@
 // Benchmark: the library page and the cost of one scan progress update on a
 // big library. Run with: flutter test tool/perf/library_bench_test.dart
+//
+// The first tick that reports progress flips `isScanning` and legitimately
+// rebuilds the page once; the number this script prints is the steady-state
+// tick after that, which is what docs/performance.md §6 D3 claims.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -82,6 +86,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Enter the scanning state first: `isScanning` flips on the first tick and
+    // legitimately rebuilds the page once. The claim in docs/performance.md is
+    // about a steady-state progress tick, so measure the second one.
+    library.pushProgress(0.05);
+    await tester.pump();
     hits.clear();
     library.pushProgress(0.42);
     await tester.pump();
