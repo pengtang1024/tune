@@ -35,10 +35,11 @@ flutter run -d linux
 ### 提交前门禁
 
 ```bash
-flutter analyze   # 必须 No issues found
-flutter test      # 全绿
-flutter gen-l10n  # 改过 ARB 文案才需要
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例（CI 跑同一条）
 ```
+
+等价分步：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过 ARB 再
+`flutter gen-l10n` 并提交产物。
 
 > 注意：工程路径含中文时，`flutter analyze` 需要一处 Flutter SDK 补丁，见
 > [getting-started.md](getting-started.md) 的「SDK 补丁」一节。
@@ -93,3 +94,19 @@ lib/
 6. **音源 = 类型 + 实例**：类型是适配器代码，实例是读者的一条配置；UI 不按 id 硬编码。
 
 详细论证见 `AGENTS.md` §1 与 `docs/architecture.md`。
+
+## 参与贡献与治理
+
+代码之外的协作入口都在仓库根，规则只有一份，别在 wiki 里抄第二遍：
+
+| 要做的事 | 读哪份 |
+| --- | --- |
+| 开发环境、分支模型、门禁、提 PR | [CONTRIBUTING.md](../CONTRIBUTING.md) |
+| 谁负责、怎么决策、怎么发布 | [GOVERNANCE.md](../GOVERNANCE.md) |
+| 报安全漏洞（请走私密渠道） | [SECURITY.md](../SECURITY.md) |
+| 提问、求助、提需求 | [SUPPORT.md](../SUPPORT.md) |
+| 参与前必须遵守的行为准则 | [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) |
+
+自动化接触面在 `.github/`：`workflows/ci.yml` 跑 `./tool/check.sh --l10n`；issue 表单是
+`ISSUE_TEMPLATE/bug_report.yml` 与 `feature_request.yml`；PR 模板在 `PULL_REQUEST_TEMPLATE.md`；
+`dependabot.yml` 每周一并一次依赖更新。提交信息格式 `type(scope): 中文说明`，一次提交只做一件事。

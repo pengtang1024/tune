@@ -1,0 +1,84 @@
+name: 使用问题
+description: 问用法、问配置、问某个音源怎么填——不是缺陷，也不是新功能。
+title: "[问题] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这个模板用于「不是 bug，也不是功能需求」的问题：某个设置在哪、某个音源怎么填、
+        为什么这样设计、某个行为是否符合预期。
+
+        提交前请先做两件事，能省掉一半来回：
+
+        1. 搜一下现有 issue（含已关闭的），很多问题已经有结论。
+        2. 翻一遍文档：安装与门禁见 [README.md](https://github.com/pengtang1024/tune/blob/develop/README.md)，
+           音源怎么配见 [需求/音源设计.md](https://github.com/pengtang1024/tune/blob/develop/需求/音源设计.md)，
+           其余见 [SUPPORT.md](https://github.com/pengtang1024/tune/blob/develop/SUPPORT.md) 里的文档索引。
+
+        > 报**安全漏洞**请走 [SECURITY.md](https://github.com/pengtang1024/tune/blob/develop/SECURITY.md) 的私密渠道，不要开公开 issue。
+        > 如果是**能稳定复现的异常行为**，请改用「缺陷报告」模板——那里会问复现步骤，更容易被修掉。
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 你的问题
+      description: 一句话说清你想知道什么。
+      placeholder: 例如：Subsonic 实例的「基础地址」应该填到哪一层？填 http://host:4533 还是 http://host:4533/subsonic？
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 你已经试过什么
+      description: 查过哪些文档、试过哪些配置、结果是什么。写清「试了但没有用」比只写「不行」有用得多。
+      placeholder: |
+        1. 看过 需求/音源设计.md 的 Subsonic 一节，没有提到路径层级
+        2. 填 http://host:4533 → 保存后显示鉴权失败
+        3. 填 http://host:4533/subsonic → 能连上，但专辑列表为空
+      render: markdown
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 设置 → 关于 页里能看到，形如 1.32.0+52。
+      placeholder: 1.32.0+52
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 平台
+      options:
+        - Linux 桌面
+        - Windows
+        - Android
+        - 其它（请在问题里说明）
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 补充信息
+      description: 相关截图、日志片段、音源类型与版本。日志请先脱敏——不要贴 token、密码、服务器地址里的密钥。
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已经搜索过现有 issue 与文档，没有找到答案
+          required: true
+        - label: 这不是安全漏洞（安全走私密渠道），也不是能稳定复现的缺陷（缺陷走缺陷报告模板）
+          required: true
+        - label: 日志与截图已脱敏，不含 token、密钥或个人信息
+          required: true

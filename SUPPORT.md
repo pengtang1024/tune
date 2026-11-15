@@ -8,7 +8,7 @@
 | --- | --- |
 | 报告可复现的缺陷 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「缺陷报告」模板 |
 | 提功能需求或改进建议 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「功能需求」模板 |
-| 问用法、问配置、问某个音源怎么填 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 标题前缀 `[问题]` |
+| 问用法、问配置、问某个音源怎么填 | [GitHub Issues](https://github.com/pengtang1024/tune/issues) · 用「使用问题」模板（标题会自动带 `[问题]`） |
 | **报告安全漏洞**（凭据泄漏、路径穿越、更新链劫持等） | **不要开公开 issue**，按 [`SECURITY.md`](SECURITY.md) 私下发邮件 |
 | 报告行为准则问题 | 按 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) 私下发邮件 |
 | 想知道谁负责、怎么决策 | [`GOVERNANCE.md`](GOVERNANCE.md) |
