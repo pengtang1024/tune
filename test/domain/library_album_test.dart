@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
@@ -378,5 +379,83 @@ void main() {
       contentKindOf(const Song(id: 3, sourceId: 'local', uri: '/music/3.mp3')),
       ContentKind.music,
     );
+  });
+
+  group('the album column finds the card of a track', () {
+    test('a music track lands on its own album', () {
+      const song = Song(
+        id: 1,
+        title: 'One',
+        artist: 'Artist',
+        album: 'Record',
+        uri: '/music/1.mp3',
+      );
+      const card = AlbumSummary(
+        key: 'record\u0000artist',
+        name: 'Record',
+        artist: 'Artist',
+        trackCount: 1,
+      );
+
+      expect(albumSummaryOf([card], song)?.key, card.key);
+      expect(albumSummaryOf(const [], song), isNull);
+    });
+
+    test('an episode lands on the show merged from two sources', () {
+      const song = Song(
+        id: 1,
+        title: 'Episode 1',
+        album: 'The Show',
+        sourceId: 'archive_podcasts',
+        uri: 'tune://archive/1',
+      );
+      const card = AlbumSummary(
+        key: 'the show\u0000show\u0000podcast_rss-1\u0001archive_podcasts',
+        name: 'The Show',
+        artist: '',
+        trackCount: 2,
+        kind: ContentKind.podcast,
+      );
+
+      expect(albumSummaryOf([card], song)?.key, card.key);
+    });
+
+    test('an episode of another source stays off the card', () {
+      const song = Song(
+        id: 1,
+        title: 'Episode 1',
+        album: 'The Show',
+        sourceId: 'podcast_rss-2',
+        uri: 'tune://podcast/1',
+      );
+      const card = AlbumSummary(
+        key: 'the show\u0000show\u0000podcast_rss-1\u0001archive_podcasts',
+        name: 'The Show',
+        artist: '',
+        trackCount: 2,
+        kind: ContentKind.podcast,
+      );
+
+      expect(albumSummaryOf([card], song), isNull);
+    });
+
+    test('a music track does not fall back to a show card', () {
+      const song = Song(
+        id: 1,
+        title: 'Track',
+        artist: 'Artist',
+        album: 'The Show',
+        uri: '/music/1.mp3',
+      );
+      const card = AlbumSummary(
+        key: 'the show\u0000show\u0000podcast_rss-1',
+        name: 'The Show',
+        artist: '',
+        trackCount: 2,
+        kind: ContentKind.podcast,
+      );
+
+      expect(albumSummaryOf([card], song), isNull);
+    });
   });
 }

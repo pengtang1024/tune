@@ -122,6 +122,30 @@ String libraryAlbumKeyOf(Song song) {
   );
 }
 
+/// The card of the album wall that holds [song], if the wall has one.
+///
+/// A music track names its album and artist. A show the library merged from
+/// several sources carries a key that names every source, so an episode lands
+/// on that card when the show name matches and its source is one of them.
+/// Both the album column and the "playing" marker read this one rule.
+AlbumSummary? albumSummaryOf(List<AlbumSummary> albums, Song song) {
+  final ownKey = libraryAlbumKeyOf(song);
+  for (final album in albums) {
+    if (album.key == ownKey) return album;
+  }
+  if (!contentKindOf(song).isSpokenWord) return null;
+  final name = normalizedShowNameOf(song.album);
+  final source = song.sourceId ?? 'local';
+  for (final album in albums) {
+    if (!isMergedShowKey(album.key)) continue;
+    final parts = album.key.split('\u0000');
+    if (parts.first != name) continue;
+    final sources = [for (final part in parts.skip(2)) ...part.split('\u0001')];
+    if (sources.contains(source)) return album;
+  }
+  return null;
+}
+
 LibraryAlbum _albumOf(List<Song> songs, {String? key}) {
   final ordered = List<Song>.of(songs)..sort(albumOrderOf);
   final first = ordered.first;

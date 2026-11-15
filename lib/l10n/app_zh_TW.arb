@@ -69,7 +69,7 @@
   "darkMode": "深色模式",
   "systemMode": "跟隨系統",
   "libraryTitle": "音樂庫",
-  "librarySummary": "{tracks} 首歌曲 · {albums} 張專輯 · {sources} 個來源",
+  "librarySummary": "{tracks} 項內容 · {albums} 張專輯 · {sources} 個來源",
   "@librarySummary": {
     "placeholders": {
       "tracks": {
@@ -118,6 +118,15 @@
       }
     }
   },
+  "libraryStationCount": "{count} 臺",
+  "@libraryStationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "沒有符合的歌曲",
   "libraryNoMatchSubtitle": "換個關鍵字，或清除搜尋條件",
   "librarySourceEmptyTitle": "該來源暫無歌曲",
@@ -140,6 +149,7 @@
   "libraryAddAllToQueue": "將整個清單加入佇列",
   "libraryViewSongs": "歌曲檢視",
   "libraryViewAlbums": "專輯檢視",
+  "libraryOpenAlbum": "開啟專輯",
   "libraryUnknownAlbum": "未知專輯",
   "libraryVariousArtists": "多位藝術家",
   "libraryBackToAlbums": "返回專輯",

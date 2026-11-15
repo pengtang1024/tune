@@ -13,6 +13,7 @@ import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
@@ -69,9 +70,21 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
     final view = await _storage.loadView();
     final sort = view?.sort ?? LibrarySort.recent;
-    final filter = view?.filter ?? LibraryFilter.empty;
+    final filter = _restored(view?.filter ?? LibraryFilter.empty);
+    // A saved view from before the scope existed carries kinds as a filter
+    // group (a reader who ticked shows and stations); writing the restored
+    // scope back keeps every start from deciding again.
+    if (view == null || view.filter != filter) {
+      unawaited(
+        _storage.saveView(LibraryView(sort: sort, filter: filter)),
+      );
+    }
     final total = await _storage.count();
     final matching = await _storage.countQuery(query: '', filter: filter);
+    final otherKindCount = await _storage.countQuery(
+      query: '',
+      filter: _otherKinds,
+    );
     final songs = await _storage.query(
       query: '',
       filter: filter,
@@ -85,6 +98,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       filter: filter,
       sort: sort,
       total: total,
+      matching: matching,
+      otherKindCount: otherKindCount,
       hasMore: songs.length < matching,
       albums: albums,
       statusMessage: songs.isEmpty
@@ -92,6 +107,31 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           : AppStrings.instance.scanSongCountShort(songs.length),
     );
   }
+
+  /// The scope every library opens with: songs, and nothing else.
+  ///
+  /// A filter that arrives without a kind — a view saved before the scope
+  /// existed, a panel that cleared every box — falls back to this instead of
+  /// showing stations and shows between the songs.
+  static LibraryFilter _scoped(LibraryFilter filter) => filter.kinds.isEmpty
+      ? filter.copyWith(kinds: const {ContentKind.music})
+      : filter;
+
+  /// The scope a saved view opens with.
+  ///
+  /// Only one kind is a scope: a saved view that names several was written
+  /// while kinds were still a filter group, and the reader who wants shows
+  /// says so again with the menu. Such a view opens as songs, like a fresh
+  /// library, instead of opening on a mixed list.
+  static LibraryFilter _restored(LibraryFilter filter) =>
+      filter.kinds.length == 1
+      ? filter
+      : filter.copyWith(kinds: const {ContentKind.music});
+
+  /// What the page counts as speech or station, for the content menu.
+  static const LibraryFilter _otherKinds = LibraryFilter(
+    kinds: {ContentKind.podcast, ContentKind.audiobook, ContentKind.radio},
+  );
 
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;
 
@@ -381,6 +421,10 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         query: '',
         filter: _current.filter,
       );
+      final otherKindCount = await _storage.countQuery(
+        query: '',
+        filter: _otherKinds,
+      );
       if (_disposed || generation != _scanGeneration) return;
       // A scan that changed nothing keeps the window it had: the list is the
       // input of the whole viewport, and a new list — even an equal one —
@@ -392,6 +436,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         _current.copyWith(
           songs: songs,
           total: total,
+          matching: matching,
+          otherKindCount: otherKindCount,
           hasMore: songs.length < matching,
           albums: saved ? await _storage.albumSummaries() : null,
           scanStatus: LibraryScanStatus.completed,
@@ -529,8 +575,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
   /// Narrows the page to [filter]; the search word stays as it is.
   Future<void> setFilter(LibraryFilter filter) async {
-    if (_disposed || !state.hasValue || _current.filter == filter) return;
-    state = AsyncData(_current.copyWith(filter: filter));
+    // The content scope is never empty: clearing the last kind falls back to
+    // songs, so no path can put stations back into the song table.
+    final next = _scoped(filter);
+    if (_disposed || !state.hasValue || _current.filter == next) return;
+    state = AsyncData(_current.copyWith(filter: next));
     _saveView();
     await _reloadForFilter();
   }
@@ -585,11 +634,16 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         ? await _storage.albumSummaries()
         : _current.albums;
     final total = songsChanged ? await _storage.count() : _current.total;
+    final otherKindCount = songsChanged
+        ? await _storage.countQuery(query: '', filter: _otherKinds)
+        : _current.otherKindCount;
     if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
       _current.copyWith(
         songs: List.unmodifiable(songs),
         total: total,
+        matching: matching,
+        otherKindCount: otherKindCount,
         hasMore: songs.length < matching,
         albums: albums,
       ),
@@ -603,7 +657,9 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     try {
       await _storage.clear();
       if (_disposed) return;
-      state = const AsyncData(LibraryState.initial);
+      state = AsyncData(
+        LibraryState.initial.copyWith(filter: LibraryFilter.songs),
+      );
     } catch (error, stackTrace) {
       Log.error('清空音乐库失败: $error\n$stackTrace');
       if (_disposed) return;

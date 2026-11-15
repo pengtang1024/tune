@@ -69,7 +69,7 @@
   "darkMode": "深色模式",
   "systemMode": "跟随系统",
   "libraryTitle": "音乐库",
-  "librarySummary": "{tracks} 首歌曲 · {albums} 张专辑 · {sources} 个来源",
+  "librarySummary": "{tracks} 项内容 · {albums} 张专辑 · {sources} 个来源",
   "@librarySummary": {
     "placeholders": {
       "tracks": {
@@ -118,6 +118,15 @@
       }
     }
   },
+  "libraryStationCount": "{count} 台",
+  "@libraryStationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "没有匹配的歌曲",
   "libraryNoMatchSubtitle": "换个关键词，或清除搜索条件",
   "librarySourceEmptyTitle": "该来源暂无歌曲",
@@ -140,6 +149,7 @@
   "libraryAddAllToQueue": "将整个列表加入队列",
   "libraryViewSongs": "歌曲视图",
   "libraryViewAlbums": "专辑视图",
+  "libraryOpenAlbum": "打开专辑",
   "libraryUnknownAlbum": "未知专辑",
   "libraryVariousArtists": "多位艺术家",
   "libraryBackToAlbums": "返回专辑",

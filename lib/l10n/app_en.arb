@@ -69,7 +69,7 @@
   "darkMode": "Dark mode",
   "systemMode": "Follow system",
   "libraryTitle": "Library",
-  "librarySummary": "{tracks, plural, =1{1 track} other{{tracks} tracks}} · {albums, plural, =1{1 album} other{{albums} albums}} · {sources, plural, =1{1 source} other{{sources} sources}}",
+  "librarySummary": "{tracks, plural, =1{1 item} other{{tracks} items}} · {albums, plural, =1{1 album} other{{albums} albums}} · {sources, plural, =1{1 source} other{{sources} sources}}",
   "@librarySummary": {
     "placeholders": {
       "tracks": {
@@ -118,6 +118,15 @@
       }
     }
   },
+  "libraryStationCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "@libraryStationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "No matching songs",
   "libraryNoMatchSubtitle": "Try another keyword or clear the search",
   "librarySourceEmptyTitle": "No songs from this source",
@@ -140,6 +149,7 @@
   "libraryAddAllToQueue": "Add the whole list to the queue",
   "libraryViewSongs": "Songs view",
   "libraryViewAlbums": "Albums view",
+  "libraryOpenAlbum": "Open album",
   "libraryUnknownAlbum": "Unknown album",
   "libraryVariousArtists": "Various artists",
   "libraryBackToAlbums": "Back to albums",

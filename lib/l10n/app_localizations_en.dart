@@ -181,8 +181,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       tracks,
       locale: localeName,
-      other: '$tracksString tracks',
-      one: '1 track',
+      other: '$tracksString items',
+      one: '1 item',
     );
     String _temp1 = intl.Intl.pluralLogic(
       albums,
@@ -260,6 +260,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryStationCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString stations',
+      one: '1 station',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get libraryNoMatchTitle => 'No matching songs';
 
   @override
@@ -308,6 +323,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryViewAlbums => 'Albums view';
+
+  @override
+  String get libraryOpenAlbum => 'Open album';
 
   @override
   String get libraryUnknownAlbum => 'Unknown album';
@@ -4297,23 +4315,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalComponentFfmpeg => 'FFmpeg (m4a and other formats)';
 
   @override
-  String get settingsSectionLocalization => 'Localization';
-
-  @override
-  String get settingsLocalizationTitle => 'Translate what is missing';
-
-  @override
-  String get settingsLocalizationDescription =>
-      'Turns titles, albums, descriptions and radio text into the language of the interface, and keeps the original in small type.';
-
-  @override
-  String get settingsLocalizationEnable => 'Translate non-interface text';
-
-  @override
-  String get settingsLocalizationEnableHint =>
-      'Missing translations are generated automatically; artist names are kept as written.';
-
-  @override
   String get settingsLocalFeatureTranslation => 'Translation';
 
   @override
@@ -4485,6 +4486,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalFeatureAddonInstalled => 'Installed';
+
+  @override
+  String get settingsSectionLocalization => 'Localization';
+
+  @override
+  String get settingsLocalizationTitle => 'Translate what is missing';
+
+  @override
+  String get settingsLocalizationDescription =>
+      'Turns titles, albums, descriptions and radio text into the language of the interface, and keeps the original in small type.';
+
+  @override
+  String get settingsLocalizationEnable => 'Translate non-interface text';
+
+  @override
+  String get settingsLocalizationEnableHint =>
+      'Missing translations are generated automatically; artist names are kept as written.';
 
   @override
   String get settingsLocalizationShowOriginal =>

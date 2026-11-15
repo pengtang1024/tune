@@ -391,7 +391,7 @@ abstract class AppLocalizations {
   /// No description provided for @librarySummary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'{tracks} 首歌曲 · {albums} 张专辑 · {sources} 个来源'**
+  /// **'{tracks} 项内容 · {albums} 张专辑 · {sources} 个来源'**
   String librarySummary(int tracks, int albums, int sources);
 
   /// No description provided for @libraryClearSearch.
@@ -441,6 +441,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'{count} 章'**
   String libraryChapterCount(int count);
+
+  /// No description provided for @libraryStationCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 台'**
+  String libraryStationCount(int count);
 
   /// No description provided for @libraryNoMatchTitle.
   ///
@@ -531,6 +537,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'专辑视图'**
   String get libraryViewAlbums;
+
+  /// No description provided for @libraryOpenAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开专辑'**
+  String get libraryOpenAlbum;
 
   /// No description provided for @libraryUnknownAlbum.
   ///

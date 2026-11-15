@@ -308,7 +308,7 @@ class LibraryFilterPanel extends ConsumerWidget {
                 key: const ValueKey('library-filter-clear'),
                 onPressed: filter.isEmpty
                     ? null
-                    : () => setFilter(LibraryFilter.empty),
+                    : () => setFilter(filter.withoutGroups()),
                 child: Text(context.loc.libraryFilterClearAll),
               ),
             ),

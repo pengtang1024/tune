@@ -98,7 +98,10 @@ void main() {
     await tester.pumpWidget(
       app(
         child: LibraryFilterChips(
-          filter: const LibraryFilter(kinds: {ContentKind.podcast}),
+          filter: const LibraryFilter(
+            kinds: {ContentKind.podcast},
+            genres: {'jazz'},
+          ),
           sourceLabels: const {},
           onChanged: (value) => next = value,
         ),
@@ -110,6 +113,24 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded).first);
     await tester.pumpAndSettle();
 
-    expect(next, LibraryFilter.empty);
+    // The scope is not a chip: it survives the group it was read with.
+    expect(next?.kinds, {ContentKind.podcast});
+    expect(next?.genres, isEmpty);
+  });
+
+  testWidgets('the content scope is not a removable chip', (tester) async {
+    await tester.pumpWidget(
+      app(
+        child: LibraryFilterChips(
+          filter: const LibraryFilter(kinds: {ContentKind.podcast}),
+          sourceLabels: const {},
+          onChanged: (_) {},
+        ),
+        overrides: [],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.close_rounded), findsNothing);
   });
 }

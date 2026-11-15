@@ -50,7 +50,11 @@ void main() {
     ),
   ];
 
-  Widget app({required Widget home, List<Song> librarySongs = songs}) {
+  Widget app({
+    required Widget home,
+    List<Song> librarySongs = songs,
+    FakeLibraryController Function(LibraryState state)? controller,
+  }) {
     return ProviderScope(
       overrides: [
         persistenceServiceProvider.overrideWithValue(FakePersistenceService()),
@@ -59,7 +63,8 @@ void main() {
         ),
         audioPlayerServiceProvider.overrideWithValue(FakeAudioPlayerService()),
         libraryControllerProvider.overrideWith(
-          () => FakeLibraryController(LibraryState(songs: librarySongs)),
+          () => controller?.call(LibraryState(songs: librarySongs)) ??
+              FakeLibraryController(LibraryState(songs: librarySongs)),
         ),
       ],
       child: MaterialApp(
@@ -85,7 +90,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.tap(find.byKey(const ValueKey('library-albums')));
     await tester.pumpAndSettle();
 
     expect(find.text('Album A'), findsOneWidget);
@@ -130,7 +135,7 @@ void main() {
         .playQueue([songs.first]);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.tap(find.byKey(const ValueKey('library-albums')));
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.equalizer_rounded), findsOneWidget);
@@ -150,7 +155,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.tap(find.byKey(const ValueKey('library-albums')));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('音乐 · '), findsNothing);
@@ -205,7 +210,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    await tester.tap(find.byKey(const ValueKey('library-albums')));
     await tester.pumpAndSettle();
 
     expect(find.text('音乐 · 1'), findsOneWidget);
@@ -217,4 +222,37 @@ void main() {
     expect(find.byType(MetaBadge), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('an album the list cannot read keeps the songs on screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1120, 760);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        controller: _EmptyAlbumController.new,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Album A').first);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.arrow_back_rounded), findsNothing);
+    expect(find.text('Album A first'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+/// A library whose album cards hold no tracks: the column still names the
+/// album, but opening it would show a page with nothing on it.
+class _EmptyAlbumController extends FakeLibraryController {
+  _EmptyAlbumController(super.seed);
+
+  @override
+  Future<List<Song>> albumSongs(String key) async => const [];
 }

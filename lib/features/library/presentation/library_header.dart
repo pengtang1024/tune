@@ -3,6 +3,7 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The heading of the library.
@@ -29,14 +30,26 @@ class LibraryHeader extends StatelessWidget {
   /// worse than one that is not there.
   final VoidCallback? onSearchOnline;
 
-  /// Whether the page is already narrowed to the stations.
-  final bool radioActive;
-
-  /// Narrows the page to the stations, or widens it again.
+  /// The content the page is scoped to, when it names exactly one kind.
   ///
-  /// The entry is left out when it is null, which is the case while the
-  /// library holds no station.
-  final VoidCallback? onRadio;
+  /// Null while the filter holds several kinds or none at all; the menu then
+  /// says it shows the kinds, not one of them.
+  final ContentKind? selectedKind;
+
+  /// Narrows the page to one kind: songs, shows, books or stations.
+  final ValueChanged<ContentKind> onKind;
+
+  /// Whether the library holds anything besides songs.
+  ///
+  /// A library of songs has no use for a menu that offers shows; the entry
+  /// is left out instead of opening an empty list.
+  final bool showKindMenu;
+
+  /// Opens the wall of albums.
+  final VoidCallback? onAlbums;
+
+  /// Whether the page is already showing the albums.
+  final bool albumsActive;
 
   /// Whether the category tree stands open.
   final bool treeExpanded;
@@ -49,8 +62,11 @@ class LibraryHeader extends StatelessWidget {
     required this.onScan,
     required this.scanning,
     required this.onSearchOnline,
-    required this.radioActive,
-    required this.onRadio,
+    required this.selectedKind,
+    required this.onKind,
+    required this.showKindMenu,
+    required this.onAlbums,
+    required this.albumsActive,
     required this.treeExpanded,
     required this.onToggleTree,
   });
@@ -102,35 +118,58 @@ class LibraryHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (onRadio != null) ...[
+          if (showKindMenu) ...[
+            const SizedBox(width: CompactTokens.space12),
+            TuneTooltip(
+              message: context.loc.libraryFilterKinds,
+              child: PopupMenuButton<ContentKind>(
+                key: const ValueKey('library-content-kind'),
+                initialValue: selectedKind,
+                onSelected: onKind,
+                itemBuilder: (context) => [
+                  for (final kind in ContentKind.values)
+                    CheckedPopupMenuItem(
+                      value: kind,
+                      checked: kind == selectedKind,
+                      child: Text(_kindLabel(context, kind)),
+                    ),
+                ],
+                child: IgnorePointer(
+                  child: OutlinedButton.icon(
+                    onPressed: () {},
+                    style: _scopeStyle(
+                      theme,
+                      selectedKind != null &&
+                          selectedKind != ContentKind.music,
+                    ),
+                    icon: Icon(
+                      selectedKind == null
+                          ? Icons.tune_rounded
+                          : _kindIcon(selectedKind!),
+                      size: CompactTokens.icon16,
+                    ),
+                    label: Text(
+                      selectedKind == null
+                          ? context.loc.libraryFilterKinds
+                          : _kindLabel(context, selectedKind!),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: CompactTokens.space8),
+          ],
+          if (onAlbums != null) ...[
             const SizedBox(width: CompactTokens.space12),
             OutlinedButton.icon(
-              key: const ValueKey('library-radio'),
-              onPressed: onRadio,
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, CompactTokens.controlDefault),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: CompactTokens.space12,
-                ),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                foregroundColor: radioActive
-                    ? theme.colorScheme.primary
-                    : null,
-                backgroundColor: radioActive
-                    ? theme.colorScheme.primary.withValues(alpha: 0.08)
-                    : null,
-                side: BorderSide(
-                  color: radioActive
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outlineVariant,
-                ),
-              ),
-              icon: Icon(
-                radioActive ? Icons.radio_rounded : Icons.podcasts_rounded,
+              key: const ValueKey('library-albums'),
+              onPressed: onAlbums,
+              style: _scopeStyle(theme, albumsActive),
+              icon: const Icon(
+                Icons.grid_view_rounded,
                 size: CompactTokens.icon16,
               ),
-              label: Text(context.loc.contentKindRadio),
+              label: Text(context.loc.libraryViewAlbums),
             ),
             const SizedBox(width: CompactTokens.space8),
           ],
@@ -204,4 +243,39 @@ class LibraryHeader extends StatelessWidget {
       ),
     );
   }
+
+  /// The look both page-wide entries share: outlined, and tinted while it is
+  /// the one the page is showing.
+  ButtonStyle _scopeStyle(ThemeData theme, bool active) =>
+      OutlinedButton.styleFrom(
+        minimumSize: const Size(0, CompactTokens.controlDefault),
+        padding: const EdgeInsets.symmetric(
+          horizontal: CompactTokens.space12,
+        ),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        foregroundColor: active ? theme.colorScheme.primary : null,
+        backgroundColor: active
+            ? theme.colorScheme.primary.withValues(alpha: 0.08)
+            : null,
+        side: BorderSide(
+          color: active
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant,
+        ),
+      );
 }
+
+String _kindLabel(BuildContext context, ContentKind kind) => switch (kind) {
+  ContentKind.music => context.loc.contentKindMusic,
+  ContentKind.podcast => context.loc.contentKindPodcast,
+  ContentKind.audiobook => context.loc.contentKindAudiobook,
+  ContentKind.radio => context.loc.contentKindRadio,
+};
+
+IconData _kindIcon(ContentKind kind) => switch (kind) {
+  ContentKind.music => Icons.music_note_rounded,
+  ContentKind.podcast => Icons.podcasts_rounded,
+  ContentKind.audiobook => Icons.record_voice_over_rounded,
+  ContentKind.radio => Icons.radio_rounded,
+};

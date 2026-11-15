@@ -28,9 +28,21 @@ class LibraryState {
   /// How many tracks the library holds on disk.
   ///
   /// It is larger than [songs] when the library is read a window at a time.
-  /// The search word and the filter do not change it: the result count beside
-  /// the sort menu reports those.
+  /// The search word and the filter do not change it: [matching] reports
+  /// those.
   final int total;
+
+  /// How many tracks the word and the filter match.
+  ///
+  /// The list holds a window of them, so the count beside the sort menu reads
+  /// this instead of the length of [songs].
+  final int matching;
+
+  /// How many tracks are not music.
+  ///
+  /// The page offers the stations and the shows in a menu; a library that
+  /// holds only songs has no use for the entry.
+  final int otherKindCount;
 
   /// Whether another window of the library is waiting on disk.
   final bool hasMore;
@@ -50,6 +62,8 @@ class LibraryState {
     this.isLoading = false,
     this.sourceSummaries = const {},
     this.total = 0,
+    this.matching = 0,
+    this.otherKindCount = 0,
     this.hasMore = false,
     this.albums = const [],
   });
@@ -93,6 +107,8 @@ class LibraryState {
     bool? isLoading,
     Map<String, SourceScanSummary>? sourceSummaries,
     int? total,
+    int? matching,
+    int? otherKindCount,
     bool? hasMore,
     List<AlbumSummary>? albums,
   }) {
@@ -112,6 +128,8 @@ class LibraryState {
       isLoading: isLoading ?? this.isLoading,
       sourceSummaries: sourceSummaries ?? this.sourceSummaries,
       total: total ?? this.total,
+      matching: matching ?? this.matching,
+      otherKindCount: otherKindCount ?? this.otherKindCount,
       hasMore: hasMore ?? this.hasMore,
       albums: albums ?? this.albums,
     );

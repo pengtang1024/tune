@@ -171,7 +171,7 @@ class AppLocalizationsZh extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String sourcesString = sourcesNumberFormat.format(sources);
 
-    return '$tracksString 首歌曲 · $albumsString 张专辑 · $sourcesString 个来源';
+    return '$tracksString 项内容 · $albumsString 张专辑 · $sourcesString 个来源';
   }
 
   @override
@@ -214,6 +214,15 @@ class AppLocalizationsZh extends AppLocalizations {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 章';
+  }
+
+  @override
+  String libraryStationCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 台';
   }
 
   @override
@@ -262,6 +271,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryViewAlbums => '专辑视图';
+
+  @override
+  String get libraryOpenAlbum => '打开专辑';
 
   @override
   String get libraryUnknownAlbum => '未知专辑';
@@ -3996,19 +4008,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
 
   @override
-  String get settingsSectionLocalization => '本地化';
-
-  @override
-  String get settingsLocalizationTitle => '补齐缺失的本地化';
-
-  @override
-  String get settingsLocalizationDescription =>
-      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
-
-  @override
-  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
-
-  @override
   String get settingsLocalFeatureTranslation => '翻译';
 
   @override
@@ -4169,6 +4168,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsLocalFeatureAddonInstalled => '已安装';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
 
   @override
   String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
@@ -4527,7 +4539,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
         intl.NumberFormat.decimalPattern(localeName);
     final String sourcesString = sourcesNumberFormat.format(sources);
 
-    return '$tracksString 首歌曲 · $albumsString 张专辑 · $sourcesString 个来源';
+    return '$tracksString 项内容 · $albumsString 张专辑 · $sourcesString 个来源';
   }
 
   @override
@@ -4570,6 +4582,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 章';
+  }
+
+  @override
+  String libraryStationCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 台';
   }
 
   @override
@@ -4618,6 +4639,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryViewAlbums => '专辑视图';
+
+  @override
+  String get libraryOpenAlbum => '打开专辑';
 
   @override
   String get libraryUnknownAlbum => '未知专辑';
@@ -8352,31 +8376,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式转码）';
 
   @override
-  String get settingsSectionLocalization => '本地化';
-
-  @override
-  String get settingsLocalizationTitle => '补齐缺失的本地化';
-
-  @override
-  String get settingsLocalizationDescription =>
-      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
-
-  @override
-  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
-
-  @override
-  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
-
-  @override
-  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
-
-  @override
-  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
-
-  @override
-  String get settingsLocalizationProvider => '翻译服务';
-
-  @override
   String get settingsLocalFeatureTranslation => '翻译';
 
   @override
@@ -8537,6 +8536,31 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureAddonInstalled => '已安装';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '补齐缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自动把曲名、专辑、简介和电台文本翻成界面语言，并在小字里保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自动翻译非界面语言文本';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在译文下方显示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源里的原始文本。';
+
+  @override
+  String get settingsLocalizationProvider => '翻译服务';
 
   @override
   String get settingsLocalizationProviderNone => '未配置';
@@ -8883,7 +8907,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
         intl.NumberFormat.decimalPattern(localeName);
     final String sourcesString = sourcesNumberFormat.format(sources);
 
-    return '$tracksString 首歌曲 · $albumsString 張專輯 · $sourcesString 個來源';
+    return '$tracksString 項內容 · $albumsString 張專輯 · $sourcesString 個來源';
   }
 
   @override
@@ -8926,6 +8950,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 章';
+  }
+
+  @override
+  String libraryStationCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 臺';
   }
 
   @override
@@ -8974,6 +9007,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewAlbums => '專輯檢視';
+
+  @override
+  String get libraryOpenAlbum => '開啟專輯';
 
   @override
   String get libraryUnknownAlbum => '未知專輯';
@@ -12709,43 +12745,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsLocalComponentFfmpeg => 'FFmpeg（m4a 等格式轉碼）';
 
   @override
-  String get settingsSectionLocalization => '本地化';
-
-  @override
-  String get settingsLocalizationTitle => '補齊缺失的本地化';
-
-  @override
-  String get settingsLocalizationDescription =>
-      '自動把曲名、專輯、簡介和電台文字翻成介面語言，並在小字裡保留原文。';
-
-  @override
-  String get settingsLocalizationEnable => '自動翻譯非介面語言文字';
-
-  @override
-  String get settingsLocalizationEnableHint => '缺失的譯文會自動產生；歌手名保持原樣。';
-
-  @override
-  String get settingsLocalizationShowOriginal => '在譯文下方顯示原文';
-
-  @override
-  String get settingsLocalizationShowOriginalHint => '小字保留音源裡的原始文字。';
-
-  @override
-  String get settingsLocalizationProvider => '翻譯服務';
-
-  @override
-  String get settingsLocalizationProviderNone => '未設定';
-
-  @override
-  String get settingsLocalizationProviderLocal => '本機模型（可選下載）';
-
-  @override
-  String get settingsLocalizationProviderCustom => '自訂 OpenAI 相容';
-
-  @override
-  String get settingsLocalizationLocalReady => '本機模型已安裝';
-
-  @override
   String get settingsLocalFeatureTranslation => '翻譯';
 
   @override
@@ -12906,6 +12905,43 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalFeatureAddonInstalled => '已安裝';
+
+  @override
+  String get settingsSectionLocalization => '本地化';
+
+  @override
+  String get settingsLocalizationTitle => '補齊缺失的本地化';
+
+  @override
+  String get settingsLocalizationDescription =>
+      '自動把曲名、專輯、簡介和電台文字翻成介面語言，並在小字裡保留原文。';
+
+  @override
+  String get settingsLocalizationEnable => '自動翻譯非介面語言文字';
+
+  @override
+  String get settingsLocalizationEnableHint => '缺失的譯文會自動產生；歌手名保持原樣。';
+
+  @override
+  String get settingsLocalizationShowOriginal => '在譯文下方顯示原文';
+
+  @override
+  String get settingsLocalizationShowOriginalHint => '小字保留音源裡的原始文字。';
+
+  @override
+  String get settingsLocalizationProvider => '翻譯服務';
+
+  @override
+  String get settingsLocalizationProviderNone => '未設定';
+
+  @override
+  String get settingsLocalizationProviderLocal => '本機模型（可選下載）';
+
+  @override
+  String get settingsLocalizationProviderCustom => '自訂 OpenAI 相容';
+
+  @override
+  String get settingsLocalizationLocalReady => '本機模型已安裝';
 
   @override
   String get settingsLocalizationLocalMissing => '本機模型尚未安裝，可下載';
