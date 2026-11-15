@@ -27,8 +27,8 @@
       }
     }
   },
-  "updateIdle": "The project page has not been checked yet",
-  "updateChecking": "Checking the project page…",
+  "updateIdle": "Updates have not been checked yet",
+  "updateChecking": "Checking for updates…",
   "updateUpToDate": "This is the newest version",
   "updateAvailable": "Version {version} is available",
   "@updateAvailable": {
@@ -52,10 +52,12 @@
   "updateFailedRateLimited": "The check failed: GitHub may be rate limiting this address (60 requests an hour without a token). Try again later or add a token",
   "updateFailedUnauthorized": "The check failed: the token is invalid or cannot read the release page",
   "updateFailedNetwork": "The check failed: the request timed out or the network is unreachable",
-  "updateFailedServer": "The check failed: the release page answered with an unexpected response",
-  "updateTokenLabel": "GitHub token (optional)",
+  "updateFailedServer": "The check failed: the update service answered with an unexpected response",
+  "updateFailedManifestMismatch": "The check failed: the two update lists disagree, so this update was refused",
+  "updateFailedArchiveMismatch": "The archive did not match its published digest and was deleted; try again",
+  "updateTokenLabel": "GitHub token (fallback, optional)",
   "updateTokenHint": "Leave empty to use GITHUB_TOKEN / GH_TOKEN from the environment",
-  "updateTokenHelp": "Only used for update checks; never written to logs",
+  "updateTokenHelp": "Usually unnecessary: only used for the GitHub API when the static list is unreachable; never written to logs",
   "updateCheck": "Check for updates",
   "updateInstall": "Download and install",
   "updateRetry": "Try again",

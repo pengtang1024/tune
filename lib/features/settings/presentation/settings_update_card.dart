@@ -97,6 +97,10 @@ class SettingsUpdateCard extends ConsumerWidget {
         UpdateCheckFailure.unauthorized => strings.updateFailedUnauthorized,
         UpdateCheckFailure.network => strings.updateFailedNetwork,
         UpdateCheckFailure.server => strings.updateFailedServer,
+        UpdateCheckFailure.manifestMismatch =>
+          strings.updateFailedManifestMismatch,
+        UpdateCheckFailure.archiveMismatch =>
+          strings.updateFailedArchiveMismatch,
         null => strings.updateFailed(state.error ?? ''),
       },
     };

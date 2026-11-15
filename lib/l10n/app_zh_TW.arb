@@ -27,8 +27,8 @@
       }
     }
   },
-  "updateIdle": "還沒檢查過發布頁",
-  "updateChecking": "正在檢查發布頁…",
+  "updateIdle": "還沒檢查過更新",
+  "updateChecking": "正在檢查更新…",
   "updateUpToDate": "已經是最新版本",
   "updateAvailable": "新版本 {version} 可用",
   "@updateAvailable": {
@@ -52,10 +52,12 @@
   "updateFailedRateLimited": "檢查失敗：GitHub 請求次數可能已超限（未登入每小時 60 次），請稍後再試或填寫 token",
   "updateFailedUnauthorized": "檢查失敗：token 無效或沒有讀取發布頁的權限",
   "updateFailedNetwork": "檢查失敗：網路請求逾時或無法連線",
-  "updateFailedServer": "檢查失敗：發布頁回傳了異常回應",
-  "updateTokenLabel": "GitHub token（選填）",
+  "updateFailedServer": "檢查失敗：更新服務回傳了異常回應",
+  "updateFailedManifestMismatch": "檢查失敗：兩份更新清單不一致，已拒絕本次更新",
+  "updateFailedArchiveMismatch": "安裝包校驗不通過，已刪除，請重試",
+  "updateTokenLabel": "GitHub token（備援，選填）",
   "updateTokenHint": "留空則讀取環境變數 GITHUB_TOKEN / GH_TOKEN",
-  "updateTokenHelp": "只用於更新檢查，不會寫入日誌",
+  "updateTokenHelp": "預設不需要；靜態清單不可達時才用 GitHub API 備援，不會寫入日誌",
   "updateCheck": "檢查更新",
   "updateInstall": "下載並安裝",
   "updateRetry": "重試",

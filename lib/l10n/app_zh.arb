@@ -27,8 +27,8 @@
       }
     }
   },
-  "updateIdle": "还没有检查过发布页",
-  "updateChecking": "正在检查发布页…",
+  "updateIdle": "还没有检查过更新",
+  "updateChecking": "正在检查更新…",
   "updateUpToDate": "已经是最新版本",
   "updateAvailable": "新版本 {version} 可用",
   "@updateAvailable": {
@@ -52,10 +52,12 @@
   "updateFailedRateLimited": "检查失败：GitHub 请求次数可能已超限（未登录每小时 60 次），请稍后再试或填写 token",
   "updateFailedUnauthorized": "检查失败：token 无效或没有读取发布页的权限",
   "updateFailedNetwork": "检查失败：网络请求超时或无法连接",
-  "updateFailedServer": "检查失败：发布页返回了异常响应",
-  "updateTokenLabel": "GitHub token（可选）",
+  "updateFailedServer": "检查失败：更新服务返回了异常响应",
+  "updateFailedManifestMismatch": "检查失败：两份更新清单不一致，已拒绝本次更新",
+  "updateFailedArchiveMismatch": "安装包校验不通过，已删除，请重试",
+  "updateTokenLabel": "GitHub token（兜底，可选）",
   "updateTokenHint": "留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN",
-  "updateTokenHelp": "只用于更新检查，不会写入日志",
+  "updateTokenHelp": "默认不需要；静态清单不可达时才用 GitHub API 兜底，不会写入日志",
   "updateCheck": "检查更新",
   "updateInstall": "下载并安装",
   "updateRetry": "重试",

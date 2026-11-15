@@ -72,10 +72,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateIdle => 'The project page has not been checked yet';
+  String get updateIdle => 'Updates have not been checked yet';
 
   @override
-  String get updateChecking => 'Checking the project page…';
+  String get updateChecking => 'Checking for updates…';
 
   @override
   String get updateUpToDate => 'This is the newest version';
@@ -113,10 +113,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateFailedServer =>
-      'The check failed: the release page answered with an unexpected response';
+      'The check failed: the update service answered with an unexpected response';
 
   @override
-  String get updateTokenLabel => 'GitHub token (optional)';
+  String get updateFailedManifestMismatch =>
+      'The check failed: the two update lists disagree, so this update was refused';
+
+  @override
+  String get updateFailedArchiveMismatch =>
+      'The archive did not match its published digest and was deleted; try again';
+
+  @override
+  String get updateTokenLabel => 'GitHub token (fallback, optional)';
 
   @override
   String get updateTokenHint =>
@@ -124,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateTokenHelp =>
-      'Only used for update checks; never written to logs';
+      'Usually unnecessary: only used for the GitHub API when the static list is unreachable; never written to logs';
 
   @override
   String get updateCheck => 'Check for updates';

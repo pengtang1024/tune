@@ -71,10 +71,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateIdle => '还没有检查过发布页';
+  String get updateIdle => '还没有检查过更新';
 
   @override
-  String get updateChecking => '正在检查发布页…';
+  String get updateChecking => '正在检查更新…';
 
   @override
   String get updateUpToDate => '已经是最新版本';
@@ -109,16 +109,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
 
   @override
-  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+  String get updateFailedServer => '检查失败：更新服务返回了异常响应';
 
   @override
-  String get updateTokenLabel => 'GitHub token（可选）';
+  String get updateFailedManifestMismatch => '检查失败：两份更新清单不一致，已拒绝本次更新';
+
+  @override
+  String get updateFailedArchiveMismatch => '安装包校验不通过，已删除，请重试';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（兜底，可选）';
 
   @override
   String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
 
   @override
-  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+  String get updateTokenHelp => '默认不需要；静态清单不可达时才用 GitHub API 兜底，不会写入日志';
 
   @override
   String get updateCheck => '检查更新';
@@ -4439,10 +4445,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String get updateIdle => '还没有检查过发布页';
+  String get updateIdle => '还没有检查过更新';
 
   @override
-  String get updateChecking => '正在检查发布页…';
+  String get updateChecking => '正在检查更新…';
 
   @override
   String get updateUpToDate => '已经是最新版本';
@@ -4477,16 +4483,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get updateFailedNetwork => '检查失败：网络请求超时或无法连接';
 
   @override
-  String get updateFailedServer => '检查失败：发布页返回了异常响应';
+  String get updateFailedServer => '检查失败：更新服务返回了异常响应';
 
   @override
-  String get updateTokenLabel => 'GitHub token（可选）';
+  String get updateFailedManifestMismatch => '检查失败：两份更新清单不一致，已拒绝本次更新';
+
+  @override
+  String get updateFailedArchiveMismatch => '安装包校验不通过，已删除，请重试';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（兜底，可选）';
 
   @override
   String get updateTokenHint => '留空则读取环境变量 GITHUB_TOKEN / GH_TOKEN';
 
   @override
-  String get updateTokenHelp => '只用于更新检查，不会写入日志';
+  String get updateTokenHelp => '默认不需要；静态清单不可达时才用 GitHub API 兜底，不会写入日志';
 
   @override
   String get updateCheck => '检查更新';
@@ -8807,10 +8819,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get updateIdle => '還沒檢查過發布頁';
+  String get updateIdle => '還沒檢查過更新';
 
   @override
-  String get updateChecking => '正在檢查發布頁…';
+  String get updateChecking => '正在檢查更新…';
 
   @override
   String get updateUpToDate => '已經是最新版本';
@@ -8845,16 +8857,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get updateFailedNetwork => '檢查失敗：網路請求逾時或無法連線';
 
   @override
-  String get updateFailedServer => '檢查失敗：發布頁回傳了異常回應';
+  String get updateFailedServer => '檢查失敗：更新服務回傳了異常回應';
 
   @override
-  String get updateTokenLabel => 'GitHub token（選填）';
+  String get updateFailedManifestMismatch => '檢查失敗：兩份更新清單不一致，已拒絕本次更新';
+
+  @override
+  String get updateFailedArchiveMismatch => '安裝包校驗不通過，已刪除，請重試';
+
+  @override
+  String get updateTokenLabel => 'GitHub token（備援，選填）';
 
   @override
   String get updateTokenHint => '留空則讀取環境變數 GITHUB_TOKEN / GH_TOKEN';
 
   @override
-  String get updateTokenHelp => '只用於更新檢查，不會寫入日誌';
+  String get updateTokenHelp => '預設不需要；靜態清單不可達時才用 GitHub API 備援，不會寫入日誌';
 
   @override
   String get updateCheck => '檢查更新';

@@ -223,13 +223,13 @@ abstract class AppLocalizations {
   /// No description provided for @updateIdle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'还没有检查过发布页'**
+  /// **'还没有检查过更新'**
   String get updateIdle;
 
   /// No description provided for @updateChecking.
   ///
   /// In zh_CN, this message translates to:
-  /// **'正在检查发布页…'**
+  /// **'正在检查更新…'**
   String get updateChecking;
 
   /// No description provided for @updateUpToDate.
@@ -289,13 +289,25 @@ abstract class AppLocalizations {
   /// No description provided for @updateFailedServer.
   ///
   /// In zh_CN, this message translates to:
-  /// **'检查失败：发布页返回了异常响应'**
+  /// **'检查失败：更新服务返回了异常响应'**
   String get updateFailedServer;
+
+  /// No description provided for @updateFailedManifestMismatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：两份更新清单不一致，已拒绝本次更新'**
+  String get updateFailedManifestMismatch;
+
+  /// No description provided for @updateFailedArchiveMismatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'安装包校验不通过，已删除，请重试'**
+  String get updateFailedArchiveMismatch;
 
   /// No description provided for @updateTokenLabel.
   ///
   /// In zh_CN, this message translates to:
-  /// **'GitHub token（可选）'**
+  /// **'GitHub token（兜底，可选）'**
   String get updateTokenLabel;
 
   /// No description provided for @updateTokenHint.
@@ -307,7 +319,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateTokenHelp.
   ///
   /// In zh_CN, this message translates to:
-  /// **'只用于更新检查，不会写入日志'**
+  /// **'默认不需要；静态清单不可达时才用 GitHub API 兜底，不会写入日志'**
   String get updateTokenHelp;
 
   /// No description provided for @updateCheck.
