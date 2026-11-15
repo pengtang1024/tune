@@ -41,7 +41,7 @@ class JustAudioPlayerService implements AudioPlayerService {
           linux: Platform.isLinux,
           windows: Platform.isWindows,
         );
-        Log.info(
+        Log.debug(
           '已注册 ${Platform.isLinux ? 'Linux' : 'Windows'} 音频后端 '
           '(just_audio_media_kit)',
         );
@@ -69,7 +69,7 @@ class JustAudioPlayerService implements AudioPlayerService {
       );
       _audioPlayer = AudioPlayer();
       _listenForErrors(_audioPlayer!);
-      Log.info('音频播放器初始化完成，已配置媒体会话');
+      Log.debug('音频播放器初始化完成，已配置媒体会话');
     } catch (e, stackTrace) {
       Log.error('初始化音频播放器失败: $e\nStack trace: $stackTrace');
       rethrow;
@@ -114,7 +114,7 @@ class JustAudioPlayerService implements AudioPlayerService {
         throw Exception(message);
       }
 
-      Log.info('尝试播放音频: $address');
+      Log.debug('尝试播放音频: $address');
 
       // 释放之前的音频源以节省内存
       if (_audioPlayer != null) {
@@ -126,7 +126,7 @@ class JustAudioPlayerService implements AudioPlayerService {
         // 播放开始后由 playingStream / positionStream 推进状态。
         _startPlayback();
       }
-      Log.info('音频播放成功');
+      Log.debug('音频播放成功');
     } catch (e, stackTrace) {
       Log.error('播放音频失败: $e\nStack trace: $stackTrace');
       rethrow;
@@ -306,7 +306,7 @@ class JustAudioPlayerService implements AudioPlayerService {
       }
       _audioPlayer?.dispose();
       _audioPlayer = null;
-      Log.info('音频播放器资源释放成功');
+      Log.debug('音频播放器资源释放成功');
     } catch (e, stackTrace) {
       Log.error('释放音频播放器资源失败: $e\nStack trace: $stackTrace');
     }

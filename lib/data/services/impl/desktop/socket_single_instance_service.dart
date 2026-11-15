@@ -62,7 +62,7 @@ class SocketSingleInstanceService implements SingleInstanceService {
       );
       _server = server;
       server.listen(_accept);
-      Log.info('已取得播放器端口: $port');
+      Log.debug('已取得播放器端口: $port');
       return true;
     } on SocketException {
       // Either the player is already running or another program holds the
@@ -146,7 +146,7 @@ class SocketSingleInstanceService implements SingleInstanceService {
   @override
   Future<void> forwardFiles(List<String> paths) async {
     if (paths.isEmpty) return;
-    Log.info('把文件交给正在运行的播放器: $paths');
+    Log.debug('把文件交给正在运行的播放器: $paths');
     await _send({'files': paths});
   }
 

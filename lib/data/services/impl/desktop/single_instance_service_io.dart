@@ -62,7 +62,7 @@ class SingleInstanceServiceImpl implements SingleInstanceService {
 
       await client.registerObject(_SingleInstanceObject(this));
       _client = client;
-      Log.info('已取得播放器位置: $singleInstanceBusName');
+      Log.debug('已取得播放器位置: $singleInstanceBusName');
       return true;
     } catch (error, stackTrace) {
       Log.error('取得播放器位置失败: $error\n$stackTrace');
@@ -89,7 +89,7 @@ class SingleInstanceServiceImpl implements SingleInstanceService {
   @override
   Future<void> forwardFiles(List<String> paths) async {
     if (paths.isEmpty) return;
-    Log.info('把文件交给正在运行的播放器: $paths');
+    Log.debug('把文件交给正在运行的播放器: $paths');
     await _callOwner('OpenFiles', [
       DBusArray(DBusSignature('s'), paths.map(DBusString.new)),
     ]);

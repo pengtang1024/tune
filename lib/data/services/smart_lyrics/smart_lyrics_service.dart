@@ -273,7 +273,7 @@ class SmartLyricsService {
       // judging machines, its account carried out with the sheet
       // (docs/smart-lyrics.md §7.6, M11b).
       final audit = auditAdmission(votes, knowledge: knowledges);
-      Log.info(
+      Log.debug(
         '准入审计: 受审=${audit.checked} 抓错=${audit.mismatched} '
         '上界=${audit.missRateUpperBound.toStringAsFixed(4)}',
       );

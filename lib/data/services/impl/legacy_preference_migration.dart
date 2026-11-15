@@ -22,7 +22,7 @@ class LegacyPreferenceMigration {
     } catch (error) {
       // The previous store is not there on every platform. Without it there
       // is nothing to move, and that is not a failure.
-      Log.info('没有旧偏好可迁移: $error');
+      Log.debug('没有旧偏好可迁移: $error');
       return;
     }
 

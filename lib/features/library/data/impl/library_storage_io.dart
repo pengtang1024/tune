@@ -345,7 +345,7 @@ class FileLibraryStorage implements LibraryStorage {
       return await file.exists() ? file : null;
     } catch (error) {
       // A platform without a documents folder simply has no older library.
-      Log.info('没有旧音乐库可迁移: $error');
+      Log.debug('没有旧音乐库可迁移: $error');
       return null;
     }
   }

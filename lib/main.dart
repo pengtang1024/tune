@@ -127,7 +127,7 @@ Future<bool> _claimThePlayerPlace(ProviderContainer container) async {
 
   final holdsPlace = await service.acquire();
   final files = service.startupFiles;
-  if (files.isNotEmpty) Log.info('命令行里的文件: $files');
+  if (files.isNotEmpty) Log.debug('命令行里的文件: $files');
 
   if (!holdsPlace) {
     Log.info('已有播放器在运行，把文件交给它');

@@ -65,9 +65,9 @@ class WindowManagerService with WindowListener {
     if (!PlatformConstants.isDesktop) return;
 
     try {
-      Log.info('开始初始化窗口管理器');
+      Log.debug('开始初始化窗口管理器');
       await windowManager.ensureInitialized();
-      Log.info('窗口管理器初始化完成');
+      Log.debug('窗口管理器初始化完成');
 
       final instance = WindowManagerService();
       final layout = WindowLayoutStore(persistence);
@@ -103,7 +103,7 @@ class WindowManagerService with WindowListener {
         titleBarStyle: TitleBarStyle.normal,
       );
 
-      Log.info(
+      Log.debug(
         '窗口选项设置完成，最小尺寸: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}',
       );
 
@@ -116,7 +116,7 @@ class WindowManagerService with WindowListener {
         if (position != null) await windowManager.setPosition(position);
         await windowManager.show();
         await windowManager.focus();
-        Log.info('窗口显示和聚焦完成');
+        Log.debug('窗口显示和聚焦完成');
 
         // 显式设置最小窗口尺寸
         await WindowManagerService.setMinimumSize();
@@ -158,7 +158,7 @@ class WindowManagerService with WindowListener {
   void onWindowMaximize() {
     _maximized = true;
     _persistGeometry().ignore();
-    Log.info('窗口已最大化');
+    Log.debug('窗口已最大化');
   }
 
   @override
@@ -167,7 +167,7 @@ class WindowManagerService with WindowListener {
     // The window may report the old size for another frame, so the write
     // waits for the edge to settle like every other one.
     _scheduleGeometrySave();
-    Log.info('窗口已取消最大化');
+    Log.debug('窗口已取消最大化');
   }
 
   @override
@@ -387,7 +387,7 @@ class WindowManagerService with WindowListener {
   /// 设置窗口最小尺寸
   static Future<void> setMinimumSize() async {
     if (!PlatformConstants.isDesktop) return;
-    Log.info(
+    Log.debug(
       '设置窗口最小尺寸为: ${PlatformConstants.desktopWindowMinWidth}x${PlatformConstants.desktopWindowMinHeight}',
     );
     await windowManager.setMinimumSize(

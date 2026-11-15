@@ -44,7 +44,7 @@ class AppInitializer {
     try {
       final persistenceService = ref.read(persistenceServiceProvider);
       await persistenceService.init();
-      Log.info('持久化服务初始化成功');
+      Log.debug('持久化服务初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化持久化服务失败: $error', stackTrace);
       rethrow;
@@ -58,7 +58,7 @@ class AppInitializer {
   static Future<void> _initDatabase(Ref ref) async {
     try {
       await ref.read(appDatabaseProvider.future);
-      Log.info('数据库初始化成功');
+      Log.debug('数据库初始化成功');
     } catch (error, stackTrace) {
       Log.error('打开数据库失败: $error', stackTrace);
       rethrow;
@@ -69,30 +69,30 @@ class AppInitializer {
     try {
       await ref.read(favoritesStoreProvider).init();
       ref.read(favoritesControllerProvider.notifier).reload();
-      Log.info('收藏初始化成功');
+      Log.debug('收藏初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化收藏失败: $error', stackTrace);
-      Log.info('收藏初始化失败，但应用将继续运行');
+      Log.debug('收藏初始化失败，但应用将继续运行');
     }
   }
 
   static Future<void> _initListeningSignals(Ref ref) async {
     try {
       await ref.read(listeningSignalStoreProvider).init();
-      Log.info('播放记录初始化成功');
+      Log.debug('播放记录初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化播放记录失败: $error', stackTrace);
-      Log.info('播放记录初始化失败，但应用将继续运行');
+      Log.debug('播放记录初始化失败，但应用将继续运行');
     }
   }
 
   static Future<void> _initPlaybackSession(Ref ref) async {
     try {
       await ref.read(playbackSessionStoreProvider).init();
-      Log.info('播放会话初始化成功');
+      Log.debug('播放会话初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化播放会话失败: $error', stackTrace);
-      Log.info('播放会话初始化失败，但应用将继续运行');
+      Log.debug('播放会话初始化失败，但应用将继续运行');
     }
   }
 
@@ -100,11 +100,11 @@ class AppInitializer {
     try {
       final audioPlayerService = ref.read(audioPlayerServiceProvider);
       await audioPlayerService.init();
-      Log.info('音频播放服务初始化成功');
+      Log.debug('音频播放服务初始化成功');
     } catch (error, stackTrace) {
       // Keep the shell usable even if the platform audio backend is missing.
       Log.error('初始化音频播放服务失败: $error', stackTrace);
-      Log.info('音频播放服务初始化失败，但应用将继续运行');
+      Log.debug('音频播放服务初始化失败，但应用将继续运行');
     }
   }
 
@@ -112,10 +112,10 @@ class AppInitializer {
     try {
       final scanner = ref.read(crossPlatformMusicScannerProvider);
       await scanner.init();
-      Log.info('音乐扫描服务初始化成功');
+      Log.debug('音乐扫描服务初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化音乐扫描服务失败: $error', stackTrace);
-      Log.info('音乐扫描服务初始化失败，但应用将继续运行');
+      Log.debug('音乐扫描服务初始化失败，但应用将继续运行');
     }
   }
 
@@ -127,10 +127,10 @@ class AppInitializer {
   static void _initDiscoverySignals(Ref ref) {
     try {
       ref.read(discoverySignalObserverProvider).start();
-      Log.info('推荐播放观察器初始化成功');
+      Log.debug('推荐播放观察器初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化推荐播放观察器失败: $error\n$stackTrace');
-      Log.info('推荐播放观察器初始化失败，但应用将继续运行');
+      Log.debug('推荐播放观察器初始化失败，但应用将继续运行');
     }
   }
 
@@ -155,10 +155,10 @@ class AppInitializer {
   static Future<void> _initDesktopIntegration(Ref ref) async {
     try {
       await ref.read(desktopIntegrationProvider).start();
-      Log.info('桌面集成初始化成功');
+      Log.debug('桌面集成初始化成功');
     } catch (error, stackTrace) {
       Log.error('初始化桌面集成失败: $error', stackTrace);
-      Log.info('初始化桌面集成失败，但应用将继续运行');
+      Log.debug('初始化桌面集成失败，但应用将继续运行');
     }
   }
 }
