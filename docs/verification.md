@@ -4,6 +4,16 @@
 
 ## 提交前门禁
 
+一条命令跑完确定性部分（CI 跑的就是它）：
+
+```bash
+./tool/check.sh            # analyze + 全部确定性用例
+./tool/check.sh --l10n     # 另外断言 lib/l10n 生成产物已提交
+./tool/check.sh --live     # 连联网用例一起跑（失败先怀疑网络）
+```
+
+分步等价：
+
 ```bash
 flutter analyze          # 必须 No issues found
 flutter test             # 全绿

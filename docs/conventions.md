@@ -135,6 +135,7 @@
 ## 脚本与工具目录
 
 - `tool/` 放开发脚本（`generate_linux_icons.dart`、`layout_shots_test.dart`），不放业务代码。
+- **门禁脚本只有一份**：[`tool/check.sh`](../tool/check.sh)。CI 与本地跑的是同一个文件（`./tool/check.sh --l10n`），新增检查项加进脚本，不要另写一份命令塞进 workflow——两处写法迟早漂移。脚本统一用 `FLUTTER=${FLUTTER:-flutter}`，便于临时指定 SDK 路径。
 - **测试专用 API 只能在 `test/` 下用**：`SharedPreferences.setMockInitialValues` 这类成员在 `tool/` 里会触发 `invalid_use_of_visible_for_testing_member`。
   - app 自己的持久化在测试里用 `FakePersistenceService` 隔离，不去碰真的磁盘存储。
   - 脚本要留在 `tool/`（不进常规 `flutter test`）就在调用处加 `// ignore: invalid_use_of_visible_for_testing_member` 并写明原因。

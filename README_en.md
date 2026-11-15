@@ -83,11 +83,10 @@ flutter run -d linux
 Verification gates (if `flutter` is not on PATH, use `export PATH="/opt/flutter/bin:$PATH"`):
 
 ```bash
-flutter analyze          # must report No issues found
-flutter test             # all green
+./tool/check.sh --l10n   # gen-l10n consistency + analyze + deterministic tests; this is what CI runs
 ```
 
-Copy changes also need `flutter gen-l10n` with its generated output committed. See [docs/verification.md](docs/verification.md).
+Step by step, that is `flutter analyze` (must report No issues found), `flutter test` (all green), and after copy changes `flutter gen-l10n` with its output committed. See [docs/verification.md](docs/verification.md).
 
 ## Build and artifacts
 
@@ -161,11 +160,10 @@ Issues and pull requests are welcome. Questions, bug reports, and feature reques
 **Gates**
 
 ```bash
-flutter pub get
-flutter analyze          # must report No issues found
-flutter test             # all green
-flutter gen-l10n         # only after changing copy; commit the output
+./tool/check.sh --l10n   # gen-l10n consistency + analyze + deterministic tests
 ```
+
+If `flutter` is not on PATH, run `export PATH="/opt/flutter/bin:$PATH"` first. The equivalent step-by-step commands are `flutter pub get`, `flutter analyze`, `flutter test`, and after copy changes `flutter gen-l10n` with the output committed.
 
 If `flutter` is not on PATH, run `export PATH="/opt/flutter/bin:$PATH"` first.
 

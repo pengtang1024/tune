@@ -120,11 +120,10 @@
 ## 2. 验证门禁
 
 ```bash
-flutter analyze          # 必须 No issues found
-flutter test             # 全绿
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例；CI 跑同一条
 ```
 
-改过文案还要 `flutter gen-l10n` 并提交产物。细节与测试布局见 [`docs/verification.md`](docs/verification.md)。
+`flutter` 不在 PATH 时用 `export PATH="/opt/flutter/bin:$PATH"`。分步等价：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过文案再 `flutter gen-l10n` 并提交产物。细节与测试布局见 [`docs/verification.md`](docs/verification.md)。
 
 ## 3. Git
 

@@ -28,9 +28,8 @@
 
 ## 自检清单
 
-- [ ] `flutter analyze` 通过（`No issues found`）
-- [ ] `flutter test` 全绿
-- [ ] 改过 `lib/l10n/*.arb` 的，已跑 `flutter gen-l10n` 并**提交生成产物**（`lib/l10n/app_localizations*.dart` 是入库文件，不是构建垃圾）
+- [ ] `./tool/check.sh --l10n` 全绿（CI 跑的就是这条：gen-l10n 一致性 + `flutter analyze` + 确定性用例）
+- [ ] 改过 `lib/l10n/*.arb` 的，生成产物已一并提交（`lib/l10n/app_localizations*.dart` 是入库文件，不是构建垃圾）
 - [ ] 没有提交任何密钥、凭据或 token（包括日志、截图、示例配置里的）
 - [ ] 改动范围最小，没有顺带重构无关代码
 - [ ] 文档已同步：对照 `AGENTS.md` 顶部的「文档地图」改掉了受影响的文档
@@ -46,12 +45,13 @@
 > 排查用 `./tool/live_sources.sh`：它把这两个文件**串行**跑（不与其余用例并发），
 > 再打印各自结果；单独跑仍失败时，先用一次请求量一下服务状态再判断。
 >
-> CI 只跑排除这两个文件的用例；本地全量 `flutter test` 才会把它们带上。
+> `./tool/check.sh` 默认就排除这两个文件（CI 同样排除）；要连它们一起跑用
+> `./tool/check.sh --live`，或直接 `flutter test` 全量。
 
 ## 验证证据
 
 <!-- 贴证据，不要只写「已测试」：
-     - flutter analyze 的结论（No issues found）
+     - ./tool/check.sh --l10n 的结论（all gates passed，或哪一步红了）
      - flutter test 的结果（通过数 / 失败数；跑的是哪条命令）
      - 关键日志、截图路径或录屏
      没跑的项目写「未验证」并说明原因，不要留空冒充通过。 -->

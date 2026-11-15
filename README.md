@@ -83,11 +83,10 @@ flutter run -d linux
 验证门禁（`flutter` 若不在 PATH，用 `export PATH="/opt/flutter/bin:$PATH"`）：
 
 ```bash
-flutter analyze          # 必须 No issues found
-flutter test             # 全绿
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例；CI 跑的就是这条
 ```
 
-改过文案还要 `flutter gen-l10n` 并提交产物。细节见 [docs/verification.md](docs/verification.md)。
+分步等价：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过文案再 `flutter gen-l10n` 并提交产物。细节见 [docs/verification.md](docs/verification.md)。
 
 ## 构建与产物
 
@@ -161,13 +160,10 @@ flutter build linux --debug
 **门禁命令**
 
 ```bash
-flutter pub get
-flutter analyze          # 必须 No issues found
-flutter test             # 全绿
-flutter gen-l10n         # 改过文案才需要，并提交产物
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例
 ```
 
-`flutter` 若不在 PATH，先 `export PATH="/opt/flutter/bin:$PATH"`。
+`flutter` 若不在 PATH，先 `export PATH="/opt/flutter/bin:$PATH"`。等价的分步命令是 `flutter pub get`、`flutter analyze`、`flutter test`，改过文案再 `flutter gen-l10n` 并提交产物。
 
 **联网测试**：`test/services/music_source_e2e_live_test.dart` 与 `test/services/music_source_live_test.dart` 访问真实外部服务，离线或外部服务 404 时失败属正常，与你的改动无关；要排查这两个文件用 `./tool/live_sources.sh`。
 

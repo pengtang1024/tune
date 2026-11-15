@@ -16,10 +16,11 @@ flutter run -d linux
 ## 提交前门禁
 
 ```bash
-flutter analyze   # 必须 No issues found
-flutter test      # 全绿
-flutter gen-l10n  # 改过 ARB 文案才需要，产物入库
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例（CI 跑同一条）
 ```
+
+等价分步：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过 ARB 再
+`flutter gen-l10n` 并把产物一起提交；只想连联网用例一起跑用 `./tool/check.sh --live`。
 
 只写测试不算验证：`analyze` 干净 + `test` 全绿 + 亲手跑过界面，三者都要有。
 

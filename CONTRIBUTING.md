@@ -30,6 +30,10 @@ flutter run -d linux
 
 若 `flutter` 不在 `PATH` 中，先把它加进去，例如 `export PATH="/opt/flutter/bin:$PATH"`。
 
+> **工程路径含中文时**（例如放在 `~/文档/` 下），Flutter 3.47.x 的 `flutter analyze` 会因 SDK 自身的
+> LSP 报文 bug 报 `FormatException: Unexpected end of input`。处理办法见
+> [`docs/verification.md`](docs/verification.md) 的「门禁的前提：SDK 补丁」一节；临时兜底是 `dart analyze`。
+
 ## 分支模型
 
 主开发分支是 **`develop`**，不是 `master`。`master` 只承接发版。
@@ -47,7 +51,17 @@ flutter run -d linux
 
 ## 提交前门禁
 
-四项都必须过，缺一不算完成：
+一条命令跑完静态检查与确定性用例：
+
+```bash
+./tool/check.sh            # analyze + 全部确定性用例
+./tool/check.sh --l10n     # 另外断言 lib/l10n 生成产物已提交（CI 用这个）
+./tool/check.sh --live     # 连联网用例一起跑，失败先怀疑网络
+```
+
+它依次做 `flutter gen-l10n`（仅 `--l10n`）→ `flutter analyze` → `flutter test`。CI 跑的是同一份脚本（`./tool/check.sh --l10n`），所以本地绿等于 CI 绿——前提是你的 Flutter 版本与 `.github/workflows/ci.yml` 里钉住的一致。首次克隆先 `flutter pub get`；`flutter` 不在 PATH 时用 `FLUTTER=/opt/flutter/bin/flutter ./tool/check.sh`。
+
+分步等价命令（脚本里做的就是这些）：
 
 ```bash
 flutter pub get
@@ -68,7 +82,7 @@ flutter gen-l10n         # 改过 ARB 文案才需要，且要提交生成产物
 ./tool/live_sources.sh   # 串行跑这两个文件并打印各自结果
 ```
 
-只想验证确定性用例时，排除这两个文件即可：
+只想验证确定性用例时，`./tool/check.sh` 默认就会跳过这两个文件；要手写等价命令是：
 
 ```bash
 flutter test $(find test -name '*_test.dart' ! -name '*live*' | sort)
