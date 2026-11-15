@@ -4,6 +4,14 @@
 #   ./tool/check.sh            analyze + every test except the ones that need the network
 #   ./tool/check.sh --live     analyze + every test, including the ones that need the network
 #   ./tool/check.sh --l10n     also fail when lib/l10n is out of date with the ARB files
+#   ./tool/check.sh --tools    also run tool/*_test.dart (the screenshot harnesses)
+#   ./tool/check.sh --docs     also check every Markdown page against docs/document-style.md
+#
+# Flags compose: CI runs `./tool/check.sh --l10n --tools --docs`.
+#
+# Why --tools is a flag and not always on: those harnesses render whole pages and
+# write PNGs under build/, so they are slower than the unit tests, and they are the
+# one part of the suite that no other gate touches (see docs/oss-maintenance.md).
 #
 # CI runs this same script (with --l10n), so a green run here means a green build
 # there — as long as your Flutter version matches the one pinned in
@@ -20,6 +28,8 @@ cd "$(dirname "$0")/.." || exit 1
 FLUTTER=${FLUTTER:-flutter}
 live=0
 l10n=0
+tools=0
+docs=0
 
 usage() {
   awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"
@@ -29,6 +39,8 @@ for arg in "$@"; do
   case "$arg" in
     --live) live=1 ;;
     --l10n) l10n=1 ;;
+    --tools) tools=1 ;;
+    --docs) docs=1 ;;
     -h|--help) usage; exit 0 ;;
     *)
       printf 'unknown option: %s\n\n' "$arg" >&2
@@ -71,6 +83,33 @@ fi
 # Word splitting is the point here: the file list is passed one path per argument.
 # shellcheck disable=SC2086
 "$FLUTTER" test $files || status=1
+
+printf '\n== tool tests\n'
+if [ "$tools" -eq 1 ]; then
+  # Only the harnesses that can run unattended. tool/tooltip_shots_test.dart
+  # compares against goldens written to build/tooltip-shots/ (not committed), so on
+  # a clean checkout it fails with "non-existent file" until you seed them once with
+  #   flutter test tool/tooltip_shots_test.dart --update-goldens
+  # It stays a local visual spot-check instead of a gate.
+  tool_files="tool/layout_shots_test.dart tool/local_feature_shots_test.dart"
+  for f in $tool_files; do
+    if [ ! -f "$f" ]; then
+      printf 'missing tool test: %s\n' "$f" >&2
+      status=1
+    fi
+  done
+  # shellcheck disable=SC2086
+  "$FLUTTER" test $tool_files || status=1
+else
+  printf 'skipped (pass --tools to run the screenshot harnesses)\n'
+fi
+
+printf '\n== docs\n'
+if [ "$docs" -eq 1 ]; then
+  python3 tool/check_docs.py || status=1
+else
+  printf 'skipped (pass --docs to check Markdown against docs/document-style.md)\n'
+fi
 
 printf '\n== summary\n'
 if [ "$status" -eq 0 ]; then

@@ -1,8 +1,9 @@
 # Tune CI：静态检查 + 单元测试
 #
 # 门禁命令只写在 ./tool/check.sh 里，CI 和本地跑的是同一份脚本，避免两处漂移。
-# 本地等价命令：./tool/check.sh --l10n
-#   它依次做：flutter gen-l10n 并断言生成产物已提交 → flutter analyze → flutter test（排除联网用例）。
+# 本地等价命令：./tool/check.sh --l10n --tools --docs
+#   它依次做：flutter gen-l10n 并断言生成产物已提交 → flutter analyze → flutter test（排除联网用例）
+#            → tool/ 下的截图探针 → Markdown 结构检查（docs/document-style.md）。
 #
 # 为什么这里没有 `flutter build linux`：
 #   当前工作树里有并发进行中的改动，Linux 桌面构建（GTK + libmpv + ninja）在 CI 上还不稳定，
@@ -66,5 +67,16 @@ jobs:
       # 用 `bash ./tool/check.sh` 而不是 `./tool/check.sh`：脚本可能因为某些平台
       # 丢掉可执行位（Windows 检出、手工复制都会），那样报的是 Permission denied，
       # 不像门禁失败，容易被误判成 CI 配置坏了。
-      - name: 门禁（gen-l10n 一致性 + analyze + test）
-        run: bash ./tool/check.sh --l10n
+      # --tools 额外跑 tool/layout_shots_test.dart 与 tool/local_feature_shots_test.dart。
+      # 为什么必须跑：这两个工具是 README 配图与设置页视觉的探针，但它们不在 test/ 下，
+      # 常规 `flutter test` 碰不到——上一轮就是这样烂掉的（专辑墙读的是 LibraryState.albums，
+      # fixture 只填了 songs，测试红了两周没人知道）。加了这一步，界面一改就会当场红。
+      #
+      # 为什么不含 tool/tooltip_shots_test.dart：它对比的基准图写在 build/tooltip-shots/
+      # （不入库），干净检出上必然报 "non-existent file"；它是本地目检工具，不是门禁。
+      #
+      # --docs 用 tool/check_docs.py 检查每份 Markdown：唯一 H1、状态行、长页目录与锚点、
+      # 标题不跳级、代码块标语言、无绝对路径、站内链接可达、表格列数一致、末尾相关文档。
+      # 规则本身写在 docs/document-style.md，检查器只是它的执行者。
+      - name: 门禁（gen-l10n 一致性 + analyze + test + 工具探针 + 文档结构）
+        run: bash ./tool/check.sh --l10n --tools --docs
