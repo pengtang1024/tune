@@ -1,0 +1,12 @@
+# 关闭空白 issue：请走下面的模板，信息更完整，也更好定位。
+blank_issues_enabled: false
+
+# 说明：GitHub 的 issue 模板选择器不接受相对路径（例如 ../SECURITY.md），
+# 这里必须写完整 URL，指向仓库默认分支 develop 上的文件。
+contact_links:
+  - name: 报告安全漏洞（请走私密渠道）
+    url: https://github.com/pengtang1024/tune/blob/develop/SECURITY.md
+    about: 漏洞、凭据泄露等敏感问题请不要开公开 issue，按 SECURITY.md 里的邮箱私密报告。
+  - name: 使用问题与讨论
+    url: https://github.com/pengtang1024/tune/blob/develop/SUPPORT.md
+    about: 安装、配置、某首歌放不出来这类问题，以及开放式讨论，请看 SUPPORT.md 里列出的渠道。

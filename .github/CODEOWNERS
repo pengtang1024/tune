@@ -1,0 +1,10 @@
+# 默认评审人。这是单人维护的项目，所有路径都指向同一个人；
+# 保留本文件是为了让 GitHub 在新人提 PR 时自动请求评审。
+* @pengtang1024
+
+# 治理与安全类文件改动请务必人工确认，不要自动合并。
+/SECURITY.md        @pengtang1024
+/GOVERNANCE.md      @pengtang1024
+/CODE_OF_CONDUCT.md @pengtang1024
+/.github/           @pengtang1024
+/docs/              @pengtang1024

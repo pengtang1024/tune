@@ -1,0 +1,35 @@
+# Dependabot：依赖更新走 PR，人工复核后合并。
+# 提交信息前缀与仓库约定 `type(scope): 中文说明` 对齐（AGENTS.md §3），
+# 生成的是 `chore(deps): ...`，不会污染 CHANGELOG 的「新增 / 修复」分类。
+version: 2
+
+updates:
+  # Dart / Flutter 依赖。pubspec.lock 入库，所以锁文件变更也在 PR 里可见。
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # 所有 flutter / dart 依赖合成一个 PR，避免一次几十个 PR 刷屏。
+      # 组内某个包升不动时，Dependabot 会把它单独拆出来（若配了 exclude-patterns）或整组失败，需人工处理。
+      dart-dependencies:
+        patterns:
+          - "*"
+
+  # GitHub Actions 版本更新（actions/checkout、subosito/flutter-action 等）。
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
