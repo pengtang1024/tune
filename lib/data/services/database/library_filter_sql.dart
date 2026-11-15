@@ -179,60 +179,67 @@ class LibraryFilterSql {
 
   static const String _live =
       "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) = 1";
-  static const String _notLive =
-      "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) != 1";
 
-  /// A station or a recording of one: a live row, or a row of a built-in
-  /// instance that declares itself a station.
-  static String get radio => '($_live OR ${_declaredOf(ContentKind.radio)})';
+  /// The kind of a row, as one CASE.
+  ///
+  /// The filter, the facets and the album shelf all read the same order as
+  /// [contentKindOfFields]: a word about this one item, then a spoken genre,
+  /// then the album exception, then the instance, then the type of the
+  /// source, then the rules of a local file, then music.
+  static final String _kindOf = _buildKindOf();
+
+  static String _buildKindOf() {
+    const stated = "json_extract(songs.json, '\$.sourceData.contentKind')";
+    final rules = <String>[
+      "WHEN $_live THEN 'radio'",
+      for (final kind in ContentKind.values)
+        "WHEN $stated = '${kind.name}' THEN '${kind.name}'",
+      for (final entry in spokenGenrePrefixes.entries)
+        "WHEN ${_tagPrefix(entry.key)} THEN '${entry.value.name}'",
+      for (final entry in declaredAlbumKinds.entries)
+        for (final album in entry.value.entries)
+          "WHEN (COALESCE(songs.source_id, '') = '${entry.key}' "
+              "AND LOWER(TRIM(COALESCE(songs.album, ''))) = "
+              "'${album.key.replaceAll("'", "''")}') THEN '${album.value.name}'",
+      for (final entry in declaredContentKinds.entries)
+        "WHEN COALESCE(songs.source_id, '') = '${entry.key}' "
+            "THEN '${entry.value.name}'",
+      "WHEN $_nonMusicGenre THEN 'soundEffect'",
+      "WHEN (${_sourcesOf(podcastSourceTypes)}) THEN 'podcast'",
+      "WHEN (${_sourcesOf(audiobookSourceTypes)}) THEN 'audiobook'",
+      "WHEN $_localAudiobook THEN 'audiobook'",
+      "WHEN $_localPodcast THEN 'podcast'",
+      "ELSE 'music'",
+    ];
+    return '(CASE ${rules.join(' ')} END)';
+  }
+
+  /// A station or a recording of one: a live row, or a row that names one.
+  static String get radio => "($_kindOf = 'radio')";
 
   /// Speech: an episode of a show or a chapter of a book.
   ///
   /// A station wins over its source, exactly as [contentKindOfSource] does:
   /// a stream of a feed is a station, not an episode.
-  static String get spokenWord =>
-      '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
-      'AND ($_podcastWhere OR $_audiobookWhere))';
+  static String get spokenWord => "($_kindOf IN ('podcast', 'audiobook'))";
 
   /// The tracks of the chosen content kinds.
   static ({String sql, List<Object?> args})? kind(Set<ContentKind> kinds) {
     if (kinds.isEmpty) return null;
-    final conditions = [
-      for (final kind in kinds)
-        switch (kind) {
-          ContentKind.radio => radio,
-          ContentKind.music =>
-            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
-                'AND NOT $_podcastWhere AND NOT $_audiobookWhere)',
-          ContentKind.podcast =>
-            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
-                'AND $_podcastWhere)',
-          ContentKind.audiobook =>
-            '($_notLive AND NOT ${_declaredOf(ContentKind.radio)} '
-                'AND $_audiobookWhere)',
-        },
-    ];
-    return (sql: '(${conditions.join(' OR ')})', args: const []);
+    final names = [for (final kind in kinds) "'${kind.name}'"].join(', ');
+    return (sql: '($_kindOf IN ($names))', args: const []);
   }
 
-  static String get _podcastWhere =>
-      '(${_sourcesOf(podcastSourceTypes)} OR '
-      '${_declaredOf(ContentKind.podcast)} OR $_localPodcast)';
+  /// Audio that the source itself files outside music.
+  ///
+  /// A prefix of a genre tag is an explicit fact of the source; a length or
+  /// a title is never read here.
+  static final String _nonMusicGenre = _tagPrefix(nonMusicGenrePrefix);
 
-  static String get _audiobookWhere =>
-      '(${_sourcesOf(audiobookSourceTypes)} OR '
-      '${_declaredOf(ContentKind.audiobook)} OR $_localAudiobook)';
-
-  /// The built-in instances that publish one kind under an adapter shared
-  /// with instances that publish another.
-  static String _declaredOf(ContentKind kind) {
-    final ids = [
-      for (final entry in declaredContentKinds.entries)
-        if (entry.value == kind) entry.key,
-    ];
-    if (ids.isEmpty) return '0';
-    return '(${ids.map((id) => "COALESCE(songs.source_id, '') = '$id'").join(' OR ')})';
-  }
+  static String _tagPrefix(String prefix) =>
+      "(LOWER(COALESCE(songs.genre, '')) LIKE '$prefix%' OR EXISTS ("
+      "SELECT 1 FROM json_each(songs.json, '\$.genres') g "
+      "WHERE LOWER(g.value) LIKE '$prefix%'))";
 
   static const String _localSource =
       "(COALESCE(songs.source_id, 'local') = 'local')";

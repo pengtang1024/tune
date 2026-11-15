@@ -149,6 +149,7 @@ class LibraryToolbar extends ConsumerWidget {
     ContentKind.podcast => context.loc.libraryEpisodeCount(count),
     ContentKind.audiobook => context.loc.libraryChapterCount(count),
     ContentKind.radio => context.loc.libraryStationCount(count),
+    ContentKind.soundEffect => context.loc.libraryEffectCount(count),
     _ => context.loc.libraryTrackCount(count),
   };
 

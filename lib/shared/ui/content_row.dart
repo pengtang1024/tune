@@ -15,6 +15,10 @@ enum RowShape {
 
   /// A station that never ends: it has no artist, no album and no duration.
   radio,
+
+  /// A sound effect or a field recording: the collection holds it, but no
+  /// artist made it and nobody reads it.
+  soundEffect,
 }
 
 /// The shape of the row that writes [song] down.
@@ -23,6 +27,7 @@ RowShape rowShapeOf(Song song) {
     ContentKind.music => RowShape.track,
     ContentKind.podcast || ContentKind.audiobook => RowShape.spokenWord,
     ContentKind.radio => RowShape.radio,
+    ContentKind.soundEffect => RowShape.soundEffect,
   };
 }
 
@@ -40,6 +45,7 @@ String rowSubtitleOf(BuildContext context, Song song) {
         ? (onAirLineOf(context, song) ?? context.loc.playerLiveBadge)
         : context.loc.playerRecordedBadge,
     RowShape.spokenWord => _spokenSubtitle(context, song),
+    RowShape.soundEffect => _effectSubtitle(context, song),
     RowShape.track => _trackSubtitle(context, song),
   };
 }
@@ -66,6 +72,9 @@ String rowSubtitleOf(BuildContext context, Song song) {
           : song.artist.trim(),
       album: song.album.trim(),
     ),
+    // An effect has no artist and is not a song: the collection is the only
+    // fact under the title, and the artist column stays empty.
+    RowShape.soundEffect => (artist: '', album: song.album.trim()),
   };
 }
 
@@ -74,6 +83,13 @@ String _trackSubtitle(BuildContext context, Song song) {
   final album = song.album.trim();
   final who = artist.isEmpty ? context.loc.playerUnknownArtist : artist;
   return album.isEmpty ? who : '$who · $album';
+}
+
+/// An effect reads as the collection it belongs to: an artist would be a lie,
+/// and the collection is what tells two effects apart.
+String _effectSubtitle(BuildContext context, Song song) {
+  final album = song.album.trim();
+  return album.isEmpty ? context.loc.contentKindSoundEffect : album;
 }
 
 String _spokenSubtitle(BuildContext context, Song song) {

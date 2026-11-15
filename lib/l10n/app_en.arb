@@ -129,6 +129,15 @@
       }
     }
   },
+  "libraryEffectCount": "{count, plural, =1{1 clip} other{{count} clips}}",
+  "@libraryEffectCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "libraryNoMatchTitle": "No matching songs",
   "libraryNoMatchSubtitle": "Try another keyword or clear the search",
   "librarySourceEmptyTitle": "No songs from this source",
@@ -1362,6 +1371,7 @@
   "contentKindAudiobook": "Audiobook",
   "contentKindMusic": "Music",
   "contentKindRadio": "Radio",
+  "contentKindSoundEffect": "Sound effects",
   "trackFactPath": "File path",
   "trackFactAddress": "Online address",
   "trackDetailsTooltip": "Details",

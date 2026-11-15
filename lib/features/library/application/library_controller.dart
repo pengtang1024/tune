@@ -128,9 +128,14 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       ? filter
       : filter.copyWith(kinds: const {ContentKind.music});
 
-  /// What the page counts as speech or station, for the content menu.
+  /// What the page counts as speech, station or effect, for the menu.
   static const LibraryFilter _otherKinds = LibraryFilter(
-    kinds: {ContentKind.podcast, ContentKind.audiobook, ContentKind.radio},
+    kinds: {
+      ContentKind.podcast,
+      ContentKind.audiobook,
+      ContentKind.radio,
+      ContentKind.soundEffect,
+    },
   );
 
   LibraryState get _current => state.valueOrNull ?? LibraryState.initial;

@@ -885,7 +885,9 @@ class AppDatabase {
   List<AlbumSummary> albumSummaries() {
     final rows = _db.select('''
       SELECT album AS name, artist AS artist, source_id AS sourceId,
-             COUNT(*) AS count, MIN(json) AS sample
+             COUNT(*) AS count, MIN(json) AS sample,
+             json_extract(MIN(json), '\$.genre') AS genre,
+             MAX(json_extract(json, '\$.sourceData.contentKind')) AS statedKind
       FROM songs
       WHERE album != ''
         AND NOT ${LibraryFilterSql.radio}
@@ -910,8 +912,11 @@ class AppDatabase {
         name: existing?.name ?? name,
         artist: existing?.artist ?? artist,
         trackCount: (existing?.trackCount ?? 0) + (row['count'] as int? ?? 0),
-        kind: existing?.kind ?? contentKindOfSource(
+        kind: existing?.kind ?? contentKindOfFields(
           sourceId: row['sourceId'] as String?,
+          album: name,
+          genre: row['genre'] as String?,
+          statedKind: row['statedKind'] as String?,
         ),
         coverPath: existing?.coverPath ?? cover.path,
         coverUrl: existing?.coverUrl ?? cover.url,

@@ -53,13 +53,14 @@ void main() {
 
     expect(find.text('有声书'), findsOneWidget);
     expect(find.text('电台'), findsOneWidget);
+    expect(find.text('音效'), findsOneWidget);
 
     await tester.tap(
-      find.widgetWithText(CheckedPopupMenuItem<ContentKind>, '播客'),
+      find.widgetWithText(CheckedPopupMenuItem<ContentKind>, '音效'),
     );
     await tester.pumpAndSettle();
 
-    expect(picked, ContentKind.podcast);
+    expect(picked, ContentKind.soundEffect);
   });
 
   testWidgets('a library of songs offers no content menu', (tester) async {

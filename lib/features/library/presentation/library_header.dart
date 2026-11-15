@@ -271,6 +271,7 @@ String _kindLabel(BuildContext context, ContentKind kind) => switch (kind) {
   ContentKind.podcast => context.loc.contentKindPodcast,
   ContentKind.audiobook => context.loc.contentKindAudiobook,
   ContentKind.radio => context.loc.contentKindRadio,
+  ContentKind.soundEffect => context.loc.contentKindSoundEffect,
 };
 
 IconData _kindIcon(ContentKind kind) => switch (kind) {
@@ -278,4 +279,5 @@ IconData _kindIcon(ContentKind kind) => switch (kind) {
   ContentKind.podcast => Icons.podcasts_rounded,
   ContentKind.audiobook => Icons.record_voice_over_rounded,
   ContentKind.radio => Icons.radio_rounded,
+  ContentKind.soundEffect => Icons.graphic_eq_rounded,
 };

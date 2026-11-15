@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/shared/ui/content_row.dart';
 
 void main() {
   test('podcast feeds publish shows', () {
@@ -102,7 +103,22 @@ void main() {
     );
     expect(contentKindOfSource(sourceId: 'old_time_radio'), ContentKind.radio);
     expect(contentKindOfSource(sourceId: 'radio_recordings'), ContentKind.radio);
-    expect(contentKindOfSource(sourceId: 'foreign_audio'), ContentKind.music);
+    expect(
+      contentKindOfSource(sourceId: 'foreign_audio'),
+      ContentKind.audiobook,
+    );
+  });
+
+  test('a chapter of a foreign book is an audiobook', () {
+    const chapter = Song(
+      id: 6,
+      uri: 'tune://internet_archive/foreign_audio/1',
+      sourceId: 'foreign_audio',
+      title: "Emile Zola - L'Assommoir - Chapitre10",
+      album: "L'Assommoir",
+    );
+
+    expect(contentKindOf(chapter), ContentKind.audiobook);
   });
 
   test('a recording of a station is a station, not a live stream', () {
@@ -114,5 +130,171 @@ void main() {
 
     expect(contentKindOf(recording), ContentKind.radio);
     expect(recording.isLiveStream, isFalse);
+  });
+
+  test('a sound effect is named by its genre, never by its length', () {
+    const bark = Song(
+      id: 7,
+      uri: 'tune://internet_archive/unlocked_recordings/1',
+      sourceId: 'unlocked_recordings',
+      album: 'Sound Effects In Stereo',
+      genre: 'Non-Music / Field Recording',
+      duration: 4000,
+    );
+    expect(contentKindOf(bark), ContentKind.soundEffect);
+    expect(ContentKind.soundEffect.isSpokenWord, isFalse);
+    expect(rowShapeOf(bark), RowShape.soundEffect);
+
+    const shortSong = Song(
+      id: 8,
+      uri: 'tune://internet_archive/unlocked_recordings/2',
+      sourceId: 'unlocked_recordings',
+      album: 'Tabla Loops',
+      genre: 'Classical',
+      duration: 2000,
+    );
+    expect(contentKindOf(shortSong), ContentKind.music);
+  });
+
+  test('an album exception refines an instance that declares nothing', () {
+    expect(
+      contentKindOfFields(
+        sourceId: 'unlocked_recordings',
+        album: 'Death of a salesman',
+      ),
+      ContentKind.audiobook,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'unlocked_recordings',
+        album: '  death   of a SALESMAN ',
+      ),
+      ContentKind.audiobook,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'unlocked_recordings',
+        album: 'For Men Only',
+        genre: 'Jazz',
+      ),
+      ContentKind.music,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'another_instance',
+        album: 'Death of a salesman',
+      ),
+      ContentKind.music,
+    );
+    // A world-music collection holds two books uploaded under their own
+    // "Audiobook" item title while their genre tag still says World.
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_world',
+        album: "Alice's Adventures In Wonderland Full Audiobook",
+        genre: 'World',
+      ),
+      ContentKind.audiobook,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_world',
+        album: 'Bali Gamelan',
+        genre: 'World',
+      ),
+      ContentKind.music,
+    );
+  });
+
+  test('a spoken genre refines a declared instance, a music genre never', () {
+    expect(
+      contentKindOfFields(
+        sourceId: 'radio_recordings',
+        album: 'American Stories',
+        genre: 'Audiobook',
+      ),
+      ContentKind.audiobook,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'radio_recordings',
+        album: 'American Stories',
+        genre: 'Blues',
+      ),
+      ContentKind.radio,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'archive_podcasts',
+        album: 'Some Show',
+        genre: 'Podcast',
+      ),
+      ContentKind.podcast,
+    );
+    // A music genre may not outrank the instance either.
+    expect(
+      contentKindOfFields(
+        sourceId: 'archive_podcasts',
+        album: 'RelicRadio.com',
+        genre: 'Gospel',
+      ),
+      ContentKind.radio,
+    );
+  });
+
+  test('an album exception refines a declared instance too', () {
+    expect(
+      contentKindOfFields(
+        sourceId: 'archive_podcasts',
+        album: 'Sleep Safe & Calm Beat Insomnia. Peaceful Music For Deep Sleep. Delta Waves',
+      ),
+      ContentKind.music,
+    );
+    expect(
+      contentKindOfFields(sourceId: 'archive_podcasts', album: 'pIANO'),
+      ContentKind.music,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'archive_podcasts',
+        album: 'RelicRadio.com',
+      ),
+      ContentKind.radio,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'archive_podcasts',
+        album: 'The Howard Stern Show',
+      ),
+      ContentKind.podcast,
+    );
+  });
+
+  test('a kind the item states for itself outranks every other rule', () {
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_classical',
+        genre: 'Classical',
+        statedKind: 'audiobook',
+      ),
+      ContentKind.audiobook,
+    );
+    const item = Song(
+      id: 11,
+      uri: 'tune://internet_archive/community_classical/1',
+      sourceId: 'community_classical',
+      genre: 'Classical',
+      sourceData: {'contentKind': 'podcast'},
+    );
+    expect(contentKindOf(item), ContentKind.podcast);
+  });
+
+  test('an archive collection names the kind of the items filed under it', () {
+    expect(contentKindOfCollections(['librivox']), ContentKind.audiobook);
+    expect(contentKindOfCollections(['podcasts', 'foo']), ContentKind.podcast);
+    expect(contentKindOfCollections(['oldtimeradio']), ContentKind.radio);
+    expect(contentKindOfCollections(['audio_foreign']), ContentKind.audiobook);
+    expect(contentKindOfCollections(['community_classical']), isNull);
+    expect(contentKindOfCollections([]), isNull);
   });
 }

@@ -460,6 +460,12 @@ abstract class AppLocalizations {
   /// **'{count} 台'**
   String libraryStationCount(int count);
 
+  /// No description provided for @libraryEffectCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 段'**
+  String libraryEffectCount(int count);
+
   /// No description provided for @libraryNoMatchTitle.
   ///
   /// In zh_CN, this message translates to:
@@ -5452,6 +5458,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'电台'**
   String get contentKindRadio;
+
+  /// No description provided for @contentKindSoundEffect.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音效'**
+  String get contentKindSoundEffect;
 
   /// No description provided for @trackFactPath.
   ///

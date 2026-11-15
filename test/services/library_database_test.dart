@@ -604,6 +604,36 @@ void main() {
           uri: 'tune://archive/2',
           sourceId: 'news_recordings',
         ),
+        const Song(
+          id: 4,
+          title: 'chuong-291',
+          album: 'Madame Bovary',
+          uri: 'tune://archive/3',
+          sourceId: 'foreign_audio',
+        ),
+        const Song(
+          id: 5,
+          title: 'Dog bark',
+          album: 'Sound Effects In Stereo',
+          uri: 'tune://archive/4',
+          sourceId: 'unlocked_recordings',
+          genre: 'Non-Music / Field Recording',
+        ),
+        const Song(
+          id: 6,
+          title: 'Side 1, Act 1',
+          album: 'Death of a salesman',
+          uri: 'tune://archive/5',
+          sourceId: 'unlocked_recordings',
+        ),
+        const Song(
+          id: 7,
+          title: 'Blue Moon',
+          album: 'For Men Only',
+          uri: 'tune://archive/6',
+          sourceId: 'unlocked_recordings',
+          genre: 'Jazz',
+        ),
       ]);
 
       final songs = database.query(
@@ -614,8 +644,11 @@ void main() {
         limit: 10,
       );
 
-      expect(songs.map((track) => track.title), ['Track 1']);
-      expect(database.countQuery(query: '', filter: LibraryFilter.songs), 1);
+      expect(
+        songs.map((track) => track.title),
+        unorderedEquals(['Track 1', 'Blue Moon']),
+      );
+      expect(database.countQuery(query: '', filter: LibraryFilter.songs), 2);
       expect(
         database.countQuery(
           query: '',
@@ -624,11 +657,75 @@ void main() {
               ContentKind.podcast,
               ContentKind.audiobook,
               ContentKind.radio,
+              ContentKind.soundEffect,
             },
           ),
         ),
-        2,
+        5,
       );
+      expect(
+        database.countQuery(
+          query: '',
+          filter: const LibraryFilter(kinds: {ContentKind.soundEffect}),
+        ),
+        1,
+      );
+    });
+
+    test('a spoken genre, an album exception and a stated kind decide alike', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Story',
+          album: 'American Stories',
+          uri: 'tune://archive/1',
+          sourceId: 'radio_recordings',
+          genre: 'Audiobook',
+        ),
+        const Song(
+          id: 2,
+          title: 'Reflection',
+          album: 'Отражение',
+          uri: 'tune://archive/2',
+          sourceId: 'radio_recordings',
+          genre: 'Blues',
+        ),
+        const Song(
+          id: 3,
+          title: 'Nocturne',
+          album: 'pIANO',
+          uri: 'tune://archive/3',
+          sourceId: 'archive_podcasts',
+        ),
+        const Song(
+          id: 4,
+          title: 'Episode 1',
+          album: 'RelicRadio.com',
+          uri: 'tune://archive/4',
+          sourceId: 'archive_podcasts',
+        ),
+        const Song(
+          id: 5,
+          title: 'Chapter 1',
+          album: 'Some Record',
+          uri: 'tune://archive/5',
+          sourceId: 'community_classical',
+          genre: 'Classical',
+          sourceData: {'contentKind': 'audiobook'},
+        ),
+      ]);
+
+      int count(Set<ContentKind> kinds) => database.countQuery(
+        query: '',
+        filter: LibraryFilter(kinds: kinds),
+      );
+
+      expect(count({ContentKind.music}), 1);
+      expect(count({ContentKind.audiobook}), 2);
+      expect(count({ContentKind.radio}), 2);
+      expect(count({ContentKind.podcast}), 0);
     });
 
     test('a music album still asks for its artist', () {

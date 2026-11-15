@@ -283,6 +283,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString clips',
+      one: '1 clip',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get libraryNoMatchTitle => 'No matching songs';
 
   @override
@@ -3163,6 +3178,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contentKindRadio => 'Radio';
+
+  @override
+  String get contentKindSoundEffect => 'Sound effects';
 
   @override
   String get trackFactPath => 'File path';

@@ -8,9 +8,10 @@ import 'package:tune/shared/ui/content_row.dart';
 import 'package:tune/shared/ui/icon_glyph.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
-/// A track row takes one of three shapes: a song, a spoken track or a
-/// station. The shape decides the line under the title and the two columns
-/// of the library table, and the kind decides the mark beside the title.
+/// A track row takes one of four shapes: a song, a spoken track, a station or
+/// a sound effect. The shape decides the line under the title and the two
+/// columns of the library table, and the kind decides the mark beside the
+/// title.
 void main() {
   const song = Song(
     id: 1,
@@ -166,6 +167,34 @@ void main() {
     );
 
     expect(subtitle, '录音');
+  });
+
+  testWidgets('a sound effect reads as its album, never as a song', (
+    tester,
+  ) async {
+    const effect = Song(
+      id: 10,
+      title: 'Door Slam',
+      artist: 'Effects Inc',
+      album: 'Sound Effects In Stereo',
+      genre: 'Non-Music / Field Recording',
+      uri: 'tune://internet_archive/unlocked_recordings/10',
+      sourceId: 'unlocked_recordings',
+    );
+
+    expect(rowShapeOf(effect), RowShape.soundEffect);
+    final subtitle = await read(
+      tester,
+      (context) => rowSubtitleOf(context, effect),
+    );
+    final columns = await read(
+      tester,
+      (context) => rowColumnsOf(context, effect),
+    );
+
+    expect(subtitle, 'Sound Effects In Stereo');
+    expect(columns.artist, isEmpty);
+    expect(columns.album, 'Sound Effects In Stereo');
   });
 
   testWidgets('a station writes nothing into the artist and album columns', (

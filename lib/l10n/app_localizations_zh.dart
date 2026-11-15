@@ -232,6 +232,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -2908,6 +2917,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get contentKindRadio => '电台';
+
+  @override
+  String get contentKindSoundEffect => '音效';
 
   @override
   String get trackFactPath => '文件路径';
@@ -4606,6 +4618,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
+  }
+
+  @override
   String get libraryNoMatchTitle => '没有匹配的歌曲';
 
   @override
@@ -7284,6 +7305,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get contentKindRadio => '电台';
 
   @override
+  String get contentKindSoundEffect => '音效';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -8977,6 +9001,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
     final String countString = countNumberFormat.format(count);
 
     return '$countString 臺';
+  }
+
+  @override
+  String libraryEffectCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString 段';
   }
 
   @override
@@ -11656,6 +11689,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get contentKindRadio => '電台';
+
+  @override
+  String get contentKindSoundEffect => '音效';
 
   @override
   String get trackFactPath => '檔案路徑';
