@@ -7,6 +7,14 @@
 - 用 `Log.info` / `Log.error`（`lib/utils/logger.dart`），不要用 `print`（lib 下目前 0 处）。
 - `Log` 只有 `debug` / `info` / `error` / `errorWithStack` 四个方法，没有 `warn`。
 - 带堆栈的错误用 `Log.error(message, stackTrace)`。
+- **`debug` 在用户机器上永远看不见**：`Log.debug` 整段包在
+  `const bool.fromEnvironment('DEBUG')` 里，不带这个 define 的构建会把它编译掉；logger
+  包默认的 `DevelopmentFilter` 还会在断言关闭后丢弃**所有**级别。所以 `Log` 改用
+  `ProductionFilter`，`Level.info` 是 release 里真正的地板。
+- 推论：**凡是要在用户机器上留痕的排障日志，一律用 `Log.info`**，别默认 `debug` 能看见。
+  `debug` 只留给自己带 `--dart-define=DEBUG=true` 构建时看的流水账。
+- `info` 是「用户能看见」的那一档，不是「随便打」：按轮、按次、按操作各一条可以；
+  按文件、按帧、按每次重试打一条不行——那就是把日志变成噪声。
 
 ## 主题与尺寸
 

@@ -4,6 +4,11 @@ import 'package:tune/utils/logger_config.dart';
 class Log {
   static final Logger _logger = Logger(
     printer: SingleLinePrinter(),
+    // The package defaults to a filter that drops every event once asserts are
+    // off, so a release build of the app logged nothing at all. A desktop app
+    // is diagnosed from its own output, so the release build keeps the lines
+    // it is told to write; the level below still drops the chatty ones.
+    filter: ProductionFilter(),
     // 可选：控制日志输出级别（如只输出 info 及以上级别）
     level: Level.info,
   );
