@@ -11,7 +11,7 @@
 
 Tune is a compact local and online music player built with Flutter. The shell has a navigation rail (discover, library, liked, sources, settings), a content area, and a player dock at the bottom; the play queue is a non-modal side panel opened from the dock or the now playing page, not a navigation destination; it dims the page content while the dock and sidebar stay usable.
 
-- **Current version**: `1.32.0+52` (codename `Pocket`, 2026-11-15). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
+- **Current version**: `1.33.0+53` (codename `Pocket`, 2026-11-15). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
 - **Primary target**: Linux desktop. Windows / Android / iOS keep an engineering entry point; macOS and Web have been removed.
 - **Source and docs**: [AGENTS.md](AGENTS.md) is the documentation map; design notes live in [docs/](docs/), a code-structure tour in [wiki/](wiki/), and the requirements entry point is [需求/README.md](需求/README.md). When something does not work, start with [Troubleshooting](docs/troubleshooting.md).
 
