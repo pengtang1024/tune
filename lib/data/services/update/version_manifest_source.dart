@@ -14,8 +14,12 @@ class VersionManifestSource {
       urls = urls ?? defaultUrls;
 
   /// CDN first; the raw host is the second address and the cross-check.
+  ///
+  /// The branch, not `@latest`: jsDelivr refuses a package of this repository
+  /// (`Package size exceeded the configured limit of 50 MB`), while the
+  /// branch address still serves single files.
   static const List<String> defaultUrls = [
-    'https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json',
+    'https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json',
     'https://raw.githubusercontent.com/pengtang1024/tune/master/version.json',
   ];
 
