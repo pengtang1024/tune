@@ -6,10 +6,10 @@ import 'package:tune/utils/logger.dart';
 /// Asks for a new release on a schedule (docs/update-cdn.md §4.3).
 ///
 /// The first check waits a minute: a start-up that races the first frame only
-/// makes the window slower. After that the check runs twice a day with a
-/// little jitter in the wait, so a fleet of machines does not reach the CDN at
-/// the same second. A failure backs off instead of repeating; a machine that
-/// is offline stays quiet until the next attempt.
+/// makes the window slower. After that the check runs about once an hour with
+/// a little jitter in the wait, so a fleet of machines does not reach the CDN
+/// at the same second. A failure backs off instead of repeating; a machine
+/// that is offline stays quiet until the next attempt.
 class UpdateScheduler {
   UpdateScheduler({
     required Future<bool> Function() check,
@@ -32,19 +32,18 @@ class UpdateScheduler {
   static const firstDelay = Duration(seconds: 60);
 
   /// How often a machine that checks successfully asks again.
-  static const interval = Duration(hours: 6);
+  static const interval = Duration(hours: 1);
 
   /// No two automatic checks are closer than this.
-  static const minimumGap = Duration(minutes: 30);
+  static const minimumGap = Duration(minutes: 15);
 
   /// The wait after the first, second and later failures in a row. It grows
-  /// until the normal interval is reached and stays there.
+  /// until the cap is reached and stays there, so a machine that is offline
+  /// for a day asks at most every two hours.
   static const backoff = [
     Duration(minutes: 30),
     Duration(hours: 1),
     Duration(hours: 2),
-    Duration(hours: 4),
-    Duration(hours: 6),
   ];
 
   /// The wait after [failures] failed checks in a row.
@@ -54,7 +53,7 @@ class UpdateScheduler {
     return backoff[index];
   }
 
-  /// The wait after a successful check: six hours, ten percent either way.
+  /// The wait after a successful check: an hour, ten percent either way.
   Duration nextDelay() {
     final span = interval.inMilliseconds;
     final jitter = (span * 0.1).round();

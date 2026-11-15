@@ -27,6 +27,7 @@ class UpdateService {
 
   final Dio _dio;
   final VersionManifestSource _source;
+  final DateTime Function() _clock;
 
   /// The release read the last time, when, and with which token.
   UpdateRelease? _cached;
@@ -38,13 +39,21 @@ class UpdateService {
   bool _hasCached = false;
 
   /// How long an automatic check may reuse the last answer.
+  ///
+  /// Ten minutes, far below the hourly round of the scheduler
+  /// (docs/update-cdn.md §4.2): the reuse only covers a second ask inside the
+  /// same round, never the next round itself.
   static const _cacheFor = Duration(minutes: 10);
 
-  UpdateService({Dio? dio, VersionManifestSource? source})
-    : _dio = dio ?? _defaultDio(),
-      _source =
-          source ??
-          VersionManifestSource(dio: dio ?? _defaultManifestDio());
+  UpdateService({
+    Dio? dio,
+    VersionManifestSource? source,
+    DateTime Function()? clock,
+  }) : _dio = dio ?? _defaultDio(),
+       _source =
+           source ??
+           VersionManifestSource(dio: dio ?? _defaultManifestDio()),
+       _clock = clock ?? DateTime.now;
 
   static Dio _defaultDio() => Dio(
     BaseOptions(
@@ -211,12 +220,12 @@ class UpdateService {
     final cachedAt = _cachedAt;
     if (cachedAt == null) return false;
     if (token != _cachedToken) return false;
-    return DateTime.now().difference(cachedAt) < _cacheFor;
+    return _clock().difference(cachedAt) < _cacheFor;
   }
 
   void _remember(UpdateRelease? release, String? token) {
     _cached = release;
-    _cachedAt = DateTime.now();
+    _cachedAt = _clock();
     _cachedToken = token;
     _hasCached = true;
   }

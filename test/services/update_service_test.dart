@@ -237,6 +237,32 @@ void main() {
     });
   });
 
+  group('reuse window', () {
+    test('a round an hour later asks again instead of reusing', () async {
+      var now = DateTime.utc(2026);
+      final adapter = _RoutingAdapter({
+        _cdn: (_) => _body(jsonEncode(_manifest())),
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+      final dio = Dio()..httpClientAdapter = adapter;
+      final service = UpdateService(dio: dio, clock: () => now);
+
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 2);
+
+      // A second ask inside the same round reuses the answer.
+      now = now.add(const Duration(minutes: 5));
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 2);
+
+      // The next hourly round is past the window, so it asks again: an hour
+      // of waiting never ends in a cached answer.
+      now = now.add(const Duration(hours: 1));
+      await service.latest(environment: const {});
+      expect(adapter.requests.length, 4);
+    });
+  });
+
   group('release page fallback', () {
     test('the release page is read when no list exists yet', () async {
       final (service, adapter) = _serviceWith({
