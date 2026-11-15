@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/update_service.dart';
+import 'package:tune/data/services/update/version_manifest_source.dart';
 
 /// Answers each host of the check, so the tiers can be told apart.
 class _RoutingAdapter implements HttpClientAdapter {
@@ -405,6 +406,28 @@ void main() {
     test('an answer without a version is no release', () {
       expect(UpdateService.parseRelease(null), isNull);
       expect(UpdateService.parseRelease({'tag_name': ''}), isNull);
+    });
+  });
+
+  group('source logging', () {
+    test('every address reports its host and result', () async {
+      final logs = <String>[];
+      final adapter = _RoutingAdapter({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+      final dio = Dio()..httpClientAdapter = adapter;
+      final source = VersionManifestSource(dio: dio, debugLog: logs.add);
+
+      final manifest = await source.read();
+
+      expect(manifest?.version, '1.33.0');
+      expect(logs, hasLength(2));
+      expect(logs.first, contains(_cdn));
+      expect(logs.first, contains('404'));
+      expect(logs.last, contains(_raw));
+      expect(logs.last, contains('命中 1.33.0+53'));
+      expect(logs.last, contains('ms'));
     });
   });
 

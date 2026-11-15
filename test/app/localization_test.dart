@@ -367,7 +367,14 @@ Iterable<File> _interfaceFiles() sync* {
   }
 }
 
-final _logCall = RegExp(r'\bLog\.(info|error|warning|debug)\(');
+/// The calls that write a line to the log and not to the interface.
+///
+/// A service may take its logging as an argument, so a test can read the
+/// messages it writes (`_debugLog` in the update source); that alias is a log
+/// call as much as a call of `Log` is.
+final _logCall = RegExp(
+  r'\b(?:Log\.(?:info|error|warning|debug)|_debugLog)\(',
+);
 
 /// Whether the parenthesis of the call is closed on the same line.
 bool _closesOnSameLine(String line) {
