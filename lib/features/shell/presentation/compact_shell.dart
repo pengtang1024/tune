@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,7 +79,8 @@ class _CompactShellState extends ConsumerState<CompactShell> {
     // The form belongs to the window, but the shell is the place that draws
     // it. The branch happens in this State so the pages of the router stay
     // mounted: a page kept offstage keeps its scroll and its fields.
-    final mini = ref.watch(windowFormProvider) == WindowForm.mini;
+    final form = ref.watch(windowFormProvider);
+    final mobile = widget.mobile ?? PlatformConstants.isMobile;
 
     return CallbackShortcuts(
       bindings: {const SingleActivator(LogicalKeyboardKey.escape): _closeQueue},
@@ -91,143 +94,184 @@ class _CompactShellState extends ConsumerState<CompactShell> {
         },
         child: Scaffold(
           backgroundColor: theme.colorScheme.surface,
-          // The shell stays mounted while the window is mini, so the pages of
-          // the router keep their scroll and their fields. Offstage skips the
-          // layout and the paint of the shell without disposing it.
-          body: Stack(
-            fit: StackFit.expand,
-            children: [
-              Offstage(
-                offstage: mini,
-                child: SafeArea(
-                  top: false,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final metrics = LayoutMetrics.of(
-                        Size(constraints.maxWidth, constraints.maxHeight),
-                        mobile: widget.mobile ?? PlatformConstants.isMobile,
-                      );
-                      final page = SidePanelHost(
-                        open: _queueOpen,
-                        onClose: _closeQueue,
-                        bottomSheet: metrics.usesBottomNavigation,
-                        barrierLabel: context.loc.close,
-                        panelBuilder: (context) =>
-                            QueuePanel(onClose: _closeQueue),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              center: const Alignment(0.9, -1.0),
-                              radius: 1.2,
-                              colors: [
-                                theme.colorScheme.primary.withValues(
-                                  alpha: 0.05,
-                                ),
-                                Colors.transparent,
-                              ],
-                              stops: const [0, 0.7],
-                            ),
-                          ),
-                          // The page is not switched here. The shell hands the
-                          // navigator of the router to the page area, and the
-                          // router moves between the pages with a motion of its
-                          // own. A second switch in this place would keep two
-                          // navigators alive at the same time, and the key of
-                          // the router belongs to only one of them.
-                          child: widget.child,
-                        ),
-                      );
-
-                      if (metrics.usesBottomNavigation) {
-                        // A phone has no pointer and no spare height: the rail
-                        // becomes a bar under the thumb, and the dock becomes
-                        // one row that opens the full page.
-                        return Column(
-                          children: [
-                            Expanded(child: page),
-                            MiniPlayerBar(
-                              onRestore: _openNowPlaying,
-                              onQueue: _toggleQueue,
-                            ),
-                            AppBottomBar(
-                              currentPath: widget.currentPath,
-                              onNavigate: _closeQueue,
-                            ),
-                          ],
-                        );
-                      }
-
-                      // The rail reaches the bottom edge of the window, under
-                      // the floating dock. The dock is a card with margins,
-                      // so without this strip the height of the bar and the
-                      // gap under it would show the page's backdrop where the
-                      // rail should still be.
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: AppSidebar.widthFor(
-                              compact: metrics.usesCompactNavigation,
-                            ),
-                            child: DecoratedBox(
-                              key: const ValueKey('shell-rail-backdrop'),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerLow,
-                                border: Border(
-                                  right: BorderSide(
-                                    color: theme.colorScheme.outlineVariant,
+          // The form is what the reader asked for; the window follows it a
+          // moment later, so the shell decides from the size it is given. A
+          // form that just left mini is drawn while the window is still the
+          // bar, and the rail, the pages and the dock do not fit in it.
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final bar =
+                  form == WindowForm.mini ||
+                  (!mobile &&
+                      (constraints.maxWidth <
+                              PlatformConstants.desktopWindowMinWidth ||
+                          constraints.maxHeight <
+                              LayoutBreakpoints.shellMinHeight));
+              // The offstage shell is still laid out, so it is given the
+              // smallest size the normal form allows instead of the frame of
+              // the bar: a hidden page must not be squeezed into it either.
+              final shellSize = bar && !mobile
+                  ? Size(
+                      math.max(
+                        constraints.maxWidth,
+                        PlatformConstants.desktopWindowMinWidth,
+                      ),
+                      math.max(
+                        constraints.maxHeight,
+                        PlatformConstants.desktopWindowMinHeight,
+                      ),
+                    )
+                  : Size(constraints.maxWidth, constraints.maxHeight);
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  // The shell stays mounted while the window is mini, so the
+                  // pages of the router keep their scroll and their fields.
+                  // Offstage skips the paint of the shell without disposing
+                  // it.
+                  Offstage(
+                    offstage: bar,
+                    child: OverflowBox(
+                      minWidth: shellSize.width,
+                      maxWidth: shellSize.width,
+                      minHeight: shellSize.height,
+                      maxHeight: shellSize.height,
+                      alignment: Alignment.topLeft,
+                      child: SafeArea(
+                        top: false,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final metrics = LayoutMetrics.of(
+                              Size(constraints.maxWidth, constraints.maxHeight),
+                              mobile: mobile,
+                            );
+                            final page = SidePanelHost(
+                              open: _queueOpen,
+                              onClose: _closeQueue,
+                              bottomSheet: metrics.usesBottomNavigation,
+                              barrierLabel: context.loc.close,
+                              panelBuilder: (context) =>
+                                  QueuePanel(onClose: _closeQueue),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: const Alignment(0.9, -1.0),
+                                    radius: 1.2,
+                                    colors: [
+                                      theme.colorScheme.primary.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      Colors.transparent,
+                                    ],
+                                    stops: const [0, 0.7],
                                   ),
                                 ),
+                                // The page is not switched here. The shell hands the
+                                // navigator of the router to the page area, and the
+                                // router moves between the pages with a motion of its
+                                // own. A second switch in this place would keep two
+                                // navigators alive at the same time, and the key of
+                                // the router belongs to only one of them.
+                                child: widget.child,
                               ),
-                            ),
-                          ),
-                          Column(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    AppSidebar(
-                                      currentPath: widget.currentPath,
-                                      compact: metrics.usesCompactNavigation,
-                                      // The page below the scrim should not
-                                      // change while the panel hides it. A
-                                      // navigation closes the panel first and
-                                      // then goes to the page the reader
-                                      // chose.
-                                      onNavigate: _closeQueue,
+                            );
+
+                            if (metrics.usesBottomNavigation) {
+                              // A phone has no pointer and no spare height: the rail
+                              // becomes a bar under the thumb, and the dock becomes
+                              // one row that opens the full page.
+                              return Column(
+                                children: [
+                                  Expanded(child: page),
+                                  MiniPlayerBar(
+                                    onRestore: _openNowPlaying,
+                                    onQueue: _toggleQueue,
+                                  ),
+                                  AppBottomBar(
+                                    currentPath: widget.currentPath,
+                                    onNavigate: _closeQueue,
+                                  ),
+                                ],
+                              );
+                            }
+
+                            // The rail reaches the bottom edge of the window, under
+                            // the floating dock. The dock is a card with margins,
+                            // so without this strip the height of the bar and the
+                            // gap under it would show the page's backdrop where the
+                            // rail should still be.
+                            return Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: AppSidebar.widthFor(
+                                    compact: metrics.usesCompactNavigation,
+                                  ),
+                                  child: DecoratedBox(
+                                    key: const ValueKey('shell-rail-backdrop'),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          theme.colorScheme.surfaceContainerLow,
+                                      border: Border(
+                                        right: BorderSide(
+                                          color:
+                                              theme.colorScheme.outlineVariant,
+                                        ),
+                                      ),
                                     ),
-                                    Expanded(child: page),
+                                  ),
+                                ),
+                                Column(
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          AppSidebar(
+                                            currentPath: widget.currentPath,
+                                            compact:
+                                                metrics.usesCompactNavigation,
+                                            // The page below the scrim should not
+                                            // change while the panel hides it. A
+                                            // navigation closes the panel first and
+                                            // then goes to the page the reader
+                                            // chose.
+                                            onNavigate: _closeQueue,
+                                          ),
+                                          Expanded(child: page),
+                                        ],
+                                      ),
+                                    ),
+                                    PlayerDock(
+                                      onToggleQueue: _toggleQueue,
+                                      queueOpen: _queueOpen,
+                                      onMini: _enterMini,
+                                    ),
                                   ],
                                 ),
-                              ),
-                              PlayerDock(
-                                onToggleQueue: _toggleQueue,
-                                queueOpen: _queueOpen,
-                                onMini: _enterMini,
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              if (mini)
-                SafeArea(
-                  child: MiniPlayerBar(
-                    onRestore: _leaveMini,
-                    onDrag: () =>
-                        WindowManagerService.startDragging().ignore(),
-                    showProgress: true,
-                  ),
-                ),
-            ],
+                  if (bar)
+                    SafeArea(
+                      child: MiniPlayerBar(
+                        onRestore: _leaveMini,
+                        onDrag: () =>
+                            WindowManagerService.startDragging().ignore(),
+                        showProgress: true,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),

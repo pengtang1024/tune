@@ -53,6 +53,15 @@ abstract final class LayoutBreakpoints {
   /// From this width the pages may use three columns.
   static const double wideMinWidth = 1180;
 
+  /// The shortest window that still draws the desktop shell.
+  ///
+  /// The normal form never drops below
+  /// [PlatformConstants.desktopWindowMinHeight]; a shorter frame is a step of
+  /// the move between the bar and the shell, because the window service raises
+  /// the minimum before it grows the window. The dock and the pages fit above
+  /// this height, and the bar draws below it.
+  static const double shellMinHeight = 250;
+
   /// The size of the window in mini mode.
   ///
   /// The bar holds the dock and nothing else, so its height follows the dock
