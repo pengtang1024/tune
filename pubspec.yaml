@@ -120,6 +120,8 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
+  # 定时检查更新的等待与退避，用假时钟验证
+  fake_async: ^1.3.1
   # 生成 Linux 主题图标
   image: ^4.12.0
   # The "flutter_lints" package below contains a set of recommended lints to
