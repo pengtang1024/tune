@@ -4009,6 +4009,168 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationEnable => '自动翻译非界面语言文本';
 
   @override
+  String get settingsLocalFeatureTranslation => '翻译';
+
+  @override
+  String get settingsLocalFeatureTranslationDesc =>
+      '不用联网就能把歌曲信息、简介和界面里的外文翻成你的语言。占空间，速度比云端慢。';
+
+  @override
+  String get settingsLocalFeatureLyrics => '智能歌词（本地出词）';
+
+  @override
+  String get settingsLocalFeatureLyricsDesc =>
+      '听歌时自动听写歌词，不联网、不上传。一首歌要等一会儿，档位越大越准也越慢。';
+
+  @override
+  String get settingsLocalFeatureTranscode => '音频转码';
+
+  @override
+  String get settingsLocalFeatureTranscodeDesc =>
+      '只有遇到播不了的格式才用得上：先把音频转成能播放的格式。平时不占资源。';
+
+  @override
+  String get settingsLocalFeatureInstall => '安装';
+
+  @override
+  String get settingsLocalFeatureCancel => '取消';
+
+  @override
+  String settingsLocalFeatureContinue(String size) {
+    return '继续（还差 $size）';
+  }
+
+  @override
+  String get settingsLocalFeatureRetry => '重试';
+
+  @override
+  String get settingsLocalFeatureDelete => '删除';
+
+  @override
+  String get settingsLocalFeatureChecking => '检查中';
+
+  @override
+  String settingsLocalFeatureDownloading(int percent) {
+    return '下载中 $percent%';
+  }
+
+  @override
+  String get settingsLocalFeatureVerifying => '校验中';
+
+  @override
+  String settingsLocalFeatureReady(String size) {
+    return '可用 · 占用 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
+
+  @override
+  String settingsLocalFeaturePartial(int done, int total) {
+    return '部分完成 · 已完成 $done/$total';
+  }
+
+  @override
+  String settingsLocalFeatureFailed(String message) {
+    return '失败：$message';
+  }
+
+  @override
+  String settingsLocalFeatureNeedDownload(String size) {
+    return '需要下载约 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureDetails => '详细信息';
+
+  @override
+  String get settingsLocalFeatureHideDetails => '收起详细信息';
+
+  @override
+  String get settingsLocalFeatureRecommended => '推荐：适合本机';
+
+  @override
+  String get settingsLocalFeatureDefaultChoice => '默认：适合多数电脑';
+
+  @override
+  String get settingsLocalFeatureNotEnough => '空间或内存可能不足';
+
+  @override
+  String get settingsLocalFeatureDeleteTitle => '删除本地文件？';
+
+  @override
+  String settingsLocalFeatureDeleteBody(String feature, String size) {
+    return '将删除「$feature」下所有本地文件，共 $size。系统自带的程序不受影响。';
+  }
+
+  @override
+  String get settingsLocalFeatureDeleteConfirm => '删除';
+
+  @override
+  String get settingsLocalFeatureTierTitle => '档位';
+
+  @override
+  String get settingsLocalFeatureAddonsTitle => '更多引擎';
+
+  @override
+  String get settingsLocalFeatureTierLow => '轻量';
+
+  @override
+  String get settingsLocalFeatureTierLowDesc => '最省内存、最快；长句和术语可能翻得生硬。';
+
+  @override
+  String get settingsLocalFeatureTierStandard => '标准';
+
+  @override
+  String get settingsLocalFeatureTierStandardDesc => '默认；歌曲信息和简介够用，速度与质量平衡。';
+
+  @override
+  String get settingsLocalFeatureTierQuality => '高质量';
+
+  @override
+  String get settingsLocalFeatureTierQualityDesc => '长句、罕见语言更准；慢 2–3 倍，占用也大。';
+
+  @override
+  String get settingsLocalFeatureTierTiny => '极简';
+
+  @override
+  String get settingsLocalFeatureTierTinyDesc => '最快、最省；清晰人声够用，嘈杂录音容易漏词。';
+
+  @override
+  String get settingsLocalFeatureTierBase => '省空间';
+
+  @override
+  String get settingsLocalFeatureTierBaseDesc => '比极简准一些，占用仍然很小。';
+
+  @override
+  String get settingsLocalFeatureTierSmall => '均衡';
+
+  @override
+  String get settingsLocalFeatureTierSmallDesc => '默认；多数歌曲够用，速度与准确率平衡。';
+
+  @override
+  String get settingsLocalFeatureTierLarge => '高质量';
+
+  @override
+  String get settingsLocalFeatureTierLargeDesc => '最准；老录音、现场版明显更好，但慢很多。';
+
+  @override
+  String get settingsLocalFeatureTierAndroid => '标准（应用内运行）';
+
+  @override
+  String get settingsLocalFeatureTierAndroidDesc => '手机上只能应用内运行；识别一次的时间比桌面久。';
+
+  @override
+  String get settingsLocalFeatureAddonFunasr => 'Fun-ASR-Nano（第三引擎）';
+
+  @override
+  String get settingsLocalFeatureAddonFunasrDesc =>
+      '中文歌曲的第三路识别；更慢、更占空间，只有装了它才参与。';
+
+  @override
+  String get settingsLocalFeatureAddonInstalled => '已安装';
+
+  @override
   String get settingsLocalizationEnableHint => '缺失的译文会自动生成；歌手名保持原样。';
 
   @override
@@ -8213,6 +8375,168 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationProvider => '翻译服务';
+
+  @override
+  String get settingsLocalFeatureTranslation => '翻译';
+
+  @override
+  String get settingsLocalFeatureTranslationDesc =>
+      '不用联网就能把歌曲信息、简介和界面里的外文翻成你的语言。占空间，速度比云端慢。';
+
+  @override
+  String get settingsLocalFeatureLyrics => '智能歌词（本地出词）';
+
+  @override
+  String get settingsLocalFeatureLyricsDesc =>
+      '听歌时自动听写歌词，不联网、不上传。一首歌要等一会儿，档位越大越准也越慢。';
+
+  @override
+  String get settingsLocalFeatureTranscode => '音频转码';
+
+  @override
+  String get settingsLocalFeatureTranscodeDesc =>
+      '只有遇到播不了的格式才用得上：先把音频转成能播放的格式。平时不占资源。';
+
+  @override
+  String get settingsLocalFeatureInstall => '安装';
+
+  @override
+  String get settingsLocalFeatureCancel => '取消';
+
+  @override
+  String settingsLocalFeatureContinue(String size) {
+    return '继续（还差 $size）';
+  }
+
+  @override
+  String get settingsLocalFeatureRetry => '重试';
+
+  @override
+  String get settingsLocalFeatureDelete => '删除';
+
+  @override
+  String get settingsLocalFeatureChecking => '检查中';
+
+  @override
+  String settingsLocalFeatureDownloading(int percent) {
+    return '下载中 $percent%';
+  }
+
+  @override
+  String get settingsLocalFeatureVerifying => '校验中';
+
+  @override
+  String settingsLocalFeatureReady(String size) {
+    return '可用 · 占用 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureSystemReady => '使用系统已安装版本';
+
+  @override
+  String settingsLocalFeaturePartial(int done, int total) {
+    return '部分完成 · 已完成 $done/$total';
+  }
+
+  @override
+  String settingsLocalFeatureFailed(String message) {
+    return '失败：$message';
+  }
+
+  @override
+  String settingsLocalFeatureNeedDownload(String size) {
+    return '需要下载约 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureDetails => '详细信息';
+
+  @override
+  String get settingsLocalFeatureHideDetails => '收起详细信息';
+
+  @override
+  String get settingsLocalFeatureRecommended => '推荐：适合本机';
+
+  @override
+  String get settingsLocalFeatureDefaultChoice => '默认：适合多数电脑';
+
+  @override
+  String get settingsLocalFeatureNotEnough => '空间或内存可能不足';
+
+  @override
+  String get settingsLocalFeatureDeleteTitle => '删除本地文件？';
+
+  @override
+  String settingsLocalFeatureDeleteBody(String feature, String size) {
+    return '将删除「$feature」下所有本地文件，共 $size。系统自带的程序不受影响。';
+  }
+
+  @override
+  String get settingsLocalFeatureDeleteConfirm => '删除';
+
+  @override
+  String get settingsLocalFeatureTierTitle => '档位';
+
+  @override
+  String get settingsLocalFeatureAddonsTitle => '更多引擎';
+
+  @override
+  String get settingsLocalFeatureTierLow => '轻量';
+
+  @override
+  String get settingsLocalFeatureTierLowDesc => '最省内存、最快；长句和术语可能翻得生硬。';
+
+  @override
+  String get settingsLocalFeatureTierStandard => '标准';
+
+  @override
+  String get settingsLocalFeatureTierStandardDesc => '默认；歌曲信息和简介够用，速度与质量平衡。';
+
+  @override
+  String get settingsLocalFeatureTierQuality => '高质量';
+
+  @override
+  String get settingsLocalFeatureTierQualityDesc => '长句、罕见语言更准；慢 2–3 倍，占用也大。';
+
+  @override
+  String get settingsLocalFeatureTierTiny => '极简';
+
+  @override
+  String get settingsLocalFeatureTierTinyDesc => '最快、最省；清晰人声够用，嘈杂录音容易漏词。';
+
+  @override
+  String get settingsLocalFeatureTierBase => '省空间';
+
+  @override
+  String get settingsLocalFeatureTierBaseDesc => '比极简准一些，占用仍然很小。';
+
+  @override
+  String get settingsLocalFeatureTierSmall => '均衡';
+
+  @override
+  String get settingsLocalFeatureTierSmallDesc => '默认；多数歌曲够用，速度与准确率平衡。';
+
+  @override
+  String get settingsLocalFeatureTierLarge => '高质量';
+
+  @override
+  String get settingsLocalFeatureTierLargeDesc => '最准；老录音、现场版明显更好，但慢很多。';
+
+  @override
+  String get settingsLocalFeatureTierAndroid => '标准（应用内运行）';
+
+  @override
+  String get settingsLocalFeatureTierAndroidDesc => '手机上只能应用内运行；识别一次的时间比桌面久。';
+
+  @override
+  String get settingsLocalFeatureAddonFunasr => 'Fun-ASR-Nano（第三引擎）';
+
+  @override
+  String get settingsLocalFeatureAddonFunasrDesc =>
+      '中文歌曲的第三路识别；更慢、更占空间，只有装了它才参与。';
+
+  @override
+  String get settingsLocalFeatureAddonInstalled => '已安装';
 
   @override
   String get settingsLocalizationProviderNone => '未配置';
@@ -12420,6 +12744,168 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationLocalReady => '本機模型已安裝';
+
+  @override
+  String get settingsLocalFeatureTranslation => '翻譯';
+
+  @override
+  String get settingsLocalFeatureTranslationDesc =>
+      '不用連網就能把歌曲資訊、簡介和介面裡的外文翻成你的語言。佔空間，速度比雲端慢。';
+
+  @override
+  String get settingsLocalFeatureLyrics => '智慧歌詞（本機出詞）';
+
+  @override
+  String get settingsLocalFeatureLyricsDesc =>
+      '聽歌時自動聽寫歌詞，不連網、不上傳。一首歌要等一會兒，檔位越大越準也越慢。';
+
+  @override
+  String get settingsLocalFeatureTranscode => '音訊轉碼';
+
+  @override
+  String get settingsLocalFeatureTranscodeDesc =>
+      '只有遇到播不了的格式才用得上：先把音訊轉成能播放的格式。平時不佔資源。';
+
+  @override
+  String get settingsLocalFeatureInstall => '安裝';
+
+  @override
+  String get settingsLocalFeatureCancel => '取消';
+
+  @override
+  String settingsLocalFeatureContinue(String size) {
+    return '繼續（還差 $size）';
+  }
+
+  @override
+  String get settingsLocalFeatureRetry => '重試';
+
+  @override
+  String get settingsLocalFeatureDelete => '刪除';
+
+  @override
+  String get settingsLocalFeatureChecking => '檢查中';
+
+  @override
+  String settingsLocalFeatureDownloading(int percent) {
+    return '下載中 $percent%';
+  }
+
+  @override
+  String get settingsLocalFeatureVerifying => '校驗中';
+
+  @override
+  String settingsLocalFeatureReady(String size) {
+    return '可用 · 佔用 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureSystemReady => '使用系統已安裝版本';
+
+  @override
+  String settingsLocalFeaturePartial(int done, int total) {
+    return '部分完成 · 已完成 $done/$total';
+  }
+
+  @override
+  String settingsLocalFeatureFailed(String message) {
+    return '失敗：$message';
+  }
+
+  @override
+  String settingsLocalFeatureNeedDownload(String size) {
+    return '需要下載約 $size';
+  }
+
+  @override
+  String get settingsLocalFeatureDetails => '詳細資訊';
+
+  @override
+  String get settingsLocalFeatureHideDetails => '收起詳細資訊';
+
+  @override
+  String get settingsLocalFeatureRecommended => '推薦：適合本機';
+
+  @override
+  String get settingsLocalFeatureDefaultChoice => '預設：適合多數電腦';
+
+  @override
+  String get settingsLocalFeatureNotEnough => '空間或記憶體可能不足';
+
+  @override
+  String get settingsLocalFeatureDeleteTitle => '刪除本機檔案？';
+
+  @override
+  String settingsLocalFeatureDeleteBody(String feature, String size) {
+    return '將刪除「$feature」下所有本機檔案，共 $size。系統內建程式不受影響。';
+  }
+
+  @override
+  String get settingsLocalFeatureDeleteConfirm => '刪除';
+
+  @override
+  String get settingsLocalFeatureTierTitle => '檔位';
+
+  @override
+  String get settingsLocalFeatureAddonsTitle => '更多引擎';
+
+  @override
+  String get settingsLocalFeatureTierLow => '輕量';
+
+  @override
+  String get settingsLocalFeatureTierLowDesc => '最省記憶體、最快；長句和術語可能翻得生硬。';
+
+  @override
+  String get settingsLocalFeatureTierStandard => '標準';
+
+  @override
+  String get settingsLocalFeatureTierStandardDesc => '預設；歌曲資訊和簡介夠用，速度與品質平衡。';
+
+  @override
+  String get settingsLocalFeatureTierQuality => '高品質';
+
+  @override
+  String get settingsLocalFeatureTierQualityDesc => '長句、罕見語言更準；慢 2–3 倍，佔用也大。';
+
+  @override
+  String get settingsLocalFeatureTierTiny => '極簡';
+
+  @override
+  String get settingsLocalFeatureTierTinyDesc => '最快、最省；清晰人聲夠用，嘈雜錄音容易漏詞。';
+
+  @override
+  String get settingsLocalFeatureTierBase => '省空間';
+
+  @override
+  String get settingsLocalFeatureTierBaseDesc => '比極簡準一些，佔用仍然很小。';
+
+  @override
+  String get settingsLocalFeatureTierSmall => '均衡';
+
+  @override
+  String get settingsLocalFeatureTierSmallDesc => '預設；多數歌曲夠用，速度與準確率平衡。';
+
+  @override
+  String get settingsLocalFeatureTierLarge => '高品質';
+
+  @override
+  String get settingsLocalFeatureTierLargeDesc => '最準；老錄音、現場版明顯更好，但慢很多。';
+
+  @override
+  String get settingsLocalFeatureTierAndroid => '標準（應用程式內執行）';
+
+  @override
+  String get settingsLocalFeatureTierAndroidDesc => '手機上只能應用程式內執行；辨識一次的時間比桌面久。';
+
+  @override
+  String get settingsLocalFeatureAddonFunasr => 'Fun-ASR-Nano（第三引擎）';
+
+  @override
+  String get settingsLocalFeatureAddonFunasrDesc =>
+      '中文歌曲的第三路辨識；更慢、更佔空間，只有裝了它才參與。';
+
+  @override
+  String get settingsLocalFeatureAddonInstalled => '已安裝';
 
   @override
   String get settingsLocalizationLocalMissing => '本機模型尚未安裝，可下載';

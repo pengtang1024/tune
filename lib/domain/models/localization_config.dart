@@ -72,6 +72,10 @@ class LocalizationConfig {
   /// One key and model per vendor, so switching vendors keeps both.
   final Map<String, ProviderCredential> credentials;
 
+  /// The downloaded model tier the reader picked: `low`, `standard`,
+  /// `quality`, or empty for "let the installed one decide".
+  final String localTier;
+
   /// Whether the reader has confirmed what leaves the device.
   final bool privacyAccepted;
 
@@ -81,6 +85,7 @@ class LocalizationConfig {
     this.privacyAccepted = false,
     this.backendId = '',
     this.credentials = const {},
+    this.localTier = '',
   });
 
   bool get hasBackend => backendId.trim().isNotEmpty;
@@ -136,6 +141,7 @@ class LocalizationConfig {
     bool? privacyAccepted,
     String? backendId,
     Map<String, ProviderCredential>? credentials,
+    String? localTier,
   }) {
     return LocalizationConfig(
       enabled: enabled ?? this.enabled,
@@ -143,6 +149,7 @@ class LocalizationConfig {
       privacyAccepted: privacyAccepted ?? this.privacyAccepted,
       backendId: backendId ?? this.backendId,
       credentials: credentials ?? this.credentials,
+      localTier: localTier ?? this.localTier,
     );
   }
 
@@ -156,6 +163,7 @@ class LocalizationConfig {
         privacyAccepted: json['privacyAccepted'] as bool? ?? false,
         backendId: backendId,
         credentials: credentials,
+        localTier: (json['localTier'] as String?)?.trim() ?? '',
       );
     }
     return LocalizationConfig._fromLegacy(json, credentials);
@@ -230,6 +238,7 @@ class LocalizationConfig {
     'showOriginal': showOriginal,
     'privacyAccepted': privacyAccepted,
     'backendId': backendId,
+    'localTier': localTier,
     'credentials': {
       for (final entry in credentials.entries)
         entry.key: {'model': entry.value.model, 'baseUrl': entry.value.baseUrl},
@@ -243,6 +252,7 @@ class LocalizationConfig {
       other.showOriginal == showOriginal &&
       other.privacyAccepted == privacyAccepted &&
       other.backendId == backendId &&
+      other.localTier == localTier &&
       _sameCredentials(other.credentials, credentials);
 
   static bool _sameCredentials(
@@ -262,6 +272,7 @@ class LocalizationConfig {
     showOriginal,
     privacyAccepted,
     backendId,
+    localTier,
     Object.hashAllUnordered(
       credentials.entries.map((entry) => Object.hash(entry.key, entry.value)),
     ),

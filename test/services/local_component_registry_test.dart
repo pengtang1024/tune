@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/data/services/components/local_component_registry.dart';
+import 'package:tune/data/services/components/local_feature.dart';
+import 'package:tune/features/settings/presentation/settings_section_catalog.dart';
 
 /// The component registry is the one list of what can be downloaded. An
 /// entry must say which platforms can actually use it, or a phone would be
@@ -66,5 +68,54 @@ void main() {
       ),
       hasLength(1),
     );
+  });
+
+  test('a platform only sees the features it can run', () {
+    List<String> visible(AppPlatform platform) {
+      final capabilities = AppCapabilities.forPlatform(platform);
+      return [
+        for (final feature in LocalFeatureRegistry.all)
+          if (feature.supports(capabilities) &&
+              feature.tiersFor(platform).isNotEmpty)
+            feature.id.name,
+      ];
+    }
+
+    expect(visible(AppPlatform.linux), [
+      'translation',
+      'lyrics',
+      'transcode',
+    ]);
+    expect(visible(AppPlatform.android), ['lyrics'],
+        reason: 'a phone runs the speech runtime in-app only');
+    expect(visible(AppPlatform.windows), isEmpty,
+        reason: 'the page hides a block that could never finish');
+  });
+
+  test('a lyrics install always brings the second vote', () {
+    for (final tier in LocalFeatureRegistry.lyrics.tiersFor(AppPlatform.linux)) {
+      final ids = tier.components.map((spec) => spec.id);
+      expect(ids, contains(LocalComponentRegistry.sherpaRuntime.id));
+      expect(ids, contains(LocalComponentRegistry.sensevoiceModel.id));
+    }
+  });
+
+  test('the optional engine is only offered where its parts run', () {
+    final addon = LocalFeatureRegistry.lyrics.addons.single;
+
+    expect(addon.supports(AppPlatform.linux), isTrue);
+    expect(addon.supports(AppPlatform.android), isFalse);
+  });
+
+  test('the settings section disappears where nothing can be installed', () {
+    bool shown(AppPlatform platform) => settingsSectionSupported(
+      SettingsSection.components,
+      AppCapabilities.forPlatform(platform),
+    );
+
+    expect(shown(AppPlatform.linux), isTrue);
+    expect(shown(AppPlatform.android), isTrue);
+    expect(shown(AppPlatform.windows), isFalse,
+        reason: 'an empty section is worse than no section at all');
   });
 }

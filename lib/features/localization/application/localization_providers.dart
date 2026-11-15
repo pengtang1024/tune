@@ -35,9 +35,17 @@ enum TranslationAvailability {
 
 final translationAssetsProvider = FutureProvider<TranslationAssets>((ref) async {
   ref.watch(localComponentsRevisionProvider);
+  final tier = ref.watch(
+    settingsControllerProvider.select(
+      (settings) => settings.localization.localTier,
+    ),
+  );
   final assets = await TranslationAssets.forApp();
   final components = await ref.watch(localComponentsProvider.future);
-  await assets.useComponents(components);
+  await assets.useComponents(
+    components,
+    preferred: LocalComponentRegistry.translationModelForTier(tier),
+  );
   return assets;
 });
 
