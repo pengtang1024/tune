@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.33.0",
-  "build": 53,
-  "released_at": "2026-11-15T15:24:31Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.33.0",
-  "notes": "### 新增\n\n- **内容类型成为音乐库的作用域**：音乐库默认只列歌曲，页头把单个「电台」换成四项内容\n  菜单（歌曲 / 专辑 / 电台 / 语音节目），计数按作用域换算成集、章、台；新增「专辑」\n  按钮直达专辑墙，歌曲视图里的专辑名可点，与正在播放共用同一套专辑命中规则。旧版\n  多选 `view.json` 启动时落回歌曲并回写，「清除全部」只清筛选组。\n- **音效类型与按来源声明纠正归类**：内容类型新增「音效」；口语类流派（有声书、演讲、\n  喜剧、诗歌等）可以覆盖实例声明，普通音乐流派不可以；专辑例外对已在实例里声明过\n  类型的来源同样生效，修正 American Stories、Sleep Safe、pIANO、RelicRadio.com 的\n  归类；Internet Archive 扫描读条目的 `collection`，按条目而不是整库声明类型。\n- **零时长曲目默认隐藏**：没有时长的条目默认不进列表，工具条显示「已隐藏 N 条」并可\n  一键显示；3 秒以内的极短轨默认保留，只在筛选面板里作为可选组排除。这条规则只作用于\n  歌曲作用域——电台直播流天然没有时长，其它作用域保留全部条目。\n- **本地组件按功能项分档并给机器推荐**：设置页按本机情况推荐档位，翻译模型、ASR 模型\n  与 FFmpeg 各自列出可选档位与体积。\n- **转码组件的自带副本入口**：系统已装 ffmpeg 时，卡片补一行来源说明与次级按钮\n  「也可以下载一份自带的」，走同一套下载、字节数与 sha256 校验；系统优先顺序不变。\n- **更新检查改读静态清单**：读仓库根的 `version.json`，三档取数（jsDelivr `@master` →\n  raw → GitHub release API 兜底），双源交叉核对后下载并校验大小与 sha256。\n\n### 变更\n\n- **自动检查节奏**：6 小时一轮改为 1 小时一轮（±10% 抖动），最小间隔 15 分钟，启动后\n  60 秒首查不变；失败退避仍是 30 分钟 → 1 小时，封顶 2 小时。\n- **ETag 与清单缓存按源持久化**：重启后仍发条件请求，不再退化成整份重下；两个源分开\n  存，304 只复用本地址的解析结果。\n- **日志分级**：release 构建保留 info 及以上（改 `ProductionFilter`），逐文件、逐曲目、\n  逐请求的流水账降为 debug，info 只留阶段汇总、用户可感知的状态变化与一次性迁移；\n  清单取数按地址记一条 info，带主机、结果与耗时毫秒。\n\n### 修复\n\n- **迷你播放条在极短中间帧溢出**：形态切换途中的 248×1 这类尺寸按可用高度收缩——高度\n  够就画行与进度条，只够进度条就只画进度条，再短什么都不画；回归测试补 248×1、\n  248×40、900×1 三个尺寸。\n- **迷你播放器还原首帧的排布**：还原时按窗口实际约束判断画播放条还是正常壳层，不再\n  出现底栏两侧被压到 44 宽、音乐库与设置页纵向挤爆。\n- **扫描开始补一条与结束同格式的日志**：每批扫描开始、结束各一条，去掉重复的开始行。\n\n### 文档与工程\n\n- 补齐开源基础设施：贡献、治理、安全、支持、行为准则、作者与引用文件，issue 表单、\n  PR 模板、CI、依赖更新、release 分组与私密漏洞通报。\n- 全仓文档统一结构（状态行、目录、相关文档），新增 `docs/document-style.md` 写作契约、\n  `tool/check_docs.py` 检查器，并把文档结构纳入 `tool/check.sh --docs` 门禁。\n- 新增 `docs/troubleshooting.md`、`docs/data-model.md`、`docs/oss-maintenance.md` 与\n  文档索引 `docs/README.md`，README 补上真实界面截图。",
+  "version": "1.33.1",
+  "build": 54,
+  "released_at": "2026-11-15T16:24:35Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.33.1",
+  "notes": "### 文档与工程\n\n- **发布手册补上真会踩的坑**：`docs/updates.md` 改成 9 步表格，写清 `DART=` 缺失会静默\n  跳过写 `version.json`、门禁必须在打包之后跑（清单测试要拿真实归档核对）、master 不\n  前进等于没发版，以及三端 release 接口各自的差异与重试前的查重。\n- **70 份文档逐条核对到 1.33.0**：约 1300 条可核对断言、117 处修正。改掉的真错包括音源\n  实例 42→47、健康度 `neutral` 已删（unknown 四项 0.25）、`LyricsLine.time` 可空、播放\n  会话已搬进 `queue`/`queue_meta` 表、`library_filter` 的零时长隐藏只作用于歌曲作用域、\n  `shared/ui/source_icon.dart` 已不存在、已移除的网易云音源举例，以及并不存在的「今日\n  混音 20% 上限」。核不动的（实机、联网、基准）如实留在旧版本号。\n- **历史稿不再冒充当前版本**：`需求/历史/` 的适用版本改为「不适用（历史稿）」，\n  `tool/check_docs.py` 对「历史状态却写具体版本」直接报错。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.33.0/tune-linux-x64-1.33.0.tar.gz",
-      "size": 53783594,
-      "sha256": "c3bb3c189071a30f778e4ddd306d8d150fcb0b0d93aa0efaf76ee34ed407fd72"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.33.1/tune-linux-x64-1.33.1.tar.gz",
+      "size": 53784087,
+      "sha256": "ce47642afd7b11898bab0cd642b8b1275c72df8345b2f567e6bf07985229a6d6"
     }
   }
 }

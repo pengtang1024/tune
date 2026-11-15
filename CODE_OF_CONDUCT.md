@@ -1,6 +1,6 @@
 # 贡献者行为准则
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 本文件采用 [Contributor Covenant](https://www.contributor-covenant.org) 2.1 版正文，仅把举报联系方式替换为本项目的实际渠道。
 > 中文版仅作阅读便利；如有歧义，以 [英文原文](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) 为准。

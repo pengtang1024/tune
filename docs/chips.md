@@ -1,6 +1,6 @@
 # 标识（chip）
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 全应用的 chip 只有一种写法。规则在这里维护，别处只指向它。
 > 相关：[architecture.md](architecture.md)（谁拥有什么）、[conventions.md](conventions.md)（写法）、[i18n.md](i18n.md)（文案）。
@@ -65,11 +65,11 @@ chip 由三样东西组成：
 
 音源的类别来自数据层已经分好的 `MusicSourceKind`，界面不再另分一套：
 
-| 类别 | 颜色 | 谁属于它 |
+| 类别 | 颜色 | 例如 |
 | --- | --- | --- |
 | 本地目录 `localDirectory` | 中性 `onSurfaceVariant` | 本地音乐 |
 | 公开目录 `openCatalog` | 主色 `primary` | Openverse、Jamendo、Internet Archive、ccMixter、iTunes、Audius、Wikimedia Commons、网络电台 |
-| 自建接口 `openApi` | 次色 `secondary` | 网易云音乐 API、播客 RSS、Subsonic、Jellyfin |
+| 自建接口 `openApi` | 次色 `secondary` | 播客 RSS、Subsonic、Jellyfin、Emby、Plex、Audiobookshelf |
 | 自定义 `custom` | 三色 `tertiary` | 用户自己加的实例（自己的 feed、直链音频、映射好的接口） |
 
 事实也有自己的语气色（`FactTone`）：中性、主色、次色、三色、错误色——同一件事在哪儿都是同一个颜色。
@@ -79,7 +79,7 @@ chip 由三样东西组成：
 - 图标按**类型**查（`sourceIconOf(type, kind)`）：同一类型的实例共用一个图标；目录里没有的类型按类别兜底。
 - 一个事实一个图标（格式、码率、画质、歌词、存储、直播……），行内靠图标就能分清。
 - 直播标记只有一份实现（`shared/ui/live_badge.dart`），底栏与正在播放页共用。
-- 内容类型只在有差别时挂标：语音行（播客 / 有声书）在标题旁挂 `ContentKindMark`（`shared/ui/content_kind_mark.dart`），tooltip 写类型；电台行用直播标记；曲目行不挂标。
+- 内容类型只在有差别时挂标：语音行（播客 / 有声书）在标题旁挂 `ContentKindMark`（`shared/ui/content_kind_mark.dart`），tooltip 写类型；电台行用直播标记；曲目行与音效行不挂标。
 - **喜欢是控件，不是标识**：红心（`shared/ui/favorite_button.dart`）自己就是那个动作，标过与没标过一眼看得出来，所以它不进事实条。
 
 ## 地址：带动作的 chip 组
@@ -121,7 +121,7 @@ chip 的**高**是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯�
 ## 谁守着这条线
 
 - `test/app/chip_style_test.dart`：扫源码，带文字的 `MetaChip` 与 `ChipGroup` 只许出现在详情面板里；chip 的类只住在 `meta_badge.dart` 一个文件里；药丸不许自带文字。
-- `test/app/source_badge_test.dart`：标识是图标、名字只在 tooltip、大小不随名字变、13 个图标互不重复、颜色跟着类别走。
+- `test/app/source_badge_test.dart`：标识是图标、名字只在 tooltip、大小不随名字变、17 个图标互不重复、颜色跟着类别走。
 - `test/app/track_facts_test.dart`：事实的图标与 tooltip。
 - `test/app/localization_render_test.dart`：两种语言 × 两种窗口都画得下，没有溢出。
 

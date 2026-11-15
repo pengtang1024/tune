@@ -1,6 +1,6 @@
 # Third-party notices
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 Tune's own source code is licensed under the [MIT License](LICENSE). The
 components below are **not** covered by that MIT grant; each one keeps its own

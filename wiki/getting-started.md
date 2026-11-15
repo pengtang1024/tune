@@ -1,6 +1,6 @@
 # 运行方式
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 ## 目录
 
@@ -30,7 +30,7 @@ flutter run -d linux
 ## 提交前门禁
 
 ```bash
-./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例（CI 跑同一条）
+./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例（CI 同一脚本，另加 --tools --docs）
 ```
 
 等价分步：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过 ARB 再

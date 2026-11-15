@@ -108,7 +108,7 @@ HintLayer（应用壳层作用域，可嵌套）
 
 **契约**
 
-- `HintIntent`：`message`、`semanticsLabel`、`anchorRect`、`delay`。
+- `HintIntent`：`owner`、`message`、`semanticsLabel`、`anchor`（全局矩形）、`waitDuration` / `visibleDuration` / `exitDuration`、`preferBelow`、`verticalOffset`。
 - `HintController`：`show(intent, owner)`、`hide(owner)`；新意图替换旧意图。
 - 触发器保留 `Semantics(tooltip:)`；卡片 `ExcludeSemantics`，读屏不重复。
 - 卡片在 overlay 的 build 里读主题，因此开着的提示也跟主题。
@@ -147,9 +147,9 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 
 `LibraryRowMetrics`（不可变）：
 
-- `showArtist`（≥480）、`showFacts`（≥600）、`showAlbum`（≥820），沿用现行阈值；
+- `showArtist`（≥480）、`showAdded`（≥760）、`showAlbum`（≥820），沿用现行阈值；
 - `extent`：`textScale == 1` 时为 `CompactTokens.libraryRowHeight`，否则 `null`；
-- `padding`、列 flex 也收进来，行里不再出现断点数字。
+- 只有这三个布尔与 `extent`；列宽由行与列头各自的常量（`library_column_header.dart` 的 `_addedWidth` 等）对齐，行里不再出现断点数字。
 
 `ListView.builder(itemExtent: metrics.extent)`；大字号时 `extent` 为 `null`，
 不会裁字。行里删除 `LayoutBuilder`。`Stack` 常驻，选中的行只在里面多一条
@@ -186,7 +186,7 @@ ripple/焦点/键盘保留。**风险**：焦点环与 ripple 形状；用 golde
 0. **设计与证据**：修基准、profile 20k、评审本文。不改产品代码。
 1. **提示层**：`HintLayer` + `TuneTooltip` 入口，先迁一个低风险界面，做行为矩阵。
 2. **密集动作 + 行度量**：库行先用；行目标 ≤180，profile 复测。（已完成）
-3. **行组合**：事实条/文本列改用 `HintTrigger`；视需要引入 `rowHintsOf`；行目标 ≤170。（已完成）
+3. **行组合**：事实条/文本列改用 `HintTrigger`（行里只挂触发器，卡片归 `HintLayer`）；行目标 ≤170。（已完成）
 4. **复用与收尾**：队列的删除按钮已改用同一原语；搜索面板的动作仍是页面
    尺寸，留作它自己的布局决定；更新 `performance.md` §7、`conventions.md`、
    `AGENTS.md` 地图。（已完成）

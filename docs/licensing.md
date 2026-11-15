@@ -1,6 +1,6 @@
 # 许可证与第三方声明
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 这份文档说明 Tune 的许可证边界，以及新增依赖或素材时要做什么。目标只有一条：
 **Tune 自有代码保持 MIT；随包分发的第三方组件必须允许再分发，并且声明齐全。**
@@ -26,8 +26,8 @@
   如果发行版把 Tune 和它装进同一个自包含包，那个包必须按 GPL 处理。FFmpeg 另有
   独立组件归档（见下），默认安装包同样不含。
 - **本地组件（按需下载，不进默认安装包）**：Qwen3-0.6B、Qwen2.5-0.5B/1.5B、Whisper
-  ggml、SenseVoice 的权重与各自运行时，许可证逐项列在 `THIRD_PARTY_NOTICES.md`。
-  组件由应用在设置页按需下载，不随默认安装包分发。
+  ggml、SenseVoice、Fun-ASR-Nano 的权重与各自运行时，许可证逐项列在
+  `THIRD_PARTY_NOTICES.md`。组件由应用在设置页按需下载，不随默认安装包分发。
 - **允许随组件分发 GPL 二进制**：目前只有 FFmpeg（GPL-2.0-or-later 静态构建）。
   前提是同一分发路径上同时给出：（a）GPL 全文；（b）精确对应的源码地址与构建配置；
   （c）版本、字节数、sha256 与许可证的对应关系。三项缺一不许上传。GPL 归档必须以
@@ -49,6 +49,7 @@
 | whisper.cpp 运行时 / Whisper ggml 模型 | `components/lyrics-whisper-*`（按需下载） | MIT | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
 | sherpa-onnx 运行时 | `components/lyrics-sherpa-runtime`（按需下载） | Apache-2.0 | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
 | SenseVoice 模型 | `components/lyrics-sensevoice-model`（按需下载） | FunASR 模型开源协议 v1.1 | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
+| Fun-ASR-Nano 模型 | `components/lyrics-funasr-nano-model`（按需下载，默认不下） | Apache-2.0 | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
 | llama.cpp 运行时 | `components/translation-runtime`（按需下载） | MIT | `translation/licenses/llama.cpp-LICENSE.txt`、`THIRD_PARTY_NOTICES.md` |
 | 应用图标 | `branding/`、`assets/icons/` | 项目自有（推定 MIT） | 来源待补（待登记项，非疏漏），见 §4 |
 

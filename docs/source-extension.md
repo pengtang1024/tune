@@ -1,6 +1,6 @@
 # 音源扩展：类型与实例
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > 实施记录：**已实施**（2026-10-21 定稿；阶段 A–C 已落地，见 §8）。
 > 本文是音源扩展方式的设计说明。实现完成后，本文的结论会并回
@@ -24,7 +24,7 @@
 
 ## 1. 为什么要改
 
-现状是「42 个内置音源，部分类型带多个实例」。由此有三个问题：
+现状是「47 个内置音源，部分类型带多个实例」。由此有三个问题：
 
 1. **加不了第二个实例。** 用户只有一个 Jamendo、一个 Subsonic。想再挂一个服务器、
    换一个关键词，只能改掉原来的那一个。
@@ -92,9 +92,9 @@ MusicSourceConfig（实例 · 数据）
 | `radio` | 网络电台 | `openCatalog` | `radio` | 台站目录 | 电台目录、标签、语言、国家/地区、关键词、数量 |
 | `azuracast` | AzuraCast | `openApi` | `azuracast` | — | 服务器地址、API Key（可选）、关键词、数量 |
 | `openverse` | Openverse | `openCatalog` | `openverse` | 最新 | 关键词（可留空）、来源（可留空） |
-| `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 | Client ID、关键词（可留空）、音质 |
+| `jamendo` | Jamendo | `openCatalog` | `jamendo` | 排行 / 最新 | Client ID、关键词（可留空）、音质 |
 | `internet_archive` | Internet Archive | `openCatalog` | `internet_archive` | 排行 / 最新 | 查询条件（可留空）、数量 |
-| `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 | 标签（可留空）、数量 |
+| `ccmixter` | ccMixter | `openCatalog` | `ccmixter` | 排行 / 最新 | 标签（可留空）、数量 |
 | `audius` | Audius | `openCatalog` | `audius` | 排行 | 关键词（可留空）、数量 |
 | `wikimedia` | Wikimedia Commons | `openCatalog` | `wikimedia` | 最新 | 关键词（可留空）、目录、数量 |
 | `peertube` | PeerTube | `openCatalog` | `peertube` | 排行 / 最新 | 服务器、关键词（可留空）、目录、数量 |
@@ -103,13 +103,17 @@ MusicSourceConfig（实例 · 数据）
 | `podcast_rss` | 播客 RSS | `openApi` | `podcast_rss` | — | feed 地址、数量 |
 | `podcast_catalog` | 播客目录 | `openCatalog` | `podcast_catalog` | 排行 | 关键词（可留空）、数量 |
 | `podcast_apple` | Apple Podcasts | `openCatalog` | `podcast_apple` | 排行 | 关键词（可留空）、国家/地区、数量 |
-| `netease` | 网易云音乐 API | `openApi` | `netease` | 每日推荐 | API 地址、关键词（可留空）、数量 |
 | `subsonic` | Subsonic | `openApi` | `subsonic` | — | 服务器、账号、密码、关键词、音质、数量 |
 | `ampache` | Ampache | `openApi` | `ampache` | 排行 / 最新 | 服务器、API Key、关键词、数量 |
 | `koel` | Koel | `openApi` | `koel` | 排行 / 最新 | 服务器、邮箱、密码、关键词、数量 |
 | `kodi` | Kodi | `openApi` | `kodi` | 最新 / 专辑 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
 | `lms` | Logitech Media Server | `openApi` | `lms` | 曲库 | 服务器、账号（可选）、密码（可选）、关键词、数量 |
 | `jellyfin` | Jellyfin | `openApi` | `jellyfin` | — | 服务器、账号、密码、数量 |
+| `librivox` | LibriVox | `openCatalog` | `librivox` | 排行 | 关键词（可留空）、章节数、题材、数量 |
+| `emby` | Emby | `openApi` | `emby` | — | 服务器、账号、密码、数量、最近窗口 |
+| `plex` | Plex | `openApi` | `plex` | 最新 | 服务器、Token、数量、最近窗口 |
+| `funkwhale` | Funkwhale | `openApi` | `funkwhale` | 最新 | 服务器、Token、关键词（可留空）、数量 |
+| `audiobookshelf` | Audiobookshelf | `openApi` | `audiobookshelf` | 最新 | 服务器、Token、关键词（可留空）、数量 |
 | `direct_url` | 直链音频 | `custom` | — | — | 一组音频地址（每行一条） |
 | `m3u` | 播放列表 | `custom` | — | — | 播放列表地址（`.m3u` / `.pls`） |
 | `json_api` | JSON 接口 | `custom` | — | — | 接口地址、字段路径映射、请求头 |
@@ -118,8 +122,9 @@ MusicSourceConfig（实例 · 数据）
 `direct_url` / `m3u` / `json_api` / `graphql` 是新增类型，`json_api` 与 `graphql` 排到最后做（见 §6）。
 
 **哪些类型站在顶层**：本地目录、网络电台，以及六个明确开放授权的曲库
-（Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-其余的内置类型（iTunes 试听、播客 RSS、网易云 API、Subsonic、Kodi 等自建服务器）
+（Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons），
+外加 Deezer、PeerTube、Apple Podcasts、播客目录与 LibriVox。
+其余的内置类型（iTunes 试听、播客 RSS、Subsonic、Kodi 等自建服务器）
 要么要凭据，要么有授权边界，摆在「更多音源」的折叠区里。类型自己声明这一点（适配器的
 `featured`），界面不按 id 硬编码。
 
@@ -129,13 +134,14 @@ MusicSourceConfig（实例 · 数据）
 
 ### 3.1 内置实例一个都不删
 
-42 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
+47 个内置实例全部保留，老用户的配置不丢。改的是**默认展示**与**默认取法**：
 
 - **内置实例的名字与类型相同**（`Jamendo` 就是 `Jamendo`），取法改成平台自己的
   浏览流（推荐/排行/首页），关键词一律留空 —— 用户装完就能用，不用替应用想口味。
 - **顶层**：本地目录、网络电台，以及明确开放授权的曲库
-  （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons）。
-- **「更多音源」（折叠）**：iTunes 试听（30 秒）、播客 RSS、网易云 API、
+  （Openverse、Jamendo、Internet Archive、ccMixter、Audius、Wikimedia Commons），
+  外加 Deezer、PeerTube、Apple Podcasts、播客目录与 LibriVox。
+- **「更多音源」（折叠）**：iTunes 试听（30 秒）、播客 RSS、
   Subsonic、Kodi 等自建服务器 —— 这些要么需要凭据，要么有授权边界，摆在折叠区不碍眼。
 - **用户添加的实例**：默认权重 `700`，进主列表；它和其他实例一样可以被后移，
   也可以折叠到「更多音源」，不再是永远显示的一段。
@@ -159,9 +165,10 @@ MusicSourceConfig（实例 · 数据）
 
 | 值 | 含义 | 谁有 |
 | --- | --- | --- |
-| `latest` | 最新（首页、最新上传） | Openverse、Wikimedia、ccMixter |
-| `charts` | 排行（人气、下载量、热歌榜） | Audius、ccMixter、Internet Archive、Jamendo |
-| `daily` | 每日推荐 | 网易云 API（自建服务） |
+| `latest` | 最新（首页、最新上传） | Openverse、Wikimedia、ccMixter、Internet Archive、Jamendo、PeerTube、Ampache、Koel、Kodi、Plex、Funkwhale、Audiobookshelf |
+| `charts` | 排行（人气、下载量、热歌榜） | Audius、ccMixter、Internet Archive、Jamendo、Deezer、Ampache、Koel、LMS、PeerTube、播客目录、Apple Podcasts、LibriVox |
+| `albums` | 专辑（按专辑浏览） | Kodi |
+| `daily` | 每日推荐 | 常量仍保留，目前没有适配器声明 |
 
 **各类型的浏览流与实现**（带验证状态；`✅` 是本次实测有数据）：
 
@@ -173,16 +180,20 @@ MusicSourceConfig（实例 · 数据）
 | `jamendo` | `charts` / `latest` | 不传 `search`；`order=popularity_total` 是排行，`order=release_date` 是最新 | 代码已支持 |
 | `wikimedia` | `latest` | `generator=search` 换成 `generator=categorymembers`（分类即首页），要带 `gcmtype=file`；分类由实例的「目录」设置给出（24 个分类：音乐 19 类，另加演讲 / 音效 / 访谈 / 诗歌 / 有声条目；最后一个的分类名是 `Category:Spoken Wikipedia`） | ✅ |
 | `openverse` | `latest` | 去掉 `q` 参数；「来源」按目录收窄（`source=jamendo` / `freesound`） | ✅ |
-| `netease` | `daily` / `charts` | `/personalized`（每日推荐）或 `/top/song`（热歌榜） | ⚠️ 要自建服务，未验证 |
 | `deezer` | `charts` | 无词读 `/chart/0/tracks`；四种读取方式各有自己的榜：专辑 `/chart/0/albums`、艺人 `/chart/0/artists`、歌单 `/chart/0/playlists`；风格编号取自 `/genre` | ✅ |
 | `lms` | `charts` | 无词时 `titles` 走整库；有关键词加 `search:` 前缀 | 代码已支持（无 LMS 服务器，未验证） |
 | `itunes` | 单曲与艺人要关键词，专辑可无词 | 单曲与艺人方式 `term` 必填；「读取方式=专辑」无词时读 `rss.marketingtools.apple.com` 的音乐专辑榜（该服务约一半请求回 502，适配器隔 0.4s / 0.9s 各重试一次）；`previewUrl` 是 30 秒试听，曲目时长按 30 秒算 | ✅ |
+
+2026-11 起新增的 LibriVox（`charts`）、Plex / Funkwhale / Audiobookshelf（`latest`）
+也声明了浏览流，无词时各读自己服务的书目或最近列表；Emby 与 Jellyfin、Subsonic、
+AzuraCast、播客 RSS 一样不声明浏览流。
 
 **浏览流放在实例的 `settings.browse` 里**，取值只能是该类型声明的那些；类型没有声明
 浏览流时，这个字段不出现。适配器声明自己有哪些浏览流，第一个就是它默认的那条。
 
 **「已配置」的定义跟着变**：有浏览流就等于已配置（不用填任何东西）；
-只有不支持浏览流的类型（目前只有 iTunes）才要求填检索词。凭据还是要的：
+不支持浏览流的类型才要求填检索词——iTunes 要关键词（单曲与艺人方式），
+AzuraCast、Subsonic、Jellyfin、Emby 与播客 RSS 要地址与凭据。凭据该有还是要有：
 Jamendo 没有 Client ID 照样扫不了，它只是不用填关键词。
 
 **老用户的关键词**：内置实例以前由应用写死一个词（`piano`、`jazz`、`ambient`…），

@@ -1,6 +1,6 @@
 # 🎵 Tune 音乐播放器项目需求文档
 
-> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：入口 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3-blue.svg" alt="Flutter Version">

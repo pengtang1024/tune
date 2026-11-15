@@ -109,6 +109,10 @@ def check(path: Path) -> list[str]:
         status = next(l for l in head if VALID_STATUS.match(l))
         if "适用版本" not in status and "索引" not in status and "入口" not in status:
             issues.append("状态行缺「适用版本」")
+        if "历史（不具约束力）" in status and "不适用" not in status:
+            issues.append(
+                "历史稿的「适用版本」应写「不适用（历史稿）」，别写具体版本号"
+            )
 
     h2_titles = [l[3:].strip() for l in prose if l.startswith("## ")]
     prose_lines = len(lines)

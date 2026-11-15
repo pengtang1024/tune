@@ -1,6 +1,6 @@
 # 开源基建与维护清单
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > **它是维护清单，不是产品规范。** 这份文档回答两件事：仓库里那些「不是代码、也不是设计文档」的文件各自管什么；哪些东西改了必须同步到别处，否则会悄悄漂掉。
 > 与实际的平台设置冲突时，以平台为准，并回来改这一页。
@@ -23,7 +23,7 @@
 | `.editorconfig` / `.gitignore` / `.gitattributes` / `.mailmap` | 编码与行尾、忽略项、生成物标记、提交者归一 | 新增生成产物、新增二进制、新增署名 | 
 | `analysis_options.yaml` / `l10n.yaml` / `pubspec.yaml` | 静态检查、本地化生成、依赖与版本 | 见各自的文档（`docs/conventions.md`、`docs/i18n.md`） |
 
-`.gitattributes` 目前只写 `* text=auto`，**故意不写 `eol=lf`**：仓库里有历史文件是 CRLF，强制重写会让一整批文件变成「全文件改动」，掩盖真正的 diff。
+`.gitattributes` 只做三件事：`* text=auto`、把生成物标成 `linguist-generated`（`lib/l10n/app_localizations*.dart`、`*.g.dart`、`pubspec.lock`），以及给二进制与 `/dist/` 打标记（二进制清单 `binary`、`/dist/ export-ignore`）；**故意不写 `eol=lf`**：仓库里有历史文件是 CRLF，强制重写会让一整批文件变成「全文件改动」，掩盖真正的 diff。
 
 ## 2. `.github/`
 

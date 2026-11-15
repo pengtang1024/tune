@@ -1,6 +1,6 @@
 # 启动继续上次播放
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 重启 Tune 后恢复上次的队列、曲目、播放模式和进度，**恢复是无条件的**。
 > 入口在设置 → 播放 →「启动时继续上次播放」，默认开启：开着时恢复后自动
@@ -24,9 +24,13 @@
 
 | Key | 内容 | 谁写 |
 | --- | --- | --- |
-| `playback_queue_v1` | 队列、`currentUri`、`playMode`、`history` | `PlaybackSessionStore` |
-| `playback_position_v1` | 当前曲目的 `uri` 与 `positionMs` | `PlaybackSessionStore` |
+| `library.db` 的 `queue` 表 | 队列（`position`、`uri`、整首 JSON） | `PlaybackSessionStore` |
+| `library.db` 的 `queue_meta` 表 | `currentUri`、`playMode`、`history`、当前位置的 `uri` 与 `positionMs` | `PlaybackSessionStore` |
 | `volume` | 音量（沿用旧偏好键） | `PlaybackSessionStore` |
+
+队列与进度都落在音乐库同一个 SQLite 文件里（`library.db`），只有音量还在偏好里。
+旧版的 `playback_queue_v1` / `playback_position_v1` 只在没有数据库可读时作为回退：
+读到旧文档就把它导入 `queue` 与 `queue_meta` 一次，之后不再写。
 
 队列与进度分开存：进度每几秒变一次，队列只在切歌、增删、换模式时变。把整条队列
 按进度反复重写没有意义，也会让磁盘一直忙。
@@ -59,7 +63,7 @@ volume         上次的音量
 
 ## 4. 容错
 
-- 队列 JSON 坏了、为空、不是列表：当作没有会话，启动为空白播放器。
+- 队列读不出、为空、不是列表：当作没有会话，启动为空白播放器。
 - `currentUri` 不在队列里：落到第一首，至少队列还能用。
 - 进度记录的 `uri` 和当前曲目不一致：进度归零。
 - 进度落在曲目最后 1 秒：从 0 开始，避免一启动就结束。

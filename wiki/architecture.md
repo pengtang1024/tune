@@ -1,6 +1,6 @@
 # 整体架构
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > 本文是 `docs/architecture.md` 的导览版；硬约束与扩展步骤以那份为准。
 
@@ -94,7 +94,7 @@ presentation → application → domain
 | 封面图 | `<音乐库>/.tune/artwork/<哈希前两位>/<哈希>.img` | `FileArtworkCache` |
 | 歌词 | 曲目目录内 `<歌名>.lrc` / `<歌名>.manual.lrc` / `<歌名>.smart.lrc` + `.smart.json` | `LyricsController` / `SmartLyricsService` → `LibraryPaths` |
 
-11 张表各自的列、约束与索引见主仓 [`docs/data-model.md`](https://github.com/pengtang1024/tune/blob/develop/docs/data-model.md)。
+11 张表各自的列、约束与索引见主仓 [`docs/data-model.md`](../docs/data-model.md)。
 
 要点：
 

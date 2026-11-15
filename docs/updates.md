@@ -1,6 +1,6 @@
 # 自动更新
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 桌面端从静态清单发现自己有新版本，下载并换掉正在运行的 bundle，重启后生效。
 
@@ -71,21 +71,55 @@ flutter build linux --release
 
 ## 发布步骤
 
-1. 改 `pubspec.yaml` 与 `lib/config/app_version.dart` 的版本号，写 CHANGELOG。
-2. 构建并打包平台归档（见上）；离线包需要先把组件包解压到 `translation/`。
-3. 把 `dist/version.json` 复制到仓库根 `version.json`（`--root` 参数会直接写）。
-4. 提交、打 tag：`git tag -a v1.4.1 -m "v1.4.1"`，推送 tag。
-5. 在 GitHub（与 Gitea）创建同名 release，把平台归档作为附件上传。
-6. 把离线打包用的翻译组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只
-   认平台归档，组件包由应用在设置页按需下载（1.32.0 起在线用户按统一组件注册表下载各组件，
-   见 [local-components.md](local-components.md)）。
-7. 失效 CDN 缓存并自检：
-   `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`，
-   再拉一次 CDN 地址确认 `version` 等于刚发的版本。
-8. 老版本的应用点「检查更新」就能看到并安装。
+v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 
-Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开的 GitHub
-（静态清单优先，API 兜底），Gitea 的 release 只作为自己人的人工下载入口。
+| # | 动作 | 命令与要点 |
+| --- | --- | --- |
+| 1 | 改版本号与 CHANGELOG | `pubspec.yaml`、`lib/config/app_version.dart`、`CHANGELOG.md` 的 `## [x.y.z] - 日期`；再把「当前版本」三处改掉：`README.md`、`README_en.md`、`wiki/README.md` |
+| 2 | 构建并打包 | `flutter build linux --release` → `./tool/package_linux.sh`（离线包加 `--offline`） |
+| 3 | 生成清单 | 脚本顺带写 `dist/version.json`；仓库根那份用 `dart run tool/write_version_manifest.dart --archive dist/tune-linux-x64-<version>.tar.gz --root` 一次写两处 |
+| 4 | 跑门禁 | `./tool/check.sh --l10n --tools --docs` |
+| 5 | 合并并打 tag | `git checkout master && git merge --no-ff develop`；`git tag -a vX.Y.Z -m "vX.Y.Z"` |
+| 6 | 推送三端 | `git push <remote> develop master vX.Y.Z`，三个远程各来一遍；tag 必须推 |
+| 7 | 建 release 上传归档 | 三端接口不同，见下表 |
+| 8 | 重推三端 wiki | `wiki/README.md` 的当前版本变了 |
+| 9 | 失效 CDN 并自检 | 见「发布后自检」 |
+
+第 2 步有个坑：`tool/package_linux.sh` 用 PATH 里的 `dart` 写清单，**找不到就静默跳过**、
+只留下归档。要么 `DART=/opt/flutter/bin/dart ./tool/package_linux.sh`，要么事后补第 3 步。
+
+第 4 步不能提前：`test/services/version_manifest_test.dart` 会拿**真实归档**核对 root
+`version.json` 的 `size` 与 `sha256`，打包前跑等于没验。
+
+第 5 步的合并不是为了整洁——应用读的是 `master` 分支上的清单，master 不前进，tag 打得再对
+也不会有人看到新版本。
+
+### 三端 release 的接口差异
+
+| 平台 | 建 release | 传附件 | 实测坑 |
+| --- | --- | --- | --- |
+| GitHub | `POST /repos/{o}/{r}/releases` | `POST {upload_url}?name=<file>`，头 `Content-Type: application/octet-stream`，体 `--data-binary @包` | 用 python `requests` 建 release 可能抛 `RemoteDisconnected`，但请求其实已成功；重试前先 GET 查重，否则建出重复 release |
+| Gitea | `POST /api/v1/repos/{o}/{r}/releases` | `POST /releases/{id}/assets?name=<file>` | 没有 `/releases/tags/{tag}` 端点（404），得 `GET /releases?limit=N` 过滤 `tag_name`；改正文用 `PATCH /releases/{id}` |
+| Gitee | `POST /api/v5/repos/{o}/{r}/releases?access_token=`，JSON body | 单独 `POST /releases/{id}/attach_files`（multipart） | 建 release 时带 `attach_files` 会 401「Access token does not exist」；平台还会自动附上源码 zip / tar.gz |
+
+三端正文用同一份文本（清单 `notes` 去硬换行 + 一句归档说明），名称沿用
+`vX.Y.Z — 一句话`。
+
+### 组件包（可选）
+
+离线打包用的翻译组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台
+归档；组件包由应用在设置页按需下载（1.32.0 起在线用户走统一组件注册表，见
+[local-components.md](local-components.md)），所以没上传只影响内网离线分发，不影响普通
+用户升级。
+
+### 发布后自检
+
+- [ ] 三端 `git ls-remote --tags <remote> 'refs/tags/vX.Y.Z^{}'` 指向同一个合并提交
+- [ ] 三端 `/releases/latest` 都返回新版本
+- [ ] 从任一平台下载归档，`sha256sum` 等于根 `version.json` 里的 `sha256`
+- [ ] `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json` 返回 `status: finished`
+- [ ] CDN 与 `raw.githubusercontent.com` 两份清单版本、`build`、`sha256` 一致
+- [ ] `tar -tzf` 首项是 `./`，且含 `tune`、`resources/`、`share/`（bundle 内容在根）
 
 ## 从旧版本升级一次
 

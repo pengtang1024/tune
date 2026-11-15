@@ -1,6 +1,6 @@
 # 健康度：unknown 应该算负面
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 给正在开发健康度系统的会话：2026-10-24。
 > 这不是推荐系统的权重表，而是对健康度输入语义的提醒。
@@ -24,18 +24,23 @@
 
 ## 代码里目前的中性点
 
-- `SourceHealth.report` 的 `playable / artwork / metadata / activity`
-  默认值是 `0.5`。
-- `SourceHealthFacts.neutral` 也是三项 `0.5` + `activity 0.5`。
-- `freshness / scan / output / speed / reliability / stability` 在缺少输入时
-  也大量使用 `0.5`。
+2026-11 起这条已经落地：`SourceHealthFacts.unknown` 把 `playable / artwork /
+metadata / activity` 四项都定成 `0.25`，`SourceHealth.report` 的同名参数默认值就是它；
+`SourceHealthFacts.neutral`（四项 `0.5`）已从代码里删掉。
 
-建议改成：
+其余维度在同一份文件里也走同一个常量：`scan`、`freshness`、`speed`、`reliability`
+在缺少输入时返回 `unknown`，`stability` 没有历史时同样。唯一还留着 `0.5` 的是
+「扫描被跳过」的产出——跳过是说「这次不到期」，不是「扫出零首」。
 
-1. 只有「从未有曲目的新来源」可以保留一个明确的 `unknown` 状态；
-2. 一旦来源有曲目，四项事实缺失就是 `0`；
-3. 没有扫描历史或产出时，不要用 `0.5` 假装“平均”；
-4. 对 unknown 状态加测试：unknown 必须低于已知良好，且不能让来源回到主列表。
+所以现在的口径是：
+
+1. 只有「从未有曲目的新来源」保留明确的 `unknown` 状态；
+2. 一旦来源有曲目，四项事实缺失就是 `0`（`playable / artwork` 按曲目比例算，
+   全缺即 0）；
+3. 没有扫描历史或产出时用 `0.25`，不用 `0.5` 假装“平均”；
+4. unknown 有测试守着：`test/app/source_weight_test.dart` 里
+   「activity is unknown before the first heart」与「favorites outside the library
+   keep activity unknown」两条都断言 `0.25`。
 
 ## 推荐侧的配套
 
