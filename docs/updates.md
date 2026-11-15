@@ -1,21 +1,23 @@
 # 自动更新
 
-> 桌面端从发布页发现自己有新版本，下载并换掉正在运行的 bundle，重启后生效。
+> 桌面端从静态清单发现自己有新版本，下载并换掉正在运行的 bundle，重启后生效。
 
 ## 数据源
 
-应用读 GitHub 的 release 接口：
+应用先读仓库根目录的静态清单 `version.json`，由 CDN 分发：
 
-```
-GET https://api.github.com/repos/pengtang1024/tune/releases/latest
-```
+1. `https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json`
+2. `https://raw.githubusercontent.com/pengtang1024/tune/master/version.json`
+3. 前两档都拿不到时，才读 GitHub 的 release 接口（有 token 挂 Bearer，没有就匿名）
 
-- `tag_name` 是版本号（`v1.4.0` 去掉 `v`），与 `AppVersion.version` 逐段比较。
-- `assets` 里按平台挑一个归档：文件名包含 `linux` / `windows` / `android` 的那个；
-  带 `-offline` 后缀的维护者离线包会被跳过，不会被当成更新附件。
-- 没有 release（404）时显示「已是最新版本」，不报错。
+两份清单都拿到时会交叉核对，不一致直接拒绝本次更新。清单字段、调度、退避与
+失败分类见 [update-cdn.md](update-cdn.md)。
 
-仓库必须是公开的：私有仓库的 release 接口需要令牌，应用不带令牌。
+- `version` 与 `build` 逐段比较；`+build` 只在版本相等时打破平局。
+- `assets` 按平台键挑归档（`linux-x64` 等）；第 3 档按文件名包含平台名挑，
+  带 `-offline` 后缀的维护者离线包会被跳过。
+- 清单与发布页都没有 release 时显示「已是最新版本」，不报错。
+- 下载后核对 `size` 与 `sha256`，不符就删掉临时文件并报失败，不进入安装。
 
 ## 产物约定
 
@@ -36,10 +38,11 @@ Linux 用打包脚本生成：
 
 ```bash
 flutter build linux --release
-./tool/package_linux.sh            # 输出 dist/tune-linux-x64-<version>.tar.gz
+./tool/package_linux.sh            # 输出 dist/tune-linux-x64-<version>.tar.gz 与 dist/version.json
 ```
 
-默认产物只含 bundle，不再调用 `tool/prepare_translation.sh`。维护者需要给没有网络的
+打包脚本随后调用 `tool/write_version_manifest.dart`，用 `pubspec.yaml` 与 CHANGELOG
+生成 `dist/version.json`（含归档实测的 `size` 与 `sha256`）。维护者需要给没有网络的
 机器做本地/内网分发时，用离线包：
 
 ```bash
@@ -53,16 +56,20 @@ flutter build linux --release
 
 ## 发布步骤
 
-1. 改 `pubspec.yaml` 与 `lib/config/app_version.dart` 的版本号。
+1. 改 `pubspec.yaml` 与 `lib/config/app_version.dart` 的版本号，写 CHANGELOG。
 2. 构建并打包平台归档（见上）；离线包需要先把组件包解压到 `translation/`。
-3. 提交、打 tag：`git tag -a v1.4.1 -m "v1.4.1"`，推送 tag。
-4. 在 GitHub（与 Gitea）创建同名 release，把平台归档作为附件上传。
-5. 把组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台归档，
+3. 把 `dist/version.json` 复制到仓库根 `version.json`（`--root` 参数会直接写）。
+4. 提交、打 tag：`git tag -a v1.4.1 -m "v1.4.1"`，推送 tag。
+5. 在 GitHub（与 Gitea）创建同名 release，把平台归档作为附件上传。
+6. 把组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台归档，
    组件包由应用在设置页按需下载。
-6. 老版本的应用点「检查更新」就能看到并安装。
+7. 失效 CDN 缓存并自检：
+   `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`
+   （`@latest` 同样刷一次），再拉一次 CDN 地址确认 `version` 等于刚发的版本。
+8. 老版本的应用点「检查更新」就能看到并安装。
 
-Gitea 的仓库是私有的，release 接口要令牌，应用不带令牌——所以更新检查
-统一走公开的 GitHub；Gitea 的 release 只作为自己人的人工下载入口。
+Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开的 GitHub
+（静态清单优先，API 兜底），Gitea 的 release 只作为自己人的人工下载入口。
 
 ## 从旧版本升级一次
 
@@ -95,12 +102,18 @@ Gitea 的仓库是私有的，release 接口要令牌，应用不带令牌——
 ## 测试
 
 - `test/services/update_service_test.dart`：版本比较（含 `1.9.9` → `1.10.0`
-  与 `+build` 后缀）、release 解析、平台归档选择、临时目录里的安装替换。
+  与 `+build` 后缀）、三档取数顺序、双清单交叉核对、304、失败分类、下载校验、
+  临时目录里的安装替换。
+- `test/services/version_manifest_test.dart`：仓库根 `version.json` 与
+  `pubspec.yaml` / `AppVersion` 一致，Linux 归档的 `size` 与 `sha256` 与清单一致。
+- `test/app/update_scheduler_test.dart`：首查延时、定时抖动、最小间隔、失败退避。
 
 ## 限制
 
-- 更新源固定为 GitHub 的公开 release；不读自建服务器的清单。
-- 归档没有签名校验。需要更强保证时，后续可加 `sha256` 字段并拒绝不匹配的包。
+- CDN 与 raw 都可能在中国大陆不可达；三档全失败时如实报「检查失败」，
+  不把失败说成「已是最新」。
+- 归档没有签名校验（第一阶段仅 `sha256` + `size` + 双源交叉核对）。
+  需要更强保证时按 [update-cdn.md](update-cdn.md) §7 补签名。
 - Android 的 APK 安装需要系统 Intent，桌面端尚未接入。
 - Linux 平台归档约 41 MiB，组件包约 500 MB；后者由用户按需下载，不占更新
   下载量，但 GitHub Release 附件上限要按这个量级预留。
