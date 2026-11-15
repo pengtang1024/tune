@@ -1,6 +1,24 @@
 # 主要模块职责
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 按 `lib/` 下的包逐一说明。每个 feature 内部都按 `domain → application → data → presentation` 分层。
+
+## 目录
+
+- [features/player —— 播放与歌词](#featuresplayer--播放与歌词)
+- [features/library —— 音乐库](#featureslibrary--音乐库)
+- [features/favorites —— 喜欢](#featuresfavorites--喜欢)
+- [features/discovery —— 发现与推荐](#featuresdiscovery--发现与推荐)
+- [features/sources —— 音源管理](#featuressources--音源管理)
+- [features/settings —— 设置](#featuressettings--设置)
+- [features/smart_lyrics —— 智能歌词](#featuressmart_lyrics--智能歌词)
+- [features/search —— 在线搜索](#featuressearch--在线搜索)
+- [features/queue —— 播放队列面板](#featuresqueue--播放队列面板)
+- [features/shell —— 壳层](#featuresshell--壳层)
+- [features/desktop —— 桌面集成](#featuresdesktop--桌面集成)
+- [全局服务层（lib/data/services）](#全局服务层libdataservices)
+- [shared / core / utils](#shared--core--utils)
 
 ## features/player —— 播放与歌词
 
@@ -32,8 +50,8 @@
 | data | `library_storage.dart` + `impl/library_storage_io.dart` | `LibraryStorage` 接口 → `SqliteLibraryStorage`（`songs` 表窗口读写、视图 JSON） |
 | presentation | `library_pane.dart` | 音乐库页（含在线搜索入口，历史例外见架构文档） |
 | presentation | `library_toolbar.dart`、`library_header.dart`、`library_column_header.dart` | 页头、工具条、列头 |
-| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart` | 列表 / 专辑 / 分类三种视图 |
-| presentation | `library_filter_panel.dart`、`library_filter_chips.dart` | 九组筛选面板与生效 chip |
+| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart` | 歌曲 / 双列 / 专辑 / 分类四种视图（`library_view_mode.dart`） |
+| presentation | `library_filter_panel.dart`、`library_filter_chips.dart` | 筛选面板（11 组）与生效 chip |
 | presentation | `library_track_card.dart`、`library_row_actions.dart`、`library_row_tail.dart` | 曲目行与其动作 |
 
 ## features/favorites —— 喜欢
@@ -149,3 +167,11 @@ service 不依赖 Riverpod，只编排 I/O；状态全在 controller。
 | `core/constants/`、`core/config/` | 偏好键常量、平台常量 |
 | `providers/` | 跨层共享 provider：封面缓存、持久化 |
 | `utils/` | `Log`（debug/info/error 三级）、`safeFileName`、稳定 key |
+
+## 相关文档
+
+- [整体架构](architecture.md) — 分层、依赖方向与状态归属
+- [关键类与函数](key-classes.md) — 模块里 controller / service 的方法与字段
+- [依赖关系](dependencies.md) — 第三方依赖与主要调用链
+- [运行方式](getting-started.md) — 环境、构建与门禁
+- [架构契约](../docs/architecture.md) — 加文件、放哪一层、能不能跨 feature 引用

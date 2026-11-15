@@ -1,8 +1,11 @@
 # Tune
 
+> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 [中文](README.md) · [English](README_en.md)
 
 [![CI](https://github.com/pengtang1024/tune/actions/workflows/ci.yml/badge.svg)](https://github.com/pengtang1024/tune/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/pengtang1024/tune?display_name=tag&sort=semver)](https://github.com/pengtang1024/tune/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 
@@ -10,7 +13,31 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 
 - **当前版本**：`1.32.0+52`（代号 `Pocket`，2026-11-15）。版本号与构建号在 [pubspec.yaml](pubspec.yaml) 和 `lib/config/app_version.dart`；最新发布清单是仓库根的 [version.json](version.json)。
 - **主要验收平台**：Linux 桌面。Windows / Android / iOS 保留工程入口；macOS 与 Web 已移除。
-- **源码与文档**：[AGENTS.md](AGENTS.md) 是工程文档地图；设计说明在 [docs/](docs/)（26 份），代码结构导览在 [wiki/](wiki/)，需求入口是 [需求/README.md](需求/README.md)。
+- **源码与文档**：[AGENTS.md](AGENTS.md) 是工程文档地图；设计说明在 [docs/](docs/)，代码结构导览在 [wiki/](wiki/)，需求入口是 [需求/README.md](需求/README.md)。用不了先看 [故障排查](docs/troubleshooting.md)。
+
+## 目录
+
+- [界面](#界面)
+- [功能](#功能)
+- [技术栈](#技术栈)
+- [项目结构](#项目结构)
+- [运行](#运行)
+- [构建与产物](#构建与产物)
+- [本地组件与离线包](#本地组件与离线包)
+- [自动更新](#自动更新)
+- [桌面图标](#桌面图标)
+- [已知限制](#已知限制)
+- [参与贡献](#参与贡献)
+- [文档索引](#文档索引)
+- [许可证](#许可证)
+
+## 界面
+
+![音乐库：歌曲列表与底部播放条](docs/images/library.png)
+
+![音乐库：专辑视图](docs/images/library-albums.png)
+
+截图由 `tool/layout_shots_test.dart` 在 1280×800 下按真实组件渲染，曲目是演示数据；界面改动后重跑该脚本即可更新（见 [docs/verification.md](docs/verification.md)）。
 
 ## 功能
 
@@ -40,7 +67,7 @@ Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。
 **喜欢、发现与设置**
 - 喜欢：曲目行、播放队列、在线搜索结果、正在播放页与底栏播放卡片都有红心，标过的曲子收在「喜欢」页
 - 发现：从音乐库和喜欢里挑今日混音、歌手与流派分段；只在本机计算，不请求音源接口；可选开启本地播放记录改善推荐；可按歌手显式在线找更多；单曲与歌手都能少推荐（可撤销）；已在队列里的曲目会降权
-- 设置页：12 个分区导航（概览 / 外观 / 音乐库 / 播放 / 歌词 / 语言 / 本地组件 / 发现 / 桌面 / 权限 / 音源健康度 / 关于），其中 6 个分区提供预设（外观 / 音乐库 / 播放 / 歌词 / 发现 / 桌面）；另有自定义 sheet、搜索与恢复默认
+- 设置页：12 个分区导航（概览 / 外观 / 音乐库 / 播放 / 歌词 / 语言 / 本地组件 / 发现 / 桌面 / 权限 / 健康度 / 关于），其中 6 个分区提供预设（外观 / 音乐库 / 播放 / 歌词 / 发现 / 桌面）；另有自定义 sheet、搜索与恢复默认
 - 浅色 / 深色 / 系统主题；界面语言：简体中文、繁體中文、中文（通用）、English，切换后音源名、日期与数字格式一起跟随
 - 窗口：首帧 900×600（GTK runner），运行时首次启动默认 1120×760、最小 760×520；紧凑布局按 900×600 设计验收
 
@@ -83,7 +110,7 @@ flutter run -d linux
 验证门禁（`flutter` 若不在 PATH，用 `export PATH="/opt/flutter/bin:$PATH"`）：
 
 ```bash
-./tool/check.sh --l10n   # gen-l10n 一致性 + analyze + 确定性用例；CI 跑的就是这条
+./tool/check.sh --l10n --tools --docs   # gen-l10n 一致性 + analyze + 用例 + 截图探针 + 文档结构；CI 跑的就是这条
 ```
 
 分步等价：`flutter analyze`（必须 No issues found）、`flutter test`（全绿）、改过文案再 `flutter gen-l10n` 并提交产物。细节见 [docs/verification.md](docs/verification.md)。
@@ -180,6 +207,7 @@ flutter build linux --debug
 | 想查什么 | 去哪 |
 | --- | --- |
 | 全部规则的入口、改动优先级 | [AGENTS.md](AGENTS.md) |
+| 设计文档全索引与状态约定（哪份算规范） | [docs/README.md](docs/README.md) |
 | 分层、状态归属、依赖方向、扩展路径 | [docs/architecture.md](docs/architecture.md) |
 | 代码结构导览（关键类、模块、依赖） | [wiki/](wiki/) |
 | 需求与验收范围（五份现行文档） | [需求/README.md](需求/README.md) |
@@ -187,7 +215,16 @@ flutter build linux --debug
 | 自动更新清单、CDN 与退避 | [docs/updates.md](docs/updates.md)、[docs/update-cdn.md](docs/update-cdn.md) |
 | 本地组件、Android、性能、验证门禁 | [docs/local-components.md](docs/local-components.md)、[docs/android.md](docs/android.md)、[docs/performance.md](docs/performance.md)、[docs/verification.md](docs/verification.md) |
 | 编码、日志、主题、许可证约定 | [docs/conventions.md](docs/conventions.md)、[docs/licensing.md](docs/licensing.md) |
+| 用不了、要排障（常见现象与处理） | [docs/troubleshooting.md](docs/troubleshooting.md) |
 
 ## 许可证
 
 Tune 的源代码采用 [MIT License](LICENSE)。内置字体采用 SIL OFL-1.1；Dart/Flutter 依赖的许可证随安装包的 `NOTICES` 分发；Linux 播放依赖系统的 libmpv（Ubuntu 打包为 GPL-3+，不随 Tune 分发）；本地 FFmpeg 组件为 GPL-2.0-or-later，由本项目自行构建发布。完整的第三方声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 与 [docs/licensing.md](docs/licensing.md)。
+
+## 相关文档
+
+- [文档地图](AGENTS.md) — 每类改动该读哪份文档
+- [参与贡献](CONTRIBUTING.md) — 分支、门禁与提交流程
+- [文档索引](docs/README.md) — 设计文档的状态与适用范围
+- [需求入口](需求/README.md) — 产品范围与验收口径
+- [获取帮助](SUPPORT.md) — 提问与排障渠道

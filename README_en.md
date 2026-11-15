@@ -1,8 +1,11 @@
 # Tune
 
+> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 [中文](README.md) · [English](README_en.md)
 
 [![CI](https://github.com/pengtang1024/tune/actions/workflows/ci.yml/badge.svg)](https://github.com/pengtang1024/tune/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/pengtang1024/tune?display_name=tag&sort=semver)](https://github.com/pengtang1024/tune/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 
@@ -10,7 +13,31 @@ Tune is a compact local and online music player built with Flutter. The shell ha
 
 - **Current version**: `1.32.0+52` (codename `Pocket`, 2026-11-15). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
 - **Primary target**: Linux desktop. Windows / Android / iOS keep an engineering entry point; macOS and Web have been removed.
-- **Source and docs**: [AGENTS.md](AGENTS.md) is the documentation map; design notes live in [docs/](docs/) (26 files), a code-structure tour in [wiki/](wiki/), and the requirements entry point is [需求/README.md](需求/README.md).
+- **Source and docs**: [AGENTS.md](AGENTS.md) is the documentation map; design notes live in [docs/](docs/), a code-structure tour in [wiki/](wiki/), and the requirements entry point is [需求/README.md](需求/README.md). When something does not work, start with [Troubleshooting](docs/troubleshooting.md).
+
+## 目录
+
+- [Screens](#screens)
+- [Features](#features)
+- [Stack](#stack)
+- [Structure](#structure)
+- [Run](#run)
+- [Build and artifacts](#build-and-artifacts)
+- [Local components and offline bundles](#local-components-and-offline-bundles)
+- [Auto update](#auto-update)
+- [Desktop icon](#desktop-icon)
+- [Known limitations](#known-limitations)
+- [Contributing](#contributing)
+- [Documentation index](#documentation-index)
+- [License](#license)
+
+## Screens
+
+![Library: the track table and the player bar](docs/images/library.png)
+
+![Library: the album wall](docs/images/library-albums.png)
+
+The shots are rendered by `tool/layout_shots_test.dart` at 1280×800 from the real widgets, with sample tracks; rerun that script after a UI change (see [docs/verification.md](docs/verification.md)).
 
 ## Features
 
@@ -40,7 +67,7 @@ Tune is a compact local and online music player built with Flutter. The shell ha
 **Liked, discover, and settings**
 - Likes: a heart in the track rows, the queue, the online search results, the now playing page, and the player card at the bottom; the tracks you mark wait in the Liked page
 - Discover: a daily mix plus artist and genre shelves picked from the library and the liked tracks; computed on this machine, no source requests; optional local listening history improves the picks; an artist can be looked up online explicitly; tracks and artists can be shown less, with undo; tracks already queued are pushed down
-- Settings console: 12 sections (overview / appearance / library / playback / lyrics / localization / local components / discovery / desktop / permissions / source health / about), 6 of which offer presets (appearance / library / playback / lyrics / discovery / desktop); plus custom sheets, search, and reset
+- Settings console: 12 sections (overview / appearance / library / playback / lyrics / localization / local components / discovery / desktop / permissions / health / about), 6 of which offer presets (appearance / library / playback / lyrics / discovery / desktop); plus custom sheets, search, and reset
 - Light / dark / system themes; interface languages: 简体中文, 繁體中文, 中文（通用）, English — source names, dates, and number formats follow the choice
 - Window: 900×600 first frame (GTK runner), runtime first start defaults to 1120×760 with a 760×520 minimum; the compact layout is designed and verified at 900×600
 
@@ -83,7 +110,7 @@ flutter run -d linux
 Verification gates (if `flutter` is not on PATH, use `export PATH="/opt/flutter/bin:$PATH"`):
 
 ```bash
-./tool/check.sh --l10n   # gen-l10n consistency + analyze + deterministic tests; this is what CI runs
+./tool/check.sh --l10n --tools --docs   # gen-l10n consistency + analyze + tests + screenshot probes + doc structure; this is what CI runs
 ```
 
 Step by step, that is `flutter analyze` (must report No issues found), `flutter test` (all green), and after copy changes `flutter gen-l10n` with its output committed. See [docs/verification.md](docs/verification.md).
@@ -182,6 +209,7 @@ Contributions are licensed under the [MIT License](LICENSE): you keep the copyri
 | What you need | Where |
 | --- | --- |
 | Entry point for all rules, change priority | [AGENTS.md](AGENTS.md) |
+| Index of every design doc and its status (what counts as a rule) | [docs/README.md](docs/README.md) |
 | Layers, state ownership, dependency direction, extension path | [docs/architecture.md](docs/architecture.md) |
 | Code-structure tour (key classes, modules, dependencies) | [wiki/](wiki/) |
 | Requirements and acceptance scope (five current docs) | [需求/README.md](需求/README.md) |
@@ -189,7 +217,16 @@ Contributions are licensed under the [MIT License](LICENSE): you keep the copyri
 | Update manifest, CDN, backoff | [docs/updates.md](docs/updates.md), [docs/update-cdn.md](docs/update-cdn.md) |
 | Local components, Android, performance, verification gates | [docs/local-components.md](docs/local-components.md), [docs/android.md](docs/android.md), [docs/performance.md](docs/performance.md), [docs/verification.md](docs/verification.md) |
 | Coding, logging, theme, licensing conventions | [docs/conventions.md](docs/conventions.md), [docs/licensing.md](docs/licensing.md) |
+| Something is broken (symptoms and fixes) | [docs/troubleshooting.md](docs/troubleshooting.md) |
 
 ## License
 
 Tune's source code is licensed under the [MIT License](LICENSE). Bundled fonts are licensed under SIL OFL-1.1. Dart/Flutter dependency licenses are shipped in the application's `NOTICES`. On Linux, playback uses the system libmpv (GPL-3+ as packaged by Ubuntu; not distributed with Tune). The local FFmpeg component is GPL-2.0-or-later, built and published by this project. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [docs/licensing.md](docs/licensing.md) for the full third-party notices.
+
+## 相关文档
+
+- [Documentation map](AGENTS.md) — which doc to read for each kind of change
+- [Contributing](CONTRIBUTING.md) — branches, gates, and the pull-request flow
+- [Documentation index](docs/README.md) — status and scope of every design doc
+- [Requirements](需求/README.md) — product scope and acceptance
+- [Support](SUPPORT.md) — where to ask and how to troubleshoot

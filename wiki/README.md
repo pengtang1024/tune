@@ -1,7 +1,10 @@
 # Tune Code Wiki
 
+> 状态：索引 · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 本 wiki 是代码的结构化导览：帮读者快速定位「什么住在哪、谁拥有什么」。
 > 规则与设计决策的权威来源是根目录 `AGENTS.md` 与 `docs/`；本 wiki 只做地图，不复制规则原文。
+> 想知道某份设计文档该不该读、算不算规范，看 [`docs/README.md`](../docs/README.md)（文档索引与状态约定）。
 
 ## 项目概述
 
@@ -106,7 +109,8 @@ lib/
 | 报安全漏洞（请走私密渠道） | [SECURITY.md](../SECURITY.md) |
 | 提问、求助、提需求 | [SUPPORT.md](../SUPPORT.md) |
 | 参与前必须遵守的行为准则 | [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) |
+| 用不了、要排障（现象 → 原因 → 怎么确认 → 怎么处理） | [docs/troubleshooting.md](../docs/troubleshooting.md) |
 
-自动化接触面在 `.github/`：`workflows/ci.yml` 跑 `./tool/check.sh --l10n`；issue 表单是
+自动化接触面在 `.github/`：`workflows/ci.yml` 跑 `./tool/check.sh --l10n --tools --docs`；issue 表单是
 `ISSUE_TEMPLATE/bug_report.yml` 与 `feature_request.yml`；PR 模板在 `PULL_REQUEST_TEMPLATE.md`；
 `dependabot.yml` 每周一并一次依赖更新。提交信息格式 `type(scope): 中文说明`，一次提交只做一件事。

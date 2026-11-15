@@ -1,9 +1,21 @@
 # 本地组件（本地能力插件）
 
-> 状态：已实施（1.32.0 起，见 CHANGELOG）；Android 的 FFI 模型见 §1.1
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
+> 实施记录：1.32.0 起，见 CHANGELOG；Android 的 FFI 模型见 §1.1
 > 适用范围：翻译的本地模型、智能歌词的本地引擎、转码用的 FFmpeg
 
 本地能力不再各自维护下载与安装状态。所有需要“下载一个可执行文件或模型”的东西，都登记成同一种**组件**，由同一份清单、同一个安装器、同一个控制器管理。
+
+## 目录
+
+- [1. 组件模型](#1-组件模型)
+- [2. 状态机](#2-状态机)
+- [3. 存放路径与取用顺序](#3-存放路径与取用顺序)
+- [4. feature 怎么取用](#4-feature-怎么取用)
+- [5. 只有一套事实来源](#5-只有一套事实来源)
+- [6. 上游与校验](#6-上游与校验)
+- [7. 设置页：功能项 → 档位 → 技术清单](#7-设置页功能项--档位--技术清单)
 
 ## 1. 组件模型
 
@@ -61,7 +73,7 @@ FFmpeg 由本项目自己构建并发布：`tool/build_ffmpeg.sh` 从 ffmpeg.org
 
 ## 2. 状态机
 
-```
+```text
 checking ──> notInstalled ──> downloading ──> verifying ──> ready
                   ^                 |                          |
                   └── 取消/失败 <────┘                          |
@@ -76,7 +88,7 @@ checking ──> notInstalled ──> downloading ──> verifying ──> read
 
 ## 3. 存放路径与取用顺序
 
-```
+```text
 <support>/components/<id>/            组件本体（可删除）
 <support>/components/.<id>.staging/   下载与解包暂存（失败即清）
 <support>/translation/                旧版翻译目录（只读兼容）
@@ -340,3 +352,11 @@ Windows 目前三个功能的二进制都是 linux-x64 构建，因此整卡不�
 1. SenseVoice（585 MB）随歌词每一档主安装一起装，因为它就是默认的两票之一；入口下载量如实包含它。
 2. 删除功能项时连未选中的档位一起删，弹窗写明总占用；系统自带副本不动。
 3. 跨平台按实际能力显示：Linux 三项齐全，Android 只有歌词，Windows 等装不了的平台连分区都不出现。
+
+## 相关文档
+
+- [settings-redesign.md](settings-redesign.md) — 设置页的分区导航与入口
+- [smart-lyrics.md](smart-lyrics.md) — 歌词引擎怎么用这些组件
+- [licensing.md](licensing.md) — 随包与下载模型的许可证边界
+- [troubleshooting.md](troubleshooting.md) — 下载或校验失败时的现象与处理
+- [architecture.md](architecture.md) — 组件注册与状态归属

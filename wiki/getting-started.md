@@ -1,5 +1,19 @@
 # 运行方式
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+
+## 目录
+
+- [环境要求](#环境要求)
+- [运行](#运行)
+- [提交前门禁](#提交前门禁)
+- [构建](#构建)
+- [打包与自动更新](#打包与自动更新)
+- [桌面图标](#桌面图标)
+- [测试布局](#测试布局)
+- [已知限制（摘自 README）](#已知限制摘自-readme)
+- [深入阅读](#深入阅读)
+
 ## 环境要求
 
 - Flutter 3（Dart SDK ^3.8.1）
@@ -104,3 +118,11 @@ flutter build linux --debug && ./linux/install-desktop-entry.sh  # 装 XDG 桌�
 | 文案与语言 | `docs/i18n.md`、`需求/多语言设计.md` |
 | 性能预算 | `docs/performance.md` |
 | 发布 | `docs/updates.md` |
+
+## 相关文档
+
+- [整体架构](architecture.md) — 分层、状态归属与持久化地图
+- [主要模块职责](modules.md) — 每个 feature 与全局服务层放什么
+- [依赖关系](dependencies.md) — 依赖清单与播放后端
+- [关键类与函数](key-classes.md) — 启动链上的关键类
+- [验证契约](../docs/verification.md) — 门禁细节与测试布局

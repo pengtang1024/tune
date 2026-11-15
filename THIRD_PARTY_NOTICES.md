@@ -1,9 +1,22 @@
 # Third-party notices
 
+> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 Tune's own source code is licensed under the [MIT License](LICENSE). The
 components below are **not** covered by that MIT grant; each one keeps its own
 license. This file is shipped with the application and is also shown from the
 in-app license page.
+
+## 目录
+
+- [Fonts](#fonts)
+- [Dart and Flutter packages](#dart-and-flutter-packages)
+- [Vendored and modified packages](#vendored-and-modified-packages)
+- [Optional local components](#optional-local-components)
+- [Linux audio backend: libmpv](#linux-audio-backend-libmpv)
+- [Flutter engine](#flutter-engine)
+- [Removed third-party JavaScript](#removed-third-party-javascript)
+- [SIL Open Font License, Version 1.1](#sil-open-font-license-version-11)
 
 ## Fonts
 
@@ -125,6 +138,7 @@ This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 
+```text
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 -----------------------------------------------------------
@@ -211,3 +225,11 @@ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
+```
+
+## 相关文档
+
+- [许可证边界](docs/licensing.md) — 依赖与素材的许可证边界
+- [本地组件](docs/local-components.md) — 组件注册表与下载校验
+- [项目入口](README.md) — 版本、平台与功能概览
+- [安全策略](SECURITY.md) — 第三方组件的漏洞报告边界

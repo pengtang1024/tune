@@ -1,6 +1,24 @@
 # 代码约定
 
+> 状态：契约 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > AGENTS.md 的展开文档。写代码前扫一眼这份。
+
+## 目录
+
+- [日志](#日志)
+- [主题与尺寸](#主题与尺寸)
+- [字体](#字体)
+- [加载指示](#加载指示)
+- [布局对齐](#布局对齐)
+- [标识（chip）](#标识chip)
+- [提示（tooltip）](#提示tooltip)
+- [常量](#常量)
+- [体积](#体积)
+- [注释](#注释)
+- [复用](#复用)
+- [平台差异](#平台差异)
+- [脚本与工具目录](#脚本与工具目录)
 
 ## 日志
 
@@ -135,9 +153,17 @@
 ## 脚本与工具目录
 
 - `tool/` 放开发脚本（`generate_linux_icons.dart`、`layout_shots_test.dart`），不放业务代码。
-- **门禁脚本只有一份**：[`tool/check.sh`](../tool/check.sh)。CI 与本地跑的是同一个文件（`./tool/check.sh --l10n`），新增检查项加进脚本，不要另写一份命令塞进 workflow——两处写法迟早漂移。脚本统一用 `FLUTTER=${FLUTTER:-flutter}`，便于临时指定 SDK 路径。
+- **门禁脚本只有一份**：[`tool/check.sh`](../tool/check.sh)。CI 与本地跑的是同一个文件（`./tool/check.sh --l10n --tools --docs`），新增检查项加进脚本，不要另写一份命令塞进 workflow——两处写法迟早漂移。脚本统一用 `FLUTTER=${FLUTTER:-flutter}`，便于临时指定 SDK 路径。
 - **测试专用 API 只能在 `test/` 下用**：`SharedPreferences.setMockInitialValues` 这类成员在 `tool/` 里会触发 `invalid_use_of_visible_for_testing_member`。
   - app 自己的持久化在测试里用 `FakePersistenceService` 隔离，不去碰真的磁盘存储。
   - 脚本要留在 `tool/`（不进常规 `flutter test`）就在调用处加 `// ignore: invalid_use_of_visible_for_testing_member` 并写明原因。
   - 脚本要进常规测试运行就挪到 `test/` 下。
 - 详见 [verification.md](verification.md)。
+
+## 相关文档
+
+- [架构契约](architecture.md) — 分层、状态归属与依赖方向
+- [测试与验证](verification.md) — 门禁命令、测试布局与截图对比
+- [国际化](i18n.md) — 文案改动后要跑的那步生成
+- [标识（chip）](chips.md) — chip 与图标的写法边界
+- [许可证与第三方声明](licensing.md) — 新增依赖或素材时的边界

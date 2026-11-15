@@ -1,5 +1,7 @@
 # 依赖关系
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 ## 内部依赖方向
 
 ```text
@@ -76,3 +78,11 @@ Desktop：PlaybackController ─→ DesktopIntegrationController ─→ MPRIS / 
 - 字体（OFL-1.1）：Fraunces、Instrument Sans、Noto Sans SC、Noto Serif SC、JetBrains Mono
 - `assets/icons/`、`LICENSE`、`THIRD_PARTY_NOTICES.md` 与字体 OFL 文本随包分发
 - Linux 播放依赖系统 `libmpv2`（GPL-3+，不随 Tune 分发）
+
+## 相关文档
+
+- [整体架构](architecture.md) — 分层、依赖方向与状态归属
+- [关键类与函数](key-classes.md) — 这里列出的 service 接口细节
+- [主要模块职责](modules.md) — 全局服务层与各 feature 的落点
+- [运行方式](getting-started.md) — 环境、构建与提交前门禁
+- [许可证边界](../docs/licensing.md) — 依赖与第三方素材的声明口径

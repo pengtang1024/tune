@@ -1,11 +1,25 @@
 # 贡献者行为准则
 
+> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 本文件采用 [Contributor Covenant](https://www.contributor-covenant.org) 2.1 版正文，仅把举报联系方式替换为本项目的实际渠道。
 > 中文版仅作阅读便利；如有歧义，以 [英文原文](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) 为准。
 
+## 目录
+
+- [Contributor Covenant Code of Conduct](#contributor-covenant-code-of-conduct)
+- [Our Pledge](#our-pledge)
+- [Our Standards](#our-standards)
+- [Enforcement Responsibilities](#enforcement-responsibilities)
+- [Scope](#scope)
+- [Enforcement](#enforcement)
+- [Enforcement Guidelines](#enforcement-guidelines)
+- [Attribution](#attribution)
+- [本项目补充说明](#本项目补充说明)
+
 ---
 
-# Contributor Covenant Code of Conduct
+## Contributor Covenant Code of Conduct
 
 ## Our Pledge
 
@@ -117,3 +131,10 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 ### 维护者责任
 
 维护者有权删除、编辑或拒绝不符合本准则的评论、提交、代码与 issue，并在必要时按上述四档处理。维护者本人同样受本准则约束；若涉及维护者自身，请直接发邮件到举报渠道。
+
+## 相关文档
+
+- [参与贡献](CONTRIBUTING.md) — 分支、门禁与提交流程
+- [获取帮助](SUPPORT.md) — 提问与报缺陷的渠道
+- [安全策略](SECURITY.md) — 漏洞的私密报告方式
+- [治理](GOVERNANCE.md) — 角色、决策与维护者职责

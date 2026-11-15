@@ -1,10 +1,23 @@
 # 关键类与函数
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 按「入口 → 状态机 → 服务接口 → 领域模型」组织。方法只列公开 API，完整签名以代码为准。
+
+## 目录
+
+- [入口与启动](#入口与启动)
+- [播放状态机](#播放状态机)
+- [音乐库](#音乐库)
+- [其余 feature controller](#其余-feature-controller)
+- [推荐引擎](#推荐引擎)
+- [服务接口（data/services）](#服务接口dataservices)
+- [领域模型](#领域模型)
+- [共享 UI 基元（shared/ui）](#共享-ui-基元sharedui)
 
 ## 入口与启动
 
-### `main()` — [lib/main.dart](file:///home/pt/Work/IdeaProjects/tune/lib/main.dart)
+### `main()` — `lib/main.dart`
 
 bootstrap 序列：
 
@@ -14,19 +27,19 @@ bootstrap 序列：
 4. `runApp(UncontrolledProviderScope(container, child: TuneApp()))`。
 5. 启动两个智能歌词后台循环：`smartLyricsLeakCheckControllerProvider.start()`（空闲查漏）与 `smartLyricsAutoFillControllerProvider.start()`（自动补齐，默认开）。
 
-### `TuneApp` — [lib/app/app.dart](file:///home/pt/Work/IdeaProjects/tune/lib/app/app.dart)
+### `TuneApp` — `lib/app/app.dart`
 
 - `appInitializationProvider`（`FutureProvider<void>`）：跑 `AppInitializer.initialize(ref)`，再 `_scheduleStartupScan`（开了自动扫描就在后台扫，不挡首帧）。
 - 初始化完成后才构建 `MaterialApp.router`（避免播放器读到空会话丢队列）。
 - `builder` 链：`LocalizationBridge` → 文本缩放 clamp（1.0–1.3）→ `HintLayer`（全应用唯一提示卡片宿主）。
 
-### `AppInitializer.initialize` — [lib/config/app_initializer.dart](file:///home/pt/Work/IdeaProjects/tune/lib/config/app_initializer.dart)
+### `AppInitializer.initialize` — `lib/config/app_initializer.dart`
 
 按序初始化：偏好存储 → 数据库 → 喜欢 → 播放记录 → 播放会话 → 音频播放器 → 扫描器 → 桌面集成 → 发现页信号观察。
 
 ## 播放状态机
 
-### `PlaybackController` — [lib/features/player/application/playback_controller.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/player/application/playback_controller.dart)
+### `PlaybackController` — `lib/features/player/application/playback_controller.dart`
 
 - provider：`playbackControllerProvider`（`StateNotifierProvider<PlaybackController, PlaybackState>`），构造时注入音频、下载、流地址解析、会话存储。
 - `snapshot`：对外只读状态入口。
@@ -34,15 +47,15 @@ bootstrap 序列：
 - `next()` / `previous()` / `seekTo()` / `setVolume()`：切歌、回退、进度跳转、音量。
 - `setPlayMode()`：顺序 / 随机 / 重复切换。
 
-### `PlaybackState` — [lib/features/player/domain/playback_state.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/player/domain/playback_state.dart)
+### `PlaybackState` — `lib/features/player/domain/playback_state.dart`
 
 字段：播放状态、进度、音量、播放模式、**队列**（队列没有第二个容器）、当前 URI、历史、错误、缓存进度。
 
-### `playbackOverviewProvider` — [lib/features/player/application/playback_overview_provider.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/player/application/playback_overview_provider.dart)
+### `playbackOverviewProvider` — `lib/features/player/application/playback_overview_provider.dart`
 
 从 `PlaybackState` 派生的慢值切片（`PlaybackOverview`）：队列、模式、音量。页面订它，进度条自己订位置——订阅整份状态的界面会被位置带着整块重建。
 
-### `LyricsController` — [lib/features/player/application/lyrics_controller.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/player/application/lyrics_controller.dart)
+### `LyricsController` — `lib/features/player/application/lyrics_controller.dart`
 
 - provider：`lyricsControllerProvider`（`AsyncNotifierProvider.autoDispose`）；`lyricsMemoryProvider` 是会话级歌词缓存。
 - 自己 watch 播放器的当前曲目来取词，页面只读不改。
@@ -59,12 +72,12 @@ bootstrap 序列：
 
 ## 音乐库
 
-### `LibraryController` — [lib/features/library/application/library_controller.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/library/application/library_controller.dart)
+### `LibraryController` — `lib/features/library/application/library_controller.dart`
 
 - 加载、扫描、排序、筛选的唯一入口；`autoScan(localPaths)` 是启动自动扫描。
 - `LibraryState.songs` 始终是 SQLite 的一个窗口（1000 行）；`setSort` / `setFilter` 后写一次 `view.json`。
 
-### `LibraryStorage` → `SqliteLibraryStorage` — [lib/features/library/data/impl/library_storage_io.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/library/data/impl/library_storage_io.dart)
+### `LibraryStorage` → `SqliteLibraryStorage` — `lib/features/library/data/impl/library_storage_io.dart`
 
 - 窗口读取、增量 upsert、视图 JSON 读写；淘汰用 SQLite 窗口函数在库内完成。
 
@@ -83,7 +96,7 @@ bootstrap 序列：
 
 ## 推荐引擎
 
-### `RecommendationEngine` — [lib/features/discovery/domain/recommendation_engine.dart](file:///home/pt/Work/IdeaProjects/tune/lib/features/discovery/domain/recommendation_engine.dart)
+### `RecommendationEngine` — `lib/features/discovery/domain/recommendation_engine.dart`
 
 `recommend(...)` 接收 library / favorites / profile / dismissed / queue / health / source order，流程：
 
@@ -102,18 +115,18 @@ bootstrap 序列：
 接口契约：播放、暂停、继续、停止、跳转、音量、速度、当前进度/时长、事件流、释放资源。
 实现基于 `just_audio` / `just_audio_media_kit`，处理 Linux 后端初始化、错误转义、本地/远程地址选择。
 
-### `MusicSourceAdapter` — [lib/data/services/music_sources/music_source_adapter.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/music_sources/music_source_adapter.dart)
+### `MusicSourceAdapter` — `lib/data/services/music_sources/music_source_adapter.dart`
 
 每个音源类型必须提供：`sourceType`、配置校验、浏览模式、分页/预览支持、扫描、刷新播放地址、获取歌词。
 
 已注册类型（`SourceTypeCatalogue`，共 30 个）：`local`、`openverse`、`jamendo`、`internet_archive`、`ccmixter`、`podcast_rss`、`podcast_catalog`、`podcast_apple`、`subsonic`、`ampache`、`koel`、`deezer`、`itunes`、`kodi`、`lms`、`peertube`、`audius`、`radio`、`azuracast`、`wikimedia`、`jellyfin`、`librivox`、`emby`、`plex`、`funkwhale`、`audiobookshelf`、`direct_url`、`m3u`、`json_api`、`graphql`。
 
-### `MusicSourceService` — [lib/data/services/music_sources/music_source_service.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/music_sources/music_source_service.dart)
+### `MusicSourceService` — `lib/data/services/music_sources/music_source_service.dart`
 
 - 维护 `type → adapter` 注册表（可注入，测试不改全局状态）、`MusicSourceStore`、`LyricsProvider`。
 - 实现 `StreamUrlResolver.refresh(Song)`：刷新远程曲目播放地址（实现了单曲刷新的音源：Subsonic / Navidrome、Ampache、Koel、Emby、Plex、Jellyfin、Deezer、播客 RSS；其余音源需重新扫描）。
 
-### `AppDatabase` — [lib/data/services/database/app_database.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/database/app_database.dart)
+### `AppDatabase` — `lib/data/services/database/app_database.dart`
 
 - 表：`songs`、`favorites`、`queue`、`queue_meta`、`listening_signals`、`smart_lyrics_tasks`、`smart_lyrics_marks`、`smart_lyrics_sample`、`smart_lyrics_audit`。
 - `load()` 读活跃歌曲窗口；`save()` 批量 upsert `songs`。
@@ -131,18 +144,18 @@ bootstrap 序列：
 
 `isSupported`、`storedFileFor`、`markCopiesOf`（给老副本补 `.tune` 标记）、`download`、`cancel`、`dispose`；并发下载合并 + 进度 + 取消。
 
-### `SmartLyricsEngine` — [lib/data/services/smart_lyrics/smart_lyrics_engine.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/smart_lyrics/smart_lyrics_engine.dart)
+### `SmartLyricsEngine` — `lib/data/services/smart_lyrics/smart_lyrics_engine.dart`
 
 转录通道抽象：`id`、`transcribe`、`runTranscription`、`dispose`、`requestCancel`。
 实现：`WhisperLocalEngine`（本地 whisper）、`SherpaLocalEngine`（SenseVoice）、`OpenAiCompatibleEngine`。
 
-### `SmartLyricsService` — [lib/data/services/smart_lyrics/smart_lyrics_service.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/smart_lyrics/smart_lyrics_service.dart)
+### `SmartLyricsService` — `lib/data/services/smart_lyrics/smart_lyrics_service.dart`
 
 `generate()` 编排整条管线：人写票 → 机器转写 → 知识票 → 票池共识 → 审计 → 落盘（`.smart.lrc` + `.smart.json`）。
 
 ## 领域模型
 
-### `Song` — [lib/domain/models/song.dart](file:///home/pt/Work/IdeaProjects/tune/lib/domain/models/song.dart)
+### `Song` — `lib/domain/models/song.dart`
 
 不可变全局实体。身份是 `uri`：本地曲目是文件路径，在线曲目是 `tune://<音源>/<编号>`。
 
@@ -157,7 +170,7 @@ bootstrap 序列：
 
 派生地址（详情面板四条地址的唯一来源）：`localFile`、`onlineAddress`、`coverAddress`、`identity`。
 
-### `MusicSourceConfig` — [lib/domain/models/music_source.dart](file:///home/pt/Work/IdeaProjects/tune/lib/domain/models/music_source.dart)
+### `MusicSourceConfig` — `lib/domain/models/music_source.dart`
 
 一条音源实例配置：`type`（适配器类型）+ `id`（实例标识，用户实例是 `<type>-<序号>`）+ 名称、参数、开关、`weight`。
 权重规则：本地固定 1000；featured 800；读者添加 700；需要凭据 400。`weight >= 500` 在主列表，低于 500 进「更多音源」；健康度低于 60 也进更多音源。
@@ -173,3 +186,11 @@ bootstrap 序列：
 | `SidePanelHost`（`side_panel_host.dart`） | 非模态侧栏宿主：只遮内容区，底栏侧栏仍可用 |
 | `TrackDetailSheet` + `track_fact*.dart` | 曲目详情面板与事实模型（三档呈现：行内图标 → 正在播放页图标+值 → 详情 chip） |
 | `FavoriteButton` | 红心控件（不是事实）；状态只来自 `FavoritesController` |
+
+## 相关文档
+
+- [整体架构](architecture.md) — 分层、状态归属与持久化地图
+- [主要模块职责](modules.md) — 这些类各自所属的 feature
+- [依赖关系](dependencies.md) — 主要调用链与第三方依赖
+- [智能歌词票池共识](../docs/smart-lyrics.md) — `SmartLyricsService` 编排的管线
+- [启动恢复播放](../docs/playback-session.md) — 会话与进度的存放口径

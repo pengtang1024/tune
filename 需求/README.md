@@ -1,10 +1,26 @@
 # 🎵 Tune 音乐播放器项目需求文档
 
+> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3-blue.svg" alt="Flutter Version">
   <img src="https://img.shields.io/badge/License-MIT%20(code)-green.svg" alt="License: MIT (source code)">
   <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20iOS%20%7C%20Windows%20%7C%20Linux-brightgreen" alt="Supported Platforms">
 </p>
+
+## 目录
+
+- [📋 项目概述](#-项目概述)
+- [📁 需求文档目录](#-需求文档目录)
+- [🛠️ 技术栈](#-技术栈)
+- [📱 平台适配要求](#-平台适配要求)
+- [📐 开发原则](#-开发原则)
+- [🎯 主要功能模块](#-主要功能模块)
+- [🧪 测试策略](#-测试策略)
+- [📈 扩展性考虑](#-扩展性考虑)
+- [📄 许可证](#-许可证)
+- [👥 贡献](#-贡献)
+- [📞 联系方式](#-联系方式)
 
 ## 📋 项目概述
 

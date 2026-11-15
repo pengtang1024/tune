@@ -1,7 +1,22 @@
 # 标识（chip）
 
+> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 全应用的 chip 只有一种写法。规则在这里维护，别处只指向它。
 > 相关：[architecture.md](architecture.md)（谁拥有什么）、[conventions.md](conventions.md)（写法）、[i18n.md](i18n.md)（文案）。
+
+## 目录
+
+- [什么是 chip](#什么是-chip)
+- [一个 chip 的结构：名字半 +（可选）动作半](#一个-chip-的结构名字半-可选动作半)
+- [一条规则：chip 写主，字进 tooltip](#一条规则chip-写主字进-tooltip)
+- [颜色：先说类别](#颜色先说类别)
+- [图标：再说个体](#图标再说个体)
+- [地址：带动作的 chip 组](#地址带动作的-chip-组)
+- [尺寸](#尺寸)
+- [例外只有三处](#例外只有三处)
+- [加东西的时候](#加东西的时候)
+- [谁守着这条线](#谁守着这条线)
 
 ## 什么是 chip
 
@@ -109,3 +124,10 @@ chip 的**高**是固定的：图标走 `icon12 / icon14 / icon16` 这一条梯�
 - `test/app/source_badge_test.dart`：标识是图标、名字只在 tooltip、大小不随名字变、13 个图标互不重复、颜色跟着类别走。
 - `test/app/track_facts_test.dart`：事实的图标与 tooltip。
 - `test/app/localization_render_test.dart`：两种语言 × 两种窗口都画得下，没有溢出。
+
+## 相关文档
+
+- [架构契约](architecture.md) — 谁拥有这些事实
+- [代码约定](conventions.md) — 组件与文件的落点
+- [国际化](i18n.md) — chip 文案与 tooltip 的语言
+- [测试与验证](verification.md) — 守着 chip 规则的那几个用例

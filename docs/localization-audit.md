@@ -1,7 +1,8 @@
 # 本地化覆盖审计
 
-> 本地化覆盖的现状、做法与踩过的坑。规范在 [i18n.md](i18n.md)，门禁在 [verification.md](verification.md)。
-> 最后更新：2026-10-20。
+> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
+> 本地化覆盖的现状、做法与踩过的坑。规范在 [i18n.md](i18n.md)，门禁在 [verification.md](verification.md)。本文最后更新于 2026-10-20。
 
 ## 现在的状态
 
@@ -61,3 +62,11 @@
 - **带字的 chip 只在详情面板里**：事实的标识在 `shared/ui/meta_badge.dart` 里是纯图标（`MetaBadge`，文字进提示气泡），`shared/ui/source_badge.dart` 写音源（也只有图标）；详情面板里事实的 `MetaChip` 写着事实的**主**（时长、大小、格式），事实的名字与副在提示气泡里。chip 的宽跟着主走，语言写出来的词有长有短，一排 chip 排成两三行是正常的。地址更长，写不进一行，就由 `ChipGroup` 带着：宽的一半写名字，小的一半是动作（本机的文件是打开，远端的地址是复制），地址在提示气泡里。
 - **门禁还没画到的界面**：深色主题（现在只画浅色）、播放器的溢出菜单、添加音源对话框、音源页上除 jamendo 以外的每一种配置对话框。
 - `test/services/music_source_live_test.dart` 偶尔因为 TLS 握手失败而红，那是网络问题，与本地化无关。
+
+## 相关文档
+
+- [i18n.md](i18n.md) — 文案规则：加文案、切语言、音源名称怎么进 ARB
+- [genre-localization.md](genre-localization.md) — 流派名怎么翻、认不出的怎么处理
+- [verification.md](verification.md) — 门禁怎么跑，本地化两道测试在哪
+- [conventions.md](conventions.md) — 写界面时的尺寸与命名约束
+- [document-style.md](document-style.md) — 本页自身的结构与表格写法

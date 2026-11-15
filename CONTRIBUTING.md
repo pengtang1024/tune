@@ -1,11 +1,28 @@
 # 参与贡献
 
+> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 感谢你愿意花时间改进 Tune。这份文档说明这个项目的协作方式、验证门禁与提交流程。开始之前请先读 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)——参与本项目即表示你同意遵守它。
 
 - 使用问题、讨论与求助 → [`SUPPORT.md`](SUPPORT.md)
 - 安全漏洞 → [`SECURITY.md`](SECURITY.md)（**不要**开公开 issue）
 - 谁负责、怎么决策 → [`GOVERNANCE.md`](GOVERNANCE.md)
 - 代码结构与设计依据 → [`AGENTS.md`](AGENTS.md)（工程文档地图）
+
+## 目录
+
+- [项目是什么](#项目是什么)
+- [开发环境](#开发环境)
+- [分支模型](#分支模型)
+- [提交前门禁](#提交前门禁)
+- [提交信息](#提交信息)
+- [拉取请求](#拉取请求)
+- [文档](#文档)
+- [新增依赖与素材](#新增依赖与素材)
+- [改文案与本地化](#改文案与本地化)
+- [代码约定](#代码约定)
+- [提交之后](#提交之后)
+- [关于节奏](#关于节奏)
 
 ## 项目是什么
 
@@ -54,12 +71,13 @@ flutter run -d linux
 一条命令跑完静态检查与确定性用例：
 
 ```bash
-./tool/check.sh            # analyze + 全部确定性用例
-./tool/check.sh --l10n     # 另外断言 lib/l10n 生成产物已提交（CI 用这个）
-./tool/check.sh --live     # 连联网用例一起跑，失败先怀疑网络
+./tool/check.sh                  # analyze + 全部确定性用例
+./tool/check.sh --l10n            # 另外断言 lib/l10n 生成产物已提交
+./tool/check.sh --l10n --tools --docs   # 再加截图探针与文档结构检查（CI 跑的就是这条）
+./tool/check.sh --live            # 连联网用例一起跑，失败先怀疑网络
 ```
 
-它依次做 `flutter gen-l10n`（仅 `--l10n`）→ `flutter analyze` → `flutter test`。CI 跑的是同一份脚本（`./tool/check.sh --l10n`），所以本地绿等于 CI 绿——前提是你的 Flutter 版本与 `.github/workflows/ci.yml` 里钉住的一致。首次克隆先 `flutter pub get`；`flutter` 不在 PATH 时用 `FLUTTER=/opt/flutter/bin/flutter ./tool/check.sh`。
+它依次做 `flutter gen-l10n`（仅 `--l10n`）→ `flutter analyze` → `flutter test` → `flutter test tool/…`（仅 `--tools`）→ `tool/check_docs.py`（仅 `--docs`）。CI 跑的是同一份脚本（`./tool/check.sh --l10n --tools --docs`），所以本地绿等于 CI 绿——前提是你的 Flutter 版本与 `.github/workflows/ci.yml` 里钉住的一致。首次克隆先 `flutter pub get`；`flutter` 不在 PATH 时用 `FLUTTER=/opt/flutter/bin/flutter ./tool/check.sh`。
 
 分步等价命令（脚本里做的就是这些）：
 
@@ -131,6 +149,24 @@ docs(wiki): 同步 1.32.0 文档更新
 
 PR 描述里请写清「为什么」。这个项目的设计文档（`docs/`、`需求/`）记录了每项决定的原因，纯代码 diff 往往看不出动机。
 
+## 文档
+
+改文档前先读 [`docs/document-style.md`](docs/document-style.md)：每页唯一 H1、H1 下状态行、长页目录、代码块标语言、末尾相关文档。`./tool/check.sh --docs` 会检查这些，CI 也跑同一份检查。
+
+文档不是附属品：这个项目的多数设计决定只写在 `docs/` 与 `需求/` 里，纯代码 diff 看不出动机。改行为时按下面三处同步。
+
+- **入口**：[`AGENTS.md`](AGENTS.md) 的文档地图。新增、改名或删除一份文档，就要在那里加/改一行——地图里没有的文档会被当成历史稿。
+- **索引**：[`docs/README.md`](docs/README.md) 记录每份设计文档的**状态**（契约 / 规范 / 已实施 / 方案 / 快照）。新文档要在那里登记；状态变了要回去改，否则别人无法判断它还算不算依据。
+- **双语 README**：[`README.md`](README.md) 与 [`README_en.md`](README_en.md) 是同一份内容的两个语言版本，章节与条目一一对应。改一面就改另一面，只改一边会让另一种语言的读者读到过期信息。
+
+其他约定：
+
+- 面向用户的变化写进 [`CHANGELOG.md`](CHANGELOG.md) 的当前版本段，按现有分类走：**新增 / 变更 / 修复 / 移除**，必要时加 **性能 / 文档 / 依赖 / 工具 / 迁移 / 许可证 / 说明**。只写用户能感知的变化，内部重构不必逐条列。
+- 版本号三处必须一致：`pubspec.yaml` 的 `version`、`lib/config/app_version.dart`、仓库根的 `version.json`。
+- 新增设计说明写进 `docs/`（不要散在仓库根），文件名 kebab-case，首段写清状态与日期。
+- 面向用户「用不了」的排障写进 [`docs/troubleshooting.md`](docs/troubleshooting.md)，不要混进设计文档。
+- 动了界面就去更新截图：跑 `flutter test tool/layout_shots_test.dart`，把 `build/layout-shots/library.png` 与 `library_albums.png` 覆盖到 [`docs/images/`](docs/images/)——两份 README 引用的就是这两张。
+
 ## 新增依赖与素材
 
 引入第三方依赖、字体或素材之前先看 [`docs/licensing.md`](docs/licensing.md)：
@@ -169,3 +205,11 @@ flutter gen-l10n   # 改完 ARB 必须跑，并把生成产物一起提交
 ## 关于节奏
 
 这是一个单人维护的项目（见 [`GOVERNANCE.md`](GOVERNANCE.md)），review 与合并没有固定时限。PR 长时间没有回应时，礼貌地在 PR 下追加一条评论即可，不需要另开 issue 催。
+
+## 相关文档
+
+- [文档地图](AGENTS.md) — 每类改动该读哪份文档
+- [架构](docs/architecture.md) — 分层、状态归属与依赖方向
+- [验证](docs/verification.md) — 门禁细节与测试布局
+- [行为准则](CODE_OF_CONDUCT.md) — 参与前需遵守的规范
+- [治理](GOVERNANCE.md) — 谁负责合并与怎么决策

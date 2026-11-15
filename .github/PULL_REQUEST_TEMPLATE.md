@@ -28,7 +28,7 @@
 
 ## 自检清单
 
-- [ ] `./tool/check.sh --l10n` 全绿（CI 跑的就是这条：gen-l10n 一致性 + `flutter analyze` + 确定性用例）
+- [ ] `./tool/check.sh --l10n --tools --docs` 全绿（CI 跑的就是这条：gen-l10n 一致性 + `flutter analyze` + 确定性用例 + 截图探针 + 文档结构）
 - [ ] 改过 `lib/l10n/*.arb` 的，生成产物已一并提交（`lib/l10n/app_localizations*.dart` 是入库文件，不是构建垃圾）
 - [ ] 没有提交任何密钥、凭据或 token（包括日志、截图、示例配置里的）
 - [ ] 改动范围最小，没有顺带重构无关代码
@@ -51,7 +51,7 @@
 ## 验证证据
 
 <!-- 贴证据，不要只写「已测试」：
-     - ./tool/check.sh --l10n 的结论（all gates passed，或哪一步红了）
+     - ./tool/check.sh --l10n --tools --docs 的结论（all gates passed，或哪一步红了）
      - flutter test 的结果（通过数 / 失败数；跑的是哪条命令）
      - 关键日志、截图路径或录屏
      没跑的项目写「未验证」并说明原因，不要留空冒充通过。 -->

@@ -1,9 +1,24 @@
 # 音乐库分类与筛选（已实施）
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+>
 > 2026-10-31。回答「音乐库除了搜索还能怎么找歌」：分类怎么分、筛选怎么叠、视觉上怎么读。
 > 相关：[library-redesign.md](library-redesign.md)（页头/列头/排序/密度）、[chips.md](chips.md)（标识）、
 > [genre-localization.md](genre-localization.md)（流派名）、[performance.md](performance.md)（查询预算）。
-> 状态：**M0–M4 已实施**。文中保留当时的设计提案，实现与原提案不一致处已在 §4/§8 就地改正，最终以代码为准。
+> 实施记录：**M0–M4 已实施**。文中保留当时的设计提案，实现与原提案不一致处已在 §4/§8 就地改正，最终以代码为准。
+
+## 目录
+
+- [1. 问题与目标](#1-问题与目标)
+- [2. 方案](#2-方案)
+- [3. 约束](#3-约束)
+- [4. 设计：分类视图 + 左侧树 + 分面筛选](#4-设计分类视图--左侧树--分面筛选)
+- [5. 数据与查询](#5-数据与查询)
+- [6. 性能预算](#6-性能预算)
+- [7. 与 library-redesign 的联合落地](#7-与-library-redesign-的联合落地)
+- [8. 已拍板与实施后定案](#8-已拍板与实施后定案)
+- [9. 不在范围](#9-不在范围)
+- [10. 验收](#10-验收)
 
 ## 1. 问题与目标
 
@@ -293,14 +308,12 @@ class LibraryFilter {
 - 条目自带声明来自 IA 的 `collection` 数组（`librivox` / `audio_foreign` → 有声书，
   `podcasts` → 播客，`oldtimeradio` → 电台），是来源自己的话，不是启发式；
   只在命中时写入 `sourceData.contentKind`，音乐条目不写，免得盖住专辑例外。
-- 专辑例外只用于「一个实例里有一张专辑是另一种内容」：`declaredAlbumKinds` 按
-  「实例 id → 归一化专辑名（小写、去首尾空白、内部空白折叠）→ 类型」书写，目前六处：
-  `unlocked_recordings` 的 `death of a salesman` → 有声书（整场话剧 7 条），
-  `community_world` 的两本书 → 有声书（上传者把书名写成带 `Full Audiobook` /
-  `Unabridged Audiobook` 的条目名，genre 却仍标 World，genre 标签救不了它们），
-  `archive_podcasts` 的 `Sleep Safe & Calm… Delta Waves`、`pIANO` → 音乐，
-  `RelicRadio.com` → 电台（老广播剧，不是播客）。
-  专辑例外也改写已声明的实例：实例声明描述整个 collection，专辑名描述那一条被放错架子的条目。
+- 专辑例外只用于「一个实例里有一张专辑是另一种内容」：`declaredAlbumKinds` 按「实例 id → 归一化专辑名（小写、去首尾空白、内部空白折叠）→ 类型」书写，目前六处：
+  - `unlocked_recordings` 的 `death of a salesman` → 有声书（整场话剧 7 条）。
+  - `community_world` 的两本书 → 有声书（上传者把书名写成带 `Full Audiobook` / `Unabridged Audiobook` 的条目名，genre 却仍标 World，genre 标签救不了它们）。
+  - `archive_podcasts` 的 `Sleep Safe & Calm… Delta Waves`、`pIANO` → 音乐。
+  - `RelicRadio.com` → 电台（老广播剧，不是播客）。
+- 专辑例外也改写已声明的实例：实例声明描述整个 collection，专辑名描述那一条被放错架子的条目。
 - 音效只由**显式元数据**判定：IA 的 `Non-Music` genre 前缀。不用时长、不用标题关键词，
   也不看艺术家——1–3 秒的鼓循环仍是音乐，30 分钟的整面音轨也可能是音乐。
 - `foreign_audio`（IA `collection:audio_foreign`）收的是非英语音频，实测 194 条全是
@@ -346,14 +359,10 @@ class LibraryFilter {
 - 音源：`COALESCE(source_id,'local') IN (…)`。
 - 语言：入库时把 `language` 归一（小写 ISO-639-1，认不出保留原值）写入 `songs.language` 真实列；
   旧库启动时一次性回填；`songs.language IN (…)`。
-- 类型：一个 `CASE` 表达式（`LibraryFilterSql._kindOf`）按 §5.1 的顺序逐条匹配，
-  每种类型都变成 `(_kindOf = '…')`，所以分面、计数与列表不可能各说一套：
-  `json_extract(songs.json,'$.sourceData.contentKind')` → 口语 genre 前缀（`LIKE 'audiobook%'`
-  等，只对 genre 首位与 `json_each(genres)` 的每个值）→ 专辑例外 (`source_id` + 归一化
-  `album`) → 实例声明 (`source_id`) → `Non-Music` 前缀 → 类型集合 / 本地规则 → `ELSE 'music'`。
-  `spokenWord` = `_kindOf IN ('podcast','audiobook')`；`radio` = `_kindOf = 'radio'`。
-  本地规则用 `genre` / `genres` 的 LIKE 与 `localPath` 的目录段复刻 Dart 侧优先级，
-  `.m4b` 单独判断；两侧都由 `content_kind.dart` 的同一组常量生成。
+- 类型：一个 `CASE` 表达式（`LibraryFilterSql._kindOf`）按 §5.1 的顺序逐条匹配，每种类型都变成 `(_kindOf = '…')`，所以分面、计数与列表不可能各说一套：
+  - 依次为 `json_extract(songs.json,'$.sourceData.contentKind')` → 口语 genre 前缀（`LIKE 'audiobook%'` 等，只对 genre 首位与 `json_each(genres)` 的每个值）→ 专辑例外 (`source_id` + 归一化 `album`) → 实例声明 (`source_id`) → `Non-Music` 前缀 → 类型集合 / 本地规则 → `ELSE 'music'`。
+  - `spokenWord` = `_kindOf IN ('podcast','audiobook')`；`radio` = `_kindOf = 'radio'`。
+  - 本地规则用 `genre` / `genres` 的 LIKE 与 `localPath` 的目录段复刻 Dart 侧优先级，`.m4b` 单独判断；两侧都由 `content_kind.dart` 的同一组常量生成。
 - 格式：入库时把 `type` / URI 扩展名归一成 `mp3/flac/ogg/m4a/wav/other` 写入 `songs.format` 真实列；
   旧库同样回填；`songs.format IN (…)`。
 - 时长：`duration` 毫秒分桶。
@@ -486,3 +495,11 @@ class LibraryFilter {
 - 空结果、无封面、无流派、`year=0`、`dateAdded=0`、无语言、未知格式都有确定表现。
 - 页头 / 列头 / 行尾 / 排序 / 双列与分类筛选同批验收。
 - `flutter analyze` 无 issue；`flutter test` 全绿。
+
+## 相关文档
+
+- [library-redesign.md](library-redesign.md) — 库页的页头、列头、排序与多列
+- [data-model.md](data-model.md) — `songs` 表的列、索引与写库纪律
+- [architecture.md](architecture.md) — 筛选与分类状态归谁
+- [performance.md](performance.md) — 查询与列表的性能预算
+- [conventions.md](conventions.md) — 尺寸与 token

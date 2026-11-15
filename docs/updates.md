@@ -1,6 +1,18 @@
 # 自动更新
 
+> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+
 > 桌面端从静态清单发现自己有新版本，下载并换掉正在运行的 bundle，重启后生效。
+
+## 目录
+
+- [数据源](#数据源)
+- [产物约定](#产物约定)
+- [发布步骤](#发布步骤)
+- [从旧版本升级一次](#从旧版本升级一次)
+- [安装行为](#安装行为)
+- [测试](#测试)
+- [限制](#限制)
 
 ## 数据源
 
@@ -30,12 +42,12 @@
 | Windows | `tune-windows-x64-<version>.zip` | `tune.exe` 及其依赖目录 |
 | Android | `tune-android-<version>.apk` | — |
 
-本地翻译模型不再随平台包分发。模型、llama.cpp 运行时与许可证打成一个可选组件包
-`tune-translation-qwen2.5-0.5b-b12274.zip`（约 500 MB），单独作为 Release 附件
-发布；应用在设置页按需下载，元数据见 `translation/manifest.json`。组件包文件名以
-`tune-translation-` 开头，不含平台名，因此不会被自动更新选中。
-1.32.0 起本地能力已收敛为统一组件注册表（[local-components.md](local-components.md)）：
-这个 zip 是「离线打包用的翻译组件」，不再是唯一的本地组件；在线用户由设置页按需下载各组件。
+- 本地翻译模型不再随平台包分发。模型、llama.cpp 运行时与许可证打成一个可选组件包
+  `tune-translation-qwen2.5-0.5b-b12274.zip`（约 500 MB），单独作为 Release 附件
+  发布；应用在设置页按需下载，元数据见 `translation/manifest.json`。
+- 组件包文件名以 `tune-translation-` 开头，不含平台名，因此不会被自动更新选中。
+- 1.32.0 起本地能力已收敛为统一组件注册表（[local-components.md](local-components.md)）：
+  这个 zip 是「离线打包用的翻译组件」，不再是唯一的本地组件；在线用户由设置页按需下载各组件。
 
 Linux 用打包脚本生成：
 
@@ -126,3 +138,10 @@ Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开
 - 源码仓库不入库模型与运行时，也没有启用 Git LFS（无 `.gitattributes`、
   `git lfs ls-files` 为空）；本地模型/运行时走 Release 组件包，由应用在设置页按需下载
   （[local-components.md](local-components.md)）。
+
+## 相关文档
+
+- [更新清单与 CDN](update-cdn.md) — `version.json`、取数与退避
+- [开源基建与维护清单](oss-maintenance.md) — 发版要同步的那几条线
+- [本地组件](local-components.md) — 组件包的下载与校验
+- [许可证与第三方声明](licensing.md) — 归档里必须带的声明
