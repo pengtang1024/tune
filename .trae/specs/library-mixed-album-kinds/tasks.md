@@ -69,3 +69,15 @@
   按同口径：有显式标签才定，纯推断留疑似并记录。
 - [x] I9 测试：口语前缀覆盖实例、专辑例外覆盖已声明实例、条目自带声明优先、
   IA collection 映射；SQL 侧 5 条 fixture 与 Dart 同序。
+
+## J. 脏数据：零时长与极短轨（2026-11-15 拍板）
+
+- [x] J1 `LibraryFilter.hideMissingDuration`（默认 `true`）与
+  `excludeShortTracks`（默认 `false`），进 `view.json`，清除全部保留前者。
+- [x] J2 SQL：`hiddenDuration` / `shortTracks` 进 `where`；`missingDurationCount`
+  统计当前搜索与筛选下被隐藏的零时长条目。
+- [x] J3 工具条：可见提示「已隐藏 N 条时长缺失的曲目」+ 一键显示，禁止暗过滤。
+- [x] J4 筛选面板「极短轨」组（≤3 秒），默认关闭，计入生效组数。
+- [x] J5 测试：零时长默认隐藏、关闭后恢复、计数文案、极短轨默认不过滤、
+  `view.json` 往返与旧视图默认值。
+- [x] J6 文档：`docs/library-browse.md` §4.9。

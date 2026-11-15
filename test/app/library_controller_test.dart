@@ -102,6 +102,7 @@ void main() {
       album: 'A Show',
       sourceId: 'podcast_rss-1',
       uri: 'tune://podcast/9',
+      duration: 60000,
     );
     final storage = FakeLibraryStorage([songA, episode]);
     final container = buildContainer(storage);
@@ -122,6 +123,7 @@ void main() {
       album: 'A Show',
       sourceId: 'podcast_rss-1',
       uri: 'tune://podcast/9',
+      duration: 60000,
     );
     final storage = FakeLibraryStorage([songA, episode]);
     final first = buildContainer(storage);
@@ -144,6 +146,7 @@ void main() {
       album: 'A Show',
       sourceId: 'podcast_rss-1',
       uri: 'tune://podcast/9',
+      duration: 60000,
     );
     final storage = FakeLibraryStorage([songA, episode])
       ..view = const LibraryView(
@@ -166,6 +169,7 @@ void main() {
       album: 'A Show',
       sourceId: 'podcast_rss-1',
       uri: 'tune://podcast/9',
+      duration: 60000,
     );
     final container = buildContainer(FakeLibraryStorage([songA, episode]));
     await container.read(libraryControllerProvider.future);
@@ -188,6 +192,7 @@ void main() {
             id: index,
             title: 'Track $index',
             uri: '/music/$index.mp3',
+            duration: 180000,
           ),
       ]),
     );
@@ -212,6 +217,7 @@ void main() {
             id: index,
             title: 'Track $index',
             uri: '/music/$index.mp3',
+            duration: 180000,
           ),
       ]),
     );
@@ -325,6 +331,7 @@ void main() {
             id: index,
             title: 'Track $index',
             uri: '/music/$index.mp3',
+            duration: 180000,
           ),
       ]),
     );
@@ -350,6 +357,7 @@ void main() {
           id: index,
           title: 'Track $index',
           uri: '/music/$index.mp3',
+          duration: 180000,
         ),
     ]);
     final container = buildContainer(storage);
@@ -378,6 +386,7 @@ void main() {
       sourceId: 'openverse',
       externalId: 'delta',
       streamUrl: 'https://example.com/delta.mp3',
+      duration: 60000,
     );
 
     final added = await container

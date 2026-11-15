@@ -89,6 +89,15 @@ abstract class LibraryStorage {
     sourceId: filter.sources.length == 1 ? filter.sources.first : null,
   );
 
+  /// How many matching tracks carry no duration, so the page hides them.
+  ///
+  /// A build without a database cannot answer this, and the page then has
+  /// nothing to hide: it answers zero.
+  Future<int> missingDurationCount({
+    required String query,
+    required LibraryFilter filter,
+  }) async => 0;
+
   /// The counts of the filter groups.
   Future<LibraryFacets> facets({required LibraryFilter filter}) async =>
       LibraryFacets.empty;

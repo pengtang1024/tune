@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tune/app/theme/compact_theme.dart';
+import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/library_sort.dart';
+import 'package:tune/features/library/presentation/library_toolbar.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
+import 'package:tune/l10n/app_localizations.dart';
+
+/// The toolbar never hides a rule silently: a list that leaves dirty rows out
+/// says how many and offers the way back.
+void main() {
+  Widget app(Widget child) => ProviderScope(
+    child: MaterialApp(
+      theme: CompactTheme.light,
+      locale: const Locale('zh', 'CN'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: child),
+    ),
+  );
+
+  Widget toolbar({
+    int hidden = 0,
+    VoidCallback? onShow,
+    LibraryFilter filter = const LibraryFilter(kinds: {}),
+  }) {
+    return LibraryToolbar(
+      controller: TextEditingController(),
+      query: '',
+      count: 10,
+      hiddenMissingDuration: hidden,
+      kind: null,
+      sources: const [],
+      sourceLabels: const {},
+      sourceFilter: null,
+      sort: LibrarySort.title,
+      filter: filter,
+      view: LibraryViewMode.values.first,
+      onQueryChanged: (_) {},
+      onClearQuery: () {},
+      onSourceFilter: (_) {},
+      onSort: (_) {},
+      onViewChanged: (_) {},
+      onFilter: () {},
+      onShowMissingDuration: onShow ?? () {},
+    );
+  }
+
+  testWidgets('the toolbar states how many tracks hide for a missing duration', (
+    tester,
+  ) async {
+    var shown = false;
+    await tester.pumpWidget(
+      app(toolbar(hidden: 3, onShow: () => shown = true)),
+    );
+
+    expect(find.text('已隐藏 3 条时长缺失的曲目'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('library-show-missing-duration')),
+    );
+    expect(shown, isTrue);
+  });
+
+  testWidgets('nothing hidden means no note', (tester) async {
+    await tester.pumpWidget(app(toolbar()));
+
+    expect(
+      find.byKey(const ValueKey('library-hidden-missing-duration')),
+      findsNothing,
+    );
+  });
+}

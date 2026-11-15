@@ -47,6 +47,10 @@ class LibraryState {
   /// Whether another window of the library is waiting on disk.
   final bool hasMore;
 
+  /// How many matching tracks the page keeps out because their duration is
+  /// unknown. The toolbar states it and offers to show them.
+  final int hiddenMissingDuration;
+
   /// The albums of the library, without their tracks.
   final List<AlbumSummary> albums;
 
@@ -65,6 +69,7 @@ class LibraryState {
     this.matching = 0,
     this.otherKindCount = 0,
     this.hasMore = false,
+    this.hiddenMissingDuration = 0,
     this.albums = const [],
   });
 
@@ -110,6 +115,7 @@ class LibraryState {
     int? matching,
     int? otherKindCount,
     bool? hasMore,
+    int? hiddenMissingDuration,
     List<AlbumSummary>? albums,
   }) {
     return LibraryState(
@@ -131,6 +137,8 @@ class LibraryState {
       matching: matching ?? this.matching,
       otherKindCount: otherKindCount ?? this.otherKindCount,
       hasMore: hasMore ?? this.hasMore,
+      hiddenMissingDuration:
+          hiddenMissingDuration ?? this.hiddenMissingDuration,
       albums: albums ?? this.albums,
     );
   }

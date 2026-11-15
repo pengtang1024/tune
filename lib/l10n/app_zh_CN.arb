@@ -1832,6 +1832,18 @@
   "libraryFilterDurationMedium": "2–5 分钟",
   "libraryFilterDurationLong": "5–10 分钟",
   "libraryFilterDurationEpic": ">10 分钟",
+  "libraryFilterShortTracks": "极短轨",
+  "libraryFilterShortTracksOption": "3 秒以内",
+  "libraryHiddenMissingDuration": "已隐藏 {count} 条时长缺失的曲目",
+  "@libraryHiddenMissingDuration": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryShowHiddenDuration": "显示",
   "libraryFilterAddedWeek": "最近 7 天",
   "libraryFilterAddedMonth": "最近 30 天",
   "libraryFilterAddedYear": "最近一年",

@@ -12,7 +12,7 @@ import 'package:tune/features/library/data/impl/library_storage_io.dart';
 /// The library lives in SQLite: rows are written one by one and a library of
 /// a hundred thousand tracks never has to be rewritten as one document.
 void main() {
-  Song song(int id, {int added = 0}) => Song(
+  Song song(int id, {int added = 0, int duration = 0}) => Song(
     id: id,
     title: 'Track $id',
     artist: 'Artist',
@@ -21,6 +21,7 @@ void main() {
     externalId: '$id',
     streamUrl: 'https://example.com/$id.mp3',
     dateAdded: added,
+    duration: duration,
   );
 
   group('library database', () {
@@ -550,13 +551,14 @@ void main() {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([
-        song(1),
+        song(1, duration: 60000),
         const Song(
           id: 2,
           title: 'Episode',
           album: 'Show',
           uri: 'tune://podcast/1',
           sourceId: 'podcast_rss-1',
+          duration: 60000,
         ),
         const Song(
           id: 3,
@@ -564,6 +566,7 @@ void main() {
           uri: 'tune://radio/1',
           sourceId: 'radio-1',
           isLiveStream: true,
+          duration: 60000,
         ),
       ]);
 
@@ -588,7 +591,7 @@ void main() {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([
-        song(1),
+        song(1, duration: 60000),
         const Song(
           id: 2,
           title: 'CC627',
@@ -596,6 +599,7 @@ void main() {
           album: 'RelicRadio.com',
           uri: 'tune://archive/1',
           sourceId: 'archive_podcasts',
+          duration: 60000,
         ),
         const Song(
           id: 3,
@@ -603,6 +607,7 @@ void main() {
           album: 'News',
           uri: 'tune://archive/2',
           sourceId: 'news_recordings',
+          duration: 60000,
         ),
         const Song(
           id: 4,
@@ -610,6 +615,7 @@ void main() {
           album: 'Madame Bovary',
           uri: 'tune://archive/3',
           sourceId: 'foreign_audio',
+          duration: 60000,
         ),
         const Song(
           id: 5,
@@ -618,6 +624,7 @@ void main() {
           uri: 'tune://archive/4',
           sourceId: 'unlocked_recordings',
           genre: 'Non-Music / Field Recording',
+          duration: 60000,
         ),
         const Song(
           id: 6,
@@ -625,6 +632,7 @@ void main() {
           album: 'Death of a salesman',
           uri: 'tune://archive/5',
           sourceId: 'unlocked_recordings',
+          duration: 60000,
         ),
         const Song(
           id: 7,
@@ -633,6 +641,7 @@ void main() {
           uri: 'tune://archive/6',
           sourceId: 'unlocked_recordings',
           genre: 'Jazz',
+          duration: 60000,
         ),
       ]);
 
@@ -683,6 +692,7 @@ void main() {
           uri: 'tune://archive/1',
           sourceId: 'radio_recordings',
           genre: 'Audiobook',
+          duration: 60000,
         ),
         const Song(
           id: 2,
@@ -691,6 +701,7 @@ void main() {
           uri: 'tune://archive/2',
           sourceId: 'radio_recordings',
           genre: 'Blues',
+          duration: 60000,
         ),
         const Song(
           id: 3,
@@ -698,6 +709,7 @@ void main() {
           album: 'pIANO',
           uri: 'tune://archive/3',
           sourceId: 'archive_podcasts',
+          duration: 60000,
         ),
         const Song(
           id: 4,
@@ -705,6 +717,7 @@ void main() {
           album: 'RelicRadio.com',
           uri: 'tune://archive/4',
           sourceId: 'archive_podcasts',
+          duration: 60000,
         ),
         const Song(
           id: 5,
@@ -714,6 +727,7 @@ void main() {
           sourceId: 'community_classical',
           genre: 'Classical',
           sourceData: {'contentKind': 'audiobook'},
+          duration: 60000,
         ),
       ]);
 
@@ -752,6 +766,66 @@ void main() {
 
       expect(albums, hasLength(2));
       expect(albums.map((album) => album.trackCount), [1, 1]);
+    });
+
+    test('a track without a duration waits behind a note, not a filter', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Timed',
+          uri: 'tune://openverse/1',
+          duration: 60000,
+        ),
+        const Song(id: 2, title: 'No duration', uri: 'tune://openverse/2'),
+      ]);
+      const filter = LibraryFilter(kinds: {ContentKind.music});
+
+      // Dirty data stays out of the page, and the note can say how much.
+      expect(database.countQuery(query: '', filter: filter), 1);
+      expect(database.missingDurationCount(query: '', filter: filter), 1);
+
+      // Turning the hiding off brings the row back; it was never deleted.
+      final shown = filter.copyWith(hideMissingDuration: false);
+      expect(database.countQuery(query: '', filter: shown), 2);
+      expect(database.missingDurationCount(query: '', filter: shown), 1);
+    });
+
+    test('a very short track is kept unless the reader narrows it away', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Blip',
+          uri: 'tune://openverse/1',
+          duration: 2000,
+        ),
+        const Song(
+          id: 2,
+          title: 'Three seconds',
+          uri: 'tune://openverse/2',
+          duration: 3000,
+        ),
+        const Song(
+          id: 3,
+          title: 'Long',
+          uri: 'tune://openverse/3',
+          duration: 60000,
+        ),
+      ]);
+      const filter = LibraryFilter(kinds: {ContentKind.music});
+
+      // Short is still audio: three rows until the reader asks otherwise.
+      expect(database.countQuery(query: '', filter: filter), 3);
+      expect(
+        database.countQuery(
+          query: '',
+          filter: filter.copyWith(excludeShortTracks: true),
+        ),
+        1,
+      );
     });
   });
 

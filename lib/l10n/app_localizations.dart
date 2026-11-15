@@ -6953,6 +6953,30 @@ abstract class AppLocalizations {
   /// **'>10 分钟'**
   String get libraryFilterDurationEpic;
 
+  /// No description provided for @libraryFilterShortTracks.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'极短轨'**
+  String get libraryFilterShortTracks;
+
+  /// No description provided for @libraryFilterShortTracksOption.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'3 秒以内'**
+  String get libraryFilterShortTracksOption;
+
+  /// No description provided for @libraryHiddenMissingDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已隐藏 {count} 条时长缺失的曲目'**
+  String libraryHiddenMissingDuration(int count);
+
+  /// No description provided for @libraryShowHiddenDuration.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'显示'**
+  String get libraryShowHiddenDuration;
+
   /// No description provided for @libraryFilterAddedWeek.
   ///
   /// In zh_CN, this message translates to:

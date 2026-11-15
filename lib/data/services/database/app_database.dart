@@ -825,6 +825,12 @@ class AppDatabase {
   int countQuery({required String query, required LibraryFilter filter}) =>
       _libraryQuery.count(query: query, filter: filter);
 
+  /// How many matching tracks carry no duration, so the page hides them.
+  int missingDurationCount({
+    required String query,
+    required LibraryFilter filter,
+  }) => _libraryQuery.missingDurationCount(query: query, filter: filter);
+
   /// The counts of the filter groups.
   LibraryFacets facets({required LibraryFilter filter}) =>
       _libraryQuery.facets(filter: filter);

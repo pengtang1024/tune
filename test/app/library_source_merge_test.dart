@@ -23,6 +23,7 @@ void main() {
     title: 'Local Song',
     artist: 'Local',
     uri: '/music/local.mp3',
+    duration: 60000,
   );
   const oldRemoteSong = Song(
     id: 2,
@@ -32,6 +33,7 @@ void main() {
     sourceId: 'openverse',
     externalId: 'old',
     streamUrl: 'https://example.com/old.mp3',
+    duration: 60000,
   );
   const newRemoteSong = Song(
     id: 3,
@@ -41,6 +43,7 @@ void main() {
     sourceId: 'openverse',
     externalId: 'new',
     streamUrl: 'https://example.com/new.mp3',
+    duration: 60000,
   );
 
   const localSource = MusicSourceConfig(
@@ -208,6 +211,7 @@ void main() {
       externalId: 'old',
       localPath: '/music/Remote/Old Remote/Old Remote.mp3',
       size: 4096,
+      duration: 60000,
     );
     final container = createContainer(
       sources: const [localSource, remoteSource],
@@ -254,6 +258,7 @@ void main() {
       sourceId: 'openverse',
       externalId: 'old',
       dateAdded: 1000,
+      duration: 60000,
     );
     const rescanned = Song(
       id: 10,
@@ -262,6 +267,7 @@ void main() {
       sourceId: 'openverse',
       externalId: 'old',
       dateAdded: 9000,
+      duration: 60000,
     );
     const brandNew = Song(
       id: 11,
@@ -270,6 +276,7 @@ void main() {
       sourceId: 'openverse',
       externalId: 'new',
       dateAdded: 8000,
+      duration: 60000,
     );
     storage.database.save([firstSeen]);
 

@@ -1832,6 +1832,18 @@
   "libraryFilterDurationMedium": "2–5 min",
   "libraryFilterDurationLong": "5–10 min",
   "libraryFilterDurationEpic": ">10 min",
+  "libraryFilterShortTracks": "Very short tracks",
+  "libraryFilterShortTracksOption": "Under 3 seconds",
+  "libraryHiddenMissingDuration": "{count, plural, =1{1 track without a duration is hidden} other{{count} tracks without a duration are hidden}}",
+  "@libraryHiddenMissingDuration": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "libraryShowHiddenDuration": "Show",
   "libraryFilterAddedWeek": "Last 7 days",
   "libraryFilterAddedMonth": "Last 30 days",
   "libraryFilterAddedYear": "Last year",

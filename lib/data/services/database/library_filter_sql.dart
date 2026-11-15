@@ -28,6 +28,8 @@ class LibraryFilterSql {
       language(filter.languages),
       durationFilter(filter.durations),
       addedFilter(filter.added),
+      hiddenDuration(filter.hideMissingDuration),
+      shortTracks(filter.excludeShortTracks),
     ]) {
       if (clause == null) continue;
       clauses.add(clause.sql);
@@ -176,6 +178,24 @@ class LibraryFilterSql {
   };
 
   static String _marks(int count) => List.filled(count, '?').join(', ');
+
+  /// A row whose duration the library never learned.
+  ///
+  /// Dirty data: the reader can play it, but the page cannot say how long it
+  /// is. [where] keeps it out unless the reader asks to see it.
+  static const String missingDuration = 'COALESCE(songs.duration, 0) <= 0';
+
+  static ({String sql, List<Object?> args})? hiddenDuration(bool hidden) =>
+      hidden ? (sql: 'NOT ($missingDuration)', args: const []) : null;
+
+  static ({String sql, List<Object?> args})? shortTracks(bool excluded) =>
+      excluded
+      ? (
+          sql: 'COALESCE(songs.duration, 0) > '
+              '${LibraryFilter.veryShortMilliseconds}',
+          args: const [],
+        )
+      : null;
 
   static const String _live =
       "COALESCE(json_extract(songs.json, '\$.isLiveStream'), 0) = 1";

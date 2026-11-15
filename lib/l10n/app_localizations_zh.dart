@@ -3736,6 +3736,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryFilterDurationEpic => '>10 分钟';
 
   @override
+  String get libraryFilterShortTracks => '极短轨';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以内';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隐藏 $countString 条时长缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '显示';
+
+  @override
   String get libraryFilterAddedWeek => '最近 7 天';
 
   @override
@@ -8130,6 +8148,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryFilterDurationEpic => '>10 分钟';
 
   @override
+  String get libraryFilterShortTracks => '极短轨';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以内';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隐藏 $countString 条时长缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '显示';
+
+  @override
   String get libraryFilterAddedWeek => '最近 7 天';
 
   @override
@@ -12522,6 +12558,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryFilterDurationEpic => '>10 分钟';
+
+  @override
+  String get libraryFilterShortTracks => '極短軌';
+
+  @override
+  String get libraryFilterShortTracksOption => '3 秒以內';
+
+  @override
+  String libraryHiddenMissingDuration(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '已隱藏 $countString 條時長缺失的曲目';
+  }
+
+  @override
+  String get libraryShowHiddenDuration => '顯示';
 
   @override
   String get libraryFilterAddedWeek => '最近 7 天';
