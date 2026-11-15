@@ -1,0 +1,42 @@
+# 自动生成的 Release Notes 怎么分组。
+#
+# 发版时在 GitHub 上「Draft a new release」→ 点「Generate release notes」，GitHub 会按
+# 这份配置把上一次 tag 之后的 PR 分到下面几类。分类靠 **label**，不靠提交信息——
+# 所以合并 PR 时请至少打一个下面的标签（见 CONTRIBUTING.md「提 PR」）。
+#
+# 这里的分类刻意与 CHANGELOG.md 的分节同名（新增 / 变更 / 修复 / 移除），
+# 让「发布页看到的」和「仓库里记的」是同一套词，不用读者自己换算。
+
+changelog:
+  # 这些不进发布说明：不是产品变更，或已经关闭不再跟进。
+  exclude:
+    labels:
+      - duplicate
+      - invalid
+      - wontfix
+      - question
+
+  categories:
+    - title: 新增
+      labels:
+        - enhancement
+        - feature
+
+    - title: 修复
+      labels:
+        - bug
+        - fix
+
+    - title: 文档
+      labels:
+        - documentation
+
+    - title: 依赖
+      labels:
+        - dependencies
+        - dart
+        - github_actions
+
+    - title: 其他变更
+      labels:
+        - "*"
