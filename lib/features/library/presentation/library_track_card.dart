@@ -44,6 +44,12 @@ class LibraryTrackCard extends StatefulWidget {
   final VoidCallback onAddToQueue;
   final VoidCallback onToggleFavorite;
 
+  /// Opens the album of the track, when the reader clicks the album cell.
+  ///
+  /// Null leaves the album as plain text: a track without an album (a
+  /// station, a loose file) has nowhere to go.
+  final ValueChanged<Song>? onOpenAlbum;
+
   const LibraryTrackCard({
     super.key,
     required this.song,
@@ -59,6 +65,7 @@ class LibraryTrackCard extends StatefulWidget {
     required this.waitsForDoubleClick,
     required this.onAddToQueue,
     required this.onToggleFavorite,
+    this.onOpenAlbum,
   });
 
   @override
@@ -67,6 +74,9 @@ class LibraryTrackCard extends StatefulWidget {
 
 class _LibraryTrackCardState extends State<LibraryTrackCard> {
   var _hovering = false;
+
+  /// Whether the pointer rests on the album cell.
+  var _hoveringAlbum = false;
 
   /// Whether the row, or an action of its tail, holds the keyboard focus.
   var _focused = false;
@@ -177,16 +187,7 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                 const SizedBox(width: CompactTokens.space8),
                 Expanded(
                   flex: 3,
-                  child: TuneTooltip(
-                    message: columns.album,
-                    child: TranslatedText(
-                      text: columns.album,
-                      dense: true,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
+                  child: _albumCell(context, theme, columns.album),
                 ),
               ],
               if (metrics.showAdded)
@@ -227,6 +228,47 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
             ? accent.withValues(alpha: 0.06)
             : Colors.transparent,
         child: row,
+      ),
+    );
+  }
+
+  /// The album cell of the row.
+  ///
+  /// The name opens the album when the wall holds a card for it. The click
+  /// lands on the name itself, not on the whole cell, so the rest of the row
+  /// still plays the track.
+  Widget _albumCell(BuildContext context, ThemeData theme, String album) {
+    final text = TranslatedText(
+      text: album,
+      dense: true,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+        decoration: _hoveringAlbum ? TextDecoration.underline : null,
+        decorationColor: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+    final onOpen = widget.onOpenAlbum;
+    if (onOpen == null || album.isEmpty) {
+      return TuneTooltip(message: album, child: text);
+    }
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hoveringAlbum = true),
+        onExit: (_) => setState(() => _hoveringAlbum = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.deferToChild,
+          onTap: () => onOpen(widget.song),
+          child: Semantics(
+            button: true,
+            label: '${context.loc.libraryOpenAlbum}: $album',
+            child: TuneTooltip(
+              message: context.loc.libraryOpenAlbum,
+              child: text,
+            ),
+          ),
+        ),
       ),
     );
   }

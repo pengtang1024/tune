@@ -162,6 +162,7 @@ final _allowedWord = RegExp(
   r'\d{1,2}:\d{2}(:\d{2})?' // a duration
   r'|\d+' // a count
   r'|v?\d+(\.\d+)+' // a version
+  r'|\d+(\.\d+)? (?:KB|MB|GB)' // a size of a component or an install
   r'|/\S+' // a path
   r'|MP3 · \d+ kbps' // a quality of a source
   r')$',

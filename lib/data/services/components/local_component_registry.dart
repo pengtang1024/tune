@@ -414,6 +414,14 @@ class LocalComponentRegistry {
     ffmpeg,
   ];
 
+  /// The translation model that belongs to a settings tier id.
+  static LocalComponentSpec translationModelForTier(String tier) =>
+      switch (tier) {
+        'low' => translationModelLow,
+        'quality' => translationModelQuality,
+        _ => translationModel,
+      };
+
   /// The whisper model component for a model name the settings page uses.
   static LocalComponentSpec whisperModel(String name) {
     for (final spec in whisperModels) {

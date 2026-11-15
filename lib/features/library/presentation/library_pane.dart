@@ -7,7 +7,6 @@ import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
-import 'package:tune/domain/models/show_album.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -212,12 +211,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // tracks.
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
-    final radioActive = library.filter.kinds.contains(ContentKind.radio);
-    // A station is a kind, not only a live stream: a recording of a broadcast
-    // is a station too, so it opens the same entry.
-    final hasRadio = library.songs.any(
-      (song) => contentKindOf(song) == ContentKind.radio,
-    );
+    // The scope names exactly one kind while the reader picked one; several
+    // kinds at once come from the filter panel, and the menu then says so.
+    final selectedKind = library.filter.kinds.length == 1
+        ? library.filter.kinds.first
+        : null;
 
     final content = Column(
       children: [
@@ -239,8 +237,13 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onScan: _scan,
                   scanning: library.isScanning,
                   onSearchOnline: widget.onSearchOnline,
-                  radioActive: radioActive,
-                  onRadio: (radioActive || hasRadio) ? _toggleRadio : null,
+                  selectedKind: selectedKind,
+                  onKind: _selectKind,
+                  showKindMenu: library.otherKindCount > 0,
+                  onAlbums: albumCount == 0
+                      ? null
+                      : () => _setView(LibraryViewMode.albums),
+                  albumsActive: _view == LibraryViewMode.albums,
                   treeExpanded: _treeExpanded,
                   onToggleTree: () =>
                       setState(() => _treeExpanded = !_treeExpanded),
@@ -264,7 +267,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               controller: _searchController,
               focusNode: ref.watch(librarySearchFocusProvider),
               query: library.query,
-              filteredCount: songs.length,
+              count: library.matching,
+              kind: selectedKind,
               sources: availableSources,
               sourceLabels: sourceLabels,
               sourceFilter: library.sourceFilter,
@@ -419,9 +423,14 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     if (songs.isEmpty) {
       return LibraryEmptyState(
         query: library.query,
-        hasSongs: library.songs.isNotEmpty,
+        hasSongs: library.total > 0,
         sourceFilter: library.sourceFilter,
-        filterActive: !library.filter.isEmpty,
+        // The scope narrowing to a show or a station counts as a filter here:
+        // an empty list then says why it is empty instead of blaming an empty
+        // library.
+        filterActive:
+            !library.filter.isEmpty ||
+            library.filter.kinds.any((kind) => kind != ContentKind.music),
         onClearQuery: _clearQuery,
         onClearSourceFilter: () {
           ref.read(libraryControllerProvider.notifier).setSourceFilter(null);
@@ -632,6 +641,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   waitsForDoubleClick: onlyLikeOnDoubleClick,
                   onAddToQueue: () => _addToQueue(song),
                   onToggleFavorite: () => _toggleFavorite(song),
+                  onOpenAlbum: _openAlbumOfSong,
                 );
               },
             );
@@ -670,18 +680,30 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return true;
   }
 
-  /// The key of the album that holds the track that plays.
-  ///
-  /// The grid marks the album the reader is hearing; the track may be
-  /// outside the current search, so the key is looked up in the whole
-  /// library and not only in the list on screen.
   /// Reads the tracks of an album and opens it.
+  ///
+  /// An album without tracks — a card whose only entries lie outside the
+  /// library, or one the query no longer finds — is not opened: a page with
+  /// no tracks would be blank, and the reader keeps the list they were on.
   Future<void> _openAlbumByKey(AlbumSummary summary) async {
     final songs = await ref
         .read(libraryControllerProvider.notifier)
         .albumSongs(summary.key);
-    if (!mounted) return;
+    if (!mounted || songs.isEmpty) return;
     setState(() => _openAlbum = _albumOf(summary, songs));
+  }
+
+  /// Opens the album a track belongs to, from the album column.
+  ///
+  /// The track may sit outside the album wall's grouping (an album without a
+  /// name has no card); the column is then plain text and the click does
+  /// nothing.
+  Future<void> _openAlbumOfSong(Song song) async {
+    final library = ref.read(libraryControllerProvider).valueOrNull;
+    if (library == null) return;
+    final summary = albumSummaryOf(library.albums, song);
+    if (summary == null) return;
+    await _openAlbumByKey(summary);
   }
 
   /// Reads the tracks of an album and plays them.
@@ -705,36 +727,20 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
+  /// The key of the album that holds the track that plays.
+  ///
+  /// The grid marks the album the reader is hearing; the track may be
+  /// outside the current search, so the key is looked up in the whole
+  /// library and not only in the list on screen.
   String? _currentAlbumKey(
     List<AlbumSummary> albums,
     List<Song> librarySongs,
     String? currentUri,
   ) {
     if (currentUri == null) return null;
-    Song? current;
     for (final song in librarySongs) {
-      if (song.uri == currentUri) {
-        current = song;
-        break;
-      }
-    }
-    if (current == null) return null;
-    final ownKey = libraryAlbumKeyOf(current);
-    for (final album in albums) {
-      if (album.key == ownKey) return album.key;
-    }
-    // A show the library merged from several sources carries a key that names
-    // every source; the track belongs to that card when its source is one of
-    // them and the show name matches.
-    if (!contentKindOf(current).isSpokenWord) return null;
-    final name = normalizedShowNameOf(current.album);
-    final source = current.sourceId ?? 'local';
-    for (final album in albums) {
-      if (!isMergedShowKey(album.key)) continue;
-      final parts = album.key.split('\u0000');
-      if (parts.first != name) continue;
-      final sources = [for (final part in parts.skip(2)) ...part.split('\u0001')];
-      if (sources.contains(source)) return album.key;
+      if (song.uri != currentUri) continue;
+      return albumSummaryOf(albums, song)?.key;
     }
     return null;
   }
@@ -750,7 +756,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     setState(() => _view = LibraryViewMode.songs);
     ref
         .read(libraryControllerProvider.notifier)
-        .setFilter(LibraryFilter.empty);
+        .setFilter(LibraryFilter.songs);
   }
 
   void _showCategory(LibraryCategoryKind kind) {
@@ -790,16 +796,21 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     ref.read(libraryControllerProvider.notifier).setFilter(next);
   }
 
-  /// Shows the stations through the same filter the panel writes, so the
-  /// page, the chips and the tree all agree on what is on screen.
-  void _toggleRadio() {
+  /// Narrows the page to one kind.
+  ///
+  /// The kind is a scope, not a filter: picking podcast shows the shows and
+  /// picking songs puts the stations and the shows away again. It writes the
+  /// same filter the panel writes, so the page, the chips and the tree all
+  /// agree on what is on screen.
+  void _selectKind(ContentKind kind) {
     final filter = ref.read(libraryControllerProvider).requireValue.filter;
-    const radio = ContentKind.radio;
-    final next = filter.kinds.contains(radio)
-        ? filter.copyWith(kinds: {...filter.kinds}..remove(radio))
-        : filter.copyWith(kinds: {radio});
-    setState(() => _view = LibraryViewMode.songs);
-    ref.read(libraryControllerProvider.notifier).setFilter(next);
+    setState(() {
+      _view = LibraryViewMode.songs;
+      _openAlbum = null;
+    });
+    ref
+        .read(libraryControllerProvider.notifier)
+        .setFilter(filter.copyWith(kinds: {kind}));
   }
 
   Future<void> _playAlbum(LibraryAlbum album) async {
@@ -867,6 +878,8 @@ typedef _LibrarySlice = ({
   List<Song> songs,
   List<AlbumSummary> albums,
   int total,
+  int matching,
+  int otherKindCount,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -885,6 +898,8 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     songs: state.songs,
     albums: state.albums,
     total: state.total,
+    matching: state.matching,
+    otherKindCount: state.otherKindCount,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,

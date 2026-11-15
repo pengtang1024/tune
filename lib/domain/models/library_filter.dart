@@ -42,6 +42,19 @@ class LibraryFilter {
 
   static const LibraryFilter empty = LibraryFilter();
 
+  /// The library a reader opens: songs, and nothing else.
+  ///
+  /// The content kind is a scope rather than a filter: it is never empty, so
+  /// a station or a show cannot fall back into the song table by accident.
+  /// The controller fills it in for any filter that arrives without one.
+  static const LibraryFilter songs = LibraryFilter(
+    kinds: {ContentKind.music},
+  );
+
+  /// Whether nothing narrows the page besides the content scope.
+  ///
+  /// The scope always names a kind, so it is not counted here: the filter
+  /// button and the chips speak about the groups the reader picks.
   bool get isEmpty =>
       status == LibraryStatusFilter.all &&
       genres.isEmpty &&
@@ -51,8 +64,7 @@ class LibraryFilter {
       formats.isEmpty &&
       durations.isEmpty &&
       added.isEmpty &&
-      languages.isEmpty &&
-      kinds.isEmpty;
+      languages.isEmpty;
 
   /// How many groups narrow the page; the filter button shows it.
   int get activeGroups => [
@@ -65,8 +77,10 @@ class LibraryFilter {
     durations.isNotEmpty,
     added.isNotEmpty,
     languages.isNotEmpty,
-    kinds.isNotEmpty,
   ].where((active) => active).length;
+
+  /// The same filter with every group cleared but the content scope.
+  LibraryFilter withoutGroups() => LibraryFilter(kinds: kinds);
 
   LibraryFilter copyWith({
     LibraryStatusFilter? status,

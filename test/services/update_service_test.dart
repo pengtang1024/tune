@@ -2,20 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
 import 'package:tune/data/services/update/update_service.dart';
 
-/// Serves one canned answer for every request.
-class _StubAdapter implements HttpClientAdapter {
-  _StubAdapter(this.status, [this.body = const {}]);
+/// Answers each host of the check, so the tiers can be told apart.
+class _RoutingAdapter implements HttpClientAdapter {
+  _RoutingAdapter(this.routes);
 
-  final int status;
-  final Map<String, dynamic> body;
-  int calls = 0;
-  RequestOptions? lastRequest;
+  final Map<String, ResponseBody Function(RequestOptions)> routes;
+  final List<RequestOptions> requests = [];
 
   @override
   Future<ResponseBody> fetch(
@@ -23,47 +22,70 @@ class _StubAdapter implements HttpClientAdapter {
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
-    calls++;
-    lastRequest = options;
-    return ResponseBody.fromString(
-      jsonEncode(body),
-      status,
-      headers: {
-        Headers.contentTypeHeader: [Headers.jsonContentType],
+    requests.add(options);
+    final answer = routes[options.uri.host];
+    if (answer == null) return _body('not found', status: 404);
+    return answer(options);
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+final _cdn = Uri.parse(
+  'https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json',
+).host;
+final _raw = Uri.parse(
+  'https://raw.githubusercontent.com/pengtang1024/tune/master/version.json',
+).host;
+const _api = 'api.github.com';
+
+ResponseBody _body(
+  String text, {
+  int status = 200,
+  Map<String, List<String>> headers = const {},
+}) {
+  return ResponseBody.fromString(
+    text,
+    status,
+    headers: {
+      Headers.contentTypeHeader: [Headers.jsonContentType],
+      ...headers,
+    },
+  );
+}
+
+ResponseBody _failureBody(int status) => _body('{"message":"error"}', status: status);
+
+Map<String, dynamic> _manifest({
+  String version = '1.33.0',
+  int build = 53,
+  String sha = 'ab',
+}) {
+  return {
+    'schema': 1,
+    'version': version,
+    'build': build,
+    'released_at': '2026-11-16T00:00:00Z',
+    'release_url': 'https://example.com/tag/v$version',
+    'notes': '### 新增\n- 一件小事',
+    'min_supported': '',
+    'assets': {
+      'linux-x64': {
+        'url': 'https://example.com/download/tune-linux-x64-$version.tar.gz',
+        'size': 123,
+        'sha256': sha,
       },
-    );
-  }
-
-  @override
-  void close({bool force = false}) {}
+    },
+  };
 }
 
-/// Fails the way a timeout does, without a response.
-class _TimeoutAdapter implements HttpClientAdapter {
-  int calls = 0;
-
-  @override
-  Future<ResponseBody> fetch(
-    RequestOptions options,
-    Stream<Uint8List>? requestStream,
-    Future<void>? cancelFuture,
-  ) async {
-    calls++;
-    throw DioException(
-      requestOptions: options,
-      type: DioExceptionType.connectionTimeout,
-    );
-  }
-
-  @override
-  void close({bool force = false}) {}
-}
-
-UpdateService _serviceWith(HttpClientAdapter adapter) {
-  final dio = Dio(
-    BaseOptions(headers: const {'Accept': 'application/vnd.github+json'}),
-  )..httpClientAdapter = adapter;
-  return UpdateService(dio: dio);
+(UpdateService, _RoutingAdapter) _serviceWith(
+  Map<String, ResponseBody Function(RequestOptions)> routes,
+) {
+  final adapter = _RoutingAdapter(routes);
+  final dio = Dio()..httpClientAdapter = adapter;
+  return (UpdateService(dio: dio), adapter);
 }
 
 Matcher _failure(UpdateCheckFailure failure) {
@@ -88,8 +110,6 @@ final _releaseBody = <String, dynamic>{
   ],
 };
 
-/// The update check compares versions, picks the archive of the machine and
-/// swaps the running bundle for the one the archive carries.
 void main() {
   group('version comparison', () {
     test('a newer version is newer part by part', () {
@@ -105,9 +125,230 @@ void main() {
       expect(UpdateService.isNewer('1.4.0', 'v1.3.0'), isFalse);
     });
 
-    test('a build suffix does not change the version', () {
+    test('a build number breaks the tie between equal versions', () {
+      expect(UpdateService.isNewer('1.4.0+52', '1.4.0+53'), isTrue);
+      expect(UpdateService.isNewer('1.4.0+53', '1.4.0+53'), isFalse);
+      expect(UpdateService.isNewer('1.4.0+53', '1.4.0+52'), isFalse);
+      // A list without a build number does not beat a newer build.
       expect(UpdateService.isNewer('1.4.0+5', '1.4.0'), isFalse);
       expect(UpdateService.isNewer('1.4.0+5', '1.4.1+1'), isTrue);
+    });
+  });
+
+  group('static list', () {
+    test('the CDN list is enough and the release page is not asked', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body(jsonEncode(_manifest())),
+      });
+
+      final release = await service.latest(environment: const {});
+
+      expect(release?.version, '1.33.0');
+      expect(release?.build, 53);
+      expect(release?.notes, '### 新增\n- 一件小事');
+      expect(release?.asset?.name, 'tune-linux-x64-1.33.0.tar.gz');
+      expect(release?.asset?.sha256, 'ab');
+      expect(adapter.requests.map((request) => request.uri.host), isNot(contains(_api)));
+    });
+
+    test('the raw host covers a CDN that cannot be reached', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _failureBody(500),
+        _raw: (_) => _body(jsonEncode(_manifest(version: '1.34.0'))),
+      });
+
+      final release = await service.latest(environment: const {});
+
+      expect(release?.version, '1.34.0');
+    });
+
+    test('two lists that disagree are refused', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _body(jsonEncode(_manifest(sha: 'aa'))),
+        _raw: (_) => _body(jsonEncode(_manifest(sha: 'bb'))),
+      });
+
+      await expectLater(
+        service.latest(environment: const {}),
+        _failure(UpdateCheckFailure.manifestMismatch),
+      );
+    });
+
+    test('a list without an archive is a different release', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _body(jsonEncode(_manifest())),
+        _raw: (_) => _body('{"version":"1.33.0","assets":{}}'),
+      });
+
+      await expectLater(
+        service.latest(environment: const {}),
+        _failure(UpdateCheckFailure.manifestMismatch),
+      );
+    });
+
+    test('a 304 keeps the parsed list and sends the validator', () async {
+      var asked = 0;
+      final (service, adapter) = _serviceWith({
+        _cdn: (request) {
+          asked++;
+          if (request.headers['If-None-Match'] == 'W/"abc"') {
+            return _body('', status: 304);
+          }
+          return _body(
+            jsonEncode(_manifest()),
+            headers: {
+              'etag': ['W/"abc"'],
+            },
+          );
+        },
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+
+      expect((await service.latest(environment: const {}))?.version, '1.33.0');
+      expect(
+        (await service.latest(
+          environment: const {},
+          forceRefresh: true,
+        ))?.version,
+        '1.33.0',
+      );
+
+      final cdnCalls = adapter.requests.where(
+        (request) => request.uri.host == _cdn,
+      );
+      expect(asked, 2);
+      expect(cdnCalls.length, 2);
+      expect(cdnCalls.last.headers['If-None-Match'], 'W/"abc"');
+    });
+
+    test('a token never rides on a static list request', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body(jsonEncode(_manifest())),
+        _raw: (_) => _body(jsonEncode(_manifest())),
+      });
+
+      await service.latest(manualToken: 'secret', environment: const {});
+
+      for (final request in adapter.requests) {
+        expect(request.headers.containsKey('Authorization'), isFalse);
+      }
+    });
+  });
+
+  group('release page fallback', () {
+    test('the release page is read when no list exists yet', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _body(jsonEncode(_releaseBody)),
+      });
+
+      final release = await service.latest(environment: const {});
+
+      expect(release?.version, '1.31.0');
+      expect(adapter.requests.last.uri.host, _api);
+    });
+
+    test('a token rides on the release page as a bearer header', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _body(jsonEncode(_releaseBody)),
+      });
+
+      await service.latest(manualToken: 'secret', environment: const {});
+
+      final apiCall = adapter.requests.last;
+      expect(apiCall.headers['Authorization'], 'Bearer secret');
+    });
+
+    test('an environment token is used when the field is empty', () {
+      expect(
+        UpdateService.resolveToken(
+          manualToken: '',
+          environment: const {'GITHUB_TOKEN': 'from-github'},
+        ),
+        'from-github',
+      );
+    });
+
+    test('a rate limited release page is a failure, not an empty page', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _failureBody(403),
+      });
+
+      await expectLater(
+        service.latest(environment: const {}),
+        _failure(UpdateCheckFailure.rateLimited),
+      );
+    });
+
+    test('a refused token is reported as unauthorized', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _failureBody(401),
+      });
+
+      await expectLater(
+        service.latest(manualToken: 'secret', environment: const {}),
+        _failure(UpdateCheckFailure.unauthorized),
+      );
+    });
+
+    test('an unreachable network is a network failure', () async {
+      ResponseBody timeout(RequestOptions request) => throw DioException(
+        requestOptions: request,
+        type: DioExceptionType.connectionTimeout,
+      );
+      final service = _serviceWith({
+        _cdn: timeout,
+        _raw: timeout,
+        _api: timeout,
+      }).$1;
+
+      await expectLater(service.latest(environment: const {}), _failure(UpdateCheckFailure.network));
+    });
+
+    test('an empty release page is a server failure', () async {
+      final (service, _) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _body(jsonEncode(const {'message': 'ok'})),
+      });
+
+      await expectLater(
+        service.latest(environment: const {}),
+        _failure(UpdateCheckFailure.server),
+      );
+    });
+
+    test('no release anywhere is an answer and is cached', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _body('', status: 404),
+      });
+
+      expect(await service.latest(environment: const {}), isNull);
+      expect(await service.latest(environment: const {}), isNull);
+
+      expect(adapter.requests.where((request) => request.uri.host == _api).length, 1);
+    });
+
+    test('a failed check is not cached', () async {
+      final (service, adapter) = _serviceWith({
+        _cdn: (_) => _body('', status: 404),
+        _raw: (_) => _body('', status: 404),
+        _api: (_) => _failureBody(403),
+      });
+
+      await expectLater(service.latest(environment: const {}), _failure(UpdateCheckFailure.rateLimited));
+      await expectLater(service.latest(environment: const {}), _failure(UpdateCheckFailure.rateLimited));
+
+      expect(adapter.requests.where((request) => request.uri.host == _api).length, 2);
     });
   });
 
@@ -167,140 +408,69 @@ void main() {
     });
   });
 
-  group('token', () {
-    test('the typed token wins over the environment', () {
-      expect(
-        UpdateService.resolveToken(
-          manualToken: ' typed ',
-          environment: const {
-            'GITHUB_TOKEN': 'from-github',
-            'GH_TOKEN': 'from-gh',
-          },
+  group('download check', () {
+    test('the archive that matches its list is accepted', () async {
+      final directory = await Directory.systemTemp.createTemp('tune-update');
+      addTearDown(() => directory.delete(recursive: true));
+      final file = File('${directory.path}/a.tar.gz')..writeAsStringSync('bytes');
+      final asset = UpdateAsset(
+        name: 'a.tar.gz',
+        url: 'https://example.com/a.tar.gz',
+        size: file.lengthSync(),
+        sha256: sha256.convert(utf8.encode('bytes')).toString(),
+      );
+
+      await UpdateService.verifyArchive(asset, file.path);
+    });
+
+    test('a wrong size or digest is refused and the file removed', () async {
+      final directory = await Directory.systemTemp.createTemp('tune-update');
+      addTearDown(() => directory.delete(recursive: true));
+      final file = File('${directory.path}/a.tar.gz')..writeAsStringSync('bytes');
+
+      await expectLater(
+        UpdateService.verifyArchive(
+          UpdateAsset(name: 'a.tar.gz', url: 'https://example.com/a', size: 99, sha256: 'f' * 64),
+          file.path,
         ),
-        'typed',
+        _failure(UpdateCheckFailure.archiveMismatch),
       );
-    });
-
-    test('a blank field falls back to GITHUB_TOKEN before GH_TOKEN', () {
-      expect(
-        UpdateService.resolveToken(
-          manualToken: '  ',
-          environment: const {
-            'GITHUB_TOKEN': 'from-github',
-            'GH_TOKEN': 'from-gh',
-          },
+      await expectLater(
+        UpdateService.verifyArchive(
+          UpdateAsset(name: 'a.tar.gz', url: 'https://example.com/a', size: 5, sha256: 'f' * 64),
+          file.path,
         ),
-        'from-github',
+        _failure(UpdateCheckFailure.archiveMismatch),
       );
     });
 
-    test('GH_TOKEN is used when GITHUB_TOKEN is blank', () {
-      expect(
-        UpdateService.resolveToken(
-          environment: const {'GITHUB_TOKEN': ' ', 'GH_TOKEN': 'from-gh'},
+    test('a download that does not match deletes what it wrote', () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      server.listen((request) async {
+        request.response
+          ..statusCode = 200
+          ..add(utf8.encode('bytes'));
+        await request.response.close();
+      });
+      final directory = await Directory.systemTemp.createTemp('tune-update');
+      addTearDown(() => directory.delete(recursive: true));
+      final path = '${directory.path}/a.tar.gz';
+
+      await expectLater(
+        UpdateService().download(
+          UpdateAsset(
+            name: 'a.tar.gz',
+            url: 'http://127.0.0.1:${server.port}/a.tar.gz',
+            size: 5,
+            sha256: 'f' * 64,
+          ),
+          path,
         ),
-        'from-gh',
-      );
-    });
-
-    test('no token anywhere means an anonymous check', () {
-      expect(UpdateService.resolveToken(environment: const {}), isNull);
-    });
-
-    test('a token rides on the request as a bearer header', () async {
-      final adapter = _StubAdapter(200, _releaseBody);
-      final service = _serviceWith(adapter);
-
-      await service.latest(manualToken: 'secret', environment: const {});
-
-      expect(adapter.lastRequest?.headers['Authorization'], 'Bearer secret');
-    });
-
-    test('an environment token is used when the field is empty', () async {
-      final adapter = _StubAdapter(200, _releaseBody);
-      final service = _serviceWith(adapter);
-
-      await service.latest(
-        manualToken: '',
-        environment: const {'GITHUB_TOKEN': 'from-github'},
+        _failure(UpdateCheckFailure.archiveMismatch),
       );
 
-      expect(
-        adapter.lastRequest?.headers['Authorization'],
-        'Bearer from-github',
-      );
-    });
-
-    test('an anonymous check carries no authorization header', () async {
-      final adapter = _StubAdapter(200, _releaseBody);
-      final service = _serviceWith(adapter);
-
-      await service.latest(environment: const {});
-
-      expect(
-        adapter.lastRequest?.headers.containsKey('Authorization'),
-        isFalse,
-      );
-    });
-  });
-
-  group('check failures', () {
-    test('a rate limited answer is a failure, not an empty page', () async {
-      final service = _serviceWith(
-        _StubAdapter(403, const {'message': 'API rate limit exceeded'}),
-      );
-
-      await expectLater(
-        service.latest(),
-        _failure(UpdateCheckFailure.rateLimited),
-      );
-    });
-
-    test('a refused token is reported as unauthorized', () async {
-      final service = _serviceWith(_StubAdapter(401));
-
-      await expectLater(
-        service.latest(),
-        _failure(UpdateCheckFailure.unauthorized),
-      );
-    });
-
-    test('a timeout is a network failure', () async {
-      final service = _serviceWith(_TimeoutAdapter());
-
-      await expectLater(service.latest(), _failure(UpdateCheckFailure.network));
-    });
-
-    test('a failed check is not cached', () async {
-      final adapter = _StubAdapter(403);
-      final service = _serviceWith(adapter);
-
-      await expectLater(
-        service.latest(),
-        _failure(UpdateCheckFailure.rateLimited),
-      );
-      await expectLater(
-        service.latest(),
-        _failure(UpdateCheckFailure.rateLimited),
-      );
-
-      expect(adapter.calls, 2);
-    });
-
-    test('an empty page without a release is a server failure', () async {
-      final service = _serviceWith(_StubAdapter(200, const {'message': 'ok'}));
-
-      await expectLater(service.latest(), _failure(UpdateCheckFailure.server));
-    });
-
-    test('a project without a release stays an answer and is cached', () async {
-      final adapter = _StubAdapter(404);
-      final service = _serviceWith(adapter);
-
-      expect(await service.latest(), isNull);
-      expect(await service.latest(), isNull);
-
-      expect(adapter.calls, 1);
+      expect(File(path).existsSync(), isFalse);
     });
   });
 

@@ -55,8 +55,12 @@ const Set<String> spokenWordSourceTypes = {
 const Map<String, ContentKind> declaredContentKinds = {
   'archive_podcasts': ContentKind.podcast,
   'independent_audiobooks': ContentKind.audiobook,
+  'news_recordings': ContentKind.radio,
   'old_time_radio': ContentKind.radio,
+  'poetry': ContentKind.audiobook,
+  'poetry_books': ContentKind.audiobook,
   'radio_recordings': ContentKind.radio,
+  'science_talks': ContentKind.podcast,
 };
 
 /// The genre tags that mark a local file as a chapter of a book.

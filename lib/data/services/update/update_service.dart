@@ -1,17 +1,24 @@
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:tune/data/services/update/update_check_exception.dart';
 import 'package:tune/data/services/update/update_release.dart';
+import 'package:tune/data/services/update/version_manifest.dart';
+import 'package:tune/data/services/update/version_manifest_source.dart';
 import 'package:tune/utils/logger.dart';
 
 /// Finds, downloads and installs a newer release of the app.
 ///
-/// The releases live on the project page; every release carries one archive
-/// per platform. A check reads the latest release, a download writes the
-/// archive of this machine, and the install replaces the bundle the app
-/// runs from. The app then asks the reader to restart: the running process
-/// still holds the files it started with.
+/// The newest version comes from `version.json`, a static file of the project
+/// served by a CDN: a check no longer spends the sixty anonymous requests an
+/// hour the GitHub API allows. The release page is only read as the last
+/// resort, when both static addresses are unreachable.
+///
+/// A download writes the archive of this machine, checks its size and digest
+/// against the list, and an install replaces the bundle the app runs from.
+/// The app then asks the reader to restart: the running process still holds
+/// the files it started with.
 class UpdateService {
   /// The repository the releases live in.
   static const _repo = 'pengtang1024/tune';
@@ -19,49 +26,91 @@ class UpdateService {
   static const _apiHost = 'https://api.github.com';
 
   final Dio _dio;
+  final VersionManifestSource _source;
 
   /// The release read the last time, when, and with which token.
   UpdateRelease? _cached;
   DateTime? _cachedAt;
   String? _cachedToken;
 
-  /// How long a check may reuse the last answer.
+  /// Whether an answer is held. A project without a release caches `null`,
+  /// which is an answer; nothing cached is not the same thing.
+  bool _hasCached = false;
+
+  /// How long an automatic check may reuse the last answer.
   static const _cacheFor = Duration(minutes: 10);
 
-  UpdateService({Dio? dio})
-    : _dio =
-          dio ??
-          Dio(
-            BaseOptions(
-              connectTimeout: const Duration(seconds: 10),
-              receiveTimeout: const Duration(seconds: 20),
-              headers: const {'Accept': 'application/vnd.github+json'},
-            ),
-          );
+  UpdateService({Dio? dio, VersionManifestSource? source})
+    : _dio = dio ?? _defaultDio(),
+      _source =
+          source ??
+          VersionManifestSource(dio: dio ?? _defaultManifestDio());
+
+  static Dio _defaultDio() => Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
+      headers: const {'Accept': 'application/vnd.github+json'},
+    ),
+  );
+
+  /// The list is a few kilobytes; a slow CDN must not stall the check.
+  static Dio _defaultManifestDio() => Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 3),
+      receiveTimeout: const Duration(seconds: 5),
+      headers: const {'Accept': 'application/json'},
+    ),
+  );
 
   /// The newest release, or `null` when the project published none.
   ///
   /// [manualToken] is the token typed in the settings; it wins over the
-  /// environment. Without either the request is anonymous, which GitHub
-  /// limits to sixty an hour per address.
+  /// environment. It is only sent to the GitHub API: the static addresses
+  /// never see it.
   ///
-  /// Only an answer of the project page is cached; a failed check is not, so
-  /// the next attempt reaches the page again instead of repeating a failure
-  /// for ten minutes.
+  /// [forceRefresh] skips the short reuse of an answer, which is what the
+  /// reader asking in the settings expects.
+  ///
+  /// Only an answer is cached; a failed check is not, so the next attempt
+  /// reaches the sources again instead of repeating a failure for ten
+  /// minutes.
   Future<UpdateRelease?> latest({
     String? manualToken,
     Map<String, String>? environment,
+    bool forceRefresh = false,
   }) async {
     final token = resolveToken(
       manualToken: manualToken,
       environment: environment,
     );
-    final cachedAt = _cachedAt;
-    if (cachedAt != null &&
-        token == _cachedToken &&
-        DateTime.now().difference(cachedAt) < _cacheFor) {
-      return _cached;
+    if (!forceRefresh && _hasCached && _cacheHolds(token)) return _cached;
+
+    VersionManifest? manifest;
+    try {
+      manifest = await _source.read();
+    } on UpdateCheckException catch (error) {
+      if (error.failure == UpdateCheckFailure.manifestMismatch) {
+        _forgetCache();
+        rethrow;
+      }
+      manifest = null;
     }
+
+    if (manifest != null) {
+      final release = releaseFromManifest(manifest);
+      _remember(release, token);
+      return release;
+    }
+
+    // No static list: a release that predates it, or a network that reaches
+    // neither address. The release page is read with the token when there is
+    // one, and anonymously otherwise.
+    return _fromApi(token);
+  }
+
+  /// The release page of the project, the source before the static list.
+  Future<UpdateRelease?> _fromApi(String? token) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '$_apiHost/repos/$_repo/releases/latest',
@@ -158,18 +207,49 @@ class UpdateService {
     return null;
   }
 
+  bool _cacheHolds(String? token) {
+    final cachedAt = _cachedAt;
+    if (cachedAt == null) return false;
+    if (token != _cachedToken) return false;
+    return DateTime.now().difference(cachedAt) < _cacheFor;
+  }
+
   void _remember(UpdateRelease? release, String? token) {
     _cached = release;
     _cachedAt = DateTime.now();
     _cachedToken = token;
+    _hasCached = true;
   }
 
   void _forgetCache() {
+    _cached = null;
     _cachedAt = null;
     _cachedToken = null;
+    _hasCached = false;
   }
 
-  /// Reads one release of the answer of the project page.
+  /// The release of a list, with the archive this machine downloads.
+  static UpdateRelease releaseFromManifest(
+    VersionManifest manifest, {
+    String? platform,
+  }) {
+    final asset = manifest.assetFor(platform ?? Platform.operatingSystem);
+    return UpdateRelease(
+      version: manifest.version,
+      build: manifest.build,
+      notes: manifest.notes,
+      asset: asset == null
+          ? null
+          : UpdateAsset(
+              name: _nameOf(asset.url),
+              url: asset.url,
+              size: asset.size,
+              sha256: asset.sha256,
+            ),
+    );
+  }
+
+  /// Reads one release of the answer of the release page.
   static UpdateRelease? parseRelease(Map<String, dynamic>? data) {
     if (data == null) return null;
 
@@ -205,18 +285,23 @@ class UpdateService {
   /// Whether [latest] is newer than [current].
   ///
   /// The versions are compared part by part, so `1.10.0` is newer than
-  /// `1.9.0` while a plain string comparison would say the opposite.
+  /// `1.9.0` while a plain string comparison would say the opposite. A build
+  /// number (`+52`) only breaks a tie between equal versions, so a rebuilt
+  /// archive of the same version reaches the machines that run the older
+  /// build.
   static bool isNewer(String current, String latest) {
-    final left = _parts(current);
-    final right = _parts(latest);
-    final length = left.length > right.length ? left.length : right.length;
+    final left = _versionOf(current);
+    final right = _versionOf(latest);
+    final length = left.parts.length > right.parts.length
+        ? left.parts.length
+        : right.parts.length;
     for (var index = 0; index < length; index++) {
-      final a = index < left.length ? left[index] : 0;
-      final b = index < right.length ? right[index] : 0;
+      final a = index < left.parts.length ? left.parts[index] : 0;
+      final b = index < right.parts.length ? right.parts[index] : 0;
       if (b > a) return true;
       if (b < a) return false;
     }
-    return false;
+    return right.build > left.build;
   }
 
   /// The archive of a release that belongs to [platform].
@@ -239,7 +324,11 @@ class UpdateService {
     return null;
   }
 
-  /// Writes the file of [asset] to [destination].
+  /// Writes the file of [asset] to [destination] and checks what it got.
+  ///
+  /// A file that does not match the size or the digest of the list is
+  /// deleted before the failure reaches the caller: an archive that is not
+  /// the one the list published never reaches the install step.
   Future<void> download(
     UpdateAsset asset,
     String destination, {
@@ -253,6 +342,28 @@ class UpdateService {
         onProgress?.call((received / total).clamp(0, 1));
       },
     );
+    try {
+      await verifyArchive(asset, destination);
+    } on UpdateCheckException {
+      await _deleteFile(destination);
+      rethrow;
+    }
+  }
+
+  /// Whether [path] is the archive the list published.
+  static Future<void> verifyArchive(UpdateAsset asset, String path) async {
+    final file = File(path);
+    if (!file.existsSync()) {
+      throw const UpdateCheckException(UpdateCheckFailure.archiveMismatch);
+    }
+    if (asset.size > 0 && file.lengthSync() != asset.size) {
+      throw const UpdateCheckException(UpdateCheckFailure.archiveMismatch);
+    }
+    if (asset.sha256.isEmpty) return;
+    final digest = await sha256.bind(file.openRead()).first;
+    if (digest.toString().toLowerCase() != asset.sha256.toLowerCase()) {
+      throw const UpdateCheckException(UpdateCheckFailure.archiveMismatch);
+    }
   }
 
   /// Replaces the bundle the app runs from with the archive.
@@ -319,6 +430,21 @@ class UpdateService {
     return null;
   }
 
+  static String _nameOf(String url) {
+    final segments = Uri.tryParse(url)?.pathSegments ?? const <String>[];
+    return segments.isEmpty ? '' : segments.last;
+  }
+
+  static Future<void> _deleteFile(String path) async {
+    final file = File(path);
+    if (!file.existsSync()) return;
+    try {
+      await file.delete();
+    } catch (error) {
+      Log.error('删除校验失败的更新包失败: $error');
+    }
+  }
+
   static Future<void> _delete(String path) async {
     final directory = Directory(path);
     if (directory.existsSync()) {
@@ -330,15 +456,21 @@ class UpdateService {
     }
   }
 
-  static List<int> _parts(String version) {
-    final cleaned = version
+  /// The numbers of a version and its build number.
+  static ({List<int> parts, int build}) _versionOf(String version) {
+    final segments = version
         .trim()
         .replaceFirst(RegExp(r'^v'), '')
-        .split('+')
-        .first;
-    return [
-      for (final part in cleaned.split('.'))
-        int.tryParse(RegExp(r'^\d+').stringMatch(part) ?? '') ?? 0,
-    ];
+        .split('+');
+    final build = segments.length > 1
+        ? int.tryParse(RegExp(r'^\d+').stringMatch(segments[1]) ?? '') ?? 0
+        : 0;
+    return (
+      parts: [
+        for (final part in segments.first.split('.'))
+          int.tryParse(RegExp(r'^\d+').stringMatch(part) ?? '') ?? 0,
+      ],
+      build: build,
+    );
   }
 }

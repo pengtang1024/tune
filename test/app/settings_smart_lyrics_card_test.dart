@@ -49,7 +49,7 @@ class _FakeComponentsController extends LocalComponentsController {
   };
 
   @override
-  Future<void> download(String id) async {
+  Future<bool> download(String id) async {
     downloaded.add(id);
     state = AsyncData({
       ...?state.valueOrNull,
@@ -59,6 +59,7 @@ class _FakeComponentsController extends LocalComponentsController {
         canDelete: true,
       ),
     });
+    return true;
   }
 }
 

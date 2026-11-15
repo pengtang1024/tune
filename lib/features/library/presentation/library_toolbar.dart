@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
@@ -25,7 +26,14 @@ class LibraryToolbar extends ConsumerWidget {
   final FocusNode? focusNode;
 
   final String query;
-  final int filteredCount;
+
+  /// How many tracks the word, the scope and the filter match.
+  final int count;
+
+  /// The content the page is scoped to, when it names one kind; the count
+  /// then counts shows, chapters or stations instead of songs.
+  final ContentKind? kind;
+
   final List<String> sources;
   final Map<String, SourceLabel> sourceLabels;
   final String? sourceFilter;
@@ -49,7 +57,8 @@ class LibraryToolbar extends ConsumerWidget {
     required this.controller,
     this.focusNode,
     required this.query,
-    required this.filteredCount,
+    required this.count,
+    required this.kind,
     required this.sources,
     required this.sourceLabels,
     required this.sourceFilter,
@@ -117,7 +126,6 @@ class LibraryToolbar extends ConsumerWidget {
 
   List<Widget> _sourceAndCount(BuildContext context) {
     final theme = Theme.of(context);
-    final showCount = query.trim().isNotEmpty || sourceFilter != null;
     return [
       if (sources.length > 1)
         LibrarySourceFilter(
@@ -126,17 +134,23 @@ class LibraryToolbar extends ConsumerWidget {
           sourceFilter: sourceFilter,
           onSourceFilter: onSourceFilter,
         ),
-      if (showCount) ...[
-        if (sources.length > 1) const SizedBox(width: CompactTokens.space8),
-        Text(
-          context.loc.libraryTrackCount(filteredCount),
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+      if (sources.length > 1) const SizedBox(width: CompactTokens.space8),
+      Text(
+        _countLabel(context),
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
         ),
-      ],
+      ),
     ];
   }
+
+  /// The count of what the list shows, in the unit of the scope.
+  String _countLabel(BuildContext context) => switch (kind) {
+    ContentKind.podcast => context.loc.libraryEpisodeCount(count),
+    ContentKind.audiobook => context.loc.libraryChapterCount(count),
+    ContentKind.radio => context.loc.libraryStationCount(count),
+    _ => context.loc.libraryTrackCount(count),
+  };
 
   List<Widget> _buttons(BuildContext context, {required bool compact}) {
     final theme = Theme.of(context);

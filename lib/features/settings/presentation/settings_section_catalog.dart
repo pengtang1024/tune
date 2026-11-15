@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/data/services/components/local_feature.dart';
 
 /// The sections of the settings page.
 enum SettingsSection {
@@ -36,6 +37,12 @@ bool settingsSectionSupported(
     // Only Android asks for the permissions at runtime.
     SettingsSection.permissions =>
       capabilities.platform == AppPlatform.android,
+    // A platform that cannot run any local feature has nothing to install.
+    SettingsSection.components => LocalFeatureRegistry.all.any(
+      (feature) =>
+          feature.supports(capabilities) &&
+          feature.tiersFor(capabilities.platform).isNotEmpty,
+    ),
     _ => true,
   };
 }

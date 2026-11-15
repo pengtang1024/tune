@@ -223,13 +223,13 @@ abstract class AppLocalizations {
   /// No description provided for @updateIdle.
   ///
   /// In zh_CN, this message translates to:
-  /// **'还没有检查过发布页'**
+  /// **'还没有检查过更新'**
   String get updateIdle;
 
   /// No description provided for @updateChecking.
   ///
   /// In zh_CN, this message translates to:
-  /// **'正在检查发布页…'**
+  /// **'正在检查更新…'**
   String get updateChecking;
 
   /// No description provided for @updateUpToDate.
@@ -289,13 +289,25 @@ abstract class AppLocalizations {
   /// No description provided for @updateFailedServer.
   ///
   /// In zh_CN, this message translates to:
-  /// **'检查失败：发布页返回了异常响应'**
+  /// **'检查失败：更新服务返回了异常响应'**
   String get updateFailedServer;
+
+  /// No description provided for @updateFailedManifestMismatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查失败：两份更新清单不一致，已拒绝本次更新'**
+  String get updateFailedManifestMismatch;
+
+  /// No description provided for @updateFailedArchiveMismatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'安装包校验不通过，已删除，请重试'**
+  String get updateFailedArchiveMismatch;
 
   /// No description provided for @updateTokenLabel.
   ///
   /// In zh_CN, this message translates to:
-  /// **'GitHub token（可选）'**
+  /// **'GitHub token（兜底，可选）'**
   String get updateTokenLabel;
 
   /// No description provided for @updateTokenHint.
@@ -307,7 +319,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateTokenHelp.
   ///
   /// In zh_CN, this message translates to:
-  /// **'只用于更新检查，不会写入日志'**
+  /// **'默认不需要；静态清单不可达时才用 GitHub API 兜底，不会写入日志'**
   String get updateTokenHelp;
 
   /// No description provided for @updateCheck.
@@ -391,7 +403,7 @@ abstract class AppLocalizations {
   /// No description provided for @librarySummary.
   ///
   /// In zh_CN, this message translates to:
-  /// **'{tracks} 首歌曲 · {albums} 张专辑 · {sources} 个来源'**
+  /// **'{tracks} 项内容 · {albums} 张专辑 · {sources} 个来源'**
   String librarySummary(int tracks, int albums, int sources);
 
   /// No description provided for @libraryClearSearch.
@@ -441,6 +453,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'{count} 章'**
   String libraryChapterCount(int count);
+
+  /// No description provided for @libraryStationCount.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{count} 台'**
+  String libraryStationCount(int count);
 
   /// No description provided for @libraryNoMatchTitle.
   ///
@@ -531,6 +549,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'专辑视图'**
   String get libraryViewAlbums;
+
+  /// No description provided for @libraryOpenAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开专辑'**
+  String get libraryOpenAlbum;
 
   /// No description provided for @libraryUnknownAlbum.
   ///
@@ -7474,6 +7498,294 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'FFmpeg（m4a 等格式转码）'**
   String get settingsLocalComponentFfmpeg;
+
+  /// No description provided for @settingsLocalFeatureTranslation.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译'**
+  String get settingsLocalFeatureTranslation;
+
+  /// No description provided for @settingsLocalFeatureTranslationDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'不用联网就能把歌曲信息、简介和界面里的外文翻成你的语言。占空间，速度比云端慢。'**
+  String get settingsLocalFeatureTranslationDesc;
+
+  /// No description provided for @settingsLocalFeatureLyrics.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'智能歌词（本地出词）'**
+  String get settingsLocalFeatureLyrics;
+
+  /// No description provided for @settingsLocalFeatureLyricsDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'听歌时自动听写歌词，不联网、不上传。一首歌要等一会儿，档位越大越准也越慢。'**
+  String get settingsLocalFeatureLyricsDesc;
+
+  /// No description provided for @settingsLocalFeatureTranscode.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'音频转码'**
+  String get settingsLocalFeatureTranscode;
+
+  /// No description provided for @settingsLocalFeatureTranscodeDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只有遇到播不了的格式才用得上：先把音频转成能播放的格式。平时不占资源。'**
+  String get settingsLocalFeatureTranscodeDesc;
+
+  /// No description provided for @settingsLocalFeatureInstall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'安装'**
+  String get settingsLocalFeatureInstall;
+
+  /// No description provided for @settingsLocalFeatureCancel.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'取消'**
+  String get settingsLocalFeatureCancel;
+
+  /// No description provided for @settingsLocalFeatureContinue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'继续（还差 {size}）'**
+  String settingsLocalFeatureContinue(String size);
+
+  /// No description provided for @settingsLocalFeatureRetry.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重试'**
+  String get settingsLocalFeatureRetry;
+
+  /// No description provided for @settingsLocalFeatureDelete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除'**
+  String get settingsLocalFeatureDelete;
+
+  /// No description provided for @settingsLocalFeatureChecking.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'检查中'**
+  String get settingsLocalFeatureChecking;
+
+  /// No description provided for @settingsLocalFeatureDownloading.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'下载中 {percent}%'**
+  String settingsLocalFeatureDownloading(int percent);
+
+  /// No description provided for @settingsLocalFeatureVerifying.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'校验中'**
+  String get settingsLocalFeatureVerifying;
+
+  /// No description provided for @settingsLocalFeatureReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'可用 · 占用 {size}'**
+  String settingsLocalFeatureReady(String size);
+
+  /// No description provided for @settingsLocalFeatureSystemReady.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'使用系统已安装版本'**
+  String get settingsLocalFeatureSystemReady;
+
+  /// No description provided for @settingsLocalFeaturePartial.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'部分完成 · 已完成 {done}/{total}'**
+  String settingsLocalFeaturePartial(int done, int total);
+
+  /// No description provided for @settingsLocalFeatureFailed.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'失败：{message}'**
+  String settingsLocalFeatureFailed(String message);
+
+  /// No description provided for @settingsLocalFeatureNeedDownload.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'需要下载约 {size}'**
+  String settingsLocalFeatureNeedDownload(String size);
+
+  /// No description provided for @settingsLocalFeatureDetails.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'详细信息'**
+  String get settingsLocalFeatureDetails;
+
+  /// No description provided for @settingsLocalFeatureHideDetails.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'收起详细信息'**
+  String get settingsLocalFeatureHideDetails;
+
+  /// No description provided for @settingsLocalFeatureRecommended.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'推荐：适合本机'**
+  String get settingsLocalFeatureRecommended;
+
+  /// No description provided for @settingsLocalFeatureDefaultChoice.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认：适合多数电脑'**
+  String get settingsLocalFeatureDefaultChoice;
+
+  /// No description provided for @settingsLocalFeatureNotEnough.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'空间或内存可能不足'**
+  String get settingsLocalFeatureNotEnough;
+
+  /// No description provided for @settingsLocalFeatureDeleteTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除本地文件？'**
+  String get settingsLocalFeatureDeleteTitle;
+
+  /// No description provided for @settingsLocalFeatureDeleteBody.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'将删除「{feature}」下所有本地文件，共 {size}。系统自带的程序不受影响。'**
+  String settingsLocalFeatureDeleteBody(String feature, String size);
+
+  /// No description provided for @settingsLocalFeatureDeleteConfirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除'**
+  String get settingsLocalFeatureDeleteConfirm;
+
+  /// No description provided for @settingsLocalFeatureTierTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'档位'**
+  String get settingsLocalFeatureTierTitle;
+
+  /// No description provided for @settingsLocalFeatureAddonsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多引擎'**
+  String get settingsLocalFeatureAddonsTitle;
+
+  /// No description provided for @settingsLocalFeatureTierLow.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'轻量'**
+  String get settingsLocalFeatureTierLow;
+
+  /// No description provided for @settingsLocalFeatureTierLowDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最省内存、最快；长句和术语可能翻得生硬。'**
+  String get settingsLocalFeatureTierLowDesc;
+
+  /// No description provided for @settingsLocalFeatureTierStandard.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标准'**
+  String get settingsLocalFeatureTierStandard;
+
+  /// No description provided for @settingsLocalFeatureTierStandardDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认；歌曲信息和简介够用，速度与质量平衡。'**
+  String get settingsLocalFeatureTierStandardDesc;
+
+  /// No description provided for @settingsLocalFeatureTierQuality.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'高质量'**
+  String get settingsLocalFeatureTierQuality;
+
+  /// No description provided for @settingsLocalFeatureTierQualityDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'长句、罕见语言更准；慢 2–3 倍，占用也大。'**
+  String get settingsLocalFeatureTierQualityDesc;
+
+  /// No description provided for @settingsLocalFeatureTierTiny.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'极简'**
+  String get settingsLocalFeatureTierTiny;
+
+  /// No description provided for @settingsLocalFeatureTierTinyDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最快、最省；清晰人声够用，嘈杂录音容易漏词。'**
+  String get settingsLocalFeatureTierTinyDesc;
+
+  /// No description provided for @settingsLocalFeatureTierBase.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'省空间'**
+  String get settingsLocalFeatureTierBase;
+
+  /// No description provided for @settingsLocalFeatureTierBaseDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'比极简准一些，占用仍然很小。'**
+  String get settingsLocalFeatureTierBaseDesc;
+
+  /// No description provided for @settingsLocalFeatureTierSmall.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡'**
+  String get settingsLocalFeatureTierSmall;
+
+  /// No description provided for @settingsLocalFeatureTierSmallDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'默认；多数歌曲够用，速度与准确率平衡。'**
+  String get settingsLocalFeatureTierSmallDesc;
+
+  /// No description provided for @settingsLocalFeatureTierLarge.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'高质量'**
+  String get settingsLocalFeatureTierLarge;
+
+  /// No description provided for @settingsLocalFeatureTierLargeDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'最准；老录音、现场版明显更好，但慢很多。'**
+  String get settingsLocalFeatureTierLargeDesc;
+
+  /// No description provided for @settingsLocalFeatureTierAndroid.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'标准（应用内运行）'**
+  String get settingsLocalFeatureTierAndroid;
+
+  /// No description provided for @settingsLocalFeatureTierAndroidDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'手机上只能应用内运行；识别一次的时间比桌面久。'**
+  String get settingsLocalFeatureTierAndroidDesc;
+
+  /// No description provided for @settingsLocalFeatureAddonFunasr.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'Fun-ASR-Nano（第三引擎）'**
+  String get settingsLocalFeatureAddonFunasr;
+
+  /// No description provided for @settingsLocalFeatureAddonFunasrDesc.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'中文歌曲的第三路识别；更慢、更占空间，只有装了它才参与。'**
+  String get settingsLocalFeatureAddonFunasrDesc;
+
+  /// No description provided for @settingsLocalFeatureAddonInstalled.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'已安装'**
+  String get settingsLocalFeatureAddonInstalled;
 
   /// No description provided for @settingsSectionLocalization.
   ///

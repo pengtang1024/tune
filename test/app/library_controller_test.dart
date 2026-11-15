@@ -10,9 +10,11 @@ import 'package:tune/data/services/providers/song_download_service_provider.dart
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
 import 'package:tune/features/sources/domain/music_sources_state.dart';
 
@@ -91,6 +93,91 @@ void main() {
 
     expect(state.songs.map((song) => song.uri), [songA.uri]);
     expect(state.statusMessage, '1 首歌曲');
+  });
+
+  test('the library opens on songs and leaves the shows out', () async {
+    const episode = Song(
+      id: 9,
+      title: 'Episode',
+      album: 'A Show',
+      sourceId: 'podcast_rss-1',
+      uri: 'tune://podcast/9',
+    );
+    final storage = FakeLibraryStorage([songA, episode]);
+    final container = buildContainer(storage);
+    final state = await container.read(libraryControllerProvider.future);
+
+    expect(state.filter.kinds, {ContentKind.music});
+    expect(state.songs.map((song) => song.uri), [songA.uri]);
+    expect(state.matching, 1);
+    expect(state.otherKindCount, 1);
+    // The scope is written back, so the next start does not decide again.
+    expect(storage.view?.filter.kinds, {ContentKind.music});
+  });
+
+  test('the shows a reader picked survive a rebuild', () async {
+    const episode = Song(
+      id: 9,
+      title: 'Episode',
+      album: 'A Show',
+      sourceId: 'podcast_rss-1',
+      uri: 'tune://podcast/9',
+    );
+    final storage = FakeLibraryStorage([songA, episode]);
+    final first = buildContainer(storage);
+    await first.read(libraryControllerProvider.future);
+    await first
+        .read(libraryControllerProvider.notifier)
+        .setFilter(const LibraryFilter(kinds: {ContentKind.podcast}));
+
+    final second = buildContainer(storage);
+    final state = await second.read(libraryControllerProvider.future);
+
+    expect(state.filter.kinds, {ContentKind.podcast});
+    expect(state.songs.map((song) => song.uri), [episode.uri]);
+  });
+
+  test('a view saved with several kinds opens on songs', () async {
+    const episode = Song(
+      id: 9,
+      title: 'Episode',
+      album: 'A Show',
+      sourceId: 'podcast_rss-1',
+      uri: 'tune://podcast/9',
+    );
+    final storage = FakeLibraryStorage([songA, episode])
+      ..view = const LibraryView(
+        filter: LibraryFilter(
+          kinds: {ContentKind.music, ContentKind.podcast, ContentKind.radio},
+        ),
+      );
+    final container = buildContainer(storage);
+    final state = await container.read(libraryControllerProvider.future);
+
+    expect(state.filter.kinds, {ContentKind.music});
+    expect(state.songs.map((song) => song.uri), [songA.uri]);
+    expect(storage.view?.filter.kinds, {ContentKind.music});
+  });
+
+  test('clearing every filter keeps the reader on songs', () async {
+    const episode = Song(
+      id: 9,
+      title: 'Episode',
+      album: 'A Show',
+      sourceId: 'podcast_rss-1',
+      uri: 'tune://podcast/9',
+    );
+    final container = buildContainer(FakeLibraryStorage([songA, episode]));
+    await container.read(libraryControllerProvider.future);
+    final controller = container.read(libraryControllerProvider.notifier);
+
+    await controller.setFilter(const LibraryFilter(genres: {'jazz'}));
+    await controller.setFilter(LibraryFilter.empty);
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.filter.kinds, {ContentKind.music});
+    expect(state.songs.map((song) => song.uri), [songA.uri]);
+    expect(state.matching, 1);
   });
 
   test('a large library is read a window at a time', () async {

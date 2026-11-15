@@ -61,11 +61,21 @@ class TranslationAssets {
   /// Lets an older copy stay the first choice while the downloaded component
   /// fills in when neither the folder nor the system has the file.
   ///
-  /// Models are tried in tier order (default, low-memory, quality), so a
-  /// reader who downloaded one alternative still has a working engine.
-  Future<void> useComponents(LocalComponents components) async {
+  /// Models are tried in tier order (the picked one first, then default,
+  /// low-memory, quality), so a reader who downloaded one alternative still
+  /// has a working engine.
+  Future<void> useComponents(
+    LocalComponents components, {
+    LocalComponentSpec? preferred,
+  }) async {
     if (_localModel() == null) {
-      for (final spec in LocalComponentRegistry.translationModels) {
+      final specs = [
+        ?preferred,
+        ...LocalComponentRegistry.translationModels.where(
+          (spec) => spec.id != preferred?.id,
+        ),
+      ];
+      for (final spec in specs) {
         final found = await components.file(spec, spec.requiredFiles.first);
         if (found != null) {
           _componentModel = found;

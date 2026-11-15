@@ -67,6 +67,8 @@ flutter --version
 - 它把平台钉成 Linux：测试套件默认假装是 Android，而 Android 用另一套密度和更大的点击区，不钉的话截图里的按钮比用户看到的矮 8 像素。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。
 - `tool/tooltip_shots_test.dart` 同理，写提示的两张图到 `build/tooltip-shots/`；改了提示样式后跑它。
+- `tool/local_feature_shots_test.dart` 写本地功能项的四张图到 `build/local-feature-shots/`
+  （默认态、技术明细、推荐标记、部分完成）；改了本地组件卡片后跑它。
 
 ## 对齐守卫
 

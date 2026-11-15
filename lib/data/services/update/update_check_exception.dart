@@ -16,6 +16,12 @@ enum UpdateCheckFailure {
 
   /// The page answered, but not with a release.
   server,
+
+  /// Two sources published different lists; neither is trusted.
+  manifestMismatch,
+
+  /// The downloaded archive does not match the size or the digest of the list.
+  archiveMismatch,
 }
 
 /// The check failed; the caller reports it instead of "already the newest".

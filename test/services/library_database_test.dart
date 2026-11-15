@@ -584,6 +584,53 @@ void main() {
       expect(read(ContentKind.music).map((track) => track.title), ['Track 1']);
     });
 
+    test('the songs scope leaves the shows out of the song table', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        song(1),
+        const Song(
+          id: 2,
+          title: 'CC627',
+          artist: 'Case Closed!',
+          album: 'RelicRadio.com',
+          uri: 'tune://archive/1',
+          sourceId: 'archive_podcasts',
+        ),
+        const Song(
+          id: 3,
+          title: 'Bulletin',
+          album: 'News',
+          uri: 'tune://archive/2',
+          sourceId: 'news_recordings',
+        ),
+      ]);
+
+      final songs = database.query(
+        query: '',
+        filter: LibraryFilter.songs,
+        sort: LibrarySort.recent,
+        offset: 0,
+        limit: 10,
+      );
+
+      expect(songs.map((track) => track.title), ['Track 1']);
+      expect(database.countQuery(query: '', filter: LibraryFilter.songs), 1);
+      expect(
+        database.countQuery(
+          query: '',
+          filter: const LibraryFilter(
+            kinds: {
+              ContentKind.podcast,
+              ContentKind.audiobook,
+              ContentKind.radio,
+            },
+          ),
+        ),
+        2,
+      );
+    });
+
     test('a music album still asks for its artist', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);

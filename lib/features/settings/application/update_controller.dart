@@ -63,12 +63,15 @@ final updateControllerProvider =
 
 final updateServiceProvider = Provider<UpdateService>((ref) => UpdateService());
 
-/// The version of the running build.
+/// The version of the running build, with the build number.
+///
+/// The build number is part of the comparison: a rebuilt archive of the same
+/// version still reaches the machines that run the older build.
 final updateCurrentVersionProvider = Provider<String>(
-  (ref) => AppVersion.version,
+  (ref) => '${AppVersion.version}+${AppVersion.buildNumber}',
 );
 
-/// Checks the project page and installs a newer release on Linux.
+/// Checks the project list and installs a newer release on Linux.
 ///
 /// The download and the install happen here, away from the widget tree, so a
 /// slow network or an unpacked archive never freezes the interface.
@@ -78,28 +81,57 @@ class UpdateController extends Notifier<UpdateState> {
   @override
   UpdateState build() => const UpdateState();
 
-  /// Asks the project page for the newest release.
-  Future<void> check({String? currentVersion}) async {
+  /// Asks the static list for the newest release.
+  ///
+  /// [automatic] is the scheduled check: it reuses a recent answer and logs a
+  /// failure quietly, because a machine that is offline for an hour is not
+  /// something the reader has to read about. A check asked for in the
+  /// settings always reaches the sources and always shows the result.
+  Future<void> check({String? currentVersion, bool automatic = false}) async {
+    if (automatic) {
+      // A download or an install in progress owns the state; a scheduled
+      // check must not reset it to `checking` and lose the progress.
+      final status = state.status;
+      if (status == UpdateStatus.checking ||
+          status == UpdateStatus.downloading ||
+          status == UpdateStatus.installing ||
+          status == UpdateStatus.ready) {
+        return;
+      }
+    }
     state = state.copyWith(status: UpdateStatus.checking);
     try {
       final token = ref.read(settingsControllerProvider).githubToken;
-      final release = await _service.latest(manualToken: token);
+      final release = await _service.latest(
+        manualToken: token,
+        forceRefresh: !automatic,
+      );
       if (release == null) {
         state = const UpdateState(status: UpdateStatus.upToDate);
         return;
       }
       final current = currentVersion ?? _currentVersion();
-      if (!UpdateService.isNewer(current, release.version)) {
+      final latest = '${release.version}+${release.build}';
+      if (!UpdateService.isNewer(current, latest)) {
         state = UpdateState(status: UpdateStatus.upToDate, release: release);
         return;
       }
       state = UpdateState(status: UpdateStatus.available, release: release);
     } on UpdateCheckException catch (error) {
-      Log.error('检查更新失败: $error');
+      _logFailure(error, automatic: automatic);
       state = UpdateState(status: UpdateStatus.failed, failure: error.failure);
     } catch (error) {
       Log.error('检查更新失败: $error');
       state = UpdateState(status: UpdateStatus.failed, error: '$error');
+    }
+  }
+
+  void _logFailure(UpdateCheckException error, {required bool automatic}) {
+    final line = '检查更新失败: $error';
+    if (automatic) {
+      Log.debug(line);
+    } else {
+      Log.error(line);
     }
   }
 
@@ -129,6 +161,13 @@ class UpdateController extends Notifier<UpdateState> {
       state = state.copyWith(status: UpdateStatus.installing);
       await _service.installLinux(archive, _bundleDirectory());
       state = state.copyWith(status: UpdateStatus.ready);
+    } on UpdateCheckException catch (error) {
+      Log.error('安装更新失败: $error');
+      state = UpdateState(
+        status: UpdateStatus.failed,
+        release: release,
+        failure: error.failure,
+      );
     } catch (error) {
       Log.error('安装更新失败: $error');
       state = UpdateState(

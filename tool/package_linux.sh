@@ -10,6 +10,8 @@
 # 默认产物写到 dist/tune-linux-x64-<version>.tar.gz，根目录就是 bundle 的内容，
 # 与 UpdateService.installLinux 读取的形状一致。它不含本地翻译模型：翻译默认走
 # 设置页配置的厂商 API，模型是设置页按需下载的可选组件。
+# 打包后同时写 dist/version.json（大小与 sha256 由归档实测，说明取自 CHANGELOG），
+# 发版时把它复制到仓库根再提交，自动更新读的就是那一份（docs/update-cdn.md §3）。
 # 把产物上传到同版本的 GitHub Release，应用就能自己发现并安装。
 #
 # --offline 会先跑 tool/prepare_translation.sh，再追加
@@ -19,7 +21,7 @@
 set -euo pipefail
 
 usage() {
-  sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -113,3 +115,13 @@ gzip -c "$tmp/bundle.tar" > "$out"
 
 echo "$out"
 echo "归档体积：$(stat -c%s "$out") B"
+
+# 离线包不是更新附件，没有清单可写；应用本体的清单在这里生成。
+if [[ "$offline" == 0 ]]; then
+  dart_bin="${DART:-dart}"
+  if ! command -v "$dart_bin" >/dev/null 2>&1; then
+    echo "找不到 dart，写不了 version.json；用 DART=<dart 路径> 指定" >&2
+    exit 1
+  fi
+  (cd "$root" && "$dart_bin" run tool/write_version_manifest.dart --archive "$out")
+fi

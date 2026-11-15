@@ -72,10 +72,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateIdle => 'The project page has not been checked yet';
+  String get updateIdle => 'Updates have not been checked yet';
 
   @override
-  String get updateChecking => 'Checking the project page…';
+  String get updateChecking => 'Checking for updates…';
 
   @override
   String get updateUpToDate => 'This is the newest version';
@@ -113,10 +113,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateFailedServer =>
-      'The check failed: the release page answered with an unexpected response';
+      'The check failed: the update service answered with an unexpected response';
 
   @override
-  String get updateTokenLabel => 'GitHub token (optional)';
+  String get updateFailedManifestMismatch =>
+      'The check failed: the two update lists disagree, so this update was refused';
+
+  @override
+  String get updateFailedArchiveMismatch =>
+      'The archive did not match its published digest and was deleted; try again';
+
+  @override
+  String get updateTokenLabel => 'GitHub token (fallback, optional)';
 
   @override
   String get updateTokenHint =>
@@ -124,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateTokenHelp =>
-      'Only used for update checks; never written to logs';
+      'Usually unnecessary: only used for the GitHub API when the static list is unreachable; never written to logs';
 
   @override
   String get updateCheck => 'Check for updates';
@@ -181,8 +189,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       tracks,
       locale: localeName,
-      other: '$tracksString tracks',
-      one: '1 track',
+      other: '$tracksString items',
+      one: '1 item',
     );
     String _temp1 = intl.Intl.pluralLogic(
       albums,
@@ -260,6 +268,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryStationCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString stations',
+      one: '1 station',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get libraryNoMatchTitle => 'No matching songs';
 
   @override
@@ -308,6 +331,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryViewAlbums => 'Albums view';
+
+  @override
+  String get libraryOpenAlbum => 'Open album';
 
   @override
   String get libraryUnknownAlbum => 'Unknown album';
@@ -4295,6 +4321,179 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocalComponentFfmpeg => 'FFmpeg (m4a and other formats)';
+
+  @override
+  String get settingsLocalFeatureTranslation => 'Translation';
+
+  @override
+  String get settingsLocalFeatureTranslationDesc =>
+      'Translate song info, descriptions and foreign text in the interface without going online. It takes disk space and is slower than the cloud.';
+
+  @override
+  String get settingsLocalFeatureLyrics => 'Smart lyrics (on-device)';
+
+  @override
+  String get settingsLocalFeatureLyricsDesc =>
+      'Write out lyrics while you listen, without network or uploads. A song takes a while; bigger tiers are more accurate and slower.';
+
+  @override
+  String get settingsLocalFeatureTranscode => 'Audio transcoding';
+
+  @override
+  String get settingsLocalFeatureTranscodeDesc =>
+      'Only needed when a format will not play: converts the audio to one the player can read. It sits idle otherwise.';
+
+  @override
+  String get settingsLocalFeatureInstall => 'Install';
+
+  @override
+  String get settingsLocalFeatureCancel => 'Cancel';
+
+  @override
+  String settingsLocalFeatureContinue(String size) {
+    return 'Continue ($size left)';
+  }
+
+  @override
+  String get settingsLocalFeatureRetry => 'Retry';
+
+  @override
+  String get settingsLocalFeatureDelete => 'Delete';
+
+  @override
+  String get settingsLocalFeatureChecking => 'Checking';
+
+  @override
+  String settingsLocalFeatureDownloading(int percent) {
+    return 'Downloading $percent%';
+  }
+
+  @override
+  String get settingsLocalFeatureVerifying => 'Verifying';
+
+  @override
+  String settingsLocalFeatureReady(String size) {
+    return 'Ready · $size used';
+  }
+
+  @override
+  String get settingsLocalFeatureSystemReady => 'Using the system install';
+
+  @override
+  String settingsLocalFeaturePartial(int done, int total) {
+    return 'Partly installed · $done/$total';
+  }
+
+  @override
+  String settingsLocalFeatureFailed(String message) {
+    return 'Failed: $message';
+  }
+
+  @override
+  String settingsLocalFeatureNeedDownload(String size) {
+    return 'About $size to download';
+  }
+
+  @override
+  String get settingsLocalFeatureDetails => 'Details';
+
+  @override
+  String get settingsLocalFeatureHideDetails => 'Hide details';
+
+  @override
+  String get settingsLocalFeatureRecommended =>
+      'Recommended: fits this machine';
+
+  @override
+  String get settingsLocalFeatureDefaultChoice =>
+      'Default: fits most computers';
+
+  @override
+  String get settingsLocalFeatureNotEnough =>
+      'Space or memory may not be enough';
+
+  @override
+  String get settingsLocalFeatureDeleteTitle => 'Delete local files?';
+
+  @override
+  String settingsLocalFeatureDeleteBody(String feature, String size) {
+    return 'This removes every local file under \"$feature\", $size in total. Programs the system already has are not touched.';
+  }
+
+  @override
+  String get settingsLocalFeatureDeleteConfirm => 'Delete';
+
+  @override
+  String get settingsLocalFeatureTierTitle => 'Tier';
+
+  @override
+  String get settingsLocalFeatureAddonsTitle => 'More engines';
+
+  @override
+  String get settingsLocalFeatureTierLow => 'Lightweight';
+
+  @override
+  String get settingsLocalFeatureTierLowDesc =>
+      'Smallest and fastest; long sentences and terms may read stiffly.';
+
+  @override
+  String get settingsLocalFeatureTierStandard => 'Standard';
+
+  @override
+  String get settingsLocalFeatureTierStandardDesc =>
+      'Default; enough for song info and descriptions, balanced speed and quality.';
+
+  @override
+  String get settingsLocalFeatureTierQuality => 'High quality';
+
+  @override
+  String get settingsLocalFeatureTierQualityDesc =>
+      'Better on long sentences and rare languages; 2–3 times slower and takes more space.';
+
+  @override
+  String get settingsLocalFeatureTierTiny => 'Tiny';
+
+  @override
+  String get settingsLocalFeatureTierTinyDesc =>
+      'Fastest and smallest; fine for clear vocals, misses words in noisy recordings.';
+
+  @override
+  String get settingsLocalFeatureTierBase => 'Space saver';
+
+  @override
+  String get settingsLocalFeatureTierBaseDesc =>
+      'A little more accurate than tiny and still small.';
+
+  @override
+  String get settingsLocalFeatureTierSmall => 'Balanced';
+
+  @override
+  String get settingsLocalFeatureTierSmallDesc =>
+      'Default; enough for most songs, balanced speed and accuracy.';
+
+  @override
+  String get settingsLocalFeatureTierLarge => 'High quality';
+
+  @override
+  String get settingsLocalFeatureTierLargeDesc =>
+      'Most accurate; clearly better on old and live recordings, much slower.';
+
+  @override
+  String get settingsLocalFeatureTierAndroid => 'Standard (runs in the app)';
+
+  @override
+  String get settingsLocalFeatureTierAndroidDesc =>
+      'Phones can only run it inside the app; one pass takes longer than on a desktop.';
+
+  @override
+  String get settingsLocalFeatureAddonFunasr => 'Fun-ASR-Nano (third engine)';
+
+  @override
+  String get settingsLocalFeatureAddonFunasrDesc =>
+      'A third Chinese-language pass; slower and larger, and only joins when installed.';
+
+  @override
+  String get settingsLocalFeatureAddonInstalled => 'Installed';
 
   @override
   String get settingsSectionLocalization => 'Localization';
