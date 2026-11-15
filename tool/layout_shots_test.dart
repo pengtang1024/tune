@@ -19,11 +19,14 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
+import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/features/discovery/presentation/discovery_pane.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/library/presentation/library_view_switch.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/domain/models/lyrics_document.dart';
@@ -78,6 +81,25 @@ const _songs = [
 
 final _rootKey = GlobalKey();
 List<Override> _overrides = const [];
+
+/// The album wall of the fixture, built the way the real library builds it.
+///
+/// `LibraryState.albums` is a separate field: the page reads it instead of
+/// grouping `songs` itself, so a fixture that only fills `songs` shows an
+/// empty wall. The grouping rule is reused here rather than hand-written, so
+/// the shots cannot drift away from what the app draws.
+List<AlbumSummary> _albumSummaries() => [
+  for (final album in libraryAlbumsOf(_songs))
+    AlbumSummary(
+      key: album.key,
+      name: album.name,
+      artist: album.artist,
+      trackCount: album.trackCount,
+      kind: album.kind,
+      coverPath: album.coverPath,
+      coverUrl: album.coverUrl,
+    ),
+];
 
 /// Loads the bundled fonts so the shots show the real type instead of the
 /// fallback boxes the test environment would use.
@@ -199,7 +221,11 @@ void main() {
       playbackControllerProvider.overrideWith((ref) => playback),
       libraryControllerProvider.overrideWith(
         () => _FakeLibraryController(
-          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+          LibraryState(
+            songs: _songs,
+            albums: _albumSummaries(),
+            statusMessage: '4 首歌曲',
+          ),
         ),
       ),
       lyricsControllerProvider.overrideWith(() => _FakeLyricsController()),
@@ -213,14 +239,26 @@ void main() {
     await _shot(tester, 'library$suffix');
 
     // The albums view is the browsing side of the library; the songs view
-    // stays one click away.
-    await tester.tap(find.byIcon(Icons.grid_view_rounded));
+    // stays one click away. The tap is scoped to the switch: once the library
+    // has albums the header grows its own grid icon, and an unscoped finder
+    // matches both.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(LibraryViewSwitch),
+        matching: find.byIcon(Icons.grid_view_rounded),
+      ),
+    );
     await _shot(tester, 'library_albums$suffix');
     await tester.tap(find.text('Nocturnes'));
     await _shot(tester, 'library_album$suffix');
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.view_list_rounded));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(LibraryViewSwitch),
+        matching: find.byIcon(Icons.view_list_rounded),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // The queue is a panel over the library now. The library itself is the
@@ -271,19 +309,20 @@ void main() {
     await tester.pumpAndSettle();
     await _shot(tester, 'settings_playback$suffix');
 
-    // The health weights live below the discovery and playback cards.
-    final healthAdjust = find.byKey(
-      const ValueKey('settings-source-health-adjust'),
+    // The health weights live below the discovery and playback cards. The
+    // card now carries the three presets and the normalized share of every
+    // dimension, so one shot shows both what the reader can pick and what the
+    // share looks like.
+    final healthPreset = find.byKey(
+      const ValueKey('settings-health-preset-playable'),
     );
-    await tester.ensureVisible(healthAdjust);
+    await tester.ensureVisible(healthPreset);
     await tester.pumpAndSettle();
     await _shot(tester, 'settings_health$suffix');
 
-    await tester.tap(healthAdjust);
+    await tester.tap(healthPreset);
     await tester.pumpAndSettle();
-    await _shot(tester, 'settings_health_dialog$suffix');
-    await tester.tap(find.text('取消'));
-    await tester.pumpAndSettle();
+    await _shot(tester, 'settings_health_preset$suffix');
 
     await tester.pumpWidget(
       app(
@@ -334,7 +373,11 @@ void main() {
       playbackControllerProvider.overrideWith((ref) => playback),
       libraryControllerProvider.overrideWith(
         () => _FakeLibraryController(
-          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+          LibraryState(
+            songs: _songs,
+            albums: _albumSummaries(),
+            statusMessage: '4 首歌曲',
+          ),
         ),
       ),
       onlineSearchControllerProvider.overrideWith(
@@ -368,7 +411,11 @@ void main() {
       playbackControllerProvider.overrideWith((ref) => playback),
       libraryControllerProvider.overrideWith(
         () => _FakeLibraryController(
-          const LibraryState(songs: _songs, statusMessage: '4 首歌曲'),
+          LibraryState(
+            songs: _songs,
+            albums: _albumSummaries(),
+            statusMessage: '4 首歌曲',
+          ),
         ),
       ),
     ];
@@ -434,6 +481,19 @@ class _FakeLibraryController extends LibraryController {
   @override
   Future<void> setQuery(String query) async {
     state = AsyncData((state.valueOrNull ?? seed).copyWith(query: query));
+  }
+
+  /// The tracks of an album, served from the fixture.
+  ///
+  /// The real controller reads them from storage, and the fixture never
+  /// builds storage: opening an album would otherwise throw a `late` field
+  /// error instead of drawing the album page.
+  @override
+  Future<List<Song>> albumSongs(String key) async {
+    for (final album in libraryAlbumsOf(_songs)) {
+      if (album.key == key) return album.songs;
+    }
+    return const [];
   }
 }
 
