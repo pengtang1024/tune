@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -411,23 +412,29 @@ void main() {
 
   group('source logging', () {
     test('every address reports its host and result', () async {
-      final logs = <String>[];
+      final lines = <String>[];
       final adapter = _RoutingAdapter({
         _cdn: (_) => _body('', status: 404),
         _raw: (_) => _body(jsonEncode(_manifest())),
       });
       final dio = Dio()..httpClientAdapter = adapter;
-      final source = VersionManifestSource(dio: dio, debugLog: logs.add);
+      final source = VersionManifestSource(dio: dio);
 
-      final manifest = await source.read();
+      // The lines the app itself writes, not a copy collected by a hook.
+      final manifest = await runZoned(
+        source.read,
+        zoneSpecification: ZoneSpecification(
+          print: (self, parent, zone, line) => lines.add(line),
+        ),
+      );
 
       expect(manifest?.version, '1.33.0');
-      expect(logs, hasLength(2));
-      expect(logs.first, contains(_cdn));
-      expect(logs.first, contains('404'));
-      expect(logs.last, contains(_raw));
-      expect(logs.last, contains('命中 1.33.0+53'));
-      expect(logs.last, contains('ms'));
+      expect(lines, hasLength(2));
+      expect(lines.first, contains(_cdn));
+      expect(lines.first, contains('404'));
+      expect(lines.last, contains(_raw));
+      expect(lines.last, contains('命中 1.33.0+53'));
+      expect(lines.last, contains('ms'));
     });
   });
 

@@ -10,13 +10,9 @@ import 'package:tune/utils/logger.dart';
 /// read every time: when both answer they must agree, because the list
 /// decides what the app downloads and installs (docs/update-cdn.md §7).
 class VersionManifestSource {
-  VersionManifestSource({
-    required Dio dio,
-    List<String>? urls,
-    void Function(String message)? debugLog,
-  }) : _dio = dio,
-       urls = urls ?? defaultUrls,
-       _debugLog = debugLog ?? Log.debug;
+  VersionManifestSource({required Dio dio, List<String>? urls})
+    : _dio = dio,
+      urls = urls ?? defaultUrls;
 
   /// CDN first; the raw host is the second address and the cross-check.
   ///
@@ -30,7 +26,6 @@ class VersionManifestSource {
 
   final Dio _dio;
   final List<String> urls;
-  final void Function(String message) _debugLog;
 
   /// The validator of each address and the list it belongs to, so a repeated
   /// read costs one conditional request instead of the whole file.
@@ -75,6 +70,8 @@ class VersionManifestSource {
     final etag = _seen[url] == null ? null : _etags[url];
     final host = Uri.tryParse(url)?.host ?? url;
     final watch = Stopwatch()..start();
+    // One line per address per round, after it is spent: a retry belongs to
+    // the scheduler, not to this loop, so a round never repeats an address.
     try {
       final response = await _dio.get<String>(
         url,
@@ -89,16 +86,16 @@ class VersionManifestSource {
       final cost = watch.elapsedMilliseconds;
       // The list did not change since the last read; the parsed copy stands.
       if (status == 304) {
-        _debugLog('清单 $host：304，沿用上次解析（${cost}ms）');
+        Log.info('清单 $host：304，沿用上次解析（${cost}ms）');
         return _seen[url];
       }
       // The address does not publish a list yet, or never did.
       if (status == 404) {
-        _debugLog('清单 $host：404，无清单（${cost}ms）');
+        Log.info('清单 $host：404，无清单（${cost}ms）');
         return null;
       }
       if (status < 200 || status >= 300) {
-        _debugLog('清单 $host：$status，跳过（${cost}ms）');
+        Log.info('清单 $host：$status，跳过（${cost}ms）');
         throw UpdateCheckException(
           UpdateCheckFailure.server,
           statusCode: status,
@@ -106,13 +103,13 @@ class VersionManifestSource {
       }
       final manifest = VersionManifest.parse(response.data ?? '');
       if (manifest == null) {
-        _debugLog('清单 $host：$status，内容无法解析（${cost}ms）');
+        Log.info('清单 $host：$status，内容无法解析（${cost}ms）');
         throw UpdateCheckException(
           UpdateCheckFailure.server,
           statusCode: status,
         );
       }
-      _debugLog('清单 $host：命中 ${_describe(manifest)}（${cost}ms）');
+      Log.info('清单 $host：命中 ${_describe(manifest)}（${cost}ms）');
       final validator = response.headers.value('etag');
       if (validator != null) _etags[url] = validator;
       _seen[url] = manifest;
@@ -123,9 +120,9 @@ class VersionManifestSource {
       final status = error.response?.statusCode;
       final cost = watch.elapsedMilliseconds;
       if (status != null) {
-        _debugLog('清单 $host：$status，跳过（${cost}ms）');
+        Log.info('清单 $host：$status，跳过（${cost}ms）');
       } else {
-        _debugLog('清单 $host：${error.type.name}（${cost}ms）');
+        Log.info('清单 $host：${error.type.name}（${cost}ms）');
       }
       if (status != null) {
         throw UpdateCheckException(
