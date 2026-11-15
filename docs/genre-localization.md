@@ -1,6 +1,6 @@
 # 流派本地化
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > 流派名怎么翻、翻哪些、翻不出来怎么办。规范在 [i18n.md](i18n.md)，门禁在 [verification.md](verification.md)。
 > 最后更新：2026-10-20。
@@ -70,7 +70,7 @@ String genresLabel(Iterable<String> genres, AppLocalizations strings);
 
 ## 接到哪里
 
-曲目详情浮层的「流派」那一条（`lib/shared/ui/track_metadata_facts.dart`）。界面里只有这一处显示流派。
+曲目详情浮层的「流派」那一条（`lib/shared/ui/track_metadata_facts.dart`）；音乐库的流派筛选、分类树与分类视图（`lib/features/library/presentation/library_filter_chips.dart`、`library_filter_panel.dart`、`library_category_tree.dart`、`library_category_view.dart`）和发现页的推荐理由（`lib/features/discovery/presentation/discovery_reason_label.dart`）也走它。
 
 ## 测试
 

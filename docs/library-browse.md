@@ -406,13 +406,14 @@ class LibraryFilter {
 
 | 操作 | 预算 | 守 |
 | --- | --- | --- |
-| 应用一次筛选（20k） | ≤ 100ms | `library_filter_bench_test` |
+| 应用一次筛选（20k） | ≤ 100ms | `test/services/library_query_bench_test.dart` |
 | 打开筛选面板的分面计数 | ≤ 150ms | 同上 |
-| 分类视图首屏（一个分段 ≤24 卡） | ≤ 150ms | 同上 |
+| 分类视图首屏（一个分段 ≤30 卡） | ≤ 150ms | 同上 |
 | 滚动 | 不高于 D5 的 23ms/步 | 现有基准 |
 | 行 element | 不增加（筛选不进行） | `row_budget_test` |
 
 - 搜索防抖 180ms；筛选即时生效，用 generation 令牌丢弃过期查询的返回。
+- 基准只卡回归上限（查询与计数 < 1s、分面 < 3s），预算数字看它打印的实测值。
 - 不在 build 里做筛选/排序/计数。
 
 ## 7. 与 library-redesign 的联合落地

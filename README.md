@@ -1,6 +1,6 @@
 # Tune
 
-> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：入口 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 [中文](README.md) · [English](README_en.md)
 
@@ -117,7 +117,7 @@ flutter run -d linux
 
 ## 构建与产物
 
-默认安装包不含本地模型，Linux 归档约 **51 MiB**（根 [version.json](version.json) 的 `linux-x64.size` = 53,725,517 B）。升级替换应用不会删除已下载的本地组件。
+默认安装包不含本地模型，Linux 归档约 **51 MiB**（根 [version.json](version.json) 的 `linux-x64.size` = 53,783,594 B）。升级替换应用不会删除已下载的本地组件。
 
 ```bash
 flutter build linux --release

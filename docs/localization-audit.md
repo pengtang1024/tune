@@ -1,6 +1,6 @@
 # 本地化覆盖审计
 
-> 状态：规范 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > 本地化覆盖的现状、做法与踩过的坑。规范在 [i18n.md](i18n.md)，门禁在 [verification.md](verification.md)。本文最后更新于 2026-10-20。
 
@@ -8,7 +8,7 @@
 
 - 四种语言（`zh_CN` / `zh` / `zh_TW` / `en`）的键集合一致，没有死键，没有漏翻的繁体。
 - 两道门禁守着：`test/app/localization_test.dart` 扫源码，`test/app/localization_render_test.dart` 把界面画出来读树。
-- 42 个内置音源都有名字：品牌名（不翻译）＋ 品牌名音源另有一条本地化名。
+- 47 个内置音源都有名字：品牌名（不翻译）＋ 品牌名音源另有一条本地化名。
 - 流派名由独立的模块翻译：认得出的流派换成读者语言的名字，认不出的保持原样（`Drum & Bass` 这类没有通行译名的）。规则见 [genre-localization.md](genre-localization.md)。
 - 已修的漏：英文下溢出的徽章、启动时语言滞后、中文界面里没解释的音源 chip。
 
@@ -38,13 +38,13 @@
 
 - **chip 的正文只有图标**（`SourceBadge`，`shared/ui/source_badge.dart`）：图标固定大小，名字不写进去，一行曲子的宽窄不再被音源名字牵着走。
 - **两个名字写在提示气泡里**：`Openverse · 开放版权聚合`；详情面板的「来源」那条事实也把它们写全。
-- **每个音源一个自己的图标**（`shared/ui/source_icon.dart`）；用户自带的音源按种类兜底。
+- **每个音源一个自己的图标**（`shared/ui/source_mark.dart`）；用户自带的音源按种类兜底。
 - **本地化名说明这是什么，不把品牌名翻一遍**。`互联网档案馆`、`维基共享资源`、`苹果音乐试听`都是品牌名的中文版（`苹果音乐试听`还把 iTunes 说成了另一个服务）。本地化名写这个音源是干什么的：`公共领域音频`、`商店试听片段`、`自由授权媒体`。
 - **描述里提到品牌，用品牌自己的拼法**：`Internet Archive 的开放音频收藏`、`Wikimedia Commons 的开放音频`、`iTunes 目录的 30 秒试听片段`，不写"互联网档案馆"这种中文版。
 
 ## 还没做完的
 
-- **9 个品牌音源的本地化名已定**。按"这个音源是干什么的"写，只改 ARB：
+- **22 个品牌音源的本地化名已定**。按"这个音源是干什么的"写，只改 ARB：
 
   | 音源 | 简体 | 繁体 | English |
   | --- | --- | --- | --- |
@@ -52,13 +52,26 @@
   | Jamendo | 独立音乐曲库 | 獨立音樂曲庫 | Indie music |
   | Internet Archive | 公共领域音频 | 公共領域音頻 | Public domain |
   | ccMixter | 共享混音素材 | 共享混音素材 | Shared remixes |
-  | iTunes | 商店试听片段 | 商店試聽片段 | Store previews |
-  | Subsonic | 自建音乐库 | 自建音樂庫 | Self-hosted |
+  | Apple Podcasts | Apple 播客 | Apple Podcasts | Apple Podcasts |
+  | Deezer | Deezer 试听 | Deezer 試聽 | Deezer previews |
+  | iTunes | iTunes 试听 | iTunes 試聽 | iTunes previews |
+  | PeerTube | PeerTube 音乐 | PeerTube 音樂 | PeerTube music |
   | Audius | 音乐人直发 | 音樂人直發 | Artist uploads |
   | Wikimedia Commons | 自由授权媒体 | 自由授權媒體 | Free media |
+  | LibriVox | 有声书 | 有聲書 | Audiobooks |
+  | Subsonic | 自建音乐库 | 自建音樂庫 | Self-hosted |
+  | Ampache | 自建 Ampache 音乐库 | 自架 Ampache 音樂庫 | Ampache |
+  | Koel | 自建 Koel 音乐库 | 自架 Koel 音樂庫 | Koel |
+  | Kodi | 自建 Kodi 媒体库 | 自架 Kodi 媒體庫 | Kodi |
+  | Logitech Media Server | Logitech Media Server | Logitech Media Server | Logitech Media Server |
+  | AzuraCast | 自建 AzuraCast 电台 | 自架 AzuraCast 電台 | AzuraCast |
   | Jellyfin | 自建媒体库 | 自建媒體庫 | Media server |
+  | Emby | Emby 媒体库 | Emby 媒體庫 | Emby library |
+  | Plex | 自建媒体库 | 自架媒體庫 | Media library |
+  | Funkwhale | 联邦音乐 | 聯邦音樂 | Federated music |
+  | Audiobookshelf | 自建有声书 | 自架有聲書 | Self-hosted audiobooks |
 
-- **英文那列压到了 14 个字符以内**，因为英文比中文长一倍；名字现在只出现在提示气泡与详情面板里，还是短一点好。想要更准确的英文说法，得先放宽提示气泡的宽度。
+- **英文那列有长有短**（最长 `Self-hosted audiobooks`，22 个字符），因为英文比中文长；名字现在只出现在提示气泡与详情面板里，还是短一点好。想要更准确的英文说法，得先放宽提示气泡的宽度。
 - **带字的 chip 只在详情面板里**：事实的标识在 `shared/ui/meta_badge.dart` 里是纯图标（`MetaBadge`，文字进提示气泡），`shared/ui/source_badge.dart` 写音源（也只有图标）；详情面板里事实的 `MetaChip` 写着事实的**主**（时长、大小、格式），事实的名字与副在提示气泡里。chip 的宽跟着主走，语言写出来的词有长有短，一排 chip 排成两三行是正常的。地址更长，写不进一行，就由 `ChipGroup` 带着：宽的一半写名字，小的一半是动作（本机的文件是打开，远端的地址是复制），地址在提示气泡里。
 - **门禁还没画到的界面**：深色主题（现在只画浅色）、播放器的溢出菜单、添加音源对话框、音源页上除 jamendo 以外的每一种配置对话框。
 - `test/services/music_source_live_test.dart` 偶尔因为 TLS 握手失败而红，那是网络问题，与本地化无关。

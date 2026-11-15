@@ -86,23 +86,24 @@
 ```
 
 - 左：标题（displayMedium 24 宋体）+ 统计（整行 mono 11，它是账目不是正文；分隔点用次要色）。
-- 右：在线搜索（34，窄窗退化为图标）、`⋯` 菜单。
+- 右：在线搜索（34）、`⋯` 菜单。
 - 视图切换归工具条（4.2）：它改的是列表的读法，不是页面的身份。
 - `⋯` 只放全库动作：`重新扫描全部音源`（扫描中禁用并显示进度）、`将当前列表加入队列`。
-- **删除**：红色眉标、独立的「全部入队」图标、独立的刷新图标。刷新降级为菜单项 + 页头下的 2px 进度线；音源失败时菜单图标带一个小圆点。
-- 统计在内容宽 < 640 时隐藏（先让位），在线搜索在 < 560 时退化为图标。
+- **删除**：红色眉标、独立的「全部入队」图标、独立的刷新图标。刷新降级为菜单项 + 列表上方的 2px 进度线；音源失败由那条状态行报出，`⋯` 图标不挂圆点。
+- 统计始终在，窄窗靠省略号收；在线搜索始终是带文字的按钮。内容宽 < 560 时工具条改成两行，不靠隐藏统计让位。
 
 ### 4.2 工具条（34）
 
 ```text
-[🔍 搜索 …………………………] [全部来源 ⌄]        [最近加入 ↓]   [列表|双列|专辑]
+[🔍 搜索 …………………………] [全部来源 ⌄] [筛选]   [最近加入 ↓] [列表|双列|分类|专辑]
 ```
 
 - 搜索：吃掉工具条剩下的宽度，上限 680；不再把 420 之后留成空白。
 - 来源筛选：写出当前值（`全部来源` / 具体音源），34 高，活动时用强调色描边。
-- 排序：`最近加入 ↓`，34 高，只在列表 / 双列出现；专辑视图隐藏（专辑按名称自有顺序）。
-- 视图切换：`列表 / 双列 / 专辑`，34 高，贴右边缘；双列是第三档（4.6）。
-- 结果数：只有搜索或筛选生效时出现，放在排序左边，不重复页头的总数。
+- 排序：`最近加入 ↓`，34 高，工具条里始终在场；专辑视图也画它，但专辑按名称自有顺序，不读它。
+- 视图切换：`列表 / 双列 / 分类 / 专辑` 四个图标按钮（名字在 tooltip），34 高，贴右边缘；双列是第二档（4.6）。
+- 结果数：按当前内容类型的单位常显（曲目 / 单集 / 章节 / 电台 / 音效），放在来源筛选右边、排序左边。
+- 筛选：34 高，生效的筛选组数写在按钮上；分面与分组见 [library-browse.md](library-browse.md)。
 - 「全部入队」不在这里：它归页头的 `⋯`（4.1）。
 
 ### 4.3 列头（26）
@@ -119,7 +120,7 @@
 ### 4.4 行（32，不变）
 
 ```text
-[#] [封面 24] [标题 flex 5] [艺术家 flex 3] [专辑 flex 3] [加入 56] [尾部 102]
+[#] [封面 24] [标题 flex 5] [艺术家 flex 3] [专辑 flex 3] [加入 64] [尾部 102]
  22     34         标题永远在         ≥480        ≥820        ≥760     音源 · 时长 · ♡
 ```
 
@@ -127,12 +128,12 @@
   这改写 [chips.md](chips.md) 里「行内自动变成一个纯图标」那一句；落地时同步改文档与 `track_facts_test`。
 - **尾部是一块 102px 的叠加区**，不是三列：
   - 静止：`[音源 18] [时长 44] [♡ 24]`，右对齐，行尾是紧的；
-  - 悬停 / 键盘聚焦 / 正在播放：时长与音源淡出，原位换成 `[ⓘ 24] [+] 24 [♡ 24]`，红心钉在最右、不移动；
+  - 悬停 / 键盘聚焦：时长与音源隐去，原位换成 `[ⓘ 24] [+] 24 [♡ 24]`，红心钉在最右、不移动；
   - 这样既不常驻一列空位，也不因显隐改变任何列宽。
   - 红心**常驻**在叠加区最右（空心 = 未标，实心 = 已标；它是状态，不是第三个动作）。
-  - 详情与入队**默认透明**；行悬停或获得键盘焦点时 120ms 淡入。焦点进入动作区时保持可见。
-  - 正在播放的行与选中行始终显示三个动作。
-- 时长右对齐、mono；加入时间 mono（`今天` / `昨天` / `3 天前` / `09-12` / `2024-05`），`dateAdded <= 0` 写 `—`。
+  - 详情与入队**默认不出现**；行悬停或获得键盘焦点时直接换出（没有淡入动画）。焦点进入动作区时保持可见。
+  - 正在播放与选中只改行底色，不常驻三个动作。
+- 时长右对齐、mono；加入时间 mono（`09-12` / `2024-05`），`dateAdded <= 0` 写 `—`。
 - 序号列保留：它给左缘一个节奏，也承载正在播放的均衡器。32 行高、24 封面不变，密度已经到底，不再压。
 
 ### 4.5 断点
@@ -189,31 +190,38 @@
 
 ### 5.1 默认：最近加入，倒序
 
-`Song.dateAdded` 已经存在，扫描与合并都保留首次入库时间（`_keepFirstSeen`），只是从没被列表用过。
+`Song.dateAdded` 已经存在，扫描与合并都保留首次入库时间（`_withFirstSeen`），只是从没被列表用过。
 默认「最近加入倒序」就是读者最常问的那句「我刚加的歌在哪」。
 
 ### 5.2 模型
 
 ```dart
-enum LibrarySortField { addedAt, title, artist, album, duration }
+enum LibrarySortField { title, addedAt, artist, album, duration }
 
 @immutable
 class LibrarySort {
   final LibrarySortField field;
   final bool ascending;
+
   const LibrarySort({
-    this.field = LibrarySortField.addedAt,
-    this.ascending = false,
+    this.field = LibrarySortField.title,
+    this.ascending = true,
   });
+
+  /// The default of the redesign: the track added last is first.
+  static const LibrarySort recent = LibrarySort(
+    field: LibrarySortField.addedAt,
+    ascending: false,
+  );
 }
 ```
 
 - 归属：`LibraryState.sort`，由 `LibraryController.setSort` 改；**不**进 settings，也不在页面里另存一份。
-- 持久化：`LibraryStorage` 增加 `loadSort()` / `saveSort()`，落在 `<支持目录>/library/view.json`。库自己的视图偏好跟库走。
-- 排序时机：`_mergeResults` 合并后按当前 `sort` 排一次；`setSort` 再排一次。**不在 build 里排**：20k 首的 `List.sort` 不能挂在每次输入上。
+- 持久化：`LibraryStorage` 的 `loadView()` / `saveView()` 落在 `<支持目录>/library/view.json`，`LibraryView` 里同时存排序与筛选。库自己的视图偏好跟库走。
+- 排序时机：排序进 SQL——`library_query.dart` 的 `_order` 按 `LibrarySort` 生成 `ORDER BY`（`title_sort`、`date_added` 等列）；`setSort` 只改状态并重读一窗。**不在 build 里排**，也不在内存里 `List.sort`。
 - 搜索与来源筛选保序（`filteredSongsOf` 不动），所以过滤后仍是同一套顺序。
 - 文本列用 `compareText`（已有的中文/拉丁比较）；`dateAdded` 与 `duration` 为 0 的条目**无论升降序都排在最后**（未知不是「最旧」）。
-- 扫描、合并、增删都走同一个比较器，避免两处规则。
+- 扫描、合并、增删都走同一条查询的排序，避免两处规则。
 
 ### 5.3 交互
 
@@ -221,7 +229,7 @@ class LibrarySort {
   （不按音源排序：音源的名字与顺序归 `MusicSourcesController`，库的 domain 不该为了排序去认识它。）
 - 点当前字段 = 反向；点别的字段 = 该字段默认方向（文本升序，加入倒序，时长升序）。
 - 列头点击等价于同一动作，两处读同一份 `LibrarySort`。
-- 专辑视图隐藏排序控件；回到列表时恢复上次选择。
+- 专辑视图不读排序控件；回到列表时仍是同一个 `LibrarySort`。
 
 ## 6. 状态与数据流
 
@@ -237,8 +245,8 @@ class LibrarySort {
 
 ## 7. 性能预算
 
-- **行**：去掉事实条（1–4 个 `MetaBadge`，每个约 5 element）后目标 ≤ 150；悬停动作 +3 个 `DenseIconAction` 后仍 ≤ 165。`row_budget_test` 守。
-- **排序**：`setSort` 在 controller 里排一次；20k 首预算 ≤ 8ms（新基准 `tool/perf/library_sort_bench_test.dart`）。
+- **行**：去掉事实条（1–4 个 `MetaBadge`，每个约 5 element）后 ≤ 170；带音源或多事实的行 ≤ 190。`row_budget_test` 守。
+- **排序**：由数据库的 `ORDER BY` 完成（`library_query.dart`），`setSort` 只改状态并重读一窗；基准见 `tool/perf/library_bench_test.dart` 与 `tool/perf/db_bench_test.dart`。
 - **悬停**：`MouseRegion` / `InkWell.onHover` 只 `setState` 那一行，禁止经过 provider。
 - **列头**：静态 `Row`，不订阅播放状态；正在播放只影响行。
 - **双列**：`GridView` 每格 element 数与列表行同量级；一屏约 1.6 倍格子，但每个更窄、没有列头与专辑列。
@@ -246,7 +254,7 @@ class LibrarySort {
 
 ## 8. 可访问性与键盘
 
-- 列头是按钮：`Semantics(button, label: '按加入时间排序，当前降序')`；视觉箭头不参与读屏。
+- 列头是按钮：`Semantics(button, label: '<列名>, ascending / descending')`（`library_column_header.dart`）；视觉箭头不参与读屏。
 - 悬停才出现的动作，必须由**行聚焦**触发显示；动作在 Tab 顺序里，不隐藏焦点。
 - 行本身 Enter = 播放（现状）；空格不抢滚动。
 - 颜色对比沿用 `theme_contrast_test.dart`；新增的 11px mono 列头只用 `onSurfaceVariant` 在 `surface` 上的那一对。
@@ -276,9 +284,9 @@ class LibrarySort {
 
 ### P3 · 收尾
 
-12. 扫描进度线 + `⋯` 失败圆点，删掉 `LibraryScanStatusBar`。
+12. 扫描进度线 + 状态行（`LibraryScanStatusBar` 改成只画 2px 进度线与一行消息）。
 13. 空态、专辑页页头对齐、i18n（四种 ARB）、文档与截图基准。
-14. `tool/perf/library_sort_bench_test.dart`、`library_sort_test`、`library_row_hover_test`、`library_header_overflow_test`。
+14. `test/app/row_budget_test.dart`、`library_row_focus_test.dart`、`library_toolbar_test.dart`、`library_view_test.dart`。
 
 ## 10. 拍板结果（2026-11-01）
 
@@ -303,7 +311,7 @@ class LibrarySort {
 - 默认启动顺序 = 最近加入倒序；重启后保持；点列头可切回标题升序。
 - 悬停 / 键盘聚焦时三个动作出现；不悬停时行内只有一个红心。
 - 双列在 1120 窗口可用，900 窗口隐藏；缩窗回落列表、放大恢复。
-- 一行 element ≤ 165；20k 首排序 ≤ 8ms；滚动基准不高于 D5 的 23ms/步。
+- 一行 element ≤ 170（带音源/多事实 ≤ 190）；滚动基准不高于 D5 的 23ms/步。
 
 ## 13. 影响面：哪些页面动，哪些不动
 
@@ -320,7 +328,7 @@ class LibrarySort {
 三条边界：
 
 1. **结构性改版只发生在「表格页」这一种页面型**。卡片页（发现）、表单页（音源 / 设置）、详情页（正在播放）不因为音乐库改版而重做。
-2. **可共享的只有三样**：`PageHeader`、34 高工具条控件、行尾（`RowTail`）。先放 `shared/ui`，音乐库先用；喜欢页与专辑页在第二批接。
+2. **可共享的只有三样**：`PageHeading`、34 高工具条控件、行尾（`LibraryRowTail`）。`PageHeading` 已在 `shared/ui`；行尾还在 `features/library/presentation`，等第二个页面真要用时再上移。
 3. **默认窗口是全局的**，但它只是给所有页面多一点空间，不算视觉改版。
 
 如果目标是「每个页面都统一到这套语言」，那要先写一份设计系统（页面型 × 组件），再逐页迁移；不建议在音乐库这一版里顺手改。那是另一个工程，不是这次的一批。

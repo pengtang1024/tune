@@ -1,6 +1,6 @@
 # 歌词
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > AGENTS.md 的展开文档。改歌词链路（取词、解析、高亮、落盘）前读这份。
 > 音源侧的整体约定见 [需求/音源设计.md](../需求/音源设计.md) 的「4.4 歌词」。
@@ -29,11 +29,11 @@ LyricsPanel (features/player/presentation)
         │     ├── MusicSourceAdapter.fetchLyrics(config, song)   音源自己的歌词
         │     └── LyricsProvider.lookup(song)                     共享库（LRCLIB）
         ├── LibraryPaths.readLyrics / saveLyrics (data/services/library)
-        └── LyricsDocument.parse (features/player/domain)
+        └── LyricsDocument.parse (lib/domain/models)
 ```
 
 - 播放位置仍由 `PlaybackController` 独家持有，歌词只**读**位置，不写。
-- 歌词文档（解析结果）是纯数据，留在 `features/player/domain`，不依赖 Flutter。
+- 歌词文档（解析结果）是纯数据，留在 `lib/domain/models`，不依赖 Flutter。
 - service 不依赖 Riverpod，也不 import `features/`。
 
 ## 2. 现状与已知缺陷（2026-10-21 实测）
@@ -53,12 +53,12 @@ LyricsPanel (features/player/presentation)
 
 ## 3. 方案
 
-### 3.1 歌词文档（`features/player/domain/lyrics_document.dart`）
+### 3.1 歌词文档（`lib/domain/models/lyrics_document.dart`）
 
 一份 LRC 有三类东西：**头部标签**、**时间戳**、**正文**。分开对待。
 
-- `LyricsLine` 增加 `timed` 标志：这一行带不带时间戳。不带时间戳的行 `time` 是 `Duration.zero`。
-  - 现在的 `isTimed` 用 `time > Duration.zero` 判断，`[00:00.00]` 开头的整份歌会被当成没有时间戳——改用显式标志。
+- `LyricsLine.time` 可空：带时间戳的行是具体时刻，**不带时间戳的行是 `null`**。
+  - 原来的 `isTimed` 用 `time > Duration.zero` 判断，`[00:00.00]` 开头的整份歌会被当成没有时间戳——改用显式记录：`LyricsDocument` 另存一份有时间戳行的下标表，`isTimed` 看它是不是空。
 - 头部标签（`ti` `ar` `al` `au` `by` `re` `ve` `length`）**不显示**，但要认出来，不能当歌词行。
 - `[offset:±毫秒]` 生效：`offset` 为正表示歌词提前，按 `时间戳 - offset` 计算。
 - 增强 LRC 的逐字标签 `<00:12.00>` 从正文里去掉（逐字高亮不做，标签不能露出来）。
@@ -115,7 +115,7 @@ LyricsPanel (features/player/presentation)
 ### 3.4 界面（`features/player/presentation/`）
 
 - `LyricsPanel` 自己从 `PlaybackController` 读当前曲目与播放位置，不再由调用方传歌。
-- 面板只显示，不改 provider（见 3.3）。五种状态，各自有下一步：
+- 面板只显示，不改 provider（见 3.3）。九种状态，各自有下一步：
 
   | 状态 | 显示 | 动作 |
   | --- | --- | --- |
@@ -129,7 +129,7 @@ LyricsPanel (features/player/presentation)
   | 有歌词（机器稿） | 头部说明行「机器稿：票池生成……」+「重新查找」，下面是歌词列表 | 「重新查找」 |
   | 有歌词 | 歌词列表，当前行高亮并自动滚动；行尾小旗（悬停可见）一键标记「这行不对」，再按撤销 | 见下「有词态的动作行」 |
 
-- **有词态的动作行**（列表底部，M6/M7）：「整首不对」「这不是唱的」两个一键整曲标记（已标高亮，再按撤销）；配了文本模型时另有「翻译」「音译」——各只做一次，做完变主题色对勾并置灰（tooltip「已对照」），对照以次级样式贴在原文行下（不参与定位、不高亮）；尾部「标记管理」进 `/marks` 一页看全部标记。读者的词只从 `manual.lrc` 来：改词在标记管理里做，面板没有任何写字入口。
+- **有词态的动作行**（列表底部，M6/M7）：「整首不对」「这不是唱的」两个一键整曲标记（已标高亮，再按撤销）；配了文本模型时另有「翻译」「音译」——各只做一次，做完变主题色对勾并置灰（tooltip「已对照」），对照以次级样式贴在原文行下（不参与定位、不高亮）；尾部「标记管理」进 `/marks` 一页看全部标记。读者的词落在 `manual.lrc`（没有同名 `.lrc` 时写回 `.lrc`）：改词在标记管理里做，面板没有任何写字入口。
 
 - 高亮位置由派生 provider（`activeLyricLineProvider`）算，**只有高亮行变了面板才重建**（D5）。
 - 滚动由 `ref.listen` 驱动，不在 build 里做副作用。
@@ -142,13 +142,13 @@ LyricsPanel (features/player/presentation)
 
 **改动**
 
-- `lib/features/player/domain/lyrics_document.dart`——解析规则、定位算法
+- `lib/domain/models/lyrics_document.dart`——解析规则、定位算法
 - `lib/features/player/application/lyrics_controller.dart`——状态语义、竞态、缓存、三个动作、高亮行
-- `lib/features/player/presentation/lyrics_panel.dart`——五种状态、动作、按行重建
+- `lib/features/player/presentation/lyrics_panel.dart`——九种状态、动作、按行重建
 - `lib/data/services/music_sources/music_source_service.dart`——三段取词与错误语义
 - `lib/data/services/music_sources/lrclib_lyrics_provider.dart`——精确匹配、归一化、容差
 - `lib/data/services/library/lyrics_text.dart`（新）——歌词文件的解码（UTF-8 / GBK）
-- `lib/data/services/library/library_paths.dart` + `impl/library_paths_io.dart`——两个歌词文件的名字与读取顺序
+- `lib/data/services/library/library_paths.dart` + `lib/data/services/impl/library_paths_io.dart`——两个歌词文件的名字与读取顺序
 - `lib/l10n/app_*.arb` + 生成的 `app_localizations*.dart`——新文案（四种语言同步）
 - `pubspec.yaml` + `pubspec.lock`——`charset`（GBK 解码）
 
@@ -174,7 +174,7 @@ LyricsPanel (features/player/presentation)
 
 | 风险 | 影响 | 缓解 |
 | --- | --- | --- |
-| `/api/get` 返回 503（实测 LRCLIB 对不存在的歌也回 503） | 精确匹配形同虚设 | 非 200 一律退回 `/api/search`；两级都失败才算「加载失败」 |
+| `/api/get` 对查不到的曲目回 404（实测；服务器出错时是 5xx） | 精确匹配形同虚设 | 非 200 一律退回 `/api/search`；两级都失败才算「加载失败」 |
 | 共享库对本地曲目开放后，请求量变大 | 慢 | 只在打开面板时请求；会话内缓存「查过没有」；结果写盘后不再请求 |
 | 手动歌词文件覆盖读者自己的 `.lrc` | 读者文件丢失 | 已有同名文件时不覆盖，改写 `<歌名>.manual.lrc`，读取时按这个顺序找 |
 | GBK 解码引入新依赖 | 构建变化 | `charset` 已在依赖树里（传递依赖），加直接依赖不引新包；解码失败退回 UTF-8 容错 |

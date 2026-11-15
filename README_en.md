@@ -1,6 +1,6 @@
 # Tune
 
-> 状态：入口 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：入口 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 [中文](README.md) · [English](README_en.md)
 
@@ -117,7 +117,7 @@ Step by step, that is `flutter analyze` (must report No issues found), `flutter 
 
 ## Build and artifacts
 
-The default package contains no local models, so the Linux archive is about **51 MiB** (root [version.json](version.json) `linux-x64.size` = 53,725,517 B). Upgrading never deletes downloaded local components.
+The default package contains no local models, so the Linux archive is about **51 MiB** (root [version.json](version.json) `linux-x64.size` = 53,783,594 B). Upgrading never deletes downloaded local components.
 
 ```bash
 flutter build linux --release

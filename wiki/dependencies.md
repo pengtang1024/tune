@@ -1,6 +1,6 @@
 # 依赖关系
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 ## 内部依赖方向
 
@@ -10,7 +10,7 @@ presentation → application → domain
 ```
 
 - `domain/`、`data/`、`core/` 不 import `features/`、`app/`、`shared/ui/`。
-- `features/x/presentation` 不 import `features/y/presentation`（唯一历史例外：`library_pane.dart` → `online_search_sheet.dart`，待消除）。
+- `features/x/presentation` 不 import `features/y/presentation`；跨页面组合放 `app/router`（如 `library_pane.dart` 的在线搜索入口由 router 注入）或 `features/shell`。
 - `features/x/application` 可以 import 别的 feature 的 `application` / `domain`。
 - service 不依赖 Riverpod；widget 不直接持有 service，只通过 provider。
 

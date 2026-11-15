@@ -1,6 +1,6 @@
 # 关键类与函数
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > 按「入口 → 状态机 → 服务接口 → 领域模型」组织。方法只列公开 API，完整签名以代码为准。
 
@@ -128,7 +128,7 @@ bootstrap 序列：
 
 ### `AppDatabase` — `lib/data/services/database/app_database.dart`
 
-- 表：`songs`、`favorites`、`queue`、`queue_meta`、`listening_signals`、`smart_lyrics_tasks`、`smart_lyrics_marks`、`smart_lyrics_sample`、`smart_lyrics_audit`。
+- 表：`songs`、`favorites`、`queue`、`queue_meta`、`listening_signals`、`smart_lyrics_tasks`、`smart_lyrics_marks`、`smart_lyrics_sample`、`smart_lyrics_audit`、`text_translations`、`translation_usage`。
 - `load()` 读活跃歌曲窗口；`save()` 批量 upsert `songs`。
 
 ### `PersistenceService` → `FilePersistenceService`

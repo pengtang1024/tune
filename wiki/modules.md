@@ -1,6 +1,6 @@
 # 主要模块职责
 
-> 状态：设计（已实施） · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
 >
 > 按 `lib/` 下的包逐一说明。每个 feature 内部都按 `domain → application → data → presentation` 分层。
 
@@ -33,8 +33,9 @@
 | application | `track_prefetcher.dart` | 预取下一首（仅缓存，不决定播放） |
 | application | `list_playback.dart` | 列表点击播放策略：替换队列或加入队列并播放（随设置） |
 | application | `playback_session_recorder.dart` | 播放会话持久化：队列切歌/编辑时写，进度每 5 秒写 |
+| application | `dead_songs_controller.dart` | 失效曲目（文件不在/地址刷不出）的标记与清理 |
 | domain | `playback_state.dart` | `PlaybackState`：状态、进度、音量、模式、队列、当前 URI、历史、错误 |
-| domain | `play_mode.dart`、`playback_source.dart`、`lyrics_document.dart` | 播放模式枚举、播放来源、歌词文档模型 |
+| domain | `play_mode.dart`、`playback_source.dart` | 播放模式枚举、播放来源（歌词文档模型 `LyricsDocument` 在 `lib/domain/models/lyrics_document.dart`） |
 | data | `playback_session_store.dart` | `queue` / `queue_meta` 表的读写 |
 | presentation | `player_dock.dart` | 底部播放条 |
 | presentation | `now_playing_page.dart`、`lyrics_panel.dart`、`now_playing_track_info.dart` | 正在播放页（整窗路由）与歌词面板 |
@@ -44,11 +45,10 @@
 | 子层 | 关键文件 | 职责 |
 | --- | --- | --- |
 | application | `library_controller.dart` | 加载、扫描、排序、筛选；窗口化读取 SQLite |
-| application | `dead_songs_controller.dart` | 失效曲目（文件不在/地址刷不出）的标记与清理 |
 | application | `playback_notes_provider.dart` | 启动时把会话笔记接进播放链路 |
-| domain | `library_state.dart`、`library_filter.dart`、`library_sort.dart`、`library_category.dart`、`library_facets.dart`、`library_album.dart` | 库状态、筛选、排序、分类树、分面、专辑 |
+| domain | `library_state.dart`、`library_view.dart`、`library_category.dart`、`library_album.dart` | 库状态、视图（排序 + 筛选组合）、分类树、专辑；筛选/排序/分面模型在 `lib/domain/models/` 的 `library_filter.dart`、`library_sort.dart`、`library_facets.dart` |
 | data | `library_storage.dart` + `impl/library_storage_io.dart` | `LibraryStorage` 接口 → `SqliteLibraryStorage`（`songs` 表窗口读写、视图 JSON） |
-| presentation | `library_pane.dart` | 音乐库页（含在线搜索入口，历史例外见架构文档） |
+| presentation | `library_pane.dart` | 音乐库页（在线搜索入口由 `app/router` 注入） |
 | presentation | `library_toolbar.dart`、`library_header.dart`、`library_column_header.dart` | 页头、工具条、列头 |
 | presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart` | 歌曲 / 双列 / 专辑 / 分类四种视图（`library_view_mode.dart`） |
 | presentation | `library_filter_panel.dart`、`library_filter_chips.dart` | 筛选面板（11 组）与生效 chip |
@@ -96,7 +96,7 @@
 | application | `settings_controller.dart` | 从偏好存储读出全部设置并持有 |
 | domain | `settings_state.dart` | 主题、语言、扫描路径、播放行为、健康度权重、智能歌词配置 |
 | presentation | `settings_pane.dart` | 左分区导航 + 右设置内容 |
-| presentation | `settings_*_card.dart` | 各分区卡片：外观/音乐库/播放/歌词/发现/桌面/更新/许可证 |
+| presentation | `settings_cards.dart`、`settings_*_card.dart` | 各分区卡片：外观 / 音乐库 / 许可证在 `settings_cards.dart`，播放、歌词、发现、桌面、更新各一份 |
 
 ## features/smart_lyrics —— 智能歌词
 

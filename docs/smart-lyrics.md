@@ -237,7 +237,7 @@ LyricsController._lyricsFor(song)
 | 跨 feature 不碰 presentation | `features/smart_lyrics` 只 import player 的 application/domain；面板上的标记动作由 player 侧的挂点回调 |
 | service 不依赖 Riverpod、不 import `features/` | `SmartLyricsService` 放 `data/services/smart_lyrics/`，只编排 I/O，状态归 controller |
 | 状态只有一个主人 | 生成/批量的**结果**经 `LyricsController` 进 `LyricsState`；不持有第二份歌词状态，`SmartLyricsController` 只持有进度；标记归 `SmartLyricsTaskStore` |
-| UI 线程不做同步 I/O / 重活 | 云端走 dio 异步；本地引擎是子进程（桌面）/ FFI（Android）；共识对齐在主 isolate 直接算（纯逻辑，毫秒级，未用 isolate）；批量 3 路 worker 全程后台，下载与转写重叠 |
+| UI 线程不做同步 I/O / 重活 | 云端走 dio 异步；本地引擎是子进程（桌面）/ FFI（Android）；共识对齐在主 isolate 直接算（纯逻辑，毫秒级，未用 isolate）；批量 6 路 worker（`smartLyricsBatchWorkersProvider` 默认 6，clamp 1..6）全程后台，下载与转写重叠 |
 | 每操作不做写放大 | 单曲成功写一个 `.smart.lrc` + 任务表一行状态更新；标记是任务表一行更新，不碰词稿文件 |
 | 库不入内存 | 批量队列、账本与标记存 SQLite（`smart_lyrics_tasks` / `smart_lyrics_marks` 表），按需取，统计在数据库里算 |
 
@@ -419,15 +419,16 @@ lib/data/services/smart_lyrics/    # engine、openai_compatible_engine、whisper
                                    # smart_lyrics_ballot（票池纯逻辑）、smart_lyrics_service
 lib/data/services/music_sources/   # lyrics_provider + 新共享库实现（人写票）
 lib/features/smart_lyrics/         # application/smart_lyrics_controller、
-                                   # data/smart_lyrics_task_store（任务表+标记表+账本）、
+                                   # data/smart_lyrics_task_store（任务表+标记表）、
+                                   # data/smart_lyrics_ledger_store（账本）、
                                    # presentation/（设置卡、标记管理）
 lib/features/player/               # lyrics_controller 新动作与读取链；lyrics_panel 动作、行标记、双语渲染
 lib/data/services/library/         # library_paths(+impl)：saveSmartLyrics / readSmartLyrics / smart JSON
 lib/features/settings/             # settings_pane 挂「智能歌词」卡（与发现卡同款）
 ```
 
-另：`features/library/data` 存储层加 `smart_lyrics_tasks` / `smart_lyrics_marks`
-两张表（迁移一处）；`lib/l10n/app_*.arb`（四语）；`pubspec.yaml` 无新增依赖
+另：`lib/data/services/database`（`app_database.dart`）加 `smart_lyrics_tasks` /
+`smart_lyrics_marks` 两张表（迁移一处）；`lib/l10n/app_*.arb`（四语）；`pubspec.yaml` 无新增依赖
 （本地引擎用自管下载的系统级二进制，不进包）。
 
 **文档**：`AGENTS.md` 文档地图加一行（落地时从「提案」转正）；`docs/architecture.md`

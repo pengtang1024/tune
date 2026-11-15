@@ -1,6 +1,6 @@
 # 架构契约
 
-> 状态：契约 · 适用版本 1.32.0 · 最后核对 2026-11-15
+> 状态：契约 · 适用版本 1.33.0 · 最后核对 2026-11-15
 
 > AGENTS.md 的展开文档。改目录、加文件、动依赖前读这份。
 
@@ -300,7 +300,6 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | `lib/shared/ui/meta_badge.dart` | `MetaChip`（带框的图标 chip，写着事实的主，名字在 tooltip 里）、`MetaBadge`（纯图标 + tooltip）与 `ChipGroup`（带着长值与动作的 chip 组） |
 | `lib/shared/ui/icon_glyph.dart` | `IconGlyph`：密集行里的图标字形，只有一个 `RichText`，不带 `Icon` 的盒子；图标是装饰 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
-| `lib/shared/ui/source_icon.dart` | 图标按类型查；目录里没有的类型按种类兜底 |
 | `lib/shared/ui/favorite_button.dart` | `FavoriteButton`：红心，标与取消标；不是事实，是控件 |
 
 同一份事实按三档呈现，读者想要多少信息就看到多少：
@@ -353,7 +352,7 @@ app 写进磁盘的文件都放在**音乐库**里：平台自己的音乐目录
 | --- | --- |
 | `lib/shared/ui/meta_badge.dart` | `MetaBadge`（纯图标 + tooltip）、`MetaChip`（带框的图标 chip，写着主）、`ChipGroup`（带着长值与动作的 chip 组）与事实的语气色 |
 | `lib/shared/ui/source_badge.dart` | `SourceBadge`：音源标识，纯图标 + tooltip，固定大小 |
-| `lib/shared/ui/source_mark.dart` | 图标按类型查；颜色按音源的类别（`sourceToneOf`） |
+| `lib/shared/ui/source_mark.dart` | 图标按类型查，目录里没有的类型按种类兜底；颜色按音源的类别（`sourceToneOf`） |
 | `lib/shared/ui/live_badge.dart` | 直播标记，底栏与正在播放页共用一份 |
 | `lib/shared/utils/readable_address.dart` | 地址写成读者读得懂的样子：去掉 `file://`，把 `%20` 写成空格 |
 
