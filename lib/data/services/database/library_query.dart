@@ -52,6 +52,8 @@ class LibraryQuery {
     required String query,
     required LibraryFilter filter,
   }) {
+    // Another scope keeps its rows: a live stream has no duration to miss.
+    if (!filter.hidesMissingDuration) return 0;
     final where = LibraryFilterSql.where(
       query,
       filter.copyWith(hideMissingDuration: false, excludeShortTracks: false),

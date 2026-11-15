@@ -92,7 +92,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       offset: 0,
       limit: windowSize,
     );
-    final hiddenMissingDuration = filter.hideMissingDuration
+    final hiddenMissingDuration = filter.hidesMissingDuration
         ? await _storage.missingDurationCount(query: '', filter: filter)
         : 0;
     final albums = await _storage.albumSummaries();
@@ -642,7 +642,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     final albums = songsChanged
         ? await _storage.albumSummaries()
         : _current.albums;
-    final hiddenMissingDuration = filter.hideMissingDuration
+    final hiddenMissingDuration = filter.hidesMissingDuration
         ? await _storage.missingDurationCount(query: query, filter: filter)
         : 0;
     final total = songsChanged ? await _storage.count() : _current.total;

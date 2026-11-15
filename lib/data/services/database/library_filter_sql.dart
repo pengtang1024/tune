@@ -28,7 +28,7 @@ class LibraryFilterSql {
       language(filter.languages),
       durationFilter(filter.durations),
       addedFilter(filter.added),
-      hiddenDuration(filter.hideMissingDuration),
+      hiddenDuration(filter.hidesMissingDuration),
       shortTracks(filter.excludeShortTracks),
     ]) {
       if (clause == null) continue;

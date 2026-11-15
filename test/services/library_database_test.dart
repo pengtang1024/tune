@@ -786,10 +786,40 @@ void main() {
       expect(database.countQuery(query: '', filter: filter), 1);
       expect(database.missingDurationCount(query: '', filter: filter), 1);
 
-      // Turning the hiding off brings the row back; it was never deleted.
+      // Turning the hiding off brings the row back; it was never deleted,
+      // and nothing is hidden any more, so the note has nothing to say.
       final shown = filter.copyWith(hideMissingDuration: false);
       expect(database.countQuery(query: '', filter: shown), 2);
-      expect(database.missingDurationCount(query: '', filter: shown), 1);
+      expect(database.missingDurationCount(query: '', filter: shown), 0);
+    });
+
+    test('a station keeps its row, whatever its duration says', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Station',
+          uri: 'tune://radio/1',
+          sourceId: 'radio-1',
+          isLiveStream: true,
+        ),
+        const Song(
+          id: 2,
+          title: 'Episode',
+          album: 'Show',
+          uri: 'tune://podcast/1',
+          sourceId: 'podcast_rss-1',
+        ),
+      ]);
+
+      // A live stream has no duration by nature, so the dirty-data rule only
+      // speaks about the song scope: the other scopes keep every row.
+      for (final kind in [ContentKind.radio, ContentKind.podcast]) {
+        final filter = LibraryFilter(kinds: {kind});
+        expect(database.countQuery(query: '', filter: filter), 1);
+        expect(database.missingDurationCount(query: '', filter: filter), 0);
+      }
     });
 
     test('a very short track is kept unless the reader narrows it away', () {

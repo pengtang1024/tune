@@ -100,6 +100,16 @@ class LibraryFilter {
     excludeShortTracks,
   ].where((active) => active).length;
 
+  /// Whether this scope is the song list and the reader keeps dirty rows out.
+  ///
+  /// A live radio stream carries no duration by nature, so the rule only
+  /// applies when the scope is exactly the songs; the podcast, audiobook and
+  /// radio scopes keep their rows whatever their duration says.
+  bool get hidesMissingDuration =>
+      hideMissingDuration &&
+      kinds.length == 1 &&
+      kinds.contains(ContentKind.music);
+
   /// The same filter with every group cleared but the content scope.
   ///
   /// The missing-duration hiding is a display rule rather than a group, so a
