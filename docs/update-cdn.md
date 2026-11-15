@@ -22,6 +22,12 @@
 | 压缩 | `Accept-Encoding: gzip` 时 `content-encoding: gzip`；`vary: Accept-Encoding` |
 | CORS | `access-control-allow-origin: *`（桌面端无影响，网页端也够用） |
 
+> **2026-11-15 复测（发版后）**：仓库打包体积 50.6 MiB（两个可变字体合计约 42 MB），
+> `@latest/version.json` 稳定返回
+> `403 Package size exceeded the configured limit of 50 MB`，
+> 而同内容的 `@master/version.json` 仍是 200。
+> **所以清单地址固定在 `@master`，不再使用 `@latest`。**
+
 ### 1.2 响应头与缓存
 
 | 寻址方式 | Cache-Control | 说明 |
@@ -66,13 +72,14 @@
 1. 仓库必须保持 public；jsDelivr 不服务 LFS 指针文件，manifest 不能放进 LFS。
 2. manifest 单文件必须 < 20 MB（实际只有几 KB）。
 3. 分支寻址有 12 小时边缘缓存，靠发版后 purge 解决；标签寻址是一年 immutable，
-   所以「发现最新版」的地址要落在 `@latest` 或 `@master` 上，不能钉死某个 tag。
+   所以「发现最新版」的地址要落在 `@master` 上，不能钉死某个 tag，也不能用 `@latest`
+   （仓库超过 jsDelivr 的 50 MB 包上限，见 §1.1 复测）。
 4. 中国大陆网络对 jsDelivr / raw.githubusercontent 都可能不通，这是本方案**最大的现实风险**，
    只能靠多级回退 + 静默失败兜住，不能保证一定查到。
 
 ## 3. `version.json` 设计
 
-位置：仓库根 `version.json`，随发版提交进 `master`（同时存在于发布 tag，供 `@latest` 解析）。
+位置：仓库根 `version.json`，随发版提交进 `master`（CDN 走 `@master` 分支地址）。
 
 ```json
 {
@@ -124,7 +131,7 @@
 ### 4.1 取数顺序
 
 ```
-1. https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json
+1. https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json
 2. https://raw.githubusercontent.com/pengtang1024/tune/master/version.json
 3. https://api.github.com/repos/.../releases/latest（现有逻辑，解析旧格式；有 token 挂 Bearer，没有就匿名）
 ```
@@ -189,7 +196,7 @@
 4. **校验**：`dist/version.json` 的 `sha256`/`size` 与归档实测一致（脚本内对比，不一致退出）。
 5. 提交 `version.json`（与版本号同一笔或紧随一笔）。
 6. tag → 推送三端（gitee 走发布点镜像）→ 建 GitHub/Gitea release 并上传。
-7. `purge.jsdelivr.net/gh/pengtang1024/tune@latest/version.json` 与 `@master/version.json`。
+7. `purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`（`@latest` 在本仓库不可用）。
 8. 自检：拉一次 CDN 地址，断言返回的 `version` 等于刚发的版本；不等则报错并提示手工 purge。
 
 ## 7. 签名校验：结论与代价

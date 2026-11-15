@@ -33,7 +33,7 @@ class _RoutingAdapter implements HttpClientAdapter {
 }
 
 final _cdn = Uri.parse(
-  'https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json',
+  'https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json',
 ).host;
 final _raw = Uri.parse(
   'https://raw.githubusercontent.com/pengtang1024/tune/master/version.json',

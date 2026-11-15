@@ -6,7 +6,8 @@
 
 应用先读仓库根目录的静态清单 `version.json`，由 CDN 分发：
 
-1. `https://cdn.jsdelivr.net/gh/pengtang1024/tune@latest/version.json`
+1. `https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json`
+   （分支地址；`@latest` 会因仓库超过 jsDelivr 的 50 MB 包上限被拒）
 2. `https://raw.githubusercontent.com/pengtang1024/tune/master/version.json`
 3. 前两档都拿不到时，才读 GitHub 的 release 接口（有 token 挂 Bearer，没有就匿名）
 
@@ -64,8 +65,8 @@ flutter build linux --release
 6. 把组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台归档，
    组件包由应用在设置页按需下载。
 7. 失效 CDN 缓存并自检：
-   `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`
-   （`@latest` 同样刷一次），再拉一次 CDN 地址确认 `version` 等于刚发的版本。
+   `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json`，
+   再拉一次 CDN 地址确认 `version` 等于刚发的版本。
 8. 老版本的应用点「检查更新」就能看到并安装。
 
 Gitea 的仓库是私有的，release 接口要令牌；更新检查只走公开的 GitHub
