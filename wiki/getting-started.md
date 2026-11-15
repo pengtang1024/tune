@@ -52,7 +52,7 @@ flutter build linux --release
 ./tool/package_linux.sh    # 产物：dist/tune-linux-x64-<version>.tar.gz
 ```
 
-- 设置页「关于 → 检查更新」：桌面端从 GitHub release 读最新版本，下载对应平台归档换掉运行中的 bundle，重启生效。
+- 设置页「关于 → 检查更新」：桌面端读仓库根静态清单 `version.json`（jsDelivr CDN `@master` → raw.githubusercontent → GitHub release API 兜底）发现新版本，下载对应平台归档换掉运行中的 bundle，重启生效；后台约 1 h 定时检查（±10% 抖动），失败按 30 min→1 h→2 h 退避，手动检查不受节流限制。详见 `docs/updates.md` 与 `docs/update-cdn.md`。
 - 1.5.0 之前的版本没有更新入口，用 `./tool/upgrade_local.sh` 升级一次。
 - 发布步骤详见 `docs/updates.md`。
 
@@ -83,9 +83,9 @@ flutter build linux --debug && ./linux/install-desktop-entry.sh  # 装 XDG 桌�
 ## 已知限制（摘自 README）
 
 - 远程播放依赖网络；桌面端边播边缓存，播放不等待下载。
-- Windows 用 just_audio_windows，不支持自定义请求头；Jellyfin、ccMixter 可能无法播放；无托盘与 MPRIS。
-- Android / iOS 本地扫描需运行时存储权限，申请流程未实现，移动端本地库可能为空。
-- 远程播放地址可能过期；网易云、Subsonic、播客、Jellyfin 支持单曲刷新，其余音源需重扫。
+- Windows 与 Linux 一样用 just_audio_media_kit（libmpv），自定义请求头随音频请求发出（不使用 just_audio_windows）；Windows 目前无托盘 / SMTC / 默认播放器 / 自动更新（见 `docs/architecture.md` 的「Windows 桌面集成待办」），单实例走回环端口。
+- Android 已用 permission_handler 申请通知与媒体读取权限，MediaStore 扫描、audio_service 后台播放、SAF 指定文件夹都已接（见 `docs/android.md`）；iOS 仅保留入口不排期。
+- 远程播放地址可能过期；实现了单曲刷新的音源（Subsonic / Navidrome、Ampache、Koel、Emby、Plex、Jellyfin、Deezer、播客 RSS）会在地址失效时重新解析单曲，其余音源需重新扫描。
 - 网络电台是直播流：不缓存、不显示进度条。
 - 不支持任意脚本插件：自定义音源只接受声明式参数。
 

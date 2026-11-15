@@ -5,12 +5,12 @@
 
 ## 项目概述
 
-**Tune** 是一款紧凑的本地与在线音乐播放器，当前版本 `1.29.0+49`。
+**Tune** 是一款紧凑的本地与在线音乐播放器，当前版本 `1.32.0+52`（`Pocket`，2026-11-15）。
 
-- **技术栈**：Flutter 3 / Dart 3.8+ · Riverpod 2（StateNotifier/AsyncNotifier）· go_router · just_audio（Linux 走 just_audio_media_kit + 系统 libmpv）· dio · SQLite（sqlite3 包）· gen-l10n
+- **技术栈**：Flutter 3 / Dart 3.8+ · Riverpod 2（StateNotifier/AsyncNotifier）· go_router · just_audio（Linux / Windows 都走 just_audio_media_kit + media_kit_libs_* + 系统 libmpv）· dio · SQLite（sqlite3 + sqlite3_flutter_libs）· gen-l10n；另有 audio_service、permission_handler、sherpa_onnx（Android 后台播放 / 运行时权限 / 本地 ASR）
 - **壳层形态**：左侧导航（发现 / 音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是从底栏或正在播放页打开的**非模态侧栏**，不注册路由
 - **主验收平台**：Linux 桌面；Windows / Android / iOS 保留工程入口；macOS 与 Web 已移除
-- **窗口**：默认 900×600，最小 760×520
+- **窗口**：首帧 900×600（GTK runner），运行时首次启动默认 1120×760，最小 760×520；紧凑布局按 900×600 设计验收
 - **界面语言**：简体中文、繁體中文、中文（通用）、English
 
 ## Wiki 索引
@@ -18,7 +18,7 @@
 | 文档 | 内容 |
 | --- | --- |
 | [architecture.md](architecture.md) | 整体架构：分层、依赖方向、状态归属、持久化地图 |
-| [modules.md](modules.md) | 主要模块职责：11 个 feature + 全局服务层 + shared/core |
+| [modules.md](modules.md) | 主要模块职责：13 个 feature + 全局服务层 + shared/core |
 | [key-classes.md](key-classes.md) | 关键类与函数说明：controller、service、domain 模型 |
 | [dependencies.md](dependencies.md) | 依赖关系：第三方依赖清单与内部依赖方向 |
 | [getting-started.md](getting-started.md) | 运行方式：环境、启动、构建、测试门禁、打包发布 |
@@ -66,7 +66,7 @@ lib/
 ├── config/                   # AppInitializer、版本号
 ├── core/                     # l10n 桥接、常量、扩展、窗口服务
 ├── data/services/            # 全局服务：播放、扫描、音源适配器、持久化、桌面集成
-│   ├── music_sources/        # 20 种音源适配器 + 注册表
+│   ├── music_sources/        # 30 个音源适配器（30 个注册类型）+ 注册表
 │   ├── smart_lyrics/         # 智能歌词引擎（whisper / sherpa / OpenAI 兼容）
 │   ├── database/             # AppDatabase（SQLite 表定义与读写）
 │   ├── mpris/ tray/ desktop/ # 桌面集成接口（无平台依赖）

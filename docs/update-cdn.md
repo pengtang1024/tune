@@ -1,6 +1,6 @@
 # 更新检查：静态清单 + CDN
 
-> 状态：**已实施**（§8 的 1–4 步；签名按决定留到第二阶段）。
+> 状态：**已实施**（§8 的 1–4 步；签名校验未纳入本次实施范围，属第二阶段，见 §7）。
 > 动机：`GET /repos/{owner}/{repo}/releases/latest` 匿名限流 60 次/小时/IP，
 > 现已确认被限流时旧版会把 403 当成「没有新版本」（v1.32.0 已改为如实报失败，
 > 但失败仍然意味着「查不到更新」）。静态清单把「查版本」从 API 挪到 CDN，
@@ -55,7 +55,7 @@
 
 ### 1.4 现有实现的现状
 
-- [update_service.dart](../../lib/data/services/update/update_service.dart) 的
+- [update_service.dart](../lib/data/services/update/update_service.dart) 的
   `latest()` 打 `https://api.github.com/repos/pengtang1024/tune/releases/latest`：**这是唯一吃 60 次/小时配额的请求**。
 - 下载走 `asset.url`，而它来自 `browser_download_url`
   （`https://github.com/.../releases/download/...`）：**现有实现已经正确**，
@@ -246,13 +246,13 @@
 - 折中（推荐）：第一版先做 **sha256 + 大小校验 + 双地址交叉核对**（CDN 与 raw 的
   manifest 若不一致则拒绝并报失败）。等确实要对外分发到不可信网络时再补签名。
 
-## 8. 实施顺序（评审通过后）
+## 8. 实施顺序
 
 1. ✅ `version.json` 模型 + 生成脚本 + 一致性测试。
 2. ✅ `UpdateService` 换数据源，三档回退 + ETag + 校验；保留 API 解析旧格式。
 3. ✅ 定时与退避调度，接到启动流程。
 4. ✅ 设置页文案微调 + 失败文案补两条。
-5. ⏳ （第二阶段）签名。
+5. ⬜ 未纳入已实施范围（第二阶段）：Ed25519 签名校验，见 §7。
 
 回滚：`latestGitHubApi()` 的旧解析仍留在 `parseRelease`，`version.json` 解析持续失败时会自然退回 API 路径。
 

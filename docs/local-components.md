@@ -1,6 +1,6 @@
 # 本地组件（本地能力插件）
 
-> 状态：设计已定，实施中（Android 的 FFI 模型已接入，见 §1.1）
+> 状态：已实施（1.32.0 起，见 CHANGELOG）；Android 的 FFI 模型见 §1.1
 > 适用范围：翻译的本地模型、智能歌词的本地引擎、转码用的 FFmpeg
 
 本地能力不再各自维护下载与安装状态。所有需要“下载一个可执行文件或模型”的东西，都登记成同一种**组件**，由同一份清单、同一个安装器、同一个控制器管理。
@@ -31,7 +31,7 @@
 | 歌词 | `lyrics-whisper-runtime`（whisper-cli）、`lyrics-whisper-model-{tiny,base,small,large-v3-turbo}`（ggml） |
 | 歌词第二票 | `lyrics-sherpa-runtime`（sherpa-onnx）、`lyrics-sensevoice-model` |
 | 歌词可选第三家族 | `lyrics-funasr-nano-model`（Fun-ASR-Nano，复用上面的 sherpa-onnx 运行时） |
-| 歌词（Android） | `lyrics-whisper-onnx-model`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
+| 歌词（Android） | `lyrics-whisper-onnx-model-small`（whisper-small 的 ONNX int8 encoder/decoder/tokens，供应用内 FFI） |
 | 转码 | `ffmpeg`（GPL-2.0-or-later 构建，由本项目自己发布） |
 
 运行时与模型分开下载、分开校验、分开删除。翻译模型按默认、低配、高质量三档并列；引擎取第一个可用的档位，下载仍从默认档开始。SenseVoice 体积大且权重协议需单独确认，只在读者点击时下载，不进默认安装。
@@ -42,14 +42,14 @@ Fun-ASR-Nano 是可选的第三 ASR 家族（`docs/local-ai-evaluation.md` D12�
 
 `platforms` 只决定「这个组件在哪些平台上被列出、被检查」。控制器与设置页都调
 `spec.supports(platform)` 过滤，桌面列表因此保持原样：Android 不会看到 `lyrics-sherpa-runtime`
-与 4 个 ggml whisper 模型，桌面也不会看到 `lyrics-whisper-onnx-model`。
+与 4 个 ggml whisper 模型，桌面也不会看到 `lyrics-whisper-onnx-model-small`。
 
 Android 的运行时不是组件：`sherpa_onnx` 2.0.1 是随包的原生库，`localAsrBackend: ffi`
 直接用它，不下载可执行文件。只有模型是组件：
 
 | 组件 | 文件 | 字节 | 用途 |
 | --- | --- | --- | --- |
-| `lyrics-whisper-onnx-model` | `small-encoder.int8.onnx` | 112,442,483 | whisper-small ONNX encoder |
+| `lyrics-whisper-onnx-model-small` | `small-encoder.int8.onnx` | 112,442,483 | whisper-small ONNX encoder |
 | | `small-decoder.int8.onnx` | 262,226,114 | whisper-small ONNX decoder |
 | | `small-tokens.txt` | 816,730 | 词表 |
 
@@ -277,6 +277,10 @@ Windows 目前三个功能的二进制都是 linux-x64 构建，因此整卡不�
 | 歌词 | 第二引擎 | 3 GB | 4 | 585 MB | 500 MB |
 | 歌词 | 第三引擎 | 8 GB | 8 | 960 MB | 1 GB |
 | 转码 | — | — | — | 6 MB | 100 MB |
+
+翻译档位口径：本表「轻量 / 标准 / 高质量」对应注册表的「低配 / 默认 / 高质量」
+（`translation-model-low` / `translation-model` / `translation-model-quality`）；
+「标准」即默认档，默认档是 Qwen3-0.6B（约 610 MB），下载从默认档开始。
 
 选择顺序（纯函数，可单测）：
 

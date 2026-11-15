@@ -106,12 +106,12 @@ bootstrap 序列：
 
 每个音源类型必须提供：`sourceType`、配置校验、浏览模式、分页/预览支持、扫描、刷新播放地址、获取歌词。
 
-已注册类型（`SourceTypeCatalogue`）：`local`、`openverse`、`jamendo`、`internet_archive`、`ccmixter`、`podcast_rss`、`subsonic`、`audius`、`radio`、`wikimedia`、`jellyfin`、`librivox`、`emby`、`plex`、`funkwhale`、`audiobookshelf`、`direct_url`、`m3u`、`json_api`、`graphql`。
+已注册类型（`SourceTypeCatalogue`，共 30 个）：`local`、`openverse`、`jamendo`、`internet_archive`、`ccmixter`、`podcast_rss`、`podcast_catalog`、`podcast_apple`、`subsonic`、`ampache`、`koel`、`deezer`、`itunes`、`kodi`、`lms`、`peertube`、`audius`、`radio`、`azuracast`、`wikimedia`、`jellyfin`、`librivox`、`emby`、`plex`、`funkwhale`、`audiobookshelf`、`direct_url`、`m3u`、`json_api`、`graphql`。
 
 ### `MusicSourceService` — [lib/data/services/music_sources/music_source_service.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/music_sources/music_source_service.dart)
 
 - 维护 `type → adapter` 注册表（可注入，测试不改全局状态）、`MusicSourceStore`、`LyricsProvider`。
-- 实现 `StreamUrlResolver.refresh(Song)`：刷新远程曲目播放地址（网易云、Subsonic、播客、Jellyfin 支持单曲刷新）。
+- 实现 `StreamUrlResolver.refresh(Song)`：刷新远程曲目播放地址（实现了单曲刷新的音源：Subsonic / Navidrome、Ampache、Koel、Emby、Plex、Jellyfin、Deezer、播客 RSS；其余音源需重新扫描）。
 
 ### `AppDatabase` — [lib/data/services/database/app_database.dart](file:///home/pt/Work/IdeaProjects/tune/lib/data/services/database/app_database.dart)
 

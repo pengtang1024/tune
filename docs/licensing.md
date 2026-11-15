@@ -38,7 +38,7 @@
 | sherpa-onnx 运行时 | `components/lyrics-sherpa-runtime`（按需下载） | Apache-2.0 | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
 | SenseVoice 模型 | `components/lyrics-sensevoice-model`（按需下载） | FunASR 模型开源协议 v1.1 | `THIRD_PARTY_NOTICES.md`、上游 LICENSE |
 | llama.cpp 运行时 | `components/translation-runtime`（按需下载） | MIT | `translation/licenses/llama.cpp-LICENSE.txt`、`THIRD_PARTY_NOTICES.md` |
-| 应用图标 | `branding/`、`assets/icons/` | 项目自有（推定 MIT） | 来源待补，见 §4 |
+| 应用图标 | `branding/`、`assets/icons/` | 项目自有（推定 MIT） | 来源待补（待登记项，非疏漏），见 §4 |
 
 `THIRD_PARTY_NOTICES.md` 会作为 asset 打进安装包，并通过
 `lib/app/licenses.dart` 注册到应用内许可证页。
@@ -87,7 +87,8 @@ flutter test
   版权头是否需要保留，属于解释问题。
 - **MPL-2.0 的 `dbus`**：未修改；如修改 MPL 文件，需要公开修改后的源文件。
 - **图标/截图来源**：`branding/app_icon.png`、`assets/icons/*.png` 推定项目自有，
-  尚无外部来源记录；引入第三方素材前先补授权和来源。
+  尚无外部来源记录（这是待登记项，不是疏漏）。**操作规则**：若引入任何第三方素材
+  （图标、字体、截图、示例音频），须先在本节登记来源与授权，再提交。
 
 ## 5. 参考
 

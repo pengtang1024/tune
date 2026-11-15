@@ -126,23 +126,23 @@ service 不依赖 Riverpod，只编排 I/O；状态全在 controller。
 
 | 服务 | 接口 → 实现 | 职责 |
 | --- | --- | --- |
-| 音频播放 | `AudioPlayerService` → `JustAudioPlayerService` | 播放/暂停/跳转/音量/速度/事件流；Linux 走 media_kit + 系统 libmpv |
+| 音频播放 | `AudioPlayerService` → `JustAudioPlayerService` | 播放/暂停/跳转/音量/速度/事件流；Linux / Windows 都走 just_audio_media_kit（media_kit_libs_* + 系统 libmpv），主要依赖另有 SQLite（sqlite3 + sqlite3_flutter_libs）、audio_service、permission_handler、sherpa_onnx |
 | 音乐扫描 | `CrossPlatformMusicScanner`（`music_scanner_config.dart` 给配置） | 本地目录扫描、元数据读取（`audio_metadata_reader`，vendor 补丁防恶意帧） |
-| 音源适配 | `MusicSourceAdapter` × 20 个类型 + `MusicSourceService` 注册表 | 取歌、浏览流、播放地址刷新、歌词；注册表可注入 |
+| 音源适配 | `MusicSourceAdapter` × 30 个注册类型（30 个适配器文件）+ `MusicSourceService` 注册表 | 取歌、浏览流、播放地址刷新、歌词；注册表可注入 |
 | 持久化 | `PersistenceService` → `FilePersistenceService` | 一偏好一文件；旧 JSON 由 `LegacyPreferenceMigration` 迁移 |
 | 数据库 | `AppDatabase`（`database/`） | SQLite 表定义与读写：`songs`、`favorites`、`queue`、`queue_meta`、`listening_signals`、`smart_lyrics_*` |
 | 封面缓存 | `ArtworkCache` → `FileArtworkCache` | URL 稳定哈希落盘，只下载看得见的封面 |
 | 下载 | `SongDownloadService` → `HttpSongDownloadService` | 并发合并、进度、取消；按 URI 哈希映射文件 |
 | 智能歌词引擎 | `SmartLyricsEngine` × 3（whisper 本地 / sherpa 本地 / OpenAI 兼容） | 转录通道抽象；`SmartLyricsService.generate` 编排票池共识 |
 | 桌面接口 | `mpris/`、`tray/`、`desktop/` 接口 → `impl/` 下 D-Bus 实现 | 会话总线上的 MPRIS、StatusNotifierItem 托盘、单实例 |
-| 更新 | `update/` | 从 GitHub release 检查与下载新版本 |
+| 更新 | `update/` | 读仓库根静态清单 `version.json`（jsDelivr CDN `@master` → raw → GitHub release API 兜底）发现并下载新版本；后台约 1 h 一次、失败退避 30 min→1 h→2 h 封顶 |
 | 流地址 | `StreamUrlResolver`（由 `MusicSourceService` 实现） | 远程曲目播放地址刷新 |
 
 ## shared / core / utils
 
 | 包 | 职责 |
 | --- | --- |
-| `shared/ui/`（30 个文件） | 跨 feature 复用 widget：曲目事实 chip（`track_fact*`、`meta_badge`）、提示层（`hint_layer`/`tune_tooltip`）、底部浮层（`compact_sheet`）、侧栏宿主（`side_panel_host`）、封面缩略图等；不含业务状态 |
+| `shared/ui/`（37 个文件） | 跨 feature 复用 widget：曲目事实 chip（`track_fact*`、`meta_badge`）、提示层（`hint_layer`/`tune_tooltip`）、底部浮层（`compact_sheet`）、侧栏宿主（`side_panel_host`）、封面缩略图等；不含业务状态 |
 | `shared/utils/` | 可读地址（去 `file://`、解码 `%20`）等 |
 | `core/l10n/` | `AppStrings` 单例、流派词典与标签、语言环境标签、本地化桥 |
 | `core/services/` | 窗口管理服务 |

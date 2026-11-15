@@ -328,13 +328,13 @@ class LibraryFilter {
 | `radio_recordings` / 访谈与音乐混排 | 约 25–30 | 部分是 Blues/Instrumental 专辑，部分是访谈 | 无逐条显式标签；能靠 genre 定的已定，其余留电台 |
 | `old_time_radio` / 少量非广播条目 | 2 | genre 与节目不符 | 同实例声明，证据不足 |
 
-**可持续机制（本轮只实现第二层）：**
+**可持续机制（本版实现第二层）：**
 
-- **第一层（待做）**：把 `contentKind` 与 `albumOverrides` 写进音源实例配置，设置页可改；
+- **第一层（后续候选，未纳入本版）**：把 `contentKind` 与 `albumOverrides` 写进音源实例配置，设置页可改；
   内置实例用现有常量做种子。新实例是数据编辑，不是改代码。
-- **第二层（已做）**：IA 扫描时读条目 `collection`，命中已知集合就写入条目级声明；
+- **第二层（已实现）**：IA 扫描时读条目 `collection`，命中已知集合就写入条目级声明；
   新增 IA 实例不需要改代码，只要它在已知 collection 里。
-- **第三层（待做）**：把 `declaredAlbumKinds` 从代码常量搬成 `(instance, normalized_album, kind)`
+- **第三层（后续候选，未纳入本版）**：把 `declaredAlbumKinds` 从代码常量搬成 `(instance, normalized_album, kind)`
   小表，界面可加可删；`Non-Music` genre 保留为唯一自动条目级细化。
 
 ### 5.2 SQL
@@ -437,7 +437,7 @@ class LibraryFilter {
 
 10. 四语文案、空态、加载/错误、筛选持久化（`view.json`）、截图与性能基准、文档与 AGENTS 地图。
 
-## 8. 已拍板与仍待定
+## 8. 已拍板与实施后定案
 
 ### 已拍板
 
