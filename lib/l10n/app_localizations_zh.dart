@@ -390,6 +390,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerExpandNowPlaying => '展开正在播放';
 
   @override
+  String get playerMoreActions => '更多操作';
+
+  @override
   String get playerCollapse => '收起';
 
   @override
@@ -4887,6 +4890,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get playerExpandNowPlaying => '展开正在播放';
 
   @override
+  String get playerMoreActions => '更多操作';
+
+  @override
   String get playerCollapse => '收起';
 
   @override
@@ -9382,6 +9388,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get playerExpandNowPlaying => '展開正在播放';
+
+  @override
+  String get playerMoreActions => '更多操作';
 
   @override
   String get playerCollapse => '收起';

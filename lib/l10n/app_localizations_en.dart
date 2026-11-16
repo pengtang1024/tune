@@ -467,6 +467,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerExpandNowPlaying => 'Open now playing';
 
   @override
+  String get playerMoreActions => 'More actions';
+
+  @override
   String get playerCollapse => 'Collapse';
 
   @override

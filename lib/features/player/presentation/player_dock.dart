@@ -27,15 +27,6 @@ import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
 
-/// The room the actions row needs before the equalizer entry fits.
-///
-/// The row is laid out as one line and does not scroll, so the entry only
-/// appears where it has room. The number is the measured edge of the row with
-/// this exact set of controls (the volume slider, the heart, the queue button
-/// and the mini window action); adding or removing one of them moves it, so
-/// measure again with tool/layout_shots_test.dart before changing it.
-const double _equalizerMinActionWidth = 900;
-
 class PlayerDock extends ConsumerWidget {
   /// Toggles the queue panel of the shell.
   ///
@@ -111,10 +102,6 @@ class PlayerDock extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final narrow = constraints.maxWidth < 720;
-          // The window actions sit at the end of the bar and the volume
-          // slider keeps its room before them: the shape of the window is
-          // the one action that can wait for a wider bar.
-          final roomForWindowActions = constraints.maxWidth >= 860;
           return Row(
             children: [
               // The two sides share the room evenly, so the transport in the
@@ -256,11 +243,16 @@ class PlayerDock extends ConsumerWidget {
                       ),
                     ),
                     if (!narrow) ...[
-                      SizedBox(
-                        width: 74,
-                        child: Slider(
-                          value: overview.volume,
-                          onChanged: controller.setVolume,
+                      // The slider is the one control of the row that may give
+                      // up its width: a bar that is a few pixels short shrinks
+                      // the slider instead of clipping the actions after it.
+                      Flexible(
+                        child: SizedBox(
+                          width: 74,
+                          child: Slider(
+                            value: overview.volume,
+                            onChanged: controller.setVolume,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -285,27 +277,28 @@ class PlayerDock extends ConsumerWidget {
                       onPressed: onToggleQueue,
                       selected: queueOpen,
                     ),
-                    if (onMini != null && roomForWindowActions)
-                      _DockIcon(
-                        icon: Icons.picture_in_picture_alt_rounded,
-                        tooltip: context.loc.playerCollapse,
-                        size: CompactTokens.icon18,
-                        onPressed: onMini,
+                    // The row keeps three actions and folds the rest behind
+                    // one menu: the bar is the surface that has to stay quiet,
+                    // and neither the shape of the window nor the equalizer is
+                    // an action a reader reaches for from here every time.
+                    if (onMini != null || equalizerAvailable) ...[
+                      const SizedBox(width: CompactTokens.space4),
+                      Builder(
+                        builder: (buttonContext) => _DockIcon(
+                          key: const ValueKey<String>('dock-more'),
+                          icon: Icons.more_horiz_rounded,
+                          tooltip: context.loc.playerMoreActions,
+                          size: CompactTokens.icon18,
+                          onPressed: () => _openDockMoreMenu(
+                            buttonContext,
+                            onMini: onMini,
+                            onEqualizer: equalizerAvailable
+                                ? () => openEqualizerPanel(context, ref)
+                                : null,
+                          ),
+                        ),
                       ),
-                    // The row is the one place of the dock that cannot shrink:
-                    // below this width the volume slider, the heart, the queue
-                    // button and the mini window action already spend all of it,
-                    // and the entry would push the row past its edge. The entry
-                    // waits for the window that can afford it, and the now
-                    // playing page still offers the panel on a narrow one.
-                    if (equalizerAvailable &&
-                        constraints.maxWidth >= _equalizerMinActionWidth)
-                      _DockIcon(
-                        icon: Icons.equalizer_rounded,
-                        tooltip: context.loc.playerEqualizer,
-                        size: CompactTokens.icon18,
-                        onPressed: () => openEqualizerPanel(context, ref),
-                      ),
+                    ],
                   ],
                 ),
               ),
@@ -429,6 +422,86 @@ class _PlayButton extends StatelessWidget {
   }
 }
 
+/// The actions the dock folds behind its one menu.
+enum _DockMoreAction { mini, equalizer }
+
+/// Opens that menu under the button that asked for it.
+///
+/// The menu is drawn with [showMenu] rather than a popup button so the hint of
+/// the button goes through [TuneTooltip] like every other hint of the app.
+Future<void> _openDockMoreMenu(
+  BuildContext context, {
+  required VoidCallback? onMini,
+  required VoidCallback? onEqualizer,
+}) async {
+  final strings = context.loc;
+  final overlay =
+      Overlay.of(context).context.findRenderObject()! as RenderBox;
+  final button = context.findRenderObject()! as RenderBox;
+  final position = RelativeRect.fromRect(
+    Rect.fromPoints(
+      button.localToGlobal(Offset.zero, ancestor: overlay),
+      button.localToGlobal(
+        button.size.bottomRight(Offset.zero),
+        ancestor: overlay,
+      ),
+    ),
+    Offset.zero & overlay.size,
+  );
+
+  final action = await showMenu<_DockMoreAction>(
+    context: context,
+    position: position,
+    items: [
+      if (onMini != null)
+        PopupMenuItem<_DockMoreAction>(
+          value: _DockMoreAction.mini,
+          height: 36,
+          child: _DockMenuItem(
+            icon: Icons.picture_in_picture_alt_rounded,
+            label: strings.playerCollapse,
+          ),
+        ),
+      if (onEqualizer != null)
+        PopupMenuItem<_DockMoreAction>(
+          value: _DockMoreAction.equalizer,
+          height: 36,
+          child: _DockMenuItem(
+            icon: Icons.equalizer_rounded,
+            label: strings.playerEqualizer,
+          ),
+        ),
+    ],
+  );
+
+  switch (action) {
+    case _DockMoreAction.mini:
+      onMini?.call();
+    case _DockMoreAction.equalizer:
+      onEqualizer?.call();
+    case null:
+      break;
+  }
+}
+
+/// One row of that menu: the glyph of the action and its name.
+class _DockMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _DockMenuItem({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: CompactTokens.icon14),
+        const SizedBox(width: CompactTokens.space8),
+        Text(label),
+      ],
+    );
+  }
+}
+
 class _DockIcon extends StatelessWidget {
   final IconData icon;
   final String tooltip;
@@ -436,6 +509,7 @@ class _DockIcon extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool selected;
   const _DockIcon({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.size,

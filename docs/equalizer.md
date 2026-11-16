@@ -174,7 +174,7 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 
 | 入口 | 位置 | 细节 |
 | --- | --- | --- |
-| 底栏 | `player_dock.dart` 动作行末尾 | `Icons.equalizer_rounded`；动作行不换行，1.37.1 起这一行是音量、收藏、队列、迷你（「展开正在播放」按钮已删除：点歌曲信息本来就进同一页），入口只在动作行可用宽度 ≥ 900 时画。余量和控件集合绑定，增删控件要重测 |
+| 底栏 | `player_dock.dart` 动作行 → 「更多」菜单 | 动作行不换行，1.37.2 起只画三个图标：收藏、队列、`Icons.more_horiz_rounded`；迷你窗口与均衡器都折进「更多」菜单（`Icons.picture_in_picture_alt_rounded` / `Icons.equalizer_rounded`）。不再按宽度藏入口，窄窗也不会溢出 |
 | 正在播放页 | `_TopBar` 队列按钮右侧 | `_RoundButton`，tooltip 用当前语言；只按可用性判断，不受宽度限制 |
 | 设置 | 「播放」卡新增一行「均衡器」 | 副标题写当前预设名；点开同一个面板 |
 

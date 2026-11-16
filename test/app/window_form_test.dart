@@ -104,9 +104,11 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(PlayerDock),
-        matching: find.byIcon(Icons.picture_in_picture_alt_rounded),
+        matching: find.byKey(const ValueKey<String>('dock-more')),
       ),
     );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.picture_in_picture_alt_rounded));
     await tester.pumpAndSettle();
 
     expect(find.byType(MiniPlayerBar), findsOneWidget);
