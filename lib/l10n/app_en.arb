@@ -163,7 +163,6 @@
   "libraryViewShows": "Shows",
   "libraryViewBooks": "Books",
   "libraryViewCollections": "Collections view",
-  "libraryViewSplit": "Split view",
   "libraryOpenCollection": "Open collection",
   "libraryCollectionItems": "{items, plural, =1{1 item} other{{items} items}} · {tracks, plural, =1{1 track} other{{tracks} tracks}}",
   "@libraryCollectionItems": {
@@ -1385,6 +1384,7 @@
   "contentKindMusic": "Music",
   "contentKindRadio": "Radio",
   "contentKindSoundEffect": "Sound effects",
+  "libraryShowKindOnly": "Show only this kind",
   "trackFactPath": "File path",
   "trackFactAddress": "Online address",
   "trackDetailsTooltip": "Details",

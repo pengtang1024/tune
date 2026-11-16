@@ -106,7 +106,6 @@ class LibraryViewSwitch extends StatelessWidget {
 /// 一档视图的图标与名字；「专辑」这一档随内容分类换成「节目」「书」。
 IconData _iconOf(LibraryViewMode mode) => switch (mode) {
   LibraryViewMode.songs => Icons.view_list_rounded,
-  LibraryViewMode.split => Icons.vertical_split_rounded,
   LibraryViewMode.columns => Icons.view_column_rounded,
   LibraryViewMode.categories => Icons.category_rounded,
   LibraryViewMode.albums => Icons.grid_view_rounded,
@@ -119,7 +118,6 @@ String _labelOf(
   LibraryGroupingLabel? groupingLabel,
 ) => switch (mode) {
   LibraryViewMode.songs => context.loc.libraryViewSongs,
-  LibraryViewMode.split => context.loc.libraryViewSplit,
   LibraryViewMode.columns => context.loc.libraryViewColumns,
   LibraryViewMode.categories => context.loc.libraryViewCategories,
   LibraryViewMode.albums => switch (groupingLabel) {

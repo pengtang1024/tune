@@ -44,6 +44,13 @@ class LibraryTrackCard extends StatefulWidget {
   final VoidCallback onAddToQueue;
   final VoidCallback onToggleFavorite;
 
+  /// Narrows the page to the content kind of the track, when the reader
+  /// clicks the mark beside its title.
+  ///
+  /// Null leaves the mark inert: a view that cannot filter (the album page)
+  /// still names the kind, it just does not act on it.
+  final VoidCallback? onOpenKind;
+
   /// Opens the album of the track, when the reader clicks the album cell.
   ///
   /// Null leaves the album as plain text: a track without an album (a
@@ -66,6 +73,7 @@ class LibraryTrackCard extends StatefulWidget {
     required this.onAddToQueue,
     required this.onToggleFavorite,
     this.onOpenAlbum,
+    this.onOpenKind,
   });
 
   @override
@@ -151,7 +159,10 @@ class _LibraryTrackCardState extends State<LibraryTrackCard> {
                         ),
                       ),
                     ),
-                    ContentKindMark(song: song),
+                    ContentKindMark(
+                      song: song,
+                      onOpenKind: widget.onOpenKind,
+                    ),
                     if (widget.unavailable) ...[
                       const SizedBox(width: CompactTokens.space4),
                       TuneTooltip(

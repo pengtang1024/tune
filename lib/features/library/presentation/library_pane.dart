@@ -27,7 +27,6 @@ import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_category_tree.dart';
 import 'package:tune/features/library/presentation/library_category_view.dart';
 import 'package:tune/features/library/presentation/library_collections_view.dart';
-import 'package:tune/features/library/presentation/library_split_albums.dart';
 import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_filter_chips.dart';
@@ -98,7 +97,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   LibraryAlbum? _openAlbum;
 
   /// 分栏视图里选中的分组；null = 全部曲目。
-  String? _splitSelection;
 
   /// The list widget of the last build, and what it was built from.
   ///
@@ -480,46 +478,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
     final view = _effectiveView(libraryLayoutForKinds(library.filter.kinds));
 
-    if (view == LibraryViewMode.split) {
-      final groups = libraryAlbumsOf(songs);
-      final selected = groups
-          .where((album) => album.key == _splitSelection)
-          .firstOrNull;
-      return Row(
-        children: [
-          SizedBox(
-            // 窄窗口里把这一列收窄，曲目行才不会为了它挤掉列。
-            width: MediaQuery.sizeOf(context).width < 900
-                ? 168
-                : (MediaQuery.sizeOf(context).width * 0.28).clamp(200, 320),
-            child: LibrarySplitAlbums(
-              albums: groups,
-              selectedKey: selected?.key,
-              groupingLabel: libraryLayoutForKinds(library.filter.kinds)
-                  .groupingLabel,
-              totalTracks: songs.length,
-              onPick: (key) => setState(() => _splitSelection = key),
-            ),
-          ),
-          const VerticalDivider(width: 1),
-          Expanded(
-            child: _trackList(
-              selected?.songs ?? songs,
-              sourceLabels,
-              onlyLikeOnDoubleClick,
-              library.sort,
-              controller: _songsScrollController,
-              hasMore: selected == null &&
-                  library.hasMore &&
-                  library.query.isEmpty &&
-                  !library.hasFilter,
-              bilingual: bilingual,
-            ),
-          ),
-        ],
-      );
-    }
-
     if (openAlbum != null) {
       return _trackList(
         openAlbum.songs,
@@ -727,6 +685,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   onAddToQueue: () => _addToQueue(song),
                   onToggleFavorite: () => _toggleFavorite(song),
                   onOpenAlbum: _openAlbumOfSong,
+                  onOpenKind: () => _showKindOf(song),
                 );
               },
             );
@@ -936,6 +895,22 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ..showSnackBar(
         SnackBar(content: Text(loc.sourcesSongsCleared(collection.name))),
       );
+  }
+
+  /// 只看这一类内容：点行里的类型标记，页面收窄到它自己的那一类。
+  ///
+  /// 用筛选面板写的同一个 `filter.kinds`，所以读法、计数单位、视图开关
+  /// 都会跟着这一类走——标记说的是「这一行是什么」，点它是「其余的都长这样」。
+  void _showKindOf(Song song) {
+    final kind = contentKindOf(song);
+    ref
+        .read(libraryControllerProvider.notifier)
+        .setFilter(
+          ref.read(libraryControllerProvider).valueOrNull?.filter.copyWith(
+                kinds: {kind},
+              ) ??
+              LibraryFilter.empty.copyWith(kinds: {kind}),
+        );
   }
 
   Future<void> _playAlbum(LibraryAlbum album) async {

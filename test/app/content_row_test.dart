@@ -231,26 +231,44 @@ void main() {
     expect(columns.album, isEmpty);
   });
 
-  testWidgets('a podcast wears the name of its kind', (tester) async {
+  testWidgets('a podcast writes what it is, not just an icon', (tester) async {
     await tester.pumpWidget(app(const ContentKindMark(song: episode)));
 
+    expect(find.text('播客'), findsOneWidget);
     expect(find.byTooltip('播客'), findsOneWidget);
-    expect(_mark(Icons.record_voice_over_rounded), findsOneWidget);
   });
 
-  testWidgets('an audiobook wears the name of its kind', (tester) async {
+  testWidgets('an audiobook writes what it is', (tester) async {
     await tester.pumpWidget(app(const ContentKindMark(song: audiobook)));
 
+    expect(find.text('有声书'), findsOneWidget);
     expect(find.byTooltip('有声书'), findsOneWidget);
-    expect(_mark(Icons.record_voice_over_rounded), findsOneWidget);
   });
 
-  testWidgets('a song and a station wear no kind mark', (tester) async {
+  testWidgets('a station names itself instead of hiding in the tail', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(const ContentKindMark(song: station)));
+
+    expect(find.text('电台'), findsOneWidget);
+  });
+
+  testWidgets('a song wears no kind mark', (tester) async {
     await tester.pumpWidget(app(const ContentKindMark(song: song)));
     expect(find.byType(IconGlyph), findsNothing);
+    expect(find.text('音乐'), findsNothing);
+  });
 
-    await tester.pumpWidget(app(const ContentKindMark(song: station)));
-    expect(find.byType(IconGlyph), findsNothing);
+  testWidgets('the mark narrows the page to its own kind', (tester) async {
+    var opened = 0;
+    await tester.pumpWidget(
+      app(ContentKindMark(song: episode, onOpenKind: () => opened++)),
+    );
+
+    await tester.tap(find.text('播客'));
+    await tester.pumpAndSettle();
+
+    expect(opened, 1);
   });
 
   testWidgets('the kind is a fact of a spoken track', (tester) async {
@@ -272,10 +290,4 @@ void main() {
 
     expect(facts.where((fact) => fact.label == '类型'), isEmpty);
   });
-}
-
-Finder _mark(IconData icon) {
-  return find.byWidgetPredicate(
-    (widget) => widget is IconGlyph && widget.icon == icon,
-  );
 }

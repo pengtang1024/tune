@@ -163,7 +163,6 @@
   "libraryViewShows": "節目",
   "libraryViewBooks": "書",
   "libraryViewCollections": "合集檢視",
-  "libraryViewSplit": "分欄檢視",
   "libraryOpenCollection": "開啟合集",
   "libraryCollectionItems": "{items} 個條目 · {tracks} 首",
   "@libraryCollectionItems": {
@@ -1385,6 +1384,7 @@
   "contentKindMusic": "音樂",
   "contentKindRadio": "電台",
   "contentKindSoundEffect": "音效",
+  "libraryShowKindOnly": "只看這一類",
   "trackFactPath": "檔案路徑",
   "trackFactAddress": "線上位址",
   "trackDetailsTooltip": "查看詳情",
