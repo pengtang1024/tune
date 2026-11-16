@@ -105,33 +105,13 @@ v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 三端正文用同一份文本（清单 `notes` 去硬换行 + 一句归档说明），名称沿用
 `vX.Y.Z — 一句话`。
 
-**Gitee 的 1 GB 附件配额会被 50 MB 一版的归档吃完**：2026-11-16 发 1.38.1 时
-`attach_files` 回 400 `验证失败：文件大小已超出仓库附件配额：1 GB`（此前十来版各挂一份
-53 MB 归档）。处理办法是把 Gitee 那份 release 的正文补一句「归档请到 GitHub / Gitea 的
-同一 tag 下取」，不再传二进制——Gitee 在本项目里是镜像，下载入口一直是 GitHub；
-要腾配额就去删历史 release 的附件，那是维护者的决定，不自动做。
-
-### 组件包（可选）
-
-离线打包用的翻译组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台
-归档；组件包由应用在设置页按需下载（1.32.0 起在线用户走统一组件注册表，见
-[local-components.md](local-components.md)），所以没上传只影响内网离线分发，不影响普通
-用户升级。
-
-### 发布后自检
-
-- [ ] 三端 `git ls-remote --tags <remote> 'refs/tags/vX.Y.Z^{}'` 指向同一个合并提交
-- [ ] 三端 `/releases/latest` 都返回新版本
-- [ ] 从任一平台下载归档，`sha256sum` 等于根 `version.json` 里的 `sha256`
-- [ ] `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json` 返回 `status: finished`
-- [ ] CDN 与 `raw.githubusercontent.com` 两份清单版本、`build`、`sha256` 一致
-- [ ] CDN 那一份**确实是新版本号**：`finished` 只表示 purge 请求被受理，不表示边缘已经换了新内容。
-      2026-11-16 发 1.33.2 时出现过「purge 已 finished、CDN 仍返回 1.33.1」约十分钟，
-      再 purge 一次并等 15–60 秒就对了。这一项为什么单列：`version.json` 的 `Cache-Control`
-      是 `max-age=604800, s-maxage=43200`（浏览器 7 天、边缘 12 小时），而客户端带
-      `If-None-Match` 发条件请求——边缘留着旧对象时会回 304，客户端沿用旧清单，
-      **用户就一直看不到新版本**，但日志上一切正常。
-- [ ] `tar -tzf` 首项是 `./`，且含 `tune`、`resources/`、`share/`（bundle 内容在根）
+**Gitee 的 1 GB 附件配额大约只够 20 版**（每份 Linux 归档约 51 MiB）：2026-11-16 发
+1.38.1 时 `attach_files` 回 400 `验证失败：文件大小已超出仓库附件配额：1 GB`。
+`DELETE /releases/{release_id}/attach_files/{attach_file_id}` 能删旧附件；当天按维护者同意
+清掉了 1.28.8 与 1.33.0–1.37.1 共 17 份（释放约 911 MB），**只保留最近 5 版**的归档，更早的
+release 仍能从 GitHub / Gitea 同一 tag 下载。占用回到约 256 MB 后，把 1.38.1、1.38.2、1.39.0
+的归档补挂上去（字节取自 Gitea 的同一份资产，`sha256` 与各自清单一致）。配额再满时照此办理：
+先删最老的、再补当前版，正文里不必留「配额已满」的说明。
 
 ## 从旧版本升级一次
 
