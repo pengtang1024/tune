@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.44.3",
-  "build": 88,
-  "released_at": "2026-11-16T15:59:34Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.44.3",
-  "notes": "### 修复\n\n- **组行不要把同一句话写两遍**：单曲型条目常把专辑名取成艺术家名（`0114 Ligaya / 0114 Ligaya`），\n  现在第二行在这种情况下不画；多艺术家的合辑仍写「多位艺术家」。",
+  "version": "1.45.0",
+  "build": 89,
+  "released_at": "2026-11-16T16:41:19Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.45.0",
+  "notes": "### 新增\n\n- **只有一首的专辑按单曲行显示**：音乐库里这类组不再先占一行「1 首」再点进去看同一条曲目，\n  而是在原位置直接显示成曲目行（32 高、复用曲目卡片、点一下就播）。播客单集与有声书单章仍\n  保持组行——组名（节目名、书名）不能被一条曲目行顶掉。\n\n### 变更\n\n- 列表行统一由 `libraryRowsOf` 产出（`LibraryAlbumRow` 组行 / `LibrarySingleRow` 单曲行），\n  两种行混排时按同一套排序字段比较；`itemExtent` 在混排时让位给自适应高度，纯组行仍是定高。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.44.3/tune-linux-x64-1.44.3.tar.gz",
-      "size": 53596864,
-      "sha256": "696c730fef99982b6a06f402afd2d1b248e89e29f8e221443306060b094858d3"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.45.0/tune-linux-x64-1.45.0.tar.gz",
+      "size": 53603335,
+      "sha256": "8866e42561a285d71c4823a2fc8d2ad884411c051f85770e9c4e7c9676a01af7"
     }
   }
 }
