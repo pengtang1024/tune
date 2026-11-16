@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# 主线只接收合并提交：发版时 develop → master 用 --no-ff 合并。
+# 直接往 master 提交会绕过这条约定，也让 tag 指向不在 develop 里的提交。
+set -u
+
+branch=$(git symbolic-ref --quiet --short HEAD || true)
+case "$branch" in
+  master | main)
+    cat >&2 <<'MSG'
+拒绝提交：master 只接收来自 develop 的合并。
+
+  1. git checkout develop
+  2. 在 develop 上提交
+  3. git checkout master && git merge --no-ff develop
+
+启用钩子：git config core.hooksPath .githooks
+MSG
+    exit 1
+    ;;
+esac
+
+exit 0
