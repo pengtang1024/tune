@@ -2042,6 +2042,8 @@
   "settingsLocalizationModelsPick": "Choose model",
   "settingsLocalizationModelsSearch": "Search models",
   "settingsLocalizationModelsEmpty": "No matching model",
+  "settingsLocalizationModelsTypeHint": "This vendor publishes no list; type the model name instead.",
+  "settingsLocalizationModelsUse": "Use “{name}”",
   "settingsLocalizationKeyHint": "The key is stored in plain text in this device's config folder and readable only by the current user.",
   "settingsLocalizationApiHint": "Supports OpenAI Chat, Anthropic Messages and Gemini. Usage comes from the response; a balance is shown only for providers that publish one.",
   "settingsLocalizationAvailabilityNeedsProvider": "Translation is paused until a provider is chosen.",

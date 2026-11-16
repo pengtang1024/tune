@@ -2042,6 +2042,8 @@
   "settingsLocalizationModelsPick": "選擇模型",
   "settingsLocalizationModelsSearch": "搜尋模型",
   "settingsLocalizationModelsEmpty": "沒有符合的模型",
+  "settingsLocalizationModelsTypeHint": "該廠商沒有提供可選清單，直接輸入模型名稱即可。",
+  "settingsLocalizationModelsUse": "使用「{name}」",
   "settingsLocalizationKeyHint": "金鑰以明文保存在本機設定目錄，僅目前使用者可讀。",
   "settingsLocalizationApiHint": "支援 OpenAI Chat、Anthropic Messages 與 Gemini 三類協定。用量取自回應；只有提供餘額介面的服務商顯示餘額。",
   "settingsLocalizationAvailabilityNeedsProvider": "尚未設定翻譯服務，翻譯已暫停。",
