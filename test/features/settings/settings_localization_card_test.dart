@@ -239,6 +239,30 @@ void main() {
     );
   });
 
+  testWidgets('a vendor without a model list shows the hint, not the button', (
+    tester,
+  ) async {
+    var reads = 0;
+    await pumpCard(tester, onQuery: (_) => reads++);
+
+    await selectProvider(tester, 'Zhipu GLM');
+
+    expect(
+      find.widgetWithText(OutlinedButton, '获取模型'),
+      findsNothing,
+      reason: 'the vendor publishes no list to fetch',
+    );
+    expect(
+      find.text('该厂商不提供模型列表，请按其文档填写模型名。'),
+      findsOneWidget,
+    );
+
+    await tester.enterText(apiKeyField(), 'sk-zhipu');
+    await tester.tap(find.widgetWithText(FilledButton, '保存'));
+    await tester.pumpAndSettle();
+    expect(reads, 0, reason: 'saving must not ask a vendor that cannot answer');
+  });
+
   testWidgets('saving reads the models of the vendor just saved', (
     tester,
   ) async {

@@ -63,6 +63,8 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     chatPath: '/chat/completions',
+    // Zhipu's API reference carries no model-list endpoint.
+    listsModels: false,
   ),
   TranslationProvider(
     id: 'groq',

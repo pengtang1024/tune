@@ -51,6 +51,14 @@ void main() {
     expect(withBalance, {'deepseek', 'moonshot', 'openrouter', 'siliconflow'});
   });
 
+  test('a vendor without a model-list endpoint says so', () {
+    // Zhipu's API reference carries no list endpoint, so the page must not
+    // offer a button that can only fail.
+    expect(providerById('zhipu')!.listsModels, isFalse);
+    expect(providerById('openai')!.listsModels, isTrue);
+    expect(providerById('custom')!.listsModels, isTrue);
+  });
+
   test('the flags tell the exceptions apart', () {
     expect(providerById('ollama')!.allowsEmptyKey, isTrue);
     expect(providerById('custom')!.isCustom, isTrue);
