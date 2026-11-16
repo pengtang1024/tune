@@ -4688,6 +4688,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLocalizationModelsEmpty => 'No matching model';
 
   @override
+  String get settingsLocalizationModelsTypeHint =>
+      'This vendor publishes no list; type the model name instead.';
+
+  @override
+  String settingsLocalizationModelsUse(String name) {
+    return 'Use “$name”';
+  }
+
+  @override
   String get settingsLocalizationKeyHint =>
       'The key is stored in plain text in this device\'s config folder and readable only by the current user.';
 

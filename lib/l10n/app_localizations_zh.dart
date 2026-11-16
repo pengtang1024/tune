@@ -4343,6 +4343,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationModelsEmpty => '没有匹配的模型';
 
   @override
+  String get settingsLocalizationModelsTypeHint => '该厂商没有提供可选列表，直接输入模型名即可。';
+
+  @override
+  String settingsLocalizationModelsUse(String name) {
+    return '使用「$name」';
+  }
+
+  @override
   String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
 
   @override
@@ -8921,6 +8929,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsEmpty => '没有匹配的模型';
+
+  @override
+  String get settingsLocalizationModelsTypeHint => '该厂商没有提供可选列表，直接输入模型名即可。';
+
+  @override
+  String settingsLocalizationModelsUse(String name) {
+    return '使用「$name」';
+  }
 
   @override
   String get settingsLocalizationKeyHint => '密钥以明文保存在本机配置目录，仅当前用户可读。';
@@ -13502,6 +13518,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsEmpty => '沒有符合的模型';
+
+  @override
+  String get settingsLocalizationModelsTypeHint => '該廠商沒有提供可選清單，直接輸入模型名稱即可。';
+
+  @override
+  String settingsLocalizationModelsUse(String name) {
+    return '使用「$name」';
+  }
 
   @override
   String get settingsLocalizationKeyHint => '金鑰以明文保存在本機設定目錄，僅目前使用者可讀。';

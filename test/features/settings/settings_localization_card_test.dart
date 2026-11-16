@@ -38,9 +38,13 @@ void main() {
         widget is TextField && widget.decoration?.labelText == 'API Key',
   );
 
-  Finder modelField() => find.byWidgetPredicate(
-    (widget) => widget is TextField && widget.decoration?.labelText == '模型',
-  );
+  Finder modelField() =>
+      find.byKey(const ValueKey('localization-model-field'));
+
+  Finder modelSearch() => find.byKey(const ValueKey('model-picker-search'));
+
+  Finder modelInField(String model) =>
+      find.descendant(of: modelField(), matching: find.text(model));
 
   Finder balanceButton() =>
       find.ancestor(of: find.text('查询余额'), matching: find.byType(TextButton));
@@ -203,15 +207,15 @@ void main() {
       reason: 'the count comes from the vendor, not a catalog',
     );
 
-    await tester.tap(find.widgetWithText(TextButton, '选择模型'));
+    await tester.tap(modelField());
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ListTile, 'model-b'));
     await tester.pumpAndSettle();
 
     expect(
-      tester.widget<TextField>(modelField()).controller!.text,
-      'model-b',
-      reason: 'the chosen model lands in the free-form field',
+      modelInField('model-b'),
+      findsOneWidget,
+      reason: 'the chosen model shows in the select field',
     );
   });
 
@@ -240,14 +244,13 @@ void main() {
     );
   });
 
-  testWidgets('a refused list says so and keeps the typed field', (
+  testWidgets('a refused list says so and still lets a model be typed', (
     tester,
   ) async {
     await pumpCard(tester, failModels: true);
     await openVendors(tester);
 
     await selectProvider(tester, 'DeepSeek');
-    await tester.enterText(modelField(), 'typed-model');
     await tester.tap(find.widgetWithText(OutlinedButton, '获取模型'));
     await tester.pumpAndSettle();
 
@@ -256,10 +259,18 @@ void main() {
       findsOneWidget,
       reason: 'the page names the failure instead of showing nothing',
     );
+
+    await tester.tap(modelField());
+    await tester.pumpAndSettle();
+    await tester.enterText(modelSearch(), 'typed-model');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('model-picker-use-typed')));
+    await tester.pumpAndSettle();
+
     expect(
-      tester.widget<TextField>(modelField()).controller!.text,
-      'typed-model',
-      reason: 'a failed fetch keeps what the reader typed',
+      modelInField('typed-model'),
+      findsOneWidget,
+      reason: 'typing a model is the fallback when the list is refused',
     );
   });
 
@@ -281,6 +292,18 @@ void main() {
       find.text('该厂商不提供模型列表，请按其文档填写模型名。'),
       findsOneWidget,
     );
+
+    await tester.tap(modelField());
+    await tester.pumpAndSettle();
+    expect(
+      find.text('该厂商没有提供可选列表，直接输入模型名即可。'),
+      findsOneWidget,
+      reason: 'the picker still opens for a vendor without a list',
+    );
+    await tester.enterText(modelSearch(), 'glm-5');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('model-picker-use-typed')));
+    await tester.pumpAndSettle();
 
     await tester.enterText(apiKeyField(), 'sk-zhipu');
     await tester.tap(find.widgetWithText(FilledButton, '保存'));

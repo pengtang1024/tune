@@ -53,7 +53,7 @@ class _SettingsLocalizationProviderBlockState
       ),
     );
     if (chosen == null || !mounted) return;
-    widget.model.text = chosen;
+    setState(() => widget.model.text = chosen);
   }
 
   @override
@@ -108,11 +108,27 @@ class _SettingsLocalizationProviderBlockState
           Text(strings.settingsLocalizationKeyHint, style: muted),
         ],
         const SizedBox(height: CompactTokens.space8),
-        TextField(
-          controller: widget.model,
-          decoration: InputDecoration(
-            labelText: strings.settingsLocalizationApiModel,
-            isDense: true,
+        // A model is chosen, not typed: the vendor's list decides what can be
+        // run, and a vendor that publishes no list still lets the reader type
+        // one inside the picker.
+        InkWell(
+          key: const ValueKey('localization-model-field'),
+          onTap: _pickModel,
+          borderRadius: BorderRadius.circular(CompactTokens.radius8),
+          child: InputDecorator(
+            isEmpty: widget.model.text.trim().isEmpty,
+            decoration: InputDecoration(
+              labelText: strings.settingsLocalizationApiModel,
+              isDense: true,
+              suffixIcon: const Icon(Icons.arrow_drop_down, size: 20),
+            ),
+            child: widget.model.text.trim().isEmpty
+                ? const SizedBox.shrink()
+                : Text(
+                    widget.model.text.trim(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
           ),
         ),
         const SizedBox(height: CompactTokens.space4),
@@ -137,18 +153,13 @@ class _SettingsLocalizationProviderBlockState
                       : strings.settingsLocalizationModelsFetch,
                 ),
               ),
-              if (widget.models.isNotEmpty) ...[
+              if (widget.models.isNotEmpty)
                 Text(
                   strings.settingsLocalizationModelsFetched(
                     widget.models.length,
                   ),
                   style: muted,
                 ),
-                TextButton(
-                  onPressed: _pickModel,
-                  child: Text(strings.settingsLocalizationModelsPick),
-                ),
-              ],
             ],
           ),
           if (widget.modelsFailed) ...[
@@ -194,7 +205,8 @@ class _SettingsLocalizationProviderBlockState
   }
 }
 
-/// Picks one model out of a list that can hold hundreds of entries.
+/// Picks one model out of a list that can hold hundreds of entries, and lets
+/// the reader type a name when the vendor publishes no list.
 class _ModelPickerDialog extends StatefulWidget {
   final List<String> models;
   final String selected;
@@ -214,15 +226,22 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
     super.dispose();
   }
 
+  void _choose(String model) => Navigator.of(context).pop(model);
+
   @override
   Widget build(BuildContext context) {
     final strings = context.loc;
-    final query = _search.text.trim().toLowerCase();
+    final typed = _search.text.trim();
+    final query = typed.toLowerCase();
     final visible = query.isEmpty
         ? widget.models
         : widget.models
               .where((model) => model.toLowerCase().contains(query))
               .toList();
+    final exact = widget.models.any(
+      (model) => model.toLowerCase() == query,
+    );
+    final offersTyped = typed.isNotEmpty && !exact;
 
     return AlertDialog(
       title: Text(strings.settingsLocalizationModelsPick),
@@ -232,6 +251,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
         child: Column(
           children: [
             TextField(
+              key: const ValueKey('model-picker-search'),
               controller: _search,
               autofocus: true,
               decoration: InputDecoration(
@@ -240,16 +260,47 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                 prefixIcon: const Icon(Icons.search, size: 18),
               ),
               onChanged: (_) => setState(() {}),
+              onSubmitted: (value) {
+                if (value.trim().isEmpty) return;
+                _choose(value.trim());
+              },
             ),
             const SizedBox(height: CompactTokens.space8),
+            if (offersTyped)
+              ListTile(
+                key: const ValueKey('model-picker-use-typed'),
+                dense: true,
+                leading: const Icon(Icons.keyboard_return, size: 18),
+                title: Text(
+                  strings.settingsLocalizationModelsUse(typed),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onTap: () => _choose(typed),
+              ),
+            if (widget.models.isEmpty && typed.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CompactTokens.space8,
+                ),
+                child: Text(
+                  strings.settingsLocalizationModelsTypeHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             Expanded(
               child: visible.isEmpty
-                  ? Center(
-                      child: Text(
-                        strings.settingsLocalizationModelsEmpty,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    )
+                  ? (widget.models.isNotEmpty && !offersTyped
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: CompactTokens.space8,
+                            ),
+                            child: Text(
+                              strings.settingsLocalizationModelsEmpty,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          )
+                        : const SizedBox.shrink())
                   : ListView.builder(
                       itemCount: visible.length,
                       itemBuilder: (context, index) {
@@ -264,7 +315,7 @@ class _ModelPickerDialogState extends State<_ModelPickerDialog> {
                           trailing: model == widget.selected
                               ? const Icon(Icons.check, size: 18)
                               : null,
-                          onTap: () => Navigator.of(context).pop(model),
+                          onTap: () => _choose(model),
                         );
                       },
                     ),

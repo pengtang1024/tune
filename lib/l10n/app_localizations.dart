@@ -8081,6 +8081,18 @@ abstract class AppLocalizations {
   /// **'没有匹配的模型'**
   String get settingsLocalizationModelsEmpty;
 
+  /// No description provided for @settingsLocalizationModelsTypeHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'该厂商没有提供可选列表，直接输入模型名即可。'**
+  String get settingsLocalizationModelsTypeHint;
+
+  /// No description provided for @settingsLocalizationModelsUse.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'使用「{name}」'**
+  String settingsLocalizationModelsUse(String name);
+
   /// No description provided for @settingsLocalizationKeyHint.
   ///
   /// In zh_CN, this message translates to:
