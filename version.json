@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.44.2",
-  "build": 87,
-  "released_at": "2026-11-16T15:45:34Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.44.2",
-  "notes": "### 修复\n\n- **同一张合辑裂成多行**：组行原来按「专辑 + 艺术家 + 来源」认行，古典合辑里每首作曲家不同，\n  `100 Masterpieces Vol. 2` 于是在列表里重复八次、每次只带一条曲目。现在一行只认「专辑名 + 来源」，\n  多艺术家时写「多位艺术家」；组行直接带着自己的曲目打开，不再回数据库按旧键查（那会把它拆回\n  一位作曲家的那几首）。曲目行的专辑名点击也走同一条路径。",
+  "version": "1.44.3",
+  "build": 88,
+  "released_at": "2026-11-16T15:59:34Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.44.3",
+  "notes": "### 修复\n\n- **组行不要把同一句话写两遍**：单曲型条目常把专辑名取成艺术家名（`0114 Ligaya / 0114 Ligaya`），\n  现在第二行在这种情况下不画；多艺术家的合辑仍写「多位艺术家」。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.44.2/tune-linux-x64-1.44.2.tar.gz",
-      "size": 53596042,
-      "sha256": "b1dbd150b3233bf9d16027c69261104c49acd488c1f483d2e64daccc59aed550"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.44.3/tune-linux-x64-1.44.3.tar.gz",
+      "size": 53596864,
+      "sha256": "696c730fef99982b6a06f402afd2d1b248e89e29f8e221443306060b094858d3"
     }
   }
 }
