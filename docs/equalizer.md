@@ -212,6 +212,7 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 组件测试：
 
 - `test/shared/equalizer_sheet_test.dart`：10 个滑块、预设 chips、手动改动后显示「自定义」、后端不可用时整块置灰且不回调。
+- `test/shared/equalizer_entry_test.dart`：入口 → 面板的联动（`openEqualizerPanel` 读控制器与平台可用性）；面板里的预设、开关、复位都落回控制器；不可用平台仍能打开但只读。
 
 Linux 手测：
 
