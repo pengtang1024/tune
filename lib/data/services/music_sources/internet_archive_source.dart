@@ -6,6 +6,7 @@ import 'package:tune/data/services/music_sources/recent_window.dart';
 import 'package:tune/data/services/music_sources/source_retry.dart';
 import 'package:tune/shared/utils/short_description.dart';
 import 'package:tune/data/services/music_sources/source_song_factory.dart';
+import 'package:tune/data/services/music_sources/track_naming.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -533,16 +534,25 @@ class InternetArchiveSourceAdapter extends MusicSourceAdapter {
             .map(Uri.encodeComponent)
             .join('/');
 
+        // 上传者常把同一份事实写两遍（标题里带艺术家、专辑里带艺术家），
+        // 归一化在取数边界做一次，界面不必叠例外。
+        final naming = normalizeTrackNaming(
+          title: cleanTitle,
+          artist: artist,
+          album: _firstText([file['album'], itemAlbum, itemTitle]),
+          creator: creator,
+        );
+
         songs.add(
           SourceSongFactory.create(
             sourceId: config.id,
             externalId: '$identifier/$fileName',
-            title: cleanTitle,
-            artist: artist,
+            title: naming.title,
+            artist: naming.artist,
             // An item is a record of its own: when neither the file nor the
             // item names an album, the name of the item is the name of the
             // record its tracks belong to, so nothing lands under no record.
-            album: _firstText([file['album'], itemAlbum, itemTitle]),
+            album: naming.album,
             duration: _parseDuration(file['length']),
             streamUrl:
                 'https://archive.org/download/${Uri.encodeComponent(identifier)}/$encodedPath',
