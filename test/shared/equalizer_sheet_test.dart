@@ -130,7 +130,7 @@ void main() {
     await openQuickPanel(tester);
 
     expect(find.text('均衡器'), findsOneWidget);
-    expect(find.text('启用均衡器'), findsOneWidget);
+    expect(find.text('均衡器开关'), findsOneWidget);
     expect(find.text(quickHint), findsOneWidget);
     expect(
       find.text('重置'),
@@ -432,7 +432,7 @@ void main() {
     final widths = <double>[];
     await openEditorPanel(tester, onBandWidthChanged: widths.add);
 
-    expect(find.text('频段宽度'), findsOneWidget);
+    expect(find.text('带宽'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey<String>('equalizer-width-2')));
     await tester.pumpAndSettle();

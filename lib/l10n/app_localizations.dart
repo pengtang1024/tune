@@ -8300,7 +8300,7 @@ abstract class AppLocalizations {
   /// No description provided for @equalizerEnable.
   ///
   /// In zh_CN, this message translates to:
-  /// **'启用均衡器'**
+  /// **'均衡器开关'**
   String get equalizerEnable;
 
   /// No description provided for @equalizerPresetFlat.
@@ -8438,13 +8438,13 @@ abstract class AppLocalizations {
   /// No description provided for @equalizerBandWidth.
   ///
   /// In zh_CN, this message translates to:
-  /// **'频段宽度'**
+  /// **'带宽'**
   String get equalizerBandWidth;
 
   /// No description provided for @equalizerBandWidthHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'越窄，一个频段影响的频率范围越小'**
+  /// **'以倍频程计，数值越小影响越窄'**
   String get equalizerBandWidthHint;
 
   /// No description provided for @equalizerWidthOne.
