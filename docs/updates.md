@@ -100,10 +100,16 @@ v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 | --- | --- | --- | --- |
 | GitHub | `POST /repos/{o}/{r}/releases` | `POST {upload_url}?name=<file>`，头 `Content-Type: application/octet-stream`，体 `--data-binary @包` | 用 python `requests` 建 release 可能抛 `RemoteDisconnected`，但请求其实已成功；重试前先 GET 查重，否则建出重复 release |
 | Gitea | `POST /api/v1/repos/{o}/{r}/releases` | `POST /releases/{id}/assets?name=<file>` | 没有 `/releases/tags/{tag}` 端点（404），得 `GET /releases?limit=N` 过滤 `tag_name`；改正文用 `PATCH /releases/{id}` |
-| Gitee | `POST /api/v5/repos/{o}/{r}/releases?access_token=`，JSON body | 单独 `POST /releases/{id}/attach_files`（multipart） | 建 release 时带 `attach_files` 会 401「Access token does not exist」；平台还会自动附上源码 zip / tar.gz |
+| Gitee | `POST /api/v5/repos/{o}/{r}/releases?access_token=`，JSON body（`tag_name`、`name`、`target_commitish` 三个字段都要给） | 单独 `POST /releases/{id}/attach_files`（multipart，字段名必须是 `file`） | 建 release 时带 `attach_files` 会 401「Access token does not exist」；改正文 `PATCH /releases/{id}` 同样要求 `tag_name` + `name`，缺任一个都回 400；平台还会自动附上源码 zip / tar.gz；**附件配额 1 GB**，见下 |
 
 三端正文用同一份文本（清单 `notes` 去硬换行 + 一句归档说明），名称沿用
 `vX.Y.Z — 一句话`。
+
+**Gitee 的 1 GB 附件配额会被 50 MB 一版的归档吃完**：2026-11-16 发 1.38.1 时
+`attach_files` 回 400 `验证失败：文件大小已超出仓库附件配额：1 GB`（此前十来版各挂一份
+53 MB 归档）。处理办法是把 Gitee 那份 release 的正文补一句「归档请到 GitHub / Gitea 的
+同一 tag 下取」，不再传二进制——Gitee 在本项目里是镜像，下载入口一直是 GitHub；
+要腾配额就去删历史 release 的附件，那是维护者的决定，不自动做。
 
 ### 组件包（可选）
 
