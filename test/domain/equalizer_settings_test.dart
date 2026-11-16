@@ -259,8 +259,24 @@ void main() {
       );
       expect(EqualizerPresets.byId('nonsense'), isNull);
       expect(EqualizerPresets.byId('bass')?.id, 'bass');
-      expect(EqualizerPresets.all.length, 8);
+      expect(EqualizerPresets.all.length, 12);
       expect(EqualizerPresets.customId, 'custom');
+    });
+
+    test('快捷面板给的四个曲线都在全部预设里', () {
+      expect(
+        EqualizerPresets.quick.map((preset) => preset.id),
+        <String>[
+          EqualizerPresets.flatId,
+          EqualizerPresets.popId,
+          EqualizerPresets.rockId,
+          EqualizerPresets.bassId,
+        ],
+      );
+      for (final preset in EqualizerPresets.quick) {
+        expect(EqualizerPresets.byId(preset.id), preset);
+        expect(EqualizerPresets.all.contains(preset), isTrue);
+      }
     });
 
     test('每个预设都是 10 段、id 唯一、增益在 ±12 dB 内', () {

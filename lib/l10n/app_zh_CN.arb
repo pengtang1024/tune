@@ -2175,9 +2175,14 @@
   "equalizerPresetBass": "重低音",
   "equalizerPresetVocal": "人声",
   "equalizerPresetElectronic": "电子",
+  "equalizerPresetAcoustic": "原声",
+  "equalizerPresetHiphop": "嘻哈",
+  "equalizerPresetLive": "现场",
+  "equalizerPresetSoft": "轻柔",
   "equalizerCustom": "自定义",
   "equalizerReset": "重置",
   "equalizerHint": "提升的频段会用等量预放抵消，避免削波",
+  "equalizerQuickHint": "更细的频段和全部预设见 设置 › 播放",
   "equalizerGainDb": "{value} dB",
   "@equalizerGainDb": {
     "placeholders": {
@@ -2196,6 +2201,6 @@
   },
   "equalizerUnavailable": "这个平台的播放后端不支持均衡器",
   "settingsEqualizerAction": "均衡器",
-  "settingsEqualizerActionHint": "打开面板选择预设并拖动十个频段",
+  "settingsEqualizerActionHint": "全部预设与十段滑杆",
   "playerEqualizer": "均衡器"
 }

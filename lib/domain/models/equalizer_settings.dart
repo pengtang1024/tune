@@ -37,6 +37,10 @@ class EqualizerPresets {
   static const String bassId = 'bass';
   static const String vocalId = 'vocal';
   static const String electronicId = 'electronic';
+  static const String acousticId = 'acoustic';
+  static const String hiphopId = 'hiphop';
+  static const String liveId = 'live';
+  static const String softId = 'soft';
 
   /// The id a curve gets once a slider moved it away from every preset.
   static const String customId = 'custom';
@@ -84,6 +88,26 @@ class EqualizerPresets {
     gains: <double>[4, 3, 0, -1, -2, 0, 1, 2, 3, 4],
   );
 
+  static const EqualizerPreset acoustic = EqualizerPreset(
+    id: acousticId,
+    gains: <double>[4, 3, 2, 1, 1, 1, 1, 2, 2, 2],
+  );
+
+  static const EqualizerPreset hiphop = EqualizerPreset(
+    id: hiphopId,
+    gains: <double>[7, 6, 4, 1, 0, -1, 0, 1, 3, 3],
+  );
+
+  static const EqualizerPreset live = EqualizerPreset(
+    id: liveId,
+    gains: <double>[4, 3, 1, -1, -1, 0, 1, 2, 3, 2],
+  );
+
+  static const EqualizerPreset soft = EqualizerPreset(
+    id: softId,
+    gains: <double>[2, 1, 0, 0, -1, -1, -2, -2, -3, -4],
+  );
+
   /// Every preset, in the order the panel draws them.
   static const List<EqualizerPreset> all = <EqualizerPreset>[
     flat,
@@ -94,6 +118,22 @@ class EqualizerPresets {
     bass,
     vocal,
     electronic,
+    acoustic,
+    hiphop,
+    live,
+    soft,
+  ];
+
+  /// The curves the player panel offers: four a listener picks by mood.
+  ///
+  /// Ten sliders and twelve curves do not belong beside a track row and a
+  /// volume thumb. The rest of [all] lives in the settings editor, and the
+  /// panel says so in one line of small print.
+  static const List<EqualizerPreset> quick = <EqualizerPreset>[
+    flat,
+    pop,
+    rock,
+    bass,
   ];
 
   static EqualizerPreset? byId(String id) {

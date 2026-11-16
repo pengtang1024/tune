@@ -4864,6 +4864,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equalizerPresetElectronic => 'Electronic';
 
   @override
+  String get equalizerPresetAcoustic => 'Acoustic';
+
+  @override
+  String get equalizerPresetHiphop => 'Hip-hop';
+
+  @override
+  String get equalizerPresetLive => 'Live';
+
+  @override
+  String get equalizerPresetSoft => 'Soft';
+
+  @override
   String get equalizerCustom => 'Custom';
 
   @override
@@ -4872,6 +4884,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get equalizerHint =>
       'Boosted bands are offset by an equal preamp so nothing clips';
+
+  @override
+  String get equalizerQuickHint =>
+      'Fine bands and every preset live in Settings › Playback';
 
   @override
   String equalizerGainDb(String value) {
@@ -4891,8 +4907,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsEqualizerAction => 'Equalizer';
 
   @override
-  String get settingsEqualizerActionHint =>
-      'Open the panel to pick a preset and drag the ten bands';
+  String get settingsEqualizerActionHint => 'Every preset and ten bands';
 
   @override
   String get playerEqualizer => 'Equalizer';

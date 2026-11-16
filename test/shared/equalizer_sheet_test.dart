@@ -5,10 +5,11 @@ import 'package:tune/domain/models/equalizer_settings.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/equalizer_sheet.dart';
 
-/// Guards the equalizer panel.
+/// Guards the two equalizer panels.
 ///
-/// The panel is the only surface of the feature and two pages open it, so the
-/// bands it draws, the band a drag belongs to, and the frozen shape of a
+/// The player opens a short panel — a switch and four curves — and the settings
+/// page opens the full editor. Both are the only surfaces of the feature, so
+/// what each draws, the band a drag belongs to, and the frozen shape of a
 /// platform without a backend are all worth a test.
 void main() {
   const frequencies = <String>[
@@ -24,27 +25,24 @@ void main() {
     '16000',
   ];
 
-  const presetLabels = <String>[
-    '平坦',
-    '流行',
-    '摇滚',
+  const quickLabels = <String>['平坦', '流行', '摇滚', '重低音'];
+
+  const editorOnlyLabels = <String>[
     '爵士',
     '古典',
-    '重低音',
+    '原声',
     '人声',
+    '嘻哈',
     '电子',
+    '现场',
+    '轻柔',
   ];
 
-  /// Opens the panel the way the player and the settings page do: through
-  /// [showEqualizerPanel], so the sheet under test is the one that ships.
-  Future<void> openPanel(
+  const quickHint = '更细的频段和全部预设见 设置 › 播放';
+
+  Future<void> pumpPanel(
     WidgetTester tester, {
-    required EqualizerSettings settings,
-    bool available = true,
-    ValueChanged<bool>? onEnabledChanged,
-    void Function(int band, double gain)? onGainChanged,
-    ValueChanged<String>? onPresetChanged,
-    VoidCallback? onReset,
+    required void Function(BuildContext context) open,
   }) async {
     tester.view.physicalSize = const Size(1000, 900);
     tester.view.devicePixelRatio = 1;
@@ -60,15 +58,7 @@ void main() {
           body: Builder(
             builder: (context) => Center(
               child: TextButton(
-                onPressed: () => showEqualizerPanel(
-                  context,
-                  settings: settings,
-                  available: available,
-                  onEnabledChanged: onEnabledChanged ?? (enabled) {},
-                  onGainChanged: onGainChanged ?? (band, gain) {},
-                  onPresetChanged: onPresetChanged ?? (presetId) {},
-                  onReset: onReset ?? () {},
-                ),
+                onPressed: () => open(context),
                 child: const Text('open'),
               ),
             ),
@@ -81,33 +71,146 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('the panel draws the ten bands and the eight curves', (
-    tester,
-  ) async {
-    await openPanel(
+  /// Opens the panel the player opens, through the shipping entry point.
+  Future<void> openQuickPanel(
+    WidgetTester tester, {
+    EqualizerSettings settings = const EqualizerSettings.flat(enabled: true),
+    bool available = true,
+    ValueChanged<bool>? onEnabledChanged,
+    ValueChanged<String>? onPresetChanged,
+  }) {
+    return pumpPanel(
       tester,
-      settings: const EqualizerSettings(
-        enabled: true,
-        gains: <double>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      open: (context) => showEqualizerQuickPanel(
+        context,
+        settings: settings,
+        available: available,
+        onEnabledChanged: onEnabledChanged ?? (enabled) {},
+        onPresetChanged: onPresetChanged ?? (presetId) {},
       ),
     );
+  }
+
+  /// Opens the panel the settings page opens.
+  Future<void> openEditorPanel(
+    WidgetTester tester, {
+    EqualizerSettings settings = const EqualizerSettings.flat(enabled: true),
+    bool available = true,
+    ValueChanged<bool>? onEnabledChanged,
+    void Function(int band, double gain)? onGainChanged,
+    ValueChanged<String>? onPresetChanged,
+    VoidCallback? onReset,
+  }) {
+    return pumpPanel(
+      tester,
+      open: (context) => showEqualizerEditorPanel(
+        context,
+        settings: settings,
+        available: available,
+        onEnabledChanged: onEnabledChanged ?? (enabled) {},
+        onGainChanged: onGainChanged ?? (band, gain) {},
+        onPresetChanged: onPresetChanged ?? (presetId) {},
+        onReset: onReset ?? () {},
+      ),
+    );
+  }
+
+  testWidgets('the quick panel draws four curves and no sliders', (
+    tester,
+  ) async {
+    await openQuickPanel(tester);
 
     expect(find.text('均衡器'), findsOneWidget);
     expect(find.text('启用均衡器'), findsOneWidget);
-    expect(find.text('重置'), findsOneWidget);
-    expect(find.text('提升的频段会用等量预放抵消，避免削波'), findsOneWidget);
+    expect(find.text(quickHint), findsOneWidget);
+    expect(
+      find.text('重置'),
+      findsNothing,
+      reason: 'resetting a curve belongs to the editor, not to the player',
+    );
 
-    for (final frequency in frequencies) {
+    for (final label in quickLabels) {
       expect(
-        find.text('$frequency Hz'),
+        find.descendant(
+          of: find.byType(ChoiceChip),
+          matching: find.text(label),
+        ),
         findsOneWidget,
-        reason: 'each band says the frequency it acts on',
+        reason: 'the curve $label is one tap away from the player',
       );
     }
+    expect(find.byType(ChoiceChip), findsNWidgets(4));
+    expect(
+      find.byType(Slider),
+      findsNothing,
+      reason: 'ten sliders do not fit beside a track row',
+    );
+    for (final label in editorOnlyLabels) {
+      expect(
+        find.text(label),
+        findsNothing,
+        reason: 'the rest of the curves live in the settings editor',
+      );
+    }
+  });
 
+  testWidgets('a curve picked in the quick panel is reported', (tester) async {
+    final picked = <String>[];
+    await openQuickPanel(tester, onPresetChanged: picked.add);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ChoiceChip),
+        matching: find.text('摇滚'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(picked, <String>[EqualizerPresets.rockId]);
+    final selected = tester
+        .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+        .where((chip) => chip.selected)
+        .map((chip) => (chip.label as Text).data);
+    expect(
+      selected,
+      <String>['摇滚'],
+      reason: 'the chip keeps the shape it was tapped into',
+    );
+  });
+
+  testWidgets('a curve moved by hand is marked as custom', (tester) async {
+    await openQuickPanel(
+      tester,
+      settings: const EqualizerSettings(
+        enabled: true,
+        gains: <double>[3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ),
+    );
+
+    expect(
+      find.descendant(of: find.byType(Chip), matching: find.text('自定义')),
+      findsOneWidget,
+      reason: 'a hand-moved curve matches no chip, and the panel says so',
+    );
+    expect(
+      find.descendant(of: find.byType(ChoiceChip), matching: find.text('平坦')),
+      findsOneWidget,
+      reason: 'the chips stay available, none of them is lit',
+    );
+  });
+
+  testWidgets('the editor draws the ten bands and every curve', (
+    tester,
+  ) async {
+    await openEditorPanel(tester);
+
+    expect(find.text('均衡器'), findsOneWidget);
+    expect(find.text('重置'), findsOneWidget);
+    expect(find.text('提升的频段会用等量预放抵消，避免削波'), findsOneWidget);
+    expect(find.byType(ChoiceChip), findsNWidgets(12));
     expect(find.byType(Slider), findsNWidgets(10));
-    expect(find.byType(ChoiceChip), findsNWidgets(8));
-    for (final label in presetLabels) {
+
+    for (final label in <String>[...quickLabels, ...editorOnlyLabels]) {
       expect(
         find.descendant(
           of: find.byType(ChoiceChip),
@@ -117,20 +220,21 @@ void main() {
         reason: 'the curve $label has its own chip',
       );
     }
-    expect(
-      find.text('自定义'),
-      findsNothing,
-      reason: 'a flat curve is a preset, not a hand-moved one',
-    );
+    for (final frequency in frequencies) {
+      expect(
+        find.text('$frequency Hz'),
+        findsOneWidget,
+        reason: 'each band says the frequency it acts on',
+      );
+    }
   });
 
   testWidgets('dragging a slider reports the band it belongs to', (
     tester,
   ) async {
     final changes = <(int, double)>[];
-    await openPanel(
+    await openEditorPanel(
       tester,
-      settings: const EqualizerSettings.flat(),
       onGainChanged: (band, gain) => changes.add((band, gain)),
     );
 
@@ -155,50 +259,15 @@ void main() {
     );
   });
 
-  testWidgets('a curve moved by hand is marked as custom', (tester) async {
-    await openPanel(
-      tester,
-      settings: EqualizerSettings(
-        enabled: true,
-        gains: EqualizerSettings.normalizeGains(<double>[
-          3,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-        ]),
-      ),
-    );
-
-    expect(
-      find.descendant(of: find.byType(Chip), matching: find.text('自定义')),
-      findsOneWidget,
-      reason: 'the hand-moved curve is marked at the end of the chips',
-    );
-    expect(
-      find.descendant(of: find.byType(ChoiceChip), matching: find.text('平坦')),
-      findsOneWidget,
-      reason: 'the chips stay available, none of them is lit',
-    );
-  });
-
   testWidgets('a platform without a backend shows why and takes no change', (
     tester,
   ) async {
-    var enabledCalls = 0;
-    var gainCalls = 0;
     var presetCalls = 0;
+    var gainCalls = 0;
 
-    await openPanel(
+    await openEditorPanel(
       tester,
-      settings: const EqualizerSettings.flat(enabled: true),
       available: false,
-      onEnabledChanged: (enabled) => enabledCalls++,
       onGainChanged: (band, gain) => gainCalls++,
       onPresetChanged: (presetId) => presetCalls++,
     );
@@ -214,18 +283,12 @@ void main() {
     );
 
     final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-    expect(chips.length, 8);
+    expect(chips.length, 12);
     expect(
       chips.every((chip) => chip.onSelected == null),
       isTrue,
       reason: 'a preset that cannot sound is not offered',
     );
-
-    // The switch of the shared row has no disabled state of its own, so the
-    // panel has to prove that a tap on it writes nothing.
-    await tester.tap(find.byType(Switch), warnIfMissed: false);
-    await tester.pumpAndSettle();
-    expect(enabledCalls, 0);
 
     await tester.tap(
       find.byKey(const ValueKey<String>('equalizer-band-5')),

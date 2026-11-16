@@ -8345,6 +8345,30 @@ abstract class AppLocalizations {
   /// **'电子'**
   String get equalizerPresetElectronic;
 
+  /// No description provided for @equalizerPresetAcoustic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'原声'**
+  String get equalizerPresetAcoustic;
+
+  /// No description provided for @equalizerPresetHiphop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'嘻哈'**
+  String get equalizerPresetHiphop;
+
+  /// No description provided for @equalizerPresetLive.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'现场'**
+  String get equalizerPresetLive;
+
+  /// No description provided for @equalizerPresetSoft.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'轻柔'**
+  String get equalizerPresetSoft;
+
   /// No description provided for @equalizerCustom.
   ///
   /// In zh_CN, this message translates to:
@@ -8362,6 +8386,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'提升的频段会用等量预放抵消，避免削波'**
   String get equalizerHint;
+
+  /// No description provided for @equalizerQuickHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更细的频段和全部预设见 设置 › 播放'**
+  String get equalizerQuickHint;
 
   /// No description provided for @equalizerGainDb.
   ///
@@ -8390,7 +8420,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsEqualizerActionHint.
   ///
   /// In zh_CN, this message translates to:
-  /// **'打开面板选择预设并拖动十个频段'**
+  /// **'全部预设与十段滑杆'**
   String get settingsEqualizerActionHint;
 
   /// No description provided for @playerEqualizer.

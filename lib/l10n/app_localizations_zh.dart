@@ -4496,6 +4496,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equalizerPresetElectronic => '电子';
 
   @override
+  String get equalizerPresetAcoustic => '原声';
+
+  @override
+  String get equalizerPresetHiphop => '嘻哈';
+
+  @override
+  String get equalizerPresetLive => '现场';
+
+  @override
+  String get equalizerPresetSoft => '轻柔';
+
+  @override
   String get equalizerCustom => '自定义';
 
   @override
@@ -4503,6 +4515,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
+
+  @override
+  String get equalizerQuickHint => '更细的频段和全部预设见 设置 › 播放';
 
   @override
   String equalizerGainDb(String value) {
@@ -4521,7 +4536,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsEqualizerAction => '均衡器';
 
   @override
-  String get settingsEqualizerActionHint => '打开面板选择预设并拖动十个频段';
+  String get settingsEqualizerActionHint => '全部预设与十段滑杆';
 
   @override
   String get playerEqualizer => '均衡器';
@@ -9019,6 +9034,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get equalizerPresetElectronic => '电子';
 
   @override
+  String get equalizerPresetAcoustic => '原声';
+
+  @override
+  String get equalizerPresetHiphop => '嘻哈';
+
+  @override
+  String get equalizerPresetLive => '现场';
+
+  @override
+  String get equalizerPresetSoft => '轻柔';
+
+  @override
   String get equalizerCustom => '自定义';
 
   @override
@@ -9026,6 +9053,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
+
+  @override
+  String get equalizerQuickHint => '更细的频段和全部预设见 设置 › 播放';
 
   @override
   String equalizerGainDb(String value) {
@@ -9044,7 +9074,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get settingsEqualizerAction => '均衡器';
 
   @override
-  String get settingsEqualizerActionHint => '打开面板选择预设并拖动十个频段';
+  String get settingsEqualizerActionHint => '全部预设与十段滑杆';
 
   @override
   String get playerEqualizer => '均衡器';
@@ -13543,6 +13573,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get equalizerPresetElectronic => '電子';
 
   @override
+  String get equalizerPresetAcoustic => '原聲';
+
+  @override
+  String get equalizerPresetHiphop => '嘻哈';
+
+  @override
+  String get equalizerPresetLive => '現場';
+
+  @override
+  String get equalizerPresetSoft => '輕柔';
+
+  @override
   String get equalizerCustom => '自訂';
 
   @override
@@ -13550,6 +13592,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get equalizerHint => '提升的頻段會用等量預放抵消，避免削波';
+
+  @override
+  String get equalizerQuickHint => '更細的頻段和全部預設見 設定 › 播放';
 
   @override
   String equalizerGainDb(String value) {
@@ -13568,7 +13613,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get settingsEqualizerAction => '等化器';
 
   @override
-  String get settingsEqualizerActionHint => '開啟面板選擇預設並拖動十個頻段';
+  String get settingsEqualizerActionHint => '全部預設與十段滑桿';
 
   @override
   String get playerEqualizer => '等化器';
