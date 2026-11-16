@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.36.1",
-  "build": 68,
-  "released_at": "2026-11-16T10:05:29Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.36.1",
-  "notes": "### 修复\n\n- **打开音乐库仍然是一列五千行曲目**：1.36.0 让视图随分类走，但页面第一次打开时仍写死\n  在平铺列表上，所以一张专辑的十几个乐章各占一行，看着像噪声而不是信息。现在打开就用\n  这一类的默认读法——音乐是专辑墙（一张专辑一张卡，点进去才是曲目），播客是节目墙，\n  电台是台列表；读者自己点过开关之后，那一档才成为他当下的选择，切到别的内容分类再重置。",
+  "version": "1.37.0",
+  "build": 69,
+  "released_at": "2026-11-16T10:29:17Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.0",
+  "notes": "### 新增\n\n- **音乐均衡器（10 段，±12 dB）**：底栏动作行、正在播放页顶栏各有一个入口，设置页「播放」\n  卡片里也有同一行。面板是 10 根竖向滑杆（31 Hz–16 kHz，1 dB 步进），外加 8 组预设\n  （平直 / 流行 / 摇滚 / 爵士 / 古典 / 低音 / 人声 / 电子）和一键还原；手动改动后预设标记\n  回到「自定义」。\n- **曲线直接落到 mpv 的滤镜图**：`af` 设为 `lavfi=[volume=…dB,equalizer=f=…:g=…,…]`，预放大取\n  最大正增益的相反数，避免叠加多段后削顶；关闭或全部为 0 dB 时清空滤镜图，声音走原路径。\n  桌面端启动时用一条 `volume=0dB` 探测 libmpv 是否带 ffmpeg 滤波器，没有的话入口不显示，\n  播放不受影响；移动端仍是 `just_audio`，`AudioPlayerService.equalizer` 为 null，同样不显示入口。\n- **设置随应用重启恢复**：曲线按 400ms 防抖写进 `audio_equalizer_v1`（`{version, enabled, gains}`），\n  启动时读回并补发给后端；拖动过程中的写入合并到 100ms 一次，mpv 只收到最后一版曲线。\n\n### 说明\n\n- 均衡器的设计与边界见 [`docs/equalizer.md`](docs/equalizer.md)。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.36.1/tune-linux-x64-1.36.1.tar.gz",
-      "size": 53568591,
-      "sha256": "3064d7fdc83f595acb695f6143a394115f31905abc6fba2a0b057b88a125c331"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.0/tune-linux-x64-1.37.0.tar.gz",
+      "size": 53699922,
+      "sha256": "2cdc1c1dc5ef3d6731bd9fe910ab2e8d8ed0e603646692860337acb0129de0f6"
     }
   }
 }
