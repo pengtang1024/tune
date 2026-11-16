@@ -146,6 +146,12 @@
 - 主线分支是 `develop`；提交信息用 `feat|fix|refactor|docs|chore(scope): 中文说明`，一次提交只做一件事。
 - 工作区里别人未提交的修改不回退、不覆盖；清理旧代码前先确认引用关系（先 grep 再删）。
 - 新约定写进本页或 `docs/`，不要改 `需求/` 里已标注为「早期规划」的文档来表达新规则。
+- **常设授权（2026-11-16 用户明令）**：一批改动做完后**默认直接走完整交付流程，不再逐项征求同意**——
+  按语义化判版本（`feat` 走 minor、`fix`/`docs` 走 patch）→ 写 CHANGELOG → 构建打包写清单 →
+  跑 `./tool/check.sh --l10n --tools --docs` → 提交 → `develop` 合 `master` + 打 tag → 推三端
+  （`origin`/`github`/`gitee`，含 `master` 与 tag）→ 三端建 release 挂归档 → purge jsDelivr 后复核
+  双源 → 同步三端 wiki → `./tool/upgrade_local.sh` 更新本机安装并重启。步骤细节见 `docs/updates.md`。
+  仅两种情况先问：要删别人的产物或历史数据；要动签名密钥、访问权限等不可回滚的东西。
 
 ## 4. 不在当前范围
 

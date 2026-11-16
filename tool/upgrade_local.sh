@@ -18,7 +18,19 @@ if [[ ! -x "$install_dir/tune" ]]; then
 fi
 
 echo "读取最新发布…"
-release="$(curl -fsSL https://api.github.com/repos/pengtang1024/tune/releases/latest)"
+# 未鉴权的 api.github.com 是 60 次/小时、按 IP 计，共享出口很容易 403；
+# 有 token 就带上，没有就退回不鉴权（错误信息里会说明）。
+token="${GITHUB_TOKEN:-}"
+if [[ -z "$token" ]] && command -v gh >/dev/null 2>&1; then
+  token="$(gh auth token 2>/dev/null || true)"
+fi
+auth=()
+[[ -n "$token" ]] && auth=(-H "Authorization: token $token")
+if ! release="$(curl -fsSL "${auth[@]}" https://api.github.com/repos/pengtang1024/tune/releases/latest)"; then
+  echo "读不到 GitHub 的发布信息（未鉴权时限额 60 次/小时）。" >&2
+  echo "设一个 token 再试：GITHUB_TOKEN=… $0 $*" >&2
+  exit 1
+fi
 url="$(printf '%s' "$release" | python3 -c '
 import json, sys
 data = json.load(sys.stdin)
