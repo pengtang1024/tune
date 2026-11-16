@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.2",
-  "build": 62,
-  "released_at": "2026-11-16T08:02:44Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.2",
-  "notes": "### 修复\n\n- **旧曲目的标题里仍重复艺术家**：1.35.1 打开库时只补齐「艺术家为空」的行，标题本身\n  写着 `Handel, Messiah - 101 Sinfonia`、艺术家列已经是 `Handel, G F` 的行没有被处理。\n  现在补齐范围扩到「标题或专辑含 ` - ` 且前半以艺术家名（或名字首词）开头」的行，\n  本机实测会改写 82 条标题、36 条专辑；补齐按行数记账，同一进程内不重复扫描。",
+  "version": "1.35.3",
+  "build": 63,
+  "released_at": "2026-11-16T09:05:23Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.3",
+  "notes": "### 修复\n\n- **标题里带曲目序号、占位符与角色后缀**：列表左边本来就有行号，标题再写一遍 `01 Theme`、\n  `102 Sinfonia`、`13 XIII. Romanza` 只会把曲名挤成省略号。现在取数边界会去掉开头的序号\n  （数字 + 分隔符、数字 + 罗马数字、前导零、与专辑 `(Disc 1 of 3)` 对得上的碟轨号）、\n  尾部的 `+++`/`**` 占位符与 `- Coro`/`- Aria` 这类角色后缀。`7 Rings`、`99 Luftballons`、\n  `2014-02-12 Bigwords` 这类把数字当名字用的标题不动。\n- **已有曲目同样补齐**：打开库时按同一套规则重写旧行（只写真正变化的行），本机实测改写\n  约 460 行，无需重新扫描音源。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.2/tune-linux-x64-1.35.2.tar.gz",
-      "size": 53675108,
-      "sha256": "6dd97a63b5ea6990303e5709e2336993384aab5fda654374881fd685a7628aa0"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.3/tune-linux-x64-1.35.3.tar.gz",
+      "size": 53676019,
+      "sha256": "a327240188f7234dab31c126d954f635408c54e381af29b1ed517f128304847c"
     }
   }
 }
