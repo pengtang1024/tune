@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/layout/layout_metrics.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/core/utils/text_order.dart';
@@ -87,6 +88,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// Whether the category tree stands open.
   bool _treeExpanded = false;
 
+  /// 窄窗口里搜索行是否展开着。宽窗口不看这个值：那里搜索常驻。
+  bool _searchOpen = false;
+
   /// The category the catalog view is showing.
   LibraryCategoryKind _categoryKind = LibraryCategoryKind.genres;
 
@@ -119,17 +123,17 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         if (notification.metrics.axis != Axis.vertical) return false;
         if (notification.metrics.extentAfter > 600) return false;
         _loadingMore = true;
-        ref
-            .read(libraryControllerProvider.notifier)
-            .loadMore()
-            .whenComplete(() {
-              if (mounted) _loadingMore = false;
-            });
+        ref.read(libraryControllerProvider.notifier).loadMore().whenComplete(
+          () {
+            if (mounted) _loadingMore = false;
+          },
+        );
         return false;
       },
       child: list,
     );
   }
+
   bool? _cachedTrackHasMore;
 
   /// Whether the next window of the library is already on its way.
@@ -245,87 +249,122 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
     final content = Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            CompactTokens.pageGutter,
-            CompactTokens.space8,
-            CompactTokens.pageGutter,
-            CompactTokens.space4,
-          ),
-          child: openAlbum == null
-              ? LibraryHeader(
-                  summary: context.loc.librarySummary(
-                    library.total,
-                    albumCount,
-                    availableSources.length,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // 页宽窄于 800 时页头收敛：搜索收成一颗图标、结果数交回页头、
+            // 页级动作进 ⋯，页面只留一行控件。宽度取自页面而不是窗口——
+            // 600–799 那一档左边还站着 76 px 的图标侧栏。
+            final compact =
+                constraints.maxWidth < LayoutBreakpoints.railCompactMaxWidth;
+            // 搜索行只在窄窗口里折叠；有查询词时保持展开，否则输入过的词
+            // 会藏在图标后面，看起来像搜索没生效。
+            final searchOpen = _searchOpen || library.query.isNotEmpty;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CompactTokens.pageGutter,
+                    CompactTokens.space8,
+                    CompactTokens.pageGutter,
+                    CompactTokens.space4,
                   ),
-                  onAddAll: songs.isEmpty ? null : () => _addAllToQueue(songs),
-                  onScan: _scan,
-                  scanning: library.isScanning,
-                  onSearchOnline: widget.onSearchOnline,
-                  onAlbums: albumCount == 0
-                      ? null
-                      : () => _setView(LibraryViewMode.albums),
-                  albumsActive: _effectiveView(layout) == LibraryViewMode.albums,
-                  treeExpanded: _treeExpanded,
-                  onToggleTree: () =>
-                      setState(() => _treeExpanded = !_treeExpanded),
-                )
-              : LibraryAlbumHeader(
-                  album: openAlbum,
-                  onBack: () => setState(() => _openAlbum = null),
-                  onPlay: () => _playAlbum(openAlbum),
-                  onAddAll: () => _addAllToQueue(openAlbum.songs),
+                  child: openAlbum == null
+                      ? LibraryHeader(
+                          summary: context.loc.librarySummary(
+                            library.total,
+                            albumCount,
+                            availableSources.length,
+                          ),
+                          count: library.matching,
+                          kind: selectedKind,
+                          compact: compact,
+                          searchOpen: searchOpen,
+                          onSearch: () =>
+                              setState(() => _searchOpen = !_searchOpen),
+                          onAddAll: songs.isEmpty
+                              ? null
+                              : () => _addAllToQueue(songs),
+                          onScan: _scan,
+                          scanning: library.isScanning,
+                          onSearchOnline: widget.onSearchOnline,
+                          onAlbums: albumCount == 0
+                              ? null
+                              : () => _setView(LibraryViewMode.albums),
+                          albumsActive:
+                              _effectiveView(layout) == LibraryViewMode.albums,
+                          treeExpanded: _treeExpanded,
+                          onToggleTree: () =>
+                              setState(() => _treeExpanded = !_treeExpanded),
+                        )
+                      : LibraryAlbumHeader(
+                          album: openAlbum,
+                          onBack: () => setState(() => _openAlbum = null),
+                          onPlay: () => _playAlbum(openAlbum),
+                          onAddAll: () => _addAllToQueue(openAlbum.songs),
+                        ),
                 ),
+                if (openAlbum == null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      CompactTokens.pageGutter,
+                      0,
+                      CompactTokens.pageGutter,
+                      CompactTokens.space8,
+                    ),
+                    child: LibraryToolbar(
+                      controller: _searchController,
+                      focusNode: ref.watch(librarySearchFocusProvider),
+                      query: library.query,
+                      count: library.matching,
+                      hiddenMissingDuration: library.hiddenMissingDuration,
+                      kind: selectedKind,
+                      sources: availableSources,
+                      sourceLabels: sourceLabels,
+                      sourceFilter: library.sourceFilter,
+                      sort: library.sort,
+                      filter: library.filter,
+                      view: _effectiveView(layout),
+                      layout: layout,
+                      compact: compact,
+                      searchOpen: searchOpen,
+                      onQueryChanged: (value) {
+                        ref
+                            .read(libraryControllerProvider.notifier)
+                            .setQuery(value);
+                      },
+                      onClearQuery: _clearQuery,
+                      onSourceFilter: (value) {
+                        ref
+                            .read(libraryControllerProvider.notifier)
+                            .setSourceFilter(value);
+                      },
+                      onSort: (sort) {
+                        ref
+                            .read(libraryControllerProvider.notifier)
+                            .setSort(sort);
+                      },
+                      onViewChanged: _setView,
+                      onFilter: () => showLibraryFilterPanel(
+                        context,
+                        sourceLabels: sourceLabels,
+                      ),
+                      onShowMissingDuration: () {
+                        ref
+                            .read(libraryControllerProvider.notifier)
+                            .setFilter(
+                              library.filter.copyWith(
+                                hideMissingDuration: false,
+                              ),
+                            );
+                      },
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
-        if (openAlbum == null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              CompactTokens.pageGutter,
-              0,
-              CompactTokens.pageGutter,
-              CompactTokens.space8,
-            ),
-            child: LibraryToolbar(
-              controller: _searchController,
-              focusNode: ref.watch(librarySearchFocusProvider),
-              query: library.query,
-              count: library.matching,
-              hiddenMissingDuration: library.hiddenMissingDuration,
-              kind: selectedKind,
-              sources: availableSources,
-              sourceLabels: sourceLabels,
-              sourceFilter: library.sourceFilter,
-              sort: library.sort,
-              filter: library.filter,
-              view: _effectiveView(layout),
-              layout: layout,
-              onQueryChanged: (value) {
-                ref.read(libraryControllerProvider.notifier).setQuery(value);
-              },
-              onClearQuery: _clearQuery,
-              onSourceFilter: (value) {
-                ref
-                    .read(libraryControllerProvider.notifier)
-                    .setSourceFilter(value);
-              },
-              onSort: (sort) {
-                ref.read(libraryControllerProvider.notifier).setSort(sort);
-              },
-              onViewChanged: _setView,
-              onFilter: () => showLibraryFilterPanel(
-                context,
-                sourceLabels: sourceLabels,
-              ),
-              onShowMissingDuration: () {
-                ref
-                    .read(libraryControllerProvider.notifier)
-                    .setFilter(
-                      library.filter.copyWith(hideMissingDuration: false),
-                    );
-              },
-            ),
-          ),
         if (!library.filter.isEmpty)
           LibraryFilterChips(
             filter: library.filter,
@@ -362,9 +401,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
           Positioned.fill(
             child: GestureDetector(
               onTap: () => setState(() => _treeExpanded = false),
-              child: ColoredBox(
-                color: Colors.black.withValues(alpha: 0.08),
-              ),
+              child: ColoredBox(color: Colors.black.withValues(alpha: 0.08)),
             ),
           ),
           Positioned(
@@ -493,8 +530,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         kind: _categoryKind,
         onKindChanged: (kind) => setState(() => _categoryKind = kind),
         songs: songs,
-        facets: ref.watch(libraryFacetsProvider).valueOrNull ??
-            LibraryFacets.empty,
+        facets:
+            ref.watch(libraryFacetsProvider).valueOrNull ?? LibraryFacets.empty,
         sourceLabels: sourceLabels,
         onSelect: _selectCategoryValue,
       );
@@ -503,8 +540,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     if (view == LibraryViewMode.columns) {
       return LayoutBuilder(
         builder: (context, constraints) {
-          final rowWidth =
-              constraints.maxWidth - CompactTokens.pageGutter * 2;
+          final rowWidth = constraints.maxWidth - CompactTokens.pageGutter * 2;
           if (rowWidth < 860) {
             // Too narrow for two columns: the list takes over, the choice
             // stays so the wall comes back when the window grows.
@@ -514,7 +550,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               onlyLikeOnDoubleClick,
               library.sort,
               controller: _songsScrollController,
-              hasMore: library.hasMore && library.query.isEmpty && !library.hasFilter,
+              hasMore:
+                  library.hasMore &&
+                  library.query.isEmpty &&
+                  !library.hasFilter,
               bilingual: bilingual,
             );
           }
@@ -631,9 +670,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               return Center(
                 child: TextButton.icon(
                   key: const ValueKey('library-load-more'),
-                  onPressed: () => ref
-                      .read(libraryControllerProvider.notifier)
-                      .loadMore(),
+                  onPressed: () =>
+                      ref.read(libraryControllerProvider.notifier).loadMore(),
                   icon: const Icon(
                     Icons.expand_more_rounded,
                     size: CompactTokens.icon16,
@@ -806,12 +844,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     });
   }
 
-
   void _showAllSongs() {
     setState(() => _view = LibraryViewMode.songs);
-    ref
-        .read(libraryControllerProvider.notifier)
-        .setFilter(LibraryFilter.songs);
+    ref.read(libraryControllerProvider.notifier).setFilter(LibraryFilter.songs);
   }
 
   void _showCategory(LibraryCategoryKind kind) {
@@ -825,12 +860,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   void _selectCategoryValue(LibraryCategoryKind kind, Object value) {
     final filter = ref.read(libraryControllerProvider).requireValue.filter;
     final next = switch (kind) {
-      LibraryCategoryKind.genres => filter.copyWith(
-        genres: {value as String},
-      ),
-      LibraryCategoryKind.decades => filter.copyWith(
-        decades: {value as int},
-      ),
+      LibraryCategoryKind.genres => filter.copyWith(genres: {value as String}),
+      LibraryCategoryKind.decades => filter.copyWith(decades: {value as int}),
       LibraryCategoryKind.artists => filter.copyWith(
         artists: {value as String},
       ),
@@ -862,9 +893,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       _view = LibraryViewMode.albums;
       _openAlbum = null;
     });
-    ref.read(libraryControllerProvider.notifier).setFilter(
-      filter.copyWith(sources: {collection.sourceId}),
-    );
+    ref
+        .read(libraryControllerProvider.notifier)
+        .setFilter(filter.copyWith(sources: {collection.sourceId}));
   }
 
   /// Empties one collection of the rows it brought in.
@@ -912,9 +943,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     ref
         .read(libraryControllerProvider.notifier)
         .setFilter(
-          ref.read(libraryControllerProvider).valueOrNull?.filter.copyWith(
-                kinds: {kind},
-              ) ??
+          ref
+                  .read(libraryControllerProvider)
+                  .valueOrNull
+                  ?.filter
+                  .copyWith(kinds: {kind}) ??
               LibraryFilter.empty.copyWith(kinds: {kind}),
         );
   }

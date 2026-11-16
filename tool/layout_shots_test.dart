@@ -133,7 +133,6 @@ Future<void> _loadFonts() async {
   }
 }
 
-
 /// 窄窗口里视图开关收成一颗菜单，宽的才是一排按钮；两种都点得到同一个档位。
 Future<void> _switchView(WidgetTester tester, IconData icon) async {
   final inSwitch = find.descendant(
@@ -454,6 +453,9 @@ void main() {
 
   testWidgets('capture pages in the smallest window', (tester) async {
     await onLinux(() async {
+      // The smallest window of the desktop, taken from the constant the
+      // window service sets: it sits inside the phone band, so these shots
+      // are the phone form of every page.
       await surface(
         tester,
         const Size(

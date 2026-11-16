@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/features/library/presentation/library_wall_columns.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
@@ -84,11 +85,12 @@ class LibraryAlbumsView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth - gutter * 2;
-        final columns = ((width + spacing) / (_maxCover + spacing))
-            .ceil()
-            .clamp(2, 10);
-        final cell = (width - spacing * (columns - 1)) / columns;
+        // 列数由 libraryWallColumns 一处决定（窄页固定三列）。
+        final columns = libraryWallColumns(
+          constraints.maxWidth,
+          maxCover: _maxCover,
+        );
+        final cell = wallCellWidth(constraints.maxWidth, columns);
         // The caption grows with the text of the desktop, like every other
         // box that holds words; the cover keeps the size the grid gave it.
         final caption =
@@ -140,7 +142,9 @@ class LibraryAlbumsView extends StatelessWidget {
                 ),
               ),
             ],
-            const SliverToBoxAdapter(child: SizedBox(height: CompactTokens.space8)),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: CompactTokens.space8),
+            ),
           ],
         );
       },

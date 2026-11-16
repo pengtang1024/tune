@@ -86,7 +86,8 @@ void main() {
     expect(
       headerTitle,
       moreOrLessEquals(firstRowTitle, epsilon: 1),
-      reason: '标题列的列头与行必须同一条竖线：列表左右各有 pageGutter，'
+      reason:
+          '标题列的列头与行必须同一条竖线：列表左右各有 pageGutter，'
           '列头不补这一圈就会整列左移 ${CompactTokens.pageGutter}',
     );
 
@@ -111,17 +112,32 @@ void main() {
   testWidgets('the count keeps its distance from the search field', (
     tester,
   ) async {
-    await pumpAt(tester, const Size(760, 560));
+    // 宽窗口里搜索框和结果数同一行：中间不留一道固定的缝，「2 首」会贴上
+    // 输入框的描边。
+    await pumpAt(tester, const Size(900, 560));
 
-    // 一行里搜索框是 Expanded：它会把结果数一直挤到自己的描边上，
-    // 除非两者之间有一道固定的缝。
     final field = tester.getRect(find.byType(TextField));
+    // 假控制器不数匹配数，结果数是「0 首」；这里只看它和搜索框的距离。
     final count = tester.getRect(find.textContaining('首').first);
     expect(
       count.left - field.right,
       greaterThanOrEqualTo(CompactTokens.space8),
-      reason: '「0 首」贴在搜索框上就是这条缝没了',
+      reason: '「2 首」贴在搜索框上就是这条缝没了',
     );
+  });
+
+  testWidgets('窄窗口把计数交给页头，搜索收成一颗图标', (tester) async {
+    await pumpAt(tester, const Size(760, 560));
+
+    // 页头只剩一个数，工具栏不再重复它；搜索行折起来，等图标叫它。
+    expect(find.textContaining('首'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byKey(const ValueKey('library-search-toggle')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('library-search-toggle')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsOneWidget);
   });
 
   testWidgets('the columns still line up in the narrow window', (tester) async {

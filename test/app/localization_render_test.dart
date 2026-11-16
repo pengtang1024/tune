@@ -232,16 +232,19 @@ Future<void> _drawEveryScreen(
     await _closeWindow(tester);
   }
 
-  // The search sheet that rises out of the library.
+  // The search sheet that rises out of the library. A page narrower than the
+  // rail breakpoint keeps the action in the ⋯ menu instead of a button beside
+  // the title.
   final search = find.widgetWithText(OutlinedButton, strings.searchOnlineTitle);
-  expect(
-    search,
-    findsOneWidget,
-    reason: 'the library has no button that opens the search sheet',
-  );
-  await tester.ensureVisible(search);
-  await tester.pumpAndSettle();
-  await tester.tap(search);
+  if (search.evaluate().isEmpty) {
+    await tester.tap(find.byKey(const ValueKey('library-more')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('library-more-online')));
+  } else {
+    await tester.ensureVisible(search);
+    await tester.pumpAndSettle();
+    await tester.tap(search);
+  }
   await tester.pumpAndSettle();
   expect(
     find.byType(BottomSheet).evaluate(),

@@ -11,7 +11,7 @@
 
 Tune 是一款紧凑的本地与在线音乐播放器，使用 Flutter 开发。界面由左侧导航（发现 / 音乐库 / 喜欢 / 音源 / 设置）、右侧内容区和底部播放条组成；播放队列是底栏或正在播放页打开的非模态侧栏，不占用导航位；它只遮住内容区，底栏和侧栏仍可用。
 
-- **当前版本**：`1.42.0+82`（代号 `Pocket`，2026-11-16）。版本号与构建号在 [pubspec.yaml](pubspec.yaml) 和 `lib/config/app_version.dart`；最新发布清单是仓库根的 [version.json](version.json)。
+- **当前版本**：`1.42.1+83`（代号 `Pocket`，2026-11-16）。版本号与构建号在 [pubspec.yaml](pubspec.yaml) 和 `lib/config/app_version.dart`；最新发布清单是仓库根的 [version.json](version.json)。
 - **主要验收平台**：Linux 桌面。Windows / Android / iOS 保留工程入口；macOS 与 Web 已移除。
 - **源码与文档**：[AGENTS.md](AGENTS.md) 是工程文档地图；设计说明在 [docs/](docs/)，代码结构导览在 [wiki/](wiki/)，需求入口是 [需求/README.md](需求/README.md)。用不了先看 [故障排查](docs/troubleshooting.md)。
 
