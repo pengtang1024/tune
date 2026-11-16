@@ -1,92 +1,66 @@
 import 'package:tune/domain/models/content_kind.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 
-/// 一类内容有自己的读法。
+/// What one group of the library is called.
 ///
-/// 音乐是「专辑 → 曲目」，播客是「节目 → 单集」，有声书是「书 → 章节」，
-/// 电台只有一串台，音效是一堆短条目——把它们塞进同一套视图开关，读者要自己
-/// 把不属于这一类的东西过滤掉。这个表就是那层判断的唯一出处：分类决定默认
-/// 打开哪个视图、允许切换哪几个、以及「专辑」这一档在这类内容里叫什么。
+/// Music groups tracks into albums, a podcast into shows and an audiobook
+/// into books. The noun is the only thing the page needs from the kind when
+/// it draws the group rows; the count still comes from each group itself.
 enum LibraryGroupingLabel {
-  /// 音乐：专辑。
+  /// Music: albums.
   album,
 
-  /// 播客：节目。
+  /// Podcast: shows.
   show,
 
-  /// 有声书：书。
+  /// Audiobook: books.
   book,
 }
 
+/// How one class of content is browsed.
+///
+/// Music, podcasts and audiobooks are read in two levels: a group first, the
+/// tracks of that group after. A station never ends and a sound effect is a
+/// single short take, so both are one flat list. This class is the single
+/// place that decision lives: the page has no view switch, and the toolbar
+/// cannot change the shape of the list.
 class LibraryLayout {
-  const LibraryLayout({
-    required this.primary,
-    required this.views,
-    this.groupingLabel,
-  });
+  const LibraryLayout({required this.grouped, this.groupingLabel});
 
-  /// 切到这类内容时打开的视图。
-  final LibraryViewMode primary;
+  /// Whether the list starts with groups that open into their own tracks.
+  final bool grouped;
 
-  /// 这类内容允许的视图，顺序即开关里的顺序。
-  final List<LibraryViewMode> views;
-
-  /// 「专辑」这一档在这类内容里的名字；为空表示这类内容没有分组墙。
+  /// The noun a group of this content carries; null on a flat list.
   final LibraryGroupingLabel? groupingLabel;
-
-  bool allows(LibraryViewMode view) => views.contains(view);
 }
 
-/// 音乐的默认读法：一屏两列——左边专辑，右边这个专辑的曲目。
-/// 一列平铺会让一张专辑的十几个乐章各占一行，专辑墙又看不到曲目；
-/// 两列同时在场，才既不重复也不丢层级。
+/// Music: album rows, then the tracks of the album the reader opened.
 const _music = LibraryLayout(
-  primary: LibraryViewMode.albums,
-  views: [
-    LibraryViewMode.songs,
-    LibraryViewMode.columns,
-    LibraryViewMode.categories,
-    LibraryViewMode.albums,
-    LibraryViewMode.collections,
-  ],
+  grouped: true,
   groupingLabel: LibraryGroupingLabel.album,
 );
 
-/// 播客按节目看，节目里是单集，所以只有两级。
+/// A podcast is read by show: one row per show, its episodes after.
 const _podcast = LibraryLayout(
-  primary: LibraryViewMode.albums,
-  views: [
-    LibraryViewMode.albums,
-    LibraryViewMode.songs,
-  ],
+  grouped: true,
   groupingLabel: LibraryGroupingLabel.show,
 );
 
-/// 有声书按书看，需要分类来找书，也需要曲目表定位某一章。
+/// An audiobook is read by book: one row per book, its chapters after.
 const _audiobook = LibraryLayout(
-  primary: LibraryViewMode.albums,
-  views: [
-    LibraryViewMode.albums,
-    LibraryViewMode.songs,
-    LibraryViewMode.categories,
-  ],
+  grouped: true,
   groupingLabel: LibraryGroupingLabel.book,
 );
 
-/// 电台没有专辑可言：一串台，加一个按来源分的合集。
-const _radio = LibraryLayout(
-  primary: LibraryViewMode.songs,
-  views: [LibraryViewMode.songs, LibraryViewMode.collections],
-);
+/// A station is a stream, not a group of tracks: one flat list of stations.
+const _radio = LibraryLayout(grouped: false);
 
-/// 音效是短的、一次性的：平铺，按名字找。
-const _soundEffect = LibraryLayout(
-  primary: LibraryViewMode.songs,
-  views: [LibraryViewMode.songs],
-);
+/// A sound effect is one short take and has nothing under it: flat.
+const _soundEffect = LibraryLayout(grouped: false);
 
-/// 一类内容对应的读法。多个分类同时选中时按最宽的那种算，
-/// 因为读者此时看到的是混合列表。
+/// The song table a page shows when nothing names a kind.
+const _flat = LibraryLayout(grouped: false);
+
+/// The shape of the list that holds [kind].
 LibraryLayout libraryLayoutFor(ContentKind kind) => switch (kind) {
   ContentKind.music => _music,
   ContentKind.podcast => _podcast,
@@ -95,6 +69,14 @@ LibraryLayout libraryLayoutFor(ContentKind kind) => switch (kind) {
   ContentKind.soundEffect => _soundEffect,
 };
 
-/// 一组分类的读法：单一分类用自己的；混合时用音乐的（最宽）。
-LibraryLayout libraryLayoutForKinds(Set<ContentKind> kinds) =>
-    kinds.length == 1 ? libraryLayoutFor(kinds.first) : _music;
+/// The shape of the list that holds [kinds].
+///
+/// Only a scope that names exactly one kind has a first level: one noun
+/// (album, show or book) to put on a row. No scope is the song table, and a
+/// scope of several kinds has no single noun — calling an episode a song, or
+/// filing a station under an album, would be the kind of row this page is
+/// here to remove. Both are one flat table of tracks.
+LibraryLayout libraryLayoutForKinds(Set<ContentKind> kinds) {
+  if (kinds.length != 1) return _flat;
+  return libraryLayoutFor(kinds.first);
+}

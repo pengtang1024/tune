@@ -10,8 +10,8 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 /// The heading of the library.
 ///
 /// A wide window shows the title, the account of what the library holds and the
-/// two whole-page entries (albums, online search) beside it; the view switch and
-/// the search belong to the toolbar, because they change how the list is read.
+/// online search entry beside it; the search field and the sort belong to the
+/// toolbar, because they change what the list holds.
 ///
 /// A narrow window ([compact]) says only what the page is and what the list
 /// holds right now: the count of the matching rows, one icon that opens the
@@ -56,12 +56,6 @@ class LibraryHeader extends StatelessWidget {
   /// worse than one that is not there.
   final VoidCallback? onSearchOnline;
 
-  /// Opens the wall of albums.
-  final VoidCallback? onAlbums;
-
-  /// Whether the page is already showing the albums.
-  final bool albumsActive;
-
   /// Whether the category tree stands open.
   final bool treeExpanded;
   final VoidCallback onToggleTree;
@@ -78,8 +72,6 @@ class LibraryHeader extends StatelessWidget {
     required this.onScan,
     required this.scanning,
     required this.onSearchOnline,
-    required this.onAlbums,
-    required this.albumsActive,
     required this.treeExpanded,
     required this.onToggleTree,
   });
@@ -159,20 +151,6 @@ class LibraryHeader extends StatelessWidget {
                 style: countStyle,
               ),
             ),
-            if (onAlbums != null) ...[
-              const SizedBox(width: CompactTokens.space12),
-              OutlinedButton.icon(
-                key: const ValueKey('library-albums'),
-                onPressed: onAlbums,
-                style: _scopeStyle(theme, albumsActive),
-                icon: const Icon(
-                  Icons.grid_view_rounded,
-                  size: CompactTokens.icon16,
-                ),
-                label: Text(context.loc.libraryViewAlbums),
-              ),
-              const SizedBox(width: CompactTokens.space8),
-            ],
             if (onSearchOnline != null) ...[
               const SizedBox(width: CompactTokens.space12),
               OutlinedButton.icon(
@@ -201,10 +179,10 @@ class LibraryHeader extends StatelessWidget {
     );
   }
 
-  /// The page entries that do not change how the list is read.
+  /// The page entries that do not change what the list holds.
   ///
-  /// In a narrow window the two outlined buttons live here instead of taking
-  /// the width the count needs.
+  /// In a narrow window the outlined button lives here instead of taking the
+  /// width the count needs.
   Widget _moreMenu(BuildContext context) {
     return TuneTooltip(
       message: context.loc.libraryMoreActions,
@@ -213,8 +191,6 @@ class LibraryHeader extends StatelessWidget {
         icon: const Icon(Icons.more_horiz),
         onSelected: (action) {
           switch (action) {
-            case 'albums':
-              onAlbums?.call();
             case 'online':
               onSearchOnline?.call();
             case 'scan':
@@ -224,16 +200,6 @@ class LibraryHeader extends StatelessWidget {
           }
         },
         itemBuilder: (context) => [
-          if (compact && onAlbums != null)
-            PopupMenuItem(
-              key: const ValueKey('library-more-albums'),
-              value: 'albums',
-              child: _menuEntry(
-                icon: Icons.grid_view_rounded,
-                label: context.loc.libraryViewAlbums,
-                active: albumsActive,
-              ),
-            ),
           if (compact && onSearchOnline != null)
             PopupMenuItem(
               key: const ValueKey('library-more-online'),
@@ -266,38 +232,12 @@ class LibraryHeader extends StatelessWidget {
     );
   }
 
-  Widget _menuEntry({
-    required IconData icon,
-    required String label,
-    bool active = false,
-  }) {
+  Widget _menuEntry({required IconData icon, required String label}) {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
       leading: Icon(icon, size: CompactTokens.icon16),
       title: Text(label),
-      trailing: active
-          ? const Icon(Icons.check_rounded, size: CompactTokens.icon16)
-          : null,
     );
   }
-
-  /// The look both page-wide entries share: outlined, and tinted while it is
-  /// the one the page is showing.
-  ButtonStyle _scopeStyle(ThemeData theme, bool active) =>
-      OutlinedButton.styleFrom(
-        minimumSize: const Size(0, CompactTokens.controlDefault),
-        padding: const EdgeInsets.symmetric(horizontal: CompactTokens.space12),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        foregroundColor: active ? theme.colorScheme.primary : null,
-        backgroundColor: active
-            ? theme.colorScheme.primary.withValues(alpha: 0.08)
-            : null,
-        side: BorderSide(
-          color: active
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outlineVariant,
-        ),
-      );
 }

@@ -110,7 +110,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  ROW["曲目行（library_columns_view / favorites_pane）"] -->|ListPlayback.play| LP["ListPlayback"]
+  ROW["曲目行（library_track_card / favorites_pane）"] -->|ListPlayback.play| LP["ListPlayback"]
   LP -->|playSong / playQueue| PC["PlaybackController"]
   PC -->|play · pause · seek| APS["AudioPlayerService"]
   APS --> JA["JustAudioPlayerService"]

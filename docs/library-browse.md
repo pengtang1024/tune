@@ -6,6 +6,10 @@
 > 相关：[library-redesign.md](library-redesign.md)（页头/列头/排序/密度）、[chips.md](chips.md)（标识）、
 > [genre-localization.md](genre-localization.md)（流派名）、[performance.md](performance.md)（查询预算）。
 > 实施记录：**M0–M4 已实施**。文中保留当时的设计提案，实现与原提案不一致处已在 §4/§8 就地改正，最终以代码为准。
+>
+> **现状（2026-11-16，1.43）**：视图开关已删除。音乐库只有两级——组行列表（一行一个专辑 / 节目 / 书）
+> 与组内曲目表（首行「返回」）。下文 §4.2、§4.3、§4.7、§9、§10 里的「分类视图 / 双列 / 合集 /
+> 专辑墙 + 视图开关」是设计沿革，已不再是实现；当前实现见 §13。
 
 ## 目录
 
@@ -21,6 +25,7 @@
 - [10. 一类内容一套读法（1.36.0）](#10-一类内容一套读法1360)
 - [11. 不在范围](#11-不在范围)
 - [12. 验收](#12-验收)
+- [13. 组行代替视图开关（1.43）](#13-组行代替视图开关143)
 
 ## 1. 问题与目标
 
@@ -622,3 +627,32 @@ class LibraryFilter {
 - [architecture.md](architecture.md) — 筛选与分类状态归谁
 - [performance.md](performance.md) — 查询与列表的性能预算
 - [conventions.md](conventions.md) — 尺寸与 token
+
+## 13. 组行代替视图开关（1.43）
+
+> 本节取代 §4.2、§4.3、§4.7、§9、§10 里关于「视图开关」的实现描述；那几节保留当时的取舍过程。
+
+### 13.1 为什么删
+
+同一份曲库被拆成五种读法（歌曲 / 双列 / 分类 / 专辑 / 合集），读者先要在页头或工具条选一个模式，
+再猜「这一屏点下去会怎样」。列表本身没有说明它是专辑还是单集，模式按钮却在替它解释——
+点一首歌和点一张封面得到的结果不同，界面却长得一样。做法反过来：**让列表自己说明它是什么**。
+
+### 13.2 现在的两级
+
+- **组行列表**（音乐 / 播客 / 有声书，单一内容类型时）：一行一个组，左 40 封面、组名、艺术家、
+  右侧这一组的计数（首 / 集 / 章）。整行可点，`ValueKey('library-group-${album.key}')`，
+  提示是 `TuneTooltip`（消息=组名）。计数单位由 `libraryLayoutForKinds(...).groupingLabel` 决定。
+- **组内曲目表**：点组行后，页头换成 `LibraryAlbumHeader`（封面、组名、艺术家 · 计数 · 时长、整组播放），
+  列表首行是「← 返回」（`ValueKey('library-group-back')`），下面是 32 高的曲目表。
+- **平铺**：电台 / 音效没有单一的組名词，空集与多类型混合也没有，直接渲染曲目表；
+  排序、列头、行内动作与组内表格同一套。
+- 不再有 `LibraryViewMode`、`LibraryViewSwitch`、「专辑视图」按钮，也没有初始视图 provider；
+  `library_layout.dart` 只回答「组列表还是平铺」以及组的名词与计数单位。
+
+### 13.3 一并删掉的实现
+
+`library_view_switch.dart`、`library_albums_view.dart`、`library_collections_view.dart`、`library_category_view.dart`、
+`library_columns_view.dart`、`library_view_mode.dart`、`library_wall_columns.dart` 与
+`library_initial_view_provider.dart`；分类树（`library_category_tree.dart`）保留，只用来写 `filter.kinds`
+与分面筛选，不再负责换视图。

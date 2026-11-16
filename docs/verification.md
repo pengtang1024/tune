@@ -93,7 +93,7 @@ flutter --version
 - 它把平台钉成 Linux：测试套件默认假装是 Android，而 Android 用另一套密度和更大的点击区，不钉的话截图里的按钮比用户看到的矮 8 像素。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。
 - `build/layout-shots/library.png` 与 `library_albums.png` 同时是两份 README「界面 / Screens」用图的来源：界面改动后重跑，把这两张（1280 宽）覆盖到 `docs/images/`，README 不用改。
-- 工具里的 `_FakeLibraryController` 必须覆盖 `albumSongs()`：真实控制器从 storage 读专辑曲目，替身不建 storage，缺这个方法会在打开专辑时抛 `LateInitializationError`。库里有专辑后页头也会出现一个网格图标，所以点视图开关要用 `find.descendant(of: find.byType(LibraryViewSwitch), ...)` 限定，不能只用 `find.byIcon`。
+- 工具里的 `_FakeLibraryController` 必须覆盖 `albumSongs()`：真实控制器从 storage 读专辑曲目，替身不建 storage，缺这个方法会在打开专辑时抛 `LateInitializationError`。库里有专辑后列表直接是组行，所以「打开专辑」就是点组行（`find.text('Album A')`），再用 `ValueKey('library-group-back')` 回组列表；视图开关已删除。
 - `tool/tooltip_shots_test.dart` 同理，写提示的两张图到 `build/tooltip-shots/`；改了提示样式后跑它。
 - `tool/local_feature_shots_test.dart` 写本地功能项的四张图到 `build/local-feature-shots/`
   （默认态、技术明细、推荐标记、部分完成）；改了本地组件卡片后跑它。

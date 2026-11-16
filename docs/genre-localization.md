@@ -70,7 +70,7 @@ String genresLabel(Iterable<String> genres, AppLocalizations strings);
 
 ## 接到哪里
 
-曲目详情浮层的「流派」那一条（`lib/shared/ui/track_metadata_facts.dart`）；音乐库的流派筛选、分类树与分类视图（`lib/features/library/presentation/library_filter_chips.dart`、`library_filter_panel.dart`、`library_category_tree.dart`、`library_category_view.dart`）和发现页的推荐理由（`lib/features/discovery/presentation/discovery_reason_label.dart`）也走它。
+曲目详情浮层的「流派」那一条（`lib/shared/ui/track_metadata_facts.dart`）；音乐库的流派筛选、分类树与分类视图（`lib/features/library/presentation/library_filter_chips.dart`、`library_filter_panel.dart`、`library_category_tree.dart`）和发现页的推荐理由（`lib/features/discovery/presentation/discovery_reason_label.dart`）也走它。
 
 ## 测试
 

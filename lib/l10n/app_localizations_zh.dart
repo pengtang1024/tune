@@ -282,34 +282,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryAddAllToQueue => '将整个列表加入队列';
 
   @override
-  String get libraryViewSongs => '歌曲视图';
-
-  @override
-  String get libraryViewAlbums => '专辑视图';
-
-  @override
-  String get libraryViewShows => '节目';
-
-  @override
-  String get libraryViewBooks => '书';
-
-  @override
-  String get libraryViewCollections => '合集视图';
-
-  @override
-  String get libraryOpenCollection => '打开合集';
-
-  @override
-  String libraryCollectionItems(int items, int tracks) {
-    final intl.NumberFormat itemsNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String itemsString = itemsNumberFormat.format(items);
-    final intl.NumberFormat tracksNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String tracksString = tracksNumberFormat.format(tracks);
-
-    return '$itemsString 个条目 · $tracksString 首';
-  }
+  String get libraryBackToGroups => '返回';
 
   @override
   String get libraryOpenAlbum => '打开专辑';
@@ -319,9 +292,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryVariousArtists => '多位艺术家';
-
-  @override
-  String get libraryBackToAlbums => '返回专辑';
 
   @override
   String get queueTitle => '播放队列';
@@ -3703,9 +3673,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMoreActions => '更多操作';
 
   @override
-  String get libraryViewColumns => '双列视图';
-
-  @override
   String get libraryFilter => '筛选';
 
   @override
@@ -3794,9 +3761,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryFilterAddedOlder => '更早';
-
-  @override
-  String get libraryViewCategories => '分类视图';
 
   @override
   String get libraryAllSongs => '全部歌曲';
@@ -4898,34 +4862,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryAddAllToQueue => '将整个列表加入队列';
 
   @override
-  String get libraryViewSongs => '歌曲视图';
-
-  @override
-  String get libraryViewAlbums => '专辑视图';
-
-  @override
-  String get libraryViewShows => '节目';
-
-  @override
-  String get libraryViewBooks => '书';
-
-  @override
-  String get libraryViewCollections => '合集视图';
-
-  @override
-  String get libraryOpenCollection => '打开合集';
-
-  @override
-  String libraryCollectionItems(int items, int tracks) {
-    final intl.NumberFormat itemsNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String itemsString = itemsNumberFormat.format(items);
-    final intl.NumberFormat tracksNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String tracksString = tracksNumberFormat.format(tracks);
-
-    return '$itemsString 个条目 · $tracksString 首';
-  }
+  String get libraryBackToGroups => '返回';
 
   @override
   String get libraryOpenAlbum => '打开专辑';
@@ -4935,9 +4872,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryVariousArtists => '多位艺术家';
-
-  @override
-  String get libraryBackToAlbums => '返回专辑';
 
   @override
   String get queueTitle => '播放队列';
@@ -8319,9 +8253,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryMoreActions => '更多操作';
 
   @override
-  String get libraryViewColumns => '双列视图';
-
-  @override
   String get libraryFilter => '筛选';
 
   @override
@@ -8410,9 +8341,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get libraryFilterAddedOlder => '更早';
-
-  @override
-  String get libraryViewCategories => '分类视图';
 
   @override
   String get libraryAllSongs => '全部歌曲';
@@ -9514,34 +9442,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get libraryAddAllToQueue => '將整個清單加入佇列';
 
   @override
-  String get libraryViewSongs => '歌曲檢視';
-
-  @override
-  String get libraryViewAlbums => '專輯檢視';
-
-  @override
-  String get libraryViewShows => '節目';
-
-  @override
-  String get libraryViewBooks => '書';
-
-  @override
-  String get libraryViewCollections => '合集檢視';
-
-  @override
-  String get libraryOpenCollection => '開啟合集';
-
-  @override
-  String libraryCollectionItems(int items, int tracks) {
-    final intl.NumberFormat itemsNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String itemsString = itemsNumberFormat.format(items);
-    final intl.NumberFormat tracksNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String tracksString = tracksNumberFormat.format(tracks);
-
-    return '$itemsString 個條目 · $tracksString 首';
-  }
+  String get libraryBackToGroups => '返回';
 
   @override
   String get libraryOpenAlbum => '開啟專輯';
@@ -9551,9 +9452,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryVariousArtists => '多位藝術家';
-
-  @override
-  String get libraryBackToAlbums => '返回專輯';
 
   @override
   String get queueTitle => '播放佇列';
@@ -12935,9 +12833,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get libraryMoreActions => '更多操作';
 
   @override
-  String get libraryViewColumns => '雙欄檢視';
-
-  @override
   String get libraryFilter => '篩選';
 
   @override
@@ -13026,9 +12921,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryFilterAddedOlder => '更早';
-
-  @override
-  String get libraryViewCategories => '分類檢視';
 
   @override
   String get libraryAllSongs => '全部歌曲';

@@ -342,46 +342,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryAddAllToQueue => 'Add the whole list to the queue';
 
   @override
-  String get libraryViewSongs => 'Songs view';
-
-  @override
-  String get libraryViewAlbums => 'Albums view';
-
-  @override
-  String get libraryViewShows => 'Shows';
-
-  @override
-  String get libraryViewBooks => 'Books';
-
-  @override
-  String get libraryViewCollections => 'Collections view';
-
-  @override
-  String get libraryOpenCollection => 'Open collection';
-
-  @override
-  String libraryCollectionItems(int items, int tracks) {
-    final intl.NumberFormat itemsNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String itemsString = itemsNumberFormat.format(items);
-    final intl.NumberFormat tracksNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String tracksString = tracksNumberFormat.format(tracks);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      items,
-      locale: localeName,
-      other: '$itemsString items',
-      one: '1 item',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      tracks,
-      locale: localeName,
-      other: '$tracksString tracks',
-      one: '1 track',
-    );
-    return '$_temp0 · $_temp1';
-  }
+  String get libraryBackToGroups => 'Back';
 
   @override
   String get libraryOpenAlbum => 'Open album';
@@ -391,9 +352,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryVariousArtists => 'Various artists';
-
-  @override
-  String get libraryBackToAlbums => 'Back to albums';
 
   @override
   String get queueTitle => 'Queue';
@@ -4014,9 +3972,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMoreActions => 'More actions';
 
   @override
-  String get libraryViewColumns => 'Two-column view';
-
-  @override
   String get libraryFilter => 'Filter';
 
   @override
@@ -4111,9 +4066,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryFilterAddedOlder => 'Older';
-
-  @override
-  String get libraryViewCategories => 'Category view';
 
   @override
   String get libraryAllSongs => 'All songs';

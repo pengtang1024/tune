@@ -4,9 +4,8 @@ import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
-/// The heading of the library offers what the page is scoped to and the wall
-/// of albums; both entries are named, so the reader does not have to guess
-/// what an icon does.
+/// The heading of the library names the page and, in a narrow window, the one
+/// count of the list; it has no entry that changes how the list is read.
 void main() {
   Widget app(Widget child) => MaterialApp(
     theme: CompactTheme.light,
@@ -17,8 +16,6 @@ void main() {
   );
 
   LibraryHeader header({
-    VoidCallback? onAlbums,
-    bool albumsActive = false,
     VoidCallback? onSearchOnline,
     bool compact = false,
     bool searchOpen = false,
@@ -35,27 +32,24 @@ void main() {
       onScan: () {},
       scanning: false,
       onSearchOnline: onSearchOnline,
-      onAlbums: onAlbums,
-      albumsActive: albumsActive,
       treeExpanded: false,
       onToggleTree: () {},
     );
   }
 
-  testWidgets('the albums entry opens the wall', (tester) async {
-    var opened = 0;
-    await tester.pumpWidget(app(header(onAlbums: () => opened += 1)));
-
-    await tester.tap(find.byKey(const ValueKey('library-albums')));
-    await tester.pumpAndSettle();
-
-    expect(opened, 1);
-  });
-
-  testWidgets('a library without albums leaves the entry out', (tester) async {
+  testWidgets('页头不再有专辑视图入口', (tester) async {
     await tester.pumpWidget(app(header()));
 
+    // 专辑就是列表里的一行，页头没有第二个入口可点。
     expect(find.byKey(const ValueKey('library-albums')), findsNothing);
+    expect(find.text('专辑视图'), findsNothing);
+  });
+
+  testWidgets('窄窗口里页头把摘要收成一个计数', (tester) async {
+    await tester.pumpWidget(app(header(compact: true)));
+
+    expect(find.text('420 首'), findsOneWidget);
+    expect(find.text('5,106 项内容 · 984 张专辑 · 15 个来源'), findsNothing);
   });
 
   testWidgets('窄窗口的页头只剩标题、当前列表的计数和一颗搜索图标', (tester) async {
@@ -82,27 +76,16 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('窄窗口里专辑墙与在线搜索进 ⋯ 菜单', (tester) async {
-    var opened = 0;
+  testWidgets('窄窗口里在线搜索进 ⋯ 菜单', (tester) async {
     await tester.pumpWidget(
-      app(
-        header(
-          compact: true,
-          onAlbums: () => opened += 1,
-          onSearchOnline: () {},
-        ),
-      ),
+      app(header(compact: true, onSearchOnline: () {})),
     );
 
     await tester.tap(find.byKey(const ValueKey('library-more')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('library-more-albums')), findsOneWidget);
+    // 专辑入口跟着视图开关一起删了；页级动作只剩在线搜索、扫描和加队列。
+    expect(find.byKey(const ValueKey('library-more-albums')), findsNothing);
     expect(find.byKey(const ValueKey('library-more-online')), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('library-more-albums')));
-    await tester.pumpAndSettle();
-
-    expect(opened, 1);
   });
 }

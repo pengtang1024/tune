@@ -27,8 +27,6 @@ import '../services/fake_persistence.dart';
 
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/page_heading.dart';
-import 'package:tune/features/library/application/library_initial_view_provider.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 
 import 'compact_layout_test.dart' show FakeLibraryController;
 import 'fake_audio_player_service.dart';
@@ -94,8 +92,6 @@ void main() {
   Widget app({required Widget home}) {
     return ProviderScope(
       overrides: [
-        // 这些用例断言的是平铺列表，直接从列表打开。
-        libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
         persistenceServiceProvider.overrideWithValue(persistence),
         audioPlayerServiceProvider.overrideWithValue(audio),
         // The settings ask the desktop whether Tune is the default player;

@@ -122,7 +122,7 @@ String libraryAlbumKeyOf(Song song) {
   );
 }
 
-/// The card of the album wall that holds [song], if the wall has one.
+/// The row of the group list that holds [song], if the list has one.
 ///
 /// A music track names its album and artist. A show the library merged from
 /// several sources carries a key that names every source, so an episode lands

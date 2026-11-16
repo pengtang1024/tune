@@ -10,19 +10,17 @@ import 'package:tune/features/library/presentation/library_count_label.dart';
 import 'package:tune/features/library/presentation/library_search_field.dart';
 import 'package:tune/features/library/presentation/library_sort_button.dart';
 import 'package:tune/features/library/presentation/library_source_filter.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
-import 'package:tune/features/library/domain/library_layout.dart';
-import 'package:tune/features/library/presentation/library_view_switch.dart';
 
-/// Search, source filter, result count, sort and view of the library.
+/// Search, source filter, result count and sort of the library.
 ///
-/// The toolbar changes how the list is read; the whole-page actions (scan,
-/// queue all) live behind the menu of the header.
+/// The toolbar changes what the list holds; the whole-page actions (scan,
+/// queue all) live behind the menu of the header. The list itself says what
+/// it is — a group row or a track row — so there is no view switch here.
 ///
 /// A wide window keeps the search field in the row, with the count beside it.
 /// A narrow window ([compact]) leaves the search to the header's icon and the
-/// count to the header, and spends its one row on the source, the filter, the
-/// order and the view — so the page keeps three rows of chrome instead of five.
+/// count to the header, and spends its one row on the source, the filter and
+/// the order — so the page keeps three rows of chrome instead of five.
 class LibraryToolbar extends ConsumerWidget {
   final TextEditingController controller;
 
@@ -49,13 +47,10 @@ class LibraryToolbar extends ConsumerWidget {
   final String? sourceFilter;
   final LibrarySort sort;
   final LibraryFilter filter;
-  final LibraryViewMode view;
-  final LibraryLayout layout;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClearQuery;
   final ValueChanged<String?> onSourceFilter;
   final ValueChanged<LibrarySort> onSort;
-  final ValueChanged<LibraryViewMode> onViewChanged;
   final VoidCallback onFilter;
 
   /// Shows the tracks whose duration is unknown again.
@@ -66,10 +61,6 @@ class LibraryToolbar extends ConsumerWidget {
 
   /// Whether the search row stands open; only read while [compact].
   final bool searchOpen;
-
-  /// 一行要放下搜索框、来源与结果数、排序和六档视图开关。比这更窄时
-  /// 六档改成一颗菜单按钮，否则英文标签会把右边缘挤出去几个像素。
-  static const double _tightViewSwitchWidth = 900;
 
   const LibraryToolbar({
     super.key,
@@ -84,13 +75,10 @@ class LibraryToolbar extends ConsumerWidget {
     required this.sourceFilter,
     required this.sort,
     required this.filter,
-    required this.view,
-    required this.layout,
     required this.onQueryChanged,
     required this.onClearQuery,
     required this.onSourceFilter,
     required this.onSort,
-    required this.onViewChanged,
     required this.onFilter,
     required this.onShowMissingDuration,
     required this.compact,
@@ -112,8 +100,7 @@ class LibraryToolbar extends ConsumerWidget {
     );
   }
 
-  /// One row: source, filter and order on the left, the view switch on the
-  /// right. The search opens above it.
+  /// One row: source, filter and order. The search opens above it.
   Widget _compactBar(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -140,18 +127,9 @@ class LibraryToolbar extends ConsumerWidget {
                 const SizedBox(width: CompactTokens.space8),
               ],
               _filterButton(context, label: false),
-              // 排序和筛选是一路的：都改「看到哪些、按什么顺序」，所以留在
-              // 左边一组；视图开关决定这一页怎么摆，靠右。
+              // 排序和筛选是一路的：都改「看到哪些、按什么顺序」。
               const SizedBox(width: CompactTokens.space8),
               LibrarySortButton(sort: sort, onSort: onSort, compact: true),
-              const Spacer(),
-              LibraryViewSwitch(
-                view: view,
-                views: layout.views,
-                groupingLabel: layout.groupingLabel,
-                onChanged: onViewChanged,
-                compact: true,
-              ),
             ],
           ),
         ),
@@ -159,36 +137,23 @@ class LibraryToolbar extends ConsumerWidget {
     );
   }
 
-  /// One row: search field, source and count, filter, order, view.
+  /// One row: search field, source and count, filter, order.
   Widget _wideBar(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final tight = constraints.maxWidth < _tightViewSwitchWidth;
-        return SizedBox(
-          height: CompactTokens.controlDefault,
-          child: Row(
-            children: [
-              Expanded(child: _searchField()),
-              // 结果数（和来源筛选）紧跟在搜索框后面：不留这道缝，
-              // 「0 首」会贴在输入框的描边上。
-              const SizedBox(width: CompactTokens.space12),
-              ..._sourceAndCount(context),
-              const SizedBox(width: CompactTokens.space12),
-              _filterButton(context, label: true),
-              const SizedBox(width: CompactTokens.space8),
-              LibrarySortButton(sort: sort, onSort: onSort),
-              const SizedBox(width: CompactTokens.space8),
-              LibraryViewSwitch(
-                view: view,
-                views: layout.views,
-                groupingLabel: layout.groupingLabel,
-                onChanged: onViewChanged,
-                compact: tight,
-              ),
-            ],
-          ),
-        );
-      },
+    return SizedBox(
+      height: CompactTokens.controlDefault,
+      child: Row(
+        children: [
+          Expanded(child: _searchField()),
+          // 结果数（和来源筛选）紧跟在搜索框后面：不留这道缝，
+          // 「0 首」会贴在输入框的描边上。
+          const SizedBox(width: CompactTokens.space12),
+          ..._sourceAndCount(context),
+          const SizedBox(width: CompactTokens.space12),
+          _filterButton(context, label: true),
+          const SizedBox(width: CompactTokens.space8),
+          LibrarySortButton(sort: sort, onSort: onSort),
+        ],
+      ),
     );
   }
 
@@ -252,7 +217,7 @@ class LibraryToolbar extends ConsumerWidget {
             : Icons.filter_alt_rounded,
         size: CompactTokens.icon16,
       ),
-      // 窄窗口里这一行还要放排序和视图开关，字会把它挤爆；
+      // 窄窗口里这一行还要放排序，字会把它挤爆；
       // 只留图标，生效的组数在筛选面板里看得到。
       label: label
           ? Text(

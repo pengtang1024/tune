@@ -7,10 +7,9 @@ import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/application/library_initial_view_provider.dart';
+import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
 
@@ -30,6 +29,14 @@ class _FakeLibraryController extends LibraryController {
 
   @override
   Future<LibraryState> build() async => LibraryState(songs: songs);
+
+  @override
+  Future<List<Song>> albumSongs(String key) async {
+    for (final album in libraryAlbumsOf(songs)) {
+      if (album.key == key) return album.songs;
+    }
+    return const [];
+  }
 
   @override
   Future<void> setFilter(LibraryFilter filter) async {
@@ -83,7 +90,6 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(() => library),
         ],
@@ -120,6 +126,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(library.lastFilter?.kinds, {ContentKind.podcast});
+    // 一类内容先给它的组：点标记收窄到播客后，页面上的行是节目，不是条目。
+    expect(find.text('An episode'), findsNothing);
+    await tester.tap(find.text('Album'));
+    await tester.pumpAndSettle();
+
     expect(find.text('An episode'), findsOneWidget);
     expect(find.text('My song'), findsNothing);
   });

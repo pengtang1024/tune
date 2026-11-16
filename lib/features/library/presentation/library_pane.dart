@@ -11,33 +11,26 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/application/library_controller.dart';
-import 'package:tune/features/library/application/library_initial_view_provider.dart';
 import 'package:tune/features/library/application/library_search_focus_provider.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_category.dart';
-import 'package:tune/features/library/domain/library_collection.dart';
-import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_empty_state.dart';
 import 'package:tune/features/library/presentation/library_album_header.dart';
-import 'package:tune/features/library/presentation/library_albums_view.dart';
 import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_category_tree.dart';
-import 'package:tune/features/library/presentation/library_category_view.dart';
-import 'package:tune/features/library/presentation/library_collections_view.dart';
 import 'package:tune/features/library/domain/library_layout.dart';
-import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_filter_chips.dart';
+import 'package:tune/features/library/presentation/library_group_rows.dart';
 import 'package:tune/features/library/presentation/library_filter_panel.dart';
 import 'package:tune/features/library/presentation/library_header.dart';
 import 'package:tune/features/library/presentation/library_scan_status_bar.dart';
 import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
 import 'package:tune/features/library/presentation/library_track_card.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/features/player/application/dead_songs_controller.dart';
 import 'package:tune/features/player/application/list_playback.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
@@ -49,6 +42,7 @@ import 'package:tune/features/sources/domain/source_order.dart';
 import 'package:tune/shared/ui/compact_spinner.dart';
 import 'package:tune/shared/ui/empty_state_view.dart';
 import 'package:tune/shared/ui/source_label.dart';
+import 'package:tune/shared/ui/tune_tooltip.dart';
 
 /// The library page.
 ///
@@ -70,20 +64,11 @@ class LibraryPane extends ConsumerStatefulWidget {
 class _LibraryPaneState extends ConsumerState<LibraryPane> {
   final TextEditingController _searchController = TextEditingController();
 
-  /// The scroll positions of the two views.
+  /// The scroll position of the track table.
   ///
-  /// A view is disposed when the other one is shown; the controller keeps
-  /// the place, so a reader who looked at an album and came back lands on
-  /// the same covers instead of the top of the page.
+  /// 组行列表不换 controller：从组内曲目返回时回到组列表顶部是合理的，
+  /// 而曲目表的位置要留住。
   final ScrollController _songsScrollController = ScrollController();
-  final ScrollController _albumsScrollController = ScrollController();
-  final ScrollController _collectionsScrollController = ScrollController();
-  final ScrollController _columnsScrollController = ScrollController();
-
-  /// How the list below the toolbar is read.
-  /// 读者自己选过的视图；为空表示「按这一类的默认读法」。空着不是缺陷：
-  /// 音乐一进来就该看到专辑墙，而不是五千行平铺的曲目。
-  LibraryViewMode? _view;
 
   /// Whether the category tree stands open.
   bool _treeExpanded = false;
@@ -91,7 +76,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// 窄窗口里搜索行是否展开着。宽窗口不看这个值：那里搜索常驻。
   bool _searchOpen = false;
 
-  /// The category the catalog view is showing.
+  /// The category the tree expands to.
   LibraryCategoryKind _categoryKind = LibraryCategoryKind.genres;
 
   /// The album the reader opened, if any.
@@ -99,8 +84,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// The tracks are read when the album is opened, so a large library does
   /// not hold every track of every album in memory.
   LibraryAlbum? _openAlbum;
-
-  /// 分栏视图里选中的分组；null = 全部曲目。
 
   /// The list widget of the last build, and what it was built from.
   ///
@@ -145,9 +128,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   void dispose() {
     _searchController.dispose();
     _songsScrollController.dispose();
-    _albumsScrollController.dispose();
-    _collectionsScrollController.dispose();
-    _columnsScrollController.dispose();
     super.dispose();
   }
 
@@ -164,18 +144,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       ),
     );
     final library = ref.watch(libraryControllerProvider.select(_librarySlice));
-    // 筛选面板里改了内容分类，就回到这一类自己的默认读法：读者先前挑的那一档
-    // 只对上一类有效（电台没有专辑墙，停在那里只会是空网格）。
+    // 筛选面板里改了内容分类，就回到组列表：打开的组属于上一类，
+    // 电台与音效没有组，停在那里只会是空页。
     ref.listen<String?>(
       libraryControllerProvider.select(
         (value) => value.valueOrNull?.filter.kinds.join(','),
       ),
       (previous, next) {
         if (previous == null || previous == next) return;
-        setState(() {
-          _view = null;
-          _openAlbum = null;
-        });
+        setState(() => _openAlbum = null);
       },
     );
     ref.listen<String?>(
@@ -234,9 +211,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     final albumCount = library.albums
         .where((album) => album.name.isNotEmpty)
         .length;
-    // The albums are grouped only while the page is showing them: the songs
-    // view has no use for the groups, and a library can hold thousands of
-    // tracks.
+    // The groups are built from the window of songs on screen, not from the
+    // whole library: a library can hold thousands of tracks.
     final openAlbum = _openAlbum;
     final hasSourceIssues = library.hasSourceIssues;
     // 只挑了一类内容时，计数用的是这一类的单位（首 / 集 / 章 / 条目）。
@@ -244,9 +220,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     final selectedKind = library.filter.kinds.length == 1
         ? library.filter.kinds.first
         : null;
-    // 一类内容有自己的读法：播客是节目 + 单集，电台没有专辑墙，音效只有平铺。
-    final layout = libraryLayoutForKinds(library.filter.kinds);
-
     final content = Column(
       children: [
         LayoutBuilder(
@@ -289,18 +262,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                           onScan: _scan,
                           scanning: library.isScanning,
                           onSearchOnline: widget.onSearchOnline,
-                          onAlbums: albumCount == 0
-                              ? null
-                              : () => _setView(LibraryViewMode.albums),
-                          albumsActive:
-                              _effectiveView(layout) == LibraryViewMode.albums,
                           treeExpanded: _treeExpanded,
                           onToggleTree: () =>
                               setState(() => _treeExpanded = !_treeExpanded),
                         )
                       : LibraryAlbumHeader(
                           album: openAlbum,
-                          onBack: () => setState(() => _openAlbum = null),
                           onPlay: () => _playAlbum(openAlbum),
                           onAddAll: () => _addAllToQueue(openAlbum.songs),
                         ),
@@ -325,8 +292,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                       sourceFilter: library.sourceFilter,
                       sort: library.sort,
                       filter: library.filter,
-                      view: _effectiveView(layout),
-                      layout: layout,
                       compact: compact,
                       searchOpen: searchOpen,
                       onQueryChanged: (value) {
@@ -345,7 +310,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                             .read(libraryControllerProvider.notifier)
                             .setSort(sort);
                       },
-                      onViewChanged: _setView,
                       onFilter: () => showLibraryFilterPanel(
                         context,
                         sourceLabels: sourceLabels,
@@ -420,8 +384,10 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                   setState(() => _treeExpanded = false);
                 },
                 onKind: (kind) {
-                  _showCategory(kind);
-                  setState(() => _treeExpanded = false);
+                  setState(() {
+                    _categoryKind = kind;
+                    _treeExpanded = false;
+                  });
                 },
                 onValue: (kind, value) {
                   _selectCategoryValue(kind, value);
@@ -513,97 +479,49 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    final view = _effectiveView(libraryLayoutForKinds(library.filter.kinds));
-
     if (openAlbum != null) {
       return _trackList(
         openAlbum.songs,
         sourceLabels,
         onlyLikeOnDoubleClick,
         library.sort,
+        showBack: true,
         bilingual: bilingual,
       );
     }
 
-    if (view == LibraryViewMode.categories) {
-      return LibraryCategoryView(
-        kind: _categoryKind,
-        onKindChanged: (kind) => setState(() => _categoryKind = kind),
-        songs: songs,
-        facets:
-            ref.watch(libraryFacetsProvider).valueOrNull ?? LibraryFacets.empty,
-        sourceLabels: sourceLabels,
-        onSelect: _selectCategoryValue,
+    // A single kind has one name for its rows (album, show, book), so the
+    // list can group. A mixed or empty scope has no such name and falls back
+    // to the plain track table.
+    final layout = libraryLayoutForKinds(library.filter.kinds);
+    final groupingLabel = layout.groupingLabel;
+    final groups = libraryAlbumsOf(songs);
+    if (!layout.grouped || groupingLabel == null || groups.isEmpty) {
+      return _flatTrackList(
+        library,
+        songs,
+        sourceLabels,
+        onlyLikeOnDoubleClick,
+        bilingual: bilingual,
       );
     }
 
-    if (view == LibraryViewMode.columns) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final rowWidth = constraints.maxWidth - CompactTokens.pageGutter * 2;
-          if (rowWidth < 860) {
-            // Too narrow for two columns: the list takes over, the choice
-            // stays so the wall comes back when the window grows.
-            return _trackList(
-              songs,
-              sourceLabels,
-              onlyLikeOnDoubleClick,
-              library.sort,
-              controller: _songsScrollController,
-              hasMore:
-                  library.hasMore &&
-                  library.query.isEmpty &&
-                  !library.hasFilter,
-              bilingual: bilingual,
-            );
-          }
-          return LibraryColumnsView(
-            songs: songs,
-            sourceLabels: sourceLabels,
-            waitsForDoubleClick: onlyLikeOnDoubleClick,
-            controller: _columnsScrollController,
-            bilingual: bilingual,
-          );
-        },
-      );
-    }
+    return LibraryGroupRows(
+      albums: groups,
+      groupingLabel: groupingLabel,
+      onOpen: _openGroup,
+      totalTracks: songs.length,
+    );
+  }
 
-    if (view == LibraryViewMode.collections) {
-      return LibraryCollectionsView(
-        collections: libraryCollectionsOf(songs, sourceLabels),
-        controller: _collectionsScrollController,
-        onOpen: _openCollectionOf,
-        onClear: _clearCollection,
-      );
-    }
-
-    if (view == LibraryViewMode.albums) {
-      // The album grid is the only place that needs to know which album
-      // plays. Listening here keeps a change of track from rebuilding the
-      // page and its list.
-      return Consumer(
-        builder: (context, ref, child) {
-          final currentUri = ref.watch(
-            playbackControllerProvider.select(
-              (value) => value.currentSong?.uri,
-            ),
-          );
-          return LibraryAlbumsView(
-            albums: library.albums,
-            currentAlbumKey: _currentAlbumKey(
-              library.albums,
-              library.songs,
-              currentUri,
-            ),
-            controller: _albumsScrollController,
-            bilingual: bilingual,
-            onOpen: _openAlbumByKey,
-            onPlay: _playAlbumByKey,
-          );
-        },
-      );
-    }
-
+  /// The plain track table, used when the scope has no single row name.
+  Widget _flatTrackList(
+    _LibrarySlice library,
+    List<Song> songs,
+    Map<String, SourceLabel> sourceLabels,
+    bool onlyLikeOnDoubleClick, {
+    required bool bilingual,
+  }) {
     return _trackList(
       songs,
       sourceLabels,
@@ -615,6 +533,56 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
+  /// Opens the tracks of one row of the group list.
+  Future<void> _openGroup(LibraryAlbum group) {
+    return _openAlbumByKey(
+      AlbumSummary(
+        key: group.key,
+        name: group.name,
+        artist: group.artist,
+        trackCount: group.trackCount,
+        coverPath: group.coverPath,
+        coverUrl: group.coverUrl,
+        kind: group.kind,
+      ),
+    );
+  }
+
+  /// The row that goes back from one group's tracks to the group list.
+  Widget _groupBackRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        CompactTokens.pageGutter,
+        CompactTokens.space4,
+        CompactTokens.pageGutter,
+        CompactTokens.space4,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TuneTooltip(
+          message: context.loc.libraryBackToGroups,
+          child: TextButton.icon(
+            key: const ValueKey('library-group-back'),
+            onPressed: () => setState(() => _openAlbum = null),
+            style: TextButton.styleFrom(
+              minimumSize: const Size(0, CompactTokens.controlDefault),
+              padding: const EdgeInsets.symmetric(
+                horizontal: CompactTokens.space8,
+              ),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(context.loc.libraryBackToGroups),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _trackList(
     List<Song> songs,
     Map<String, SourceLabel> sourceLabels,
@@ -622,6 +590,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     LibrarySort sort, {
     ScrollController? controller,
     bool hasMore = false,
+    bool showBack = false,
     bool bilingual = false,
   }) {
     return LayoutBuilder(
@@ -645,6 +614,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             mapEquals(_cachedTrackLabels!, sourceLabels)) {
           return Column(
             children: [
+              if (showBack) _groupBackRow(),
               _columnHeader(metrics, sort),
               Expanded(child: cached),
             ],
@@ -732,6 +702,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         _cachedTracks = _withLoadMore(list, hasMore);
         return Column(
           children: [
+            if (showBack) _groupBackRow(),
             _columnHeader(metrics, sort),
             Expanded(child: _cachedTracks!),
           ],
@@ -783,24 +754,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
 
   /// Opens the album a track belongs to, from the album column.
   ///
-  /// The track may sit outside the album wall's grouping (an album without a
-  /// name has no card); the column is then plain text and the click does
-  /// nothing.
+  /// The track may sit outside the grouping the list shows (an album without
+  /// a name still has a row); when storage cannot read that album's tracks the
+  /// click keeps the reader where they are.
   Future<void> _openAlbumOfSong(Song song) async {
     final library = ref.read(libraryControllerProvider).valueOrNull;
     if (library == null) return;
     final summary = albumSummaryOf(library.albums, song);
     if (summary == null) return;
     await _openAlbumByKey(summary);
-  }
-
-  /// Reads the tracks of an album and plays them.
-  Future<void> _playAlbumByKey(AlbumSummary summary) async {
-    final songs = await ref
-        .read(libraryControllerProvider.notifier)
-        .albumSongs(summary.key);
-    if (!mounted || songs.isEmpty) return;
-    await _playAlbum(_albumOf(summary, songs));
   }
 
   LibraryAlbum _albumOf(AlbumSummary summary, List<Song> songs) {
@@ -815,46 +777,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     );
   }
 
-  /// The key of the album that holds the track that plays.
-  ///
-  /// The grid marks the album the reader is hearing; the track may be
-  /// outside the current search, so the key is looked up in the whole
-  /// library and not only in the list on screen.
-  String? _currentAlbumKey(
-    List<AlbumSummary> albums,
-    List<Song> librarySongs,
-    String? currentUri,
-  ) {
-    if (currentUri == null) return null;
-    for (final song in librarySongs) {
-      if (song.uri != currentUri) continue;
-      return albumSummaryOf(albums, song)?.key;
-    }
-    return null;
-  }
-
-  /// 这一页真正在用的视图：读者点过的 > 测试指定的初始档 > 内容分类的默认读法。
-  LibraryViewMode _effectiveView(LibraryLayout layout) =>
-      _view ?? ref.read(libraryInitialViewProvider) ?? layout.primary;
-
-  void _setView(LibraryViewMode view) {
-    setState(() {
-      _view = view;
-      _openAlbum = null;
-    });
-  }
-
   void _showAllSongs() {
-    setState(() => _view = LibraryViewMode.songs);
     ref.read(libraryControllerProvider.notifier).setFilter(LibraryFilter.songs);
-  }
-
-  void _showCategory(LibraryCategoryKind kind) {
-    setState(() {
-      _view = LibraryViewMode.categories;
-      _categoryKind = kind;
-      _openAlbum = null;
-    });
   }
 
   void _selectCategoryValue(LibraryCategoryKind kind, Object value) {
@@ -878,65 +802,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         kinds: {value as ContentKind},
       ),
     };
-    setState(() => _view = LibraryViewMode.songs);
     ref.read(libraryControllerProvider.notifier).setFilter(next);
-  }
-
-  /// Opens one collection: its items first, their tracks after.
-  ///
-  /// A collection is a shelf, not a filter value: the card leads to the wall
-  /// of items it holds, and an item opens its tracks. The source filter is
-  /// what keeps the wall to that shelf, and clearing it comes back to all.
-  void _openCollectionOf(LibraryCollection collection) {
-    final filter = ref.read(libraryControllerProvider).requireValue.filter;
-    setState(() {
-      _view = LibraryViewMode.albums;
-      _openAlbum = null;
-    });
-    ref
-        .read(libraryControllerProvider.notifier)
-        .setFilter(filter.copyWith(sources: {collection.sourceId}));
-  }
-
-  /// Empties one collection of the rows it brought in.
-  ///
-  /// The instance stays: this is the pruning of a shelf whose uploads were
-  /// not worth keeping, not the removal of the source itself.
-  Future<void> _clearCollection(LibraryCollection collection) async {
-    final loc = context.loc;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(loc.sourcesClearSongsTitle(collection.name)),
-        content: Text(loc.sourcesClearSongsHint),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(loc.cancel),
-          ),
-          FilledButton(
-            key: const ValueKey('collection-clear-confirm'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(loc.clear),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-    await ref
-        .read(libraryControllerProvider.notifier)
-        .dropSource(collection.sourceId);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(loc.sourcesSongsCleared(collection.name))),
-      );
   }
 
   /// 只看这一类内容：点行里的类型标记，页面收窄到它自己的那一类。
   ///
-  /// 用筛选面板写的同一个 `filter.kinds`，所以读法、计数单位、视图开关
+  /// 用筛选面板写的同一个 `filter.kinds`，所以读法、计数单位、分组方式
   /// 都会跟着这一类走——标记说的是「这一行是什么」，点它是「其余的都长这样」。
   void _showKindOf(Song song) {
     final kind = contentKindOf(song);
