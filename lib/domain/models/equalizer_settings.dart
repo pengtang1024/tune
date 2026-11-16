@@ -178,12 +178,16 @@ class EqualizerSettings {
     required this.enabled,
     required this.gains,
     this.userPresets = const <EqualizerPreset>[],
+    this.bandWidth = defaultBandWidth,
+    this.preampOverrideDb,
   });
 
   /// Bypassed, with a flat curve.
   const EqualizerSettings.flat({this.enabled = false})
     : gains = EqualizerPresets.flatGains,
-      userPresets = const <EqualizerPreset>[];
+      userPresets = const <EqualizerPreset>[],
+      bandWidth = defaultBandWidth,
+      preampOverrideDb = null;
 
   final bool enabled;
 
@@ -193,6 +197,16 @@ class EqualizerSettings {
   /// The curves the reader saved, oldest first. Each carries a label; built-in
   /// curves do not, because their label comes from the translation file.
   final List<EqualizerPreset> userPresets;
+
+  /// How much of the spectrum one band moves, in octaves. One octave is the
+  /// layout the ten centres were chosen for; a third of an octave turns each
+  /// band into a narrow notch that leaves its neighbours alone.
+  final double bandWidth;
+
+  /// The preamp the reader set by hand, in decibels, or null to follow the
+  /// loudest boost. Following the boost is right most of the time; lifting it
+  /// by hand is how a quiet recording gets its level back.
+  final double? preampOverrideDb;
 
   /// Built-in curves first, then the reader's own, in the order they are drawn.
   List<EqualizerPreset> get allPresets => <EqualizerPreset>[
@@ -217,7 +231,19 @@ class EqualizerSettings {
 
   static const double minGain = -12;
   static const double maxGain = 12;
-  static const double step = 1;
+
+  /// Half a decibel per step: a whole decibel is too coarse to hear the last
+  /// move of a band, and ffmpeg takes the decimal gain as written.
+  static const double step = 0.5;
+
+  /// One octave per band is the ISO layout the ten centres were chosen for.
+  static const double defaultBandWidth = 1;
+
+  /// The widths the panel offers, widest first, in octaves.
+  static const List<double> bandWidths = <double>[1, 2 / 3, 0.5, 1 / 3];
+
+  static const double minPreampDb = -24;
+  static const double maxPreampDb = 0;
 
   /// The ISO octave centres, low to high.
   static const List<double> frequencies = <double>[
@@ -258,6 +284,8 @@ class EqualizerSettings {
   /// the preamp by the largest boost keeps the loudest band at or below 0 dB;
   /// the whole curve becomes quieter instead of distorted.
   double get preampDb {
+    final override = preampOverrideDb;
+    if (override != null) return clampPreamp(override);
     var peak = 0.0;
     for (final gain in gains) {
       if (gain > peak) peak = gain;
@@ -283,11 +311,22 @@ class EqualizerSettings {
     bool? enabled,
     List<double>? gains,
     List<EqualizerPreset>? userPresets,
+    double? bandWidth,
+    double? preampOverrideDb,
+    bool useAutoPreamp = false,
   }) {
     return EqualizerSettings(
       enabled: enabled ?? this.enabled,
       gains: gains == null ? this.gains : normalizeGains(gains),
       userPresets: userPresets ?? this.userPresets,
+      bandWidth: bandWidth == null
+          ? this.bandWidth
+          : clampBandWidth(bandWidth),
+      preampOverrideDb: useAutoPreamp
+          ? null
+          : (preampOverrideDb == null
+                ? this.preampOverrideDb
+                : clampPreamp(preampOverrideDb)),
     );
   }
 
@@ -340,6 +379,8 @@ class EqualizerSettings {
       enabled: enabled,
       gains: next,
       userPresets: userPresets,
+      bandWidth: bandWidth,
+      preampOverrideDb: preampOverrideDb,
     );
   }
 
@@ -376,6 +417,14 @@ class EqualizerSettings {
               0,
         ]),
         userPresets: _readUserPresets(decoded['userPresets']),
+        bandWidth: clampBandWidth(
+          decoded['bandWidth'] is num
+              ? (decoded['bandWidth'] as num).toDouble()
+              : defaultBandWidth,
+        ),
+        preampOverrideDb: decoded['preampDb'] is num
+            ? clampPreamp((decoded['preampDb'] as num).toDouble())
+            : null,
       );
     } on FormatException {
       return const EqualizerSettings.flat();
@@ -386,6 +435,10 @@ class EqualizerSettings {
     'version': schemaVersion,
     'enabled': enabled,
     'gains': gains,
+    // Defaults stay unwritten, so a file from before these fields existed
+    // reads the same after a save that never touched them.
+    if (bandWidth != defaultBandWidth) 'bandWidth': bandWidth,
+    if (preampOverrideDb != null) 'preampDb': preampOverrideDb,
     // Written only when there is something to write: a reader who never saved
     // a curve keeps the file it had before this field existed.
     if (userPresets.isNotEmpty)
@@ -440,6 +493,27 @@ class EqualizerSettings {
     return stepped.clamp(minGain, maxGain).toDouble();
   }
 
+  /// A width the filter can take: one of [bandWidths], or the nearest one.
+  static double clampBandWidth(double value) {
+    if (value.isNaN || value.isInfinite) return defaultBandWidth;
+    var best = bandWidths.first;
+    var bestGap = (value - best).abs();
+    for (final width in bandWidths) {
+      final gap = (value - width).abs();
+      if (gap < bestGap) {
+        best = width;
+        bestGap = gap;
+      }
+    }
+    return best;
+  }
+
+  /// A preamp inside [minPreampDb]..[maxPreampDb], on a whole decibel.
+  static double clampPreamp(double value) {
+    if (value.isNaN || value.isInfinite) return 0;
+    return value.roundToDouble().clamp(minPreampDb, maxPreampDb).toDouble();
+  }
+
   /// Exactly [bandCount] stepped gains, so a truncated or padded stored curve
   /// cannot reach the filter chain.
   static List<double> normalizeGains(List<double> gains) {
@@ -454,6 +528,8 @@ class EqualizerSettings {
     if (identical(this, other)) return true;
     if (other is! EqualizerSettings) return false;
     if (other.enabled != enabled) return false;
+    if (other.bandWidth != bandWidth) return false;
+    if (other.preampOverrideDb != preampOverrideDb) return false;
     if (other.gains.length != gains.length) return false;
     for (var i = 0; i < gains.length; i++) {
       if (other.gains[i] != gains[i]) return false;
@@ -471,6 +547,8 @@ class EqualizerSettings {
   @override
   int get hashCode => Object.hash(
     enabled,
+    bandWidth,
+    preampOverrideDb ?? -1,
     Object.hashAll(gains),
     Object.hashAll(
       userPresets.map((preset) => Object.hash(preset.id, preset.name)),

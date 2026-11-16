@@ -95,7 +95,8 @@ void main() {
         '{"version":1,"enabled":true,"gains":[99,-99,0.4,0.6,3,4,5,6,7,8]}',
       );
 
-      expect(settings.gains, <double>[12, -12, 0, 1, 3, 4, 5, 6, 7, 8]);
+      // 半格步进：0.4 与 0.6 都落回 0.5，而不是各自取整成 0 / 1。
+      expect(settings.gains, <double>[12, -12, 0.5, 0.5, 3, 4, 5, 6, 7, 8]);
     });
 
     test('gains 里的非数字项按 0 dB 处理', () {
@@ -109,13 +110,15 @@ void main() {
   });
 
   group('clampGain 的步进与上下限', () {
-    test('落在 1 dB 的整数步进上（四舍五入）', () {
+    test('落在 0.5 dB 的半格步进上（四舍五入）', () {
+      expect(EqualizerSettings.step, 0.5);
       expect(EqualizerSettings.clampGain(3), 3);
-      expect(EqualizerSettings.clampGain(3.4), 3);
-      expect(EqualizerSettings.clampGain(3.5), 4);
-      expect(EqualizerSettings.clampGain(3.6), 4);
-      expect(EqualizerSettings.clampGain(-3.4), -3);
-      expect(EqualizerSettings.clampGain(-3.5), -4);
+      expect(EqualizerSettings.clampGain(3.2), 3);
+      expect(EqualizerSettings.clampGain(3.4), 3.5);
+      expect(EqualizerSettings.clampGain(3.5), 3.5);
+      expect(EqualizerSettings.clampGain(3.6), 3.5);
+      expect(EqualizerSettings.clampGain(-3.4), -3.5);
+      expect(EqualizerSettings.clampGain(-3.5), -3.5);
     });
 
     test('夹在 -12 / +12 dB', () {
@@ -182,13 +185,13 @@ void main() {
     test('越界增益先夹紧再写入', () {
       expect(flat.withGain(0, 99).gainAt(0), 12);
       expect(flat.withGain(0, -99).gainAt(0), -12);
-      expect(flat.withGain(0, 3.6).gainAt(0), 4);
-      expect(flat.withGain(0, 3.4).gainAt(0), 3);
+      expect(flat.withGain(0, 3.6).gainAt(0), 3.5);
+      expect(flat.withGain(0, 3.2).gainAt(0), 3);
     });
 
     test('值没变时返回同一个对象，不制造无意义的重建', () {
       expect(identical(flat.withGain(0, 0), flat), isTrue);
-      expect(identical(flat.withGain(0, -0.4), flat), isTrue);
+      expect(identical(flat.withGain(0, -0.2), flat), isTrue);
     });
 
     test('频段下标越界时原样返回', () {
@@ -571,4 +574,85 @@ void main() {
       }
     });
   });
+
+  group('频段宽度与预放', () {
+    const boosted = EqualizerSettings(
+      enabled: true,
+      gains: <double>[6, 3, 0, 0, 0, 0, 0, 0, 0, 0],
+    );
+
+    test('默认是一倍频程与自动预放', () {
+      const settings = EqualizerSettings.flat(enabled: true);
+
+      expect(settings.bandWidth, EqualizerSettings.defaultBandWidth);
+      expect(settings.preampOverrideDb, isNull);
+      expect(EqualizerSettings.bandWidths.first, 1);
+    });
+
+    test('自动预放跟随最大增益，手动值取整到 dB 并夹在 -24..0', () {
+      expect(boosted.preampDb, -6);
+      expect(boosted.copyWith(preampOverrideDb: -13.4).preampDb, -13);
+      expect(boosted.copyWith(preampOverrideDb: -99).preampDb, -24);
+      expect(boosted.copyWith(preampOverrideDb: 5).preampDb, 0);
+      expect(
+        boosted.copyWith(preampOverrideDb: -3).copyWith(useAutoPreamp: true).preampDb,
+        -6,
+        reason: 'going back to automatic drops the manual value',
+      );
+    });
+
+    test('宽度吸附到四档之一', () {
+      expect(EqualizerSettings.clampBandWidth(0.9), 1);
+      expect(EqualizerSettings.clampBandWidth(0.7), 2 / 3);
+      expect(EqualizerSettings.clampBandWidth(0.5), 0.5);
+      expect(EqualizerSettings.clampBandWidth(0.2), 1 / 3);
+      expect(EqualizerSettings.clampBandWidth(double.nan), 1);
+    });
+
+    test('withGain 保留宽度与手动预放', () {
+      final moved = boosted
+          .copyWith(bandWidth: 0.5, preampOverrideDb: -9)
+          .withGain(1, 12);
+
+      expect(moved.bandWidth, 0.5);
+      expect(moved.preampOverrideDb, -9);
+      expect(moved.gainAt(1), 12);
+    });
+
+    test('JSON 往返保留宽度与手动预放', () {
+      final settings = boosted.copyWith(bandWidth: 1 / 3, preampOverrideDb: -9);
+      final restored = EqualizerSettings.fromJson(settings.toJson());
+
+      expect(restored.bandWidth, 1 / 3);
+      expect(restored.preampOverrideDb, -9);
+      expect(restored.preampDb, -9);
+      expect(restored, settings);
+    });
+
+    test('默认值不写进 JSON，旧文件读回来仍是默认', () {
+      final json = const EqualizerSettings.flat(enabled: true).toJson();
+
+      expect(json.contains('bandWidth'), isFalse);
+      expect(json.contains('preampDb'), isFalse);
+
+      final legacy = EqualizerSettings.fromJson(
+        '{"version":1,"enabled":true,"gains":[0,0,0,0,0,0,0,0,0,0]}',
+      );
+      expect(legacy.bandWidth, 1);
+      expect(legacy.preampOverrideDb, isNull);
+    });
+
+    test('宽度与预放参与相等判断', () {
+      final base = EqualizerSettings.flat(enabled: true);
+
+      expect(base == base.copyWith(bandWidth: 0.5), isFalse);
+      expect(base == base.copyWith(preampOverrideDb: -3), isFalse);
+      expect(
+        base == base.copyWith(bandWidth: 1, preampOverrideDb: null),
+        isTrue,
+        reason: '默认值写回去不该被当成一次改动',
+      );
+    });
+  });
 }
+

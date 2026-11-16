@@ -107,6 +107,8 @@ Future<void> _openEqualizer(BuildContext context, WidgetRef ref) {
       return ref.read(equalizerControllerProvider).presetId;
     },
     onDeletePreset: controller.deletePreset,
+    onBandWidthChanged: controller.setBandWidth,
+    onPreampChanged: controller.setPreampOverride,
   );
 }
 

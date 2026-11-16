@@ -4917,6 +4917,44 @@ class AppLocalizationsEn extends AppLocalizations {
       'The audio backend of this platform has no equalizer';
 
   @override
+  String get equalizerBandWidth => 'Band width';
+
+  @override
+  String get equalizerBandWidthHint =>
+      'Narrower widths affect less of the spectrum';
+
+  @override
+  String get equalizerWidthOne => '1 octave';
+
+  @override
+  String get equalizerWidthTwoThirds => '2/3 octave';
+
+  @override
+  String get equalizerWidthHalf => '1/2 octave';
+
+  @override
+  String get equalizerWidthThird => '1/3 octave';
+
+  @override
+  String get equalizerPreamp => 'Preamp';
+
+  @override
+  String get equalizerPreampAuto => 'Follow the loudest boost';
+
+  @override
+  String get equalizerPreampManual => 'Manual';
+
+  @override
+  String get equalizerPreampHint =>
+      'Lowering it by hand clips less at loud volumes';
+
+  @override
+  String get equalizerGainDialogTitle => 'Set gain';
+
+  @override
+  String get equalizerGainDialogHint => 'Steps of 0.5 dB';
+
+  @override
   String get settingsEqualizerAction => 'Equalizer';
 
   @override

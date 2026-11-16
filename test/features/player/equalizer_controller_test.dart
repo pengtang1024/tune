@@ -429,4 +429,78 @@ void main() {
       expect(controller.state.presetId, id);
     });
   });
+
+  group('频段宽度与预放', () {
+    test('setBandWidth 会吸附并立刻下发', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.setBandWidth(0.55);
+
+      expect(controller.state.bandWidth, 0.5);
+      expect(backend.applied.length, 1);
+      expect(backend.last!.bandWidth, 0.5);
+    });
+
+    test('宽度没变时不重复下发', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.setBandWidth(EqualizerSettings.defaultBandWidth);
+
+      expect(backend.applied, isEmpty);
+      expect(controller.state.bandWidth, 1);
+    });
+
+    test('setPreampOverride 写入手动值，传 null 回到自动', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.setGain(0, 6);
+      controller.setPreampOverride(-9);
+
+      expect(controller.state.preampOverrideDb, -9);
+      expect(controller.state.preampDb, -9);
+      expect(backend.last!.preampDb, -9);
+
+      controller.setPreampOverride(null);
+
+      expect(controller.state.preampOverrideDb, isNull);
+      expect(controller.state.preampDb, -6);
+      expect(backend.last!.preampDb, -6);
+    });
+
+    test('宽度与预放会落盘，重启后读得回来', () async {
+      final persistence = _RecordingPersistence();
+      final controller = EqualizerController(
+        persistence,
+        FakeAudioEqualizerBackend(),
+      );
+      addTearDown(controller.dispose);
+
+      controller.setBandWidth(2 / 3);
+      controller.setPreampOverride(-9);
+
+      await Future<void>.delayed(
+        equalizerSaveDelay + const Duration(milliseconds: 150),
+      );
+
+      final saved = EqualizerSettings.fromJson(persistence.getString(key));
+      expect(saved.bandWidth, 2 / 3);
+      expect(saved.preampOverrideDb, -9);
+
+      final restarted = EqualizerController(
+        persistence,
+        FakeAudioEqualizerBackend(),
+      );
+      addTearDown(restarted.dispose);
+
+      expect(restarted.state.bandWidth, 2 / 3);
+      expect(restarted.state.preampOverrideDb, -9);
+    });
+  });
 }
+

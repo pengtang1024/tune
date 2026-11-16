@@ -263,7 +263,8 @@ else
 
   if [[ "$SKIP_WIKI" -eq 0 ]]; then
     log "同步三端 wiki"
-    ./tool/release_wiki.sh "$WT" "$MERGE_SHA" "$VERSION"
+    # 用 bash 调用，不依赖检出时有没有执行位。
+    bash tool/release_wiki.sh "$WT" "$MERGE_SHA" "$VERSION"
   fi
 
   log "purge CDN 并复核"

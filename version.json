@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.40.3",
-  "build": 79,
-  "released_at": "2026-11-16T13:38:54Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.40.3",
-  "notes": "模型列表只在厂商真的提供接口时抓取：智谱没有这个端点，改为提示手填；其余厂商的模型地址与四个余额地址已逐个用探针核对。",
+  "version": "1.41.0",
+  "build": 80,
+  "released_at": "2026-11-16T13:55:32Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.41.0",
+  "notes": "### 新增\n\n- **均衡器的三个细调维度**（设置 › 播放 › 均衡器）：增益步进从 1 dB 收到 0.5 dB，\n  点频段上方的数字可以直接键入（小数按 0.5 吸附）；十个频段共用一档带宽，\n  1 / 2⁄3 / 1⁄2 / 1⁄3 倍频程可选，窄档下提升 1 kHz 不会连累整段中低频；\n  预放从固定「跟随最大增益」改成可手动覆盖到 -24–0 dB，音量大又提了很多低频时\n  可以自己再压一点。三项都跟曲线一起落盘，旧偏好文件照旧读得回来。\n\n### 文档与工程\n\n- `docs/equalizer.md` 记下宽度与预放两个字段、键入对话框与四档带宽的文案与用例。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.40.3/tune-linux-x64-1.40.3.tar.gz",
-      "size": 53606033,
-      "sha256": "8e5f8cb98eef71a5acb2eef9bc87201ca274b30c72d4e6af954c78ae1f914891"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.41.0/tune-linux-x64-1.41.0.tar.gz",
+      "size": 53616434,
+      "sha256": "4611da3643bfdd5bd5f720dc37db573a5e8532a6a8fbb3eb7f59918ccf4c2bf1"
     }
   }
 }

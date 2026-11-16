@@ -62,6 +62,25 @@ class EqualizerController extends StateNotifier<EqualizerSettings> {
     _changed();
   }
 
+  /// Changes how much of the spectrum one band moves.
+  void setBandWidth(double width) {
+    final next = state.copyWith(bandWidth: width);
+    if (next == state) return;
+    state = next;
+    _changed();
+  }
+
+  /// Lifts or lowers the preamp by hand. A null goes back to following the
+  /// loudest boost, which is what keeps a boosted curve from clipping.
+  void setPreampOverride(double? decibels) {
+    final next = decibels == null
+        ? state.copyWith(useAutoPreamp: true)
+        : state.copyWith(preampOverrideDb: decibels);
+    if (next == state) return;
+    state = next;
+    _changed();
+  }
+
   void applyPreset(String presetId) {
     final preset = state.findPreset(presetId);
     if (preset == null) return;
