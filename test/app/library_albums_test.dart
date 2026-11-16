@@ -8,9 +8,11 @@ import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_group_rows.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
+import 'package:tune/features/library/presentation/library_track_card.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
@@ -99,6 +101,7 @@ void main() {
     List<Song> librarySongs = songs,
     LibraryFilter filter = LibraryFilter.songs,
     FakeLibraryController Function(LibraryState state)? controller,
+    FakeAudioPlayerService? audio,
   }) {
     return ProviderScope(
       overrides: [
@@ -106,9 +109,12 @@ void main() {
         defaultPlayerServiceProvider.overrideWithValue(
           FakeDefaultPlayerService(),
         ),
-        audioPlayerServiceProvider.overrideWithValue(FakeAudioPlayerService()),
+        audioPlayerServiceProvider.overrideWithValue(
+          audio ?? FakeAudioPlayerService(),
+        ),
         libraryControllerProvider.overrideWith(
-          () => controller?.call(
+          () =>
+              controller?.call(
                 LibraryState(songs: librarySongs, filter: filter),
               ) ??
               FakeLibraryController(
@@ -133,7 +139,9 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('the library opens on one row per album', (tester) async {
+  testWidgets('a group of two stays one row, a group of one is that track', (
+    tester,
+  ) async {
     sizeOf(tester, const Size(900, 563));
 
     await tester.pumpWidget(
@@ -143,14 +151,98 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 一首曲子一行是「五条同样的信息」；一张专辑一行才是一条信息。
+    // 两首以上的专辑仍是一行组：信息收在一条里，点进去才看曲目。
     expect(find.text('Album A'), findsOneWidget);
-    expect(find.text('Album B'), findsOneWidget);
-    expect(find.text('Artist A'), findsOneWidget);
     expect(find.text('2 首'), findsOneWidget);
-    expect(find.text('1 首'), findsOneWidget);
     expect(find.text('Album A first'), findsNothing);
     expect(find.text('Album A second'), findsNothing);
+
+    // 只有一首的专辑不算一张专辑：它就是那一首曲目，直接画成曲目行。
+    expect(find.byType(LibraryTrackCard), findsOneWidget);
+    expect(find.text('Album B first'), findsOneWidget);
+    expect(find.text('1 首'), findsNothing);
+
+    // 两种行在同一个列表里。
+    expect(
+      find.descendant(
+        of: find.byType(LibraryGroupRows),
+        matching: find.byType(LibraryTrackCard),
+      ),
+      findsOneWidget,
+    );
+
+    // 组行 44、曲目行 32，两种高度混在一个列表里就不能再钉 itemExtent；
+    // 但行依旧不保活。
+    final list = tester.widget<ListView>(
+      find.descendant(
+        of: find.byType(LibraryGroupRows),
+        matching: find.byType(ListView),
+      ),
+    );
+    expect(list.itemExtent, isNull);
+    final delegate = list.childrenDelegate as SliverChildBuilderDelegate;
+    expect(delegate.addAutomaticKeepAlives, isFalse);
+  });
+
+  testWidgets('a single row plays at once and never opens the album page', (
+    tester,
+  ) async {
+    sizeOf(tester, const Size(1120, 760));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        audio: audio,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(LibraryTrackCard));
+    await tester.pumpAndSettle();
+
+    expect(audio.playedSong?.uri, '/music/b1.mp3');
+    // 单曲行没有「专辑内页」：点它就是放它，列表还在原处。
+    expect(find.byKey(const ValueKey('library-group-back')), findsNothing);
+    // The dock writes the playing title too; the row itself is still there.
+    expect(
+      find.descendant(
+        of: find.byType(LibraryGroupRows),
+        matching: find.text('Album B first'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a double click marks a single row, like a row of an album', (
+    tester,
+  ) async {
+    sizeOf(tester, const Size(1120, 760));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        audio: audio,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // 双击的第二下是收藏；曲目行的这套语义在两种列表里是同一份实现。
+    await tester.tap(find.byType(LibraryTrackCard));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.byType(LibraryTrackCard));
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+    expect(
+      container.read(favoritesControllerProvider).contains('/music/b1.mp3'),
+      isTrue,
+    );
   });
 
   testWidgets('a group row opens the tracks, the first row leads back', (
@@ -176,7 +268,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('library-group-back')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Album B'), findsOneWidget);
+    // Album B is one track, so it is a track row and has no group page.
+    expect(find.text('Album B first'), findsOneWidget);
     expect(find.text('Album A first'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -269,20 +362,32 @@ class _EmptyAlbumController extends FakeLibraryController {
 }
 
 /// A library whose one album carries the same words as its artist.
+///
+/// The album has two tracks, so it stays a group row: a one-track group is
+/// drawn as a track row, and a track row writes its artist and album.
 const _sameNameSeed = LibraryState(
   filter: LibraryFilter.songs,
   songs: [
-      Song(
-        id: 1,
-        uri: 'tune://internet_archive/ligaya',
-        title: 'Ligaya',
-        artist: '0114 Ligaya',
-        album: '0114 Ligaya',
-        duration: 200000,
+    Song(
+      id: 1,
+      uri: 'tune://internet_archive/ligaya',
+      title: 'Ligaya',
+      artist: '0114 Ligaya',
+      album: '0114 Ligaya',
+      duration: 200000,
+      sourceId: 'community_music',
+    ),
+    Song(
+      id: 2,
+      uri: 'tune://internet_archive/ligaya-2',
+      title: 'Sa Aking Puso',
+      artist: '0114 Ligaya',
+      album: '0114 Ligaya',
+      duration: 210000,
       sourceId: 'community_music',
     ),
   ],
-  total: 1,
+  total: 2,
 );
 
 class _SameNameController extends FakeLibraryController {

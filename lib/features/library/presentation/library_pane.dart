@@ -495,8 +495,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // to the plain track table.
     final layout = libraryLayoutForKinds(library.filter.kinds);
     final groupingLabel = layout.groupingLabel;
-    final groups = libraryAlbumGroupsOf(songs);
-    if (!layout.grouped || groupingLabel == null || groups.isEmpty) {
+    // The group list is a mixed list: a group that holds two or more tracks
+    // stays one row, a group that holds one track is that track's row. The
+    // rule and the order both live in the domain, not here.
+    final rows = libraryRowsOf(songs, sort: library.sort);
+    if (!layout.grouped || groupingLabel == null || rows.isEmpty) {
       return _flatTrackList(
         library,
         songs,
@@ -506,11 +509,47 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
-    return LibraryGroupRows(
-      albums: groups,
-      groupingLabel: groupingLabel,
-      onOpen: _openGroup,
-      totalTracks: songs.length,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final metrics = _rowMetrics(
+          context,
+          width: constraints.maxWidth,
+          bilingual: bilingual,
+        );
+        return LibraryGroupRows(
+          rows: rows,
+          groupingLabel: groupingLabel,
+          metrics: metrics,
+          // The single rows come from the track list's one row builder: a
+          // group of one is played, not opened, so it carries no album link.
+          buildTrackRow: (song, index) => _trackCard(
+            song,
+            index,
+            sourceLabels,
+            metrics,
+            waitsForDoubleClick: onlyLikeOnDoubleClick,
+            openAlbum: false,
+          ),
+          onOpen: _openGroup,
+          totalTracks: songs.length,
+        );
+      },
+    );
+  }
+
+  /// The column widths of a row of the library.
+  ///
+  /// The row's width is the list's width without its gutter. Both lists
+  /// measure here, so a track row and a group row share one ruler.
+  LibraryRowMetrics _rowMetrics(
+    BuildContext context, {
+    required double width,
+    required bool bilingual,
+  }) {
+    return LibraryRowMetrics.of(
+      context,
+      width - CompactTokens.pageGutter * 2,
+      bilingual: bilingual,
     );
   }
 
@@ -588,12 +627,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // The width of a row is the width of the list without its gutter.
-        // It is resolved once here, so a row does not run a layout callback
-        // of its own to discover the same number.
-        final metrics = LibraryRowMetrics.of(
+        // The row width is resolved once here, so a row does not run a
+        // layout callback of its own to discover the same number.
+        final metrics = _rowMetrics(
           context,
-          constraints.maxWidth - CompactTokens.pageGutter * 2,
+          width: constraints.maxWidth,
           bilingual: bilingual,
         );
 
@@ -643,46 +681,12 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                 ),
               );
             }
-            final song = songs[index];
-            // Each row listens to the three values it paints, not to the
-            // whole page state. Liking a track rebuilds one row; playing a
-            // track rebuilds the two rows whose mark changes.
-            return Consumer(
-              builder: (context, ref, child) {
-                final (selected, playing) = ref.watch(
-                  playbackControllerProvider.select((value) {
-                    final selected = value.currentSong?.uri == song.uri;
-                    return (selected, selected && value.isPlaying);
-                  }),
-                );
-                final isFavorite = ref.watch(
-                  favoritesControllerProvider.select(
-                    (value) => value.contains(song.uri),
-                  ),
-                );
-                return LibraryTrackCard(
-                  song: song,
-                  index: index,
-                  selected: selected,
-                  playing: playing,
-                  isFavorite: isFavorite,
-                  unavailable: ref.watch(deadSongsProvider).contains(song.uri),
-                  source: sourceLabel(song, sourceLabels),
-                  metrics: metrics,
-                  onTap: () {
-                    // The list the user clicks in decides what happens to
-                    // the queue; by default the track joins the queue and
-                    // plays right away.
-                    ref.read(listPlaybackProvider).play(song);
-                  },
-                  onDoubleTap: () => _markFavorite(song),
-                  waitsForDoubleClick: onlyLikeOnDoubleClick,
-                  onAddToQueue: () => _addToQueue(song),
-                  onToggleFavorite: () => _toggleFavorite(song),
-                  onOpenAlbum: _openAlbumOfSong,
-                  onOpenKind: () => _showKindOf(song),
-                );
-              },
+            return _trackCard(
+              songs[index],
+              index,
+              sourceLabels,
+              metrics,
+              waitsForDoubleClick: onlyLikeOnDoubleClick,
             );
           },
         );
@@ -699,6 +703,61 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             _columnHeader(metrics, sort),
             Expanded(child: _cachedTracks!),
           ],
+        );
+      },
+    );
+  }
+
+  /// One row of the track table: the only place a track row is built.
+  ///
+  /// The group list draws its singles with this too, so both lists keep one
+  /// look, one set of click rules and one set of callbacks. [openAlbum] is
+  /// false for a single: a group of one track is played, not opened.
+  Widget _trackCard(
+    Song song,
+    int index,
+    Map<String, SourceLabel> sourceLabels,
+    LibraryRowMetrics metrics, {
+    required bool waitsForDoubleClick,
+    bool openAlbum = true,
+  }) {
+    // Each row listens to the three values it paints, not to the whole page
+    // state. Liking a track rebuilds one row; playing a track rebuilds the
+    // two rows whose mark changes.
+    return Consumer(
+      builder: (context, ref, child) {
+        final (selected, playing) = ref.watch(
+          playbackControllerProvider.select((value) {
+            final selected = value.currentSong?.uri == song.uri;
+            return (selected, selected && value.isPlaying);
+          }),
+        );
+        final isFavorite = ref.watch(
+          favoritesControllerProvider.select(
+            (value) => value.contains(song.uri),
+          ),
+        );
+        return LibraryTrackCard(
+          song: song,
+          index: index,
+          selected: selected,
+          playing: playing,
+          isFavorite: isFavorite,
+          unavailable: ref.watch(deadSongsProvider).contains(song.uri),
+          source: sourceLabel(song, sourceLabels),
+          metrics: metrics,
+          onTap: () {
+            // The list the user clicks in decides what happens to the
+            // queue; by default the track joins the queue and plays right
+            // away.
+            ref.read(listPlaybackProvider).play(song);
+          },
+          onDoubleTap: () => _markFavorite(song),
+          waitsForDoubleClick: waitsForDoubleClick,
+          onAddToQueue: () => _addToQueue(song),
+          onToggleFavorite: () => _toggleFavorite(song),
+          onOpenAlbum: openAlbum ? _openAlbumOfSong : null,
+          onOpenKind: () => _showKindOf(song),
         );
       },
     );

@@ -3,19 +3,23 @@ import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_layout.dart';
+import 'package:tune/features/library/presentation/library_row_metrics.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
-/// The library as rows of groups: one album, show or book per row.
+/// The library as the rows of the group list.
 ///
 /// A table of tracks repeats the album name on every line; a group row says
 /// it once — cover, name, whose it is, how much it holds — and a click opens
-/// its tracks. The rows are the list; there is no mode and no switch.
+/// its tracks. A group that holds one track is that track: it is drawn as a
+/// track row, in the same list and order, and a click plays it. The rows are
+/// the list; there is no mode and no switch.
 class LibraryGroupRows extends StatelessWidget {
-  /// The groups to draw, in the order the library gave them.
-  final List<LibraryAlbum> albums;
+  /// The rows to draw, in the order [libraryRowsOf] gave them.
+  final List<LibraryListRow> rows;
 
   /// The noun the page's groups carry, from [libraryLayoutForKinds].
   ///
@@ -23,8 +27,17 @@ class LibraryGroupRows extends StatelessWidget {
   /// groups only while its scope names one kind, so one noun fits the list.
   final LibraryGroupingLabel groupingLabel;
 
+  /// The widths of the columns of a track row, measured by the page.
+  ///
+  /// The page measures both lists with one ruler, so a single row and a row
+  /// of the album view line up on the same columns.
+  final LibraryRowMetrics metrics;
+
   /// Opens one group: its tracks replace the rows below.
   final ValueChanged<LibraryAlbum> onOpen;
+
+  /// Draws one single row from the one track-row implementation of the page.
+  final Widget Function(Song song, int index) buildTrackRow;
 
   /// What the whole list holds for a screen reader; a row says its own count.
   final int? totalTracks;
@@ -38,9 +51,11 @@ class LibraryGroupRows extends StatelessWidget {
 
   const LibraryGroupRows({
     super.key,
-    required this.albums,
+    required this.rows,
     required this.groupingLabel,
+    required this.metrics,
     required this.onOpen,
+    required this.buildTrackRow,
     this.totalTracks,
   });
 
@@ -53,19 +68,25 @@ class LibraryGroupRows extends StatelessWidget {
         CompactTokens.pageGutter,
         CompactTokens.space8,
       ),
-      // Two lines of text always take the same room, so the list can fix its
-      // extent; a larger text scale has to grow the row, so it steps aside.
-      itemExtent: _isDefaultTextScale(context) ? _rowHeight : null,
+      // Fixing the extent is only honest while every row is as tall as the
+      // next: two lines of text take the same room as long as the text scale
+      // is the default, and a track row takes the height the table measured.
+      // A list that holds both heights must let every row measure itself.
+      itemExtent: _itemExtent(context),
       // A row keeps no state.
       addAutomaticKeepAlives: false,
-      itemCount: albums.length,
+      itemCount: rows.length,
       itemBuilder: (context, index) {
-        final album = albums[index];
-        return _GroupRow(
-          album: album,
-          groupingLabel: groupingLabel,
-          onOpen: () => onOpen(album),
-        );
+        final row = rows[index];
+        return switch (row) {
+          LibraryAlbumRow(:final album) => _GroupRow(
+            album: album,
+            groupingLabel: groupingLabel,
+            onOpen: () => onOpen(album),
+          ),
+          LibrarySingleRow(song: final song, index: final trackIndex) =>
+            buildTrackRow(song, trackIndex),
+        };
       },
     );
 
@@ -76,6 +97,23 @@ class LibraryGroupRows extends StatelessWidget {
       label: context.loc.libraryTrackCount(total),
       child: list,
     );
+  }
+
+  /// The height every row of this list shares, or null while two kinds of
+  /// row are in it.
+  double? _itemExtent(BuildContext context) {
+    var groups = false;
+    var tracks = false;
+    for (final row in rows) {
+      if (row is LibraryAlbumRow) {
+        groups = true;
+      } else {
+        tracks = true;
+      }
+    }
+    if (groups && tracks) return null;
+    if (tracks) return metrics.extent;
+    return _isDefaultTextScale(context) ? _rowHeight : null;
   }
 
   static bool _isDefaultTextScale(BuildContext context) {

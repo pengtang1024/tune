@@ -243,8 +243,10 @@ void main() {
       ),
     );
     // The rows name the groups; the tracks of a group are one click away.
+    // Nocturnes has one track, so it is a track row now: the group to open is
+    // the three unnamed tracks that share one group.
     await _shot(tester, 'library$suffix');
-    await tester.tap(find.text('Nocturnes'));
+    await tester.tap(find.byKey(const ValueKey('library-group-\u0000local')));
     await tester.pumpAndSettle();
     await _shot(tester, 'library_group_tracks$suffix');
     await tester.tap(find.byKey(const ValueKey('library-group-back')));
