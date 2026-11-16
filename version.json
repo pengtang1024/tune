@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.36.0",
-  "build": 67,
-  "released_at": "2026-11-16T09:42:35Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.36.0",
-  "notes": "### 新增\n\n- **一类内容一套读法**：视图开关不再对所有人一样长。音乐是「专辑 → 曲目」，播客是\n  「节目 → 单集」，有声书是「书 → 章节」，电台只有一串台，音效是平铺的短条目。切到哪一类\n  就打开它自己的默认视图，开关里只留这一类说得通的档位（播客没有分类墙，电台没有专辑墙），\n  「专辑」这一档在播客里叫「节目」、在有声书里叫「书」。判断只有一处出处：\n  `lib/features/library/domain/library_layout.dart`。\n\n### 修复\n\n- **播放条还显示旧标题**：队列是播放当时存下的快照，库里的行在打开应用时被补齐过，\n  但恢复出来的队列仍用快照，底栏因此还写着 `01 - The Shade of Cardinal Richelieu.`。\n  现在恢复队列时优先取库里那一行（同一个 `uri`），库里没有的条目（电台流、已删除的音源）\n  才用快照。\n\n### 变更\n\n- **打开一个节目/一本书时的计数口径**随内容分类走：播客数单集、有声书数章节、音效数条目，\n  不再一律写「首」。",
+  "version": "1.36.1",
+  "build": 68,
+  "released_at": "2026-11-16T10:05:29Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.36.1",
+  "notes": "### 修复\n\n- **打开音乐库仍然是一列五千行曲目**：1.36.0 让视图随分类走，但页面第一次打开时仍写死\n  在平铺列表上，所以一张专辑的十几个乐章各占一行，看着像噪声而不是信息。现在打开就用\n  这一类的默认读法——音乐是专辑墙（一张专辑一张卡，点进去才是曲目），播客是节目墙，\n  电台是台列表；读者自己点过开关之后，那一档才成为他当下的选择，切到别的内容分类再重置。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.36.0/tune-linux-x64-1.36.0.tar.gz",
-      "size": 53677932,
-      "sha256": "b1850680fb32ac016bc456ccad3bef2b691e2be1207773b5b1afc79cc3e722ec"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.36.1/tune-linux-x64-1.36.1.tar.gz",
+      "size": 53568591,
+      "sha256": "3064d7fdc83f595acb695f6143a394115f31905abc6fba2a0b057b88a125c331"
     }
   }
 }

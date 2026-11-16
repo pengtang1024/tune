@@ -20,6 +20,8 @@ import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
 import 'package:tune/shared/ui/favorite_button.dart';
 import 'package:tune/shared/ui/icon_glyph.dart';
+import 'package:tune/features/library/application/library_initial_view_provider.dart';
+import 'package:tune/features/library/presentation/library_view_mode.dart';
 
 import '../services/fake_persistence.dart';
 import 'compact_layout_test.dart' show FakeLibraryController;
@@ -65,6 +67,8 @@ void main() {
 
     return ProviderScope(
       overrides: [
+        // 这些用例断言的是平铺列表，直接从列表打开。
+        libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
         persistenceServiceProvider.overrideWithValue(persistence),
         audioPlayerServiceProvider.overrideWithValue(audio),
         libraryControllerProvider.overrideWith(
