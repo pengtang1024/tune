@@ -37,6 +37,7 @@
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
 | 加音源类型 / 实例：适配器注册、参数与依赖方向 | [`docs/source-extension.md`](docs/source-extension.md)（结论已并回 需求/音源设计.md） |
 | 查健康度里 unknown 的处理约定 | [`docs/health-unknown.md`](docs/health-unknown.md)（给健康度会话的提醒） |
+| 让健康度决定来源是否进音乐库、加隐藏门槛 | [`docs/health-gating.md`](docs/health-gating.md)（方案，未实施） |
 | 查队列的模型（游标、随机重排、上一首） | [`需求/队列模型方案.md`](需求/队列模型方案.md) |
 | 查启动恢复播放：存什么、什么时候写、开关在哪 | [`docs/playback-session.md`](docs/playback-session.md) |
 | 查队列的呈现（浮层、入口、关闭） | [`docs/queue-panel.md`](docs/queue-panel.md) |

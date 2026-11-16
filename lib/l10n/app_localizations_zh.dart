@@ -2922,6 +2922,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryShowKindOnly => '只看这一类';
 
   @override
+  String libraryHiddenSources(int count) {
+    return '来自 $count 个来源的曲目已隐藏';
+  }
+
+  @override
+  String get libraryShowHiddenSources => '显示';
+
+  @override
+  String get settingsHealthGateTitle => '隐藏健康度低的来源';
+
+  @override
+  String get settingsHealthGateHint => '它们的曲目不再出现在音乐库；置顶某个来源即可保留。';
+
+  @override
+  String settingsHealthGateValue(Object value) {
+    return '$value% 及以上';
+  }
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -7510,6 +7529,25 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryShowKindOnly => '只看这一类';
 
   @override
+  String libraryHiddenSources(int count) {
+    return '来自 $count 个来源的曲目已隐藏';
+  }
+
+  @override
+  String get libraryShowHiddenSources => '显示';
+
+  @override
+  String get settingsHealthGateTitle => '隐藏健康度低的来源';
+
+  @override
+  String get settingsHealthGateHint => '它们的曲目不再出现在音乐库；置顶某个来源即可保留。';
+
+  @override
+  String settingsHealthGateValue(Object value) {
+    return '$value% 及以上';
+  }
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -12096,6 +12134,25 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryShowKindOnly => '只看這一類';
+
+  @override
+  String libraryHiddenSources(int count) {
+    return '來自 $count 個來源的曲目已隱藏';
+  }
+
+  @override
+  String get libraryShowHiddenSources => '顯示';
+
+  @override
+  String get settingsHealthGateTitle => '隱藏健康度低的來源';
+
+  @override
+  String get settingsHealthGateHint => '它們的曲目不再出現在音樂庫；置頂某個來源即可保留。';
+
+  @override
+  String settingsHealthGateValue(Object value) {
+    return '$value% 及以上';
+  }
 
   @override
   String get trackFactPath => '檔案路徑';

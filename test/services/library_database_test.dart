@@ -1054,4 +1054,28 @@ void main() {
     expect(database.loadQueue().single.title, 'The Shade of Cardinal Richelieu.');
   });
 });
+
+  test('a hidden source leaves the rows and the count together', () async {
+    final database = AppDatabase.inMemory();
+    addTearDown(database.close);
+    database.save([
+      song(1).copyWith(sourceId: 'weak'),
+      song(2).copyWith(sourceId: 'weak'),
+      song(3).copyWith(sourceId: 'strong'),
+    ]);
+
+    const open = LibraryFilter();
+    expect(database.countQuery(query: '', filter: open), 3);
+    final gated = open.copyWith(excludeSources: {'weak'});
+    expect(database.countQuery(query: '', filter: gated), 1);
+    final rows = database.query(
+      query: '',
+      filter: gated,
+      sort: LibrarySort.recent,
+      offset: 0,
+      limit: 50,
+    );
+    expect(rows.map((row) => row.uri), ['tune://openverse/3']);
+    expect(database.albumSummaries(excludeSources: {'weak'}), isEmpty);
+  });
 }

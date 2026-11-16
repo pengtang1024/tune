@@ -38,6 +38,12 @@ class LibraryToolbar extends ConsumerWidget {
   /// How many matching tracks the list leaves out for having no duration.
   final int hiddenMissingDuration;
 
+  /// How many sources the health gate keeps out of this page.
+  final int hiddenSourceCount;
+
+  /// Pins every hidden source, so the reader can see what the gate took.
+  final VoidCallback onShowHiddenSources;
+
   /// The content the page is scoped to, when it names one kind; the count
   /// then counts shows, chapters or stations instead of songs.
   final ContentKind? kind;
@@ -69,6 +75,8 @@ class LibraryToolbar extends ConsumerWidget {
     required this.query,
     required this.count,
     required this.hiddenMissingDuration,
+    required this.hiddenSourceCount,
+    required this.onShowHiddenSources,
     required this.kind,
     required this.sources,
     required this.sourceLabels,
@@ -87,7 +95,18 @@ class LibraryToolbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final content = compact ? _compactBar(context) : _wideBar(context);
+    var content = compact ? _compactBar(context) : _wideBar(context);
+    if (hiddenSourceCount > 0) {
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          content,
+          const SizedBox(height: CompactTokens.space4),
+          _hiddenSourcesNote(context),
+        ],
+      );
+    }
     if (hiddenMissingDuration <= 0) return content;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -96,6 +115,35 @@ class LibraryToolbar extends ConsumerWidget {
         content,
         const SizedBox(height: CompactTokens.space4),
         _missingDurationNote(context),
+      ],
+    );
+  }
+
+  /// Names the sources the health gate hid, so nothing disappears silently.
+  Widget _hiddenSourcesNote(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      key: const ValueKey('library-hidden-sources'),
+      children: [
+        Expanded(
+          child: Text(
+            context.loc.libraryHiddenSources(hiddenSourceCount),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        TextButton(
+          key: const ValueKey('library-show-hidden-sources'),
+          onPressed: onShowHiddenSources,
+          style: TextButton.styleFrom(
+            minimumSize: const Size(0, 28),
+            padding: const EdgeInsets.symmetric(
+              horizontal: CompactTokens.space8,
+            ),
+          ),
+          child: Text(context.loc.libraryShowHiddenSources),
+        ),
       ],
     );
   }

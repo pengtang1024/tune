@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_fact_counts.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/library_filter.dart';
@@ -24,6 +25,16 @@ class LibraryState {
   /// Last scan outcome per source. One source failing must not hide results
   /// from the sources that succeeded.
   final Map<String, SourceScanSummary> sourceSummaries;
+
+  /// The per-source counts counted over the whole table, not over [songs].
+  ///
+  /// The health score reads these; a window of a thousand rows cannot tell a
+  /// five-thousand-track source from a broken one, and a rule that hides rows
+  /// must not change the numbers that decide what to hide.
+  final Map<String, SourceFactCounts> sourceFacts;
+
+  /// The sources the health gate keeps out of this page.
+  final Set<String> hiddenSources;
 
   /// How many tracks the library holds on disk.
   ///
@@ -65,6 +76,8 @@ class LibraryState {
     this.errorMessage,
     this.isLoading = false,
     this.sourceSummaries = const {},
+    this.sourceFacts = const {},
+    this.hiddenSources = const {},
     this.total = 0,
     this.matching = 0,
     this.otherKindCount = 0,
@@ -111,6 +124,8 @@ class LibraryState {
     Object? errorMessage = _unset,
     bool? isLoading,
     Map<String, SourceScanSummary>? sourceSummaries,
+    Map<String, SourceFactCounts>? sourceFacts,
+    Set<String>? hiddenSources,
     int? total,
     int? matching,
     int? otherKindCount,
@@ -133,6 +148,8 @@ class LibraryState {
           : errorMessage as String?,
       isLoading: isLoading ?? this.isLoading,
       sourceSummaries: sourceSummaries ?? this.sourceSummaries,
+      sourceFacts: sourceFacts ?? this.sourceFacts,
+      hiddenSources: hiddenSources ?? this.hiddenSources,
       total: total ?? this.total,
       matching: matching ?? this.matching,
       otherKindCount: otherKindCount ?? this.otherKindCount,

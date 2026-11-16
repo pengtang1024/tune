@@ -1,6 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:tune/features/library/application/hidden_sources_provider.dart';
+import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/player/application/playback_overview_provider.dart';
+import 'package:tune/features/settings/application/settings_controller.dart';
+import 'package:tune/features/sources/application/music_sources_controller.dart';
+import 'package:tune/features/sources/application/source_health_reports.dart';
+import 'package:tune/features/sources/domain/source_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,6 +63,36 @@ Future<void> main(List<String> arguments) async {
       // The Windows runner hands the command line to `main`; Linux reads it
       // from `/proc`, so the words are only used where they arrive.
       startupArgumentsProvider.overrideWithValue(arguments),
+      // The health gate reads settings, the scan history and what is playing;
+      // the page only asks for the answer, so the rule stays in one place.
+      libraryHiddenSourcesProvider.overrideWith((ref) {
+        final settings = ref.watch(settingsControllerProvider);
+        if (!settings.hideUnhealthySources) return const <String>{};
+        final sources = ref
+            .watch(musicSourcesControllerProvider)
+            .valueOrNull;
+        if (sources == null || sources.sources.isEmpty) {
+          return const <String>{};
+        }
+        final reports = ref.watch(sourceHealthReportsProvider);
+        if (reports.isEmpty) return const <String>{};
+        final state = ref.watch(libraryControllerProvider).valueOrNull;
+        return SourceVisibility(
+          threshold: settings.healthGateThreshold,
+          alwaysVisible: settings.alwaysVisibleSources,
+          playingSourceId: ref.watch(playbackOverviewProvider).currentSong
+              ?.sourceId,
+        ).hiddenOf(
+          reports: reports,
+          localSourceIds: {
+            for (final source in sources.sources)
+              if (source.isLocal) source.id,
+          },
+          sourcesWithTracks: (state?.sourceFacts ?? const {}).keys.toSet(),
+          sourcesWithEvidence: (state?.sourceSummaries ?? const {}).keys.toSet(),
+          libraryIsEmpty: (state?.sourceFacts ?? const {}).isEmpty,
+        );
+      }),
     ],
   );
   if (!await _claimThePlayerPlace(container)) {

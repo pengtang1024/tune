@@ -61,6 +61,15 @@ class SettingsState {
   /// The weights of the dimensions of the source health score.
   final SourceHealthWeights sourceHealthWeights;
 
+  /// Whether the health gate keeps weak sources out of the library page.
+  final bool hideUnhealthySources;
+
+  /// The score a source must reach to keep its rows, as an absolute share.
+  final double healthGateThreshold;
+
+  /// The sources the reader pinned, kept visible whatever their score.
+  final Set<String> alwaysVisibleSources;
+
   /// What the reader pasted for the smart lyrics pipeline.
   final SmartLyricsConfig smartLyrics;
 
@@ -96,6 +105,9 @@ class SettingsState {
     this.autoResumeOnStartup = true,
     this.sourcesMoreExpanded = false,
     this.sourceHealthWeights = SourceHealthWeights.defaults,
+    this.hideUnhealthySources = true,
+    this.healthGateThreshold = 0.55,
+    this.alwaysVisibleSources = const {},
     this.smartLyrics = const SmartLyricsConfig(),
     this.localization = const LocalizationConfig(),
     this.useListeningHistory = false,
@@ -123,6 +135,9 @@ class SettingsState {
     bool? autoResumeOnStartup,
     bool? sourcesMoreExpanded,
     SourceHealthWeights? sourceHealthWeights,
+    bool? hideUnhealthySources,
+    double? healthGateThreshold,
+    Set<String>? alwaysVisibleSources,
     SmartLyricsConfig? smartLyrics,
     LocalizationConfig? localization,
     bool? useListeningHistory,
@@ -146,6 +161,11 @@ class SettingsState {
       autoResumeOnStartup: autoResumeOnStartup ?? this.autoResumeOnStartup,
       sourcesMoreExpanded: sourcesMoreExpanded ?? this.sourcesMoreExpanded,
       sourceHealthWeights: sourceHealthWeights ?? this.sourceHealthWeights,
+      hideUnhealthySources:
+          hideUnhealthySources ?? this.hideUnhealthySources,
+      healthGateThreshold: healthGateThreshold ?? this.healthGateThreshold,
+      alwaysVisibleSources:
+          alwaysVisibleSources ?? this.alwaysVisibleSources,
       smartLyrics: smartLyrics ?? this.smartLyrics,
       localization: localization ?? this.localization,
       useListeningHistory: useListeningHistory ?? this.useListeningHistory,

@@ -10,6 +10,7 @@ import 'package:tune/data/services/theme_service.dart';
 import 'package:tune/data/services/translation/translation_key_store.dart';
 import 'package:tune/features/settings/domain/settings_state.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/sources/domain/source_visibility.dart';
 import 'package:tune/domain/models/localization_config.dart';
 import 'package:tune/domain/models/smart_lyrics_config.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -68,6 +69,14 @@ class SettingsController extends StateNotifier<SettingsState> {
             keyStore?.keys ?? const {},
           ),
           sourceHealthWeights: _readSourceHealthWeights(_persistence),
+          hideUnhealthySources:
+              _persistence.getBool('health_gate_enabled') ?? true,
+          healthGateThreshold:
+              _persistence.getDouble('health_gate_threshold') ??
+              SourceVisibility.defaultThreshold,
+          alwaysVisibleSources: {
+            ...?_persistence.getStringList('health_gate_pinned'),
+          },
           useListeningHistory:
               _persistence.getBool('discovery_use_listening_history') ?? false,
           githubToken: _persistence.getString('github_token') ?? '',
@@ -175,6 +184,36 @@ class SettingsController extends StateNotifier<SettingsState> {
     if (state.sourcesMoreExpanded == value) return;
     state = state.copyWith(sourcesMoreExpanded: value);
     await _persistence.setBool('sources_more_expanded', value);
+  }
+
+  /// Sets whether the health gate keeps weak sources out of the library.
+  Future<void> setHideUnhealthySources(bool value) async {
+    if (state.hideUnhealthySources == value) return;
+    state = state.copyWith(hideUnhealthySources: value);
+    await _persistence.setBool('health_gate_enabled', value);
+  }
+
+  /// Sets the absolute score a source must reach to keep its rows.
+  Future<void> setHealthGateThreshold(double value) async {
+    if (state.healthGateThreshold == value) return;
+    state = state.copyWith(healthGateThreshold: value);
+    await _persistence.setDouble('health_gate_threshold', value);
+  }
+
+  /// Pins or unpins one source, so its rows show whatever its score.
+  Future<void> setSourcePinned(String sourceId, {required bool pinned}) async {
+    final next = {...state.alwaysVisibleSources};
+    if (pinned) {
+      next.add(sourceId);
+    } else {
+      next.remove(sourceId);
+    }
+    if (next.length == state.alwaysVisibleSources.length &&
+        next.containsAll(state.alwaysVisibleSources)) {
+      return;
+    }
+    state = state.copyWith(alwaysVisibleSources: next);
+    await _persistence.setStringList('health_gate_pinned', next.toList());
   }
 
   /// Sets whether the discover page may learn from what was played.

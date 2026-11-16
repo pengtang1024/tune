@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart' show mapEquals;
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/app/layout/layout_metrics.dart';
@@ -286,6 +288,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
                       query: library.query,
                       count: library.matching,
                       hiddenMissingDuration: library.hiddenMissingDuration,
+                      hiddenSourceCount: library.hiddenSources.length,
+                      onShowHiddenSources: () => _showHiddenSources(library),
                       kind: selectedKind,
                       sources: availableSources,
                       sourceLabels: sourceLabels,
@@ -838,6 +842,17 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   ///
   /// 用筛选面板写的同一个 `filter.kinds`，所以读法、计数单位、分组方式
   /// 都会跟着这一类走——标记说的是「这一行是什么」，点它是「其余的都长这样」。
+  /// Pins every hidden source, so the reader can see what the gate took.
+  ///
+  /// Pinning is a setting, not a filter: the rows come back through the same
+  /// query the page already runs, and the choice survives a restart.
+  void _showHiddenSources(_LibrarySlice library) {
+    final settings = ref.read(settingsControllerProvider.notifier);
+    for (final sourceId in library.hiddenSources) {
+      unawaited(settings.setSourcePinned(sourceId, pinned: true));
+    }
+  }
+
   void _showKindOf(Song song) {
     final kind = contentKindOf(song);
     ref
@@ -920,6 +935,7 @@ typedef _LibrarySlice = ({
   int matching,
   int otherKindCount,
   int hiddenMissingDuration,
+  Set<String> hiddenSources,
   String query,
   String? sourceFilter,
   LibrarySort sort,
@@ -941,6 +957,7 @@ _LibrarySlice? _librarySlice(AsyncValue<LibraryState> value) {
     matching: state.matching,
     otherKindCount: state.otherKindCount,
     hiddenMissingDuration: state.hiddenMissingDuration,
+    hiddenSources: state.hiddenSources,
     query: state.query,
     sourceFilter: state.sourceFilter,
     sort: state.sort,

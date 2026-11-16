@@ -8,6 +8,7 @@ import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/music_source_providers.dart';
 import 'package:tune/data/services/providers/song_download_service_provider.dart';
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/features/library/application/hidden_sources_provider.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/features/library/data/impl/library_storage.dart';
 import 'package:tune/features/library/data/library_storage.dart';
@@ -79,23 +80,28 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         _storage.saveView(LibraryView(sort: sort, filter: filter)),
       );
     }
+    final sourceFacts = await _storage.sourceFacts();
+    final hidden = _hiddenNow();
+    final shown = _withGate(filter, hidden);
     final total = await _storage.count();
-    final matching = await _storage.countQuery(query: '', filter: filter);
+    final matching = await _storage.countQuery(query: '', filter: shown);
     final otherKindCount = await _storage.countQuery(
       query: '',
-      filter: _otherKinds,
+      filter: _withGate(_otherKinds, hidden),
     );
     final songs = await _storage.query(
       query: '',
-      filter: filter,
+      filter: shown,
       sort: sort,
       offset: 0,
       limit: windowSize,
     );
-    final hiddenMissingDuration = filter.hidesMissingDuration
-        ? await _storage.missingDurationCount(query: '', filter: filter)
+    final hiddenMissingDuration = shown.hidesMissingDuration
+        ? await _storage.missingDurationCount(query: '', filter: shown)
         : 0;
-    final albums = await _storage.albumSummaries();
+    final albums = hidden.isEmpty
+        ? await _storage.albumSummaries()
+        : await _storage.albumSummaries(excludeSources: hidden);
     return LibraryState(
       songs: List.unmodifiable(songs),
       filter: filter,
@@ -104,6 +110,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       matching: matching,
       otherKindCount: otherKindCount,
       hiddenMissingDuration: hiddenMissingDuration,
+      sourceFacts: Map.unmodifiable(sourceFacts),
+      hiddenSources: hidden,
       hasMore: songs.length < matching,
       albums: albums,
       statusMessage: songs.isEmpty
@@ -111,6 +119,17 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           : AppStrings.instance.scanSongCountShort(songs.length),
     );
   }
+
+  /// The sources the health gate keeps out of this page.
+  ///
+  /// Read from the provider that owns the rule, never computed here: the gate
+  /// needs the settings and the scan history, and a controller that read them
+  /// itself would have to duplicate the health report.
+  Set<String> _hiddenNow() => ref.read(libraryHiddenSourcesProvider);
+
+  /// The filter with the gate applied, so counts and rows ask one question.
+  static LibraryFilter _withGate(LibraryFilter filter, Set<String> hidden) =>
+      hidden.isEmpty ? filter : filter.copyWith(excludeSources: hidden);
 
   /// The scope every library opens with: songs, and nothing else.
   ///
@@ -456,7 +475,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
           matching: matching,
           otherKindCount: otherKindCount,
           hasMore: songs.length < matching,
-          albums: saved ? await _storage.albumSummaries() : null,
+          albums: saved
+              ? await _storage.albumSummaries(
+                  excludeSources: _current.hiddenSources,
+                )
+              : null,
           scanStatus: LibraryScanStatus.completed,
           scanProgress: 1,
           isLoading: false,
@@ -472,6 +495,7 @@ class LibraryController extends AsyncNotifier<LibraryState> {
               ? AppStrings.instance.scanAllSourcesFailed
               : null,
           sourceSummaries: Map.unmodifiable(summaries),
+          sourceFacts: Map.unmodifiable(await _storage.sourceFacts()),
         ),
       );
     } catch (error, stackTrace) {
@@ -638,7 +662,11 @@ class LibraryController extends AsyncNotifier<LibraryState> {
     if (_disposed || !state.hasValue) return;
     final generation = ++_reloadGeneration;
     final query = _current.query.trim();
-    final filter = _current.filter;
+    // The gate is recomputed here rather than only at open: a scan, a settings
+    // change or a source edit all land through this path.
+    final facts = await _storage.sourceFacts();
+    final hidden = _hiddenNow();
+    final filter = _withGate(_current.filter, hidden);
     final matching = await _storage.countQuery(query: query, filter: filter);
     final songs = await _storage.query(
       query: query,
@@ -648,14 +676,17 @@ class LibraryController extends AsyncNotifier<LibraryState> {
       limit: windowSize,
     );
     final albums = songsChanged
-        ? await _storage.albumSummaries()
+        ? await _storage.albumSummaries(excludeSources: hidden)
         : _current.albums;
     final hiddenMissingDuration = filter.hidesMissingDuration
         ? await _storage.missingDurationCount(query: query, filter: filter)
         : 0;
     final total = songsChanged ? await _storage.count() : _current.total;
     final otherKindCount = songsChanged
-        ? await _storage.countQuery(query: '', filter: _otherKinds)
+        ? await _storage.countQuery(
+            query: '',
+            filter: _withGate(_otherKinds, hidden),
+          )
         : _current.otherKindCount;
     if (_disposed || generation != _reloadGeneration) return;
     state = AsyncData(
@@ -667,6 +698,8 @@ class LibraryController extends AsyncNotifier<LibraryState> {
         hiddenMissingDuration: hiddenMissingDuration,
         hasMore: songs.length < matching,
         albums: albums,
+        hiddenSources: hidden,
+        sourceFacts: Map.unmodifiable(facts),
       ),
     );
   }

@@ -21,6 +21,13 @@ class LibraryFilter {
   final Set<int> decades;
   final Set<String> artists;
   final Set<String> sources;
+
+  /// The sources kept out of the page because their health is too low.
+  ///
+  /// Filled by the controller from the health gate, never by the filter panel:
+  /// it is an automatic rule, so it is not a group, is not counted by
+  /// [activeGroups] and survives "clear all".
+  final Set<String> excludeSources;
   final Set<String> formats;
   final Set<LibraryDurationBucket> durations;
   final Set<LibraryAddedWindow> added;
@@ -53,6 +60,7 @@ class LibraryFilter {
     this.decades = const {},
     this.artists = const {},
     this.sources = const {},
+    this.excludeSources = const {},
     this.formats = const {},
     this.durations = const {},
     this.added = const {},
@@ -127,6 +135,7 @@ class LibraryFilter {
   /// reader who turned one off keeps it off when the groups are cleared.
   LibraryFilter withoutGroups() => LibraryFilter(
     kinds: kinds,
+    excludeSources: excludeSources,
     hideMissingDuration: hideMissingDuration,
     excludeShortTracks: excludeShortTracks,
   );
@@ -137,6 +146,7 @@ class LibraryFilter {
     Set<int>? decades,
     Set<String>? artists,
     Set<String>? sources,
+    Set<String>? excludeSources,
     Set<String>? formats,
     Set<LibraryDurationBucket>? durations,
     Set<LibraryAddedWindow>? added,
@@ -150,6 +160,7 @@ class LibraryFilter {
     decades: decades ?? this.decades,
     artists: artists ?? this.artists,
     sources: sources ?? this.sources,
+    excludeSources: excludeSources ?? this.excludeSources,
     formats: formats ?? this.formats,
     durations: durations ?? this.durations,
     added: added ?? this.added,
@@ -182,6 +193,7 @@ class LibraryFilter {
     Object.hashAllUnordered(decades),
     Object.hashAllUnordered(artists),
     Object.hashAllUnordered(sources),
+    Object.hashAllUnordered(excludeSources),
     Object.hashAllUnordered(formats),
     Object.hashAllUnordered(durations),
     Object.hashAllUnordered(added),

@@ -3,6 +3,7 @@ import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/source_fact_counts.dart';
 import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 
@@ -109,7 +110,15 @@ abstract class LibraryStorage {
   Future<void> saveView(LibraryView view) async {}
 
   /// The albums of the library, without their tracks.
-  Future<List<AlbumSummary>> albumSummaries();
+  /// The per-source counts of the library, counted over the whole table.
+  ///
+  /// Counted in one pass by the database so the source page and any rule that
+  /// depends on it never read one window of a thousand rows and mistake it for
+  /// the whole library. Stores that cannot count cheaply leave it empty.
+  Future<Map<String, SourceFactCounts>> sourceFacts() async => const {};
+
+  /// The albums the page can show, with the hidden sources already left out.
+  Future<List<AlbumSummary>> albumSummaries({Set<String> excludeSources});
 
   /// The tracks of one album.
   Future<List<Song>> albumSongs(String key);

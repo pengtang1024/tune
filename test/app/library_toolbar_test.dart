@@ -32,6 +32,8 @@ void main() {
       query: '',
       count: 10,
       hiddenMissingDuration: hidden,
+      hiddenSourceCount: 0,
+      onShowHiddenSources: () {},
       kind: null,
       sources: const [],
       sourceLabels: const {},
