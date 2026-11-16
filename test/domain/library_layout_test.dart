@@ -4,10 +4,10 @@ import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
 
 void main() {
-  test('music opens on the album wall and may switch to any of its views', () {
+  test('music opens on two lists side by side and may switch to any view', () {
     final layout = libraryLayoutFor(ContentKind.music);
 
-    expect(layout.primary, LibraryViewMode.albums);
+    expect(layout.primary, LibraryViewMode.split);
     expect(layout.groupingLabel, LibraryGroupingLabel.album);
     for (final view in LibraryViewMode.values) {
       expect(layout.allows(view), isTrue, reason: '$view should be allowed');
@@ -17,16 +17,20 @@ void main() {
   test('podcast stops at two levels: shows, then episodes', () {
     final layout = libraryLayoutFor(ContentKind.podcast);
 
-    expect(layout.primary, LibraryViewMode.albums);
+    expect(layout.primary, LibraryViewMode.split);
     expect(layout.groupingLabel, LibraryGroupingLabel.show);
-    expect(layout.views, [LibraryViewMode.albums, LibraryViewMode.songs]);
+    expect(layout.views, [
+      LibraryViewMode.split,
+      LibraryViewMode.albums,
+      LibraryViewMode.songs,
+    ]);
     expect(layout.allows(LibraryViewMode.categories), isFalse);
   });
 
   test('audiobook groups by book and keeps categories to find one', () {
     final layout = libraryLayoutFor(ContentKind.audiobook);
 
-    expect(layout.primary, LibraryViewMode.albums);
+    expect(layout.primary, LibraryViewMode.split);
     expect(layout.groupingLabel, LibraryGroupingLabel.book);
     expect(layout.allows(LibraryViewMode.categories), isTrue);
     expect(layout.allows(LibraryViewMode.collections), isFalse);
@@ -49,7 +53,7 @@ void main() {
   test('a mixed selection reads like music, the widest layout', () {
     expect(
       libraryLayoutForKinds({ContentKind.podcast, ContentKind.music}).primary,
-      LibraryViewMode.albums,
+      LibraryViewMode.split,
     );
     expect(
       libraryLayoutForKinds({ContentKind.podcast, ContentKind.radio})
@@ -58,7 +62,7 @@ void main() {
     );
     expect(
       libraryLayoutForKinds(const <ContentKind>{}).primary,
-      LibraryViewMode.albums,
+      LibraryViewMode.split,
     );
   });
 

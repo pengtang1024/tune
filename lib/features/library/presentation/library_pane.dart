@@ -27,6 +27,7 @@ import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_category_tree.dart';
 import 'package:tune/features/library/presentation/library_category_view.dart';
 import 'package:tune/features/library/presentation/library_collections_view.dart';
+import 'package:tune/features/library/presentation/library_split_albums.dart';
 import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_filter_chips.dart';
@@ -95,6 +96,9 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// The tracks are read when the album is opened, so a large library does
   /// not hold every track of every album in memory.
   LibraryAlbum? _openAlbum;
+
+  /// 分栏视图里选中的分组；null = 全部曲目。
+  String? _splitSelection;
 
   /// The list widget of the last build, and what it was built from.
   ///
@@ -464,6 +468,46 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     }
 
     final view = _effectiveView(libraryLayoutForKinds(library.filter.kinds));
+
+    if (view == LibraryViewMode.split) {
+      final groups = libraryAlbumsOf(songs);
+      final selected = groups
+          .where((album) => album.key == _splitSelection)
+          .firstOrNull;
+      return Row(
+        children: [
+          SizedBox(
+            // 窄窗口里把这一列收窄，曲目行才不会为了它挤掉列。
+            width: MediaQuery.sizeOf(context).width < 900
+                ? 168
+                : (MediaQuery.sizeOf(context).width * 0.28).clamp(200, 320),
+            child: LibrarySplitAlbums(
+              albums: groups,
+              selectedKey: selected?.key,
+              groupingLabel: libraryLayoutForKinds(library.filter.kinds)
+                  .groupingLabel,
+              totalTracks: songs.length,
+              onPick: (key) => setState(() => _splitSelection = key),
+            ),
+          ),
+          const VerticalDivider(width: 1),
+          Expanded(
+            child: _trackList(
+              selected?.songs ?? songs,
+              sourceLabels,
+              onlyLikeOnDoubleClick,
+              library.sort,
+              controller: _songsScrollController,
+              hasMore: selected == null &&
+                  library.hasMore &&
+                  library.query.isEmpty &&
+                  !library.hasFilter,
+              bilingual: bilingual,
+            ),
+          ),
+        ],
+      );
+    }
 
     if (openAlbum != null) {
       return _trackList(

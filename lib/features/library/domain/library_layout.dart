@@ -37,10 +37,13 @@ class LibraryLayout {
   bool allows(LibraryViewMode view) => views.contains(view);
 }
 
-/// 音乐的默认读法：专辑墙进，曲目表查。
+/// 音乐的默认读法：一屏两列——左边专辑，右边这个专辑的曲目。
+/// 一列平铺会让一张专辑的十几个乐章各占一行，专辑墙又看不到曲目；
+/// 两列同时在场，才既不重复也不丢层级。
 const _music = LibraryLayout(
-  primary: LibraryViewMode.albums,
+  primary: LibraryViewMode.split,
   views: [
+    LibraryViewMode.split,
     LibraryViewMode.songs,
     LibraryViewMode.columns,
     LibraryViewMode.categories,
@@ -52,15 +55,20 @@ const _music = LibraryLayout(
 
 /// 播客按节目看，节目里是单集，所以只有两级。
 const _podcast = LibraryLayout(
-  primary: LibraryViewMode.albums,
-  views: [LibraryViewMode.albums, LibraryViewMode.songs],
+  primary: LibraryViewMode.split,
+  views: [
+    LibraryViewMode.split,
+    LibraryViewMode.albums,
+    LibraryViewMode.songs,
+  ],
   groupingLabel: LibraryGroupingLabel.show,
 );
 
 /// 有声书按书看，需要分类来找书，也需要曲目表定位某一章。
 const _audiobook = LibraryLayout(
-  primary: LibraryViewMode.albums,
+  primary: LibraryViewMode.split,
   views: [
+    LibraryViewMode.split,
     LibraryViewMode.albums,
     LibraryViewMode.songs,
     LibraryViewMode.categories,

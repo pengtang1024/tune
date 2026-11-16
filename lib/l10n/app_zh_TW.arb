@@ -163,6 +163,7 @@
   "libraryViewShows": "節目",
   "libraryViewBooks": "書",
   "libraryViewCollections": "合集檢視",
+  "libraryViewSplit": "分欄檢視",
   "libraryOpenCollection": "開啟合集",
   "libraryCollectionItems": "{items} 個條目 · {tracks} 首",
   "@libraryCollectionItems": {
