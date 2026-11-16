@@ -1,6 +1,6 @@
 # 健康度：unknown 应该算负面
 
-> 状态：规范 · 适用版本 1.33.0 · 最后核对 2026-11-15
+> 状态：规范 · 适用版本 1.45.1 · 最后核对 2026-11-17
 
 > 给正在开发健康度系统的会话：2026-10-24。
 > 这不是推荐系统的权重表，而是对健康度输入语义的提醒。
@@ -41,6 +41,23 @@ metadata / activity` 四项都定成 `0.25`，`SourceHealth.report` 的同名参
 4. unknown 有测试守着：`test/app/source_weight_test.dart` 里
    「activity is unknown before the first heart」与「favorites outside the library
    keep activity unknown」两条都断言 `0.25`。
+
+## 「不到期」不是一个样本
+
+2026-11-17 修掉了一个让健康度整体失真的缺陷：自动扫描会按间隔跳过每个来源，
+而 `skipped` 以前被当成一次**真实结果**写进两处：
+
+- 健康历史（`SourceScanHealthHistory`，只留最近 5 条）——连跳五次就把上一次
+  成功或失败挤出去，稳定度定格在 0.75 左右，所有来源看起来一样好；
+- 上次扫描摘要（`LibraryState.sourceSummaries`）——跳过一次就把上一次的
+  「成功」覆盖成「跳过」，于是页头一直挂着「有来源有问题」，健康度的扫描/产出/
+  可靠性三项永远读 0.66/0.5/0.75。
+
+现在的口径：`skipped` **不写入健康历史**，也**不覆盖上一次真实摘要**；没有更早
+摘要时才把这次跳过留作占位。判据由两条用例守着：
+`test/app/music_sources_controller_test.dart` 的「a scan that is not due yet is
+not a health sample」与 `test/app/library_source_merge_test.dart` 的
+「a scan that is not due yet keeps the last real summary」。
 
 ## 推荐侧的配套
 

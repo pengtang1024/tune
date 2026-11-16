@@ -249,6 +249,10 @@ class MusicSourcesController extends AsyncNotifier<MusicSourcesState> {
     final history = {..._current.healthHistory};
     final lastScanAt = {..._current.lastScanAt};
     for (final result in results) {
+      // A skipped scan means "not due yet", so it carries no outcome: keeping
+      // it would push the last real success or failure out of the five-record
+      // window and leave the stability dimension reading a constant.
+      if (result.status == SourceScanStatus.skipped) continue;
       final previous =
           history[result.sourceId] ?? const SourceScanHealthHistory();
       history[result.sourceId] = previous.append(
