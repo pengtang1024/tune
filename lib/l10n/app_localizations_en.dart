@@ -357,9 +357,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryViewCollections => 'Collections view';
 
   @override
-  String get libraryViewSplit => 'Split view';
-
-  @override
   String get libraryOpenCollection => 'Open collection';
 
   @override
@@ -3223,6 +3220,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contentKindSoundEffect => 'Sound effects';
+
+  @override
+  String get libraryShowKindOnly => 'Show only this kind';
 
   @override
   String get trackFactPath => 'File path';

@@ -574,12 +574,6 @@ abstract class AppLocalizations {
   /// **'合集视图'**
   String get libraryViewCollections;
 
-  /// No description provided for @libraryViewSplit.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'分栏视图'**
-  String get libraryViewSplit;
-
   /// No description provided for @libraryOpenCollection.
   ///
   /// In zh_CN, this message translates to:
@@ -5506,6 +5500,12 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'音效'**
   String get contentKindSoundEffect;
+
+  /// No description provided for @libraryShowKindOnly.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'只看这一类'**
+  String get libraryShowKindOnly;
 
   /// No description provided for @trackFactPath.
   ///

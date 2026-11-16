@@ -297,9 +297,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryViewCollections => '合集视图';
 
   @override
-  String get libraryViewSplit => '分栏视图';
-
-  @override
   String get libraryOpenCollection => '打开合集';
 
   @override
@@ -2950,6 +2947,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get contentKindSoundEffect => '音效';
+
+  @override
+  String get libraryShowKindOnly => '只看这一类';
 
   @override
   String get trackFactPath => '文件路径';
@@ -4844,9 +4844,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryViewCollections => '合集视图';
 
   @override
-  String get libraryViewSplit => '分栏视图';
-
-  @override
   String get libraryOpenCollection => '打开合集';
 
   @override
@@ -7499,6 +7496,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get contentKindSoundEffect => '音效';
 
   @override
+  String get libraryShowKindOnly => '只看这一类';
+
+  @override
   String get trackFactPath => '文件路径';
 
   @override
@@ -9389,9 +9389,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewCollections => '合集檢視';
-
-  @override
-  String get libraryViewSplit => '分欄檢視';
 
   @override
   String get libraryOpenCollection => '開啟合集';
@@ -12044,6 +12041,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get contentKindSoundEffect => '音效';
+
+  @override
+  String get libraryShowKindOnly => '只看這一類';
 
   @override
   String get trackFactPath => '檔案路徑';

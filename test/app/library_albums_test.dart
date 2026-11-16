@@ -93,7 +93,6 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-        initialView: LibraryViewMode.albums,
       ),
     );
     await tester.pumpAndSettle();
@@ -105,47 +104,6 @@ void main() {
     expect(find.text('Album A second'), findsNothing);
   });
 
-  testWidgets('the library opens as two lists: the groups and their tracks', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1200, 700);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // 左列是分组，右列是曲目，两者同屏在场：一张专辑的十几个乐章不再
-    // 各占一行散在五千行里，也没有把曲目藏到另一页。
-    expect(find.byKey(const ValueKey('library-split-groups')), findsOneWidget);
-    expect(find.text('Album A'), findsWidgets);
-    expect(find.text('Album B'), findsWidgets);
-    expect(find.text('Album A first'), findsOneWidget);
-    expect(find.text('Album B first'), findsOneWidget);
-
-    await tester.tap(
-      find.descendant(
-        of: find.byKey(const ValueKey('library-split-groups')),
-        matching: find.text('Album A'),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const ValueKey('library-split-groups')), findsOneWidget);
-    expect(find.text('Album A first'), findsOneWidget);
-    expect(find.text('Album A second'), findsOneWidget);
-    expect(find.text('Album B first'), findsNothing);
-
-    await tester.tap(find.byKey(const ValueKey('library-split-all')));
-    await tester.pumpAndSettle();
-    expect(find.text('Album B first'), findsOneWidget);
-  });
-
   testWidgets('the library opens an album from the cover grid', (tester) async {
     tester.view.physicalSize = const Size(900, 563);
     tester.view.devicePixelRatio = 1.0;
@@ -155,7 +113,6 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-        initialView: LibraryViewMode.albums,
       ),
     );
     await tester.pumpAndSettle();
@@ -190,7 +147,6 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-        initialView: LibraryViewMode.albums,
       ),
     );
     await tester.pumpAndSettle();
@@ -219,7 +175,6 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-        initialView: LibraryViewMode.albums,
       ),
     );
     await tester.pumpAndSettle();
@@ -272,7 +227,6 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         librarySongs: mixed,
-        initialView: LibraryViewMode.albums,
       ),
     );
     await tester.pumpAndSettle();
