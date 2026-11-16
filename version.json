@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.39.1",
-  "build": 76,
-  "released_at": "2026-11-16T12:59:52Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.39.1",
+  "version": "1.40.1",
+  "build": 77,
+  "released_at": "2026-11-16T13:09:06Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.40.1",
   "notes": "### 新增\n\n- **每一行写出它是什么**：标题右边给播客单集、有声书章节、电台、音效各写一个词\n  （歌不写，缺词就是默认），点这个词收窄到这一类；行的点击仍然播放。以前一列里混着五种\n  东西，只能靠打开详情面板才分得清。\n\n### 修复\n\n- **撤掉分栏视图**：左列按艺术家与来源把同一张专辑拆成多行（屏幕上出现九条一模一样的\n  专辑名），「全部歌曲」还把数据库窗口大小当成总数（写 1000，库里 5,121 首）。默认回到\n  每一类的墙：音乐看专辑墙、播客看节目墙、有声书看书墙。\n\n### 文档与工程\n\n- `docs/library-browse.md` 补「一行是什么，就写什么」一节，并记下分栏为什么被撤。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.39.1/tune-linux-x64-1.39.1.tar.gz",
-      "size": 53598899,
-      "sha256": "66340756dc362cdbc22ba6e4bec4266bebe821ca4ed94611c98ddb7c435259c4"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.40.1/tune-linux-x64-1.40.1.tar.gz",
+      "size": 53605603,
+      "sha256": "25806e99416c793fe22facdadc97e9c7a635eaeb80fd8d0dae472903c0396188"
     }
   }
 }

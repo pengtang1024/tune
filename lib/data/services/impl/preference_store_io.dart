@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:tune/data/services/impl/legacy_preference_migration.dart';
+import 'package:tune/data/services/impl/legacy_translation_model_migration.dart';
 import 'package:tune/data/services/persistence_service.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -44,6 +45,7 @@ class FilePersistenceService implements PersistenceService {
     _root = await _resolveRoot();
     await _readAll();
     await LegacyPreferenceMigration.migrateInto(this);
+    await LegacyTranslationModelMigration.migrateInto(this);
   }
 
   @override

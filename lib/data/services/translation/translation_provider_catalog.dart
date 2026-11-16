@@ -32,7 +32,7 @@ const List<TranslationProvider> translationProviderCatalog = [
     id: 'deepseek',
     name: 'DeepSeek',
     protocol: TranslationProtocol.openAiChat,
-    baseUrl: 'https://api.deepseek.com/v1',
+    baseUrl: 'https://api.deepseek.com',
     chatPath: '/chat/completions',
     balance: TranslationBalanceApi(
       url: 'https://api.deepseek.com/user/balance',
