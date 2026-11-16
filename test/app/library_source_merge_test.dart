@@ -87,6 +87,60 @@ void main() {
     return container;
   }
 
+  test('a scan that is not due yet keeps the last real summary', () async {
+    final container = createContainer(
+      sources: const [localSource, remoteSource],
+      results: {
+        'local': SourceScanResult(
+          sourceId: 'local',
+          status: SourceScanStatus.success,
+          songs: [localSong],
+        ),
+        'openverse': SourceScanResult(
+          sourceId: 'openverse',
+          status: SourceScanStatus.success,
+          songs: [oldRemoteSong],
+        ),
+      },
+    );
+
+    await container.read(libraryControllerProvider.future);
+    final controller = container.read(libraryControllerProvider.notifier);
+    await controller.scan(['/music']);
+
+    final success = container
+        .read(libraryControllerProvider)
+        .requireValue
+        .sourceSummaries['openverse']!;
+    expect(success.status, SourceScanStatus.success);
+
+    // The next automatic pass is inside the interval, so every source comes
+    // back as skipped: the page must keep reading the last real outcome.
+    service.results = {
+      'local': SourceScanResult(
+        sourceId: 'local',
+        status: SourceScanStatus.skipped,
+        message: '距离下次扫描还有 30 分钟',
+      ),
+      'openverse': SourceScanResult(
+        sourceId: 'openverse',
+        status: SourceScanStatus.skipped,
+        message: '距离下次扫描还有 30 分钟',
+      ),
+    };
+    await controller.scan(['/music'], auto: true);
+
+    final state = container.read(libraryControllerProvider).requireValue;
+    expect(state.sourceSummaries['openverse']!.status, SourceScanStatus.success);
+    expect(state.sourceSummaries['openverse']!.songCount, success.songCount);
+    expect(
+      state.sourceSummaries.values.every(
+        (summary) => summary.status == SourceScanStatus.success,
+      ),
+      isTrue,
+    );
+  });
+
   test('a failed source keeps its cached songs', () async {
     final container = createContainer(
       sources: const [localSource, remoteSource],

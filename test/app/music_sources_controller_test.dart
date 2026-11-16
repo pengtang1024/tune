@@ -126,6 +126,38 @@ void main() {
     );
   });
 
+  test('a scan that is not due yet is not a health sample', () async {
+    final persistence = FakePersistenceService();
+    final container = containerFor(persistence);
+    addTearDown(container.dispose);
+    await container.read(musicSourcesControllerProvider.future);
+    final controller = container.read(musicSourcesControllerProvider.notifier);
+
+    await controller.recordScanResults([
+      SourceScanResult(
+        sourceId: 'openverse',
+        status: SourceScanStatus.success,
+        elapsed: const Duration(seconds: 1),
+        scannedAt: DateTime(2026),
+      ),
+      SourceScanResult(
+        sourceId: 'openverse',
+        status: SourceScanStatus.skipped,
+        message: '距离下次扫描还有 30 分钟',
+        elapsed: Duration.zero,
+        scannedAt: DateTime(2026),
+      ),
+    ]);
+
+    final history = container
+        .read(musicSourcesControllerProvider)
+        .requireValue
+        .healthHistory['openverse'];
+    expect(history?.records, hasLength(1));
+    expect(history?.records.single.status, SourceScanStatus.success);
+    expect(history?.stabilityRate, 1.0);
+  });
+
   test('the scan history survives a controller rebuild', () async {
     final persistence = FakePersistenceService();
     final first = containerFor(persistence);

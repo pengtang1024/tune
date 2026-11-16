@@ -369,10 +369,18 @@ class LibraryController extends AsyncNotifier<LibraryState> {
 
       if (_disposed || generation != _scanGeneration) return;
 
-      final summaries = <String, SourceScanSummary>{
-        for (final result in results)
-          result.sourceId: SourceScanSummary.fromResult(result),
-      };
+      // A skipped result says "not due yet", not "returned nothing": it must
+      // not replace the last real outcome, or the page keeps reporting a
+      // problem and the health report keeps reading a mediocre scan forever.
+      final summaries = <String, SourceScanSummary>{};
+      for (final result in results) {
+        if (result.status == SourceScanStatus.skipped) {
+          final kept = _current.sourceSummaries[result.sourceId];
+          if (kept != null) summaries[result.sourceId] = kept;
+          continue;
+        }
+        summaries[result.sourceId] = SourceScanSummary.fromResult(result);
+      }
 
       // The scanned tracks travel to the database a window at a time; the
       // controller never holds more than one window of the library. A source
