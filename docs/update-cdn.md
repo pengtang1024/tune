@@ -42,6 +42,11 @@
 > 而同内容的 `@master/version.json` 仍是 200。
 > **所以清单地址固定在 `@master`，不再使用 `@latest`。**
 
+> **2026-11-16 复测**：仓库打包体积涨到 **54.5 MiB**，`@master/version.json`
+> 也返回同一条 `403 Package size exceeded the configured limit of 50 MB`
+> （`cache-control: max-age=60, s-maxage=60`）。**第一档从此不可用**，
+> 取数顺序改为 raw 优先（§4.1）；CDN 退回第二档，仅作为将来换镜像的位置。
+
 ### 1.2 响应头与缓存
 
 | 寻址方式 | Cache-Control | 说明 |
@@ -145,10 +150,16 @@
 ### 4.1 取数顺序
 
 ```text
-1. https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json
-2. https://raw.githubusercontent.com/pengtang1024/tune/master/version.json
+1. https://raw.githubusercontent.com/pengtang1024/tune/master/version.json
+2. https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json
 3. https://api.github.com/repos/.../releases/latest（现有逻辑，解析旧格式；有 token 挂 Bearer，没有就匿名）
 ```
+
+第一档换成 raw 是因为 **2026-11-16 起仓库打包体积 54.5 MiB，已越过 jsDelivr 的 50 MB
+包上限**：`@master/version.json` 也返回
+`403 Package size exceeded the configured limit of 50 MB`（§1.1 复测）。
+此前 CDN 排第一，是先花的这一趟注定得到 403 的请求；现在它退到第二档，
+仓库缩小或换镜像后仍可立刻复用，不必改代码。
 
 - 1 与 2 各给 3 s 连接 / 5 s 接收（清单只有几 KB，慢 CDN 不应拖住检查）。
 - 两份清单都拿到时**交叉核对**，按三种情形分别处置：
@@ -284,6 +295,7 @@
 | --- | --- | --- |
 | 中国大陆访问 jsDelivr / raw 不稳定 | 查不到更新，或首次失败 | 三档回退、失败静默、手动重试；必要时后续加国内镜像 |
 | jsDelivr 单文件 20 MB | 无（manifest 几 KB）；但别把模型塞进仓库 | 大文件继续走 release 资产 |
+| jsDelivr 包体积 50 MB | **已触发**（仓库 54.5 MiB）：`@master/version.json` 返回 403 | 取数顺序 raw 优先（§4.1）；CDN 只留作第二档 |
 | 分支 12 小时边缘缓存 | 发版后最长半天内老客户端查不到 | 发版脚本主动 purge + 发布自检 |
 | 仓库转私有 | jsDelivr 立即失效 | 保持 public；转私有需同时切回 API 或 Pages |
 | `version.json` 与真实资产不一致 | 下载校验失败 | 生成脚本内比对 + 发布自检 |

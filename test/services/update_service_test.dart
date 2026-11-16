@@ -473,10 +473,16 @@ void main() {
 
       expect(manifest?.version, '1.33.0');
       expect(lines, hasLength(2));
-      expect(lines.first, contains(_cdn));
-      expect(lines.first, contains('404'));
-      expect(lines.last, contains(_raw));
-      expect(lines.last, contains('命中 1.33.0+53'));
+      // One line per address, whichever order the addresses are tried in.
+      final byHost = {
+        for (final line in lines)
+          if (line.contains(_cdn))
+            _cdn: line
+          else if (line.contains(_raw))
+            _raw: line,
+      };
+      expect(byHost[_cdn], contains('404'));
+      expect(byHost[_raw], contains('命中 1.33.0+53'));
       expect(lines.last, contains('ms'));
     });
   });

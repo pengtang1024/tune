@@ -128,8 +128,13 @@ void main() {
     final secondSource = _source(Dio()..httpClientAdapter = second, root);
     final manifest = await secondSource.read();
 
-    expect(second.requests[0].headers['If-None-Match'], 'W/"cdn-1"');
-    expect(second.requests[1].headers['If-None-Match'], 'W/"raw-1"');
+    // Keyed by host: the order of the addresses is a policy, not a contract.
+    final validators = {
+      for (final request in second.requests)
+        request.uri.host: request.headers['If-None-Match'],
+    };
+    expect(validators[_cdn], 'W/"cdn-1"');
+    expect(validators[_raw], 'W/"raw-1"');
     // Both answered 304: the parsed lists from the file are the answer.
     expect(manifest?.version, '1.33.0');
   });
