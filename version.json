@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.34.3",
-  "build": 59,
-  "released_at": "2026-11-16T06:39:25Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.34.3",
-  "notes": "### 变更\n\n- 更新清单的取数顺序改为 **raw 优先、CDN 第二档**。仓库打包体积已涨到 54.5 MiB，\n  越过 jsDelivr 的 50 MB 包上限，`@master/version.json` 实测返回\n  `403 Package size exceeded the configured limit of 50 MB`——此前每轮检查都先花一趟\n  注定拿到 403 的请求。raw 不占 API 配额、没有包体积限制，因此排在前面；\n  CDN 留在列表里，仓库缩小或换镜像后可直接复用。\n\n### 文档与工程\n\n- `docs/update-cdn.md`：§1.1 补 2026-11-16 复测（`@master` 也已 403）、§4.1 改取数顺序并写明\n  理由、§9 风险表新增「jsDelivr 包体积 50 MB：已触发」一行；`docs/updates.md` 的数据源列表同步。\n- 两个取数相关用例改为按主机断言（`If-None-Match` 与日志行），不再钉死地址顺序——\n  顺序是策略不是契约，换顺序不该让用例红。",
+  "version": "1.35.0",
+  "build": 60,
+  "released_at": "2026-11-16T07:25:54Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.0",
+  "notes": "### 变更\n\n- **桌面播放后端改为直接对接 `media_kit` / libmpv**：此前隔着一层 `just_audio` +\n  `just_audio_media_kit`，底层播放器与属性设置都在私有字段里，缓存策略只能沿用\n  别人的默认值（media_kit 硬开 `cache-on-disk=yes`，而 mpv 0.41 的\n  `--demuxer-cache-dir` 默认空串，于是每开一个网络流就打印一条\n  `Failed to create file cache`，磁盘缓存一次也没建成）。现在缓存策略由\n  `MpvPolicy`（`lib/data/services/mpv_policy.dart`）声明、在初始化时逐条落到\n  mpv 上：只用内存缓存 8 MiB，磁盘缓存显式关闭。移动端仍走 `just_audio`，\n  两条实现共用同一个 `AudioPlayerService` 接口。\n- **音源命名归一化**（`lib/data/services/music_sources/track_naming.dart`）：上传者\n  常把同一份事实写两遍——专辑写成 `Edward ELGAR - Enigma Variations` 而艺术家空着、\n  标题写成 `Handel, Messiah - 103 …` 而艺术家列已有。现在在取数边界做一次归一化：\n  艺术家缺失时依次用条目的 `creator`、专辑里 `艺术家 - 作品` 的前半段补齐；专辑与\n  标题里重复的艺术家前缀去掉。只在能确认是同一个事实时才动手（前缀须与艺术家名对得上、\n  剩下的一半非空、纯编号不算艺术家）。已有曲目在下一次扫描对应实例时重写。\n\n### 文档与工程\n\n- `docs/source-extension.md` 新增 §6.5，写清四条归一化规则与生效时机；\n  `docs/troubleshooting.md` 的 `lavf: Failed to create file cache` 一节改为「已由\n  `MpvPolicy` 消除」的口径，保留系统 mpv 的复现命令作为这段历史的证据。\n- `tool/check.sh --tools` 的门禁照旧；新增 `test/services/mpv_policy_test.dart`、\n  `test/services/track_naming_test.dart`，Internet Archive 适配器补两条端到端用例\n  （拆专辑名、去标题重复前缀），另有一条 `media_kit_cache_live_test.dart` 走真实\n  libmpv 与网络，按 `live` 命名不进确定性门禁。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.34.3/tune-linux-x64-1.34.3.tar.gz",
-      "size": 53792507,
-      "sha256": "7168fb073a75cb53197a7351bd08a71f79258f753394bdca03a3a5c8b309725a"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.0/tune-linux-x64-1.35.0.tar.gz",
+      "size": 53672678,
+      "sha256": "a2f5ea780c778c5cc96e46bbcf1fdbe25c44a57050b86ad7b97ebc633d82c996"
     }
   }
 }

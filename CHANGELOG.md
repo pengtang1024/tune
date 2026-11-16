@@ -2,6 +2,35 @@
 
 本文件从「音源类型化」这次改动开始记。之前的变化跟着 git tag 走。
 
+## [1.35.0] - 2026-11-16
+
+### 变更
+
+- **桌面播放后端改为直接对接 `media_kit` / libmpv**：此前隔着一层 `just_audio` +
+  `just_audio_media_kit`，底层播放器与属性设置都在私有字段里，缓存策略只能沿用
+  别人的默认值（media_kit 硬开 `cache-on-disk=yes`，而 mpv 0.41 的
+  `--demuxer-cache-dir` 默认空串，于是每开一个网络流就打印一条
+  `Failed to create file cache`，磁盘缓存一次也没建成）。现在缓存策略由
+  `MpvPolicy`（`lib/data/services/mpv_policy.dart`）声明、在初始化时逐条落到
+  mpv 上：只用内存缓存 8 MiB，磁盘缓存显式关闭。移动端仍走 `just_audio`，
+  两条实现共用同一个 `AudioPlayerService` 接口。
+- **音源命名归一化**（`lib/data/services/music_sources/track_naming.dart`）：上传者
+  常把同一份事实写两遍——专辑写成 `Edward ELGAR - Enigma Variations` 而艺术家空着、
+  标题写成 `Handel, Messiah - 103 …` 而艺术家列已有。现在在取数边界做一次归一化：
+  艺术家缺失时依次用条目的 `creator`、专辑里 `艺术家 - 作品` 的前半段补齐；专辑与
+  标题里重复的艺术家前缀去掉。只在能确认是同一个事实时才动手（前缀须与艺术家名对得上、
+  剩下的一半非空、纯编号不算艺术家）。已有曲目在下一次扫描对应实例时重写。
+
+### 文档与工程
+
+- `docs/source-extension.md` 新增 §6.5，写清四条归一化规则与生效时机；
+  `docs/troubleshooting.md` 的 `lavf: Failed to create file cache` 一节改为「已由
+  `MpvPolicy` 消除」的口径，保留系统 mpv 的复现命令作为这段历史的证据。
+- `tool/check.sh --tools` 的门禁照旧；新增 `test/services/mpv_policy_test.dart`、
+  `test/services/track_naming_test.dart`，Internet Archive 适配器补两条端到端用例
+  （拆专辑名、去标题重复前缀），另有一条 `media_kit_cache_live_test.dart` 走真实
+  libmpv 与网络，按 `live` 命名不进确定性门禁。
+
 ## [1.34.3] - 2026-11-16
 
 ### 变更
