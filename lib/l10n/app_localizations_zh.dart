@@ -288,6 +288,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryViewAlbums => '专辑视图';
 
   @override
+  String get libraryViewShows => '节目';
+
+  @override
+  String get libraryViewBooks => '书';
+
+  @override
   String get libraryViewCollections => '合集视图';
 
   @override
@@ -4718,6 +4724,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryViewAlbums => '专辑视图';
 
   @override
+  String get libraryViewShows => '节目';
+
+  @override
+  String get libraryViewBooks => '书';
+
+  @override
   String get libraryViewCollections => '合集视图';
 
   @override
@@ -9146,6 +9158,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewAlbums => '專輯檢視';
+
+  @override
+  String get libraryViewShows => '節目';
+
+  @override
+  String get libraryViewBooks => '書';
 
   @override
   String get libraryViewCollections => '合集檢視';

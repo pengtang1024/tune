@@ -11,7 +11,7 @@
 
 Tune is a compact local and online music player built with Flutter. The shell has a navigation rail (discover, library, liked, sources, settings), a content area, and a player dock at the bottom; the play queue is a non-modal side panel opened from the dock or the now playing page, not a navigation destination; it dims the page content while the dock and sidebar stay usable.
 
-- **Current version**: `1.35.5+65` (codename `Pocket`, 2026-11-16). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
+- **Current version**: `1.36.0+67` (codename `Pocket`, 2026-11-16). Version and build number live in [pubspec.yaml](pubspec.yaml) and `lib/config/app_version.dart`; the published manifest is the root [version.json](version.json).
 - **Primary target**: Linux desktop. Windows / Android / iOS keep an engineering entry point; macOS and Web have been removed.
 - **Source and docs**: [AGENTS.md](AGENTS.md) is the documentation map; design notes live in [docs/](docs/), a code-structure tour in [wiki/](wiki/), and the requirements entry point is [需求/README.md](需求/README.md). When something does not work, start with [Troubleshooting](docs/troubleshooting.md).
 
@@ -44,7 +44,7 @@ The shots are rendered by `tool/layout_shots_test.dart` at 1280×800 from the re
 **Library**
 - Local music folder scanning (directory walk on Linux, MediaStore / SAF on Android), search, and SQLite persistence; the library is never loaded into memory, it is always a 1000-track window read from the database
 - A category drawer (genre / decade / artist / source / language / format / content kind), a faceted filter panel (content kind / status / genre / decade / artist / source / language / format / duration / short tracks / date added) with active chips; filtering happens in SQL
-- Five views: songs list / two-column / categories / albums / collections; a collection groups the rows by the reach they came from, opens as that reach's album wall, and can be emptied in one step. Sort, columns, and filters come back on the next start
+- Views follow the kind of content: music is an album wall plus songs / two-column / categories / collections, podcasts are shows plus episodes, audiobooks are books plus chapters, radio is just stations, sound effects are a flat list; switching kinds opens that kind's own default view. A collection groups the rows by where they came from, opens as that reach's album wall, and can be emptied in one step. Sort, columns, and filters come back on the next start
 - Browse by content kind (songs / albums / radio / spoken-word shows), with same-named spoken-word shows merged across sources
 - Filter by source; remote tracks show source and artwork; track rows mark format, quality, and bitrate with icons — hover to read them, open a track for all of its facts and its path
 

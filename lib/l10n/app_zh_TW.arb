@@ -160,6 +160,8 @@
   "libraryAddAllToQueue": "將整個清單加入佇列",
   "libraryViewSongs": "歌曲檢視",
   "libraryViewAlbums": "專輯檢視",
+  "libraryViewShows": "節目",
+  "libraryViewBooks": "書",
   "libraryViewCollections": "合集檢視",
   "libraryOpenCollection": "開啟合集",
   "libraryCollectionItems": "{items} 個條目 · {tracks} 首",

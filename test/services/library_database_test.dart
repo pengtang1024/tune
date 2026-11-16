@@ -1017,5 +1017,41 @@ void main() {
     addTearDown(database.close);
     expect(database.load().single.title, 'Vote on Tuesday');
   });
+
+  test('the queue reads the library copy of a track', () async {
+    final directory = await Directory.systemTemp.createTemp('tune-queue');
+    addTearDown(() => directory.delete(recursive: true));
+    final path = '${directory.path}/library.db';
+
+    var database = AppDatabase.open(path);
+    database.save([
+      const Song(
+        id: 9100,
+        uri: 'tune://librivox/after-01',
+        title: 'The Shade of Cardinal Richelieu.',
+        artist: 'Alexandre Dumas',
+        album: 'Twenty Years After',
+        duration: 240000,
+        sourceId: 'librivox',
+      ),
+    ]);
+    // 快照是播放当时的旧名字：库里的行在打开时被补齐过，队列不该把它盖回去。
+    database.saveQueue([
+      const Song(
+        id: 9100,
+        uri: 'tune://librivox/after-01',
+        title: '01 - The Shade of Cardinal Richelieu.',
+        artist: 'Alexandre Dumas',
+        album: 'Twenty Years After',
+        duration: 240000,
+        sourceId: 'librivox',
+      ),
+    ]);
+    database.close();
+
+    database = AppDatabase.open(path);
+    addTearDown(database.close);
+    expect(database.loadQueue().single.title, 'The Shade of Cardinal Richelieu.');
+  });
 });
 }

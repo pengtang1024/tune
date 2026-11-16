@@ -26,6 +26,7 @@ import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_category_tree.dart';
 import 'package:tune/features/library/presentation/library_category_view.dart';
 import 'package:tune/features/library/presentation/library_collections_view.dart';
+import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_filter_chips.dart';
 import 'package:tune/features/library/presentation/library_filter_panel.dart';
@@ -220,6 +221,8 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     final selectedKind = library.filter.kinds.length == 1
         ? library.filter.kinds.first
         : null;
+    // 一类内容有自己的读法：播客是节目 + 单集，电台没有专辑墙，音效只有平铺。
+    final layout = libraryLayoutForKinds(library.filter.kinds);
 
     final content = Column(
       children: [
@@ -280,6 +283,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
               sort: library.sort,
               filter: library.filter,
               view: _view,
+              layout: layout,
               onQueryChanged: (value) {
                 ref.read(libraryControllerProvider.notifier).setQuery(value);
               },
@@ -773,6 +777,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     });
   }
 
+  /// 分类变了就换读法：每种内容有自己的默认视图。
+  /// 「电台」没有专辑墙，停在那里只会是空的；「播客」进来就该看到节目，
+  /// 而不是一个混着单集的平铺列表。
+  void _applyLayoutForKind(ContentKind? kind) {
+    final layout = libraryLayoutFor(kind ?? ContentKind.music);
+    _view = layout.primary;
+    _openAlbum = null;
+  }
+
   void _showAllSongs() {
     setState(() => _view = LibraryViewMode.songs);
     ref
@@ -878,7 +891,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   void _selectKind(ContentKind kind) {
     final filter = ref.read(libraryControllerProvider).requireValue.filter;
     setState(() {
-      _view = LibraryViewMode.songs;
+      _applyLayoutForKind(kind);
       _openAlbum = null;
     });
     ref

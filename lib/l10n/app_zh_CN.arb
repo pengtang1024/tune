@@ -160,6 +160,8 @@
   "libraryAddAllToQueue": "将整个列表加入队列",
   "libraryViewSongs": "歌曲视图",
   "libraryViewAlbums": "专辑视图",
+  "libraryViewShows": "节目",
+  "libraryViewBooks": "书",
   "libraryViewCollections": "合集视图",
   "libraryOpenCollection": "打开合集",
   "libraryCollectionItems": "{items} 个条目 · {tracks} 首",

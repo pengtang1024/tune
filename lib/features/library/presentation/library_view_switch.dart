@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
-/// The two ways to read the library: as songs or as albums.
+/// The ways to read the library that this kind of content offers.
 ///
 /// The switch sits next to the title of the page because it changes what
 /// the page is, not what the search finds. A reader who is looking for one
 /// track keeps the table; a reader who is browsing keeps the covers.
+///
+/// 哪几档出现由内容的分类决定（`library_layout.dart`）：播客只有「节目 / 单集」，
+/// 电台没有专辑墙，音效只有平铺列表——把不属于这一类的按钮摆出来，读者要自己
+/// 试一遍才知道哪个没用。
 class LibraryViewSwitch extends StatelessWidget {
   final LibraryViewMode view;
+  final List<LibraryViewMode> views;
+  final LibraryGroupingLabel? groupingLabel;
   final ValueChanged<LibraryViewMode> onChanged;
 
   const LibraryViewSwitch({
     super.key,
     required this.view,
+    this.views = LibraryViewMode.values,
+    this.groupingLabel,
     required this.onChanged,
   });
 
@@ -34,41 +43,44 @@ class LibraryViewSwitch extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _ViewButton(
-            icon: Icons.view_list_rounded,
-            tooltip: context.loc.libraryViewSongs,
-            selected: view == LibraryViewMode.songs,
-            onPressed: () => onChanged(LibraryViewMode.songs),
-          ),
-          _ViewButton(
-            icon: Icons.view_column_rounded,
-            tooltip: context.loc.libraryViewColumns,
-            selected: view == LibraryViewMode.columns,
-            onPressed: () => onChanged(LibraryViewMode.columns),
-          ),
-          _ViewButton(
-            icon: Icons.category_rounded,
-            tooltip: context.loc.libraryViewCategories,
-            selected: view == LibraryViewMode.categories,
-            onPressed: () => onChanged(LibraryViewMode.categories),
-          ),
-          _ViewButton(
-            icon: Icons.grid_view_rounded,
-            tooltip: context.loc.libraryViewAlbums,
-            selected: view == LibraryViewMode.albums,
-            onPressed: () => onChanged(LibraryViewMode.albums),
-          ),
-          _ViewButton(
-            icon: Icons.collections_bookmark_rounded,
-            tooltip: context.loc.libraryViewCollections,
-            selected: view == LibraryViewMode.collections,
-            onPressed: () => onChanged(LibraryViewMode.collections),
-          ),
+          for (final option in views)
+            _ViewButton(
+              icon: _iconOf(option),
+              tooltip: _labelOf(context, option, groupingLabel),
+              selected: view == option,
+              onPressed: () => onChanged(option),
+            ),
         ],
       ),
     );
   }
 }
+
+/// 一档视图的图标与名字；「专辑」这一档随内容分类换成「节目」「书」。
+IconData _iconOf(LibraryViewMode mode) => switch (mode) {
+  LibraryViewMode.songs => Icons.view_list_rounded,
+  LibraryViewMode.columns => Icons.view_column_rounded,
+  LibraryViewMode.categories => Icons.category_rounded,
+  LibraryViewMode.albums => Icons.grid_view_rounded,
+  LibraryViewMode.collections => Icons.collections_bookmark_rounded,
+};
+
+String _labelOf(
+  BuildContext context,
+  LibraryViewMode mode,
+  LibraryGroupingLabel? groupingLabel,
+) =>
+    switch (mode) {
+      LibraryViewMode.songs => context.loc.libraryViewSongs,
+      LibraryViewMode.columns => context.loc.libraryViewColumns,
+      LibraryViewMode.categories => context.loc.libraryViewCategories,
+      LibraryViewMode.albums => switch (groupingLabel) {
+        LibraryGroupingLabel.show => context.loc.libraryViewShows,
+        LibraryGroupingLabel.book => context.loc.libraryViewBooks,
+        _ => context.loc.libraryViewAlbums,
+      },
+      LibraryViewMode.collections => context.loc.libraryViewCollections,
+    };
 
 class _ViewButton extends StatelessWidget {
   final IconData icon;

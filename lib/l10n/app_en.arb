@@ -160,6 +160,8 @@
   "libraryAddAllToQueue": "Add the whole list to the queue",
   "libraryViewSongs": "Songs view",
   "libraryViewAlbums": "Albums view",
+  "libraryViewShows": "Shows",
+  "libraryViewBooks": "Books",
   "libraryViewCollections": "Collections view",
   "libraryOpenCollection": "Open collection",
   "libraryCollectionItems": "{items, plural, =1{1 item} other{{items} items}} · {tracks, plural, =1{1 track} other{{tracks} tracks}}",
