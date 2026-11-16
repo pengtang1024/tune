@@ -544,47 +544,11 @@ abstract class AppLocalizations {
   /// **'将整个列表加入队列'**
   String get libraryAddAllToQueue;
 
-  /// No description provided for @libraryViewSongs.
+  /// No description provided for @libraryBackToGroups.
   ///
   /// In zh_CN, this message translates to:
-  /// **'歌曲视图'**
-  String get libraryViewSongs;
-
-  /// No description provided for @libraryViewAlbums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'专辑视图'**
-  String get libraryViewAlbums;
-
-  /// No description provided for @libraryViewShows.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'节目'**
-  String get libraryViewShows;
-
-  /// No description provided for @libraryViewBooks.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'书'**
-  String get libraryViewBooks;
-
-  /// No description provided for @libraryViewCollections.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'合集视图'**
-  String get libraryViewCollections;
-
-  /// No description provided for @libraryOpenCollection.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'打开合集'**
-  String get libraryOpenCollection;
-
-  /// No description provided for @libraryCollectionItems.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'{items} 个条目 · {tracks} 首'**
-  String libraryCollectionItems(int items, int tracks);
+  /// **'返回'**
+  String get libraryBackToGroups;
 
   /// No description provided for @libraryOpenAlbum.
   ///
@@ -603,12 +567,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'多位艺术家'**
   String get libraryVariousArtists;
-
-  /// No description provided for @libraryBackToAlbums.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'返回专辑'**
-  String get libraryBackToAlbums;
 
   /// No description provided for @queueTitle.
   ///
@@ -6869,12 +6827,6 @@ abstract class AppLocalizations {
   /// **'更多操作'**
   String get libraryMoreActions;
 
-  /// No description provided for @libraryViewColumns.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'双列视图'**
-  String get libraryViewColumns;
-
   /// No description provided for @libraryFilter.
   ///
   /// In zh_CN, this message translates to:
@@ -7042,12 +6994,6 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'更早'**
   String get libraryFilterAddedOlder;
-
-  /// No description provided for @libraryViewCategories.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'分类视图'**
-  String get libraryViewCategories;
 
   /// No description provided for @libraryAllSongs.
   ///

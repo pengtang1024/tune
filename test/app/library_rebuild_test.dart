@@ -10,8 +10,6 @@ import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/shared/ui/hint_layer.dart';
-import 'package:tune/features/library/application/library_initial_view_provider.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 
 import 'fake_audio_player_service.dart';
 
@@ -54,8 +52,6 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          // 这些用例断言的是平铺列表，直接从列表打开。
-          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(() => library),
         ],

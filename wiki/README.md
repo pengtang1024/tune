@@ -8,7 +8,7 @@
 
 ## 项目概述
 
-**Tune** 是一款紧凑的本地与在线音乐播放器，当前版本 `1.42.1+83`（`Pocket`，2026-11-16）。
+**Tune** 是一款紧凑的本地与在线音乐播放器，当前版本 `1.43.0+84`（`Pocket`，2026-11-16）。
 
 - **技术栈**：Flutter 3 / Dart 3.8+ · Riverpod 2（StateNotifier/AsyncNotifier）· go_router · just_audio（Linux / Windows 都走 just_audio_media_kit + media_kit_libs_* + 系统 libmpv）· dio · SQLite（sqlite3 + sqlite3_flutter_libs）· gen-l10n；另有 audio_service、permission_handler、sherpa_onnx（Android 后台播放 / 运行时权限 / 本地 ASR）
 - **壳层形态**：左侧导航（发现 / 音乐库 / 喜欢 / 音源 / 设置）+ 右侧内容区 + 底部播放条；播放队列是从底栏或正在播放页打开的**非模态侧栏**，不注册路由

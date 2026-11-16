@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.42.1",
-  "build": 83,
-  "released_at": "2026-11-16T14:38:48Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.42.1",
-  "notes": "- 窄页头（页宽 < 800）：页头只说这一页是什么和当前列表有几行，标题后面跟着计数与搜索、⋯ 两颗图标；搜索行点开才出现，专辑墙与在线搜索搬进 ⋯，筛选/排序/视图留在工具条一行里\n- 封面墙在窄页固定三列：四列会把封面压到 110px，专辑名全被截断\n- 计数单位与宽窗口共用一处（`libraryCountLabel`），宽窄两种页头只换位置不换口径",
+  "version": "1.43.0",
+  "build": 84,
+  "released_at": "2026-11-16T15:17:36Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.43.0",
+  "notes": "### 新增\n\n- **列表里一行一专辑**：音乐库打开就是一张专辑一行（封面、专辑名、艺术家、`N 首`），点这一行\n  进入它的曲目，列表首行是「← 返回」。播客按节目、有声书按书，计数换成 `N 集` / `N 章`；\n  电台与音效不分组，直接是台与音效的列表。\n\n### 移除\n\n- **视图开关那一排图标（列表 / 双列 / 专辑 / 合集）与页头的「专辑视图」按钮**都删掉了。它们\n  只是切换同一份数据的呈现方式，读者得先记住哪个图标是哪个模式；现在呈现由内容分类决定，\n  路径只有一条：组行 → 曲目 → 返回。分类视图、双列视图、合集视图与封面墙随按钮一起移除——\n  它们原本只能从那排按钮进入。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.42.1/tune-linux-x64-1.42.1.tar.gz",
-      "size": 53627109,
-      "sha256": "7b20c5ebc915b79655599ea3f5f47d5393f5f0d3d5a331c27362f3c8c3290729"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.43.0/tune-linux-x64-1.43.0.tar.gz",
+      "size": 53595101,
+      "sha256": "fed59feba8377b48a793c783875f1ae70ce0ca93f9f9ecc8e36efd3d805a7475"
     }
   }
 }

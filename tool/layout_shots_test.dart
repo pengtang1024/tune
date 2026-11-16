@@ -20,13 +20,13 @@ import 'package:tune/data/services/providers/audio_player_service_provider.dart'
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/source_scan_result.dart';
 import 'package:tune/domain/models/album_summary.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/features/discovery/presentation/discovery_pane.dart';
 import 'package:tune/features/favorites/presentation/favorites_pane.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
-import 'package:tune/features/library/presentation/library_view_switch.dart';
 import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/domain/models/lyrics_document.dart';
@@ -133,22 +133,8 @@ Future<void> _loadFonts() async {
   }
 }
 
-/// 窄窗口里视图开关收成一颗菜单，宽的才是一排按钮；两种都点得到同一个档位。
-Future<void> _switchView(WidgetTester tester, IconData icon) async {
-  final inSwitch = find.descendant(
-    of: find.byType(LibraryViewSwitch),
-    matching: find.byIcon(icon),
-  );
-  if (inSwitch.evaluate().isNotEmpty) {
-    await tester.tap(inSwitch);
-  } else {
-    await tester.tap(find.byKey(const ValueKey('library-view-menu')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(icon).last);
-  }
-  await tester.pumpAndSettle();
-}
 
+/// 窄窗口里视图开关收成一颗菜单，宽的才是一排按钮；两种都点得到同一个档位。
 Future<void> _shot(WidgetTester tester, String name) async {
   // The first pump builds whatever was just pushed, the second one lets the
   // animation of a sheet settle.
@@ -241,6 +227,9 @@ void main() {
           LibraryState(
             songs: _songs,
             albums: _albumSummaries(),
+            total: 4,
+            matching: 4,
+            filter: LibraryFilter.songs,
             statusMessage: '4 首歌曲',
           ),
         ),
@@ -253,25 +242,12 @@ void main() {
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
       ),
     );
+    // The rows name the groups; the tracks of a group are one click away.
     await _shot(tester, 'library$suffix');
-
-    // The collections view groups the rows by the reach they came from, so a
-    // 5000-row library reads as twenty shelves instead of one wall.
-    await _switchView(tester, Icons.collections_bookmark_rounded);
-    await _shot(tester, 'library_collections$suffix');
-    await _switchView(tester, Icons.view_list_rounded);
-
-    // The albums view is the browsing side of the library; the songs view
-    // stays one click away. The tap is scoped to the switch: once the library
-    // has albums the header grows its own grid icon, and an unscoped finder
-    // matches both.
-    await _switchView(tester, Icons.grid_view_rounded);
-    await _shot(tester, 'library_albums$suffix');
     await tester.tap(find.text('Nocturnes'));
-    await _shot(tester, 'library_album$suffix');
-    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
-    await _switchView(tester, Icons.view_list_rounded);
+    await _shot(tester, 'library_group_tracks$suffix');
+    await tester.tap(find.byKey(const ValueKey('library-group-back')));
     await tester.pumpAndSettle();
 
     // The queue is a panel over the library now. The library itself is the
@@ -389,6 +365,8 @@ void main() {
           LibraryState(
             songs: _songs,
             albums: _albumSummaries(),
+            total: 4,
+            matching: 4,
             statusMessage: '4 首歌曲',
           ),
         ),
@@ -427,6 +405,8 @@ void main() {
           LibraryState(
             songs: _songs,
             albums: _albumSummaries(),
+            total: 4,
+            matching: 4,
             statusMessage: '4 首歌曲',
           ),
         ),

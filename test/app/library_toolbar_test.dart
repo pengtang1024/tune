@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
-import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
-import 'package:tune/features/library/domain/library_layout.dart';
 import 'package:tune/features/library/presentation/library_toolbar.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 import 'package:tune/l10n/app_localizations.dart';
 
 /// The toolbar never hides a rule silently: a list that leaves dirty rows out
@@ -41,13 +38,10 @@ void main() {
       sourceFilter: null,
       sort: LibrarySort.title,
       filter: filter,
-      view: LibraryViewMode.values.first,
-      layout: libraryLayoutFor(ContentKind.music),
       onQueryChanged: (_) {},
       onClearQuery: () {},
       onSourceFilter: (_) {},
       onSort: (_) {},
-      onViewChanged: (_) {},
       onFilter: () {},
       onShowMissingDuration: onShow ?? () {},
       compact: compact,
@@ -86,7 +80,7 @@ void main() {
 
     expect(find.byType(TextField), findsNothing);
     expect(find.text('10 首'), findsNothing);
-    // 这一行留的是改读法的那几颗：筛选、排序、视图。
+    // 这一行留的是改列表内容的那几颗：筛选、排序、搜索。
     expect(find.byKey(const ValueKey('library-filter')), findsOneWidget);
   });
 

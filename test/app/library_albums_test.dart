@@ -4,23 +4,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
-import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
 import 'package:tune/providers/persistence_providers.dart';
-import 'package:tune/shared/ui/meta_badge.dart';
-import 'package:tune/features/library/application/library_initial_view_provider.dart';
-import 'package:tune/features/library/presentation/library_view_mode.dart';
 import '../services/fake_default_player_service.dart';
 import '../services/fake_persistence.dart';
 
 import 'compact_layout_test.dart' show FakeLibraryController;
 import 'fake_audio_player_service.dart';
 
+/// A library of one kind is read in two levels: rows that name a group, and
+/// the tracks of the row the reader opened. Opening is a click on the row;
+/// going back is the first row of the list, not a button in the heading.
 void main() {
   const songs = [
     Song(
@@ -52,24 +53,66 @@ void main() {
     ),
   ];
 
+  /// Episodes of one show, as a podcast source writes them.
+  const episodes = [
+    Song(
+      id: 11,
+      title: 'Episode 1',
+      album: 'The Show',
+      sourceId: 'podcast_rss-1',
+      duration: 1800000,
+      uri: 'tune://podcast/1',
+    ),
+    Song(
+      id: 12,
+      title: 'Episode 2',
+      album: 'The Show',
+      sourceId: 'podcast_rss-1',
+      duration: 1800000,
+      uri: 'tune://podcast/2',
+    ),
+  ];
+
+  /// Chapters of one book, as an audiobook source writes them.
+  const chapters = [
+    Song(
+      id: 21,
+      title: 'Chapter 1',
+      album: 'The Book',
+      sourceId: 'librivox',
+      duration: 600000,
+      uri: 'tune://librivox/1',
+    ),
+    Song(
+      id: 22,
+      title: 'Chapter 2',
+      album: 'The Book',
+      sourceId: 'librivox',
+      duration: 600000,
+      uri: 'tune://librivox/2',
+    ),
+  ];
+
   Widget app({
     required Widget home,
     List<Song> librarySongs = songs,
+    LibraryFilter filter = LibraryFilter.songs,
     FakeLibraryController Function(LibraryState state)? controller,
-    LibraryViewMode? initialView,
   }) {
     return ProviderScope(
       overrides: [
-        if (initialView != null)
-          libraryInitialViewProvider.overrideWithValue(initialView),
         persistenceServiceProvider.overrideWithValue(FakePersistenceService()),
         defaultPlayerServiceProvider.overrideWithValue(
           FakeDefaultPlayerService(),
         ),
         audioPlayerServiceProvider.overrideWithValue(FakeAudioPlayerService()),
         libraryControllerProvider.overrideWith(
-          () => controller?.call(LibraryState(songs: librarySongs)) ??
-              FakeLibraryController(LibraryState(songs: librarySongs)),
+          () => controller?.call(
+                LibraryState(songs: librarySongs, filter: filter),
+              ) ??
+              FakeLibraryController(
+                LibraryState(songs: librarySongs, filter: filter),
+              ),
         ),
       ],
       child: MaterialApp(
@@ -82,13 +125,15 @@ void main() {
     );
   }
 
-  testWidgets('the library opens on the album wall, one card per album', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(900, 563);
+  void sizeOf(WidgetTester tester, Size size) {
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
+  testWidgets('the library opens on one row per album', (tester) async {
+    sizeOf(tester, const Size(900, 563));
 
     await tester.pumpWidget(
       app(
@@ -97,18 +142,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 一首曲子一行是「五条同样的信息」；一张专辑一张卡才是一条信息。
+    // 一首曲子一行是「五条同样的信息」；一张专辑一行才是一条信息。
     expect(find.text('Album A'), findsOneWidget);
     expect(find.text('Album B'), findsOneWidget);
+    expect(find.text('Artist A'), findsOneWidget);
+    expect(find.text('2 首'), findsOneWidget);
+    expect(find.text('1 首'), findsOneWidget);
     expect(find.text('Album A first'), findsNothing);
     expect(find.text('Album A second'), findsNothing);
   });
 
-  testWidgets('the library opens an album from the cover grid', (tester) async {
-    tester.view.physicalSize = const Size(900, 563);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('a group row opens the tracks, the first row leads back', (
+    tester,
+  ) async {
+    sizeOf(tester, const Size(900, 563));
 
     await tester.pumpWidget(
       app(
@@ -116,10 +163,6 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-
-    expect(find.text('Album A'), findsOneWidget);
-    expect(find.text('Album B'), findsOneWidget);
-    expect(find.text('Album A first'), findsNothing);
 
     await tester.tap(find.text('Album A'));
     await tester.pumpAndSettle();
@@ -127,8 +170,9 @@ void main() {
     expect(find.text('Album A first'), findsOneWidget);
     expect(find.text('Album A second'), findsOneWidget);
     expect(find.text('Album B first'), findsNothing);
+    expect(find.byKey(const ValueKey('library-group-back')), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+    await tester.tap(find.byKey(const ValueKey('library-group-back')));
     await tester.pumpAndSettle();
 
     expect(find.text('Album B'), findsOneWidget);
@@ -136,125 +180,47 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the album of the playing track carries the playback mark', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(900, 563);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('each kind counts its own unit', (tester) async {
+    sizeOf(tester, const Size(900, 563));
 
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-      ),
-    );
+    Future<void> pumpKind(
+      List<Song> librarySongs,
+      ContentKind kind,
+      String count,
+    ) async {
+      await tester.pumpWidget(
+        app(
+          home: const CompactShell(
+            currentPath: '/library',
+            child: LibraryPane(),
+          ),
+          librarySongs: librarySongs,
+          filter: LibraryFilter(kinds: {kind}),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(count), findsOneWidget);
+    }
+
+    await pumpKind(episodes, ContentKind.podcast, '2 集');
+    // 一个 ProviderScope 的 override 不能换掉它已经建好的控制器：
+    // 拆掉作用域再挂下一类，否则第二页读的还是上一页的库。
+    await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
-
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(LibraryPane)),
-    );
-    await container
-        .read(playbackControllerProvider.notifier)
-        .playQueue([songs.first]);
-    await tester.pumpAndSettle();
-
-    expect(
-      find.byKey(const ValueKey<String>('dock-more')),
-      findsOneWidget,
-    );
+    await pumpKind(chapters, ContentKind.audiobook, '2 章');
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('one kind of album needs no section header', (tester) async {
-    tester.view.physicalSize = const Size(900, 563);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('音乐 · '), findsNothing);
-    expect(find.text('Album A'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('songs, shows and books stand in three sections', (
+  testWidgets('an album the list cannot read keeps the rows on screen', (
     tester,
   ) async {
-    const mixed = [
-      Song(
-        id: 1,
-        title: 'Song',
-        artist: 'Artist',
-        album: 'Record',
-        duration: 1000,
-        uri: '/music/1.mp3',
-      ),
-      Song(
-        id: 2,
-        title: 'Episode 1',
-        album: 'The Show',
-        sourceId: 'podcast_rss-1',
-        uri: 'tune://podcast/1',
-      ),
-      Song(
-        id: 3,
-        title: 'Episode 2',
-        album: 'The Show',
-        sourceId: 'podcast_rss-1',
-        uri: 'tune://podcast/2',
-      ),
-      Song(
-        id: 4,
-        title: 'Chapter 1',
-        album: 'The Book',
-        sourceId: 'librivox',
-        uri: 'tune://librivox/1',
-      ),
-    ];
-    tester.view.physicalSize = const Size(900, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
-        librarySongs: mixed,
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('音乐 · 1'), findsOneWidget);
-    expect(find.text('播客 · 1'), findsOneWidget);
-    expect(find.text('有声书 · 1'), findsOneWidget);
-    expect(find.text('1 首'), findsOneWidget);
-    expect(find.text('2 集'), findsOneWidget);
-    expect(find.text('1 章'), findsOneWidget);
-    expect(find.byType(MetaBadge), findsNWidgets(2));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('an album the list cannot read keeps the songs on screen', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1120, 760);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+    sizeOf(tester, const Size(1120, 760));
 
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         controller: _EmptyAlbumController.new,
-        // 断言的是列表里点专辑名不跳走，所以从列表打开。
-        initialView: LibraryViewMode.songs,
       ),
     );
     await tester.pumpAndSettle();
@@ -262,14 +228,15 @@ void main() {
     await tester.tap(find.text('Album A').first);
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.arrow_back_rounded), findsNothing);
-    expect(find.text('Album A first'), findsOneWidget);
+    expect(find.byKey(const ValueKey('library-group-back')), findsNothing);
+    expect(find.text('Album A'), findsOneWidget);
+    expect(find.text('Album B'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
 
-/// A library whose album cards hold no tracks: the column still names the
-/// album, but opening it would show a page with nothing on it.
+/// A library whose album rows hold no tracks: the row still names the album,
+/// but opening it would show a page with nothing on it.
 class _EmptyAlbumController extends FakeLibraryController {
   _EmptyAlbumController(super.seed);
 
