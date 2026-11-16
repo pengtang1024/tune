@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.38.0",
-  "build": 72,
-  "released_at": "2026-11-16T11:39:17Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.38.0",
-  "notes": "### 新增\n\n- **分栏视图成为音乐的默认读法**：左列是分组（专辑 / 节目 / 书），右列是这一组的曲目，\n  两列同时在场。1.36.1 把默认从平铺改成封面墙，虽然一张专辑不再散成十几行，但曲目被藏到\n  了另一页——「多种列表」变成了「一次只看一种」。现在两者同屏：点左边换右边，「全部」回到\n  整库，窄窗口里左列自动收窄，视图开关在内容区不到 760 时收成一颗菜单。\n\n### 变更\n\n- **播客与有声书的开关**各多一档「分栏」，仍是只保留这类内容说得通的档位。\n- **工具栏断点**：内容区宽度不到 760 时视图开关收成菜单，避免英文标签在这条单行里溢出。",
+  "version": "1.38.1",
+  "build": 73,
+  "released_at": "2026-11-16T11:56:41Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.38.1",
+  "notes": "### 修复\n\n- **页头的内容分类菜单撤掉**：这个「音乐 ▾」按钮和筛选面板的「类型」组写的是同一个\n  `filter.kinds`，等于把一条筛选摆在两个地方，读者不知道该点哪个。现在内容类型只在\n  筛选面板里改，页头只留按类型换的计数单位与视图开关。\n- 分类在筛选面板里改完之后，视图会回到这一类自己的默认读法（以前只有点页头菜单才会切）。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.38.0/tune-linux-x64-1.38.0.tar.gz",
-      "size": 53593809,
-      "sha256": "2433e38eae5241041eb69101211a4b7feccdcd9298cfb4c7255c126d5aeb09ce"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.38.1/tune-linux-x64-1.38.1.tar.gz",
+      "size": 53590827,
+      "sha256": "282386f93730d42d259be87adb1a3c443662a7a88efa0fce425432decbea2450"
     }
   }
 }
