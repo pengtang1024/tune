@@ -1905,7 +1905,7 @@
   "settingsPresetQuitHint": "关窗口就停止播放",
   "settingsSearchKeywordsAppearance": "主题 语言 深色 浅色 theme language",
   "settingsSearchKeywordsLibrary": "扫描 文件夹 缓存 音乐库 scan folder cache",
-  "settingsSearchKeywordsPlayback": "队列 双击 收藏 播放 queue click favorite",
+  "settingsSearchKeywordsPlayback": "队列 双击 收藏 播放 均衡器 等化器 eq equalizer queue click",
   "settingsSearchKeywordsLyrics": "歌词 补齐 查漏 标记 lyrics fill",
   "settingsSearchKeywordsDiscovery": "推荐 历史 发现 discover history",
   "settingsSearchKeywordsDesktop": "托盘 媒体控制 默认播放器 desktop tray media",
@@ -2149,5 +2149,38 @@
   "settingsPermissionNeeded": "扫描前需要允许媒体读取权限。",
   "settingsPermissionDialogTitle": "需要权限",
   "settingsPermissionDialogBody": "媒体读取权限已被拒绝。请到系统设置里允许后再扫描。",
-  "settingsSearchKeywordsPermissions": "权限 通知 媒体 存储 android 允许"
+  "settingsSearchKeywordsPermissions": "权限 通知 媒体 存储 android 允许",
+  "equalizerTitle": "均衡器",
+  "equalizerEnable": "启用均衡器",
+  "equalizerPresetFlat": "平坦",
+  "equalizerPresetPop": "流行",
+  "equalizerPresetRock": "摇滚",
+  "equalizerPresetJazz": "爵士",
+  "equalizerPresetClassical": "古典",
+  "equalizerPresetBass": "重低音",
+  "equalizerPresetVocal": "人声",
+  "equalizerPresetElectronic": "电子",
+  "equalizerCustom": "自定义",
+  "equalizerReset": "重置",
+  "equalizerHint": "提升的频段会用等量预放抵消，避免削波",
+  "equalizerGainDb": "{value} dB",
+  "@equalizerGainDb": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerFrequencyHz": "{frequency} Hz",
+  "@equalizerFrequencyHz": {
+    "placeholders": {
+      "frequency": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerUnavailable": "这个平台的播放后端不支持均衡器",
+  "settingsEqualizerAction": "均衡器",
+  "settingsEqualizerActionHint": "打开面板选择预设并拖动十个频段",
+  "playerEqualizer": "均衡器"
 }

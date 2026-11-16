@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:media_kit/media_kit.dart';
 import 'package:tune/core/l10n/app_strings.dart';
+import 'package:tune/data/services/audio_equalizer_backend.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/audio_source_address.dart';
+import 'package:tune/data/services/impl/mpv_equalizer_filter.dart';
 import 'package:tune/data/services/mpv_policy.dart';
+import 'package:tune/domain/models/equalizer_settings.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/utils/logger.dart';
 
@@ -21,13 +24,39 @@ import 'package:tune/utils/logger.dart';
 ///
 /// 移动端仍用 `just_audio`（[JustAudioPlayerService]）：那里需要的是平台自带的
 /// 音频焦点与 audio_service 的会话集成，media_kit 在 Android 上要接的东西更多。
-class MediaKitAudioPlayerService implements AudioPlayerService {
+class MediaKitAudioPlayerService
+    implements AudioPlayerService, AudioEqualizerBackend {
   MediaKitAudioPlayerService({this.policy = const MpvPolicy()});
 
   /// 缓存策略。默认只留内存缓存，理由见 [MpvPolicy] 的说明。
   final MpvPolicy policy;
 
   Player? _player;
+
+  /// 两次 af 写入之间的最小间隔。
+  ///
+  /// 拖动 slider 时每帧都会算出新曲线，全写下去等于每 16ms 一次属性写入；
+  /// 压到 100ms 后最后一次值仍然落下（见 [_flushEqualizer] 的串行循环），听感
+  /// 上分辨不出，mpv 侧少掉大量无谓的滤波器重建。
+  static const Duration _equalizerWriteInterval = Duration(milliseconds: 100);
+
+  /// 均衡器是否探测通过（libmpv 带 ffmpeg 滤波器）。
+  bool _equalizerAvailable = false;
+
+  /// 探测只做一次：每次启动设一遍属性就够了，不必每个播放都试。
+  bool _equalizerProbed = false;
+
+  /// 最近一次交给后端的曲线，播放器重建后据此恢复。
+  EqualizerSettings? _equalizerSettings;
+
+  /// 待写入的 `af` 值；null 表示没有待写，空串表示清空滤镜图。
+  String? _pendingEqualizerChain;
+
+  /// 合并 100ms 内的连续拖动：mpv 只收到最后一次。
+  Timer? _equalizerTimer;
+
+  /// 串行化写入：上一次 setProperty 还没回来时不再并发写同一个属性。
+  bool _writingEqualizer = false;
 
   /// 广播控制器：把 mpv 的错误事件转成应用层错误。
   ///
@@ -53,6 +82,7 @@ class MediaKitAudioPlayerService implements AudioPlayerService {
       );
       _player = player;
       await _applyPolicy(player);
+      await _probeEqualizer(player);
       _listenForErrors(player);
       Log.debug('音频播放后端已就绪 (media_kit / libmpv)');
     } catch (e, stackTrace) {
@@ -79,6 +109,93 @@ class MediaKitAudioPlayerService implements AudioPlayerService {
       '已应用 mpv 缓存策略: 内存 ${policy.bufferBytes ~/ (1024 * 1024)} MiB，'
       '磁盘缓存${policy.usesDiskCache ? '开（${policy.diskCacheDirectory}）' : '关'}',
     );
+  }
+
+  @override
+  AudioEqualizerBackend? get equalizer => this;
+
+  @override
+  bool get isAvailable => _equalizerAvailable;
+
+  @override
+  Future<void> apply(EqualizerSettings settings) async {
+    _equalizerSettings = settings;
+    if (!_equalizerAvailable) return;
+    // 生成新的 `af` 值，等 [_flushEqualizer] 落盘；空串代表清空滤镜图。
+    _pendingEqualizerChain = MpvEqualizerFilter.build(settings) ?? '';
+    _scheduleEqualizerWrite();
+  }
+
+  @override
+  Future<void> clear() async {
+    _equalizerSettings = null;
+    if (!_equalizerAvailable) return;
+    _pendingEqualizerChain = '';
+    _scheduleEqualizerWrite();
+  }
+
+  /// 确认这台机器的 libmpv 能跑均衡器滤镜。
+  ///
+  /// 探测用的图是 `volume=0dB`：它不需要滤波器插件，也能证明 lavfi 图被
+  /// 接受。失败只记一行 debug，界面据此不画入口，声音照常播放。
+  Future<void> _probeEqualizer(Player player) async {
+    if (_equalizerProbed) return;
+    _equalizerProbed = true;
+    final native = player.platform;
+    if (native is! NativePlayer) {
+      _equalizerAvailable = false;
+      return;
+    }
+    try {
+      await native.setProperty('af', 'lavfi=[volume=0dB]');
+      await native.setProperty('af', '');
+      _equalizerAvailable = true;
+      Log.debug('均衡器可用（libmpv lavfi）');
+    } catch (error, stackTrace) {
+      _equalizerAvailable = false;
+      Log.debug('当前 libmpv 不支持 lavfi 均衡器: $error');
+      Log.error('均衡器探测失败: $error', stackTrace);
+    }
+    // 探测完成前存下的曲线在这里补上，启动恢复不会因为顺序而丢。
+    final settings = _equalizerSettings;
+    if (_equalizerAvailable && settings != null) {
+      _pendingEqualizerChain = MpvEqualizerFilter.build(settings) ?? '';
+      _scheduleEqualizerWrite();
+    }
+  }
+
+  void _scheduleEqualizerWrite() {
+    _equalizerTimer?.cancel();
+    _equalizerTimer = Timer(_equalizerWriteInterval, () {
+      unawaited(_flushEqualizer());
+    });
+  }
+
+  /// 把最新的一条 `af` 写给 mpv。
+  ///
+  /// 写入是串行的：期间到达的新值留在 [_pendingEqualizerChain]，由下一轮
+  /// 循环取走，所以拖动一百次最终落下的仍是最后一个值。
+  Future<void> _flushEqualizer() async {
+    if (_writingEqualizer) return;
+    _writingEqualizer = true;
+    try {
+      while (_pendingEqualizerChain != null) {
+        final chain = _pendingEqualizerChain!;
+        _pendingEqualizerChain = null;
+        final native = _player?.platform;
+        if (native is! NativePlayer) return;
+        try {
+          await native.setProperty('af', chain);
+        } catch (error, stackTrace) {
+          // 属性写不进去说明滤镜图被拒：关掉入口，别让界面继续假装生效。
+          _equalizerAvailable = false;
+          Log.error('写入均衡器滤镜失败: $error', stackTrace);
+          return;
+        }
+      }
+    } finally {
+      _writingEqualizer = false;
+    }
   }
 
   /// 把 mpv 的错误事件转发给上层。
@@ -263,6 +380,8 @@ class MediaKitAudioPlayerService implements AudioPlayerService {
   @override
   void dispose() {
     try {
+      _equalizerTimer?.cancel();
+      _equalizerTimer = null;
       _errorSubscription?.cancel();
       _errorSubscription = null;
       if (!_errorController.isClosed) {

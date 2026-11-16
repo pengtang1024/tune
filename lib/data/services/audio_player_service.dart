@@ -1,3 +1,4 @@
+import 'package:tune/data/services/audio_equalizer_backend.dart';
 import 'package:tune/domain/models/song.dart';
 
 /// 播放后端报告的一次错误。
@@ -70,6 +71,13 @@ abstract class AudioPlayerService {
   ///
   /// 只在后端加载地址失败时触发，用于把"卡在加载中"变成可见错误。
   Stream<AudioPlayerError> get errorStream;
+
+  /// 均衡器后端；当前平台的实现不支持时为 null。
+  ///
+  /// 桌面端（media_kit / libmpv）返回自己，移动端没有这条链路。
+  /// 用 null 而不是一个"永远不可用"的对象，是为了让界面直接判断有没有入口，
+  /// 而不是先打开再发现什么也改不了。
+  AudioEqualizerBackend? get equalizer => null;
 
   /// 释放资源
   void dispose();

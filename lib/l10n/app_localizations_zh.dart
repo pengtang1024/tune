@@ -3929,7 +3929,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSearchKeywordsPlayback =>
-      '队列 双击 收藏 播放 queue click favorite';
+      '队列 双击 收藏 播放 均衡器 等化器 eq equalizer queue click';
 
   @override
   String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
@@ -4438,6 +4438,67 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
+
+  @override
+  String get equalizerTitle => '均衡器';
+
+  @override
+  String get equalizerEnable => '启用均衡器';
+
+  @override
+  String get equalizerPresetFlat => '平坦';
+
+  @override
+  String get equalizerPresetPop => '流行';
+
+  @override
+  String get equalizerPresetRock => '摇滚';
+
+  @override
+  String get equalizerPresetJazz => '爵士';
+
+  @override
+  String get equalizerPresetClassical => '古典';
+
+  @override
+  String get equalizerPresetBass => '重低音';
+
+  @override
+  String get equalizerPresetVocal => '人声';
+
+  @override
+  String get equalizerPresetElectronic => '电子';
+
+  @override
+  String get equalizerCustom => '自定义';
+
+  @override
+  String get equalizerReset => '重置';
+
+  @override
+  String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
+
+  @override
+  String equalizerGainDb(String value) {
+    return '$value dB';
+  }
+
+  @override
+  String equalizerFrequencyHz(String frequency) {
+    return '$frequency Hz';
+  }
+
+  @override
+  String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
+
+  @override
+  String get settingsEqualizerAction => '均衡器';
+
+  @override
+  String get settingsEqualizerActionHint => '打开面板选择预设并拖动十个频段';
+
+  @override
+  String get playerEqualizer => '均衡器';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -8365,7 +8426,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSearchKeywordsPlayback =>
-      '队列 双击 收藏 播放 queue click favorite';
+      '队列 双击 收藏 播放 均衡器 等化器 eq equalizer queue click';
 
   @override
   String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
@@ -8874,6 +8935,67 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsSearchKeywordsPermissions => '权限 通知 媒体 存储 android 允许';
+
+  @override
+  String get equalizerTitle => '均衡器';
+
+  @override
+  String get equalizerEnable => '启用均衡器';
+
+  @override
+  String get equalizerPresetFlat => '平坦';
+
+  @override
+  String get equalizerPresetPop => '流行';
+
+  @override
+  String get equalizerPresetRock => '摇滚';
+
+  @override
+  String get equalizerPresetJazz => '爵士';
+
+  @override
+  String get equalizerPresetClassical => '古典';
+
+  @override
+  String get equalizerPresetBass => '重低音';
+
+  @override
+  String get equalizerPresetVocal => '人声';
+
+  @override
+  String get equalizerPresetElectronic => '电子';
+
+  @override
+  String get equalizerCustom => '自定义';
+
+  @override
+  String get equalizerReset => '重置';
+
+  @override
+  String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
+
+  @override
+  String equalizerGainDb(String value) {
+    return '$value dB';
+  }
+
+  @override
+  String equalizerFrequencyHz(String frequency) {
+    return '$frequency Hz';
+  }
+
+  @override
+  String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
+
+  @override
+  String get settingsEqualizerAction => '均衡器';
+
+  @override
+  String get settingsEqualizerActionHint => '打开面板选择预设并拖动十个频段';
+
+  @override
+  String get playerEqualizer => '均衡器';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12801,7 +12923,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSearchKeywordsPlayback =>
-      '队列 双击 收藏 播放 queue click favorite';
+      '佇列 雙擊 收藏 播放 等化器 均衡器 eq equalizer queue click';
 
   @override
   String get settingsSearchKeywordsLyrics => '歌词 补齐 查漏 标记 lyrics fill';
@@ -13311,4 +13433,65 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsSearchKeywordsPermissions => '權限 通知 媒體 儲存 android 允許';
+
+  @override
+  String get equalizerTitle => '等化器';
+
+  @override
+  String get equalizerEnable => '啟用等化器';
+
+  @override
+  String get equalizerPresetFlat => '平坦';
+
+  @override
+  String get equalizerPresetPop => '流行';
+
+  @override
+  String get equalizerPresetRock => '搖滾';
+
+  @override
+  String get equalizerPresetJazz => '爵士';
+
+  @override
+  String get equalizerPresetClassical => '古典';
+
+  @override
+  String get equalizerPresetBass => '重低音';
+
+  @override
+  String get equalizerPresetVocal => '人聲';
+
+  @override
+  String get equalizerPresetElectronic => '電子';
+
+  @override
+  String get equalizerCustom => '自訂';
+
+  @override
+  String get equalizerReset => '重設';
+
+  @override
+  String get equalizerHint => '提升的頻段會用等量預放抵消，避免削波';
+
+  @override
+  String equalizerGainDb(String value) {
+    return '$value dB';
+  }
+
+  @override
+  String equalizerFrequencyHz(String frequency) {
+    return '$frequency Hz';
+  }
+
+  @override
+  String get equalizerUnavailable => '這個平台的播放後端不支援等化器';
+
+  @override
+  String get settingsEqualizerAction => '等化器';
+
+  @override
+  String get settingsEqualizerActionHint => '開啟面板選擇預設並拖動十個頻段';
+
+  @override
+  String get playerEqualizer => '等化器';
 }

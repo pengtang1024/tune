@@ -7,6 +7,7 @@ import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/application/library_cache_limit_provider.dart';
 import 'package:tune/features/library/application/library_controller.dart';
+import 'package:tune/features/player/application/equalizer_providers.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/features/settings/presentation/settings_cards.dart';
 import 'package:tune/features/settings/presentation/settings_desktop_card.dart';
@@ -18,6 +19,7 @@ import 'package:tune/features/settings/presentation/settings_playback_card.dart'
 import 'package:tune/features/settings/presentation/settings_section_catalog.dart';
 import 'package:tune/features/settings/presentation/settings_smart_lyrics_card.dart';
 import 'package:tune/features/settings/presentation/settings_source_health_card.dart';
+import 'package:tune/shared/ui/equalizer_sheet.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/tune_tooltip.dart';
 
@@ -83,6 +85,24 @@ void showSettingsCustomizeSheet({
 }
 
 /// The body of the customize sheet: the card of one section.
+/// Opens the equalizer panel with the wiring of this screen.
+///
+/// The panel itself lives in shared UI and knows nothing about Riverpod; the
+/// callers hand it the settings and the four writers, so the reader sees the
+/// same panel from the dock, the now playing page and here.
+Future<void> _openEqualizer(BuildContext context, WidgetRef ref) {
+  final controller = ref.read(equalizerControllerProvider.notifier);
+  return showEqualizerPanel(
+    context,
+    settings: ref.read(equalizerControllerProvider),
+    available: ref.read(equalizerAvailableProvider),
+    onEnabledChanged: controller.setEnabled,
+    onGainChanged: controller.setGain,
+    onPresetChanged: controller.applyPreset,
+    onReset: controller.reset,
+  );
+}
+
 class SettingsCustomizeCard extends ConsumerWidget {
   final SettingsSection section;
   final AppCapabilities capabilities;
@@ -147,6 +167,8 @@ class SettingsCustomizeCard extends ConsumerWidget {
         replaceQueueOnClick: settings.replaceQueueOnClick,
         onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
         favoritesDoubleClickPlays: settings.favoritesDoubleClickPlays,
+        equalizerAvailable: ref.watch(equalizerAvailableProvider),
+        onOpenEqualizer: () => _openEqualizer(context, ref),
         onAutoResumeOnStartup: controller.setAutoResumeOnStartup,
         onReplaceQueueOnClick: controller.setReplaceQueueOnClick,
         onOnlyLikeOnDoubleClick: controller.setOnlyLikeOnDoubleClick,

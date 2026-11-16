@@ -4254,7 +4254,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSearchKeywordsPlayback =>
-      'queue double click favorite playback';
+      'queue double click favorite playback equalizer eq bands bass treble';
 
   @override
   String get settingsSearchKeywordsLyrics => 'lyrics fill gap mark';
@@ -4805,4 +4805,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsSearchKeywordsPermissions =>
       'permission permissions notification media storage android allow';
+
+  @override
+  String get equalizerTitle => 'Equalizer';
+
+  @override
+  String get equalizerEnable => 'Enable equalizer';
+
+  @override
+  String get equalizerPresetFlat => 'Flat';
+
+  @override
+  String get equalizerPresetPop => 'Pop';
+
+  @override
+  String get equalizerPresetRock => 'Rock';
+
+  @override
+  String get equalizerPresetJazz => 'Jazz';
+
+  @override
+  String get equalizerPresetClassical => 'Classical';
+
+  @override
+  String get equalizerPresetBass => 'Bass';
+
+  @override
+  String get equalizerPresetVocal => 'Vocal';
+
+  @override
+  String get equalizerPresetElectronic => 'Electronic';
+
+  @override
+  String get equalizerCustom => 'Custom';
+
+  @override
+  String get equalizerReset => 'Reset';
+
+  @override
+  String get equalizerHint =>
+      'Boosted bands are offset by an equal preamp so nothing clips';
+
+  @override
+  String equalizerGainDb(String value) {
+    return '$value dB';
+  }
+
+  @override
+  String equalizerFrequencyHz(String frequency) {
+    return '$frequency Hz';
+  }
+
+  @override
+  String get equalizerUnavailable =>
+      'The audio backend of this platform has no equalizer';
+
+  @override
+  String get settingsEqualizerAction => 'Equalizer';
+
+  @override
+  String get settingsEqualizerActionHint =>
+      'Open the panel to pick a preset and drag the ten bands';
+
+  @override
+  String get playerEqualizer => 'Equalizer';
 }

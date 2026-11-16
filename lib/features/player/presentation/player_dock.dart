@@ -9,12 +9,14 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
 import 'package:tune/features/localization/application/localization_providers.dart';
 import 'package:tune/features/localization/domain/text_language.dart';
+import 'package:tune/features/player/application/equalizer_providers.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/application/playback_overview_provider.dart';
 import 'package:tune/features/player/domain/audio_source_status.dart';
 import 'package:tune/features/player/domain/play_mode.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
 import 'package:tune/features/player/presentation/audio_source_badge.dart';
+import 'package:tune/features/player/presentation/equalizer_entry.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
 import 'package:tune/shared/ui/bilingual_text.dart';
@@ -24,6 +26,14 @@ import 'package:tune/shared/ui/tune_tooltip.dart';
 import 'package:tune/shared/utils/duration_format.dart';
 import 'package:tune/shared/ui/live_badge.dart';
 import 'package:tune/shared/ui/track_facts.dart';
+
+/// The room the actions row needs before the equalizer entry fits.
+///
+/// The row is laid out as one line and does not scroll, so an extra button can
+/// only be added where it has room. Measured against the dock: below this
+/// width the row runs 5 to 35 pixels past its edge (the volume slider, the
+/// heart, the queue button and the two window actions are what fill it).
+const double _equalizerMinActionWidth = 900;
 
 class PlayerDock extends ConsumerWidget {
   /// Toggles the queue panel of the shell.
@@ -65,6 +75,10 @@ class PlayerDock extends ConsumerWidget {
         (state) => song == null ? false : state.contains(song.uri),
       ),
     );
+
+    // The entry is only drawn where the backend can apply a curve: a button
+    // that leads to a switch that cannot change the sound is worse than none.
+    final equalizerAvailable = ref.watch(equalizerAvailableProvider);
 
     return Container(
       // The bar keeps the height of the token, but it grows when the text
@@ -190,8 +204,7 @@ class PlayerDock extends ConsumerWidget {
                         const SizedBox(width: CompactTokens.space4),
                         _PlayButton(
                           status: overview.status,
-                          onPressed:
-                              overview.hasTrack && !overview.isLoading
+                          onPressed: overview.hasTrack && !overview.isLoading
                               ? controller.togglePlayPause
                               : null,
                         ),
@@ -229,9 +242,8 @@ class PlayerDock extends ConsumerWidget {
                           ? context.loc.playerMute
                           : context.loc.playerUnmute,
                       child: IconButton(
-                        onPressed: () => controller.setVolume(
-                          overview.volume > 0 ? 0 : 1,
-                        ),
+                        onPressed: () =>
+                            controller.setVolume(overview.volume > 0 ? 0 : 1),
                         icon: Icon(
                           overview.volume == 0
                               ? Icons.volume_off_rounded
@@ -287,6 +299,20 @@ class PlayerDock extends ConsumerWidget {
                         size: CompactTokens.icon18,
                         onPressed: onMini,
                       ),
+                    // The row is the one place of the dock that cannot shrink:
+                    // below this width the volume slider, the heart, the queue
+                    // button and the two window actions already spend all of it,
+                    // and the entry would push the row past its edge. The entry
+                    // waits for the window that can afford it, and the now
+                    // playing page still offers the panel on a narrow one.
+                    if (equalizerAvailable &&
+                        constraints.maxWidth >= _equalizerMinActionWidth)
+                      _DockIcon(
+                        icon: Icons.equalizer_rounded,
+                        tooltip: context.loc.playerEqualizer,
+                        size: CompactTokens.icon18,
+                        onPressed: () => openEqualizerPanel(context, ref),
+                      ),
                   ],
                 ),
               ),
@@ -338,8 +364,8 @@ class _DockProgress extends ConsumerWidget {
                       onChanged: overview.hasTrack
                           ? (value) => controller.seekTo(
                               Duration(
-                                milliseconds:
-                                    (clock.$2.inMilliseconds * value).round(),
+                                milliseconds: (clock.$2.inMilliseconds * value)
+                                    .round(),
                               ),
                             )
                           : null,
@@ -401,9 +427,7 @@ class _PlayButton extends StatelessWidget {
           icon: isLoading
               ? CompactSpinner.small(color: theme.colorScheme.onPrimary)
               : Icon(
-                  isPlaying
-                      ? Icons.pause_rounded
-                      : Icons.play_arrow_rounded,
+                  isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   size: CompactTokens.icon20,
                 ),
         ),
@@ -516,12 +540,7 @@ class _DockTitle extends ConsumerWidget {
       settingsControllerProvider.select((settings) => settings.localization),
     );
     final translation = ref
-        .watch(
-          translatedTextProvider((
-            text: original,
-            targetLanguage: target,
-          )),
-        )
+        .watch(translatedTextProvider((text: original, targetLanguage: target)))
         .value;
     final style = theme.textTheme.bodyMedium?.copyWith(
       fontWeight: FontWeight.w600,

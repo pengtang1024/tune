@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tune/core/services/window_manager_service.dart';
 import 'package:tune/data/services/providers/app_database_provider.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
+import 'package:tune/features/player/application/equalizer_providers.dart';
 import 'package:tune/features/player/application/playback_session_store_provider.dart';
 import 'package:tune/data/services/providers/cross_platform_music_scanner_provider.dart';
 import 'package:tune/features/desktop/application/desktop_integration_provider.dart';
@@ -28,6 +29,7 @@ class AppInitializer {
       await _initListeningSignals(ref);
       await _initPlaybackSession(ref);
       await _initAudioPlayerService(ref);
+      await _initEqualizer(ref);
       await _initMusicScannerService(ref);
       await WindowManagerService.init(ref.read(persistenceServiceProvider));
       _startDesktopIntegrationAfterFirstFrame(ref);
@@ -105,6 +107,20 @@ class AppInitializer {
       // Keep the shell usable even if the platform audio backend is missing.
       Log.error('初始化音频播放服务失败: $error', stackTrace);
       Log.debug('音频播放服务初始化失败，但应用将继续运行');
+    }
+  }
+
+  /// 把存下的均衡器曲线交给后端。
+  ///
+  /// 开关和曲线要在第一首歌之前生效：启动恢复的播放不该先平坦几秒再变声。
+  /// 后端不可用只记日志，均衡器失败不拦住启动。
+  static Future<void> _initEqualizer(Ref ref) async {
+    try {
+      await ref.read(equalizerControllerProvider.notifier).restore();
+      Log.debug('均衡器初始化成功');
+    } catch (error, stackTrace) {
+      Log.error('初始化均衡器失败: $error', stackTrace);
+      Log.debug('均衡器初始化失败，但应用将继续运行');
     }
   }
 

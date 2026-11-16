@@ -7310,7 +7310,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSearchKeywordsPlayback.
   ///
   /// In zh_CN, this message translates to:
-  /// **'队列 双击 收藏 播放 queue click favorite'**
+  /// **'队列 双击 收藏 播放 均衡器 等化器 eq equalizer queue click'**
   String get settingsSearchKeywordsPlayback;
 
   /// No description provided for @settingsSearchKeywordsLyrics.
@@ -8236,6 +8236,120 @@ abstract class AppLocalizations {
   /// In zh_CN, this message translates to:
   /// **'权限 通知 媒体 存储 android 允许'**
   String get settingsSearchKeywordsPermissions;
+
+  /// No description provided for @equalizerTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡器'**
+  String get equalizerTitle;
+
+  /// No description provided for @equalizerEnable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'启用均衡器'**
+  String get equalizerEnable;
+
+  /// No description provided for @equalizerPresetFlat.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'平坦'**
+  String get equalizerPresetFlat;
+
+  /// No description provided for @equalizerPresetPop.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'流行'**
+  String get equalizerPresetPop;
+
+  /// No description provided for @equalizerPresetRock.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'摇滚'**
+  String get equalizerPresetRock;
+
+  /// No description provided for @equalizerPresetJazz.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'爵士'**
+  String get equalizerPresetJazz;
+
+  /// No description provided for @equalizerPresetClassical.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'古典'**
+  String get equalizerPresetClassical;
+
+  /// No description provided for @equalizerPresetBass.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重低音'**
+  String get equalizerPresetBass;
+
+  /// No description provided for @equalizerPresetVocal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'人声'**
+  String get equalizerPresetVocal;
+
+  /// No description provided for @equalizerPresetElectronic.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'电子'**
+  String get equalizerPresetElectronic;
+
+  /// No description provided for @equalizerCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义'**
+  String get equalizerCustom;
+
+  /// No description provided for @equalizerReset.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'重置'**
+  String get equalizerReset;
+
+  /// No description provided for @equalizerHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'提升的频段会用等量预放抵消，避免削波'**
+  String get equalizerHint;
+
+  /// No description provided for @equalizerGainDb.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{value} dB'**
+  String equalizerGainDb(String value);
+
+  /// No description provided for @equalizerFrequencyHz.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{frequency} Hz'**
+  String equalizerFrequencyHz(String frequency);
+
+  /// No description provided for @equalizerUnavailable.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'这个平台的播放后端不支持均衡器'**
+  String get equalizerUnavailable;
+
+  /// No description provided for @settingsEqualizerAction.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡器'**
+  String get settingsEqualizerAction;
+
+  /// No description provided for @settingsEqualizerActionHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开面板选择预设并拖动十个频段'**
+  String get settingsEqualizerActionHint;
+
+  /// No description provided for @playerEqualizer.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'均衡器'**
+  String get playerEqualizer;
 }
 
 class _AppLocalizationsDelegate
