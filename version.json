@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.40.0",
-  "build": 76,
-  "released_at": "2026-11-16T13:01:02Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.40.0",
-  "notes": "### 新增\n\n- **均衡器可以把当前曲线存成自己的预设**：设置 › 播放 › 均衡器 的标题行多了「存为预设」，\n  起个名字就落进预设行，点一下即应用，右侧 × 删掉；同名再存是覆盖那条曲线。\n  自存曲线与 12 组内置曲线同表参与高亮（内置优先），一起写进 `audio_equalizer_v1` 的\n  `userPresets` 字段，没存过时不写这个字段，旧偏好照旧能读。",
+  "version": "1.40.1",
+  "build": 77,
+  "released_at": "2026-11-16T13:09:06Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.40.1",
+  "notes": "### 新增\n\n- **每一行写出它是什么**：标题右边给播客单集、有声书章节、电台、音效各写一个词\n  （歌不写，缺词就是默认），点这个词收窄到这一类；行的点击仍然播放。以前一列里混着五种\n  东西，只能靠打开详情面板才分得清。\n\n### 修复\n\n- **撤掉分栏视图**：左列按艺术家与来源把同一张专辑拆成多行（屏幕上出现九条一模一样的\n  专辑名），「全部歌曲」还把数据库窗口大小当成总数（写 1000，库里 5,121 首）。默认回到\n  每一类的墙：音乐看专辑墙、播客看节目墙、有声书看书墙。\n\n### 文档与工程\n\n- `docs/library-browse.md` 补「一行是什么，就写什么」一节，并记下分栏为什么被撤。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.40.0/tune-linux-x64-1.40.0.tar.gz",
-      "size": 53609060,
-      "sha256": "44df249f7f29ce71bd0510f4439827ca7b327c785bdd58d47c23bc9f6c25f19f"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.40.1/tune-linux-x64-1.40.1.tar.gz",
+      "size": 53605603,
+      "sha256": "25806e99416c793fe22facdadc97e9c7a635eaeb80fd8d0dae472903c0396188"
     }
   }
 }
