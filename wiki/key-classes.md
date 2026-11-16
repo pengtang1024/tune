@@ -1,6 +1,6 @@
 # 关键类与函数
 
-> 状态：设计（已实施） · 适用版本 1.37.2 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.39.0 · 最后核对 2026-11-16
 >
 > 按「入口 → 状态机 → 服务接口 → 领域模型」组织。方法只列公开 API，完整签名以代码为准。
 
@@ -65,7 +65,8 @@ bootstrap 序列：
 
 - provider：`equalizerControllerProvider`（`StateNotifierProvider<EqualizerController, EqualizerSettings>`）；`equalizerAvailableProvider` 读 `AudioPlayerService.equalizer?.isAvailable`。
 - `restore()`：启动时从 `audio_equalizer_v1` 读曲线并下发；`setGain()` / `setEnabled()` / `applyPreset()` / `reset()` 写状态并推送，落盘 400 ms 防抖。
-- 曲线模型 `EqualizerSettings`（`lib/domain/models/equalizer_settings.dart`）：10 段 31–16 kHz、±12 dB、步进 1，`presetId` 由曲线比对得出，不单独存。
+- 曲线模型 `EqualizerSettings`（`lib/domain/models/equalizer_settings.dart`）：10 段 31–16 kHz、±12 dB、步进 1，`presetId` 由曲线比对得出，不单独存；`EqualizerPresets` 有 12 组曲线，`quick` 是快捷面板给的那四组。
+- 两个面板共用这一份状态：`showEqualizerQuickPanel`（播放器旁边，开关 + 四组常用曲线）与 `showEqualizerEditorPanel`（设置 › 播放，开关 + 重置 + 12 组曲线 + 10 根滑杆）。
 
 ### 播放辅助
 
