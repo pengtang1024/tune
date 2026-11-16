@@ -288,10 +288,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryOpenAlbum => '打开专辑';
 
   @override
-  String get libraryUnknownAlbum => '未知专辑';
+  String get libraryVariousArtists => '多位艺术家';
 
   @override
-  String get libraryVariousArtists => '多位艺术家';
+  String get libraryUnknownAlbum => '未知专辑';
 
   @override
   String get queueTitle => '播放队列';
@@ -4876,10 +4876,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryOpenAlbum => '打开专辑';
 
   @override
-  String get libraryUnknownAlbum => '未知专辑';
+  String get libraryVariousArtists => '多位艺术家';
 
   @override
-  String get libraryVariousArtists => '多位艺术家';
+  String get libraryUnknownAlbum => '未知专辑';
 
   @override
   String get queueTitle => '播放队列';
@@ -9464,10 +9464,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get libraryOpenAlbum => '開啟專輯';
 
   @override
-  String get libraryUnknownAlbum => '未知專輯';
+  String get libraryVariousArtists => '多位藝術家';
 
   @override
-  String get libraryVariousArtists => '多位藝術家';
+  String get libraryUnknownAlbum => '未知專輯';
 
   @override
   String get queueTitle => '播放佇列';

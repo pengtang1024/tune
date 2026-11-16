@@ -556,17 +556,17 @@ abstract class AppLocalizations {
   /// **'打开专辑'**
   String get libraryOpenAlbum;
 
-  /// No description provided for @libraryUnknownAlbum.
-  ///
-  /// In zh_CN, this message translates to:
-  /// **'未知专辑'**
-  String get libraryUnknownAlbum;
-
   /// No description provided for @libraryVariousArtists.
   ///
   /// In zh_CN, this message translates to:
   /// **'多位艺术家'**
   String get libraryVariousArtists;
+
+  /// No description provided for @libraryUnknownAlbum.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'未知专辑'**
+  String get libraryUnknownAlbum;
 
   /// No description provided for @queueTitle.
   ///
