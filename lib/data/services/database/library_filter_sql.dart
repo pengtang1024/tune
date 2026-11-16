@@ -29,7 +29,7 @@ class LibraryFilterSql {
       durationFilter(filter.durations),
       addedFilter(filter.added),
       hiddenDuration(filter.hidesMissingDuration),
-      shortTracks(filter.excludeShortTracks),
+      shortTracks(filter.hidesShortTracks),
     ]) {
       if (clause == null) continue;
       clauses.add(clause.sql);

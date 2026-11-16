@@ -160,6 +160,15 @@
   "libraryAddAllToQueue": "將整個清單加入佇列",
   "libraryViewSongs": "歌曲檢視",
   "libraryViewAlbums": "專輯檢視",
+  "libraryViewCollections": "合集檢視",
+  "libraryOpenCollection": "開啟合集",
+  "libraryCollectionItems": "{items} 個條目 · {tracks} 首",
+  "@libraryCollectionItems": {
+    "placeholders": {
+      "items": { "type": "int", "format": "decimalPattern" },
+      "tracks": { "type": "int", "format": "decimalPattern" }
+    }
+  },
   "libraryOpenAlbum": "開啟專輯",
   "libraryUnknownAlbum": "未知專輯",
   "libraryVariousArtists": "多位藝術家",

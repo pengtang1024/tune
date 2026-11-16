@@ -50,7 +50,7 @@
 | data | `library_storage.dart` + `impl/library_storage_io.dart` | `LibraryStorage` 接口 → `SqliteLibraryStorage`（`songs` 表窗口读写、视图 JSON） |
 | presentation | `library_pane.dart` | 音乐库页（在线搜索入口由 `app/router` 注入） |
 | presentation | `library_toolbar.dart`、`library_header.dart`、`library_column_header.dart` | 页头、工具条、列头 |
-| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart` | 歌曲 / 双列 / 专辑 / 分类四种视图（`library_view_mode.dart`） |
+| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart`、`library_collections_view.dart` | 歌曲 / 双列 / 专辑 / 分类 / 合集五种视图（`library_view_mode.dart`）；合集按来源分组，点开是那一个来源的专辑墙 |
 | presentation | `library_filter_panel.dart`、`library_filter_chips.dart` | 筛选面板（11 组）与生效 chip |
 | presentation | `library_track_card.dart`、`library_row_actions.dart`、`library_row_tail.dart` | 曲目行与其动作 |
 

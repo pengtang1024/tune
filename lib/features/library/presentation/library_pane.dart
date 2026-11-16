@@ -14,6 +14,7 @@ import 'package:tune/features/library/application/library_search_focus_provider.
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 import 'package:tune/features/library/domain/library_category.dart';
+import 'package:tune/features/library/domain/library_collection.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
@@ -24,6 +25,7 @@ import 'package:tune/features/library/presentation/library_albums_view.dart';
 import 'package:tune/features/library/presentation/library_column_header.dart';
 import 'package:tune/features/library/presentation/library_category_tree.dart';
 import 'package:tune/features/library/presentation/library_category_view.dart';
+import 'package:tune/features/library/presentation/library_collections_view.dart';
 import 'package:tune/features/library/presentation/library_columns_view.dart';
 import 'package:tune/features/library/presentation/library_filter_chips.dart';
 import 'package:tune/features/library/presentation/library_filter_panel.dart';
@@ -72,6 +74,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   /// the same covers instead of the top of the page.
   final ScrollController _songsScrollController = ScrollController();
   final ScrollController _albumsScrollController = ScrollController();
+  final ScrollController _collectionsScrollController = ScrollController();
   final ScrollController _columnsScrollController = ScrollController();
 
   /// How the list below the toolbar is read.
@@ -133,6 +136,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     _searchController.dispose();
     _songsScrollController.dispose();
     _albumsScrollController.dispose();
+    _collectionsScrollController.dispose();
     _columnsScrollController.dispose();
     super.dispose();
   }
@@ -503,6 +507,15 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
       );
     }
 
+    if (_view == LibraryViewMode.collections) {
+      return LibraryCollectionsView(
+        collections: libraryCollectionsOf(songs, sourceLabels),
+        controller: _collectionsScrollController,
+        onOpen: _openCollectionOf,
+        onClear: _clearCollection,
+      );
+    }
+
     if (_view == LibraryViewMode.albums) {
       // The album grid is the only place that needs to know which album
       // plays. Listening here keeps a change of track from rebuilding the
@@ -802,6 +815,58 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     };
     setState(() => _view = LibraryViewMode.songs);
     ref.read(libraryControllerProvider.notifier).setFilter(next);
+  }
+
+  /// Opens one collection: its items first, their tracks after.
+  ///
+  /// A collection is a shelf, not a filter value: the card leads to the wall
+  /// of items it holds, and an item opens its tracks. The source filter is
+  /// what keeps the wall to that shelf, and clearing it comes back to all.
+  void _openCollectionOf(LibraryCollection collection) {
+    final filter = ref.read(libraryControllerProvider).requireValue.filter;
+    setState(() {
+      _view = LibraryViewMode.albums;
+      _openAlbum = null;
+    });
+    ref.read(libraryControllerProvider.notifier).setFilter(
+      filter.copyWith(sources: {collection.sourceId}),
+    );
+  }
+
+  /// Empties one collection of the rows it brought in.
+  ///
+  /// The instance stays: this is the pruning of a shelf whose uploads were
+  /// not worth keeping, not the removal of the source itself.
+  Future<void> _clearCollection(LibraryCollection collection) async {
+    final loc = context.loc;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(loc.sourcesClearSongsTitle(collection.name)),
+        content: Text(loc.sourcesClearSongsHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(loc.cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('collection-clear-confirm'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(loc.clear),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await ref
+        .read(libraryControllerProvider.notifier)
+        .dropSource(collection.sourceId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(loc.sourcesSongsCleared(collection.name))),
+      );
   }
 
   /// Narrows the page to one kind.

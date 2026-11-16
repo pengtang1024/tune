@@ -238,6 +238,22 @@ void main() {
     );
     await _shot(tester, 'library$suffix');
 
+    // The collections view groups the rows by the reach they came from, so a
+    // 5000-row library reads as twenty shelves instead of one wall.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(LibraryViewSwitch),
+        matching: find.byIcon(Icons.collections_bookmark_rounded),
+      ),
+    );
+    await _shot(tester, 'library_collections$suffix');
+    await tester.tap(
+      find.descendant(
+        of: find.byType(LibraryViewSwitch),
+        matching: find.byIcon(Icons.view_list_rounded),
+      ),
+    );
+
     // The albums view is the browsing side of the library; the songs view
     // stays one click away. The tap is scoped to the switch: once the library
     // has albums the header grows its own grid icon, and an unscoped finder

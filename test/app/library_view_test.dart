@@ -29,6 +29,6 @@ void main() {
     });
 
     expect(back.filter.hideMissingDuration, isTrue);
-    expect(back.filter.excludeShortTracks, isFalse);
+    expect(back.filter.excludeShortTracks, isTrue);
   });
 }

@@ -1,6 +1,6 @@
 # 音乐库分类与筛选（已实施）
 
-> 状态：设计（已实施） · 适用版本 1.33.0 · 最后核对 2026-11-15
+> 状态：设计（已实施） · 适用版本 1.34.0 · 最后核对 2026-11-16
 >
 > 2026-10-31。回答「音乐库除了搜索还能怎么找歌」：分类怎么分、筛选怎么叠、视觉上怎么读。
 > 相关：[library-redesign.md](library-redesign.md)（页头/列头/排序/密度）、[chips.md](chips.md)（标识）、
@@ -17,8 +17,9 @@
 - [6. 性能预算](#6-性能预算)
 - [7. 与 library-redesign 的联合落地](#7-与-library-redesign-的联合落地)
 - [8. 已拍板与实施后定案](#8-已拍板与实施后定案)
-- [9. 不在范围](#9-不在范围)
-- [10. 验收](#10-验收)
+- [9. 合集视图（1.34.0）](#9-合集视图1340)
+- [10. 不在范围](#10-不在范围)
+- [11. 验收](#11-验收)
 
 ## 1. 问题与目标
 
@@ -469,7 +470,49 @@ class LibraryFilter {
 | 内容类型（2026-11-13） | 四值 `music / podcast / audiobook / radio`，作为第 7 个分类维度与筛选项；页头「电台」入口走同一条筛选；专辑墙按三节呈现（规格见 `.trae/specs/library-browse-kinds/`） |
 | 内容类型是作用域（2026-11-15） | `filter.kinds` 永不为空，默认 `{music}`；页头改为四项内容菜单；专辑在页头按钮、专辑列、专辑墙三处可见（规格见 `.trae/specs/library-kind-scope/`） |
 
-## 9. 不在范围
+## 9. 合集视图（1.34.0）
+
+一个来源一次扫描能带进几百行：5118 首的库里 `community_classical` 199 行、`librivox` 496 行。
+歌曲视图把它们摊平成一张表，读起来像一堵墙。合集视图是第五种视图，按来源把行收成书架：
+
+| 元素 | 内容 | 来源 |
+| --- | --- | --- |
+| 封面 | 该来源首个有封面的曲目 | `libraryCollectionsOf` 取 `albumArtPath` → `artworkUrl` |
+| 右下角计数 | 曲目数 | `libraryTrackCount` |
+| 名称 | 来源名（实例被删后仍按 `sourceId` 列出） | `SourceLabel.localizedName` → `name` → `sourceId` |
+| 说明 | `N 个条目 · M 首` | `libraryCollectionItems(itemCount, trackCount)` |
+| 打开 | 点卡片：切到专辑视图并把源收窄到该合集 | `LibraryViewMode.albums` + `filter.copyWith(sources: …)` |
+| 清空 | 卡片右上角（悬停出现）：确认后移除该源的曲目，来源本身保留 | `LibraryController.dropSource` |
+
+- **层级**：合集 → 条目（专辑墙）→ 曲目。清掉源过滤就回到全部，不发散。
+- **条目数**按 `album` 归一后去重，无专辑的曲目各自算一条；排序是曲目数降序、同数按名称。
+- **为什么不是「默认关掉脏音源」**：内置的 Internet Archive 合集各有手写 `query`/`theme`（如
+  `community_classical` 只取 `subject:(classical) AND NOT subject:(rock OR jazz …)`）并靠 `weight: 400`
+  折进「更多音源」，是刻意设计；关掉等于退货。合集视图 + 一键清空把选择留给读者，且对已有安装立刻生效。
+
+### 短曲目默认隐藏
+
+一秒两秒的行是采样、循环、片段，不是要去听的曲目，所以 `excludeShortTracks` 默认开启（阈值 3000ms）：
+
+- 只作用于歌曲作用域（`hidesShortTracks` 与 `hidesMissingDuration` 同构）——音效、播客、有声书作用域照样显示，
+  因为一秒长的音效本来就该出现；
+- 专辑仍整体打开：`albumSongs` 走独立查询，不读这条规则；
+- 它是**显示规则**而非筛选组：不计入 `activeGroups`，筛选按钮不会恒显示 1；读者手动关掉后，「清除筛选」不会把它重置。
+
+### 专辑级例外
+
+`declaredAlbumKinds` 可以按 `(实例, 归一专辑名)` 声明内容类型，查询期生效、不需要重扫：
+
+```dart
+'community_classical': {
+  'tabla loops for music composition - 8 beats kaharwa taal': ContentKind.soundEffect,
+},
+```
+
+这条把上传进古典合集的 6 行一至三秒塔布拉循环从歌曲表里划掉（`library_filter_sql.dart` 用
+`LOWER(TRIM(COALESCE(songs.album, '')))` 精确比对），同合集其余 199 行不受影响。
+
+## 10. 不在范围
 
 - 多选、拖拽排序、列宽拖拽、列显示偏好。
 - 保存/分享自定义视图（P3 之后再议）。
@@ -477,7 +520,7 @@ class LibraryFilter {
 - 移动端布局。
 - 智能推荐/相似曲目（发现页的职责）。
 
-## 10. 验收
+## 11. 验收
 
 - 20k 首：应用筛选 ≤ 100ms；分面计数 ≤ 150ms；滚动不退化。
 - 组内 OR、组间 AND、搜索 AND 的语义有测试；连续勾选只发最后一次查询。
@@ -496,6 +539,7 @@ class LibraryFilter {
 - 空结果、无封面、无流派、`year=0`、`dateAdded=0`、无语言、未知格式都有确定表现。
 - 页头 / 列头 / 行尾 / 排序 / 双列与分类筛选同批验收。
 - `flutter analyze` 无 issue；`flutter test` 全绿。
+- 合集视图：卡片名称/条目数与曲目数正确，点开收窄到该来源，清空后来源保留、曲目消失。
 
 ## 相关文档
 

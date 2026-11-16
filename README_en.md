@@ -44,7 +44,7 @@ The shots are rendered by `tool/layout_shots_test.dart` at 1280×800 from the re
 **Library**
 - Local music folder scanning (directory walk on Linux, MediaStore / SAF on Android), search, and SQLite persistence; the library is never loaded into memory, it is always a 1000-track window read from the database
 - A category drawer (genre / decade / artist / source / language / format / content kind), a faceted filter panel (content kind / status / genre / decade / artist / source / language / format / duration / short tracks / date added) with active chips; filtering happens in SQL
-- Four views: songs list / two-column / categories / albums; sort, columns, and filters come back on the next start
+- Five views: songs list / two-column / categories / albums / collections; a collection groups the rows by the reach they came from, opens as that reach's album wall, and can be emptied in one step. Sort, columns, and filters come back on the next start
 - Browse by content kind (songs / albums / radio / spoken-word shows), with same-named spoken-word shows merged across sources
 - Filter by source; remote tracks show source and artwork; track rows mark format, quality, and bitrate with icons — hover to read them, open a track for all of its facts and its path
 

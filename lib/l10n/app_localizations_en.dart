@@ -348,6 +348,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryViewAlbums => 'Albums view';
 
   @override
+  String get libraryViewCollections => 'Collections view';
+
+  @override
+  String get libraryOpenCollection => 'Open collection';
+
+  @override
+  String libraryCollectionItems(int items, int tracks) {
+    final intl.NumberFormat itemsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String itemsString = itemsNumberFormat.format(items);
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$itemsString items',
+      one: '1 item',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      tracks,
+      locale: localeName,
+      other: '$tracksString tracks',
+      one: '1 track',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get libraryOpenAlbum => 'Open album';
 
   @override

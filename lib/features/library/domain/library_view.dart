@@ -72,10 +72,10 @@ class LibraryView {
                   if (ContentKind.values.asNameMap()[name] != null)
                     ContentKind.values.asNameMap()[name]!,
               },
-              // A view written before the rule existed carries no key; it
-              // opens with the same default as a fresh library.
+              // A view written before either rule existed carries no key for
+              // it; it opens with the same default as a fresh library.
               hideMissingDuration: filter['hideMissingDuration'] != false,
-              excludeShortTracks: filter['excludeShortTracks'] == true,
+              excludeShortTracks: filter['excludeShortTracks'] != false,
             )
           : LibraryFilter.empty,
     );

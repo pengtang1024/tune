@@ -35,10 +35,13 @@ class LibraryFilter {
   /// is not counted by [isEmpty] and survives a "clear all".
   final bool hideMissingDuration;
 
-  /// Whether tracks of three seconds or less are left out on request.
+  /// Whether tracks of three seconds or less stay out of the list.
   ///
-  /// Unlike a missing duration, a very short track is still audio; it is only
-  /// narrowed away when the reader ticks the group.
+  /// A track of one or two seconds is a sample, a loop or a fragment rather
+  /// than something to listen to, and the archives the library reads carry
+  /// thousands of them; the row is out of the table by default and the short
+  /// group in the filter panel brings it back. An album still opens whole:
+  /// its own query does not read this rule.
   final bool excludeShortTracks;
 
   /// The longest track the "very short" group leaves out, in milliseconds.
@@ -56,7 +59,7 @@ class LibraryFilter {
     this.languages = const {},
     this.kinds = const {},
     this.hideMissingDuration = true,
-    this.excludeShortTracks = false,
+    this.excludeShortTracks = true,
   });
 
   static const LibraryFilter empty = LibraryFilter();
@@ -72,8 +75,9 @@ class LibraryFilter {
 
   /// Whether nothing narrows the page besides the content scope.
   ///
-  /// The scope always names a kind, so it is not counted here: the filter
-  /// button and the chips speak about the groups the reader picks.
+  /// The scope always names a kind, and the two duration rules are display
+  /// rules that stay on between visits, so neither is counted here: the
+  /// filter button and the chips speak about the groups the reader picks.
   bool get isEmpty =>
       status == LibraryStatusFilter.all &&
       genres.isEmpty &&
@@ -83,8 +87,7 @@ class LibraryFilter {
       formats.isEmpty &&
       durations.isEmpty &&
       added.isEmpty &&
-      languages.isEmpty &&
-      !excludeShortTracks;
+      languages.isEmpty;
 
   /// How many groups narrow the page; the filter button shows it.
   int get activeGroups => [
@@ -97,8 +100,16 @@ class LibraryFilter {
     durations.isNotEmpty,
     added.isNotEmpty,
     languages.isNotEmpty,
-    excludeShortTracks,
   ].where((active) => active).length;
+
+  /// Whether this scope is the song list and the very short rows stay out.
+  ///
+  /// A sound effect is a second long by nature, so the rule only applies when
+  /// the scope is exactly the songs, the same way [hidesMissingDuration] does.
+  bool get hidesShortTracks =>
+      excludeShortTracks &&
+      kinds.length == 1 &&
+      kinds.contains(ContentKind.music);
 
   /// Whether this scope is the song list and the reader keeps dirty rows out.
   ///
@@ -112,11 +123,12 @@ class LibraryFilter {
 
   /// The same filter with every group cleared but the content scope.
   ///
-  /// The missing-duration hiding is a display rule rather than a group, so a
-  /// reader who turned it off keeps it off after clearing the groups.
+  /// The two duration rules are display rules rather than groups, so a
+  /// reader who turned one off keeps it off when the groups are cleared.
   LibraryFilter withoutGroups() => LibraryFilter(
     kinds: kinds,
     hideMissingDuration: hideMissingDuration,
+    excludeShortTracks: excludeShortTracks,
   );
 
   LibraryFilter copyWith({

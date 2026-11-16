@@ -556,6 +556,24 @@ abstract class AppLocalizations {
   /// **'专辑视图'**
   String get libraryViewAlbums;
 
+  /// No description provided for @libraryViewCollections.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'合集视图'**
+  String get libraryViewCollections;
+
+  /// No description provided for @libraryOpenCollection.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开合集'**
+  String get libraryOpenCollection;
+
+  /// No description provided for @libraryCollectionItems.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{items} 个条目 · {tracks} 首'**
+  String libraryCollectionItems(int items, int tracks);
+
   /// No description provided for @libraryOpenAlbum.
   ///
   /// In zh_CN, this message translates to:

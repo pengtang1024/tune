@@ -270,6 +270,37 @@ void main() {
     );
   });
 
+  test('a loop pack filed under a music collection is not a shelf', () {
+    // A pack of one- to three-second tabla loops for composing was uploaded
+    // into the classical collection; its genre tag says Classical, so the
+    // album name is the only declaration that names what it is.
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_classical',
+        album: 'Tabla Loops for Music Composition - 8 Beats Kaharwa Taal',
+        genre: 'Classical',
+      ),
+      ContentKind.soundEffect,
+    );
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_classical',
+        album: '  tabla LOOPS for music composition - 8 beats kaharwa taal ',
+        genre: 'Classical',
+      ),
+      ContentKind.soundEffect,
+    );
+    // The rest of that collection is music, artist or no artist.
+    expect(
+      contentKindOfFields(
+        sourceId: 'community_classical',
+        album: 'Edward ELGAR - Enigma Variations',
+        genre: 'Classic Rock',
+      ),
+      ContentKind.music,
+    );
+  });
+
   test('a kind the item states for itself outranks every other rule', () {
     expect(
       contentKindOfFields(
