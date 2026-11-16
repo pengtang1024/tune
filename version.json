@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.39.0",
-  "build": 75,
-  "released_at": "2026-11-16T12:10:04Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.39.0",
-  "notes": "### 变更\n\n- **均衡器拆成两层**：播放器旁边（底栏「更多」菜单、正在播放页顶栏）只留开关加四组常用曲线\n  （平坦 / 流行 / 摇滚 / 重低音），十个频段滑杆、重置和全部预设挪到 设置 › 播放 › 均衡器。\n  两层共用一个 `EqualizerController`，在哪边调另一边都同步。\n- **预设从 8 组扩到 12 组**：新增原声、嘻哈、现场、轻柔；快捷面板固定取 `EqualizerPresets.quick`\n  那四组，设置行的副标题显示当前曲线名。",
+  "version": "1.39.1",
+  "build": 76,
+  "released_at": "2026-11-16T12:59:52Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.39.1",
+  "notes": "### 新增\n\n- **每一行写出它是什么**：标题右边给播客单集、有声书章节、电台、音效各写一个词\n  （歌不写，缺词就是默认），点这个词收窄到这一类；行的点击仍然播放。以前一列里混着五种\n  东西，只能靠打开详情面板才分得清。\n\n### 修复\n\n- **撤掉分栏视图**：左列按艺术家与来源把同一张专辑拆成多行（屏幕上出现九条一模一样的\n  专辑名），「全部歌曲」还把数据库窗口大小当成总数（写 1000，库里 5,121 首）。默认回到\n  每一类的墙：音乐看专辑墙、播客看节目墙、有声书看书墙。\n\n### 文档与工程\n\n- `docs/library-browse.md` 补「一行是什么，就写什么」一节，并记下分栏为什么被撤。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.39.0/tune-linux-x64-1.39.0.tar.gz",
-      "size": 53602666,
-      "sha256": "d8c8c9e8aaca5f7e14e119aec6ec5d0bbd0cacd9bfbfce666affcdd000ed708a"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.39.1/tune-linux-x64-1.39.1.tar.gz",
+      "size": 53598899,
+      "sha256": "66340756dc362cdbc22ba6e4bec4266bebe821ca4ed94611c98ddb7c435259c4"
     }
   }
 }
