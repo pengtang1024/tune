@@ -177,6 +177,7 @@ log "更新版本号"
 python3 - "$VERSION" "$BUILD" "$DATE" <<'PY'
 import re
 import sys
+from pathlib import Path
 version, build, date = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 
 def sub(path, pattern, repl, required=True):
@@ -192,6 +193,8 @@ sub('lib/config/app_version.dart', r'static const int buildNumber = \d+;', f'sta
 sub('lib/config/app_version.dart', r"static const String buildDate = '[^']*';", f"static const String buildDate = '{date}';")
 for path in ('README.md', 'README_en.md', 'wiki/README.md'):
     sub(path, r'\d+\.\d+\.\d+\+\d+', f'{version}+{build}')
+for path in sorted(Path('wiki').glob('*.md')):
+    sub(str(path), r'(适用版本 )\d+\.\d+\.\d+', '\\g<1>' + version, required=False)
 sub('CITATION.cff', r'^version: "[^"]*"$', f'version: "{version}"')
 PY
 
@@ -215,7 +218,7 @@ else
 fi
 
 log "提交发版改动"
-git add -- pubspec.yaml lib/config/app_version.dart CHANGELOG.md README.md README_en.md wiki/README.md CITATION.cff version.json
+git add -- pubspec.yaml lib/config/app_version.dart CHANGELOG.md README.md README_en.md wiki CITATION.cff version.json
 git commit -q -m "chore(release): $VERSION 更新清单与 Linux 归档"
 RELEASE_SHA="$(git rev-parse HEAD)"
 
