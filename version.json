@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.43.0",
-  "build": 84,
-  "released_at": "2026-11-16T15:17:36Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.43.0",
-  "notes": "### 新增\n\n- **列表里一行一专辑**：音乐库打开就是一张专辑一行（封面、专辑名、艺术家、`N 首`），点这一行\n  进入它的曲目，列表首行是「← 返回」。播客按节目、有声书按书，计数换成 `N 集` / `N 章`；\n  电台与音效不分组，直接是台与音效的列表。\n\n### 移除\n\n- **视图开关那一排图标（列表 / 双列 / 专辑 / 合集）与页头的「专辑视图」按钮**都删掉了。它们\n  只是切换同一份数据的呈现方式，读者得先记住哪个图标是哪个模式；现在呈现由内容分类决定，\n  路径只有一条：组行 → 曲目 → 返回。分类视图、双列视图、合集视图与封面墙随按钮一起移除——\n  它们原本只能从那排按钮进入。",
+  "version": "1.44.0",
+  "build": 85,
+  "released_at": "2026-11-16T15:31:12Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.44.0",
+  "notes": "- 设置页在手机形态（页宽窄于 600）把左侧那条分区图标栏撤掉，换成页头下面一排横着走的 chip：图标 + 名称，选中的一档给描边与浅底，正文从 342 宽回到整条；600–899 仍是图标栏。\n- 正文滚到哪一组，那一排 chip 就把对应档位推到看得见的位置，高亮不会跑出视野。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.43.0/tune-linux-x64-1.43.0.tar.gz",
-      "size": 53595101,
-      "sha256": "fed59feba8377b48a793c783875f1ae70ce0ca93f9f9ecc8e36efd3d805a7475"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.44.0/tune-linux-x64-1.44.0.tar.gz",
+      "size": 53597985,
+      "sha256": "86eaa79eeb37d0a6fa07d97c4222c81e7059221fa4632598a3485b95109d566f"
     }
   }
 }
