@@ -66,6 +66,15 @@ flutter run -d linux
 
 **不要** force push 到 `main` / `master`，也不要直接往这两个分支推提交。
 
+这条约定有钩子兜底。克隆后启用一次：
+
+```bash
+git config core.hooksPath .githooks
+```
+
+之后在 `master` 上 `git commit` 会被 `.githooks/pre-commit` 拒掉并打印正确顺序
+（切到 `develop` 提交 → `git merge --no-ff develop`）。合并提交不走这个钩子，发版流程不受影响。
+
 ## 提交前门禁
 
 一条命令跑完静态检查与确定性用例：
