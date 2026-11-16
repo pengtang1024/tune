@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.5",
-  "build": 65,
-  "released_at": "2026-11-16T09:20:27Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.5",
-  "notes": "### 修复\n\n- **尾部占位符漏在扫描条件外**：补齐旧行时用 WHERE 把范围收在「标题或专辑含 ` - `、艺术家为空、\n  标题以数字开头」三种情形里，`Vote on Tuesday**` 这种只有尾部占位符的行从来没进过扫描。\n  现在按全表扫一遍，开销仍由按行数记账的守卫兜住（一个进程每个库只扫一次）。",
+  "version": "1.36.0",
+  "build": 67,
+  "released_at": "2026-11-16T09:42:35Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.36.0",
+  "notes": "### 新增\n\n- **一类内容一套读法**：视图开关不再对所有人一样长。音乐是「专辑 → 曲目」，播客是\n  「节目 → 单集」，有声书是「书 → 章节」，电台只有一串台，音效是平铺的短条目。切到哪一类\n  就打开它自己的默认视图，开关里只留这一类说得通的档位（播客没有分类墙，电台没有专辑墙），\n  「专辑」这一档在播客里叫「节目」、在有声书里叫「书」。判断只有一处出处：\n  `lib/features/library/domain/library_layout.dart`。\n\n### 修复\n\n- **播放条还显示旧标题**：队列是播放当时存下的快照，库里的行在打开应用时被补齐过，\n  但恢复出来的队列仍用快照，底栏因此还写着 `01 - The Shade of Cardinal Richelieu.`。\n  现在恢复队列时优先取库里那一行（同一个 `uri`），库里没有的条目（电台流、已删除的音源）\n  才用快照。\n\n### 变更\n\n- **打开一个节目/一本书时的计数口径**随内容分类走：播客数单集、有声书数章节、音效数条目，\n  不再一律写「首」。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.5/tune-linux-x64-1.35.5.tar.gz",
-      "size": 53677038,
-      "sha256": "d5d1be2f98611e2f458b62e0bc1dabfe2ca0e6fe278bc5461b19c032f72098db"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.36.0/tune-linux-x64-1.36.0.tar.gz",
+      "size": 53677932,
+      "sha256": "b1850680fb32ac016bc456ccad3bef2b691e2be1207773b5b1afc79cc3e722ec"
     }
   }
 }
