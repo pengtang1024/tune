@@ -65,7 +65,8 @@ bootstrap 序列：
 
 - provider：`equalizerControllerProvider`（`StateNotifierProvider<EqualizerController, EqualizerSettings>`）；`equalizerAvailableProvider` 读 `AudioPlayerService.equalizer?.isAvailable`。
 - `restore()`：启动时从 `audio_equalizer_v1` 读曲线并下发；`setGain()` / `setEnabled()` / `applyPreset()` / `reset()` 写状态并推送，落盘 400 ms 防抖。
-- 曲线模型 `EqualizerSettings`（`lib/domain/models/equalizer_settings.dart`）：10 段 31–16 kHz、±12 dB、步进 1，`presetId` 由曲线比对得出，不单独存；`EqualizerPresets` 有 12 组曲线，`quick` 是快捷面板给的那四组。
+- `savePreset(name)` / `deletePreset(id)`：把当前曲线收进 `EqualizerSettings.userPresets`（同名覆盖、保留 id），删除只动预设表不动增益；两者都走同一条推送与防抖落盘。
+- 曲线模型 `EqualizerSettings`（`lib/domain/models/equalizer_settings.dart`）：10 段 31–16 kHz、±12 dB、步进 1，`presetId` 由曲线比对得出（先内置 12 组、再自存曲线），不单独存；`EqualizerPresets` 有 12 组内置曲线，`quick` 是快捷面板给的那四组；`userPresets` 是读者自存的曲线（带 `name`），存在偏好 JSON 的 `userPresets` 字段里。
 - 两个面板共用这一份状态：`showEqualizerQuickPanel`（播放器旁边，开关 + 四组常用曲线）与 `showEqualizerEditorPanel`（设置 › 播放，开关 + 重置 + 12 组曲线 + 10 根滑杆）。
 
 ### 播放辅助

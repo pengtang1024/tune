@@ -1,10 +1,12 @@
 # 音乐均衡器
 
-> 状态：设计（已实施） · 适用版本 1.39.0 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.40.0 · 最后核对 2026-11-16
 >
 > 2026-11-16 立项。回答「桌面播放器怎么加 10 段均衡器：界面、状态与音频后端各归谁」。
 > `AGENTS.md` §4 曾把均衡器列为 v1 之外；读者 2026-11-16 明确要求增加，这一版按本方案实施，§4 那一行随之改成「已实施」。
 > 结论：桌面走 media_kit / libmpv 的 `af` 属性挂 ffmpeg 均衡器链；移动端本轮不做。
+>
+> 2026-11-16 增补（1.40.0）：可以把当前曲线存成自己的预设，名字与增益一起落盘；自存曲线与内置曲线同表参与高亮，内置优先。
 
 ## 目录
 
@@ -26,7 +28,7 @@
 ## 目标与非目标
 
 - 10 段 ISO 中心频率，增益 ±12 dB，步进 1 dB；
-- 8 个预设 + 自定义；预设是查找表，不是第二份状态；
+- 12 个内置预设 + 自存预设 + 自定义；预设是查找表，不是第二份状态；
 - 开关即旁路：关闭后 mpv 上不留任何均衡器滤镜；
 - 拖动即时生效，重启恢复；换歌、暂停、seek 都不重挂滤镜；
 - 一套面板，三个入口：底栏、正在播放页、设置「播放」卡；
@@ -92,13 +94,25 @@ set_property af "" → success（清空）
 | 10 | 16 kHz | 1 octave |
 
 - 增益 `-12.0`–`+12.0` dB，步进 `1.0`；`enabled` 默认 `false`；`gains` 长度固定 10。
-- 只存 `enabled` 与 `gains`；预设是查找表，当前值命中哪组就高亮哪组，否则显示「自定义」。
+- 存 `enabled`、`gains` 与 `userPresets`；当前值命中哪组就高亮哪组，否则显示「自定义」。
+- `userPresets` 是读者自己存的曲线：`[{"id": "user-<微秒>", "name": "...", "gains": [...]}]`，可空、可缺省（旧文件读进来就是空表，不迁移、不改 `version`）。
+- 命中顺序：先 12 组内置曲线，再按顺序比自存曲线；同一根曲线既像内置又像自存时显示内置名——内置说法不因读者存了一份副本而改名。
+- 同名再存是覆盖那一条的增益，id 不变；删掉正在用的曲线只动预设表，增益原样留着，于是回落到「自定义」。
 - 读取时按长度、范围、NaN 归一；版本不认识就回默认，不抛异常——坏偏好不能拦住启动。
 - 预放是派生值：`preampDb = -max(0, max(gains))`，用来抵消提升段带来的削波；不写进 JSON，也不进 UI 状态。
 
 ```json
-{"version": 1, "enabled": true, "gains": [4, 3, 1, -1, -2, 0, 2, 4, 4, 3]}
+{
+  "version": 1,
+  "enabled": true,
+  "gains": [7, 6, 4, 1, 0, -1, 0, 1, 3, 3],
+  "userPresets": [
+    {"id": "user-1731763200123456", "name": "我的低音", "gains": [7, 6, 4, 1, 0, -1, 0, 1, 3, 3]}
+  ]
+}
 ```
+
+- 没存过曲线时 `userPresets` 整个字段不写，文件形状与 1.39.0 一致。
 
 预设曲线（代码常量 `EqualizerPresets`；改曲线不改 schema）。1.37.3 起 12 组，`quick` 是快捷面板给的那四组：
 
@@ -119,7 +133,7 @@ set_property af "" → success（清空）
 }
 ```
 
-`EqualizerPresets.quick = [flat, pop, rock, bass]`：播放器旁边只给这四个，其余在设置里。
+`EqualizerPresets.quick = [flat, pop, rock, bass]`：播放器旁边只给这四个，其余在设置里。自存曲线不进 `quick`，只在编辑器里出现。
 
 ## 后端映射
 
@@ -175,13 +189,15 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | 面板 | 谁打开 | 内容 |
 | --- | --- | --- |
 | 快捷面板 `EqualizerQuickSheet` | 底栏「更多」菜单、正在播放页顶栏 | 标题 + 开关 + 4 个常用曲线（平坦 / 流行 / 摇滚 / 重低音）；手动改过的曲线追加高亮的「自定义」；底部一行小字指向设置（`equalizerQuickHint`） |
-| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「重置」+ 12 个曲线 chips + 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
+| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「存为预设」「重置」+ 12 个内置 chips + 自存 chips（带删除标记）+ 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
 
 - 为什么分两层：底栏和正在播放页顶栏只有几百像素，十个滑块加十二枚 chip 会跟播放控件抢空间；听歌时选曲线本来也只需要「按心情点一下」。
 - 快捷面板用 `EqualizerPresets.quick`，编辑器用 `EqualizerPresets.all`；两张表都在 model 里，面板不自己写一份。
 - 关闭状态：两个面板的控件仍可改，灰显但不锁死；读者可以先调曲线再打开开关。
 - 后端不可用：两个面板照常打开，控件置灰且不回调，顶部写 `equalizerUnavailable`。
 - 编辑器里的滑块中心 0 dB，上 +12、下 -12，拖动时在滑轨上显示当前 dB。
+- 「存为预设」弹出 `AlertDialog` 要一个名字（去空白后为空就不存）；存下的曲线立刻以 `InputChip` 出现在 chips 行，点击即应用，右侧 × 删除。面板自己记住刚存下的 id，所以不必重开面板。
+- 自存曲线的名字是数据，直接当 chip 文字；内置曲线仍走 ARB。设置行副标题对两者都显示名字（`equalizerCurrentPresetLabel`）。
 
 入口：
 
@@ -203,6 +219,9 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | `equalizerPresetFlat` / `Pop` / `Rock` / `Jazz` / `Classical` / `Acoustic` / `Bass` / `Vocal` / `Hiphop` / `Electronic` / `Live` / `Soft` | 平坦 / 流行 / 摇滚 / 爵士 / 古典 / 原声 / 重低音 / 人声 / 嘻哈 / 电子 / 现场 / 轻柔 | 12 个预设名 |
 | `equalizerCustom` | 自定义 | 未命中预设时的状态 |
 | `equalizerReset` | 重置 | 恢复平坦 |
+| `equalizerSavePreset` | 存为预设 | 编辑器标题行的保存按钮，也是命名对话框的标题 |
+| `equalizerPresetName` | 预设名称 | 命名对话框的输入框 |
+| `equalizerPresetDelete` | 删除预设 | 自存 chip 删除标记的 tooltip |
 | `equalizerHint` | 提升的频段会用等量预放抵消，避免削波 | 编辑器底部说明 |
 | `equalizerQuickHint` | 更细的频段和全部预设见 设置 › 播放 | 快捷面板底部说明 |
 | `equalizerGainDb(value)` | {value} dB | 滑块值与语义标签 |
@@ -219,13 +238,13 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 
 单测：
 
-- `test/domain/equalizer_settings_test.dart`：JSON 往返、长度/范围/NaN 归一、未知版本回默认、预设命中与 `custom`、预放。
+- `test/domain/equalizer_settings_test.dart`：JSON 往返、长度/范围/NaN 归一、未知版本回默认、预设命中与 `custom`、预放；自存预设的存取/覆盖/删除、坏条目跳过、内置优先、`userPresets` 为空时不写字段。
 - `test/services/mpv_equalizer_filter_test.dart`：关闭 → 空；全 0 → 空；10 段顺序与 `width_type=o:width=1`；预放；固定样例与 IPC 实测图串一致。
-- `test/features/player/equalizer_controller_test.dart`：`FakePersistenceService` + 假后端；预设命中、400 ms 落盘防抖、值不变不写、`dispose` 补写、后端为 `null` 时不崩。
+- `test/features/player/equalizer_controller_test.dart`：`FakePersistenceService` + 假后端；预设命中、400 ms 落盘防抖、值不变不写、`dispose` 补写、后端为 `null` 时不崩；存为预设后落盘能读回、空名不存、同名覆盖、删掉在用的预设回落 `custom`。
 
 组件测试：
 
-- `test/shared/equalizer_sheet_test.dart`：快捷面板只画 4 个 chip、没有滑块与重置；编辑器画 12 个 chip 与 10 个滑块，拖动回落到正确频段；手动改动后显示「自定义」；后端不可用时两个面板都置灰且不回调。
+- `test/shared/equalizer_sheet_test.dart`：快捷面板只画 4 个 chip、没有滑块与重置；编辑器画 12 个 chip 与 10 个滑块，拖动回落到正确频段；手动改动后显示「自定义」；后端不可用时两个面板都置灰且不回调；存为预设对话框回传去空白后的名字并画出 chip、回调给不出 id 时不画、自存 chip 的删除标记回调 id 并消失。
 - `test/shared/equalizer_entry_test.dart`：播放器入口 → 快捷面板的联动（`openEqualizerPanel` 读控制器与平台可用性）；预设与开关落回控制器、面板里不出现滑块；不可用平台仍能打开但只读。
 
 Linux 手测：
@@ -249,6 +268,7 @@ Linux 手测：
 | M2 | 后端 getter、mpv 写入、启动探测、controller 与初始化 | 假后端与真机各一次 apply 成功 |
 | M3 | 面板、滑块、三个入口、四份 ARB 与 gen-l10n | 组件测试绿，中英文不溢出 |
 | M4 | architecture 的状态归属/持久化表、README 与 AGENTS 收口、手测 | `check.sh` 全绿 + 手测清单 |
+| M5 | 自存预设：`userPresets` 落盘、存/删对话框与 chips、三处文案 | 领域与控制器用例绿，存下的曲线重启后还在 |
 
 ## 风险与回滚
 
