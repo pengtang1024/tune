@@ -122,6 +122,13 @@ const Map<String, Map<String, ContentKind>> declaredAlbumKinds = {
   'unlocked_recordings': {
     'death of a salesman': ContentKind.audiobook,
   },
+  'community_classical': {
+    // A pack of one- to three-second tabla loops for composing was uploaded
+    // into the classical collection; every track is a bar of a beat, not a
+    // piece of music to listen to.
+    'tabla loops for music composition - 8 beats kaharwa taal':
+        ContentKind.soundEffect,
+  },
 };
 
 /// The genre tags that name speech outright, whatever the instance declares.

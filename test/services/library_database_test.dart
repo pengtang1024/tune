@@ -681,6 +681,50 @@ void main() {
       );
     });
 
+    test('a loop pack stays out of the song table', () {
+      final database = AppDatabase.inMemory();
+      addTearDown(database.close);
+      database.save([
+        const Song(
+          id: 1,
+          title: 'Tabla Loop 4',
+          artist: 'Tabla Radio.Com',
+          album: 'Tabla Loops for Music Composition - 8 Beats Kaharwa Taal',
+          uri: 'tune://archive/loop-4',
+          sourceId: 'community_classical',
+          genre: 'Classical',
+          duration: 1200,
+        ),
+        const Song(
+          id: 2,
+          title: '01 Theme, I. C.A.E.',
+          album: 'Edward ELGAR - Enigma Variations',
+          uri: 'tune://archive/elgar-1',
+          sourceId: 'community_classical',
+          genre: 'Classic Rock',
+          duration: 200210,
+        ),
+      ]);
+
+      final songs = database.query(
+        query: '',
+        filter: LibraryFilter.songs,
+        sort: LibrarySort.recent,
+        offset: 0,
+        limit: 10,
+      );
+
+      expect(songs.map((track) => track.title), ['01 Theme, I. C.A.E.']);
+      expect(database.countQuery(query: '', filter: LibraryFilter.songs), 1);
+      expect(
+        database.countQuery(
+          query: '',
+          filter: const LibraryFilter(kinds: {ContentKind.soundEffect}),
+        ),
+        1,
+      );
+    });
+
     test('a spoken genre, an album exception and a stated kind decide alike', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);
@@ -786,9 +830,13 @@ void main() {
       expect(database.countQuery(query: '', filter: filter), 1);
       expect(database.missingDurationCount(query: '', filter: filter), 1);
 
-      // Turning the hiding off brings the row back; it was never deleted,
-      // and nothing is hidden any more, so the note has nothing to say.
-      final shown = filter.copyWith(hideMissingDuration: false);
+      // Turning both duration rules off brings the row back: a row with no
+      // duration is also a row under three seconds. It was never deleted, and
+      // nothing is hidden any more, so the note has nothing to say.
+      final shown = filter.copyWith(
+        hideMissingDuration: false,
+        excludeShortTracks: false,
+      );
       expect(database.countQuery(query: '', filter: shown), 2);
       expect(database.missingDurationCount(query: '', filter: shown), 0);
     });
@@ -822,7 +870,7 @@ void main() {
       }
     });
 
-    test('a very short track is kept unless the reader narrows it away', () {
+    test('a very short track waits behind the short group', () {
       final database = AppDatabase.inMemory();
       addTearDown(database.close);
       database.save([
@@ -847,14 +895,15 @@ void main() {
       ]);
       const filter = LibraryFilter(kinds: {ContentKind.music});
 
-      // Short is still audio: three rows until the reader asks otherwise.
-      expect(database.countQuery(query: '', filter: filter), 3);
+      // A one-second loop is a sample, not a track to listen to: out by
+      // default, back when the short group is unticked.
+      expect(database.countQuery(query: '', filter: filter), 1);
       expect(
         database.countQuery(
           query: '',
-          filter: filter.copyWith(excludeShortTracks: true),
+          filter: filter.copyWith(excludeShortTracks: false),
         ),
-        1,
+        3,
       );
     });
   });

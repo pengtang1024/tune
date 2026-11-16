@@ -288,6 +288,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryViewAlbums => '专辑视图';
 
   @override
+  String get libraryViewCollections => '合集视图';
+
+  @override
+  String get libraryOpenCollection => '打开合集';
+
+  @override
+  String libraryCollectionItems(int items, int tracks) {
+    final intl.NumberFormat itemsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String itemsString = itemsNumberFormat.format(items);
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+
+    return '$itemsString 个条目 · $tracksString 首';
+  }
+
+  @override
   String get libraryOpenAlbum => '打开专辑';
 
   @override
@@ -4700,6 +4718,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryViewAlbums => '专辑视图';
 
   @override
+  String get libraryViewCollections => '合集视图';
+
+  @override
+  String get libraryOpenCollection => '打开合集';
+
+  @override
+  String libraryCollectionItems(int items, int tracks) {
+    final intl.NumberFormat itemsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String itemsString = itemsNumberFormat.format(items);
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+
+    return '$itemsString 个条目 · $tracksString 首';
+  }
+
+  @override
   String get libraryOpenAlbum => '打开专辑';
 
   @override
@@ -9110,6 +9146,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewAlbums => '專輯檢視';
+
+  @override
+  String get libraryViewCollections => '合集檢視';
+
+  @override
+  String get libraryOpenCollection => '開啟合集';
+
+  @override
+  String libraryCollectionItems(int items, int tracks) {
+    final intl.NumberFormat itemsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String itemsString = itemsNumberFormat.format(items);
+    final intl.NumberFormat tracksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String tracksString = tracksNumberFormat.format(tracks);
+
+    return '$itemsString 個條目 · $tracksString 首';
+  }
 
   @override
   String get libraryOpenAlbum => '開啟專輯';
