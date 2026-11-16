@@ -68,13 +68,28 @@ void main() {
   testWidgets('a narrow desktop window keeps the rail and the dock', (
     tester,
   ) async {
-    // The window of the desktop never goes below 760 wide, where the rail
-    // has already dropped its labels.
+    // Between 600 and 799 the rail has dropped its labels but is still a
+    // rail: the window is tall and a mouse reaches it.
     await pumpShell(tester, size: const Size(760, 844), mobile: false);
 
     expect(find.byType(AppBottomBar), findsNothing);
     expect(find.byType(AppSidebar), findsOneWidget);
     expect(find.byType(PlayerDock), findsOneWidget);
+  });
+
+  testWidgets('the narrowest desktop window draws the phone shell', (
+    tester,
+  ) async {
+    // 560 is PlatformConstants.desktopWindowMinWidth, the narrowest the
+    // window goes: there the rail and the dock are gone and the pages get
+    // the whole width, which is what the phone form is.
+    await pumpShell(tester, size: const Size(560, 844), mobile: false);
+
+    expect(find.byType(AppBottomBar), findsOneWidget);
+    expect(find.byType(MiniPlayerBar), findsOneWidget);
+    expect(find.byType(AppSidebar), findsNothing);
+    expect(find.byType(PlayerDock), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a phone bar lists every destination', (tester) async {

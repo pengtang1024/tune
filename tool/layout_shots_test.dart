@@ -31,6 +31,7 @@ import 'package:tune/features/player/application/lyrics_controller.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/domain/models/lyrics_document.dart';
 import 'package:tune/features/player/presentation/now_playing_page.dart';
+import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/features/queue/presentation/queue_panel.dart';
 import 'package:tune/features/search/application/online_search_controller.dart';
 import 'package:tune/features/search/domain/online_search_state.dart';
@@ -453,7 +454,13 @@ void main() {
 
   testWidgets('capture pages in the smallest window', (tester) async {
     await onLinux(() async {
-      await surface(tester, const Size(760, 520));
+      await surface(
+        tester,
+        const Size(
+          PlatformConstants.desktopWindowMinWidth,
+          PlatformConstants.desktopWindowMinHeight,
+        ),
+      );
       await capture(tester, '_narrow');
     });
   });

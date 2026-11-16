@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/app/layout/layout_metrics.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/core/config/platform_constants.dart';
 
 void main() {
   LayoutMetrics metrics(double width, {bool mobile = false}) {
@@ -25,10 +26,26 @@ void main() {
     expect(metrics(1180).navigation, NavigationForm.rail);
   });
 
-  test('a narrow desktop window keeps the rail instead of a bottom bar', () {
-    expect(metrics(420).navigation, NavigationForm.railCompact);
-    expect(metrics(420).usesBottomNavigation, isFalse);
-    expect(metrics(599).usesCompactNavigation, isTrue);
+  test('a window narrower than a phone takes the bottom bar, whatever it runs on', () {
+    // The desktop window stops at 560 wide, inside this band, so the
+    // narrowest window is the phone form instead of a squeezed rail.
+    expect(
+      LayoutBreakpoints.phoneMaxWidth,
+      greaterThan(PlatformConstants.desktopWindowMinWidth),
+    );
+    expect(metrics(420).navigation, NavigationForm.bottomBar);
+    expect(metrics(420).usesBottomNavigation, isTrue);
+    expect(metrics(560).navigation, NavigationForm.bottomBar);
+    expect(metrics(599).navigation, NavigationForm.bottomBar);
+    expect(metrics(599).isPhone, isTrue);
+  });
+
+  test('the rail keeps its labels between the phone and the wide layout', () {
+    // A desktop window between 600 and 799 still shows the rail, with icons
+    // only, because it has the height of a desktop and a mouse to reach it.
+    expect(metrics(600).navigation, NavigationForm.railCompact);
+    expect(metrics(760).navigation, NavigationForm.railCompact);
+    expect(metrics(799).usesCompactNavigation, isTrue);
   });
 
   test('a touch build moves the navigation to the bottom', () {

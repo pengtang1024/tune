@@ -6,6 +6,7 @@ import 'package:tune/app/layout/window_form_controller.dart';
 import 'package:tune/app/theme/compact_theme.dart';
 import 'package:tune/data/services/providers/audio_player_service_provider.dart';
 import 'package:tune/data/services/providers/desktop_service_providers.dart';
+import 'package:tune/core/config/platform_constants.dart';
 import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -14,6 +15,8 @@ import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/presentation/player_dock.dart';
 import 'package:tune/features/settings/presentation/settings_pane.dart';
+import 'package:tune/features/shell/presentation/app_bottom_bar.dart';
+import 'package:tune/features/shell/presentation/app_sidebar.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/features/shell/presentation/mini_player_bar.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -71,6 +74,8 @@ const _frames = [
   Size(760, 249),
   Size(760, 250),
   Size(760, 520),
+  Size(560, 520),
+  Size(599, 520),
   Size(900, 1),
   Size(900, 600),
   Size(1120, 815),
@@ -168,14 +173,22 @@ void main() {
     );
 
     // The arrangement follows what the window can hold, not the form alone.
+    // Below the minimum width the shell cannot draw and the bar stands in;
+    // from the minimum up the shell draws, and narrower than a phone it draws
+    // the phone form: a bottom bar and one row, without the rail or the dock.
     final holdsShell =
-        size.width >= 760 && size.height >= LayoutBreakpoints.shellMinHeight;
+        size.width >= PlatformConstants.desktopWindowMinWidth &&
+        size.height >= LayoutBreakpoints.shellMinHeight;
+    final phone = holdsShell && size.width < LayoutBreakpoints.phoneMaxWidth;
+    // The phone form has the bar row too; only the rail form leaves it out.
     expect(
       find.byType(MiniPlayerBar),
-      holdsShell ? findsNothing : findsOneWidget,
+      holdsShell && !phone ? findsNothing : findsOneWidget,
     );
     if (holdsShell) {
-      expect(find.byType(PlayerDock), findsOneWidget);
+      expect(find.byType(AppBottomBar), phone ? findsOneWidget : findsNothing);
+      expect(find.byType(AppSidebar), phone ? findsNothing : findsOneWidget);
+      expect(find.byType(PlayerDock), phone ? findsNothing : findsOneWidget);
     }
   }
 

@@ -96,8 +96,11 @@ abstract final class CompactTokens {
 
   /// Width below which the navigation rail drops its labels.
   ///
-  /// The minimum window is 760 wide, so the threshold has to sit above it:
-  /// a narrow form that the window cannot reach is a form nobody sees.
+  /// The minimum window is 560 wide, so this threshold has to sit above it:
+  /// a narrow form that the window cannot reach is a form nobody sees. Below
+  /// the phone breakpoint (600) the rail is gone altogether and the shell
+  /// draws the bottom bar instead, so this form is where a desktop window
+  /// still has a rail — narrower than the labels need, wider than a phone.
   static const double sidebarCompactBreakpoint = 800;
 
   /// Inner padding of the navigation rail.

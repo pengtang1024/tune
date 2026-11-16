@@ -99,6 +99,9 @@ class LibraryToolbar extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(child: _searchField()),
+                // 结果数（和来源筛选）紧跟在搜索框后面：不留这道缝，
+                // 「0 首」会贴在输入框的描边上。
+                const SizedBox(width: CompactTokens.space12),
                 ..._sourceAndCount(context),
                 const SizedBox(width: CompactTokens.space12),
                 ..._buttons(context, compact: false, tight: tight),
