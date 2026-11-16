@@ -147,7 +147,7 @@ void main() {
       app(
         home: CompactShell(currentPath: '/library', child: child),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           playbackControllerProvider.overrideWith((ref) => controller),
         ],
@@ -217,7 +217,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -245,7 +245,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -300,7 +300,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(LibraryState(songs: songs)),
@@ -364,7 +364,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(LibraryState(songs: songs)),
@@ -408,7 +408,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -445,7 +445,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -482,7 +482,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -535,7 +535,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -572,7 +572,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -628,7 +628,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -668,7 +668,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -707,7 +707,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -1038,7 +1038,7 @@ void main() {
               QueuePanel(onClose: onClose, showTransport: true),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           playbackControllerProvider.overrideWith((ref) => controller),
         ],
@@ -1105,7 +1105,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1130,7 +1130,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1148,46 +1148,47 @@ void main() {
     expect(find.text('健康度'), findsWidgets);
   });
 
-  testWidgets('settings cards share a row height and the health card spans it', (
-    tester,
-  ) async {
-    await setSurface(tester, const Size(1180, 860));
-    final audio = FakeAudioPlayerService();
-    addTearDown(audio.dispose);
+  testWidgets(
+    'settings cards share a row height and the health card spans it',
+    (tester) async {
+      await setSurface(tester, const Size(1180, 860));
+      final audio = FakeAudioPlayerService();
+      addTearDown(audio.dispose);
 
-    await tester.pumpWidget(
-      app(
-        home: const CompactShell(
-          currentPath: '/settings',
-          child: SettingsPane(),
-        ),
-        overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
-          audioPlayerServiceProvider.overrideWithValue(audio),
-          libraryControllerProvider.overrideWith(
-            () => FakeLibraryController(const LibraryState()),
+      await tester.pumpWidget(
+        app(
+          home: const CompactShell(
+            currentPath: '/settings',
+            child: SettingsPane(),
           ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
+          overrides: [
+            libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+            audioPlayerServiceProvider.overrideWithValue(audio),
+            libraryControllerProvider.overrideWith(
+              () => FakeLibraryController(const LibraryState()),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    final appearance = tester.getSize(
-      find.byKey(const ValueKey('settings-card-appearance')),
-    );
-    final library = tester.getSize(
-      find.byKey(const ValueKey('settings-card-library')),
-    );
-    final health = tester.getSize(
-      find.byKey(const ValueKey('settings-card-sourceHealth')),
-    );
+      final appearance = tester.getSize(
+        find.byKey(const ValueKey('settings-card-appearance')),
+      );
+      final library = tester.getSize(
+        find.byKey(const ValueKey('settings-card-library')),
+      );
+      final health = tester.getSize(
+        find.byKey(const ValueKey('settings-card-sourceHealth')),
+      );
 
-    // Cards in one row end on the same line, and the health table reads
-    // across the page instead of leaving a hole beside it.
-    expect(appearance.height, library.height);
-    expect(appearance.width, library.width);
-    expect(health.width, closeTo(appearance.width * 2 + 8, 0.5));
-  });
+      // Cards in one row end on the same line, and the health table reads
+      // across the page instead of leaving a hole beside it.
+      expect(appearance.height, library.height);
+      expect(appearance.width, library.width);
+      expect(health.width, closeTo(appearance.width * 2 + 8, 0.5));
+    },
+  );
 
   testWidgets('about and update sit side by side on a wide page', (
     tester,
@@ -1203,7 +1204,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1240,7 +1241,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1252,7 +1253,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-sourceHealth')));
     await tester.pumpAndSettle();
-    final adjust = find.byKey(const ValueKey('settings-customize-sourceHealth'));
+    final adjust = find.byKey(
+      const ValueKey('settings-customize-sourceHealth'),
+    );
     await tester.ensureVisible(adjust);
     await tester.pumpAndSettle();
     expect(adjust, findsOneWidget);
@@ -1276,7 +1279,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1320,7 +1323,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1339,7 +1342,9 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('settings-customize-playback')),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
@@ -1372,7 +1377,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(const LibraryState()),
@@ -1392,7 +1397,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-playback')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-playback')));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('settings-customize-playback')),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('settings-customize-playback')));
     await tester.pumpAndSettle();
@@ -1415,7 +1422,8 @@ void main() {
   testWidgets('library search field follows controller query reset', (
     tester,
   ) async {
-    await setSurface(tester, const Size(900, 563));
+    // 宽窗口里搜索框一直挂在页面上，Reset 后的空值直接看得见。
+    await setSurface(tester, const Size(1200, 700));
     final audio = FakeAudioPlayerService();
     addTearDown(audio.dispose);
 
@@ -1423,7 +1431,7 @@ void main() {
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -1457,6 +1465,61 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('the narrow search row closes again once the query is gone', (
+    tester,
+  ) async {
+    // 窄窗口里搜索行是折起来的：查询词没了它就收回去，词还留在输入框的
+    // 控制器里，重新点开时还能看见（而不是被悄悄丢掉）。
+    await setSurface(tester, const Size(900, 563));
+    final audio = FakeAudioPlayerService();
+    addTearDown(audio.dispose);
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        overrides: [
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          audioPlayerServiceProvider.overrideWithValue(audio),
+          libraryControllerProvider.overrideWith(
+            () => FakeLibraryController(
+              const LibraryState(songs: [songA, songB]),
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(LibraryPane)),
+    );
+    final toggle = find.byKey(const ValueKey('library-search-toggle'));
+
+    expect(find.byType(TextField), findsNothing);
+
+    container.read(libraryControllerProvider.notifier).setQuery('Beta');
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      'Beta',
+    );
+
+    container.read(libraryControllerProvider.notifier).setQuery('');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsNothing);
+
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      isEmpty,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('settings scan and clear actions follow library scan state', (
     tester,
   ) async {
@@ -1471,7 +1534,7 @@ void main() {
           child: SettingsPane(),
         ),
         overrides: [
-                    libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
+          libraryInitialViewProvider.overrideWithValue(LibraryViewMode.songs),
           audioPlayerServiceProvider.overrideWithValue(audio),
           libraryControllerProvider.overrideWith(
             () => FakeLibraryController(
@@ -1486,7 +1549,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('settings-nav-library')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('settings-customize-library')));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('settings-customize-library')),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('settings-customize-library')));
     await tester.pump();

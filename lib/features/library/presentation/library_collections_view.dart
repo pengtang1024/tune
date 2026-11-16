@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
+import 'package:tune/features/library/presentation/library_wall_columns.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/features/library/domain/library_collection.dart';
 import 'package:tune/shared/ui/artwork_thumb.dart';
@@ -41,11 +42,12 @@ class LibraryCollectionsView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth - gutter * 2;
-        final columns = ((width + spacing) / (_maxCover + spacing))
-            .ceil()
-            .clamp(2, 10);
-        final cell = (width - spacing * (columns - 1)) / columns;
+        // 列数由 libraryWallColumns 一处决定（窄页固定三列）。
+        final columns = libraryWallColumns(
+          constraints.maxWidth,
+          maxCover: _maxCover,
+        );
+        final cell = wallCellWidth(constraints.maxWidth, columns);
         final caption =
             _captionHeight * MediaQuery.textScalerOf(context).scale(1);
 

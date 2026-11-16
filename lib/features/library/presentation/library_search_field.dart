@@ -14,6 +14,13 @@ class LibrarySearchField extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
 
+  /// Takes the keyboard as soon as it appears.
+  ///
+  /// Only a field that was just opened should ask for it: a narrow window
+  /// folds the search behind an icon, and the reader who tapped the icon is
+  /// already typing.
+  final bool autofocus;
+
   const LibrarySearchField({
     super.key,
     required this.controller,
@@ -21,6 +28,7 @@ class LibrarySearchField extends StatelessWidget {
     required this.query,
     required this.onChanged,
     required this.onClear,
+    this.autofocus = false,
   });
 
   @override
@@ -37,6 +45,7 @@ class LibrarySearchField extends StatelessWidget {
           child: TextField(
             controller: controller,
             focusNode: focusNode,
+            autofocus: autofocus,
             onChanged: onChanged,
             style: theme.textTheme.bodySmall,
             decoration: InputDecoration(
@@ -79,21 +88,15 @@ class LibrarySearchField extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: CompactTokens.borderRadius8,
-                borderSide: BorderSide(
-                  color: theme.colorScheme.outlineVariant,
-                ),
+                borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: CompactTokens.borderRadius8,
-                borderSide: BorderSide(
-                  color: theme.colorScheme.outlineVariant,
-                ),
+                borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: CompactTokens.borderRadius8,
-                borderSide: BorderSide(
-                  color: theme.colorScheme.primary,
-                ),
+                borderSide: BorderSide(color: theme.colorScheme.primary),
               ),
             ),
           ),
