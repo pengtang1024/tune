@@ -3,8 +3,8 @@ import 'package:tune/utils/logger.dart';
 import 'package:tune/data/services/translation/anthropic_translation_engine.dart';
 import 'package:tune/data/services/translation/gemini_translation_engine.dart';
 import 'package:tune/data/services/translation/llama_local_translation_engine.dart';
-import 'package:tune/data/services/translation/ollama_models.dart';
 import 'package:tune/data/services/translation/openai_translation_engine.dart';
+import 'package:tune/data/services/translation/provider_models.dart';
 import 'package:tune/data/services/translation/translation_assets.dart';
 import 'package:tune/data/services/translation/translation_balance.dart';
 import 'package:tune/data/services/translation/translation_provider_catalog.dart';
@@ -33,7 +33,9 @@ enum TranslationAvailability {
   localNotInstalled,
 }
 
-final translationAssetsProvider = FutureProvider<TranslationAssets>((ref) async {
+final translationAssetsProvider = FutureProvider<TranslationAssets>((
+  ref,
+) async {
   ref.watch(localComponentsRevisionProvider);
   final tier = ref.watch(
     settingsControllerProvider.select(
@@ -105,12 +107,14 @@ final translationAvailabilityProvider = Provider<TranslationAvailability>((
   if (provider.isCustom && credential.baseUrl.trim().isEmpty) {
     return TranslationAvailability.needsProvider;
   }
-  final model = credential.model.trim().isEmpty
-      ? provider.defaultModel.trim()
-      : credential.model.trim();
-  if (model.isEmpty) return TranslationAvailability.needsModel;
+  // The key comes first: it is how the page reads the model list, so asking
+  // for a model before the key would ask for something the reader cannot yet
+  // see.
   if (!provider.allowsEmptyKey && credential.apiKey.trim().isEmpty) {
     return TranslationAvailability.needsKey;
+  }
+  if (credential.model.trim().isEmpty) {
+    return TranslationAvailability.needsModel;
   }
   return TranslationAvailability.available;
 });
@@ -205,32 +209,31 @@ final translationBalanceProvider =
       );
     });
 
-/// The models the running Ollama has pulled.
-///
-/// Only the `ollama` backend asks; every other choice, and an Ollama that is
-/// not up, answer an empty list, so the page keeps its free-form field.
-final ollamaModelsProvider = FutureProvider.autoDispose<List<String>>((
-  ref,
-) async {
-  final config = ref.watch(
-    settingsControllerProvider.select((settings) => settings.localization),
-  );
-  if (config.backendId != 'ollama') return const [];
-  final typed = config.credentialFor('ollama').baseUrl.trim();
-  final baseUrl = typed.isEmpty
-      ? providerById('ollama')?.baseUrl ?? ''
-      : typed;
-  if (baseUrl.isEmpty) return const [];
-  return fetchOllamaModels(baseUrl: _withoutVersionSuffix(baseUrl));
+/// What the settings page asks a vendor: who it is, where it lives, and the
+/// key that proves the reader may read the list.
+typedef ProviderModelQuery = ({
+  String providerId,
+  String baseUrl,
+  String apiKey,
 });
 
-/// `/api/tags` sits on the server root, not under the `/v1` chat path.
-String _withoutVersionSuffix(String baseUrl) {
-  final trimmed = baseUrl.trim();
-  const suffix = '/v1';
-  if (!trimmed.endsWith(suffix)) return trimmed;
-  return trimmed.substring(0, trimmed.length - suffix.length);
-}
+/// The models one endpoint serves, read from the endpoint itself.
+///
+/// The query is part of the key: changing the vendor, the endpoint or the key
+/// asks again, and an endpoint that is down answers an empty list so the page
+/// keeps its free-form field.
+final providerModelsProvider = FutureProvider.autoDispose
+    .family<List<String>, ProviderModelQuery>((ref, query) async {
+      final provider = providerById(query.providerId);
+      if (provider == null || provider.isLocalModel) return const [];
+      return fetchProviderModels(
+        provider: provider,
+        credential: ProviderCredential(
+          apiKey: query.apiKey,
+          baseUrl: query.baseUrl,
+        ),
+      );
+    });
 
 Future<TranslationEngine?> _engineFor(
   Ref ref,

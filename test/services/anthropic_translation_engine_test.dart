@@ -49,8 +49,7 @@ Matcher _unavailable() => throwsA(
 
 TranslationProvider get _anthropic => providerById('anthropic')!;
 
-Dio _dioWith(HttpClientAdapter adapter) =>
-    Dio()..httpClientAdapter = adapter;
+Dio _dioWith(HttpClientAdapter adapter) => Dio()..httpClientAdapter = adapter;
 
 void main() {
   test('a batch travels to /messages with the Anthropic headers', () async {
@@ -68,14 +67,16 @@ void main() {
     });
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(apiKey: 'anthropic-key'),
+      credential: const ProviderCredential(
+        apiKey: 'anthropic-key',
+        model: 'claude-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
-    final result = await engine.translate(
-      ['Blue in Green'],
-      targetLanguage: 'zh-CN',
-    );
+    final result = await engine.translate([
+      'Blue in Green',
+    ], targetLanguage: 'zh-CN');
 
     final request = adapter.lastRequest!;
     expect(request.method, 'POST');
@@ -87,7 +88,7 @@ void main() {
     );
 
     final body = request.data as Map<String, dynamic>;
-    expect(body['model'], _anthropic.defaultModel);
+    expect(body['model'], 'claude-test-model');
     expect(body['max_tokens'], 96);
     expect(body['system'], contains('zh-CN'));
     final messages = body['messages'] as List;
@@ -114,14 +115,16 @@ void main() {
     });
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(apiKey: 'anthropic-key'),
+      credential: const ProviderCredential(
+        apiKey: 'anthropic-key',
+        model: 'claude-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
-    final result = await engine.translate(
-      ['Kind of Blue'],
-      targetLanguage: 'zh-CN',
-    );
+    final result = await engine.translate([
+      'Kind of Blue',
+    ], targetLanguage: 'zh-CN');
 
     expect(result.translations, {'Kind of Blue': '泛蓝'});
     expect(result.promptTokens, 0);
@@ -132,7 +135,7 @@ void main() {
     final adapter = _JsonAdapter(200, const {});
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(),
+      credential: const ProviderCredential(model: 'claude-test-model'),
       dio: _dioWith(adapter),
     );
 
@@ -147,7 +150,10 @@ void main() {
     final adapter = _JsonAdapter(200, const {});
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(apiKey: 'anthropic-key'),
+      credential: const ProviderCredential(
+        apiKey: 'anthropic-key',
+        model: 'claude-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
@@ -164,7 +170,10 @@ void main() {
     });
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(apiKey: 'bad-key'),
+      credential: const ProviderCredential(
+        apiKey: 'bad-key',
+        model: 'claude-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
@@ -188,15 +197,18 @@ void main() {
     });
     final engine = AnthropicTranslationEngine(
       provider: _anthropic,
-      credential: const ProviderCredential(apiKey: 'anthropic-key'),
+      credential: const ProviderCredential(
+        apiKey: 'anthropic-key',
+        model: 'claude-test-model',
+      ),
       dio: _dioWith(adapter),
     );
 
     await expectLater(
-      engine.translate(
-        ['Blue in Green', 'Kind of Blue'],
-        targetLanguage: 'zh-CN',
-      ),
+      engine.translate([
+        'Blue in Green',
+        'Kind of Blue',
+      ], targetLanguage: 'zh-CN'),
       throwsA(
         isA<TranslationException>().having(
           (error) => error.unavailable,

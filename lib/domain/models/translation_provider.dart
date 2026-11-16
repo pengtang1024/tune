@@ -25,6 +25,10 @@ class TranslationBalanceApi {
 ///
 /// The catalog is a read-only constant table, not state: the reader's choice
 /// lives in [LocalizationConfig], and the key/model live with that choice.
+///
+/// The catalog names no model. Every vendor serves a different list and
+/// retires names without notice, so the settings page asks the vendor what it
+/// serves ([fetchProviderModels]) instead of carrying a copy that goes stale.
 class TranslationProvider {
   final String id;
   final String name;
@@ -36,12 +40,6 @@ class TranslationProvider {
   /// Appended to [baseUrl] for one translation request. Empty for Gemini,
   /// whose path carries the model name.
   final String chatPath;
-
-  /// The models offered in the picker. The reader may still type another.
-  final List<String> suggestedModels;
-
-  /// The model selected when the vendor is chosen for the first time.
-  final String defaultModel;
 
   /// Whether a request may go out without a key (Ollama, a local proxy).
   final bool allowsEmptyKey;
@@ -64,8 +62,6 @@ class TranslationProvider {
     required this.protocol,
     required this.baseUrl,
     required this.chatPath,
-    required this.suggestedModels,
-    required this.defaultModel,
     this.allowsEmptyKey = false,
     this.isLocalModel = false,
     this.isCustom = false,

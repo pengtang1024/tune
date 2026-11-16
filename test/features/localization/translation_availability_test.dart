@@ -52,9 +52,17 @@ void main() {
   });
 
   test('a local proxy may go without a key', () {
+    final config = const LocalizationConfig(
+      backendId: 'ollama',
+    ).withCredential('ollama', const ProviderCredential(model: 'qwen3:4b'));
+
+    expect(availabilityOf(config), TranslationAvailability.available);
+  });
+
+  test('a local proxy without a model asks for the model', () {
     expect(
       availabilityOf(const LocalizationConfig(backendId: 'ollama')),
-      TranslationAvailability.available,
+      TranslationAvailability.needsModel,
     );
   });
 

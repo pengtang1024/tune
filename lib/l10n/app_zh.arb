@@ -2032,7 +2032,20 @@
   "settingsLocalizationApiBaseUrl": "端点（Base URL）",
   "settingsLocalizationApiKey": "API Key",
   "settingsLocalizationApiModel": "模型",
-  "settingsLocalizationModelSuggestions": "常用模型",
+  "settingsLocalizationModelsFetch": "获取模型",
+  "settingsLocalizationModelsFetching": "正在获取…",
+  "settingsLocalizationModelsFetched": "已获取 {count} 个模型",
+  "@settingsLocalizationModelsFetched": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsLocalizationModelsFailed": "没有获取到模型，确认端点与密钥后重试，或直接填写模型名。",
+  "settingsLocalizationModelsPick": "选择模型",
+  "settingsLocalizationModelsSearch": "搜索模型",
+  "settingsLocalizationModelsEmpty": "没有匹配的模型",
   "settingsLocalizationKeyHint": "密钥以明文保存在本机配置目录，仅当前用户可读。",
   "settingsLocalizationApiHint": "支持 OpenAI Chat、Anthropic Messages 与 Gemini 三类协议。用量取自响应；只有提供余额接口的服务商显示余额。",
   "settingsLocalizationAvailabilityNeedsProvider": "未配置翻译服务，翻译已暂停。",

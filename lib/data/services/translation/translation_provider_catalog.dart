@@ -2,8 +2,10 @@ import 'package:tune/domain/models/translation_provider.dart';
 
 /// The vendors the settings page offers, in display order.
 ///
-/// Endpoints and model names are starting points, not promises: every vendor
-/// changes them, so the page always allows typing another model.
+/// The table carries what a vendor *is* — its dialect, its endpoint and how
+/// its balance is read — and no model name. Vendors rename and retire models
+/// without notice, so the page asks the vendor for the current list
+/// ([fetchProviderModels]) and the reader may still type a name by hand.
 const List<TranslationProvider> translationProviderCatalog = [
   TranslationProvider(
     id: 'openai',
@@ -11,8 +13,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://api.openai.com/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['gpt-4o-mini', 'gpt-4.1-mini', 'gpt-4o'],
-    defaultModel: 'gpt-4o-mini',
   ),
   TranslationProvider(
     id: 'anthropic',
@@ -20,11 +20,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.anthropicMessages,
     baseUrl: 'https://api.anthropic.com/v1',
     chatPath: '/messages',
-    suggestedModels: [
-      'claude-3-5-haiku-latest',
-      'claude-3-5-sonnet-latest',
-    ],
-    defaultModel: 'claude-3-5-haiku-latest',
   ),
   TranslationProvider(
     id: 'gemini',
@@ -32,8 +27,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.geminiGenerateContent,
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     chatPath: '',
-    suggestedModels: ['gemini-2.0-flash', 'gemini-2.5-flash'],
-    defaultModel: 'gemini-2.0-flash',
   ),
   TranslationProvider(
     id: 'deepseek',
@@ -41,8 +34,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://api.deepseek.com/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['deepseek-chat', 'deepseek-reasoner'],
-    defaultModel: 'deepseek-chat',
     balance: TranslationBalanceApi(
       url: 'https://api.deepseek.com/user/balance',
       parser: TranslationBalanceParser.deepseek,
@@ -54,10 +45,8 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://api.moonshot.cn/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['moonshot-v1-8k', 'moonshot-v1-32k', 'kimi-latest'],
-    defaultModel: 'moonshot-v1-8k',
     balance: TranslationBalanceApi(
-      url: 'https://api.moonshot.cn/users/me/balance',
+      url: 'https://api.moonshot.cn/v1/users/me/balance',
       parser: TranslationBalanceParser.moonshot,
     ),
   ),
@@ -67,8 +56,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['qwen-turbo', 'qwen-plus', 'qwen-max'],
-    defaultModel: 'qwen-turbo',
   ),
   TranslationProvider(
     id: 'zhipu',
@@ -76,8 +63,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     chatPath: '/chat/completions',
-    suggestedModels: ['glm-4-flash', 'glm-4-air', 'glm-4-plus'],
-    defaultModel: 'glm-4-flash',
   ),
   TranslationProvider(
     id: 'groq',
@@ -85,8 +70,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://api.groq.com/openai/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile'],
-    defaultModel: 'llama-3.1-8b-instant',
   ),
   TranslationProvider(
     id: 'openrouter',
@@ -94,8 +77,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://openrouter.ai/api/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['openai/gpt-4o-mini', 'google/gemini-2.0-flash-001'],
-    defaultModel: 'openai/gpt-4o-mini',
     balance: TranslationBalanceApi(
       url: 'https://openrouter.ai/api/v1/credits',
       parser: TranslationBalanceParser.openrouter,
@@ -107,10 +88,8 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'https://api.siliconflow.cn/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['Qwen/Qwen2.5-7B-Instruct', 'deepseek-ai/DeepSeek-V3'],
-    defaultModel: 'Qwen/Qwen2.5-7B-Instruct',
     balance: TranslationBalanceApi(
-      url: 'https://api.siliconflow.cn/user/info',
+      url: 'https://api.siliconflow.cn/v1/user/info',
       parser: TranslationBalanceParser.siliconflow,
     ),
   ),
@@ -120,8 +99,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: 'http://127.0.0.1:11434/v1',
     chatPath: '/chat/completions',
-    suggestedModels: ['qwen2.5:3b', 'llama3.2:3b'],
-    defaultModel: 'qwen2.5:3b',
     allowsEmptyKey: true,
   ),
   TranslationProvider(
@@ -130,8 +107,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: '',
     chatPath: '/chat/completions',
-    suggestedModels: [],
-    defaultModel: '',
     allowsEmptyKey: true,
     isCustom: true,
   ),
@@ -141,8 +116,6 @@ const List<TranslationProvider> translationProviderCatalog = [
     protocol: TranslationProtocol.openAiChat,
     baseUrl: '',
     chatPath: '',
-    suggestedModels: [],
-    defaultModel: '',
     isLocalModel: true,
   ),
 ];

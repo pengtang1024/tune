@@ -11,19 +11,28 @@ void main() {
     expect(ids.toSet(), hasLength(ids.length));
   });
 
-  test(
-    'every vendor but the custom and local entries names a default model',
-    () {
-      for (final provider in translationProviderCatalog) {
-        if (provider.id == 'custom' || provider.id == 'local') continue;
-        expect(
-          provider.defaultModel.trim(),
-          isNotEmpty,
-          reason: '${provider.id} needs a starting model',
-        );
-      }
-    },
-  );
+  test('every vendor but the custom and local entries names an endpoint', () {
+    for (final provider in translationProviderCatalog) {
+      if (provider.id == 'custom' || provider.id == 'local') continue;
+      expect(
+        provider.baseUrl.trim(),
+        isNotEmpty,
+        reason: '${provider.id} needs an endpoint',
+      );
+    }
+  });
+
+  test('the balance endpoints sit under the versioned API root', () {
+    // Both vendors answer 404 without the `/v1` prefix.
+    expect(
+      providerById('moonshot')!.balance!.url,
+      'https://api.moonshot.cn/v1/users/me/balance',
+    );
+    expect(
+      providerById('siliconflow')!.balance!.url,
+      'https://api.siliconflow.cn/v1/user/info',
+    );
+  });
 
   test('the OpenAI-compatible vendors share the completions path', () {
     for (final provider in translationProviderCatalog) {
