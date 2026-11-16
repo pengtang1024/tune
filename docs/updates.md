@@ -119,6 +119,12 @@ v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 - [ ] 从任一平台下载归档，`sha256sum` 等于根 `version.json` 里的 `sha256`
 - [ ] `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json` 返回 `status: finished`
 - [ ] CDN 与 `raw.githubusercontent.com` 两份清单版本、`build`、`sha256` 一致
+- [ ] CDN 那一份**确实是新版本号**：`finished` 只表示 purge 请求被受理，不表示边缘已经换了新内容。
+      2026-11-16 发 1.33.2 时出现过「purge 已 finished、CDN 仍返回 1.33.1」约十分钟，
+      再 purge 一次并等 15–60 秒就对了。这一项为什么单列：`version.json` 的 `Cache-Control`
+      是 `max-age=604800, s-maxage=43200`（浏览器 7 天、边缘 12 小时），而客户端带
+      `If-None-Match` 发条件请求——边缘留着旧对象时会回 304，客户端沿用旧清单，
+      **用户就一直看不到新版本**，但日志上一切正常。
 - [ ] `tar -tzf` 首项是 `./`，且含 `tune`、`resources/`、`share/`（bundle 内容在根）
 
 ## 从旧版本升级一次
