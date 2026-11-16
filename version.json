@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.33.1",
-  "build": 54,
-  "released_at": "2026-11-15T16:24:35Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.33.1",
-  "notes": "### 文档与工程\n\n- **发布手册补上真会踩的坑**：`docs/updates.md` 改成 9 步表格，写清 `DART=` 缺失会静默\n  跳过写 `version.json`、门禁必须在打包之后跑（清单测试要拿真实归档核对）、master 不\n  前进等于没发版，以及三端 release 接口各自的差异与重试前的查重。\n- **70 份文档逐条核对到 1.33.0**：约 1300 条可核对断言、117 处修正。改掉的真错包括音源\n  实例 42→47、健康度 `neutral` 已删（unknown 四项 0.25）、`LyricsLine.time` 可空、播放\n  会话已搬进 `queue`/`queue_meta` 表、`library_filter` 的零时长隐藏只作用于歌曲作用域、\n  `shared/ui/source_icon.dart` 已不存在、已移除的网易云音源举例，以及并不存在的「今日\n  混音 20% 上限」。核不动的（实机、联网、基准）如实留在旧版本号。\n- **历史稿不再冒充当前版本**：`需求/历史/` 的适用版本改为「不适用（历史稿）」，\n  `tool/check_docs.py` 对「历史状态却写具体版本」直接报错。",
+  "version": "1.33.2",
+  "build": 55,
+  "released_at": "2026-11-16T03:46:50Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.33.2",
+  "notes": "### 修复\n\n- **`./tool/live_sources.sh` 实际不可执行**：它在 git 里是 `100644`，而 README、CONTRIBUTING、\n  PR 模板、`docs/verification.md`、`docs/troubleshooting.md` 六处都让人这么跑，等于\n  「联网测试失败时请跑这个」那条排查路径一直是断的。改成 `100755`。\n\n### 文档与工程\n\n- **性能数字可复现了**：`docs/performance.md` 新增「复测」一节，六个 `tool/perf/` 脚本\n  对到各自支撑的章节，并写明两条口径（element 是结构量可跨机比、毫秒是 debug 实测会\n  变）。顺带修掉 `library_bench_test.dart` 的量法——它原先量的是 `isScanning` 翻转那次\n  一次性重建（386 element），不是文档声称的稳态值（3）。\n- **国际化文档改正失败形态**：真实情况是「非法 JSON 让 `gen-l10n` exit 1 并报行号」与\n  「合法 JSON 但缺键 → 该语言静默回落模板语言」两件事，原文把前者说成静默。\n- **在线查找补上用例**：文档声称的六条规则此前只有一条主路径有测试，补了四条（没有在线\n  音源时一次请求都不发、丢掉库里已有与直播流、同歌手再查是替换、上限 20 首）。\n- **音源设计分清设计与快照**：设计部分按 1.33.1 核对，第三方目录的「实测」标明是 2026-10\n  快照并给出复核命令。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.33.1/tune-linux-x64-1.33.1.tar.gz",
-      "size": 53784087,
-      "sha256": "ce47642afd7b11898bab0cd642b8b1275c72df8345b2f567e6bf07985229a6d6"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.33.2/tune-linux-x64-1.33.2.tar.gz",
+      "size": 53783206,
+      "sha256": "7636032041b77a2529b39a23a69870c3ca932137395b4b0852728718f5422d9a"
     }
   }
 }
