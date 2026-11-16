@@ -373,6 +373,188 @@ void main() {
     });
   });
 
+  group('自己存下的预设', () {
+    const kept = EqualizerPreset(
+      id: 'user-1',
+      name: '我的低音',
+      gains: <double>[1, 0, 2, 0, 3, 0, 4, 0, 5, 0],
+    );
+
+    test('存下的曲线在 JSON 里往返，名字与增益都不丢', () {
+      final settings = const EqualizerSettings.flat(
+        enabled: true,
+      ).saveCurrentAsPreset('我的低音', id: 'user-1');
+
+      final json = settings.toJson();
+      final restored = EqualizerSettings.fromJson(json);
+
+      expect(json, contains('userPresets'));
+      expect(restored.userPresets.length, 1);
+      expect(restored.userPresets.single.id, 'user-1');
+      expect(restored.userPresets.single.name, '我的低音');
+      expect(restored.userPresets.single.gains, <double>[
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+      ]);
+      expect(restored, settings);
+    });
+
+    test('没存过曲线时 JSON 里不出现 userPresets', () {
+      expect(
+        const EqualizerSettings.flat(enabled: true).toJson(),
+        isNot(contains('userPresets')),
+        reason: '旧版本读到的文件形状保持原样',
+      );
+    });
+
+    test('坏条目被跳过，好条目照常读回', () {
+      final restored = EqualizerSettings.fromJson(
+        '{"version":1,"enabled":true,'
+        '"gains":[0,0,0,0,0,0,0,0,0,0],'
+        '"userPresets":['
+        '{"id":"","name":"没 id","gains":[1]},'
+        '{"id":"user-1","name":"  ","gains":[1]},'
+        '{"id":"user-2","name":"好的","gains":[1,2,99]},'
+        '{"id":"user-2","name":"重复 id","gains":[0]},'
+        '42'
+        ']}',
+      );
+
+      expect(restored.userPresets.length, 1);
+      expect(restored.userPresets.single.id, 'user-2');
+      expect(restored.userPresets.single.name, '好的');
+      expect(restored.userPresets.single.gains, <double>[
+        1,
+        2,
+        12,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+      ]);
+    });
+
+    test('userPresets 不是列表时当作没存过', () {
+      final restored = EqualizerSettings.fromJson(
+        '{"version":1,"enabled":false,"gains":[0,0,0,0,0,0,0,0,0,0],'
+        '"userPresets":{"id":"user-1"}}',
+      );
+
+      expect(restored.userPresets, isEmpty);
+    });
+
+    test('当前曲线命中自己存的预设时，presetId 指向它', () {
+      final settings = EqualizerSettings(
+        enabled: true,
+        gains: kept.gains,
+        userPresets: const <EqualizerPreset>[kept],
+      );
+
+      expect(settings.presetId, 'user-1');
+      expect(settings.findPreset('user-1')?.name, '我的低音');
+      expect(settings.allPresets.length, EqualizerPresets.all.length + 1);
+    });
+
+    test('内置曲线优先于自己存的同形状曲线', () {
+      final settings = EqualizerSettings(
+        enabled: true,
+        gains: EqualizerPresets.bass.gains,
+        userPresets: const <EqualizerPreset>[
+          EqualizerPreset(
+            id: 'user-bass',
+            name: '我的重低音',
+            gains: <double>[1, 0, 2, 0, 3, 0, 4, 0, 5, 0],
+          ),
+        ],
+      );
+
+      expect(
+        settings.presetId,
+        EqualizerPresets.bassId,
+        reason: '同一根曲线先报内置名，用户预设不该抢走既有说法',
+      );
+    });
+
+    test('同名再存是覆盖，不新增条目', () {
+      final first = const EqualizerSettings.flat(
+        enabled: true,
+      ).saveCurrentAsPreset('我的低音', id: 'user-1');
+      final second = first
+          .withGain(0, 9)
+          .saveCurrentAsPreset('我的低音', id: 'user-2');
+
+      expect(second.userPresets.length, 1);
+      expect(second.userPresets.single.id, 'user-1');
+      expect(second.userPresets.single.gains[0], 9);
+    });
+
+    test('空名字不留下条目', () {
+      final settings = const EqualizerSettings.flat(
+        enabled: true,
+      ).saveCurrentAsPreset('   ', id: 'user-1');
+
+      expect(settings.userPresets, isEmpty);
+    });
+
+    test('删除只动预设表，曲线原样保留', () {
+      final settings = EqualizerSettings(
+        enabled: true,
+        gains: kept.gains,
+        userPresets: const <EqualizerPreset>[kept],
+      ).removePreset('user-1');
+
+      expect(settings.userPresets, isEmpty);
+      expect(settings.gains, kept.gains);
+      expect(settings.presetId, EqualizerPresets.customId);
+    });
+
+    test('删除不存在的 id 原样返回', () {
+      final settings = EqualizerSettings(
+        enabled: true,
+        gains: kept.gains,
+        userPresets: const <EqualizerPreset>[kept],
+      );
+
+      expect(settings.removePreset('user-nope'), same(settings));
+    });
+
+    test('预设表不同即不相等', () {
+      final base = EqualizerSettings(
+        enabled: true,
+        gains: kept.gains,
+        userPresets: const <EqualizerPreset>[kept],
+      );
+
+      expect(
+        base ==
+            EqualizerSettings(
+              enabled: true,
+              gains: kept.gains,
+              userPresets: const <EqualizerPreset>[
+                EqualizerPreset(
+                  id: 'user-1',
+                  name: '换了名字',
+                  gains: <double>[1, 0, 2, 0, 3, 0, 4, 0, 5, 0],
+                ),
+              ],
+            ),
+        isFalse,
+      );
+      expect(base == base.copyWith(), isTrue);
+    });
+  });
+
   group('频段表', () {
     test('10 段中心频率与面板顺序一致', () {
       expect(

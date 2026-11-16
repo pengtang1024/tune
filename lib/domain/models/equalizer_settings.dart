@@ -17,12 +17,16 @@ class EqualizerBand {
 /// The curves are constants: a stored `presetId` goes stale the moment one of
 /// them is edited, so the panel reads the id back from the gains instead.
 class EqualizerPreset {
-  const EqualizerPreset({required this.id, required this.gains});
+  const EqualizerPreset({required this.id, required this.gains, this.name});
 
   final String id;
 
   /// Ten gains, from the lowest band to the highest, in decibels.
   final List<double> gains;
+
+  /// The reader's own label. Built-in curves carry none: their label comes
+  /// from the translation file, so renaming a language does not stale it.
+  final String? name;
 }
 
 /// The ten bands of the equalizer and the curves that come with it.
@@ -44,6 +48,9 @@ class EqualizerPresets {
 
   /// The id a curve gets once a slider moved it away from every preset.
   static const String customId = 'custom';
+
+  /// Prefix of the ids the reader's own presets get.
+  static const String userPresetPrefix = 'user-';
 
   /// The neutral curve, and the shape the panel resets to.
   static const List<double> flatGains = <double>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -147,12 +154,13 @@ class EqualizerPresets {
   /// slider away from every curve.
   static EqualizerPreset? matching(List<double> gains) {
     for (final preset in all) {
-      if (_sameGains(preset.gains, gains)) return preset;
+      if (sameGains(preset.gains, gains)) return preset;
     }
     return null;
   }
 
-  static bool _sameGains(List<double> a, List<double> b) {
+  /// Whether two curves hold the same gains, band by band.
+  static bool sameGains(List<double> a, List<double> b) {
     if (a.length != b.length) return false;
     for (var i = 0; i < a.length; i++) {
       if (a[i] != b[i]) return false;
@@ -166,16 +174,40 @@ class EqualizerPresets {
 /// The settings are one truth for the panel, the filter chain and the button
 /// that opens it: gains in decibels, and whether the chain is bypassed.
 class EqualizerSettings {
-  const EqualizerSettings({required this.enabled, required this.gains});
+  const EqualizerSettings({
+    required this.enabled,
+    required this.gains,
+    this.userPresets = const <EqualizerPreset>[],
+  });
 
   /// Bypassed, with a flat curve.
   const EqualizerSettings.flat({this.enabled = false})
-    : gains = EqualizerPresets.flatGains;
+    : gains = EqualizerPresets.flatGains,
+      userPresets = const <EqualizerPreset>[];
 
   final bool enabled;
 
   /// Ten gains, from the lowest band to the highest, in decibels.
   final List<double> gains;
+
+  /// The curves the reader saved, oldest first. Each carries a label; built-in
+  /// curves do not, because their label comes from the translation file.
+  final List<EqualizerPreset> userPresets;
+
+  /// Built-in curves first, then the reader's own, in the order they are drawn.
+  List<EqualizerPreset> get allPresets => <EqualizerPreset>[
+    ...EqualizerPresets.all,
+    ...userPresets,
+  ];
+
+  /// The preset behind [id], whether it ships with the app or the reader saved
+  /// it.
+  EqualizerPreset? findPreset(String id) {
+    for (final preset in allPresets) {
+      if (preset.id == id) return preset;
+    }
+    return null;
+  }
 
   static const int bandCount = 10;
 
@@ -234,13 +266,64 @@ class EqualizerSettings {
   }
 
   /// The preset the curve matches, or [EqualizerPresets.customId].
-  String get presetId =>
-      EqualizerPresets.matching(gains)?.id ?? EqualizerPresets.customId;
+  ///
+  /// Built-in curves win a tie: a reader who dragged a curve back onto a
+  /// shipped preset sees that preset's name, not one of their own that happens
+  /// to be identical.
+  String get presetId {
+    final builtIn = EqualizerPresets.matching(gains);
+    if (builtIn != null) return builtIn.id;
+    for (final preset in userPresets) {
+      if (EqualizerPresets.sameGains(preset.gains, gains)) return preset.id;
+    }
+    return EqualizerPresets.customId;
+  }
 
-  EqualizerSettings copyWith({bool? enabled, List<double>? gains}) {
+  EqualizerSettings copyWith({
+    bool? enabled,
+    List<double>? gains,
+    List<EqualizerPreset>? userPresets,
+  }) {
     return EqualizerSettings(
       enabled: enabled ?? this.enabled,
       gains: gains == null ? this.gains : normalizeGains(gains),
+      userPresets: userPresets ?? this.userPresets,
+    );
+  }
+
+  /// Saves the current curve as [name], keeping every other stored curve.
+  ///
+  /// A name already in the list is overwritten in place (same id, new gains),
+  /// so saving twice under one label does not pile up duplicates. [id] is only
+  /// used for a new entry; an overwrite keeps the id it already had.
+  EqualizerSettings saveCurrentAsPreset(String name, {required String id}) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return this;
+    final saved = <EqualizerPreset>[];
+    var replaced = false;
+    for (final preset in userPresets) {
+      if (!replaced && preset.name == trimmed) {
+        saved.add(EqualizerPreset(id: preset.id, name: trimmed, gains: gains));
+        replaced = true;
+      } else {
+        saved.add(preset);
+      }
+    }
+    if (!replaced) {
+      saved.add(EqualizerPreset(id: id, name: trimmed, gains: gains));
+    }
+    return copyWith(userPresets: List<EqualizerPreset>.unmodifiable(saved));
+  }
+
+  /// Drops one saved curve. The gains stay where they are, so the panel shows
+  /// [EqualizerPresets.customId] if the curve was the one being used.
+  EqualizerSettings removePreset(String id) {
+    if (!userPresets.any((preset) => preset.id == id)) return this;
+    return copyWith(
+      userPresets: List<EqualizerPreset>.unmodifiable(<EqualizerPreset>[
+        for (final preset in userPresets)
+          if (preset.id != id) preset,
+      ]),
     );
   }
 
@@ -253,7 +336,11 @@ class EqualizerSettings {
     final next = <double>[
       for (var i = 0; i < bandCount; i++) i == index ? clamped : gainAt(i),
     ];
-    return EqualizerSettings(enabled: enabled, gains: next);
+    return EqualizerSettings(
+      enabled: enabled,
+      gains: next,
+      userPresets: userPresets,
+    );
   }
 
   /// The flat curve, keeping the switch as it is.
@@ -288,6 +375,7 @@ class EqualizerSettings {
             else
               0,
         ]),
+        userPresets: _readUserPresets(decoded['userPresets']),
       );
     } on FormatException {
       return const EqualizerSettings.flat();
@@ -298,7 +386,52 @@ class EqualizerSettings {
     'version': schemaVersion,
     'enabled': enabled,
     'gains': gains,
+    // Written only when there is something to write: a reader who never saved
+    // a curve keeps the file it had before this field existed.
+    if (userPresets.isNotEmpty)
+      'userPresets': <Object?>[
+        for (final preset in userPresets)
+          <String, Object?>{
+            'id': preset.id,
+            'name': preset.name,
+            'gains': preset.gains,
+          },
+      ],
   });
+
+  /// Reads the saved curves, dropping the ones that cannot be trusted.
+  ///
+  /// One bad entry does not cost the reader the others: an entry without a
+  /// usable id, label or gain list is skipped, and every kept curve is
+  /// normalized like the live one.
+  static List<EqualizerPreset> _readUserPresets(Object? raw) {
+    if (raw is! List) return const <EqualizerPreset>[];
+    final presets = <EqualizerPreset>[];
+    final seen = <String>{};
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final id = entry['id'];
+      final name = entry['name'];
+      final gains = entry['gains'];
+      if (id is! String || id.isEmpty || !seen.add(id)) continue;
+      if (name is! String || name.trim().isEmpty) continue;
+      if (gains is! List) continue;
+      presets.add(
+        EqualizerPreset(
+          id: id,
+          name: name.trim(),
+          gains: normalizeGains(<double>[
+            for (var i = 0; i < bandCount; i++)
+              if (i < gains.length && gains[i] is num)
+                (gains[i] as num).toDouble()
+              else
+                0,
+          ]),
+        ),
+      );
+    }
+    return List<EqualizerPreset>.unmodifiable(presets);
+  }
 
   /// A gain inside the range, on a step.
   static double clampGain(double value) {
@@ -325,9 +458,22 @@ class EqualizerSettings {
     for (var i = 0; i < gains.length; i++) {
       if (other.gains[i] != gains[i]) return false;
     }
+    if (other.userPresets.length != userPresets.length) return false;
+    for (var i = 0; i < userPresets.length; i++) {
+      final mine = userPresets[i];
+      final theirs = other.userPresets[i];
+      if (mine.id != theirs.id || mine.name != theirs.name) return false;
+      if (!EqualizerPresets.sameGains(mine.gains, theirs.gains)) return false;
+    }
     return true;
   }
 
   @override
-  int get hashCode => Object.hash(enabled, Object.hashAll(gains));
+  int get hashCode => Object.hash(
+    enabled,
+    Object.hashAll(gains),
+    Object.hashAll(
+      userPresets.map((preset) => Object.hash(preset.id, preset.name)),
+    ),
+  );
 }

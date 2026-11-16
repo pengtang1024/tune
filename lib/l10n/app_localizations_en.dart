@@ -4882,6 +4882,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equalizerReset => 'Reset';
 
   @override
+  String get equalizerPresetDelete => 'Delete preset';
+
+  @override
+  String get equalizerPresetName => 'Preset name';
+
+  @override
+  String get equalizerSavePreset => 'Save preset';
+
+  @override
   String get equalizerHint =>
       'Boosted bands are offset by an equal preamp so nothing clips';
 

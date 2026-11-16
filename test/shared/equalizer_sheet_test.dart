@@ -100,6 +100,8 @@ void main() {
     void Function(int band, double gain)? onGainChanged,
     ValueChanged<String>? onPresetChanged,
     VoidCallback? onReset,
+    String? Function(String name)? onSavePreset,
+    ValueChanged<String>? onDeletePreset,
   }) {
     return pumpPanel(
       tester,
@@ -111,6 +113,8 @@ void main() {
         onGainChanged: onGainChanged ?? (band, gain) {},
         onPresetChanged: onPresetChanged ?? (presetId) {},
         onReset: onReset ?? () {},
+        onSavePreset: onSavePreset ?? (name) => 'user-test',
+        onDeletePreset: onDeletePreset ?? (presetId) {},
       ),
     );
   }
@@ -300,5 +304,106 @@ void main() {
     await tester.tap(find.byType(ChoiceChip).first, warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(presetCalls, 0);
+  });
+
+  testWidgets('a curve can be kept under a name', (tester) async {
+    final saved = <String>[];
+    await openEditorPanel(
+      tester,
+      onSavePreset: (name) {
+        saved.add(name);
+        return 'user-7';
+      },
+    );
+
+    await tester.tap(find.byKey(const ValueKey<String>('equalizer-save-preset')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.widgetWithText(AlertDialog, '存为预设'),
+      findsOneWidget,
+      reason: 'the dialog asks what to call it',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('equalizer-preset-name')),
+      '  我的低音  ',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey<String>('equalizer-preset-name-save')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      saved,
+      <String>['我的低音'],
+      reason: 'the name reaches the caller trimmed',
+    );
+    expect(
+      find.widgetWithText(InputChip, '我的低音'),
+      findsOneWidget,
+      reason: 'the saved curve is a chip of its own at once',
+    );
+    expect(
+      find.byType(ChoiceChip),
+      findsNWidgets(12),
+      reason: 'the built-in curves stay where they are',
+    );
+  });
+
+  testWidgets('a name that goes nowhere keeps no chip', (tester) async {
+    await openEditorPanel(tester, onSavePreset: (name) => null);
+
+    await tester.tap(find.byKey(const ValueKey<String>('equalizer-save-preset')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('equalizer-preset-name')),
+      '丢掉',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey<String>('equalizer-preset-name-save')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.widgetWithText(InputChip, '丢掉'),
+      findsNothing,
+      reason: 'a curve the caller could not keep is not drawn as kept',
+    );
+  });
+
+  testWidgets('a kept curve is dropped by its delete mark', (tester) async {
+    final deleted = <String>[];
+    await openEditorPanel(
+      tester,
+      settings: const EqualizerSettings(
+        enabled: true,
+        gains: <double>[6, 5, 4, 2, 0, 0, 0, 0, 0, 0],
+        userPresets: <EqualizerPreset>[
+          EqualizerPreset(
+            id: 'user-1',
+            name: '我的低音',
+            gains: <double>[6, 5, 4, 2, 0, 0, 0, 0, 0, 0],
+          ),
+        ],
+      ),
+      onDeletePreset: deleted.add,
+    );
+
+    final chip = find.byKey(
+      const ValueKey<String>('equalizer-preset-user-1'),
+    );
+    expect(chip, findsOneWidget);
+
+    await tester.tap(
+      find.descendant(of: chip, matching: find.byIcon(Icons.close_rounded)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(deleted, <String>['user-1']);
+    expect(
+      find.widgetWithText(InputChip, '我的低音'),
+      findsNothing,
+      reason: 'the chip leaves the row with the curve',
+    );
   });
 }

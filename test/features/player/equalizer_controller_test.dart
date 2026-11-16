@@ -293,4 +293,140 @@ void main() {
       expect(persistence.writtenKeys, isEmpty);
     });
   });
+
+  group('存为预设与删除预设', () {
+    test('存下的曲线立刻多一个用户预设，落了盘还能读回来', () async {
+      final persistence = _RecordingPersistence();
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(persistence, backend);
+      addTearDown(controller.dispose);
+
+      controller.setGain(0, 7);
+      controller.setGain(1, 5);
+      final appliedBefore = backend.applied.length;
+
+      controller.savePreset('  我的低音  ');
+
+      expect(controller.state.userPresets.length, 1);
+      final kept = controller.state.userPresets.single;
+      expect(kept.name, '我的低音', reason: '名字两头的空白不留');
+      expect(kept.id, startsWith(EqualizerPresets.userPresetPrefix));
+      expect(kept.gains, controller.state.gains);
+      expect(
+        controller.state.presetId,
+        kept.id,
+        reason: '刚存下的曲线就是当前曲线，界面该点亮这一条',
+      );
+      expect(
+        backend.applied.length,
+        appliedBefore + 1,
+        reason: '存曲线不改声音，但状态换了，照常下发一次',
+      );
+
+      await Future<void>.delayed(
+        equalizerSaveDelay + const Duration(milliseconds: 150),
+      );
+
+      final saved = EqualizerSettings.fromJson(persistence.getString(key));
+      expect(saved.userPresets.single.name, '我的低音');
+      expect(saved.userPresets.single.gains, controller.state.gains);
+    });
+
+    test('空名字不存，也不打扰后端', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.setGain(0, 4);
+      final applied = backend.applied.length;
+
+      controller.savePreset('   ');
+
+      expect(controller.state.userPresets, isEmpty);
+      expect(backend.applied.length, applied);
+    });
+
+    test('同名再存一次是覆盖曲线，id 与条数都不变', () {
+      final controller = EqualizerController(
+        _RecordingPersistence(),
+        FakeAudioEqualizerBackend(),
+      );
+      addTearDown(controller.dispose);
+
+      controller.setGain(0, 4);
+      controller.savePreset('我的低音');
+      final firstId = controller.state.userPresets.single.id;
+
+      controller.setGain(0, 9);
+      controller.savePreset('我的低音');
+
+      expect(controller.state.userPresets.length, 1);
+      expect(controller.state.userPresets.single.id, firstId);
+      expect(controller.state.userPresets.single.gains[0], 9);
+    });
+
+    test('删掉正在用的预设回落到自定义，别的预设不受影响', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.setGain(0, 4);
+      controller.savePreset('低音一');
+      final first = controller.state.userPresets.single.id;
+
+      controller.reset();
+      controller.setGain(2, 6);
+      controller.savePreset('低音二');
+      final second = controller.state.userPresets
+          .firstWhere((preset) => preset.name == '低音二')
+          .id;
+
+      controller.applyPreset(second);
+      final applied = backend.applied.length;
+
+      controller.deletePreset(second);
+
+      expect(controller.state.userPresets.map((preset) => preset.id), <String>[
+        first,
+      ]);
+      expect(
+        controller.state.presetId,
+        EqualizerPresets.customId,
+        reason: '曲线还在，只是不再是任何一条预设',
+      );
+      expect(
+        backend.applied.length,
+        applied + 1,
+        reason: '删预设不动声音，但状态换了要下发',
+      );
+    });
+
+    test('删一个不存在的 id 不产生下发', () {
+      final backend = FakeAudioEqualizerBackend();
+      final controller = EqualizerController(_RecordingPersistence(), backend);
+      addTearDown(controller.dispose);
+
+      controller.deletePreset('user-nope');
+
+      expect(backend.applied, isEmpty);
+    });
+
+    test('用户预设能被 applyPreset 选中', () {
+      final controller = EqualizerController(
+        _RecordingPersistence(),
+        FakeAudioEqualizerBackend(),
+      );
+      addTearDown(controller.dispose);
+
+      controller.setGain(3, 5);
+      controller.savePreset('中音');
+      final id = controller.state.userPresets.single.id;
+
+      controller.reset();
+      controller.applyPreset(id);
+
+      expect(controller.state.gainAt(3), 5);
+      expect(controller.state.presetId, id);
+    });
+  });
 }

@@ -36,7 +36,8 @@ Future<void> showEqualizerQuickPanel(
   );
 }
 
-/// Opens the full editor: every curve, one slider per band, and the reset.
+/// Opens the full editor: every curve, one slider per band, the save and the
+/// reset.
 ///
 /// The settings page is the only caller. The player keeps its panel small on
 /// purpose: ten sliders do not fit beside a track row and a volume thumb.
@@ -48,6 +49,8 @@ Future<void> showEqualizerEditorPanel(
   required void Function(int band, double gain) onGainChanged,
   required ValueChanged<String> onPresetChanged,
   required VoidCallback onReset,
+  required String? Function(String name) onSavePreset,
+  required ValueChanged<String> onDeletePreset,
 }) async {
   await showCompactSheet<void>(
     context,
@@ -58,6 +61,8 @@ Future<void> showEqualizerEditorPanel(
       onGainChanged: onGainChanged,
       onPresetChanged: onPresetChanged,
       onReset: onReset,
+      onSavePreset: onSavePreset,
+      onDeletePreset: onDeletePreset,
     ),
   );
 }
@@ -83,6 +88,21 @@ String equalizerPresetLabel(BuildContext context, String presetId) {
     EqualizerPresets.softId => loc.equalizerPresetSoft,
     _ => loc.equalizerCustom,
   };
+}
+
+/// The name of the curve the settings are on.
+///
+/// A built-in curve is named by the localization, a curve the reader kept by
+/// itself; the fallback covers a curve moved by hand. The settings row names a
+/// curve too, so the resolver is public.
+String equalizerCurrentPresetLabel(
+  BuildContext context,
+  EqualizerSettings settings,
+) {
+  final preset = settings.findPreset(settings.presetId);
+  final name = preset?.name;
+  if (name != null && name.isNotEmpty) return name;
+  return equalizerPresetLabel(context, settings.presetId);
 }
 
 /// The panel the player opens: switch and four curves.
@@ -148,7 +168,7 @@ class _EqualizerQuickSheetState extends State<EqualizerQuickSheet> {
         children: [
           SettingsSwitchRow(
             title: context.loc.equalizerEnable,
-            description: equalizerPresetLabel(context, _settings.presetId),
+            description: equalizerCurrentPresetLabel(context, _settings),
             value: _settings.enabled,
             // The switch row of the app has no disabled state of its own; the
             // dimmed block of the frame keeps the pointer away and this guard
@@ -179,6 +199,8 @@ class EqualizerEditorSheet extends StatefulWidget {
     required this.onGainChanged,
     required this.onPresetChanged,
     required this.onReset,
+    required this.onSavePreset,
+    required this.onDeletePreset,
   });
 
   /// The settings the panel opens with.
@@ -194,6 +216,13 @@ class EqualizerEditorSheet extends StatefulWidget {
   final ValueChanged<String> onPresetChanged;
 
   final VoidCallback onReset;
+
+  /// Keeps the curve under a name and answers with the id it landed on, so the
+  /// panel can draw the new chip before the sheet is opened again. Null when
+  /// the caller could not keep it.
+  final String? Function(String name) onSavePreset;
+
+  final ValueChanged<String> onDeletePreset;
 
   @override
   State<EqualizerEditorSheet> createState() => _EqualizerEditorSheetState();
@@ -221,7 +250,7 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
   }
 
   void _applyPreset(String presetId) {
-    final preset = EqualizerPresets.byId(presetId);
+    final preset = _settings.findPreset(presetId);
     if (preset == null) return;
     setState(() => _settings = _settings.copyWith(gains: preset.gains));
     widget.onPresetChanged(presetId);
@@ -232,18 +261,52 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
     widget.onReset();
   }
 
+  Future<void> _savePreset() async {
+    final current = _settings.findPreset(_settings.presetId);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => _PresetNameDialog(initialName: current?.name ?? ''),
+    );
+    if (!mounted || name == null || name.trim().isEmpty) return;
+    final trimmed = name.trim();
+    final presetId = widget.onSavePreset(trimmed);
+    if (presetId == null) return;
+    setState(() {
+      _settings = _settings.saveCurrentAsPreset(trimmed, id: presetId);
+    });
+  }
+
+  void _deletePreset(String presetId) {
+    setState(() => _settings = _settings.removePreset(presetId));
+    widget.onDeletePreset(presetId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return _EqualizerFrame(
       available: widget.available,
       hint: context.loc.equalizerHint,
-      trailing: TextButton.icon(
-        onPressed: widget.available ? _reset : null,
-        icon: const Icon(
-          Icons.restart_alt_rounded,
-          size: CompactTokens.icon16,
-        ),
-        label: Text(context.loc.equalizerReset),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton.icon(
+            key: const ValueKey<String>('equalizer-save-preset'),
+            onPressed: widget.available ? _savePreset : null,
+            icon: const Icon(
+              Icons.bookmark_add_outlined,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(context.loc.equalizerSavePreset),
+          ),
+          TextButton.icon(
+            onPressed: widget.available ? _reset : null,
+            icon: const Icon(
+              Icons.restart_alt_rounded,
+              size: CompactTokens.icon16,
+            ),
+            label: Text(context.loc.equalizerReset),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,15 +314,16 @@ class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
         children: [
           SettingsSwitchRow(
             title: context.loc.equalizerEnable,
-            description: equalizerPresetLabel(context, _settings.presetId),
+            description: equalizerCurrentPresetLabel(context, _settings),
             value: _settings.enabled,
             onChanged: widget.available ? _setEnabled : _ignoreSwitch,
           ),
           const SizedBox(height: CompactTokens.space16),
           _PresetChips(
-            presets: EqualizerPresets.all,
+            presets: _settings.allPresets,
             presetId: _settings.presetId,
             onSelected: widget.available ? _applyPreset : null,
+            onDeleted: widget.available ? _deletePreset : null,
           ),
           const SizedBox(height: CompactTokens.space16),
           SizedBox(
@@ -388,6 +452,7 @@ class _PresetChips extends StatelessWidget {
     required this.presets,
     required this.presetId,
     required this.onSelected,
+    this.onDeleted,
   });
 
   final List<EqualizerPreset> presets;
@@ -398,6 +463,10 @@ class _PresetChips extends StatelessWidget {
   /// tap leads nowhere.
   final ValueChanged<String>? onSelected;
 
+  /// Only the editor passes this: the curves the reader kept can be dropped
+  /// again, the built-in ones are part of the app.
+  final ValueChanged<String>? onDeleted;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -407,13 +476,7 @@ class _PresetChips extends StatelessWidget {
       spacing: CompactTokens.space6,
       runSpacing: CompactTokens.space6,
       children: [
-        for (final preset in presets)
-          ChoiceChip(
-            label: Text(equalizerPresetLabel(context, preset.id)),
-            selected: preset.id == presetId,
-            onSelected:
-                onSelected == null ? null : (_) => onSelected!(preset.id),
-          ),
+        for (final preset in presets) _chip(context, preset),
         // The stored shape has no id: a curve the reader moved by hand matches
         // no preset, and the panel says so instead of lighting up a wrong chip.
         if (isCustom)
@@ -422,6 +485,93 @@ class _PresetChips extends StatelessWidget {
             backgroundColor: theme.colorScheme.primaryContainer,
             side: BorderSide.none,
           ),
+      ],
+    );
+  }
+
+  /// A built-in curve is a name from the localization; a curve the reader kept
+  /// carries its own name and can be dropped again.
+  Widget _chip(BuildContext context, EqualizerPreset preset) {
+    final name = preset.name;
+    final selected = preset.id == presetId;
+    final onSelected = this.onSelected;
+
+    if (name == null) {
+      return ChoiceChip(
+        label: Text(equalizerPresetLabel(context, preset.id)),
+        selected: selected,
+        onSelected: onSelected == null ? null : (_) => onSelected(preset.id),
+      );
+    }
+
+    final onDeleted = this.onDeleted;
+    return InputChip(
+      key: ValueKey<String>('equalizer-preset-${preset.id}'),
+      label: Text(name),
+      selected: selected,
+      onSelected: onSelected == null ? null : (_) => onSelected(preset.id),
+      onDeleted: onDeleted == null ? null : () => onDeleted(preset.id),
+      deleteIcon: const Icon(Icons.close_rounded, size: CompactTokens.icon14),
+      deleteButtonTooltipMessage: context.loc.equalizerPresetDelete,
+    );
+  }
+}
+
+/// Asks the reader for the name a curve is kept under.
+///
+/// An input error, or the back of the sheet, answers with null: no name, no
+/// curve. A name that is already taken overwrites that curve, which is what
+/// the reader means when they type it a second time.
+class _PresetNameDialog extends StatefulWidget {
+  const _PresetNameDialog({required this.initialName});
+
+  final String initialName;
+
+  @override
+  State<_PresetNameDialog> createState() => _PresetNameDialogState();
+}
+
+class _PresetNameDialogState extends State<_PresetNameDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialName,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    Navigator.of(context).pop(_controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(context.loc.equalizerSavePreset),
+      content: TextField(
+        key: const ValueKey<String>('equalizer-preset-name'),
+        controller: _controller,
+        autofocus: true,
+        textInputAction: TextInputAction.done,
+        decoration: InputDecoration(
+          labelText: context.loc.equalizerPresetName,
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.loc.cancel),
+        ),
+        FilledButton(
+          key: const ValueKey<String>('equalizer-preset-name-save'),
+          onPressed: _submit,
+          child: Text(context.loc.save),
+        ),
       ],
     );
   }

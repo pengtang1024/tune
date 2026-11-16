@@ -63,7 +63,7 @@ class EqualizerController extends StateNotifier<EqualizerSettings> {
   }
 
   void applyPreset(String presetId) {
-    final preset = EqualizerPresets.byId(presetId);
+    final preset = state.findPreset(presetId);
     if (preset == null) return;
     // Compare the derived id, not the lists: List has no element-wise ==,
     // so two equal curves are two different objects and a reference check
@@ -71,6 +71,41 @@ class EqualizerController extends StateNotifier<EqualizerSettings> {
     if (state.presetId == preset.id) return;
     state = state.copyWith(gains: preset.gains);
     _changed();
+  }
+
+  /// Saves the current curve under [name].
+  ///
+  /// An empty name is ignored: the dialog already blocks it, but a reader can
+  /// still confirm a field of spaces, and a nameless chip would be unreadable.
+  /// Reusing an existing label overwrites that curve instead of adding a
+  /// second one with the same name.
+  void savePreset(String name) {
+    if (name.trim().isEmpty) return;
+    final next = state.saveCurrentAsPreset(name, id: _nextPresetId());
+    if (next == state) return;
+    state = next;
+    _changed();
+  }
+
+  /// Drops one saved curve. The live gains are untouched, so a reader who
+  /// deletes the curve they are listening through keeps the sound and lands on
+  /// the custom chip.
+  void deletePreset(String presetId) {
+    final next = state.removePreset(presetId);
+    if (next == state) return;
+    state = next;
+    _changed();
+  }
+
+  /// A label-free id for a new saved curve, unique within this state.
+  String _nextPresetId() {
+    var stamp = DateTime.now().microsecondsSinceEpoch;
+    var id = '${EqualizerPresets.userPresetPrefix}$stamp';
+    while (state.userPresets.any((preset) => preset.id == id)) {
+      stamp += 1;
+      id = '${EqualizerPresets.userPresetPrefix}$stamp';
+    }
+    return id;
   }
 
   void reset() {
