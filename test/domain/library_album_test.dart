@@ -627,6 +627,31 @@ void main() {
       expect(isSingleTrackGroup(album), isFalse);
     });
   });
+  test('a station favicon never becomes an album cover', () {
+    final songs = [
+      Song(
+        id: 1,
+        title: 'Smooth jazz',
+        artist: '',
+        album: '',
+        uri: 'tune://radio/one',
+        sourceId: 'radio',
+        artworkUrl: 'http://101smoothjazz.com/favicon.ico',
+        duration: 0,
+      ),
+      Song(
+        id: 2,
+        title: 'Late night',
+        artist: '',
+        album: '',
+        uri: 'tune://radio/two',
+        sourceId: 'radio',
+        duration: 0,
+      ),
+    ];
+    final album = libraryAlbumGroupsOf(songs).single;
+    expect(album.coverUrl, isNull);
+  });
 }
 
 /// A track with the facts the row order reads.
@@ -647,4 +672,6 @@ Song rowSong({
     duration: duration,
     dateAdded: addedAt,
   );
+
+
 }
