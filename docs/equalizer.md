@@ -198,7 +198,7 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | 面板 | 谁打开 | 内容 |
 | --- | --- | --- |
 | 快捷面板 `EqualizerQuickSheet` | 底栏「更多」菜单、正在播放页顶栏 | 标题 + 开关 + 4 个常用曲线（平坦 / 流行 / 摇滚 / 重低音）；手动改过的曲线追加高亮的「自定义」；底部一行小字指向设置（`equalizerQuickHint`） |
-| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「存为预设」「重置」+ 12 个内置 chips + 自存 chips（带删除标记）+ 频段宽度 chips + 预放（自动/手动 + 滑杆）+ 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
+| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「存为预设」「重置」+ 12 个内置 chips + 自存 chips（带删除标记）+ 带宽 chips + 预放（自动/手动 + 滑杆）+ 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
 
 - 为什么分两层：底栏和正在播放页顶栏只有几百像素，十个滑块加十二枚 chip 会跟播放控件抢空间；听歌时选曲线本来也只需要「按心情点一下」。
 - 快捷面板用 `EqualizerPresets.quick`，编辑器用 `EqualizerPresets.all`；两张表都在 model 里，面板不自己写一份。
@@ -206,7 +206,7 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 - 后端不可用：两个面板照常打开，控件置灰且不回调，顶部写 `equalizerUnavailable`。
 - 编辑器里的滑块中心 0 dB，上 +12、下 -12，48 格（0.5 dB 一格），拖动时在滑轨上显示当前 dB；小数按 1 位显示（+3.5 dB），整数不带小数点。
 - 点频段上方的 dB 数字弹出 `AlertDialog` 直接键入数值：解析失败或超范围就留在对话框里提示 `equalizerGainDialogHint`，合法值按 0.5 吸附后立刻下发。
-- 频段宽度在 chips 行下面单列一排，四档（1 / 2⁄3 / 1⁄2 / 1⁄3 倍频程），按 `EqualizerSettings.bandWidths` 顺序画；当前档高亮。十个频段共用一档，不是每段单独设。
+- 带宽在 chips 行下面单列一排，四档（1 / 2⁄3 / 1⁄2 / 1⁄3 倍频程），按 `EqualizerSettings.bandWidths` 顺序画；当前档高亮。十个频段共用一档，不是每段单独设。
 - 预放是一个开关加一条滑杆：默认「跟随最大增益」（自动，滑杆不显示），切到手动后露出 -24–0 dB 滑杆，取整 dB；改回自动即清掉覆盖值。
 - 「存为预设」弹出 `AlertDialog` 要一个名字（去空白后为空就不存）；存下的曲线立刻以 `InputChip` 出现在 chips 行，点击即应用，右侧 × 删除。面板自己记住刚存下的 id，所以不必重开面板。
 - 自存曲线的名字是数据，直接当 chip 文字；内置曲线仍走 ARB。设置行副标题对两者都显示名字（`equalizerCurrentPresetLabel`）。
@@ -227,15 +227,15 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | 键 | 中文 | 用在哪 |
 | --- | --- | --- |
 | `equalizerTitle` | 均衡器 | 面板标题 |
-| `equalizerEnable` | 启用均衡器 | 开关 |
+| `equalizerEnable` | 均衡器开关 | 开关 |
 | `equalizerPresetFlat` / `Pop` / `Rock` / `Jazz` / `Classical` / `Acoustic` / `Bass` / `Vocal` / `Hiphop` / `Electronic` / `Live` / `Soft` | 平坦 / 流行 / 摇滚 / 爵士 / 古典 / 原声 / 重低音 / 人声 / 嘻哈 / 电子 / 现场 / 轻柔 | 12 个预设名 |
 | `equalizerCustom` | 自定义 | 未命中预设时的状态 |
 | `equalizerReset` | 重置 | 恢复平坦 |
 | `equalizerSavePreset` | 存为预设 | 编辑器标题行的保存按钮，也是命名对话框的标题 |
 | `equalizerPresetName` | 预设名称 | 命名对话框的输入框 |
 | `equalizerPresetDelete` | 删除预设 | 自存 chip 删除标记的 tooltip |
-| `equalizerBandWidth` | 频段宽度 | 宽度选择器标题 |
-| `equalizerBandWidthHint` | 越窄，一个频段影响的频率范围越小 | 宽度选择器说明 |
+| `equalizerBandWidth` | 带宽 | 宽度选择器标题 |
+| `equalizerBandWidthHint` | 以倍频程计，数值越小影响越窄 | 宽度选择器说明 |
 | `equalizerWidthOne` / `TwoThirds` / `Half` / `Third` | 1 倍频程 / 2⁄3 倍频程 / 1⁄2 倍频程 / 1⁄3 倍频程 | 四个宽度 chip |
 | `equalizerPreamp` | 预放 | 预放开关标题 |
 | `equalizerPreampAuto` / `Manual` | 跟随最大增益 / 手动 | 预放开关的副标题 |

@@ -4472,7 +4472,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equalizerTitle => '均衡器';
 
   @override
-  String get equalizerEnable => '启用均衡器';
+  String get equalizerEnable => '均衡器开关';
 
   @override
   String get equalizerPresetFlat => '平坦';
@@ -4545,10 +4545,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
 
   @override
-  String get equalizerBandWidth => '频段宽度';
+  String get equalizerBandWidth => '带宽';
 
   @override
-  String get equalizerBandWidthHint => '越窄，一个频段影响的频率范围越小';
+  String get equalizerBandWidthHint => '以倍频程计，数值越小影响越窄';
 
   @override
   String get equalizerWidthOne => '1 倍频程';
@@ -9058,7 +9058,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get equalizerTitle => '均衡器';
 
   @override
-  String get equalizerEnable => '启用均衡器';
+  String get equalizerEnable => '均衡器开关';
 
   @override
   String get equalizerPresetFlat => '平坦';
@@ -9131,10 +9131,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get equalizerUnavailable => '这个平台的播放后端不支持均衡器';
 
   @override
-  String get equalizerBandWidth => '频段宽度';
+  String get equalizerBandWidth => '带宽';
 
   @override
-  String get equalizerBandWidthHint => '越窄，一个频段影响的频率范围越小';
+  String get equalizerBandWidthHint => '以倍频程计，数值越小影响越窄';
 
   @override
   String get equalizerWidthOne => '1 倍频程';
@@ -13645,7 +13645,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get equalizerTitle => '等化器';
 
   @override
-  String get equalizerEnable => '啟用等化器';
+  String get equalizerEnable => '等化器開關';
 
   @override
   String get equalizerPresetFlat => '平坦';
@@ -13718,10 +13718,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get equalizerUnavailable => '這個平台的播放後端不支援等化器';
 
   @override
-  String get equalizerBandWidth => '頻段寬度';
+  String get equalizerBandWidth => '頻寬';
 
   @override
-  String get equalizerBandWidthHint => '越窄，一個頻段影響的頻率範圍越小';
+  String get equalizerBandWidthHint => '以倍頻程計，數值越小影響越窄';
 
   @override
   String get equalizerWidthOne => '1 倍頻程';

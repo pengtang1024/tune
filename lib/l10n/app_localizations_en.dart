@@ -4841,7 +4841,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equalizerTitle => 'Equalizer';
 
   @override
-  String get equalizerEnable => 'Enable equalizer';
+  String get equalizerEnable => 'Equalizer switch';
 
   @override
   String get equalizerPresetFlat => 'Flat';
@@ -4917,11 +4917,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'The audio backend of this platform has no equalizer';
 
   @override
-  String get equalizerBandWidth => 'Band width';
+  String get equalizerBandWidth => 'Bandwidth';
 
   @override
   String get equalizerBandWidthHint =>
-      'Narrower widths affect less of the spectrum';
+      'Measured in octaves; smaller values reach fewer frequencies';
 
   @override
   String get equalizerWidthOne => '1 octave';

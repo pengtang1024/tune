@@ -575,7 +575,7 @@ void main() {
     });
   });
 
-  group('频段宽度与预放', () {
+  group('带宽与预放', () {
     const boosted = EqualizerSettings(
       enabled: true,
       gains: <double>[6, 3, 0, 0, 0, 0, 0, 0, 0, 0],

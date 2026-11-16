@@ -430,7 +430,7 @@ void main() {
     });
   });
 
-  group('频段宽度与预放', () {
+  group('带宽与预放', () {
     test('setBandWidth 会吸附并立刻下发', () {
       final backend = FakeAudioEqualizerBackend();
       final controller = EqualizerController(_RecordingPersistence(), backend);
