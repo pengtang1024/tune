@@ -163,7 +163,6 @@
   "libraryViewShows": "节目",
   "libraryViewBooks": "书",
   "libraryViewCollections": "合集视图",
-  "libraryViewSplit": "分栏视图",
   "libraryOpenCollection": "打开合集",
   "libraryCollectionItems": "{items} 个条目 · {tracks} 首",
   "@libraryCollectionItems": {
@@ -1385,6 +1384,7 @@
   "contentKindMusic": "音乐",
   "contentKindRadio": "电台",
   "contentKindSoundEffect": "音效",
+  "libraryShowKindOnly": "只看这一类",
   "trackFactPath": "文件路径",
   "trackFactAddress": "在线地址",
   "trackDetailsTooltip": "查看详情",
