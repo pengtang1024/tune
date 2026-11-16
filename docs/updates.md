@@ -8,6 +8,7 @@
 
 - [数据源](#数据源)
 - [产物约定](#产物约定)
+- [一条命令发版](#一条命令发版)
 - [发布步骤](#发布步骤)
 - [从旧版本升级一次](#从旧版本升级一次)
 - [安装行为](#安装行为)
@@ -69,7 +70,40 @@ flutter build linux --release
 `translation/models/*.gguf`、`translation/bin/llama-b12274` 与 `translation/licenses`。
 任何一步失败都会直接退出，不会产出缺模型的离线包。离线包不作为更新附件发布。
 
+## 一条命令发版
+
+`tool/release.sh` 把下面的「发布步骤」串成一条流水线：版本号 +1、写 CHANGELOG、构建打包、
+写清单、跑门禁、提交、推 `develop`、合 `master` 打 tag、推三端、建三端 release 传归档、
+同步 wiki、purge CDN 并复核、升级本机、退掉隔离 worktree。脚本在 `origin/develop` 上
+新建 worktree 干活，不碰当前工作区的未提交改动；成功自动清理，失败保留现场并打印路径。
+
+```bash
+./tool/release.sh                      # 自动 +1 patch，说明从提交生成
+./tool/release.sh --version 1.40.0     # 指定版本
+./tool/release.sh --notes-file /tmp/notes.md
+./tool/release.sh --dry-run            # 只打印计划，不建 worktree
+./tool/release.sh --no-push            # 本地演练：构建、门禁、提交、打 tag，不碰远端
+```
+
+前置：要发的改动已经提交进 `origin/develop`，且 `lib/l10n` 生成物已提交（`check.sh`
+会核对）。版本号必须大于当前值；不给 `--notes` / `--notes-file` 时，从上一个 tag 到
+基线的提交自动生成「### 变更」列表；CHANGELOG 里已有该版本段则沿用。
+
+常用开关：`--skip-build`、`--skip-gate`、`--skip-publish`、`--skip-wiki`、
+`--skip-upgrade`、`--no-restart`、`--keep-worktree`、`--install-dir`、`--base`、
+`--worktree`。`--no-push` 只在本机提交并打 tag，演练完记得删掉那个 tag。
+
+凭据：GitHub 用 `GITHUB_TOKEN` 或 `gh auth token`；Gitea / Gitee 用
+`git credential fill`（`GITEA_TOKEN` / `GITEE_TOKEN` 可覆盖）。Gitee 附件配额满时脚本
+只警告、不阻塞——release 仍有正文和平台自动附的源码包。CDN 以
+`raw.githubusercontent.com` 为准：jsDelivr 的 `finished` 只表示 purge 受理，脚本会重试
+并打印两边版本，raw 正确就算发版成功。
+
+三端 release、wiki 的接口细节仍以下面的表为准；脚本出错时按表手工补那一步。
+
 ## 发布步骤
+
+下面是手工步骤，脚本化后用于排障与补做。
 
 v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 
