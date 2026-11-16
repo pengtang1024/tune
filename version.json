@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.4",
-  "build": 64,
-  "released_at": "2026-11-16T09:14:20Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.4",
-  "notes": "### 修复\n\n- **没有艺术家的曲目也去掉标题序号**：1.35.3 的清洗挂在「艺术家已知」那条分支上，艺术家为空的\n  行（`06 Hazardous Material 2 vbr`、`03 Ngopi Pagi Ini`）一条都没动。序号、占位符与角色后缀\n  本来就不需要艺术家才能判断，现在这类行同样清理。",
+  "version": "1.35.5",
+  "build": 65,
+  "released_at": "2026-11-16T09:20:27Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.5",
+  "notes": "### 修复\n\n- **尾部占位符漏在扫描条件外**：补齐旧行时用 WHERE 把范围收在「标题或专辑含 ` - `、艺术家为空、\n  标题以数字开头」三种情形里，`Vote on Tuesday**` 这种只有尾部占位符的行从来没进过扫描。\n  现在按全表扫一遍，开销仍由按行数记账的守卫兜住（一个进程每个库只扫一次）。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.4/tune-linux-x64-1.35.4.tar.gz",
-      "size": 53676428,
-      "sha256": "9a555cdc025f393f9495a13fdd4f89a31be71464064a36707f899b6d603b201e"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.5/tune-linux-x64-1.35.5.tar.gz",
+      "size": 53677038,
+      "sha256": "d5d1be2f98611e2f458b62e0bc1dabfe2ca0e6fe278bc5461b19c032f72098db"
     }
   }
 }
