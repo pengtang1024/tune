@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:tune/data/services/audio_equalizer_backend.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/data/services/audio_source_address.dart';
 import 'package:tune/core/l10n/app_strings.dart';
@@ -15,6 +16,11 @@ import 'package:tune/utils/logger.dart';
 /// media_kit / libmpv，缓存策略由 `MpvPolicy` 声明。
 class JustAudioPlayerService implements AudioPlayerService {
   AudioPlayer? _audioPlayer;
+
+  /// 移动端没有均衡器链路：just_audio 不暴露滤波器，平台的音效接口
+  /// 也不经过这里。界面据此不画入口。
+  @override
+  AudioEqualizerBackend? get equalizer => null;
 
   /// 广播控制器：把 just_audio 的错误事件转成应用层错误。
   ///

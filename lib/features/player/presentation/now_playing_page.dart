@@ -15,10 +15,12 @@ import 'package:tune/data/services/window_layout_store.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/favorites/application/favorites_controller.dart';
+import 'package:tune/features/player/application/equalizer_providers.dart';
 import 'package:tune/features/player/application/playback_controller.dart';
 import 'package:tune/features/player/application/playback_overview_provider.dart';
 import 'package:tune/features/player/domain/playback_overview.dart';
 import 'package:tune/features/player/domain/playback_state.dart';
+import 'package:tune/features/player/presentation/equalizer_entry.dart';
 import 'package:tune/features/player/presentation/lyrics_panel.dart';
 import 'package:tune/features/player/presentation/now_playing_track_info.dart';
 import 'package:tune/features/sources/application/music_sources_controller.dart';
@@ -245,7 +247,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
 }
 
 /// Header with the back action and the page title.
-class _TopBar extends StatelessWidget {
+class _TopBar extends ConsumerWidget {
   const _TopBar({
     required this.overview,
     required this.showLyrics,
@@ -267,7 +269,7 @@ class _TopBar extends StatelessWidget {
   final VoidCallback? onToggleFavorite;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Row(
       children: [
@@ -333,6 +335,16 @@ class _TopBar extends StatelessWidget {
           tooltip: context.loc.queueTitle,
           onPressed: onToggleQueue,
         ),
+        // The same entry as the dock, guarded the same way: one panel, two
+        // doors, and neither promises a sound the platform cannot make.
+        if (ref.watch(equalizerAvailableProvider)) ...[
+          const SizedBox(width: 8),
+          _RoundButton(
+            icon: Icons.equalizer_rounded,
+            tooltip: context.loc.playerEqualizer,
+            onPressed: () => openEqualizerPanel(context, ref),
+          ),
+        ],
       ],
     );
   }

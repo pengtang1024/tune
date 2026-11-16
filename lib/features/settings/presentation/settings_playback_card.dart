@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
+import 'package:tune/shared/ui/settings_action_row.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/settings_switch_row.dart';
 
@@ -14,10 +15,16 @@ class SettingsPlaybackCard extends StatelessWidget {
   final bool replaceQueueOnClick;
   final bool onlyLikeOnDoubleClick;
   final bool favoritesDoubleClickPlays;
+
+  /// Whether the platform backend can carry an equalizer curve.
+  final bool equalizerAvailable;
   final ValueChanged<bool> onAutoResumeOnStartup;
   final ValueChanged<bool> onReplaceQueueOnClick;
   final ValueChanged<bool> onOnlyLikeOnDoubleClick;
   final ValueChanged<bool> onFavoritesDoubleClickPlays;
+
+  /// Opens the equalizer panel; null when there is no equalizer to open.
+  final VoidCallback? onOpenEqualizer;
 
   const SettingsPlaybackCard({
     super.key,
@@ -25,6 +32,8 @@ class SettingsPlaybackCard extends StatelessWidget {
     required this.replaceQueueOnClick,
     required this.onlyLikeOnDoubleClick,
     required this.favoritesDoubleClickPlays,
+    required this.equalizerAvailable,
+    required this.onOpenEqualizer,
     required this.onAutoResumeOnStartup,
     required this.onReplaceQueueOnClick,
     required this.onOnlyLikeOnDoubleClick,
@@ -67,6 +76,14 @@ class SettingsPlaybackCard extends StatelessWidget {
             description: context.loc.settingsFavoritesDoubleClickPlaysHint,
             value: favoritesDoubleClickPlays,
             onChanged: onFavoritesDoubleClickPlays,
+          ),
+          const SizedBox(height: 8),
+          SettingsActionRow(
+            title: context.loc.settingsEqualizerAction,
+            description: equalizerAvailable
+                ? context.loc.settingsEqualizerActionHint
+                : context.loc.equalizerUnavailable,
+            onPressed: equalizerAvailable ? onOpenEqualizer : null,
           ),
         ],
       ),

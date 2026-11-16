@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:tune/data/services/audio_equalizer_backend.dart';
 import 'package:tune/data/services/audio_player_service.dart';
 import 'package:tune/domain/models/song.dart';
+
+import 'fake_audio_equalizer_backend.dart';
 
 class FakeAudioPlayerService implements AudioPlayerService {
   final _positionController = StreamController<Duration>.broadcast();
@@ -9,6 +12,10 @@ class FakeAudioPlayerService implements AudioPlayerService {
   final _playingController = StreamController<bool>.broadcast();
   final _completionController = StreamController<void>.broadcast();
   final _errorController = StreamController<AudioPlayerError>.broadcast();
+
+  /// 桌面后端的均衡器替身；测试可以注入一个来观察曲线是否送到后端。
+  @override
+  AudioEqualizerBackend? equalizer = FakeAudioEqualizerBackend();
 
   Song? playedSong;
   String? playedLocalFilePath;

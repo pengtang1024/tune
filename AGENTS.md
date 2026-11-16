@@ -31,6 +31,7 @@
 | 查智能歌词 / 字幕的票池共识、账本口径与里程碑 | [`docs/smart-lyrics.md`](docs/smart-lyrics.md)（M0–M13 已实施；产品口径：每首有词，准入降级为高置信标注） |
 | 查本地组件（翻译/歌词模型、FFmpeg）的注册、下载校验与设置页 | [`docs/local-components.md`](docs/local-components.md) |
 | 改设置页的布局、分区导航、预设与自定义 | [`docs/settings-redesign.md`](docs/settings-redesign.md)（已实施） |
+| 加音乐均衡器、改频段/预设或 mpv 音效 | [`docs/equalizer.md`](docs/equalizer.md)（1.37.0 已实施） |
 | 改音乐库的页头、列头、排序、密度与多列 | [`docs/library-redesign.md`](docs/library-redesign.md)（M1a/M1b 已实施；分类筛选见 library-browse） |
 | 查音乐库的分类、分面筛选与浏览视图 | [`docs/library-browse.md`](docs/library-browse.md)（M0–M4 已实施） |
 | 查音源的权重、健康度维度/权重、排序与「更多音源」折叠 | [`需求/音源设计.md`](需求/音源设计.md) 的「权重」 |
@@ -155,7 +156,8 @@
 
 ## 4. 不在当前范围
 
-- 移动端通知栏 / 锁屏控制、均衡器、播放历史、账号系统不在 v1 桌面主链路内，不要顺手加回来；Android 的后台播放 / 通知 / 锁屏控制已由 audio_service 单独实现（见 [docs/android.md](docs/android.md)），不属于桌面主链路。
+- 移动端通知栏 / 锁屏控制、播放历史、账号系统不在 v1 桌面主链路内，不要顺手加回来；Android 的后台播放 / 通知 / 锁屏控制已由 audio_service 单独实现（见 [docs/android.md](docs/android.md)），不属于桌面主链路。
+- 桌面均衡器已在 1.37.0 交付（[`docs/equalizer.md`](docs/equalizer.md)，10 段 ±12 dB，走 libmpv `af` lavfi 滤镜链）；它当初不在 v1 范围、由读者要求加入，后续改动按该文档执行，不要因为旧范围描述把它删掉。
 - 主要验收平台是 Linux 桌面端；其它保留入口的平台行为可以不同，但差异要写进 README 的「已知限制」。macOS 与 Web 不在支持范围。
 
 ## 相关文档
