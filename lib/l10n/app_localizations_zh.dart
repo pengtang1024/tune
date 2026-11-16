@@ -4514,6 +4514,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equalizerReset => '重置';
 
   @override
+  String get equalizerPresetDelete => '删除预设';
+
+  @override
+  String get equalizerPresetName => '预设名称';
+
+  @override
+  String get equalizerSavePreset => '存为预设';
+
+  @override
   String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
 
   @override
@@ -9050,6 +9059,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get equalizerReset => '重置';
+
+  @override
+  String get equalizerPresetDelete => '删除预设';
+
+  @override
+  String get equalizerPresetName => '预设名称';
+
+  @override
+  String get equalizerSavePreset => '存为预设';
 
   @override
   String get equalizerHint => '提升的频段会用等量预放抵消，避免削波';
@@ -13589,6 +13607,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get equalizerReset => '重設';
+
+  @override
+  String get equalizerPresetDelete => '刪除預設';
+
+  @override
+  String get equalizerPresetName => '預設名稱';
+
+  @override
+  String get equalizerSavePreset => '存為預設';
 
   @override
   String get equalizerHint => '提升的頻段會用等量預放抵消，避免削波';

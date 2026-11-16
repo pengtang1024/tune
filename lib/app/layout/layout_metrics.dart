@@ -40,13 +40,19 @@ enum NavigationForm {
 /// The numbers are part of the layout contract: the shell, the settings page
 /// and the tests all read them here instead of carrying copies.
 abstract final class LayoutBreakpoints {
-  /// Below this width the navigation moves to the bottom on a touch screen.
+  /// Below this width the navigation moves to the bottom of the window.
+  ///
+  /// This is the phone form on every platform: the pages stack, the rail is
+  /// gone and the dock becomes one row. The minimum window of the desktop
+  /// ([PlatformConstants.desktopWindowMinWidth], 560) sits inside this band, so
+  /// the narrowest window a reader can drag to is the phone form instead of a
+  /// squeezed desktop.
   static const double phoneMaxWidth = 600;
 
   /// Below this width the rail drops its labels.
   ///
-  /// The minimum window of the desktop is 760 wide, so a desktop window only
-  /// ever sees this form on its narrowest sizes.
+  /// A touch build leaves the rail here already, so only a desktop window sees
+  /// this form, between [phoneMaxWidth] and this width.
   static const double railCompactMaxWidth =
       CompactTokens.sidebarCompactBreakpoint;
 
@@ -86,9 +92,12 @@ class LayoutMetrics {
 
   /// The metrics of [size], for a build whose shell is [mobile] or not.
   ///
-  /// The bottom bar belongs to the touch screen alone: a narrow desktop
-  /// window keeps the rail, because a mouse reaches a rail faster than a bar
-  /// and the window never becomes a phone by being made small.
+  /// The bottom bar is the form of a window that is narrower than
+  /// [LayoutBreakpoints.phoneMaxWidth], on any platform: a window that narrow
+  /// has the width of a phone, and a rail with labels does not fit next to a
+  /// page there. [mobile] only moves the bar's threshold up to
+  /// [LayoutBreakpoints.railCompactMaxWidth], where a rail without labels
+  /// would still be reachable with a finger.
   factory LayoutMetrics.of(Size size, {required bool mobile}) {
     final width = size.width;
     final layoutClass = switch (width) {
@@ -98,6 +107,7 @@ class LayoutMetrics {
       _ => LayoutClass.wide,
     };
     final navigation = switch (width) {
+      < LayoutBreakpoints.phoneMaxWidth => NavigationForm.bottomBar,
       _ when mobile && width < LayoutBreakpoints.railCompactMaxWidth =>
         NavigationForm.bottomBar,
       < LayoutBreakpoints.railCompactMaxWidth => NavigationForm.railCompact,

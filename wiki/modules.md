@@ -34,7 +34,7 @@
 | application | `list_playback.dart` | 列表点击播放策略：替换队列或加入队列并播放（随设置） |
 | application | `playback_session_recorder.dart` | 播放会话持久化：队列切歌/编辑时写，进度每 5 秒写 |
 | application | `dead_songs_controller.dart` | 失效曲目（文件不在/地址刷不出）的标记与清理 |
-| application | `equalizer_controller.dart`、`equalizer_providers.dart` | 均衡器曲线：恢复/持久化（`audio_equalizer_v1`，400 ms 防抖）、预设命中、可用性取音频后端的探测结果 |
+| application | `equalizer_controller.dart`、`equalizer_providers.dart` | 均衡器曲线：恢复/持久化（`audio_equalizer_v1`，400 ms 防抖）、内置与自存预设的命中/保存/删除、可用性取音频后端的探测结果 |
 | domain | `playback_state.dart` | `PlaybackState`：状态、进度、音量、模式、队列、当前 URI、历史、错误 |
 | domain | `play_mode.dart`、`playback_source.dart` | 播放模式枚举、播放来源（歌词文档模型 `LyricsDocument` 在 `lib/domain/models/lyrics_document.dart`） |
 | data | `playback_session_store.dart` | `queue` / `queue_meta` 表的读写 |

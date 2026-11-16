@@ -100,6 +100,13 @@ Future<void> _openEqualizer(BuildContext context, WidgetRef ref) {
     onGainChanged: controller.setGain,
     onPresetChanged: controller.applyPreset,
     onReset: controller.reset,
+    // The panel keeps its own echo of the curve; the id has to reach it in the
+    // same turn, so the save writes the state and the id is read back at once.
+    onSavePreset: (name) {
+      controller.savePreset(name);
+      return ref.read(equalizerControllerProvider).presetId;
+    },
+    onDeletePreset: controller.deletePreset,
   );
 }
 
@@ -168,7 +175,10 @@ class SettingsCustomizeCard extends ConsumerWidget {
         onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
         favoritesDoubleClickPlays: settings.favoritesDoubleClickPlays,
         equalizerAvailable: ref.watch(equalizerAvailableProvider),
-        equalizerPresetId: ref.watch(equalizerControllerProvider).presetId,
+        equalizerPresetName: equalizerCurrentPresetLabel(
+          context,
+          ref.watch(equalizerControllerProvider),
+        ),
         onOpenEqualizer: () => _openEqualizer(context, ref),
         onAutoResumeOnStartup: controller.setAutoResumeOnStartup,
         onReplaceQueueOnClick: controller.setReplaceQueueOnClick,

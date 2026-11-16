@@ -88,7 +88,7 @@ flutter --version
 ## 截图对比
 
 - `tool/layout_shots_test.dart` 是开发用的截图工具，不是测试套件的一部分。
-- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`（1280、900、760×520 三套；760 是应用最小尺寸）。队列侧栏写 `queue_panel*.png`，正在播放页的队列侧栏写 `now_playing_queue*.png`；窄屏截图里导航是紧凑态，内容区被遮罩压暗，正在播放页的面板带迷你播放条。旧的 `queue*.png` 整页截图不再生成。
+- 跑法：`flutter test tool/layout_shots_test.dart`，每个页面写一张 PNG 到 `build/layout-shots/`（1280、900、560×520 三套；560×520 是应用最小尺寸，取 `PlatformConstants.desktopWindowMinWidth/MinHeight`，落在手机档位里）。队列侧栏写 `queue_panel*.png`，正在播放页的队列侧栏写 `now_playing_queue*.png`；窄屏截图里是手机形态——底部栏 + 单行播放条，内容区被遮罩压暗，队列面板变成抽屉。旧的 `queue*.png` 整页截图不再生成。
 - 它在 `tool/` 下，常规 `flutter test` 不会跑到它。
 - 它把平台钉成 Linux：测试套件默认假装是 Android，而 Android 用另一套密度和更大的点击区，不钉的话截图里的按钮比用户看到的矮 8 像素。
 - 改了界面布局后跑一次，和改动前的 PNG 对比，比读代码更快发现布局问题。

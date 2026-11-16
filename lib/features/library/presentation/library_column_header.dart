@@ -56,7 +56,10 @@ class LibraryColumnHeader extends StatelessWidget {
                 style,
               ),
             ),
-            if (metrics.showArtist)
+            // 行里两列之间各隔 space8：列头不隔的话每个 Expanded 会宽
+            // 8 像素，越往右偏得越多。
+            if (metrics.showArtist) ...[
+              const SizedBox(width: CompactTokens.space8),
               Expanded(
                 flex: 3,
                 child: _column(
@@ -66,7 +69,9 @@ class LibraryColumnHeader extends StatelessWidget {
                   style,
                 ),
               ),
-            if (metrics.showAlbum)
+            ],
+            if (metrics.showAlbum) ...[
+              const SizedBox(width: CompactTokens.space8),
               Expanded(
                 flex: 3,
                 child: _column(
@@ -76,6 +81,7 @@ class LibraryColumnHeader extends StatelessWidget {
                   style,
                 ),
               ),
+            ],
             if (metrics.showAdded)
               SizedBox(
                 width: _addedWidth,
@@ -89,12 +95,20 @@ class LibraryColumnHeader extends StatelessWidget {
               ),
             SizedBox(
               width: _tailWidth,
-              child: _column(
-                context,
-                context.loc.libraryColumnDuration,
-                LibrarySortField.duration,
-                style,
-                alignEnd: true,
+              // 行尾是 [来源][时长][收藏]：收藏按钮占住最后 24 + 4 像素
+              // （libraryRowAction + space4），所以「时长」要往左让这么多，
+              // 才落在那一列数字的正上方，而不是贴着窗口的右边。
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  right: CompactTokens.libraryRowAction + CompactTokens.space4,
+                ),
+                child: _column(
+                  context,
+                  context.loc.libraryColumnDuration,
+                  LibrarySortField.duration,
+                  style,
+                  alignEnd: true,
+                ),
               ),
             ),
           ],

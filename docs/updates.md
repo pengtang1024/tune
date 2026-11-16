@@ -8,6 +8,7 @@
 
 - [数据源](#数据源)
 - [产物约定](#产物约定)
+- [一条命令发版](#一条命令发版)
 - [发布步骤](#发布步骤)
 - [从旧版本升级一次](#从旧版本升级一次)
 - [安装行为](#安装行为)
@@ -69,7 +70,40 @@ flutter build linux --release
 `translation/models/*.gguf`、`translation/bin/llama-b12274` 与 `translation/licenses`。
 任何一步失败都会直接退出，不会产出缺模型的离线包。离线包不作为更新附件发布。
 
+## 一条命令发版
+
+`tool/release.sh` 把下面的「发布步骤」串成一条流水线：版本号 +1、写 CHANGELOG、构建打包、
+写清单、跑门禁、提交、推 `develop`、合 `master` 打 tag、推三端、建三端 release 传归档、
+同步 wiki、purge CDN 并复核、升级本机、退掉隔离 worktree。脚本在 `origin/develop` 上
+新建 worktree 干活，不碰当前工作区的未提交改动；成功自动清理，失败保留现场并打印路径。
+
+```bash
+./tool/release.sh                      # 自动 +1 patch，说明从提交生成
+./tool/release.sh --version 1.40.0     # 指定版本
+./tool/release.sh --notes-file /tmp/notes.md
+./tool/release.sh --dry-run            # 只打印计划，不建 worktree
+./tool/release.sh --no-push            # 本地演练：构建、门禁、提交、打 tag，不碰远端
+```
+
+前置：要发的改动已经提交进 `origin/develop`，且 `lib/l10n` 生成物已提交（`check.sh`
+会核对）。版本号必须大于当前值；不给 `--notes` / `--notes-file` 时，从上一个 tag 到
+基线的提交自动生成「### 变更」列表；CHANGELOG 里已有该版本段则沿用。
+
+常用开关：`--skip-build`、`--skip-gate`、`--skip-publish`、`--skip-wiki`、
+`--skip-upgrade`、`--no-restart`、`--keep-worktree`、`--install-dir`、`--base`、
+`--worktree`。`--no-push` 只在本机提交并打 tag，演练完记得删掉那个 tag。
+
+凭据：GitHub 用 `GITHUB_TOKEN` 或 `gh auth token`；Gitea / Gitee 用
+`git credential fill`（`GITEA_TOKEN` / `GITEE_TOKEN` 可覆盖）。Gitee 附件配额满时脚本
+只警告、不阻塞——release 仍有正文和平台自动附的源码包。CDN 以
+`raw.githubusercontent.com` 为准：jsDelivr 的 `finished` 只表示 purge 受理，脚本会重试
+并打印两边版本，raw 正确就算发版成功。
+
+三端 release、wiki 的接口细节仍以下面的表为准；脚本出错时按表手工补那一步。
+
 ## 发布步骤
+
+下面是手工步骤，脚本化后用于排障与补做。
 
 v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 
@@ -105,33 +139,13 @@ v1.33.0（2026-11-15）按这个顺序走通了一遍，照抄即可。
 三端正文用同一份文本（清单 `notes` 去硬换行 + 一句归档说明），名称沿用
 `vX.Y.Z — 一句话`。
 
-**Gitee 的 1 GB 附件配额会被 50 MB 一版的归档吃完**：2026-11-16 发 1.38.1 时
-`attach_files` 回 400 `验证失败：文件大小已超出仓库附件配额：1 GB`（此前十来版各挂一份
-53 MB 归档）。处理办法是把 Gitee 那份 release 的正文补一句「归档请到 GitHub / Gitea 的
-同一 tag 下取」，不再传二进制——Gitee 在本项目里是镜像，下载入口一直是 GitHub；
-要腾配额就去删历史 release 的附件，那是维护者的决定，不自动做。
-
-### 组件包（可选）
-
-离线打包用的翻译组件包 `tune-translation-*` 单独上传到同一个 release。自动更新只认平台
-归档；组件包由应用在设置页按需下载（1.32.0 起在线用户走统一组件注册表，见
-[local-components.md](local-components.md)），所以没上传只影响内网离线分发，不影响普通
-用户升级。
-
-### 发布后自检
-
-- [ ] 三端 `git ls-remote --tags <remote> 'refs/tags/vX.Y.Z^{}'` 指向同一个合并提交
-- [ ] 三端 `/releases/latest` 都返回新版本
-- [ ] 从任一平台下载归档，`sha256sum` 等于根 `version.json` 里的 `sha256`
-- [ ] `curl https://purge.jsdelivr.net/gh/pengtang1024/tune@master/version.json` 返回 `status: finished`
-- [ ] CDN 与 `raw.githubusercontent.com` 两份清单版本、`build`、`sha256` 一致
-- [ ] CDN 那一份**确实是新版本号**：`finished` 只表示 purge 请求被受理，不表示边缘已经换了新内容。
-      2026-11-16 发 1.33.2 时出现过「purge 已 finished、CDN 仍返回 1.33.1」约十分钟，
-      再 purge 一次并等 15–60 秒就对了。这一项为什么单列：`version.json` 的 `Cache-Control`
-      是 `max-age=604800, s-maxage=43200`（浏览器 7 天、边缘 12 小时），而客户端带
-      `If-None-Match` 发条件请求——边缘留着旧对象时会回 304，客户端沿用旧清单，
-      **用户就一直看不到新版本**，但日志上一切正常。
-- [ ] `tar -tzf` 首项是 `./`，且含 `tune`、`resources/`、`share/`（bundle 内容在根）
+**Gitee 的 1 GB 附件配额大约只够 20 版**（每份 Linux 归档约 51 MiB）：2026-11-16 发
+1.38.1 时 `attach_files` 回 400 `验证失败：文件大小已超出仓库附件配额：1 GB`。
+`DELETE /releases/{release_id}/attach_files/{attach_file_id}` 能删旧附件；当天按维护者同意
+清掉了 1.28.8 与 1.33.0–1.37.1 共 17 份（释放约 911 MB），**只保留最近 5 版**的归档，更早的
+release 仍能从 GitHub / Gitea 同一 tag 下载。占用回到约 256 MB 后，把 1.38.1、1.38.2、1.39.0
+的归档补挂上去（字节取自 Gitea 的同一份资产，`sha256` 与各自清单一致）。配额再满时照此办理：
+先删最老的、再补当前版，正文里不必留「配额已满」的说明。
 
 ## 从旧版本升级一次
 

@@ -648,13 +648,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
             mapEquals(_cachedTrackLabels!, sourceLabels)) {
           return Column(
             children: [
-              LibraryColumnHeader(
-                metrics: metrics,
-                sort: sort,
-                onSort: (field) => ref
-                    .read(libraryControllerProvider.notifier)
-                    .setSort(sort.then(field)),
-              ),
+              _columnHeader(metrics, sort),
               Expanded(child: cached),
             ],
           );
@@ -741,17 +735,29 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
         _cachedTracks = _withLoadMore(list, hasMore);
         return Column(
           children: [
-            LibraryColumnHeader(
-              metrics: metrics,
-              sort: sort,
-              onSort: (field) => ref
-                  .read(libraryControllerProvider.notifier)
-                  .setSort(sort.then(field)),
-            ),
+            _columnHeader(metrics, sort),
             Expanded(child: _cachedTracks!),
           ],
         );
       },
+    );
+  }
+
+  /// The column header of a track list.
+  ///
+  /// The list keeps [CompactTokens.pageGutter] on both sides, so the header
+  /// has to keep it too: it shares the row metrics, and a header 24 pixels
+  /// wider than the rows puts every column under the wrong one.
+  Widget _columnHeader(LibraryRowMetrics metrics, LibrarySort sort) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: CompactTokens.pageGutter),
+      child: LibraryColumnHeader(
+        metrics: metrics,
+        sort: sort,
+        onSort: (field) => ref
+            .read(libraryControllerProvider.notifier)
+            .setSort(sort.then(field)),
+      ),
     );
   }
 

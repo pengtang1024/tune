@@ -36,8 +36,11 @@ class PlatformConstants {
   /// 桌面端窗口默认高度
   static const double desktopWindowHeight = 760;
 
-  /// 桌面端窗口最小宽度：保证左播放器 + 右列表仍可用
-  static const double desktopWindowMinWidth = 760;
+  /// 桌面端窗口最小宽度：落在手机档位里（窄于
+  /// `LayoutBreakpoints.phoneMaxWidth` 的 600），所以拉到最窄得到的是手机
+  /// 布局——底部导航 + 单行播放条 + 整页内容，而不是把桌面三栏压扁。
+  /// 布局层从这里取值，不在别处另写一份数字。
+  static const double desktopWindowMinWidth = 560;
 
   /// 桌面端窗口最小高度
   static const double desktopWindowMinHeight = 520;

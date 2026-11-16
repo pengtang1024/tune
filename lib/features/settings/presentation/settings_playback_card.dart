@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
-import 'package:tune/shared/ui/equalizer_sheet.dart';
 import 'package:tune/shared/ui/settings_action_row.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 import 'package:tune/shared/ui/settings_switch_row.dart';
@@ -20,8 +19,9 @@ class SettingsPlaybackCard extends StatelessWidget {
   /// Whether the platform backend can carry an equalizer curve.
   final bool equalizerAvailable;
 
-  /// The curve the equalizer is set to, so the row says which one is on.
-  final String equalizerPresetId;
+  /// The name of the curve the equalizer is set to, so the row says which one
+  /// is on; a curve the reader kept carries the name they gave it.
+  final String equalizerPresetName;
   final ValueChanged<bool> onAutoResumeOnStartup;
   final ValueChanged<bool> onReplaceQueueOnClick;
   final ValueChanged<bool> onOnlyLikeOnDoubleClick;
@@ -37,7 +37,7 @@ class SettingsPlaybackCard extends StatelessWidget {
     required this.onlyLikeOnDoubleClick,
     required this.favoritesDoubleClickPlays,
     required this.equalizerAvailable,
-    required this.equalizerPresetId,
+    required this.equalizerPresetName,
     required this.onOpenEqualizer,
     required this.onAutoResumeOnStartup,
     required this.onReplaceQueueOnClick,
@@ -86,7 +86,7 @@ class SettingsPlaybackCard extends StatelessWidget {
           SettingsActionRow(
             title: context.loc.settingsEqualizerAction,
             description: equalizerAvailable
-                ? '${equalizerPresetLabel(context, equalizerPresetId)} · '
+                ? '$equalizerPresetName · '
                     '${context.loc.settingsEqualizerActionHint}'
                 : context.loc.equalizerUnavailable,
             onPressed: equalizerAvailable ? onOpenEqualizer : null,

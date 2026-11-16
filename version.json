@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.39.0",
-  "build": 75,
-  "released_at": "2026-11-16T12:10:04Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.39.0",
-  "notes": "### 变更\n\n- **均衡器拆成两层**：播放器旁边（底栏「更多」菜单、正在播放页顶栏）只留开关加四组常用曲线\n  （平坦 / 流行 / 摇滚 / 重低音），十个频段滑杆、重置和全部预设挪到 设置 › 播放 › 均衡器。\n  两层共用一个 `EqualizerController`，在哪边调另一边都同步。\n- **预设从 8 组扩到 12 组**：新增原声、嘻哈、现场、轻柔；快捷面板固定取 `EqualizerPresets.quick`\n  那四组，设置行的副标题显示当前曲线名。",
+  "version": "1.40.0",
+  "build": 76,
+  "released_at": "2026-11-16T13:01:02Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.40.0",
+  "notes": "### 新增\n\n- **均衡器可以把当前曲线存成自己的预设**：设置 › 播放 › 均衡器 的标题行多了「存为预设」，\n  起个名字就落进预设行，点一下即应用，右侧 × 删掉；同名再存是覆盖那条曲线。\n  自存曲线与 12 组内置曲线同表参与高亮（内置优先），一起写进 `audio_equalizer_v1` 的\n  `userPresets` 字段，没存过时不写这个字段，旧偏好照旧能读。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.39.0/tune-linux-x64-1.39.0.tar.gz",
-      "size": 53602666,
-      "sha256": "d8c8c9e8aaca5f7e14e119aec6ec5d0bbd0cacd9bfbfce666affcdd000ed708a"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.40.0/tune-linux-x64-1.40.0.tar.gz",
+      "size": 53609060,
+      "sha256": "44df249f7f29ce71bd0510f4439827ca7b327c785bdd58d47c23bc9f6c25f19f"
     }
   }
 }

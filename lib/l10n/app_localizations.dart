@@ -8381,6 +8381,24 @@ abstract class AppLocalizations {
   /// **'重置'**
   String get equalizerReset;
 
+  /// No description provided for @equalizerPresetDelete.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'删除预设'**
+  String get equalizerPresetDelete;
+
+  /// No description provided for @equalizerPresetName.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'预设名称'**
+  String get equalizerPresetName;
+
+  /// No description provided for @equalizerSavePreset.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'存为预设'**
+  String get equalizerSavePreset;
+
   /// No description provided for @equalizerHint.
   ///
   /// In zh_CN, this message translates to:
