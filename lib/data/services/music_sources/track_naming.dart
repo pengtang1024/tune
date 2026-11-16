@@ -64,9 +64,10 @@ TrackNaming normalizeTrackNaming({
     }
   }
 
+  // 没有艺术家时 3、4 两条无从比对，但标题里的序号与占位符与艺术家无关。
   if (trimmedArtist.isEmpty) {
     return TrackNaming(
-      title: trimmedTitle,
+      title: _cleanTrackTitle(trimmedTitle, trimmedAlbum),
       artist: trimmedArtist,
       album: trimmedAlbum,
     );
