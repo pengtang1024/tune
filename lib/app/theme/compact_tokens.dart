@@ -192,13 +192,13 @@ abstract final class CompactTokens {
   /// on the first line, the artist under it, the count at the right. It is
   /// taller than a track row because it holds two lines, and the rows of one
   /// list stand on the same grid, so the height is fixed.
-  static const double libraryGroupRowHeight = 44;
+  static const double libraryGroupRowHeight = 40;
 
   /// Artwork of a group row.
   ///
   /// Bigger than [libraryArtwork]: a group is what the reader picks first,
   /// and a 24-pixel cover among two lines of text is a bullet, not a cover.
-  static const double libraryGroupArtwork = 40;
+  static const double libraryGroupArtwork = 32;
 
   /// Artwork of a track in the library table.
   static const double libraryArtwork = 24;

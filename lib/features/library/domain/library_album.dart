@@ -366,6 +366,17 @@ AlbumSummary? albumSummaryOf(List<AlbumSummary> albums, Song song) {
   return null;
 }
 
+/// Whether an artwork URL is a cover rather than a site icon.
+///
+/// Radio rows carry the station's `favicon.ico`; upscaled into a 40 px square
+/// it is a bright patch of colour that belongs to no album, so a group skips
+/// it and falls back to the quiet placeholder instead.
+bool _isCoverArt(String url) {
+  final last = url.split('/').last.toLowerCase();
+  if (last.isEmpty || last.startsWith('favicon')) return false;
+  return !last.contains('favicon.');
+}
+
 LibraryAlbum _albumOf(List<Song> songs, {String? key}) {
   final ordered = List<Song>.of(songs)..sort(albumOrderOf);
   final first = ordered.first;
@@ -378,7 +389,7 @@ LibraryAlbum _albumOf(List<Song> songs, {String? key}) {
       coverPath = path;
     }
     final url = song.artworkUrl;
-    if (coverUrl == null && url != null && url.isNotEmpty) {
+    if (coverUrl == null && url != null && _isCoverArt(url)) {
       coverUrl = url;
     }
     if (coverPath != null && coverUrl != null) break;
