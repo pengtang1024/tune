@@ -3,6 +3,11 @@
 # 直接往 master 提交会绕过这条约定，也让 tag 指向不在 develop 里的提交。
 set -u
 
+# 合并产生的提交由 pre-merge-commit 放行；这里只拦手工提交。
+if [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
+  exit 0
+fi
+
 branch=$(git symbolic-ref --quiet --short HEAD || true)
 case "$branch" in
   master | main)

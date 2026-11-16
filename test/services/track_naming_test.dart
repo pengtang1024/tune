@@ -163,5 +163,16 @@ void main() {
       "102 Comfort ye - Ev'ry valley",
     );
   });
+
+  test('a title keeps no track number even without an artist', () {
+    expect(
+      normalizeTrackNaming(title: '06 Hazardous Material 2 vbr', artist: '', album: 'Fix').title,
+      'Hazardous Material 2 vbr',
+    );
+    expect(
+      normalizeTrackNaming(title: 'Romanza; +++', artist: '', album: 'Enigma').title,
+      'Romanza',
+    );
+  });
 });
 }

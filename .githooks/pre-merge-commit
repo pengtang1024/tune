@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# 合并提交放行（与 pre-commit 的 MERGE_HEAD 判断一致）。
+exit 0
