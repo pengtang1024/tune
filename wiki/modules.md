@@ -46,11 +46,11 @@
 | --- | --- | --- |
 | application | `library_controller.dart` | 加载、扫描、排序、筛选；窗口化读取 SQLite |
 | application | `playback_notes_provider.dart` | 启动时把会话笔记接进播放链路 |
-| domain | `library_state.dart`、`library_view.dart`、`library_category.dart`、`library_album.dart` | 库状态、视图（排序 + 筛选组合）、分类树、专辑；筛选/排序/分面模型在 `lib/domain/models/` 的 `library_filter.dart`、`library_sort.dart`、`library_facets.dart` |
+| domain | `library_state.dart`、`library_view.dart`、`library_category.dart`、`library_album.dart`、`library_layout.dart` | 库状态、视图（排序 + 筛选组合）、分类树、专辑；筛选/排序/分面模型在 `lib/domain/models/` 的 `library_filter.dart`、`library_sort.dart`、`library_facets.dart` |
 | data | `library_storage.dart` + `impl/library_storage_io.dart` | `LibraryStorage` 接口 → `SqliteLibraryStorage`（`songs` 表窗口读写、视图 JSON） |
 | presentation | `library_pane.dart` | 音乐库页（在线搜索入口由 `app/router` 注入） |
 | presentation | `library_toolbar.dart`、`library_header.dart`、`library_column_header.dart` | 页头、工具条、列头 |
-| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart`、`library_collections_view.dart` | 歌曲 / 双列 / 专辑 / 分类 / 合集五种视图（`library_view_mode.dart`）；合集按来源分组，点开是那一个来源的专辑墙 |
+| presentation | `library_columns_view.dart`、`library_albums_view.dart`、`library_category_view.dart`、`library_collections_view.dart` | 视图随内容分类走（`library_layout.dart`）：音乐是专辑墙 + 歌曲 / 双列 / 分类 / 合集，播客是节目墙 + 单集，有声书是书墙 + 章节，电台只有台列表，音效平铺；合集按来源分组，点开是那一个来源的专辑墙 |
 | presentation | `library_filter_panel.dart`、`library_filter_chips.dart` | 筛选面板（11 组）与生效 chip |
 | presentation | `library_track_card.dart`、`library_row_actions.dart`、`library_row_tail.dart` | 曲目行与其动作 |
 
