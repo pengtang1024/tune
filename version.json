@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.38.2",
-  "build": 74,
-  "released_at": "2026-11-16T12:03:12Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.38.2",
-  "notes": "### 修复\n\n- **翻译模型的名单不再写死**：设置页不再内置各厂商的「推荐模型」，模型列表由厂商的\n  模型接口当场读取；点「获取模型」列出全部可用名字，可搜索选择，也可以直接手填。\n  OpenRouter 这类模型每周都在换的厂商，不会再把早已下线的名字摆在第一位。\n- **Moonshot 与 SiliconFlow 的余额查得出来**：两家的余额接口补上 `/v1` 前缀，\n  之前一直落在 404 上，余额栏只能空着。\n- **模型为空时不再偷偷回落到目录默认值**：三个翻译引擎都只认设置里填的模型，\n  没填就明确提示需要模型，而不是拿一个可能已经下线的名字去请求。\n\n### 变更\n\n- 厂商目录只保留「这家厂商是什么」：协议、端点、密钥要求与余额接口；模型名字\n  交给运行时查询，目录里不再有 `suggestedModels` / `defaultModel` 这类会过期的字段。",
+  "version": "1.39.0",
+  "build": 75,
+  "released_at": "2026-11-16T12:10:04Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.39.0",
+  "notes": "### 变更\n\n- **均衡器拆成两层**：播放器旁边（底栏「更多」菜单、正在播放页顶栏）只留开关加四组常用曲线\n  （平坦 / 流行 / 摇滚 / 重低音），十个频段滑杆、重置和全部预设挪到 设置 › 播放 › 均衡器。\n  两层共用一个 `EqualizerController`，在哪边调另一边都同步。\n- **预设从 8 组扩到 12 组**：新增原声、嘻哈、现场、轻柔；快捷面板固定取 `EqualizerPresets.quick`\n  那四组，设置行的副标题显示当前曲线名。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.38.2/tune-linux-x64-1.38.2.tar.gz",
-      "size": 53600275,
-      "sha256": "f5d83736ef6ff9095d9aec5c9a44d90ef4e1e484d307e83cf18d69a0f3fb2a01"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.39.0/tune-linux-x64-1.39.0.tar.gz",
+      "size": 53602666,
+      "sha256": "d8c8c9e8aaca5f7e14e119aec6ec5d0bbd0cacd9bfbfce666affcdd000ed708a"
     }
   }
 }

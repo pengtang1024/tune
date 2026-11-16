@@ -12,12 +12,35 @@ import 'package:tune/shared/ui/settings_switch_row.dart';
 /// slider takes whatever the two labels above and below it leave.
 const double _bandHeight = 200;
 
-/// Opens the music equalizer.
+/// Opens the quick panel: the switch and the curves most listeners pick by
+/// mood, and nothing else.
 ///
 /// The panel is arguments and callbacks only: the player and the settings page
-/// both open it, and a sheet shared by two features may not read the state of
-/// either. The caller keeps the settings; the panel says what changed.
-Future<void> showEqualizerPanel(
+/// both open a sheet, and a sheet shared by two features may not read the state
+/// of either. The caller keeps the settings; the panel says what changed.
+Future<void> showEqualizerQuickPanel(
+  BuildContext context, {
+  required EqualizerSettings settings,
+  required bool available,
+  required ValueChanged<bool> onEnabledChanged,
+  required ValueChanged<String> onPresetChanged,
+}) async {
+  await showCompactSheet<void>(
+    context,
+    (context) => EqualizerQuickSheet(
+      settings: settings,
+      available: available,
+      onEnabledChanged: onEnabledChanged,
+      onPresetChanged: onPresetChanged,
+    ),
+  );
+}
+
+/// Opens the full editor: every curve, one slider per band, and the reset.
+///
+/// The settings page is the only caller. The player keeps its panel small on
+/// purpose: ten sliders do not fit beside a track row and a volume thumb.
+Future<void> showEqualizerEditorPanel(
   BuildContext context, {
   required EqualizerSettings settings,
   required bool available,
@@ -28,7 +51,7 @@ Future<void> showEqualizerPanel(
 }) async {
   await showCompactSheet<void>(
     context,
-    (context) => EqualizerSheet(
+    (context) => EqualizerEditorSheet(
       settings: settings,
       available: available,
       onEnabledChanged: onEnabledChanged,
@@ -39,14 +62,116 @@ Future<void> showEqualizerPanel(
   );
 }
 
-/// The equalizer panel: the switch, the curves and one slider per band.
+/// The name of a curve, read through the localization of the window.
 ///
-/// The panel keeps the values it last handed to [onGainChanged] on its own. The
+/// The quick panel, the editor and the settings row all name a curve, so the
+/// switch lives here instead of being written three times.
+String equalizerPresetLabel(BuildContext context, String presetId) {
+  final loc = context.loc;
+  return switch (presetId) {
+    EqualizerPresets.flatId => loc.equalizerPresetFlat,
+    EqualizerPresets.popId => loc.equalizerPresetPop,
+    EqualizerPresets.rockId => loc.equalizerPresetRock,
+    EqualizerPresets.jazzId => loc.equalizerPresetJazz,
+    EqualizerPresets.classicalId => loc.equalizerPresetClassical,
+    EqualizerPresets.acousticId => loc.equalizerPresetAcoustic,
+    EqualizerPresets.bassId => loc.equalizerPresetBass,
+    EqualizerPresets.vocalId => loc.equalizerPresetVocal,
+    EqualizerPresets.hiphopId => loc.equalizerPresetHiphop,
+    EqualizerPresets.electronicId => loc.equalizerPresetElectronic,
+    EqualizerPresets.liveId => loc.equalizerPresetLive,
+    EqualizerPresets.softId => loc.equalizerPresetSoft,
+    _ => loc.equalizerCustom,
+  };
+}
+
+/// The panel the player opens: switch and four curves.
+///
+/// The panel keeps the values it last handed to the callbacks on its own. The
 /// sheet is a route of its own and does not rebuild when the controller writes
-/// the new settings down, so without the echo the thumb would jump back to the
-/// value the panel opened with; the callbacks stay the only writer.
-class EqualizerSheet extends StatefulWidget {
-  const EqualizerSheet({
+/// the new settings down, so without the echo the chips would fall back to the
+/// values the panel opened with; the callbacks stay the only writer.
+class EqualizerQuickSheet extends StatefulWidget {
+  const EqualizerQuickSheet({
+    super.key,
+    required this.settings,
+    required this.available,
+    required this.onEnabledChanged,
+    required this.onPresetChanged,
+  });
+
+  /// The settings the panel opens with.
+  final EqualizerSettings settings;
+
+  /// Whether the backend of this platform can apply a curve at all.
+  final bool available;
+
+  final ValueChanged<bool> onEnabledChanged;
+
+  final ValueChanged<String> onPresetChanged;
+
+  @override
+  State<EqualizerQuickSheet> createState() => _EqualizerQuickSheetState();
+}
+
+class _EqualizerQuickSheetState extends State<EqualizerQuickSheet> {
+  late EqualizerSettings _settings = widget.settings;
+
+  @override
+  void didUpdateWidget(EqualizerQuickSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.settings != widget.settings) {
+      _settings = widget.settings;
+    }
+  }
+
+  void _setEnabled(bool enabled) {
+    setState(() => _settings = _settings.copyWith(enabled: enabled));
+    widget.onEnabledChanged(enabled);
+  }
+
+  void _applyPreset(String presetId) {
+    final preset = EqualizerPresets.byId(presetId);
+    if (preset == null) return;
+    setState(() => _settings = _settings.copyWith(gains: preset.gains));
+    widget.onPresetChanged(presetId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _EqualizerFrame(
+      available: widget.available,
+      hint: context.loc.equalizerQuickHint,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SettingsSwitchRow(
+            title: context.loc.equalizerEnable,
+            description: equalizerPresetLabel(context, _settings.presetId),
+            value: _settings.enabled,
+            // The switch row of the app has no disabled state of its own; the
+            // dimmed block of the frame keeps the pointer away and this guard
+            // keeps the value still for the keyboard.
+            onChanged: widget.available ? _setEnabled : _ignoreSwitch,
+          ),
+          const SizedBox(height: CompactTokens.space16),
+          _PresetChips(
+            presets: EqualizerPresets.quick,
+            presetId: _settings.presetId,
+            onSelected: widget.available ? _applyPreset : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _ignoreSwitch(bool _) {}
+}
+
+/// The panel the settings page opens: every curve and one slider per band.
+class EqualizerEditorSheet extends StatefulWidget {
+  const EqualizerEditorSheet({
     super.key,
     required this.settings,
     required this.available,
@@ -71,14 +196,14 @@ class EqualizerSheet extends StatefulWidget {
   final VoidCallback onReset;
 
   @override
-  State<EqualizerSheet> createState() => _EqualizerSheetState();
+  State<EqualizerEditorSheet> createState() => _EqualizerEditorSheetState();
 }
 
-class _EqualizerSheetState extends State<EqualizerSheet> {
+class _EqualizerEditorSheetState extends State<EqualizerEditorSheet> {
   late EqualizerSettings _settings = widget.settings;
 
   @override
-  void didUpdateWidget(EqualizerSheet oldWidget) {
+  void didUpdateWidget(EqualizerEditorSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.settings != widget.settings) {
       _settings = widget.settings;
@@ -106,6 +231,84 @@ class _EqualizerSheetState extends State<EqualizerSheet> {
     setState(() => _settings = _settings.resetGains());
     widget.onReset();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return _EqualizerFrame(
+      available: widget.available,
+      hint: context.loc.equalizerHint,
+      trailing: TextButton.icon(
+        onPressed: widget.available ? _reset : null,
+        icon: const Icon(
+          Icons.restart_alt_rounded,
+          size: CompactTokens.icon16,
+        ),
+        label: Text(context.loc.equalizerReset),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SettingsSwitchRow(
+            title: context.loc.equalizerEnable,
+            description: equalizerPresetLabel(context, _settings.presetId),
+            value: _settings.enabled,
+            onChanged: widget.available ? _setEnabled : _ignoreSwitch,
+          ),
+          const SizedBox(height: CompactTokens.space16),
+          _PresetChips(
+            presets: EqualizerPresets.all,
+            presetId: _settings.presetId,
+            onSelected: widget.available ? _applyPreset : null,
+          ),
+          const SizedBox(height: CompactTokens.space16),
+          SizedBox(
+            height: _bandHeight,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final band in EqualizerSettings.bands)
+                  Expanded(
+                    child: _BandSlider(
+                      band: band,
+                      gain: _settings.gainAt(band.index),
+                      enabled: widget.available,
+                      onChanged: (gain) => _setGain(band.index, gain),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _ignoreSwitch(bool _) {}
+}
+
+/// The chrome both panels share: title, the mark that the platform cannot do
+/// this, the controls, and one line of small print.
+///
+/// A platform without a filter chain still shows the panel: the reader sees
+/// that the feature exists and why it is quiet. The controls are dimmed and
+/// take no pointer, so nothing promises a change that cannot happen.
+class _EqualizerFrame extends StatelessWidget {
+  const _EqualizerFrame({
+    required this.available,
+    required this.hint,
+    required this.child,
+    this.trailing,
+  });
+
+  final bool available;
+
+  final String hint;
+
+  /// An action that belongs in the title row; the quick panel has none.
+  final Widget? trailing;
+
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -141,17 +344,10 @@ class _EqualizerSheetState extends State<EqualizerSheet> {
                     ),
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: widget.available ? _reset : null,
-                  icon: const Icon(
-                    Icons.restart_alt_rounded,
-                    size: CompactTokens.icon16,
-                  ),
-                  label: Text(context.loc.equalizerReset),
-                ),
+                ?trailing,
               ],
             ),
-            if (!widget.available) ...[
+            if (!available) ...[
               const SizedBox(height: CompactTokens.space8),
               Row(
                 children: [
@@ -173,68 +369,28 @@ class _EqualizerSheetState extends State<EqualizerSheet> {
               ),
             ],
             const SizedBox(height: CompactTokens.space12),
-            // A platform without a filter chain still shows the panel: the
-            // reader sees that the feature exists and why it is quiet. Every
-            // control is dimmed and takes no pointer, so nothing promises a
-            // change that cannot happen.
             Opacity(
-              opacity: widget.available ? 1 : 0.45,
-              child: IgnorePointer(
-                ignoring: !widget.available,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SettingsSwitchRow(
-                      title: context.loc.equalizerEnable,
-                      description: _presetLabel(context, _settings.presetId),
-                      value: _settings.enabled,
-                      // The switch row of the app has no disabled state of its
-                      // own; the dimmed block above keeps the pointer away and
-                      // this guard keeps the value still for the keyboard.
-                      onChanged: widget.available ? _setEnabled : _ignoreSwitch,
-                    ),
-                    const SizedBox(height: CompactTokens.space16),
-                    _PresetRow(
-                      presetId: _settings.presetId,
-                      onSelected: widget.available ? _applyPreset : null,
-                    ),
-                    const SizedBox(height: CompactTokens.space16),
-                    SizedBox(
-                      height: _bandHeight,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          for (final band in EqualizerSettings.bands)
-                            Expanded(
-                              child: _BandSlider(
-                                band: band,
-                                gain: _settings.gainAt(band.index),
-                                enabled: widget.available,
-                                onChanged: (gain) => _setGain(band.index, gain),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              opacity: available ? 1 : 0.45,
+              child: IgnorePointer(ignoring: !available, child: child),
             ),
             const SizedBox(height: CompactTokens.space12),
-            Text(context.loc.equalizerHint, style: hintStyle),
+            Text(hint, style: hintStyle),
           ],
         ),
       ),
     );
   }
-
-  void _ignoreSwitch(bool _) {}
 }
 
-/// The eight curves, and the mark that says the reader left all of them.
-class _PresetRow extends StatelessWidget {
-  const _PresetRow({required this.presetId, required this.onSelected});
+/// A row of curves, and the mark that says the reader left all of them.
+class _PresetChips extends StatelessWidget {
+  const _PresetChips({
+    required this.presets,
+    required this.presetId,
+    required this.onSelected,
+  });
+
+  final List<EqualizerPreset> presets;
 
   final String presetId;
 
@@ -251,13 +407,12 @@ class _PresetRow extends StatelessWidget {
       spacing: CompactTokens.space6,
       runSpacing: CompactTokens.space6,
       children: [
-        for (final preset in EqualizerPresets.all)
+        for (final preset in presets)
           ChoiceChip(
-            label: Text(_presetLabel(context, preset.id)),
+            label: Text(equalizerPresetLabel(context, preset.id)),
             selected: preset.id == presetId,
-            onSelected: onSelected == null
-                ? null
-                : (_) => onSelected!(preset.id),
+            onSelected:
+                onSelected == null ? null : (_) => onSelected!(preset.id),
           ),
         // The stored shape has no id: a curve the reader moved by hand matches
         // no preset, and the panel says so instead of lighting up a wrong chip.
@@ -338,22 +493,6 @@ class _BandSlider extends StatelessWidget {
       ),
     );
   }
-}
-
-/// The name of a curve, read through the localization of the window.
-String _presetLabel(BuildContext context, String presetId) {
-  final loc = context.loc;
-  return switch (presetId) {
-    EqualizerPresets.flatId => loc.equalizerPresetFlat,
-    EqualizerPresets.popId => loc.equalizerPresetPop,
-    EqualizerPresets.rockId => loc.equalizerPresetRock,
-    EqualizerPresets.jazzId => loc.equalizerPresetJazz,
-    EqualizerPresets.classicalId => loc.equalizerPresetClassical,
-    EqualizerPresets.bassId => loc.equalizerPresetBass,
-    EqualizerPresets.vocalId => loc.equalizerPresetVocal,
-    EqualizerPresets.electronicId => loc.equalizerPresetElectronic,
-    _ => loc.equalizerCustom,
-  };
 }
 
 /// A gain as the panel spells it: a sign on the boosts, none on the cuts.

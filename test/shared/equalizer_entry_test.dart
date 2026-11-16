@@ -68,8 +68,8 @@ void main() {
   testWidgets('the entry opens the panel the controller fills', (tester) async {
     await pumpEntry(tester);
 
-    expect(find.byType(EqualizerSheet), findsOneWidget);
-    expect(find.byType(Slider), findsNWidgets(10));
+    expect(find.byType(EqualizerQuickSheet), findsOneWidget);
+    expect(find.byType(ChoiceChip), findsNWidgets(4));
     expect(controller.state.isFlat, isTrue);
   });
 
@@ -101,17 +101,14 @@ void main() {
     expect(controller.state.enabled, isTrue);
   });
 
-  testWidgets('reset returns a moved curve to flat', (tester) async {
+  testWidgets('the player panel leaves the sliders to the settings page', (
+    tester,
+  ) async {
     await pumpEntry(tester);
 
-    await tester.tap(find.text('重低音'));
-    await tester.pumpAndSettle();
-    expect(controller.state.isFlat, isFalse);
-
-    await tester.tap(find.text('重置'));
-    await tester.pumpAndSettle();
-
-    expect(controller.state.isFlat, isTrue);
+    expect(find.byType(Slider), findsNothing);
+    expect(find.text('重置'), findsNothing);
+    expect(find.text('更细的频段和全部预设见 设置 › 播放'), findsOneWidget);
   });
 
   testWidgets('a platform without a backend still opens, as unavailable', (
@@ -119,8 +116,8 @@ void main() {
   ) async {
     await pumpEntry(tester, available: false);
 
-    expect(find.byType(EqualizerSheet), findsOneWidget);
+    expect(find.byType(EqualizerQuickSheet), findsOneWidget);
     expect(find.text('这个平台的播放后端不支持均衡器'), findsOneWidget);
-    expect(find.byType(Slider), findsNWidgets(10));
+    expect(find.byType(ChoiceChip), findsNWidgets(4));
   });
 }

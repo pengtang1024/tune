@@ -116,7 +116,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.equalizer_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.byType(EqualizerSheet), findsOneWidget);
+    expect(find.byType(EqualizerQuickSheet), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

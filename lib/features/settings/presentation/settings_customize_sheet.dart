@@ -85,14 +85,14 @@ void showSettingsCustomizeSheet({
 }
 
 /// The body of the customize sheet: the card of one section.
-/// Opens the equalizer panel with the wiring of this screen.
+/// Opens the full equalizer editor with the wiring of this screen.
 ///
 /// The panel itself lives in shared UI and knows nothing about Riverpod; the
-/// callers hand it the settings and the four writers, so the reader sees the
-/// same panel from the dock, the now playing page and here.
+/// caller hands it the settings and the writers. The player opens the short
+/// panel — switch and four curves; ten sliders live here.
 Future<void> _openEqualizer(BuildContext context, WidgetRef ref) {
   final controller = ref.read(equalizerControllerProvider.notifier);
-  return showEqualizerPanel(
+  return showEqualizerEditorPanel(
     context,
     settings: ref.read(equalizerControllerProvider),
     available: ref.read(equalizerAvailableProvider),
@@ -168,6 +168,7 @@ class SettingsCustomizeCard extends ConsumerWidget {
         onlyLikeOnDoubleClick: settings.onlyLikeOnDoubleClick,
         favoritesDoubleClickPlays: settings.favoritesDoubleClickPlays,
         equalizerAvailable: ref.watch(equalizerAvailableProvider),
+        equalizerPresetId: ref.watch(equalizerControllerProvider).presetId,
         onOpenEqualizer: () => _openEqualizer(context, ref),
         onAutoResumeOnStartup: controller.setAutoResumeOnStartup,
         onReplaceQueueOnClick: controller.setReplaceQueueOnClick,

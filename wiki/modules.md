@@ -1,6 +1,6 @@
 # 主要模块职责
 
-> 状态：设计（已实施） · 适用版本 1.37.2 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.39.0 · 最后核对 2026-11-16
 >
 > 按 `lib/` 下的包逐一说明。每个 feature 内部都按 `domain → application → data → presentation` 分层。
 
@@ -40,7 +40,7 @@
 | data | `playback_session_store.dart` | `queue` / `queue_meta` 表的读写 |
 | presentation | `player_dock.dart` | 底部播放条 |
 | presentation | `now_playing_page.dart`、`lyrics_panel.dart`、`now_playing_track_info.dart` | 正在播放页（整窗路由）与歌词面板 |
-| presentation | `equalizer_entry.dart` | 打开均衡器面板的入口（底栏与正在播放页共用；面板本体在 `lib/shared/ui/equalizer_sheet.dart`，不依赖 provider） |
+| presentation | `equalizer_entry.dart` | 打开均衡器快捷面板的入口（底栏与正在播放页共用；两个面板本体都在 `lib/shared/ui/equalizer_sheet.dart`，不依赖 provider，设置页自己开完整编辑器） |
 
 ## features/library —— 音乐库
 
