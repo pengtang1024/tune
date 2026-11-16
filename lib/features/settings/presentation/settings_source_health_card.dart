@@ -5,6 +5,7 @@ import 'package:tune/app/theme/compact_type_scale.dart';
 import 'package:tune/app/theme/compact_typography.dart';
 import 'package:tune/core/extension/localizations_extension.dart';
 import 'package:tune/domain/models/source_health_weights.dart';
+import 'package:tune/features/sources/domain/source_visibility.dart';
 import 'package:tune/features/settings/application/settings_controller.dart';
 import 'package:tune/shared/ui/settings_card_shell.dart';
 
@@ -26,11 +27,72 @@ class SettingsSourceHealthCard extends ConsumerWidget {
     final weights = ref.watch(
       settingsControllerProvider.select((state) => state.sourceHealthWeights),
     );
+    final gate = ref.watch(
+      settingsControllerProvider.select(
+        (state) => (
+          enabled: state.hideUnhealthySources,
+          threshold: state.healthGateThreshold,
+        ),
+      ),
+    );
     final theme = Theme.of(context);
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    context.loc.settingsHealthGateTitle,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: CompactTokens.space4),
+                  Text(
+                    context.loc.settingsHealthGateHint,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              key: const ValueKey('settings-health-gate'),
+              value: gate.enabled,
+              onChanged: (value) => ref
+                  .read(settingsControllerProvider.notifier)
+                  .setHideUnhealthySources(value),
+            ),
+          ],
+        ),
+        if (gate.enabled)
+          Wrap(
+            spacing: CompactTokens.space6,
+            runSpacing: CompactTokens.space6,
+            children: [
+              for (final preset in const [
+                (id: 'strict', value: 0.65),
+                (id: 'default', value: SourceVisibility.defaultThreshold),
+                (id: 'loose', value: 0.45),
+              ])
+                ChoiceChip(
+                  key: ValueKey('settings-health-gate-${preset.id}'),
+                  label: Text(_gateLabel(context, preset.value)),
+                  selected: (gate.threshold - preset.value).abs() < 0.001,
+                  onSelected: (_) => ref
+                      .read(settingsControllerProvider.notifier)
+                      .setHealthGateThreshold(preset.value),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+            ],
+          ),
+        const SizedBox(height: CompactTokens.space8),
         Wrap(
           spacing: CompactTokens.space6,
           runSpacing: CompactTokens.space6,
@@ -69,6 +131,10 @@ class SettingsSourceHealthCard extends ConsumerWidget {
       child: body,
     );
   }
+
+  /// The share a source must reach, as a percentage of the score.
+  static String _gateLabel(BuildContext context, double value) =>
+      context.loc.settingsHealthGateValue((value * 100).round());
 
   static Future<void> _apply(WidgetRef ref, SourceHealthWeights weights) async {
     await ref

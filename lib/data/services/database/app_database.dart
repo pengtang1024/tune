@@ -12,6 +12,7 @@ import 'package:tune/data/services/database/translation_tables.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
 import 'package:tune/domain/models/library_facets.dart';
+import 'package:tune/domain/models/source_fact_counts.dart';
 import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/domain/models/show_album.dart';
@@ -1000,7 +1001,52 @@ class AppDatabase {
   /// carries it: those are read back and merged in Dart, because whether two
   /// sources really publish one show is a fact about their episodes, not
   /// about their rows. A station is not an album, so it is left out.
-  List<AlbumSummary> albumSummaries() {
+  /// The per-source counts of the library, counted over the whole table.
+  ///
+  /// One grouped query: the health score reads rates per source, and counting
+  /// them from a window of a thousand rows would let the sort order decide how
+  /// healthy a source looks. Reading a source's own rows only: a rule that
+  /// hides rows from the list must never change the numbers that decide what
+  /// to hide.
+  Map<String, SourceFactCounts> sourceFacts() {
+    final rows = _db.select('''
+      SELECT songs.source_id AS source_id,
+             COUNT(*) AS total,
+             SUM(CASE WHEN songs.uri LIKE 'file://%'
+                        OR COALESCE(json_extract(songs.json, '\$.streamUrl'), '') <> ''
+                      THEN 1 ELSE 0 END) AS playable,
+             SUM(CASE WHEN COALESCE(json_extract(songs.json, '\$.albumArtPath'),
+                                    json_extract(songs.json, '\$.artworkUrl'), '') <> ''
+                      THEN 1 ELSE 0 END) AS artwork,
+             SUM(CASE WHEN TRIM(COALESCE(songs.artist, '')) <> '' THEN 1 ELSE 0 END) AS artist,
+             SUM(CASE WHEN TRIM(COALESCE(songs.album, '')) <> '' THEN 1 ELSE 0 END) AS album,
+             SUM(CASE WHEN COALESCE(songs.year, 0) > 0 THEN 1 ELSE 0 END) AS year,
+             SUM(CASE WHEN EXISTS (SELECT 1 FROM favorites f WHERE f.uri = songs.uri)
+                      THEN 1 ELSE 0 END) AS liked
+        FROM songs
+       WHERE songs.active = 1
+       GROUP BY songs.source_id
+    ''');
+    int at(Map<String, Object?> row, String key) =>
+        (row[key] as num?)?.toInt() ?? 0;
+    return {
+      for (final row in rows)
+        (row['source_id'] as String? ?? 'local'): SourceFactCounts(
+          total: at(row, 'total'),
+          playable: at(row, 'playable'),
+          artwork: at(row, 'artwork'),
+          artist: at(row, 'artist'),
+          album: at(row, 'album'),
+          year: at(row, 'year'),
+          liked: at(row, 'liked'),
+        ),
+    };
+  }
+
+  List<AlbumSummary> albumSummaries({Set<String> excludeSources = const {}}) {
+    final hidden = LibraryFilterSql.excludedSources(excludeSources);
+    final extra = hidden == null ? '' : ' AND ${hidden.sql}';
+    final extraArgs = hidden?.args ?? const <Object?>[];
     final rows = _db.select('''
       SELECT album AS name, artist AS artist, source_id AS sourceId,
              COUNT(*) AS count, MIN(json) AS sample,
@@ -1010,9 +1056,10 @@ class AppDatabase {
       WHERE album != ''
         AND NOT ${LibraryFilterSql.radio}
         AND NOT ${LibraryFilterSql.spokenWord}
+        $extra
       GROUP BY album, artist, source_id
       ORDER BY album COLLATE NOCASE, artist COLLATE NOCASE
-    ''');
+    ''', extraArgs);
     final albums = <String, AlbumSummary>{};
     for (final row in rows) {
       final name = row['name'] as String? ?? '';

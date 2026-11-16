@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.45.1",
-  "build": 90,
-  "released_at": "2026-11-16T18:03:20Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.45.1",
-  "notes": "### 修复\n\n- **健康度整体失真**：自动扫描按间隔跳过来源时，`skipped` 被当成真实结果写进健康历史\n  （只留最近 5 条）与上次扫描摘要，连跳几次就把成功/失败挤掉，所有来源的健康度收敛到\n  同一个偏高值，页头也一直挂着「有来源有问题」。现在跳过不写历史、不覆盖上一次真实摘要。",
+  "version": "1.46.0",
+  "build": 91,
+  "released_at": "2026-11-16T19:26:18Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.46.0",
+  "notes": "### 新增\n\n- **健康度可以决定来源是否进音乐库**：分数低于门槛的来源，其曲目不再出现在库里。\n  门槛是绝对分数（设置里三档：65% / 55% / 45%，默认 55%），不是百分比排名——\n  加一个健康来源不会把原本正常的挤出去。\n- **永不隐藏的四种情况**：本地来源、没有曲目的来源、本次扫描还没有证据的来源、\n  被置顶或正在播放的来源。库为空时一条也不隐藏。\n- 工具栏在隐藏发生时写一行「来自 N 个来源的曲目已隐藏」，右边「显示」一次把它们全部置顶。\n\n### 变更\n\n- **健康度的事实改从整库聚合**（`sourceFacts()` 一条 `GROUP BY`）而不是从加载的 1000 行窗口数：\n  隐藏曲目不再改变决定隐藏的那些数字，分数也不再随排序抖动。\n- 隐藏落在 SQL 里（`COALESCE(song.source_id,'local') NOT IN (?)`），计数、分面、专辑墙\n  与列表用同一个谓词，页头数字与看到的行不会对不上。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.45.1/tune-linux-x64-1.45.1.tar.gz",
-      "size": 53604047,
-      "sha256": "15f0fea8bab2317eca7d77bb97cead379e21170740ef0c2382a846a03e7c5ce8"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.46.0/tune-linux-x64-1.46.0.tar.gz",
+      "size": 53608417,
+      "sha256": "ccb35eda0a11066e24f490d28c6059289bbf66b08264a33457f1d9f2e5f046a3"
     }
   }
 }

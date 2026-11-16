@@ -3183,6 +3183,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryShowKindOnly => 'Show only this kind';
 
   @override
+  String libraryHiddenSources(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hidden sources',
+      one: '1 hidden source',
+    );
+    return 'Tracks from $_temp0 are hidden.';
+  }
+
+  @override
+  String get libraryShowHiddenSources => 'Show them';
+
+  @override
+  String get settingsHealthGateTitle => 'Hide sources whose health is low';
+
+  @override
+  String get settingsHealthGateHint =>
+      'Their tracks leave the library; pin a source to keep it.';
+
+  @override
+  String settingsHealthGateValue(Object value) {
+    return '$value% and above';
+  }
+
+  @override
   String get trackFactPath => 'File path';
 
   @override

@@ -9,6 +9,7 @@ import 'package:tune/features/discovery/domain/taste_aggregates.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/library_facets.dart';
 import 'package:tune/domain/models/library_filter.dart';
+import 'package:tune/domain/models/source_fact_counts.dart';
 import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/features/library/domain/library_view.dart';
 import 'package:tune/features/library/domain/library_album.dart';
@@ -37,6 +38,10 @@ LibraryStorage createLibraryStorage(
 /// This file is intentionally outside the controllers: both scanning and
 /// startup loading should go through the same storage boundary.
 class FileLibraryStorage implements LibraryStorage {
+
+  @override
+  Future<Map<String, SourceFactCounts>> sourceFacts() async => const {};
+
   FileLibraryStorage({
     Future<Directory> Function()? supportDirectory,
     Future<Directory> Function()? documentsDirectory,
@@ -260,8 +265,17 @@ class FileLibraryStorage implements LibraryStorage {
   }
 
   @override
-  Future<List<AlbumSummary>> albumSummaries() async {
-    final albums = libraryAlbumsOf(await load());
+  Future<List<AlbumSummary>> albumSummaries({
+    Set<String> excludeSources = const {},
+  }) async {
+    final albums = libraryAlbumsOf(
+      excludeSources.isEmpty
+          ? await load()
+          : [
+              for (final song in await load())
+                if (!excludeSources.contains(song.sourceId ?? 'local')) song,
+            ],
+    );
     return [
       for (final album in albums)
         AlbumSummary(
@@ -589,6 +603,16 @@ class SqliteLibraryStorage implements LibraryStorage {
   }
 
   @override
+  Future<Map<String, SourceFactCounts>> sourceFacts() async {
+    try {
+      return (await _db()).sourceFacts();
+    } catch (error, stackTrace) {
+      Log.error('统计来源事实失败: $error\n$stackTrace');
+      return const {};
+    }
+  }
+
+  @override
   Future<LibraryFacets> facets({required LibraryFilter filter}) async {
     try {
       final database = await _db();
@@ -631,9 +655,11 @@ class SqliteLibraryStorage implements LibraryStorage {
   }
 
   @override
-  Future<List<AlbumSummary>> albumSummaries() async {
+  Future<List<AlbumSummary>> albumSummaries({
+    Set<String> excludeSources = const {},
+  }) async {
     try {
-      return (await _db()).albumSummaries();
+      return (await _db()).albumSummaries(excludeSources: excludeSources);
     } catch (error, stackTrace) {
       Log.error('读取专辑列表失败: $error\n$stackTrace');
       return const [];

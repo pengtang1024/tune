@@ -24,6 +24,7 @@ class LibraryFilterSql {
       decade(filter.decades),
       artist(filter.artists),
       source(filter.sources),
+      excludedSources(filter.excludeSources),
       format(filter.formats),
       language(filter.languages),
       durationFilter(filter.durations),
@@ -113,6 +114,22 @@ class LibraryFilterSql {
     return (
       sql: "COALESCE(songs.source_id, 'local') IN (${_marks(sources.length)})",
       args: [...sources],
+    );
+  }
+
+  /// Keeps the sources the health gate hid out of the page.
+  ///
+  /// A source id is never empty in the table, but a row written before the
+  /// column existed carries none; those belong to the local library and are
+  /// never hidden, so the comparison treats a missing id as `local`.
+  static ({String sql, List<Object?> args})? excludedSources(
+    Set<String> ids,
+  ) {
+    if (ids.isEmpty) return null;
+    final marks = List.filled(ids.length, '?').join(', ');
+    return (
+      sql: "COALESCE(songs.source_id, 'local') NOT IN ($marks)",
+      args: ids.toList(),
     );
   }
 

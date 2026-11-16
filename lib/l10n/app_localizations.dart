@@ -5465,6 +5465,36 @@ abstract class AppLocalizations {
   /// **'只看这一类'**
   String get libraryShowKindOnly;
 
+  /// Note above the list when the health gate hides sources
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'来自 {count} 个来源的曲目已隐藏'**
+  String libraryHiddenSources(int count);
+
+  /// No description provided for @libraryShowHiddenSources.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'显示'**
+  String get libraryShowHiddenSources;
+
+  /// No description provided for @settingsHealthGateTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'隐藏健康度低的来源'**
+  String get settingsHealthGateTitle;
+
+  /// No description provided for @settingsHealthGateHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'它们的曲目不再出现在音乐库；置顶某个来源即可保留。'**
+  String get settingsHealthGateHint;
+
+  /// No description provided for @settingsHealthGateValue.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'{value}% 及以上'**
+  String settingsHealthGateValue(Object value);
+
   /// No description provided for @trackFactPath.
   ///
   /// In zh_CN, this message translates to:

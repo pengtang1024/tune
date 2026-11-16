@@ -1,4 +1,5 @@
 import 'package:tune/domain/models/song.dart';
+import 'package:tune/domain/models/source_fact_counts.dart';
 
 /// The per-source facts the health score reads from the library.
 ///
@@ -17,6 +18,25 @@ class SourceHealthFacts {
     required this.metadata,
     required this.activity,
   });
+
+  /// Reads the rates a source's own counts give.
+  ///
+  /// The counts come from the whole table, so this agrees with what the source
+  /// page shows even when the page itself hides some of those rows.
+  factory SourceHealthFacts.fromCounts(SourceFactCounts counts) {
+    if (counts.isEmpty) return unknown;
+    final metadata =
+        (counts.rate(counts.artist) +
+            counts.rate(counts.album) +
+            counts.rate(counts.year)) /
+        3;
+    return SourceHealthFacts(
+      playable: counts.rate(counts.playable),
+      artwork: counts.rate(counts.artwork),
+      metadata: metadata,
+      activity: counts.rate(counts.liked),
+    );
+  }
 
   static const unknown = SourceHealthFacts(
     playable: 0.25,
