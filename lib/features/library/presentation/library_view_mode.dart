@@ -3,6 +3,11 @@ enum LibraryViewMode {
   /// The dense table of every track.
   songs,
 
+  /// Two lists side by side: the groups on the left, the tracks of the
+  /// selected group on the right. The left list stays visible while a group
+  /// is open, so a reader can see where he is and what is inside at once.
+  split,
+
   /// The covers of the albums the tracks belong to.
   albums,
 

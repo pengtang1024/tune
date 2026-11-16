@@ -163,6 +163,7 @@
   "libraryViewShows": "Shows",
   "libraryViewBooks": "Books",
   "libraryViewCollections": "Collections view",
+  "libraryViewSplit": "Split view",
   "libraryOpenCollection": "Open collection",
   "libraryCollectionItems": "{items, plural, =1{1 item} other{{items} items}} · {tracks, plural, =1{1 track} other{{tracks} tracks}}",
   "@libraryCollectionItems": {

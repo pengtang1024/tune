@@ -132,6 +132,23 @@ Future<void> _loadFonts() async {
   }
 }
 
+
+/// 窄窗口里视图开关收成一颗菜单，宽的才是一排按钮；两种都点得到同一个档位。
+Future<void> _switchView(WidgetTester tester, IconData icon) async {
+  final inSwitch = find.descendant(
+    of: find.byType(LibraryViewSwitch),
+    matching: find.byIcon(icon),
+  );
+  if (inSwitch.evaluate().isNotEmpty) {
+    await tester.tap(inSwitch);
+  } else {
+    await tester.tap(find.byKey(const ValueKey('library-view-menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(icon).last);
+  }
+  await tester.pumpAndSettle();
+}
+
 Future<void> _shot(WidgetTester tester, String name) async {
   // The first pump builds whatever was just pushed, the second one lets the
   // animation of a sheet settle.
@@ -240,41 +257,21 @@ void main() {
 
     // The collections view groups the rows by the reach they came from, so a
     // 5000-row library reads as twenty shelves instead of one wall.
-    await tester.tap(
-      find.descendant(
-        of: find.byType(LibraryViewSwitch),
-        matching: find.byIcon(Icons.collections_bookmark_rounded),
-      ),
-    );
+    await _switchView(tester, Icons.collections_bookmark_rounded);
     await _shot(tester, 'library_collections$suffix');
-    await tester.tap(
-      find.descendant(
-        of: find.byType(LibraryViewSwitch),
-        matching: find.byIcon(Icons.view_list_rounded),
-      ),
-    );
+    await _switchView(tester, Icons.view_list_rounded);
 
     // The albums view is the browsing side of the library; the songs view
     // stays one click away. The tap is scoped to the switch: once the library
     // has albums the header grows its own grid icon, and an unscoped finder
     // matches both.
-    await tester.tap(
-      find.descendant(
-        of: find.byType(LibraryViewSwitch),
-        matching: find.byIcon(Icons.grid_view_rounded),
-      ),
-    );
+    await _switchView(tester, Icons.grid_view_rounded);
     await _shot(tester, 'library_albums$suffix');
     await tester.tap(find.text('Nocturnes'));
     await _shot(tester, 'library_album$suffix');
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
-    await tester.tap(
-      find.descendant(
-        of: find.byType(LibraryViewSwitch),
-        matching: find.byIcon(Icons.view_list_rounded),
-      ),
-    );
+    await _switchView(tester, Icons.view_list_rounded);
     await tester.pumpAndSettle();
 
     // The queue is a panel over the library now. The library itself is the

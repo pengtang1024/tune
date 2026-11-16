@@ -102,6 +102,7 @@ void main() {
 
 IconData _iconOf(LibraryViewMode mode) => switch (mode) {
   LibraryViewMode.songs => Icons.view_list_rounded,
+  LibraryViewMode.split => Icons.vertical_split_rounded,
   LibraryViewMode.columns => Icons.view_column_rounded,
   LibraryViewMode.categories => Icons.category_rounded,
   LibraryViewMode.albums => Icons.grid_view_rounded,

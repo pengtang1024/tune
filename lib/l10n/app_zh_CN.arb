@@ -163,6 +163,7 @@
   "libraryViewShows": "节目",
   "libraryViewBooks": "书",
   "libraryViewCollections": "合集视图",
+  "libraryViewSplit": "分栏视图",
   "libraryOpenCollection": "打开合集",
   "libraryCollectionItems": "{items} 个条目 · {tracks} 首",
   "@libraryCollectionItems": {

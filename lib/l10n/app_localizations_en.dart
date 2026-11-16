@@ -357,6 +357,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryViewCollections => 'Collections view';
 
   @override
+  String get libraryViewSplit => 'Split view';
+
+  @override
   String get libraryOpenCollection => 'Open collection';
 
   @override

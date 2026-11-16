@@ -60,6 +60,10 @@ class LibraryToolbar extends ConsumerWidget {
   /// overflows. A phone gets two rows instead.
   static const double _twoRowBreakpoint = 560;
 
+  /// 一行要放下搜索框、来源与结果数、排序和六档视图开关。比这更窄时
+  /// 六档改成一颗菜单按钮，否则英文标签会把右边缘挤出去几个像素。
+  static const double _tightControlsWidth = 760;
+
   const LibraryToolbar({
     super.key,
     required this.controller,
@@ -88,6 +92,7 @@ class LibraryToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final content = LayoutBuilder(
       builder: (context, constraints) {
+        final tight = constraints.maxWidth < _tightControlsWidth;
         if (constraints.maxWidth >= _twoRowBreakpoint) {
           return SizedBox(
             height: CompactTokens.controlDefault,
@@ -96,7 +101,7 @@ class LibraryToolbar extends ConsumerWidget {
                 Expanded(child: _searchField()),
                 ..._sourceAndCount(context),
                 const SizedBox(width: CompactTokens.space12),
-                ..._buttons(context, compact: false),
+                ..._buttons(context, compact: false, tight: tight),
               ],
             ),
           );
@@ -115,7 +120,7 @@ class LibraryToolbar extends ConsumerWidget {
                 children: [
                   ..._sourceAndCount(context),
                   const Spacer(),
-                  ..._buttons(context, compact: true),
+                  ..._buttons(context, compact: true, tight: true),
                 ],
               ),
             ),
@@ -214,7 +219,11 @@ class LibraryToolbar extends ConsumerWidget {
     _ => context.loc.libraryTrackCount(count),
   };
 
-  List<Widget> _buttons(BuildContext context, {required bool compact}) {
+  List<Widget> _buttons(
+    BuildContext context, {
+    required bool compact,
+    required bool tight,
+  }) {
     final theme = Theme.of(context);
     return [
       OutlinedButton.icon(
@@ -236,15 +245,21 @@ class LibraryToolbar extends ConsumerWidget {
               ? theme.colorScheme.onSurfaceVariant
               : theme.colorScheme.primary,
         ),
-        icon: const Icon(
-          Icons.filter_alt_outlined,
+        icon: Icon(
+          filter.activeGroups == 0
+              ? Icons.filter_alt_outlined
+              : Icons.filter_alt_rounded,
           size: CompactTokens.icon16,
         ),
-        label: Text(
-          filter.activeGroups == 0
-              ? context.loc.libraryFilter
-              : '${context.loc.libraryFilter} ${filter.activeGroups}',
-        ),
+        // 窄窗口里这一行还要放排序和六档视图开关，字会把它挤爆；
+        // 只留图标，生效的组数在筛选面板里看得到。
+        label: compact
+            ? const SizedBox.shrink()
+            : Text(
+                filter.activeGroups == 0
+                    ? context.loc.libraryFilter
+                    : '${context.loc.libraryFilter} ${filter.activeGroups}',
+              ),
       ),
       const SizedBox(width: CompactTokens.space8),
       LibrarySortButton(sort: sort, onSort: onSort, compact: compact),
@@ -254,6 +269,7 @@ class LibraryToolbar extends ConsumerWidget {
         views: layout.views,
         groupingLabel: layout.groupingLabel,
         onChanged: onViewChanged,
+        compact: tight,
       ),
     ];
   }

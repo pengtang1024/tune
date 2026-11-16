@@ -297,6 +297,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryViewCollections => '合集视图';
 
   @override
+  String get libraryViewSplit => '分栏视图';
+
+  @override
   String get libraryOpenCollection => '打开合集';
 
   @override
@@ -4797,6 +4800,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get libraryViewCollections => '合集视图';
 
   @override
+  String get libraryViewSplit => '分栏视图';
+
+  @override
   String get libraryOpenCollection => '打开合集';
 
   @override
@@ -9295,6 +9301,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get libraryViewCollections => '合集檢視';
+
+  @override
+  String get libraryViewSplit => '分欄檢視';
 
   @override
   String get libraryOpenCollection => '開啟合集';
