@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.34.2",
-  "build": 58,
-  "released_at": "2026-11-16T06:32:43Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.34.2",
-  "notes": "### 修复\n\n- 两个取数地址的清单**版本不同时不再拒绝更新**：CDN 边缘在发布后仍会服务上一条清单\n  （`s-maxage` 12 小时），此前这会被当成「两份清单不一致」直接失败——1.34.1 发布后就因此\n  卡住，读者既看不到新版本又收到「检查失败」。现在按 `build` 取较新的那份；同一个 `build`\n  却给出不同资产（截断的上传、被换掉的文件）仍然拒绝，`assets` 为空也拒绝。\n  清单取数、日志与失败文案的手法见 `docs/update-cdn.md` §4.1 / §4.3.1 / §4.4。\n\n### 文档与工程\n\n- `docs/troubleshooting.md` 的「更新检查失败」按新规则改写，并补一条「知道发了新版却说已是最新」\n  的排查路径（对比 raw 与 CDN 的 `build`）。",
+  "version": "1.34.3",
+  "build": 59,
+  "released_at": "2026-11-16T06:39:25Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.34.3",
+  "notes": "### 变更\n\n- 更新清单的取数顺序改为 **raw 优先、CDN 第二档**。仓库打包体积已涨到 54.5 MiB，\n  越过 jsDelivr 的 50 MB 包上限，`@master/version.json` 实测返回\n  `403 Package size exceeded the configured limit of 50 MB`——此前每轮检查都先花一趟\n  注定拿到 403 的请求。raw 不占 API 配额、没有包体积限制，因此排在前面；\n  CDN 留在列表里，仓库缩小或换镜像后可直接复用。\n\n### 文档与工程\n\n- `docs/update-cdn.md`：§1.1 补 2026-11-16 复测（`@master` 也已 403）、§4.1 改取数顺序并写明\n  理由、§9 风险表新增「jsDelivr 包体积 50 MB：已触发」一行；`docs/updates.md` 的数据源列表同步。\n- 两个取数相关用例改为按主机断言（`If-None-Match` 与日志行），不再钉死地址顺序——\n  顺序是策略不是契约，换顺序不该让用例红。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.34.2/tune-linux-x64-1.34.2.tar.gz",
-      "size": 53792425,
-      "sha256": "7369620983dca74bceb6caeaeadb47f12da94143e4802f1960e0ed6ea08f64b8"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.34.3/tune-linux-x64-1.34.3.tar.gz",
+      "size": 53792507,
+      "sha256": "7168fb073a75cb53197a7351bd08a71f79258f753394bdca03a3a5c8b309725a"
     }
   }
 }
