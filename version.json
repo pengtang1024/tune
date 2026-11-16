@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.3",
-  "build": 63,
-  "released_at": "2026-11-16T09:05:23Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.3",
-  "notes": "### 修复\n\n- **标题里带曲目序号、占位符与角色后缀**：列表左边本来就有行号，标题再写一遍 `01 Theme`、\n  `102 Sinfonia`、`13 XIII. Romanza` 只会把曲名挤成省略号。现在取数边界会去掉开头的序号\n  （数字 + 分隔符、数字 + 罗马数字、前导零、与专辑 `(Disc 1 of 3)` 对得上的碟轨号）、\n  尾部的 `+++`/`**` 占位符与 `- Coro`/`- Aria` 这类角色后缀。`7 Rings`、`99 Luftballons`、\n  `2014-02-12 Bigwords` 这类把数字当名字用的标题不动。\n- **已有曲目同样补齐**：打开库时按同一套规则重写旧行（只写真正变化的行），本机实测改写\n  约 460 行，无需重新扫描音源。",
+  "version": "1.35.4",
+  "build": 64,
+  "released_at": "2026-11-16T09:14:20Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.4",
+  "notes": "### 修复\n\n- **没有艺术家的曲目也去掉标题序号**：1.35.3 的清洗挂在「艺术家已知」那条分支上，艺术家为空的\n  行（`06 Hazardous Material 2 vbr`、`03 Ngopi Pagi Ini`）一条都没动。序号、占位符与角色后缀\n  本来就不需要艺术家才能判断，现在这类行同样清理。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.3/tune-linux-x64-1.35.3.tar.gz",
-      "size": 53676019,
-      "sha256": "a327240188f7234dab31c126d954f635408c54e381af29b1ed517f128304847c"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.4/tune-linux-x64-1.35.4.tar.gz",
+      "size": 53676428,
+      "sha256": "9a555cdc025f393f9495a13fdd4f89a31be71464064a36707f899b6d603b201e"
     }
   }
 }
