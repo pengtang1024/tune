@@ -37,6 +37,7 @@
 | [`chips.md`](chips.md) | chip / 标识的统一写法：图标、颜色、tooltip、详情面板 |
 | [`licensing.md`](licensing.md) | 许可证边界；新增依赖、字体、素材前要登记什么 |
 | [`health-unknown.md`](health-unknown.md) | 健康度里 `unknown` 的处理约定（不按中性算） |
+| [`health-gating.md`](health-gating.md) | 健康度决定“进不进音乐库”的方案（未实施，含性能预算） |
 
 ## 功能设计（已实施，动这块功能前读）
 
