@@ -206,7 +206,7 @@ flowchart LR
 
 - 窄于 600 就换手机形态，桌面也一样：底部栏 + 单行播放条 + 整页内容。桌面窗口的最小宽度是 560（`PlatformConstants.desktopWindowMinWidth`，读 `LayoutBreakpoints.phoneMaxWidth` 这一档），所以拉到最窄得到的是手机布局，不是把三栏挤小的迷你桌面。
 - 600–799 仍然保留图标侧栏：这个宽度在桌面上还有窗口高度与鼠标，侧栏够得着；再窄 40px 就进手机形态。触屏外壳在这个区间已经是底部栏。
-- 页面自己也得跟着宽度收敛，不能只换外壳：页宽窄于 800（`LayoutBreakpoints.railCompactMaxWidth`，按**页面**拿到的宽度算）时，音乐库的页头只剩标题、当前列表的计数与两颗图标（搜索开关、`⋯`），搜索行点开才出现，专辑墙与在线搜索进 `⋯`，筛选/排序/视图合成一行，封面墙固定三列。宽度仍只有一份来源（`layout_metrics.dart`），页面不自己发明断点。
+- 页面自己也得跟着宽度收敛，不能只换外壳：页宽窄于 800（`LayoutBreakpoints.railCompactMaxWidth`，按**页面**拿到的宽度算）时，音乐库的页头只剩标题、当前列表的计数与两颗图标（搜索开关、`⋯`），搜索行点开才出现，专辑墙与在线搜索进 `⋯`，筛选/排序/视图合成一行，封面墙固定三列。宽度仍只有一份来源（`layout_metrics.dart`），页面不自己发明断点。设置页另走一档：页宽窄于 600（`LayoutBreakpoints.phoneMaxWidth`）时，左侧那条 56px 分区栏换成页头下面一行横着走的 chip（图标 + 名称，选中给描边与浅底），正文拿回整条宽度；600–899 仍是图标栏，因为那里只剩「认得出图标」这一个负担，再窄正文才会被挤到 342px。
 - 窗口形态是 `WindowForm`（`normal` / `mini` / `immersive`），读者改的那一份由 `windowFormProvider`（`lib/app/layout/window_form_controller.dart`）持有；尺寸、位置与最大化属于窗口本身，由 `WindowManagerService` 防抖写入，两者都经 `WindowLayoutStore`（`lib/data/services/window_layout_store.dart`），键为 `window_geometry_v1` 与 `window_form_v1`。最大化时保存的仍是普通形态的尺寸，取消最大化回到读者离开时的大小。
 - 平台能力读 `AppCapabilities`（`lib/core/config/app_capabilities.dart`），界面不再自己判断 `Platform.isLinux`：托盘、MPRIS、默认播放器、自动更新、外部工具管线今天只有 Linux 为真；单实例在 Linux 与 Windows 为真（Windows 走回环端口）；Windows 只开窗口管理与单实例，移动端只开触屏外壳，Android 另开后台播放（`audio_service`，真机验收未完成）。
 - 设置页按能力表渲染：桌面分组只在托盘 / 媒体控制 / 默认播放器至少有一项为真时出现，更新卡片跟随 `autoUpdate`；没有接线的开关不画，避免给出按了没反应的入口。
