@@ -1,6 +1,7 @@
 import 'package:tune/core/utils/text_order.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/domain/models/show_album.dart';
 import 'package:tune/domain/models/song.dart';
 
@@ -132,8 +133,7 @@ List<LibraryAlbum> libraryAlbumGroupsOf(List<Song> songs) {
     groups.putIfAbsent(_groupKeyOf(song), () => []).add(song);
   }
   for (final show in spokenAlbumsOf(spoken)) {
-    groups.putIfAbsent(show.key, () => [])
-        .addAll(show.songs);
+    groups.putIfAbsent(show.key, () => []).addAll(show.songs);
   }
 
   final albums = <LibraryAlbum>[
@@ -149,6 +149,150 @@ List<LibraryAlbum> libraryAlbumGroupsOf(List<Song> songs) {
   });
   return albums;
 }
+
+/// Whether the group row of [album] is really one song.
+///
+/// A music album of one track is not an album the reader can walk into: it is
+/// a single. The library list draws it as a track row instead of a group row,
+/// and this function is the only place that decides it — the page, the list
+/// and the tests all ask here.
+///
+/// A show or a book of one episode keeps its group row: the row names the
+/// show as well as the episode, and the reader still walks into it.
+bool isSingleTrackGroup(LibraryAlbum album) =>
+    album.kind == ContentKind.music && album.songs.length == 1;
+
+/// One row of the group list.
+///
+/// The list holds two kinds of rows in one order: a group the reader can
+/// open, and the track of a group that has only one track.
+sealed class LibraryListRow {
+  const LibraryListRow();
+}
+
+/// A group row: an album, a show or a book that opens into its tracks.
+final class LibraryAlbumRow extends LibraryListRow {
+  const LibraryAlbumRow(this.album);
+
+  final LibraryAlbum album;
+}
+
+/// A track row: the only track of a one-track group.
+final class LibrarySingleRow extends LibraryListRow {
+  const LibrarySingleRow(this.song, {required this.index});
+
+  final Song song;
+
+  /// The position of the track in the list the page was given.
+  ///
+  /// The track row keeps the table's number column, so it has to say which
+  /// track of the list it is, not which row of the mixed list.
+  final int index;
+}
+
+/// The rows of the group list, in the order of [sort].
+///
+/// A group with one track becomes that track's row; every other group stays
+/// one row. Both kinds are ranked by the column the sort names, read from
+/// what the row itself writes: the group name, its artist, its newest track
+/// and its total length for a group, and the track's own facts for a single.
+/// A tie falls back to the row name, so the list does not jump between
+/// rebuilds when the sort column is equal.
+List<LibraryListRow> libraryRowsOf(
+  List<Song> songs, {
+  required LibrarySort sort,
+}) {
+  final indexOf = <String, int>{
+    for (var i = 0; i < songs.length; i++) songs[i].uri: i,
+  };
+  final rows = <LibraryListRow>[];
+  for (final album in libraryAlbumGroupsOf(songs)) {
+    if (isSingleTrackGroup(album)) {
+      final song = album.songs.single;
+      rows.add(LibrarySingleRow(song, index: indexOf[song.uri] ?? rows.length));
+    } else {
+      rows.add(LibraryAlbumRow(album));
+    }
+  }
+  rows.sort((left, right) => _compareRows(left, right, sort));
+  return rows;
+}
+
+int _compareRows(LibraryListRow left, LibraryListRow right, LibrarySort sort) {
+  final order = _compareByField(left, right, sort.field);
+  if (order != 0) return sort.ascending ? order : -order;
+  final byName = _compareTextLastEmpty(_rowName(left), _rowName(right));
+  if (byName != 0) return byName;
+  return _compareTextLastEmpty(_rowId(left), _rowId(right));
+}
+
+int _compareByField(
+  LibraryListRow left,
+  LibraryListRow right,
+  LibrarySortField field,
+) {
+  switch (field) {
+    case LibrarySortField.title:
+      return _compareTextLastEmpty(_rowTitle(left), _rowTitle(right));
+    case LibrarySortField.album:
+      return _compareTextLastEmpty(_rowAlbum(left), _rowAlbum(right));
+    case LibrarySortField.artist:
+      return _compareTextLastEmpty(_rowArtist(left), _rowArtist(right));
+    case LibrarySortField.addedAt:
+      return _rowAddedAt(left).compareTo(_rowAddedAt(right));
+    case LibrarySortField.duration:
+      return _rowDuration(left).compareTo(_rowDuration(right));
+  }
+}
+
+/// Compares two names, with the empty one last.
+///
+/// The group list has always kept the tracks without an album at the bottom;
+/// a single with no title belongs there too.
+int _compareTextLastEmpty(String left, String right) {
+  if (left.isEmpty != right.isEmpty) return left.isEmpty ? 1 : -1;
+  return compareText(left, right);
+}
+
+String _rowTitle(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.name,
+  LibrarySingleRow(:final song) => song.title.trim(),
+};
+
+String _rowName(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.name,
+  LibrarySingleRow(:final song) =>
+    song.title.trim().isEmpty ? song.album.trim() : song.title.trim(),
+};
+
+String _rowAlbum(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.name,
+  LibrarySingleRow(:final song) => song.album.trim(),
+};
+
+String _rowArtist(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) =>
+    album.artist.isNotEmpty ? album.artist : album.songs.first.artist.trim(),
+  LibrarySingleRow(:final song) => song.artist.trim(),
+};
+
+int _rowAddedAt(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.songs.fold(
+    0,
+    (latest, song) => song.dateAdded > latest ? song.dateAdded : latest,
+  ),
+  LibrarySingleRow(:final song) => song.dateAdded,
+};
+
+int _rowDuration(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.durationInMillis,
+  LibrarySingleRow(:final song) => song.durationInMillis,
+};
+
+String _rowId(LibraryListRow row) => switch (row) {
+  LibraryAlbumRow(:final album) => album.key,
+  LibrarySingleRow(:final song) => song.uri,
+};
 
 /// The key a group row is grouped by: the album name and where it came from.
 String _groupKeyOf(Song song) {

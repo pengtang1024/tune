@@ -1,23 +1,28 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
+import 'package:tune/domain/models/library_sort.dart';
 import 'package:tune/domain/models/music_source.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 
 void main() {
-
-Song songOf(String album, String artist, {required String uri, String source = 'community_music'}) {
-  return Song(
-    id: uri.hashCode,
-    uri: 'tune://$source/$uri',
-    title: 'Track $uri',
-    artist: artist,
-    album: album,
-    duration: 180000,
-    sourceId: source,
-  );
-}
+  Song songOf(
+    String album,
+    String artist, {
+    required String uri,
+    String source = 'community_music',
+  }) {
+    return Song(
+      id: uri.hashCode,
+      uri: 'tune://$source/$uri',
+      title: 'Track $uri',
+      artist: artist,
+      album: album,
+      duration: 180000,
+      sourceId: source,
+    );
+  }
 
   test('the tracks of an album are grouped and ordered by the album', () {
     const songs = [
@@ -500,4 +505,146 @@ Song songOf(String album, String artist, {required String uri, String source = '
 
     expect(groups, hasLength(2));
   });
+
+  group('the rows of the group list', () {
+    // A is one track, Alpha is two, D is one: one of each row, in an order
+    // the name sort would not give.
+    final songs = [
+      rowSong(
+        title: 'A song',
+        album: 'Omega',
+        artist: 'Ann',
+        duration: 1000,
+        addedAt: 10,
+        uri: 'a',
+      ),
+      rowSong(
+        title: 'B song',
+        album: 'Alpha',
+        artist: 'Bob',
+        duration: 2000,
+        addedAt: 300,
+        uri: 'b',
+      ),
+      rowSong(
+        title: 'C song',
+        album: 'Alpha',
+        artist: 'Bob',
+        duration: 3000,
+        addedAt: 100,
+        uri: 'c',
+      ),
+      rowSong(
+        title: 'D song',
+        album: 'Zeta',
+        artist: 'Ann',
+        duration: 4000,
+        addedAt: 500,
+        uri: 'd',
+      ),
+    ];
+
+    List<String> namesOf(LibrarySort sort) => [
+      for (final row in libraryRowsOf(songs, sort: sort))
+        switch (row) {
+          LibraryAlbumRow(:final album) => album.name,
+          LibrarySingleRow(:final song) => song.title,
+        },
+    ];
+
+    test('a group of one track is that track row, a group of two stays', () {
+      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
+
+      expect(rows.whereType<LibraryAlbumRow>(), hasLength(1));
+      expect(rows.whereType<LibraryAlbumRow>().single.album.name, 'Alpha');
+      expect(
+        [for (final row in rows.whereType<LibrarySingleRow>()) row.song.title],
+        ['A song', 'D song'],
+      );
+      for (final row in rows) {
+        expect(
+          row is LibraryAlbumRow && isSingleTrackGroup(row.album),
+          isFalse,
+        );
+      }
+    });
+
+    test('the single row carries the track position of the list', () {
+      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
+
+      expect(
+        [
+          for (final row in rows.whereType<LibrarySingleRow>())
+            (row.song.title, row.index),
+        ],
+        [('A song', 0), ('D song', 3)],
+      );
+    });
+
+    test('the mixed rows follow the sort field', () {
+      expect(namesOf(LibrarySort.title), ['A song', 'Alpha', 'D song']);
+      expect(namesOf(LibrarySort.title.flipped()), [
+        'D song',
+        'Alpha',
+        'A song',
+      ]);
+      expect(namesOf(LibrarySort.recent), ['D song', 'Alpha', 'A song']);
+      expect(namesOf(const LibrarySort(field: LibrarySortField.duration)), [
+        'A song',
+        'D song',
+        'Alpha',
+      ]);
+      expect(namesOf(const LibrarySort(field: LibrarySortField.artist)), [
+        'A song',
+        'D song',
+        'Alpha',
+      ]);
+      expect(namesOf(const LibrarySort(field: LibrarySortField.album)), [
+        'Alpha',
+        'A song',
+        'D song',
+      ]);
+    });
+
+    test('a show of one episode keeps its group row', () {
+      final songs = [
+        Song(
+          id: 1,
+          uri: 'tune://podcast_rss/1',
+          title: 'An episode',
+          artist: 'Host',
+          album: 'The Show',
+          duration: 200000,
+          sourceId: 'podcast_rss',
+        ),
+      ];
+
+      final rows = libraryRowsOf(songs, sort: LibrarySort.title);
+
+      expect(rows.single, isA<LibraryAlbumRow>());
+      final album = (rows.single as LibraryAlbumRow).album;
+      expect(album.songs, hasLength(1));
+      expect(isSingleTrackGroup(album), isFalse);
+    });
+  });
+}
+
+/// A track with the facts the row order reads.
+Song rowSong({
+  required String title,
+  required String album,
+  required String artist,
+  required int duration,
+  required int addedAt,
+  required String uri,
+}) {
+  return Song(
+    id: uri.hashCode,
+    uri: 'tune://community_music/$uri',
+    title: title,
+    artist: artist,
+    album: album,
+    duration: duration,
+    dateAdded: addedAt,
+  );
 }
