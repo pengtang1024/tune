@@ -30,8 +30,8 @@ class _MemoryKeyStore extends TranslationKeyStore {
   }
 }
 
-/// The card of the translation settings: the vendor, its key and the models
-/// the vendor itself reports.
+/// The card of the translation settings: the switch, the chosen vendor and a
+/// way into the vendor page.
 void main() {
   Finder apiKeyField() => find.byWidgetPredicate(
     (widget) =>
@@ -45,10 +45,19 @@ void main() {
   Finder balanceButton() =>
       find.ancestor(of: find.text('查询余额'), matching: find.byType(TextButton));
 
-  Future<void> selectProvider(WidgetTester tester, String label) async {
-    await tester.tap(find.byType(DropdownButton<String>));
+  Future<void> openVendors(WidgetTester tester) async {
+    await tester.tap(find.widgetWithText(OutlinedButton, '配置服务商'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(label).last);
+  }
+
+  Future<void> selectProvider(WidgetTester tester, String name) async {
+    await tester.enterText(
+      find.byKey(const ValueKey('translation-vendors-search')),
+      name,
+    );
+    await tester.pumpAndSettle();
+    // The search field holds the same words, so tap the row, not the text.
+    await tester.tap(find.widgetWithText(ListTile, name));
     await tester.pumpAndSettle();
   }
 
@@ -109,8 +118,18 @@ void main() {
 
     expect(
       find.text('未配置'),
+      findsWidgets,
+      reason: 'the card starts on the empty entry',
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is OutlinedButton &&
+            widget.child is Text &&
+            (widget.child! as Text).data == '配置服务商',
+      ),
       findsOneWidget,
-      reason: 'the picker starts on the empty entry',
+      reason: 'the vendor page is one click away',
     );
     expect(
       find.text('会发送哪些内容'),
@@ -123,6 +142,7 @@ void main() {
   testWidgets('the balance button follows the vendor: off without an '
       'endpoint, on with one', (tester) async {
     await pumpCard(tester);
+    await openVendors(tester);
 
     await selectProvider(tester, 'OpenAI');
     expect(
@@ -143,6 +163,7 @@ void main() {
     tester,
   ) async {
     final controller = await pumpCard(tester);
+    await openVendors(tester);
 
     await selectProvider(tester, 'DeepSeek');
     await tester.enterText(apiKeyField(), 'sk-deepseek');
@@ -170,6 +191,7 @@ void main() {
   testWidgets('the fetch button reads the vendor models and the picker fills '
       'the field', (tester) async {
     await pumpCard(tester, models: const ['model-a', 'model-b']);
+    await openVendors(tester);
 
     await selectProvider(tester, 'OpenAI');
     await tester.tap(find.widgetWithText(OutlinedButton, '获取模型'));
@@ -202,6 +224,7 @@ void main() {
       models: const ['deepseek-chat'],
       onQuery: (query) => seen = query,
     );
+    await openVendors(tester);
 
     await selectProvider(tester, 'DeepSeek');
     await tester.enterText(apiKeyField(), 'sk-now');
@@ -221,6 +244,7 @@ void main() {
     tester,
   ) async {
     await pumpCard(tester, failModels: true);
+    await openVendors(tester);
 
     await selectProvider(tester, 'DeepSeek');
     await tester.enterText(modelField(), 'typed-model');
@@ -244,6 +268,7 @@ void main() {
   ) async {
     var reads = 0;
     await pumpCard(tester, onQuery: (_) => reads++);
+    await openVendors(tester);
 
     await selectProvider(tester, 'Zhipu GLM');
 
@@ -268,6 +293,7 @@ void main() {
   ) async {
     var reads = 0;
     await pumpCard(tester, onQuery: (_) => reads++);
+    await openVendors(tester);
 
     await selectProvider(tester, 'OpenAI');
     await tester.enterText(apiKeyField(), 'sk-save');

@@ -90,8 +90,8 @@ Future<List<String>> _fetchOpenAi(
   TranslationProvider provider,
   Duration timeout,
 ) async {
-  final response = await dio.get<Map<String, dynamic>>(
-    '$baseUrl/models',
+  final response = await dio.get<dynamic>(
+    _modelListUrlOf(provider, baseUrl),
     options: Options(
       receiveTimeout: timeout,
       sendTimeout: timeout,
@@ -102,12 +102,7 @@ Future<List<String>> _fetchOpenAi(
       },
     ),
   );
-  final data = response.data?['data'];
-  if (data is! List) return const [];
-  return [
-    for (final entry in data)
-      if (entry is Map && entry['id'] is String) (entry['id'] as String).trim(),
-  ];
+  return _namesFrom(response.data);
 }
 
 Future<List<String>> _fetchAnthropic(
@@ -130,12 +125,7 @@ Future<List<String>> _fetchAnthropic(
       },
     ),
   );
-  final data = response.data?['data'];
-  if (data is! List) return const [];
-  return [
-    for (final entry in data)
-      if (entry is Map && entry['id'] is String) (entry['id'] as String).trim(),
-  ];
+  return _namesFrom(response.data);
 }
 
 Future<List<String>> _fetchGemini(
@@ -169,6 +159,38 @@ Future<List<String>> _fetchGemini(
     names.add(
       name.startsWith('models/') ? name.substring('models/'.length) : name,
     );
+  }
+  return names;
+}
+
+/// The absolute list endpoint: a catalog override wins over `baseUrl/models`.
+String _modelListUrlOf(TranslationProvider provider, String baseUrl) {
+  final explicit = provider.modelListUrl?.trim() ?? '';
+  return explicit.isNotEmpty ? explicit : '$baseUrl/models';
+}
+
+/// Reads names out of the three list shapes vendors publish: OpenAI's
+/// `data[].id`, an Anthropic-style `data[].id`, and a plain list of names or
+/// `{id, name}` objects (OpenCode answers one of these).
+List<String> _namesFrom(Object? body) {
+  final entries = switch (body) {
+    final List<dynamic> list => list,
+    final Map<dynamic, dynamic> map when map['data'] is List =>
+      map['data'] as List<dynamic>,
+    final Map<dynamic, dynamic> map when map['models'] is List =>
+      map['models'] as List<dynamic>,
+    _ => const <dynamic>[],
+  };
+  final names = <String>[];
+  for (final entry in entries) {
+    if (entry is String) {
+      names.add(entry);
+      continue;
+    }
+    if (entry is Map) {
+      final value = entry['id'] ?? entry['name'];
+      if (value is String) names.add(value);
+    }
   }
   return names;
 }

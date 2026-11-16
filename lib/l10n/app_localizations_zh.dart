@@ -4340,6 +4340,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsLocalizationModelsUnsupported => '该厂商不提供模型列表，请按其文档填写模型名。';
 
   @override
+  String get settingsLocalizationVendorsTitle => '翻译服务商';
+
+  @override
+  String get settingsLocalizationVendorsSearch => '搜索厂商';
+
+  @override
+  String get settingsLocalizationVendorsEmpty => '没有匹配的厂商';
+
+  @override
+  String get settingsLocalizationVendorsOpen => '配置服务商';
+
+  @override
+  String get settingsLocalizationVendorsGroupSubscription => '订阅套餐';
+
+  @override
+  String get settingsLocalizationVendorsGroupApi => '按量 API';
+
+  @override
+  String get settingsLocalizationVendorsGroupLocal => '本地';
+
+  @override
+  String get settingsLocalizationVendorsGroupCustom => '自定义';
+
+  @override
+  String get settingsLocalizationVendorsKindSubscription => '订阅';
+
+  @override
+  String get settingsLocalizationSubscriptionHint => '按订阅套餐计费，用量以套餐额度为准。';
+
+  @override
   String get settingsLocalizationModelsPick => '选择模型';
 
   @override
@@ -8924,6 +8954,36 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsUnsupported => '该厂商不提供模型列表，请按其文档填写模型名。';
+
+  @override
+  String get settingsLocalizationVendorsTitle => '翻译服务商';
+
+  @override
+  String get settingsLocalizationVendorsSearch => '搜索厂商';
+
+  @override
+  String get settingsLocalizationVendorsEmpty => '没有匹配的厂商';
+
+  @override
+  String get settingsLocalizationVendorsOpen => '配置服务商';
+
+  @override
+  String get settingsLocalizationVendorsGroupSubscription => '订阅套餐';
+
+  @override
+  String get settingsLocalizationVendorsGroupApi => '按量 API';
+
+  @override
+  String get settingsLocalizationVendorsGroupLocal => '本地';
+
+  @override
+  String get settingsLocalizationVendorsGroupCustom => '自定义';
+
+  @override
+  String get settingsLocalizationVendorsKindSubscription => '订阅';
+
+  @override
+  String get settingsLocalizationSubscriptionHint => '按订阅套餐计费，用量以套餐额度为准。';
 
   @override
   String get settingsLocalizationModelsPick => '选择模型';
@@ -13511,6 +13571,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get settingsLocalizationModelsUnsupported => '該廠商不提供模型列表，請按其文件填寫模型名稱。';
+
+  @override
+  String get settingsLocalizationVendorsTitle => '翻譯服務商';
+
+  @override
+  String get settingsLocalizationVendorsSearch => '搜尋廠商';
+
+  @override
+  String get settingsLocalizationVendorsEmpty => '沒有符合的廠商';
+
+  @override
+  String get settingsLocalizationVendorsOpen => '設定服務商';
+
+  @override
+  String get settingsLocalizationVendorsGroupSubscription => '訂閱方案';
+
+  @override
+  String get settingsLocalizationVendorsGroupApi => '按量 API';
+
+  @override
+  String get settingsLocalizationVendorsGroupLocal => '本機';
+
+  @override
+  String get settingsLocalizationVendorsGroupCustom => '自訂';
+
+  @override
+  String get settingsLocalizationVendorsKindSubscription => '訂閱';
+
+  @override
+  String get settingsLocalizationSubscriptionHint => '依訂閱方案計費，用量以方案額度為準。';
 
   @override
   String get settingsLocalizationModelsPick => '選擇模型';

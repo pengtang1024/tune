@@ -84,6 +84,26 @@ const List<TranslationProvider> translationProviderCatalog = [
       parser: TranslationBalanceParser.openrouter,
     ),
   ),
+  // OpenCode runs two gateways on one host: Go is a monthly plan and Console
+  // is metered. Both answer the OpenAI chat dialect, but their model list sits
+  // above the chat path, so it is named here instead of being derived.
+  TranslationProvider(
+    id: 'opencode-go',
+    name: 'OpenCode Go',
+    protocol: TranslationProtocol.openAiChat,
+    baseUrl: 'https://opencode.ai/inference/go/openai/v1',
+    chatPath: '/chat/completions',
+    modelListUrl: 'https://opencode.ai/inference/go/v1/models',
+    subscription: true,
+  ),
+  TranslationProvider(
+    id: 'opencode-zen',
+    name: 'OpenCode Zen',
+    protocol: TranslationProtocol.openAiChat,
+    baseUrl: 'https://opencode.ai/inference/openai/v1',
+    chatPath: '/chat/completions',
+    modelListUrl: 'https://opencode.ai/inference/v1/models',
+  ),
   TranslationProvider(
     id: 'siliconflow',
     name: 'SiliconFlow',

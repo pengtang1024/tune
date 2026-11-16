@@ -8057,6 +8057,66 @@ abstract class AppLocalizations {
   /// **'该厂商不提供模型列表，请按其文档填写模型名。'**
   String get settingsLocalizationModelsUnsupported;
 
+  /// No description provided for @settingsLocalizationVendorsTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'翻译服务商'**
+  String get settingsLocalizationVendorsTitle;
+
+  /// No description provided for @settingsLocalizationVendorsSearch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'搜索厂商'**
+  String get settingsLocalizationVendorsSearch;
+
+  /// No description provided for @settingsLocalizationVendorsEmpty.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'没有匹配的厂商'**
+  String get settingsLocalizationVendorsEmpty;
+
+  /// No description provided for @settingsLocalizationVendorsOpen.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'配置服务商'**
+  String get settingsLocalizationVendorsOpen;
+
+  /// No description provided for @settingsLocalizationVendorsGroupSubscription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅套餐'**
+  String get settingsLocalizationVendorsGroupSubscription;
+
+  /// No description provided for @settingsLocalizationVendorsGroupApi.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按量 API'**
+  String get settingsLocalizationVendorsGroupApi;
+
+  /// No description provided for @settingsLocalizationVendorsGroupLocal.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'本地'**
+  String get settingsLocalizationVendorsGroupLocal;
+
+  /// No description provided for @settingsLocalizationVendorsGroupCustom.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'自定义'**
+  String get settingsLocalizationVendorsGroupCustom;
+
+  /// No description provided for @settingsLocalizationVendorsKindSubscription.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'订阅'**
+  String get settingsLocalizationVendorsKindSubscription;
+
+  /// No description provided for @settingsLocalizationSubscriptionHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'按订阅套餐计费，用量以套餐额度为准。'**
+  String get settingsLocalizationSubscriptionHint;
+
   /// No description provided for @settingsLocalizationModelsPick.
   ///
   /// In zh_CN, this message translates to:

@@ -4695,6 +4695,38 @@ class AppLocalizationsEn extends AppLocalizations {
       'This vendor publishes no model list; type a model name from its documentation.';
 
   @override
+  String get settingsLocalizationVendorsTitle => 'Translation vendors';
+
+  @override
+  String get settingsLocalizationVendorsSearch => 'Search vendors';
+
+  @override
+  String get settingsLocalizationVendorsEmpty => 'No matching vendor';
+
+  @override
+  String get settingsLocalizationVendorsOpen => 'Configure vendor';
+
+  @override
+  String get settingsLocalizationVendorsGroupSubscription =>
+      'Subscription plans';
+
+  @override
+  String get settingsLocalizationVendorsGroupApi => 'Metered API';
+
+  @override
+  String get settingsLocalizationVendorsGroupLocal => 'Local';
+
+  @override
+  String get settingsLocalizationVendorsGroupCustom => 'Custom';
+
+  @override
+  String get settingsLocalizationVendorsKindSubscription => 'Plan';
+
+  @override
+  String get settingsLocalizationSubscriptionHint =>
+      'Billed by the subscription plan; usage follows the plan\'s allowance.';
+
+  @override
   String get settingsLocalizationModelsPick => 'Choose model';
 
   @override
