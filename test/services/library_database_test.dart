@@ -966,5 +966,32 @@ void main() {
     expect(track.artist, 'Edward ELGAR');
     expect(track.album, 'Enigma Variations');
   });
+
+  test('a stored row that repeats its artist in the title loses the prefix', () async {
+    final directory = await Directory.systemTemp.createTemp('tune-naming-2');
+    addTearDown(() => directory.delete(recursive: true));
+    final path = '${directory.path}/library.db';
+
+    var database = AppDatabase.open(path);
+    database.save([
+      const Song(
+        id: 9002,
+        uri: 'tune://internet_archive/messiah-101',
+        title: 'Handel, Messiah - 101 Sinfonia',
+        artist: 'Handel, G F',
+        album: 'Messiah (Disc 1 of 3)',
+        duration: 173000,
+        sourceId: 'community_classical',
+      ),
+    ]);
+    database.close();
+
+    database = AppDatabase.open(path);
+    addTearDown(database.close);
+    final track = database.load().single;
+
+    expect(track.artist, 'Handel, G F');
+    expect(track.title, '101 Sinfonia');
+  });
 });
 }
