@@ -54,6 +54,13 @@ class ProviderCredential {
 /// The switches live in [SettingsState] like every other preference: this
 /// object is the value of that field, not a second source of truth.
 class LocalizationConfig {
+  /// The shape of the document this build writes.
+  ///
+  /// A document without it was written by a build that still filled in the
+  /// model names of the vendor table; `LegacyTranslationModelMigration`
+  /// drops those once and stamps this number.
+  static const int schemaVersion = 2;
+
   /// The backend that runs the optional local model.
   static const String localBackendId = 'local';
 
@@ -234,6 +241,7 @@ class LocalizationConfig {
   /// file by `TranslationKeyStore`. `fromJson` still reads an `apiKey` that an
   /// older build left here, so an upgrade keeps the keys it was given.
   Map<String, dynamic> toJson() => {
+    'schema': schemaVersion,
     'enabled': enabled,
     'showOriginal': showOriginal,
     'privacyAccepted': privacyAccepted,
