@@ -730,6 +730,12 @@ abstract class AppLocalizations {
   /// **'展开正在播放'**
   String get playerExpandNowPlaying;
 
+  /// No description provided for @playerMoreActions.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'更多操作'**
+  String get playerMoreActions;
+
   /// No description provided for @playerCollapse.
   ///
   /// In zh_CN, this message translates to:
