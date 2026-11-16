@@ -271,9 +271,9 @@ void main() {
   });
 
   test('a loop pack filed under a music collection is not a shelf', () {
-    // A pack of one- to three-second tabla loops for composing was uploaded
-    // into the classical collection; its genre tag says Classical, so the
-    // album name is the only declaration that names what it is.
+    // Three packs of tabla loops for composing were uploaded into the
+    // classical collection; their genre tags say Classical or Instrumental,
+    // so the album name is the only declaration that names what they are.
     expect(
       contentKindOfFields(
         sourceId: 'community_classical',
@@ -290,6 +290,19 @@ void main() {
       ),
       ContentKind.soundEffect,
     );
+    // The two packs of longer loops are tagged Instrumental, five to thirty
+    // seconds each; they are still bars of a beat, not tracks to sit through.
+    for (final album in ['Tabla Loops', 'tabla loop', 'Tabla Loop']) {
+      expect(
+        contentKindOfFields(
+          sourceId: 'community_classical',
+          album: album,
+          genre: 'Instrumental',
+        ),
+        ContentKind.soundEffect,
+        reason: album,
+      );
+    }
     // The rest of that collection is music, artist or no artist.
     expect(
       contentKindOfFields(

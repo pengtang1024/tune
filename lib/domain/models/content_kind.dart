@@ -123,9 +123,13 @@ const Map<String, Map<String, ContentKind>> declaredAlbumKinds = {
     'death of a salesman': ContentKind.audiobook,
   },
   'community_classical': {
-    // A pack of one- to three-second tabla loops for composing was uploaded
-    // into the classical collection; every track is a bar of a beat, not a
-    // piece of music to listen to.
+    // Three packs of tabla loops for composing were uploaded into the
+    // classical collection; every track is a bar of a beat meant to be
+    // looped, not a piece of music to listen to. Two of the packs tag
+    // themselves Instrumental and one Classical, so the album name is the
+    // only declaration that names them.
+    'tabla loops': ContentKind.soundEffect,
+    'tabla loop': ContentKind.soundEffect,
     'tabla loops for music composition - 8 beats kaharwa taal':
         ContentKind.soundEffect,
   },

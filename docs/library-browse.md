@@ -505,12 +505,18 @@ class LibraryFilter {
 
 ```dart
 'community_classical': {
-  'tabla loops for music composition - 8 beats kaharwa taal': ContentKind.soundEffect,
+  'tabla loops': ContentKind.soundEffect,
+  'tabla loop': ContentKind.soundEffect,
+  'tabla loops for music composition - 8 beats kaharwa taal':
+      ContentKind.soundEffect,
 },
 ```
 
-这条把上传进古典合集的 6 行一至三秒塔布拉循环从歌曲表里划掉（`library_filter_sql.dart` 用
-`LOWER(TRIM(COALESCE(songs.album, '')))` 精确比对），同合集其余 199 行不受影响。
+这三条把上传进古典合集的**三个塔布拉循环包**从歌曲表里划掉，共 21 行：一张一至三秒的短循环
+（6 行，`genre` 写 Classical），两张五至三十秒的循环（13 + 2 行，`genre` 写 Instrumental）。
+`library_filter_sql.dart` 用 `LOWER(TRIM(COALESCE(songs.album, '')))` 精确比对，同合集其余
+178 行不受影响。循环包本身是编曲素材，不是听的作品；它们的 `genre` 标签并不说明这件事，
+所以只有专辑名这份声明能命名它们。
 
 ## 10. 不在范围
 
