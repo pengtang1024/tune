@@ -165,7 +165,7 @@ void main() {
     expect(byHost[_raw], 'W/"raw-1"');
   });
 
-  test('a 304 and a different 200 are still refused', () async {
+  test('a 304 and a newer 200 take the newer list', () async {
     final first = _RoutingAdapter({
       _cdn: (_) => _body(
         jsonEncode(_manifest()),
@@ -182,12 +182,52 @@ void main() {
     });
     await _source(Dio()..httpClientAdapter = first, root).read();
 
-    // The CDN edge still serves the old list; the raw host already has the
-    // new one. The cached 1.33.0 is an answer, and it must face the check.
+    // The CDN edge still serves the previous release while the raw host is
+    // already new. That is the ordinary shape of a fresh release, not a
+    // disagreement to refuse: the newer list is the answer.
     final second = _RoutingAdapter({
       _cdn: (_) => _body('', status: 304),
       _raw: (_) => _body(
         jsonEncode(_manifest(version: '1.34.0', build: 54)),
+        headers: {
+          'etag': ['W/"raw-2"'],
+        },
+      ),
+    });
+
+    final manifest = await _source(Dio()..httpClientAdapter = second, root).read();
+    expect(manifest?.version, '1.34.0');
+    expect(manifest?.build, 54);
+  });
+
+  test('one build with two different archives is still refused', () async {
+    final first = _RoutingAdapter({
+      _cdn: (_) => _body(
+        jsonEncode(_manifest()),
+        headers: {
+          'etag': ['W/"cdn-1"'],
+        },
+      ),
+      _raw: (_) => _body(
+        jsonEncode(_manifest()),
+        headers: {
+          'etag': ['W/"raw-1"'],
+        },
+      ),
+    });
+    await _source(Dio()..httpClientAdapter = first, root).read();
+
+    // Same version and build, another digest: a truncated upload or a file
+    // swapped on the way. There is no newer list to prefer.
+    final second = _RoutingAdapter({
+      _cdn: (_) => _body(
+        jsonEncode(_manifest()),
+        headers: {
+          'etag': ['W/"cdn-1"'],
+        },
+      ),
+      _raw: (_) => _body(
+        jsonEncode(_manifest(sha: 'f' * 64)),
         headers: {
           'etag': ['W/"raw-2"'],
         },

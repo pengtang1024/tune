@@ -23,8 +23,8 @@
 2. `https://raw.githubusercontent.com/pengtang1024/tune/master/version.json`
 3. 前两档都拿不到时，才读 GitHub 的 release 接口（有 token 挂 Bearer，没有就匿名）
 
-两份清单都拿到时会交叉核对，不一致直接拒绝本次更新。清单字段、调度、退避与
-失败分类见 [update-cdn.md](update-cdn.md)。
+两份清单都拿到时会交叉核对：`build` 不同取较新的（CDN 边缘过期是发布后的常态），
+同一个 `build` 却资产不同才拒绝。清单字段、调度、退避与失败分类见 [update-cdn.md](update-cdn.md)。
 
 - `version` 与 `build` 逐段比较；`+build` 只在版本相等时打破平局。
 - `assets` 按平台键挑归档（`linux-x64` 等）；第 3 档按文件名包含平台名挑，
