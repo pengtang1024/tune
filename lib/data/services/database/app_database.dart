@@ -280,53 +280,113 @@ class AppDatabase {
   /// This runs inside [open], so the one run of it is a one-time pause on the
   /// first start with an older database — a few hundred rows cost nothing, a
   /// library of fifty thousand rows pauses once and never again.
-  /// 取数时的命名规则（`track_naming.dart`）只在扫描时生效，升级前入库的行
-  /// 还是旧名字：艺术家空着、专辑里写着「艺术家 - 作品」。
+  /// Runs [normalizeTrackNaming] over rows an older build stored as-is.
   ///
-  /// 这里把存量的那部分补齐一次。范围由 WHERE 收窄成一个自限的条件——
-  /// 补过之后 artist 不再为空，下次打开这条查询就返回空，不再有代价。
+  /// The rule lives at the ingest edge (`track_naming.dart`); rows written
+  /// before it existed still read `Handel, Messiah - 101 Sinfonia` under an
+  /// artist already called `Handel, G F`. Opening the table reconciles them:
+  /// only rows whose text actually changes are written, and the scan reads
+  /// four short columns, not the json.
+  ///
+  /// Four stores open the same file during startup, so a pass already run
+  /// against the same row count is skipped; a scan that adds rows changes
+  /// the count and buys one more pass.
+  static final Map<String, int> _namingPasses = <String, int>{};
+  static int _inMemoryOpens = 0;
+
   static void _repairTrackNaming(Database db) {
-    final rows = db.select(
-      "SELECT uri, title, artist, album, json FROM songs "
-      "WHERE artist = '' AND instr(album, ' - ') > 0",
-    );
-    if (rows.isEmpty) return;
+    final key = _databaseKey(db);
+    final count = db.select('SELECT count(*) AS rows FROM songs').first['rows']
+        as int;
+    if (_namingPasses[key] == count) return;
+    _namingPasses[key] = count;
+    final changed = <List<Object?>>[];
+    for (final row in db.select(
+      'SELECT uri, title, artist, album FROM songs '
+      "WHERE instr(title, ' - ') > 0 OR instr(album, ' - ') > 0 "
+      "OR artist = ''",
+    )) {
+      final title = row['title'] as String? ?? '';
+      final artist = row['artist'] as String? ?? '';
+      final album = row['album'] as String? ?? '';
+      final naming = normalizeTrackNaming(
+        title: title,
+        artist: artist,
+        album: album,
+      );
+      if (naming.title == title &&
+          naming.artist == artist &&
+          naming.album == album) {
+        continue;
+      }
+      changed.add([
+        naming.title,
+        naming.artist,
+        naming.album,
+        foldText(naming.title),
+        row['uri'] as String,
+      ]);
+    }
+    if (changed.isEmpty) return;
+
     db.execute('BEGIN');
     try {
+      final document = db.prepare('SELECT json FROM songs WHERE uri = ?');
       final statement = db.prepare(
         'UPDATE songs SET title = ?, artist = ?, album = ?, title_sort = ?, '
         'json = ? WHERE uri = ?',
       );
       try {
-        for (final row in rows) {
-          final naming = normalizeTrackNaming(
-            title: row['title'] as String? ?? '',
-            artist: row['artist'] as String? ?? '',
-            album: row['album'] as String? ?? '',
-          );
-          if (naming.artist.isEmpty) continue;
-          final document =
-              jsonDecode(row['json'] as String) as Map<String, dynamic>;
-          document['title'] = naming.title;
-          document['artist'] = naming.artist;
-          document['album'] = naming.album;
+        for (final change in changed) {
+          final uri = change.last as String;
+          final row = document.select([uri]);
+          final encoded = row.isEmpty ? null : row.first['json'] as String?;
+          final json = encoded == null
+              ? null
+              : _renameDocument(encoded, change[0] as String,
+                  change[1] as String, change[2] as String);
           statement.execute([
-            naming.title,
-            naming.artist,
-            naming.album,
-            foldText(naming.title),
-            jsonEncode(document),
-            row['uri'] as String,
+            change[0],
+            change[1],
+            change[2],
+            change[3],
+            json,
+            change[4],
           ]);
         }
       } finally {
         statement.close();
+        document.close();
       }
       db.execute('COMMIT');
     } catch (error) {
       db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  /// The json holds the same three fields; patching it keeps the whole
+  /// document equal to the columns the table reads.
+  static String _renameDocument(
+    String encoded,
+    String title,
+    String artist,
+    String album,
+  ) {
+    final document = jsonDecode(encoded);
+    if (document is! Map<String, dynamic>) return encoded;
+    document['title'] = title;
+    document['artist'] = artist;
+    document['album'] = album;
+    return jsonEncode(document);
+  }
+
+  /// A stable name for the file behind [db]; every in-memory table of a test
+  /// run gets its own, so two of them never share the one-time pass.
+  static String _databaseKey(Database db) {
+    final rows = db.select('PRAGMA database_list');
+    final file = rows.isEmpty ? '' : rows.first['file'] as String? ?? '';
+    return file.isEmpty ? 'memory#${_inMemoryOpens++}' : file;
   }
 
   static void _backfillTitleSort(Database db) {
