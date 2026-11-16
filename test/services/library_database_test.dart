@@ -993,5 +993,29 @@ void main() {
     expect(track.artist, 'Handel, G F');
     expect(track.title, 'Sinfonia');
   });
+
+  test('a placeholder at the end of a stored title goes', () async {
+    final directory = await Directory.systemTemp.createTemp('tune-placeholder');
+    addTearDown(() => directory.delete(recursive: true));
+    final path = '${directory.path}/library.db';
+
+    var database = AppDatabase.open(path);
+    database.save([
+      const Song(
+        id: 9003,
+        uri: 'tune://internet_archive/vote-1',
+        title: 'Vote on Tuesday**',
+        artist: 'Some Show',
+        album: 'Somewhere',
+        duration: 60000,
+        sourceId: 'community_music',
+      ),
+    ]);
+    database.close();
+
+    database = AppDatabase.open(path);
+    addTearDown(database.close);
+    expect(database.load().single.title, 'Vote on Tuesday');
+  });
 });
 }

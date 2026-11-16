@@ -302,9 +302,10 @@ class AppDatabase {
     _namingPasses[key] = count;
     final changed = <List<Object?>>[];
     for (final row in db.select(
-      'SELECT uri, title, artist, album FROM songs '
-      "WHERE instr(title, ' - ') > 0 OR instr(album, ' - ') > 0 "
-      "OR artist = '' OR title GLOB '[0-9]*'",
+      // 全表扫一遍：占位符（`Tuesday**`）与角色后缀可能出现在任何一行的
+      // 标题里，用 WHERE 收窄反而会漏掉它们。开销由上面按行数记账的守卫兜住，
+      // 一个进程每个库只扫一次。
+      'SELECT uri, title, artist, album FROM songs',
     )) {
       final title = row['title'] as String? ?? '';
       final artist = row['artist'] as String? ?? '';
