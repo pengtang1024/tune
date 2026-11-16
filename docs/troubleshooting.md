@@ -117,7 +117,7 @@
 
 **现象**：`设置 → 关于` 点「检查更新」没反应，或显示「检查失败：…」；后台也不提示新版本。
 
-**可能原因**：后台检查不是实时的——启动 60 秒后首查，之后每 1 小时 ±10%，两次自动检查至少隔 15 分钟，失败按 30 分钟 → 1 小时 → 2 小时退避，手动检查不受节流（[update-cdn.md](update-cdn.md) §4.3）；网络到不了 jsDelivr 与 raw.githubusercontent.com（中国大陆常见），三档取数全部失败（[updates.md](updates.md) 的「限制」、[update-cdn.md](update-cdn.md) §9）；两份清单不一致时直接拒绝本次更新并报 `manifestMismatch`（[update-cdn.md](update-cdn.md) §4.1、§4.4）；下载完成但字节数或 sha256 不符，会删掉临时文件并提示重试（[update-cdn.md](update-cdn.md) §4.4）。
+**可能原因**：后台检查不是实时的——启动 60 秒后首查，之后每 1 小时 ±10%，两次自动检查至少隔 15 分钟，失败按 30 分钟 → 1 小时 → 2 小时退避，手动检查不受节流（[update-cdn.md](update-cdn.md) §4.3）；网络到不了 jsDelivr 与 raw.githubusercontent.com（中国大陆常见），三档取数全部失败（[updates.md](updates.md) 的「限制」、[update-cdn.md](update-cdn.md) §9）；两份清单的 `build` 不同时取较新的（CDN 边缘过期不算错误），只有同一个 `build` 却资产不同才拒绝并报 `manifestMismatch`（[update-cdn.md](update-cdn.md) §4.1、§4.4）；下载完成但字节数或 sha256 不符，会删掉临时文件并提示重试（[update-cdn.md](update-cdn.md) §4.4）。
 
 **怎么确认**：手动点一次「检查更新」，看失败分类是网络超时 / 异常响应 / 清单不一致（[update-cdn.md](update-cdn.md) §4.4）；看标准输出里的取数日志——每个地址每轮一条 `info`，内容是「主机 + 结果 + 耗时」，304 写「沿用上次解析」（[update-cdn.md](update-cdn.md) §4.3.1）；`curl -s https://cdn.jsdelivr.net/gh/pengtang1024/tune@master/version.json` 看能不能取到清单。
 
@@ -125,7 +125,8 @@
 
 - 手动重试；失败退避是设计行为，等下一轮即可（[update-cdn.md](update-cdn.md) §4.3）。
 - 换网络后重试；静态清单两档都不可达时才会走 GitHub API 兜底（[updates.md](updates.md)）。
-- 提示「两份更新清单不一致」属于发布侧问题，不是你机器的问题，等修复或按 [SUPPORT.md](../SUPPORT.md) 反馈。
+- 提示「两份更新清单不一致」属于发布侧问题（同一个 `build` 出现两种资产），不是你机器的问题，等修复或按 [SUPPORT.md](../SUPPORT.md) 反馈。
+- 版本号对不上（自己知道发了新版，应用说「已是最新」）多半是 CDN 边缘还在服务上一条清单；`curl` 一下 raw 那一档对比 `build`，以及按 [updates.md](updates.md) 的发布后自检复核。
 - 三档全失败时如实报「检查失败」，不会说成「已是最新」（[updates.md](updates.md) 的「限制」）。
 
 ## 托盘与媒体控制不生效

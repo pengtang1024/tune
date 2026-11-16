@@ -52,13 +52,32 @@ class VersionManifestSource {
           chosen = manifest;
           continue;
         }
-        if (!chosen.sameAs(manifest)) {
+        if (chosen.sameAs(manifest)) continue;
+        // One build, two different archives: a truncated upload or a file
+        // swapped on the way. There is no "newer" to fall back on, so the
+        // list is refused outright (docs/update-cdn.md §7). A list that
+        // publishes no archive at all cannot be lined up with one that does,
+        // and is refused the same way.
+        if (chosen.build == manifest.build ||
+            chosen.assets.isEmpty ||
+            manifest.assets.isEmpty) {
           Log.error(
             '更新清单不一致：'
             '${_describe(chosen)} 与 ${_describe(manifest)}',
           );
           throw const UpdateCheckException(UpdateCheckFailure.manifestMismatch);
         }
+        // Two builds: the CDN edge still serves the previous release until
+        // its neighbour object expires (s-maxage 12h), while the raw host is
+        // already new. The newer list wins; refusing here would leave every
+        // reader on the old build for half a day and report a failure while
+        // the update is in fact published.
+        final newest = manifest.build > chosen.build ? manifest : chosen;
+        Log.info(
+          '更新清单不一致，取较新的 ${newest.version}（+${newest.build}）：'
+          '${_describe(chosen)} 与 ${_describe(manifest)}',
+        );
+        chosen = newest;
       } on UpdateCheckException catch (error) {
         if (error.failure == UpdateCheckFailure.manifestMismatch) rethrow;
         failure ??= error;
