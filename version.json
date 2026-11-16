@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.37.0",
-  "build": 69,
-  "released_at": "2026-11-16T10:29:17Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.0",
-  "notes": "### 新增\n\n- **音乐均衡器（10 段，±12 dB）**：底栏动作行、正在播放页顶栏各有一个入口，设置页「播放」\n  卡片里也有同一行。面板是 10 根竖向滑杆（31 Hz–16 kHz，1 dB 步进），外加 8 组预设\n  （平直 / 流行 / 摇滚 / 爵士 / 古典 / 低音 / 人声 / 电子）和一键还原；手动改动后预设标记\n  回到「自定义」。\n- **曲线直接落到 mpv 的滤镜图**：`af` 设为 `lavfi=[volume=…dB,equalizer=f=…:g=…,…]`，预放大取\n  最大正增益的相反数，避免叠加多段后削顶；关闭或全部为 0 dB 时清空滤镜图，声音走原路径。\n  桌面端启动时用一条 `volume=0dB` 探测 libmpv 是否带 ffmpeg 滤波器，没有的话入口不显示，\n  播放不受影响；移动端仍是 `just_audio`，`AudioPlayerService.equalizer` 为 null，同样不显示入口。\n- **设置随应用重启恢复**：曲线按 400ms 防抖写进 `audio_equalizer_v1`（`{version, enabled, gains}`），\n  启动时读回并补发给后端；拖动过程中的写入合并到 100ms 一次，mpv 只收到最后一版曲线。\n\n### 说明\n\n- 均衡器的设计与边界见 [`docs/equalizer.md`](docs/equalizer.md)。",
+  "version": "1.37.1",
+  "build": 70,
+  "released_at": "2026-11-16T11:08:48Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.37.1",
+  "notes": "### 变更\n\n- **底栏去掉重复的「展开正在播放」图标**：点歌曲信息（封面 / 标题那一片）本来就进同一页，\n  这个按钮只是把同一个动作做了两遍，还把动作行挤到需要为均衡器额外定一个宽度下限。\n  现在动作行是音量、收藏、队列、迷你、均衡器五个位置里去掉重复项后的四个入口。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.0/tune-linux-x64-1.37.0.tar.gz",
-      "size": 53699922,
-      "sha256": "2cdc1c1dc5ef3d6731bd9fe910ab2e8d8ed0e603646692860337acb0129de0f6"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.37.1/tune-linux-x64-1.37.1.tar.gz",
+      "size": 53585075,
+      "sha256": "35f5c389450cdf7f1614e35d8bd229d4b3a8878f753b282454138e12ad87a68e"
     }
   }
 }

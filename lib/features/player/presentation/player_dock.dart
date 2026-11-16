@@ -29,10 +29,11 @@ import 'package:tune/shared/ui/track_facts.dart';
 
 /// The room the actions row needs before the equalizer entry fits.
 ///
-/// The row is laid out as one line and does not scroll, so an extra button can
-/// only be added where it has room. Measured against the dock: below this
-/// width the row runs 5 to 35 pixels past its edge (the volume slider, the
-/// heart, the queue button and the two window actions are what fill it).
+/// The row is laid out as one line and does not scroll, so the entry only
+/// appears where it has room. The number is the measured edge of the row with
+/// this exact set of controls (the volume slider, the heart, the queue button
+/// and the mini window action); adding or removing one of them moves it, so
+/// measure again with tool/layout_shots_test.dart before changing it.
 const double _equalizerMinActionWidth = 900;
 
 class PlayerDock extends ConsumerWidget {
@@ -284,14 +285,6 @@ class PlayerDock extends ConsumerWidget {
                       onPressed: onToggleQueue,
                       selected: queueOpen,
                     ),
-                    _DockIcon(
-                      icon: Icons.open_in_full_rounded,
-                      tooltip: context.loc.playerExpandNowPlaying,
-                      size: CompactTokens.icon18,
-                      onPressed: song == null
-                          ? null
-                          : () => context.push('/now-playing'),
-                    ),
                     if (onMini != null && roomForWindowActions)
                       _DockIcon(
                         icon: Icons.picture_in_picture_alt_rounded,
@@ -301,7 +294,7 @@ class PlayerDock extends ConsumerWidget {
                       ),
                     // The row is the one place of the dock that cannot shrink:
                     // below this width the volume slider, the heart, the queue
-                    // button and the two window actions already spend all of it,
+                    // button and the mini window action already spend all of it,
                     // and the entry would push the row past its edge. The entry
                     // waits for the window that can afford it, and the now
                     // playing page still offers the panel on a narrow one.
