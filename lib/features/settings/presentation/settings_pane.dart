@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tune/app/layout/layout_metrics.dart';
 import 'package:tune/app/theme/compact_tokens.dart';
 import 'package:tune/core/config/app_capabilities.dart';
 import 'package:tune/features/library/application/library_controller.dart';
@@ -49,6 +50,13 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _scrollViewKey = GlobalKey();
 
+  /// The phone's section chips scroll sideways; these keep the chosen one in
+  /// sight while the body scrolls.
+  final ScrollController _navScrollController = ScrollController();
+  final Map<SettingsSection, GlobalKey> _navKeys = {
+    for (final section in SettingsSection.values) section: GlobalKey(),
+  };
+
   /// Set while a nav click animates the page; the scroll spy must not
   /// fight the animation and land on a section it passes on the way.
   var _programmaticScroll = false;
@@ -69,6 +77,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
   void dispose() {
     _search.dispose();
     _scrollController.dispose();
+    _navScrollController.dispose();
     super.dispose();
   }
 
@@ -86,63 +95,85 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
     );
     final controller = ref.read(settingsControllerProvider.notifier);
     final wide = MediaQuery.sizeOf(context).width >= 900;
+    final visible = _sections.where(_visible).toList();
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SettingsNavRail(
-          sections: _sections.where(_visible).toList(),
-          selected: _section,
-          wide: wide,
-          onSelected: _goTo,
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SettingsPaneHeader(
-                searchController: _search,
-                query: _query,
-                section: _section,
-                onQueryChanged: _onSearchChanged,
-                onResetSection: () =>
-                    confirmReset(all: false, currentSection: _section),
-                onResetAll: () =>
-                    confirmReset(all: true, currentSection: _section),
-              ),
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification is ScrollUpdateNotification ||
-                        notification is ScrollEndNotification) {
-                      _syncSectionWithScroll();
-                    }
-                    return false;
-                  },
-                  child: SingleChildScrollView(
-                    key: _scrollViewKey,
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(
-                      CompactTokens.pageGutter,
-                      CompactTokens.space8,
-                      CompactTokens.pageGutter,
-                      CompactTokens.pageGutter,
-                    ),
-                    child: _body(
-                      context,
-                      settings,
-                      controller,
-                      libraryReady: library.$1,
-                      scanning: library.$2,
-                      clearing: library.$3,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    final header = SettingsPaneHeader(
+      searchController: _search,
+      query: _query,
+      section: _section,
+      onQueryChanged: _onSearchChanged,
+      onResetSection: () => confirmReset(all: false, currentSection: _section),
+      onResetAll: () => confirmReset(all: true, currentSection: _section),
+    );
+    final body = Expanded(
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          if (notification is ScrollUpdateNotification ||
+              notification is ScrollEndNotification) {
+            _syncSectionWithScroll();
+          }
+          return false;
+        },
+        child: SingleChildScrollView(
+          key: _scrollViewKey,
+          controller: _scrollController,
+          padding: const EdgeInsets.fromLTRB(
+            CompactTokens.pageGutter,
+            CompactTokens.space8,
+            CompactTokens.pageGutter,
+            CompactTokens.pageGutter,
+          ),
+          child: _body(
+            context,
+            settings,
+            controller,
+            libraryReady: library.$1,
+            scanning: library.$2,
+            clearing: library.$3,
           ),
         ),
-      ],
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 手机形态（页宽 < 600）：左边那条图标栏换成一排横着走的 chip，
+        // 正文拿回整条宽度；桌面窗口再窄也还是左侧栏。
+        final phone = constraints.maxWidth < LayoutBreakpoints.phoneMaxWidth;
+        if (phone) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              SettingsNavStrip(
+                sections: visible,
+                selected: _section,
+                onSelected: _goTo,
+                controller: _navScrollController,
+                itemKeys: _navKeys,
+              ),
+              body,
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SettingsNavRail(
+              sections: visible,
+              selected: _section,
+              wide: wide,
+              onSelected: _goTo,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [header, body],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -202,6 +233,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
 
   void _goTo(SettingsSection section) {
     setState(() => _section = section);
+    _revealSection(section);
     _programmaticScroll = true;
     final done = settingsScrollToSection(
       controller: _scrollController,
@@ -217,6 +249,22 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
     });
   }
 
+  /// Walks the phone's chip row to the section the body settled on.
+  ///
+  /// 这只是让高亮留在视野里：等这一帧画完再滚动，按的是新的宽度与位置。
+  void _revealSection(SettingsSection section) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final target = _navKeys[section]?.currentContext;
+      if (target == null) return;
+      Scrollable.ensureVisible(
+        target,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 200),
+      );
+    });
+  }
+
   /// Makes the left rail follow the section under the top of the page.
   void _syncSectionWithScroll() {
     if (!mounted || _programmaticScroll || _query.isNotEmpty) return;
@@ -228,6 +276,7 @@ class _SettingsPaneState extends ConsumerState<SettingsPane>
     );
     if (next != null && next != _section) {
       setState(() => _section = next);
+      _revealSection(next);
     }
   }
 
