@@ -9,6 +9,7 @@ import 'package:tune/domain/models/library_filter.dart';
 import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/application/library_controller.dart';
 import 'package:tune/features/library/domain/library_state.dart';
+import 'package:tune/features/library/presentation/library_group_rows.dart';
 import 'package:tune/features/library/presentation/library_pane.dart';
 import 'package:tune/features/shell/presentation/compact_shell.dart';
 import 'package:tune/l10n/app_localizations.dart';
@@ -233,6 +234,29 @@ void main() {
     expect(find.byKey(const ValueKey('library-group-back')), findsOneWidget);
     expect(find.text('Album A first'), findsOneWidget);
   });
+
+  testWidgets('a row does not write its artist twice', (tester) async {
+    sizeOf(tester, const Size(1120, 760));
+
+    await tester.pumpWidget(
+      app(
+        home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        controller: _SameNameController.new,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The album names itself after its artist: one line, not two. The
+    // tooltip repeats the name for pointers, so only the row's own text
+    // counts here.
+    expect(
+      find.descendant(
+        of: find.byType(LibraryGroupRows),
+        matching: find.text('0114 Ligaya'),
+      ),
+      findsOneWidget,
+    );
+  });
 }
 
 /// A library whose album rows hold no tracks: the row still names the album,
@@ -242,4 +266,27 @@ class _EmptyAlbumController extends FakeLibraryController {
 
   @override
   Future<List<Song>> albumSongs(String key) async => const [];
+}
+
+/// A library whose one album carries the same words as its artist.
+const _sameNameSeed = LibraryState(
+  filter: LibraryFilter.songs,
+  songs: [
+      Song(
+        id: 1,
+        uri: 'tune://internet_archive/ligaya',
+        title: 'Ligaya',
+        artist: '0114 Ligaya',
+        album: '0114 Ligaya',
+        duration: 200000,
+      sourceId: 'community_music',
+    ),
+  ],
+  total: 1,
+);
+
+class _SameNameController extends FakeLibraryController {
+  // The seed is the one this test needs, not the helper's default list.
+  // ignore: unused_element_parameter
+  _SameNameController(LibraryState seed) : super(_sameNameSeed);
 }

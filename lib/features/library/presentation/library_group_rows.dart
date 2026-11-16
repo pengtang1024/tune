@@ -107,6 +107,10 @@ class _GroupRow extends StatelessWidget {
         : album.artist.isEmpty
         ? context.loc.playerUnknownArtist
         : album.artist;
+    // A single that names itself after its artist would print the same words
+    // twice; the second line is dropped rather than repeated.
+    final showArtist =
+        artist.toLowerCase() != name.toLowerCase() || album.hasMultipleArtists;
 
     return TuneTooltip(
       message: name,
@@ -152,15 +156,17 @@ class _GroupRow extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          artist,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                        if (showArtist) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            artist,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
