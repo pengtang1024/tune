@@ -103,11 +103,11 @@ def publish_asset(platform, token, release_id, archive, asset_name, upload_url=N
         )
         return status in (200, 201) or fail(f"gitea 上传失败 HTTP {status}: {body[:200]!r}")
 
-    # Gitee：multipart 字段名固定 attach_files；配额满时只警告，不阻塞发版。
+    # Gitee：multipart 字段名必须是 file（docs/updates.md 记过这条）；配额满时只警告，不阻塞发版。
     boundary = uuid.uuid4().hex
     payload = (
         f"--{boundary}\r\n"
-        f'Content-Disposition: form-data; name="attach_files"; filename="{asset_name}"\r\n'
+        f'Content-Disposition: form-data; name="file"; filename="{asset_name}"\r\n'
         "Content-Type: application/octet-stream\r\n\r\n"
     ).encode() + open(archive, "rb").read() + f"\r\n--{boundary}--\r\n".encode()
     status, body = http(
@@ -120,7 +120,7 @@ def publish_asset(platform, token, release_id, archive, asset_name, upload_url=N
     )
     if status in (200, 201):
         return True
-    if status == 403 and "配额" in body.decode("utf-8", "replace"):
+    if status in (400, 403) and "配额" in body.decode("utf-8", "replace"):
         print("  gitee: 附件配额已满，release 只留正文与源码包（不阻塞）")
         return True
     return fail(f"gitee 上传失败 HTTP {status}: {body[:200]!r}")
