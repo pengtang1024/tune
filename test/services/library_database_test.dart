@@ -939,5 +939,32 @@ void main() {
       await storage.clear();
       expect(await storage.load(), isEmpty);
     });
+  
+  test('a row stored before the naming rule is repaired when the table opens', () async {
+    final directory = await Directory.systemTemp.createTemp('tune-naming');
+    addTearDown(() => directory.delete(recursive: true));
+    final path = '${directory.path}/library.db';
+
+    var database = AppDatabase.open(path);
+    database.save([
+      const Song(
+        id: 9001,
+        uri: 'file:///music/elgar-01.mp3',
+        title: '01 Theme, I. C.A.E.',
+        artist: '',
+        album: 'Edward ELGAR - Enigma Variations',
+        duration: 200000,
+        sourceId: 'community_classical',
+      ),
+    ]);
+    database.close();
+
+    database = AppDatabase.open(path);
+    addTearDown(database.close);
+    final track = database.load().single;
+
+    expect(track.artist, 'Edward ELGAR');
+    expect(track.album, 'Enigma Variations');
   });
+});
 }

@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "version": "1.35.0",
-  "build": 60,
-  "released_at": "2026-11-16T07:25:54Z",
-  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.0",
-  "notes": "### 变更\n\n- **桌面播放后端改为直接对接 `media_kit` / libmpv**：此前隔着一层 `just_audio` +\n  `just_audio_media_kit`，底层播放器与属性设置都在私有字段里，缓存策略只能沿用\n  别人的默认值（media_kit 硬开 `cache-on-disk=yes`，而 mpv 0.41 的\n  `--demuxer-cache-dir` 默认空串，于是每开一个网络流就打印一条\n  `Failed to create file cache`，磁盘缓存一次也没建成）。现在缓存策略由\n  `MpvPolicy`（`lib/data/services/mpv_policy.dart`）声明、在初始化时逐条落到\n  mpv 上：只用内存缓存 8 MiB，磁盘缓存显式关闭。移动端仍走 `just_audio`，\n  两条实现共用同一个 `AudioPlayerService` 接口。\n- **音源命名归一化**（`lib/data/services/music_sources/track_naming.dart`）：上传者\n  常把同一份事实写两遍——专辑写成 `Edward ELGAR - Enigma Variations` 而艺术家空着、\n  标题写成 `Handel, Messiah - 103 …` 而艺术家列已有。现在在取数边界做一次归一化：\n  艺术家缺失时依次用条目的 `creator`、专辑里 `艺术家 - 作品` 的前半段补齐；专辑与\n  标题里重复的艺术家前缀去掉。只在能确认是同一个事实时才动手（前缀须与艺术家名对得上、\n  剩下的一半非空、纯编号不算艺术家）。已有曲目在下一次扫描对应实例时重写。\n\n### 文档与工程\n\n- `docs/source-extension.md` 新增 §6.5，写清四条归一化规则与生效时机；\n  `docs/troubleshooting.md` 的 `lavf: Failed to create file cache` 一节改为「已由\n  `MpvPolicy` 消除」的口径，保留系统 mpv 的复现命令作为这段历史的证据。\n- `tool/check.sh --tools` 的门禁照旧；新增 `test/services/mpv_policy_test.dart`、\n  `test/services/track_naming_test.dart`，Internet Archive 适配器补两条端到端用例\n  （拆专辑名、去标题重复前缀），另有一条 `media_kit_cache_live_test.dart` 走真实\n  libmpv 与网络，按 `live` 命名不进确定性门禁。",
+  "version": "1.35.1",
+  "build": 61,
+  "released_at": "2026-11-16T07:36:58Z",
+  "release_url": "https://github.com/pengtang1024/tune/releases/tag/v1.35.1",
+  "notes": "### 修复\n\n- **升级后旧曲目仍显示「未知艺术家」**：命名归一化原本只在取数时生效，1.35.0 之前\n  入库的行保留旧名字。现在打开数据库时会把「艺术家为空、专辑写着『艺术家 - 作品』」\n  的行补齐一次（`songs.artist = '' AND instr(album, ' - ') > 0`，补完条件自然为空，\n  后续打开零代价），写回标题、艺术家、专辑与排序键，并同步 `json` 列。",
   "min_supported": "",
   "assets": {
     "linux-x64": {
-      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.0/tune-linux-x64-1.35.0.tar.gz",
-      "size": 53672678,
-      "sha256": "a2f5ea780c778c5cc96e46bbcf1fdbe25c44a57050b86ad7b97ebc633d82c996"
+      "url": "https://github.com/pengtang1024/tune/releases/download/v1.35.1/tune-linux-x64-1.35.1.tar.gz",
+      "size": 53672332,
+      "sha256": "ee83beb577606cf69c619b2535bad7d493c2c5a68534141fc08a27cedc370689"
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/domain/models/song_facts.dart';
 import 'package:tune/data/services/database/library_query.dart';
 import 'package:tune/data/services/database/library_filter_sql.dart';
+import 'package:tune/data/services/music_sources/track_naming.dart';
 import 'package:tune/data/services/database/translation_tables.dart';
 import 'package:tune/domain/models/album_summary.dart';
 import 'package:tune/domain/models/content_kind.dart';
@@ -225,6 +226,7 @@ class AppDatabase {
     // is named 'local', and every row that belongs to it says so from now on.
     db.execute("UPDATE songs SET source_id = 'local' WHERE source_id IS NULL");
     if (added.contains('title_sort')) _backfillTitleSort(db);
+    _repairTrackNaming(db);
     if (added.contains('language') ||
         added.contains('format') ||
         added.contains('duration')) {
@@ -278,6 +280,55 @@ class AppDatabase {
   /// This runs inside [open], so the one run of it is a one-time pause on the
   /// first start with an older database — a few hundred rows cost nothing, a
   /// library of fifty thousand rows pauses once and never again.
+  /// 取数时的命名规则（`track_naming.dart`）只在扫描时生效，升级前入库的行
+  /// 还是旧名字：艺术家空着、专辑里写着「艺术家 - 作品」。
+  ///
+  /// 这里把存量的那部分补齐一次。范围由 WHERE 收窄成一个自限的条件——
+  /// 补过之后 artist 不再为空，下次打开这条查询就返回空，不再有代价。
+  static void _repairTrackNaming(Database db) {
+    final rows = db.select(
+      "SELECT uri, title, artist, album, json FROM songs "
+      "WHERE artist = '' AND instr(album, ' - ') > 0",
+    );
+    if (rows.isEmpty) return;
+    db.execute('BEGIN');
+    try {
+      final statement = db.prepare(
+        'UPDATE songs SET title = ?, artist = ?, album = ?, title_sort = ?, '
+        'json = ? WHERE uri = ?',
+      );
+      try {
+        for (final row in rows) {
+          final naming = normalizeTrackNaming(
+            title: row['title'] as String? ?? '',
+            artist: row['artist'] as String? ?? '',
+            album: row['album'] as String? ?? '',
+          );
+          if (naming.artist.isEmpty) continue;
+          final document =
+              jsonDecode(row['json'] as String) as Map<String, dynamic>;
+          document['title'] = naming.title;
+          document['artist'] = naming.artist;
+          document['album'] = naming.album;
+          statement.execute([
+            naming.title,
+            naming.artist,
+            naming.album,
+            foldText(naming.title),
+            jsonEncode(document),
+            row['uri'] as String,
+          ]);
+        }
+      } finally {
+        statement.close();
+      }
+      db.execute('COMMIT');
+    } catch (error) {
+      db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
   static void _backfillTitleSort(Database db) {
     final rows = db.select("SELECT uri, title FROM songs WHERE title_sort = ''");
     if (rows.isEmpty) return;
