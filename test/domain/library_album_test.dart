@@ -6,6 +6,19 @@ import 'package:tune/domain/models/song.dart';
 import 'package:tune/features/library/domain/library_album.dart';
 
 void main() {
+
+Song songOf(String album, String artist, {required String uri, String source = 'community_music'}) {
+  return Song(
+    id: uri.hashCode,
+    uri: 'tune://$source/$uri',
+    title: 'Track $uri',
+    artist: artist,
+    album: album,
+    duration: 180000,
+    sourceId: source,
+  );
+}
+
   test('the tracks of an album are grouped and ordered by the album', () {
     const songs = [
       Song(
@@ -457,5 +470,34 @@ void main() {
 
       expect(albumSummaryOf([card], song), isNull);
     });
+  });
+
+  test('one album name from one source is one row, whatever the artists', () {
+    // A compilation names a different performer on every track. Grouping by
+    // artist would print the album title once per composer.
+    final songs = [
+      songOf('100 Masterpieces Vol. 2', 'Bach', uri: 'a'),
+      songOf('100 Masterpieces Vol. 2', 'Vivaldi', uri: 'b'),
+      songOf('100 Masterpieces Vol. 2', '', uri: 'c'),
+    ];
+
+    final groups = libraryAlbumGroupsOf(songs);
+
+    expect(groups, hasLength(1));
+    expect(groups.single.name, '100 Masterpieces Vol. 2');
+    expect(groups.single.trackCount, 3);
+    expect(groups.single.hasMultipleArtists, isTrue);
+    expect(groups.single.artist, isEmpty);
+  });
+
+  test('the same album name from two sources stays two rows', () {
+    final songs = [
+      songOf('Nocturnes', 'A', uri: 'a', source: 'community_music'),
+      songOf('Nocturnes', 'B', uri: 'b', source: 'netlabels'),
+    ];
+
+    final groups = libraryAlbumGroupsOf(songs);
+
+    expect(groups, hasLength(2));
   });
 }

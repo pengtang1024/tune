@@ -102,7 +102,9 @@ class _GroupRow extends StatelessWidget {
     final name = album.name.isEmpty
         ? context.loc.libraryUnknownAlbum
         : album.name;
-    final artist = album.artist.isEmpty
+    final artist = album.hasMultipleArtists
+        ? context.loc.libraryVariousArtists
+        : album.artist.isEmpty
         ? context.loc.playerUnknownArtist
         : album.artist;
 

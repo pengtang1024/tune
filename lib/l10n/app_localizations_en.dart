@@ -348,10 +348,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryOpenAlbum => 'Open album';
 
   @override
-  String get libraryUnknownAlbum => 'Unknown album';
+  String get libraryVariousArtists => 'Various artists';
 
   @override
-  String get libraryVariousArtists => 'Various artists';
+  String get libraryUnknownAlbum => 'Unknown album';
 
   @override
   String get queueTitle => 'Queue';

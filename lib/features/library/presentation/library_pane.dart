@@ -495,7 +495,7 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     // to the plain track table.
     final layout = libraryLayoutForKinds(library.filter.kinds);
     final groupingLabel = layout.groupingLabel;
-    final groups = libraryAlbumsOf(songs);
+    final groups = libraryAlbumGroupsOf(songs);
     if (!layout.grouped || groupingLabel == null || groups.isEmpty) {
       return _flatTrackList(
         library,
@@ -534,18 +534,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   }
 
   /// Opens the tracks of one row of the group list.
-  Future<void> _openGroup(LibraryAlbum group) {
-    return _openAlbumByKey(
-      AlbumSummary(
-        key: group.key,
-        name: group.name,
-        artist: group.artist,
-        trackCount: group.trackCount,
-        coverPath: group.coverPath,
-        coverUrl: group.coverUrl,
-        kind: group.kind,
-      ),
-    );
+  Future<void> _openGroup(LibraryAlbum group) async {
+    // The row already holds its tracks: grouping ignores the artist, so the
+    // album key the database knows about would find only the tracks of one
+    // performer out of a compilation.
+    setState(() => _openAlbum = group);
   }
 
   /// The row that goes back from one group's tracks to the group list.
@@ -739,19 +732,6 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
     return true;
   }
 
-  /// Reads the tracks of an album and opens it.
-  ///
-  /// An album without tracks — a card whose only entries lie outside the
-  /// library, or one the query no longer finds — is not opened: a page with
-  /// no tracks would be blank, and the reader keeps the list they were on.
-  Future<void> _openAlbumByKey(AlbumSummary summary) async {
-    final songs = await ref
-        .read(libraryControllerProvider.notifier)
-        .albumSongs(summary.key);
-    if (!mounted || songs.isEmpty) return;
-    setState(() => _openAlbum = _albumOf(summary, songs));
-  }
-
   /// Opens the album a track belongs to, from the album column.
   ///
   /// The track may sit outside the grouping the list shows (an album without
@@ -760,21 +740,11 @@ class _LibraryPaneState extends ConsumerState<LibraryPane> {
   Future<void> _openAlbumOfSong(Song song) async {
     final library = ref.read(libraryControllerProvider).valueOrNull;
     if (library == null) return;
-    final summary = albumSummaryOf(library.albums, song);
-    if (summary == null) return;
-    await _openAlbumByKey(summary);
-  }
-
-  LibraryAlbum _albumOf(AlbumSummary summary, List<Song> songs) {
-    return LibraryAlbum(
-      key: summary.key,
-      name: summary.name,
-      artist: summary.artist,
-      kind: summary.kind,
-      songs: songs,
-      coverPath: summary.coverPath,
-      coverUrl: summary.coverUrl,
-    );
+    // The row the list shows is grouped by album and source; read the group
+    // off the same list the reader is looking at so the click lands on it.
+    final group = libraryGroupOf(library.songs, song);
+    if (group == null) return;
+    await _openGroup(group);
   }
 
   void _showAllSongs() {

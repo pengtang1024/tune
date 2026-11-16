@@ -55,7 +55,9 @@ class LibraryAlbum {
   bool get hasMultipleArtists {
     final artists = <String>{};
     for (final song in songs) {
-      artists.add(song.artist.trim().toLowerCase());
+      final artist = song.artist.trim().toLowerCase();
+      if (artist.isEmpty) continue;
+      artists.add(artist);
       if (artists.length > 1) return true;
     }
     return false;
@@ -108,6 +110,80 @@ List<LibraryAlbum> libraryAlbumsOf(List<Song> songs) {
     return compareText(left.artist, right.artist);
   });
   return albums;
+}
+
+/// Groups the tracks of a library into the rows of the group list.
+///
+/// One row is one album of one source: the name and the source decide, not
+/// the artist. A compilation names a different performer on every track, so
+/// grouping by artist would turn one album into as many rows as it has
+/// composers — the reader then sees the same album title repeated down the
+/// list, which is the opposite of a group row.
+List<LibraryAlbum> libraryAlbumGroupsOf(List<Song> songs) {
+  final groups = <String, List<Song>>{};
+  final spoken = <Song>[];
+  for (final song in songs) {
+    final kind = contentKindOf(song);
+    if (kind == ContentKind.radio) continue;
+    if (kind.isSpokenWord) {
+      spoken.add(song);
+      continue;
+    }
+    groups.putIfAbsent(_groupKeyOf(song), () => []).add(song);
+  }
+  for (final show in spokenAlbumsOf(spoken)) {
+    groups.putIfAbsent(show.key, () => [])
+        .addAll(show.songs);
+  }
+
+  final albums = <LibraryAlbum>[
+    for (final group in groups.entries) _groupOf(group.value, key: group.key),
+  ];
+  albums.sort((left, right) {
+    if (left.name.isEmpty != right.name.isEmpty) {
+      return left.name.isEmpty ? 1 : -1;
+    }
+    final byName = compareText(left.name, right.name);
+    if (byName != 0) return byName;
+    return compareText(left.artist, right.artist);
+  });
+  return albums;
+}
+
+/// The key a group row is grouped by: the album name and where it came from.
+String _groupKeyOf(Song song) {
+  final name = normalizedAlbumName(song.album);
+  final source = song.sourceId ?? 'local';
+  return '$name\u0000$source';
+}
+
+/// Builds one group row out of its tracks.
+LibraryAlbum _groupOf(List<Song> songs, {required String key}) {
+  final artists = <String>{};
+  for (final song in songs) {
+    final artist = song.artist.trim();
+    if (artist.isNotEmpty) artists.add(artist);
+  }
+  final album = _albumOf(songs, key: key);
+  return LibraryAlbum(
+    key: key,
+    name: album.name,
+    artist: artists.length == 1 ? artists.single : '',
+    coverPath: album.coverPath,
+    coverUrl: album.coverUrl,
+    songs: album.songs,
+    kind: album.kind,
+  );
+}
+
+/// The group row of [songs] that holds [song], if the list has one.
+LibraryAlbum? libraryGroupOf(Iterable<Song> songs, Song song) {
+  for (final group in libraryAlbumGroupsOf(songs.toList())) {
+    for (final track in group.songs) {
+      if (track.uri == song.uri) return group;
+    }
+  }
+  return null;
 }
 
 /// The key the album of [song] is grouped by.

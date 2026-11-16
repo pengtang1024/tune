@@ -212,7 +212,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('an album the list cannot read keeps the rows on screen', (
+  testWidgets('a row brings its own tracks, so it never opens blank', (
     tester,
   ) async {
     sizeOf(tester, const Size(1120, 760));
@@ -220,6 +220,8 @@ void main() {
     await tester.pumpWidget(
       app(
         home: const CompactShell(currentPath: '/library', child: LibraryPane()),
+        // This controller answers nothing for an album key: the rows still
+        // open, because a row carries the tracks it was built from.
         controller: _EmptyAlbumController.new,
       ),
     );
@@ -228,10 +230,8 @@ void main() {
     await tester.tap(find.text('Album A').first);
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('library-group-back')), findsNothing);
-    expect(find.text('Album A'), findsOneWidget);
-    expect(find.text('Album B'), findsOneWidget);
-    expect(tester.takeException(), isNull);
+    expect(find.byKey(const ValueKey('library-group-back')), findsOneWidget);
+    expect(find.text('Album A first'), findsOneWidget);
   });
 }
 
