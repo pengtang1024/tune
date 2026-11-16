@@ -1,12 +1,14 @@
 # 音乐均衡器
 
-> 状态：设计（已实施） · 适用版本 1.40.0 · 最后核对 2026-11-16
+> 状态：设计（已实施） · 适用版本 1.41.0 · 最后核对 2026-11-16
 >
 > 2026-11-16 立项。回答「桌面播放器怎么加 10 段均衡器：界面、状态与音频后端各归谁」。
 > `AGENTS.md` §4 曾把均衡器列为 v1 之外；读者 2026-11-16 明确要求增加，这一版按本方案实施，§4 那一行随之改成「已实施」。
 > 结论：桌面走 media_kit / libmpv 的 `af` 属性挂 ffmpeg 均衡器链；移动端本轮不做。
 >
 > 2026-11-16 增补（1.40.0）：可以把当前曲线存成自己的预设，名字与增益一起落盘；自存曲线与内置曲线同表参与高亮，内置优先。
+>
+> 2026-11-16 增补（1.41.0）：步进改为 0.5 dB 且允许键入数值；十个频段共用一档带宽（1 / 2⁄3 / 1⁄2 / 1⁄3 倍频程）；预放可手动覆盖。三项都只存在于完整编辑器，快捷面板仍是开关 + 四组曲线。
 
 ## 目录
 
@@ -27,9 +29,10 @@
 
 ## 目标与非目标
 
-- 10 段 ISO 中心频率，增益 ±12 dB，步进 1 dB；
+- 10 段 ISO 中心频率，增益 ±12 dB，步进 0.5 dB，可键入到 0.1 dB；
 - 12 个内置预设 + 自存预设 + 自定义；预设是查找表，不是第二份状态；
 - 开关即旁路：关闭后 mpv 上不留任何均衡器滤镜；
+- 频段宽度、预放（自动或手动）可调，与曲线一起落盘；
 - 拖动即时生效，重启恢复；换歌、暂停、seek 都不重挂滤镜；
 - 一套面板，三个入口：底栏、正在播放页、设置「播放」卡；
 - Linux 桌面验收；Windows 共用同一后端，未真机验收前不写成已验收。
@@ -93,13 +96,14 @@ set_property af "" → success（清空）
 | 9 | 8 kHz | 1 octave |
 | 10 | 16 kHz | 1 octave |
 
-- 增益 `-12.0`–`+12.0` dB，步进 `1.0`；`enabled` 默认 `false`；`gains` 长度固定 10。
+- 增益 `-12.0`–`+12.0` dB，步进 `0.5`；`enabled` 默认 `false`；`gains` 长度固定 10。面板滑块 48 格（24 dB ÷ 0.5），点增益数字可以键入数值，读到的小数按 0.5 吸附（`clampGain`）。
 - 存 `enabled`、`gains` 与 `userPresets`；当前值命中哪组就高亮哪组，否则显示「自定义」。
 - `userPresets` 是读者自己存的曲线：`[{"id": "user-<微秒>", "name": "...", "gains": [...]}]`，可空、可缺省（旧文件读进来就是空表，不迁移、不改 `version`）。
 - 命中顺序：先 12 组内置曲线，再按顺序比自存曲线；同一根曲线既像内置又像自存时显示内置名——内置说法不因读者存了一份副本而改名。
 - 同名再存是覆盖那一条的增益，id 不变；删掉正在用的曲线只动预设表，增益原样留着，于是回落到「自定义」。
 - 读取时按长度、范围、NaN 归一；版本不认识就回默认，不抛异常——坏偏好不能拦住启动。
-- 预放是派生值：`preampDb = -max(0, max(gains))`，用来抵消提升段带来的削波；不写进 JSON，也不进 UI 状态。
+- 频段宽度 `bandWidth`：十个频段共用一档，取值只有 `1`、`2/3`、`1/2`、`1/3` 倍频程（`EqualizerSettings.bandWidths`，写入前经 `clampBandWidth` 吸附）。等于 `1` 是默认值，不写进 JSON。
+- 预放默认是派生值 `preampDb = -max(0, max(gains))`，用来抵消提升段带来的削波；读者可以手动覆盖成 `-24`–`0` 的整 dB 值（`preampOverrideDb`，经 `clampPreamp` 取整并夹紧），此时才写进 JSON 的 `preampDb`。`copyWith(useAutoPreamp: true)` 回到自动。
 
 ```json
 {
@@ -108,11 +112,14 @@ set_property af "" → success（清空）
   "gains": [7, 6, 4, 1, 0, -1, 0, 1, 3, 3],
   "userPresets": [
     {"id": "user-1731763200123456", "name": "我的低音", "gains": [7, 6, 4, 1, 0, -1, 0, 1, 3, 3]}
-  ]
+  ],
+  "bandWidth": 0.5,
+  "preampDb": -9
 }
 ```
 
 - 没存过曲线时 `userPresets` 整个字段不写，文件形状与 1.39.0 一致。
+- `bandWidth` 只在不是 1 倍频程时写；`preampDb` 只在手动覆盖时写。旧文件读回来两者都取默认（1 倍频程、自动预放），不迁移、不改 `version`。
 
 预设曲线（代码常量 `EqualizerPresets`；改曲线不改 schema）。1.37.3 起 12 组，`quick` 是快捷面板给的那四组：
 
@@ -152,6 +159,8 @@ abstract class AudioEqualizerBackend {
 lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000:width_type=o:width=1:g=3]
 ```
 
+- `width` 是倍频程数，跟着 `settings.bandWidth` 走：1 → `1`、2⁄3 → `0.667`、1⁄2 → `0.5`、1⁄3 → `0.333`（`MpvEqualizerFilter._octaves` 取三位小数）。十个频段共用同一档。
+
 - 启动探测：`init()` 之后写一次 `af='lavfi=[volume=0dB]'` 再清空。失败只记一次日志并把后端置空，界面据此隐藏入口，播放不受影响。
 - 写入串行化：同一时刻最多一个 `setProperty` 在飞，只保留最新一份待写；拖动时节流 100 ms（每秒最多 10 次重建滤镜链）。
 - 换曲、seek、暂停都不重挂：`af` 是播放器属性，下一首沿用；后端重新 `init()` 时用缓存的最新设置重放一次。
@@ -189,13 +198,16 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | 面板 | 谁打开 | 内容 |
 | --- | --- | --- |
 | 快捷面板 `EqualizerQuickSheet` | 底栏「更多」菜单、正在播放页顶栏 | 标题 + 开关 + 4 个常用曲线（平坦 / 流行 / 摇滚 / 重低音）；手动改过的曲线追加高亮的「自定义」；底部一行小字指向设置（`equalizerQuickHint`） |
-| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「存为预设」「重置」+ 12 个内置 chips + 自存 chips（带删除标记）+ 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
+| 完整编辑器 `EqualizerEditorSheet` | 设置 › 播放 › 均衡器 | 标题 + 开关 + 「存为预设」「重置」+ 12 个内置 chips + 自存 chips（带删除标记）+ 频段宽度 chips + 预放（自动/手动 + 滑杆）+ 10 个竖向滑块 + 底部预放说明（`equalizerHint`） |
 
 - 为什么分两层：底栏和正在播放页顶栏只有几百像素，十个滑块加十二枚 chip 会跟播放控件抢空间；听歌时选曲线本来也只需要「按心情点一下」。
 - 快捷面板用 `EqualizerPresets.quick`，编辑器用 `EqualizerPresets.all`；两张表都在 model 里，面板不自己写一份。
 - 关闭状态：两个面板的控件仍可改，灰显但不锁死；读者可以先调曲线再打开开关。
 - 后端不可用：两个面板照常打开，控件置灰且不回调，顶部写 `equalizerUnavailable`。
-- 编辑器里的滑块中心 0 dB，上 +12、下 -12，拖动时在滑轨上显示当前 dB。
+- 编辑器里的滑块中心 0 dB，上 +12、下 -12，48 格（0.5 dB 一格），拖动时在滑轨上显示当前 dB；小数按 1 位显示（+3.5 dB），整数不带小数点。
+- 点频段上方的 dB 数字弹出 `AlertDialog` 直接键入数值：解析失败或超范围就留在对话框里提示 `equalizerGainDialogHint`，合法值按 0.5 吸附后立刻下发。
+- 频段宽度在 chips 行下面单列一排，四档（1 / 2⁄3 / 1⁄2 / 1⁄3 倍频程），按 `EqualizerSettings.bandWidths` 顺序画；当前档高亮。十个频段共用一档，不是每段单独设。
+- 预放是一个开关加一条滑杆：默认「跟随最大增益」（自动，滑杆不显示），切到手动后露出 -24–0 dB 滑杆，取整 dB；改回自动即清掉覆盖值。
 - 「存为预设」弹出 `AlertDialog` 要一个名字（去空白后为空就不存）；存下的曲线立刻以 `InputChip` 出现在 chips 行，点击即应用，右侧 × 删除。面板自己记住刚存下的 id，所以不必重开面板。
 - 自存曲线的名字是数据，直接当 chip 文字；内置曲线仍走 ARB。设置行副标题对两者都显示名字（`equalizerCurrentPresetLabel`）。
 
@@ -222,6 +234,14 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 | `equalizerSavePreset` | 存为预设 | 编辑器标题行的保存按钮，也是命名对话框的标题 |
 | `equalizerPresetName` | 预设名称 | 命名对话框的输入框 |
 | `equalizerPresetDelete` | 删除预设 | 自存 chip 删除标记的 tooltip |
+| `equalizerBandWidth` | 频段宽度 | 宽度选择器标题 |
+| `equalizerBandWidthHint` | 越窄，一个频段影响的频率范围越小 | 宽度选择器说明 |
+| `equalizerWidthOne` / `TwoThirds` / `Half` / `Third` | 1 倍频程 / 2⁄3 倍频程 / 1⁄2 倍频程 / 1⁄3 倍频程 | 四个宽度 chip |
+| `equalizerPreamp` | 预放 | 预放开关标题 |
+| `equalizerPreampAuto` / `Manual` | 跟随最大增益 / 手动 | 预放开关的副标题 |
+| `equalizerPreampHint` | 手动调低一点，音量大时更少削波 | 手动预放滑杆旁的说明 |
+| `equalizerGainDialogTitle` | 设置增益 | 键入数值对话框标题 |
+| `equalizerGainDialogHint` | 以 0.5 dB 为一步 | 键入数值对话框的输入提示与错误提示 |
 | `equalizerHint` | 提升的频段会用等量预放抵消，避免削波 | 编辑器底部说明 |
 | `equalizerQuickHint` | 更细的频段和全部预设见 设置 › 播放 | 快捷面板底部说明 |
 | `equalizerGainDb(value)` | {value} dB | 滑块值与语义标签 |
@@ -238,18 +258,19 @@ lavfi=[volume=-4dB,equalizer=f=31:width_type=o:width=1:g=4,…,equalizer=f=16000
 
 单测：
 
-- `test/domain/equalizer_settings_test.dart`：JSON 往返、长度/范围/NaN 归一、未知版本回默认、预设命中与 `custom`、预放；自存预设的存取/覆盖/删除、坏条目跳过、内置优先、`userPresets` 为空时不写字段。
-- `test/services/mpv_equalizer_filter_test.dart`：关闭 → 空；全 0 → 空；10 段顺序与 `width_type=o:width=1`；预放；固定样例与 IPC 实测图串一致。
-- `test/features/player/equalizer_controller_test.dart`：`FakePersistenceService` + 假后端；预设命中、400 ms 落盘防抖、值不变不写、`dispose` 补写、后端为 `null` 时不崩；存为预设后落盘能读回、空名不存、同名覆盖、删掉在用的预设回落 `custom`。
+- `test/domain/equalizer_settings_test.dart`：JSON 往返、长度/范围/NaN 归一、未知版本回默认、预设命中与 `custom`、预放；自存预设的存取/覆盖/删除、坏条目跳过、内置优先、`userPresets` 为空时不写字段；步进 0.5 吸附、`bandWidth` / `preampDb` 往返与「默认值不写盘」、`clampBandWidth` / `clampPreamp`、`withGain` 保留宽度与预放。
+- `test/services/mpv_equalizer_filter_test.dart`：关闭 → 空；全 0 → 空；10 段顺序与 `width_type=o:width=1`；预放；固定样例与 IPC 实测图串一致；四档宽度对应的 `width=0.5 / 0.667 / 0.333`、0.5 dB 小数增益、手动预放覆盖自动值。
+- `test/features/player/equalizer_controller_test.dart`：`FakePersistenceService` + 假后端；预设命中、400 ms 落盘防抖、值不变不写、`dispose` 补写、后端为 `null` 时不崩；存为预设后落盘能读回、空名不存、同名覆盖、删掉在用的预设回落 `custom`；`setBandWidth` 吸附后下发且值不变不下发、`setPreampOverride` 手动/回自动、宽度与预放落盘后重启读得回来。
 
 组件测试：
 
-- `test/shared/equalizer_sheet_test.dart`：快捷面板只画 4 个 chip、没有滑块与重置；编辑器画 12 个 chip 与 10 个滑块，拖动回落到正确频段；手动改动后显示「自定义」；后端不可用时两个面板都置灰且不回调；存为预设对话框回传去空白后的名字并画出 chip、回调给不出 id 时不画、自存 chip 的删除标记回调 id 并消失。
+- `test/shared/equalizer_sheet_test.dart`：快捷面板只画 4 个 chip、没有滑块与重置；编辑器画 12 个 chip 与 10 个滑块，拖动回落到正确频段；手动改动后显示「自定义」；后端不可用时两个面板都置灰且不回调；存为预设对话框回传去空白后的名字并画出 chip、回调给不出 id 时不画、自存 chip 的删除标记回调 id 并消失；滑块 48 格、点 dB 数字键入 3.7 回 3.5、非法输入留在对话框；宽度 chip 回报对应倍频程、预放开关切到手动才露出滑杆。
 - `test/shared/equalizer_entry_test.dart`：播放器入口 → 快捷面板的联动（`openEqualizerPanel` 读控制器与平台可用性）；预设与开关落回控制器、面板里不出现滑块；不可用平台仍能打开但只读。
 
 Linux 手测：
 
 - 本地曲目播放中拖 31 Hz 与 16 kHz，听感有变化，进度不跳、不中断；
+- 把宽度从 1 倍频程切到 1⁄3，提升 1 kHz 时听感更窄；手动预放拉到 -12 后整体变轻；
 - 切歌后设置仍在，关闭开关恢复原声；
 - 重启应用设置恢复，关面板再开值一致；
 - 读 `PlaybackController` 的音量：改均衡器不改变音量，MPRIS 音量不动。
@@ -269,6 +290,7 @@ Linux 手测：
 | M3 | 面板、滑块、三个入口、四份 ARB 与 gen-l10n | 组件测试绿，中英文不溢出 |
 | M4 | architecture 的状态归属/持久化表、README 与 AGENTS 收口、手测 | `check.sh` 全绿 + 手测清单 |
 | M5 | 自存预设：`userPresets` 落盘、存/删对话框与 chips、三处文案 | 领域与控制器用例绿，存下的曲线重启后还在 |
+| M6 | 细调维度：0.5 dB 步进与键入、共用频段宽度、手动预放（1.41.0） | 四个测试文件绿，宽度/预放重启后还在 |
 
 ## 风险与回滚
 
