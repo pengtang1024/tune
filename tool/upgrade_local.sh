@@ -72,6 +72,9 @@ echo "已升级到 $version，旧版本留在 $backup"
 if [[ "$restart" == "--restart" ]]; then
   pid="$(pgrep -f "$install_dir/tune" | head -1 || true)"
   if [[ -n "$pid" ]]; then kill "$pid"; sleep 2; fi
-  nohup "$install_dir/tune" >/tmp/tune-launch.log 2>&1 &
+  # 发版脚本在自己的 worktree 里跑，然后又把这个目录删掉：直接 nohup 拉起，
+  # 应用会继承一个已被删除的当前目录，读配置、读密钥全报 PathNotFound，
+  # 启动失败只剩一个空窗口。家目录稳定，先切过去再拉起。
+  ( cd "$HOME" && nohup "$install_dir/tune" >/tmp/tune-launch.log 2>&1 & )
   echo "已重启"
 fi
